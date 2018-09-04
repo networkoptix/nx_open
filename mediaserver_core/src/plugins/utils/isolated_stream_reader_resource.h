@@ -18,7 +18,7 @@ class IsolatedStreamReaderResource: public QnPlOnvifResource
 
 public:
 
-    IsolatedStreamReaderResource(QnCommonModule* commonModule);
+    IsolatedStreamReaderResource(QnMediaServerModule* serverModule);
 
     virtual bool hasProperty(const QString &key) const override;
     virtual QString getProperty(const QString &key) const override;

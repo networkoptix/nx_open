@@ -67,7 +67,7 @@ class QnMotionArchive: public QObject
 {
     Q_OBJECT
 public:
-    QnMotionArchive(QnNetworkResourcePtr resource, int channel);
+    QnMotionArchive(const QString& dataDir, QnNetworkResourcePtr resource, int channel);
     virtual ~QnMotionArchive();
     bool saveToArchive(QnConstMetaDataV1Ptr data);
     QnTimePeriodList matchPeriod(const QRegion& region, qint64 startTime, qint64 endTime, int detailLevel);
@@ -94,6 +94,7 @@ private:
 
     friend class QnMotionArchiveConnection;
 private:
+    QString m_dataDir;
     QnNetworkResourcePtr m_resource;
     int m_channel;
     QnSecurityCamResourcePtr m_camResource;

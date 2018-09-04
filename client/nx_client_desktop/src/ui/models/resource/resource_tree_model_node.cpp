@@ -259,7 +259,7 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
     if (m_initialized)
     {
         auto nodePtr = toSharedPointer();
-        NX_EXPECT(!nodePtr.isNull());
+        NX_ASSERT(!nodePtr.isNull());
         if (m_resource)
             manager()->removeResourceNode(nodePtr);
         m_resource = resource;

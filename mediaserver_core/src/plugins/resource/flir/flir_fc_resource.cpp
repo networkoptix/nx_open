@@ -20,7 +20,9 @@ namespace flir {
 
 const QString kDriverName = lit("FlirFC");
 
-FcResource::FcResource():
+FcResource::FcResource(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_ioManager(nullptr),
     m_callbackIsInProgress(false)
 {

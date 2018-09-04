@@ -149,7 +149,6 @@ void BasicTestFixture::startRelay(int index)
     m_relays.push_back(std::move(newRelay));
 }
 
-
 void BasicTestFixture::SetUp()
 {
     setUpPublicIpFactoryFunc();
@@ -222,7 +221,7 @@ void BasicTestFixture::restartMediator()
 void BasicTestFixture::assertConnectionCanBeEstablished()
 {
     m_clientSocket = SocketFactory::createStreamSocket();
-    auto clientSocketGuard = makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
+    auto clientSocketGuard = nx::utils::makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
     ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
 
     std::string targetAddress =

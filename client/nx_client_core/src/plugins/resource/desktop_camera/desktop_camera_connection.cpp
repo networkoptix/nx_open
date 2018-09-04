@@ -32,7 +32,7 @@ public:
     {
         for (int i = 0; i < 2; ++i)
         {
-            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()));
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()->metrics()));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
         }
@@ -153,8 +153,6 @@ void QnDesktopCameraConnectionProcessor::processRequest()
         // nothing to do. we restarting timer on any request
     }
     d->response.headers.insert(std::make_pair("cSeq", nx::network::http::getHeaderValue(d->request.headers, "cSeq")));
-    //QnMutexLocker lock( &d->sendMutex );
-    //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
 
 void QnDesktopCameraConnectionProcessor::disconnectInternal()

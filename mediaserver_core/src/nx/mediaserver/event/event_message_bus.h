@@ -6,7 +6,6 @@
 
 #include <common/common_module_aware.h>
 #include <nx_ec/impl/ec_api_impl.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -25,7 +24,6 @@ namespace event {
 
 class EventMessageBus:
     public QThread,
-    public Singleton<EventMessageBus>,
     public QnCommonModuleAware
 {
     Q_OBJECT

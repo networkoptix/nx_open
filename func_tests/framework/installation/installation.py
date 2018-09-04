@@ -1,12 +1,27 @@
 import logging
+import re
 from abc import ABCMeta, abstractmethod, abstractproperty
+from pprint import pformat
 
+from framework.installation.installer import InstallIdentity
 from framework.installation.service import Service
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 _logger = logging.getLogger(__name__)
+
+
+class NotInstalled(Exception):
+    pass
+
+
+class OsNotSupported(Exception):
+    def __init__(self, installation_cls, os_access):
+        assert issubclass(installation_cls, Installation)
+        super(OsNotSupported, self).__init__(
+            "{!r} is not supported on {!r}.".format(
+                installation_cls, os_access))
 
 
 class Installation(object):
@@ -21,13 +36,30 @@ class Installation(object):
         self._core_dumps_dirs = [dir / core_dumps_dir for core_dumps_dir in core_dumps_dirs]
         self._core_dump_glob = core_dump_glob  # type: str
 
-    @abstractproperty
+    def _build_info(self):
+        path = self.dir / 'build_info.txt'
+        try:
+            text = path.read_text(encoding='ascii')
+        except DoesNotExist as e:
+            raise NotInstalled(e)
+        parsed = dict(line.split('=', 1) for line in text.splitlines(False))
+        return parsed
+
     def identity(self):
-        pass
+        return InstallIdentity.from_build_info(self._build_info())
 
     @abstractmethod
     def install(self, installer):
         pass
+
+    def _can_install(self, installer):
+        return False
+
+    def choose_installer(self, installers):
+        for installer in installers:
+            if self._can_install(installer):
+                return installer
+        raise ValueError("{}: no suitable installer among: {}".format(self, pformat(installers)))
 
     @abstractmethod
     def is_valid(self):
@@ -82,22 +114,36 @@ class Installation(object):
             'tranLogLevel': 'DEBUG2',
             'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
             })
+        self.reset_default_cloud_host()
 
     def cleanup_core_dumps(self):
         _logger.info("Remove old core dumps.")
         for core_dump_path in self.list_core_dumps():
             core_dump_path.unlink()
 
-    class SpecificFeatures(object):
-        def __init__(self, items=[]):
-            self.items = set(items)
-
-        def __getattr__(self, name):
-            return name in self.items
-
     def specific_features(self):
         path = self.dir / 'specific_features.txt'
         try:
-            return self.SpecificFeatures(path.read_text(encoding='ascii').splitlines())
+            return path.read_text(encoding='ascii').splitlines()
         except DoesNotExist:
-            return self.SpecificFeatures()
+            return []
+
+    @abstractmethod
+    def ini_config(self, name):
+        pass
+
+    @abstractmethod
+    def _find_library(self, name):
+        """Similar to `ctypes.util.find_library()`."""
+        return FileSystemPath()
+
+    _cloud_host_regex = re.compile(br'this_is_cloud_host_name (?P<value>.+?)(?P<padding>\0*)\0')
+
+    def set_cloud_host(self, new_host):
+        if self.service.status().is_running:
+            raise RuntimeError("Mediaserver must be stopped to patch cloud host.")
+        return self._find_library('nx_network').patch_string(self._cloud_host_regex, new_host.encode('ascii'), '.cloud_host_offset')
+
+    def reset_default_cloud_host(self):
+        cloud_host = self._build_info()['cloudHost']
+        return self.set_cloud_host(cloud_host)

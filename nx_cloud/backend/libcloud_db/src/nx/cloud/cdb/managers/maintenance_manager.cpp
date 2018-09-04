@@ -5,6 +5,8 @@
 #include <nx/cloud/cdb/managers/managers_types.h>
 #include <nx/data_sync_engine/synchronization_engine.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 namespace nx {
 namespace cdb {
 

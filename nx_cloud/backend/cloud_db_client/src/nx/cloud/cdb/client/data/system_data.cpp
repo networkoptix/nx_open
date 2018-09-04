@@ -106,7 +106,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 bool loadFromUrlQuery(const QUrlQuery& /*urlQuery*/, SystemSharingList* const /*systemSharing*/)
 {
     //TODO
-    NX_EXPECT(false);
+    NX_ASSERT(false);
     return false;
 }
 

@@ -18,7 +18,6 @@ class TrafficCapture(object):
 
     def __init__(self, dir):
         self._dir = dir  # type: FileSystemPath
-        self._dir.mkdir(exist_ok=True, parents=True)
 
     @abstractmethod
     def _make_capturing_command(self, capture_path, size_limit_bytes, duration_limit_sec):
@@ -26,10 +25,12 @@ class TrafficCapture(object):
 
     @contextmanager
     def capturing(self, size_limit_bytes=DEFAULT_SIZE_LIMIT_BYTES, duration_limit_sec=DEFAULT_DURATION_LIMIT_SEC):
+        self._dir.mkdir(exist_ok=True, parents=True)
         old_capture_files = sorted(self._dir.glob('*'))
         for old_capture_file in old_capture_files[:-2]:
             old_capture_file.unlink()
         capture_file = self._dir / '{:%Y%m%d%H%M%S%u}.cap'.format(datetime.utcnow())
+        _logger.info('Start capturing traffic to file %s', capture_file)
         with self._make_capturing_command(capture_file, size_limit_bytes, duration_limit_sec).running() as run:
             time.sleep(1)
             try:
@@ -37,6 +38,7 @@ class TrafficCapture(object):
             finally:
                 time.sleep(1)
                 run.terminate()
+                _logger.info('Stop capturing traffic to file %s', capture_file)
                 stdout, stderr = run.communicate(timeout_sec=5)  # Time to cleanup.
                 _logger.debug("Outcome: %s", run.outcome)
                 _logger.debug("STDOUT:\n%s", stdout)

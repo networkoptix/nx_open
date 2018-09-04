@@ -51,9 +51,7 @@ class TestHelper
 
 public:
     TestHelper(
-        QnCommonModule* commonModule,
-        QnStorageManager* normalStorageManager,
-        QnStorageManager* backupStorageManager,
+        QnMediaServerModule* serverModule,
         QStringList &&paths,
         int fileCount = 0)
     :
@@ -62,8 +60,8 @@ public:
         m_fileCount(fileCount)
     {
         generateTestData();
-        createStorages(commonModule, normalStorageManager, backupStorageManager);
-        loadMedia();
+        createStorages(serverModule);
+        loadMedia(serverModule);
     }
 
     ~TestHelper() {}
@@ -175,14 +173,16 @@ public:
             if (time < m_timePoint)
                 return false;
 
-            //qDebug() << "current time period: ("
-            //         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs
-            //         << lit("%1 left to the end ) ")
-            //                .arg(m_currentIt->startTimeMs +
-            //                     m_currentIt->durationMs -
-            //                     m_timePoint)
-            //         << "time: " << time << " m_time: " << m_timePoint
-            //         << " diff: " << std::abs(time - m_timePoint);
+            #if 0 // Debug output
+                qDebug() << "current time period: ("
+                         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs
+                         << lit("%1 left to the end ) ")
+                                .arg(m_currentIt->startTimeMs +
+                                     m_currentIt->durationMs -
+                                     m_timePoint)
+                         << "time: " << time << " m_time: " << m_timePoint
+                         << " diff: " << std::abs(time - m_timePoint);
+            #endif
 
             if (std::abs(time - m_timePoint) > m_timeGapMs) {
                 if (time > m_timePoint && m_currentIt->startTimeMs +
@@ -227,22 +227,24 @@ public:
         NX_LOGX(lm("We have %1 files, %2 time periods")
             .arg(m_fileCount).arg(m_timeLine.m_timeLine.size()), cl_logDEBUG1);
 
-        //qint64 prevStartTime;
-        //int prevDuration;
-        //qDebug() << "Time periods details: ";
+        qint64 prevStartTime;
+        int prevDuration;
+        qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin();
              it != m_timeLine.m_timeLine.cend();
-             ++it) {
-            //qDebug() << it->startTimeMs << " " << it->durationMs;
-            //if (it != m_timeLine.m_timeLine.cbegin()) {
-            //    qDebug() << "\tGap from previous: "
-            //             << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
-            //             << (it->startTimeMs - (prevStartTime + prevDuration))/1000
-            //             << "s )";
-            //}
-            //prevStartTime = it->startTimeMs;
-            //prevDuration = it->durationMs;
+             ++it)
+        {
+            qDebug() << it->startTimeMs << " " << it->durationMs;
+            if (it != m_timeLine.m_timeLine.cbegin())
+            {
+                qDebug() << "\tGap from previous: "
+                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
+                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+                         << "s )";
+            }
+            prevStartTime = it->startTimeMs;
+            prevDuration = it->durationMs;
         }
     }
 
@@ -351,13 +353,13 @@ private:
         }
     }
 
-    void createStorages(
-        QnCommonModule* commonModule,
-        QnStorageManager* normalStorageManager,
-        QnStorageManager* backupStorageManager)
+    void createStorages(QnMediaServerModule* serverModule)
     {
-        for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(commonModule));
+        QnStorageManager* normalStorageManager = serverModule->normalStorageManager();
+        QnStorageManager* backupStorageManager = serverModule->backupStorageManager();
+        for (int i = 0; i < m_storageUrls.size(); ++i)
+        {
+            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(serverModule));
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
@@ -371,12 +373,13 @@ private:
         }
     }
 
-    void loadMedia()
+    void loadMedia(QnMediaServerModule* serverModule)
     {
         nx::caminfo::ArchiveCameraDataList archiveCameras;
         for (int i = 0; i < m_storageUrls.size(); ++i)
         {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
+            QnStorageManager *manager = i % 2 == 0
+                ? serverModule->normalStorageManager() : serverModule->backupStorageManager();
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::LowQualityCatalog);
             manager->getFileCatalog(lit("%1").arg(cameraFolder), QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
@@ -393,8 +396,7 @@ private:
     std::vector<QnStorageResourcePtr> m_storages;
 };
 
-class ServerArchiveDelegatePlaybackTest:
-    public MediaServerModuleFixture
+class ServerArchiveDelegatePlaybackTest: public MediaServerModuleFixture
 {
 };
 
@@ -447,78 +449,9 @@ TEST_F(ServerArchiveDelegatePlaybackTest, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(16));
     ASSERT_TRUE(timeLine.checkTime(18));
     ASSERT_TRUE(timeLine.checkTime(19));
-    //ASSERT_TRUE(!timeLine.checkTime(21));
-    //ASSERT_TRUE(!timeLine.checkTime(22));
-    //ASSERT_TRUE(!timeLine.checkTime(24));
     ASSERT_TRUE(timeLine.checkTime(25));
     ASSERT_TRUE(timeLine.checkTime(26));
     ASSERT_TRUE(timeLine.checkTime(28));
-}
-
-TEST_F(ServerArchiveDelegatePlaybackTest, Main)
-{
-    nx::ut::utils::WorkDirResource storageWorkDir1;
-    nx::ut::utils::WorkDirResource storageWorkDir2;
-    QnWriterPool writerPool;
-
-    ASSERT_TRUE((bool)storageWorkDir1.getDirName());
-    ASSERT_TRUE((bool)storageWorkDir2.getDirName());
-
-    auto storageUrl_1 = *storageWorkDir1.getDirName();
-    auto storageUrl_2 = *storageWorkDir2.getDirName();
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
-
-    qnNormalStorageMan->stopAsyncTasks();
-
-    qnBackupStorageMan->stopAsyncTasks();
-
-    serverModule().roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
-    serverModule().roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
-#if defined (__arm__)
-    TestHelper testHelper(
-        serverModule().commonModule(),
-        qnNormalStorageMan, qnBackupStorageMan,
-        std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
-#else
-    TestHelper testHelper(
-        serverModule().commonModule(),
-        qnNormalStorageMan, qnBackupStorageMan,
-        std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
-#endif
-    testHelper.print();
-
-    QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource());
-    cameraResource->setPhysicalId(cameraFolder);
-
-    QnFfmpegInitializer ffmpegHolder;
-
-    QnServerArchiveDelegate archiveDelegate(qnServerModule);
-    archiveDelegate.open(cameraResource, /*archiveIntegrityWatcher*/ nullptr);
-    archiveDelegate.setQuality(MEDIA_Quality_High, true, QSize());
-    archiveDelegate.seek(0, true);
-    testHelper.getTimeLine().reset();
-
-    QnAbstractMediaDataPtr data;
-    while(1) {
-        data = archiveDelegate.getNextData();
-        if (data)
-            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
-        else
-            break;
-    }
-
-    archiveDelegate.setQuality(MEDIA_Quality_Low, true, QSize());
-    archiveDelegate.seek(0, true);
-    testHelper.getTimeLine().reset();
-
-    while(1) {
-        data = archiveDelegate.getNextData();
-        if (data)
-            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
-        else
-            break;
-    }
 }
 
 class ChunkQualityChooserTest: public ::testing::Test
@@ -538,11 +471,7 @@ public:
         serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
         serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 
-        TestHelper testHelper(
-            serverModule->commonModule(),
-            serverModule->normalStorageManager(),
-            serverModule->backupStorageManager(),
-            QStringList());
+        TestHelper testHelper(serverModule.get(), QStringList());
 
         auto hqStorageManager = hqFromBackup
             ? serverModule->backupStorageManager() : serverModule->normalStorageManager();

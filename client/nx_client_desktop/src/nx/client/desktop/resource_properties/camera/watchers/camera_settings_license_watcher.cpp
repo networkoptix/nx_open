@@ -11,14 +11,39 @@
 #include <ui/workbench/workbench_context.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx/client/desktop/common/utils/basic_text_provider.h>
+#include <nx/client/desktop/resource_properties/camera/utils/license_usage_provider.h>
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-// ------------------------------------------------------------------------------------------------
+namespace {
+
+class CameraSettingsLicenseUsageProvider: public LicenseUsageProvider
+{
+public:
+    virtual QString text() const override { return m_text; }
+    virtual bool limitExceeded() const override { return m_limitExceeded; }
+
+    void setData(const QString& text, bool limitExceeded)
+    {
+        if (m_text == text && m_limitExceeded == limitExceeded)
+            return;
+
+        m_text = text;
+        m_limitExceeded = limitExceeded;
+
+        emit stateChanged();
+        emit textChanged(m_text);
+    }
+
+private:
+    QString m_text;
+    bool m_limitExceeded = false;
+};
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
 // CameraSettingsLicenseWatcher::Private
 
 class CameraSettingsLicenseWatcher::Private: public QObject
@@ -29,7 +54,7 @@ public:
     Private(CameraSettingsLicenseWatcher* q, CameraSettingsDialogStore* store):
         QObject(),
         q(q),
-        m_textProvider(new BasicTextProvider()),
+        m_usageProvider(new CameraSettingsLicenseUsageProvider()),
         m_store(store)
     {
         NX_ASSERT(m_store);
@@ -39,9 +64,9 @@ public:
         connect(watcher, &QnLicenseUsageWatcher::licenseUsageChanged, this, &Private::updateText);
     }
 
-    AbstractTextProvider* licenseUsageTextProvider() const
+    LicenseUsageProvider* licenseUsageProvider() const
     {
-        return m_textProvider.data();
+        return m_usageProvider.data();
     }
 
     QnVirtualCameraResourceList cameras() const
@@ -61,19 +86,28 @@ public:
 private:
     void updateText()
     {
-        m_textProvider->setText(calculateText());
+        const auto info = calculateInfo();
+        m_usageProvider->setData(info.usageText, info.limitExceeded);
     }
 
-    QString calculateText() const
+    struct LicenseInfo
+    {
+        QString usageText;
+        bool limitExceeded = false;
+    };
+
+    LicenseInfo calculateInfo() const
     {
         if (!m_store)
-            return QString();
+            return {};
 
         QnCamLicenseUsageHelper helper(q->commonModule());
         if (m_store->state().recording.enabled.hasValue())
             helper.propose(m_cameras, m_store->state().recording.enabled());
 
         QStringList lines;
+        bool limitExceeded = false;
+
         for (auto type: helper.licenseTypes())
         {
             const int used = helper.usedLicenses(type);
@@ -87,6 +121,7 @@ private:
             const int required = helper.requiredLicenses(type);
             if (required > 0)
             {
+                limitExceeded = true;
                 message += setWarningStyleHtml(lit(" (%1)").arg(
                     CameraSettingsLicenseWatcher::tr("%n more required", "", required)));
             }
@@ -94,16 +129,16 @@ private:
             lines << message;
         }
 
-        return lines.join(lit("<br/>"));
+        return {lines.join(lit("<br/>")), limitExceeded};
     }
 
 private:
-    const QScopedPointer<BasicTextProvider> m_textProvider;
+    const QScopedPointer<CameraSettingsLicenseUsageProvider> m_usageProvider;
     QPointer<CameraSettingsDialogStore> m_store;
     QnVirtualCameraResourceList m_cameras;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // CameraSettingsLicenseWatcher
 
 CameraSettingsLicenseWatcher::CameraSettingsLicenseWatcher(
@@ -131,11 +166,9 @@ void CameraSettingsLicenseWatcher::setCameras(const QnVirtualCameraResourceList&
     d->setCameras(value);
 }
 
-AbstractTextProvider* CameraSettingsLicenseWatcher::licenseUsageTextProvider() const
+LicenseUsageProvider* CameraSettingsLicenseWatcher::licenseUsageProvider() const
 {
-    return d->licenseUsageTextProvider();
+    return d->licenseUsageProvider();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

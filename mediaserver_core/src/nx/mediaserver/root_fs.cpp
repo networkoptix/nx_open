@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/system_error.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <media_server/media_server_module.h>
 #if defined (Q_OS_LINUX)
     #include <nx/system_commands/domain_socket/read_linux.h>
@@ -399,13 +399,15 @@ bool RootFileSystem::dmiInfo(QString* outPartNumber, QString *outSerialNumber)
         outSerialNumber);
 }
 
-std::unique_ptr<RootFileSystem> instantiateRootFileSystem(const QString& applicationPath)
+std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
+    bool isRootToolEnabled,
+    const QString& applicationPath)
 {
     const auto toolPath = QFileInfo(applicationPath).dir().filePath("root_tool");
     const auto alternativeToolPath = QFileInfo(applicationPath).dir().filePath("root-tool-bin");
     bool isRootToolExists = QFileInfo(toolPath).exists() || QFileInfo(alternativeToolPath).exists();
+    bool isRootToolUsed = isRootToolExists && isRootToolEnabled;
 
-    bool isRootToolUsed = isRootToolExists & !qnServerModule->settings().ignoreRootTool();
     #if defined (Q_OS_UNIX)
         isRootToolUsed &= geteuid() != 0; //< No root_tool if the user is root
     #endif

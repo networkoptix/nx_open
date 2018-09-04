@@ -1,5 +1,4 @@
-#ifndef _FILE_STORAGE_PROTOCOL_H__
-#define _FILE_STORAGE_PROTOCOL_H__
+#pragma once
 
 #include <atomic>
 #include "core/resource/storage_resource.h"
@@ -15,6 +14,7 @@
 */
 
 class QnStorageManager;
+class QnMediaServerModule;
 
 namespace nx { namespace mediaserver { class RootFileSystem; } }
 
@@ -28,10 +28,10 @@ private:
     static const QString TO_SEP;
 
 public:
-    QnFileStorageResource(QnCommonModule* commonModule);
+    QnFileStorageResource(QnMediaServerModule* serverModule);
     ~QnFileStorageResource();
 
-    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
+    static QnStorageResource* instance(QnMediaServerModule* serverModule, const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
@@ -61,13 +61,13 @@ public:
     // true if storage is located on local disks
     bool isLocal();
     // calculate space limit judging by partition type
-    static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
+    qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype) const;
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);
 
 private:
-
+    qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
     QString removeProtocolPrefix(const QString& url);
     Qn::StorageInitResult initOrUpdateInternal();
     Qn::StorageInitResult updatePermissions(const QString& url) const;
@@ -100,7 +100,7 @@ public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
     // was not called.
-    static void removeOldDirs();
+    static void removeOldDirs(QnMediaServerModule *serverModule);
 
 private:
     mutable std::atomic<bool> m_valid;
@@ -116,7 +116,6 @@ private:
     mutable QnMutex      m_writeTestMutex;
     bool m_isSystem;
     bool m_isMounted = true;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
-
-#endif // _FILE_STORAGE_PROTOCOL_H__

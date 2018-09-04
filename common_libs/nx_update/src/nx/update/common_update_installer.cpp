@@ -1,53 +1,65 @@
 #include "common_update_installer.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/software_version.h>
 #include <utils/common/process.h>
 #include <utils/common/app_info.h>
+#include <audit/audit_manager.h>
+#include <api/model/audit/auth_session.h>
+#include <common/common_module.h>
+
 #include <QtCore>
 
 namespace nx {
+
+CommonUpdateInstaller::CommonUpdateInstaller(QObject* parent):
+    QnCommonModuleAware(parent)
+{
+}
+
+CommonUpdateInstaller::~CommonUpdateInstaller()
+{
+    stopSync();
+}
 
 void CommonUpdateInstaller::prepareAsync(const QString& path)
 {
     {
         QnMutexLocker lock(&m_mutex);
         if (m_state == CommonUpdateInstaller::State::inProgress)
-            return setState(CommonUpdateInstaller::State::inProgress);
+            return;
 
         m_state = CommonUpdateInstaller::State::inProgress;
         if (!cleanInstallerDirectory())
-        {
-            lock.unlock();
             return setState(CommonUpdateInstaller::State::cleanTemporaryFilesError);
-        }
     }
 
     m_extractor.extractAsync(
         path,
         installerWorkDir(),
-        [self = this](QnZipExtractor::Error errorCode, const QString& outputPath)
+        [this](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
-            auto cleanupGuard = QnRaiiGuard::createDestructible(
-                [self, errorCode]()
+            auto cleanupGuard = nx::utils::makeScopeGuard(
+                [this, errorCode]()
                 {
                     if (errorCode != QnZipExtractor::Error::Ok)
-                        self->cleanInstallerDirectory();
+                        cleanInstallerDirectory();
 
-                    QnMutexLocker lock(&self->m_mutex);
-                    self->m_condition.wakeOne();
+                    QnMutexLocker lock(&m_mutex);
+                    m_condition.wakeOne();
                 });
 
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
-                    return self->setStateLocked(self->checkContents(outputPath));
+                    return setStateLocked(checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
-                    return self->setStateLocked(CommonUpdateInstaller::State::noFreeSpace);
+                    return setStateLocked(CommonUpdateInstaller::State::noFreeSpace);
                 default:
                     NX_WARNING(
-                        self,
+                        this,
                         lm("ZipExtractor error: %1").args(QnZipExtractor::errorToString(errorCode)));
-                    return self->setStateLocked(CommonUpdateInstaller::State::unknownError);
+                    return setStateLocked(CommonUpdateInstaller::State::unknownError);
             }
         });
 }
@@ -111,12 +123,19 @@ CommonUpdateInstaller::State CommonUpdateInstaller::checkContents(const QString&
         return CommonUpdateInstaller::State::updateContentsError;
     }
 
+    QString variantVersion = infoMap.value("variantVersion").toString();
+    if (nx::utils::SoftwareVersion(variantVersion) > nx::utils::SoftwareVersion(systemInfo.version))
+    {
+        NX_ERROR(this, lm("Incompatible update: %1 > %2").args(variantVersion, systemInfo.version));
+        return CommonUpdateInstaller::State::updateContentsError;
+    }
+
     m_version = infoMap.value(QStringLiteral("version")).toString();
 
     return CommonUpdateInstaller::State::ok;
 }
 
-bool CommonUpdateInstaller::install()
+bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
 {
     QString currentDir = QDir::currentPath();
     QDir::setCurrent(installerWorkDir());
@@ -139,6 +158,10 @@ bool CommonUpdateInstaller::install()
 
         NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
     }
+
+    auto authRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
+    authRecord.addParam("version", m_version.toLatin1());
+    commonModule()->auditManager()->addAuditRecord(authRecord);
 
     const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(
         QDir(installerWorkDir()).absoluteFilePath(m_executable),
@@ -171,11 +194,6 @@ void CommonUpdateInstaller::stopSync()
     while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
     m_state = CommonUpdateInstaller::State::idle;
-}
-
-CommonUpdateInstaller::~CommonUpdateInstaller()
-{
-    stopSync();
 }
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()

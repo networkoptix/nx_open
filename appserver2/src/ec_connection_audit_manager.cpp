@@ -47,7 +47,12 @@ ECConnectionAuditManager::~ECConnectionAuditManager()
 void ECConnectionAuditManager::at_resourceAboutToRemoved(const QnUuid& id)
 {
     if (QnResourcePtr res = m_connection->commonModule()->resourcePool()->getResourceById(id))
-        m_remvedResourceNames[id] = res->getName();
+        m_removedResourceNames[id] = res->getName();
+}
+
+QnCommonModule* ECConnectionAuditManager::commonModule() const
+{
+    return m_connection->commonModule();
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -55,10 +60,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const CameraAttributesDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_CameraUpdate);
     for (const auto& value: params)
         auditRecord.resources.push_back(value.cameraId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -66,9 +71,9 @@ void ECConnectionAuditManager::addAuditRecord(
     const CameraAttributesData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_CameraUpdate);
     auditRecord.resources.push_back(params.cameraId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -76,9 +81,9 @@ void ECConnectionAuditManager::addAuditRecord(
     const MediaServerUserAttributesData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
     auditRecord.resources.push_back(params.serverId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -86,10 +91,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const MediaServerUserAttributesDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
     for (const auto& value: params)
         auditRecord.resources.push_back(value.serverId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -97,9 +102,9 @@ void ECConnectionAuditManager::addAuditRecord(
     const StorageData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
     auditRecord.resources.push_back(params.parentId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -107,10 +112,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const StorageDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
     for (const auto& value: params)
         auditRecord.resources.push_back(value.parentId);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -118,10 +123,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const UserDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_UserUpdate);
     for (const auto& value: params)
         auditRecord.resources.push_back(value.id);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -129,9 +134,9 @@ void ECConnectionAuditManager::addAuditRecord(
     const UserData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UserUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_UserUpdate);
     auditRecord.resources.push_back(params.id);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -139,14 +144,14 @@ void ECConnectionAuditManager::addAuditRecord(
     const EventRuleData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_BEventUpdate);
     auditRecord.resources.push_back(params.id);
     nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
     fromApiToResource(params, rule);
     nx::vms::event::StringsHelper helper(m_connection->commonModule());
     auditRecord.addParam("description", helper.ruleDescriptionText(rule).toUtf8());
 
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -154,10 +159,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const EventRuleDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_BEventUpdate);
     for (const auto& value: params)
         auditRecord.resources.push_back(value.id);
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -166,7 +171,7 @@ void ECConnectionAuditManager::addAuditRecord(
     const QnAuthSession& authInfo)
 {
     if (QnGlobalSettings::isGlobalSetting(param))
-        qnAuditManager->notifySettingsChanged(authInfo, param.name);
+        commonModule()->auditManager()->notifySettingsChanged(authInfo, param.name);
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -204,7 +209,7 @@ void ECConnectionAuditManager::addAuditRecord(
         {
             if (QnResourcePtr res = resPool->getResourceById(params.id))
             {
-                description = m_remvedResourceNames.value(params.id);
+                description = m_removedResourceNames.value(params.id);
                 if (description.isNull())
                     description = res->getName();
                 if (res.dynamicCast<QnUserResource>())
@@ -245,12 +250,12 @@ void ECConnectionAuditManager::addAuditRecord(
 
     if (eventType != Qn::AR_NotDefined)
     {
-        auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
+        auto auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, eventType);
         if (!description.isEmpty())
             auditRecord.addParam("description", description.toUtf8());
         if (!resourceId.isNull())
             auditRecord.resources.push_back(resourceId);
-        qnAuditManager->addAuditRecord(auditRecord);
+        commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 }
 
@@ -268,7 +273,7 @@ void ECConnectionAuditManager::addAuditRecord(
     const ResetEventRulesData& /*params*/,
     const QnAuthSession& authInfo)
 {
-    qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventReset));
+    commonModule()->auditManager()->addAuditRecord(commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_BEventReset));
 }
 
 void ECConnectionAuditManager::addAuditRecord(
@@ -276,8 +281,8 @@ void ECConnectionAuditManager::addAuditRecord(
     const DatabaseDumpData& /*params*/,
     const QnAuthSession& authInfo)
 {
-    qnAuditManager->addAuditRecord(
-            qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
+    commonModule()->auditManager()->addAuditRecord(
+            commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
 }
 
 AbstractECConnection* ECConnectionAuditManager::ec2Connection() const

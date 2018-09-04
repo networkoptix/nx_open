@@ -23,7 +23,7 @@ function(nx_target_enable_werror target werror_condition)
 endfunction()
 
 function(nx_add_target name type)
-    set(options NO_MOC WERROR NO_WERROR SIGNED)
+    set(options NO_MOC WERROR NO_WERROR SIGNED MACOS_ARG_MAX_WORKAROUND)
     set(oneValueArgs LIBRARY_TYPE RC_FILE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
@@ -93,6 +93,17 @@ function(nx_add_target name type)
 
     if(WINDOWS)
         build_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}" "src")
+    endif()
+
+    if(NX_MACOS_ARG_MAX_WORKAROUND AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+        # In MacOS CMake incorrectly evauates when command line is too long to pass linker
+        # arguments directly. Unfortunately there's no way to enforce passing arguments as a file.
+        # This dirty hack overcomes the evaluation limit and forces CMake to use a file.
+        set(dummy_directory_name "macos_arg_max_cmake_workaround")
+        foreach(i RANGE 10)
+            string(APPEND dummy_directory_name _${dummy_directory_name})
+        endforeach()
+        link_directories(${dummy_directory_name})
     endif()
 
     if("${type}" STREQUAL "EXECUTABLE")

@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
-        "useTextEmailFormat": "Gửi email văn bản thuần túy"
+        "useTextEmailFormat": "Gửi email văn bản thuần túy",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

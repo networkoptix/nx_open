@@ -10,6 +10,11 @@ namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
+TransactionDataObject::TransactionDataObject(int transactionFormatVersion):
+    m_transactionFormatVersion(transactionFormatVersion)
+{
+}
+
 nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     nx::sql::QueryContext* queryContext,
     const TransactionData& tran)
@@ -35,7 +40,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
 
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
-            .arg(tran.systemId).arg(::ec2::ApiCommand::toString(tran.header.command))
+            .arg(tran.systemId).arg(tran.header.command)
             .arg(tran.header).arg(tran.hash).arg(saveTranQuery.lastError().text()),
             cl_logWARNING);
         return nx::sql::DBResult::ioError;
@@ -107,7 +112,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
                 std::make_unique<UbjsonTransactionPresentation>(
                     fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray(),
-                    nx_ec::EC2_PROTO_VERSION)
+                    m_transactionFormatVersion)
                 });
     }
 

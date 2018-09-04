@@ -90,7 +90,7 @@ public:
         return paramCount() == 0 ? nullptr : &m_params.front();
     }
 
-    virtual int paramCount() override { return m_params.size(); }
+    virtual int paramCount() override { return (int) m_params.size(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -137,8 +137,8 @@ public:
 
 public:
     std::string m_actionId = "";
-    nxpl::NX_GUID m_objectId = {0};
-    nxpl::NX_GUID m_cameraId = {0};
+    nxpl::NX_GUID m_objectId = {{0}};
+    nxpl::NX_GUID m_cameraId = {{0}};
     int64_t m_timestampUs = 0;
     bool m_handleResultCalled = false;
     bool m_expectedNonNullActionUrl = false;
@@ -177,7 +177,7 @@ static void testExecuteActionAddPerson(nx::sdk::metadata::Plugin* plugin)
 {
     Action action;
     action.m_actionId = "nx.stub.addPerson";
-    action.m_objectId = {0};
+    action.m_objectId = {{0}};
     action.m_expectedNonNullActionUrl = true;
 
     nx::sdk::Error error = nx::sdk::Error::noError;
@@ -280,7 +280,7 @@ TEST(stub_metadata_plugin, test)
     plugin->releaseRef();
 }
 
-int main()
+int main(int argc, const char* const argv[])
 {
-    return nx::kit::test::runAllTests();
+    return nx::kit::test::runAllTests("stub_metadata_plugin", argc, argv);
 }

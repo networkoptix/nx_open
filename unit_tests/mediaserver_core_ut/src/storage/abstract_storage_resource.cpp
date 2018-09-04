@@ -49,8 +49,6 @@ class AbstractStorageResourceTest:
 protected:
     virtual void TearDown() override
     {
-        qnNormalStorageMan->stopAsyncTasks();
-        qnBackupStorageMan->stopAsyncTasks();
     }
 
     virtual void SetUp() override
@@ -62,23 +60,26 @@ protected:
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), fileStorageUrl));
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
+            QnStoragePluginFactory::instance()->createStorage(serverModule.commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
-        qnNormalStorageMan->addStorage(fileStorage);
+        serverModule.normalStorageManager()->addStorage(fileStorage);
 
         if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+                serverModule.commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!nx::ut::cfg::configInstance().smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+                serverModule.commonModule(), nx::ut::cfg::configInstance().smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
-            qnNormalStorageMan->addStorage(smbStorage);
+            serverModule.normalStorageManager()->addStorage(smbStorage);
         }
    }
 
@@ -91,21 +92,26 @@ protected:
 
         platformAbstraction = std::make_unique<QnPlatformAbstraction>();
 
-        QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        pluginManager->loadPlugins(serverModule().roSettings());
+        QnStoragePluginFactory::instance()->registerStoragePlugin(
+            "file",
+            [this](QnCommonModule*, const QString& path)
+            {
+                return QnFileStorageResource::instance(&serverModule, path);
+            }, /*isDefaultProtocol*/ true);
+        pluginManager->loadPlugins(serverModule.roSettings());
 
-        for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+        for (const auto storagePlugin: pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
+            const auto settings = &serverModule.settings();
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 storagePlugin->storageType(),
                 std::bind(
                     &QnThirdPartyStorageResource::instance,
                     std::placeholders::_1,
                     std::placeholders::_2,
-                    storagePlugin
-                ),
-                false
-            );
+                    storagePlugin,
+                    settings),
+                false);
         }
     }
 
@@ -113,14 +119,14 @@ protected:
     QString                             smbStorageUrl;
     std::unique_ptr<PluginManager>      pluginManager;
     nx::ut::utils::WorkDirResource workDirResource;
-
+    QnMediaServerModule serverModule;
     std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
 };
 } // namespace <anonymous>
 
 TEST_F(AbstractStorageResourceTest, Capabilities)
 {
-    for (auto storage : qnNormalStorageMan->getStorages())
+    for (auto storage: serverModule.normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -173,7 +179,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage : qnNormalStorageMan->getStorages())
+    for (auto storage: serverModule.normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -268,7 +274,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 
 TEST_F(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage : qnNormalStorageMan->getStorages())
+    for (auto storage: serverModule.normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -282,8 +288,8 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         );
         ASSERT_TRUE((bool)ioDevice);
 
-        const size_t dataSize = 10*1024*1024;
-        const size_t seekCount = 10000;
+        const size_t dataSize = 100*1024;
+        const size_t seekCount = 1000;
         const char* newData = "bcdefg";
         const size_t newDataSize = strlen(newData);
         std::vector<char> data(dataSize);
@@ -346,7 +352,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
             const qint64 seekPos = seekDistribution(gen);
             ASSERT_TRUE(ioDevice->seek(seekPos));
             QByteArray buf = ioDevice->read(readSize);
-            ASSERT_TRUE(memcmp(buf.constData(), data.data(), readSize));
+            ASSERT_EQ(0, memcmp(buf.constData(), data.data() + seekPos, readSize));
         }
 
         ioDevice->close();

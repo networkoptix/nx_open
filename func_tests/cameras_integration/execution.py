@@ -1,8 +1,8 @@
 import logging
 import time
+import timeit
 from datetime import timedelta
 
-from monotonic import monotonic as time_monotomic
 from typing import List
 
 from framework.installation.mediaserver import Mediaserver
@@ -16,8 +16,8 @@ SERVER_STAGES_KEY = '-SERVER-'
 class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout
-                 ):  # type: (Mediaserver, str, dict, timedelta) -> None
+    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout):
+        # type: (Mediaserver, str, dict, timedelta) -> None
         self.camera_id = camera_id
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
@@ -53,20 +53,20 @@ class CameraStagesExecutor(object):
         return {k: v for k, v in data.items() if v}
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        start_time = time_monotomic()
+        start_time = timeit.default_timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
-                    self._duration = timedelta(seconds=time_monotomic() - start_time)
+                    self._duration = timedelta(seconds=timeit.default_timer() - start_time)
                     yield
 
                 except StopIteration:
                     _logger.info('%s stage result %s', self.camera_id, executors.report)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timedelta(seconds=time_monotomic() - start_time)
+                        self._duration = timedelta(seconds=timeit.default_timer() - start_time)
                         return
                     break
 
@@ -107,11 +107,17 @@ class ServerStagesExecutor(object):
 
         running_stage = self.Stage(name, rules)
         checker = checks.Checker()
-        for query, expected_values in running_stage.rules.items():
-            actual_values = self.server.api.generic.get(query)
-            checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
+        try:
+            for query, expected_values in running_stage.rules.items():
+                actual_values = self.server.api.generic.get(query)
+                checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
 
-        running_stage.result = checker.result()
+        except Exception:
+            running_stage.result = checks.Failure(is_exception=True)
+
+        else:
+            running_stage.result = checker.result()
+
         self.stages.append(running_stage)
 
     @property
@@ -127,9 +133,17 @@ class ServerStagesExecutor(object):
             stages=[dict(_=s.name, **s.result.report) for s in self.stages])
 
 
+class SpecificFeatures(object):
+    def __init__(self, items=[]):
+        self.items = set(items)
+
+    def __getattr__(self, name):
+        return name in self.items
+
+
 class Stand(object):
-    def __init__(self, server, config, stage_hard_timeout
-                 ):  # type: (Mediaserver, dict, deltatime) -> None
+    def __init__(self, server, config, stage_hard_timeout):
+        # type: (Mediaserver, dict, timedelta) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
         self.server_features = server.installation.specific_features()
@@ -190,7 +204,7 @@ class Stand(object):
                 pass
             else:
                 del rules[name]
-                if eval(condition, dict(features=self.server_features, **self.server_information)):
+                if eval(condition, dict(features=SpecificFeatures(self.server_features), **self.server_information)):
                     base_rule = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_rule(base_rule, rule, may_override=False)
 

@@ -37,11 +37,21 @@ Command* CommandsFactory::get(const std::string& command) const
 std::string CommandsFactory::help() const
 {
     std::stringstream out;
-    out << "Usage: root_tool <command> <args...>" << std::endl
+    out << "Nx root tool service. Executes commands received via domain socket" << std::endl
         << "Supported commands:" << std::endl;
 
+    size_t firstColumnWidth = 0;
     for (const auto& p: m_commands)
-        out << " " << std::setw(10) << std::left << p.first << p.second->help() << std::endl;
+    {
+        if (p.first.size() > firstColumnWidth)
+            firstColumnWidth = p.first.size();
+    }
+
+    for (const auto& p: m_commands)
+    {
+        out << " " << std::setw(firstColumnWidth + 1) << std::left << p.first << p.second->help()
+            << std::endl;
+    }
 
     return out.str();
 }

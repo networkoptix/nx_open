@@ -1,6 +1,6 @@
 #include "selectable_text_button_group.h"
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
 
 namespace nx {
@@ -87,7 +87,8 @@ bool SelectableTextButtonGroup::setSelected(SelectableTextButton* button)
 
     auto oldButton = m_selected;
 
-    QnRaiiGuard guard([this]() { m_selectionChanging = false; });
+    auto guard = nx::utils::makeScopeGuard(
+        [this]() { m_selectionChanging = false; });
     m_selectionChanging = true;
 
     if (oldButton && oldButton->state() == SelectableTextButton::State::selected)
@@ -97,7 +98,7 @@ bool SelectableTextButtonGroup::setSelected(SelectableTextButton* button)
         button->setState(SelectableTextButton::State::selected);
 
     m_selected = button;
-    guard.finalize();
+    guard.fire();
 
     emit selectionChanged(oldButton, button);
     return true;

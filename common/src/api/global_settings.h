@@ -181,10 +181,10 @@ public:
     void setAutoDiscoveryEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
-    void setEmailSettings(const QnEmailSettings &settings);
+    void setEmailSettings(const QnEmailSettings& settings);
 
     QnLdapSettings ldapSettings() const;
-    void setLdapSettings(const QnLdapSettings &settings);
+    void setLdapSettings(const QnLdapSettings& settings);
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
@@ -226,7 +226,7 @@ public:
     QString clientStatisticsSettingsUrl() const;
 
     QString statisticsReportServerApi() const;
-    void setStatisticsReportServerApi(const QString &value);
+    void setStatisticsReportServerApi(const QString& value);
 
     std::chrono::seconds connectionKeepAliveTimeout() const;
     void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
@@ -348,7 +348,7 @@ public:
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
     QnWatermarkSettings watermarkSettings() const;
-    void setWatermarkSettings(const QnWatermarkSettings & settings) const;
+    void setWatermarkSettings(const QnWatermarkSettings& settings) const;
 
     std::chrono::minutes sessionTimeoutLimit() const;
     void setSessionTimeoutLimit(std::chrono::minutes value);
@@ -404,65 +404,65 @@ private:
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
-    void at_adminUserAdded(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void at_adminUserAdded(const QnResourcePtr& resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
-    QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_cameraSettingsOptimizationAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_autoUpdateThumbnailsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxSceneItemsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_useWindowsEmailLineFeedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_useTextEmailFormatAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_useWindowsEmailLineFeedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
 
-    QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_disabledVendorsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_autoDiscoveryEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_updateNotificationsEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_timeSynchronizationEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_synchronizeTimeWithInternetAdaptor = nullptr;
     QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_syncTimeExchangePeriodAdaptor = nullptr;
-    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_osTimeChangeCheckPeriodAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_syncTimeExchangePeriodAdaptor = nullptr;
+    QnResourcePropertyAdaptor<Qn::CameraBackupQualities>* m_backupQualitiesAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_backupNewCamerasByDefaultAdaptor = nullptr;
 
     // set of statistics settings adaptors
-    QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastTimeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportLastVersionAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_statisticsReportLastNumberAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportTimeCycleAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportUpdateDelayAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool> *m_upnpPortMappingEnabledAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_localSystemIdAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_statisticsReportServerApiAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_clientStatisticsSettingsUrlAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnOptionalBool>* m_statisticsAllowedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_statisticsReportLastTimeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_statisticsReportLastVersionAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_statisticsReportLastNumberAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_statisticsReportTimeCycleAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_statisticsReportUpdateDelayAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_upnpPortMappingEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_localSystemIdAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_statisticsReportServerApiAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_clientStatisticsSettingsUrlAdaptor = nullptr;
 
     // set of email settings adaptors
-    QnResourcePropertyAdaptor<QString> *m_serverAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_fromAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_userAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_passwordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_signatureAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_supportLinkAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QnEmail::ConnectionType> *m_connectionTypeAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_portAdaptor = nullptr;
-    QnResourcePropertyAdaptor<int> *m_timeoutAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_serverAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_fromAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_userAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_passwordAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_signatureAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_supportLinkAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnEmail::ConnectionType>* m_connectionTypeAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_portAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_timeoutAdaptor = nullptr;
     /** Flag that we are using simple smtp settings set */
-    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_simpleAdaptor = nullptr;
 
     // set of ldap settings adaptors
-    QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_ldapAdminDnAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_ldapAdminPasswordAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor = nullptr;
-    QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QUrl>* m_ldapUriAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapAdminDnAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapAdminPasswordAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapSearchBaseAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QString>* m_ldapSearchFilterAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor = nullptr;

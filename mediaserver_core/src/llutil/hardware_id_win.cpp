@@ -26,13 +26,13 @@
 #include <QtCore/QSettings>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 
-#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 #include "licensing/hardware_info.h"
-#include "util.h"
+#include <media_server/media_server_module.h>
 
 #define _WIN32_DCOM
 #pragma comment(lib, "wbemuuid.lib")
@@ -48,7 +48,7 @@ const QString kEmptyMac = lit("");
 
 namespace LLUtil {
 
-void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
+void fillHardwareIds(QnMediaServerModule* serverModule, HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
 typedef std::map<_bstr_t, QnMacAndDeviceClass> QnPathToMacAndDeviceClassMap;
 
@@ -396,7 +396,8 @@ static void fillHardwareInfo(
 {
     hardwareInfo.compatibilityBoardUUID =
         execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"));
-    hardwareInfo.boardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
+    hardwareInfo.boardUUID =
+        nx::utils::changedGuidByteOrder(hardwareInfo.compatibilityBoardUUID);
 
     hardwareInfo.boardID = execQuery(pSvc, _T("SerialNumber"), _T("Win32_BaseBoard"));
     hardwareInfo.boardManufacturer = execQuery(pSvc, _T("Manufacturer"), _T("Win32_BaseBoard"));
@@ -447,7 +448,9 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap,
 
 } // namespace LLUtil
 
-void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
+void LLUtil::fillHardwareIds(
+    QnMediaServerModule* /*serverModule*/,
+    HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     bool needUninitialize = true;
     HRESULT hres;

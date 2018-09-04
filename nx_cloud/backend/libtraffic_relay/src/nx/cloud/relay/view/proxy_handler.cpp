@@ -1,10 +1,12 @@
 #include "proxy_handler.h"
 
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
 #include <nx/cloud/relaying/listening_peer_connector.h>
 
-#include "../model/abstract_remote_relay_peer_pool.h"
+#include "../model/remote_relay_peer_pool_aio_wrapper.h"
 #include "../model/alias_manager.h"
 #include "../settings.h"
 
@@ -16,7 +18,7 @@ namespace view {
 ProxyHandler::ProxyHandler(
     const conf::Settings& settings,
     relaying::AbstractListeningPeerPool* listeningPeerPool,
-    model::AbstractRemoteRelayPeerPool* remotePeerPool,
+    model::RemoteRelayPeerPoolAioWrapper* remotePeerPool,
     model::AliasManager* aliasManager)
     :
     m_listeningPeerPool(listeningPeerPool),
@@ -132,8 +134,7 @@ std::optional<std::string> ProxyHandler::findHostByAlias(
 {
     for (const auto& value: possibleAliases)
     {
-        if (auto hostName = m_aliasManager->findHostByAlias(value);
-            hostName && !hostName->empty())
+        if (const auto hostName = m_aliasManager->findHostByAlias(value); hostName)
         {
             NX_VERBOSE(this, lm("Using alias %1 for host %2").args(value, *hostName));
             return hostName;
@@ -188,13 +189,14 @@ void ProxyHandler::invokeRemotePeerPool(
 
     for (const auto& domainName: hostNames)
     {
-        m_remotePeerPool->findRelayByDomain(domainName).then(
+        m_remotePeerPool->findRelayByDomain(
+            domainName,
             [this, domainName, sharedGuard = m_guard.sharedGuard()](
-                cf::future<std::string> relayDomainFuture)
+                std::string relayDomain)
             {
                 auto lock = sharedGuard->lock();
                 if (!lock)
-                    return cf::unit();
+                    return;
 
                 {
                     // Using this to make sure
@@ -202,27 +204,33 @@ void ProxyHandler::invokeRemotePeerPool(
                     QnMutexLocker lock(&m_mutex);
                 }
 
-                --m_pendingRequestCount;
-                if (!m_findRelayInstanceHandler)
-                    return cf::unit();
-
-                auto relayDomain = relayDomainFuture.get();
-                if (relayDomain.empty())
-                {
-                    if (m_pendingRequestCount == 0)
-                    {
-                        nx::utils::swapAndCall(
-                            m_findRelayInstanceHandler, std::nullopt, std::string());
-                    }
-                    // Else, waiting for other requests to finish.
-                    return cf::unit();
-                }
-
-                nx::utils::swapAndCall(
-                    m_findRelayInstanceHandler, relayDomain, domainName);
-                return cf::unit();
+                processFindRelayResult(relayDomain, domainName);
             });
     }
+}
+
+void ProxyHandler::processFindRelayResult(
+    const std::string& relayDomain,
+    const std::string& proxyTarget)
+{
+    --m_pendingRequestCount;
+    if (!m_findRelayInstanceHandler)
+        return;
+
+    if (relayDomain.empty())
+    {
+        if (m_pendingRequestCount == 0)
+        {
+            nx::utils::swapAndCall(
+                m_findRelayInstanceHandler, std::nullopt, std::string());
+        }
+
+        // Else, waiting for other requests to finish.
+        return;
+    }
+
+    nx::utils::swapAndCall(
+        m_findRelayInstanceHandler, relayDomain, proxyTarget);
 }
 
 void ProxyHandler::onRelayInstanceSearchCompleted(

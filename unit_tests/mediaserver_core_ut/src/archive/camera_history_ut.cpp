@@ -7,6 +7,7 @@
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <media_server/media_server_module.h>
 
 struct BuildHistoryDataAccess
 {
@@ -20,7 +21,8 @@ struct BuildHistoryDataAccess
 
 TEST(CameraHistory, BuildHistoryData)
 {
-    QnCameraHistoryRestHandler handler;
+    QnMediaServerModule serverModule;
+    QnCameraHistoryRestHandler handler(&serverModule);
     {
         // s1: |---------| |-------------| |--------|
         MultiServerPeriodDataList chunkPeriods;

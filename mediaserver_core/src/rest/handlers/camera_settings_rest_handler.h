@@ -41,10 +41,10 @@ class QnCachingCameraAdvancedParamsReader;
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
 {
     Q_OBJECT
-	typedef Connective<QnJsonRestHandler> base_type;
+    typedef Connective<QnJsonRestHandler> base_type;
 
 public:
-    QnCameraSettingsRestHandler();
+    QnCameraSettingsRestHandler(QnResourceCommandProcessor* commandProcessor);
     virtual ~QnCameraSettingsRestHandler() override;
 
     virtual int executeGet(
@@ -53,4 +53,5 @@ public:
 
 private:
     QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
+    QnResourceCommandProcessor* m_commandProcessor = nullptr;
 };

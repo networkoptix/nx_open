@@ -3,17 +3,23 @@
 import datetime
 import logging
 import tempfile
+from abc import ABCMeta, abstractmethod
 
 import pytz
 from pathlib2 import Path
 
 from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
+from framework.installation.installer import InstallerSet
+from framework.installation.make_installation import make_installation
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
+from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import copy_file
 from framework.utils import datetime_utc_to_timestamp
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
+from ..switched_logging import with_logger
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -27,42 +33,112 @@ MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waitin
 _logger = logging.getLogger(__name__)
 
 
-class Mediaserver(object):
-    """Mediaserver, same for physical and virtual machines"""
+@with_logger(_logger, 'framework.waiting')
+@with_logger(_logger, 'framework.http_api')
+@with_logger(_logger, 'framework.mediaserver_api')
+class BaseMediaserver(object):
+    __metaclass__ = ABCMeta
 
-    def __init__(self, name, installation, port=7001):  # type: (str, Installation) -> None
-        assert port is not None
+    def __init__(self, name, installation):  # type: (str, Installation) -> None
         self.name = name
         self.installation = installation
-        self.service = installation.service
+
+    @abstractmethod
+    def is_online(self):
+        pass
+
+    def start(self, already_started_ok=False):
+        _logger.info('Start %s', self)
+        service = self.installation.service
+        if service.is_running():
+            if not already_started_ok:
+                raise Exception("Already started")
+        else:
+            service.start()
+            wait_for_truthy(
+                self.is_online,
+                description='{} is started'.format(self),
+                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds(),
+                )
+
+    def stop(self, already_stopped_ok=False):
+        _logger.info("Stop mediaserver %s.", self)
+        service = self.installation.service
+        if service.is_running():
+            service.stop()
+            wait_for_truthy(lambda: not service.is_running(), "{} stops".format(service))
+        else:
+            if not already_stopped_ok:
+                raise Exception("Already stopped")
+
+    def examine(self, stopped_ok=False):
+        examination_logger = _logger.getChild('examination')
+        examination_logger.info('Post-test check for %s', self)
+        status = self.installation.service.status()
+        if status.is_running:
+            examination_logger.debug("%s is running.", self)
+            if self.is_online():
+                examination_logger.debug("%s is online.", self)
+            else:
+                self.installation.os_access.make_core_dump(status.pid)
+                _logger.error('{} is not online; core dump made.'.format(self))
+        else:
+            if stopped_ok:
+                examination_logger.info("%s is stopped; it's OK.", self)
+            else:
+                _logger.error("{} is stopped.".format(self))
+
+    def collect_artifacts(self, artifacts_dir):
+        for file in self.installation.list_log_files():
+            if file.exists():
+                copy_file(file, artifacts_dir / file.name)
+        for core_dump in self.installation.list_core_dumps():
+            local_core_dump_path = artifacts_dir / core_dump.name
+            copy_file(core_dump, local_core_dump_path)
+            # noinspection PyBroadException
+            try:
+                traceback = self.installation.parse_core_dump(core_dump)
+                backtrace_name = local_core_dump_path.name + '.backtrace.txt'
+                local_traceback_path = local_core_dump_path.with_name(backtrace_name)
+                local_traceback_path.write_text(traceback)
+            except Exception:
+                _logger.exception("Cannot parse core dump: %s.", core_dump)
+
+
+class Mediaserver(BaseMediaserver):
+    """Mediaserver, same for physical and virtual machines"""
+
+    def __init__(self, name, installation, port=7001):  # type: (str, Installation, int) -> None
+        super(Mediaserver, self).__init__(name, installation)
+        assert port is not None
+        self.name = name
         self.os_access = installation.os_access
         self.port = port
+        self.service = installation.service
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
         self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
 
+    def __str__(self):
+        return 'Mediaserver {} at {}'.format(self.name, self.api.generic.http.url(''))
+
     def __repr__(self):
-        return '<Mediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
+        return '<{!s}>'.format(self)
 
-    def start(self, already_started_ok=False):
-        if self.service.is_running():
-            if not already_started_ok:
-                raise Exception("Already started")
-        else:
-            self.service.start()
-            wait_for_true(
-                self.api.is_online,
-                description='{} is started'.format(self),
-                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
+    @classmethod
+    def setup(cls, os_access, installer_set, ssl_key_cert):
+        # type: (OSAccess, InstallerSet, str) -> Mediaserver
+        """Get mediaserver as if it hasn't run before."""
+        installation = make_installation(os_access, installer_set.customization)
+        installer = installation.choose_installer(installer_set.installers)
+        installation.install(installer)
+        mediaserver = cls(os_access.alias, installation)
+        mediaserver.stop(already_stopped_ok=True)
+        mediaserver.installation.cleanup(ssl_key_cert)
+        return mediaserver
 
-    def stop(self, already_stopped_ok=False):
-        _logger.info("Stop mediaserver %r.", self)
-        if self.service.is_running():
-            self.service.stop()
-            wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
-        else:
-            if not already_stopped_ok:
-                raise Exception("Already stopped")
+    def is_online(self):
+        return self.api.is_online()
 
     @property
     def storage(self):
@@ -95,16 +171,16 @@ class Storage(object):
         for quality in {'low_quality', 'hi_quality'}:
             path = self._construct_fpath(camera_mac_addr, quality, start_time, unixtime_utc_ms, sample.duration)
             path.parent.mkdir(parents=True, exist_ok=True)
-            _logger.info('Storing media sample %r to %r', sample.fpath, path)
+            _logger.info('Storing media sample %r to %r', sample.path, path)
             path.write_bytes(contents)
 
     def _read_with_start_time_metadata(self, sample, unixtime_utc_ms):
-        _, path = tempfile.mkstemp(suffix=sample.fpath.suffix)
+        _, path = tempfile.mkstemp(suffix=sample.path.suffix)
         path = Path(path)
         try:
             local_shell.run_command([
                 'ffmpeg',
-                '-i', sample.fpath,
+                '-i', sample.path,
                 '-codec', 'copy',
                 '-metadata', 'START_TIME=%s' % unixtime_utc_ms,
                 '-y',

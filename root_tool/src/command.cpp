@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <sstream>
-#include <iostream>
+#include <cstdio>
 #include "command.h"
 
 Command::Command(const std::string& name, const std::vector<std::string>& argNames, Action action):
@@ -15,7 +15,7 @@ Result Command::exec(const std::string& command, int transportFd)
 {
     auto result = m_action(command, transportFd);
     ::close(transportFd);
-    std::cout << "Command " << command << " --> " << toString(result) << std::endl;
+    std::fprintf(stdout, "%s --> %s\n", command.c_str(), toString(result).c_str());
     return result;
 }
 

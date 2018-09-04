@@ -62,18 +62,16 @@ ServerConnection::ServerConnection(
     QnCommonModuleAware(commonModule),
     m_serverId(serverId)
 {
-    auto httpPool = nx::network::http::ClientPool::instance();
     Qn::directConnect(
-        httpPool, &nx::network::http::ClientPool::done,
+        httpClientPool(), &nx::network::http::ClientPool::done,
         this, &ServerConnection::onHttpClientDone);
 }
 
 ServerConnection::~ServerConnection()
 {
     directDisconnectAll();
-    auto httpPool = nx::network::http::ClientPool::instance();
     for (const auto& handle : m_runningRequests.keys())
-        httpPool->terminate(handle);
+        httpClientPool()->terminate(handle);
 }
 
 rest::Handle ServerConnection::cameraHistoryAsync(
@@ -694,6 +692,12 @@ Handle ServerConnection::consumeWearableCameraFile(
         targetThread);
 }
 
+Handle ServerConnection::getStatistics(
+    ServerConnection::GetCallback callback, QThread* targetThread)
+{
+    return executeGet("/api/statistics", {}, callback, targetThread);
+}
+
 Handle ServerConnection::getEvents(QnEventLogRequestData request,
     Result<EventLogData>::type callback,
     QThread *targetThread)
@@ -1107,7 +1111,7 @@ Handle ServerConnection::executeRequest(
 
 void ServerConnection::cancelRequest(const Handle& requestId)
 {
-    nx::network::http::ClientPool::instance()->terminate(requestId);
+    httpClientPool()->terminate(requestId);
     QnMutexLocker lock(&m_mutex);
     m_runningRequests.remove(requestId);
 }
@@ -1181,9 +1185,8 @@ Handle ServerConnection::sendRequest(
     const nx::network::http::ClientPool::Request& request,
     HttpCompletionFunc callback)
 {
-    auto httpPool = nx::network::http::ClientPool::instance();
     QnMutexLocker lock(&m_mutex);
-    Handle requestId = httpPool->sendRequest(request);
+    Handle requestId = httpClientPool()->sendRequest(request);
     m_runningRequests.insert(requestId, callback);
     return requestId;
 }

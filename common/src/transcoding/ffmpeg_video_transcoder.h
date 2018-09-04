@@ -7,6 +7,8 @@
 
 #include "transcoder.h"
 
+namespace nx { namespace metrics { struct Storage; } }
+
 extern "C"
 {
     #include <libswscale/swscale.h>
@@ -18,11 +20,11 @@ extern "C"
 
 AVCodecID findVideoEncoder(const QString& codecName);
 
-class QnFfmpegVideoTranscoder: public QnVideoTranscoder, public QnCommonModuleAware
+class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(QnCommonModule* commonModule, AVCodecID codecId);
+    QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -61,6 +63,7 @@ private:
     bool m_useRealTimeOptimization;
     AVPacket* m_outPacket;
     QnConstMediaContextPtr m_ctxPtr;
+    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

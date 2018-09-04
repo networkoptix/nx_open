@@ -1,11 +1,78 @@
+import datetime
+import timeit
 from abc import ABCMeta, abstractmethod, abstractproperty
+from contextlib import contextmanager
+from textwrap import dedent
+
+import pytz
+from netaddr import EUI, IPAddress
+from pathlib2 import PurePath
+from six.moves import shlex_quote
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.exceptions import exit_status_error_cls, AlreadyAcquired
+from framework.os_access.path import copy_file_using_read_and_write
+from framework.utils import RunningTime
 
-_STREAM_BUFFER_SIZE = 16 * 1024
+STREAM_BUFFER_SIZE = 16 * 1024
+_PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
 
 
-class PosixOutcome(CommandOutcome):
+def quote_arg(arg):
+    return shlex_quote(str(arg))
+
+
+def command_to_script(command):
+    return ' '.join(quote_arg(str(arg)) for arg in command)
+
+
+def env_values_to_str(env):
+    converted_env = {}
+    for name, value in env.items():
+        if isinstance(value, bool):  # Beware: bool is subclass of int.
+            converted_env[name] = 'true' if value else 'false'
+            continue
+        if isinstance(value, (int, PurePath, IPAddress, EUI)):
+            converted_env[name] = str(value)
+            continue
+        if isinstance(value, str):
+            converted_env[name] = value
+            continue
+        if value is None:
+            converted_env[name] = ''
+            continue
+        raise RuntimeError("Unexpected value {!r} of type {}".format(value, type(value)))
+    return converted_env
+
+
+def env_to_command(env):
+    converted_env = env_values_to_str(env)
+    command = []
+    for name, value in converted_env.items():
+        if name in _PROHIBITED_ENV_NAMES:
+            raise ValueError("Potential name clash with built-in name: {}".format(name))
+        command.append('{}={}'.format(name, quote_arg(str(value))))
+    return command
+
+
+def augment_script(script, cwd=None, env=None, set_eux=True, shebang=False):
+    augmented_script_lines = []
+    if shebang:
+        # language=Bash
+        augmented_script_lines.append('#!/bin/sh')
+    if set_eux:
+        # language=Bash
+        augmented_script_lines.append('set -eux')  # It's sh (dash), pipefail cannot be set here.
+    if cwd is not None:
+        augmented_script_lines.append(command_to_script(['cd', cwd]))
+    if env is not None:
+        augmented_script_lines.extend(env_to_command(env))
+    augmented_script_lines.append(dedent(script).strip())
+    augmented_script = '\n'.join(augmented_script_lines)
+    return augmented_script
+
+
+class Outcome(CommandOutcome):
     __metaclass__ = ABCMeta
 
     # See: http://tldp.org/LDP/abs/html/exitcodes.html
@@ -79,24 +146,76 @@ class PosixOutcome(CommandOutcome):
         return "Terminated by {} ({}; default action: {})".format(name, comment, action)
 
 
-class PosixShell(object):
+class Shell(object):
     """Posix-specific interface"""
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def command(self, args, cwd=None, env=None):
+    def command(self, args, cwd=None, env=None, logger=None):
         return Command()
 
     @abstractmethod
-    def sh_script(self, script, cwd=None, env=None):
+    def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
         return Command()
 
-    def run_command(self, args, input=None, cwd=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
+    @contextmanager
+    def lock_acquired(self, path, timeout_sec=10):
+        command = self.sh_script(
+            # language=Bash
+            '''
+                exec 3>"$FILE"  # Open file as file descriptor 3 (small arbitrary integer).
+                flock --wait $TIMEOUT_SEC 3 || exit 3
+                echo 'acquired'
+                read -r _ # Wait for any input to continue.
+                # No need to unlock: file is closed.
+                ''',
+            env={'FILE': path, 'TIMEOUT_SEC': timeout_sec},
+            )
+        with command.running() as run:
+            try:
+                run.expect(b'acquired\n', timeout_sec=timeout_sec + 1)
+            except exit_status_error_cls(3):
+                raise AlreadyAcquired("{} already acquired, timeout {}".format(self, timeout_sec))
+            try:
+                yield
+            finally:
+                run.communicate(input=b'release\n', timeout_sec=1)
+
+    def run_command(self, args, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
-        return self.command(args, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
+        return self.command(
+            args, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
+    def run_sh_script(self, script, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
-        return self.sh_script(script, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
+        return self.sh_script(
+            script, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
+
+    def copy_posix_file_to(self, posix_source, destination):
+        copy_file_using_read_and_write(posix_source, destination)
+
+    def copy_file_from_posix(self, source, posix_destination):
+        copy_file_using_read_and_write(source, posix_destination)
 
 
+class ReadOnlyTime(object):
+    def __init__(self, shell):  # type: (Shell) -> None
+        self._shell = shell
+
+    def get(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self._shell.command(['date', '+%s']).check_output(timeout_sec=2)
+        timestamp = int(timestamp_output.decode('ascii').rstrip())
+        delay_sec = timeit.default_timer() - started_at
+        timezone_output = self._shell.command(['cat', '/etc/timezone']).check_output(timeout_sec=2)
+        timezone_name = timezone_output.decode('ascii').rstrip()
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+
+class Time(ReadOnlyTime):
+    def set(self, new_time):
+        started_at = datetime.datetime.now(pytz.utc)
+        self._shell.command(['date', '--set', new_time.isoformat()])
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)

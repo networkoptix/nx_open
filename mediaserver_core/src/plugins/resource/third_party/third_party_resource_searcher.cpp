@@ -24,13 +24,15 @@
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 static const QString kUpnpBasicDeviceType("Basic");
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnMdnsResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule, kUpnpBasicDeviceType)
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnUpnpResourceSearcherAsync(serverModule->commonModule(), kUpnpBasicDeviceType),
+    m_serverModule(serverModule)
 {
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule->pluginManager();
     NX_ASSERT(pluginManager, lit("There is no plugin manager"));
     QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
@@ -45,8 +47,11 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonMod
         ++it )
     {
         const QList<QString>& modelList = it->getReservedModelList();
-        for(const  QString& modelMask: modelList )
-            CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
+        for(const QString& modelMask: modelList)
+        {
+            m_serverModule->commonModule()->cameraDriverRestrictionList()
+                ->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask);
+        }
     }
 }
 
@@ -93,13 +98,13 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
     NX_ASSERT( discoveryManager->getRef() );
     //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid),
         //so just instanciating QnThirdPartyResource
-    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
+    result = QnThirdPartyResourcePtr( new QnThirdPartyResource(m_serverModule, cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
 
     // If third party driver returns MAC based physical ID then re-format MAC address string
     // to ensure it has same string format as build-in drivers.
     auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuidStr);
+    const auto uuidMac = nx::utils::MacAddress(uuidStr);
     if (!uuidMac.isNull())
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
@@ -306,8 +311,8 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
-
-    QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
+    QnThirdPartyResourcePtr resource(new QnThirdPartyResource(
+        m_serverModule, cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
     auto model = QString::fromUtf8(cameraInfo.modelName);
     if (!QUrl(model).scheme().isEmpty())
@@ -317,7 +322,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setModel(model);
 
     const auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
-    const auto uuidMac = nx::network::QnMacAddress(uuid);
+    const auto uuidMac = nx::utils::MacAddress(uuid);
     resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
     resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );

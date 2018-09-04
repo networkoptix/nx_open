@@ -26,9 +26,8 @@ inline std::string toString(Result result)
 
 using Action = std::function<Result(const std::string&, int)>;
 
-inline bool skipWhileSpacesPred(char c) { return isspace(c); }
-inline bool skipWhileNotSpacesPred(char c) { return !isspace(c); }
-inline bool skipWhileNotQuotePred(char c) { return c != '\''; }
+inline bool isNotSpace(char c) { return !isspace(c); }
+inline bool isNotQuote(char c) { return c != '\''; }
 
 template<typename Pred>
 void advanceWhile(std::string::const_iterator* it, std::string::const_iterator end, Pred pred)
@@ -40,11 +39,11 @@ void advanceWhile(std::string::const_iterator* it, std::string::const_iterator e
 template<typename OutBuf>
 void extractWord(std::string::const_iterator* it, std::string::const_iterator end, OutBuf* outBuf)
 {
-    std::function<bool(char)> pred = &skipWhileNotSpacesPred;
+    std::function<bool(char)> pred = &isNotSpace;
     if (**it == '\'')
     {
         ++(*it);
-        pred = &skipWhileNotQuotePred;
+        pred = &isNotQuote;
     }
     auto wordStartIt = *it;
     advanceWhile(it, end, pred);
@@ -70,7 +69,7 @@ template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
     boost::optional<std::string>* head, Tail... tail)
 {
-    advanceWhile(it, end, &skipWhileSpacesPred);
+    advanceWhile(it, end, &isspace);
     if (*it != end)
         extractWord(it, end, head);
 
@@ -81,7 +80,7 @@ template<typename... Tail>
 bool parseCommandImpl(std::string::const_iterator* it, std::string::const_iterator end,
     std::string* head, Tail... tail)
 {
-    advanceWhile(it, end, &skipWhileSpacesPred);
+    advanceWhile(it, end, &isspace);
     if (*it == end)
         return false;
 
@@ -93,7 +92,7 @@ template<typename... Args>
 bool parseCommand(const std::string& command, Args... args)
 {
     auto it = command.cbegin();
-    advanceWhile(&it, command.cend(), &skipWhileSpacesPred);
-    advanceWhile(&it, command.cend(), &skipWhileNotSpacesPred); //< Skipping command name.
+    advanceWhile(&it, command.cend(), &isspace);
+    advanceWhile(&it, command.cend(), &isNotSpace); //< Skipping command name.
     return parseCommandImpl(&it, command.cend(), args...);
 }

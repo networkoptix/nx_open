@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <queue>
 
 #include "stream_socket_server.h"
 
@@ -37,10 +38,16 @@ private:
     nx::Buffer m_readBuffer;
     const std::chrono::steady_clock::time_point m_creationTimestamp;
     bool m_keepConnection = false;
+    std::queue<nx::Buffer> m_sendQueue;
 
     void onDataRead(
         SystemError::ErrorCode errorCode,
         size_t bytesRead);
+
+    void scheduleMessageSend();
+
+    void sendNextMessage();
+
     void onDataSent(
         SystemError::ErrorCode errorCode,
         size_t bytesSent);

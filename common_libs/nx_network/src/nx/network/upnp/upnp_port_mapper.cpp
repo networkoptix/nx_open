@@ -269,7 +269,7 @@ void PortMapper::updateExternalIp(Device& device)
     m_upnpClient->externalIp(device.url,
         [this, &device](HostAddress externalIp)
     {
-        std::list<Guard> callbackGuards;
+        std::list<nx::utils::Guard> callbackGuards;
 
         QnMutexLocker lock(&m_mutex);
         NX_DEBUG(this, lm("externalIp='%1' on device %2").args(
@@ -283,7 +283,7 @@ void PortMapper::updateExternalIp(Device& device)
                 const auto it = m_mapRequests.find(map.first);
                 if (it != m_mapRequests.end())
                 {
-                    callbackGuards.push_back(Guard(std::bind(
+                    callbackGuards.push_back(nx::utils::Guard(std::bind(
                         it->second, SocketAddress(device.externalIp, 0))));
                 }
             }

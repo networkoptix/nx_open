@@ -30,11 +30,11 @@ def network(hypervisor, vm_types, layout):
 
 
 @pytest.fixture()
-def system(network, mediaserver_factory, layout):
+def system(mediaserver_allocation, network, layout):
     with ExitStack() as stack:
         def allocate_mediaserver(alias):
             vm = network[alias]
-            server = stack.enter_context(mediaserver_factory.allocated_mediaserver(alias, vm))
+            server = stack.enter_context(mediaserver_allocation(vm))
             return server
         used_mediaservers = setup_system(allocate_mediaserver, layout['mergers'])
         yield used_mediaservers

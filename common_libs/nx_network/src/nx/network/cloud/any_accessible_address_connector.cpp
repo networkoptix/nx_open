@@ -150,11 +150,12 @@ void AnyAccessibleAddressConnector::onDirectConnectDone(
     else
         tcpSocket->cancelIOSync(aio::etNone);
 
-    onConnectDone(sysErrorCode, boost::none, std::move(tcpSocket));
+    onConnectDone(sysErrorCode, AddressType::direct, boost::none, std::move(tcpSocket));
 }
 
 void AnyAccessibleAddressConnector::onConnectDone(
     SystemError::ErrorCode sysErrorCode,
+    AddressType addressType,
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
@@ -162,9 +163,16 @@ void AnyAccessibleAddressConnector::onConnectDone(
         .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
 
     if (sysErrorCode == SystemError::noError)
+    {
         NX_ASSERT(connection->getAioThread() == getAioThread());
+        if (!cloudTunnelAttributes)
+            cloudTunnelAttributes = TunnelAttributes();
+        cloudTunnelAttributes->addressType = addressType;
+    }
     else
+    {
         NX_ASSERT(!connection);
+    }
 
     --m_awaitedConnectOperationCount;
     if (m_awaitedConnectOperationCount > 0 && sysErrorCode != SystemError::noError)
@@ -214,6 +222,7 @@ void AnyAccessibleAddressConnector::onCloudConnectDone(
 
     onConnectDone(
         sysErrorCode,
+        AddressType::cloud,
         std::move(cloudTunnelAttributes),
         std::move(connection));
 }

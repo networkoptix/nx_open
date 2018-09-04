@@ -37,7 +37,7 @@ public:
     */
     TunnelConnector(
         AddressEntry targetHostAddress,
-        nx::String connectSessionId,
+        std::string connectSessionId,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
     virtual ~TunnelConnector();
 
@@ -65,7 +65,7 @@ protected:
 
 private:
     const AddressEntry m_targetHostAddress;
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
     ConnectCompletionHandler m_completionHandler;
     std::unique_ptr<UdtStreamSocket> m_udtConnection;

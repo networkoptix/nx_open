@@ -63,8 +63,8 @@ class QnMediaResourceWidget: public Customized<QnResourceWidget>
     Q_OBJECT
     typedef Customized<QnResourceWidget> base_type;
 
-    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors WRITE
-        setMotionSensitivityColors);
+    Q_PROPERTY(QVector<QColor> motionSensitivityColors READ motionSensitivityColors
+        WRITE setMotionSensitivityColors);
 
 public:
     QnMediaResourceWidget(
@@ -88,8 +88,8 @@ public:
     /**
      * @param itemPos Point in item coordinates to map to grid coordinates.
      * @return Coordinates of the motion cell that the given point belongs to. Note that motion
-     * grid is finite, so even if the passed coordinate lies outside the item boundary, returned
-     * joint will lie inside it.
+     *     grid is finite, so even if the passed coordinate lies outside the item boundary, the
+     *     returned joint will lie inside it.
      */
     QPoint mapToMotionGrid(const QPointF& itemPos);
 
@@ -100,8 +100,8 @@ public:
     QPointF mapFromMotionGrid(const QPoint& gridPos);
 
     /**
-     * @param gridRect Rectangle in grid coordinates to add to selected motion region of this
-     * widget.
+     * @param gridRect Rectangle in grid coordinates to add to the selected motion region of this
+     *     widget.
      */
     void addToMotionSelection(const QRect& gridRect);
 
@@ -131,8 +131,7 @@ public:
     void setImageEnhancement(const ImageCorrectionParams& imageEnhancement);
 
     /**
-     * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns nullptr.
+     * @return PTZ controller associated with this widget. Never returns null.
      */
     QnPtzControllerPtr ptzController() const;
 
@@ -200,6 +199,7 @@ protected:
 
     virtual Qn::ResourceOverlayButton calculateOverlayButton(
         Qn::ResourceStatusOverlay statusOverlay) const override;
+
     virtual QString overlayCustomButtonText(
         Qn::ResourceStatusOverlay statusOverlay) const override;
 
@@ -207,29 +207,36 @@ protected:
         QPainter* painter,
         const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
+
     virtual Qn::RenderStatus paintChannelBackground(
         QPainter* painter,
         int channel,
         const QRectF& channelRect,
         const QRectF& paintRect) override;
+
     virtual void paintChannelForeground(
         QPainter* painter,
         int channel,
         const QRectF& rect) override;
+
     void paintMotionSensitivityIndicators(QPainter* painter, int channel, const QRectF& rect);
+
     void paintMotionGrid(
         QPainter* painter,
         int channel,
         const QRectF& rect,
         const QnMetaDataV1Ptr& motion);
+
     void paintMotionSensitivity(QPainter* painter, int channel, const QRectF& rect);
     void paintWatermark(QPainter* painter, const QRectF& rect);
+
     void paintFilledRegionPath(
         QPainter* painter,
         const QRectF& rect,
         const QPainterPath& path,
         const QColor& color,
         const QColor& penColor);
+
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
     void ensureMotionSensitivity() const;
@@ -368,19 +375,25 @@ private:
 
     void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
+
     void configureTriggerButton(
         nx::client::desktop::SoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
+
     void resetTriggers();
 
     void updateTriggersAvailability();
     void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
+
     void updateTriggerButtonTooltip(
         nx::client::desktop::SoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+	void updateWatermark();
+
+    using ButtonHandler = void (QnMediaResourceWidget::*)(bool checked);
     void createActionAndButton(
         const char* iconName,
         bool checked,
@@ -389,7 +402,7 @@ private:
         Qn::HelpTopic helpTopic,
         Qn::WidgetButtons buttonId,
         const QString& buttonName,
-        void (QnMediaResourceWidget::*executor)(bool checked));
+        ButtonHandler executor);
 
     using TriggerDataList = QList<SoftwareTrigger>;
     TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);

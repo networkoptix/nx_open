@@ -6,7 +6,7 @@
 #include <nx/vms/api/data/module_information.h>
 
 CloudMediaServerEndpointVerificator::CloudMediaServerEndpointVerificator(
-    const nx::String& connectSessionId)
+    const std::string& connectSessionId)
     :
     m_connectSessionId(connectSessionId)
 {

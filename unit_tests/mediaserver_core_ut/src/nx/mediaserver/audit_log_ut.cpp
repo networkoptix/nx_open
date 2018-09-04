@@ -19,9 +19,9 @@ public:
     {
         QnSyncTime syncTime;
 
-        using Record = QnAuditManager::CameraPlaybackInfo;
+        using Record = QnMServerAuditManager::CameraPlaybackInfo;
         QVector<Record> recordsToAggregate;
-        
+
         Record record;
         record.session.id = QnUuid::createUuid();
         record.cameraId = QnUuid::createUuid();
@@ -35,11 +35,11 @@ public:
         record.cameraId = QnUuid::createUuid();
         recordsToAggregate.push_back(record);
 
-        QnAuditManager::processDelayedRecordsInternal(recordsToAggregate, 1000 * 1000);
+        QnMServerAuditManager::processDelayedRecordsInternal(recordsToAggregate, 1000 * 1000);
         ASSERT_EQ(3, recordsToAggregate.size());
 
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
-        auto result = QnAuditManager::processDelayedRecordsInternal(recordsToAggregate, 0);
+        auto result = QnMServerAuditManager::processDelayedRecordsInternal(recordsToAggregate, 0);
         ASSERT_EQ(0, recordsToAggregate.size());
 
         ASSERT_EQ(2, result.size());
@@ -47,7 +47,8 @@ public:
         int resourceCount = 0;
         for (const auto& record: result)
             resourceCount += record.resources.size();
-        NX_EXPECT(3, resourceCount);
+
+        ASSERT_EQ(3, resourceCount);
     }
 };
 

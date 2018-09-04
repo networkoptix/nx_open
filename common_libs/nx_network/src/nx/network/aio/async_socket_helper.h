@@ -11,8 +11,6 @@
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/future.h>
 
@@ -221,7 +219,6 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         NX_CRITICAL(addr.address.isIpAddress());
-        // TODO: #ak With UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline.
 
         if (this->m_socket->impl()->terminated.load(std::memory_order_relaxed) > 0)
         {
@@ -282,10 +279,13 @@ public:
         m_recvBuffer = buf;
         m_recvHandler = std::move(handler);
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_recvAsyncCallCounter;
-        this->m_aioService->startMonitoring(
-            this->m_socket, aio::etRead, this);
+        this->dispatch(
+            [this]()
+            {
+                ++m_recvAsyncCallCounter;
+                this->m_aioService->startMonitoring(
+                    this->m_socket, aio::etRead, this);
+            });
     }
 
     void sendAsync(
@@ -303,10 +303,13 @@ public:
         m_sendHandler = std::move(handler);
         m_sendBufPos = 0;
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_connectSendAsyncCallCounter;
-        this->m_aioService->startMonitoring(
-            this->m_socket, aio::etWrite, this);
+        this->dispatch(
+            [this]()
+            {
+                ++m_connectSendAsyncCallCounter;
+                this->m_aioService->startMonitoring(
+                    this->m_socket, aio::etWrite, this);
+            });
     }
 
     void registerTimer(
@@ -319,13 +322,16 @@ public:
 
         m_timerHandler = std::move(handler);
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_registerTimerCallCounter;
-        this->m_aioService->startMonitoring(
-            this->m_socket,
-            aio::etTimedOut,
-            this,
-            timeoutMs);
+        this->dispatch(
+            [this, timeoutMs]()
+            {
+                ++m_registerTimerCallCounter;
+                this->m_aioService->startMonitoring(
+                    this->m_socket,
+                    aio::etTimedOut,
+                    this,
+                    timeoutMs);
+            });
     }
 
     void cancelIOSync(aio::EventType eventType)
@@ -337,7 +343,7 @@ public:
         }
         else
         {
-            NX_EXPECT(!this->m_aioService->isInAnyAioThread());
+            NX_ASSERT(!this->m_aioService->isInAnyAioThread());
 
             nx::utils::promise<void> promise;
             this->m_aioService->post(
@@ -387,7 +393,6 @@ private:
     std::atomic<bool> m_asyncSendIssued;
     std::atomic<bool> m_addressResolverIsInUse;
     const int m_ipVersion;
-    QnMutex m_mutex;
 
     nx::utils::ObjectDestructionFlag m_socketDestroyedDuringEventHandlingFlag;
     nx::utils::ObjectDestructionFlag m_socketDestroyedInUserHandlerFlag;
@@ -467,20 +472,22 @@ private:
         if (!this->m_socket->getSendTimeout(&sendTimeout))
             return false;
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_connectSendAsyncCallCounter;
-        this->m_aioService->startMonitoring(
-            this->m_socket,
-            aio::etWrite,
-            this,
-            boost::none,
+        this->dispatch(
             [this, resolvedAddress, sendTimeout]()
             {
-                NX_CRITICAL(resolvedAddress.address.isIpAddress());
-                this->m_socket->connect(
-                    resolvedAddress,
-                    std::chrono::milliseconds(sendTimeout));
-            });    //< Functor will be called between pollset.add and pollset.poll.
+                ++m_connectSendAsyncCallCounter;
+                this->m_aioService->startMonitoring(
+                    this->m_socket,
+                    aio::etWrite,
+                    this,
+                    boost::none,
+                    [this, resolvedAddress, sendTimeout]()
+                    {
+                        this->m_socket->connect(
+                            resolvedAddress,
+                            std::chrono::milliseconds(sendTimeout));
+                    }); //< This functor will be called between pollset.add and pollset.poll.
+            });
         return true;
     }
 
@@ -493,13 +500,12 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, registerTimerCallCounterBak = m_registerTimerCallCounter]()
             {
                 if (watcher.objectDestroyed())
                     return;
 
-                QnMutexLocker lock(&m_mutex);
                 if (registerTimerCallCounterBak == m_registerTimerCallCounter)
                 {
                     this->m_aioService->stopMonitoring(
@@ -562,13 +568,12 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, recvAsyncCallCounterBak = m_recvAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
                     return;
 
-                QnMutexLocker lock(&m_mutex);
                 if (recvAsyncCallCounterBak == m_recvAsyncCallCounter)
                 {
                     this->m_aioService->stopMonitoring(
@@ -659,13 +664,12 @@ private:
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_socketDestroyedInUserHandlerFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &watcher, connectSendAsyncCallCounterBak = m_connectSendAsyncCallCounter]()
             {
                 if (watcher.objectDestroyed())
                     return;
 
-                QnMutexLocker lock(&m_mutex);
                 if (connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter)
                 {
                     this->m_aioService->stopMonitoring(
@@ -817,12 +821,16 @@ public:
     {
         m_acceptHandler = std::move(handler);
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_acceptAsyncCallCount;
-        // TODO: #ak Usually, acceptAsync is called repeatedly.
-        // SHOULD avoid unneccessary startMonitoring and stopMonitoring calls.
-        return this->m_aioService->startMonitoring(
-            this->m_socket, aio::etRead, this);
+
+        this->dispatch(
+            [this]()
+            {
+                ++m_acceptAsyncCallCount;
+                // TODO: #ak Usually, acceptAsync is called repeatedly.
+                // SHOULD avoid unneccessary startMonitoring and stopMonitoring calls.
+                return this->m_aioService->startMonitoring(
+                    this->m_socket, aio::etRead, this);
+            });
     }
 
     void cancelIOSync()
@@ -855,7 +863,6 @@ private:
     AcceptCompletionHandler m_acceptHandler;
     std::atomic<int> m_acceptAsyncCallCount;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
-    QnMutex m_mutex;
 
     void cancelIoWhileInAioThread()
     {
@@ -869,14 +876,13 @@ private:
     {
         nx::utils::ObjectDestructionFlag::Watcher thisWatcher(&m_destructionFlag);
 
-        auto execFinally = makeScopeGuard(
+        auto execFinally = nx::utils::makeScopeGuard(
             [this, &thisWatcher, acceptAsyncCallCountBak = m_acceptAsyncCallCount.load()]()
             {
                 if (thisWatcher.objectDestroyed())
                     return;
 
                 // If asyncAccept has been called from onNewConnection, no need to call stopMonitoring.
-                QnMutexLocker lock(&m_mutex);
                 if (m_acceptAsyncCallCount == acceptAsyncCallCountBak)
                     this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
             });

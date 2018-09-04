@@ -12,23 +12,20 @@
 #include <test_support/resource/camera_resource_stub.h>
 
 #include "../camera/video_camera_mock.h"
+#include <core/dataprovider/data_provider_factory.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace vms {
 namespace mediaserver {
 namespace test {
 
-class StreamingChunkTranscoder:
-    public ::testing::Test
+class StreamingChunkTranscoder: public ::testing::Test
 {
 public:
     StreamingChunkTranscoder():
-        m_commonModule(false, nx::core::access::Mode::cached),
-        m_resourcePool(&m_commonModule),
-        m_videoCameraPool(m_settings.settings(), &m_resourcePool),
         m_streamingChunkTranscoder(
-            &m_resourcePool,
-            &m_videoCameraPool,
+            &m_serverModule,
             static_cast<::StreamingChunkTranscoder::Flags>(0))
     {
     }
@@ -40,8 +37,8 @@ protected:
 
         auto cameraResource = QnResourcePtr(new CameraResourceStub());
         cameraResource->setId(m_cameraResourceId);
-        m_resourcePool.addResource(cameraResource);
-        ASSERT_TRUE(m_videoCameraPool.addVideoCamera(
+        m_serverModule.resourcePool()->addResource(cameraResource);
+        ASSERT_TRUE(m_serverModule.videoCameraPool()->addVideoCamera(
             cameraResource, QnVideoCameraPtr(new MediaServerVideoCameraMock())));
 
         m_streamingChunkKey = StreamingChunkCacheKey(
@@ -72,11 +69,7 @@ protected:
     }
 
 private:
-    MSSettings m_settings;
-    QnCommonModule m_commonModule;
-
-    QnResourcePool m_resourcePool;
-    QnVideoCameraPool m_videoCameraPool;
+    QnMediaServerModule m_serverModule;
     ::StreamingChunkTranscoder m_streamingChunkTranscoder;
     QnUuid m_cameraResourceId;
     StreamingChunkCacheKey m_streamingChunkKey;

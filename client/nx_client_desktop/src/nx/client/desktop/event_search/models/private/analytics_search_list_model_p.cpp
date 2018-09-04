@@ -313,7 +313,7 @@ template<typename Iter>
 bool AnalyticsSearchListModel::Private::commitPrefetch(
     const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
 {
-    QnRaiiGuard clearPrefetch([this]() { m_prefetch.clear(); });
+    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
 
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);
@@ -420,7 +420,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     for (const auto& metadata: packets)
     {
-        NX_EXPECT(metadata->metadataType == MetadataType::ObjectDetection);
+        NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
         const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
         const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 

@@ -1,12 +1,14 @@
 #pragma once
 
-#include <QtCore>
 #include <atomic>
+
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_information.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
+
+struct QnAuthSession;
 
 namespace nx {
 
@@ -24,7 +26,7 @@ public:
     update::Status status();
     void cancel();
     void startUpdate(const QByteArray& content);
-    void install();
+    void install(const QnAuthSession& authInfo);
 
 private:
     std::atomic<bool> m_downloaderFailed = false;

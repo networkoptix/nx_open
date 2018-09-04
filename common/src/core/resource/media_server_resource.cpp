@@ -325,10 +325,17 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 
 QString QnMediaServerResource::getUrl() const
 {
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
+        .setScheme(isSslAllowed() ? "https" : "http")
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
+}
+
+QString QnMediaServerResource::rtspUrl() const
+{
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
+    nx::network::url::Builder urlBuilder(getUrl());
+    urlBuilder.setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure));
+    return urlBuilder.toString();
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
@@ -611,6 +618,13 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags().testFlag(vms::api::SF_Edge));
+    return false;
+}
+
+bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
+{
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags().testFlag(vms::api::SF_ArmServer));
     return false;
 }
 

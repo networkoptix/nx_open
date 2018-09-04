@@ -16,11 +16,14 @@
 
 #include <nx/vms/event/event_fwd.h>
 
+class QnMediaServerModule;
+
 class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
     QnServerStreamRecorder(
+        QnMediaServerModule* serverModule,
         const QnResourcePtr                 &dev,
         QnServer::ChunksCatalog             catalog,
         QnAbstractMediaStreamDataProvider*  mediaProvider
@@ -175,4 +178,5 @@ private:
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
     bool m_canDropPackets;
+    QnMediaServerModule* m_serverModule = nullptr;
 };

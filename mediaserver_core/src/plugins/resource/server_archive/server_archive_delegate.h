@@ -1,5 +1,4 @@
-#ifndef _SERVER_ARCHIVE_DELEGATE_H__
-#define _SERVER_ARCHIVE_DELEGATE_H__
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 #include <QtGui/QRegion>
@@ -19,7 +18,7 @@ class QnServerArchiveDelegate: public QnAbstractArchiveDelegate
 public:
     QnServerArchiveDelegate(
         QnMediaServerModule* mediaServerModule, MediaQuality quality = MEDIA_Quality_High);
-    virtual ~QnServerArchiveDelegate();
+    virtual ~QnServerArchiveDelegate() override;
 
     //virtual void setSendMotion(bool value) override;
 
@@ -27,16 +26,16 @@ public:
         const QnResourcePtr &resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     bool isOpened() const;
-    virtual void close();
-    virtual qint64 startTime() const;
-    virtual qint64 endTime() const;
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual qint64 seek (qint64 time, bool findIFrame);
+    virtual void close() override;
+    virtual qint64 startTime() const override;
+    virtual qint64 endTime() const override;
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    virtual qint64 seek (qint64 time, bool findIFrame) override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
 
-    virtual AVCodecContext* setAudioChannel(int num);
-    virtual void setSpeed(qint64 displayTime, double value);
+    virtual bool setAudioChannel(unsigned num) override;
+    virtual void setSpeed(qint64 displayTime, double value) override;
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch, const QSize &) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
@@ -73,7 +72,7 @@ private:
     QnAviArchiveDelegatePtr m_aviDelegate;
     QnAviResourcePtr m_fileRes;
     bool m_reverseMode;
-    int m_selectedAudioChannel;
+    unsigned m_selectedAudioChannel = 0;
 
     QRegion m_motionRegion;
 
@@ -102,8 +101,8 @@ private:
     QnServer::StoragePool m_newQualityChunkStoragePool;
 
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 typedef QSharedPointer<QnServerArchiveDelegate> QnServerArchiveDelegatePtr;
-
-#endif // _SERVER_ARCHIVE_DELEGATE_H__

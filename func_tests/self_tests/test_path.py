@@ -1,4 +1,5 @@
 # coding=utf-8
+import logging
 import os
 from string import whitespace
 
@@ -7,7 +8,10 @@ import pytest
 from framework.os_access.exceptions import BadParent, DoesNotExist, NotADir, NotAFile
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
+from framework.os_access.path import copy_file
 from framework.os_access.posix_shell_path import PosixShellPath
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
@@ -20,7 +24,7 @@ def ssh_path_cls():
     return PosixShellPath.specific_cls(local_shell)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def windows_vm(vm_types):
     with vm_types['windows'].vm_ready('paths-test') as windows_vm:
         yield windows_vm
@@ -78,10 +82,6 @@ def existing_remote_dir(remote_test_dir):
     return path
 
 
-def test_tmp(path_cls):
-    assert path_cls.tmp().exists()
-
-
 def test_home(path_cls):
     assert path_cls.home().exists()
 
@@ -119,17 +119,17 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
     assert not root_dir.exists()
 
 
-@pytest.mark.parametrize(
-    'data',
-    [
-        ('chr0_to_chr255', b''.join(map(chr, range(0xFF)))),
-        ('chr0_to_chr255_100times', b''.join(map(chr, range(0xFF))) * 100),
-        ('whitespace', whitespace),
-        ('windows_newlines', '\r\n' * 100),
-        ('linux_newlines', '\n' * 100),
-        ('ending_with_chr0', 'abc\0'),
-        ],
-    ids='{0[0]}'.format)
+_tricky_bytes = [
+    ('chr0_to_chr255', bytes(bytearray(range(0x100)))),
+    ('chr0_to_chr255_100times', bytes(bytearray(range(0x100)) * 100)),
+    ('whitespace', whitespace),
+    ('windows_newlines', '\r\n' * 100),
+    ('linux_newlines', '\n' * 100),
+    ('ending_with_chr0', 'abc\0'),
+    ]
+
+
+@pytest.mark.parametrize('data', _tricky_bytes, ids='{0[0]}'.format)
 def test_write_read_bytes(remote_test_dir, data):
     name, written = data
     file_path = remote_test_dir / '{}.dat'.format(name)
@@ -137,6 +137,24 @@ def test_write_read_bytes(remote_test_dir, data):
     assert bytes_written == len(written)
     read = file_path.read_bytes()
     assert read == written
+
+
+@pytest.mark.parametrize('data', _tricky_bytes, ids='{0[0]}'.format)
+def test_write_read_tricky_bytes_with_offsets(remote_test_dir, data):
+    name, written = data
+    file_path = remote_test_dir / '{}.dat'.format(name)
+    file_path.write_bytes(written, offset=10)
+    assert file_path.read_bytes(offset=10, max_length=100) == written[:100]
+
+
+def test_write_read_bytes_with_tricky_offsets(remote_test_dir):
+    file_path = remote_test_dir / 'abc.dat'
+    file_path.write_bytes(b'aaaaa')
+    file_path.write_bytes(b'ccccc', offset=10)
+    file_path.write_bytes(b'bbbbb', offset=5)
+    assert file_path.read_bytes(offset=12, max_length=5) == b'ccc'
+    assert file_path.read_bytes(offset=8, max_length=5) == b'bbccc'
+    assert file_path.read_bytes(offset=3, max_length=5) == b'aabbb'
 
 
 @pytest.mark.parametrize(
@@ -234,3 +252,44 @@ def test_many_mkdir_rmtree(remote_test_dir, iterations, depth):
         deep_path.mkdir(parents=True)
         deep_path.joinpath('treasure').write_bytes(b'\0' * 1000000)
         top_path.rmtree()
+
+
+path_type_list = ['local', 'posix', 'ssh', 'smb']
+
+def remote_file_path(request, path_type, name):
+    if path_type == 'ssh':
+        vm_fixture_name = 'linux_vm'
+    if path_type == 'smb':
+        vm_fixture_name = 'windows_vm'
+    vm = request.getfixturevalue(vm_fixture_name)
+    path_class = vm.os_access.Path
+    tmp_dir = path_class.tmp()
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
+    return base_remote_dir.joinpath(request.node.name + '-' + name)
+
+def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):
+    if path_type in 'local':
+        path = node_dir.joinpath('local-file-%s' % name)
+    elif path_type == 'posix':
+        path = ssh_path_cls(str(node_dir.joinpath('posix-file-%s' % name)))
+    else:
+        path = remote_file_path(request, path_type, name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+@pytest.mark.parametrize('destination_path_type', path_type_list)
+@pytest.mark.parametrize('source_path_type', path_type_list)
+def test_copy_file(request, node_dir, ssh_path_cls, source_path_type, destination_path_type):
+    source = path_type_to_path(request, node_dir, ssh_path_cls, source_path_type, 'source')
+    destination = path_type_to_path(request, node_dir, ssh_path_cls, destination_path_type, 'destination')
+
+    _logger.info('Copy: %r -> %r', source, destination)
+
+    bytes = '0123456789' * 10 * 1024  # 100K
+    source.write_bytes(bytes)
+    destination.ensure_file_is_missing()
+    copy_file(source, destination)
+    assert destination.exists()
+    assert destination.read_bytes() == bytes

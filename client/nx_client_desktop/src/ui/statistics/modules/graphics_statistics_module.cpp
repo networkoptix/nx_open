@@ -2,7 +2,6 @@
 
 #include <QtWidgets/QApplication>
 
-#include <utils/common/app_info.h>
 
 #include <statistics/base/functor_metric.h>
 #include <statistics/base/metrics_container.h>
@@ -13,10 +12,12 @@
 #include <ui/statistics/modules/private/preview_search_duration_metric.h>
 #include <ui/statistics/modules/private/motion_search_duration_metric.h>
 
-QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
-    , m_metrics(new QnMetricsContainer())
+#include <utils/common/app_info.h>
+
+QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject* parent):
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
+    m_metrics(new QnMetricsContainer())
 {
     const auto avgTabsCount = QnAbstractMetricPtr(
         new AvgTabsCountMetric(context()->workbench()));
@@ -30,47 +31,59 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
     const auto msearchDuration = QnAbstractMetricPtr(
         new MotionSearchDurationMetric(context()));
 
-    const auto versionMetric = QnFunctorMetric::create([] { return qApp->applicationVersion(); });
+    const auto versionMetric = QnFunctorMetric::create(
+        []()
+        {
+            return qApp->applicationVersion();
+        });
 
-    const auto archMetric = QnFunctorMetric::create([]()
-    {
-        return QnAppInfo::applicationArch();
-    });
+    const auto archMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnAppInfo::applicationArch();
+        });
 
-    const auto platformMetric = QnFunctorMetric::create([]()
-    {
-        return QnAppInfo::applicationPlatform();
-    });
+    const auto platformMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnAppInfo::applicationPlatform();
+        });
 
-    const auto platformModificationMetric = QnFunctorMetric::create([]()
-    {
-        return QnAppInfo::applicationPlatformModification();
-    });
+    const auto platformModificationMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnAppInfo::applicationPlatformModification();
+        });
 
-    const auto revisionMetric = QnFunctorMetric::create([]()
-    {
-        return QnAppInfo::applicationRevision();
-    });
+    const auto revisionMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnAppInfo::applicationRevision();
+        });
 
-    const auto customizationMetric = QnFunctorMetric::create([]()
-    {
-        return QnAppInfo::customizationName();
-    });
+    const auto customizationMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnAppInfo::customizationName();
+        });
 
-    const auto glVersionMetric = QnFunctorMetric::create([]()
-    {
-        return QnGlFunctions::openGLCachedInfo().version;
-    });
+    const auto glVersionMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnGlFunctions::openGLCachedInfo().version;
+        });
 
-    const auto glRendererMetric = QnFunctorMetric::create([]()
-    {
-        return QnGlFunctions::openGLCachedInfo().renderer;
-    });
+    const auto glRendererMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnGlFunctions::openGLCachedInfo().renderer;
+        });
 
-    const auto glVendorMetric = QnFunctorMetric::create([]()
-    {
-        return QnGlFunctions::openGLCachedInfo().vendor;
-    });
+    const auto glVendorMetric = QnFunctorMetric::create(
+        []()
+        {
+            return QnGlFunctions::openGLCachedInfo().vendor;
+        });
 
     m_metrics->addMetric(lit("avg_tabs_cnt"), avgTabsCount);
     m_metrics->addMetric(lit("psearch_duration_ms"), psearchDuration);
@@ -88,7 +101,8 @@ QnGraphicsStatisticsModule::QnGraphicsStatisticsModule(QObject *parent)
 }
 
 QnGraphicsStatisticsModule::~QnGraphicsStatisticsModule()
-{}
+{
+}
 
 QnStatisticValuesHash QnGraphicsStatisticsModule::values() const
 {

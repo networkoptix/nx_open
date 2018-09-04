@@ -7,7 +7,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include "utils/common/util.h"
 #include "storage_db.h"
 
@@ -70,7 +70,11 @@ private:
 
 } // namespace <anonynous>
 
-QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
+QnStorageDb::QnStorageDb(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& s, int storageIndex)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_storage(s),
     m_storageIndex(storageIndex),
     m_dbHelper(this),
@@ -363,8 +367,10 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId))
-            result << DeviceFileCatalogPtr(new DeviceFileCatalog(uniqueId, catalog,
-                                                                 QnServer::StoragePool::None));
+            result << DeviceFileCatalogPtr(new DeviceFileCatalog(
+                serverModule(),
+                uniqueId, catalog,
+                QnServer::StoragePool::None));
     }
 }
 
@@ -453,7 +459,7 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
 bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
 {
     QnMutexLocker lk(&m_readMutex);
-    auto resetModeGuard = QnRaiiGuard::createDestructible(
+    auto resetModeGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             m_dbHelper.setMode(nx::media_db::Mode::Write);
@@ -614,15 +620,19 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::buildReadResult() const
     QVector<DeviceFileCatalogPtr> result;
     for (auto it = m_readData.cbegin(); it != m_readData.cend(); ++it)
     {
-        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(it->first,
-                                                                  QnServer::ChunksCatalog::LowQualityCatalog,
-                                                                  QnServer::StoragePool::None));
+        DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(
+            serverModule(),
+            it->first,
+            QnServer::ChunksCatalog::LowQualityCatalog,
+            QnServer::StoragePool::None));
         newFileCatalog->assignChunksUnsafe(it->second[0].cbegin(), it->second[0].cend());
         result.push_back(newFileCatalog);
 
-        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(it->first,
-                                                                    QnServer::ChunksCatalog::HiQualityCatalog,
-                                                                    QnServer::StoragePool::None));
+        newFileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+            serverModule(),
+            it->first,
+            QnServer::ChunksCatalog::HiQualityCatalog,
+            QnServer::StoragePool::None));
         newFileCatalog->assignChunksUnsafe(it->second[1].cbegin(), it->second[1].cend());
         result.push_back(newFileCatalog);
     }

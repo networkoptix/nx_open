@@ -11,15 +11,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace {
-// Pixmap is scaled on the mediawidget.
-const QSize kWatermarkSize = QSize(1920, 1080);
-} // namespace
-
 WatermarkPainter::WatermarkPainter()
 {
-    m_pixmap = QPixmap(kWatermarkSize);
-    updateWatermark();
 }
 
 void WatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
@@ -30,30 +23,23 @@ void WatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
     if (rect.isEmpty()) //< Just a double-check to avoid division byzeroem later.
         return;
 
+    if (!m_pixmap)
+        updateWatermarkImage(rect.toRect().size()); //< First-time call, need to get image.
+
     // We are scaling our bitmap to the output rectangle. Probably there is better solution.
     painter->drawPixmap(rect, m_pixmap, m_pixmap.rect());
-
-    // #sandreenko this block or the line above will be removed; they represent different scaling approach.
-    // // rect can be 10000x5000 or even more - so scale our pixmap preserving aspect ratio.
-    // if (rect.width() * kWatermarkSize.height() > rect.height() * kWatermarkSize.width())
-    //     painter->drawPixmap(rect, m_pixmap,
-    //         QRectF(0, 0, m_pixmap.width(), (m_pixmap.width() * rect.height()) / rect.width()));
-    // else
-    //     painter->drawPixmap(rect, m_pixmap,
-    //         QRectF(0, 0, (m_pixmap.height() * rect.width()) / rect.height(), m_pixmap.height()));
 }
-
 
 void WatermarkPainter::setWatermark(nx::core::Watermark watermark)
 {
     m_watermark = watermark;
     m_watermark.text = watermark.text.trimmed(); //< Whitespace is stripped, so that the text is empty or printable.
-    updateWatermark();
+    m_pixmap = QPixmap(); //< Destroy current image because now we need a new one.
 }
 
-void WatermarkPainter::updateWatermark()
+void WatermarkPainter::updateWatermarkImage(const QSize& size)
 {
-    m_pixmap = nx::core::getWatermarkImage(m_watermark, kWatermarkSize);
+    m_pixmap = nx::core::retrieveWatermarkImage(m_watermark, size);
 }
 
 } // namespace desktop

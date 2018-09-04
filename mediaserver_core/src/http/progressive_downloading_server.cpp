@@ -40,6 +40,8 @@
 #include "rest/server/json_rest_result.h"
 #include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <nx/metrics/metrics_storage.h>
+#include <nx/utils/scope_guard.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -99,7 +101,6 @@ public:
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
             m_dataQueue,
-            /*cseq*/ 0,
             /*iFramesOnly*/ false);
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
@@ -160,7 +161,7 @@ protected:
         }
 
         if (media && m_auditHandle)
-            qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
+            m_owner->commonModule()->auditManager()->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
         if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
         {
@@ -336,6 +337,7 @@ private:
 class QnProgressiveDownloadingConsumerPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
+    QnMediaServerModule* serverModule = nullptr;
     std::unique_ptr<QnFfmpegTranscoder> transcoder;
     QByteArray streamingFormat;
     AVCodecID videoCodec;
@@ -365,13 +367,15 @@ static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    QnMediaServerModule* serverModule,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, std::move(socket), owner)
 {
     Q_D(QnProgressiveDownloadingConsumer);
-
-    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()));
+    d->serverModule = serverModule;
+    d->transcoder.reset(new QnFfmpegTranscoder(owner->commonModule()->metrics()));
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
     d->socket->setSendTimeout(CONNECTION_TIMEOUT);
@@ -387,7 +391,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
     const int sessionLiveTimeoutSec =
-        qnServerModule->settings().progressiveDownloadSessionLiveTimeSec();
+        d->serverModule->settings().progressiveDownloadSessionLiveTimeSec();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
@@ -491,11 +495,18 @@ void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
+    auto metrics = d->serverModule->commonModule()->metrics();
+    metrics->tcpConnections().progressiveDownloading()++;
+    auto metricsGuard = nx::utils::makeScopeGuard(
+        [metrics]()
+        {
+            metrics->tcpConnections().progressiveDownloading()--;
+        });
 
     if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
-        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        sendResponse(nx::network::http::StatusCode::notImplemented, "text/plain");
         return;
     }
 
@@ -523,7 +534,7 @@ void QnProgressiveDownloadingConsumer::run()
         if (mimeType.isEmpty())
         {
             d->response.messageBody = QByteArray("Unsupported streaming format ") + mimeType;
-            sendResponse(CODE_NOT_FOUND, "text/plain");
+            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
         updateCodecByFormat(d->streamingFormat);
@@ -556,13 +567,13 @@ void QnProgressiveDownloadingConsumer::run()
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
-            sendResponse(CODE_NOT_FOUND, "text/plain");
+            sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
 
         if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
             return;
         }
 
@@ -632,7 +643,7 @@ void QnProgressiveDownloadingConsumer::run()
             msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder->getLastErrorMessage().toLatin1();
             qWarning() << msg;
             d->response.messageBody = msg;
-            sendResponse(CODE_INTERNAL_ERROR, "plain/text");
+            sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
             return;
         }
 
@@ -651,14 +662,14 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && qnServerModule->settings().ffmpegRealTimeOptimization())
+        if (rtOptimization && d->serverModule->settings().ffmpegRealTimeOptimization())
             d->transcoder->setUseRealTimeOptimization(true);
 
 
         QByteArray position = decodedUrlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).toLatin1();
         QByteArray endPosition = decodedUrlQuery.queryItemValue( StreamingParams::END_POS_PARAM_NAME ).toLatin1();
         bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
-        auto camera = qnCameraPool->getVideoCamera(resource);
+        auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
         auto requiredPermission = isLive
@@ -672,7 +683,7 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
 
-            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
             return;
         }
 
@@ -692,13 +703,13 @@ void QnProgressiveDownloadingConsumer::run()
             if (isUTCRequest)
             {
                 d->response.messageBody = "now";
-                sendResponse(CODE_OK, "text/plain");
+                sendResponse(nx::network::http::StatusCode::ok, "text/plain");
                 return;
             }
 
             if (!camera) {
                 d->response.messageBody = "Media not found\r\n";
-                sendResponse(CODE_NOT_FOUND, "text/plain");
+                sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
                 return;
             }
             QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
@@ -722,12 +733,12 @@ void QnProgressiveDownloadingConsumer::run()
                 {
                     archive = camRes->createArchiveDelegate();
                     if (!archive)
-                        archive = new QnServerArchiveDelegate(qnServerModule); // default value
+                        archive = new QnServerArchiveDelegate(d->serverModule); // default value
                 }
                 if (archive)
                 {
                     if (!archive->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanSeekImmediatly))
-                        archive->open(resource, qnServerModule->archiveIntegrityWatcher());
+                        archive->open(resource, d->serverModule->archiveIntegrityWatcher());
                     archive->seek( timeUSec, true);
 
                     if (auto mediaStreamEvent = archive->lastError().toMediaStreamEvent())
@@ -767,7 +778,7 @@ void QnProgressiveDownloadingConsumer::run()
                             ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLatin1() + QByteArray("\"");
                     }
                     d->response.messageBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});");
-                    sendResponse(CODE_OK, "application/json");
+                    sendResponse(nx::network::http::StatusCode::ok, "application/json");
                 }
                 else
                 {
@@ -778,9 +789,9 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
-                qnServerModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
-            d->archiveDP->open(qnServerModule->archiveIntegrityWatcher());
-            d->archiveDP->jumpTo( timeUSec, timeUSec );
+                d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
+            d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+            d->archiveDP->jumpTo(timeUSec, timeUSec);
 
             if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())
             {
@@ -816,11 +827,11 @@ void QnProgressiveDownloadingConsumer::run()
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
         d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
-        sendResponse(CODE_OK, mimeType);
+        sendResponse(nx::network::http::StatusCode::ok, mimeType);
 
         //dataConsumer.sendResponse();
 
-        dataConsumer.setAuditHandle(qnAuditManager->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+        dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
 
         dataConsumer.start();
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )

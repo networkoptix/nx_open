@@ -64,7 +64,7 @@ class _WinRMCommandOutcome(CommandOutcome):
 
 class _WinRMRun(Run):
     def __init__(self, protocol, shell_id, command, *arguments):
-         
+
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
@@ -98,6 +98,11 @@ class _WinRMRun(Run):
         # TODO: Prohibit writes when passing up.
         self._is_done = False
         self._outcome = None
+
+    @property
+    def logger(self):
+        # TODO: pass local logger to constructor and return here
+        return _logger
 
     def send(self, stdin_bytes, is_last=False):
         # See: https://msdn.microsoft.com/en-us/library/cc251742.aspx.

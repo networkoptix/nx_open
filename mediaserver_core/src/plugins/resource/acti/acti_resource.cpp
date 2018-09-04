@@ -53,7 +53,8 @@ const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
 
 } // namespace
 
-QnActiResource::QnActiResource() :
+QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
@@ -449,7 +450,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
     auto report = parseSystemInfo(serverReport);
 
     setFirmware(report.value(kActiFirmawareVersionParamName));
-    setMAC(nx::network::QnMacAddress(report.value(kActiMacAddressParamName)));
+    setMAC(nx::utils::MacAddress(report.value(kActiMacAddressParamName)));
 
     m_platform = report.value(kActiPlatformParamName)
         .trimmed()

@@ -141,7 +141,7 @@ void ModuleConnector::InformationReader::start(const nx::network::SocketAddress&
         [this](nx::network::http::AsyncHttpClientPtr client) mutable
         {
             NX_ASSERT(m_httpClient, client);
-            const auto clientGuard = makeScopeGuard([client](){ client->pleaseStopSync(); });
+            const auto clientGuard = nx::utils::makeScopeGuard([client](){ client->pleaseStopSync(); });
             m_httpClient.reset();
             if (!client->hasRequestSucceeded())
                 return nx::utils::swapAndCall(m_handler, boost::none, lit("HTTP request has failed"));

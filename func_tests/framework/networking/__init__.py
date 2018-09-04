@@ -1,6 +1,6 @@
 from netaddr import IPNetwork
 
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 
 def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
@@ -52,7 +52,7 @@ def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
 
     for alias, ips in nodes_ips.items():
         for ip in ips.values():
-            wait_for_true(
+            wait_for_truthy(
                 lambda: allocated_machines[alias].os_access.networking.can_reach(ip, timeout_sec=1),
                 "machine {} can reach itself by {}".format(alias, ip),
                 timeout_sec=20)
@@ -60,7 +60,7 @@ def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
         for destination_alias in reachability[destination_net]:
             for source_alias in reachability[destination_net][destination_alias]:
                 destination_ip = nodes_ips[destination_alias][IPNetwork(destination_net)]
-                wait_for_true(
+                wait_for_truthy(
                     lambda: allocated_machines[source_alias].os_access.networking.can_reach(destination_ip, timeout_sec=1),
                     "machine {} can reach {} by {}".format(source_alias, destination_alias, destination_ip),
                     timeout_sec=60)

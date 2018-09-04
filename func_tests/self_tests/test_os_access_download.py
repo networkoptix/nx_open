@@ -4,7 +4,7 @@ import pytest
 from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
-from framework.os_access.exceptions import AlreadyDownloaded
+from framework.os_access.exceptions import AlreadyExists
 from framework.serving import WsgiServer, make_base_url_for_remote_machine
 
 
@@ -61,6 +61,6 @@ def url(request):
 def test_download(os_access, url, downloads_dir):
     path = os_access.download(url, downloads_dir)
     assert path.exists() or path.is_symlink()
-    with pytest.raises(AlreadyDownloaded) as excinfo:
+    with pytest.raises(AlreadyExists) as excinfo:
         os_access.download(url, downloads_dir)
     assert excinfo.value.path == path

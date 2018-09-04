@@ -16,7 +16,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/datetime.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/event/strings_helper.h>
 
 namespace nx {
@@ -185,7 +185,7 @@ template<typename Iter>
 bool EventSearchListModel::Private::commitPrefetch(
     const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
 {
-    QnRaiiGuard clearPrefetch([this]() { m_prefetch.clear(); });
+    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
 
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);

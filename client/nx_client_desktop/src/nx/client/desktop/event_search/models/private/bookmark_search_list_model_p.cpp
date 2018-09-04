@@ -16,7 +16,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace client {
@@ -209,7 +209,7 @@ template<typename Iter>
 bool BookmarkSearchListModel::Private::commitPrefetch(
     const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
 {
-    QnRaiiGuard clearPrefetch([this]() { m_prefetch.clear(); });
+    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
 
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);

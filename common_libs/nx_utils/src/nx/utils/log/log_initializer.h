@@ -9,6 +9,12 @@ namespace nx {
 namespace utils {
 namespace log {
 
+/**
+ * Builds logger with all filtering specified in settings.
+ * NOTE: If settings.loggers actually contains multiple elements,
+ * then this function instantiates AggregateLogger that manages
+ * multiple regular loggers.
+ */
 NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,

@@ -18,9 +18,7 @@ set(android.keypass "S6rtgPMk")
 # Support section
 set(companyUrl "http://www.ioezio.com")
 set(productUrl "http://www.ioezio.com")
-set(supportUrl "")
 set(supportEmail "support@ioezio.com")
-set(supportPhone "")
 set(licenseEmail "support@ioezio.com")
 # end of Support section
 

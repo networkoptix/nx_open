@@ -1,7 +1,7 @@
 /***********************************************************************
-*	File: file.h
-*	Author: Andrey Kolesnikov
-*	Date: 13 oct 2006
+* File: file.h
+* Author: Andrey Kolesnikov
+* Date: 13 oct 2006
 ***********************************************************************/
 
 #ifndef _FS_FILE_H_

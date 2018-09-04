@@ -19,8 +19,8 @@ module.exports = merge(common, {
             },
             {
                 context: '/static/',
-                target: "https://0.0.0.0:9000",
-                pathRewrite: {"^/static" : ""},
+                target: 'https://0.0.0.0:9000',
+                pathRewrite: {'^/static': ''},
                 changeOrigin: true,
                 secure: false
             }

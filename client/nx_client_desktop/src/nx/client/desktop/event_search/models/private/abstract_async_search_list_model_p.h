@@ -76,7 +76,7 @@ private:
     FetchInformation m_request;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // Template method implementation.
 
 template<class DataContainer, class UpperBoundPredicate>

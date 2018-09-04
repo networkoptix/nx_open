@@ -21,7 +21,10 @@ const int kDefaultChannelCount = 4;
 
 } // namespace
 
-QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
+QnArecontPanoramicResource::QnArecontPanoramicResource(
+    QnMediaServerModule* serverModule, const QString& name)
+    :
+    QnPlAreconVisionResource(serverModule)
 {
     setName(name);
     m_isRotated = false;

@@ -7,6 +7,24 @@ from cloud import settings
 from cms.admin import CMSAdmin
 from django_csv_exports.admin import CSVExportAdmin
 
+from django.contrib.admin import SimpleListFilter
+
+
+class GroupFilter(SimpleListFilter):
+    title = 'Group'
+    parameter_name = 'group'
+
+    def lookups(self, request, model_admin):
+        groups = Group.objects.all()
+        if not request.user.is_superuser:
+            groups = groups.filter(usergroupstocustomizationpermissions__customization__name=settings.CUSTOMIZATION)
+        return [(g.id, g.name) for g in groups]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(groups=self.value())
+        return queryset
+
 
 @admin.register(Account)
 class AccountAdmin(CMSAdmin, CSVExportAdmin):
@@ -18,8 +36,8 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
 
     exclude = ("user_permissions",)
 
-    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization',)
-    search_fields = ('email', 'first_name', 'last_name', 'customization', 'language',)
+    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', 'customization', GroupFilter, )
+    search_fields = ('email', 'first_name', 'last_name', 'customization', 'language', 'groups__name')
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
                   'subscribe', 'is_staff', 'language', 'customization')

@@ -34,9 +34,7 @@
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/event/strings_helper.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 namespace {
 
@@ -103,7 +101,10 @@ EventPanel::Private::Private(EventPanel* q):
     setupEventSearch();
     setupAnalyticsSearch();
 
-    connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
+    connect(m_notificationsTab, &NotificationListWidget::tileHovered,
+        q, &EventPanel::tileHovered);
+    connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
+        q, &EventPanel::unreadCountChanged);
 
     for (auto tab: {m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
         connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
@@ -507,6 +508,4 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -461,8 +461,12 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
-
-
+        
+        $scope.checkTrafficEncryption = function() {
+            if (!$scope.trafficSettings.trafficEncryptionForced) {
+                $scope.trafficSettings.videoTrafficEncryptionForced = false;
+            }
+        };
 
         $scope.saveTrafficSettings = function(){
             mediaserver.systemSettings($scope.trafficSettings).then(function(r){
@@ -487,10 +491,10 @@ angular.module('webadminApp')
                 var systemSettings = r.data.reply.settings;
 
                 $scope.trafficSettings = {
-                    trafficEncryptionForced: systemSettings.trafficEncryptionForced,
-                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced
+                    // This weird check is due to servers weird response to api/systemSettings request
+                    trafficEncryptionForced: systemSettings.trafficEncryptionForced === 'true',
+                    videoTrafficEncryptionForced: systemSettings.videoTrafficEncryptionForced === 'true'
                 };
-                console.log('debug loadTrafficSettings', $scope.trafficSettings, systemSettings);
             });
         }
         loadTrafficSettings();

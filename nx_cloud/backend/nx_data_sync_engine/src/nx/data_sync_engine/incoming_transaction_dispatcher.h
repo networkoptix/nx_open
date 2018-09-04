@@ -45,50 +45,49 @@ public:
     /**
      * Register processor function by command type.
      */
-    template<int TransactionCommandValue, typename TransactionDataType, typename AuxiliaryArgType>
+    template<typename CommandDescriptor>
     void registerTransactionHandler(
-        typename TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
-        >::ProcessEc2TransactionFunc processTranFunc,
-        typename TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType
-        >::OnTranProcessedFunc onTranProcessedFunc)
+        typename TransactionProcessor<CommandDescriptor>::
+            ProcessEc2TransactionFunc processTranFunc)
     {
+        using SpecificCommandProcessor = TransactionProcessor<CommandDescriptor>;
+
         auto context = std::make_unique<TransactionProcessorContext>();
-        context->processor = std::make_unique<TransactionProcessor<
-            TransactionCommandValue, TransactionDataType, AuxiliaryArgType>>(
-                m_transactionLog,
-                std::move(processTranFunc),
-                std::move(onTranProcessedFunc));
+        context->processor = std::make_unique<SpecificCommandProcessor>(
+            m_transactionLog,
+            std::move(processTranFunc));
 
         m_transactionProcessors.emplace(
-            (::ec2::ApiCommand::Value)TransactionCommandValue,
+            CommandDescriptor::code,
             std::move(context));
     }
 
     /**
      * Register processor function that does not need to save data to DB.
      */
-    template<int TransactionCommandValue, typename TransactionDataType>
+    template<typename CommandDescriptor>
     void registerSpecialCommandHandler(
-        typename SpecialCommandProcessor<
-            TransactionCommandValue, TransactionDataType
-        >::ProcessorFunc processTranFunc)
+        typename SpecialCommandProcessor<CommandDescriptor>::ProcessorFunc processTranFunc)
     {
+        using SpecificCommandProcessor = SpecialCommandProcessor<CommandDescriptor>;
+
         auto context = std::make_unique<TransactionProcessorContext>();
-        context->processor = std::make_unique<SpecialCommandProcessor<
-            TransactionCommandValue, TransactionDataType>>(
-                std::move(processTranFunc));
+        context->processor = std::make_unique<SpecificCommandProcessor>(
+            std::move(processTranFunc));
 
         m_transactionProcessors.emplace(
-            (::ec2::ApiCommand::Value)TransactionCommandValue,
+            CommandDescriptor::code,
             std::move(context));
     }
 
     /**
      * Waits for every running transaction of type transactionType processing to complete.
      */
-    void removeHandler(::ec2::ApiCommand::Value transactionType);
+    template<typename CommandDescriptor>
+    void removeHandler()
+    {
+        removeHandler(CommandDescriptor::code);
+    }
 
     WatchTransactionSubscription& watchTransactionSubscription();
 
@@ -104,7 +103,7 @@ private:
     };
 
     using TransactionProcessors =
-        std::map<::ec2::ApiCommand::Value, std::unique_ptr<TransactionProcessorContext>>;
+        std::map<int, std::unique_ptr<TransactionProcessorContext>>;
 
     const QnUuid m_moduleGuid;
     TransactionLog* const m_transactionLog;
@@ -129,6 +128,8 @@ private:
         CommandHeader transaction,
         TransactionDataSource dataSource,
         TransactionProcessedHandler completionHandler);
+
+    void removeHandler(int commandCode);
 };
 
 } // namespace data_sync_engine

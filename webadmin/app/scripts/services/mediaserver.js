@@ -206,6 +206,32 @@ angular.module('webadminApp')
 
                 return auth;
             },
+            debugLogin:function(login,password,realm,nonce,method){
+                var digestSource = login + ':' + realm + ':' + password;
+                var digestMD5 = md5(digestSource);
+                var methodSource = (method||'GET') + ':';
+                var methodMD5 = md5(methodSource);
+                var authDigestSource = digestMD5 + ':' + nonce + ':' + methodMD5;
+                var authDigestMD5 = md5(authDigestSource);
+                var authSource = login + ':' + nonce + ':' + authDigestMD5;
+                var authBase64 = Base64.encode(authSource);
+                return {
+                    alogin:login,
+                    bpassword:password,
+                    crealm:realm,
+                    dnonce:nonce,
+                    emethod:methodSource,
+                    emethodMD5:methodMD5,
+                    fdigestSource: digestSource,
+                    gdigestMD5: digestMD5,
+                    hmethodSource: methodSource,
+                    imethodMD5: methodMD5,
+                    jauthDigestSource: authDigestSource,
+                    kauthDigestMD5: authDigestMD5,
+                    lauthSource: authSource,
+                    mauthBase64: authBase64
+                };
+            },
             login:function(login, password){
                 login = login.toLowerCase();
                 var self = this;
@@ -251,8 +277,12 @@ angular.module('webadminApp')
             url:function(){
                 return proxy;
             },
-            logUrl:function(params){
-                return proxy + '/web/api/showLog' + (params||'');
+            logUrl:function(name, lines){
+                name = name ? "?name=" + name : '';
+                lines = lines ? "lines=" + lines : '';
+                if(lines)
+                    lines = (name ? "&": "?") + lines;
+                return proxy + '/web/api/showLog' + name + lines;
             },
             authForMedia:function(){
                 return $localStorage.auth;
@@ -452,8 +482,15 @@ angular.module('webadminApp')
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
             },
-            logLevel:function(logId,level){
-                return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
+            logLevel:function(logId, loggerName, level){
+                logId = logId ? '?id=' + logId : '';
+                loggerName = loggerName ? '?name=' + loggerName: '';
+                level = level ? '&value=' + level : '';
+                // Prioritize name of the logger over logger id
+                var query = loggerName ? loggerName + level : "";
+                query = !query && logId ? logId + level : query;
+                
+                return wrapGet(proxy + '/web/api/logLevel' + query);
             },
 
 
@@ -561,7 +598,9 @@ angular.module('webadminApp')
                     });
                 });
             },
-
+            getServerDocumentation:function(){
+                return wrapGet('/api/settingsDocumentation');
+            },
             networkSettings:function(settings){
                 if(!settings) {
                     return wrapGet(proxy + '/web/api/iflist');

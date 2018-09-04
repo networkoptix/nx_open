@@ -16,9 +16,7 @@ set(installer.name "vmsdemo")
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "")
-set(supportPhone "")
-set(licenseEmail "support@networkoptix.com")
+set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_form_id=316807")
 # end of Support section
 
 set(defaultWebPages "")

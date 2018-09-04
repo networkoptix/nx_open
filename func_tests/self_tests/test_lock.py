@@ -1,27 +1,35 @@
-import time
-from multiprocessing import Process
-from threading import Thread
+import logging
+from multiprocessing import Condition, Process
+from threading import Thread, current_thread
 from time import sleep
 
 import pytest
 
-from framework.lock import AlreadyAcquired, LocalPosixFileLock, PosixMoveLock, PosixShellFileLock
+from framework.os_access.exceptions import AlreadyAcquired
 from framework.os_access.local_shell import local_shell
+from framework.os_access.posix_access import portalocker_lock_acquired
+
+_logger = logging.getLogger(__name__)
+_default_timeout_sec = 10
 
 
-@pytest.fixture(params=['move', 'local_flock', 'shell_flock'])
+@pytest.fixture(params=['shell_flock', 'portalocker'])
 def lock(request, node_dir):
+    path = node_dir / 'shell_flock.lock'
     return {
-        'move': lambda: PosixMoveLock(local_shell, node_dir / 'move.lock'),
-        'local_flock': lambda: LocalPosixFileLock(node_dir / 'local_flock.lock'),
-        'shell_flock': lambda: PosixShellFileLock(local_shell, node_dir / 'shell_flock.lock'),
-        }[request.param]()
+        'shell_flock':
+            lambda timeout_sec=_default_timeout_sec:
+            local_shell.lock_acquired(path, timeout_sec=timeout_sec),
+        'portalocker':
+            lambda timeout_sec=_default_timeout_sec:
+            portalocker_lock_acquired(path, timeout_sec=timeout_sec),
+        }[request.param]
 
 
 def test_already_acquired_timed_out(lock):
-    with lock.acquired():
+    with lock():
         with pytest.raises(AlreadyAcquired):
-            with lock.acquired(timeout_sec=2):
+            with lock(timeout_sec=2):
                 pass
 
 
@@ -30,9 +38,10 @@ def test_already_acquired_wait_successfully(lock):
 
     def acquire_wait_release():
         try:
-            with lock.acquired(timeout_sec=2):
+            with lock(timeout_sec=2):
                 sleep(1)
         except Exception as e:
+            _logger.exception("Exception in %r.", current_thread())
             exceptions.append(e)
 
     threads = [
@@ -47,17 +56,19 @@ def test_already_acquired_wait_successfully(lock):
         raise exception
 
 
-def _hold_lock(lock, sleep_sec):
-    with lock.acquired():
-        time.sleep(sleep_sec)
+def _hold_lock(lock, cv):
+    cv.acquire()
+    with lock():
+        cv.notify()
+        cv.wait()
 
 
 def test_cleanup_on_process_termination(lock):
-    if isinstance(lock, PosixMoveLock):
-        pytest.xfail("PosixMoveLock holds if process is terminated")
-    p = Process(target=_hold_lock, args=(lock, 2))
+    cv = Condition()
+    cv.acquire()
+    p = Process(target=_hold_lock, args=(lock, cv))
     p.start()
-    time.sleep(1)
+    cv.wait()
     p.terminate()
-    with lock.acquired(timeout_sec=1):
+    with lock(timeout_sec=1):
         pass

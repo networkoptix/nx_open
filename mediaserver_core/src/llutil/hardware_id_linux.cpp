@@ -21,13 +21,13 @@
     #include <QtCore/QCryptographicHash>
 #endif
 
-#include <nx/utils/license/util.h>
 #include "licensing/hardware_info.h"
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 #include <nx/mediaserver/root_fs.h>
 #include <media_server/media_server_module.h>
-#include <nx/utils/license/util.h>
+#include <nx/utils/uuid.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -47,9 +47,9 @@ std::string trim(const std::string& str) {
     return result;
 }
 
-QString readFile(const char* path)
+QString readFile(nx::mediaserver::RootFileSystem* rootTool, const char* path)
 {
-    int fd = qnServerModule->rootTool()->open(path, QIODevice::ReadOnly);
+    int fd = rootTool->open(path, QIODevice::ReadOnly);
     QFile file(path);
     if (fd < 0 || !file.open(fd, QIODevice::ReadOnly))
     {
@@ -61,9 +61,11 @@ QString readFile(const char* path)
     return QString::fromLatin1(content).trimmed();
 }
 
-void getMemoryInfo(QString &partNumber, QString &serialNumber)
+void getMemoryInfo(
+    nx::mediaserver::RootFileSystem* rootTool,
+    QString &partNumber, QString &serialNumber)
 {
-    bool result = qnServerModule->rootTool()->dmiInfo(&partNumber, &serialNumber);
+    bool result = rootTool->dmiInfo(&partNumber, &serialNumber);
     NX_VERBOSE(
         kLogTag,
         lm("[RootTool] Got memory info. Result: %1 PN: %2, SN: %3")
@@ -137,19 +139,21 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
     }
 }
 
-void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
+void fillHardwareIds(
+    QnMediaServerModule* serverModule,
+    HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
-    hardwareInfo.boardUUID = readFile("/sys/class/dmi/id/product_uuid");
-    hardwareInfo.compatibilityBoardUUID = nx::utils::license::changedGuidByteOrder(hardwareInfo.boardUUID);
+    hardwareInfo.boardUUID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/product_uuid");
+    hardwareInfo.compatibilityBoardUUID = nx::utils::changedGuidByteOrder(hardwareInfo.boardUUID);
 
-    hardwareInfo.boardID = readFile("/sys/class/dmi/id/board_serial");
-    hardwareInfo.boardManufacturer = readFile("/sys/class/dmi/id/board_vendor");
-    hardwareInfo.boardProduct = readFile("/sys/class/dmi/id/board_name");
+    hardwareInfo.boardID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_serial");
+    hardwareInfo.boardManufacturer = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_vendor");
+    hardwareInfo.boardProduct = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/board_name");
 
-    hardwareInfo.biosID = readFile("/sys/class/dmi/id/product_serial");
-    hardwareInfo.biosManufacturer = readFile("/sys/class/dmi/id/bios_vendor");
+    hardwareInfo.biosID = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/product_serial");
+    hardwareInfo.biosManufacturer = readFile(serverModule->rootFileSystem(), "/sys/class/dmi/id/bios_vendor");
 
-    getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
+    getMemoryInfo(serverModule->rootFileSystem(), hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
 
     findMacAddresses(hardwareInfo.nics);
 
@@ -185,7 +189,9 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
+void fillHardwareIds(
+    QnMediaServerModule* /*serverModule*/,
+    HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     char MAC_str[13];
     memset(MAC_str, 0, sizeof(MAC_str));

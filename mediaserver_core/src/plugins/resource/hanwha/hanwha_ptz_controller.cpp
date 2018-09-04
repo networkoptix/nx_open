@@ -12,6 +12,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
+#include <common/static_common_module.h>
+#include <core/resource_management/resource_data_pool.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -645,8 +647,12 @@ bool HanwhaPtzController::hasAnyCapability(
 
 bool HanwhaPtzController::useNormalizedSpeed() const
 {
+    auto resData = qnStaticCommon->dataPool()->data(m_hanwhaResource);
+    bool normilizedSpeedDisabled = resData.value<bool>(lit("disableNormalizedSpeed"), false);
+
     return m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaNormalizedSpeedPtzTrait))
-        && ini().allowNormalizedPtzSpeed;
+        && ini().allowNormalizedPtzSpeed
+        && !normilizedSpeedDisabled;
 }
 
 } // namespace plugins

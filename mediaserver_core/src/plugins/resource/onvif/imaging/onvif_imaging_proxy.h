@@ -15,7 +15,10 @@
 //
 class QnOnvifImagingProxy {
 public:
-    QnOnvifImagingProxy(const std::string& imagingUrl, const QString &login,
+    QnOnvifImagingProxy(
+        const SoapTimeouts& timeouts,
+        const std::string& imagingUrl,
+        const QString &login,
         const QString &passwd, const std::string& videoSrcToken, int _timeDrift);
     ~QnOnvifImagingProxy();
 
@@ -41,6 +44,7 @@ private:
     const std::string m_videoSrcToken;
 
     QHash<QString, QnAbstractOnvifImagingOperationPtr > m_supportedOperations;
+    SoapTimeouts m_timeouts;
 };
 
 #endif //ENABLE_ONVIF

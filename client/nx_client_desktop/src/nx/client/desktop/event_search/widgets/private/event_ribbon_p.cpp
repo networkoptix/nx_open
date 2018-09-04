@@ -219,7 +219,7 @@ EventTile* EventRibbon::Private::createTile(const QModelIndex& index)
 
 void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
 {
-    NX_EXPECT(tile && index.isValid());
+    NX_ASSERT(tile && index.isValid());
 
     // Check whether the tile is a special busy indicator tile.
     const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
@@ -490,7 +490,7 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
 void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMode)
 {
-    NX_EXPECT(count);
+    NX_ASSERT(count);
     if (count == 0)
         return;
 
@@ -654,7 +654,7 @@ void EventRibbon::Private::setFootersEnabled(bool value)
 
 int EventRibbon::Private::calculateHeight(QWidget* widget) const
 {
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
     return widget->hasHeightForWidth()
         ? widget->heightForWidth(m_viewport->width())
         : widget->sizeHint().expandedTo(minimumWidgetSize(widget)).height();

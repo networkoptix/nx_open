@@ -49,9 +49,9 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email megadása kötelező</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email megadása szükséges</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Adj meg egy érvényes Email-t</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Kérjük adjon meg valós e-mail címet</span></div>
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ez az e-mail már regisztrálva van %PRODUCT_NAME%</span></div>
             </div>

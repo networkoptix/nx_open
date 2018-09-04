@@ -2,11 +2,14 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl/ssl_engine.h>
+#include <nx/network/ssl/ssl_stream_server_socket.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/timer_manager.h>
@@ -67,9 +70,9 @@ public:
         SocketContext& operator=(const SocketContext&) = delete;
         SocketContext& operator=(SocketContext&&) = default;
 
-        SocketContext(String systemId, String authKey, String serverId)
-        :
-            mediatorConnector(new hpm::api::MediatorConnector),
+        SocketContext(String systemId, String authKey, String serverId):
+            mediatorConnector(std::make_unique<hpm::api::MediatorConnector>(
+                nx::network::SocketGlobals::cloud().cloudHost().toStdString())),
             socket(nullptr),
             listeningAddress(QString::fromUtf8(serverId))
         {
@@ -254,9 +257,9 @@ static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslSer
 
     NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
 
-    return std::make_unique<nx::network::deprecated::SslServerSocket>(
+    return std::make_unique<nx::network::ssl::StreamServerSocket>(
         std::move(serverSocket),
-        false);
+        network::ssl::EncryptionUse::always);
 }
 
 static void loadSettings(
@@ -293,7 +296,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
-    const auto guard = makeScopeGuard(
+    const auto guard = nx::utils::makeScopeGuard(
         [&serverSocket]()
         {
             if (serverSocket)

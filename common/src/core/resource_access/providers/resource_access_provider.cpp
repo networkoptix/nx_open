@@ -152,7 +152,7 @@ void QnResourceAccessProvider::afterUpdate()
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;

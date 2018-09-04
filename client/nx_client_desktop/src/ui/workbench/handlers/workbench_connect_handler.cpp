@@ -86,7 +86,7 @@
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <helpers/system_helpers.h>
@@ -345,7 +345,8 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         return;
     }
 
-    QnRaiiGuard connectingStateGuard([this]() { m_connecting.reset(); });
+    auto connectingStateGuard =
+        nx::utils::makeScopeGuard([this]() { m_connecting.reset(); });
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -684,7 +685,7 @@ void QnWorkbenchConnectHandler::reconnectStep()
     }
 
     m_reconnectHelper->next();
-    NX_EXPECT(m_reconnectDialog);
+    NX_ASSERT(m_reconnectDialog);
     if (m_reconnectDialog)
         m_reconnectDialog->setCurrentServer(m_reconnectHelper->currentServer());
 

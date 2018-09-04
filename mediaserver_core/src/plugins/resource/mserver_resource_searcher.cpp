@@ -25,15 +25,16 @@ static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
 static QString groupAddress(QLatin1String("224.0.1.243"));
 static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
-QByteArray localAppServerHost()
+QByteArray localAppServerHost(const QnMediaServerModule* serverModule)
 {
     QString host;
-    if (qnServerModule->settings().appserverHost.present())
-        host = qnServerModule->settings().appserverHost();
+    if (serverModule->settings().appserverHost.present())
+        host = serverModule->settings().appserverHost();
     else
         host = DEFAULT_APPSERVER_HOST;
     QByteArray result = host.toUtf8();
-    if (isLocalAppServer(result)) {
+    if (nx::mediaserver::Utils::isLocalAppServer(result))
+    {
         QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
         if (!interfaces.isEmpty())
             result = interfaces[0].address.toString().toUtf8();
@@ -132,13 +133,13 @@ public:
         return m_systemId;
     }
 
-    static QByteArray getRequest(const QnCommonModule* commonModule)
+    static QByteArray getRequest(const QnMediaServerModule* serverModule)
     {
         QList<QByteArray> result;
         result << guidStr;
-        result << commonModule->globalSettings()->localSystemId().toByteArray();
-        result << localAppServerHost();
-        QStringList cameras = getLocalUsingCameras(commonModule);
+        result << serverModule->globalSettings()->localSystemId().toByteArray();
+        result << localAppServerHost(serverModule);
+        QStringList cameras = getLocalUsingCameras(serverModule->commonModule());
         for (const QString &camera: cameras)
             result.append(camera.toUtf8());
         return listToByteArray(result);
@@ -158,8 +159,8 @@ public:
     }
 };
 
-QnMServerResourceSearcher::QnMServerResourceSearcher(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnMServerResourceSearcher::QnMServerResourceSearcher(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -228,13 +229,13 @@ void QnMServerResourceSearcher::readDataFromSocket()
 {
     if (m_socketLifeTime.elapsed() > UPDATE_IF_LIST_INTERVAL)
         updateSocketList();
-
+    auto commonModule = serverModule()->commonModule();
     for (int i = 0; i < m_socketList.size(); ++i)
     {
         nx::network::AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest(commonModule());
+        QByteArray datagram = DiscoveryPacket::getRequest(serverModule());
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -243,11 +244,12 @@ void QnMServerResourceSearcher::readDataFromSocket()
 
     QnCameraConflictList conflicts;
     readSocketInternal(m_receiveSocket.get(), conflicts);
-    if (!conflicts.camerasByServer.isEmpty()) {
-        conflicts.sourceServer = localAppServerHost();
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(serverGuid()));
+    if (!conflicts.camerasByServer.isEmpty())
+    {
+        conflicts.sourceServer = localAppServerHost(serverModule());
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(commonModule->moduleGUID()));
         if (mediaServer)
-            qnEventRuleConnector->at_serverConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
+            serverModule()->eventConnector()->at_serverConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }
 }
 
@@ -261,12 +263,12 @@ void QnMServerResourceSearcher::readSocketInternal(nx::network::AbstractDatagram
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemId())
+            if (packet.isValidPacket() && packet.systemId() != globalSettings()->localSystemId())
             {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();
-                packet.fillCameraConflictList(commonModule(), cameras);
+                packet.fillCameraConflictList(serverModule()->commonModule(), cameras);
                 if (!cameras.isEmpty())
                     conflictList.camerasByServer[packet.appServerHost()] = cameras;
             }

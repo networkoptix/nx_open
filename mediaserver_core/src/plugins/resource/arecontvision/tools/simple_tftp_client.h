@@ -9,7 +9,6 @@
 #include "utils/camera/camera_diagnostics.h"
 #include <nx/network/socket.h>
 
-
 class QnByteArray;
 
 // this class is designed just to be friendly with AV cams;( I doubd it can be usefull with smth else)
@@ -26,7 +25,7 @@ class CLSimpleTFTPClient
 
 public:
 
-	static const int kDefaultTFTPPort = 69;
+    static const int kDefaultTFTPPort = 69;
 
     CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry);
     ~CLSimpleTFTPClient(){};

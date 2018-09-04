@@ -48,9 +48,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Invalid login.");
 
         case ResultCode::serviceUnavailable:
-            return tr("Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.",
-                "%1 is the cloud name (like Nx Cloud)")
-                .arg(nx::network::AppInfo::cloudName());
+            return tr("Nx Cloud is temporary unavailable. Please try again later.");
 
         case ResultCode::credentialsRemovedPermanently:
             return tr("Credentials are no longer valid.");

@@ -39,7 +39,7 @@ class Halt(Result):
         self.message = message
 
     def __repr__(self):
-        return '{}({})'.format(type(self).__name__, repr(message))
+        return '{}({!r})'.format(type(self).__name__, self.message)
 
     @property
     def report(self):
@@ -67,12 +67,15 @@ class Checker(object):
     def expect_values(self, expected, actual, path='camera'):
         if isinstance(expected, dict):
             self.expect_dict(expected, actual, path)
+
         elif isinstance(expected, list):
             low, high = expected
             if not low <= actual <= high:
                 self.add_error('{} is {}, expected to be in {}', path, actual, expected)
+
         elif expected != actual:
             self.add_error('{} is {}, expected {}', path, actual, expected)
+
         return not self._errors
 
     def expect_dict(self, expected, actual, path='camera'):
@@ -80,8 +83,8 @@ class Checker(object):
         for key, expected_value in expected.items():
             if '.' in key:
                 base_key, sub_key = key.split('.', 1)
-                self.expect_values({sub_key: expected_value}, actual.get(base_key),
-                                   '{}.{}'.format(path, base_key))
+                self.expect_values({base_key: {sub_key: expected_value}}, actual, path)
+
             elif '=' in key:
                 if not isinstance(actual, list):
                     self.add_error('{} is {}, expected to be a list', path, actual_type)
@@ -102,7 +105,7 @@ class Checker(object):
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
-        'codec': {8: 'MJPEG', 28: 'H264'},
+        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},  # used to also contain 'MP2': 'G711' - probably not correct
     }
 
     @classmethod

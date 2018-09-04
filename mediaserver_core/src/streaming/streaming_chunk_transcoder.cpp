@@ -9,7 +9,7 @@
 #include <providers/filtered_ondemand_data_provider.h>
 #include <media/filters/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 
@@ -38,12 +38,10 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext():
 }
 
 StreamingChunkTranscoder::StreamingChunkTranscoder(
-    QnResourcePool* resPool,
-    QnVideoCameraPool* videoCameraPool,
+    QnMediaServerModule* serverModule,
     Flags flags)
     :
-    m_resPool(resPool),
-    m_videoCameraPool(videoCameraPool),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_flags(flags),
     m_dataSourceCache(nx::utils::TimerManager::instance())
 {
@@ -59,7 +57,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder(
     }
 
     Qn::directConnect(
-        resPool, &QnResourcePool::resourceRemoved,
+        serverModule->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &StreamingChunkTranscoder::onResourceRemoved);
 }
 
@@ -95,7 +93,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     // Searching for resource.
     QnSecurityCamResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
-            m_resPool,
+            serverModule()->resourcePool(),
             transcodeParams.srcResourceUniqueID());
     if (!cameraResource)
     {
@@ -107,7 +105,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     auto camera = videoCameraPool()->getVideoCamera(cameraResource);
     // Camera is inserted to this pool asynchronously. So it could be a race condition when
-    // camera already at resourcePool but still missing at qnCameraPool.
+    // camera already at resourcePool but still missing at videoCameraPool().
     if (!camera)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -302,7 +300,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
 
     // Creating archive reader.
     QSharedPointer<QnAbstractStreamDataProvider> dp(
-        qnServerModule->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
+        serverModule()->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
     if (!dp)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -437,7 +435,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
 
     //launching transcoding:
     //creating transcoder
-    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(mediaResource->commonModule()));
+    std::unique_ptr<QnTranscoder> transcoder(new QnFfmpegTranscoder(mediaResource->commonModule()->metrics()));
     if (transcoder->setContainer(transcodeParams.containerFormat()) != 0)
     {
         NX_LOGX(lm("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4")
@@ -557,6 +555,5 @@ void StreamingChunkTranscoder::onResourceRemoved(const QnResourcePtr& resource)
 
 QnVideoCameraPool* StreamingChunkTranscoder::videoCameraPool()
 {
-    // TODO: #ak Fix it after fixing initialization order in MediaServerModule.
-    return m_videoCameraPool ? m_videoCameraPool : qnCameraPool;
+    return serverModule()->videoCameraPool();
 }

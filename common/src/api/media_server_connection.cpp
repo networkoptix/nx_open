@@ -60,7 +60,6 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (StorageStatusObject, "storageStatus")
     (StorageSpaceObject, "storageSpace")
     (TimePeriodsObject, "RecordedTimePeriods")
-    (StatisticsObject, "statistics")
     (PtzContinuousMoveObject, "ptz")
     (PtzContinuousFocusObject, "ptz")
     (PtzAbsoluteMoveObject, "ptz")
@@ -200,9 +199,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             emitFinished(this, status, reply, handle);
             break;
         }
-        case StatisticsObject:
-            processJsonReply<QnStatisticsReply>(this, response, handle);
-            break;
         case GetParamsObject:
         case SetParamsObject:
             processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
@@ -368,7 +364,7 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
             connection->connectionInfo().ecUrl.userName().toUtf8());
     }
-	extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
+    extraHeaders.emplace(nx::network::http::header::kUserAgent, nx::network::http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
 
@@ -1180,12 +1176,6 @@ int QnMediaServerConnection::getStorageStatusAsync(
         params, QN_STRINGIZE_TYPE(QnStorageStatusReply), target, slot);
 }
 
-int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slot)
-{
-    return sendAsyncGetRequestLogged(StatisticsObject,
-        QnRequestParamList(), QN_STRINGIZE_TYPE(QnStatisticsReply), target, slot);
-}
-
 int QnMediaServerConnection::installUpdate(
     const QString& updateId, bool delayed, QObject* target, const char* slot)
 {
@@ -1310,7 +1300,6 @@ int QnMediaServerConnection::recordedTimePeriods(
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
-
 
 int QnMediaServerConnection::acknowledgeEventAsync(
     const QnCameraBookmark& bookmark,

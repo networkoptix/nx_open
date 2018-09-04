@@ -264,7 +264,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     const auto tcpTimeout = m_RtpSession.getTCPTimeout();
     if (m_callbackTimeout.count() > 0)
         m_RtpSession.setTCPTimeout(m_callbackTimeout);
-    const auto scopeGuard = makeScopeGuard([
+    const auto scopeGuard = nx::utils::makeScopeGuard([
         this, tcpTimeout]()
         {
             if (m_callbackTimeout.count() > 0)
@@ -697,7 +697,8 @@ int QnMulticodecRtpReader::getLastResponseCode() const
 void QnMulticodecRtpReader::closeStream()
 {
     m_rtpStarted = false;
-    m_RtpSession.sendTeardown();
+    if (m_RtpSession.isOpened())
+        m_RtpSession.sendTeardown();
     m_RtpSession.stop();
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i) {
         if (m_demuxedData[i])

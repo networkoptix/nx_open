@@ -12,7 +12,7 @@ public:
     static constexpr const char* const kManufacturer = "NetworkOptix";
     static constexpr const char* const kModel = "TestCameraLive";
 
-    QnTestCameraResource();
+    QnTestCameraResource(QnMediaServerModule* serverModule);
 
     virtual int getMaxFps() const override;
     virtual QString getDriverName() const override;

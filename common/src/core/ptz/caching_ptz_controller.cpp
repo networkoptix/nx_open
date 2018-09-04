@@ -80,7 +80,7 @@ bool QnCachingPtzController::getLimits(
             return true;
 
         default:
-            NX_EXPECT(false, "Wrong coordinate space");
+            NX_ASSERT(false, "Wrong coordinate space");
             return false;
     }
 

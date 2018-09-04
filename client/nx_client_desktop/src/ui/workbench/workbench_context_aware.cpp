@@ -67,9 +67,13 @@ void QnWorkbenchContextAware::init(QObject* parent)
     {
         if (const auto contextAware = dynamic_cast<QnWorkbenchContextAware*>(parent))
         {
-            if (contextAware->isContextInitialized())
+            const auto context = contextAware->m_initializationMode == InitializationMode::lazy
+                ? contextAware->context()
+                : (contextAware->isContextInitialized() ? contextAware->context() : nullptr);
+
+            if (context)
             {
-                m_context = contextAware->context();
+                m_context = context;
                 afterContextInitialized();
             }
             return;

@@ -218,7 +218,14 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         [](QGraphicsItem* item)
         {
             const auto widget = dynamic_cast<QnResourceWidget*>(item);
-            return widget && !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden);
+            if (!widget)
+                return false;
+            const auto workbenchItem = widget->item();
+            if (!workbenchItem)
+                return false;
+            const auto layout = workbenchItem->layout();
+            return !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden)
+                && !layout->locked();
         }));
 
     /* Item instruments. */
@@ -235,8 +242,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_dropInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, dndEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, dndEventTypes, this));
-
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
+
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_gridAdjustmentInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
@@ -588,7 +595,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     QKeyEvent *e = static_cast<QKeyEvent *>(event);
 
     auto w = qobject_cast<MainWindow*>(mainWindowWidget());
-    NX_EXPECT(w);
+    NX_ASSERT(w);
     if (w && w->handleKeyPress(e->key()))
         return;
 
@@ -1018,7 +1025,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     delete widget;
 
     const auto resource = zoomTargetWidget->resource()->toResourcePtr();
-    NX_EXPECT(resource);
+    NX_ASSERT(resource);
     if (!resource)
         return;
 
@@ -1517,7 +1524,7 @@ void QnWorkbenchController::updateCurrentLayoutInstruments()
     const auto fixedViewport = layout->flags().testFlag(QnLayoutFlag::FixedViewport);
     m_wheelZoomInstrument->setEnabled(!fixedViewport);
     m_handScrollInstrument->setEnabled(!fixedViewport);
-    m_gridAdjustmentInstrument->setEnabled(!fixedViewport);
+    m_gridAdjustmentInstrument->setEnabled(!(fixedViewport || layout->locked()));
 }
 
 void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {

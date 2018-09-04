@@ -59,7 +59,7 @@ namespace
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-	m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
+    m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -93,9 +93,9 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     // These signals are emitted from the same thread. It is safe to call close();
     auto closeIfExpired =
         [this]()
-	    {
-		    if (isConnectionExpired())
-			    close();
+        {
+            if (isConnectionExpired())
+                close();
         };
     if (reader)
     {
@@ -194,11 +194,11 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnSecurityCamResourcePtr &came
         : camera->getParentServer();
     if (!server)
         return QString();
-    QString url = server->getUrl() + QLatin1Char('/');
+    QString url = server->rtspUrl() + QLatin1Char('/');
     if (camera)
         url += camera->getPhysicalId();
     else
-        url += server->getUrl();
+        url += server->rtspUrl();
     return url;
 }
 
@@ -355,7 +355,6 @@ bool QnRtspClientArchiveDelegate::openInternal()
     if (isOpened)
     {
         m_sessionTimeout.restart();
-
 
         QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);
@@ -895,8 +894,11 @@ void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFi
     m_streamDataFilter = filter;
     m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME,
         QnLexical::serialized(filter).toUtf8());
-    m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME,
-        QnLexical::serialized(filter).toUtf8());
+    if (m_rtspSession->isOpened())
+    {
+        m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME,
+            QnLexical::serialized(filter).toUtf8());
+    }
 }
 
 nx::vms::api::StreamDataFilters QnRtspClientArchiveDelegate::streamDataFilter() const

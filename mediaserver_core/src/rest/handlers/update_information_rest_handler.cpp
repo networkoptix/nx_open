@@ -24,6 +24,7 @@
 namespace {
 
 static const QString kPublicationKeyParamName = "publicationKey";
+}
 
 struct UpdateInformationRequestData: public QnMultiserverRequestData
 {
@@ -49,9 +50,9 @@ struct UpdateInformationRequestData: public QnMultiserverRequestData
     QString publicationId;
 };
 
-qint64 freeSpaceForUpdate()
+qint64 QnUpdateInformationRestHandler::freeSpaceForUpdate() const
 {
-    auto updatesDir = qnServerModule->settings().dataDir();
+    auto updatesDir = m_settings->dataDir();
     if (updatesDir.isEmpty())
         updatesDir = QDir::tempPath();
 
@@ -102,15 +103,15 @@ void checkCloudHostRemotely(
     detail::requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
-static int checkInternetForUpdate(
+int QnUpdateInformationRestHandler::checkInternetForUpdate(
     const QString& publicationKey,
     QByteArray* result,
     QByteArray* contentType,
-    const UpdateInformationRequestData& request)
+    const UpdateInformationRequestData& request) const
 {
     nx::update::InformationError error;
     auto information = nx::update::updateInformation(
-        qnServerModule->settings().checkForUpdateUrl(),
+        m_settings->checkForUpdateUrl(),
         publicationKey,
         &error);
 
@@ -169,19 +170,23 @@ static int checkForUpdateInformationRemotely(
 }
 
 static int getUpdateInformationFromGlobalSettings(
+    QnCommonModule* commonModule,
     QByteArray* result,
     QByteArray* contentType,
     const UpdateInformationRequestData& request)
 {
     *contentType = Qn::serializationFormatToHttpContentType(request.format);
-    *result = qnServerModule->commonModule()->globalSettings()->updateInformation();
+    *result = commonModule->globalSettings()->updateInformation();
     if (result->isEmpty())
         *result = "{}";
 
     return nx::network::http::StatusCode::ok;
 }
 
-} // namespace
+QnUpdateInformationRestHandler::QnUpdateInformationRestHandler(const nx::mediaserver::Settings* settings):
+    m_settings(settings)
+{
+}
 
 int QnUpdateInformationRestHandler::executeGet(
     const QString& path,
@@ -190,6 +195,8 @@ int QnUpdateInformationRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
+    auto commonModule = processor->commonModule();
+
     const auto request = QnMultiserverRequestData::fromParams<UpdateInformationRequestData>(
         processor->resourcePool(),
         params);
@@ -201,11 +208,11 @@ int QnUpdateInformationRestHandler::executeGet(
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
         QnUpdateFreeSpaceReply reply;
-        const auto moduleGuid = processor->commonModule()->moduleGUID();
+        const auto moduleGuid = commonModule->moduleGUID();
         reply.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)
-            loadFreeSpaceRemotely(processor->commonModule(), path, reply, &context);
+            loadFreeSpaceRemotely(commonModule, path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
         return nx::network::http::StatusCode::ok;
@@ -216,14 +223,14 @@ int QnUpdateInformationRestHandler::executeGet(
         reply.cloudHost = processor->globalSettings()->cloudHost();
 
         if (!request.isLocal)
-            checkCloudHostRemotely(processor->commonModule(), path, reply, &context);
+            checkCloudHostRemotely(commonModule, path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
         return nx::network::http::StatusCode::ok;
     }
 
-    auto mediaServer = qnServerModule->resourcePool()->getResourceById<QnMediaServerResource>(
-        qnServerModule->commonModule()->moduleGUID());
+    auto mediaServer = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        commonModule->moduleGUID());
 
     NX_CRITICAL(mediaServer);
     if (params.contains(kPublicationKeyParamName))
@@ -235,8 +242,8 @@ int QnUpdateInformationRestHandler::executeGet(
         }
 
         return checkForUpdateInformationRemotely(
-            processor->commonModule(), path, &result, &contentType, &context);
+            commonModule, path, &result, &contentType, &context);
     }
 
-    return getUpdateInformationFromGlobalSettings(&result, &contentType, request);
+    return getUpdateInformationFromGlobalSettings(commonModule, &result, &contentType, request);
 }

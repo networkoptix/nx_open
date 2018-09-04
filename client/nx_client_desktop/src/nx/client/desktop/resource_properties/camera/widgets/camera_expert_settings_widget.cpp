@@ -10,7 +10,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/client/desktop/common/utils/check_box_utils.h>
@@ -50,7 +50,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     layout()->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
     NX_ASSERT(parent);
-    auto scrollBar = new QnSnappedScrollBar(this);
+    auto scrollBar = new SnappedScrollBar(this);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 

@@ -44,7 +44,7 @@ private:
     EndpointVerificatorFactory::Function m_factoryBak;
 
     std::unique_ptr<AbstractEndpointVerificator> verificatorFactoryFunc(
-        const nx::String& connectSessionId)
+        const std::string& connectSessionId)
     {
         return std::make_unique<CloudMediaServerEndpointVerificator>(connectSessionId);
     }
@@ -93,7 +93,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
 
     const TestData testSystemIdArray[] = {
         {system1.id, true},
-        {nx::String("invalid_cloud_system_id"), false},
+        {QnUuid::createUuid().toSimpleByteArray(), false},
         {boost::none, false} };
 
     // Connecting to a specific server within a system,

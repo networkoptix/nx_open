@@ -387,7 +387,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
         .arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
-    const auto executeOnConnectedHandlerGuard = makeScopeGuard(
+    const auto executeOnConnectedHandlerGuard = nx::utils::makeScopeGuard(
         [&connectCompletionHandler, code]()
         {
             if (connectCompletionHandler)

@@ -98,7 +98,7 @@ TEST_F(FtAioTimer, modify_timeout)
     for (int i = 0; i < 29; ++i)
     {
         aio::Timer timer;
-        auto timerGuard = makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
+        auto timerGuard = nx::utils::makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
 
         nx::utils::promise<void> timedoutPromise;
         auto timeoutHandler = [&timedoutPromise]{ timedoutPromise.set_value(); };
@@ -119,7 +119,7 @@ TEST_F(FtAioTimer, cancellation)
     auto timeoutHandler = [&timedoutPromise] { timedoutPromise.set_value(); };
 
     aio::Timer timer;
-    auto timerGuard = makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
+    auto timerGuard = nx::utils::makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
 
     timer.start(timeout, timeoutHandler);
     timer.post([&timer]{ timer.cancelSync(); });

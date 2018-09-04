@@ -334,7 +334,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
         [this](SelectableTextButton* button)
         {
-            NX_EXPECT(button);
+            NX_ASSERT(button);
             const auto overlayTypeVariant = button->property(kOverlayPropertyName);
             const auto overlayType = overlayTypeVariant.canConvert<ExportOverlayType>()
                 ? overlayTypeVariant.value<ExportOverlayType>()
@@ -518,6 +518,12 @@ void ExportSettingsDialog::updateWidgetsState()
         transcodingChecked = false;
     }
 
+    if (d->exportMediaSettings().transcodingSettings.watermark.visible())
+    {
+        transcodingLocked = true;
+        transcodingChecked = true;
+    }
+
     // Applying data to UI.
     // All UI events should be locked here.
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
@@ -623,7 +629,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 
 void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
 
     QWidget* tab = (mode == Mode::Media) ? ui->cameraTab : ui->layoutTab;
     int tabIndex = ui->tabWidget->indexOf(tab);
@@ -634,7 +640,7 @@ void ExportSettingsDialog::disableTab(Mode mode, const QString& reason)
 
 void ExportSettingsDialog::hideTab(Mode mode)
 {
-    NX_EXPECT(ui->tabWidget->count() > 1);
+    NX_ASSERT(ui->tabWidget->count() > 1);
     QWidget* tabToRemove = (mode == Mode::Media ? ui->cameraTab : ui->layoutTab);
     ui->tabWidget->removeTab(ui->tabWidget->indexOf(tabToRemove));
     updateMode();

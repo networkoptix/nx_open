@@ -1,5 +1,4 @@
-#ifndef onvif_stream_reader_h
-#define onvif_stream_reader_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -120,5 +119,3 @@ private:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // onvif_stream_reader_h

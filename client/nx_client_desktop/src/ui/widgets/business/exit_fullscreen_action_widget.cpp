@@ -9,7 +9,7 @@
 #include <nx/vms/event/action_parameters.h>
 #include <nx/client/desktop/event_rules/helpers/exit_fullscreen_action_helper.h>
 
-#include <nx/client/desktop/ui/event_rules/layout_selection_dialog.h>
+#include <nx/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 
 using namespace nx::client::desktop;
 
@@ -68,32 +68,13 @@ void QnExitFullscreenActionWidget::openLayoutSelectionDialog()
 
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    LayoutSelectionDialog dialog(/*singlePick*/ false, this);
-
-    const auto selectionMode = LayoutSelectionDialog::ModeFull;
-
-    const auto selection = model()->actionResources();
-
-    const auto localLayouts = resourcePool()->getResources<QnLayoutResource>(
-        [](const QnLayoutResourcePtr& layout)
-        {
-            return !layout->isShared() && layout->hasFlags(Qn::remote);
-        });
-    dialog.setLocalLayouts(localLayouts, selection, selectionMode);
-
-    const auto sharedLayouts = resourcePool()->getResources<QnLayoutResource>(
-        [](const QnLayoutResourcePtr& layout)
-        {
-            return layout->isShared() && layout->hasFlags(Qn::remote);
-        });
-
-    dialog.setSharedLayouts(sharedLayouts, selection);
-
-    if (dialog.exec() != QDialog::Accepted)
+    using namespace nx::client::desktop::node_view;
+    auto selection = model()->actionResources();
+    if (!MultipleLayoutSelectionDialog::selectLayouts(selection, this))
         return;
 
     model()->setActionResourcesRaw(
-        ExitFullscreenActionHelper::setLayoutIds(model().data(), dialog.checkedLayouts()));
+        ExitFullscreenActionHelper::setLayoutIds(model().data(), selection));
 
     updateLayoutButton();
 }

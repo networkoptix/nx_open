@@ -5,6 +5,11 @@
 #include <managers/updates_manager.h>
 #include <nx/utils/file_system.h>
 
+QnUpdateUnauthenticatedRestHandler::QnUpdateUnauthenticatedRestHandler(QnServerUpdateTool* updateTool):
+    m_updateTool(updateTool)
+{
+}
+
 int QnUpdateUnauthenticatedRestHandler::executeGet(
     const QString& path,
     const QnRequestParams& params,
@@ -33,7 +38,7 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     }
 
     QnUploadUpdateReply reply;
-    const bool res = QnServerUpdateTool::instance()->installUpdate(
+    const bool res = m_updateTool->installUpdate(
         updateId,
         delayed
             ? QnServerUpdateTool::UpdateType::Delayed

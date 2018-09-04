@@ -78,6 +78,7 @@
 #include "nx/mediaserver/resource/camera.h"
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <api/helpers/camera_id_helper.h>
 
 namespace {
 
@@ -217,9 +218,9 @@ struct EmailAttachmentData
     QString imageName;
 };
 
-ExtendedRuleProcessor::ExtendedRuleProcessor(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_emailManager(new EmailManagerImpl(commonModule))
+ExtendedRuleProcessor::ExtendedRuleProcessor(QnMediaServerModule* serverModule):
+    base_type(serverModule),
+    m_emailManager(new EmailManagerImpl(serverModule->commonModule()))
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &ExtendedRuleProcessor::onRemoveResource, Qt::QueuedConnection);
@@ -245,7 +246,7 @@ ExtendedRuleProcessor::~ExtendedRuleProcessor()
 
 void ExtendedRuleProcessor::onRemoveResource(const QnResourcePtr& resource)
 {
-    qnServerDb->removeLogForRes(resource->getId());
+    serverModule()->serverDb()->removeLogForRes(resource->getId());
 }
 
 void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::AbstractActionPtr& action)
@@ -306,7 +307,7 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     {
         if (actionRequiresLogging(action))
         {
-            qnServerDb->saveActionToDB(action);
+            serverModule()->serverDb()->saveActionToDB(action);
         }
         else
         {
@@ -339,10 +340,10 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         auto url = lit("dbfile://notifications/") + params.url;
 
         QnAviResourcePtr resource(new QnAviResource(url));
-        resource->setCommonModule(commonModule());
+        resource->setCommonModule(serverModule()->commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
-            qnServerModule->dataProviderFactory()->createDataProvider(resource));
+            serverModule()->dataProviderFactory()->createDataProvider(resource));
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 
@@ -356,16 +357,16 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         QnAbstractStreamDataProviderPtr provider;
         if (action->getToggleState() == vms::api::EventState::active)
         {
-            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            provider = audioStreamPool()->getActionDataProvider(action);
             transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
         else if (action->getToggleState() == vms::api::EventState::inactive)
         {
-            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            provider = audioStreamPool()->getActionDataProvider(action);
             transmitter->unsubscribe(provider.data());
             if (provider->processorsCount() == 0)
-                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+                audioStreamPool()->destroyActionDataProvider(action);
         }
     }
 
@@ -401,7 +402,8 @@ bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActio
 
 bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr& action)
 {
-    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid());
+    const QnUuid serverGuid(serverModule()->settings().serverGuid());
+    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid);
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
@@ -412,7 +414,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
     if (action->getToggleState() == vms::api::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
-    commonModule()->propertyDictionary()->saveParams(mediaServer->getId());
+    propertyDictionary()->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -468,7 +470,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
         QByteArray contentType = actionParameters.contentType.toUtf8();
         if (contentType.isEmpty())
-            contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
+            contentType = nx::mediaserver::Utils::autoDetectHttpContentType(actionParameters.text.toUtf8());
 
         nx::network::http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
@@ -484,13 +486,13 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
 
 bool ExtendedRuleProcessor::executePtzAction(const vms::event::AbstractActionPtr& action)
 {
-    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
         return broadcastAction(action); // execute action on a client side
 
-    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    QnPtzControllerPtr controller = camera->serverModule()->ptzControllerPool()->controller(camera);
     if (!controller)
         return false;
     return controller->activatePreset(action->getParams().presetId, QnAbstractPtzController::MaxPtzSpeed);
@@ -509,7 +511,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
         if (toggleState == vms::api::EventState::active || //< Prolonged actions starts
             action->getDurationSec() > 0) //< Instant action
         {
-            rez = qnRecordingManager->startForcedRecording(
+            rez = recordingManager()->startForcedRecording(
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
@@ -519,7 +521,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
         }
         else
         {
-            rez = qnRecordingManager->stopForcedRecording(camera);
+            rez = recordingManager()->stopForcedRecording(camera);
         }
     }
     return rez;
@@ -536,12 +538,12 @@ bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActi
         return false;
 
     const auto bookmark = helpers::bookmarkFromAction(action, camera);
-    return qnServerDb->addBookmark(bookmark);
+    return serverModule()->serverDb()->addBookmark(bookmark);
 }
 
 QnUuid ExtendedRuleProcessor::getGuid() const
 {
-    return serverGuid();
+    return QnUuid(serverModule()->settings().serverGuid());
 }
 
 bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputActionPtr& action)
@@ -575,8 +577,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     QSize dstSize) const
 {
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-        commonModule()->moduleGUID());
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
 
     if (!camera || !server)
         return TimespampedFrame();
@@ -587,11 +588,11 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     request.size = dstSize;
     request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
-    QnMultiserverThumbnailRestHandler handler;
+    QnMultiserverThumbnailRestHandler handler(serverModule());
     TimespampedFrame timestemedFrame;
     //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
-    auto result = handler.getScreenshot(commonModule(), request, timestemedFrame.frame, contentType,
+    auto result = handler.getScreenshot(serverModule()->commonModule(), request, timestemedFrame.frame, contentType,
         server->getPort(), &timestemedFrame.timestampUsec);
     if (result != nx::network::http::StatusCode::ok)
         return TimespampedFrame();
@@ -622,7 +623,7 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
                 std::bind(&ExtendedRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
         };
 
-    executeDelayed(sendMailFunction, kEmailSendDelay, qnEventRuleConnector->thread());
+    executeDelayed(sendMailFunction, kEmailSendDelay, serverModule()->eventConnector()->thread());
     return true;
 }
 
@@ -630,13 +631,13 @@ void ExtendedRuleProcessor::sendEmailAsync(
     vms::event::SendMailActionPtr action,
     QStringList recipients, int aggregatedResCount)
 {
-    const bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+    const bool isHtml = !globalSettings()->isUseTextEmailFormat();
 
     EmailManagerImpl::AttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     EmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  // TODO: https://networkoptix.atlassian.net/browse/VMS-2831
-    QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
-    QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
+    QnEmailSettings emailSettings = globalSettings()->emailSettings();
+    QString cloudOwnerAccount = globalSettings()->cloudAccountName();
 
     auto addIcon =
         [&attachments, &contextMap](const QString& name, const QString& source)
@@ -694,12 +695,12 @@ void ExtendedRuleProcessor::sendEmailAsync(
         ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = commonModule()->globalSettings()->systemName();
+    contextMap[tpSystemName] = globalSettings()->systemName();
     contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
     contextMap[tpSource] = helper.getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(action->getRuntimeParams());
 
@@ -712,7 +713,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
     renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
 
-    const bool isWindowsLineFeed = qnGlobalSettings->isUseWindowsEmailLineFeed();
+    const bool isWindowsLineFeed = globalSettings()->isUseWindowsEmailLineFeed();
     if (isWindowsLineFeed)
     {
         messageBody.replace("\n", "\r\n");
@@ -808,7 +809,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     EventType eventType = params.eventType;
 
     QVariantMap contextMap;
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
@@ -932,10 +933,11 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             {
                 QVariantList cameras;
                 int screenshotNum = 1;
-                for (const QnUuid& cameraId: metadata.cameraRefs)
+                for (const auto& cameraId: metadata.cameraRefs)
                 {
-                    if (QnVirtualCameraResourcePtr camRes =
-                        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+                    auto camRes = camera_id_helper::findCameraByFlexibleId(
+                        resourcePool(), cameraId);
+                    if (camRes)
                     {
                         QVariantMap camera;
 
@@ -945,12 +947,12 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
                         cameraHistoryPool()->updateCameraHistorySync(camRes);
                         camera[tpUrlInt] = helper.urlForCamera(
-                            cameraId, params.eventTimestampUsec, /*isPublic*/ false);
+                            camRes->getId(), params.eventTimestampUsec, /*isPublic*/ false);
                         camera[tpUrlExt] = helper.urlForCamera(
-                            cameraId, params.eventTimestampUsec, /*isPublic*/ true);
+                            camRes->getId(), params.eventTimestampUsec, /*isPublic*/ true);
 
                         QByteArray screenshotData = getEventScreenshotEncoded(
-                            cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
+                            camRes->getId(), params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
                         if (!screenshotData.isNull())
                         {
                             QBuffer screenshotStream(&screenshotData);
@@ -1032,7 +1034,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 {
     const vms::event::EventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
-    vms::event::StringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(serverModule()->commonModule());
 
     QVariantMap detailsMap;
 

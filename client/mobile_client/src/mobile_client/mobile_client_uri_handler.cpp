@@ -107,7 +107,7 @@ void QnMobileClientUriHandler::Private::loginToCloudDirectlyInternal(
     const SystemUri::Auth& auth,
     const QString& connectHandle)
 {
-    NX_EXPECT(directCloudConnectionHandle.isEmpty(),
+    NX_ASSERT(directCloudConnectionHandle.isEmpty(),
         "Double connect-to-cloud operation requested");
 
     uiController->disconnectFromSystem();
@@ -159,7 +159,7 @@ void QnMobileClientUriHandler::Private::loginToCloud(
         // and we logged out from cloud. Otherwise we just accept previously made connection.
         if (!password.isEmpty())
         {
-            NX_EXPECT(false, "We dont support password without user");
+            NX_ASSERT(false, "We dont support password without user");
         }
         else if (cloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
         {
@@ -213,7 +213,7 @@ void QnMobileClientUriHandler::Private::connectToServerDirectly(const SystemUri&
     if (!uiController)
         return;
 
-    NX_EXPECT(connectToServerHandle.isEmpty(),
+    NX_ASSERT(connectToServerHandle.isEmpty(),
         "Double connect-to-server operation requested.");
 
     auto url = uri.connectionUrl();

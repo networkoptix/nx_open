@@ -17,9 +17,9 @@ extern "C"
 
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-#include <common/common_module_aware.h>
 
 class CLVideoDecoderOutput;
+namespace nx { namespace metrics { struct Storage; } }
 
 /*!
     \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
@@ -137,12 +137,12 @@ class QnFfmpegVideoTranscoder;
 /*
 * Transcode input MediaPackets to specified format
 */
-class QnTranscoder: public QObject, public QnCommonModuleAware
+class QnTranscoder: public QObject
 {
     Q_OBJECT
 
 public:
-    QnTranscoder(QnCommonModule* commonModule);
+    QnTranscoder(nx::metrics::Storage* metrics);
     virtual ~QnTranscoder();
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
@@ -267,6 +267,7 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
+    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

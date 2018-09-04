@@ -20,9 +20,10 @@ extern QString getValueFromString(const QString& line);
 
 #define CL_BROAD_CAST_RETRY 1
 
-QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -45,7 +46,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnUuid &resourceTy
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
+    result = QnVirtualCameraResourcePtr(new QnPlDlinkResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -118,7 +119,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             }
 
             const unsigned char* data = (unsigned char*)(datagram.data());
-            const auto smac = nx::network::QnMacAddress::fromRawData(data);
+            const auto smac = nx::utils::MacAddress::fromRawData(data);
 
 
             bool haveToContinue = false;
@@ -137,7 +138,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 break;
 
 
-            QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
+            QnPlDlinkResourcePtr resource (new QnPlDlinkResource(serverModule()));
 
             QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
             if (rt.isNull())
@@ -222,11 +223,11 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
-    QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
+    QnNetworkResourcePtr resource ( new QnPlDlinkResource(serverModule()) );
 
     resource->setTypeId(rt);
     resource->setName(name);
-    resource->setMAC(nx::network::QnMacAddress(mac));
+    resource->setMAC(nx::utils::MacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(host);
     resource->setDefaultAuth(auth);

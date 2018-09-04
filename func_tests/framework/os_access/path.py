@@ -4,7 +4,8 @@ from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
 
-from framework.os_access.exceptions import NotADir
+from framework.os_access import exceptions
+from framework.os_access.exceptions import DoesNotExist, NotADir
 
 _logger = logging.getLogger(__name__)
 
@@ -59,7 +60,7 @@ class FileSystemPath(PurePath):
         pass
 
     @abstractmethod
-    def read_bytes(self):
+    def read_bytes(self, offset=0, max_length=None):
         return b''
 
     @abstractmethod
@@ -74,6 +75,12 @@ class FileSystemPath(PurePath):
     def write_text(self, data, encoding, errors):
         return 0
 
+    def copy_to(self, destination):
+        copy_file_using_read_and_write(self, destination)
+
+    def copy_from(self, source):
+        copy_file_using_read_and_write(source, self)
+
     def ensure_empty_dir(self):
         if self.exists():
             self.rmtree()
@@ -86,9 +93,61 @@ class FileSystemPath(PurePath):
     @classmethod
     def tmp_file(cls, base_name):
         random_name = os.urandom(6).encode('hex')
-        return cls.tmp().joinpath(base_name.stem + '-' + random_name + base_name.suffix)
+        dir = cls.tmp()
+        dir.mkdir(parents=True, exist_ok=True)
+        return dir.joinpath(base_name.stem + '-' + random_name + base_name.suffix)
+
+    def patch_string(self, regex, new_value, offset_cache_suffix):
+        offset_path = self.with_name(self.name + offset_cache_suffix)
+
+        def _try_cached_offset():
+            _logger.debug("Read file with offset %s.", offset_path)
+            try:
+                offset_str = offset_path.read_text()
+            except DoesNotExist:
+                _logger.debug("Cannot find file with offset %s.", offset_path)
+                return
+            offset = int(offset_str)
+            _logger.debug("Check offset %d in %s.", offset, self)
+            chunk = self.read_bytes(offset=offset, max_length=300)  # Length is arbitrary.
+            match = regex.match(chunk)
+            if match is None:
+                return
+            _logger.debug("Old value is %s.", match.group('value'))
+            return match.start('value'), offset + match.start('value'), offset + match.end('padding')
+
+        def _search_in_entire_file():
+            contents = self.read_bytes()
+            match = regex.search(contents)
+            if match is None:
+                raise RuntimeError("Cannot find a place matching {!r} in {!r}.".format(regex.pattern, self))
+            offset_path.write_bytes(bytes(match.start()))
+            return match.start('value'), match.start('value'), match.end('padding')
+
+        old_value, begin, end = _try_cached_offset() or _search_in_entire_file()
+        if old_value == new_value:
+            _logger.info("New value is same as old %s.", new_value)
+        if len(new_value) > end - begin:
+            raise ValueError("New value %r is too long, max length is %d.", new_value, end - begin)
+        self.write_bytes(new_value.ljust(end - begin, b'\0'), offset=begin)
+        return old_value
+
+    def take_from(self, local_source_path):
+        destination = self / local_source_path.name
+        if not local_source_path.exists():
+            raise exceptions.CannotDownload(
+                "Local file {} doesn't exist.".format(local_source_path))
+        if destination.exists():
+            raise exceptions.AlreadyExists(
+                "Cannot copy {!s} to {!s}".format(local_source_path, self),
+                destination)
+        copy_file(local_source_path, destination)
+        return destination
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
     _logger.info("Copy from %s to %s", source, destination)
+    source.copy_to(destination)
+
+def copy_file_using_read_and_write(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
     destination.write_bytes(source.read_bytes())

@@ -26,7 +26,10 @@ private:
     bool fixFileUpload(
         const QnSecurityCamResourcePtr& camera,
         nx::client::desktop::WearableUpload *upload);
-    bool fixFolderUpload(const QString& path, nx::client::desktop::WearableUpload* upload);
+    bool fixFolderUpload(
+        const QString& path, 
+        const QnSecurityCamResourcePtr& camera, 
+        nx::client::desktop::WearableUpload* upload);
     bool fixStorageCleanupUpload(nx::client::desktop::WearableUpload* upload);
     void uploadValidFiles(
         const QnSecurityCamResourcePtr& camera,

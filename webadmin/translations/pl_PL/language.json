@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
-        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem"
+        "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
+        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows"
     },
     "info": {
         "tabs": {

@@ -10,7 +10,7 @@ using namespace nx::hpm;
 
 ConnectorExecutor::ConnectorExecutor(
     const AddressEntry& targetAddress,
-    const nx::String& connectSessionId,
+    const std::string& connectSessionId,
     const hpm::api::ConnectResponse& response,
     std::unique_ptr<UDPSocket> udpSocket)
     :
@@ -70,9 +70,12 @@ void ConnectorExecutor::start(CompletionHandler handler)
                 {
                     return left.startDelay < right.startDelay;
                 });
-            const auto delayOffset = connectorWithMinDelayIter->startDelay;
+            const auto minDelay = connectorWithMinDelayIter->startDelay;
 
-            startConnectors(delayOffset);
+            for (auto& connectorContext: m_connectors)
+                connectorContext.startDelay -= minDelay;
+
+            startConnectors();
         });
 }
 
@@ -94,14 +97,14 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
         });
 }
 
-void ConnectorExecutor::startConnectors(std::chrono::milliseconds delayOffset)
+void ConnectorExecutor::startConnectors()
 {
     for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
         if (it->startDelay > std::chrono::milliseconds::zero())
         {
             it->timer->start(
-                it->startDelay - delayOffset,
+                it->startDelay,
                 std::bind(&ConnectorExecutor::startConnector, this, it));
         }
         else

@@ -6,6 +6,7 @@
 
 #include "request_type_wrappers.h"
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx_ec/data/api_statistics.h>
 
 class QUrlQuery;
 class QnCommonModule;
@@ -68,5 +69,20 @@ bool parseHttpRequestParams(
     const QString& command, const QnRequestParamList &params, QByteArray *value);
 void toUrlParams(
     const QByteArray &filter, QUrlQuery *query);
+
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command, const QnRequestParamList& params,
+    ApiStatisticsServerArguments* arguments);
+void toUrlParams(
+    const ApiStatisticsServerArguments& arguments, QUrlQuery* query);
+
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command,
+    const QnRequestParamList& params,
+    QnCameraDataExQuery* query);
+void toUrlParams(
+    const QnCameraDataExQuery& filter, QUrlQuery *query);
 
 } // namespace ec2

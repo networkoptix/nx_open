@@ -95,7 +95,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1, false),
     LicenseTypeInfo(Qn::LC_Analog,          "analog",        0, false),
     LicenseTypeInfo(Qn::LC_Professional,    "digital",       0, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, false),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, /*allowedToShareChannel*/ true),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0, false),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0, false),
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1, false),
@@ -108,7 +108,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // LicenseTypeInfo
 
 LicenseTypeInfo::LicenseTypeInfo(
@@ -124,7 +124,7 @@ LicenseTypeInfo::LicenseTypeInfo(
 {
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicense
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
@@ -521,7 +521,7 @@ LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType)
     return ::licenseTypeInfo[licenseType];
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicenseListHelper
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList)
@@ -575,7 +575,7 @@ void QnLicenseListHelper::update(const QnLicenseList& licenseList)
         m_licenseDict[license->key()] = license;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicensePool
 
 QnLicensePool::QnLicensePool(QObject* parent):

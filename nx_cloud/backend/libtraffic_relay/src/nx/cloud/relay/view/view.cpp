@@ -166,26 +166,26 @@ void View::registerCompatibilityHandlers()
         &m_controller->connectSessionManager());
 }
 
-template<typename Handler, typename ... Arg>
+template<typename Handler, typename ... Args>
 void View::registerApiHandler(
     const nx::network::http::StringType& method,
-    Arg ... arg)
+    Args ... args)
 {
-    registerApiHandler<Handler, Arg...>(
-        Handler::kPath, method, std::move(arg)...);
+    registerApiHandler<Handler, Args...>(
+        Handler::kPath, method, std::move(args)...);
 }
 
-template<typename Handler, typename ... Arg>
+template<typename Handler, typename ... Args>
 void View::registerApiHandler(
     const char* path,
     const nx::network::http::StringType& method,
-    Arg ... arg)
+    Args ... args)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, arg...]() -> std::unique_ptr<Handler>
+        [this, args...]() -> std::unique_ptr<Handler>
         {
-            return std::make_unique<Handler>(arg...);
+            return std::make_unique<Handler>(args...);
         },
         method);
 }
@@ -202,7 +202,7 @@ void View::initializeProxy()
             return std::make_unique<view::ProxyHandler>(
                 m_settings,
                 &m_model->listeningPeerPool(),
-                &m_model->remoteRelayPeerPool(),
+                &m_model->remoteRelayPeerPoolAioWrapper(),
                 &m_model->aliasManager());
         });
 }

@@ -399,7 +399,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
 
     const auto controller = widget->ptzController();
     const auto item = widget->item();
-    NX_EXPECT(item && controller);
+    NX_ASSERT(item && controller);
     if (!item || !controller)
         return;
 
@@ -426,7 +426,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
         return;
 
     const auto controller = widget->ptzController();
-    NX_EXPECT(controller);
+    NX_ASSERT(controller);
     if (!controller)
         return;
 

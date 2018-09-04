@@ -47,12 +47,6 @@ protected:
         {
             createData(server, 0, 0);
             const auto connection = server->moduleInstance()->ecConnection();
-            MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
-            auto intervals = bus->delayIntervals();
-            intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
-            intervals.outConnectionsInterval = std::chrono::milliseconds(1);
-            intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
-            bus->setDelayIntervals(intervals);
             QObject::connect(
                 server->moduleInstance()->commonModule()->messageProcessor(),
                 &QnCommonMessageProcessor::businessActionReceived,
@@ -61,6 +55,7 @@ protected:
                     ++m_actionReceived;
                 });
         }
+        setLowDelayIntervals();
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
         MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();

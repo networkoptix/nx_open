@@ -24,6 +24,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
@@ -524,7 +525,7 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(CODE_OK),
+    m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
@@ -738,7 +739,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = CODE_OK;
+    m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
@@ -936,11 +937,15 @@ void QnRtspClient::addAuth(QByteArray& request)
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
-
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+        &headers, nx::network::http::HttpHeader("CSeq", QByteArray::number(m_csec++)));
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent ));
+        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent));
+    nx::network::http::insertOrReplaceHeader(
+        &headers,
+        nx::network::http::HttpHeader(
+            "Host",
+            nx::network::url::getEndpoint(m_url).toString().toUtf8()));
 }
 
 void QnRtspClient::addAdditionalHeaders(

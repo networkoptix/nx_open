@@ -10,7 +10,7 @@
 #include <core/resource/camera_resource.h>
 #include <nx/streaming/nx_streaming_ini.h>
 #include <utils/common/synctime.h>
-#include <nx/kit/debug.h>
+#include <nx/utils/time_helper.h>
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 
@@ -84,7 +84,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
-    mFramesLost = 0;
+    m_framesLost = 0;
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
@@ -104,11 +104,11 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
     if (data==0)
     {
         setNeedKeyData();
-        ++mFramesLost;
+        ++m_framesLost;
         m_stat[0].onData(0, false);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-        if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+        if (m_framesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             m_stat[0].onLostConnection();
 
         QnSleep::msleep(10);
@@ -118,14 +118,14 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
 
     const QnCompressedVideoData* videoData = dynamic_cast<const QnCompressedVideoData*>(data);
 
-    if (mFramesLost > 0) // we are alive again
+    if (m_framesLost > 0) // we are alive again
     {
-        if (mFramesLost >= MAX_LOST_FRAME)
+        if (m_framesLost >= MAX_LOST_FRAME)
         {
             m_stat[0].onEvent(CL_STAT_CAMRESETED);
         }
 
-        mFramesLost = 0;
+        m_framesLost = 0;
     }
 
     if (videoData && needKeyData())
@@ -241,37 +241,6 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     }
 }
 
-/**
- * Assume the camera sends PTSes starting from e.g. 0, and looping no later than modulusUs, like
- * testcamera can do with the appropriate options. The goal is to convert PTSes from the camera to
- * "unlooped" PTSes which are monotonous. PTS 0 is converted to a moment with* us-since-epoch
- * divisible by modulusUs, and the first received PTS is converted to a moment in the past which is
- * the closest to the current time. This allows to restore the original PTS by taking the
- * "unlooped" PTS modulo modulusUs.
- */
-static qint64 unloopCameraPtsWithModulus(
-    int modulusUs, qint64 ptsUs, qint64 prevPtsUs, qint64* periodStartUs)
-{
-    if (ptsUs < 0)
-        NX_PRINT << "WARNING: PTS is less than zero: " << ptsUs;
-
-    if (prevPtsUs == AV_NOPTS_VALUE)
-    {
-        // First frame received.
-        const qint64 nowUs = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-        *periodStartUs = (nowUs / modulusUs - 1) * modulusUs;
-        NX_PRINT << "First frame: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
-    }
-    else if (prevPtsUs > ptsUs)
-    {
-        // Looping - first frame of the period received.
-        *periodStartUs += modulusUs;
-        NX_PRINT << "Looping: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
-    }
-
-    return *periodStartUs + ptsUs % modulusUs;
-}
-
 void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
     const QnAbstractMediaDataPtr& media)
 {
@@ -287,8 +256,13 @@ void QnAbstractMediaStreamDataProvider::checkAndFixTimeFromCamera(
 
     const int channel = media->channelNumber;
     const qint64 pts = media->timestamp;
-    media->timestamp = unloopCameraPtsWithModulus(
-        modulusUs, pts, m_lastMediaTime[channel], &m_unloopingPeriodStartUs);
+    media->timestamp = nx::utils::TimeHelper::unloopCameraPtsWithModulus(
+        []() { return std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()); },
+        AV_NOPTS_VALUE,
+        modulusUs,
+        pts,
+        m_lastMediaTime[channel],
+        &m_unloopingPeriodStartUs);
     m_lastMediaTime[channel] = pts;
 }
 

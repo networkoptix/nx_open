@@ -8,15 +8,24 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
-
 #include <utils/common/html.h>
+#include <utils/license_usage_helper.h>
 
 #include "camera_settings_tab.h"
+#include "redux/camera_settings_dialog_state.h"
+#include "redux/camera_settings_dialog_store.h"
+#include "utils/camera_settings_dialog_state_conversion_functions.h"
+#include "utils/license_usage_provider.h"
+#include "watchers/camera_settings_license_watcher.h"
+#include "watchers/camera_settings_readonly_watcher.h"
+#include "watchers/camera_settings_wearable_state_watcher.h"
+#include "watchers/camera_settings_global_settings_watcher.h"
+#include "watchers/camera_settings_global_permissions_watcher.h"
 #include "widgets/camera_settings_general_tab_widget.h"
 #include "widgets/camera_schedule_widget.h"
 #include "widgets/camera_motion_settings_widget.h"
@@ -25,27 +34,14 @@
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
 
-#include "redux/camera_settings_dialog_state.h"
-#include "redux/camera_settings_dialog_store.h"
-
-#include "watchers/camera_settings_license_watcher.h"
-#include "watchers/camera_settings_readonly_watcher.h"
-#include "watchers/camera_settings_wearable_state_watcher.h"
-#include "watchers/camera_settings_global_settings_watcher.h"
-#include "watchers/camera_settings_global_permissions_watcher.h"
-
-#include "utils/camera_settings_dialog_state_conversion_functions.h"
-#include <utils/license_usage_helper.h>
-
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialog::Private
 {
+    CameraSettingsDialog* const q;
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsLicenseWatcher> licenseWatcher;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
@@ -53,6 +49,8 @@ struct CameraSettingsDialog::Private
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
+
+    Private(CameraSettingsDialog* q): q(q) {}
 
     bool hasChanges() const
     {
@@ -93,7 +91,7 @@ struct CameraSettingsDialog::Private
         store->loadCameras(cameras);
     }
 
-    void handleAction(CameraSettingsDialog* q, ui::action::IDType action)
+    void handleAction(ui::action::IDType action)
     {
         switch (action)
         {
@@ -118,13 +116,43 @@ struct CameraSettingsDialog::Private
                     q->menu()->trigger(action, cameras.front());
                 break;
 
+            case ui::action::CopyRecordingScheduleAction:
+                NX_ASSERT(cameras.size() == 1
+                    && !cameras.front()->hasFlags(Qn::wearable_camera));
+                q->menu()->trigger(action, cameras.front());
+                break;
+
             case ui::action::PreferencesLicensesTabAction:
                 q->menu()->trigger(action);
                 break;
 
+            case ui::action::ChangeDefaultCameraPasswordAction:
+            {
+                const auto cameras =
+                    QnVirtualCameraResourceList(q->ui->defaultPasswordAlert->cameras().toList());
+                const auto parameters = ui::action::Parameters(cameras).withArgument(
+                    Qn::ForceShowCamerasList, q->ui->defaultPasswordAlert->useMultipleForm());
+                q->menu()->trigger(ui::action::ChangeDefaultCameraPasswordAction, parameters);
+                break;
+            }
+
             default:
                 NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
         }
+    }
+
+    void handleCamerasWithDefaultPasswordChanged()
+    {
+        const auto defaultPasswordWatcher = q->context()->instance<DefaultPasswordCamerasWatcher>();
+        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+            .intersect(cameras.toSet());
+
+        if (!troublesomeCameras.empty())
+            q->setCurrentPage(int(CameraSettingsTab::general));
+
+        q->ui->tabWidget->setEnabled(troublesomeCameras.empty());
+        q->ui->defaultPasswordAlert->setUseMultipleForm(cameras.size() > 1);
+        q->ui->defaultPasswordAlert->setCameras(troublesomeCameras);
     }
 };
 
@@ -132,7 +160,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent, InitializationMode::lazy),
     ui(new Ui::CameraSettingsDialog()),
-    d(new Private())
+    d(new Private(this))
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -155,16 +183,16 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     new CameraSettingsGlobalPermissionsWatcher(d->store, this);
 
     auto generalTab = new CameraSettingsGeneralTabWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(this, action); });
+        [this](ui::action::IDType action) { d->handleAction(action); });
 
     auto recordingTab = new CameraScheduleWidget(
-        d->licenseWatcher->licenseUsageTextProvider(), d->store, ui->tabWidget);
+        d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(this, action); });
+        [this](ui::action::IDType action) { d->handleAction(action); });
 
     addPage(
         int(CameraSettingsTab::general),
@@ -238,6 +266,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
             }
         });
 
+    connect(ui->defaultPasswordAlert, &DefaultPasswordAlertBar::changeDefaultPasswordRequest, this,
+        [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
+
+    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+        [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
+
     // Make sure we will not handle stateChanged, triggered when creating watchers.
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
@@ -294,6 +329,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         ? cameras.front()
         : QnVirtualCameraResourcePtr());
 
+    d->handleCamerasWithDefaultPasswordChanged();
     return true;
 }
 
@@ -394,63 +430,6 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 
     setPageVisible(int(CameraSettingsTab::expert), !hasWearableCameras
         && state.devicesDescription.isIoModule == CombinedValue::None);
-
-    ui->alertBar->setText(getAlertText(state));
 }
 
-QString CameraSettingsDialog::getAlertText(const CameraSettingsDialogState& state)
-{
-    if (!state.alert)
-        return QString();
-
-    using Alert = CameraSettingsDialogState::Alert;
-    switch (*state.alert)
-    {
-        case Alert::brushChanged:
-            return tr("Select areas on the schedule to apply chosen parameters to.");
-
-        case Alert::emptySchedule:
-            return tr(
-                "Set recording parameters and select areas "
-                "on the schedule grid to apply them to.");
-
-        case Alert::notEnoughLicenses:
-            return tr("Not enough licenses to enable recording.");
-
-        case Alert::licenseLimitExceeded:
-            return tr("License limit exceeded, recording will not be enabled.");
-
-        case Alert::recordingIsNotEnabled:
-            return tr("Turn on selector at the top of the window to enable recording.");
-
-        case Alert::highArchiveLength:
-            return QnCameraDeviceStringSet(
-                    tr("High minimum value can lead to archive length decrease on other devices."),
-                    tr("High minimum value can lead to archive length decrease on other cameras."))
-                .getString(state.deviceType);
-
-        case Alert::motionDetectionRequiresRecording:
-            return tr(
-                "Motion detection will work only when camera is being viewed. "
-                "Enable recording to make it work all the time.");
-
-        case Alert::motionDetectionTooManyRectangles:
-            return tr("Maximum number of motion detection rectangles for current camera is reached");
-
-        case Alert::motionDetectionTooManyMaskRectangles:
-            return tr("Maximum number of ignore motion rectangles for current camera is reached");
-
-        case Alert::motionDetectionTooManySensitivityRectangles:
-            return tr("Maximum number of detect motion rectangles for current camera is reached");
-
-        default:
-            NX_EXPECT(false, "Unhandled enum value");
-            break;
-    }
-
-    return QString();
-}
-
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

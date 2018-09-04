@@ -237,20 +237,22 @@ void ConnectionProcessor::run()
     if (remotePeer.isClient())
     {
         auto session = authSession();
-        qnAuditManager->at_connectionOpened(session);
-        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+        commonModule->auditManager()->at_connectionOpened(session);
+        onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule->auditManager(), session);
     }
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(d->socket)));
-    webSocket->setAliveTimeout(keepAliveTimeout);
+    if (keepAliveTimeout > std::chrono::milliseconds::zero())
+        webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
+        QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);
 }

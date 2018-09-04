@@ -1,5 +1,4 @@
-#ifndef QN_CORE_PLATFORM_ABSTRACTION_H
-#define QN_CORE_PLATFORM_ABSTRACTION_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -26,6 +25,3 @@ private:
 };
 
 #define qnPlatform (QnCorePlatformAbstraction::instance())
-
-
-#endif // QN_CORE_PLATFORM_ABSTRACTION_H

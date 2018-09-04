@@ -10,12 +10,11 @@ import pytest
 
 import server_api_data_generators as generator
 from framework.http_api import HttpError
-from framework.installation.cloud_host_patching import set_cloud_host
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.mediaserver_api import INITIAL_API_PASSWORD, ExplicitMergeError
+from framework.mediaserver_api import ExplicitMergeError, INITIAL_API_PASSWORD
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ def check_system_settings(server, **kw):
 
 
 def wait_for_settings_merge(one, two):
-    wait_for_true(
+    wait_for_truthy(
         lambda: one.api.get_system_settings() == two.api.get_system_settings(),
         '{} and {} response identically to /api/systemSettings'.format(one, two))
 
@@ -51,7 +50,7 @@ def check_admin_disabled(server):
 @pytest.fixture()
 def one(two_stopped_mediaservers, test_system_settings, cloud_host):
     one, _ = two_stopped_mediaservers
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_local_system(test_system_settings)
@@ -61,7 +60,7 @@ def one(two_stopped_mediaservers, test_system_settings, cloud_host):
 @pytest.fixture()
 def two(two_stopped_mediaservers, cloud_host):
     _, two = two_stopped_mediaservers
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_local_system()
@@ -136,12 +135,12 @@ def test_merge_take_remote_settings(one, two):
 def test_merge_cloud_with_local(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account, test_system_settings)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.start()
     two.api.setup_local_system()
 
@@ -171,12 +170,12 @@ def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, ta
 
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account_1)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_cloud_system(cloud_account_2)
@@ -199,12 +198,12 @@ def test_merge_cloud_systems(two_stopped_mediaservers, cloud_account_factory, ta
 def test_cloud_merge_after_disconnect(two_stopped_mediaservers, cloud_account, test_system_settings, cloud_host):
     one, two = two_stopped_mediaservers
 
-    set_cloud_host(one.installation, cloud_host)
+    one.installation.set_cloud_host(cloud_host)
     one.os_access.networking.enable_internet()
     one.start()
     one.api.setup_cloud_system(cloud_account, test_system_settings)
 
-    set_cloud_host(two.installation, cloud_host)
+    two.installation.set_cloud_host(cloud_host)
     two.os_access.networking.enable_internet()
     two.start()
     two.api.setup_cloud_system(cloud_account)
@@ -264,18 +263,18 @@ def test_merge_resources(two_separate_mediaservers):
 def test_restart_one_server(one, two, cloud_account, ca):
     merge_systems(one, two)
 
-    wait_for_true(one.api.servers_is_online, timeout_sec=10)
+    wait_for_truthy(one.api.servers_is_online, timeout_sec=10)
 
     # Stop Server2 and clear its database
     guid2 = two.api.get_server_id()
     two.stop()
     two.installation.cleanup(ca.generate_key_and_cert())
-    wait_for_true(one.api.neighbor_is_offline, timeout_sec=10)
+    wait_for_truthy(one.api.neighbor_is_offline, timeout_sec=10)
     two.start()
 
     # Remove Server2 from database on Server1
     one.api.remove_resource(guid2)
-    
+
     # Restore initial REST API
     two.api.generic.http.set_credentials('admin', INITIAL_API_PASSWORD)
 

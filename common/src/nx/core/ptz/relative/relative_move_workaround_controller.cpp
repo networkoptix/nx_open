@@ -110,7 +110,7 @@ bool RelativeMoveWorkaroundController::relativeMove(
     const nx::core::ptz::Vector& direction,
     const nx::core::ptz::Options& options)
 {
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_relativeMoveDoneCallback)
@@ -200,7 +200,7 @@ bool RelativeMoveWorkaroundController::relativeFocus(
     qreal direction,
     const nx::core::ptz::Options& options)
 {
-    auto guard = makeScopeGuard(
+    auto guard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_relativeMoveDoneCallback)

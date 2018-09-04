@@ -35,15 +35,15 @@ QnServerArchiveDelegate::QnServerArchiveDelegate(
     m_lastPacketTime(0),
     m_skipFramesToTime(0),
     m_reverseMode(false),
-    m_selectedAudioChannel(0),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     //m_sendMotion(false),
     m_eof(false),
     m_quality(quality),
-    m_dialQualityHelper(qnNormalStorageMan, qnBackupStorageMan),
+    m_dialQualityHelper(mediaServerModule->normalStorageManager(), mediaServerModule->backupStorageManager()),
     m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
-    m_lastChunkQuality(QnServer::LowQualityCatalog)
+    m_lastChunkQuality(QnServer::LowQualityCatalog),
+    m_serverModule(mediaServerModule)
 {
     m_flags |= Flag_CanSendMetadata;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
@@ -112,19 +112,19 @@ bool QnServerArchiveDelegate::isOpened() const
 void QnServerArchiveDelegate::setCatalogs() const
 {
     m_catalogHi[QnServer::StoragePool::Normal] =
-        qnNormalStorageMan->getFileCatalog(m_resource->getUniqueId(),
+        m_serverModule->normalStorageManager()->getFileCatalog(m_resource->getUniqueId(),
                                            QnServer::HiQualityCatalog);
 
     m_catalogHi[QnServer::StoragePool::Backup] =
-        qnBackupStorageMan->getFileCatalog(m_resource->getUniqueId(),
+        m_serverModule->backupStorageManager()->getFileCatalog(m_resource->getUniqueId(),
                                            QnServer::HiQualityCatalog);
 
     m_catalogLow[QnServer::StoragePool::Normal] =
-        qnNormalStorageMan->getFileCatalog(m_resource->getUniqueId(),
+        m_serverModule->normalStorageManager()->getFileCatalog(m_resource->getUniqueId(),
                                            QnServer::LowQualityCatalog);
 
     m_catalogLow[QnServer::StoragePool::Backup] =
-        qnBackupStorageMan->getFileCatalog(m_resource->getUniqueId(),
+        m_serverModule->backupStorageManager()->getFileCatalog(m_resource->getUniqueId(),
                                            QnServer::LowQualityCatalog);
 }
 
@@ -467,7 +467,7 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnectio
     QnMutexLocker lock(&m_mutex);
 
     return std::dynamic_pointer_cast<QnAbstractMotionArchiveConnection>(
-        QnMotionHelper::instance()->createConnection(m_resource, channel));
+        m_mediaServerModule->motionHelper()->createConnection(m_resource, channel));
 }
 
 QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getAnalyticsConnection(int channel)
@@ -506,9 +506,9 @@ void QnServerArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_aviDelegate->setSpeed(displayTime, value);
 }
 
-AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
+bool QnServerArchiveDelegate::setAudioChannel(unsigned num)
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lk(&m_mutex);
 
     m_selectedAudioChannel = num;
     return m_aviDelegate->setAudioChannel(num);
@@ -528,7 +528,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
 
     m_fileRes = QnAviResourcePtr(new QnAviResource(url));
     m_aviDelegate->close();
-    m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url, QnServer::StoragePool::Both));
+    m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(
+        m_serverModule, url, QnServer::StoragePool::Both));
 
     NX_LOG(lit("Switching to chunk %1").arg(url), cl_logDEBUG2);
 
@@ -589,8 +590,8 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
             m_newQualityAviDelegate->setFastStreamFind(true);
 
             m_newQualityAviDelegate->setStorage(
-                QnStorageManager::getStorageByUrl(m_newQualityFileRes->getUrl(),
-                                                  QnServer::StoragePool::Both));
+                QnStorageManager::getStorageByUrl(
+                    m_serverModule, m_newQualityFileRes->getUrl(), QnServer::StoragePool::Both));
 
             if (!m_newQualityAviDelegate->open(m_newQualityFileRes, m_archiveIntegrityWatcher))
                 continue;

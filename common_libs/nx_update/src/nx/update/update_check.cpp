@@ -7,7 +7,7 @@
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace update {
@@ -95,37 +95,23 @@ static InformationError findCustomizationInfo(
     CustomizationInfo* customizationInfo,
     Information* result)
 {
-    QJsonObject::const_iterator it = topLevelObject.constBegin();
-    for (; it != topLevelObject.constEnd(); ++it)
+    if (!QJson::deserialize(topLevelObject, QnAppInfo::customizationName(), customizationInfo))
     {
-        if (it.key() == kAlternativesServersKey || it.key() == "__version")
-            continue;
+        NX_ERROR(
+            typeid(Information),
+            lm("Customization %1 not found").args(QnAppInfo::customizationName()));
 
-        if (!QJson::deserialize(topLevelObject, it.key(), customizationInfo))
-        {
-            NX_ERROR(
-                typeid(Information),
-                lm("Customization json parsing failed: %1").args(it.key()));
-            return InformationError::jsonError;
-        }
-
-        if (QnAppInfo::customizationName() == it.key())
-        {
-            result->releaseNotesUrl = customizationInfo->release_notes;
-            return InformationError::noError;
-        }
+        return InformationError::jsonError;
     }
 
-    NX_ERROR(
-        typeid(Information),
-        lm("Customization %1 not found").args(QnAppInfo::customizationName()));
-
-    return InformationError::jsonError;
+    result->releaseNotesUrl = customizationInfo->release_notes;
+    return InformationError::noError;
 }
 
 static InformationError parsePackages(
     const QJsonObject topLevelObject,
     const QString& baseUpdateUrl,
+    const QString& publicationKey,
     Information* result)
 {
     QList<Package> packages;
@@ -135,7 +121,7 @@ static InformationError parsePackages(
     for (const auto& p: packages)
     {
         Package newPackage = p;
-        newPackage.file = "updates/" + p.file;
+        newPackage.file = "updates/" + publicationKey + '/' + p.file;
         newPackage.url = baseUpdateUrl + "/" + p.file;
         result->packages.append(newPackage);
     }
@@ -146,6 +132,7 @@ static InformationError parsePackages(
 static InformationError parseAndExtractInformation(
     const QByteArray& data,
     const QString& baseUpdateUrl,
+    const QString& publicationKey,
     Information* result)
 {
     QJsonParseError parseError;
@@ -161,7 +148,7 @@ static InformationError parseAndExtractInformation(
         return InformationError::jsonError;
     }
 
-    return parsePackages(topLevelObject, baseUpdateUrl, result);
+    return parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
 }
 
 static InformationError fillUpdateInformation(
@@ -191,7 +178,11 @@ static InformationError fillUpdateInformation(
     if (error != InformationError::noError)
         return error;
 
-    return parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
+    return parseAndExtractInformation(
+        httpClient->fetchMessageBodyBuffer(),
+        baseUpdateUrl,
+        publicationKey,
+        result);
 }
 
 Information updateInformationImpl(
@@ -203,7 +194,8 @@ Information updateInformationImpl(
     nx::network::http::AsyncClient httpClient;
     Information result;
     InformationError localError = makeHttpRequest(&httpClient, url);
-    auto onStop = QnRaiiGuard::createDestructible([&httpClient](){ httpClient.pleaseStopSync(); });
+    auto onStop = nx::utils::makeScopeGuard(
+        [&httpClient](){ httpClient.pleaseStopSync(); });
 
     if (localError != InformationError::noError)
     {

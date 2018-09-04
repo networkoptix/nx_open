@@ -5,7 +5,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
 
@@ -459,7 +459,7 @@ void Worker::handleFileInformationReply(
             .arg(statusString(success))
             .arg(requestSubjectString(m_state)));
 
-    auto exitGuard = QnRaiiGuard::createDestructible(
+    auto exitGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (!m_contextByHandle.isEmpty())
@@ -588,7 +588,7 @@ void Worker::handleChecksumsReply(
             .arg(m_peerManager->peerString(requestContext.peerId))
             .arg(statusString(success)));
 
-    auto exitGuard = QnRaiiGuard::createDestructible(
+    auto exitGuard = nx::utils::makeScopeGuard(
         [this, &success]()
         {
             if (success)
@@ -755,7 +755,7 @@ void Worker::handleDownloadChunkReply(
     NX_ASSERT(!requestContext.peerId.isNull());
     NX_ASSERT(requestContext.type == State::downloadingChunks);
 
-    auto exitGuard = QnRaiiGuard::createDestructible(
+    auto exitGuard = nx::utils::makeScopeGuard(
         [this, &success, &lock]()
         {
             setShouldWait(false);
@@ -909,7 +909,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 {
     QList<QnUuid> result;
 
-    auto exitLogGuard = QnRaiiGuard::createDestructible(
+    auto exitLogGuard = nx::utils::makeScopeGuard(
         [this, &result]
         {
             if (result.isEmpty())
@@ -1099,7 +1099,7 @@ QList<QnUuid> Worker::selectPeersForInternetDownload() const
     if (m_peerManager->hasInternetConnection(m_peerManager->selfId())
         || m_peerManager->hasAccessToTheUrl(fileInformation().url.toString()))
     {
-        return { m_peerManager->selfId() };
+        return {m_peerManager->selfId()};
     }
 
     const auto& peers = peersWithInternetConnection();

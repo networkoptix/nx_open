@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import logging
 import re
 
@@ -55,7 +57,7 @@ class UpstartService(Service):
     def status(self):
         command = ['status', self._service_name]
         output = self._ssh.run_command(command)
-        match = _status_output_re.match(output.strip())
+        match = _status_output_re.match(output.decode('ascii').strip())
         if match is None:
             raise ValueError("Cannot parse output of `{}`:\n{}".format(' '.join(command), output))
         if match.group('job') != self._service_name:

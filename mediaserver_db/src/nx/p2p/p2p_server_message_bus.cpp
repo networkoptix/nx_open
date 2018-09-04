@@ -397,6 +397,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
@@ -405,6 +406,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         remotePeer,
         localPeerEx(),
         std::move(webSocket),
+        requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
@@ -426,6 +428,9 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         sendInitialDataToClient(connection);
     }
     context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;
+
+    lock.unlock();
+    emit newDirectConnectionEstablished(connection.data());
 }
 
 void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)

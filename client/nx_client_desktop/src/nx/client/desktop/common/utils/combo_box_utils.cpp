@@ -18,9 +18,7 @@ struct ComboBoxUtils
 
 } // namespace
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 namespace combo_box_utils {
 
 void setItemHidden(QComboBox* combo, int index, bool hidden)
@@ -93,6 +91,4 @@ void insertMultipleValuesItem(QComboBox* combo, int index)
 }
 
 } // namespace combo_box_utils
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

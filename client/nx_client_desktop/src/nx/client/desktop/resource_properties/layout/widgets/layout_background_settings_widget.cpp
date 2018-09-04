@@ -202,18 +202,18 @@ void LayoutBackgroundSettingsWidget::initCache(bool isLocalFile)
         &ServerFileCache::fileDownloaded,
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
-            {
-                at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
-            });
+        {
+            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
+        });
 
     connect(
         d->cache,
         &ServerFileCache::fileUploaded,
         this,
         [this](const QString& filename, ServerFileCache::OperationResult status)
-            {
-                at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
-            });
+        {
+            at_imageStored(filename, status == ServerFileCache::OperationResult::ok);
+        });
 }
 
 void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& state)
@@ -227,19 +227,18 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     if (state.background.canStartDownloading())
         executeLater([this] { startDownloading(); }, this);
 
-    NX_EXPECT(background.width.max <= qnGlobals->layoutBackgroundMaxSize().width());
+    NX_ASSERT(background.width.max <= qnGlobals->layoutBackgroundMaxSize().width());
     ui->widthSpinBox->setRange(background.width.min, background.width.max);
     ui->widthSpinBox->setValue(background.width.value);
 
-    NX_EXPECT(background.height.max <= qnGlobals->layoutBackgroundMaxSize().height());
+    NX_ASSERT(background.height.max <= qnGlobals->layoutBackgroundMaxSize().height());
     ui->heightSpinBox->setRange(background.height.min, background.height.max);
     ui->heightSpinBox->setValue(background.height.value);
 
     ui->keepAspectRatioCheckBox->setChecked(background.keepImageAspectRatio);
     ui->opacitySpinBox->setValue(background.opacityPercent);
 
-    ui->stackedWidget->setCurrentWidget(
-        background.loadingInProgress()
+    ui->stackedWidget->setCurrentWidget(background.loadingInProgress()
         ? ui->loadingPage
         : ui->imagePage);
 
@@ -344,7 +343,7 @@ void LayoutBackgroundSettingsWidget::startDownloading()
 void LayoutBackgroundSettingsWidget::viewFile()
 {
     const auto& state = m_store->state();
-    NX_EXPECT(state.background.imagePresent());
+    NX_ASSERT(state.background.imagePresent());
 
     QString path = QLatin1String("file:///") + state.background.imageSourcePath;
     if (QDesktopServices::openUrl(QUrl(path)))
@@ -367,9 +366,7 @@ void LayoutBackgroundSettingsWidget::selectFile()
             this,
             tr("Select file..."),
             qnSettings->backgroundsFolder(),
-            tr("Pictures %1").arg(nameFilter)
-        )
-    );
+            tr("Pictures %1").arg(nameFilter)));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     if (!dialog->exec())

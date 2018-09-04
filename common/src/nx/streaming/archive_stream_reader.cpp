@@ -285,6 +285,7 @@ bool QnArchiveStreamReader::init()
 
     if (!opened)
         return false;
+
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     m_jumpMtx.lock();
@@ -1042,7 +1043,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     return result;
 }
 
-unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
+unsigned QnArchiveStreamReader::getCurrentAudioChannel() const
 {
     return m_selectedAudioChannel;
 }
@@ -1055,12 +1056,13 @@ QStringList QnArchiveStreamReader::getAudioTracksInfo() const
     return rez;
 }
 
-bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
+bool QnArchiveStreamReader::setAudioChannel(unsigned num)
 {
-    AVCodecContext* audioContext = m_delegate->setAudioChannel(num);
-    if (audioContext)
-        m_selectedAudioChannel = num;
-    return audioContext != 0;
+    if (!m_delegate->setAudioChannel(num))
+        return false;
+
+    m_selectedAudioChannel = num;
+    return true;
 }
 
 void QnArchiveStreamReader::setSpeedInternal(double value, qint64 currentTimeHint)

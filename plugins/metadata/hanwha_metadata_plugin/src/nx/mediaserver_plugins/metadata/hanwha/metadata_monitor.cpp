@@ -6,18 +6,12 @@
 #include "bytestream_filter.h"
 #include <nx/utils/log/log.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#elif defined(_MSC_VER)
-    #define NX_PRETTY_FUNCTION __FUNCSIG__
-#else
-    #define NX_PRETTY_FUNCTION __func__
-#endif
-
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace hanwha {
+
+using namespace std::chrono;
 
 namespace {
 
@@ -25,9 +19,9 @@ static const QString kMonitorUrlTemplate =
     lit("http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
 static const int kDefaultHttpPort = 80;
-
-static const std::chrono::minutes kKeepAliveTimeout{2};
-static const std::chrono::seconds kMinReopenInterval{10};
+static const minutes kKeepAliveTimeout(2);
+static const seconds kMinReopenInterval(10);
+static const seconds kResponseTimeout(10);
 
 } // namespace
 
@@ -153,8 +147,8 @@ void MetadataMonitor::initMonitorUnsafe()
     httpClient->setTotalReconnectTries(nx::network::http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
-    httpClient->setMessageBodyReadTimeoutMs(
-        std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
+    httpClient->setResponseReadTimeoutMs(duration_cast<milliseconds>(kResponseTimeout).count());
+    httpClient->setMessageBodyReadTimeoutMs(duration_cast<milliseconds>(kKeepAliveTimeout).count());
 
     auto handler =
         [this](const EventList& events)
@@ -192,7 +186,14 @@ void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr 
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
         <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
-    m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
+
+    m_timer.start(
+        reopenDelay,
+        [this]()
+        {
+            stopMonitorUnsafe();
+            initMonitorUnsafe();
+        });
 }
 
 } // namespace hanwha

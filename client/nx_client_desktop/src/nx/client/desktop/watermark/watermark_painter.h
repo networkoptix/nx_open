@@ -22,12 +22,11 @@ public:
     void setWatermark(nx::core::Watermark watermark);
 
 private:
-    void updateWatermark();
+    void updateWatermarkImage(const QSize& size);
 
     nx::core::Watermark m_watermark;
 
     QPixmap m_pixmap;
-    QSize m_pixmapSize = QSize(0, 0);
 };
 
 } // namespace desktop

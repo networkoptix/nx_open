@@ -42,9 +42,11 @@ void QnVideoCameraPool::stop()
 
 QnVideoCameraPool::QnVideoCameraPool(
     const nx::mediaserver::Settings& settings,
+    QnDataProviderFactory* dataProviderFactory,
     QnResourcePool* resourcePool)
     :
     m_settings(settings),
+    m_dataProviderFactory(dataProviderFactory),
     m_resourcePool(resourcePool)
 {
 }
@@ -76,7 +78,7 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
         return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
     return m_cameras.insert(
-        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
+        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, m_dataProviderFactory, res))).value();
 }
 
 bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)

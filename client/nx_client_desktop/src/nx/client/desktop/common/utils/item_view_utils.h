@@ -4,9 +4,7 @@
 
 class QAbstractItemView;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class TreeView;
 
@@ -18,32 +16,54 @@ enum class BatchToggleMode
 
 namespace item_view_utils {
 
-/** Inverts check box at specified index. */
-void toggleCheckBox(QAbstractItemModel* model, const QModelIndex& index);
+using IsCheckable = std::function<bool (const QModelIndex& index)>;
 
-void toggleCheckBox(QAbstractItemView* view, const QModelIndex& index, int checkBoxColumn);
+/** Inverts check box at specified index. */
+void toggleCheckBox(
+    QAbstractItemModel* model,
+    const QModelIndex& index,
+    IsCheckable isCheckable = {});
+
+void toggleCheckBox(
+    QAbstractItemView* view,
+    const QModelIndex& index,
+    int checkBoxColumn,
+    IsCheckable isCheckable = {});
 
 /** Batch-toggles check boxes at selected rows, with specified toggle mode. */
-void toggleSelectedRows(QAbstractItemView* view, int checkBoxColumn,
-    BatchToggleMode toggleMode = BatchToggleMode::unify);
+void toggleSelectedRows(
+    QAbstractItemView* view,
+    int checkBoxColumn,
+    BatchToggleMode toggleMode = BatchToggleMode::unify,
+    IsCheckable isCheckable = {});
 
 /** Sets up automatic toggle of a check box when its row is clicked. */
-void autoToggleOnRowClick(QAbstractItemView* view, int checkBoxColumn,
-    Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier);
+void autoToggleOnRowClick(
+    QAbstractItemView* view,
+    int checkBoxColumn,
+    Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier,
+    IsCheckable isCheckable = {});
 
 /** Sets up automatic toggle of check boxes at selected rows when Space key is pressed. */
-void autoToggleOnSpaceKey(TreeView* view, int checkBoxColumn,
-    BatchToggleMode toggleMode = BatchToggleMode::unify);
+void autoToggleOnSpaceKey(
+    TreeView* view,
+    int checkBoxColumn,
+    BatchToggleMode toggleMode = BatchToggleMode::unify,
+    IsCheckable isCheckable = {});
 
 /** Sets up automatic toggle of check boxes when shift-click selection is performed:
  * check boxes in all affected rows are set to the state of originating row check box. */
-void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn);
+void autoToggleOnShiftClick(
+    TreeView* view,
+    int checkBoxColumn,
+    IsCheckable isCheckable = {});
 
 /** Default setup for automatic check box toggle.
  * Takes view's selection mode into consideration. */
-void setupDefaultAutoToggle(TreeView* view, int checkBoxColumn);
+void setupDefaultAutoToggle(
+    TreeView* view,
+    int checkBoxColumn,
+    IsCheckable isCheckable = {});
 
 } // namespace item_view_utils
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

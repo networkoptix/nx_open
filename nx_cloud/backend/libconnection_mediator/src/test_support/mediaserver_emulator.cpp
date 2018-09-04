@@ -81,7 +81,7 @@ MediaServerEmulator::MediaServerEmulator(
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
-    m_mediatorConnector(std::make_unique<hpm::api::MediatorConnector>()),
+    m_mediatorConnector(std::make_unique<hpm::api::MediatorConnector>("127.0.0.1")),
     m_httpServer(std::make_unique<nx::network::http::HttpStreamSocketServer>(
         nullptr,
         &m_httpMessageDispatcher,

@@ -14,7 +14,7 @@ namespace cloud {
 namespace relay {
 
 namespace conf { class Settings; }
-namespace model { class AbstractRemoteRelayPeerPool; }
+namespace model { class RemoteRelayPeerPoolAioWrapper; }
 namespace model { class AliasManager; }
 
 namespace view {
@@ -28,7 +28,7 @@ public:
     ProxyHandler(
         const conf::Settings& settings,
         relaying::AbstractListeningPeerPool* listeningPeerPool,
-        model::AbstractRemoteRelayPeerPool* remotePeerPool,
+        model::RemoteRelayPeerPoolAioWrapper* remotePeerPool,
         model::AliasManager* aliasManager);
     ~ProxyHandler();
 
@@ -50,7 +50,7 @@ protected:
 
 private:
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
-    model::AbstractRemoteRelayPeerPool* m_remotePeerPool;
+    model::RemoteRelayPeerPoolAioWrapper* m_remotePeerPool;
     ProxyTargetDetectedHandler m_detectProxyTargetHandler;
     nx::utils::Url m_requestUrl;
     nx::utils::AsyncOperationGuard m_guard;
@@ -80,6 +80,10 @@ private:
         nx::utils::MoveOnlyFunc<void(
             std::optional<std::string> /*relayHostName*/,
             std::string /*proxyTargetHostName*/)> handler);
+
+    void processFindRelayResult(
+        const std::string& relayDomain,
+        const std::string& proxyTarget);
 
     void onRelayInstanceSearchCompleted(
         std::optional<std::string> relayHost,

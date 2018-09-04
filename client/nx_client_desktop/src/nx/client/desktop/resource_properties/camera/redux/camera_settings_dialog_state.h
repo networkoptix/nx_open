@@ -34,12 +34,6 @@ struct CameraSettingsDialogState
 
         T operator()() const { return get(); }
 
-        void setUserIfChanged(T value)
-        {
-            if (m_user || m_base != value)
-                m_user = value;
-        }
-
     private:
         T m_base = T();
         std::optional<T> m_user;
@@ -71,7 +65,7 @@ struct CameraSettingsDialogState
         All
     };
 
-    enum class Alert
+    enum class RecordingHint
     {
         // Brush was changed (mode, fps, quality).
         brushChanged,
@@ -79,21 +73,18 @@ struct CameraSettingsDialogState
         // Recording was enabled, while schedule is empty.
         emptySchedule,
 
-        // Not enough licenses to enable recording.
-        notEnoughLicenses,
-
-        // License limit exceeded, recording will not be enabled.
-        licenseLimitExceeded,
-
         // Schedule was changed but recording is not enabled.
-        recordingIsNotEnabled,
+        recordingIsNotEnabled
+    };
 
+    enum class RecordingAlert
+    {
         // High minimal archive length value selected.
-        highArchiveLength,
+        highArchiveLength
+    };
 
-        // Motion detection was enabled while recording was not.
-        motionDetectionRequiresRecording,
-
+    enum class MotionAlert
+    {
         // Selection attempt produced too many motion rectangles.
         motionDetectionTooManyRectangles,
 
@@ -101,7 +92,7 @@ struct CameraSettingsDialogState
         motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        motionDetectionTooManySensitivityRectangles,
+        motionDetectionTooManySensitivityRectangles
     };
 
     CameraSettingsDialogState() = default;
@@ -152,33 +143,12 @@ struct CameraSettingsDialogState
     WearableState singleWearableState;
     QString wearableUploaderName; //< Name of user currently uploading footage to wearable camera.
 
-    struct FisheyeCalibrationSettings
-    {
-        QPointF offset;
-        qreal radius = 0.5;
-        qreal aspectRatio = 1.0;
-
-        bool operator==(const FisheyeCalibrationSettings& s) const
-        {
-            return offset == s.offset && qFuzzyEquals(radius, s.radius)
-                && qFuzzyEquals(aspectRatio, s.aspectRatio);
-        }
-
-        bool operator!=(const FisheyeCalibrationSettings& s) const
-        {
-            return !(*this == s);
-        }
-    };
-
     struct SingleCameraSettings
     {
         UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
 
-        UserEditable<bool> enableFisheyeDewarping;
-        UserEditable<QnMediaDewarpingParams::ViewMode> fisheyeMountingType;
-        UserEditable<FisheyeCalibrationSettings> fisheyeCalibrationSettings;
-        UserEditable<qreal> fisheyeFovRotation;
+        UserEditable<QnMediaDewarpingParams> fisheyeDewarping;
 
         UserEditable<int> logicalId;
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.
@@ -240,9 +210,8 @@ struct CameraSettingsDialogState
 
     struct RecordingDays
     {
-        int absoluteValue = 0;
-        bool automatic = true;
-        bool same = true;
+        UserEditableMultiple<bool> automatic;
+        UserEditableMultiple<int> value;
     };
 
     struct RecordingSettings
@@ -278,8 +247,8 @@ struct CameraSettingsDialogState
         bool showQuality = true;
         bool showFps = true;
 
-        RecordingDays minDays{nx::vms::api::kDefaultMinArchiveDays, true, true};
-        RecordingDays maxDays{nx::vms::api::kDefaultMaxArchiveDays, true, true};
+        RecordingDays minDays;
+        RecordingDays maxDays;
 
         bool isCustomBitrate() const
         {
@@ -299,7 +268,9 @@ struct CameraSettingsDialogState
 
     UserEditableMultiple<bool> audioEnabled;
 
-    std::optional<Alert> alert;
+    std::optional<RecordingHint> recordingHint;
+    std::optional<RecordingAlert> recordingAlert;
+    std::optional<MotionAlert> motionAlert;
 
     struct ImageControlSettings
     {
@@ -348,20 +319,6 @@ struct CameraSettingsDialogState
     {
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
-    }
-
-    QnMediaDewarpingParams fisheyeSettings() const
-    {
-        QnMediaDewarpingParams params;
-        FisheyeCalibrationSettings calibration = singleCameraSettings.fisheyeCalibrationSettings();
-        params.enabled = singleCameraSettings.enableFisheyeDewarping();
-        params.xCenter = 0.5 + calibration.offset.x();
-        params.yCenter = 0.5 + calibration.offset.y();
-        params.radius = calibration.radius;
-        params.hStretch = calibration.aspectRatio;
-        params.fovRot = singleCameraSettings.fisheyeFovRotation();
-        params.viewMode = singleCameraSettings.fisheyeMountingType();
-        return params;
     }
 };
 

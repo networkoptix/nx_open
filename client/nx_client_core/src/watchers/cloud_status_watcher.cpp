@@ -1,6 +1,5 @@
 #include "cloud_status_watcher.h"
 
-#include <chrono>
 #include <algorithm>
 
 #include <QtCore/QUrl>
@@ -130,6 +129,25 @@ public:
     void setCloudEnabled(bool enabled);
     bool cloudIsEnabled() const;
 
+    using TimePoint = QnCloudStatusWatcher::TimePoint;
+    /**
+     * @brief Stops watcher from interacting with cloud from background
+     * Background interaction with the cloud breaks user lockout feature in
+     * ConnectToCloudDialog. Any request from the watcher is done with proper
+     * user credentials, so it resets the counter for failed password attempts.
+     * Mirrored from the parent class.
+     * @param timeout: interaction will be automatically resumed after it expires.
+     */
+    void suppressCloudInteraction(QnCloudStatusWatcher::TimePoint::duration timeout);
+
+    /**
+     * @brief Resumes background interaction with the cloud.
+     * Mirrored from the parent class.
+     */
+    void resumeCloudInteraction();
+
+    bool checkSuppressed();
+
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -145,6 +163,18 @@ private:
 private:
     QTimer* m_pingTimer;
     bool m_cloudIsEnabled;
+
+    enum class SuppressionMode
+    {
+        Resumed,
+        Suppressed,
+        SuppressedUntil,
+    };
+
+    SuppressionMode m_suppression = SuppressionMode::Resumed;
+
+    // Time limit for cloud suppression.
+    TimePoint m_suppressUntil;
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
@@ -331,10 +361,23 @@ bool QnCloudStatusWatcher::isCloudEnabled() const
     return d->cloudIsEnabled();
 }
 
+void QnCloudStatusWatcher::suppressCloudInteraction(TimePoint::duration timeout)
+{
+    Q_D(QnCloudStatusWatcher);
+    d->suppressCloudInteraction(timeout);
+}
+
+void QnCloudStatusWatcher::resumeCloudInteraction()
+{
+    Q_D(QnCloudStatusWatcher);
+    d->resumeCloudInteraction();
+}
+
 void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
 {
-    setCloudEnabled((result != api::ResultCode::networkError)
-        && (result != api::ResultCode::serviceUnavailable));
+    setCloudEnabled(result != api::ResultCode::networkError
+        && result != api::ResultCode::serviceUnavailable
+        && result != api::ResultCode::accountBlocked);
 
     switch (result)
     {
@@ -374,6 +417,9 @@ void QnCloudStatusWatcher::updateSystems()
     const bool isMobile = d->isMobile;
 
     if (status() != Online)
+        return;
+
+    if (!d->checkSuppressed())
         return;
 
     QPointer<QnCloudStatusWatcher> guard(this);
@@ -460,7 +506,14 @@ QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *p
 
     updateTimer->setInterval(kUpdateIntervalMs);
     updateTimer->start();
-    connect(updateTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
+
+    connect(updateTimer, &QTimer::timeout, q,
+        [this, q]()
+        {
+             if (checkSuppressed())
+                 q->updateSystems();
+        });
+
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
             this, &QnCloudStatusWatcherPrivate::updateCurrentSystem);
 
@@ -684,6 +737,9 @@ void QnCloudStatusWatcherPrivate::createTemporaryCredentials()
 
 void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 {
+    if (!checkSuppressed())
+        return;
+
     TRACE("Prolong temporary credentials");
     if (temporaryCredentials.login.empty())
         return;
@@ -735,3 +791,41 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
     temporaryConnection->ping(completionHandler);
 }
 
+void QnCloudStatusWatcherPrivate::suppressCloudInteraction(
+        TimePoint::duration timeout)
+{
+    if (timeout > std::chrono::milliseconds(0))
+    {
+        m_suppression = SuppressionMode::SuppressedUntil;
+        // Updating suppression time only if it will be later than the current limit.
+        TimePoint newTime = TimePoint::clock::now() + timeout;
+        if (newTime > m_suppressUntil)
+            m_suppressUntil = newTime;
+    }
+    else
+    {
+        m_suppression = SuppressionMode::Suppressed;
+        m_suppressUntil = TimePoint::clock::now();
+    }
+}
+
+void QnCloudStatusWatcherPrivate::resumeCloudInteraction()
+{
+    m_suppression = SuppressionMode::Resumed;
+}
+
+bool QnCloudStatusWatcherPrivate::checkSuppressed()
+{
+    if (m_suppression == SuppressionMode::Suppressed)
+        return false;
+    if (m_suppression == SuppressionMode::SuppressedUntil)
+    {
+        if (m_suppressUntil < TimePoint::clock::now())
+        {
+            m_suppression = SuppressionMode::Resumed;
+            return true;
+        }
+        return false;
+    }
+    return true;
+}

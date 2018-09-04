@@ -4,10 +4,8 @@ from datetime import datetime
 import datadiff
 import pytest
 import pytz
-import requests
-import requests.auth
 
-from framework.mediaserver_api import TimePeriod
+from framework.mediaserver_api import MediaserverApiRequestError, TimePeriod, Unauthorized
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -38,15 +36,22 @@ def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
     wait = Wait("until responses become equal")
     target_guid = system[target_alias].api.get_server_id()
     while True:
-        response_direct = requests.get(
-            system[target_alias].api.generic.http.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[target_alias].api.generic.http.user, system[target_alias].api.generic.http.password))
-        response_via_proxy = requests.get(
-            system[proxy_alias].api.generic.http.url(api_endpoint),
-            auth=requests.auth.HTTPDigestAuth(system[proxy_alias].api.generic.http.user, system[proxy_alias].api.generic.http.password),
-            headers={'X-server-guid': target_guid})
+        try:
+            response_via_proxy = system[proxy_alias].api.generic.get(
+                api_endpoint,
+                headers={'X-server-guid': target_guid})
+        except (MediaserverApiRequestError, Unauthorized) as exc:
+            # We can get MediaserverApiRequestError or Unauthorized here,
+            # if mediaservers doesn't sync some data (interfaces, users, etc) yet.
+            if not wait.again():
+                assert False, ("Can't send '{}' request via proxy: {}".format(
+                    api_endpoint, str(exc)))
+            else:
+                wait.sleep()
+                continue
+        response_direct = system[target_alias].api.generic.get(api_endpoint)
         diff = datadiff.diff(
-            response_via_proxy.json(), response_direct.json(),
+            response_via_proxy, response_direct,
             fromfile='via proxy', tofile='direct',
             context=100)
         if not diff:

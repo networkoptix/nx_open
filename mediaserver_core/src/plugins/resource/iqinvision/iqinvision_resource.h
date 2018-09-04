@@ -4,12 +4,12 @@
 #include <nx/network/deprecated/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 
-class QnPlIqResource : public nx::mediaserver::resource::Camera
+class QnPlIqResource: public nx::mediaserver::resource::Camera
 {
 public:
     static const QString MANUFACTURE;
 
-    QnPlIqResource();
+    QnPlIqResource(QnMediaServerModule* serverModule);
 
     virtual QString getDriverName() const override;
 

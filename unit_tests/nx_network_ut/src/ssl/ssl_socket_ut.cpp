@@ -199,6 +199,8 @@ public:
 
     virtual void add(std::unique_ptr<AbstractStreamSocket> streamSocket) override
     {
+        QnMutexLocker lock(&m_mutex);
+
         ASSERT_TRUE(streamSocket->setNonBlockingMode(false));
         auto syncReflector = std::make_unique<SynchronousReflector>(std::move(streamSocket));
         syncReflector->start();
@@ -207,11 +209,15 @@ public:
 
     virtual std::size_t count() const override
     {
+        QnMutexLocker lock(&m_mutex);
+
         return m_reflectors.size();
     }
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
     {
+        QnMutexLocker lock(&m_mutex);
+
         auto result = m_reflectors.front()->takeSocket();
         m_reflectors.pop_front();
         return result;
@@ -219,6 +225,7 @@ public:
 
 private:
     std::deque<std::unique_ptr<SynchronousReflector>> m_reflectors;
+    mutable QnMutex m_mutex;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -254,6 +261,7 @@ public:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
 
         QnMutexLocker lock(&m_mutex);
+
         m_reflectors.push_back(nullptr);
         auto asyncReflector =
             std::make_unique<AbstractStreamSocketAsyncReflector>(
@@ -266,11 +274,14 @@ public:
 
     virtual std::size_t count() const override
     {
+        QnMutexLocker lock(&m_mutex);
         return m_reflectors.size();
     }
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
     {
+        QnMutexLocker lock(&m_mutex);
+
         auto result = m_reflectors.front()->takeChannel();
         m_reflectors.pop_front();
         return result;
@@ -279,7 +290,7 @@ public:
 private:
     std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>> m_reflectors;
     bool m_terminated;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 
     void onReflectorDone(
         std::list<std::unique_ptr<AbstractStreamSocketAsyncReflector>>::iterator reflectorIter,
@@ -558,6 +569,13 @@ class SslSocketSpecificHandshake:
 {
     using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
 
+public:
+    ~SslSocketSpecificHandshake()
+    {
+        if (m_encryptedConnection)
+            m_encryptedConnection->pleaseStopSync();
+    }
+
 protected:
     void whenDoHandshake()
     {
@@ -605,7 +623,7 @@ protected:
         thenSameDataHasBeenReceivedInResponse();
     }
 
-    void changeSocketIoMode()
+    void changeServerSocketIoMode()
     {
         ASSERT_EQ(1U, reflectorPoolInUse()->count());
         auto socket = reflectorPoolInUse()->takeSocket();
@@ -622,19 +640,23 @@ protected:
 
 TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
 {
+    switchToAsynchronousMode();
+
     givenEstablishedConnection();
 
     exchangeDataInAsyncMode();
-    changeSocketIoMode();
+    changeServerSocketIoMode();
     exchangeDataInSyncMode();
 }
 
 TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 {
+    switchToSynchronousMode();
+
     givenEstablishedConnection();
 
     exchangeDataInSyncMode();
-    changeSocketIoMode();
+    changeServerSocketIoMode();
     exchangeDataInAsyncMode();
 }
 

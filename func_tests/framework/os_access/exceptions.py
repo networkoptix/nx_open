@@ -3,7 +3,7 @@ from pylru import lrudecorator
 
 def _error_message_from_stderr(stderr):
     """Simple heuristic to get short message from STDERR"""
-    for line in reversed(stderr.splitlines()):
+    for line in reversed(stderr.decode('ascii').splitlines()):
         if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
             return line
     return 'stderr empty'
@@ -44,12 +44,8 @@ class CannotDownload(DoesNotExist):
 
 
 class AlreadyExists(Exception):
-    pass
-
-
-class AlreadyDownloaded(AlreadyExists):
-    def __init__(self, message, path):
-        super(AlreadyDownloaded, self).__init__(message)
+    def __init__(self, message, path=None):
+        super(AlreadyExists, self).__init__(message)
         self.path = path
 
 
@@ -71,3 +67,14 @@ class FileIsADir(Exception):
 
 class DirIsAFile(Exception):
     pass
+
+
+class AlreadyAcquired(Exception):
+    pass
+
+
+class CoreDumpError(Exception):
+
+    def __init__(self, cause):
+        super(CoreDumpError, self).__init__('Failed to make core dump: %s' % cause)
+        self.cause = cause

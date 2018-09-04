@@ -13,10 +13,15 @@
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/events/events_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
+
+class QnServerModule;
 
 namespace nx {
 namespace mediaserver {
 namespace event {
+
+class RuleProcessor;
 
 /*
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
@@ -24,13 +29,12 @@ namespace event {
 
 class EventConnector:
     public QObject,
-    public QnCommonModuleAware,
-    public Singleton<EventConnector>
+    public ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    EventConnector(QnCommonModule* commonModule);
+    EventConnector(QnMediaServerModule* serverModule);
     virtual ~EventConnector() override;
 
 public slots:
@@ -131,9 +135,9 @@ public slots:
 
 private slots:
     void onNewResource(const QnResourcePtr& resource);
+private:
+    QThread* m_thread = nullptr;
 };
-
-#define qnEventRuleConnector nx::mediaserver::event::EventConnector::instance()
 
 } // namespace event
 } // namespace mediaserver

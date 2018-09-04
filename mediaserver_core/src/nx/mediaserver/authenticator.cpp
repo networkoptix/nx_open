@@ -387,7 +387,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
                         &response.headers,
                         nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
                 }
-                bool needRecalcPassword = needUpdateRealm && canUpdateRealm
+                bool needRecalcPassword = (needUpdateRealm && canUpdateRealm)
                      || (userResource->isLdap() && userResource->passwordExpired());
                 if (needRecalcPassword)
                 {
@@ -764,23 +764,19 @@ Qn::AuthResult Authenticator::tryAuthRecord(
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
         return Qn::Auth_WrongDigest;
 
-    QnResourcePtr res;
-    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
-    std::tie(errCode, res) = m_userDataProvider->authorize(
+    auto [errorCode, resource] = m_userDataProvider->authorize(
         method,
         authorization,
         &response.headers);
-    if (!res)
-        return Qn::Auth_WrongLogin;
 
-    if (auto user = res.dynamicCast<QnUserResource>())
+    if (const auto user = resource.dynamicCast<QnUserResource>())
     {
         if (accessRights)
             *accessRights = Qn::UserAccessData(user->getId());
     }
 
-    saveLoginResult(authorization.digest->userid, clientIp, errCode);
-    return errCode;
+    saveLoginResult(authorization.digest->userid, clientIp, errorCode);
+    return errorCode;
 }
 
 QnUserResourcePtr Authenticator::findUserByName(const QByteArray& nxUserName) const
@@ -833,13 +829,13 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 }
 
 Authenticator::SessionKeys::SessionKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kSessionKeyLifeTime, /*prolongLifeOnUse*/ true})
 {
 }
 
 Authenticator::PathKeys::PathKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kPathKeyLifeTime, /*prolongLifeOnUse*/ false})
 {
 }

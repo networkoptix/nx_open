@@ -20,6 +20,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
@@ -381,7 +382,7 @@ public:
         auto widgets = m_rectByWidget.keys();
         for (auto widget: widgets)
             removeWidget(widget);
-        NX_EXPECT(m_rectByWidget.empty());
+        NX_ASSERT(m_rectByWidget.empty());
     }
 
     QPointer<QnMediaResourceWidget> target() const
@@ -406,7 +407,7 @@ public:
 
     void removeWidget(ZoomWindowWidget* widget)
     {
-        NX_EXPECT(widget);
+        NX_ASSERT(widget);
         if (!widget)
             return;
 
@@ -501,7 +502,7 @@ private:
 
     void updateLayout(ZoomWindowWidget* widget)
     {
-        NX_EXPECT(widget);
+        NX_ASSERT(widget);
         if (widget)
         {
             auto widgetRect = m_rectByWidget.value(widget);
@@ -746,7 +747,7 @@ void ZoomWindowInstrument::registerWidget(QnMediaResourceWidget *widget)
 
 void ZoomWindowInstrument::unregisterWidget(QnMediaResourceWidget* widget)
 {
-    NX_EXPECT(widget);
+    NX_ASSERT(widget);
     if (!widget)
         return;
 
@@ -823,20 +824,21 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     qreal opacity = 0.0;
     bool interactive = false;
     bool instant = false;
+    auto options = widget->options();
     if (widget == display()->widget(Qn::ZoomedRole))
     {
         /* Leave invisible. */
     }
-    else if (widget->options() & QnResourceWidget::DisplayDewarped)
+    else if (options & QnResourceWidget::DisplayDewarped)
     {
         /* Leave invisible. */
         instant = true;
     }
-    else if (widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
+    else if (options & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
     {
         /* Leave invisible. */
     }
-    else if (widget->options() & QnResourceWidget::DisplayCrosshair)
+    else if (options & QnResourceWidget::DisplayCrosshair)
     {
         /* PTZ mode - transparent, non-interactive. */
         opacity = 0.3;
@@ -844,7 +846,9 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     else
     {
         opacity = 1.0;
-        interactive = true;
+        // Locking interaction for the locked layouts.
+        QnWorkbenchLayout* layout = widget->item()->layout();
+        interactive = layout ? !layout->locked() : true;
     }
 
     if (instant)
@@ -1223,7 +1227,7 @@ void ZoomWindowInstrument::at_resizing(
     m_storedWindowWidget = windowTarget();
 
     QRectF zoomRect = widget->zoomRect();
-    NX_EXPECT(oldTargetWidget);
+    NX_ASSERT(oldTargetWidget);
     QnLayoutItemData oldLayoutData = oldTargetWidget->item()->data();
     QnLayoutItemData newLayoutData = newTargetWidget->item()->data();
     auto oldAbsoluteSize = oldTargetWidget->rect();

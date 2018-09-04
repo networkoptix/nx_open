@@ -98,6 +98,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::RemoteArchiveSyncError:
+        case QnSystemHealth::DefaultCameraPasswords:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.

@@ -86,7 +86,7 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 
 static bool informersEnabled()
 {
-    return ini().enableProgressInformers && ini().unifiedEventPanel;
+    return ini().enableProgressInformers;
 }
 
 bool isBinaryExportSupported()
@@ -543,11 +543,12 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     return std::make_pair(exportId, std::move(tool));
 }
 
-void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
 {
     if (ini().enableWatermark)
     {
         if (globalSettings()->watermarkSettings().useWatermark
+            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
             && context()->user() && !context()->user()->getName().isEmpty())
         {
             dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});

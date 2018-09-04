@@ -10,7 +10,7 @@ from framework.networking import setup_flat_network
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope='session', params=[10], ids='{}_nodes'.format)
+@pytest.fixture(params=[10], ids='{}_nodes'.format)
 def big_flat_network(vm_types, hypervisor, request):
     number_of_nodes = request.param
     aliases = ['machine-{:03d}'.format(machine_index) for machine_index in range(number_of_nodes)]

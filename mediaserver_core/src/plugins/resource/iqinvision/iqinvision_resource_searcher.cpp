@@ -32,10 +32,11 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 
 } // namespace
 
-QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnMdnsResourceSearcher(commonModule)
+QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
 }
 
@@ -58,7 +59,7 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr(new QnPlIqResource());
+    result = QnVirtualCameraResourcePtr(new QnPlIqResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create IQE camera resource. typeID:" << resourceTypeId.toString();
@@ -91,7 +92,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     nx::utils::Url iqEyeUrl(url);
     iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));
 
-    QnPlIqResourcePtr resource(new QnPlIqResource);
+    QnPlIqResourcePtr resource(new QnPlIqResource(m_serverModule));
     resource->setUrl(iqEyeUrl.toString());
     resource->setAuth(auth);
 
@@ -111,7 +112,7 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
     if (!macAddressResponse.isSuccessful())
         return QList<QnResourcePtr>();
 
-    const nx::network::QnMacAddress macAddress(macAddressResponse.toString().trimmed());
+    const nx::utils::MacAddress macAddress(macAddressResponse.toString().trimmed());
     if (macAddress.isNull())
         return QList<QnResourcePtr>();
 
@@ -189,7 +190,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
-    nx::network::QnMacAddress macAddress(smac);
+    nx::utils::MacAddress macAddress(smac);
     if (macAddress.isNull())
         return localResults;
 
@@ -204,7 +205,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return localResults; //< Model forced by ONVIF.
 
-    QnPlIqResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));
 
     const auto rt = resourceType(name);
     if (rt.isNull())
@@ -229,10 +230,12 @@ void QnPlIqResourceSearcher::processNativePacket(
         return;
     }
 
-    QList<quint8> bytes;
-    for (int i = 6; i < 12; ++i)
-        bytes.push_back(responseData.at(i));
-    const nx::network::QnMacAddress macAddr(bytes);
+    static constexpr int kMacAddressOffset = 6;
+
+    nx::utils::MacAddress::Data bytes;
+    for (int i = 0; i < nx::utils::MacAddress::kMacAddressLength; ++i)
+        bytes[i] = responseData.at(i + kMacAddressOffset);
+    const nx::utils::MacAddress macAddr(bytes);
 
     int iqpos = responseData.indexOf("IQ"); //< name
     iqpos = responseData.indexOf("IQ", iqpos + 2); //< vendor
@@ -254,7 +257,7 @@ void QnPlIqResourceSearcher::processNativePacket(
     if (rt.isNull())
         return;
 
-    QnPlIqResourcePtr resource (new QnPlIqResource());
+    QnPlIqResourcePtr resource (new QnPlIqResource(m_serverModule));
     in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
     QHostAddress peerAddress(QLatin1String(inet_ntoa(*peerAddr)));
     resource->setTypeId(rt);

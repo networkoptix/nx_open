@@ -7,9 +7,7 @@ class QComboBox;
 class QString;
 class QIcon;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 namespace combo_box_utils {
 
 void setItemHidden(QComboBox* combo, int index, bool hidden = true);
@@ -29,6 +27,4 @@ QString multipleValuesText();
 void insertMultipleValuesItem(QComboBox* combo, int index = 0);
 
 } // namespace combo_box_utils
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Free license</source>
-      <translation>Gratis Licensie</translation>
+      <translation>Gratis Licentie</translation>
     </message>
     <message>
       <source>Time</source>
@@ -488,7 +488,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Testlicenties</translation>
+      <translation>Tijdlicenties</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>Gratis licensie</translation>
+      <translation>Gratis licentie</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -685,7 +685,7 @@
     </message>
     <message>
       <source>Time License</source>
-      <translation>Proeflicentie</translation>
+      <translation>Tijdlicentie</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -1524,19 +1524,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Probleem met de opslagruimte</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Opslagruimteprobleem bij %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Schakelen naar volledige schermweergave</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Volledige schermweergave afsluiten</translation>
     </message>
   </context>
   <context>

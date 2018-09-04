@@ -18,7 +18,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
 
-    NX_INI_FLAG(1, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
     NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, enableOldAnalyticsController, "Enable old analytics controller (zoom-window based).");
     NX_INI_FLAG(0, demoAnalyticsDriver, "Enable demo analytics driver.");
@@ -46,9 +45,10 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, enableWebKitPlugins, "Enable WebKit NPAPI plugins (Flash, Java, etc.)");
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
-    NX_INI_FLAG(1, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
-    NX_INI_FLAG(1, enableWatermark, "Enable watermarks preview and setup.");
+    NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
+    NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
+    NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
 };
 
 inline Ini& ini()

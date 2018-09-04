@@ -195,7 +195,7 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 
     m_endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const nx::String& connectSessionId)
+            [](const std::string& connectSessionId)
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
             {
                 return std::make_unique<CloudMediaServerEndpointVerificator>(

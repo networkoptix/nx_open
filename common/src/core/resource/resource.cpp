@@ -372,7 +372,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_EXPECT(commonModule());
+    NX_ASSERT(commonModule());
     if (!commonModule())
         return;
 
@@ -521,7 +521,7 @@ QString QnResource::getResourceProperty(
     // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    NX_EXPECT(commonModule);
+    NX_ASSERT(commonModule);
     QString value = commonModule
         ? commonModule->propertyDictionary()->value(resourceId, key)
         : QString();
@@ -557,7 +557,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     }
 
     NX_ASSERT(!getId().isNull());
-    NX_EXPECT(commonModule());
+    NX_ASSERT(commonModule());
 
     bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
@@ -632,8 +632,9 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance()
+QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
 {
+    initResPool()->setMaxThreadCount(threadCount);
     return initResPool();
 }
 // -----------------------------------------------------------------------------
@@ -790,7 +791,7 @@ QString QnResource::idForToStringFromPtr() const
 
 bool QnResource::saveParams()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParams(getId());
     return false;
@@ -798,7 +799,7 @@ bool QnResource::saveParams()
 
 int QnResource::saveParamsAsync()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParamsAsync(getId());
     return false;

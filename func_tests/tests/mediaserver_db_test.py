@@ -19,7 +19,7 @@ import pytest
 from framework.merging import merge_systems
 from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str
-from framework.waiting import WaitTimeout, wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ def check_camera_absence_on_server(server, camera_guid):
 
 def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
     try:
-        wait_for_true(
+        wait_for_truthy(
             lambda: one.api.generic.get('ec2/getFullInfo') == two.api.generic.get('ec2/getFullInfo'),
             "Servers have the same ec2/getFullInfo {}".format(stage))
     finally:
@@ -122,9 +122,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
     assert full_info_with_new_camera != full_info_initial, (
         "Servers ec2/getFullInfo data before and after saveCamera are not the same")
     # 90 seconds is empiric value (30 isn't enough to restart after restore database)
-    with one.api.server_is_restarted(timeout_sec=90), two.api.server_is_restarted(timeout_sec=90):
+    with one.api.waiting_for_restart(timeout_sec=90), two.api.waiting_for_restart(timeout_sec=90):
         one.api.generic.post('ec2/restoreDatabase', dict(data=backup['data']))
-    wait_for_true(
+    wait_for_truthy(
         lambda: check_camera_absence_on_server(one, camera_guid),
         "Server ONE camera disappearance")
     full_info_after_backup_restore = wait_for_full_info_be_the_same(
@@ -145,20 +145,10 @@ def test_backup_restore(artifact_factory, one, two, camera):
 
 # To detect VMS-5969
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_server_guids_changed
-@pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
-def test_server_guids_changed(one, two):
-    one.stop()
-    two.stop()
-    # To make server database and configuration file guids different
-    one.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['one'].SERVER_GUID})
-    two.installation.update_mediaserver_conf({'guidIsHWID': 'no', 'serverGuid': SERVER_CONFIG['two'].SERVER_GUID})
-    one.start()
-    two.start()
-    one.api.setup_local_system()
-    two.api.setup_local_system()
+def test_server_guids_changed(one, two, artifact_factory):
     merge_systems(two, one)
-    wait_until_servers_have_same_full_info(one, two)
+    wait_for_full_info_be_the_same(one, two, "after_merge", artifact_factory)
 
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

@@ -1,5 +1,4 @@
-#ifndef __STORAGE_PLUGIN_FACTORY_RESOURCE_H__
-#define __STORAGE_PLUGIN_FACTORY_RESOURCE_H__
+#pragma once
 
 #include <functional>
 
@@ -10,7 +9,7 @@
 class QnStoragePluginFactory
 {
 public:
-    typedef std::function<QnStorageResource *(QnCommonModule*, const QString &)> StorageFactory;
+    typedef std::function<QnStorageResource *(QnCommonModule*, const QString&)> StorageFactory;
 
     QnStoragePluginFactory();
     virtual ~QnStoragePluginFactory();
@@ -28,5 +27,3 @@ private:
     StorageFactory m_defaultFactory;
     QnMutex m_mutex; // TODO: #vasilenko this mutex is not used, is it intentional?
 };
-
-#endif // __STORAGE_PLUGIN_FACTORY_RESOURCE_H__

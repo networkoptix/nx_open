@@ -1,17 +1,18 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 #include "ini_config.h"
 
+#include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
-#include <vector>
 #include <map>
 #include <memory>
-#include <climits>
 #include <sstream>
-#include <cstring>
 #include <string>
-#include <cstdlib>
-#include <cerrno>
-#include <algorithm>
+#include <vector>
+#include <unordered_set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
@@ -29,9 +30,9 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // Utils
 
-static bool fileExists(const std::string& filename)
+static bool fileExists(const char* filename)
 {
-    return static_cast<bool>(std::ifstream(filename.c_str()));
+    return static_cast<bool>(std::ifstream(filename));
 }
 
 static bool isWhitespace(char c)
@@ -109,47 +110,48 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
 static std::string determineIniFilesDir()
 {
     #if defined(ANDROID) || defined(__ANDROID__)
+        // On Android, tmpnam() returns "/tmp", which does not exist.
         return "/sdcard/";
     #else
-        #if defined(_WIN32)
-            static const char kSeparator = '\\';
-            static const char* const kEnvVar = "LOCALAPPDATA";
-            static const std::string extraDir = "";
-            static const std::string defaultDir = ""; //< Current directory.
-        #else
-            static const char kSeparator = '/';
-            static const char* const kEnvVar = "HOME";
-            static const std::string extraDir = std::string(".config") + kSeparator;
-            static const std::string defaultDir = "/etc/nx_ini/";
-        #endif
-
-        const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
-        if (env_NX_INI_DIR != nullptr)
-            return std::string(env_NX_INI_DIR) + kSeparator;
-
-        const char* const env = getenv(kEnvVar);
-        if (env != nullptr)
-            return std::string(env) + kSeparator + extraDir + "nx_ini" + kSeparator;
-
-        return defaultDir;
-    #endif
-
-    #if 0 // Using OS temp dir has been abandoned.
-        char iniFileDir[L_tmpnam] = "";
-        if (std::tmpnam(iniFileDir))
-        {
-            // Extract dir name from the file path - truncate after the last path separator.
-            for (int i = (int) strlen(iniFileDir) - 1; i >= 0; --i)
+        #if 0 // Using system temp dir has been abandoned.
+            char iniFileDir[L_tmpnam] = "";
+            if (std::tmpnam(iniFileDir))
             {
-                if (iniFileDir[i] == '/' || iniFileDir[i] == '\\')
+                // Extract dir name from the file path - truncate after the last path separator.
+                for (int i = (int) strlen(iniFileDir) - 1; i >= 0; --i)
                 {
-                    iniFileDir[i + 1] = '\0';
-                    break;
+                    if (iniFileDir[i] == '/' || iniFileDir[i] == '\\')
+                    {
+                        iniFileDir[i + 1] = '\0';
+                        break;
+                    }
                 }
             }
-        }
-        return std::string(iniFileDir);
-    #endif // 0
+            return std::string(iniFileDir);
+        #else
+            #if defined(_WIN32)
+                static const char kPathSeparator = '\\';
+                static const char* const kEnvVar = "LOCALAPPDATA";
+                static const std::string extraDir = "";
+                static const std::string defaultDir = ""; //< Current directory.
+            #else
+                static const char kPathSeparator = '/';
+                static const char* const kEnvVar = "HOME";
+                static const std::string extraDir = std::string(".config") + kPathSeparator;
+                static const std::string defaultDir = "/etc/nx_ini/";
+            #endif
+
+            const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
+            if (env_NX_INI_DIR != nullptr)
+                return std::string(env_NX_INI_DIR) + kPathSeparator;
+
+            const char* const env = getenv(kEnvVar);
+            if (env != nullptr)
+                return std::string(env) + kPathSeparator + extraDir + "nx_ini" + kPathSeparator;
+
+            return defaultDir;
+        #endif
+    #endif
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -384,8 +386,7 @@ class IniConfig::Impl
 {
 public:
     Impl(const char* iniFile):
-        iniFile(validateIniFile(iniFile)),
-        iniFilePath(iniFilesDir() + iniFile)
+        iniFile(validateIniFile(iniFile))
     {
     }
 
@@ -396,7 +397,7 @@ public:
     static std::string& iniFilesDir(bool goingToSet = false)
     {
         static std::string iniFilesDir = goingToSet
-            ? std::string()
+            ? ""
             : ((NX_INI_CONFIG_DEFAULT_INI_FILES_DIR) != nullptr)
                 ? (NX_INI_CONFIG_DEFAULT_INI_FILES_DIR)
                 : determineIniFilesDir();
@@ -417,7 +418,14 @@ public:
 
 public:
     const std::string iniFile;
-    const std::string iniFilePath;
+
+    /** Needed to initialize m_cachedIniFilePath using the up-to-date value of iniFilesDir(). */
+    const char* iniFilePath()
+    {
+        if (m_cachedIniFilePath.empty())
+            m_cachedIniFilePath = iniFilesDir() + iniFile;
+        return m_cachedIniFilePath.c_str();
+    }
 
 private:
     static std::string validateIniFile(const char* iniFile);
@@ -426,10 +434,12 @@ private:
     void reloadParams(std::ostream* output, bool* outputIsNeeded) const;
 
 private:
-    bool firstTimeReload = true;
-    bool iniFileEverExisted = false;
-    std::map<std::string, std::string> iniMap;
-    std::vector<std::unique_ptr<AbstractParam>> params;
+    bool m_firstTimeReload = true;
+    bool m_iniFileEverExisted = false;
+    std::map<std::string, std::string> m_iniMap;
+    std::vector<std::unique_ptr<AbstractParam>> m_params;
+    std::unordered_set<std::string> m_paramNames;
+    std::string m_cachedIniFilePath; //< Initialized on first call to iniFilePath().
 };
 
 template<typename Value>
@@ -439,7 +449,8 @@ Value IniConfig::Impl::regParam(
     const Value& validatedDefaultValue = Param<Value>::validateDefaultValue(defaultValue);
     if (isEnabled())
     {
-        params.push_back(std::unique_ptr<Param<Value>>(new Param<Value>(
+        m_paramNames.insert(paramName);
+        m_params.push_back(std::unique_ptr<Param<Value>>(new Param<Value>(
             paramName, description, const_cast<Value*>(pValue), validatedDefaultValue)));
     }
     return validatedDefaultValue;
@@ -462,7 +473,7 @@ std::string IniConfig::Impl::validateIniFile(const char* iniFile)
     }
 
     const size_t len = strlen(iniFile);
-    constexpr const char* ext = ".ini";
+    constexpr char ext[] = ".ini";
     if (len < strlen(ext) || strcmp(iniFile + len - strlen(ext), ext) != 0)
     {
         if (output())
@@ -480,9 +491,9 @@ std::string IniConfig::Impl::validateIniFile(const char* iniFile)
  */
 bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
 {
-    iniMap.clear();
+    m_iniMap.clear();
 
-    std::ifstream file(iniFilePath.c_str());
+    std::ifstream file(iniFilePath());
     if (!file.good())
         return true;
 
@@ -499,7 +510,7 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
             if (output)
             {
                 *output << iniFile << " ERROR: Cannot parse line " << line
-                    << ", file " << iniFilePath << std::endl;
+                    << ", file " << iniFilePath() << std::endl;
                 if (outputIsNeeded != nullptr)
                     *outputIsNeeded = true;
             }
@@ -507,7 +518,7 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
         }
 
         if (!name.empty())
-            iniMap[name] = value;
+            m_iniMap[name] = value;
     }
 
     return line > 0;
@@ -515,15 +526,15 @@ bool IniConfig::Impl::parseIniFile(std::ostream* output, bool* outputIsNeeded)
 
 void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
 {
-    std::ofstream file(iniFilePath.c_str());
+    std::ofstream file(iniFilePath());
     if (!file.good())
     {
         if (output)
-            *output << iniFile << " ERROR: Cannot rewrite file " << iniFilePath << std::endl;
+            *output << iniFile << " ERROR: Cannot rewrite file " << iniFilePath() << std::endl;
         return;
     }
 
-    for (const auto& param: params)
+    for (const auto& param: m_params)
     {
         std::string description = param->description;
         if (!description.empty())
@@ -540,17 +551,23 @@ void IniConfig::Impl::createDefaultIniFile(std::ostream* output)
 
 void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) const
 {
-    for (const auto& param: params)
+    for (const auto& param: m_params)
     {
         const std::string* value = nullptr;
-        const auto it = iniMap.find(param->name);
-        if (it != iniMap.end())
+        const auto it = m_iniMap.find(param->name);
+        if (it != m_iniMap.end())
             value = &it->second;
         if (param->reload(value, output))
         {
             if (output && outputIsNeeded != nullptr)
                 *outputIsNeeded = true;
         }
+    }
+
+    for (const auto& entry: m_iniMap)
+    {
+        if (m_paramNames.count(entry.first) == 0 && output)
+            *output << "!!! " << entry.first << " [unexpected param in file]" << std::endl;
     }
 }
 
@@ -559,21 +576,21 @@ void IniConfig::Impl::reload()
     if (!isEnabled())
         return;
 
-    const bool iniFileExists = fileExists(iniFilePath);
+    const bool iniFileExists = fileExists(iniFilePath());
     if (iniFileExists)
-        iniFileEverExisted = true;
-    if (!firstTimeReload && !iniFileEverExisted)
+        m_iniFileEverExisted = true;
+    if (!m_firstTimeReload && !m_iniFileEverExisted)
         return;
 
     std::ostringstream outputString;
     std::ostream* out = output() ? &outputString : nullptr;
 
-    bool outputIsNeeded = firstTimeReload;
+    bool outputIsNeeded = m_firstTimeReload;
 
     if (iniFileExists)
     {
         if (out)
-            *out << iniFile << " [" << iniFilePath << "]" << std::endl;
+            *out << iniFile << " [" << iniFilePath() << "]" << std::endl;
         if (!parseIniFile(out, &outputIsNeeded))
         {
             if (out)
@@ -587,8 +604,11 @@ void IniConfig::Impl::reload()
     else
     {
         if (out)
-            *out << iniFile << " (absent) To fill in defaults, touch " << iniFilePath << std::endl;
-        iniMap.clear();
+        {
+            *out << iniFile << " (absent) To fill in defaults, touch " << iniFilePath()
+                << std::endl;
+        }
+        m_iniMap.clear();
     }
 
     reloadParams(iniFileExists ? out : nullptr, &outputIsNeeded);
@@ -596,8 +616,8 @@ void IniConfig::Impl::reload()
     if (out && outputIsNeeded)
         *Impl::output() << outputString.str();
 
-    if (firstTimeReload)
-        firstTimeReload = false;
+    if (m_firstTimeReload)
+        m_firstTimeReload = false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -679,7 +699,7 @@ const char* IniConfig::iniFile() const
 
 const char* IniConfig::iniFilePath() const
 {
-    return d->iniFilePath.c_str();
+    return d->iniFilePath();
 }
 
 void IniConfig::reload()

@@ -34,6 +34,8 @@ static constexpr int kMinFps = 1;
 static constexpr auto kMinQuality = Qn::StreamQuality::low;
 static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
+static constexpr int kMinArchiveDaysAlertThreshold = 5;
+
 template<class Data>
 void fetchFromCameras(
     State::UserEditableMultiple<Data>& value,
@@ -99,15 +101,6 @@ QString calculateWebPage(const Camera& camera)
     }
 
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
-}
-
-State::FisheyeCalibrationSettings fisheyeCalibrationSettings(const QnMediaDewarpingParams& params)
-{
-    State::FisheyeCalibrationSettings calibration;
-    calibration.offset = QPointF(params.xCenter - 0.5, params.yCenter - 0.5);
-    calibration.radius = params.radius;
-    calibration.aspectRatio = params.hStretch;
-    return calibration;
 }
 
 bool isMotionDetectionEnabled(const Camera& camera)
@@ -213,66 +206,28 @@ State loadNetworkInfo(State state, const Camera& camera)
     return state;
 }
 
+State::RecordingDays calculateRecordingDays(const Cameras& cameras,
+    std::function<int(const Camera&)> getter)
+{
+    State::RecordingDays result;
+
+    fetchFromCameras<bool>(result.automatic, cameras,
+        [getter](const Camera& camera) { return getter(camera) < 0; });
+
+    fetchFromCameras<int>(result.value, cameras,
+        [getter](const Camera& camera) { return qMax(qAbs(getter(camera)), 1); });
+
+    return result;
+}
+
 State::RecordingDays calculateMinRecordingDays(const Cameras& cameras)
 {
-    if (cameras.empty())
-        return {vms::api::kDefaultMinArchiveDays, true, true};
-
-    // Any negative min days value means 'auto'. Storing absolute value to keep previous one.
-    auto calcMinDays = [](int d) { return d == 0 ? vms::api::kDefaultMinArchiveDays : qAbs(d); };
-
-    const int minDays = (*std::min_element(
-        cameras.cbegin(),
-        cameras.cend(),
-        [calcMinDays](
-        const Camera& l,
-        const Camera& r)
-        {
-            return calcMinDays(l->minDays()) < calcMinDays(r->minDays());
-        }))->minDays();
-
-    const bool isAuto = minDays <= 0;
-    const bool sameMinDays = std::all_of(
-        cameras.cbegin(),
-        cameras.cend(),
-        [minDays, isAuto](const Camera& camera)
-        {
-            return isAuto
-                ? camera->minDays() <= 0
-                : camera->minDays() == minDays;
-        });
-    return {calcMinDays(minDays), isAuto, sameMinDays};
+    return calculateRecordingDays(cameras, [](const Camera& camera) { return camera->minDays(); });
 }
 
 State::RecordingDays calculateMaxRecordingDays(const Cameras& cameras)
 {
-    if (cameras.empty())
-        return {vms::api::kDefaultMaxArchiveDays, true, true};
-
-    /* Any negative max days value means 'auto'. Storing absolute value to keep previous one. */
-    auto calcMaxDays = [](int d) { return d == 0 ? vms::api::kDefaultMaxArchiveDays : qAbs(d); };
-
-    const int maxDays = (*std::max_element(
-        cameras.cbegin(),
-        cameras.cend(),
-        [calcMaxDays](
-        const Camera& l,
-        const Camera& r)
-        {
-            return calcMaxDays(l->maxDays()) < calcMaxDays(r->maxDays());
-        }))->maxDays();
-
-    const bool isAuto = maxDays <= 0;
-    const bool sameMaxDays = std::all_of(
-        cameras.cbegin(),
-        cameras.cend(),
-        [maxDays, isAuto](const Camera& camera)
-        {
-            return isAuto
-                ? camera->maxDays() <= 0
-                : camera->maxDays() == maxDays;
-        });
-    return {calcMaxDays(maxDays), isAuto, sameMaxDays};
+    return calculateRecordingDays(cameras, [](const Camera& camera) { return camera->maxDays(); });
 }
 
 State::ImageControlSettings calculateImageControlSettings(
@@ -431,11 +386,27 @@ bool isDefaultExpertSettings(const State& state)
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
 
+std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
+{
+    const bool warning = state.recording.minDays.automatic.hasValue()
+        && !state.recording.minDays.automatic()
+        && state.recording.minDays.value.hasValue()
+        && state.recording.minDays.value() > kMinArchiveDaysAlertThreshold;
+
+    if (warning)
+        return State::RecordingAlert::highArchiveLength;
+
+    if (state.recordingAlert && *state.recordingAlert == State::RecordingAlert::highArchiveLength)
+        return {};
+
+    return state.recordingAlert;
+}
+
 } // namespace
 
 State CameraSettingsDialogStateReducer::applyChanges(State state)
 {
-    NX_EXPECT(!state.readOnly);
+    NX_ASSERT(!state.readOnly);
     state.hasChanges = false;
     return state;
 }
@@ -498,7 +469,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.wearableMotion = {};
     state.devicesCount = cameras.size();
     state.audioEnabled = {};
-    state.alert = {};
+    state.recordingHint = {};
+    state.recordingAlert = {};
+    state.motionAlert = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -576,11 +549,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         }
 
         const auto fisheyeParams = firstCamera->getDewarpingParams();
-        state.singleCameraSettings.enableFisheyeDewarping.setBase(fisheyeParams.enabled);
-        state.singleCameraSettings.fisheyeMountingType.setBase(fisheyeParams.viewMode);
-        state.singleCameraSettings.fisheyeFovRotation.setBase(fisheyeParams.fovRot);
-        state.singleCameraSettings.fisheyeCalibrationSettings.setBase(
-            fisheyeCalibrationSettings(fisheyeParams));
+        state.singleCameraSettings.fisheyeDewarping.setBase(fisheyeParams);
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -777,7 +746,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
         state.maxRecordingBrushFps());
 
     state = setScheduleBrushFps(std::move(state), fps);
-    state.alert = State::Alert::brushChanged;
+    state.recordingHint = State::RecordingHint::brushChanged;
 
     return state;
 }
@@ -786,8 +755,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
-    NX_EXPECT(value != Qn::RecordingType::motionOnly || state.hasMotion());
-    NX_EXPECT(value != Qn::RecordingType::motionAndLow
+    NX_ASSERT(value != Qn::RecordingType::motionOnly || state.hasMotion());
+    NX_ASSERT(value != Qn::RecordingType::motionAndLow
         || (state.hasMotion()
             && state.devicesDescription.hasDualStreamingCapability == State::CombinedValue::All));
 
@@ -799,14 +768,14 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
             state.recording.brush.fps,
             state.maxRecordingBrushFps());
     }
-    state.alert = State::Alert::brushChanged;
+    state.recordingHint = State::RecordingHint::brushChanged;
 
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int value)
 {
-    NX_EXPECT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
+    NX_ASSERT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
     state.recording.brush.fps = value;
     if (state.recording.brush.isAutomaticBitrate() || !state.recording.customBitrateAvailable)
     {
@@ -821,7 +790,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         state = loadMinMaxCustomBitrate(std::move(state));
         state = setCustomRecordingBitrateNormalized(std::move(state), normalizedBitrate);
     }
-    state.alert = State::Alert::brushChanged;
+    state.recordingHint = State::RecordingHint::brushChanged;
 
     return state;
 }
@@ -832,7 +801,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 {
     state.recording.brush.quality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
-    state.alert = State::Alert::brushChanged;
+    state.recordingHint = State::RecordingHint::brushChanged;
 
     return state;
 }
@@ -850,8 +819,8 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
 
     state.recording.schedule.setUser(processed);
 
-    if (state.alert == State::Alert::brushChanged || state.alert == State::Alert::emptySchedule)
-        state.alert = {};
+    if (state.recordingHint != State::RecordingHint::recordingIsNotEnabled)
+        state.recordingHint = {};
 
     return state;
 }
@@ -870,14 +839,14 @@ State CameraSettingsDialogStateReducer::setRecordingShowQuality(State state, boo
 
 State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable);
+    NX_ASSERT(state.recording.customBitrateAvailable);
     state.recording.customBitrateVisible = !state.recording.customBitrateVisible;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setCustomRecordingBitrateMbps(State state, float mbps)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
+    NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbps = mbps;
     state.recording.brush.quality = calculateQualityForBitrateMbps(state, mbps);
     state.recording.bitrateMbps = mbps;
@@ -888,7 +857,7 @@ State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
     State state,
     float value)
 {
-    NX_EXPECT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
+    NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
     return setCustomRecordingBitrateMbps(std::move(state), mbps);
@@ -897,38 +866,88 @@ State CameraSettingsDialogStateReducer::setCustomRecordingBitrateNormalized(
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
 {
     state.hasChanges = true;
-    state.recording.minDays.same = true;
-    state.recording.minDays.automatic = value;
+    state.recording.minDays.automatic.setUser(value);
+
+    if (!value)
+    {
+        if (!state.recording.minDays.value.hasValue())
+            state.recording.minDays.value.setUser(nx::vms::api::kDefaultMinArchiveDays);
+
+        const bool maxDaysFixed = !state.recording.maxDays.automatic.valueOr(true)
+            && state.recording.maxDays.value.hasValue();
+
+        if (maxDaysFixed)
+        {
+            state.recording.minDays.value.setUser(
+                qMin(state.recording.minDays.value(), state.recording.maxDays.value()));
+        }
+    }
+
+    state.recordingAlert = updateArchiveLengthAlert(state);
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
-    NX_EXPECT(state.recording.minDays.same && !state.recording.minDays.automatic);
+    NX_ASSERT(!state.recording.minDays.automatic.valueOr(true));
+
     state.hasChanges = true;
-    state.recording.minDays.absoluteValue = value;
+    state.recording.minDays.value.setUser(value);
+    state.recordingAlert = updateArchiveLengthAlert(state);
+
+    if (!state.recording.maxDays.automatic.valueOr(true)
+        && state.recording.maxDays.value.hasValue()
+        && state.recording.maxDays.value() < value)
+    {
+        state.recording.maxDays.value.setUser(value);
+    }
+
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state, bool value)
 {
     state.hasChanges = true;
-    state.recording.maxDays.same = true;
-    state.recording.maxDays.automatic = value;
+    state.recording.maxDays.automatic.setUser(value);
+
+    if (!value)
+    {
+        if (!state.recording.maxDays.value.hasValue())
+            state.recording.maxDays.value.setUser(nx::vms::api::kDefaultMaxArchiveDays);
+
+        const bool minDaysFixed = !state.recording.minDays.automatic.valueOr(true)
+            && state.recording.minDays.value.hasValue();
+
+        if (minDaysFixed)
+        {
+            state.recording.maxDays.value.setUser(
+                qMax(state.recording.minDays.value(), state.recording.maxDays.value()));
+        }
+    }
+
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
-    NX_EXPECT(state.recording.maxDays.same && !state.recording.maxDays.automatic);
+    NX_ASSERT(!state.recording.maxDays.automatic.valueOr(true));
+
     state.hasChanges = true;
-    state.recording.maxDays.absoluteValue = value;
+    state.recording.maxDays.value.setUser(value);
+
+    if (!state.recording.minDays.automatic.valueOr(true)
+        && state.recording.minDays.value.hasValue()
+        && state.recording.minDays.value() > value)
+    {
+        state.recording.minDays.value.setUser(value);
+    }
+
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
 {
-    NX_EXPECT(state.hasMotion());
+    NX_ASSERT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
     return state;
@@ -936,7 +955,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 
 State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
 {
-    NX_EXPECT(state.hasMotion());
+    NX_ASSERT(state.hasMotion());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
     return state;
@@ -946,7 +965,7 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
     State state,
     const QnAspectRatio& value)
 {
-    NX_EXPECT(state.imageControl.aspectRatioAvailable);
+    NX_ASSERT(state.imageControl.aspectRatioAvailable);
     state.hasChanges = true;
     state.imageControl.aspectRatio.setUser(value);
     return state;
@@ -954,7 +973,7 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
 
 State CameraSettingsDialogStateReducer::setCustomRotation(State state, const Rotation& value)
 {
-    NX_EXPECT(state.imageControl.rotationAvailable);
+    NX_ASSERT(state.imageControl.rotationAvailable);
     state.hasChanges = true;
     state.imageControl.rotation.setUser(value);
     return state;
@@ -993,12 +1012,6 @@ State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, b
 {
     state.hasChanges = true;
     state.singleCameraSettings.enableMotionDetection.setUser(value);
-
-    if (state.hasMotion() && !state.recording.enabled())
-        state.alert = State::Alert::motionDetectionRequiresRecording;
-    else if (state.alert == State::Alert::motionDetectionRequiresRecording)
-        state.alert = {};
-
     return state;
 }
 
@@ -1011,13 +1024,13 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
         switch (errorCode)
         {
             case QnMotionRegion::ErrorCode::Windows:
-                state.alert = State::Alert::motionDetectionTooManyRectangles;
+                state.motionAlert = State::MotionAlert::motionDetectionTooManyRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Masks:
-                state.alert = State::Alert::motionDetectionTooManyMaskRectangles;
+                state.motionAlert = State::MotionAlert::motionDetectionTooManyMaskRectangles;
                 break;
             case QnMotionRegion::ErrorCode::Sens:
-                state.alert = State::Alert::motionDetectionTooManySensitivityRectangles;
+                state.motionAlert = State::MotionAlert::motionDetectionTooManySensitivityRectangles;
                 break;
         }
 
@@ -1026,18 +1039,14 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 
     state.hasChanges = true;
     state.singleCameraSettings.motionRegionList.setUser(value);
+    state.motionAlert = {};
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setFisheyeSettings(
     State state, const QnMediaDewarpingParams& value)
 {
-    state.singleCameraSettings.enableFisheyeDewarping.setUserIfChanged(value.enabled);
-    state.singleCameraSettings.fisheyeMountingType.setUserIfChanged(value.viewMode);
-    state.singleCameraSettings.fisheyeFovRotation.setUserIfChanged(value.fovRot);
-    state.singleCameraSettings.fisheyeCalibrationSettings.setUserIfChanged(
-        fisheyeCalibrationSettings(value));
-
+    state.singleCameraSettings.fisheyeDewarping.setUser(value);
     state.hasChanges = true;
     return state;
 }

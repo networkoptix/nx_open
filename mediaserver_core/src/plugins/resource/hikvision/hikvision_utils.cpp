@@ -238,15 +238,40 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
             return false;
 
         if (tag == kVideoCodecTypeTag)
+        {
             success = parseCodecList(options, &outCapabilities->codecs);
+        }
         else if (tag == kVideoResolutionWidthTag)
+        {
             success = parseIntegerList(options, &resolutionWidths);
+        }
         else if (tag == kVideoResolutionHeightTag)
+        {
             success = parseIntegerList(options, &resolutionHeights);
+        }
         else if (tag == kFixedQualityTag)
+        {
             success = parseIntegerList(options, &outCapabilities->quality);
+        }
         else if (tag == kMaxFrameRateTag)
-            success = parseIntegerList(options, &outCapabilities->fps);
+        {
+            auto& fpsList = outCapabilities->fps;
+            success = parseIntegerList(options, &fpsList);
+
+            // ISAPI documentation:
+            // <maxFrameRate> <!—req, xs+:integer, maximum frame rate x100 +[]</maxFrameRate>
+            const auto maxFps = std::max_element(fpsList.begin(), fpsList.end());
+            if (maxFps != fpsList.end() && *maxFps >= 200)
+            {
+                // Threshold is to avoid problems with rear cameras which send raw FPS.
+                for (auto& fps: outCapabilities->fps)
+                    fps /= 100;
+
+                // Cameras often report strange values below 0 FPS...
+                fpsList.erase(std::remove_if(fpsList.begin(), fpsList.end(),
+                    [](int fps) { return fps == 0; }));
+            }
+        }
         else if (tag == kFixedBitrateTag)
         {
             outCapabilities->bitrateRange.first = propertyElement.attribute("min").toInt(&success);

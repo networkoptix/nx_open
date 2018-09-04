@@ -69,7 +69,7 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))

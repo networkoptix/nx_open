@@ -14,7 +14,7 @@ from framework.http_api import HttpError, REST_API_TIMEOUT_SEC
 from framework.mediaserver_api import TimePeriod
 from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import log_list
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ def assert_post_forbidden(server, method, **kw):
 # https://networkoptix.atlassian.net/browse/VMS-2246
 def test_create_and_remove_user_with_resource(one_running_mediaserver):
     user = generator.generate_user_data(
-        user_id=1,  name="user1", email="user1@example.com",
+        user_id=1, name="user1", email="user1@example.com",
         permissions="2432", cryptSha512Hash="", digest="",
         hash="", isAdmin=False, isEnabled=True, isLdap=False, realm="")
     one_running_mediaserver.api.generic.post('ec2/saveUser', dict(**user))
@@ -196,15 +196,15 @@ def test_static_vulnerability(one_running_mediaserver):
 
 
 # https://networkoptix.atlassian.net/browse/VMS-7775
-def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_dir):
-    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir) as timeless_server:
+def test_auth_with_time_changed(mediaserver_allocation, one_vm):
+    with timeless_mediaserver(mediaserver_allocation, one_vm) as timeless_server:
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()
         url = timeless_server.api.generic.http.url('ec2/testConnection')
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
-        wait_for_true(
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc)),
             "time on {} is close to now".format(timeless_server))
 
@@ -216,8 +216,8 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_di
         response = requests.get(url, headers={'Authorization': authorization_header_value})
         response.raise_for_status()
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
-        wait_for_true(
+        timeless_server.os_access.time.set(datetime.now(pytz.utc) + shift)
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc) + shift),
             "time on {} is close to now + {}".format(timeless_server, shift))
 
@@ -228,17 +228,17 @@ def test_auth_with_time_changed(one_vm, mediaserver_installers, ca, artifacts_di
         assert not timeless_server.installation.list_core_dumps()
 
 
-def test_uptime_is_monotonic(one_vm, mediaserver_installers, ca, artifacts_dir):
-    with timeless_mediaserver(one_vm, mediaserver_installers, ca, artifacts_dir) as timeless_server:
+def test_uptime_is_monotonic(mediaserver_allocation, one_vm):
+    with timeless_mediaserver(mediaserver_allocation, one_vm) as timeless_server:
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
         first_uptime = timeless_server.api.generic.get('api/statistics')['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
             _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
-        new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
-        wait_for_true(
+        new_time = timeless_server.os_access.time.set(datetime.now(pytz.utc) - timedelta(minutes=1))
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(new_time),
             "time on {} is close to {}".format(timeless_server, new_time))
         second_uptime = timeless_server.api.generic.get('api/statistics')['uptimeMs']

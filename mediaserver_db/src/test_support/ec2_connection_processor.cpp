@@ -103,7 +103,7 @@ void Ec2ConnectionProcessor::run()
 
             if (!authenticate())
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::unauthorized);
                 ready = readRequest();
                 ++authenticateTries;
                 continue;

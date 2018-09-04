@@ -5,15 +5,21 @@ represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect
 Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
 """
 
+import logging
+
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
-from .mediaserver import MEDIASERVER_START_TIMEOUT
+from .mediaserver import BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
+from ..switched_logging import with_logger
 from ..template_renderer import TemplateRenderer
-from ..waiting import wait_for_true
+from ..waiting import wait_for_truthy
+
+_logger = logging.getLogger(__name__)
+
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -28,7 +34,7 @@ class LwsInstallation(CustomPosixInstallation):
     SERVER_INFO_PATH = 'server_info.yaml'
 
     @classmethod
-    def create(cls, posix_access, dir, installation_group, server_port_base):
+    def create(cls, posix_access, dir, installation_group, server_bind_address, server_port_base):
         try:
             server_info_text = dir.joinpath(cls.SERVER_INFO_PATH).read_text()
         except DoesNotExist:
@@ -42,20 +48,21 @@ class LwsInstallation(CustomPosixInstallation):
             posix_access,
             dir,
             installation_group,
+            server_bind_address,
             server_port_base,
             identity,
             )
         installation.ensure_server_is_stopped()
         return installation
 
-    def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
+    def __init__(self, posix_access, dir, installation_group, server_bind_address, server_port_base, identity=None):
         super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir / 'bin'])
         self._installation_group = installation_group
+        self.server_bind_address = server_bind_address
         self.server_port_base = server_port_base
         self._lws_binary_path = self.dir / 'bin' / LWS_BINARY_NAME
         self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
-        self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
         self._template_renderer = TemplateRenderer()
         self._installed_server_count = None
 
@@ -95,7 +102,6 @@ class LwsInstallation(CustomPosixInstallation):
         self.posix_access.run_command(['cp', '-a'] + dist_dir.glob('*') + [self.dir])
         copy_file(lightweight_mediaserver_installer, self._lws_binary_path)
         self.posix_access.run_command(['chmod', '+x', self._lws_binary_path])
-        self._identity = installer.identity  # used by following _write_server_info
         self._write_server_info()
         self.dir.joinpath(LWS_CTL_NAME).ensure_file_is_missing()
         assert self.is_valid()
@@ -124,9 +130,10 @@ class LwsInstallation(CustomPosixInstallation):
         self._installed_server_count = server_count
 
     def _write_server_info(self):
+        identity = self.identity()
         server_info_text = serialize.dump(dict(
-            customization_name=self._identity.customization.customization_name,
-            version=self._identity.version.as_str,
+            customization_name=identity.customization.customization_name,
+            version=identity.version.as_str,
             ))
         self.dir.joinpath(self.SERVER_INFO_PATH).write_text(server_info_text)
 
@@ -144,28 +151,31 @@ class LwServer(object):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
-class LwMultiServer(object):
+@with_logger(_logger, 'framework.waiting')
+@with_logger(_logger, 'framework.http_api')
+@with_logger(_logger, 'framework.mediaserver_api')
+class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
     def __init__(self, installation):
+        super(LwMultiServer, self).__init__('lws', installation)
         self.installation = installation
         self.os_access = installation.os_access
         self.address = installation.os_access.port_map.remote.address
+        self.server_bind_address = installation.server_bind_address
         self._server_remote_port_base = installation.server_port_base
         self._server_count = installation.server_count
         self.service = installation.service
 
-    def __repr__(self):
-        return '<LwMultiServer at {}:{} {} (#{})>'.format(
+    def __str__(self):
+        return 'LwMultiServer at {}:{} {} ({} instances)'.format(
             self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
 
-    @property
-    def name(self):
-        return 'lws'
+    def __repr__(self):
+        return '<{!s}>'.format(self)
 
-    @property
-    def api(self):
-        return self[0].api
+    def is_online(self):
+        return self[0].api.is_online()
 
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
@@ -181,20 +191,9 @@ class LwMultiServer(object):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def start(self, already_started_ok=False):
-        if self.service.is_running():
-            if not already_started_ok:
-                raise Exception("Already started")
-        else:
-            self.service.start()
-            wait_for_true(
-                self[0].api.is_online,
-                description='{} is started'.format(self),
-                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
-
     def wait_until_synced(self, timeout_sec):
-        wait_for_true(
-            self._is_synced, "Waiting for lightweight servers to merge between themselves", timeout_sec)
+        wait_for_truthy(
+            self._is_synced, "%s instances to merge between themselves" % self, timeout_sec)
 
     def _is_synced(self):
         response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)

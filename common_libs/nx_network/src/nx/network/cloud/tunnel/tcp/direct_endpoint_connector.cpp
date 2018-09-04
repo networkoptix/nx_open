@@ -12,7 +12,7 @@ namespace tcp {
 
 DirectEndpointConnector::DirectEndpointConnector(
     AddressEntry targetHostAddress,
-    nx::String connectSessionId)
+    std::string connectSessionId)
     :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId))
@@ -197,12 +197,11 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
 
     m_verificators.clear();
 
-    auto tunnel =
-        std::make_unique<DirectTcpEndpointTunnel>(
-            getAioThread(),
-            m_connectSessionId,
-            std::move(endpoint),
-            std::move(streamSocket));
+    auto tunnel = std::make_unique<DirectTcpEndpointTunnel>(
+        getAioThread(),
+        m_connectSessionId,
+        std::move(endpoint),
+        std::move(streamSocket));
 
     auto handler = std::move(m_completionHandler);
     m_completionHandler = nullptr;

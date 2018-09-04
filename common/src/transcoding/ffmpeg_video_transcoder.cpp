@@ -57,10 +57,9 @@ namespace {
     }
 }
 
-QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(QnCommonModule* commonModule, AVCodecID codecId)
+QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId)
     :
     QnVideoTranscoder(codecId),
-    QnCommonModuleAware(commonModule),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
@@ -71,7 +70,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(QnCommonModule* commonModule, A
     m_encodedFrames(0),
     m_droppedFrames(0),
     m_useRealTimeOptimization(false),
-    m_outPacket(av_packet_alloc())
+    m_outPacket(av_packet_alloc()),
+    m_metrics(metrics)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -81,7 +81,8 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(QnCommonModule* commonModule, A
     m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
-    commonModule->metrics()->transcoders()++;
+    if (m_metrics)
+        m_metrics->transcoders()++;
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -89,7 +90,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     qFreeAligned(m_videoEncodingBuffer);
     close();
     av_packet_free(&m_outPacket);
-    commonModule()->metrics()->transcoders()--;
+    if (m_metrics)
+        m_metrics->transcoders()--;
 }
 
 void QnFfmpegVideoTranscoder::close()
@@ -137,7 +139,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
     AVDictionary* options = nullptr;
-    makeScopeGuard([&]() { av_dict_free(&options); });
+    nx::utils::makeScopeGuard([&]() { av_dict_free(&options); });
 
     for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {

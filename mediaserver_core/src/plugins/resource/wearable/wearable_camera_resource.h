@@ -10,7 +10,7 @@ class QnWearableCameraResource: public nx::mediaserver::resource::Camera
 public:
     static const QString kManufacture;
 
-    QnWearableCameraResource();
+    QnWearableCameraResource(QnMediaServerModule* serverModule);
     virtual ~QnWearableCameraResource() override;
 
     virtual QString getDriverName() const override;

@@ -1889,6 +1889,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
+    if (updateName.endsWith(lit("/99_20180413_remove_extra_buisiness_rules.sql")))
+    {
+        for (const auto& rule: vms::event::Rule::getDisabledRulesUpd43())
+            removeBusinessRule(rule->id());
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
@@ -3775,14 +3782,27 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
+    CameraDataExList& cameraExList)
 {
     QSqlQuery queryCameras( m_sdb );
     queryCameras.setForwardOnly(true);
 
+    QStringList filters;
+
+    // Skip desktop cameras from the most of queries.
+    if (!query.showDesktopCameras)
+    {
+        filters.push_back(QString("r.xtype_guid != %1")
+            .arg(guidToSqlString(CameraData::kDesktopCameraTypeId)));
+    }
+
+    if (!query.cameraId.isNull())
+        filters.push_back(QString("r.guid = %1").arg(guidToSqlString(query.cameraId)));
+
     QString filterStr;
-    if (!id.isNull())
-        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+    if (!filters.empty())
+        filterStr = QString("WHERE %1").arg(filters.join(" AND "));
 
     const QString queryStr = R"sql(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId,

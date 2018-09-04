@@ -39,7 +39,7 @@ angular.module('cloudApp')
                 status = ' (offline)';
             }
             else if(system.stateOfHealth == 'online' && system.canMerge){
-                status = ' (incompatable)';
+                status = ' (incompatible)';
             }
             return system.name + status;
         };

@@ -17,12 +17,15 @@ static void runServer(const ListenOnRelaySettings& settings)
     std::cout << "Listening as " << settings.listeningPeerHostName()
         << " on relay " << settings.baseRelayUrl().toStdString() << std::endl;
 
+    std::cout << std::endl << "Type \"exit\" to close the application" << std::endl;
     for (;;)
     {
         std::string command;
-        std::cin >> command;
+        std::getline(std::cin, command);
         if (command == "exit")
             return;
+        else
+            std::cout << "Unknown command: " << command << std::endl;
     }
 }
 

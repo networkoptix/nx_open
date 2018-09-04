@@ -65,7 +65,9 @@ angular.module('nxCommon')
         ServerConnection.prototype._getUrlBase = function(){
             var urlBase = '';
             if(this.systemId){
-                urlBase += Config.gatewayUrl + '/' + this.systemId;
+                urlBase = window.location.protocol +'//' +
+                    (Config.trafficRelayHost.replace('{host}', window.location.host).
+                                        replace('{systemId}', this.systemId));
             }
             urlBase += '/web';
             if(this.serverId){
@@ -75,7 +77,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.apiHost = function(){
             if(this.systemId){
-                return window.location.host + Config.gatewayUrl + '/' + this.systemId;
+                return Config.trafficRelayHost.replace('{host}', window.location.host).replace('{systemId}', this.systemId);
             }
             return window.location.host;
         };
@@ -131,7 +133,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype._setGetParams = function(url, data, auth, absoluteUrl){
             if(auth){
-                data = data || {}
+                data = data || {};
                 data.auth = auth;
             }
             if(data){
@@ -139,8 +141,9 @@ angular.module('nxCommon')
                 url += $.param(data);
             }
             url = this.urlBase + url;
-            if(absoluteUrl){
-                var host = window.location.protocol + "//" +
+
+            if(absoluteUrl && url.indexOf('://') === -1){
+                var host = window.location.protocol + '//' +
                            window.location.hostname +
                            (window.location.port ? ':' + window.location.port: '');
                 url = host + url;

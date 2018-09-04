@@ -10,7 +10,7 @@ int QnRestartRestHandler::executeGet(const QString& /*path*/, const QnRequestPar
     QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
     result.setError(QnJsonRestResult::NoError);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 void QnRestartRestHandler::afterExecute(
