@@ -1,5 +1,5 @@
 <div class="nx-checkbox">
-    <input type="checkbox" [name]="name" [id]="id">
+    <input type="checkbox" [name]="name" [id]="id" ng-model-options="{ updateOn: 'default', debounce: 0 }">
     <label [for]="id"
            class="check"
            [ngClass]="state"
