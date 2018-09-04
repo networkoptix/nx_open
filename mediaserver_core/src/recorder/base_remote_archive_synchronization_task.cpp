@@ -7,6 +7,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 
+#include <utils/common/synctime.h>
+
 #include <nx/mediaserver/event/event_connector.h>
 
 namespace nx {
@@ -151,7 +153,10 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
             /*keepSmallChunks*/ true,
             std::numeric_limits<int>::max());
 
-    auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId]);
+    auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId])
+        .intersected(
+            QnTimePeriod(QnTimePeriod::minTimeValue(), qnSyncTime->currentMSecsSinceEpoch()));
+
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device time periods: %2. Device: %3.")
         .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Server time periods: %2. Device: %3.")
@@ -285,8 +290,21 @@ bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(
             const auto chunk = remoteArchiveChunkByTimePeriod(timePeriod, overlappedId);
             if (chunk == boost::none)
                 continue;
-
+            qDebug() << "@@@@@@@@@@@ WRITING CHUNKS TO ARCHIVE, OVERLAPPED ID" << overlappedId;
             writeTimePeriodToArchive(timePeriod, *chunk);
+        }
+        else
+        {
+            NX_VERBOSE(
+                this,
+                lm("Skipping chunk because its duration is less than %1ms, "
+                    "chunk start time: %2 (%3), resource %4 (%5)")
+                    .args(
+                        duration_cast<milliseconds>(kMinChunkDuration).count(),
+                        timePeriod.startTimeMs,
+                        QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
+                        m_resource->getUserDefinedName(),
+                        m_resource->getId()));
         }
     }
 
