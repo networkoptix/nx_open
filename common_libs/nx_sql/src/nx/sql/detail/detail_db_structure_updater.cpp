@@ -101,8 +101,8 @@ void DbStructureUpdater::updateStruct(QueryContext* const queryContext)
     DbSchemaState dbState = analyzeDbSchemaState(queryContext);
     if (dbState.version < m_initialVersion)
     {
-        NX_LOGX(lm("DB of version %1 cannot be upgraded! Minimal supported version is %2")
-            .arg(dbState.version).arg(m_initialVersion), cl_logERROR);
+        NX_ERROR(this, lm("DB of version %1 cannot be upgraded! Minimal supported version is %2")
+            .arg(dbState.version).arg(m_initialVersion));
         throw Exception(DBResult::notFound);
     }
 
@@ -155,9 +155,9 @@ DBResult DbStructureUpdater::createInitialSchema(
                 m_fullSchemaScriptByVersion.rbegin()->second,
                 RdbmsDriverType::unknown))
         {
-            NX_LOG(lm("DbStructureUpdater. Failed to create schema of version %1: %2")
+            NX_WARNING(this, lm("Failed to create schema of version %1: %2")
                 .arg(m_fullSchemaScriptByVersion.rbegin()->first)
-                .arg(queryContext->connection()->lastErrorText()), cl_logWARNING);
+                .arg(queryContext->connection()->lastErrorText()));
             return DBResult::ioError;
         }
         dbSchemaState->version = m_fullSchemaScriptByVersion.rbegin()->first;
@@ -195,15 +195,14 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
     nx::sql::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
-    NX_LOGX(lm("Updating structure to version %1").arg(dbState->version), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Updating structure to version %1").arg(dbState->version));
 
     if (!execDbUpdate(
             m_updateScripts[dbState->version - m_initialVersion],
             queryContext))
     {
-        NX_LOG(lm("DbStructureUpdater. Failure updating to version %1: %2")
-            .arg(dbState->version).arg(queryContext->connection()->lastErrorText()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Failure updating to version %1: %2")
+            .arg(dbState->version).arg(queryContext->connection()->lastErrorText()));
         return DBResult::ioError;
     }
 
@@ -240,7 +239,7 @@ bool DbStructureUpdater::execDbUpdate(
     {
         if (dbUpdate.func(queryContext) != nx::sql::DBResult::ok)
         {
-            NX_LOGX(lm("Error executing update function"), cl_logWARNING);
+            NX_WARNING(this, lm("Error executing update function"));
             return false;
         }
     }
@@ -258,8 +257,8 @@ bool DbStructureUpdater::execStructureUpdateTask(
         selectSuitableScript(dbTypeToScript, driverType);
     if (selectedScriptIter == dbTypeToScript.end())
     {
-        NX_LOGX(lm("Could not find script version for DB %1. Aborting...")
-            .arg(driverType), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not find script version for DB %1. Aborting...")
+            .arg(driverType));
         return false;
     }
 

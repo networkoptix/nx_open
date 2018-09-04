@@ -147,7 +147,7 @@ void CLServerPushStreamReader::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG2);
+    NX_VERBOSE(this, "stream reader started");
 
     beforeRun();
 
@@ -274,7 +274,7 @@ void CLServerPushStreamReader::run()
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG2);
+    NX_VERBOSE(this, "stream reader stopped");
 }
 
 void CLServerPushStreamReader::beforeRun()

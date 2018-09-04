@@ -39,7 +39,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
 
     if (resourceType.isNull())
     {
-        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("No resource type for ID %1").arg(resourceTypeId.toString()));
 
         return result;
     }
@@ -52,7 +52,7 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
     result = QnVirtualCameraResourcePtr(new QnPlAxisResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()));
 
     return result;
 

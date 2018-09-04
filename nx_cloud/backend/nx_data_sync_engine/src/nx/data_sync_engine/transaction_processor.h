@@ -129,10 +129,8 @@ private:
         auto transaction = Ec2Transaction(std::move(transactionHeader));
         if (!deserializeTransactionDataFunc(&transaction.params))
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Failed to deserialize transaction %1 received from %2")
-                .arg(CommandDescriptor::name).arg(transportHeader),
-                cl_logWARNING);
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialize transaction %1 received from %2")
+                .arg(CommandDescriptor::name).arg(transportHeader));
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
                 {
@@ -151,10 +149,8 @@ private:
         const TransactionTransportHeader& transportHeader,
         TransactionProcessedHandler completionHandler)
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to deserialize transaction %1 received from %2")
-            .arg(CommandDescriptor::name).arg(transportHeader),
-            cl_logWARNING);
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialize transaction %1 received from %2")
+            .arg(CommandDescriptor::name).arg(transportHeader));
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
             {
@@ -283,23 +279,19 @@ private:
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
                 .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader.systemId)
-                .arg(transactionContext.transportHeader.endpoint),
-                cl_logDEBUG1);
+                .arg(transactionContext.transportHeader.endpoint));
             return dbResultCode;
         }
         else if (dbResultCode != nx::sql::DBResult::ok)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
                 .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint)
-                .arg(queryContext->connection()->lastErrorText()),
-                cl_logWARNING);
+                .arg(queryContext->connection()->lastErrorText()));
             return dbResultCode;
         }
 
@@ -309,12 +301,10 @@ private:
             std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Error processing transaction %1 received from %2. %3")
+            NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("Error processing transaction %1 received from %2. %3")
                 .arg(CommandDescriptor::name)
                 .arg(transactionContext.transportHeader)
-                .arg(queryContext->connection()->lastErrorText()),
-                cl_logWARNING);
+                .arg(queryContext->connection()->lastErrorText()));
         }
         return dbResultCode;
     }

@@ -103,9 +103,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     {
         /* Restore protocol part that was cut out. */
         QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
-        NX_LOG(lit("Run with custom URI %1").arg(fixedUri), cl_logDEBUG1);
+        NX_DEBUG(typeid(QnStartupParameters), lit("Run with custom URI %1").arg(fixedUri));
         result.customUri = nx::vms::utils::SystemUri(fixedUri);
-        NX_LOG(lit("Parsed to %1").arg(result.customUri.toString()), cl_logDEBUG1);
+        NX_DEBUG(typeid(QnStartupParameters), lit("Parsed to %1").arg(result.customUri.toString()));
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);

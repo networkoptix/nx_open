@@ -183,12 +183,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         if (elapsed > m_rtpFrameTimeoutMs) {
             reason = vms::api::EventReason::networkNoFrame;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-            NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
+            NX_WARNING(this, QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()));
         }
         else {
             reason = vms::api::EventReason::networkConnectionClosed;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-            NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
+            NX_WARNING(this, QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()));
         }
 
         emit networkIssue(getResource(),

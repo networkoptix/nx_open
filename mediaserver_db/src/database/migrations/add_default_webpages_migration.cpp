@@ -17,6 +17,8 @@ namespace ec2 {
 namespace database {
 namespace migrations {
 
+struct FunctionsTag{};
+
 bool addDefaultWebpages(ec2::database::api::QueryContext* context)
 {
     auto addWebPage = [context](const QString& name, const QString& url)
@@ -37,7 +39,7 @@ bool addDefaultWebpages(ec2::database::api::QueryContext* context)
     QFile config(":/serverProperties.json");
     if (!config.open(QIODevice::ReadOnly))
     {
-        NX_LOG(lit("Could not read serverProperties.json"), cl_logDEBUG1); //< UT don't have it.
+        NX_DEBUG(typeid(FunctionsTag), lit("Could not read serverProperties.json")); //< UT don't have it.
         return true; // We don't want to crash if partner did not fill any of these
     }
 
@@ -51,7 +53,7 @@ bool addDefaultWebpages(ec2::database::api::QueryContext* context)
         bool success = addWebPage(name, url);
         NX_ASSERT(success);
         if (!success)
-            NX_LOG(lit("Invalid predefined url %1: %2").arg(name).arg(url), cl_logERROR);
+            NX_ERROR(typeid(FunctionsTag), lit("Invalid predefined url %1: %2").arg(name).arg(url));
     }
 
     return true; // We don't want to crash if partner did not fill any of these

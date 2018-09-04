@@ -446,14 +446,13 @@ bool resourceAccessHelper(
 
     bool result = commonModule->resourceAccessManager()->hasPermission(userResource, target, permissions);
     if (!result)
-        NX_LOG(
-            lit("%1 \n\tuser %2 with %3 permissions is asking for \
+        NX_DEBUG(typeid(TransactionDescriptorBase), lit("%1 \n\tuser %2 with %3 permissions is asking for \
                 \n\t%4 resource with %5 permissions and fails...")
                 .arg(Q_FUNC_INFO)
                 .arg(accessData.userId.toString())
                 .arg((int)accessData.access)
                 .arg(resourceId.toString())
-                .arg(permissions), cl_logDEBUG1);
+                .arg(permissions));
 
     return result;
 }
@@ -480,11 +479,10 @@ struct ModifyResourceAccess
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_LOG(lit("%1 resource access returned false. User resource: %3. Target resource: %4")
+            NX_WARNING(this, lit("%1 resource access returned false. User resource: %3. Target resource: %4")
                 .arg(isRemove ? "Remove" : "Modify")
                 .arg(userResource ? userResource->getId().toString() : QString())
-                .arg(target ? target->getId().toString() : QString()),
-                cl_logWARNING);
+                .arg(target ? target->getId().toString() : QString()));
 
         return result;
     }
@@ -924,9 +922,8 @@ struct VideoWallControlAccess
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
-            NX_LOG(lit("Access check for ApiVideoWallControlMessageData failed for user %1")
-                .arg(userName),
-                cl_logWARNING);
+            NX_WARNING(this, lit("Access check for ApiVideoWallControlMessageData failed for user %1")
+                .arg(userName));
         }
         return result;
     }
@@ -1056,11 +1053,10 @@ struct ModifyListAccess
         FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size())
         {
-            NX_LOG(lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
+            NX_WARNING(this, lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
                 .arg(paramContainer.size() - tmpContainer.size())
                 .arg(paramContainer.size())
-                .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()),
-                cl_logWARNING);
+                .arg(getTransactionDescriptorByParam<ParamContainer>()->getName()));
             return false;
         }
         return true;

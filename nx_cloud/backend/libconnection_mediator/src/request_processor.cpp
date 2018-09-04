@@ -30,8 +30,8 @@ api::ResultCode RequestProcessor::getMediaserverData(
     const auto serverAttr = request.getAttribute<network::stun::extension::attrs::ServerId>();
     if (!serverAttr)
     {
-        NX_LOGX(lm("Ignoring request %1 from %2 without ServerId")
-            .args(request.header.method, connection.getSourceAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Ignoring request %1 from %2 without ServerId")
+            .args(request.header.method, connection.getSourceAddress()));
 
         *errorMessage = "Attribute ServerId is required";
         return api::ResultCode::badRequest;
@@ -47,8 +47,8 @@ api::ResultCode RequestProcessor::getMediaserverData(
     const auto system = m_cloudData->getSystem(data.systemId);
     if (!system)
     {
-        NX_LOGX(lm("Ignoring request %1 from %2, system %3 could not be found")
-            .args(request.header.method, connection.getSourceAddress(), data.systemId), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Ignoring request %1 from %2, system %3 could not be found")
+            .args(request.header.method, connection.getSourceAddress(), data.systemId));
 
         *errorMessage = "System could not be found";
         return api::ResultCode::notAuthorized;
@@ -63,9 +63,9 @@ api::ResultCode RequestProcessor::getMediaserverData(
 
     if (!request.verifyIntegrity(data.systemId, system->authKey))
     {
-        NX_LOGX(lm("Ignoring request %1 from %2 with wrong message integrity, credentials: %3:%4")
+        NX_DEBUG(this, lm("Ignoring request %1 from %2 with wrong message integrity, credentials: %3:%4")
             .args(request.header.method, connection.getSourceAddress(), data.systemId,
-                system->authKey), cl_logDEBUG1);
+                system->authKey));
 
         *errorMessage = "Wrong message integrity";
         return api::ResultCode::notAuthorized;

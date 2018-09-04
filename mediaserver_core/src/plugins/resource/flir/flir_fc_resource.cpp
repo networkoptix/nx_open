@@ -158,13 +158,12 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
             m_callbackIsInProgress = true;
 
             lock.unlock();
-            const auto logLevel = isFatal ? cl_logWARNING : cl_logERROR;
-            NX_LOG(
+            const auto logLevel = isFatal ? utils::log::Level::warning : utils::log::Level::error;
+            NX_UTILS_LOG(logLevel, this,
                 lm("Flir Onvif resource, %1 (%2), netowk issue detected. Reason: %3")
                     .arg(getModel())
                     .arg(getUrl())
-                    .arg(reason),
-                logLevel);
+                    .arg(reason));
 
             lock.relock();
             m_callbackIsInProgress = false;

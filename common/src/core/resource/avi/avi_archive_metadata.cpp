@@ -111,7 +111,7 @@ bool deserializeLayout(const QString& layout, QnAviArchiveMetadata& metadata)
         QStringList params = info[i].split(L',');
         if (params.size() != 2)
         {
-            NX_LOG(lit("Invalid layout string stored at file metadata: \"%1\"").arg(layout), cl_logWARNING);
+            NX_WARNING(typeid(QnAviArchiveMetadata), lit("Invalid layout string stored at file metadata: \"%1\"").arg(layout));
             return false;
         }
         if (i == 0)
@@ -129,7 +129,8 @@ bool deserializeLayout(const QString& layout, QnAviArchiveMetadata& metadata)
             int index = y * metadata.videoLayoutSize.width() + x;
             if (index < 0 || index >= metadata.videoLayoutChannels.size())
             {
-                NX_LOG(lit("Invalid layout string stored at file metadata: %1").arg(layout), cl_logWARNING);
+                NX_WARNING(typeid(QnAviArchiveMetadata),
+                    lit("Invalid layout string stored at file metadata: %1"), layout);
                 return false;
             }
             metadata.videoLayoutChannels[index] = channel;

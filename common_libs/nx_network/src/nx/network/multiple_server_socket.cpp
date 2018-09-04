@@ -234,7 +234,7 @@ std::unique_ptr<AbstractStreamSocket> MultipleServerSocket::accept()
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    NX_LOGX(lm("Stopping..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Stopping..."));
     m_timer.pleaseStop(
         [this, handler = std::move(handler)]()
         {
@@ -309,7 +309,7 @@ size_t MultipleServerSocket::count() const
 
 void MultipleServerSocket::stopWhileInAioThread()
 {
-    NX_LOGX(lm("Stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Stopped"));
     m_serverSockets.clear();
     m_aggregateAcceptor.pleaseStopSync();
 

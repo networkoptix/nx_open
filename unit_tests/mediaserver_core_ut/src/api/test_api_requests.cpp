@@ -11,6 +11,8 @@ namespace test {
 
 namespace api_requests_detail {
 
+struct FunctionsTag{};
+
 /**
  * Convert a JSON Object from string to map. If JSON is invalid or non-object, register a test
  * failure and return empty map.
@@ -75,15 +77,14 @@ void doExecutePost(
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
-    NX_LOG(lm("[TEST] POST %1").arg(urlStr), cl_logINFO);
-    NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(actualRequest), cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST %1").arg(urlStr));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_REQUEST: %2").arg(actualRequest));
 
     httpClient->doPost(url, "application/json", actualRequest);
 
     const auto response = readResponseBody(httpClient.get());
-    NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(response), cl_logINFO);
-    NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_RESPONSE: %1").arg(response));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
@@ -105,15 +106,14 @@ void doExecuteGet(
 {
     auto httpClient = createHttpClient();
 
-    NX_LOG(lm("[TEST] GET %1").arg(url.path()), cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET %1").arg(url.path()));
 
     ASSERT_TRUE(httpClient->doGet(url));
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());
-    NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(*outResponse), cl_logINFO);
-    NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_RESPONSE: %1").arg(*outResponse));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }

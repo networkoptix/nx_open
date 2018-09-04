@@ -283,7 +283,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         QTextStream str(&s);
         str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
         str.flush();
-        NX_LOG(s, cl_logDEBUG2);
+        NX_VERBOSE(this, s);
         */
         m_lastSeekTime = rez;
         m_afterSeek = true;
@@ -531,7 +531,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(
         m_serverModule, url, QnServer::StoragePool::Both));
 
-    NX_LOG(lit("Switching to chunk %1").arg(url), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Switching to chunk %1").arg(url));
 
     bool rez = m_aviDelegate->open(m_fileRes, m_archiveIntegrityWatcher);
     if (rez)

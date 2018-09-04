@@ -141,8 +141,8 @@ int QnSessionManager::sendAsyncRequest(
     NX_ASSERT(qnHasEventLoop(QThread::currentThread()) || (!target));
     if (!qnHasEventLoop(QThread::currentThread()) && target)
     {
-        NX_LOG(QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
-            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)), cl_logERROR);
+        NX_ERROR(this, QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)));
         std::cout << "QnSessionManager::sendAsyncRequest. No event loop in current thread, "
             "but response is awaited. target " << target << ", slot " << slot << std::endl;
     }

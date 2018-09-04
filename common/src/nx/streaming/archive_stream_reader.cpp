@@ -404,7 +404,7 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
-    //NX_LOG(lit("QnArchiveStreamReader::getNextData()"), cl_logDEBUG2);
+    //NX_VERBOSE(this, lit("QnArchiveStreamReader::getNextData()"));
 
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
@@ -527,7 +527,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            NX_LOG(s, cl_logALWAYS);
+            NX_ALWAYS(this, s);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);

@@ -202,7 +202,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     {
         if (lp_size < 21)
         {
-            NX_LOG("last packet is too short!", cl_logERROR);
+            NX_ERROR(this, "last packet is too short!");
             return QnAbstractMediaDataPtr(0);
         }
 
@@ -211,7 +211,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     if (h264 && (lp_size < iframe_index))
     {
-        NX_LOG("last packet is too short!", cl_logERROR);
+        NX_ERROR(this, "last packet is too short!");
         //delete videoData;
         return QnAbstractMediaDataPtr(0);
     }
@@ -276,7 +276,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 if (diff > 0)
                     img.startWriting(diff);
 
-                NX_LOG("Perfomance hint: AVClientPullSSTFTP streamreader moved received data", cl_logINFO);
+                NX_INFO(this, "Perfomance hint: AVClientPullSSTFTP streamreader moved received data");
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
                 img.finishWriting(diff);

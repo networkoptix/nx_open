@@ -443,9 +443,8 @@ void SystemManager::getAccessRoleList(
             api::SystemAccessRoleList());
 
     const auto accessRole = getAccountRightsForSystem(accountEmail, systemId.systemId);
-    NX_LOGX(lm("account %1, system %2, account rights on system %3").
-            arg(accountEmail).arg(systemId.systemId).arg(QnLexical::serialized(accessRole)),
-            cl_logDEBUG2);
+    NX_VERBOSE(this, lm("account %1, system %2, account rights on system %3").
+            arg(accountEmail).arg(systemId.systemId).arg(QnLexical::serialized(accessRole)));
     if (accessRole == api::SystemAccessRole::none)
     {
         NX_ASSERT(false);
@@ -468,7 +467,7 @@ void SystemManager::updateSystem(
     data::SystemAttributesUpdate data,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("Updating system %1 sttributes").arg(data.systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Updating system %1 sttributes").arg(data.systemId));
 
     // Validating data received.
     if (data.name && (data.name->empty() || data.name->size() > kMaxSystemNameLength))
@@ -516,9 +515,8 @@ void SystemManager::recordUserSessionStart(
         userSessionDescriptor.systemId = authzInfo.get<std::string>(attr::authSystemId);
         if (!userSessionDescriptor.systemId)
         {
-            NX_LOGX(lm("system id may be absent in request parameters "
-                "only if it has been used as a login"),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("system id may be absent in request parameters "
+                "only if it has been used as a login"));
             return completionHandler(api::ResultCode::forbidden);
         }
     }
@@ -529,9 +527,8 @@ void SystemManager::recordUserSessionStart(
             authzInfo.get<std::string>(attr::authAccountEmail);
         if (!userSessionDescriptor.accountEmail)
         {
-            NX_LOGX(lm("account email may be absent in request parameters "
-                "only if it has been used as a login"),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("account email may be absent in request parameters "
+                "only if it has been used as a login"));
             return completionHandler(api::ResultCode::forbidden);
         }
     }
@@ -752,9 +749,8 @@ nx::sql::DBResult SystemManager::insertNewSystemDataToDb(
         queryContext, newSystem.accountEmail, &account);
     if (dbResult == nx::sql::DBResult::notFound)
     {
-        NX_LOG(lm("Failed to add system %1 (%2) to account %3. Account not found")
-            .arg(newSystem.name).arg(result->systemData.id).arg(newSystem.accountEmail),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to add system %1 (%2) to account %3. Account not found")
+            .arg(newSystem.name).arg(result->systemData.id).arg(newSystem.accountEmail));
         return nx::sql::DBResult::notFound;
     }
     if (dbResult != nx::sql::DBResult::ok)
@@ -804,10 +800,9 @@ nx::sql::DBResult SystemManager::insertOwnerSharingToDb(
         NotificationCommand::doNotSendNotification);
     if (resultCode != nx::sql::DBResult::ok)
     {
-        NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
+        NX_DEBUG(this, lm("Could not insert system %1 to account %2 binding into DB. %3").
             arg(newSystem.name).arg(newSystem.accountEmail).
-            arg(queryContext->connection()->lastErrorText()),
-            cl_logDEBUG1);
+            arg(queryContext->connection()->lastErrorText()));
         return resultCode;
     }
 
@@ -927,8 +922,8 @@ nx::sql::DBResult SystemManager::shareSystem(
     }
     if (dbResult != nx::sql::DBResult::notFound)
     {
-        NX_LOGX(lm("Error fetching sharing (%1, %2) from Db")
-            .arg(sharing.systemId).arg(inviteeAccount->email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error fetching sharing (%1, %2) from Db")
+            .arg(sharing.systemId).arg(inviteeAccount->email));
         return dbResult;
     }
 
@@ -943,8 +938,8 @@ nx::sql::DBResult SystemManager::shareSystem(
         isNewAccount ? SharingType::invite : SharingType::sharingWithExistingAccount);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error invoking system sharing extension (%1, %2). %3")
-            .arg(sharing.systemId).arg(inviteeAccount->email).arg(dbResult), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error invoking system sharing extension (%1, %2). %3")
+            .arg(sharing.systemId).arg(inviteeAccount->email).arg(dbResult));
         return dbResult;
     }
 
@@ -975,8 +970,8 @@ nx::sql::DBResult SystemManager::addNewSharing(
         &sharingWithCalculatedData.usageFrequency);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error calculating usage frequency for sharing (%1, %2)")
-            .arg(sharing.systemId).arg(inviteeAccount.email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error calculating usage frequency for sharing (%1, %2)")
+            .arg(sharing.systemId).arg(inviteeAccount.email));
         return dbResult;
     }
 
@@ -985,8 +980,8 @@ nx::sql::DBResult SystemManager::addNewSharing(
         std::move(sharingWithCalculatedData));
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error updating sharing (%1, %2) in Db")
-            .arg(sharing.systemId).arg(inviteeAccount.email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error updating sharing (%1, %2) in Db")
+            .arg(sharing.systemId).arg(inviteeAccount.email));
         return dbResult;
     }
 
@@ -1226,9 +1221,8 @@ nx::sql::DBResult SystemManager::fetchAccountToShareWith(
             break;
 
         default:
-            NX_LOGX(lm("Error fetching account by email %1. %2")
-                .arg(sharing.accountEmail).arg(dbResult),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("Error fetching account by email %1. %2")
+                .arg(sharing.accountEmail).arg(dbResult));
             return dbResult;
     }
 
@@ -1336,10 +1330,9 @@ nx::sql::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
         &account);
     if (result != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error sharing/unsharing system %1 with account %2. %3")
+        NX_DEBUG(this, lm("Error sharing/unsharing system %1 with account %2. %3")
             .arg(sharing.systemId).arg(sharing.accountEmail)
-            .arg(result),
-            cl_logDEBUG1);
+            .arg(result));
         return result;
     }
 
@@ -1520,8 +1513,8 @@ nx::sql::DBResult SystemManager::renameSystem(
     nx::sql::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
-    NX_LOGX(lm("Renaming system %1 to %2")
-        .arg(data.systemId).arg(data.name.get()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Renaming system %1 to %2")
+        .arg(data.systemId).arg(data.name.get()));
 
     const auto result = m_systemDao->execSystemNameUpdate(queryContext, data);
     if (result != nx::sql::DBResult::ok)
@@ -1670,11 +1663,10 @@ nx::sql::DBResult SystemManager::saveUserSessionStart(
         &sharing);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error fetching user sharing (%1, %2). %3")
+        NX_DEBUG(this, lm("Error fetching user sharing (%1, %2). %3")
             .arg(*userSessionDescriptor.accountEmail)
             .arg(*userSessionDescriptor.systemId)
-            .arg(dbResult),
-            cl_logDEBUG1);
+            .arg(dbResult));
         return dbResult;
     }
 
@@ -1694,7 +1686,7 @@ nx::sql::DBResult SystemManager::saveUserSessionStart(
         newUsageFrequency);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Error updating user login statistics"), cl_logWARNING);
+        NX_WARNING(this, lm("Error updating user login statistics"));
         return dbResult;
     }
 
@@ -1825,7 +1817,7 @@ nx::sql::DBResult SystemManager::fetchSystemToAccountBinder(
         queryContext, &sharings);
     if (result != nx::sql::DBResult::ok)
     {
-        NX_LOG(lit("Failed to read system list from DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to read system list from DB"));
         return nx::sql::DBResult::ioError;
     }
 
@@ -1843,8 +1835,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
     bool expected = false;
     if (!m_dropExpiredSystemsTaskStillRunning.compare_exchange_strong(expected, true))
     {
-        NX_LOGX(lit("Previous 'drop expired systems' task is still running..."),
-            cl_logWARNING);
+        NX_WARNING(this, lit("Previous 'drop expired systems' task is still running..."));
         return; //previous task is still running
     }
 
@@ -1887,11 +1878,10 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
 {
     const auto& vmsUser = transaction.params;
 
-    NX_LOGX(lm("Processing vms transaction saveUser. "
+    NX_VERBOSE(this, lm("Processing vms transaction saveUser. "
         "user %1, systemId %2, permissions %3, enabled %4")
         .arg(vmsUser.email).arg(systemId)
-        .arg(QnLexical::serialized(vmsUser.permissions)).arg(vmsUser.isEnabled),
-        cl_logDEBUG2);
+        .arg(QnLexical::serialized(vmsUser.permissions)).arg(vmsUser.isEnabled));
 
     // Preparing SystemSharing structure.
     data::SystemSharing systemSharing;
@@ -1912,8 +1902,8 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
     if (dbResult != nx::sql::DBResult::ok &&
         dbResult != nx::sql::DBResult::notFound)
     {
-        NX_LOGX(lm("Error fetching saveUser transaction author. systemId %1")
-            .arg(systemId), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error fetching saveUser transaction author. systemId %1")
+            .arg(systemId));
         return dbResult;
     }
     //< System could have been shared by a local user, so we will not find him in our DB.
@@ -1958,11 +1948,8 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
 {
     const auto& data = transaction.params;
 
-    NX_LOGX(
-        QnLog::EC2_TRAN_LOG,
-        lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-            .arg(systemId).arg(data.id),
-        cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
+            .arg(systemId).arg(data.id));
 
     data::SystemSharing systemSharing;
     systemSharing.systemId = systemId.toStdString();
@@ -1975,12 +1962,9 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             QnSql::serialized_field(systemSharing.vmsUserId))});
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
                 .arg(systemId).arg(data.id)
-                .arg(queryContext->connection()->lastErrorText()),
-            cl_logDEBUG1);
+                .arg(queryContext->connection()->lastErrorText()));
         return dbResult;
     }
 
@@ -2014,12 +1998,9 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
     if (data.resourceId != QnUserResource::kAdminGuid ||
         data.name != nx::settings_names::kNameSystemName)
     {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Ignoring transaction setResourceParam with "
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction setResourceParam with "
                "systemId %1, resourceId %2, param name %3, param value %4")
-                .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value),
-            cl_logDEBUG2);
+                .arg(systemId).arg(data.resourceId).arg(data.name).arg(data.value));
         return nx::sql::DBResult::ok;
     }
 
@@ -2044,13 +2025,10 @@ nx::sql::DBResult SystemManager::processRemoveResourceParam(
     data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.
-    NX_LOGX(
-        QnLog::EC2_TRAN_LOG,
-        lm("Ignoring transaction %1 with "
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring transaction %1 with "
             "systemId %2, resourceId %3, param name %4")
             .arg(::ec2::ApiCommand::toString(data.command)).arg(systemId)
-            .arg(data.params.resourceId).arg(data.params.name),
-        cl_logDEBUG2);
+            .arg(data.params.resourceId).arg(data.params.name));
     return nx::sql::DBResult::ok;
 }
 

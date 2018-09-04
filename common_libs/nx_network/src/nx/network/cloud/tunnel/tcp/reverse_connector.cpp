@@ -52,9 +52,9 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             if (m_httpClient.response()->statusLine.statusCode !=
                     nx::network::http::StatusCode::switchingProtocols)
             {
-                NX_LOG(lm("Unexpected status: (%1) %2")
+                NX_DEBUG(this, lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient.response()->statusLine.statusCode)
-                    .arg(m_httpClient.response()->statusLine.reasonPhrase), cl_logDEBUG1);
+                    .arg(m_httpClient.response()->statusLine.reasonPhrase));
 
                 return handler(SystemError::connectionAbort);
             }
@@ -72,8 +72,8 @@ std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
     if (socket->setSendTimeout(0) && socket->setRecvTimeout(0))
         return socket;
 
-    NX_LOGX(lm("Could not disable timeouts on HTTP socket: %1")
-        .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Could not disable timeouts on HTTP socket: %1")
+        .arg(SystemError::getLastOSErrorText()));
 
     return nullptr;
 }

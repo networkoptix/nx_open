@@ -237,8 +237,8 @@ void AccountManager::resetPassword(
     auto account = m_cache.find(accountEmail.email);
     if (!account)
     {
-        NX_LOG(lm("%1 (%2). Account not found").
-            arg(kAccountPasswordResetPath).arg(accountEmail.email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("%1 (%2). Account not found").
+            arg(kAccountPasswordResetPath).arg(accountEmail.email));
         return completionHandler(
             api::ResultCode::notFound,
             data::AccountConfirmationCode());
@@ -273,8 +273,8 @@ void AccountManager::reactivateAccount(
     const auto existingAccount = m_cache.find(accountEmail.email);
     if (!existingAccount)
     {
-        NX_LOG(lm("/account/reactivate. Unknown account %1").
-            arg(accountEmail.email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("/account/reactivate. Unknown account %1").
+            arg(accountEmail.email));
         return completionHandler(
             api::ResultCode::notFound,
             data::AccountConfirmationCode());
@@ -282,8 +282,8 @@ void AccountManager::reactivateAccount(
 
     if (existingAccount->statusCode == api::AccountStatus::activated)
     {
-        NX_LOG(lm("/account/reactivate. Not reactivating of already activated account %1").
-            arg(accountEmail.email), cl_logDEBUG1);
+        NX_DEBUG(this, lm("/account/reactivate. Not reactivating of already activated account %1").
+            arg(accountEmail.email));
         return completionHandler(
             api::ResultCode::forbidden,
             data::AccountConfirmationCode());
@@ -334,8 +334,8 @@ void AccountManager::createTemporaryCredentials(
     if (!account)
     {
         //this can happen due to some race
-        NX_LOG(lm("%1 (%2). Account not found").
-            arg(kAccountCreateTemporaryCredentialsPath).arg(accountEmail), cl_logDEBUG1);
+        NX_DEBUG(this, lm("%1 (%2). Account not found").
+            arg(kAccountCreateTemporaryCredentialsPath).arg(accountEmail));
         return completionHandler(
             api::ResultCode::notFound,
             api::TemporaryCredentials());
@@ -514,8 +514,8 @@ nx::sql::DBResult AccountManager::createPasswordResetCode(
     std::string temporaryPassword;
     if (dbResultCode == nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Found existing password reset code (%1) for account %2")
-            .arg(credentials.password).arg(accountEmail), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Found existing password reset code (%1) for account %2")
+            .arg(credentials.password).arg(accountEmail));
         temporaryPassword = credentials.password;
 
         // Updating expiration time.
@@ -608,9 +608,8 @@ nx::sql::DBResult AccountManager::registerNewAccountInDb(
     {
         if (existingAccount->statusCode != api::AccountStatus::invited)
         {
-            NX_LOG(lm("Failed to add account with already used email %1, status %2").
-                arg(accountData.email).arg(QnLexical::serialized(existingAccount->statusCode)),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("Failed to add account with already used email %1, status %2").
+                arg(accountData.email).arg(QnLexical::serialized(existingAccount->statusCode)));
             return nx::sql::DBResult::uniqueConstraintViolation;
         }
 
@@ -623,8 +622,8 @@ nx::sql::DBResult AccountManager::registerNewAccountInDb(
         auto dbResult = updateAccount(queryContext, std::move(*existingAccount));
         if (dbResult != nx::sql::DBResult::ok)
         {
-            NX_LOGX(lm("Failed to update existing account %1")
-                .arg(accountData.email), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Failed to update existing account %1")
+                .arg(accountData.email));
             return dbResult;
         }
     }
@@ -633,8 +632,8 @@ nx::sql::DBResult AccountManager::registerNewAccountInDb(
         auto dbResult = insertAccount(queryContext, accountData);
         if (dbResult != nx::sql::DBResult::ok)
         {
-            NX_LOGX(lm("Failed to insert new account. Email %1")
-                .arg(accountData.email), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Failed to insert new account. Email %1")
+                .arg(accountData.email));
             return dbResult;
         }
     }
@@ -934,8 +933,8 @@ nx::sql::DBResult AccountManager::issueRestorePasswordCode(
         confirmationCode);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOGX(lm("Failed to issue password reset code for account %1")
-            .arg(accountEmail), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to issue password reset code for account %1")
+            .arg(accountEmail));
         return dbResult;
     }
 
@@ -964,9 +963,9 @@ void AccountManager::temporaryCredentialsSaved(
 {
     if (resultCode != api::ResultCode::ok)
     {
-        NX_LOG(lm("%1 (%2). Failed to save temporary credentials (%3)")
+        NX_DEBUG(this, lm("%1 (%2). Failed to save temporary credentials (%3)")
             .arg(kAccountCreateTemporaryCredentialsPath).arg(accountEmail)
-            .arg((int)resultCode), cl_logDEBUG1);
+            .arg((int)resultCode));
         return completionHandler(
             resultCode,
             api::TemporaryCredentials());

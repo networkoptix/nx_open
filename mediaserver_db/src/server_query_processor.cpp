@@ -63,10 +63,10 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     PostProcessList* const transactionsToSend,
     TransactionType::Value transactionType)
 {
-    NX_LOG(lit("%1 Processing remove resourse %2 status transaction. Transaction type = %3")
+    NX_VERBOSE(this, lit("%1 Processing remove resourse %2 status transaction. Transaction type = %3")
            .arg(Q_FUNC_INFO)
            .arg(id.toString())
-           .arg(transactionType), cl_logDEBUG2);
+           .arg(transactionType));
 
     return removeHelper(
         id,

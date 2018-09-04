@@ -306,12 +306,11 @@ bool QBufferedFile::updatePos()
             int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
             int newBufSize = (1 << (curPow + 1)) * 1024;
 
-            NX_LOG(lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
+            NX_DEBUG(this, lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
                     .arg((uintptr_t)this)
                     .arg(m_minBufferSize)
                     .arg(newBufSize)
-                    .arg(newBufSize - m_minBufferSize),
-                   cl_logDEBUG1);
+                    .arg(newBufSize - m_minBufferSize));
 
             if (newBufSize < m_maxBufferSize)
             {

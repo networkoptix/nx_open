@@ -107,16 +107,16 @@ bool QnRuntimeTransactionLog::contains(const api::TranState& state) const
     {
         if (!m_state.values.contains(itr.key()))
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is missing...")
-                .arg(itr.key().id.toString()).arg(itr.key().persistentId.toString()), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is missing...")
+                .arg(itr.key().id.toString()).arg(itr.key().persistentId.toString()));
             return false;
         }
 
         if (itr.value() > m_state.values.value(itr.key()))
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is old (%3 vs %4) ...")
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Runtime info for peer %1 (dbId %2) is old (%3 vs %4) ...")
                 .arg(itr.key().id.toString()).arg(itr.key().persistentId.toString())
-                .arg(m_state.values.value(itr.key())).arg(itr.value()), cl_logDEBUG1);
+                .arg(m_state.values.value(itr.key())).arg(itr.value()));
             return false;
         }
     }

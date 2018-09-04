@@ -30,7 +30,7 @@ ReverseConnectionPool::ReverseConnectionPool(
     m_acceptor(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
-            NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("New socket(%1) from %2").args(socket, hostName));
             getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
     m_isReconnectHandlerSet(false),
@@ -62,8 +62,8 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
             serverAddress,
             m_mediatorConnection->getAioThread()))
     {
-        NX_LOGX(lm("Could not start acceptor on %1: %2")
-            .args(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_WARNING(this, lm("Could not start acceptor on %1: %2")
+            .args(serverAddress, SystemError::getLastOSErrorText()));
 
         return false;
     }
@@ -87,7 +87,7 @@ std::shared_ptr<ReverseConnectionSource>
         const auto suffixIterator = m_connectionHolders.find(hostName);
         if (suffixIterator == m_connectionHolders.end())
         {
-            NX_LOGX(lm("No holders by host suffix %1").arg(hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders by host suffix %1").arg(hostName));
             return nullptr;
         }
 
@@ -95,14 +95,14 @@ std::shared_ptr<ReverseConnectionSource>
         {
             if (const auto connections = host.second->socketCount())
             {
-                NX_LOGX(lm("Return holder for %1 by suffix %2 with %3 connections(s)")
-                    .args(host.first, hostName, connections), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Return holder for %1 by suffix %2 with %3 connections(s)")
+                    .args(host.first, hostName, connections));
                 return host.second;
             }
         }
 
-        NX_LOGX(lm("No connections on %1 holder(s) by suffix %2")
-            .args(suffixIterator->second.size(), hostName), cl_logDEBUG1);
+        NX_DEBUG(this, lm("No connections on %1 holder(s) by suffix %2")
+            .args(suffixIterator->second.size(), hostName));
         return nullptr;
     }
     else
@@ -110,26 +110,26 @@ std::shared_ptr<ReverseConnectionSource>
         const auto suffixIterator = m_connectionHolders.find(suffix);
         if (suffixIterator == m_connectionHolders.end())
         {
-            NX_LOGX(lm("No holders by suffix %1 of %2").args(suffix, hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders by suffix %1 of %2").args(suffix, hostName));
             return nullptr;
         }
 
         const auto hostIterator = suffixIterator->second.find(hostName);
         if (hostIterator == suffixIterator->second.end())
         {
-            NX_LOGX(lm("No holders for host %1").arg(hostName), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("No holders for host %1").arg(hostName));
             return nullptr;
         }
 
         // TODO: #ak Not active objects MUST be removed, not stored forever.
         if (hostIterator->second->isActive())
         {
-            NX_LOGX(lm("Return holder for %1 with %2 connection(s)")
-                .args(hostName, hostIterator->second->socketCount()), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Return holder for %1 with %2 connection(s)")
+                .args(hostName, hostIterator->second->socketCount()));
             return hostIterator->second;
         }
 
-        NX_LOGX(lm("No connections on holder for %1").args(hostName), cl_logDEBUG1);
+        NX_DEBUG(this, lm("No connections on holder for %1").args(hostName));
         return nullptr;
     }
 }
@@ -189,18 +189,18 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Registered on mediator by %1 with %2")
-                    .args(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
+                NX_INFO(this, lm("Registered on mediator by %1 with %2")
+                    .args(m_acceptor.selfHostName(), m_acceptor.address()));
 
                 if (auto& options = responce.tcpConnectionKeepAlive)
                     m_mediatorConnection->client()->setKeepAliveOptions(std::move(*options));
             }
             else
             {
-                NX_LOGX(lm("Could not register on mediator by %1: %2")
-                    .args(m_acceptor.selfHostName(), code),
-                    (std::chrono::steady_clock::now() - m_startTime > m_startTimeout)
-                        ? cl_logWARNING : cl_logDEBUG1);
+                NX_UTILS_LOG((std::chrono::steady_clock::now() - m_startTime > m_startTimeout) ?
+                    utils::log::Level::warning : utils::log::Level::debug, this,
+                    lm("Could not register on mediator by %1: %2"),
+                    m_acceptor.selfHostName(), code);
             }
 
             if (!m_isReconnectHandlerSet)

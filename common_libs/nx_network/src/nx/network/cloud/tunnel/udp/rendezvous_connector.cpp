@@ -79,9 +79,8 @@ void RendezvousConnector::connect(
             if (!initializeUdtConnection(udtConnection.get(), timeout))
             {
                 const auto sysErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOGX(lm("session %1. Failed to create UDT socket. %2")
-                    .arg(m_connectSessionId).arg(SystemError::toString(sysErrorCode)),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, lm("session %1. Failed to create UDT socket. %2")
+                    .arg(m_connectSessionId).arg(SystemError::toString(sysErrorCode)));
                 return completionHandler(sysErrorCode);
             }
 
@@ -150,10 +149,9 @@ void RendezvousConnector::onUdtConnectFinished(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("session %1. Error establishing rendezvous udt connection to %2: %3")
+        NX_VERBOSE(this, lm("session %1. Error establishing rendezvous udt connection to %2: %3")
             .arg(m_connectSessionId).arg(m_remotePeerAddress.toString())
-            .arg(SystemError::toString(errorCode)),
-            cl_logDEBUG2);
+            .arg(SystemError::toString(errorCode)));
         auto completionHandler = std::move(m_completionHandler);
         completionHandler(errorCode);
         return;
@@ -161,9 +159,8 @@ void RendezvousConnector::onUdtConnectFinished(
 
     //TODO #ak Validating that remote side uses same connection id.
 
-    NX_LOGX(lm("session %1. Successfully established rendezvous udt connection to %2")
-        .arg(m_connectSessionId).arg(m_remotePeerAddress.toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("session %1. Successfully established rendezvous udt connection to %2")
+        .arg(m_connectSessionId).arg(m_remotePeerAddress.toString()));
 
     auto completionHandler = std::move(m_completionHandler);
     completionHandler(SystemError::noError);
