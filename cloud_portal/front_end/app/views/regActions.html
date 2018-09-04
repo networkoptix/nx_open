@@ -77,6 +77,7 @@
                 <label class="checkbox mb-0 mb-md-3">
                     <input type="checkbox"
                            ng-model="account.accept"
+                           ng-model-options="{ updateOn: 'default', debounce: 0 }"
                            name="accept" id="accept" required>
                     <span class="checkmark">
                         <svg viewBox="0 0 20 16">
