@@ -9,6 +9,7 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/style/helper.h>
+#include <ui/style/globals.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <client/client_color_types.h>
@@ -51,7 +52,8 @@ void ResourceNodeViewItemDelegate::paint(
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
-    paintItemText(painter, option, index, d->colors.mainText, d->colors.extraText);
+    paintItemText(painter, option, index, d->colors.mainText,
+        d->colors.extraText, qnGlobals->errorTextColor());
     paintItemIcon(painter, option, index, QIcon::Normal);
 }
 
@@ -84,15 +86,16 @@ void ResourceNodeViewItemDelegate::paintItemText(
     const QStyleOptionViewItem &styleOption,
     const QModelIndex &index,
     const QColor& mainColor,
-    const QColor& extraColor) const
+    const QColor& extraColor,
+    const QColor& invalidColor) const
 {
     auto option = styleOption;
     const auto style = option.widget ? option.widget->style() : QApplication::style();
-    auto baseColor = mainColor;
+    auto baseColor = isValidNode(index) ? mainColor : invalidColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
         baseColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
-        option.palette.setColor(QPalette::Text, mainColor);
+        option.palette.setColor(QPalette::Text, baseColor);
         style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
     }
 
@@ -120,7 +123,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
 
     if (textEnd > textPos.x())
     {
-        const auto main = d->textPixmapCache.pixmap(nodeText, option.font, mainColor,
+        const auto main = d->textPixmapCache.pixmap(nodeText, option.font, baseColor,
             textEnd - textPos.x() + 1, option.textElideMode);
 
         if (!main.pixmap.isNull())

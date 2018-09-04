@@ -42,22 +42,27 @@
 //
 // class QnOnvifImagingProxy
 //
-QnOnvifImagingProxy::QnOnvifImagingProxy(const std::string& imagingUrl,
-                                                 const QString& login,
-                                                 const QString& passwd,
-                                                 const std::string& videoSrcToken,
-                                                 int _timeDrift):
-    m_rangesSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
-    m_valsSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
+QnOnvifImagingProxy::QnOnvifImagingProxy(
+    const SoapTimeouts& timeouts,
+    const std::string& imagingUrl,
+    const QString& login,
+    const QString& passwd,
+    const std::string& videoSrcToken,
+    int _timeDrift)
+    :
+    m_rangesSoapWrapper(new ImagingSoapWrapper(timeouts, imagingUrl, login, passwd, _timeDrift)),
+    m_valsSoapWrapper(new ImagingSoapWrapper(timeouts, imagingUrl, login, passwd, _timeDrift)),
     m_ranges(new ImagingOptionsResp()),
     m_values(new ImagingSettingsResp()),
-    m_videoSrcToken(videoSrcToken)
+    m_videoSrcToken(videoSrcToken),
+    m_timeouts(timeouts)
 {
     m_ranges->ImagingOptions = 0;
     m_values->ImagingSettings = 0;
 }
 
-QnOnvifImagingProxy::~QnOnvifImagingProxy() {
+QnOnvifImagingProxy::~QnOnvifImagingProxy()
+{
     m_supportedOperations.clear();
 
     delete m_values;
@@ -207,7 +212,8 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
 }
 
-bool QnOnvifImagingProxy::makeSetRequest() {
+bool QnOnvifImagingProxy::makeSetRequest()
+{
     QString endpoint = getImagingUrl();
     if (endpoint.isEmpty()) {
         return false;
@@ -216,7 +222,7 @@ bool QnOnvifImagingProxy::makeSetRequest() {
     QString login = getLogin();
     QString passwd = getPassword();
 
-    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login, passwd, getTimeDrift());
+    ImagingSoapWrapper soapWrapper(m_timeouts, endpoint.toStdString(), login, passwd, getTimeDrift());
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
     NX_ASSERT(m_values);

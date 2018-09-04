@@ -143,14 +143,19 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
 
 bool VMaxStreamFetcher::vmaxConnect()
 {
+    auto vmaxResource = dynamic_cast<QnPlVmax480Resource*>(m_res);
+    QnVMax480Server* vmax480Server =
+        vmaxResource->serverModule()->findInstance<QnVMax480Server>();
+
+
     vmaxDisconnect();
 
     QStringList args;
-    int port = QnVMax480Server::instance()->getPort();
+    int port = vmax480Server->getPort();
     if (port == -1)
         return false;
     args << QString::number(port);
-    m_tcpID = QnVMax480Server::instance()->registerProvider(this);
+    m_tcpID = vmax480Server->registerProvider(this);
     args << m_tcpID;
     m_vMaxProxy = new QProcess();
 
@@ -181,7 +186,7 @@ bool VMaxStreamFetcher::vmaxConnect()
 
     delete m_vMaxProxy;
     m_vMaxProxy = 0;
-    QnVMax480Server::instance()->unregisterProvider(this);
+    vmax480Server->unregisterProvider(this);
     return false;
 }
 
@@ -200,7 +205,10 @@ void VMaxStreamFetcher::vmaxDisconnect()
         delete m_vMaxProxy;
         m_vMaxProxy = 0;
     }
-    QnVMax480Server::instance()->unregisterProvider(this);
+
+    auto vmaxResource = dynamic_cast<QnPlVmax480Resource*>(m_res);
+    auto vmax480Server = vmaxResource->serverModule()->instance<QnVMax480Server>();
+    vmax480Server->unregisterProvider(this);
     m_lastSeekPos = AV_NOPTS_VALUE;
     m_eofReached = false;
 }

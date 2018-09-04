@@ -6,6 +6,7 @@
 #include <utils/merge_systems_common.h>
 
 #include <nx/vms/api/data_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 struct MergeSystemData;
 
@@ -13,12 +14,13 @@ namespace ec2 { class AbstractTransactionMessageBus; }
 
 class QnCommonModule;
 
-class QnMergeSystemsRestHandler: public QnJsonRestHandler
+class QnMergeSystemsRestHandler:
+    public QnJsonRestHandler, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    QnMergeSystemsRestHandler(ec2::AbstractTransactionMessageBus* messageBus);
+    QnMergeSystemsRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
         const QString &path,

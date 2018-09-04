@@ -38,12 +38,13 @@ static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
 } // namespace
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
-    QnResourceDiscoveryManager(commonModule)
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule):
+    QnResourceDiscoveryManager(serverModule->commonModule())
 {
-    connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
-        qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = qnServerModule->settings().redundancyTimeout() * 1000;
+    connect(
+        this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
+        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
+    m_serverOfflineTimeout = serverModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
 }
@@ -408,7 +409,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
-                } else 
+                } else
                 {
                     NX_VERBOSE(this,
                         lm("Mark resource %1 as offline because it doesn't response to discovery any more.").arg(NetResString(camRes)));

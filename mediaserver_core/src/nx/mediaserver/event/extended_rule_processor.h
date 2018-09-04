@@ -5,6 +5,8 @@
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/email/email_manager_impl.h>
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace mediaserver {
 namespace event {
@@ -19,7 +21,7 @@ class ExtendedRuleProcessor: public RuleProcessor
     using base_type = RuleProcessor;
 
 public:
-    ExtendedRuleProcessor(QnCommonModule* commonModule);
+    ExtendedRuleProcessor(QnMediaServerModule* serverModule);
     virtual ~ExtendedRuleProcessor();
 
     virtual QnUuid getGuid() const override;

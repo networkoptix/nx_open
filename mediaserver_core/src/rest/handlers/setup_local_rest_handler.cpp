@@ -19,6 +19,12 @@
 #include "rest/server/rest_connection_processor.h"
 #include "rest/helpers/permissions_helper.h"
 #include "system_settings_handler.h"
+#include <media_server/media_server_module.h>
+
+QnSetupLocalSystemRestHandler::QnSetupLocalSystemRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
 
 int QnSetupLocalSystemRestHandler::executeGet(
     const QString& /*path*/,
@@ -45,7 +51,7 @@ int QnSetupLocalSystemRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult& result)
 {
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
@@ -65,7 +71,7 @@ int QnSetupLocalSystemRestHandler::execute(
 
     if (auto admin = setupSystemProcessor.getModifiedLocalAdmin())
     {
-        HostSystemPasswordSynchronizer::instance()->
+        serverModule()->hostSystemPasswordSynchronizer()->
             syncLocalHostRootPasswordWithAdminIfNeeded(admin);
     }
 

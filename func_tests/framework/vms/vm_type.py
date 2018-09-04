@@ -2,11 +2,11 @@ import logging
 from contextlib import contextmanager
 from functools import partial
 
-from framework.switched_logging import with_logger
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
+from framework.switched_logging import with_logger
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_true

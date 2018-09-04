@@ -3,6 +3,7 @@ import datetime
 import logging
 import re
 
+import six
 import yaml
 from pathlib2 import Path
 
@@ -147,7 +148,7 @@ class SingleTestConfig(object):
 
     @staticmethod
     def _cast_value(value, t):
-        if not isinstance(value, (str, unicode)):
+        if not isinstance(value, six.string_types):
             return value
         if t is int:
             return int(value)

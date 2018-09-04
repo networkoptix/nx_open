@@ -2,11 +2,13 @@
 
 #include <common/common_module.h>
 #include <api/global_settings.h>
+#include <api/runtime_info_manager.h>
 #include <nx/network/http/custom_headers.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace nx {
 namespace p2p {
@@ -27,6 +29,30 @@ Connection::Connection(QnCommonModule* commonModule,
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(localPeer).toBase64());
+    headers.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME, localPeer.instanceId.toByteArray());
+
+    addAdditionalRequestHeaders(std::move(headers));
+
+    const auto& localInfo = commonModule->runtimeInfoManager()->localInfo();
+
+    std::vector<std::pair<QString, QString>> queryParams;
+    if (!localInfo.data.videoWallInstanceGuid.isNull())
+    {
+        queryParams.push_back({
+            "videoWallInstanceGuid",
+            localInfo.data.videoWallInstanceGuid.toSimpleString()});
+    }
+
+    if (!localInfo.data.videoWallControlSession.isNull())
+    {
+        queryParams.push_back({
+            "videoWallControlSession",
+            localInfo.data.videoWallControlSession.toSimpleString()});
+    }
+
+    addRequestQueryParams(std::move(queryParams));
 }
 
 Connection::Connection(
@@ -34,6 +60,7 @@ Connection::Connection(
     const vms::api::PeerDataEx& remotePeer,
     const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::unique_ptr<QObject> opaqueObject,
     ConnectionLockGuard connectionLockGuard)
@@ -42,10 +69,18 @@ Connection::Connection(
         remotePeer,
         localPeer,
         std::move(webSocket),
+        requestUrlQuery,
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
     QnCommonModuleAware(commonModule)
 {
+    commonModule->metrics()->connections().p2p()++;
+}
+
+Connection::~Connection()
+{
+    if (m_direction == Direction::incoming)
+        commonModule()->metrics()->connections().p2p()--;
 }
 
 void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey)

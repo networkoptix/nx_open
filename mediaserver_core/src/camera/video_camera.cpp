@@ -26,6 +26,8 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 
+class QnDataProviderFactory;
+
 using nx::api::ImageRequest;
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -453,9 +455,11 @@ void QnVideoCameraGopKeeper::clearVideoData()
 
 QnVideoCamera::QnVideoCamera(
     const nx::mediaserver::Settings& settings,
+    QnDataProviderFactory* dataProviderFactory,
     const QnResourcePtr& resource)
     :
     m_settings(settings),
+    m_dataProviderFactory(dataProviderFactory),
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
@@ -551,7 +555,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         QnAbstractStreamDataProvider* dataProvider = NULL;
         if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
-            dataProvider = qnServerModule->dataProviderFactory()->createDataProvider(m_resource, role);
+            dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
 
         if ( dataProvider )
         {

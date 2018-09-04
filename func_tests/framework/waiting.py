@@ -2,7 +2,9 @@ import logging
 import time
 import timeit
 
-_logger = logging.getLogger(__name__)
+from .switched_logging import SwitchedLogger
+
+_logger = SwitchedLogger(__name__, 'wait')
 
 
 class Wait(object):
@@ -16,8 +18,8 @@ class Wait(object):
         self._attempts_made = 0
         self.delay_sec = 0.5
         self._logger = logger or _logger
-        self._logger.debug(
-            "Start waiting until %s: %.1f sec, %d attempts.",
+        self._logger.info(
+            "Waiting until %s: %.1f sec, %d attempts.",
             self._until, self._timeout_sec, self._attempts_limit)
 
     def again(self):
@@ -25,7 +27,7 @@ class Wait(object):
         since_start_sec = timeit.default_timer() - self._started_at
         if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
             self._logger.warning(
-                "Stop waiting until %s: %g/%g sec, %d/%d attempts.",
+                "Timed out waiting until %s: %g/%g sec, %d/%d attempts.",
                 self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
             return False
         since_last_checked_sec = now - self._last_checked_at
@@ -74,7 +76,7 @@ def _description_from_func(func):
         return func.__name__
     if object_bound_to is None:
         raise ValueError("Cannot make description from unbound method")
-    return '{func.__self__!r}.{func.__name__!s}'.format(func=func)
+    return '{func.__self__!s}.{func.__name__!s}'.format(func=func)
 
 
 def wait_for_true(bool_func, description=None, timeout_sec=30, logger=None):

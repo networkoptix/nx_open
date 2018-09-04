@@ -4,6 +4,7 @@
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
 #include <nx/utils/timer_manager.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnFfmpegTranscoder;
 
@@ -18,7 +19,9 @@ public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     QnProgressiveDownloadingConsumer(
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+        QnMediaServerModule* serverModule,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+        QnTcpListener* owner);
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();

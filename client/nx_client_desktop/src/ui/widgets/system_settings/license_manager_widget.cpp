@@ -609,8 +609,7 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) c
     // TODO: add more checks according to specs
     const auto errorCode = m_validator->validate(license);
     const bool activeLicense = errorCode == QnLicenseErrorCode::NoError; // Only active licenses
-    const bool acceptedLicenseType = license->type() != Qn::LC_Edge
-        && license->type() != Qn::LC_Trial;
+    const bool acceptedLicenseType = license->type() != Qn::LC_Trial;
 
     const auto serverId = m_validator->serverId(license);
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);

@@ -10,7 +10,7 @@ from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
 
 from framework.method_caching import cached_getter
-from framework.os_access.exceptions import AlreadyExists, BadParent, DoesNotExist, NotADir, NotAFile
+from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
 from framework.waiting import Wait
 
@@ -152,7 +152,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         return True
 
     @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
-    @_reraising_on_operation_failure({_STATUS_FILE_IS_A_DIRECTORY: NotAFile})
+    @_reraising_on_operation_failure({_STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile})
     def unlink(self):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
@@ -163,9 +163,9 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         return self
 
     @_reraising_on_operation_failure({
-        _STATUS_NOT_A_DIRECTORY: NotADir,
-        _STATUS_OBJECT_NAME_NOT_FOUND: DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
+        _STATUS_NOT_A_DIRECTORY: exceptions.NotADir,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
         })
     def _glob(self, pattern):
         try:
@@ -197,7 +197,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         if self.parent == self:
             assert self == self.__class__(self.anchor)  # I.e. disk root, e.g. C:\.
             if not exist_ok:
-                raise AlreadyExists(repr(self))
+                raise exceptions.AlreadyExists(repr(self))
         else:
             try:
                 _logger.debug("Create directory %s on %s", self._relative_path, self._service_name)
@@ -207,32 +207,32 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 # See: https://msdn.microsoft.com/en-us/library/cc704588.aspx
                 if last_message_status == _STATUS_OBJECT_NAME_COLLISION:
                     if not exist_ok:
-                        raise AlreadyExists(repr(self))
+                        raise exceptions.AlreadyExists(repr(self))
                 elif last_message_status == _STATUS_OBJECT_NAME_NOT_FOUND:
                     if parents:
                         self.parent.mkdir(parents=False, exist_ok=True)
                         self.mkdir(parents=False, exist_ok=False)
                     else:
-                        raise BadParent("Parent {0.parent} of {0} doesn't exist.".format(self))
+                        raise exceptions.BadParent("Parent {0.parent} of {0} doesn't exist.".format(self))
                 elif last_message_status == _STATUS_OBJECT_PATH_NOT_FOUND:
                     if parents:
                         self.parent.parent.mkdir(parents=True, exist_ok=True)
                         self.parent.mkdir(parents=False, exist_ok=False)
                         self.mkdir(parents=False, exist_ok=False)
                     else:
-                        raise BadParent("Grandparent {0.parent.parent} of {0} doesn't exist.".format(self))
+                        raise exceptions.BadParent("Grandparent {0.parent.parent} of {0} doesn't exist.".format(self))
                 else:
                     raise
 
     def rmtree(self, ignore_errors=False):
         try:
             iter_entries = self.glob('*')
-        except DoesNotExist:
+        except exceptions.DoesNotExist:
             if ignore_errors:
                 pass
             else:
                 raise
-        except NotADir:
+        except exceptions.NotADir:
             self.unlink()
         else:
             for entry in iter_entries:
@@ -240,9 +240,9 @@ class SMBPath(FileSystemPath, PureWindowsPath):
             self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
 
     @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
-        _STATUS_OBJECT_NAME_NOT_FOUND: DoesNotExist,
-        _STATUS_OBJECT_PATH_NOT_FOUND: DoesNotExist,
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
         })
     def read_bytes(self, offset=0, max_length=-1):
         # TODO: Speedup. Speed is ~1.4 MB/sec. Full dumps are ~300 MB.
@@ -258,8 +258,8 @@ class SMBPath(FileSystemPath, PureWindowsPath):
 
     @_retrying_on_status(_STATUS_DELETE_PENDING)
     @_reraising_on_operation_failure({
-        _STATUS_FILE_IS_A_DIRECTORY: NotAFile,
-        _STATUS_OBJECT_PATH_NOT_FOUND: BadParent})
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.BadParent})
     def write_bytes(self, data, offset=None):
         ad_hoc_file_object = BytesIO(data)
         if offset is None:

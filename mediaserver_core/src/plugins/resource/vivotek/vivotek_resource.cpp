@@ -31,7 +31,7 @@ const QString kStreamCodecParameterTemplate = lit("videoin_c%1_s%2_codectype");
 
 const std::chrono::milliseconds kHttpTimeout(5000);
 
-using StreamCodecCapabilityUnderlyingType = 
+using StreamCodecCapabilityUnderlyingType =
     std::underlying_type<VivotekResource::StreamCodecCapability>::type;
 
 } // namespace
@@ -39,6 +39,11 @@ using StreamCodecCapabilityUnderlyingType =
 QString VivotekResource::defaultCodec() const
 {
     return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H265);
+}
+
+VivotekResource::VivotekResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
+{
 }
 
 CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesResp& onvifCapabilities)
@@ -82,17 +87,20 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     return result;
 }
 
-CameraDiagnostics::Result VivotekResource::customStreamConfiguration(Qn::ConnectionRole role)
+CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
+    Qn::ConnectionRole role,
+    const QnLiveStreamParams& params)
 {
     bool success = true;
-    if (streamSupportsHevc(role))
+    const bool isHevcCodec = params.codec.compare(kHevcCodecString, Qt::CaseInsensitive) == 0;
+    if (isHevcCodec && streamSupportsHevc(role))
         success = setHevcForStream(role);
 
     if (!success)
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("Set HEVC for stream %1")
-                .arg(role == Qn::ConnectionRole::CR_LiveVideo 
+                .arg(role == Qn::ConnectionRole::CR_LiveVideo
                     ? lit("primary")
                     : lit("secondary")),
             lit("Request failed."));
@@ -264,6 +272,31 @@ bool VivotekResource::setVivotekParameter(
         return false;
 
     return true;
+}
+
+nx::mediaserver::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    QnMutexLocker lock(&m_mutex);
+    using namespace nx::mediaserver::resource;
+
+    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QSet<QPair<int,int>> resolutions;
+    for (const auto key: onvifResult.keys())
+        resolutions.insert(QPair<int, int>(key.resolution.width(), key.resolution.height()));
+
+    nx::mediaserver::resource::StreamCapabilityMap result = onvifResult;
+    if (m_hasHevcSupport && m_hasHevcSupport.get())
+    {
+        for (const auto& resolution: resolutions)
+        {
+            StreamCapabilityKey key;
+            key.codec = kHevcCodecString.toUpper();
+            key.resolution = QSize(resolution.first, resolution.second);
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
 }
 
 } // namespace plugins

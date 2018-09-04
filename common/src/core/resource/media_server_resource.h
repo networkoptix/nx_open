@@ -59,6 +59,7 @@ public:
     boost::optional<nx::network::SocketAddress> getCloudAddress() const;
 
     virtual QString getUrl() const override;
+    QString rtspUrl() const;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
@@ -124,6 +125,7 @@ public:
     QString realm() const;
 
     static bool isEdgeServer(const QnResourcePtr &resource);
+    static bool isArmServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
     virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;

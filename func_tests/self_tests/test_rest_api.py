@@ -56,4 +56,3 @@ def test_timeout(service_ports):
         api = GenericMediaserverApi.new('not a server', '127.0.0.1', server.port)
         exception_info = pytest.raises(MediaserverApiRequestError, api.get, '', timeout=1)
         _logger.info(exception_info)
-

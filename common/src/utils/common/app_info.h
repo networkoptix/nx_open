@@ -71,6 +71,7 @@ public:
     static Q_INVOKABLE bool isAndroid();
     static Q_INVOKABLE bool isIos();
     static Q_INVOKABLE bool isMobile();
+    static Q_INVOKABLE bool isWindows();
 
     static Q_INVOKABLE nx::vms::api::SystemInformation currentSystemInformation();
 };

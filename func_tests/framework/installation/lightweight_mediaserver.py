@@ -5,15 +5,21 @@ represented as one unit test from appserver2_ut -- P2pMessageBusTest.FullConnect
 Libraries required by this binary are taken from mediaserver distribution, *-server-*.deb.
 """
 
+import logging
+
 from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
-from .mediaserver import MEDIASERVER_START_TIMEOUT, BaseMediaserver
+from .mediaserver import BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
+from ..switched_logging import with_logger
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_true
+
+_logger = logging.getLogger(__name__)
+
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -145,6 +151,9 @@ class LwServer(object):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
+@with_logger(_logger, 'framework.waiting')
+@with_logger(_logger, 'framework.http_api')
+@with_logger(_logger, 'framework.mediaserver_api')
 class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
@@ -158,9 +167,12 @@ class LwMultiServer(BaseMediaserver):
         self._server_count = installation.server_count
         self.service = installation.service
 
-    def __repr__(self):
-        return '<LwMultiServer at {}:{} {} (#{})>'.format(
+    def __str__(self):
+        return 'LwMultiServer at {}:{} {} ({} instances)'.format(
             self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
+
+    def __repr__(self):
+        return '<{!s}>'.format(self)
 
     def is_online(self):
         return self[0].api.is_online()
@@ -179,20 +191,9 @@ class LwMultiServer(BaseMediaserver):
     def servers(self):
         return [self[index] for index in range(self._server_count)]
 
-    def start(self, already_started_ok=False):
-        if self.service.is_running():
-            if not already_started_ok:
-                raise Exception("Already started")
-        else:
-            self.service.start()
-            wait_for_true(
-                self[0].api.is_online,
-                description='{} is started'.format(self),
-                timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
-
     def wait_until_synced(self, timeout_sec):
         wait_for_true(
-            self._is_synced, "Waiting for lightweight servers to merge between themselves", timeout_sec)
+            self._is_synced, "%s instances to merge between themselves" % self, timeout_sec)
 
     def _is_synced(self):
         response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)

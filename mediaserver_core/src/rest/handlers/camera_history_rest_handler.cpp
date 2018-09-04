@@ -72,6 +72,11 @@ LoadDataContext* getContext(const QnUuid& id)
 
 } // namespace
 
+QnCameraHistoryRestHandler::QnCameraHistoryRestHandler(QnMediaServerModule * serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 nx::vms::api::CameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(
     const MultiServerPeriodDataList& chunks)
 {
@@ -131,7 +136,8 @@ int QnCameraHistoryRestHandler::executeGet(
             updatedRequest.endTimeMs = DATETIME_NOW;
             updatedRequest.resList.clear();
             updatedRequest.resList.push_back(camera);
-            MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
+            QnMultiserverChunksRestHandler chunksLoader(serverModule());
+            MultiServerPeriodDataList chunks = chunksLoader.loadDataSync(updatedRequest, owner);
             outputRecord.items = buildHistoryData(chunks);
             if (owner->cameraHistoryPool()->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
                 context->timer.restart();

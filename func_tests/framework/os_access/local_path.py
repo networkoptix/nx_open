@@ -5,7 +5,7 @@ from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotADir, NotAFile
+from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
 
 
@@ -28,19 +28,19 @@ def _reraising(raised_errors_cls_map):
 
 
 _reraising_new_file_errors = _reraising({
-    ENOENT: BadParent,
-    ENOTDIR: BadParent,
-    EEXIST: AlreadyExists,
-    EISDIR: NotAFile,
+    ENOENT: exceptions.BadParent,
+    ENOTDIR: exceptions.BadParent,
+    EEXIST: exceptions.AlreadyExists,
+    EISDIR: exceptions.NotAFile,
     })
 _reraising_existing_file_errors = _reraising({
-    ENOENT: DoesNotExist,
-    EISDIR: NotAFile,
+    ENOENT: exceptions.DoesNotExist,
+    EISDIR: exceptions.NotAFile,
     })
 _reraising_existing_dir_errors = _reraising({
-    ENOENT: DoesNotExist,
-    EEXIST: AlreadyExists,
-    EISDIR: DirIsAFile,
+    ENOENT: exceptions.DoesNotExist,
+    EEXIST: exceptions.AlreadyExists,
+    EISDIR: exceptions.DirIsAFile,
     })
 
 
@@ -67,9 +67,9 @@ class LocalPath(PosixPath, FileSystemPath):
 
     def glob(self, pattern):
         if not self.exists():
-            raise DoesNotExist(self)
+            raise exceptions.DoesNotExist(self)
         if not self.is_dir():
-            raise NotADir(self)
+            raise exceptions.NotADir(self)
         return super(LocalPath, self).glob(pattern)
 
     @_reraising_existing_dir_errors

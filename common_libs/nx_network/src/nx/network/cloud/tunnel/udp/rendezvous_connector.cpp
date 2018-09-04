@@ -10,7 +10,7 @@ namespace cloud {
 namespace udp {
 
 RendezvousConnector::RendezvousConnector(
-    nx::String connectSessionId,
+    std::string connectSessionId,
     SocketAddress remotePeerAddress,
     std::unique_ptr<nx::network::UDPSocket> udpSocket)
 :
@@ -21,7 +21,7 @@ RendezvousConnector::RendezvousConnector(
 }
 
 RendezvousConnector::RendezvousConnector(
-    nx::String connectSessionId,
+    std::string connectSessionId,
     SocketAddress remotePeerAddress,
     SocketAddress localAddressToBindTo)
 :
@@ -102,7 +102,7 @@ std::unique_ptr<nx::network::UdtStreamSocket> RendezvousConnector::takeConnectio
     return std::move(m_udtConnection);
 }
 
-const nx::String& RendezvousConnector::connectSessionId() const
+const std::string& RendezvousConnector::connectSessionId() const
 {
     return m_connectSessionId;
 }

@@ -110,7 +110,6 @@ private:
     void fetchEndpoint();
     void initializeUrlFetcher();
     void connectToMediatorAsync();
-    void saveMediatorEndpoint();
     void reconnectToMediator();
 };
 

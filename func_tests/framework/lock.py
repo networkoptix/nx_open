@@ -7,7 +7,7 @@ import portalocker
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.local_path import LocalPath
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.posix_shell import Shell
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class Lock(object):
 
 class PosixShellFileLock(Lock):
     def __init__(self, shell, path):
-        self._shell = shell  # type: PosixShell
+        self._shell = shell  # type: Shell
         self._path = path  # type: LocalPath
 
     def __repr__(self):

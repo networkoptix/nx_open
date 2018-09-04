@@ -1,7 +1,6 @@
 import base64
 import hashlib
 import json
-import logging
 from abc import ABCMeta, abstractmethod
 from pprint import pformat
 
@@ -9,18 +8,13 @@ import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
+from .switched_logging import SwitchedLogger
+
+_logger = SwitchedLogger(__name__, 'http')
+
+
 STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
-
-_logger = logging.getLogger(__name__)
-
-
-def _to_get_param(python_value):
-    if isinstance(python_value, bool):
-        return 'true' if python_value else 'false'
-    if isinstance(python_value, (int, float, str, bytes, unicode)):
-        return str(python_value)
-    assert False, "Cannot use %r of type %s as GET parameter." % (python_value, type(python_value).__name__)
 
 
 class HttpError(Exception):
@@ -95,11 +89,17 @@ class HttpApi(object):
         return {}
 
     def get(self, path, params=None, **kwargs):
-        _logger.debug('GET params:\n%s', pformat(params, indent=4))
+        params_str = pformat(params, indent=4)
+        if '\n' in params_str or len(params_str) > 60:
+            params_str = '\n' + params_str
+        _logger.debug('GET %s, params: %s', self.http.url(path), params_str)
         assert 'data' not in kwargs
         assert 'json' not in kwargs
         return self.request('GET', path, params=params, **kwargs)
 
     def post(self, path, data, **kwargs):
-        _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
+        data_str = json.dumps(data)
+        if len(data_str) > 60:
+            data_str = '\n' + json.dumps(data, indent=4)
+        _logger.debug('POST %s, payload: %s', self.http.url(path), data_str)
         return self.request('POST', path, json=data, **kwargs)

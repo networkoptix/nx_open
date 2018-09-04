@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>Ustawienia ekranu...</translation>
     </message>
   </context>
   <context>
@@ -990,15 +990,15 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Wybierz układ...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n układ</numerusform>
+        <numerusform>%n układy</numerusform>
+        <numerusform>%n układów</numerusform>
+        <numerusform>%n układów</numerusform>
       </translation>
     </message>
   </context>
@@ -1068,29 +1068,29 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Wybierz urządzenie...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Wybierz kamerę...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Wybierz układ...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n układ</numerusform>
+        <numerusform>%n układy</numerusform>
+        <numerusform>%n układów</numerusform>
+        <numerusform>%n układów</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 na %2</translation>
     </message>
   </context>
   <context>
@@ -3709,11 +3709,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>Nieprawidłowy obraz wejściowy.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Błąd wewnętrzny.</translation>
     </message>
   </context>
   <context>
@@ -3727,11 +3727,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>Ta kamera aktualnie nie znajduje się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamera zostanie dodana.</numerusform>
+        <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
+        <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
+        <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
       </translation>
     </message>
   </context>
@@ -4977,7 +4977,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Obrót</translation>
     </message>
   </context>
   <context>
@@ -8059,6 +8059,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 obejmuje okres, z którego nagranie jest w trakcie przesyłania.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation>Za mało przestrzeni dyskowej na serwerze</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8358,7 +8362,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Brak drugiego strumienia</translation>
     </message>
   </context>
   <context>
@@ -8555,7 +8559,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Numer własny, który można przypisać do układu w celu szybkiej identyfikacji i dostępu</translation>
     </message>
   </context>
   <context>
@@ -8566,7 +8570,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Tło</translation>
     </message>
   </context>
   <context>
@@ -9215,16 +9219,20 @@ to %1</source>
       <translation>Kamery przenośne nie mogą być przełączane między serwerami</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Uwaga! Ta wersja służy wyłącznie do testowania! Proszę zaktualizować oprogramowanie do następnej wersji, gdy tylko zostanie ona udostępniona.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>Nie udało się zmienić hasła</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Nie udało się zmienić hasła w %1 z %2 kamer</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation>Ostrzeżenie! Ta wersja służy wyłącznie do testowania!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation>Proszę zaktualizować oprogramowanie nową poprawką lub wersją, kiedy tylko będzie to możliwe.</translation>
     </message>
   </context>
   <context>

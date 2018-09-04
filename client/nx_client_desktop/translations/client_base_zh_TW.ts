@@ -894,7 +894,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation type="unfinished">Screen Settings...</translation>
+      <translation>螢幕設定</translation>
     </message>
   </context>
   <context>
@@ -991,12 +991,12 @@ to view more bookmarks</source>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>選擇佈局</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
       </translation>
     </message>
   </context>
@@ -1066,26 +1066,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>選擇裝置...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>選擇攝影機...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>選擇佈局</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>在 %2 顯示 %1</translation>
     </message>
   </context>
   <context>
@@ -3594,11 +3594,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation type="unfinished">Invalid input image.</translation>
+      <translation>圖片有誤。</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>內部錯誤.</translation>
     </message>
   </context>
   <context>
@@ -3612,8 +3612,8 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      <translation>
+        <numerusform>此攝影機現在不在選定的佈局上。請在觸發警報前加入攝影機，否則警報將無法作用。</numerusform>
       </translation>
     </message>
   </context>
@@ -4808,7 +4808,7 @@ to %1</source>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>旋轉</translation>
     </message>
   </context>
   <context>
@@ -7776,6 +7776,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 包含了正在上傳的影像</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8018,7 +8022,7 @@ to %1</source>
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>無次串流</translation>
     </message>
   </context>
   <context>
@@ -8215,7 +8219,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>請分配自訂編號給佈局，以便快速識別和連結</translation>
     </message>
   </context>
   <context>
@@ -8226,7 +8230,7 @@ to %1</source>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>背景</translation>
     </message>
   </context>
   <context>
@@ -8851,16 +8855,20 @@ to %1</source>
       <translation>穿戴式攝影機無法跨伺服器移動</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>警告！此版本僅用於測試目的! 請升級到下一版更新程式或正式版</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>變更密碼失敗</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

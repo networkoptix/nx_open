@@ -1,6 +1,9 @@
 #pragma once
 
+#include <rest/request_type_wrappers.h>
+
 #include <transaction/transaction.h>
+
 #include <nx_ec/managers/abstract_camera_manager.h>
 
 namespace ec2 {
@@ -86,10 +89,10 @@ int QnCameraManager<QueryProcessorType>::getCamerasEx(impl::GetCamerasExHandlerP
         {
             handler->done(reqID, errorCode, cameras);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnCameraDataExQuery,
         nx::vms::api::CameraDataExList, decltype(queryDoneHandler)>(
         ApiCommand::getCamerasEx,
-        QnUuid(),
+        QnCameraDataExQuery(),
         queryDoneHandler);
     return reqID;
 }

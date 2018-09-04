@@ -1,12 +1,11 @@
 import logging
-import time
-from multiprocessing import Process, Condition
+from multiprocessing import Condition, Process
 from threading import Thread, current_thread
 from time import sleep
 
 import pytest
 
-from framework.lock import AlreadyAcquired, PosixShellFileLock, PortalockerLock
+from framework.lock import AlreadyAcquired, PortalockerLock, PosixShellFileLock
 from framework.os_access.local_shell import local_shell
 
 _logger = logging.getLogger(__name__)

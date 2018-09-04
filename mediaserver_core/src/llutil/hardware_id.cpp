@@ -16,6 +16,9 @@
 
 #include <nx/utils/log/log.h>
 #include "licensing/hardware_info.h"
+#include <media_server/media_server_module.h>
+
+class QnMediaServerModule;
 
 namespace
 {
@@ -30,7 +33,9 @@ namespace
 
 namespace LLUtil {
 
-    void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
+    void fillHardwareIds(
+        QnMediaServerModule* serverModule,
+        HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
     void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version)
     {
@@ -118,11 +123,11 @@ namespace LLUtil {
         return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
     }
 
-    void initHardwareId(QSettings* settings)
+    void initHardwareId(QnMediaServerModule* serverModule)
     {
         if (g_hardwareIdInitialized)
             return;
-
+        auto settings = serverModule->roSettings();
         try
         {
             // Add old hardware id first
@@ -134,7 +139,7 @@ namespace LLUtil {
             macHardwareIds << MacAndItsHardwareIds(kEmptyMac, oldHardwareIds);
             g_hardwareId << macHardwareIds;
 
-            fillHardwareIds(g_hardwareId, g_hardwareInfo);
+            fillHardwareIds(serverModule, g_hardwareId, g_hardwareInfo);
             NX_ASSERT(g_hardwareId.size() == LATEST_HWID_VERSION + 1);
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);

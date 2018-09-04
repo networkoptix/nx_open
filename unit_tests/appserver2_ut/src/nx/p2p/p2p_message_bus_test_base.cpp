@@ -311,6 +311,21 @@ void P2pMessageBusTestBase::waitForSync(int cameraCount)
     NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
 }
 
+void P2pMessageBusTestBase::setLowDelayIntervals()
+{
+    for (const auto& server: m_servers)
+    {
+        auto commonModule = server->moduleInstance()->commonModule();
+        const auto connection = server->moduleInstance()->ecConnection();
+        MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
+        auto intervals = bus->delayIntervals();
+        intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
+        intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+        intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
+        bus->setDelayIntervals(intervals);
+    }
+}
+
 } // namespace test
 } // namespace p2p
 } // namespace nx

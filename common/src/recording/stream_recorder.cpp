@@ -970,7 +970,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             {
                 // transcode audio
                 m_audioTranscoder = new QnFfmpegAudioTranscoder(m_dstAudioCodec);
-                m_audioTranscoder->open(mediaContext);
+                if (!m_audioTranscoder->open(mediaContext))
+                {
+                    m_lastError = StreamRecorderErrorStruct(StreamRecorderError::invalidAudioCodec,
+                        context.storage);
+                    NX_ERROR(this, "Failed to open audio transcoder, error %1",
+                        m_audioTranscoder->getLastError());
+                    return false;
+                }
                 QnFfmpegHelper::copyAvCodecContex(audioStream->codec, m_audioTranscoder->getCodecContext());
             }
             audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;

@@ -130,7 +130,7 @@ def test_secondary_server_temporary_inet_on(two_mediaservers):
     primary, secondary = two_mediaservers
     primary.api.generic.post('ec2/forcePrimaryTimeServer', dict())
     secondary.os_access.networking.enable_internet()
-    
+
     wait_for_true(
         lambda: secondary.api.get_time().is_close_to(get_internet_time()),
         "time on NON-PRIMARY {} aligns with INTERNET {} while internet is enabled".format(

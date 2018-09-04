@@ -19,13 +19,15 @@ class RendezvousConnectorWithVerification:
 {
 public:
     RendezvousConnectorWithVerification(
-        nx::String connectSessionId,
+        std::string connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
+
     RendezvousConnectorWithVerification(
-        nx::String connectSessionId,
+        std::string connectSessionId,
         SocketAddress remotePeerAddress,
         SocketAddress localAddressToBindTo);
+
     virtual ~RendezvousConnectorWithVerification();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;

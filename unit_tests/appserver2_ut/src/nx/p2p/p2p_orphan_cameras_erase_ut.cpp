@@ -71,6 +71,7 @@ public:
     void givenThreeSyncronizedServersAndTwoCamerasOnServer0()
     {
         startServers(3);
+        setLowDelayIntervals();
 
         //here we change default OrphanCameraWatcher update interval to 1 second
         for (size_t i = 0; i < 3; ++i)

@@ -525,7 +525,7 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(CODE_OK),
+    m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
@@ -739,7 +739,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = CODE_OK;
+    m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;

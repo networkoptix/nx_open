@@ -27,7 +27,6 @@
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <media_server/media_server_module.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
@@ -269,15 +268,22 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString fileName = closeDirPath(qnServerModule->settings().eventsDBFilePath())
+}
+
+bool QnServerDb::open()
+{
+    const QString eventsDBFilePath = serverModule()->settings().eventsDBFilePath();
+    const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
+
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
     {
@@ -289,13 +295,22 @@ QnServerDb::QnServerDb(QnCommonModule* commonModule):
     else
     {
         qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
+        return false;
     }
 
     if (!execSQLScript("vacuum;", m_sdb))
+    {
         qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
+        return false;
+    }
 
     if (!tuneDBAfterOpen(&m_sdb))
+    {
         qWarning() << "failed to turn on journal mode for mserver database" << Q_FUNC_INFO;
+        return false;
+    }
+
+    return true;
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
@@ -523,7 +538,7 @@ bool QnServerDb::cleanupEvents()
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->eventLogPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->eventLogPeriodDays() * 3600 * 24;
 
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
@@ -703,7 +718,7 @@ bool QnServerDb::cleanupAuditLog()
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = currentTime / 1000000ll - qnGlobalSettings->auditTrailPeriodDays() * 3600 * 24;
+        int utc = currentTime / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }
@@ -926,6 +941,7 @@ vms::event::ActionDataList QnServerDb::getActions(
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionData.eventParams.eventTimestampUsec / 1000))
                 {
                     actionData.flags |= vms::event::ActionData::VideoLinkExists;
@@ -993,6 +1009,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(
+                    serverModule(),
                     camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt() * 1000ll))
                 {
                     flags |= vms::event::ActionData::VideoLinkExists;
@@ -1106,9 +1123,9 @@ bool QnServerDb::getBookmarks(
             return false;
 
         QnCameraBookmark::sortBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks[1],
-            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
 
         // Bookmarks between start end end time
         bool needSecondRequest = true;
@@ -1123,9 +1140,9 @@ bool QnServerDb::getBookmarks(
             return false;
 
         result = QnCameraBookmark::mergeCameraBookmarks(
-            commonModule(),
+            serverModule()->commonModule(),
             bookmarks,
-            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
     }
     else
     {
@@ -1133,7 +1150,7 @@ bool QnServerDb::getBookmarks(
             return false;
     }
 
-    QnCameraBookmark::sortBookmarks(commonModule(), result, filter.orderBy);
+    QnCameraBookmark::sortBookmarks(serverModule()->commonModule(), result, filter.orderBy);
     return true;
 
 }
@@ -1216,7 +1233,7 @@ bool QnServerDb::getBookmarksInternal(
     }
 
     QString queryStr = queryTemplate
-        .arg(filterText).arg(filter.orderBy.order == Qt::AscendingOrder ? "ASC" : "DESC");
+        .arg(filterText, QString(filter.orderBy.order == Qt::AscendingOrder ? "ASC" : "DESC"));
 
     if (filter.limit != QnCameraBookmarkSearchFilter::kNoLimit)
         queryStr += lit(" LIMIT %1").arg(filter.limit);
@@ -1328,8 +1345,9 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
     QnDbTransactionLocker tran(getTransaction());
 
     int docId = 0;
+    if (isUpdate)
     {
-        QSqlQuery insQuery(m_sdb);
+        QSqlQuery updQuery(m_sdb);
 
         static const auto kUpdateQueryText =
             R"(
@@ -1344,6 +1362,21 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
                     timeout = :timeout
                 WHERE guid = :guid)";
 
+        updQuery.prepare(kUpdateQueryText);
+        QnSql::bind(bookmark, &updQuery);
+        if (!execSQLQuery(&updQuery, Q_FUNC_INFO))
+            return false;
+        QSqlQuery getRowIdQuery(m_sdb);
+        getRowIdQuery.prepare("SELECT rowid from bookmarks WHERE guid = :guid");
+        getRowIdQuery.addBindValue(QnSql::serialized_field(bookmark.guid));
+        if (!execSQLQuery(&getRowIdQuery, Q_FUNC_INFO))
+            return false;
+        getRowIdQuery.next();
+        docId = getRowIdQuery.value(0).toInt();
+    }
+    else
+    {
+        QSqlQuery insQuery(m_sdb);
         static const auto kAddQueryText =
             R"(
                 INSERT
@@ -1354,8 +1387,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
                     :creatorId, :creationTimeStampMs)
             )";
 
-        insQuery.prepare(isUpdate ? kUpdateQueryText : kAddQueryText);
-
+        insQuery.prepare(kAddQueryText);
         QnSql::bind(bookmark, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;

@@ -39,7 +39,7 @@ class Halt(Result):
         self.message = message
 
     def __repr__(self):
-        return '{}({})'.format(type(self).__name__, repr(message))
+        return '{}({!r})'.format(type(self).__name__, self.message)
 
     @property
     def report(self):
@@ -102,7 +102,7 @@ class Checker(object):
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
-        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265'},
+        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},  # used to also contain 'MP2': 'G711' - probably not correct
     }
 
     @classmethod

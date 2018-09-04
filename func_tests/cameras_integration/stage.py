@@ -6,7 +6,7 @@ from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
-from .checks import Failure, Result, Success, Halt
+from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
 
@@ -19,6 +19,7 @@ class Run(object):
         self.server = server
         self.id = camera_id
         self.data = None  # type: dict
+        self.media_url = server.api.generic.http.url(camera_id, media=True, with_auth=True)
 
     def update_data(self):
         self.data = self.server.api.get_resource('CamerasEx', self.id)
@@ -81,16 +82,22 @@ class Executor(object):
         self._result = Halt('Stage is not finished')
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
-            _logger.debug('Stage "%s" for %s status %s',
-                          self.stage.name, self.camera_id, self._result.report)
+            _logger.debug(
+                'Stage "%s" for %s after %s status %s',
+                self.stage.name, self.camera_id, self._duration, self._result.report)
 
             if self._duration > self._timeout:
-                _logger.info('Stage "%s" for %s timed out', self.stage.name, self.camera_id)
+                _logger.info(
+                    'Stage "%s" for %s timed out in %s',
+                    self.stage.name, self.camera_id, self._duration)
                 break
 
             yield
 
-        _logger.info('Stage "%s" is finished: %s', self.stage.name, self.report)
+        steps.close()
+        _logger.info(
+            'Stage "%s" is finished in %s: %s',
+            self.stage.name, self._duration, self.report)
 
     @property
     def is_successful(self):

@@ -11,6 +11,11 @@
 #include <rest/server/rest_connection_processor.h>
 #include <nx/utils/string.h>
 
+QnAuditLogRestHandler::QnAuditLogRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnAuditLogRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& params,
@@ -37,7 +42,7 @@ int QnAuditLogRestHandler::executeGet(
             period.durationMs = endTimeMs - period.startTimeMs;
     }
 
-    QnAuditRecordList outputData = qnServerDb->getAuditData(period, sessionId);
+    QnAuditRecordList outputData = serverModule()->serverDb()->getAuditData(period, sessionId);
     for(QnAuditRecord& record: outputData)
     {
         if (record.isPlaybackType()) {
@@ -48,7 +53,7 @@ int QnAuditLogRestHandler::executeGet(
                 QnTimePeriod period;
                 period.startTimeMs = record.rangeStartSec * 1000ll;
                 period.durationMs = (record.rangeEndSec - record.rangeStartSec) * 1000ll;
-                bool exists = res && QnStorageManager::isArchiveTimeExists(res->getUniqueId(), period);
+                bool exists = res && QnStorageManager::isArchiveTimeExists(serverModule(), res->getUniqueId(), period);
                 playbackFlags.append(exists ? '1' : '0');
             }
             record.addParam("archiveExist", playbackFlags);

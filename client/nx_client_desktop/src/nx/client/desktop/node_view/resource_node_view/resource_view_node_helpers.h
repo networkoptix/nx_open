@@ -20,9 +20,13 @@ QnResourceList getSelectedResources(const details::NodePtr& root);
 QnResourcePtr getResource(const details::NodePtr& node);
 QnResourcePtr getResource(const QModelIndex& index);
 
-QString extraText(const QModelIndex& node);
+QString extraText(const QModelIndex& index);
 void setExtraText(const QString& value, const details::NodePtr& node, int column);
-void setExtraText(const QString& value, const details::ViewNodeData& data, int column);
+
+bool isValidNode(const details::NodePtr& node);
+bool isValidNode(const QModelIndex& index);
+details::ViewNodeData getDataForInvalidNode(bool invalid);
+void setNodeValidState(const details::NodePtr& node, bool valid);
 
 } // namespace node_view
 } // namespace desktop

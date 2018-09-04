@@ -21,7 +21,8 @@ static const QString RTP_METADATA_GENERIC_STR("ffmpeg-metadata");
 
 static const int RTSP_MIN_SEEK_INTERVAL = 1000 * 30; // 30 ms as min seek interval
 
-class QnRtspDataConsumer: public QnAbstractDataConsumer, public QnlTimeSource
+class QnRtspDataConsumer: 
+    public QnAbstractDataConsumer, public QnlTimeSource
 {
 public:
     static const int MAX_STREAMING_SPEED = INT_MAX;

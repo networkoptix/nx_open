@@ -42,6 +42,7 @@ public:
 
 public:
     QnServerEdgeStreamRecorder(
+        QnMediaServerModule* serverModule,
         const QnResourcePtr &dev,
         QnServer::ChunksCatalog catalog,
         QnAbstractMediaStreamDataProvider* mediaProvider);

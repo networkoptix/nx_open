@@ -39,10 +39,12 @@ const int kCacheExpirationInterval = 60 * 1000;
 
 const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("production id");
 
-QnActiResourceSearcher::QnActiResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    base_type(kUpnpBasicDeviceType)
+QnActiResourceSearcher::QnActiResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    base_type(kUpnpBasicDeviceType),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
 }
@@ -111,7 +113,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeI
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnVirtualCameraResourcePtr( new QnActiResource() );
+    result = QnVirtualCameraResourcePtr(new QnActiResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     return result;
@@ -130,7 +132,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    auto actiRes = QnActiResourcePtr(new QnActiResource());
+    auto actiRes = QnActiResourcePtr(new QnActiResource(serverModule()));
 
     nx::utils::Url urlCopy(
         lit("http://%1:%2")
@@ -278,7 +280,7 @@ bool QnActiResourceSearcher::processPacket(
         return true;
     m_alreadyFoundMacAddresses.insert(physicalId);
 
-    auto existingRes = resourcePool()->getNetResourceByPhysicalId(physicalId);
+    auto existingRes = serverModule()->resourcePool()->getNetResourceByPhysicalId(physicalId);
 
     QAuthenticator cameraAuth;
     const QString defaultLogin = isNx ? DEFAULT_NX_LOGIN : DEFAULT_LOGIN;
@@ -309,7 +311,7 @@ bool QnActiResourceSearcher::processPacket(
 
         // Possible auth = auth from resources with the same host address + default one.
         QSet<QAuthenticator> possibleAuth;
-        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(host)
+        auto sameHostResources = serverModule()->resourcePool()->getAllNetResourceByHostAddress(host)
             .filtered<QnActiResource>();
 
         if (!sameHostResources.isEmpty())
@@ -371,7 +373,7 @@ void QnActiResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    QnActiResourcePtr resource(new QnActiResource());
+    QnActiResourcePtr resource(new QnActiResource(serverModule()));
     resource->setTypeId(m_resTypeId);
 
     if(isNx)
@@ -437,17 +439,17 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     const QString& serialNumber,
     const QString& macAddress)
 {
-    auto existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
+    auto existingRes = serverModule()->resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
 
     if (!existingRes)
-        existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
+        existingRes = serverModule()->resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
 
     if (!existingRes && !nx::utils::MacAddress(macAddress).isNull())
-        existingRes = resourcePool()->getResourceByMacAddress(macAddress);
+        existingRes = serverModule()->resourcePool()->getResourceByMacAddress(macAddress);
 
     if (!existingRes && !serialNumber.isEmpty())
     {
-        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(hostAddress)
+        auto sameHostResources = serverModule()->resourcePool()->getAllNetResourceByHostAddress(hostAddress)
             .filtered<QnActiResource>();
 
         for (const auto& camera: sameHostResources)

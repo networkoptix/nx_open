@@ -4,7 +4,6 @@ Measure system synchronization time.
 """
 
 import datetime
-import logging
 from collections import namedtuple
 from contextlib import contextmanager
 from functools import wraps
@@ -21,12 +20,14 @@ from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
 from framework.merging import merge_systems
+from framework.switched_logging import SwitchedLogger, with_logger
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
-_logger = logging.getLogger(__name__)
+_logger = SwitchedLogger(__name__)
+
 
 SET_RESOURCE_STATUS_CMD = '202'
 
@@ -46,6 +47,9 @@ def config(test_config):
 
 
 # resource creation  ================================================================================
+
+_create_test_data_logger = _logger.getChild('create_test_data')
+
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
     sequence = [(server, i) for i in range(size)]
@@ -67,7 +71,7 @@ def create_resources_on_server(server, api_method, resource_generators, sequence
         resources.append((server, resource_data))
     duration = utils.datetime_utc_now() - start_time
     requests = len(sequence)
-    _logger.info('%r ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
+    _create_test_data_logger.info('%s ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
         server, api_method, requests, duration, req_duration, duration / requests, req_duration / requests))
     return resources
 
@@ -90,7 +94,11 @@ def with_traceback(fn):
 
 
 @with_traceback
-def create_test_data_on_server((config, server, index)):
+@with_logger(_create_test_data_logger, 'framework.http_api')
+@with_logger(_create_test_data_logger, 'framework.mediaserver_api')
+def create_test_data_on_server(server_tuple):
+    config, server, index = server_tuple
+    _logger.info('Create test data on server %s:', server)
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(
             generator.generate_camera_data,
@@ -121,6 +129,7 @@ def create_test_data_on_server((config, server, index)):
     create_resources_on_server(server, 'saveLayout', resource_generators, users)
     create_resources_on_server(server, 'saveCameraUserAttributes', resource_generators, cameras)
     create_resources_on_server(server, 'setResourceParams', resource_generators, cameras)
+    _logger.info('Create test data on server %s: complete.', server)
 
 
 def create_test_data(config, servers):
@@ -203,6 +212,7 @@ def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, mes
 
 
 def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
+    _logger.info('Wait for method %r results are merged:', api_method)
     growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
     while True:
@@ -225,8 +235,9 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
 
         first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
-            _logger.info('%s merge duration: %s' % (api_method,
-                                                    utils.datetime_utc_now() - api_call_start_time))
+            _logger.info(
+                'Wait for method %r results are merged: done, merge duration: %s',
+                api_method, utils.datetime_utc_now() - api_call_start_time)
             return
         if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
             _logger.info(
@@ -240,7 +251,13 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
         growing_delay.sleep()
 
 
+_merge_logger = _logger.getChild('merge')
+
+@with_logger(_merge_logger, 'framework.waiting')
+@with_logger(_merge_logger, 'framework.http_api')
+@with_logger(_merge_logger, 'framework.mediaserver_api')
 def wait_for_data_merged(artifact_factory, merge_timeout, env):
+    _logger.info('Wait for all data are merged:')
     api_methods_to_check = [
         # 'getMediaServersEx',  # The only method to debug/check if servers are actually able to merge.
         'ec2/getUsers',
@@ -252,6 +269,7 @@ def wait_for_data_merged(artifact_factory, merge_timeout, env):
         ]
     for api_method in api_methods_to_check:
         wait_for_method_matched(artifact_factory, merge_timeout, env, api_method)
+    _logger.info('Wait for all data are merged: done.')
 
 
 def collect_additional_metrics(metrics_saver, os_access_set, lws):
@@ -351,6 +369,18 @@ def env(request, unpacked_mediaserver_factory, config):
         yield request.getfixturevalue('vm_env')
 
 
+_post_check_logger = _logger.getChild('post_check')
+
+@with_logger(_post_check_logger, 'framework.http_api')
+@with_logger(_post_check_logger, 'framework.mediaserver_api')
+def perform_post_checks(env):
+    _logger.info('Perform test post checks:')
+    if env.real_server_list[0].api.is_online():
+        settings = env.real_server_list[0].api.get_system_settings()  # log final settings
+        assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+    _logger.info('Perform test post checks: done.')
+
+
 def test_scalability(artifact_factory, metrics_saver, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
@@ -360,9 +390,7 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
     finally:
-        if env.real_server_list[0].api.is_online():
-            settings = env.real_server_list[0].api.get_system_settings()  # log final settings
-            assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+        perform_post_checks(env)
 
     for server in env.real_server_list:
         assert not server.installation.list_core_dumps()

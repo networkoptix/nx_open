@@ -144,7 +144,9 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         });
 }
 
-NotificationListWidget::Private::~Private() = default;
+NotificationListWidget::Private::~Private()
+{
+}
 
 QToolButton* NotificationListWidget::Private::newActionButton(
     ui::action::IDType actionId,

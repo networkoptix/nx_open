@@ -5,7 +5,7 @@ import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
-from framework.installation.installer import Installer, PackageNameParseError
+from framework.installation.installer import Installer, PackageNameParseError, InstallerSet
 from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
@@ -30,32 +30,20 @@ def mediaserver_installers_dir(request):
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installers(mediaserver_installers_dir):
-    installers = []
-    for path in mediaserver_installers_dir.glob('*'):
-        try:
-            installer = Installer(path)
-        except PackageNameParseError as e:
-            _logger.debug("File {}: {!s}".format(path, e))
-            continue
-        _logger.info("File {}: {!r}".format(path, installer))
-        installers.append(installer)
-    if len(set((installer.identity.customization, installer.identity.version) for installer in installers)) != 1:
-        raise ValueError("Only one version and customizations expected in {}: {}".format(mediaserver_installers_dir, installers))
-    installers_by_platform = {installer.platform: installer for installer in installers}
-    return installers_by_platform
+def mediaserver_installer_set(mediaserver_installers_dir):
+    return InstallerSet(mediaserver_installers_dir)
 
 
 @pytest.fixture(scope='session')
-def customization(request, mediaserver_installers):
-    customization, = {installer.customization for installer in mediaserver_installers.values()}
+def customization(request, mediaserver_installer_set):
     customization_from_argument = request.config.getoption('--customization')
     if customization_from_argument is not None:
-        if customization_from_argument != customization.customization_name:
+        if customization_from_argument != mediaserver_installer_set.customization.customization_name:
             raise ValueError(
                 "Customization name {!r} provided via --customization doesn't match {!r} of {!r}".format(
-                    customization_from_argument, mediaserver_installers, customization))
-    return customization
+                    customization_from_argument,
+                    mediaserver_installer_set, mediaserver_installer_set.customization))
+    return mediaserver_installer_set.customization
 
 
 @pytest.fixture()
@@ -118,11 +106,11 @@ def one_licensed_mediaserver(one_mediaserver, required_licenses):
 
 
 @pytest.fixture()
-def mediaserver_allocation(mediaserver_installers, artifacts_dir, ca):
+def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca):
     @contextmanager
     def cm(vm):
         mediaserver = Mediaserver.setup(
-            vm.os_access, mediaserver_installers.values(), ca.generate_key_and_cert())
+            vm.os_access, mediaserver_installer_set, ca.generate_key_and_cert())
         with mediaserver.os_access.traffic_capture.capturing() as cap:
             yield mediaserver
 

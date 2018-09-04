@@ -20,8 +20,8 @@
 
 using namespace nx;
 
-QnScheduleSync::QnScheduleSync(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnScheduleSync::QnScheduleSync(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_syncing(false),
     m_forced(false),
     m_interrupted(false),
@@ -64,7 +64,7 @@ DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
         NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs),
                cl_logDEBUG2);
 
-        auto toCatalog = qnBackupStorageMan->getFileCatalog(
+        auto toCatalog = serverModule()->backupStorageManager()->getFileCatalog(
             chunkKey.cameraId,
             chunkKey.catalog
         );
@@ -86,7 +86,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     SyncData                *syncData
 ) const
 {
-    auto fromCatalog = qnNormalStorageMan->getFileCatalog(
+    auto fromCatalog = serverModule()->normalStorageManager()->getFileCatalog(
         cameraId,
         catalog
     );
@@ -168,14 +168,14 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 
 QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 {
-    auto fromCatalog = qnNormalStorageMan->getFileCatalog(
+    auto fromCatalog = serverModule()->normalStorageManager()->getFileCatalog(
         chunkKey.cameraId,
         chunkKey.catalog
     );
     if (!fromCatalog)
         return CopyError::GetCatalogError;
 
-    auto toCatalog = qnBackupStorageMan->getFileCatalog(
+    auto toCatalog = serverModule()->backupStorageManager()->getFileCatalog(
         chunkKey.cameraId,
         chunkKey.catalog
     );
@@ -198,6 +198,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
         QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);
         auto fromStorage = QnStorageManager::getStorageByUrl(
+            serverModule(),
             fromFileFullName,
             QnServer::StoragePool::Normal
         );
@@ -235,11 +236,11 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return storage->getFreeSpace() > storage->getSpaceLimit() / 2;
         };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(optimalRootBackupPred);
+        auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
 
         if (!toStorage) {
-            qnBackupStorageMan->clearSpace(true);
-            toStorage = qnBackupStorageMan->getOptimalStorageRoot(optimalRootBackupPred);
+            serverModule()->backupStorageManager()->clearSpace(true);
+            toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot(optimalRootBackupPred);
             if (!toStorage)
                 return CopyError::NoBackupStorageError;
         }
@@ -312,7 +313,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::Interrupted;
         }
         // add chunk to catalog
-        bool result = qnBackupStorageMan->fileStarted(
+        bool result = serverModule()->backupStorageManager()->fileStarted(
             chunkKey.chunk.startTimeMs,
             chunkKey.chunk.timeZone,
             newFileName,
@@ -322,7 +323,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         if (!result)
             return CopyError::ChunkError;
 
-        result = qnBackupStorageMan->fileFinished(
+        result = serverModule()->backupStorageManager()->fileFinished(
             chunkKey.chunk.durationMs,
             newFileName,
             nullptr,
@@ -341,7 +342,7 @@ void QnScheduleSync::addSyncDataKey(
 )
 {
     SyncData syncData;
-    auto catalog = qnBackupStorageMan->getFileCatalog(cameraId, quality);
+    auto catalog = serverModule()->backupStorageManager()->getFileCatalog(cameraId, quality);
     if (!catalog)
         return;
 
@@ -374,7 +375,7 @@ template<typename NeedMoveOnCB>
 vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
-    if (!qnBackupStorageMan->getOptimalStorageRoot()) {
+    if (!serverModule()->backupStorageManager()->getOptimalStorageRoot()) {
         NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
         return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
@@ -523,7 +524,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
 
 void QnScheduleSync::renewSchedule()
 {
-    auto server = commonModule()->currentServer();
+    auto server = serverModule()->commonModule()->currentServer();
     NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;
@@ -610,7 +611,7 @@ void QnScheduleSync::run()
         {
             while (true)
             {
-                bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
+                bool hasRebuildingStorages = serverModule()->normalStorageManager()->hasRebuildingStorages();
                 if (hasRebuildingStorages)
                 {
                     NX_LOG(

@@ -90,7 +90,7 @@ public:
         return paramCount() == 0 ? nullptr : &m_params.front();
     }
 
-    virtual int paramCount() override { return m_params.size(); }
+    virtual int paramCount() override { return (int) m_params.size(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -280,7 +280,7 @@ TEST(stub_metadata_plugin, test)
     plugin->releaseRef();
 }
 
-int main()
+int main(int argc, const char* const argv[])
 {
-    return nx::kit::test::runAllTests();
+    return nx::kit::test::runAllTests("stub_metadata_plugin", argc, argv);
 }

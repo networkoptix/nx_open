@@ -13,9 +13,9 @@
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
-bool QnPermissionsHelper::isSafeMode(const QnCommonModule* commonModule)
+bool QnPermissionsHelper::isSafeMode(const QnMediaServerModule* serverModule)
 {
-    return qnServerModule->settings().ecDbReadOnly() || commonModule->isReadOnly();
+    return serverModule->settings().ecDbReadOnly() || serverModule->commonModule()->isReadOnly();
 }
 
 int QnPermissionsHelper::safeModeError(QnRestResult &result)

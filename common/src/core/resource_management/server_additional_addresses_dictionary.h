@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>

@@ -6,6 +6,8 @@ echo "Environment:"
 env
 echo "---------------------------"
 
+PORTAL_WORKERS=${PORTAL_WORKERS:-1}
+
 function update_with_module_configuration()
 {
     local config_file=$1
@@ -90,7 +92,7 @@ do
             python manage.py filldata
 
             find /app/app/static | xargs touch
-            exec gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug --timeout 300
+            exec gunicorn cloud.wsgi --capture-output --workers ${PORTAL_WORKERS} --bind :5000 --log-level=debug --timeout 300
             ;;
         celery)
             write_my_cnf

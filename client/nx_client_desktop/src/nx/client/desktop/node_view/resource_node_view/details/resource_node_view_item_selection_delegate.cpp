@@ -1,5 +1,6 @@
 #include "resource_node_view_item_selection_delegate.h"
 
+#include "../resource_view_node_helpers.h"
 #include "../../details/node/view_node_helpers.h"
 #include "../../selection_node_view/selection_view_node_helpers.h"
 
@@ -9,6 +10,7 @@
 #include <QtWidgets/QApplication>
 
 #include <ui/style/helper.h>
+#include <ui/style/globals.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <client/client_color_types.h>
@@ -50,9 +52,10 @@ void ResourceNodeViewItemSelectionDelegate::paint(
     const bool highlighted = checked || selectedChildrenCount(node) > 0;
     const auto extraColor = highlighted ? targetColors.extraTextSelected : targetColors.extraText;
     const auto mainColor = highlighted ? targetColors.mainTextSelected : targetColors.mainText;
+
     auto option = styleOption;
     initStyleOption(&option, index);
-    paintItemText(painter, option, index, mainColor, extraColor);
+    paintItemText(painter, option, index, mainColor, extraColor, qnGlobals->errorTextColor());
     paintItemIcon(painter, option, index, highlighted ? QIcon::Selected : QIcon::Normal);
 }
 

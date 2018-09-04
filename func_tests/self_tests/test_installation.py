@@ -5,7 +5,7 @@ from netaddr import IPNetwork
 from pathlib2 import PurePath
 
 from framework.installation.installer import Installer
-from framework.installation.make_installation import installer_by_vm_type, make_installation
+from framework.installation.make_installation import make_installation
 from framework.merging import merge_systems
 from framework.utils import bool_to_str
 
@@ -14,9 +14,9 @@ pytest_plugins = ['fixtures.unpacked_mediaservers']
 _logger = logging.getLogger(__name__)
 
 
-def test_install(one_vm, mediaserver_installers):
-    installer = installer_by_vm_type(mediaserver_installers, one_vm.type)
-    installation = make_installation(one_vm.os_access, installer.customization)
+def test_install(one_vm, mediaserver_installer_set):
+    installation = make_installation(one_vm.os_access, mediaserver_installer_set.customization)
+    installer = installation.choose_installer(mediaserver_installer_set.installers)
     installation.install(installer)
     assert installation.is_valid()
 
@@ -101,14 +101,13 @@ def test_lws_core_dump(artifacts_dir, config, groups):
     'path',
     [
         PurePath('/tmp/nxwitness-server-3.2.0.20805-linux64.deb'),
-        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta-test.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-demo.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-test.deb'),
         PurePath('/tmp/nxwitness-server-4.0.0.2049-win64-beta-test.exe'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-mac-beta-test.dmg'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-bpi-beta-test.tar.gz'),
         PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.exe'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.zip'),
-        PurePath('/tmp/wave-server-3.2.0.40235-bananapi-beta-test.zip'),
-        PurePath('/tmp/dwspectrum-server-3.2.0.40235-edge1-beta-test.zip'),
+        PurePath('/tmp/wave-server-3.2.0.40235-linux86-beta-test.zip'),
+        PurePath('/tmp/dwspectrum-server-3.2.0.40235-linux86-beta-test.zip'),
         PurePath('/tmp/wave-server-3.2.0.40238-win86-beta-test.msi'),
         ],
     ids=lambda path: path.name

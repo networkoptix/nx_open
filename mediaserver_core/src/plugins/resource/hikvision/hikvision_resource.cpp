@@ -48,8 +48,8 @@ static const QString kCgi = lit("CGI");
 using namespace nx::mediaserver_core::plugins::hikvision;
 using namespace nx::plugins::utils;
 
-HikvisionResource::HikvisionResource():
-    QnPlOnvifResource()
+HikvisionResource::HikvisionResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
 }
 
@@ -282,6 +282,7 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
 bool HikvisionResource::findDefaultPtzProfileToken()
 {
     std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
+        onvifTimeouts(),
         getMediaUrl().toStdString(),
         getAuth().user(),
         getAuth().password(),

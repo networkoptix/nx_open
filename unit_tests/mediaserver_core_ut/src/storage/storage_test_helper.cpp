@@ -7,25 +7,22 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
 
-
 namespace nx {
 namespace ut {
 namespace utils {
 
-FileStorageTestHelper::FileStorageTestHelper() :
-    m_commonModule(new QnCommonModule(/*isClient*/false,
-        nx::core::access::Mode::direct)),
+FileStorageTestHelper::FileStorageTestHelper():
+    m_serverModule(new QnMediaServerModule()),
     m_platformAbstraction(new QnPlatformAbstraction())
 {
-    m_commonModule->setModuleGUID(QnUuid::createUuid());
+    m_serverModule->commonModule()->setModuleGUID(QnUuid::createUuid());
 }
 
 QnStorageResourcePtr FileStorageTestHelper::createStorage(
-    QnCommonModule* commonModule,
     const QString& url,
     qint64 spaceLimit)
 {
-    QnStorageResourcePtr result(new QnFileStorageResource(commonModule));
+    QnStorageResourcePtr result(new QnFileStorageResource(m_serverModule.get()));
     result->setUrl(url);
     result->setSpaceLimit(spaceLimit);
     result->setId(QnUuid::createUuid());
@@ -33,4 +30,6 @@ QnStorageResourcePtr FileStorageTestHelper::createStorage(
     return result;
 }
 
-}}}
+} // namespace utils
+} // namespace ut
+} // namespace nx

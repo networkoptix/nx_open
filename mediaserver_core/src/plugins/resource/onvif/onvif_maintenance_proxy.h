@@ -1,11 +1,11 @@
-#ifndef QN_ONVIF_MAINTENANCE_PROXY_H
-#define QN_ONVIF_MAINTENANCE_PROXY_H
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
 #include <QtNetwork/QAuthenticator>
 
 #include <utils/camera/camera_diagnostics.h>
+#include "soap_wrapper.h"
 
 class DeviceSoapWrapper;
 
@@ -14,8 +14,13 @@ class DeviceSoapWrapper;
 //
 class QnOnvifMaintenanceProxy {
 public:
-    QnOnvifMaintenanceProxy(const QString &maintenanceUrl, const QAuthenticator &auth, const QString &videoSrcToken, int timeDrift);
-    ~QnOnvifMaintenanceProxy();
+    QnOnvifMaintenanceProxy(
+        const SoapTimeouts& timeouts,
+        const QString& maintenanceUrl,
+        const QAuthenticator& auth,
+        const QString& videoSrcToken,
+        int timeDrift);
+    ~QnOnvifMaintenanceProxy() = default;
 
     QSet<QString> supportedParameters() const;
 
@@ -30,5 +35,3 @@ private:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif //QN_ONVIF_MAINTENANCE_PROXY_H

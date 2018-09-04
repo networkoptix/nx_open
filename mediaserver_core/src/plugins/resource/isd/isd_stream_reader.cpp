@@ -15,7 +15,9 @@ const int QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS = 5000;
 
 extern QString getValueFromString(const QString& line);
 
-QnISDStreamReader::QnISDStreamReader(const QnPlIsdResourcePtr& res):
+QnISDStreamReader::QnISDStreamReader(
+    const QnPlIsdResourcePtr& res)
+    :
     CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_isdCam(res)

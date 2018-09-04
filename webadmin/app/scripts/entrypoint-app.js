@@ -17,6 +17,9 @@ require('./bootstrap.js');
 //App
 require('./app.js');
 
+//Vendor
+require('./vendor/vkbeautify.js');
+
 //Services
 require('./services/cloudAPI.js');
 require('./services/dialogs.js');
@@ -56,3 +59,4 @@ require('./controllers/offline.js');
 require('./controllers/restart.js');
 require('./controllers/sdkeula.js');
 require('./controllers/settings.js');
+require('./controllers/serverdoc.js');

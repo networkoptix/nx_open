@@ -383,9 +383,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin")
                 .arg(channel)
                 .arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
-            if (motionIO)
+            // Doing some additional checks in case data is broken.
+            if (motionIO && (motionIO->size() % sizeof(QnMetaDataV1Light) == 0))
             {
-                NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
                 size_t motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0)

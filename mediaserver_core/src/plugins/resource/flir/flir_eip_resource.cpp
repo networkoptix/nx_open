@@ -18,7 +18,8 @@ const QString kAlarmsCountParamName("alarmsCount");
 
 } //namespace
 
-QnFlirEIPResource::QnFlirEIPResource() :
+QnFlirEIPResource::QnFlirEIPResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_advancedParametersProvider(this),
     m_inputPortMonitored(false),
     m_currentCheckingPortNumber(0),

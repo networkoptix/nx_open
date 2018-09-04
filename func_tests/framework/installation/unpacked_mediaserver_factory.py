@@ -2,9 +2,9 @@
 Idea for this is to have same code used by self_tests and usual tests
 and to have less code in tests."""
 
+import logging
 from collections import namedtuple
 from contextlib import contextmanager
-import logging
 
 from pathlib2 import Path
 
@@ -109,7 +109,7 @@ class UnpackMediaserverInstallationGroups(object):
             server.start()
             server.api.setup_local_system(system_settings)
             return server
-        except:
+        except Exception:
             self._collect_server_actifacts(server)
             raise
 
@@ -126,7 +126,6 @@ class UnpackMediaserverInstallationGroups(object):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
         mediaserver.collect_artifacts(mediaserver_artifacts_dir)
-
 
 
 class UnpackedMediaserverFactory(object):

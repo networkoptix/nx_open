@@ -900,7 +900,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Indirizzi dei flussi</translation>
     </message>
   </context>
   <context>
@@ -1083,7 +1083,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Sul layout</translation>
     </message>
   </context>
   <context>
@@ -1211,17 +1211,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Sul layout</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Telecamera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Telecamera sorgente</translation>
     </message>
   </context>
   <context>
@@ -1422,22 +1422,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Size</source>
-      <translation type="unfinished">Fixed Size</translation>
+      <translation>Bloccato</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Larghezza</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Altezza</translation>
     </message>
     <message>
       <location/>
@@ -1454,23 +1449,28 @@
       <source>Reset</source>
       <translation>Reset</translation>
     </message>
+    <message>
+      <location/>
+      <source>Minimal Size</source>
+      <translation>Dimensione minima</translation>
+    </message>
   </context>
   <context>
     <name>LayoutSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Selezionare layout</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Layout condivisi</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Selezionare alcuni singoli utenti in &quot;Visualizza linea&quot; per visualizzare il layout locale in questo elenco</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Modifica flussi...</translation>
     </message>
   </context>
   <context>
@@ -2310,25 +2310,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWatermarkPreviewDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
-      <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Opacity</source>
-      <translation>Opacità</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Attivare la timeline sul video wall</translation>
     </message>
   </context>
   <context>
@@ -3009,12 +2991,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Visualizza il watermark con nome utente sul video</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Anteprima watermark</translation>
     </message>
   </context>
   <context>
@@ -3197,7 +3179,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Questa pagina web è per l'integrazione C2P</translation>
     </message>
   </context>
   <context>
@@ -3226,6 +3208,24 @@
       <location/>
       <source>Note: Schedule is based on server time.</source>
       <translation>Nota: la pianificazione è basata sull'orario del server.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation>Anteprima watermark</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Opacità</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation>Frequenza</translation>
     </message>
   </context>
 </TS>

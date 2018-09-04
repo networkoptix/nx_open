@@ -253,11 +253,12 @@ private:
 
         auto auxiliaryArg = std::make_unique<AuxiliaryArgType>();
         auto auxiliaryArgPtr = auxiliaryArg.get();
+        const auto systemId = transportHeader.systemId;
         TransactionContext transactionContext{
             std::move(transportHeader),
             std::move(transaction)};
         m_transactionLog->startDbTransaction(
-            transportHeader.systemId,
+            systemId,
             [this,
                 auxiliaryArgPtr,
                 transactionContext = std::move(transactionContext)](

@@ -11,6 +11,12 @@
 namespace nx {
 namespace network {
 
+AbstractStreamSocket::~AbstractStreamSocket()
+{
+    if (m_beforeDestroyCallback)
+        m_beforeDestroyCallback();
+}
+
 //-------------------------------------------------------------------------------------------------
 // class AbstractSocket.
 
@@ -218,6 +224,11 @@ bool AbstractDatagramSocket::sendTo(
     const SocketAddress& foreignAddress)
 {
     return sendTo(buf.constData(), buf.size(), foreignAddress);
+}
+
+void AbstractStreamSocket::setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void()> callback)
+{
+    m_beforeDestroyCallback = std::move(callback);
 }
 
 } // namespace network

@@ -159,45 +159,33 @@ namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
     QnCommonModule* commonModule,
-    const QString               &url,
-    const StorageFactoryPtrType &sf
+    const QString& url,
+    const StorageFactoryPtrType& sf,
+    const nx::mediaserver::Settings* settings
 )
 {
     try
     {
-        return new QnThirdPartyStorageResource(
-            commonModule,
-            sf,
-            url
-        );
+        return new QnThirdPartyStorageResource(commonModule, sf, url, settings);
     }
     catch(...)
     {
-        return new QnThirdPartyStorageResource;
+        return nullptr;
     }
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
-        QnCommonModule* commonModule,
-        const StorageFactoryPtrType &sf,
-        const QString               &storageUrl)
-:
+    QnCommonModule* commonModule,
+    const StorageFactoryPtrType &sf,
+    const QString               &storageUrl,
+    const nx::mediaserver::Settings* settings)
+    :
     base_type(commonModule),
-    m_valid(true)
+    m_valid(true),
+    m_settings(settings)
 {
-    openStorage(
-        storageUrl.toLatin1().constData(),
-        sf
-    );
+    openStorage(storageUrl.toLatin1().constData(), sf);
 }
-
-QnThirdPartyStorageResource::QnThirdPartyStorageResource():
-    base_type(nullptr),
-    m_valid(false)
-{}
-
-QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
-{}
 
 void QnThirdPartyStorageResource::openStorage(
     const char                  *storageUrl,
@@ -292,12 +280,12 @@ QIODevice *QnThirdPartyStorageResource::open(
         int ffmpegBufferSize = 0;
 
         int ffmpegMaxBufferSize =
-            qnServerModule->settings().maxFfmpegBufferSize();
+            m_settings->maxFfmpegBufferSize();
 
         if (openMode & QIODevice::WriteOnly)
         {
-            ioBlockSize = qnServerModule->settings().ioBlockSize();
-            ffmpegBufferSize = qnServerModule->settings().ffmpegBufferSize();
+            ioBlockSize = m_settings->ioBlockSize();
+            ffmpegBufferSize = m_settings->ffmpegBufferSize();
         }
         std::unique_ptr<QBufferedFile> rez(
             new QBufferedFile(

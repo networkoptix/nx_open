@@ -60,6 +60,7 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         std::unique_ptr<QObject> opaqueObject,
         std::unique_ptr<ConnectionLockGuard> connectionLockGuard = nullptr);
 
@@ -74,6 +75,7 @@ public:
     virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
     virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     State state() const;
     virtual void setState(State state);
@@ -91,6 +93,10 @@ public:
     void stopWhileInAioThread();
 
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& /*peer*/) const { return true; }
+
+    void addAdditionalRequestHeaders(nx::network::http::HttpHeaders headers);
+    void addRequestQueryParams(std::vector<std::pair<QString, QString>> queryParams);
+
 signals:
     void gotMessage(QWeakPointer<ConnectionBase> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<ConnectionBase> connection, ConnectionBase::State state);
@@ -120,7 +126,8 @@ private:
         appserverConnectionFactory,
         none,
     };
-
+protected:
+    const Direction m_direction;
 private:
     std::deque<nx::Buffer> m_dataToSend;
     QByteArray m_readBuffer;
@@ -135,7 +142,6 @@ private:
     nx::network::WebSocketPtr m_webSocket;
     std::atomic<State> m_state{State::Connecting};
 
-    Direction m_direction;
     nx::utils::Url m_remotePeerUrl;
 
     static SendCounters m_sendCounters;
@@ -150,6 +156,10 @@ private:
 
     nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
+
+    nx::network::http::HttpHeaders m_additionalRequestHeaders;
+    std::vector<std::pair<QString, QString>> m_requestQueryParams;
+    std::multimap<QString, QString> m_remoteQueryParams;
 };
 
 QString toString(ConnectionBase::State value);

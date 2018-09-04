@@ -6,7 +6,6 @@
 
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
-class QnNotificationsCollectionWidget;
 class QnImageButtonWidget;
 class QnBlinkingImageButtonWidget;
 class HoverFocusProcessor;
@@ -40,9 +39,10 @@ public:
 
     virtual ~NotificationsWorkbenchPanel() override;
 
-    QnControlBackgroundWidget* backgroundItem;
-    QnNotificationsCollectionWidget* item;
-    VariantAnimator* xAnimator;
+    QnControlBackgroundWidget* const backgroundItem;
+    QGraphicsWidget* const item;
+    VariantAnimator* const xAnimator;
+    QRectF tooltipsEnclosingRect;
 
 public:
     virtual bool isPinned() const override;

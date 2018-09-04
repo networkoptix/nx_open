@@ -14,10 +14,12 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
+#include <media_server/media_server_module.h>
 
 using namespace nx;
 
-QnExternalEventRestHandler::QnExternalEventRestHandler()
+QnExternalEventRestHandler::QnExternalEventRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -40,7 +42,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'event_type'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -58,7 +60,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'state'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -70,7 +72,7 @@ int QnExternalEventRestHandler::executeGet(
         {
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'reasonCode'.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -95,7 +97,7 @@ int QnExternalEventRestHandler::executeGet(
             result.setError(QnRestResult::InvalidParameter,
                 "Invalid value for parameter 'metadata'. "
                 "It should be a json object. See documentation for more details.");
-            return CODE_OK;
+            return nx::network::http::StatusCode::ok;
         }
     }
 
@@ -109,8 +111,8 @@ int QnExternalEventRestHandler::executeGet(
 
     const auto& userId = owner->accessRights().userId;
 
-    if (!qnEventRuleConnector->createEventFromParams(businessParams, eventState, userId, &errStr))
+    if (!serverModule()->eventConnector()->createEventFromParams(businessParams, eventState, userId, &errStr))
         result.setError(QnRestResult::InvalidParameter, errStr);
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
