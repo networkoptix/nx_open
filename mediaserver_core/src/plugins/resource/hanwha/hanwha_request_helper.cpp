@@ -281,7 +281,7 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
 }
 
 /*static*/
-nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
+nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url, int bypassChannel)
 {
     nx::utils::Url bypassUrl(url);
     bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));

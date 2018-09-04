@@ -106,7 +106,7 @@ private:
         const Parameters& parameters,
         nx::utils::RwLockType requestType);
 
-    static utils::Url makeBypassUrl(const utils::Url &url);
+    static utils::Url makeBypassUrl(const utils::Url &url, int bypassChannel);
 
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
