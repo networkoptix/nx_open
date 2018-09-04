@@ -10,17 +10,20 @@
 #include <QSharedPointer>
 
 #include <utils/common/credentials.h>
+#include <utils/camera/camera_diagnostics.h>
 #include <plugins/resource/onvif/onvif_helper.h>
 #include <plugins/resource/onvif/onvif_namespace_registrar.h>
 #include <plugins/resource/onvif/soap_helpers.h>
 
 #include <onvif\soapDeviceIOBindingProxy.h>
+#include <onvif\soapMediaBindingProxy.h>
+#include <onvif\soapMedia2BindingProxy.h>
 
 struct soap;
 class DeviceBindingProxy;
 //class DeviceIOBindingProxy;
-class MediaBindingProxy;
-class Media2BindingProxy;
+//class MediaBindingProxy;
+//class Media2BindingProxy;
 class PTZBindingProxy;
 class ImagingBindingProxy;
 class NotificationProducerBindingProxy;
@@ -429,26 +432,57 @@ public:
     static const RequestFunc requestFunc; //< = &DeviceIOBindingProxy::GetDigitalInputs;
 };
 */
-#define DECLARE_RESPONSE_TRAITS(BINDING_PROXY, REQUEST, RESPONSE) \
+
+#define MAKE_BINDINGPROXY_LEXEME(WEBSERVICE) WEBSERVICE##BindingProxy
+#define MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION
+#define MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION##Response
+
+#define DECLARE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
+template<> \
+class ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)> \
+{ \
+public: \
+    using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
+    using Request = MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION); \
+    using Response = MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION); \
+    using RequestFunc = \
+        int (BindingProxy::*)( \
+            const char* soap_endpoint, \
+            const char* soap_action, \
+            Request* request, \
+            Response& response); \
+    static const RequestFunc requestFunc;  \
+    static const char funcName[64]; \
+};
+
+#define DECLARE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, REQUEST, RESPONSE) \
 template<> \
 class ResponseTraits<RESPONSE> \
 { \
 public: \
-    using BindingProxy = BINDING_PROXY; \
+    using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
     using Request = REQUEST; \
     using Response = RESPONSE; \
     using RequestFunc = \
-        int (BINDING_PROXY::*)( \
+        int (BindingProxy::*)( \
             const char* soap_endpoint, \
             const char* soap_action, \
-            REQUEST* request, \
-            RESPONSE& response); \
+            Request* request, \
+            Response& response); \
     static const RequestFunc requestFunc;  \
+    static const char funcName[64]; \
 };
 
-DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse)
-DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
-DECLARE_RESPONSE_TRAITS(DeviceIOBindingProxy, _onvifDeviceIO__SetRelayOutputSettings, _onvifDeviceIO__SetRelayOutputSettingsResponse)
+DECLARE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
+
+DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
+DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
+
+DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2, onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2, onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<class Response>
@@ -484,6 +518,12 @@ public:
         NX_CRITICAL(m_responseOwner);
         return &m_responseOwner->m_response;
     }
+    // Forbidden to suppress error-prone code.
+    //const Response& operator*() const
+    //{
+    //    NX_CRITICAL(m_responseOwner);
+    //    return m_responseOwner->m_response;
+    //}
 private:
     ResponseWrapper<Response>* m_responseOwner;
 };
@@ -496,7 +536,7 @@ public:
     using BindingProxy = typename ResponseTraits<Response>::BindingProxy;
     using Request = typename ResponseTraits<Response>::Request;
 
-    explicit ResponseWrapper(RequestParams& params):
+    explicit ResponseWrapper(RequestParams params):
         m_wrapper(std::move(params.endpoint), std::move(params.login), std::move(params.passwd),
             params.timeDrift, params.tcpKeepAlive)
     {
@@ -531,10 +571,10 @@ public:
         m_wrapper.beforeMethodInvocation<Request>();
         const char* ptr = m_wrapper.m_endpoint;
 
-        m_soapError = std::invoke(ResponseTraits<Response>::requestFunc,
+        std::invoke(ResponseTraits<Response>::requestFunc,
             m_wrapper.m_soapProxy, m_wrapper.m_endpoint, nullptr, &request, m_response);
 
-        return m_soapError == SOAP_OK;
+        return soapError() == SOAP_OK;
     }
 
     void reset()
@@ -546,28 +586,45 @@ public:
 
             m_response.soap_default(m_response.soap);
 
-            m_soapError = SOAP_ERR;
             m_wrapper.m_invoked = false;
         }
 
     }
-
-    const Response& dangerous_get() const noexcept { return m_response; }
 
     ResponseHolder<Response> get()
     {
         return ResponseHolder<Response>(this);
     }
 
-    int soapError() const noexcept { return m_soapError; }
-    operator bool() const noexcept { return m_soapError == SOAP_OK; }
+    Response& getEphemeralReference()
+    {
+        return m_response;
+    }
+
+    const char* requestFunctionName() const
+    {
+        return ResponseTraits<Response>::funcName;
+    }
+
+    int soapError() const noexcept { return m_wrapper.m_soapProxy->soap->error; }
+
+    QString soapErrorAsString() const
+    {
+        return SoapErrorHelper::fetchDescription(m_wrapper.m_soapProxy->soap_fault());
+    }
+    CameraDiagnostics::RequestFailedResult requestFailedResult() const
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            QString(requestFunctionName()), soapErrorAsString());
+    }
+
+    operator bool() const noexcept { return soapError() == SOAP_OK; }
     const SoapWrapper<BindingProxy>& innerWrapper() const noexcept { return m_wrapper; }
     QString endpoint() const { return QString::fromLatin1(m_wrapper.endpoint()); }
 
 protected:
     SoapWrapper<BindingProxy> m_wrapper;
     Response m_response;
-    int m_soapError = SOAP_ERR;
     int responseHolderCount = 0;
 };
 
@@ -576,9 +633,23 @@ namespace DeviceIO {
 using DigitalInputs = ResponseWrapper<_onvifDeviceIO__GetDigitalInputsResponse>;
 using RelayOutputs = ResponseWrapper<_onvifDevice__GetRelayOutputsResponse>;
 
-int setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response);
-
+using RelayOutputSettingsSettingResult = ResponseWrapper<_onvifDeviceIO__SetRelayOutputSettingsResponse>;
 }// namespace DeviceIO
+
+namespace Media {
+
+    using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationsResponse>;
+    using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
+    using Profiles = ResponseWrapper<_onvifMedia__GetProfilesResponse>;
+}// namespace Media2
+
+namespace Media2 {
+
+using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationsResponse>;
+using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
+}// namespace Media2
+
+//#TODO szaitsev: Replace DeviceIO::GetRelayOutputs with DeviceIO::GetRelayOutputs and so on.
 
 class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
 {
@@ -588,8 +659,8 @@ public:
 
 //    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
 //    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
-//    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
-    int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
+////    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
+//    int setRelayOutputSettings_( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
 };
 
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
@@ -607,15 +678,15 @@ public:
     int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
     int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);
     int getProfile(ProfileReq& request, ProfileResp& response);
-    int getProfiles(ProfilesReq& request, ProfilesResp& response);
+/**/int getProfiles(ProfilesReq& request, ProfilesResp& response);
     int getStreamUri(StreamUriReq& request, StreamUriResp& response);
     int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
     int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
 
     int getAudioOutputs( _onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response );
     int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
-    int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
-    int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
+/**/int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
+/**/int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
 
     int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
 
@@ -641,43 +712,9 @@ public:
     Media2SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
     virtual ~Media2SoapWrapper();
 
-    //int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
-    //int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
-    //int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
-    //int setVideoSourceConfiguration(SetVideoSrcConfigReq& request, SetVideoSrcConfigResp& response);
-
     int getVideoEncoderConfigurationOptions(VideoOptionsResp2& response);
     int getVideoEncoderConfigurationOptions(onvifMedia2__GetConfiguration& request, VideoOptionsResp2& response);
 
-    //int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
-    //int addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response);
-    //int getCompatibleAudioDecoderConfigurations(GetCompatibleAudioDecoderConfigurationsReq& request, GetCompatibleAudioDecoderConfigurationsResp& response);
-    //int addAudioDecoderConfiguration(AddAudioDecoderConfigurationReq& request, AddAudioDecoderConfigurationResp& response);
-
-    //int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
-    //int getAudioEncoderConfigurations(AudioConfigsReq& request, AudioConfigsResp& response);
-    //int getAudioSourceConfigurations(AudioSrcConfigsReq& request, AudioSrcConfigsResp& response);
-    //int getProfile(ProfileReq& request, ProfileResp& response);
-    //int getProfiles(ProfilesReq& request, ProfilesResp& response);
-    //int getStreamUri(StreamUriReq& request, StreamUriResp& response);
-    //int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
-
-    //int getAudioOutputs(_onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response);
-    //int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
-
-    //int getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response);
-
-    //int addAudioEncoderConfiguration(AddAudioConfigReq& request, AddAudioConfigResp& response);
-    //int addAudioSourceConfiguration(AddAudioSrcConfigReq& request, AddAudioSrcConfigResp& response);
-    //int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
-    //int addPTZConfiguration(AddPTZConfigReq& request, AddPTZConfigResp& response);
-    //int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
-
-    //int createProfile(CreateProfileReq& request, CreateProfileResp& response);
-
-    //int setAudioEncoderConfiguration(SetAudioConfigReq& request, SetAudioConfigResp& response);
-    //int setAudioSourceConfiguration(SetAudioSrcConfigReq& request, SetAudioSrcConfigResp& response);
-    //int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
 };
 
 class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>

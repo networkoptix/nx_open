@@ -530,17 +530,36 @@ const ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
     ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
     = &DeviceIOBindingProxy::GetDigitalInputs;
  */
-#define DEFINE_RESPONSE_TRAITS(BINDING_PROXY, FUNC, RESPONSE) \
-    const ResponseTraits<RESPONSE>::RequestFunc ResponseTraits<RESPONSE>::requestFunc = \
-        &BINDING_PROXY::FUNC;
+#define DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
+    const ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
+        ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::requestFunc = \
+        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+    \
+    const char ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::funcName[64] = \
+        #FUNCTION;
 
-DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse)
-DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
-DEFINE_RESPONSE_TRAITS(DeviceIOBindingProxy, SetRelayOutputSettings, _onvifDeviceIO__SetRelayOutputSettingsResponse)
+#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, RESPONSE) \
+    const ResponseTraits<RESPONSE>::RequestFunc \
+        ResponseTraits<RESPONSE>::requestFunc = \
+        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+    \
+    const char ResponseTraits<RESPONSE>::funcName[64] = \
+        #FUNCTION;
 
+DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
+
+DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
+DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
+
+DEFINE_RESPONSE_TRAITS(Media2, GetVideoEncoderConfigurations)
+DEFINE_RESPONSE_TRAITS(Media2, GetVideoEncoderConfigurationOptions)
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //
+
 DeviceIOWrapper::DeviceIOWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
     SoapWrapper<DeviceIOBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
@@ -564,11 +583,11 @@ DeviceIOWrapper::~DeviceIOWrapper()
 //{
 //    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputOptions, &request, response);
 //}
-
-int DeviceIOWrapper::setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response)
-{
-    return invokeMethod(&DeviceIOBindingProxy::SetRelayOutputSettings, &request, response);
-}
+//
+//int DeviceIOWrapper::setRelayOutputSettings_(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response)
+//{
+//    return invokeMethod(&DeviceIOBindingProxy::SetRelayOutputSettings, &request, response);
+//}
 
 // -------------------------------------------------------------------------- //
 // MediaSoapWrapper

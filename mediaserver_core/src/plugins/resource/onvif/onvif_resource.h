@@ -6,6 +6,7 @@
 #include <memory>
 #include <stack>
 
+#include <QString>
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QList>
@@ -135,6 +136,18 @@ public:
         SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
+    /**
+     There are 3 permitted video encodings (all others are ignored).
+     The values are used to sort video encoders.
+     */
+    enum class PermittedEncoding
+    {
+        NONE = 0,
+        JPEG = 1,
+        H265 = 2,
+        H264 = 3
+    };
+
     class VideoOptionsLocal
     {
     public:
@@ -143,10 +156,15 @@ public:
         VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
             QnBounds frameRateBounds = QnBounds());
 
+        //VideoOptionsLocal(const QString& id,
+        //    const _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse& resp,
+        //    QnBounds frameRateBounds = QnBounds());
+
         QVector<onvifXsd__H264Profile> h264Profiles;
         QString id;
         QList<QSize> resolutions;
         bool isH264 = false;
+        PermittedEncoding encoding = PermittedEncoding::NONE;
         int minQ = -1;
         int maxQ = 1;
         int frameRateMin = -1;
@@ -394,6 +412,8 @@ protected:
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
 private:
+    CameraDiagnostics::Result ReadVideoEncoderOptionsForToken(
+        const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds);
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptionsNew();
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
@@ -405,14 +425,14 @@ private:
 
     int round(float value);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
+    void checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration);
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
+    CameraDiagnostics::Result updateVideoEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
@@ -592,7 +612,8 @@ private:
         CapabilitiesResp* response );
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo( const CapabilitiesResp& response );
-    CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
+    CameraDiagnostics::Result getVideoEncoderTokens(
+        Media::VideoEncoderConfigurations* videoEncoderConfigurations, QStringList* tokenList);
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
