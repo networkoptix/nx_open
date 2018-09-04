@@ -9,7 +9,7 @@ class CLServerPushStreamReader;
 
 namespace nx::mediaserver::camera {
 
-class ErrorProcessor: public QObject, public ServerModuleAware
+class ErrorProcessor: public QObject
 {
     Q_OBJECT
 
