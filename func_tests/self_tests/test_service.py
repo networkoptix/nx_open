@@ -2,7 +2,7 @@ import pytest
 
 from framework.installation.upstart_service import UpstartService
 from framework.installation.windows_service import WindowsService
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 
 @pytest.fixture()
@@ -29,11 +29,11 @@ def test_stop_start(service):
     # Both actions must be executed.
     if service.is_running():
         service.stop()
-        wait_for_true(lambda: not service.is_running(), "service is stopped")
+        wait_for_truthy(lambda: not service.is_running(), "service is stopped")
         service.start()
-        wait_for_true(service.is_running)
+        wait_for_truthy(service.is_running)
     else:
         service.start()
-        wait_for_true(service.is_running)
+        wait_for_truthy(service.is_running)
         service.stop()
-        wait_for_true(lambda: not service.is_running(), "service is stopped")
+        wait_for_truthy(lambda: not service.is_running(), "service is stopped")

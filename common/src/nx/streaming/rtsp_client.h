@@ -79,7 +79,7 @@ public:
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
     qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
-    QString getResID() const { return m_resourceId; }
+    QString getResourceId() const { return m_resourceId; }
 
     void setTimePolicy(TimePolicy policy);
 

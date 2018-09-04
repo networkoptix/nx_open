@@ -435,6 +435,7 @@ public:
 PlayerSetQualityTest::PlayerSetQualityTest()
 {
     m_module->resourcePool()->clear(); //< Just in case.
+    m_server->setUrl("http://localhost:7001");
     m_module->resourcePool()->addResource(m_server);
     m_module->resourcePool()->addResource(m_camera);
 }

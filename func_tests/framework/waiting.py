@@ -79,12 +79,12 @@ def _description_from_func(func):
     return '{func.__self__!s}.{func.__name__!s}'.format(func=func)
 
 
-def wait_for_true(bool_func, description=None, timeout_sec=30, logger=None):
+def wait_for_truthy(get_value, description=None, timeout_sec=30, logger=None):
     if description is None:
-        description = _description_from_func(bool_func)
+        description = _description_from_func(get_value)
     wait = Wait(description, timeout_sec=timeout_sec, logger=logger)
     while True:
-        result = bool_func()
+        result = get_value()
         if result:
             return result
         if not wait.again():
@@ -93,6 +93,15 @@ def wait_for_true(bool_func, description=None, timeout_sec=30, logger=None):
                 "Timed out ({} seconds) waiting for: {}".format(timeout_sec, description),
                 )
         wait.sleep()
+
+
+def wait_for_equal(get_actual, expected, actual_desc=None, expected_desc=None, timeout_sec=30):
+    if actual_desc is None:
+        actual_desc = _description_from_func(get_actual)
+    if expected_desc is None:
+        expected_desc = repr(expected)
+    desc = "{} returns {}".format(actual_desc, expected_desc)
+    wait_for_truthy(lambda: get_actual() == expected, description=desc, timeout_sec=timeout_sec)
 
 
 class NotPersistent(Exception):

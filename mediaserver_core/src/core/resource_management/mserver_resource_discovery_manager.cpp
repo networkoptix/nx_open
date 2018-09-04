@@ -436,8 +436,7 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkReso
 bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
     const QnNetworkResourcePtr &newResource) const
 {
-    QnVirtualCameraResourcePtr newCameraResource =
-        newResource.dynamicCast<QnVirtualCameraResource>();
+    const auto newCameraResource = newResource.dynamicCast<QnVirtualCameraResource>();
 
     if (!newCameraResource)
         return true;
@@ -450,7 +449,7 @@ bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
     if (knownCameraChannels.empty())
         return true;
 
-    // if there is another channel for camera on this server we can add another one
+    // If there is another channel for the camera on this server, we can add another one.
     const auto it = std::find_if(knownCameraChannels.begin(), knownCameraChannels.end(),
         [this](const QnSecurityCamResourcePtr& camera)
         {
@@ -459,8 +458,7 @@ bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
     if (it != knownCameraChannels.end())
         return true;
 
-    NX_VERBOSE(this,
-        lm("Other channels of resource '%1' belong to other servers, do nothing."),
+    NX_VERBOSE(this, lm("Other channels of resource '%1' belong to other servers, do nothing."),
         NetResString(newCameraResource));
     return false;
 }

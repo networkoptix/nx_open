@@ -8,7 +8,7 @@ from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_shell import SSH
 from framework.switched_logging import SwitchedLogger, with_logger
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = SwitchedLogger(__name__, 'networking')
 
@@ -93,7 +93,7 @@ class LinuxNetworking(Networking):
                 ''',
             input=rules_input)
         global_ip = '8.8.8.8'
-        wait_for_true(
+        wait_for_truthy(
             lambda: self.can_reach(global_ip),
             "internet on {} is on ({} is reachable)".format(self, global_ip))
 
@@ -112,7 +112,7 @@ class LinuxNetworking(Networking):
                 ''',
             input=rules_input.encode('ascii'))
         global_ip = '8.8.8.8'
-        wait_for_true(
+        wait_for_truthy(
             lambda: not self.can_reach(global_ip),
             "internet on {} is off ({} is unreachable)".format(self, global_ip))
 

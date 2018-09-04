@@ -538,7 +538,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     if (m_needCorrectTime && rez)
     {
         if (auto helper = timeHelper(rez))
-            rez->timestamp = helper->getTimeUs(rez->timestamp);
+            rez->timestamp = helper->getCurrentTimeUs(rez->timestamp);
     }
 
     return rez;
