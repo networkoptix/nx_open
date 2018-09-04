@@ -53,6 +53,9 @@ namespace {
 
 static QList<QHostAddress> allowedInterfaces;
 
+struct nettoolsFunctionsTag{};
+static const nx::utils::log::Tag kLogTag(typeid(nettoolsFunctionsTag));
+
 } // namespace
 
 namespace nx {
@@ -324,9 +327,7 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    static const nx::utils::log::Tag kTag(QLatin1String("pingableAddresses"));
-
-    NX_INFO(kTag, "About to find all ip responded to ping....");
+    NX_INFO(kLogTag, "About to find all ip responded to ping....");
     QTime time;
     time.restart();
 
@@ -357,8 +358,8 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    NX_INFO(kTag, lm("Done. time elapsed = %1").arg(time.elapsed()));
-    NX_INFO(kTag, lm("Ping results %1").container(result));
+    NX_INFO(kLogTag, lm("Done. time elapsed = %1").arg(time.elapsed()));
+    NX_INFO(kLogTag, lm("Ping results %1").container(result));
     return result;
 }
 
@@ -493,7 +494,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
     {
-        NX_ERROR(this, "sysctl: route-sysctl-estimate error");
+        NX_ERROR(kLogTag, "sysctl: route-sysctl-estimate error");
         return utils::MacAddress();
     }
 
@@ -504,7 +505,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
     {
-        NX_ERROR(this, "actual retrieval of routing table failed");
+        NX_ERROR(kLogTag, "actual retrieval of routing table failed");
         return utils::MacAddress();
     }
 
@@ -519,7 +520,7 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
         if (sdl->sdl_alen)
         {
             /* complete ARP entry */
-            NX_DEBUG(this, lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)));
+            NX_DEBUG(kLogTag, lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)));
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return utils::MacAddress::fromRawData((unsigned char*)LLADDR(sdl));
