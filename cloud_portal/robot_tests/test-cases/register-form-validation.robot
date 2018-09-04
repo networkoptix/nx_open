@@ -63,7 +63,7 @@ Cyrillic Password                         mark        hamill      ${valid email}
     [tags]    C41860
 Smiley Password                           mark        hamill      ${valid email}            ${SMILEY TEXT}              True
     [tags]    C41860
-qwe/Glyph Password                        mark        hamill      ${valid email}            ${GLYPH TEXT}               True
+Glyph Password                            mark        hamill      ${valid email}            ${GLYPH TEXT}               True
     [tags]    C41860
 TM Password                               mark        hamill      ${valid email}            ${TM TEXT}                  True
     [tags]    C41860

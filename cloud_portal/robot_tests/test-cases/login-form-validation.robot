@@ -48,7 +48,7 @@ Test Login Invalid
     Log In Form Validation    ${email}    ${pass}
     Outline Error    ${email}    ${pass}
     Run Keyword If    "${email}"=="${good email}" and "${pass}"=="${bad password}"    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
-    Run Keyword If    "${email}"=="${good email unregistered}" and "${pass}"=="${good password}"    Wait Until Element Is Visible    ${ACCOUNT NOT FOUND MESSAGE}
+    Run Keyword If    "${email}"=="${good email unregistered}" and "${pass}"=="${good password}"    Wait Until Element Is Visible    ${ACCOUNT NOT FOUND}
 
 Log In Form Validation
     [Arguments]    ${email}    ${pass}
