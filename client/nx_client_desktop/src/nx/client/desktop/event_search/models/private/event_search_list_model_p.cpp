@@ -196,7 +196,7 @@ bool EventSearchListModel::Private::commitPrefetch(
     // In live mode "later" direction events are requested with 1 ms overlap. Handle overlap here.
     if (q->effectiveIsLive() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
     {
-        const auto last = m_data.front();
+        const auto& last = m_data.front();
         const auto lastTimeUs = last.eventParams.eventTimestampUsec;
 
         while (end != begin)
@@ -235,10 +235,10 @@ bool EventSearchListModel::Private::commitPrefetch(
 bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
     if (currentRequest().direction == FetchDirection::earlier)
-        return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
+        return commitPrefetch(periodToCommit, m_prefetch.begin(), m_prefetch.end(), count());
 
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
-    return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
+    return commitPrefetch(periodToCommit, m_prefetch.rbegin(), m_prefetch.rend(), 0);
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period,

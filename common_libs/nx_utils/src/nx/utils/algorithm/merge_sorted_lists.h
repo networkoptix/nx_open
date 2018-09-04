@@ -23,7 +23,7 @@ namespace algorithm {
 */
 template<class ListOfSortedLists, class LessPredicate>
 auto merge_sorted_lists(
-    ListOfSortedLists sortedLists,
+    ListOfSortedLists&& sortedLists,
     LessPredicate lessItem,
     int totalLimit = std::numeric_limits<int>::max())
 {
@@ -80,7 +80,11 @@ auto merge_sorted_lists(
         std::pop_heap(queueData.begin(), queueData.end(), lessPriority);
         auto& range = queueData.back();
 
-        result.push_back(*range.first);
+        if constexpr (std::is_rvalue_reference_v<decltype(sortedLists)>)
+            result.push_back(std::move(*range.first));
+        else
+            result.push_back(*range.first);
+
         ++range.first;
 
         if (range.first == range.second)
@@ -89,7 +93,7 @@ auto merge_sorted_lists(
             std::push_heap(queueData.begin(), queueData.end(), lessPriority);
     }
 
-    return std::move(result);
+    return result;
 };
 
 /**

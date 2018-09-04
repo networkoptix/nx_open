@@ -31,23 +31,21 @@ namespace QnUbjson {
         return result;
     }
 
-    template<class T>
-    T deserialized(const QByteArray& value, const T& defaultValue = T(), bool* success = nullptr)
+    template<typename T>
+    auto deserialized(const QByteArray& value, T&& defaultValue = {}, bool* success = nullptr)
     {
-        T target;
+        using Type = std::remove_reference_t<T>;
+
+        Type target;
         QnUbjsonReader<QByteArray> stream(&value);
         const bool result = QnUbjson::deserialize(&stream, &target);
         if (success)
             *success = result;
 
         if (result)
-        {
-            T local; // Enforcing NRVO, which is blocked by address-taking operator above.
-            std::swap(local, target);
-            return local;
-        }
+            return target;
 
-        return defaultValue;
+        return std::forward<Type>(defaultValue);
     }
 
 } // namespace QnUbjson

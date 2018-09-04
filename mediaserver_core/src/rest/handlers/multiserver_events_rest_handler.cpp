@@ -61,8 +61,8 @@ public:
         const auto getTimestamp =
             [](const vms::event::ActionData& data) { return data.eventParams.eventTimestampUsec; };
 
-        return std::move(utils::algorithm::merge_sorted_lists(std::move(outputData),
-            getTimestamp, request.order, request.limit));
+        return utils::algorithm::merge_sorted_lists(std::move(outputData),
+            getTimestamp, request.order, request.limit);
     }
 
 private:
@@ -91,9 +91,11 @@ private:
                 vms::event::ActionDataList remoteData;
                 bool success = false;
 
-                if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
+                if (osErrorCode == SystemError::noError
+                    && statusCode == nx::network::http::StatusCode::ok)
                 {
-                    remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
+                    remoteData =
+                        QnUbjson::deserialized<vms::event::ActionDataList>(msgBody, {}, &success);
                     NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
                 }
 
