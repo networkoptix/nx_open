@@ -254,8 +254,5 @@ if(beta)
 else()
     set(beta_bool "false")
 endif()
-nx_configure_file(
-    build_variables/maven/filter-resources/build_info.txt
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_save_known_files()
