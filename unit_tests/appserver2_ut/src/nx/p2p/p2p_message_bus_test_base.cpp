@@ -289,14 +289,14 @@ void P2pMessageBusTestBase::waitForSync(int cameraCount)
     using namespace std::placeholders;
     checkMessageBus(std::bind(&P2pMessageBusTestBase::checkRuntimeInfo, this, _1, _2), lm("missing runtime info"));
 
-    int expectedCamerasCount = m_servers.size();
+    int expectedCamerasCount = (int) m_servers.size();
     expectedCamerasCount *= cameraCount;
     // wait for data sync
     int syncDoneCounter = 0;
     do
     {
         syncDoneCounter = 0;
-        for (const auto& server : m_servers)
+        for (const auto& server: m_servers)
         {
             const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
             const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
