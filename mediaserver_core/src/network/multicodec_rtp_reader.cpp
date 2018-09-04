@@ -108,8 +108,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_timeHelper.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
+            m_defaultTimePolicy = TimePolicy::ignoreCameraTimeIfBigJitter;
     }
+    updateTimePolicy();
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -509,6 +510,9 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
         && networkResource->mediaPort() != m_RtpSession.getUrl().port(nx_rtsp::DEFAULT_RTSP_PORT);
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
+
+    if (key == QnMediaResource::trustCameraTimeKey())
+        updateTimePolicy();
 }
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
@@ -797,14 +801,18 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
     m_RtpSession.setDateTimeFormat(format);
 }
 
-void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
-{
-    m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
-}
-
 void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
 {
-    m_timeHelper.setTimePolicy(timePolicy);
+    m_defaultTimePolicy = timePolicy;
+    updateTimePolicy();
+}
+
+void QnMulticodecRtpReader::updateTimePolicy()
+{
+    if (m_resource && m_resource->getProperty(QnMediaResource::trustCameraTimeKey()).toInt() > 0)
+        m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
+    else
+        m_timeHelper.setTimePolicy(m_defaultTimePolicy);
 }
 
 void QnMulticodecRtpReader::addRequestHeader(

@@ -65,7 +65,6 @@ enum class TimePolicy
     ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
     forceLocalTime, //< Use local time only.
     forceCameraTime, //< Use camera NPT time only.
-    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper

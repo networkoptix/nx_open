@@ -388,7 +388,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
         return currentUs;
     }
 
-    if (m_timePolicy == TimePolicy::onvifExtension
+    if (m_timePolicy == TimePolicy::forceCameraTime
         && statistics.ntpOnvifExtensionTime.is_initialized())
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")
