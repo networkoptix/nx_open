@@ -3,6 +3,7 @@
 
 import imaplib
 import re
+from platform import system
 import email.header
 from email.parser import HeaderParser
 import os.path
@@ -144,3 +145,14 @@ class NoptixLibrary(object):
             if url in found:
                 return
         raise Exception(url+ " was not in the email.")
+
+    def get_os(self):
+        plat = system()
+        if plat == "Windows":
+            return "Windows"
+        elif plat == "Darwin":
+            return "MacOS"
+        elif plat == "Linux":
+            return "Linux"
+        else:
+            raise Exception("Mismatched platform")
