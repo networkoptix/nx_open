@@ -60,24 +60,28 @@ should register user with correct credentials
     Validate Register Success
 
 should register user with cyrillic First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Validate Register Success
 
 should register user with smiley First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
     Validate Register Success
 
 should register user with glyph First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
     Validate Register Success
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
@@ -149,6 +153,7 @@ should respond to Enter key and save data
     Validate Register Success
 
 should respond to Tab key
+    [tags]    C41867
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
     Click Link    ${CREATE ACCOUNT HEADER}
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
@@ -162,7 +167,9 @@ should respond to Tab key
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
     Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Element Should Be Focused    ${TERMS AND CONDITIONS LINK}
     Press Key    ${TERMS AND CONDITIONS LINK}    ${TAB}
+    Element Should Be Focused    ${PRIVACY POLICY LINK}
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
 
@@ -230,3 +237,40 @@ should not allow to access /register/success /activate/success by direct input
     Go To    ${url}/activate/success
     Wait Until Element Is Visible    ${JUMBOTRON}
     Location Should Be    ${url}/
+
+Cannot register email that is already registered
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
+
+Cannot register email that is already activated
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
+
+Check registration email links
+    [tags]    C24211
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
+    ${email text}    Get Email Body    ${email}
+    Log   ${email text}
+    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
+    ${links}    Get Links From Email    ${email}
+    log    ${links}
+    @{expected links}    Set Variable    ${SUPPORT_URL}    ${WEBSITE_URL}    ${ENV}    ${ENV}/activate
+    : FOR    ${link}  IN  @{links}
+    \    check in list    ${expected links}    ${link}
+    Delete Email    ${email}
+    Close Mailbox
