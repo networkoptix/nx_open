@@ -3,13 +3,16 @@
 
 #include <QtCore/QFile>
 
+#include <core/resource/storage_resource.h>
+
+#include "layout_storage_stream.h"
+
 extern "C"
 {
     #include <libavformat/avio.h>
 }
-#include "core/resource/storage_resource.h"
 
-class QnLayoutFile;
+class QnLayoutPlainStream;
 class QnTimePeriodList;
 
 /*
@@ -51,6 +54,24 @@ public:
     static QString itemUniqueId(const QString& layoutUrl, const QString& itemUniqueId);
 
     virtual QString getPath() const override;
+
+    // These functions interface with internal streams.
+    struct Stream
+    {
+        qint64 position = 0;
+        qint64 size = 0;
+
+        bool valid() const { return position > 0; }
+    };
+    // Adds new stream to the layout storage.
+    Stream addStream(const QString& fileName);
+    // Searches for a stream with the given name.
+    Stream findStream(const QString& fileName);
+    // Called from a output stream when it is closed.
+    void finalizeWrittenStream();
+    void registerFile(QnLayoutStream* file);
+    void unregisterFile(QnLayoutStream* file);
+
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 
@@ -77,23 +98,18 @@ public:
 #pragma pack(pop)
 
 private:
-    bool addFileEntry(const QString& fileName);
-    qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     bool readIndexHeader();
-    void registerFile(QnLayoutFile* file);
-    void unregisterFile(QnLayoutFile* file);
-
+    void addBinaryPostfix(QFile& file);
     void closeOpenedFiles();
     void restoreOpenedFiles();
-    void addBinaryPostfix(QFile& file);
     int getPostfixSize() const;
 
     static const quint64 MAGIC_STATIC = 0xfed8260da9eebc04ll;
 
 private:
-    friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
-    QSet<QnLayoutFile*> m_openedFiles;
+    QSet<QnLayoutStream*> m_openedFiles;
+    QSet<QnLayoutStream*> m_cachedOpenedFiles;
     QnMutex m_fileSync;
     static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
