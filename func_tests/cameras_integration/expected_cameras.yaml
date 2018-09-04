@@ -16,7 +16,7 @@
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: [0, 5]
-      transactions: {"errors": 0, "local": [1, 2], "success": [100, 200]}
+      transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
 
 
 00-09-18-4E-55-3A:
