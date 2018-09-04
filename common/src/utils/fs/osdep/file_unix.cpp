@@ -124,22 +124,21 @@ qint64 QnFile::read( char* buffer, qint64 count )
 
 qint64 QnFile::write( const char* buffer, qint64 count )
 {
-    auto printLogMessage = [](const QString& m, QnLogLevel l)
+    auto printLogMessage = [](const QString& m)
     {
-        NX_ERROR(typeid(QnFile), lit("Write failed. %1 Errno: %2")
-                .arg(m)
-                .arg(errno));
+        NX_ERROR(typeid(QnFile), lit("Write failed. %1 Errno: %2").arg(m).arg(errno));
     };
+
     if( !isOpen() )
     {
-        printLogMessage(lit("File is not opened."), cl_logERROR);
+        printLogMessage(lit("File is not opened."));
         return -1;
     }
     ssize_t writtenBytes = ::write( (long)m_impl, buffer, count );
     if (writtenBytes == -1)
-        printLogMessage(lit(""), cl_logERROR);
+        printLogMessage(lit(""));
     else if (writtenBytes < count)
-        printLogMessage(lit("Failed to write all bytes."), cl_logERROR);
+        printLogMessage(lit("Failed to write all bytes."));
 
     return writtenBytes;
 }

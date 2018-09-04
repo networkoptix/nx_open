@@ -177,7 +177,7 @@ qreal QnGlobalMonitor::totalCpuUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevCpuUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_WARNING(this, lit("MONITORING. Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2));
+        NX_WARNING(this, lit("Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2));
         d->prevCpuUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -194,7 +194,7 @@ qreal QnGlobalMonitor::totalRamUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevMemUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_WARNING(this, lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2));
+        NX_WARNING(this, lit("Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2));
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
 
 #ifdef __linux__
@@ -278,10 +278,10 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevHddUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_WARNING(this, lit("MONITORING. HDD usage:"));
+        NX_WARNING(this, lit("HDD usage:"));
         for( const HddLoad& hddLoad : d->totalHddLoad )
             NX_WARNING(this, lit("%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
-        NX_WARNING(this, lit("MONITORING. File handles:"));
+        NX_WARNING(this, lit("File handles:"));
         logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
@@ -292,7 +292,7 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
             FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
             malloc_info(0, memStatStr);
             fclose(memStatStr);
-            NX_WARNING(this, lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()));
+            NX_WARNING(this, lit("malloc statistics: \n%1").arg(memStatBuf.data()));
         #endif
     }
 
@@ -309,7 +309,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevNetworkUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_WARNING(this, lit("MONITORING. Network usage:"));
+        NX_WARNING(this, lit("Network usage:"));
         for( const NetworkLoad& networkLoad : d->totalNetworkLoad )
             NX_WARNING(this, lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).
                 arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024));

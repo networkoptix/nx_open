@@ -27,7 +27,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     m_sock->setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
     if (!m_sock->setDestAddr(m_resolvedAddress, kDefaultTFTPPort))
     {
-        qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << SystemError::getLastOSErrorText();
+        NX_WARNING(this, lm("setDestAddr() failed: %1"), SystemError::getLastOSErrorText());
     }
 }
 
@@ -120,7 +120,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             for (i = 0; i < m_retry; ++i)
             {
 
-                //NX_WARNING(this, "sending... ", blk_cam_sending);
+                //NX_VERBOSE(this, "sending... ", blk_cam_sending);
 
                 m_prevResult = CameraDiagnostics::NoErrorResult();
                 if (!m_sock->send(buff_send,len_send))
@@ -129,7 +129,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                     return 0;
                 }
 
-                //NX_WARNING(this, "send ", blk_cam_sending);
+                //NX_VERBOSE(this, "send ", blk_cam_sending);
 
                 while(1)
                 {
@@ -148,7 +148,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                         blk_cam_sending = buff_recv[2]*256 + buff_recv[3];
 
-                        //NX_WARNING(this, "got ", blk_cam_sending);
+                        //NX_VERBOSE(this, "got ", blk_cam_sending);
 
                         int data_len = len_recv-4;
 

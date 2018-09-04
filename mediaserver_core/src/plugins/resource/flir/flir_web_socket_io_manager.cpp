@@ -245,10 +245,10 @@ void WebSocketIoManager::routeIOMonitoringInitializationUnsafe(InitState newStat
             connectNotificationWebSocketUnsafe();
             break;
         case InitState::subscribed:
-            NX_VERBOSE(this, lit("Flir, successfully subscribed to IO notifications"));
+            NX_VERBOSE(this, lit("successfully subscribed to IO notifications"));
             break;
         case InitState::error:
-            NX_WARNING(this, lit("Flir, error occurred when subscribing to IO notifications"));
+            NX_WARNING(this, lit("error occurred when subscribing to IO notifications"));
             break;
         default:
             NX_ASSERT(false, "We should never be here.");

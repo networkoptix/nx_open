@@ -132,7 +132,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
 #elif defined(USE_SINGLE_DEVICE_PER_DECODER)
     if( !openD3D9Device() )
     {
-        NX_ERROR(this, QString::fromLatin1("QuicksyncDecoderPlugin. Failed to create D3D device. %1").
+        NX_ERROR(this, QString::fromLatin1("Failed to create D3D device. %1").
             arg(QString::fromWCharArray(DXGetErrorDescription(m_prevD3DOperationResult))));
         return NULL;
     }
@@ -141,7 +141,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     d3d9Ctx = m_d3dDevices[0];
 #endif
 
-    NX_INFO (this, QString::fromLatin1("QuicksyncDecoderPlugin. Creating decoder..."));
+    NX_INFO (this, QString::fromLatin1("Creating decoder..."));
 
     std::unique_ptr<VideoDecoderSwitcher> videoDecoderSwitcher( new VideoDecoderSwitcher( NULL, data, *this ) );
 
@@ -457,13 +457,13 @@ bool QuicksyncDecoderPlugin::isStreamSupportedNonSafe( const nx::utils::stree::A
     PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
     if( !usageLock.locked() )
     {
-        NX_WARNING (this, QString::fromLatin1("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"));
+        NX_WARNING (this, QString::fromLatin1("Failed to lock shared usage watcher. Cannot create decoder"));
         return false;
     }
 
     if( !m_usageWatcher->readExternalUsage() )
     {
-        NX_WARNING (this, QString::fromLatin1("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"));
+        NX_WARNING (this, QString::fromLatin1("Failed to read total usage. Cannot create decoder"));
         return false;
     }
 

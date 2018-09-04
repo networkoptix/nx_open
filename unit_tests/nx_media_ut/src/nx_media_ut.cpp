@@ -70,7 +70,7 @@ public:
             && (resolution.width() > s_maxResolution.width()
                 || resolution.height() > s_maxResolution.height()))
         {
-            NX_INFO(typeid(MockVideoDecoder),lit("[TEST] MockVideoDecoder::isCompatible() -> false: "
+            NX_INFO(typeid(MockVideoDecoder),lit("[TEST] isCompatible() -> false: "
                 "resolution %1 x %2 is higher than %3 x %4")
                 .arg(resolution.width()).arg(resolution.height())
                 .arg(s_maxResolution.width()).arg(s_maxResolution.height()));
@@ -82,7 +82,7 @@ public:
             && (resolution.width() > s_maxTranscodedResolution.width()
                 || resolution.height() > s_maxTranscodedResolution.height()))
         {
-            NX_INFO(typeid(MockVideoDecoder), lit("[TEST] MockVideoDecoder::isCompatible() -> false: "
+            NX_INFO(typeid(MockVideoDecoder), lit("[TEST] isCompatible() -> false: "
                 "For transcoding codec %1, resolution %2 x %3 is higher than %4 x %5")
                 .arg(s_transcodingCodec)
                 .arg(resolution.width()).arg(resolution.height())
@@ -102,7 +102,7 @@ public:
         const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
         QVideoFramePtr* /*outDecodedFrame*/) override
     {
-        NX_INFO(this, lit("[TEST] INTERNAL ERROR: VideoDecoder::decode() called"));
+        NX_INFO(this, lit("[TEST] INTERNAL ERROR: decode() called"));
         return 0;
     }
 

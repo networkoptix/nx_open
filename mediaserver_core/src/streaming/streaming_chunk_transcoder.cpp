@@ -97,8 +97,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
             transcodeParams.srcResourceUniqueID());
     if (!cameraResource)
     {
-        NX_DEBUG(this, lm("StreamingChunkTranscoder::transcodeAsync. "
-            "Requested resource %1 is not a media resource")
+        NX_DEBUG(this, lm("Requested resource %1 is not a media resource")
             .arg(transcodeParams.srcResourceUniqueID()));
         return false;
     }
@@ -108,8 +107,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     // camera already at resourcePool but still missing at videoCameraPool().
     if (!camera)
     {
-        NX_DEBUG(this, lm("StreamingChunkTranscoder::transcodeAsync. "
-            "Requested resource %1 is not completly registered yet")
+        NX_DEBUG(this, lm("Requested resource %1 is not completly registered yet")
             .arg(transcodeParams.srcResourceUniqueID()));
         return false;
     }
@@ -235,8 +233,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             createTranscoder(cameraResource, transcodeParams);
         if (!dataSourceCtx->transcoder)
         {
-            NX_WARNING(this, lm("StreamingChunkTranscoder::transcodeAsync. "
-                "Failed to create transcoder. resource %1, format %2, video codec %3")
+            NX_WARNING(this, lm("Failed to create transcoder. resource %1, format %2, video codec %3")
                 .arg(transcodeParams.srcResourceUniqueID()).arg(transcodeParams.containerFormat())
                 .arg(transcodeParams.videoCodec()));
             return nullptr;
@@ -302,8 +299,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
         serverModule()->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
     if (!dp)
     {
-        NX_WARNING(this, lm("StreamingChunkTranscoder::transcodeAsync. "
-            "Failed (1) to create archive data provider (resource %1)").
+        NX_WARNING(this, lm("Failed (1) to create archive data provider (resource %1)").
             arg(transcodeParams.srcResourceUniqueID()));
         return nullptr;
     }
@@ -314,8 +310,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     archiveReader->getArchiveDelegate()->setPlaybackMode(PlaybackMode::Export);
     if (!archiveReader || !archiveReader->open(/*archiveIntegrityWatcher*/ nullptr))
     {
-        NX_WARNING(this, lm("StreamingChunkTranscoder::transcodeAsync. "
-            "Failed (2) to create archive data provider (resource %1)").
+        NX_WARNING(this, lm("Failed (2) to create archive data provider (resource %1)").
             arg(transcodeParams.srcResourceUniqueID()));
         return nullptr;
     }
@@ -344,8 +339,7 @@ void StreamingChunkTranscoder::onTimer(const quint64& timerID)
     std::map<quint64, int>::const_iterator taskIter = m_taskIDToTranscode.find(timerID);
     if (taskIter == m_taskIDToTranscode.end())
     {
-        NX_DEBUG(this, lm("StreamingChunkTranscoder::onTimer. "
-            "Received timer event with unknown id %1. Ignoring...").arg(timerID));
+        NX_DEBUG(this, lm("Received timer event with unknown id %1. Ignoring...").arg(timerID));
         return;
     }
 
@@ -356,13 +350,13 @@ void StreamingChunkTranscoder::onTimer(const quint64& timerID)
         m_scheduledTranscodings.find(transcodeID);
     if (transcodeIter == m_scheduledTranscodings.end())
     {
-        NX_DEBUG(this, lm("StreamingChunkTranscoder::onTimer. "
+        NX_DEBUG(this, lm("onTimer. "
             "Received timer event (%1) with unknown transcode id %2. Ignoring...").
             arg(timerID).arg(transcodeID));
         return;
     }
 
-    NX_DEBUG(this, lm("StreamingChunkTranscoder::onTimer. Received timer event with id %1. Resource %1").
+    NX_DEBUG(this, lm("onTimer. Received timer event with id %1. Resource %1").
         arg(timerID).arg(transcodeIter->second.mediaResource->toResource()->getUniqueId()));
 
     if (!startTranscoding(
@@ -371,7 +365,7 @@ void StreamingChunkTranscoder::onTimer(const quint64& timerID)
             transcodeIter->second.transcodeParams,
             transcodeIter->second.chunk))
     {
-        NX_WARNING(this, lm("StreamingChunkTranscoder::onTimer. Failed to start transcoding (resource %1)").
+        NX_WARNING(this, lm("onTimer. Failed to start transcoding (resource %1)").
             arg(transcodeIter->second.mediaResource->toResource()->getUniqueId()));
         transcodeIter->second.chunk->doneModification(StreamingChunk::rcError);
     }

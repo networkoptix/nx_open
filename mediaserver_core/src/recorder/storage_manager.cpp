@@ -582,7 +582,7 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
         if (doAdd)
             camerasToAdd.push_back(camera);
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
         {
             QString logMessage;
             QTextStream logStream(&logMessage);
@@ -933,7 +933,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
                 storagesToScan << storage;
         }
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
         {
             QString logString;
             QTextStream logStream(&logString);
@@ -1668,7 +1668,7 @@ void QnStorageManager::clearSpace(bool forced)
     qint64 toDeleteTotal = 0;
     std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now();
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
     {
         NX_VERBOSE(this, lit("[Cleanup, measure]: %1 storages are ready for a cleanup").arg(storages.size()));
         NX_VERBOSE(this, lit("[Cleanup, measure]: Starting cleanup routine for %1 storage manager")
@@ -1712,7 +1712,7 @@ void QnStorageManager::clearSpace(bool forced)
     for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false, storage->getSpaceLimit());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2) && toDeleteTotal > 0)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose) && toDeleteTotal > 0)
     {
         QString clearSpaceLogMessage;
         QTextStream clearSpaceLogStream(&clearSpaceLogMessage);

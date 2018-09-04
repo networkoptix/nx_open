@@ -76,14 +76,14 @@ QuickSyncVideoDecoder::QuicksyncDXVAPictureData::QuicksyncDXVAPictureData(
     ++surface->syncCtx.externalRefCounter;
     allocator->gethdl( m_mfxSurface->mfxSurface.Data.MemId, reinterpret_cast<mfxHDL*>(&m_d3dSurface) );
     ULONG refCount = m_d3dSurface->AddRef();
-    NX_VERBOSE(this, QString::fromLatin1("QuickSyncVideoDecoder::QuicksyncDXVAPictureData::QuicksyncDXVAPictureData(). surf(%1) ref %2").
+    NX_VERBOSE(this, QString::fromLatin1("Constructor. surf(%1) ref %2").
         arg((size_t)m_d3dSurface, 0, 16).arg(refCount));
 }
 
 QuickSyncVideoDecoder::QuicksyncDXVAPictureData::~QuicksyncDXVAPictureData()
 {
     ULONG refCount = m_d3dSurface->Release();
-    NX_VERBOSE(this, QString::fromLatin1("QuickSyncVideoDecoder::QuicksyncDXVAPictureData::~QuicksyncDXVAPictureData(). surf(%1) ref %2").
+    NX_VERBOSE(this, QString::fromLatin1("Destructor. surf(%1) ref %2").
         arg((size_t)m_d3dSurface, 0, 16).arg(refCount));
     --m_mfxSurface->syncCtx.externalRefCounter;
 }
@@ -363,7 +363,7 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
 
         const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
         const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
-        NX_VERBOSE(this, QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
+        NX_VERBOSE(this, QString("decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4%5").
             arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).arg(millisSincePrevInputFrame).
             arg(QString::fromLatin1(delayedInputFrame ? ". Delayed input frame" : "")));
 
@@ -507,10 +507,10 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
     if( decoderProducedFrame )
     {
         if( m_totalOutputFrames == 0 )
-            NX_DEBUG(this, QString::fromLatin1( "QuickSyncVideoDecoder. First decoded frame delayed for %1 input frame(s). clock %2" ).arg(m_totalInputFrames-1).arg(GetTickCount()));
+            NX_DEBUG(this, QString::fromLatin1( "First decoded frame delayed for %1 input frame(s). clock %2" ).arg(m_totalInputFrames-1).arg(GetTickCount()));
         ++m_totalOutputFrames;
         if( currentClock - m_prevOutPictureClock > 1000 )
-            NX_DEBUG(this, QString::fromLatin1( "QuickSyncVideoDecoder. Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock));
+            NX_DEBUG(this, QString::fromLatin1( "Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock));
         m_prevOutPictureClock = currentClock;
 
         if( *outFrame )
@@ -521,7 +521,7 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
         }
     }
 
-    //NX_DEBUG(this, QString::fromLatin1( "QuickSyncVideoDecoder::decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()));
+    //NX_DEBUG(this, QString::fromLatin1( "decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()));
     m_prevInputFrameMs = GetTickCount();
 
     //return m_totalOutputFrames > 5 ? false : decoderProducedFrame;
@@ -584,7 +584,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
             if( opStatus >= MFX_ERR_NONE && m_syncPoint )
             {
                 opStatus = m_mfxSession.SyncOperation( m_syncPoint, INFINITE );
-                NX_VERBOSE(this, QString::fromLatin1("QuickSyncVideoDecoder. sync operation result %1").arg(mfxStatusCodeToString(opStatus)),
+                NX_VERBOSE(this, QString::fromLatin1("sync operation result %1").arg(mfxStatusCodeToString(opStatus)),
                     opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
 
                 if( decodedFrame && !decodedFrameCtx.data() )
@@ -631,11 +631,11 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
             {
                 if( !gotDisplayPicture )
                 {
-                    NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. Providing picture at output. Out frame timestamp %1, frame order %2, corrupted %3").
+                    NX_INFO(this, QString::fromLatin1("Providing picture at output. Out frame timestamp %1, frame order %2, corrupted %3").
                         arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(decodedFrameCtx->mfxSurface.Data.FrameOrder).arg(decodedFrameCtx->mfxSurface.Data.Corrupted));
                     if( m_prevTimestamp > decodedFrameCtx->mfxSurface.Data.TimeStamp )
                     {
-                        NX_INFO(this, QString::fromLatin1("QuickSyncVideoDecoder. Warning! timestamp decreased by %1. Current 90KHz timestamp %2, previous %3. Ignoring frame...").
+                        NX_INFO(this, QString::fromLatin1("Warning! timestamp decreased by %1. Current 90KHz timestamp %2, previous %3. Ignoring frame...").
                             arg(QString::number(m_prevTimestamp - decodedFrameCtx->mfxSurface.Data.TimeStamp)).
                             arg(QString::number(decodedFrameCtx->mfxSurface.Data.TimeStamp)).
                             arg(QString::number(m_prevTimestamp)));
@@ -661,7 +661,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                 {
                     //decoder returned second picture for same input. Enqueue? We must be sure that we will not come into dead-lock waiting
                         //for some frame to become free before decoding and holding frame(s) in this decoded picture queue
-                    NX_WARNING (this, QString::fromLatin1("QuickSyncVideoDecoder. Warning! Got second picture from Intel media decoder during single decoding step! Ignoring..."));
+                    NX_WARNING (this, QString::fromLatin1("Warning! Got second picture from Intel media decoder during single decoding step! Ignoring..."));
                 }
                 break;
             }
@@ -686,10 +686,10 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                 //limiting recursion depth
                 if( m_recursionDepth > 0 )
                 {
-                    NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. Recursion detected!"));
+                    NX_ERROR (this, QString::fromLatin1("Recursion detected!"));
                     return false;
                 }
-                NX_ERROR(this, QString::fromLatin1("QuickSyncVideoDecoder. Critical error occured during Quicksync decode session %1").
+                NX_ERROR(this, QString::fromLatin1("Critical error occured during Quicksync decode session %1").
                     arg(mfxStatusCodeToString(opStatus)));
                 //draining decoded frames from decoder
                 mfxBitstream emptyBuffer;
@@ -836,10 +836,10 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                 //limiting recursion depth
                 if( m_recursionDepth > 0 )
                 {
-                    NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. Recursion detected!"));
+                    NX_ERROR (this, QString::fromLatin1("Recursion detected!"));
                     return false;
                 }
-                NX_ERROR(this, QString::fromLatin1("QuickSyncVideoDecoder. Critical error occured during Quicksync decode session %1").
+                NX_ERROR(this, QString::fromLatin1("Critical error occured during Quicksync decode session %1").
                     arg(mfxStatusCodeToString(opStatus)));
                 //draining decoded frames from decoder
                 mfxBitstream emptyBuffer;
@@ -1273,7 +1273,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
 {
     NX_ASSERT( m_mfxSessionEstablished );
 
-    NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Initializing decoder..."));
+    NX_DEBUG(this, QString::fromLatin1("Initializing decoder..."));
 
     if( !m_decoder.get() )
     {
@@ -1433,7 +1433,7 @@ bool QuickSyncVideoDecoder::initProcessor()
 {
     NX_ASSERT( m_decodingInitialized );
 
-    NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Initializing VPP processor..."));
+    NX_DEBUG(this, QString::fromLatin1("Initializing VPP processor..."));
 
     if( m_outPictureSize == QSize(m_srcStreamParam.mfx.FrameInfo.Width, m_srcStreamParam.mfx.FrameInfo.Height - (m_originalFrameCropTop + m_originalFrameCropBottom)) )
     {
@@ -1558,12 +1558,12 @@ bool QuickSyncVideoDecoder::initOpenCL()
     m_prevCLStatus = clGetPlatformIDs( MAX_PLATFORMS_NUMBER, platforms, &numPlatforms );
     if( m_prevCLStatus != CL_SUCCESS )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. clGetPlatformIDs failed. %1").arg(prevCLErrorText()));
+        NX_ERROR (this, QString::fromLatin1("clGetPlatformIDs failed. %1").arg(prevCLErrorText()));
         return false;
     }
     if( numPlatforms == 0 )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. No OpenCL platform IDs found"));
+        NX_ERROR (this, QString::fromLatin1("No OpenCL platform IDs found"));
         return false;
     }
 
@@ -1583,10 +1583,10 @@ bool QuickSyncVideoDecoder::initOpenCL()
     //platformExtensionsStr[std::min<size_t>(actualPlatformExtensionsStrSize, sizeof(platformExtensionsStr)/sizeof(*platformExtensionsStr))] = 0;
     //if( m_prevCLStatus != CL_SUCCESS )
     //{
-    //    NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. clGetPlatformInfo failed. %1").arg(prevCLErrorText()));
+    //    NX_ERROR (this, QString::fromLatin1("clGetPlatformInfo failed. %1").arg(prevCLErrorText()));
     //    return false;
     //}
-    //NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Supported CL extension: %1").arg(QString::fromLatin1(platformExtensionsStr)));
+    //NX_DEBUG(this, QString::fromLatin1("Supported CL extension: %1").arg(QString::fromLatin1(platformExtensionsStr)));
 
     if( !m_clGetDeviceIDsFromDX9INTEL )
         m_clGetDeviceIDsFromDX9INTEL = (clGetDeviceIDsFromDX9INTEL_fn)clGetExtensionFunctionAddress( "clGetDeviceIDsFromDX9INTEL" );
@@ -1595,7 +1595,7 @@ bool QuickSyncVideoDecoder::initOpenCL()
     //clGetGLContextInfoKHR_fn clGetGLContextInfoKHR = (clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress( "clGetGLContextInfoKHR" );
     if( !m_clGetDeviceIDsFromDX9INTEL || !m_clCreateFromDX9MediaSurfaceINTEL )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. Seems like no cl_intel_dx9_media_sharing extension on this platform... %1"));
+        NX_ERROR (this, QString::fromLatin1("Seems like no cl_intel_dx9_media_sharing extension on this platform... %1"));
         return false;
     }
 
@@ -1619,12 +1619,12 @@ bool QuickSyncVideoDecoder::initOpenCL()
     //    &numOfDevices );
     if( m_prevCLStatus != CL_SUCCESS )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. clGetDeviceIDs failed. %1").arg(prevCLErrorText()));
+        NX_ERROR (this, QString::fromLatin1("clGetDeviceIDs failed. %1").arg(prevCLErrorText()));
         return false;
     }
     if( numOfDevices == 0 )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. No OpenCL device IDs found"));
+        NX_ERROR (this, QString::fromLatin1("No OpenCL device IDs found"));
         return false;
     }
 
@@ -1643,7 +1643,7 @@ bool QuickSyncVideoDecoder::initOpenCL()
         &m_prevCLStatus );
     if( m_prevCLStatus != CL_SUCCESS )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. clCreateContext failed. %1").arg(prevCLErrorText()));
+        NX_ERROR (this, QString::fromLatin1("clCreateContext failed. %1").arg(prevCLErrorText()));
         return false;
     }
 
@@ -1793,7 +1793,7 @@ void QuickSyncVideoDecoder::checkAsyncOperations( AsyncOperationContext** const 
                 {
                     //NOTE it is normal, that we cannot find unused surface for vpp, since we give out vpp_out surfaces to the caller and it is unspecified,
                         //when it will release vpp_out surface. Because of this we need all this states & transitions
-                    NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Cannot start VPP of frame (pts %1), since there is no unused vpp_out surface").
+                    NX_DEBUG(this, QString::fromLatin1("Cannot start VPP of frame (pts %1), since there is no unused vpp_out surface").
                         arg(it->decodedFrame->mfxSurface.Data.TimeStamp));
                     break;  //to next surface
                 }
@@ -1811,7 +1811,7 @@ void QuickSyncVideoDecoder::checkAsyncOperations( AsyncOperationContext** const 
                 //marking it->outPicture surface as used
                 _InterlockedIncrement16( (short*)&it->outPicture->mfxSurface.Data.Locked );
 
-                NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. starting frame (pts %1) post-processing. Result %2").
+                NX_DEBUG(this, QString::fromLatin1("starting frame (pts %1) post-processing. Result %2").
                     arg(it->decodedFrame->mfxSurface.Data.TimeStamp).arg(mfxStatusCodeToString(opStatus)));
                 break;
 
@@ -1974,7 +1974,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
             const DWORD t1 = GetTickCount();
             if( surfaceCtx.syncCtx.usageCounter > 0 )
             {
-                NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. Invalidated frame (0x%1) refs, waiting for refs to be released... (externalRefCounter = %2, Locked = %3)").
+                NX_INFO(this, QString::fromLatin1("Invalidated frame (0x%1) refs, waiting for refs to be released... (externalRefCounter = %2, Locked = %3)").
                     arg((size_t)&surfaceCtx.syncCtx, 0, 16).arg(surfaceCtx.syncCtx.externalRefCounter).arg(surfaceCtx.mfxSurface.Data.Locked));
             }
             //waiting for the surface to become unused (usage counter must drop to zero)
@@ -1985,7 +1985,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
             --surfaceCtx.syncCtx.externalRefCounter;
             _InterlockedDecrement16( (short*)&surfaceCtx.mfxSurface.Data.Locked );
             surfaceCtx.didWeLockedSurface = false;
-            NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Cancelled frame (0x%1) rendering (externalRefCounter = %2, Locked = %3). It took %4 ms").
+            NX_DEBUG(this, QString::fromLatin1("Cancelled frame (0x%1) rendering (externalRefCounter = %2, Locked = %3). It took %4 ms").
                 arg((size_t)&surfaceCtx.syncCtx, 0, 16).arg(surfaceCtx.syncCtx.externalRefCounter).arg(surfaceCtx.mfxSurface.Data.Locked).arg(GetTickCount()-t1));
             return surfacePool->at(i);
         }
@@ -2124,7 +2124,7 @@ void QuickSyncVideoDecoder::saveToAVFrame(
            &m_prevCLStatus );
         if( m_prevCLStatus != CL_SUCCESS )
         {
-            NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. clCreateFromDX9MediaSurfaceINTEL failed. %1").arg(prevCLErrorText()));
+            NX_ERROR (this, QString::fromLatin1("clCreateFromDX9MediaSurfaceINTEL failed. %1").arg(prevCLErrorText()));
         }
     }
 #endif
@@ -2267,13 +2267,13 @@ mfxStatus QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputSt
                 if( m_sps.get() )
                     if( m_sps->seq_parameter_set_id != sps->seq_parameter_set_id )
                     {
-                        NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. SPS id changed from %1 to %2. Reinitializing...").
+                        NX_DEBUG(this, QString::fromLatin1("SPS id changed from %1 to %2. Reinitializing...").
                             arg(m_sps->seq_parameter_set_id).arg(sps->seq_parameter_set_id));
                         m_reinitializeNeeded = true;
                     }
                     else if( (m_sps->pic_width_in_mbs != sps->pic_width_in_mbs) || (m_sps->pic_height_in_map_units != sps->pic_height_in_map_units) )
                     {
-                        NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Picture size in SPS has changed from %1.%2 to %3.%4. Reinitializing...").
+                        NX_DEBUG(this, QString::fromLatin1("Picture size in SPS has changed from %1.%2 to %3.%4. Reinitializing...").
                             arg(m_sps->getWidth()).arg(m_sps->getHeight()).arg(sps->getWidth()).arg(sps->getHeight()));
                         m_reinitializeNeeded = true;
                     }
@@ -2368,7 +2368,7 @@ mfxStatus QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputSt
 
     if( spsFound && ppsFound && !requirePicTimingSEI )
     {
-        NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Found and parsed sequence header"));
+        NX_DEBUG(this, QString::fromLatin1("Found and parsed sequence header"));
         return MFX_ERR_NONE;
     }
 
@@ -2670,7 +2670,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
 
     //if( res != D3D_OK )
     //{
-    //    NX_ERROR(this, QString::fromLatin1("QuickSyncVideoDecoder. Scaling. CheckDeviceFormatConversion failed. %1").
+    //    NX_ERROR(this, QString::fromLatin1("Scaling. CheckDeviceFormatConversion failed. %1").
     //        arg(QString::fromWCharArray(DXGetErrorDescription(res))));
     //    return MFX_ERR_UNKNOWN;
     //}
@@ -2689,7 +2689,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     res = surfFrom->GetDesc( &surfFromDesc );
     if( res != D3D_OK )
     {
-        NX_ERROR(this, QString::fromLatin1("QuickSyncVideoDecoder. Scaling. Failed to get src surface desc. %1").
+        NX_ERROR(this, QString::fromLatin1("Scaling. Failed to get src surface desc. %1").
             arg(QString::fromWCharArray(DXGetErrorDescription(res))));
         return MFX_ERR_UNKNOWN;
     }
@@ -2704,7 +2704,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     dstRect.right = m_outPictureSize.width();
     dstRect.bottom = m_outPictureSize.height();
 
-    NX_VERBOSE(this, QString::fromLatin1("QuickSyncVideoDecoder. Scaling decoded frame to %1x%2...").
+    NX_VERBOSE(this, QString::fromLatin1("Scaling decoded frame to %1x%2...").
         arg(m_outPictureSize.width()).arg(m_outPictureSize.height()));
 
     //const DWORD t1 = GetTickCount();
@@ -2724,7 +2724,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
     }
     if( res != D3D_OK )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. Scaling. Failed to lock d3d device. %1").arg(QString::fromWCharArray(DXGetErrorDescription(res))));
+        NX_ERROR (this, QString::fromLatin1("Scaling. Failed to lock d3d device. %1").arg(QString::fromWCharArray(DXGetErrorDescription(res))));
         return MFX_ERR_UNKNOWN;
     }
 
@@ -2736,7 +2736,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
 
     if( res != D3D_OK )
     {
-        NX_ERROR (this, QString::fromLatin1("QuickSyncVideoDecoder. Scaling. Failed to scale frame. %1").arg(QString::fromWCharArray(DXGetErrorDescription(res))));
+        NX_ERROR (this, QString::fromLatin1("Scaling. Failed to scale frame. %1").arg(QString::fromWCharArray(DXGetErrorDescription(res))));
         return MFX_ERR_UNKNOWN;
     }
 
@@ -2744,7 +2744,7 @@ mfxStatus QuickSyncVideoDecoder::scaleFrame( const mfxFrameSurface1& from, mfxFr
 
     //const DWORD t3 = GetTickCount();
 
-    //NX_DEBUG(this, QString::fromLatin1("QuickSyncVideoDecoder. Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
+    //NX_DEBUG(this, QString::fromLatin1("Frame has been successfully scaled to %1x%2. It took %3 ms (%4 ms to locking)").
     //    arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).arg(t3-t1).arg(t2-t1));
 
     return MFX_ERR_NONE;
@@ -2846,9 +2846,9 @@ mfxStatus QuickSyncVideoDecoder::doDecodingStep( mfxBitstream* const inputStream
     if( inputStream->DataOffset - dataOffsetBak > 0 )
         m_inputStreamFile.write( (const char*)inputStream->Data + dataOffsetBak, inputStream->DataOffset - dataOffsetBak );
 #endif
-    NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. starting frame (pts %1) decoding. Result %2").
-        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)),
-        (opStatus == MFX_ERR_NONE || opStatus == MFX_ERR_MORE_DATA) ? cl_logDEBUG2 : cl_logDEBUG1 );
+    NX_UTILS_LOG((opStatus == MFX_ERR_NONE || opStatus == MFX_ERR_MORE_DATA) ? nx::utils::log::Level::verbose : nx::utils::log::Level::debug,
+        this, QString::fromLatin1("starting frame (pts %1) decoding. Result %2").
+        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)));
 
     return opStatus;
 }
@@ -2874,8 +2874,9 @@ mfxStatus QuickSyncVideoDecoder::doProcessingStep( QSharedPointer<SurfaceContext
 
 #if defined(SCALE_WITH_MFX)
     opStatus = m_processor->RunFrameVPPAsync( &decodedFrameCtx->mfxSurface, &(*scaledFrameCtx)->mfxSurface, NULL, &m_syncPoint );
-    NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. starting frame (pts %1) processing. Result %2").
-        arg((*scaledFrameCtx)->mfxSurface.Data.TimeStamp).arg(mfxStatusCodeToString(opStatus)), opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
+    NX_UTILS_LOG(opStatus == MFX_ERR_NONE ? nx::utils::log::Level::verbose : nx::utils::log::Level::debug,
+        this, QString::fromLatin1("starting frame (pts %1) processing. Result %2").
+        arg((*scaledFrameCtx)->mfxSurface.Data.TimeStamp).arg(mfxStatusCodeToString(opStatus)));
 #else
     // Scaling with directx.
     opStatus = scaleFrame( decodedFrameCtx->mfxSurface, &(*scaledFrameCtx)->mfxSurface );

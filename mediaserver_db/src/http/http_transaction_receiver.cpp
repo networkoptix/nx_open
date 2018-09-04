@@ -89,7 +89,7 @@ namespace ec2
             {
                 if( d->prevSocketError == SystemError::timedOut )
                 {
-                    NX_DEBUG(this, lit("QnHttpTransactionReceiver. Keep-alive timeout on transaction connection %1 from peer %2").
+                    NX_DEBUG(this, lit("Keep-alive timeout on transaction connection %1 from peer %2").
                         arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()));
                 }
                 break;
@@ -127,7 +127,7 @@ namespace ec2
                     d->request,
                     d->requestBody ) )
             {
-                NX_WARNING(this, lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
+                NX_WARNING(this, lit("Received transaction from %1 for unknown connection %2").
                     arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()));
                 sendResponse( nx::network::http::StatusCode::notFound, nx::network::http::StringType() );
                 break;

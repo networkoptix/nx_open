@@ -241,7 +241,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get parent id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -252,7 +252,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get type id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -267,7 +267,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -283,7 +283,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -305,7 +305,7 @@ bool Reader::readFileData()
         m_lastError =  {
             lit("File data is NULL for archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -326,7 +326,7 @@ bool Reader::parseData()
             m_lastError = {
                 lit("Camera info file %1 parse failed")
                     .arg(infoFilePath()),
-                cl_logERROR
+                utils::log::Level::error
             };
             return false;
         case ParseResult::ParseCode::Ok:

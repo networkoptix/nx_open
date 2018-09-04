@@ -2,16 +2,6 @@
 
 #include <nx/utils/log/log_main.h>
 
-typedef nx::utils::log::Level QnLogLevel;
-static constexpr const QnLogLevel cl_logUNKNOWN = nx::utils::log::Level::undefined;
-static constexpr const QnLogLevel cl_logNONE = nx::utils::log::Level::none;
-static constexpr const QnLogLevel cl_logALWAYS = nx::utils::log::Level::always;
-static constexpr const QnLogLevel cl_logERROR = nx::utils::log::Level::error;
-static constexpr const QnLogLevel cl_logWARNING = nx::utils::log::Level::warning;
-static constexpr const QnLogLevel cl_logINFO = nx::utils::log::Level::info;
-static constexpr const QnLogLevel cl_logDEBUG1 = nx::utils::log::Level::debug;
-static constexpr const QnLogLevel cl_logDEBUG2 = nx::utils::log::Level::verbose;
-
 struct QnLogs;
 struct QnLog
 {

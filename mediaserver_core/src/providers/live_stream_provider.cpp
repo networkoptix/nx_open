@@ -718,7 +718,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
         m_cameraRes->saveParamsAsync();
-        NX_INFO(this, lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
+        NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
                 .arg(QnLexical::serialized(info.encoderIndex)));
     }
 }

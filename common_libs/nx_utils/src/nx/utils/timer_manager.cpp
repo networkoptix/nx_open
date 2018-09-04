@@ -255,7 +255,7 @@ void StandaloneTimerManager::run()
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_DEBUG(this, lm("StandaloneTimerManager started"));
+    NX_DEBUG(this, lm("started"));
 
     while (!m_terminated)
     {
@@ -325,7 +325,7 @@ void StandaloneTimerManager::run()
         }
         catch (exception& e)
         {
-            NX_ERROR(this, lm("StandaloneTimerManager. Error. Exception in %1:%2. %3")
+            NX_ERROR(this, lm("Error. Exception in %1:%2. %3")
                 .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())));
             timeToWait = kErrorSkipTimeout;
             m_runningTaskID = 0;
@@ -340,7 +340,7 @@ void StandaloneTimerManager::run()
             m_cond.wait(lk.mutex());
     }
 
-    NX_DEBUG(this, lm("StandaloneTimerManager stopped"));
+    NX_DEBUG(this, lm("stopped"));
 }
 
 void StandaloneTimerManager::addTaskNonSafe(

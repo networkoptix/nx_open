@@ -909,10 +909,10 @@ QSize QnPlOnvifResource::findSecondaryResolution(
         }
         else
         {
-            qWarning()
-                << "QnPlOnvifResource::findSecondaryResolution(). "
-                << "Wrong parameter format (FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME) "
-                << forcedSecondaryResolution;
+            NX_WARNING(this,
+                lm("findSecondaryResolution(): Wrong parameter format "
+                   "(FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME) %1"),
+                forcedSecondaryResolution);
         }
     }
 
@@ -1298,14 +1298,14 @@ int QnPlOnvifResource::innerQualityToOnvif(
     if (quality > Qn::StreamQuality::highest)
     {
         NX_VERBOSE(this,
-            lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too big): %1")
+            lm("innerQualityToOnvif: got unexpected quality (too big): %1")
             .arg((int)quality));
         return maxQuality;
     }
     if (quality < Qn::StreamQuality::lowest)
     {
         NX_VERBOSE(this,
-            lm("QnPlOnvifResource::innerQualityToOnvif: got unexpected quality (too small): %1")
+            lm("innerQualityToOnvif: got unexpected quality (too small): %1")
             .arg((int)quality));
         return minQuality;
     }
@@ -1314,7 +1314,7 @@ int QnPlOnvifResource::innerQualityToOnvif(
         + (maxQuality - minQuality)
         * ((int)quality - (int)Qn::StreamQuality::lowest)
         / ((int)Qn::StreamQuality::highest - (int)Qn::StreamQuality::lowest);
-    NX_DEBUG(this, QString(lit("QnPlOnvifResource::innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4"))
+    NX_DEBUG(this, QString(lit("innerQualityToOnvif: in quality = %1, out qualty = %2, minOnvifQuality = %3, maxOnvifQuality = %4"))
             .arg((int)quality)
             .arg(onvifQuality)
             .arg(minQuality)

@@ -45,12 +45,12 @@ QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvi
 {
     if (isRTSPSupported())
     {
-        NX_DEBUG(this, lit("Arecont. Creating live RTSP provider for camera %1").arg(getHostAddress()));
+        NX_DEBUG(this, lit("Creating live RTSP provider for camera %1").arg(getHostAddress()));
         return new QnArecontRtspStreamReader(toSharedPointer(this));
     }
     else
     {
-        NX_DEBUG(this, lit("Arecont. Create live TFTP provider for camera %1").arg(getHostAddress()));
+        NX_DEBUG(this, lit("Create live TFTP provider for camera %1").arg(getHostAddress()));
         return new AVClientPullSSTFTPStreamreader(toSharedPointer(this));
     }
 }

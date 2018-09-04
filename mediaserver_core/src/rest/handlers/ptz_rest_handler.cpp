@@ -192,7 +192,7 @@ int QnPtzRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    NX_DEBUG(this, lit("QnPtzRestHandler: received request %1 %2").arg(path).arg(toString(params)));
+    NX_DEBUG(this, lit("received request %1 %2").arg(path).arg(toString(params)));
 
     QString sequenceId;
     int sequenceNumber = -1;

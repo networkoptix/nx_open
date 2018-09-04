@@ -76,7 +76,7 @@ static void printInLogNetResources(const QnResourceList& resources)
             continue;
 
         NX_INFO(typeid(QnMServerResourceDiscoveryManager),
-            lit("Discovery----: %1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()));
+            lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()));
     }
 }
 
