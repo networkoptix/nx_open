@@ -153,6 +153,23 @@ Email field is un-editable
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
 
+Should respond to tab and go in the correct order
+    [tags]    C41838
+    Go To    ${url}/account
+    Log In    ${EMAIL NOPERM}    ${password}    button=None
+    Validate Log In
+    Verify In Account Page
+    Press Key    ${ACCOUNT DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT EMAIL}
+    Press Key    ${ACCOUNT EMAIL}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT FIRST NAME}
+    Press Key    ${ACCOUNT FIRST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LAST NAME}
+    Press Key    ${ACCOUNT LAST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
+    Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT SAVE}
+
 #Langauge is changeable on the account page
 #    Go To    ${url}/account
 #    Log In    ${EMAIL NOPERM}    ${password}    button=None
