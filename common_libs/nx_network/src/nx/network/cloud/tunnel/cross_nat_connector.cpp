@@ -86,6 +86,8 @@ void CrossNatConnector::connect(
                 NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
                     .arg(hostName));
 
+                m_remotePeerFullName = hostName;
+
                 return handler(
                     SystemError::noError,
                     std::make_unique<tcp::OutgoingReverseTunnelConnection>(
