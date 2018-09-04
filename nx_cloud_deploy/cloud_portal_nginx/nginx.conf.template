@@ -71,9 +71,6 @@ http {
 
             # checks for static file, if not found proxy to app
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
- 
-            # Add HTTP Strict Transport Security for good measure.
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
         }
 
 
@@ -82,9 +79,6 @@ http {
 
             # checks for static file, if not found proxy to app
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
- 
-            # Add HTTP Strict Transport Security for good measure.
-            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
         }
 
         location /api/cloud_modules {
@@ -163,6 +157,9 @@ http {
         location /static {
             error_page 404 /static/index.html;
         }
+
+        # Add HTTP Strict Transport Security for good measure.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
 
         # config to don't allow the browser to render the page inside an frame or iframe
         # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
