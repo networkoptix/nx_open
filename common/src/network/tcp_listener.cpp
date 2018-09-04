@@ -248,7 +248,7 @@ void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    NX_DEBUG(this, lm("QnTcpListener::pleaseStop() called"));
+    NX_DEBUG(this, lm("pleaseStop() called"));
 }
 
 void QnTcpListener::removeAllConnections()
@@ -272,7 +272,7 @@ void QnTcpListener::removeAllConnections()
         itr != oldConnections.end(); ++itr)
     {
         QnLongRunnable* processor = *itr;
-        NX_DEBUG(this, lit("TCPListener. Stopping processor (sysThreadID %1)")
+        NX_DEBUG(this, lit("Stopping processor (sysThreadID %1)")
             .arg(processor->systemThreadId()));
         delete processor;
     }
@@ -301,7 +301,7 @@ void QnTcpListener::run()
     if(!d->serverSocket)
         bindToLocalAddress();
 
-    NX_DEBUG(this, lit("Entered QnTcpListener::run. %1:%2, system thread id %3")
+    NX_DEBUG(this, lit("Entered run(). %1:%2, system thread id %3")
         .arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()));
     try
     {
@@ -313,7 +313,7 @@ void QnTcpListener::run()
             {
                 int oldPort = d->localPort;
                 d->localPort.store(d->newPort);
-                NX_INFO(this, lit("TCPListener (%1:%2). Switching port to: %3")
+                NX_INFO(this, lit("(%1:%2). Switching port to: %3")
                     .arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort));
                 // TODO: Add comment why this code is commented out.
                 //removeAllConnections();
@@ -324,7 +324,7 @@ void QnTcpListener::run()
                     QThread::msleep(1000);
                     continue;
                 }
-                NX_INFO(this, lit("TCPListener (%1:%2). Switched to port %3")
+                NX_INFO(this, lit("(%1:%2). Switched to port %3")
                     .arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort));
                 int currentValue = d->localPort;
 
@@ -355,7 +355,7 @@ void QnTcpListener::run()
                     && prevErrorCode != SystemError::again
                     && prevErrorCode != SystemError::interrupted)
                 {
-                    NX_WARNING(this, lit("TCPListener (%1:%2). Accept failed: %3 (%4)")
+                    NX_WARNING(this, lit("(%1:%2). Accept failed: %3 (%4)")
                         .arg(d->serverAddress.toString()).arg(d->localPort)
                         .arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)));
                     QThread::msleep(1000);
@@ -371,12 +371,12 @@ void QnTcpListener::run()
             .arg(d->serverAddress.toString()).arg(d->localPort).arg(QString::fromLatin1(e.what())));
     }
 
-    NX_DEBUG(this, lit("TCPListener (%1:%2). Removing all connections before stop")
+    NX_DEBUG(this, lit("(%1:%2). Removing all connections before stop")
         .arg(d->serverAddress.toString()).arg(d->localPort));
     removeAllConnections();
     destroyServerSocket(d->serverSocket);
     d->serverSocket = nullptr;
-    NX_DEBUG(this, lit("Exiting QnTcpListener::run. %1:%2")
+    NX_DEBUG(this, lit("Exiting run(). %1:%2")
         .arg(d->serverAddress.toString()).arg(d->localPort));
 }
 

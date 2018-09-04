@@ -28,21 +28,21 @@ String Engine::makeCertificateAndKey(
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to generate big number");
+        NX_WARNING(typeid(Engine), "Unable to generate big number");
         return String();
     }
 
     auto rsa = utils::wrapUnique(RSA_new(), &RSA_free);
     if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to generate RSA");
+        NX_WARNING(typeid(Engine), "Unable to generate RSA");
         return String();
     }
 
     auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
     if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to generate PKEY");
+        NX_WARNING(typeid(Engine), "Unable to generate PKEY");
         return String();
     }
 
@@ -53,7 +53,7 @@ String Engine::makeCertificateAndKey(
         || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
         || !X509_set_pubkey(x509.get(), pkey.get()))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to generate X509 cert");
+        NX_WARNING(typeid(Engine), "Unable to generate X509 cert");
         return String();
     }
 
@@ -70,7 +70,7 @@ String Engine::makeCertificateAndKey(
         || !X509_set_issuer_name(x509.get(), name)
         || !X509_sign(x509.get(), pkey.get(), EVP_sha256()))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to sign X509 cert");
+        NX_WARNING(typeid(Engine), "Unable to sign X509 cert");
         return String();
     }
 
@@ -81,7 +81,7 @@ String Engine::makeCertificateAndKey(
         || !PEM_write_bio_X509(bio.get(), x509.get())
         || !BIO_read(bio.get(), writeBuffer, kBufferSize))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to generate cert string");
+        NX_WARNING(typeid(Engine), "Unable to generate cert string");
         return String();
     }
 
@@ -111,18 +111,18 @@ static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
     auto certSize = i2d_X509(x509.get(), 0);
     if (!x509 || certSize <= 0)
     {
-        NX_DEBUG(typeid(Engine), "SSL: Unable to read primary X509");
+        NX_DEBUG(typeid(Engine), "Unable to read primary X509");
         return false;
     }
 
     size_t chainSize = (size_t)certSize;
     if (!SSL_CTX_use_certificate(sslData->serverContext(), x509.get()))
     {
-        NX_WARNING(typeid(Engine), lm("SSL: Unable to use primary X509: %1").arg(x509info(*x509)));
+        NX_WARNING(typeid(Engine), lm("Unable to use primary X509: %1").arg(x509info(*x509)));
         return false;
     }
 
-    NX_INFO(typeid(Engine), lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())));
+    NX_INFO(typeid(Engine), lm("Primary X509 is loaded: %1").arg(x509info(*x509.get())));
     while (true)
     {
         x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
@@ -133,18 +133,18 @@ static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
         chainSize += (size_t)certSize;
         if (chainSize > maxChainSize)
         {
-            NX_ASSERT(false, "SSL: Certificate chain is too long");
+            NX_ASSERT(false, "Certificate chain is too long");
             return true;
         }
 
         if (SSL_CTX_add_extra_chain_cert(sslData->serverContext(), x509.get()))
         {
-            NX_INFO(typeid(Engine), lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)));
+            NX_INFO(typeid(Engine), lm("Chained X509 is loaded: %1").arg(x509info(*x509)));
             x509.release();
         }
         else
         {
-            NX_WARNING(typeid(Engine), lm("SSL: Unable to load chained X509: %1").arg(x509info(*x509)));
+            NX_WARNING(typeid(Engine), lm("Unable to load chained X509: %1").arg(x509info(*x509)));
             return false;
         }
     }
@@ -159,17 +159,17 @@ static bool pKeyLoad(ssl::SslStaticData* sslData, const Buffer& certBytes)
     sslData->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
     if (!sslData->pkey)
     {
-        NX_DEBUG(typeid(Engine), "SSL: Unable to read PKEY");
+        NX_DEBUG(typeid(Engine), "Unable to read PKEY");
         return false;
     }
 
     if (!SSL_CTX_use_PrivateKey(sslData->serverContext(), sslData->pkey.get()))
     {
-        NX_WARNING(typeid(Engine), "SSL: Unable to use PKEY");
+        NX_WARNING(typeid(Engine), "Unable to use PKEY");
         return false;
     }
 
-    NX_INFO(typeid(Engine), "SSL: PKEY is loaded (SSL init is complete)");
+    NX_INFO(typeid(Engine), "PKEY is loaded (SSL init is complete)");
     return true;
 }
 
@@ -185,11 +185,11 @@ bool Engine::useOrCreateCertificate(
 {
     if (loadCertificateFromFile(filePath))
     {
-        NX_INFO(typeid(Engine), lm("SSL: Loaded certificate from '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
         return true;
     }
 
-    NX_ALWAYS(typeid(Engine), lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
+    NX_ALWAYS(typeid(Engine), lm("Unable to find valid SSL certificate '%1', generate new one")
         .arg(filePath));
 
     const auto certData = makeCertificateAndKey(name, country, company);
@@ -202,12 +202,12 @@ bool Engine::useOrCreateCertificate(
         if (!file.open(QIODevice::WriteOnly) ||
             file.write(certData) != certData.size())
         {
-            NX_ERROR(typeid(Engine), lm("SSL: Unable to write SSL certificate to file %1")
+            NX_ERROR(typeid(Engine), lm("Unable to write SSL certificate to file %1")
                 .args(filePath));
         }
     }
 
-    NX_INFO(typeid(Engine), lm("SSL: Using auto-generated certificate"));
+    NX_INFO(typeid(Engine), lm("Using auto-generated certificate"));
     return useCertificateAndPkey(certData);
 }
 
@@ -217,19 +217,19 @@ bool Engine::loadCertificateFromFile(const QString& filePath)
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
     {
-        NX_INFO(typeid(Engine), lm("SSL: Failed to open certificate file '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), lm("Failed to open certificate file '%1'").arg(filePath));
         return false;
     }
     certData = file.readAll();
 
-    NX_INFO(typeid(Engine), lm("SSL: Loaded certificate from '%1'").arg(filePath));
+    NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
     if (!useCertificateAndPkey(certData))
     {
-        NX_INFO(typeid(Engine), lm("SSL: Failed to load certificate from '%1'").arg(filePath));
+        NX_INFO(typeid(Engine), lm("Failed to load certificate from '%1'").arg(filePath));
         return false;
     }
 
-    NX_INFO(typeid(Engine), lm("SSL: Loaded certificate from '%1'").arg(filePath));
+    NX_INFO(typeid(Engine), lm("Loaded certificate from '%1'").arg(filePath));
     return true;
 }
 

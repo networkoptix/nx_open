@@ -276,8 +276,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
     const nx::utils::Url& ecUrl,
     impl::ConnectHandlerPtr handler)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit(
-        "RemoteConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("errorCode = %1, ecUrl = %2")
         .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)));
 
     // TODO: #ak async ssl is working now, make async request to old ec here
@@ -310,8 +309,8 @@ void RemoteConnectionFactory::remoteConnectionFinished(
         connectionInfoCopy.ecUrl.setHost(fullHost);
     }
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit(
-        "RemoteConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit(
+        "remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)));
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
@@ -401,7 +400,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
             if (infoList.size() > 0
                 && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
             {
-                NX_VERBOSE(this, lit("RemoteConnectionFactory: New client had already been registered with the same params"));
+                NX_VERBOSE(this, lit("New client had already been registered with the same params"));
                 return ErrorCode::ok;
             }
 
@@ -411,11 +410,11 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
                 {
                     if (result == ErrorCode::ok)
                     {
-                        NX_INFO(this, lit("RemoteConnectionFactory: New client has been registered"));
+                        NX_INFO(this, lit("New client has been registered"));
                     }
                     else
                     {
-                        NX_ERROR(this, lit("RemoteConnectionFactory: New client transaction has failed %1")
+                        NX_ERROR(this, lit("New client transaction has failed %1")
                             .arg(toString(result)));
                     }
                 });

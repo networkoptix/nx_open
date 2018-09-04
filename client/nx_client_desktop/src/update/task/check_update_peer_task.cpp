@@ -191,7 +191,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
         bool updateServer = isUpdateNeeded(server->getVersion(), m_target.version);
         if (updateServer && !m_updateFiles.value(server->getSystemInfo()))
         {
-            NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: No update file for server [%1 : %2]")
+            NX_VERBOSE(this, lit("Update: No update file for server [%1 : %2]")
                    .arg(server->getName()).arg(server->getApiUrl().toString()));
             return QnCheckForUpdateResult::ServerUpdateImpossible;
         }
@@ -204,7 +204,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
         if (updateClient && !m_clientUpdateFile)
         {
-            NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: No update file for client."));
+            NX_VERBOSE(this, lit("Update: No update file for client."));
             return QnCheckForUpdateResult::ClientUpdateImpossible;
         }
 
@@ -251,7 +251,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline()
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
         this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
-    NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString(QUrl::RemovePassword)));
+    NX_VERBOSE(this, lit("Update: Request [%1]").arg(url.toString(QUrl::RemovePassword)));
     httpClient->doGet(url);
 
     m_runningRequests.insert(reply);
@@ -269,7 +269,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates()
     m_targetMustBeNewer = m_target.version.isNull();
     m_checkLatestVersion = m_target.version.isNull();
 
-    NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Checking online updates [%1]")
+    NX_DEBUG(this, lit("Update: Checking online updates [%1]")
         .arg(m_target.version.toString()));
 
     if (!tryNextServer())
@@ -281,7 +281,7 @@ void QnCheckForUpdatesPeerTask::checkLocalUpdates()
     clear();
     m_targetMustBeNewer = false;
 
-    NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Checking local update [%1]")
+    NX_DEBUG(this, lit("Update: Checking local update [%1]")
         .arg(m_target.fileName));
 
     if (!QFile::exists(m_target.fileName))
@@ -305,7 +305,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
 
     if (reply->isFailed())
     {
-        NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
+        NX_VERBOSE(this, lit("Update: Request to %1 failed.")
             .arg(reply->url().toString()));
 
         if (!tryNextServer())
@@ -314,7 +314,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
         return;
     }
 
-    NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.")
+    NX_VERBOSE(this, lit("Update: Reply received from %1.")
         .arg(reply->url().toString()));
 
     const auto json = QJsonDocument::fromJson(reply->data()).object();
@@ -381,7 +381,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     if (reply->isFailed() || (reply->response().statusLine.statusCode != nx::network::http::StatusCode::ok))
     {
-        NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Request to %1 failed.")
+        NX_VERBOSE(this, lit("Update: Request to %1 failed.")
             .arg(reply->url().toString()));
 
         if (!tryNextServer())
@@ -390,7 +390,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         return;
     }
 
-    NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Reply received from %1.")
+    NX_VERBOSE(this, lit("Update: Reply received from %1.")
         .arg(reply->url().toString()));
 
     BuildInformation buildInformation;
@@ -398,7 +398,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
     {
         if (!tryNextServer())
         {
-            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: No such build."));
+            NX_DEBUG(this, lit("Update: No such build."));
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
         return;
@@ -410,7 +410,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
     {
         if (!tryNextServer())
         {
-            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: No such build."));
+            NX_DEBUG(this, lit("Update: No such build."));
             finishTask(QnCheckForUpdateResult::NoSuchBuild);
         }
         return;
@@ -446,7 +446,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
             nx::vms::api::SystemInformation systemInformation(platform.key(), arch, modification);
             m_updateFiles.insert(systemInformation, info);
 
-            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Server update file [%1, %2, %3].")
+            NX_DEBUG(this, lit("Update: Server update file [%1, %2, %3].")
                    .arg(systemInformation.toString())
                    .arg(info->baseFileName)
                    .arg(info->fileSize));
@@ -470,7 +470,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
             m_clientUpdateFile->fileSize = variant.size;
             m_clientUpdateFile->md5 = variant.md5;
 
-            NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Client update file [%2, %3].")
+            NX_DEBUG(this, lit("Update: Client update file [%2, %3].")
                    .arg(m_clientUpdateFile->baseFileName)
                    .arg(m_clientUpdateFile->fileSize));
         }
@@ -483,7 +483,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
     {
         m_clientRequiresInstaller = true;
     }
-    NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Client requires installer [%1].")
+    NX_DEBUG(this, lit("Update: Client requires installer [%1].")
         .arg(m_clientRequiresInstaller));
 
     checkUpdate();
@@ -571,7 +571,7 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value)
     result.description = m_description;
     result.cloudHost = m_cloudHost;
 
-    NX_DEBUG(this, lit("Update: QnCheckForUpdatesPeerTask: Check finished [%1, %2].")
+    NX_DEBUG(this, lit("Update: Check finished [%1, %2].")
        .arg(value).arg(result.version.toString()));
 
     emit checkFinished(result);
@@ -608,7 +608,7 @@ bool QnCheckForUpdatesPeerTask::tryNextServer()
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
         this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
-    NX_VERBOSE(this, lit("Update: QnCheckForUpdatesPeerTask: Request [%1]")
+    NX_VERBOSE(this, lit("Update: Request [%1]")
         .arg(m_currentUpdateUrl.toString(QUrl::RemovePassword)));
     httpClient->doGet(m_currentUpdateUrl);
     m_runningRequests.insert(reply);

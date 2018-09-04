@@ -106,7 +106,7 @@ namespace detail
 
     void GetFileOperation::asyncStatDone( SystemError::ErrorCode errorCode, qint64 fileSize )
     {
-        NX_VERBOSE(this, QString::fromLatin1("GetFileOperation::asyncStatDone. file %1, result %2").arg(entryPath).arg(SystemError::toString(errorCode)));
+        NX_VERBOSE(this, QString::fromLatin1("asyncStatDone. file %1, result %2").arg(entryPath).arg(SystemError::toString(errorCode)));
 
         std::unique_lock<std::mutex> lk( m_mutex );
 
@@ -228,7 +228,7 @@ namespace detail
 
     void GetFileOperation::onResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
     {
-        NX_VERBOSE(this, QString::fromLatin1("GetFileOperation::onResponseReceived. file %1").arg(entryPath));
+        NX_VERBOSE(this, QString::fromLatin1("onResponseReceived. file %1").arg(entryPath));
 
         m_responseReceivedCalled = true;
 
@@ -311,7 +311,7 @@ namespace detail
 
     void GetFileOperation::onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
     {
-        NX_VERBOSE(this, QString::fromLatin1("GetFileOperation::onHttpDone. file %1, state %2. http result %3").
+        NX_VERBOSE(this, QString::fromLatin1("onHttpDone. file %1, state %2. http result %3").
             arg(entryPath).arg((int)m_state).arg(!httpClient->failed()));
 
         switch( m_state )
@@ -419,7 +419,7 @@ namespace detail
 
     void GetFileOperation::checkIfFileDownloadRequired()
     {
-        NX_VERBOSE(this, QString::fromLatin1("GetFileOperation::checkIfFileDownloadRequired. file %1").arg(entryPath));
+        NX_VERBOSE(this, QString::fromLatin1("checkIfFileDownloadRequired. file %1").arg(entryPath));
 
         NX_ASSERT( m_localFileSize && m_remoteFileSize );
         NX_ASSERT( m_state == State::sCheckingLocalFile );

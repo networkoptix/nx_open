@@ -155,7 +155,7 @@ DBResult DbStructureUpdater::createInitialSchema(
                 m_fullSchemaScriptByVersion.rbegin()->second,
                 RdbmsDriverType::unknown))
         {
-            NX_WARNING(this, lm("DbStructureUpdater. Failed to create schema of version %1: %2")
+            NX_WARNING(this, lm("Failed to create schema of version %1: %2")
                 .arg(m_fullSchemaScriptByVersion.rbegin()->first)
                 .arg(queryContext->connection()->lastErrorText()));
             return DBResult::ioError;
@@ -201,7 +201,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
             m_updateScripts[dbState->version - m_initialVersion],
             queryContext))
     {
-        NX_WARNING(this, lm("DbStructureUpdater. Failure updating to version %1: %2")
+        NX_WARNING(this, lm("Failure updating to version %1: %2")
             .arg(dbState->version).arg(queryContext->connection()->lastErrorText()));
         return DBResult::ioError;
     }

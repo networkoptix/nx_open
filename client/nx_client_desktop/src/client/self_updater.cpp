@@ -52,11 +52,11 @@ bool runMinilaucherInternal(const QStringList& args)
         && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
         NX_INFO(typeid(SelfUpdater),
-            lit("SelfUpdater: Minilauncher process started successfully."));
+            lit("Minilauncher process started successfully."));
         return true;
     }
 
-    NX_ERROR(typeid(SelfUpdater), lit("SelfUpdater: Minilauncher process could not be started %1.").arg(minilauncherPath));
+    NX_ERROR(typeid(SelfUpdater), lit("Minilauncher process could not be started %1.").arg(minilauncherPath));
     return false;
 }
 
@@ -128,7 +128,7 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
             auto result = copy(src, dst, OverwriteExisting);
             if (!result)
             {
-                NX_ERROR(typeid(SelfUpdater), lit("SelfUpdater: Cannot copy %1 to %2. Code: %3")
+                NX_ERROR(typeid(SelfUpdater), lit("Cannot copy %1 to %2. Code: %3")
                     .arg(src)
                     .arg(dst)
                     .arg(result.code));

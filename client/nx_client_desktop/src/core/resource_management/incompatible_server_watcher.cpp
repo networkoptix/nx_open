@@ -266,7 +266,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(
         }
         resourcePool()->addIncompatibleServer(server);
 
-        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
+        NX_DEBUG(this, lit("Add incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
             .arg(serverData.systemName)
             .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))));
@@ -284,7 +284,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(
 
         server->setFakeServerModuleInformation(serverData);
 
-        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
+        NX_DEBUG(this, lit("Update incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
             .arg(serverData.systemName)
             .arg(QStringList(serverData.remoteAddresses.toList()).join(lit(", "))));
@@ -309,7 +309,7 @@ void QnIncompatibleServerWatcherPrivate::removeResource(const QnUuid &id)
 
     if (auto server = resourcePool()->getIncompatibleServerById(id))
     {
-        NX_DEBUG(this, lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
+        NX_DEBUG(this, lit("Remove incompatible server %1 at %2")
             .arg(serverId.toString())
             .arg(server->getModuleInformation().systemName));
 

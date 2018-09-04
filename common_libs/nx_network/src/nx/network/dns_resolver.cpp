@@ -68,7 +68,7 @@ DnsResolver::~DnsResolver()
 
 void DnsResolver::pleaseStop()
 {
-    NX_VERBOSE(this, lm("DnsResolver::pleaseStop"));
+    NX_VERBOSE(this, lm("pleaseStop"));
 
     QnMutexLocker lock(&m_mutex);
     m_terminated = true;
@@ -192,7 +192,7 @@ int DnsResolver::maxRegisteredResolverPriority() const
 
 void DnsResolver::run()
 {
-    NX_VERBOSE(this, lm("DnsResolver::run. Entered"));
+    NX_VERBOSE(this, lm("run. Entered"));
 
     QnMutexLocker lock(&m_mutex);
     while (!m_terminated)
@@ -232,7 +232,7 @@ void DnsResolver::run()
         m_cond.wakeAll();
     }
 
-    NX_VERBOSE(this, lm("DnsResolver::run. Exiting. %1").arg(m_terminated));
+    NX_VERBOSE(this, lm("run. Exiting. %1").arg(m_terminated));
 }
 
 bool DnsResolver::isExpired(const ResolveTask& task) const

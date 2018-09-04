@@ -69,7 +69,6 @@ void QnAbstractDataConsumer::run()
 
         if (!get)
         {
-            //NX_VERBOSE(this, lit("QnAbstractDataConsumer::run. queue is empty %1").arg((int)(long)(&m_dataQueue)));
             QnSleep::msleep(10);
             continue;
         }

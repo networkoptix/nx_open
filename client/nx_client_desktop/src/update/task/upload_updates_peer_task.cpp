@@ -41,7 +41,7 @@ void QnUploadUpdatesPeerTask::doStart()
     m_peersBySystemInformation.clear();
     m_finishedPeers.clear();
 
-    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Starting upload."));
+    NX_DEBUG(this, lit("Update: Starting upload."));
 
     for (const auto& id: peers())
     {
@@ -60,7 +60,7 @@ void QnUploadUpdatesPeerTask::doStart()
 
     m_pendingUploads = m_peersBySystemInformation.uniqueKeys();
 
-    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Have to upload %1 file(s).").arg(m_pendingUploads.size()));
+    NX_DEBUG(this, lit("Update: Have to upload %1 file(s).").arg(m_pendingUploads.size()));
 
     uploadNextUpdate();
 }
@@ -69,20 +69,20 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate()
 {
     if (m_pendingUploads.isEmpty())
     {
-        NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Upload finished."));
+        NX_DEBUG(this, lit("Update: Upload finished."));
         finish(NoError);
         return;
     }
 
     const auto systemInformation = m_pendingUploads.first();
 
-    NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Starting upload [%1 : %2].").arg(
+    NX_DEBUG(this, lit("Update: Starting upload [%1 : %2].").arg(
         systemInformation.toString(), m_fileBySystemInformation[systemInformation]));
 
     if (!m_uploader->uploadUpdate(m_updateId, m_fileBySystemInformation[systemInformation],
         m_peersBySystemInformation.values(systemInformation).toSet()))
     {
-        NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Uploader failure."));
+        NX_DEBUG(this, lit("Update: Uploader failure."));
         finish(UploadError);
         return;
     }
@@ -100,7 +100,7 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnU
                 m_finishedPeers.insert(id);
             }
 
-            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Finished upload [%1].")
+            NX_DEBUG(this, lit("Update: Finished upload [%1].")
                 .arg(m_pendingUploads.first().toString()));
 
             m_pendingUploads.removeFirst();
@@ -110,22 +110,22 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnU
         }
 
         case QnUpdateUploader::NoFreeSpace:
-            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: No free space."));
+            NX_DEBUG(this, lit("Update: No free space."));
             finish(NoFreeSpaceError, failedPeers);
             break;
 
         case QnUpdateUploader::TimeoutError:
-            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Timeout."));
+            NX_DEBUG(this, lit("Update: Timeout."));
             finish(TimeoutError, failedPeers);
             break;
 
         case QnUpdateUploader::AuthenticationError:
-            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Authentication failed."));
+            NX_DEBUG(this, lit("Update: Authentication failed."));
             finish(AuthenticationError, failedPeers);
             break;
 
         default:
-            NX_DEBUG(this, lit("Update: QnUploadUpdatesPeerTask: Unknown error."));
+            NX_DEBUG(this, lit("Update: Unknown error."));
             finish(UploadError, failedPeers);
             break;
     }

@@ -114,7 +114,7 @@ bool SystemMergeProcessor::validateInputData(
 {
     if (data.url.isEmpty())
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Request missing required parameter \"url\""));
+        NX_DEBUG(this, lit("Request missing required parameter \"url\""));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("url")));
         return false;
@@ -123,7 +123,7 @@ bool SystemMergeProcessor::validateInputData(
     const nx::utils::Url url(data.url);
     if (!url.isValid())
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Received invalid parameter url %1")
+        NX_DEBUG(this, lit("Received invalid parameter url %1")
             .arg(data.url));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::InvalidParameter, lit("url")));
@@ -132,7 +132,7 @@ bool SystemMergeProcessor::validateInputData(
 
     if (data.getKey.isEmpty())
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Request missing required parameter \"getKey\""));
+        NX_DEBUG(this, lit("Request missing required parameter \"getKey\""));
         result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return false;
@@ -150,13 +150,13 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     QnUserResourcePtr adminUser = m_commonModule->resourcePool()->getAdministrator();
     if (!adminUser)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Failed to find admin user"));
+        NX_DEBUG(this, lit("Failed to find admin user"));
         return nx::network::http::StatusCode::internalServerError;
     }
 
     if (m_remoteModuleInformation.version < kMinimalVersion)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Remote system has too old version %2 (%1)")
+        NX_DEBUG(this, lit("Remote system has too old version %2 (%1)")
             .arg(data.url).arg(m_remoteModuleInformation.version.toString()));
         setMergeError(result, MergeStatus::incompatibleVersion);
         return nx::network::http::StatusCode::badRequest;
@@ -223,7 +223,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         || connectionResult == Qn::IncompatibleCloudHostConnectionResult
         || connectionResult == Qn::IncompatibleVersionConnectionResult)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Incompatible systems. "
+        NX_DEBUG(this, lit("Incompatible systems. "
             "Local customization %1, cloud host %2, "
             "remote customization %3, cloud host %4, version %5")
             .arg(QnAppInfo::customizationName())
@@ -238,7 +238,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     if (connectionResult == Qn::IncompatibleProtocolConnectionResult
         && !data.ignoreIncompatible)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Incompatible systems protocol. "
+        NX_DEBUG(this, lit("Incompatible systems protocol. "
             "Local %1, remote %2")
             .arg(QnAppInfo::ec2ProtoVersion())
             .arg(m_remoteModuleInformation.protoVersion));
@@ -256,7 +256,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
     if (isDefaultSystemName)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor. Can not merge to the non configured system"));
+        NX_DEBUG(this, lit("Can not merge to the non configured system"));
         setMergeError(result, MergeStatus::unconfiguredSystem);
         return nx::network::http::StatusCode::badRequest;
     }
@@ -275,7 +275,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
                 m_dataDirectory,
                 m_commonModule->ec2Connection()))
         {
-            NX_DEBUG(this, lit("SystemMergeProcessor. takeRemoteSettings %1. Failed to backup database")
+            NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to backup database")
                 .arg(data.takeRemoteSettings));
             setMergeError(result, MergeStatus::backupFailed);
             return nx::network::http::StatusCode::internalServerError;
@@ -291,7 +291,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
                 data.getKey,
                 data.postKey))
         {
-            NX_DEBUG(this, lit("SystemMergeProcessor. takeRemoteSettings %1. Failed to apply remote settings")
+            NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings));
             setMergeError(result, MergeStatus::configurationFailed);
             return nx::network::http::StatusCode::internalServerError;
@@ -304,7 +304,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
                 data.postKey,
                 data.mergeOneServer))
         {
-            NX_DEBUG(this, lit("SystemMergeProcessor. takeRemoteSettings %1. Failed to apply current settings")
+            NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
                 .arg(data.takeRemoteSettings));
             setMergeError(result, MergeStatus::configurationFailed);
             return nx::network::http::StatusCode::internalServerError;
@@ -415,7 +415,7 @@ bool SystemMergeProcessor::executeRemoteConfigure(
     if (!client.doPost(requestUrl, "application/json", serializedData) ||
         !isResponseOK(client))
     {
-        NX_WARNING(this, lit("SystemMergeProcessor::executeRemoteConfigure api/configure failed. HTTP code %1.")
+        NX_WARNING(this, lit("executeRemoteConfigure api/configure failed. HTTP code %1.")
             .arg(client.response() ? client.response()->statusLine.statusCode : 0));
         return false;
     }
@@ -427,13 +427,13 @@ bool SystemMergeProcessor::executeRemoteConfigure(
     QnJsonRestResult jsonResult;
     if (!QJson::deserialize(response, &jsonResult))
     {
-        NX_WARNING(this, lit("SystemMergeProcessor::executeRemoteConfigure api/configure failed."
+        NX_WARNING(this, lit("executeRemoteConfigure api/configure failed."
             "Invalid json response received."));
         return false;
     }
     if (jsonResult.error != QnRestResult::NoError)
     {
-        NX_WARNING(this, lit("SystemMergeProcessor::executeRemoteConfigure api/configure failed. Json error %1.")
+        NX_WARNING(this, lit("executeRemoteConfigure api/configure failed. Json error %1.")
             .arg(jsonResult.error));
         return false;
     }
@@ -505,7 +505,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(m_commonModule, data))
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor::applyRemoteSettings. Failed to change system name"));
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to change system name"));
         return false;
     }
 
@@ -543,7 +543,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_DEBUG(this, lit("SystemMergeProcessor::applyRemoteSettings. Failed to save new system name: %1")
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to save new system name: %1")
             .arg(ec2::toString(errorCode)));
         return false;
     }
@@ -585,7 +585,7 @@ bool SystemMergeProcessor::executeRequest(
     if (!client.doGet(requestUrl) || !isResponseOK(client))
     {
         auto status = getClientResponse(client);
-        NX_DEBUG(this, lit("SystemMergeProcessor::applyRemoteSettings. Failed to invoke %1: %2")
+        NX_DEBUG(this, lit("applyRemoteSettings. Failed to invoke %1: %2")
             .arg(path)
             .arg(QLatin1String(nx::network::http::StatusCode::toString(status))));
         return false;
@@ -631,7 +631,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
         if (!client.doGet(requestUrl) || !isResponseOK(client))
         {
             auto status = getClientResponse(client);
-            NX_DEBUG(this, lm("SystemMergeProcessor. Error requesting url %1: %2")
+            NX_DEBUG(this, lm("Error requesting url %1: %2")
                 .args(url, nx::network::http::StatusCode::toString(status)));
             return status == nx::network::http::StatusCode::undefined
                 ? nx::network::http::StatusCode::serviceUnavailable

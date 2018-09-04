@@ -839,7 +839,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     m_cachedTotalSpace = rootTool()->totalSpace(path); // update cached value periodically
     NX_VERBOSE(
         this,
-        lm("QnFileStorageResource::initOrUpdate successfully completed for %1").args(getUrl()));
+        lm("initOrUpdate successfully completed for %1").args(getUrl()));
 
     return Qn::StorageInit_Ok;
 }

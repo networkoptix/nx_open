@@ -68,7 +68,7 @@ void QnDownloadUpdatesPeerTask::doCancel()
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
-    NX_DEBUG(this, lit("Update: QnDownloadUpdatesPeerTask: Starting download %1 file(s).").arg(m_targets.size()));
+    NX_DEBUG(this, lit("Update: Starting download %1 file(s).").arg(m_targets.size()));
 
     m_resultingFiles.clear();
     m_pendingDownloads = m_targets.keys();
@@ -77,7 +77,7 @@ void QnDownloadUpdatesPeerTask::doStart() {
 
 void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     if (m_pendingDownloads.isEmpty()) {
-        NX_DEBUG(this, lit("Update: QnDownloadUpdatesPeerTask: Download finished."));
+        NX_DEBUG(this, lit("Update: Download finished."));
         finish(NoError);
         return;
     }
@@ -88,11 +88,11 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     QString fileName = updateFilePath(m_targets[url]);
     m_resultingFiles.insert(url, fileName);
 
-    NX_DEBUG(this, lit("Update: QnDownloadUpdatesPeerTask: Starting download [%1 -> %2].").arg(url.toString(QUrl::RemovePassword)).arg(fileName));
+    NX_DEBUG(this, lit("Update: Starting download [%1 -> %2].").arg(url.toString(QUrl::RemovePassword)).arg(fileName));
 
     m_file.reset(new QFile(fileName));
     if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: Could not open file %1.").arg(fileName));
+        NX_ERROR(this, lit("Update: Could not open file %1.").arg(fileName));
         finish(FileError);
         return;
     }
@@ -115,7 +115,7 @@ void QnDownloadUpdatesPeerTask::continueDownload() {
 
     QNetworkRequest request(url.toQUrl());
     request.setRawHeader("Range", QString(lit("bytes=%1-")).arg(pos).toLatin1());
-    NX_VERBOSE(this, lit("Update: QnDownloadUpdatesPeerTask: Continue download at %1.").arg(pos));
+    NX_VERBOSE(this, lit("Update: Continue download at %1.").arg(pos));
     QNetworkReply *reply = m_networkAccessManager->get(request);
     connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
     connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
@@ -153,14 +153,14 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
 
         m_file->remove();
         m_file.reset();
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: Network error."));
+        NX_ERROR(this, lit("Update: Network error."));
         finish(DownloadError);
         return;
     }
 
     if (!readAllData(reply, m_file.data()))
     {
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: No free space."));
+        NX_ERROR(this, lit("Update: No free space."));
         finishTask(NoFreeSpaceError);
         return;
     }
@@ -172,7 +172,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     m_file.reset();
 
     if (md5 != m_hashByUrl[m_pendingDownloads.first()]) {
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: Checksum check is failed."));
+        NX_ERROR(this, lit("Update: Checksum check is failed."));
         finish(DownloadError);
         return;
     }
@@ -180,7 +180,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     foreach (const QnUuid &peerId, m_currentPeers)
         emit peerFinished(peerId);
 
-    NX_DEBUG(this, lit("Update: QnDownloadUpdatesPeerTask: Download finished [%1].").arg(m_pendingDownloads.first().toString()));
+    NX_DEBUG(this, lit("Update: Download finished [%1].").arg(m_pendingDownloads.first().toString()));
 
     m_pendingDownloads.removeFirst();
     downloadNextUpdate();
@@ -209,7 +209,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
     if (bytesReceived > bytesTotal) {
         m_file->close();
         m_file->remove();
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: Wrong file size."));
+        NX_ERROR(this, lit("Update: Wrong file size."));
         finishTask(DownloadError);
         return;
     }
@@ -237,7 +237,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     }
 
     if (!readAllData(reply, m_file.data())) {
-        NX_ERROR(this, lit("Update: QnDownloadUpdatesPeerTask: No free space."));
+        NX_ERROR(this, lit("Update: No free space."));
         finishTask(NoFreeSpaceError);
     }
 }

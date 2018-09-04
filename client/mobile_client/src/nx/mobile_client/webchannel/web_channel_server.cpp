@@ -44,7 +44,7 @@ private:
         QJsonDocument message = QJsonDocument::fromJson(messageData.toUtf8(), &error);
         if (error.error)
         {
-            NX_ERROR(this, lit("WebChannelServer: Failed to parse text message as JSON object: ")
+            NX_ERROR(this, lit("Failed to parse text message as JSON object: ")
                 + error.errorString());
             return;
         }
@@ -68,14 +68,14 @@ WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
 {
     if (!m_server->listen(QHostAddress::LocalHost, port))
     {
-        NX_ERROR(this, lit("WebChannelServer: Could not start server"));
+        NX_ERROR(this, lit("Could not start server"));
 
         delete m_server;
         m_server = nullptr;
         return;
     }
 
-    NX_DEBUG(this, lit("WebChannelServer: Server started at localhost:%1").arg(m_server->serverPort()));
+    NX_DEBUG(this, lit("Server started at localhost:%1").arg(m_server->serverPort()));
 
     connect(m_server, &QWebSocketServer::newConnection, this,
         [this]

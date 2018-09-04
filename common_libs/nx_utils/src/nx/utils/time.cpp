@@ -108,7 +108,7 @@ bool setTimeZone(const QString& timeZoneId)
 
         return true;
     #else
-        NX_ERROR(this, lm("setTimeZone(): Unsupported platform"));
+        NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unsupported platform"));
         nx::utils::unused(timeZoneId);
         return false;
     #endif
@@ -196,7 +196,7 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
         return true;
     #else
         nx::utils::unused(millisecondsSinceEpoch);
-        NX_ERROR(this, lm("setDateTime(): unsupported platform"));
+        NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): unsupported platform"));
     #endif
 
     return true;

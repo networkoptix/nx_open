@@ -219,7 +219,7 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     std::swap(m_connection, newConnection);
     if (!m_connection)
     {
-        NX_DEBUG(this, lit("CdbNonceFetcher. Failed to get connection to cdb"));
+        NX_DEBUG(this, lit("Failed to get connection to cdb"));
         m_timer.start(
             kGetNonceRetryTimeout,
             std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));

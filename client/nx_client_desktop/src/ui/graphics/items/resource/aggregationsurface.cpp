@@ -266,8 +266,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
         QnMutexLocker lk( &m_mutex );
         if( m_glMemRegion.contains( rect ) )
         {
-            NX_DEBUG(this, lit("AggregationSurface(%1)::ensureUploadedToOGL. Requested region %2 is uploaded already. Total locked rects count %3, bounding rect %4").
-                arg((size_t)this, 0, 16).arg(rectToString(rect)).arg(lockedRectCount).arg(rectToString(lockedRegionBeingLoaded.boundingRect())));
+            NX_DEBUG(this, lit("ensureUploadedToOGL. Requested region %1 is uploaded already. Total locked rects count %2, bounding rect %3")
+                .arg(rectToString(rect)).arg(lockedRectCount).arg(rectToString(lockedRegionBeingLoaded.boundingRect())));
             return; //region already uploaded
         }
         m_invalidatedRegion = QRegion();
@@ -276,8 +276,8 @@ void AggregationSurface::ensureUploadedToOGL( const QRect& rect, qreal opacity )
         lockedRegionBeingLoaded = m_lockedSysMemBufferRegion;
     }
 
-    NX_DEBUG(this, lit("AggregationSurface(%1)::ensureUploadedToOGL. Uploading aggregation surface containing %2 locked rects (bounding rect %3) to opengl...").
-        arg((size_t)this, 0, 16).arg(lockedRectCount).arg(rectToString(lockedRegionBeingLoaded.boundingRect())));
+    NX_DEBUG(this, lit("ensureUploadedToOGL. Uploading aggregation surface containing %1 locked rects (bounding rect %2) to opengl...")
+        .arg(lockedRectCount).arg(rectToString(lockedRegionBeingLoaded.boundingRect())));
 
     unsigned int r_w[3] = { (uint)m_fullRect.width(), (uint)m_fullRect.width() / 2, (uint)m_fullRect.width() / 2 }; // real_width / visible
     unsigned int h[3] = { (uint)m_fullRect.height(), (uint)m_fullRect.height() / 2, (uint)m_fullRect.height() / 2 };
@@ -506,7 +506,7 @@ bool AggregationSurface::lockRect( const QRect& rect )
 
     totalLockedRectCount.ref();
 
-    NX_DEBUG(this, lit("AggregationSurface::lockRect. Locked rect %1. Total locked bounding rect %2, total locked rects %3").
+    NX_DEBUG(this, lit("lockRect. Locked rect %1. Total locked bounding rect %2, total locked rects %3").
         arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()));
 
     ++m_lockedRectCount;
@@ -540,7 +540,7 @@ QRect AggregationSurface::findAndLockRect( const QSize& requestedRectSize )
 
             totalLockedRectCount.ref();
 
-            NX_DEBUG(this, lit("AggregationSurface::findAndLockRect. Locked rect %1 of size %2x%3. Total locked bounding rect %4, total locked rects %5").
+            NX_DEBUG(this, lit("findAndLockRect. Locked rect %1 of size %2x%3. Total locked bounding rect %4, total locked rects %5").
                 arg(rectToString(unusedRect)).arg(requestedRectSize.width()).arg(requestedRectSize.height()).
                 arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()));
 
@@ -564,7 +564,7 @@ void AggregationSurface::unlockRect( const QRect& rect )
     QnMutexLocker lk( &m_mutex );
     m_lockedSysMemBufferRegion -= rect;
     totalLockedRectCount.deref();
-    NX_DEBUG(this, lit("AggregationSurface::unlockRect. Unlocked rect %1. Total locked bounding rect %2, total locked rects %3").
+    NX_DEBUG(this, lit("unlockRect. Unlocked rect %1. Total locked bounding rect %2, total locked rects %3").
         arg(rectToString(rect)).arg(rectToString(m_lockedSysMemBufferRegion.boundingRect())).arg(totalLockedRectCount.load()));
 
     --m_lockedRectCount;
@@ -657,7 +657,7 @@ QSharedPointer<AggregationSurfaceRect> AggregationSurfacePool::takeSurfaceRect(
         return QSharedPointer<AggregationSurfaceRect>( new AggregationSurfaceRect( it->second, lockedRect ) );
     }
 
-    NX_DEBUG(this, lit("AggregationSurfacePool::takeSurfaceRect. Creating new surface"));
+    NX_DEBUG(this, lit("takeSurfaceRect. Creating new surface"));
 
     //creating new surface
     QSharedPointer<AggregationSurface> newSurface( new AggregationSurface( format, surfaceSize ) );

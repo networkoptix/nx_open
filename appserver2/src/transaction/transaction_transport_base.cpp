@@ -189,7 +189,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor for object = %1").arg((size_t) this,  0, 16));
 
     using namespace std::placeholders;
     if( m_contentEncoding == "gzip" )
@@ -255,7 +255,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor for object = %1").arg((size_t) this,  0, 16));
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
@@ -277,7 +277,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Destructor for object = %1").arg((size_t) this,  0, 16));
 
     stopWhileInAioThread();
 
@@ -534,7 +534,7 @@ void QnTransactionTransportBase::removeEventHandler( int eventHandlerID )
 
 void QnTransactionTransportBase::doOutgoingConnect(const nx::utils::Url& remotePeerUrl)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lm("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").arg(remotePeerUrl));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("doOutgoingConnect. remotePeerUrl = %1").arg(remotePeerUrl));
 
     setState(ConnectingStage1);
 
@@ -654,14 +654,14 @@ void QnTransactionTransportBase::repeatDoGet()
 
 void QnTransactionTransportBase::cancelConnecting()
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("%1 Connection to peer %2 canceled from state %3").
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("%1 Connection to peer %2 canceled from state %3").
         arg(Q_FUNC_INFO).arg(m_remotePeer.id.toString()).arg(toString(getState())));
     setState(Error);
 }
 
 void QnTransactionTransportBase::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::onSomeBytesRead. errorCode = %1, bytesRead = %2").
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("onSomeBytesRead. errorCode = %1, bytesRead = %2").
         arg((int)errorCode).arg(bytesRead));
 
     emit onSomeDataReceivedFromRemotePeer();
@@ -757,7 +757,8 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
     if (!transportHeader.isNull())
     {
         NX_ASSERT(!transportHeader.processedPeers.empty());
-        NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lit("receivedTransactionNonSafe. Got transaction with seq %1 from %2").
             arg(transportHeader.sequence).arg(m_remotePeer.id.toString()));
     }
 
@@ -1168,7 +1169,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_responseReceived. statusCode = %1").
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("at_responseReceived. statusCode = %1").
         arg(statusCode));
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
@@ -1431,7 +1432,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
 
 void QnTransactionTransportBase::at_httpClientDone( const nx::network::http::AsyncHttpClientPtr& client )
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::at_httpClientDone. state = %1").
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("at_httpClientDone. state = %1").
         arg((int)client->state()));
 
     nx::network::http::AsyncClient::State state = client->state();

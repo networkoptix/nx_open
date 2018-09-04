@@ -110,7 +110,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
             return;
     }
 
-    NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnResourceAccessManager: %1 -> %2: %3")
+    NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("%1 -> %2: %3")
         .arg(subject.name())
         .arg(resource->getName())
         .arg(QnLexical::serialized(permissions)));

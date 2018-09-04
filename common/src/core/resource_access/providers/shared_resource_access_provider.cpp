@@ -44,21 +44,21 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
     {
         if (!layout->isShared())
         {
-            NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 is not shared, ignore it")
+            NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("%1 is not shared, ignore it")
                 .arg(layout->getName()));
             return false;
         }
     }
     else if (!isMediaResource(resource))
     {
-        NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 has invalid type, ignore it")
+        NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("%1 has invalid type, ignore it")
             .arg(resource->getName()));
         return false;
     }
 
     bool result = sharedResourcesManager()->sharedResources(subject).contains(resource->getId());
 
-    NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: update access %1 to %2: %3")
+    NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("update access %1 to %2: %3")
         .arg(subject.name())
         .arg(resource->getName())
         .arg(result));
@@ -98,13 +98,13 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
     {
         if (newValues.contains(resource->getId()))
         {
-            NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 shared to %2")
+            NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("%1 shared to %2")
                 .arg(resource->getName())
                 .arg(subjectName));
         }
         else
         {
-            NX_DEBUG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: %1 no more shared to %2")
+            NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("%1 no more shared to %2")
                 .arg(resource->getName())
                 .arg(subjectName));
         }

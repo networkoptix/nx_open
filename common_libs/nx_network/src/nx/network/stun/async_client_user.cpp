@@ -9,7 +9,7 @@ namespace stun {
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
-    NX_VERBOSE(this, "AsyncClientUser()");
+    NX_VERBOSE(this, "Constructor");
 
     m_client->addOnReconnectedHandler(
         [this, guard = m_asyncGuard.sharedGuard()]()
@@ -17,8 +17,7 @@ AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
             if (auto lock = guard->lock())
                 return post(std::bind(&AsyncClientUser::reportReconnect, this));
 
-            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg((void*)this));
+            NX_DEBUG(this, lm("Ignoring reconnect handler"));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -57,8 +56,8 @@ void AsyncClientUser::sendRequest(
                     });
             }
 
-            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignore response %2 handler")
-                .arg((void*)this).arg(message.header.transactionId.toHex()));
+            NX_DEBUG(this, lm("Ignore response %2 handler")
+                .arg(message.header.transactionId.toHex()));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -74,8 +73,7 @@ bool AsyncClientUser::setIndicationHandler(
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
 
-            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignore indication %2 handler")
-                .arg((void*)this).arg(message.header.method));
+            NX_DEBUG(this, lm("Ignore indication %2 handler").arg(message.header.method));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -96,8 +94,7 @@ bool AsyncClientUser::setConnectionTimer(
             if (auto lock = guard->lock())
                 return post(std::move(handler));
 
-            NX_DEBUG(this, lm("AsyncClientUser(%1). Ignoring timer handler")
-                .arg((void*)this));
+            NX_DEBUG(this, lm("Ignoring timer handler"));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -132,7 +129,7 @@ void AsyncClientUser::disconnectFromClient()
             guard.reset();
         });
 
-    NX_VERBOSE(this, lm("AsyncClientUser(%1). Disconnected from client").arg(this));
+    NX_VERBOSE(this, lm("Disconnected from client"));
     m_asyncGuard.reset();
 }
 
