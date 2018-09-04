@@ -1,13 +1,9 @@
 #pragma once
 
-#include <QtCore/QtGlobal>
-#include <QtCore/QIODevice>
-
-class QnLayoutStream: public QIODevice
+class QnLayoutStreamSupport
 {
 public:
-    // // Includes any stream metadata and padding.
-    // virtual qint64 grossSize() const = 0;
+    virtual ~QnLayoutStreamSupport() = default;
 
     virtual void lockFile() = 0;
     virtual void unlockFile() = 0;

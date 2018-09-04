@@ -5,15 +5,25 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "layout_storage_stream.h"
-#include "layout_storage_resource.h"
+namespace nx {
+namespace utils {
 
-class QnLayoutCryptoStream : public QIODevice, public QnLayoutStreamSupport
+/**
+ * Class that represents a crypted stream in a file.
+ * The stream may constitute the whole file or part of it.
+ * Additionally provides thread-safe access.
+ */
+
+class CryptedFileStream : public QIODevice
 {
 public:
-    QnLayoutCryptoStream(QnLayoutFileStorageResource& storageResource, const QString& fileName);
+    struct Stream;
 
-    virtual ~QnLayoutCryptoStream();
+    CryptedFileStream(const QString& fileName);
+
+    virtual ~CryptedFileStream();
+
+    void setEnclosure(qint64 position, qint64 size);
 
     virtual bool seek(qint64 offset) override;
     virtual qint64 pos() const override;
@@ -25,13 +35,17 @@ public:
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;
 
-    virtual void lockFile() override;
-    virtual void unlockFile() override;
+    // Equivalent to QnLayoutFileStorageResource::Stream, but there are no common headers.
+    struct Stream
+    {
+        qint64 position = 0;
+        qint64 size = 0;
+        qint64 originalSize = 0; //< This one is only to make open() reentrant on error.
 
-    virtual void storeStateAndClose() override;
-    virtual void restoreState() override;
+        bool isNull() { return (position == 0) && (size == 0);}
+    } m_enclosure;
 
-private:
+protected:
     constexpr static int kCryptoStreamVersion = 1;
     constexpr static int kCryptoBlockSize = 1024;
     constexpr static int kHeaderSize = 1024;
@@ -44,9 +58,6 @@ private:
     } m_header;
 #pragma pack(pop)
 
-    QnLayoutFileStorageResource::Stream m_enclosure;
-
-    QnLayoutFileStorageResource& m_storageResource;
 
     QString m_fileName;
 
@@ -58,7 +69,7 @@ private:
         bool dirty = false; //< Data in decrypted block is not flashed.
 
         void setPosition(qint64 position) { blockIndex = position / kCryptoBlockSize;
-            positionInBlock = position % kCryptoBlockSize; }
+        positionInBlock = position % kCryptoBlockSize; }
         qint64 position() const { return blockIndex * kCryptoBlockSize + positionInBlock; }
     } m_position;
 
@@ -90,9 +101,12 @@ private:
 
     // Working with stream header.
     void createHeader();
-    void readHeader();
+    bool readHeader();
     void writeHeader();
 
     void cryptBlock();
     void decryptBlock();
 };
+
+} // namespace utils
+} // namespace nx

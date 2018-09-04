@@ -69,8 +69,8 @@ public:
     Stream findStream(const QString& fileName);
     // Called from a output stream when it is closed.
     void finalizeWrittenStream();
-    void registerFile(QnLayoutStream* file);
-    void unregisterFile(QnLayoutStream* file);
+    void registerFile(QnLayoutStreamSupport* file);
+    void unregisterFile(QnLayoutStreamSupport* file);
 
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
@@ -108,8 +108,8 @@ private:
 
 private:
     QnLayoutFileIndex m_index;
-    QSet<QnLayoutStream*> m_openedFiles;
-    QSet<QnLayoutStream*> m_cachedOpenedFiles;
+    QSet<QnLayoutStreamSupport*> m_openedFiles;
+    QSet<QnLayoutStreamSupport*> m_cachedOpenedFiles;
     QnMutex m_fileSync;
     static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;

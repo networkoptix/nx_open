@@ -22,7 +22,6 @@ namespace {
     static const QString kLayoutProtocol(lit("layout://"));
 }
 
-
 QnMutex QnLayoutFileStorageResource::m_storageSync;
 QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
@@ -45,10 +44,10 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
 #ifdef _DEBUG
     if (openMode & QIODevice::WriteOnly)
     {
-        for (QSet<QnLayoutStream*>::iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
+        for (auto storage : m_openedFiles)
         {
-            QnLayoutStream* storage = *itr;
-            if (storage->openMode() & QIODevice::WriteOnly)
+            // Enjoy cross cast - it actually works!
+            if (dynamic_cast<QIODevice*>(storage)->openMode() & QIODevice::WriteOnly)
                 NX_ASSERT(false, Q_FUNC_INFO, "Can't open several files for writing");
         }
     }
@@ -63,13 +62,13 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     return rez;
 }
 
-void QnLayoutFileStorageResource::registerFile(QnLayoutStream* file)
+void QnLayoutFileStorageResource::registerFile(QnLayoutStreamSupport* file)
 {
     QnMutexLocker lock( &m_fileSync );
     m_openedFiles.insert(file);
 }
 
-void QnLayoutFileStorageResource::unregisterFile(QnLayoutStream* file)
+void QnLayoutFileStorageResource::unregisterFile(QnLayoutStreamSupport* file)
 {
     QnMutexLocker lock( &m_fileSync );
     m_openedFiles.remove(file);
