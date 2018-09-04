@@ -17,12 +17,48 @@ export class NxMainComponent implements OnInit, OnDestroy {
                 {
                     'id':'servers',
                     'label': 'Servers',
-                    'path': 'servers'
+                    'path': 'servers',
+                    'level2': [
+                        {
+                            'id': '12345',
+                            'label': 'Good server',
+                            'path': 'servers',
+                        },
+                        {
+                            'id': '67890',
+                            'label': 'Bad server',
+                            'path': 'servers',
+                            'level3': [
+                                {
+                                    'id': '1234absd',
+                                    'label': 'Status',
+                                    'path': 'servers',
+                                },
+                                {
+                                    'id': '5678efgh',
+                                    'label': 'Settings',
+                                    'path': 'servers',
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     'id': 'users',
                     'label': 'Users',
-                    'path': 'users'
+                    'path': 'users',
+                    'level3': [
+                        {
+                            'id': 'absd',
+                            'label': 'Tsanko',
+                            'path': 'users',
+                        },
+                        {
+                            'id': 'efgh',
+                            'label': 'Evgeny',
+                            'path': 'users',
+                        }
+                    ]
                 },
                 {
                     'id': 'other',

@@ -8,19 +8,16 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
     selector: 'nx-menu',
     templateUrl: 'menu.component.html',
-    styleUrls: []
+    styleUrls: ['menu.component.scss']
 })
 export class NxMenuComponent implements OnInit {
     @Input() content: any;
     @Input() elements: any;
 
-    private level1:any;
-
     constructor() {
     }
 
     ngOnInit() {
-        this.level1 = this.content.level1;
     }
 
     // *** Breadcrumb for usage of named (auxiliary) router outlet

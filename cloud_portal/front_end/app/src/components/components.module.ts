@@ -1,48 +1,46 @@
 import { NgModule }        from '@angular/core';
 import { CommonModule }    from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { downgradeComponent }       from '@angular/upgrade/static';
+import { RouterModule }             from '@angular/router';
 
-import { NxMenuComponent }          from './menu/menu.component';
 import { NxProcessButtonComponent } from './process-button/process-button.component';
 import { NxPreLoaderComponent }     from './pre-loader/pre-loader.component';
 import { NxCheckboxComponent }      from './checkbox/checkbox.component';
 import { NxRadioComponent }         from './radio/radio.component';
-import { downgradeComponent }       from '@angular/upgrade/static';
-import { RouterModule }             from '@angular/router';
+import { MenuModule }               from './menu/menu.module';
 
 @NgModule({
     imports: [
         CommonModule,
         TranslateModule,
-        RouterModule
+        RouterModule,
+        MenuModule
     ],
     declarations: [
-        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     entryComponents: [
-        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     providers: [
-        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
         NxRadioComponent
     ],
     exports: [
-        NxMenuComponent,
         NxProcessButtonComponent,
         NxPreLoaderComponent,
         NxCheckboxComponent,
-        NxRadioComponent
+        NxRadioComponent,
+        MenuModule
     ]
 })
 export class ComponentsModule {

@@ -1,9 +1,19 @@
 <h1>Dynamic</h1>
 <div>
-    <div *ngFor="let item of level1">
-        <a [id]="item.id"
-           [routerLink]="['/main', item.path]"
-           [innerHtml]="item.label"></a>
+    <div *ngFor="let item of content.level1">
+        <nx-level-1-item [item]="item"></nx-level-1-item>
+
+        <div *ngFor="let subitem of item.level2">
+            <nx-level-2-item [item]="subitem"></nx-level-2-item>
+
+            <div *ngFor="let details of subitem.level3">
+                <nx-level-3-item [item]="details"></nx-level-3-item>
+            </div>
+        </div>
+
+        <div *ngFor="let details of item.level3">
+            <nx-level-3-item [item]="details"></nx-level-3-item>
+        </div>
     </div>
 </div>
 

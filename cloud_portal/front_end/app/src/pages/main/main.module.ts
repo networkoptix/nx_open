@@ -17,7 +17,7 @@ import { NxOtherDetailsComponent }  from '../details/others/others.component';
 const appRoutes: Routes = [
     {path: 'main', component: NxMainComponent,
         children: [
-            {path: '', redirectTo: 'all', pathMatch: 'full'},
+            {path: '', redirectTo: 'servers', pathMatch: 'full'},
             {path: 'servers', component: NxServersDetailComponent},
             {path: 'users', component: NxUsersDetailComponent},
             {path: 'other', component: NxOtherDetailsComponent}
