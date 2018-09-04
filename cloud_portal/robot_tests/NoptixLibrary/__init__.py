@@ -138,3 +138,9 @@ class NoptixLibrary(object):
             return
         else:
             raise Exception("File does not appear to be available.")
+
+    def check_in_list(self, expected, found):
+        for url in expected:
+            if url in found:
+                return
+        raise Exception(url+ " was not in the email.")

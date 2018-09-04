@@ -11,14 +11,6 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
-Check Bad Email Input
-    [arguments]    ${email}
-    Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
-    Input Text    ${REGISTER EMAIL INPUT}    ${email}
-    Click Button    ${CREATE ACCOUNT BUTTON}
-    ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
-    Should Contain    ${class}    has-error
-
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -56,8 +48,10 @@ should open register page in anonymous state by clicking Register button on home
 
 #I am assuming this means directly going to the /register url and not clicking a button
 should open register page in anonymous state
+    [tags]    C24211
     Go To    ${url}/register
     Location should be    ${url}/register
+    Wait Until Element Is Visible    //form[@name="registerForm"]
 
 should register user with correct credentials
     ${email}    Get Random Email    ${BASE EMAIL}
@@ -126,6 +120,21 @@ with valid inputs no errors are displayed
     @{list}    Set Variable    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO SHORT}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${EMAIL INVALID}
     : FOR    ${element}    IN    @{list}
     \    Element Should Not Be Visible    ${element}
+
+displays password masked, shows password and changes eye icon when clicked
+    [tags]    C24211
+    Go To    ${url}/register
+    Wait Until Elements Are Visible    ${REGISTER PASSWORD INPUT}    ${REGISTER EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
+    Click Element    ${REGISTER EYE ICON OPEN}
+    Wait Until Element Is Visible    ${REGISTER EYE ICON CLOSED}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'text'
+    Click Element    ${REGISTER EYE ICON CLOSED}
+    Wait Until Element Is Visible    ${REGISTER EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
 
 should respond to Enter key and save data
     ${email}    Get Random Email    ${BASE EMAIL}

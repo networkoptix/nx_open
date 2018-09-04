@@ -24,7 +24,7 @@ Open New Browser On Failure
 
 *** Test Cases ***
 Register and Activate
-    [tags]    email
+    [tags]    email    C24211
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    'mark'    'hamill'    ${email}    ${password}

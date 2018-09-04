@@ -1,5 +1,8 @@
 {
     "%PRODUCT_NAME%"         : "Nx Cloud",
     "%VMS_NAME%"             : "Nx Witness",
-    "PRIVACY_POLICY_URL"     : "http://www.networkoptix.com/privacy-policy/"
+    "PRIVACY_POLICY_URL"     : "http://www.networkoptix.com/privacy-policy/",
+    "SUPPORT_URL"            : "http://support.networkoptix.com",
+    "WEBSITE_URL"            : "http://networkoptix.com"
+
 }

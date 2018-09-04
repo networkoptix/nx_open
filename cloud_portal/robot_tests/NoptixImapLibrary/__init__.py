@@ -148,7 +148,7 @@ class NoptixImapLibrary(object):
         #body = body.decode('utf-8')
         print (body)
         res = findall(r'href=[\'"]?([^\'" >]+)', str(body))
-        return res[1]
+        return res
 
     def get_nx_links_from_email(self, email_index, path):
         body = self.get_email_body(email_index)

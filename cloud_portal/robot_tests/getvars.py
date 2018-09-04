@@ -15,4 +15,6 @@ def get_variables(lang="en_US"):
             translation_variables =  json.loads(translation_variables, encoding='utf-8-sig')
             translation_variables['LANGUAGE']=lang
             translation_variables['PRIVACY_POLICY_URL']=customization_json['PRIVACY_POLICY_URL']
+            translation_variables['SUPPORT_URL']=customization_json['SUPPORT_URL']
+            translation_variables['WEBSITE_URL']=customization_json['WEBSITE_URL']
             return translation_variables
