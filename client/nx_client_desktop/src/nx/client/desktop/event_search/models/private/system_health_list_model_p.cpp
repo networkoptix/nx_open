@@ -254,8 +254,8 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
             const auto runtimeParameters = action->getRuntimeParams();
             resource = runtimeParameters.metadata.cameraRefs.empty()
                 ? resourcePool()->getResourceById(runtimeParameters.eventResourceId)
-                : camera_id_helper::findCameraByFlexibleId(resourcePool(),
-                    runtimeParameters.metadata.cameraRefs[0]);
+                : static_cast<QnResourcePtr>(camera_id_helper::findCameraByFlexibleId(resourcePool(),
+                    runtimeParameters.metadata.cameraRefs[0]));
         }
     }
 
