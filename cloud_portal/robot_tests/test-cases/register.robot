@@ -166,12 +166,31 @@ should respond to Tab key
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
+
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-not-empty") and @ng-model='account.accept']
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-empty") and @ng-model='account.accept']
+
     Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS LINK}    ${ENTER}
     Element Should Be Focused    ${TERMS AND CONDITIONS LINK}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Be    ${url}/content/eula
+    Select Window    @{tabs}[0]
     Press Key    ${TERMS AND CONDITIONS LINK}    ${TAB}
     Element Should Be Focused    ${PRIVACY POLICY LINK}
+    Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[2]
+    Location Should Be    ${url}/content/privacy
+    Select Window    @{tabs}[0]
+
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
+    Press Key    ${CREATE ACCOUNT BUTTON}    ${ENTER}
+    Wait Until Elements Are Visible    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD IS REQUIRED}
 
 should open Terms and conditions in a new page
     [tags]    C41558
