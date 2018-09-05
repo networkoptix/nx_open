@@ -13,7 +13,7 @@
 class NamedPipeServerImpl;
 
 //!Named pipe for IPC
-class NX_VMS_APPLAUNCHER_API_API NamedPipeServer
+class NX_UTILS_API NamedPipeServer
 {
 public:
     NamedPipeServer();

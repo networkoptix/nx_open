@@ -9,7 +9,7 @@ class NamedMutexImpl;
     On win32 it is implemented as Mutex, on Unix - as QSystemSemaphore, since unix provides ability to rollback semaphore state on process termination (SEM_UNDO).
     On win32 QSystemSemaphore is not released with unexpected process termination
 */
-class NamedMutex
+class NX_UTILS_API NamedMutex
 {
 public:
     class ScopedLock

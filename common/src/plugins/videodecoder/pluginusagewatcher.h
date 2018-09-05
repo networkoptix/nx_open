@@ -13,7 +13,7 @@
 #include "pluginusagerecord.h"
 #include "videodecoderplugintypes.h"
 #include "../../decoders/video/abstract_video_decoder.h"
-#include "../../utils/ipc/namedmutex.h"
+#include <nx/utils/ipc/namedmutex.h>
 
 
 class UsageRecordArray;

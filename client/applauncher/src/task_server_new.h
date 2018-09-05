@@ -4,7 +4,7 @@
 
 #include <nx/vms/applauncher/api/applauncher_api.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <nx/vms/applauncher/api/ipc/named_pipe_server.h>
+#include <nx/utils/ipc/named_pipe_server.h>
 
 class AbstractRequestProcessor;
 

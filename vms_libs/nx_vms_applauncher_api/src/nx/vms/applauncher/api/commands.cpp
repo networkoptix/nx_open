@@ -1,6 +1,6 @@
 #include "commands.h"
 
-#include "ipc/named_pipe_socket.h"
+#include "nx/utils/ipc/named_pipe_socket.h"
 
 #include <nx/utils/log/log.h>
 
