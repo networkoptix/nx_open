@@ -1,13 +1,6 @@
-/**********************************************************
-* 25 oct 2012
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NAMEDMUTEX_H
-#define NAMEDMUTEX_H
+#pragma once
 
 #include <QtCore/QString>
-
 
 class NamedMutexImpl;
 
@@ -78,5 +71,3 @@ public:
 private:
     NamedMutexImpl* m_impl;
 };
-
-#endif  //NAMEDMUTEX_H

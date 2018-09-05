@@ -1,13 +1,6 @@
-/**********************************************************
-* 20 sep 2013
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef ABSTRACT_REQUEST_PROCESSOR_H
-#define ABSTRACT_REQUEST_PROCESSOR_H
-
-#include <api/applauncher_api.h>
-
+#include <nx/vms/applauncher/api/applauncher_api.h>
 
 class AbstractRequestProcessor
 {
@@ -22,5 +15,3 @@ public:
         const std::shared_ptr<applauncher::api::BaseTask>& request,
         applauncher::api::Response** const response ) = 0;
 };
-
-#endif  //ABSTRACT_REQUEST_PROCESSOR_H

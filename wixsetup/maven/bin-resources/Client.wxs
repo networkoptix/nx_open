@@ -14,13 +14,6 @@
                 </RegistryKey>
             </Component>
 
-            <Component Id="AppLauncherConfigurationSystem">
-                <RegistryKey Root="HKLM"
-                         Key="Software\[Manufacturer]\$(var.applauncherName)">
-                    <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
-                </RegistryKey>
-            </Component>
-
             <Component Id="ClientEulaVersion">
                 <RegistryKey Root="HKCU"
                          Key="Software\[Manufacturer]\$(var.clientInternalName)">
@@ -131,6 +124,9 @@
         <ComponentGroup Id="ClientLibs" Directory="ClientRootDir">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
+            </Component>
+            <Component>
+                <File Id="nx_vms_applauncher_api.dll" Name="nx_vms_applauncher_api.dll" Source="$(var.SourceDir)/nx_vms_applauncher_api.dll" DiskId="13" />
             </Component>
             <Component>
                 <File Id="nx_vms_utils.dll" Name="nx_vms_utils.dll" Source="$(var.SourceDir)/nx_vms_utils.dll" DiskId="13" />
@@ -291,7 +287,6 @@
             <ComponentRef Id="MiniLauncherExecutable" />
             <ComponentRef Id="AppLauncherExecutable" />
             <ComponentRef Id="AppLauncherConfigurationUser" />
-            <ComponentRef Id="AppLauncherConfigurationSystem" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentRef Id="ClientEulaVersion"/>

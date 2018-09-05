@@ -36,7 +36,6 @@ set(android.storepass "5PggyvSp")
 set(android.keypass "RBxeExNL")
 
 # Update parameters
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.vista-cctv.com/updates.json")
 set(releaseNotesUrl "http://updates.vista-cctv.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.vista-cctv.com/updates.json")

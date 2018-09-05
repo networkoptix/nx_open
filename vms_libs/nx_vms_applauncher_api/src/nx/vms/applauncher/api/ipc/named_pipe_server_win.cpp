@@ -91,7 +91,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
         if( dwRes != ERROR_SUCCESS )
             break;
 
-        pSD = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH); 
+        pSD = (PSECURITY_DESCRIPTOR)LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH);
         if( !pSD )
             break;
         if( !InitializeSecurityDescriptor(pSD, SECURITY_DESCRIPTOR_REVISION)
@@ -111,17 +111,17 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     secAttrs.lpSecurityDescriptor = pSD;
     secAttrs.bInheritHandle = FALSE;
 
-    const QString win32PipeName = lit("\\\\.\\pipe\\%1").arg(pipeName);
+    const QString win32PipeName = QString("\\\\.\\pipe\\%1").arg(pipeName);
     m_impl->hPipe = CreateNamedPipe(
-        reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),              // pipe name 
+        reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),              // pipe name
         FILE_FLAG_FIRST_PIPE_INSTANCE | PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,       // read/write access, overlapped I/O
-        PIPE_TYPE_MESSAGE |                 // message type pipe 
-            PIPE_READMODE_MESSAGE |         // message-read mode 
-            PIPE_WAIT,                      // blocking mode 
-        PIPE_UNLIMITED_INSTANCES,           // max. instances  
-        NamedPipeSocketImpl::BUFSIZE,       // output buffer size 
-        NamedPipeSocketImpl::BUFSIZE,       // input buffer size 
-        0,                                  // client time-out 
+        PIPE_TYPE_MESSAGE |                 // message type pipe
+            PIPE_READMODE_MESSAGE |         // message-read mode
+            PIPE_WAIT,                      // blocking mode
+        PIPE_UNLIMITED_INSTANCES,           // max. instances
+        NamedPipeSocketImpl::BUFSIZE,       // output buffer size
+        NamedPipeSocketImpl::BUFSIZE,       // input buffer size
+        0,                                  // client time-out
         pSD ? &secAttrs : NULL );
 
     if( pEveryoneSID )

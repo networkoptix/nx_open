@@ -34,7 +34,7 @@ void ApplauncherGuard::timerEvent(QTimerEvent* event)
         return;
     }
 
-    applauncher::checkOnline();
+    applauncher::api::checkOnline();
 }
 
 } // namespace desktop

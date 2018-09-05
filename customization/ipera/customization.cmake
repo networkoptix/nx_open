@@ -26,7 +26,6 @@ set(defaultWebPages
     "{\"Home Page\": \"http://flyviewvms.ru\", \"Support\": \"http://flyviewvms.ru/support\"}")
 
 # Update parameters
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.flyviewvms.ru/updates.json")
 set(releaseNotesUrl "http://updates.flyviewvms.ru/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.flyviewvms.ru/updates.json")

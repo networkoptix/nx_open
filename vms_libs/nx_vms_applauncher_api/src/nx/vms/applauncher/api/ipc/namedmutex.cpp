@@ -1,12 +1,10 @@
-/**********************************************************
-* 25 oct 2012
-* a.kolesnikov
-***********************************************************/
-
 #include "namedmutex.h"
 
-#include <QSystemSemaphore>
+#ifdef _WIN32
+    #include "windows.h"
+#endif
 
+#include <QSystemSemaphore>
 
 #ifdef _WIN32
 class NamedMutexImpl

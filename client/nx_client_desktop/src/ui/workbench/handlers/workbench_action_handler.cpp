@@ -2024,7 +2024,8 @@ void ActionHandler::closeApplication(bool force) {
     menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);
     qApp->exit(0);
-    applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT);
+    applauncher::api::scheduleProcessKill(QCoreApplication::applicationPid(),
+        PROCESS_TERMINATE_TIMEOUT);
 }
 
 void ActionHandler::at_beforeExitAction_triggered() {
@@ -2367,14 +2368,14 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     auto tryToRestartClient = []
         {
-            using namespace applauncher;
+            using namespace applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())
                 return false;
 
             const auto result = restartClient();
-            if (result == applauncher::api::ResultType::Value::ok)
+            if (result == ResultType::Value::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2382,7 +2383,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
             {
                 QThread::msleep(100);
                 qApp->processEvents();
-                if (restartClient() == applauncher::api::ResultType::ok)
+                if (restartClient() == ResultType::ok)
                     return true;
             }
             return false;

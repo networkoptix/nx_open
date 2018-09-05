@@ -5,7 +5,7 @@
 class NamedPipeSocketImpl;
 
 //!Named pipe for IPC
-class NamedPipeSocket
+class NX_VMS_APPLAUNCHER_API_API NamedPipeSocket
 {
     friend class NamedPipeServer;
 

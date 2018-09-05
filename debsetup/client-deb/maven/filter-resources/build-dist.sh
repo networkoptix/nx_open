@@ -6,7 +6,6 @@ set -e
 COMPANY_NAME=@deb.customization.company.name@
 FULL_COMPANY_NAME="@company.name@"
 FULL_PRODUCT_NAME="@company.name@ @product.name@ Client.conf"
-FULL_APPLAUNCHER_NAME="@company.name@ Launcher.conf"
 
 VERSION=@release.version@
 FULLVERSION=@release.version@.@buildNumber@
@@ -84,9 +83,7 @@ buildDistribution()
     mkdir -p $ICONSTAGE
     mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 
-    echo "Copying client.conf and applauncher.conf"
     cp debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
-    cp debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 
     echo "Copying build_info.txt"
     cp -r $BUILD_INFO_TXT $BINSTAGE/../

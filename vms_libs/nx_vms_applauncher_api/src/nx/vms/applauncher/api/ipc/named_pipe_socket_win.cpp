@@ -49,13 +49,13 @@ SystemError::ErrorCode NamedPipeSocket::connectToServerSync( const QString& pipe
 {
     //TODO/IMPL: #ak timeoutMillis support
 
-    const QString win32PipeName = lit("\\\\.\\pipe\\%1").arg(pipeName);
+    const QString win32PipeName = QString("\\\\.\\pipe\\%1").arg(pipeName);
 
     // TODO: use WaitNamedPipe
 
     m_impl->hPipe = CreateFile(
-        reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),             // pipe name 
-        GENERIC_READ | GENERIC_WRITE,       // read/write access 
+        reinterpret_cast<const wchar_t *>(win32PipeName.utf16()),             // pipe name
+        GENERIC_READ | GENERIC_WRITE,       // read/write access
         0,
         NULL,
         OPEN_EXISTING,

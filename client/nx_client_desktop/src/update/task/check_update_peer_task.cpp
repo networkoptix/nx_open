@@ -85,9 +85,11 @@ namespace {
         return QnSoftwareVersion();
     }
 
-    QnSoftwareVersion maximumAvailableVersion() {
+    QnSoftwareVersion maximumAvailableVersion()
+    {
+        using namespace applauncher::api;
         QList<QnSoftwareVersion> versions;
-        if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
+        if (getInstalledVersions(&versions) != ResultType::ok)
             versions.append(QnSoftwareVersion(qApp->applicationVersion()));
 
         return *std::max_element(versions.begin(), versions.end());
