@@ -57,8 +57,9 @@ PersistentScheduler::PersistentScheduler(
         {
             if (result != nx::sql::DBResult::ok)
             {
-                NX_LOG(lit("[Scheduler] Failed to load schedule data. Error code: %1")
-                    .arg(nx::sql::toString(result)), cl_logERROR);
+                NX_ERROR(typeid(PersistentScheduler),
+                    lit("Failed to load schedule data. Error code: %1")
+                    .arg(nx::sql::toString(result)));
             }
             p.set_value();
         });
@@ -113,8 +114,8 @@ nx::sql::DBResult PersistentScheduler::subscribe(
     auto dbResult = m_dbHelper->subscribe(queryContext, functorId, outTaskId, taskInfo);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOG(lit("[Scheduler] Failed to subscribe. Functor id: %1")
-            .arg(functorId.toString()), cl_logERROR);
+        NX_ERROR(this, lit("Failed to subscribe. Functor id: %1")
+            .arg(functorId.toString()));
         return dbResult;
     }
 
@@ -129,8 +130,8 @@ nx::sql::DBResult PersistentScheduler::unsubscribe(
     auto dbResult = m_dbHelper->unsubscribe(queryContext, taskId);
     if (dbResult != nx::sql::DBResult::ok)
     {
-        NX_LOG(lit("[Scheduler] Failed to unsubscribe. Task id: %1")
-            .arg(taskId.toString()), cl_logERROR);
+        NX_ERROR(this, lit("Failed to unsubscribe. Task id: %1")
+            .arg(taskId.toString()));
         return dbResult;
     }
 
@@ -148,7 +149,7 @@ void PersistentScheduler::removeTimer(const QnUuid& taskId)
         NX_ASSERT(taskToTimerIt != m_taskToTimer.cend());
         if (taskToTimerIt == m_taskToTimer.cend())
         {
-            NX_LOG(lit("[Scheduler] timer id not found in TaskToTimer map"), cl_logERROR);
+            NX_ERROR(this, lit("timer id not found in TaskToTimer map"));
             return;
         }
         timerId = taskToTimerIt->second;
@@ -157,7 +158,7 @@ void PersistentScheduler::removeTimer(const QnUuid& taskId)
     NX_ASSERT(m_timerManager);
     if (!m_timerManager)
     {
-        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        NX_WARNING(this, lit("[Scheduler, timer] timer manager is NULL"));
         return;
     }
     m_timerManager->deleteTimer(timerId);
@@ -173,7 +174,7 @@ void PersistentScheduler::addTimer(
     NX_ASSERT(m_timerManager);
     if (!m_timerManager)
     {
-        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        NX_WARNING(this, lit("[Scheduler, timer] timer manager is NULL"));
         return;
     }
 
@@ -196,8 +197,8 @@ void PersistentScheduler::addTimer(
     NX_ASSERT(taskToTimerIt == m_taskToTimer.cend());
     if (taskToTimerIt != m_taskToTimer.cend())
     {
-        NX_LOG(lit("[Scheduler] timer id %1 is already present in TaskToTimer map")
-               .arg(timerId), cl_logERROR);
+        NX_ERROR(this, lit("timer id %1 is already present in TaskToTimer map")
+               .arg(timerId));
         return;
     }
     m_taskToTimer[taskId] = timerId;
@@ -214,8 +215,8 @@ void PersistentScheduler::timerFunction(
         auto it = m_functorToReceiver.find(functorId);
         if (it == m_functorToReceiver.cend())
         {
-            NX_LOG(lit("[Scheduler] No receiver for functor id %1")
-               .arg(functorId.toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("No receiver for functor id %1")
+               .arg(functorId.toString()));
 
             auto& taskToParams = m_functorToTaskToParams[functorId];
             if (taskToParams.find(taskId) == taskToParams.cend())
@@ -235,8 +236,8 @@ void PersistentScheduler::timerFunction(
         {
             if (result != nx::sql::DBResult::ok)
             {
-                NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
-                   .arg(toString(result)), cl_logERROR);
+                NX_ERROR(this, lit("Use on timer callback returned error %1")
+                   .arg(toString(result)));
             }
         });
 }

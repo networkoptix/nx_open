@@ -70,10 +70,10 @@ public:
             && (resolution.width() > s_maxResolution.width()
                 || resolution.height() > s_maxResolution.height()))
         {
-            NX_LOG(lit("[TEST] MockVideoDecoder::isCompatible() -> false: "
+            NX_INFO(typeid(MockVideoDecoder),lit("[TEST] isCompatible() -> false: "
                 "resolution %1 x %2 is higher than %3 x %4")
                 .arg(resolution.width()).arg(resolution.height())
-                .arg(s_maxResolution.width()).arg(s_maxResolution.height()), cl_logINFO);
+                .arg(s_maxResolution.width()).arg(s_maxResolution.height()));
             return false;
         }
 
@@ -82,12 +82,11 @@ public:
             && (resolution.width() > s_maxTranscodedResolution.width()
                 || resolution.height() > s_maxTranscodedResolution.height()))
         {
-            NX_LOG(lit("[TEST] MockVideoDecoder::isCompatible() -> false: "
+            NX_INFO(typeid(MockVideoDecoder), lit("[TEST] isCompatible() -> false: "
                 "For transcoding codec %1, resolution %2 x %3 is higher than %4 x %5")
                 .arg(s_transcodingCodec)
                 .arg(resolution.width()).arg(resolution.height())
-                .arg(s_maxTranscodedResolution.width()).arg(s_maxTranscodedResolution.height()),
-                cl_logINFO);
+                .arg(s_maxTranscodedResolution.width()).arg(s_maxTranscodedResolution.height()));
             return false;
         }
 
@@ -103,7 +102,7 @@ public:
         const QnConstCompressedVideoDataPtr& /*compressedVideoData*/,
         QVideoFramePtr* /*outDecodedFrame*/) override
     {
-        NX_LOG(lit("[TEST] INTERNAL ERROR: VideoDecoder::decode() called"), cl_logINFO);
+        NX_INFO(this, lit("[TEST] INTERNAL ERROR: decode() called"));
         return 0;
     }
 
@@ -214,13 +213,13 @@ public:
             int(!lowResolution.isEmpty()) + int(!highResolution.isEmpty());
         if ((size_t)expectedStreamsCount != mediaStreams().streams.size())
         {
-            NX_LOG(lit(
+            NX_INFO(this, lit(
                 "[TEST] INTERNAL ERROR: Failed adding camera streams: expected %1, actual %2")
-                .arg(expectedStreamsCount).arg(mediaStreams().streams.size()), cl_logINFO);
+                .arg(expectedStreamsCount).arg(mediaStreams().streams.size()));
             NX_CRITICAL(false, "[TEST]");
         }
 
-        NX_LOG(lit("[TEST] Camera streams JSON: %1").arg(json), cl_logDEBUG1);
+        NX_DEBUG(this, lit("[TEST] Camera streams JSON: %1").arg(json));
         debugLogStreams();
     }
 
@@ -247,22 +246,22 @@ private:
         {
             if (stream.getEncoderIndex() == Qn::StreamIndex::primary) //< High
             {
-                NX_LOG(lit("[TEST] Camera High stream: %1 x %2, AVCodecID %3")
+                NX_DEBUG(this, lit("[TEST] Camera High stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
-                    .arg(stream.codec), cl_logDEBUG1);
+                    .arg(stream.codec));
             }
             else if (stream.getEncoderIndex() == Qn::StreamIndex::secondary) //< Low
             {
-                NX_LOG(lit("[TEST] Camera Low stream: %1 x %2, AVCodecID %3")
+                NX_DEBUG(this, lit("[TEST] Camera Low stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
-                    .arg(stream.codec), cl_logDEBUG1);
+                    .arg(stream.codec));
             }
             else
             {
-                NX_LOG(lit(
+                NX_DEBUG(this, lit(
                     "[TEST] INTERNAL ERROR: Unexpected camera stream: %1 x %2, AVCodecID %3")
                     .arg(stream.getResolution().width()).arg(stream.getResolution().height())
-                    .arg(stream.codec), cl_logDEBUG1);
+                    .arg(stream.codec));
                 NX_CRITICAL(false, "[TEST]");
             }
         }
@@ -448,9 +447,8 @@ PlayerSetQualityTest::~PlayerSetQualityTest()
 
 void PlayerSetQualityTest::test(const TestCase& testCase)
 {
-    NX_LOG(lit("[TEST] ====================================================================="),
-        cl_logINFO);
-    NX_LOG(lit("[TEST] %1\n").arg(testCase.toString()), cl_logDEBUG2);
+    NX_INFO(this, lit("[TEST] ====================================================================="));
+    NX_VERBOSE(this, lit("[TEST] %1\n").arg(testCase.toString()));
 
     VideoDecoderRegistry::instance()->setTranscodingEnabled(
         testCase.clientSupportsTranscoding);

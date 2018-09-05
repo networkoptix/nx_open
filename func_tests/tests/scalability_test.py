@@ -343,7 +343,7 @@ def unpack_env(config, groups):
         yield make_real_servers_env(config, server_list, IPNetwork('0.0.0.0/0'))
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def two_vm_types():
     return 'linux', 'linux'
 

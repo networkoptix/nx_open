@@ -233,7 +233,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
-            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to cloud"));
             qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
             break;
         }
@@ -246,7 +246,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
-            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);
             systemUrl.setPassword(auth.password);
@@ -254,7 +254,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             if (systemIsCloud)
             {
                 qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Custom URI: System is cloud, connecting to cloud first"));
             }
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);

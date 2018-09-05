@@ -229,7 +229,8 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage()
-def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Generator[Result]
+def io_events(run, ins, outs, connected=False):
+        # type: (stage.Run, list, list, bool) -> Generator[Result]
     expected_ports = {}
     for id in ins:
         expected_ports['id=' + id] = dict(portType='Input', inputName='Input ' + id)
@@ -259,27 +260,40 @@ def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Ge
             yield Failure('No input events from camera')
 
 
+PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
+PTZ_POSITION_KEYS = ('focus', 'pan', 'rotation', 'tilt', 'zoom')
+
+
 @_stage()
 def ptz_presets(run, *presets):  # type: (stage.Run, List[dict]) -> Generator[Result]
-    for name, flag in (('presets', 0x10000), ('absolute', 0x40000070)):
-        if not (run.data['ptzCapabilities'] or flag):
-            raise KeyError('PTZ {} capability is not supported'.format(name))
+    for name, flag in PTZ_CAPABILITY_FLAGS.items():
+        if run.data['ptzCapabilities'] & flag == 0:
+            raise KeyError('PTZ {}({:b}) capability is not supported in {:b}'.format(
+                name, flag, run.data['ptzCapabilities']))
 
-    def ptz(*args, **kwargs):
-        return run.server.api.ptz(run.id, *args, **kwargs)
-
-    def current_position():
-        p = ptz('GetDevicePosition')
-        return '-'.join(str(p.get(k)) for k in ('focus', 'pan', 'rotation', 'tilt', 'zoom'))
+    def execute(*args, **kwargs):
+        return run.server.api.execute_ptz(run.id, *args, **kwargs)
 
     checker = Checker()
     for preset in presets:
-        expected = {'id=' + preset['id']: {'name': preset.get('name', preset['id'])}}
-        while not checker.expect_values(expected, ptz('GetPresets'), 'presets'):
-            yield checker.result()
+        is_logical = preset.get('is_logical', False)
+        if 'id' in preset:
+            expected = {'id=' + preset['id']: {'name': preset.get('name', preset['id'])}}
+            while not checker.expect_values(expected, execute('GetPresets'), 'presets'):
+                yield checker.result()
 
-        ptz('ActivatePreset', presetId=preset['id'], speed=100)
-        while not checker.expect_values(preset['position'], current_position(), preset['id']):
+            execute('ActivatePreset', speed=100, presetId=preset['id'])
+        else:
+            execute(
+                'AbsoluteLogicalMove' if is_logical else 'AbsoluteDeviceMove', speed=100,
+                **{k: v for k, v in zip(PTZ_POSITION_KEYS, preset['position'].split('-'))})
+
+        def get_position():
+            position = execute('GetLogicalPosition' if is_logical else 'GetDevicePosition')
+            return '-'.join(str(position.get(k)) for k in PTZ_POSITION_KEYS)
+
+        yield Halt('Wait for move to {}'.format(preset['position']))
+        while not checker.expect_values(preset['position'], get_position(), preset.get('id')):
             yield checker.result()
 
     yield Success()

@@ -522,7 +522,7 @@ void MessageBus::at_gotMessage(
 
     if (connection->state() == Connection::State::Error)
         return; //< Connection has been closed
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) &&
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this) &&
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
@@ -871,7 +871,7 @@ void MessageBus::gotTransaction(
 {
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
@@ -918,7 +918,7 @@ void MessageBus::gotUnicastTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& header)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     std::set<QnUuid> unprocessedPeers;

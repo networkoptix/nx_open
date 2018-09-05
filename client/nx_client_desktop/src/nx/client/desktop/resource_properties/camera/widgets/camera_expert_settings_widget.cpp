@@ -115,6 +115,9 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->customMediaPortSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setCustomMediaPort);
 
+    connect(ui->trustCameraTimeCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setTrustCameraTime);
+
     connect(ui->logicalIdSpinBox, QnSpinboxIntValueChanged,
         store, &CameraSettingsDialogStore::setLogicalId);
 

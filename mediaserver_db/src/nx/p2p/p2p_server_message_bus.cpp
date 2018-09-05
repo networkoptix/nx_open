@@ -164,7 +164,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
         {
             connectionContext->localPeersMessage = data;
             connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printPeersMessage();
             connection->sendMessage(data);
         }
@@ -529,7 +529,7 @@ void ServerMessageBus::resubscribePeers(
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
 
             QVector<SubscribeRecord> request;
@@ -594,7 +594,7 @@ bool ServerMessageBus::selectAndSendTransactions(
     context(connection)->sendDataInProgress = !isFinished;
     context(connection)->remoteSubscription = newSubscription;
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
     {
         for (const auto& serializedTran : serializedTransactions)
         {

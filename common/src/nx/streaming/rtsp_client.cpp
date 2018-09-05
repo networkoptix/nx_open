@@ -344,12 +344,11 @@ void QnRtspTimeHelper::printTime(double jitter)
     {
         if (m_jitPackets > 0)
         {
-            NX_LOG(lm("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms")
+            NX_INFO(this, lm("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms")
                 .arg(m_resourceId)
                 .arg((int) (/*rounding*/ 0.5 + m_minJitter * 1000))
                 .arg((int) (/*rounding*/ 0.5 + m_maxJitter * 1000))
-                .arg((int) (/*rounding*/ 0.5 + m_jitterSum * 1000 / m_jitPackets)),
-                cl_logINFO);
+                .arg((int) (/*rounding*/ 0.5 + m_jitterSum * 1000 / m_jitPackets)));
         }
         m_statsTimer.restart();
         m_minJitter = INT_MAX;
@@ -389,7 +388,7 @@ qint64 QnRtspTimeHelper::getUsecTime(
         return currentUs;
     }
 
-    if (m_timePolicy == TimePolicy::onvifExtension
+    if (m_timePolicy == TimePolicy::forceCameraTime
         && statistics.ntpOnvifExtensionTime.is_initialized())
     {
         VERBOSE(lm("-> %2 (%3), resourceId: %1")
@@ -843,9 +842,8 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
     if( result )
     {
-        NX_LOG(lit("Sucessfully opened RTSP stream %1")
-                .arg(m_url.toString(QUrl::RemovePassword)),
-            cl_logALWAYS);
+        NX_ALWAYS(this, lit("Sucessfully opened RTSP stream %1")
+                .arg(m_url.toString(QUrl::RemovePassword)));
     }
 
     return result;
@@ -1657,13 +1655,13 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
             {
                 if( bytesRead == 0 )
                 {
-                    NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
-                        arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
+                    NX_INFO(this, lit("RTSP connection to %1 has been unexpectedly closed").
+                        arg(m_tcpSock->getForeignAddress().toString()));
                 }
                 else if (!m_tcpSock->isClosed())
                 {
-                    NX_LOG( lit("Error reading RTSP response from %1. %2").
-                        arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    NX_WARNING(this, lit("Error reading RTSP response from %1. %2").
+                        arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()));
                 }
                 return false;	//error occured or connection closed
             }
@@ -1705,8 +1703,8 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
         }
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
-            NX_LOG( lit("RTSP response from %1 has exceeded max response size (%2)").
-                arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN), cl_logINFO );
+            NX_INFO(this, lit("RTSP response from %1 has exceeded max response size (%2)").
+                arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN));
             return false;
         }
     }

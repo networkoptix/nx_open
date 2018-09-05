@@ -21,24 +21,24 @@ TEST(SaveCamera, invalidData)
     cameraData.physicalId = "matching physicalId";
     cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
-    NX_LOG("[TEST] Both id and physicalId fields correctly defined.", cl_logINFO);
+    NX_INFO(this, "[TEST] Both id and physicalId fields correctly defined.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData);
 
-    NX_LOG("[TEST] Error case: id doesn't match physicalId.", cl_logINFO);
+    NX_INFO(this, "[TEST] Error case: id doesn't match physicalId.");
     cameraData.physicalId = "non-matching physicalId";
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({"id", "physicalId", "parentId", "typeId", "vendor"}),
         nx::network::http::StatusCode::forbidden);
 
-    NX_LOG("[TEST] Create another camera with auto-generated id.", cl_logINFO);
+    NX_INFO(this, "[TEST] Create another camera with auto-generated id.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({/*"id",*/ "physicalId", "parentId", "typeId", "vendor"}));
 
-    NX_LOG("[TEST] Merge by id with the existing object.", cl_logINFO);
+    NX_INFO(this, "[TEST] Merge by id with the existing object.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({"id", /*"physicalId",*/ "parentId", "typeId", "vendor"}));
 
-    NX_LOG("[TEST] Error case: both id and physicalId are missing.", cl_logINFO);
+    NX_INFO(this, "[TEST] Error case: both id and physicalId are missing.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({/*"id",*/ /*"physicalId",*/ "parentId", "typeId", "vendor"}),
         nx::network::http::StatusCode::forbidden);

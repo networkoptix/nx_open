@@ -314,7 +314,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
 
         m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+        NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()));
 
         //checking url type and creating corresponding data provider
 

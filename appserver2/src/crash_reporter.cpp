@@ -45,8 +45,8 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
         return QFileInfoList(); // do nothing. not implemented
     #endif
 
-    NX_LOG(lit("readCrashes: scan %1 for files %2")
-           .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
+    NX_DEBUG(typeid(ec2::CrashReporter), lit("readCrashes: scan %1 for files %2")
+           .arg(crashDir.absolutePath()).arg(crashFilter));
 
     auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
     // Qt has a crossplatform bug in build in sort by QDir::Time
@@ -116,7 +116,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (!globalSettings->isStatisticsAllowed()
         || globalSettings->isNewSystem())
     {
-        NX_LOGX(lit("Automatic report system is disabled"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Automatic report system is disabled"));
         return false;
     }
 
@@ -127,8 +127,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (now < lastTime.addSecs(SENDING_MIN_INTERVAL) &&
         lastTime < now.addSecs(SENDING_MIN_INTERVAL)) // avoid possible long resync problem
     {
-        NX_LOGX(lit("Previous crash was reported %1, exit")
-                .arg(lastTime.toString(Qt::ISODate)), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Previous crash was reported %1, exit")
+                .arg(lastTime.toString(Qt::ISODate)));
         return false;
     }
 
@@ -144,8 +144,8 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         if (crash.size() < SENDING_MIN_SIZE)
         {
             QFile::remove(crash.absoluteFilePath());
-            NX_LOGX(lit("Remove not informative crash: %1")
-                .arg(crash.absolutePath()), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("Remove not informative crash: %1")
+                .arg(crash.absolutePath()));
         }
         else
         if (crash.size() < SENDING_MAX_SIZE)
@@ -164,11 +164,11 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     // This function is not supposed to be called more then once per binary, but anyway:
     if (m_activeCollection.isInProgress())
     {
-        NX_LOGX(lit("Previous report is in progress, exit"), cl_logERROR);
+        NX_ERROR(this, lit("Previous report is in progress, exit"));
         return;
     }
 
-    NX_LOGX(lit("Start new async report"), cl_logINFO);
+    NX_INFO(this, lit("Start new async report"));
     m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
         // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
@@ -181,7 +181,7 @@ void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
     if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
     {
-        NX_LOGX(lm("Sending is disabled for developer builds (buildNumber=0)"), cl_logINFO);
+        NX_INFO(this, lm("Sending is disabled for developer builds (buildNumber=0)"));
         return;
     }
 
@@ -202,8 +202,8 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     auto content = file.readAll();
     if (content.size() == 0)
     {
-        NX_LOGX(lit("Error: %1 is not readable or empty: %2")
-                .arg(filePath).arg(file.errorString()), cl_logWARNING);
+        NX_WARNING(this, lit("Error: %1 is not readable or empty: %2")
+                .arg(filePath).arg(file.errorString()));
         return false;
     }
 
@@ -219,11 +219,11 @@ bool CrashReporter::send(const nx::utils::Url& serverApi, const QFileInfo& crash
     QnMutexLocker lock(&m_mutex);
     if (m_activeHttpClient)
     {
-        NX_LOGX(lit("Another report already is in progress!"), cl_logWARNING);
+        NX_WARNING(this, lit("Another report already is in progress!"));
         return false;
     }
 
-    NX_LOGX(lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()), cl_logINFO);
+    NX_INFO(this, lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()));
 
     httpClient->doPost(serverApi, "application/octet-stream", content);
     m_activeHttpClient = std::move(httpClient);
@@ -243,14 +243,14 @@ void ReportData::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
 {
     if (!httpClient->hasRequestSucceeded())
     {
-        NX_LOGX(lit("Sending %1 to %2 has failed")
+        NX_WARNING(this, lit("Sending %1 to %2 has failed")
                 .arg(m_crashFile.absoluteFilePath())
-                .arg(httpClient->url().toString()), cl_logWARNING);
+                .arg(httpClient->url().toString()));
     }
     else
     {
-        NX_LOGX(lit("Report %1 has been sent successfully")
-                .arg(m_crashFile.absoluteFilePath()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Report %1 has been sent successfully")
+                .arg(m_crashFile.absoluteFilePath()));
 
         const auto now = qnSyncTime->currentDateTime().toUTC();
         m_settings->setValue(LAST_CRASH, now.toString(Qt::ISODate));

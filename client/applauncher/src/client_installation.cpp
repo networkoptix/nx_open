@@ -73,7 +73,7 @@ QString QnClientInstallation::libraryPath() const
 
 bool QnClientInstallation::verify() const
 {
-    NX_LOG(QString::fromLatin1("Entered VerifyInstallation"), cl_logDEBUG1);
+    NX_DEBUG(this, QString::fromLatin1("Entered VerifyInstallation"));
 
     QMap<QString, qint64> fileSizeByEntry;
     QDir rootDir(m_rootPath);

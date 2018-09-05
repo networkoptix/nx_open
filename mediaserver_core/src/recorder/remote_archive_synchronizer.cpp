@@ -33,13 +33,11 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* server
     if (!serverModule->globalSettings()->isEdgeRecordingEnabled())
         return;
 
-    NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Creating remote archive synchronizer."));
 
     const auto threadCount = maxSynchronizationThreads();
-    NX_LOGX(
-        lit("Setting maximum number of archive synchronization threads to %1")
-        .arg(threadCount),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lit("Setting maximum number of archive synchronization threads to %1")
+        .arg(threadCount));
 
     m_workerPool->setMaxTaskCount(threadCount);
     m_workerPool->setTaskMapAccessor([this](){ return m_tasks.get(); });

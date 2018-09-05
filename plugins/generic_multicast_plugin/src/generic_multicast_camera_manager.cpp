@@ -17,13 +17,6 @@ const char* multicastPluginParamsXML =
             version=\"1\"                                             \
             unique_id=\"5f41750e-d2f2-4056-928e-a01a833cceae\">       \
         <parameters>                                                  \
-            <group name=\"Main\">                                     \
-                <param                                                \
-                    name=\"multicast_url\"                            \
-                    description=\"Multicast URL\"                     \
-                    dataType=\"String\"                               \
-                    readOnly=\"true\"/>                               \
-            </group>                                                  \
         </parameters>                                                 \
     </plugin>";
 

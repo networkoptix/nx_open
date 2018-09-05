@@ -127,8 +127,8 @@ void UdpClient::messageReceived(SocketAddress sourceAddress, Message message)
 void UdpClient::ioFailure(SystemError::ErrorCode errorCode)
 {
     //TODO #ak ???
-    NX_LOGX(lm("I/O error on socket: %1").
-        arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+    NX_DEBUG(this, lm("I/O error on socket: %1").
+        arg(SystemError::toString(errorCode)));
 }
 
 bool UdpClient::isMessageShouldBeDiscarded(
@@ -139,15 +139,15 @@ bool UdpClient::isMessageShouldBeDiscarded(
     if (requestContextIter == m_ongoingRequests.end())
     {
         // This may be late response.
-        NX_LOGX(lm("Received message from %1 with unexpected transaction id %2")
-            .args(sourceAddress, message.header.transactionId.toHex()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Received message from %1 with unexpected transaction id %2")
+            .args(sourceAddress, message.header.transactionId.toHex()));
         return true;
     }
 
     if (sourceAddress != requestContextIter->second.resolvedServerAddress)
     {
-        NX_LOGX(lm("Received message (transaction id %1) from unexpected address %2")
-            .args(message.header.transactionId.toHex(), sourceAddress), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Received message (transaction id %1) from unexpected address %2")
+            .args(message.header.transactionId.toHex(), sourceAddress));
         return true;
     }
 

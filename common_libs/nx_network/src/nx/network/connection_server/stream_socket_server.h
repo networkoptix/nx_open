@@ -302,8 +302,8 @@ private:
 
         if (code != SystemError::noError)
         {
-            NX_LOGX(lm("Accept has failed: %1")
-                .arg(SystemError::toString(code)), cl_logWARNING);
+            NX_WARNING(this, lm("Accept has failed: %1")
+                .arg(SystemError::toString(code)));
             return;
         }
 

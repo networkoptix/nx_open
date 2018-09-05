@@ -592,6 +592,6 @@ class MediaserverApi(object):
         query = {'from': from_, 'to': to_, 'cameraId': camera_id, 'event_type': type_}
         return self.generic.get('api/getEvents', {k: v for k, v in query.items() if v})
 
-    def ptz(self, camera_id, command, **kwargs):
+    def execute_ptz(self, camera_id, command, **kwargs):
         return self.generic.get('api/ptz', dict(
             cameraId=camera_id, command=command + 'PtzCommand', **kwargs))

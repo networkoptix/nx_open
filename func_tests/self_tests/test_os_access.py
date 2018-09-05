@@ -8,7 +8,7 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def os_access(one_vm):
     return one_vm.os_access
 

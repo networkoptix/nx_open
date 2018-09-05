@@ -85,15 +85,15 @@ class TestsConfig(object):
     @classmethod
     def merge_config_list(cls, config_list, test_params):
         if config_list:
-            config = TestsConfig.from_yaml_file(config_list[0])
+            config = config_list[0]
             for other in config_list[1:]:
-                config.update(TestsConfig.from_yaml_file(other))
+                config.update(other)
         elif test_params:
             config = cls()
         else:
             return None
         if test_params:
-            config._update_with_tests_params(TestParameter.from_str(test_params))
+            config._update_with_tests_params(test_params)
         return config
 
     def __init__(self, tests=None):

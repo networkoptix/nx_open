@@ -37,7 +37,7 @@ Controller::Controller(const conf::Settings& settings):
 {
     if (!m_cloudDataProvider)
     {
-        NX_LOGX(lit("STUN Server is running without cloud (debug mode)"), cl_logALWAYS);
+        NX_ALWAYS(this, lit("STUN Server is running without cloud (debug mode)"));
     }
 }
 

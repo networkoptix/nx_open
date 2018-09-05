@@ -74,7 +74,7 @@ protected:
         defaultPeer = createPeer("Default Peer");
         peerById[defaultPeer->id] = defaultPeer;
 
-        NX_LOG(lm("Default Peer worker: %1").arg(defaultPeer->worker), cl_logINFO);
+        NX_INFO(this, lm("Default Peer worker: %1").arg(defaultPeer->worker));
 
         commonPeerManager->start();
     }

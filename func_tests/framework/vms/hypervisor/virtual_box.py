@@ -306,9 +306,9 @@ class _VirtualBoxVm(VmHardware):
         if not self._is_running:
             _logger.debug("Recover %r: powered off. Power on.", self)
             self.power_on()
-            _logger.debug("Recover %r: allow %d sec.", power_on_timeout_sec, self)
+            _logger.debug("Recover %r: allow %d sec.", self, power_on_timeout_sec)
             yield power_on_timeout_sec
-            _logger.warning("Recover %r: allow %d sec: first run?", power_on_timeout_sec, self)
+            _logger.warning("Recover %r: allow %d sec: first run?", self, power_on_timeout_sec)
             yield power_on_timeout_sec
         else:
             _logger.debug("Recover %r: powered on, expect response on first attempt.", self)

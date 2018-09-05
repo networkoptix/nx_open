@@ -138,8 +138,8 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
     {
-        NX_LOG( lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
-            arg(getHostAddress()).arg(status), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
+            arg(getHostAddress()).arg(status));
     }
 
     return CameraDiagnostics::NoErrorResult();
@@ -218,8 +218,8 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
-        NX_LOG( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
-            arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
+            arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)));
         m_inputMonitorHttpClient.reset();
         return;
     }

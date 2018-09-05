@@ -65,6 +65,8 @@ extern "C"
 using namespace nx::mobile_client;
 using namespace std::chrono;
 
+const nx::utils::log::Tag kLogTag(QString("main"));
+
 int runUi(QtSingleGuiApplication* application)
 {
     QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
@@ -202,8 +204,8 @@ int runUi(QtSingleGuiApplication* application)
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow.data(),
         [&context, &mainWindow](const QString& serializedMessage)
         {
-            NX_LOG(lit("Processing application message BEGIN: %1")
-                .arg(serializedMessage), cl_logDEBUG1);
+            NX_DEBUG(kLogTag, lit("Processing application message BEGIN: %1")
+                .arg(serializedMessage));
 
             using nx::client::mobile::InterClientMessage;
 
@@ -228,8 +230,8 @@ int runUi(QtSingleGuiApplication* application)
                 }
             }
 
-            NX_LOG(lit("Processing application message END: %1")
-                .arg(serializedMessage), cl_logDEBUG1);
+            NX_DEBUG(kLogTag, lit("Processing application message END: %1")
+                .arg(serializedMessage));
         });
 
     return application->exec();
@@ -340,7 +342,7 @@ void processStartupParams(const QnMobileClientStartupParameters& startupParamete
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeEnabled));
 
     if (startupParameters.url.isValid())
-        NX_LOG(lit("--url: %1").arg(startupParameters.url.toString()), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lit("--url: %1").arg(startupParameters.url.toString()));
 
     if (startupParameters.autoLoginMode != AutoLoginMode::Undefined)
         qnSettings->setAutoLoginMode(static_cast<int>(startupParameters.autoLoginMode));
@@ -374,13 +376,13 @@ int main(int argc, char *argv[])
         {
             const auto serializedMessage = message.toString();
 
-            NX_LOG(lit("BEGIN Sending application message: %1")
-                .arg(serializedMessage), cl_logDEBUG1);
+            NX_DEBUG(kLogTag, lit("BEGIN Sending application message: %1")
+                .arg(serializedMessage));
 
             application.sendMessage(serializedMessage);
 
-            NX_LOG(lit("END Sending application message: %1")
-                .arg(serializedMessage), cl_logDEBUG1);
+            NX_DEBUG(kLogTag, lit("END Sending application message: %1")
+                .arg(serializedMessage));
         };
 
     if (application.isRunning())

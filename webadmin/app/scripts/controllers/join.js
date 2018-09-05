@@ -166,9 +166,9 @@ angular.module('webadminApp')
             // TODO: $scope.settings.currentPassword here
 
             var remoteUrl = normalizeUrl($scope.settings.url);
-            mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
+            //mediaserver.checkCurrentPassword($scope.settings.currentPassword).then(function() {
                 mediaserver.mergeSystems(remoteUrl, $scope.settings.login, $scope.settings.password || Config.defaultPassword,
-                    $scope.settings.keepMySystem).then(function (r) {
+                    $scope.settings.keepMySystem, $scope.settings.currentPassword).then(function (r) {
                         if (r.data.error !== '0') {
                             var errorToShow = errorHandler(r.data.errorString);
                             if (errorToShow) {
@@ -180,9 +180,9 @@ angular.module('webadminApp')
                             window.location.reload();
                         });
                     });
-            },function(){
-                dialogs.alert(L.settings.wrongPassword);
-            });
+            //},function(){
+            //    dialogs.alert(L.settings.wrongPassword);
+            //});
         };
 
         $scope.selectSystem = function (system){

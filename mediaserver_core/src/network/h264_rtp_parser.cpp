@@ -431,7 +431,7 @@ bool CLH264RtpParser::processData(
 
     if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
-        NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
+        NX_WARNING(this, "Too large RTP/H.264 frame. Truncate video buffer");
         clearInternalBuffer();
         isPacketLost = true;
     }
@@ -439,14 +439,14 @@ bool CLH264RtpParser::processData(
     auto processPacketLost = [this, sequenceNum]()
     {
         if (m_timeHelper) {
-            NX_LOG(QString(
+            NX_WARNING(this, QString(
                 lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
                 .arg(m_timeHelper->getResourceId())
                 .arg(m_prevSequenceNum)
-                .arg(sequenceNum), cl_logWARNING);
+                .arg(sequenceNum));
         }
         else {
-            NX_LOG("RTP Packet loss detected!!!!", cl_logWARNING);
+            NX_WARNING(this, "RTP Packet loss detected!!!!");
         }
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
@@ -565,7 +565,7 @@ bool CLH264RtpParser::processData(
         case MTAP24_PACKET:
         {
             // Not implemented
-            NX_LOG("Got MTAP packet. Not implemented yet", cl_logWARNING);
+            NX_WARNING(this, "Got MTAP packet. Not implemented yet");
             return clearInternalBuffer();
         }
         default:

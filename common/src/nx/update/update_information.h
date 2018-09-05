@@ -47,6 +47,8 @@ enum class InformationError
     networkError,
     httpError,
     jsonError,
+    brokenPackageError,
+    missingPackageError,
     incompatibleCloudHostError,
     notFoundError
 };

@@ -191,6 +191,12 @@ void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& camera
         camera->setProperty(QnMediaResource::rtpTransportKey(), valueStr);
 }
 
+void setTrustCameraTime(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->trustCameraTime(value);
+}
+
 void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)
 {
     const auto isValueSupported =
@@ -410,6 +416,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.customMediaPort.hasValue())
         setCustomMediaPort(state.expert.customMediaPort(), cameras);
+
+    if (state.expert.trustCameraTime.hasValue())
+        setTrustCameraTime(state.expert.trustCameraTime(), cameras);
 }
 
 } // namespace desktop

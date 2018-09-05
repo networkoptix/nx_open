@@ -350,7 +350,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.isEmpty());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) && qnStaticCommon)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this) && qnStaticCommon)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);

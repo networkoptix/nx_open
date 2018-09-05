@@ -8,7 +8,7 @@ from pathlib2 import Path
 from . import execution
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def one_vm_type():
     return 'linux'
 

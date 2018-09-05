@@ -127,10 +127,10 @@ void QnAxClientWindow::setCurrentTimeUsec(qint64 timeUsec) {
 
 void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint64 timeStampMs)
 {
-    NX_LOG("Adding resources to layout", cl_logINFO);
+    NX_INFO(this, "Adding resources to layout");
     if (!m_context || !m_context->user())
     {
-        NX_LOG("Not logged in, returning...", cl_logINFO);
+        NX_INFO(this, "Not logged in, returning...");
         return;
     }
 
@@ -138,14 +138,14 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     for(const auto& id: uniqueIds)
     {
         QnResourcePtr resource = resourcePool()->getResourceById(id);
-        NX_LOG(lm("Found resource: %1").arg(resource ? resource->getName() : "???"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Found resource: %1").arg(resource ? resource->getName() : "???"));
         if (resource)
             resources << resource;
     }
 
     if (resources.isEmpty())
     {
-        NX_LOG("No cameras found, returning...", cl_logINFO);
+        NX_INFO(this, "No cameras found, returning...");
         return;
     }
 

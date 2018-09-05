@@ -73,14 +73,14 @@ bool parseHttpRequestParams(
     QnCameraDataExQuery* query)
 {
     // Semantics of the returned value is quite strange. We must parse both params anyway.
-    parseHttpRequestParams(commonModule, command, params, &query->cameraId);
+    parseHttpRequestParams(commonModule, command, params, &query->id);
     deserialize(params, lit("showDesktopCameras"), &query->showDesktopCameras);
     return true;
 }
 
 void toUrlParams(const QnCameraDataExQuery& filter, QUrlQuery* query)
 {
-    serialize(filter.cameraId, lit("id"), query);
+    serialize(filter.id, lit("id"), query);
     serialize(filter.showDesktopCameras, lit("showDesktopCameras"), query);
 }
 

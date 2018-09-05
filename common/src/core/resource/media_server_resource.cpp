@@ -650,11 +650,11 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
         {
             if (res->hasFlags(Qn::depend_on_parent_status))
             {
-                NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                         .arg(QString::fromLatin1(Q_FUNC_INFO))
                         .arg(res->getId().toString())
                         .arg(res->getName())
-                        .arg(res->getUrl()), cl_logDEBUG2);
+                        .arg(res->getUrl()));
                 emit res->statusChanged(res, Qn::StatusChangeReason::Local);
             }
         }

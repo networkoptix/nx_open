@@ -93,8 +93,8 @@ void OutgoingTunnelConnection::establishNewConnection(
 {
     NX_ASSERT(!m_pleaseStopHasBeenCalled);
 
-    NX_LOGX(lm("cross-nat %1. New stream socket has been requested")
-        .arg(m_connectionId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. New stream socket has been requested")
+        .arg(m_connectionId));
 
     auto newConnection = std::make_unique<UdtStreamSocket>(SocketFactory::udpIpVersion());
     if (!socketAttributes.applyTo(newConnection.get()) ||
@@ -103,8 +103,8 @@ void OutgoingTunnelConnection::establishNewConnection(
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
         NX_ASSERT(errorCode != SystemError::noError);
-        NX_LOGX(lm("cross-nat %1. Failed to apply socket options to new connection. %2")
-            .arg(m_connectionId).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. Failed to apply socket options to new connection. %2")
+            .arg(m_connectionId).arg(SystemError::toString(errorCode)));
         post(
             [this, handler = move(handler), errorCode]() mutable
             {
@@ -153,8 +153,8 @@ void OutgoingTunnelConnection::proceedWithConnection(
     UdtStreamSocket* connectionPtr,
     std::chrono::milliseconds timeout)
 {
-    NX_LOGX(lm("cross-nat %1. timeout %2")
-        .arg(m_connectionId).arg(timeout), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. timeout %2")
+        .arg(m_connectionId).arg(timeout));
 
     //we are in connectionPtr socket aio thread
 
@@ -164,9 +164,8 @@ void OutgoingTunnelConnection::proceedWithConnection(
     if (m_ongoingConnections.find(connectionPtr) == m_ongoingConnections.end())
         return; //connection has been cancelled by pleaseStop, ignoring...
 
-    NX_LOGX(lm("cross-nat %1. Initiating async connect to %2 with timeout %3")
-        .arg(m_connectionId).arg(m_remoteHostAddress.toString()).arg(timeout),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Initiating async connect to %2 with timeout %3")
+        .arg(m_connectionId).arg(m_remoteHostAddress.toString()).arg(timeout));
 
     const bool timoutPresent = timeout > std::chrono::milliseconds::zero();
 
@@ -196,9 +195,8 @@ void OutgoingTunnelConnection::onConnectCompleted(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {
-    NX_LOGX(lm("cross-nat %1. result: %2")
-        .arg(m_connectionId).arg(SystemError::toString(errorCode)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. result: %2")
+        .arg(m_connectionId).arg(SystemError::toString(errorCode)));
 
     //called from connectionPtr completion handler
 
@@ -213,9 +211,8 @@ void OutgoingTunnelConnection::reportConnectResult(
     UdtStreamSocket* connectionPtr,
     SystemError::ErrorCode errorCode)
 {
-    NX_LOGX(lm("cross-nat %1. result: %2")
-        .arg(m_connectionId).arg(SystemError::toString(errorCode)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. result: %2")
+        .arg(m_connectionId).arg(SystemError::toString(errorCode)));
 
     //we are in object's thread
 
@@ -249,9 +246,8 @@ void OutgoingTunnelConnection::closeConnection(
     SystemError::ErrorCode closeReason,
     ConnectionType* connection)
 {
-    NX_LOGX(lm("cross-nat %1. Control connection has been closed: %2")
-        .arg(m_connectionId).arg(SystemError::toString(closeReason)),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("cross-nat %1. Control connection has been closed: %2")
+        .arg(m_connectionId).arg(SystemError::toString(closeReason)));
 
     auto controlConnection = std::move(m_controlConnection);
 
@@ -277,19 +273,19 @@ void OutgoingTunnelConnection::onStunMessageReceived(
     {
         if (synAck.connectSessionId != m_connectionId)
         {
-            NX_LOGX(lm("cross-nat %1. Received SYN response with unexpected "
+            NX_DEBUG(this, lm("cross-nat %1. Received SYN response with unexpected "
                        "connection id: %2 vs %1")
-                .arg(m_connectionId).arg(synAck.connectSessionId), cl_logDEBUG1);
+                .arg(m_connectionId).arg(synAck.connectSessionId));
         }
     }
     else
     {
-        NX_LOGX(lm("cross-nat %1. Failed to parse SYN response")
-            .arg(m_connectionId), cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. Failed to parse SYN response")
+            .arg(m_connectionId));
     }
 
-    NX_LOGX(lm("cross-nat %1. Control connection has been verified")
-        .arg(m_connectionId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Control connection has been verified")
+        .arg(m_connectionId));
 }
 
 } // namespace udp

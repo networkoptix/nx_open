@@ -7,7 +7,7 @@ from framework.os_access.windows_remoting.users import Users
 _logger = logging.getLogger(__name__)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def users(winrm):
     users = Users(winrm)
     return users

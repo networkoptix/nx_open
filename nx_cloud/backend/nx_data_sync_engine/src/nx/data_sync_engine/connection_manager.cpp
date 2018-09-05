@@ -94,41 +94,33 @@ void ConnectionManager::createTransactionConnection(
 
     if (systemId.empty())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Ignoring createTransactionConnection request without systemId from %1")
-            .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring createTransactionConnection request without systemId from %1")
+            .arg(connection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     ConnectionRequestAttributes connectionRequestAttributes;
     if (!fetchDataFromConnectRequest(request, &connectionRequestAttributes))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
-            .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress()),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .arg(connection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     if (!m_protocolVersionRange.isCompatible(
             connectionRequestAttributes.remotePeerProtocolVersion))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
-            .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress(),
-                connectionRequestAttributes.remotePeerProtocolVersion),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .arg(connection->socket()->getForeignAddress())
+            .arg(connectionRequestAttributes.remotePeerProtocolVersion));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
-            .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress(),
-                connectionRequestAttributes.connectionId),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
+        .arg(connectionRequestAttributes.remotePeer.id).arg(systemId).arg(connection->socket()->getForeignAddress())
+        .arg(connectionRequestAttributes.connectionId));
 
     // newTransport MUST be ready to accept connections before sending response.
     const nx::String systemIdLocal(systemId.c_str());
@@ -156,12 +148,9 @@ void ConnectionManager::createTransactionConnection(
 
     if (!addNewConnection(std::move(context), remotePeer))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
-            .args(connectionRequestAttributes.remotePeer.id, systemId,
-                connection->socket()->getForeignAddress(),
-                connectionRequestAttributes.connectionId),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .arg(connection->socket()->getForeignAddress()).arg(connectionRequestAttributes.connectionId));
         return completionHandler(nx::network::http::StatusCode::forbidden);
     }
 
@@ -186,19 +175,17 @@ void ConnectionManager::createWebsocketTransactionConnection(
 
     if (systemId.empty())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
-            .arg(connection->socket()->getForeignAddress()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
+            .arg(connection->socket()->getForeignAddress()));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
     if (!m_protocolVersionRange.isCompatible(remotePeerInfo.protoVersion))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
             .args(remotePeerInfo.id, systemId, connection->socket()->getForeignAddress(),
-                remotePeerInfo.protoVersion),
-            cl_logDEBUG1);
+                remotePeerInfo.protoVersion));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
@@ -211,11 +198,9 @@ void ConnectionManager::createWebsocketTransactionConnection(
     auto error = websocket::validateRequest(request, response);
     if (error != websocket::Error::noError)
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Can't upgrade request from peer %1 to webSocket. Error: %2")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Can't upgrade request from peer %1 to webSocket. Error: %2")
             .arg(connection->socket()->getForeignAddress())
-            .arg((int) error),
-            cl_logDEBUG1);
+            .arg((int) error));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
@@ -245,11 +230,9 @@ void ConnectionManager::pushTransaction(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Received %1 request from %2 without required header %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 without required header %3")
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME),
-            cl_logDEBUG1);
+            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
     const auto connectionId = connectionIdIter->second;
@@ -260,11 +243,9 @@ void ConnectionManager::pushTransaction(
     auto connectionIter = connectionByIdIndex.find(connectionId);
     if (connectionIter == connectionByIdIndex.end())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Received %1 request from %2 for unknown connection %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 for unknown connection %3")
             .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-            .arg(connectionId),
-            cl_logDEBUG1);
+            .arg(connectionId));
         return completionHandler(nx::network::http::StatusCode::notFound);
     }
 
@@ -275,11 +256,9 @@ void ConnectionManager::pushTransaction(
         return completionHandler(nx::network::http::StatusCode::badRequest);
     }
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Received %1 request from %2 for connection %3")
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 for connection %3")
         .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-        .arg(connectionId),
-        cl_logDEBUG2);
+        .arg(connectionId));
 
     transactionTransport->post(
         [transactionTransport,
@@ -297,10 +276,8 @@ void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("systemId %1. Dispatching transaction %2")
-        .arg(systemId).arg(transactionSerializer->transactionHeader()),
-        cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching transaction %2")
+        .arg(systemId).arg(transactionSerializer->transactionHeader()));
 
     // Generating transport header.
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
@@ -407,8 +384,7 @@ void ConnectionManager::closeConnectionsToSystem(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Closing all connections to system %1").args(systemId), cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing all connections to system %1").args(systemId));
 
     auto allConnectionsRemovedGuard =
         nx::utils::makeSharedGuard(std::move(completionHandler));
@@ -461,11 +437,9 @@ bool ConnectionManager::addNewConnection(
             &ConnectionManager::onGotTransaction, this,
             context.connection->connectionGuid().toByteArray(), _1, _2, _3));
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Adding new transaction connection %1 from %2")
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Adding new transaction connection %1 from %2")
             .arg(context.connectionId)
-            .arg(context.connection->commonTransportHeaderOfRemoteTransaction()),
-        cl_logDEBUG1);
+            .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
     const auto systemId = context.fullPeerName.systemId.toStdString();
 
@@ -495,13 +469,11 @@ bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
 
     if (existingConnectionCount >= m_settings.maxConcurrentConnectionsFromSystem)
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Refusing connection %1 from %2 since "
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Refusing connection %1 from %2 since "
                 "there are already %3 connections from that system")
             .arg(context.connectionId)
             .arg(context.connection->commonTransportHeaderOfRemoteTransaction())
-            .arg(existingConnectionCount),
-            cl_logDEBUG2);
+            .arg(existingConnectionCount));
         return false;
     }
 
@@ -563,11 +535,9 @@ void ConnectionManager::removeConnectionByIter(
 
     AbstractTransactionTransport* existingConnectionPtr = existingConnection.get();
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("Removing transaction connection %1 from %2")
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Removing transaction connection %1 from %2")
             .arg(existingConnectionPtr->connectionGuid())
-            .arg(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()),
-        cl_logDEBUG1);
+            .arg(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()));
 
     // ::ec2::TransactionTransportBase does not support its removal
     //  in signal handler, so have to remove it delayed.
@@ -598,7 +568,7 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, lm("Removing connection %1").args(connectionId), cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Removing connection %1").args(connectionId));
 
     QnMutexLocker lock(&m_mutex);
     removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
@@ -627,11 +597,8 @@ void ConnectionManager::onTransactionDone(
 {
     if (resultCode != ResultCode::ok)
     {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Closing connection %1 due to failed transaction (result code %2)")
-                .arg(connectionId).arg(toString(resultCode)),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing connection %1 due to failed transaction (result code %2)")
+                .arg(connectionId).arg(toString(resultCode)));
 
         // Closing connection in case of failure.
         QnMutexLocker lock(&m_mutex);
@@ -653,9 +620,7 @@ bool ConnectionManager::fetchDataFromConnectRequest(
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
             &connectionRequestAttributes->remotePeerProtocolVersion))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Missing required header %1").arg(Qn::EC2_PROTO_VERSION_HEADER_NAME),
-            cl_logDEBUG2);
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Missing required header %1").arg(Qn::EC2_PROTO_VERSION_HEADER_NAME));
         return false;
     }
 
@@ -675,9 +640,8 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     if (query.hasQueryItem("format"))
         if (!QnLexical::deserialize(query.queryItemValue("format"), &dataFormat))
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG,
-                lm("Invalid value of \"format\" field: %1")
-                .arg(query.queryItemValue("format")), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Invalid value of \"format\" field: %1")
+                .arg(query.queryItemValue("format")));
             return false;
         }
 
@@ -810,10 +774,8 @@ void ConnectionManager::addWebSocketTransactionTransport(
 
     if (!addNewConnection(std::move(context), remotePeerInfo))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
-            .arg(remotePeerInfo.id).arg(systemId).arg(remoteAddress).arg(connectionId),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
+            .arg(remotePeerInfo.id).arg(systemId).arg(remoteAddress).arg(connectionId));
     }
 }
 

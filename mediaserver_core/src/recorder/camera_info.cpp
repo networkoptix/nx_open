@@ -64,7 +64,7 @@ Writer::Writer(WriterHandler* writeHandler):
 
 void Writer::write()
 {
-    NX_LOG(lit("[CamInfo] writing camera info files starting..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files starting..."));
 
     for (auto& storageUrl: m_handler->storagesUrls())
         for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
@@ -77,7 +77,7 @@ void Writer::write()
                     m_composer.make(m_handler->composerHandler(cameraId)));
             }
 
-    NX_LOG(lit("[CamInfo] writing camera info files DONE"), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[CamInfo] writing camera info files DONE"));
 }
 
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
@@ -91,10 +91,10 @@ bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFi
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    NX_LOG(lit("%1: write camera info to %2. Data changed: %3")
+    NX_VERBOSE(this, lit("%1: write camera info to %2. Data changed: %3")
             .arg(Q_FUNC_INFO)
             .arg(infoFilePath)
-            .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
+            .arg(isWriteNeeded(infoFilePath, infoFileData)));
 
     if (isWriteNeeded(infoFilePath, infoFileData))
     {
@@ -150,9 +150,9 @@ bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& 
     auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
     if (!outFile)
     {
-        NX_LOG(lit("%1. Create file failed for this path: %2")
+        NX_DEBUG(this, lit("%1. Create file failed for this path: %2")
                 .arg(Q_FUNC_INFO)
-                .arg(path), cl_logDEBUG1);
+                .arg(path));
         return false;
     }
     outFile->write(data);
@@ -241,7 +241,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get parent id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -252,7 +252,7 @@ bool Reader::initArchiveCamData()
         m_lastError = {
             lit("Unable to get type id for the archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -267,7 +267,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -283,7 +283,7 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logDEBUG2
+            utils::log::Level::verbose
         };
         return true;
     }
@@ -305,7 +305,7 @@ bool Reader::readFileData()
         m_lastError =  {
             lit("File data is NULL for archive camera %1")
                 .arg(m_archiveCamData.coreData.physicalId),
-            cl_logERROR
+            utils::log::Level::error
         };
         return false;
     }
@@ -326,7 +326,7 @@ bool Reader::parseData()
             m_lastError = {
                 lit("Camera info file %1 parse failed")
                     .arg(infoFilePath()),
-                cl_logERROR
+                utils::log::Level::error
             };
             return false;
         case ParseResult::ParseCode::Ok:
@@ -402,7 +402,7 @@ bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const
 {
-    NX_LOG(errorInfo.message, errorInfo.severity);
+    NX_UTILS_LOG(errorInfo.severity, this, errorInfo.message);
 }
 
 

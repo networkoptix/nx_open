@@ -168,7 +168,7 @@ protected:
 
         NX_ASSERT(!(remotePeer == peerId)); //< loop
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
             printTran(connection, tran, Connection::Direction::outgoing);
 
         switch (connection->remotePeer().dataFormat)

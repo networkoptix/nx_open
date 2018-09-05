@@ -3,7 +3,7 @@ import pytest
 from framework.os_access.windows_remoting.registry import Type, WindowsRegistry
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def windows_registry(winrm):
     return WindowsRegistry(winrm)
 

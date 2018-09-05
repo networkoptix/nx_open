@@ -13,7 +13,7 @@ void trace(const QString& message)
     for (const QString& line : message.split(lit("\n"), QString::SkipEmptyParts))
         qDebug() << line;
 #endif
-    NX_LOG(message, cl_logINFO);
+    NX_INFO(typeid(QnWebPage), message);
 }
 
 }

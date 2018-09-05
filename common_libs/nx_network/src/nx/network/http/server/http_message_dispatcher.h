@@ -126,7 +126,7 @@ public:
 
     void addModRewriteRule(QString oldPrefix, QString newPrefix)
     {
-        NX_LOGX(lm("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix), cl_logDEBUG1);
+        NX_DEBUG(this, lm("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix));
         m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
     }
 
@@ -147,7 +147,7 @@ private:
         if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path()))
         {
             const auto newPath = url->path().replace(it->first, it->second);
-            NX_LOGX(lm("Rewriting url '%1' to '%2'").args(url->path(), newPath), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Rewriting url '%1' to '%2'").args(url->path(), newPath));
             url->setPath(newPath);
         }
     }
