@@ -98,22 +98,33 @@ should allow activation, if user is registered by link /register/?from=mobile
     Validate Log In
 
 link works and suggests to log out user, if he was logged in, buttons operate correctly
-    [tags]    email
-    ${email}    Get Random Email    ${BASE EMAIL}
+    [tags]    email    C41564
+    ${email1}    Get Random Email    ${BASE EMAIL}
+    ${email2}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    mark    hamill    ${email}    ${password}
-    ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}
-    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Register    mark    hamill    ${email1}    ${password}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email2}    ${password}
+    Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    Go To    ${link}
-    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    ${link1}    Get Email Link    ${email1}    activate
+    ${link2}    Get Email Link    ${email2}    activate
+    Go To    ${link1}
+    Wait Until Page Contains Element    ${ACTIVATION SUCCESS}
+    Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}
     Click Button    ${LOGGED IN CONTINUE BUTTON}
     Validate Log In
-    Go To    ${link}
-    Wait Until Elements Are Visible    ${LOGGED IN CONTINUE BUTTON}    ${LOGGED IN LOG OUT BUTTON}
+    Log Out
+    Validate Log Out
+    Log In    ${email1}    ${password}
+    Validate Log In
+    Go To    ${link2}
+    Wait Until Page Contains Element    ${ACTIVATION SUCCESS}
+    Wait Until Element Is Visible    ${LOGGED IN LOG OUT BUTTON}
     Click Button    ${LOGGED IN LOG OUT BUTTON}
     Validate Log Out
+    Log In    ${email2}    ${password}
+    Validate Log In
 
 #This is identical to "redirects to /activate and shows non-activated
 #user message when not activated; Resend activation button sends email"
