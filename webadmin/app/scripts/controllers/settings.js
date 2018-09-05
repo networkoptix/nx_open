@@ -119,7 +119,7 @@ angular.module('webadminApp')
             //1. confirm detach
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
 
-                mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                //mediaserver.checkCurrentPassword(oldPassword).then(function() {
                     mediaserver.restoreFactoryDefaults(oldPassword).then(function (data) {
                         if (data.data.error !== '0' && data.data.error !== 0) {
                             // Some Error has happened
@@ -133,9 +133,9 @@ angular.module('webadminApp')
                         $log.log('can\'t detach');
                         $log.error(error);
                     });
-                },function(){
-                    dialogs.alert(L.settings.wrongPassword);
-                });
+                //},function(){
+                //    dialogs.alert(L.settings.wrongPassword);
+                //});
             });
         };
 
@@ -317,7 +317,7 @@ angular.module('webadminApp')
                 L.settings.confirmChangePasswordAction,
                 'danger').then(function (oldPassword) {
                     //1. Check password
-                    return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    //return mediaserver.checkCurrentPassword(oldPassword).then(function() {
                         // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
                         mediaserver.changeAdminPassword($scope.settings.rootPassword, oldPassword).then(function(result){
                             resultHandler(result);
@@ -325,9 +325,9 @@ angular.module('webadminApp')
                                 mediaserver.login($localStorage.login, $scope.settings.rootPassword);
                             }
                         }, errorHandler);
-                    },function(){
-                        dialogs.alert(L.settings.wrongPassword);
-                    });
+                    //},function(){
+                    //    dialogs.alert(L.settings.wrongPassword);
+                    //});
                 });
         };
 
@@ -338,9 +338,8 @@ angular.module('webadminApp')
                 L.settings.confirmDisconnectFromSystemAction,
                 'danger').then(function (oldPassword) {
                     //1. Check password
-                    return mediaserver.checkCurrentPassword(oldPassword).
-                        then(function(){
-                            return mediaserver.disconnectFromSystem().then(function(){
+                    //return mediaserver.checkCurrentPassword(oldPassword).then(function(){
+                            return mediaserver.disconnectFromSystem(oldPassword).then(function(){
                                 return dialogs.alert(L.settings.disconnectedFromSystemSuccess).
                                     finally(function(){
                                         window.location.reload();
@@ -349,16 +348,16 @@ angular.module('webadminApp')
                                 dialogs.alert(L.settings.unexpectedError);
                                 console.error(error);
                             });
-                        },function(){
-                            dialogs.alert(L.settings.wrongPassword);
-                        });
+                   //     },function(){
+                   //         dialogs.alert(L.settings.wrongPassword);
+                   //     });
                 });
         };
 
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
-            function doDisconnect(localLogin,localPassword){
+            function doDisconnect(oldPassword, localLogin,localPassword){
                 // 2. Send request to the system only
-                return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
+                return mediaserver.disconnectFromCloud(oldPassword, localLogin, localPassword).then(function(){
                     dialogs.alert(L.settings.disconnectedFromCloudSuccess.replace("{{CLOUD_NAME}}",
                                   Config.cloud.productName)).finally(function(){
                                       window.location.reload();
@@ -374,7 +373,7 @@ angular.module('webadminApp')
                 L.settings.confirmDisconnectFromCloudAction.replace("{{CLOUD_NAME}}",Config.cloud.productName),
                 'danger').then(function (oldPassword) {
                 //1. Check password
-                return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                //return mediaserver.checkCurrentPassword(oldPassword).then(function() {
                     // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
                     mediaserver.getUsers().then(function(result){
                         var localAdmin = _.find(result.data,function(user){
@@ -383,15 +382,15 @@ angular.module('webadminApp')
                         if(!localAdmin){
                             // Request for login and password
                             dialogs.createUser( null /*L.settings.createLocalOwner*/, L.settings.createLocalOwnerTitle).then(function(data){
-                                doDisconnect(data.login,data.password);
-                            })
+                                doDisconnect(oldPassword, data.login, data.password);
+                            });
                         }else{
-                            doDisconnect();
+                            doDisconnect(oldPassword);
                         }
                     });
-                },function(){
-                    dialogs.alert(L.settings.wrongPassword);
-                });
+                //},function(){
+                //    dialogs.alert(L.settings.wrongPassword);
+                //});
             });
         };
 
