@@ -39,7 +39,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 {
     QElapsedTimer timer;
     timer.restart();
-    NX_DEBUG(this, this, lm("Start searching new cameras"));
+    NX_DEBUG(this, lm("Start searching new cameras"));
 
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
@@ -52,7 +52,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     if (addr1.isNull())
     {
-        NX_WARNING(this, this, lm("Invalid parameter 'start_ip'."));
+        NX_WARNING(this, lm("Invalid parameter 'start_ip'."));
         return nx::network::http::StatusCode::invalidParameter;
     }
 
@@ -80,7 +80,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
-    NX_DEBUG(this, this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()));
+    NX_DEBUG(this, lm("Finish searching new cameras. Working time=%1ms").arg(timer.elapsed()));
     return nx::network::http::StatusCode::ok;
 }
 

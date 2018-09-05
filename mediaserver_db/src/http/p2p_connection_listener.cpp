@@ -88,7 +88,7 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
-            NX_WARNING(this, this,
+            NX_WARNING(this,
                 lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
@@ -101,7 +101,7 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
     {
         if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeer.cloudHost)
         {
-            NX_WARNING(this, this,
+            NX_WARNING(this,
                 lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
                     "Local peer host: %2, remote peer host: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
