@@ -14,6 +14,26 @@ nx-radio {
         input[type="radio"] {
             display : none;
         }
+
+        input:hover ~ .check {
+            svg path.circle {
+                fill : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg path.circle {
+                fill : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
+            }
+        }
     }
 }
 
@@ -50,7 +70,7 @@ nx-radio {
         width  : 20px;
 
         & path.circle {
-            fill : $dark9;
+            fill         : $dark9;
         }
 
         & circle {
