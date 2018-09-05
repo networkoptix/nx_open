@@ -39,6 +39,25 @@ namespace {
 static const std::chrono::microseconds kMaxFaultySeekReopenOffset = std::chrono::seconds(15);
 static const qint64 kSeekError = -1;
 
+/**
+ * Since we may have multiple NAL units without actual data (such as SPS, PPS), we have to iterate
+ * them until we meet the one with data to check if it's a key frame. That might be time-consuming,
+ * so this function should not be used after at least one key frame has been found.
+ */
+static bool isIFrame(const void* data, int size)
+{
+    const quint8* pData = (const quint8*)data;
+    const quint8* pDataEnd = pData + size;
+
+    while ((pData = NALUnit::findNextNAL(pData, pDataEnd)) != pDataEnd)
+    {
+        if (NALUnit::isIFrame(pData, pDataEnd - pData))
+            return true;
+    }
+
+    return false;
+}
+
 } // namespace
 
 class QnAviAudioLayout: public QnResourceAudioLayout
@@ -246,6 +265,18 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->compressionType = stream->codec->codec_id;
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
+    /**
+     * FFMPEG fills MediaFlags_AVKey for IDR frames but won't do it for non-IDR ones. That's why we
+     * check for such frames manually, but only one time per file open or per seek.
+     */
+    if (!m_keyFrameFound[data->channelNumber]
+        && (data->flags.testFlag(QnAbstractMediaData::MediaFlag::MediaFlags_AVKey)
+            || isIFrame(data->data(), data->dataSize())))
+    {
+        data->flags |= QnAbstractMediaData::MediaFlag::MediaFlags_AVKey;
+        m_keyFrameFound[data->channelNumber] = true;
+    }
+
     while (packet.stream_index >= m_lastPacketTimes.size())
         m_lastPacketTimes << m_startTimeUs;
     if (data->timestamp == AV_NOPTS_VALUE) {
@@ -276,6 +307,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (m_eofReached)
         return time;
 
+    std::fill(m_keyFrameFound.begin(), m_keyFrameFound.end(), false);
     const auto timeToSeek = qMax(time - m_startTimeUs, 0ll) + m_playlistOffsetUs;
     if (m_hasVideo)
     {
@@ -413,6 +445,7 @@ bool QnAviArchiveDelegate::open(
 
         getVideoLayout();
     }
+    m_keyFrameFound.resize(m_formatContext->nb_streams, false);
     m_resource->setStatus(Qn::Online);
     return m_initialized;
 }

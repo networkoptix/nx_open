@@ -911,7 +911,17 @@ begin_label:
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
             m_eof = false;
         }
-        if (m_BOF) {
+
+        /**
+         * Consumers, such as CamDisplay, skip data frames if data with MediaFlags_BOF flag has
+         * not been received yet. On the other hand, QnAbstractArchiveStreamReader drops non-key
+         * frames if it hasn't received one. So, without this condition below
+         * (&& m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)) we may end up
+         * with a frame with MediaFlags_BOF flag being dropped because it is not a key frame and
+         * consumer won't never get a BOF frame.
+         */
+        if (m_BOF && m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        {
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
             m_BOF = false;
         }
@@ -1014,7 +1024,6 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     {
 
         result = m_delegate->getNextData();
-
         if (result == 0 && !needToStop())
         {
             if (m_cycleMode)
