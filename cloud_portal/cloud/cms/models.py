@@ -10,6 +10,8 @@ from util.config import get_config
 from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
 
+# TODO: For product type update
+# Change context.product to context.product_type maybe
 
 def update_global_cache(customization, version_id):
     global_cache = caches['global']
@@ -23,8 +25,9 @@ def check_update_cache(customization, version_id):
     return version_id != global_id, global_id
 
 
-def customization_cache(customization_name, value=None, force=False):
+def cloud_portal_customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
+    product = Product.objects.get(name=settings.PRIMARY_PRODUCT, product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
 
     if data and 'version_id' in data and not force:
         force = check_update_cache(customization_name, data['version_id'])[0]
@@ -34,17 +37,17 @@ def customization_cache(customization_name, value=None, force=False):
         custom_config = get_config(customization.name)
 
         data = {
-            'version_id': customization.version_id(),
+            'version_id': product.version_id(),
             'languages': customization.languages_list,
             'default_language': customization.default_language.code,
-            'mail_from_name': customization.read_global_value('%MAIL_FROM_NAME%'),
-            'mail_from_email': customization.read_global_value('%MAIL_FROM_EMAIL%'),
+            'mail_from_name': product.read_global_value('%MAIL_FROM_NAME%'),
+            'mail_from_email': product.read_global_value('%MAIL_FROM_EMAIL%'),
             'portal_url': custom_config['cloud_portal']['url'],
-            'smtp_host': customization.read_global_value('%SMTP_HOST%'),
-            'smtp_port': customization.read_global_value('%SMTP_PORT%'),
-            'smtp_user': customization.read_global_value('%SMTP_USER%'),
-            'smtp_password': customization.read_global_value('%SMTP_PASSWORD%'),
-            'smtp_tls': customization.read_global_value('%SMTP_TLS%')
+            'smtp_host': product.read_global_value('%SMTP_HOST%'),
+            'smtp_port': product.read_global_value('%SMTP_PORT%'),
+            'smtp_user': product.read_global_value('%SMTP_USER%'),
+            'smtp_password': product.read_global_value('%SMTP_PASSWORD%'),
+            'smtp_tls': product.read_global_value('%SMTP_TLS%')
         }
         cache.set(customization_name, data)
         update_global_cache(customization, data['version_id'])
@@ -56,17 +59,114 @@ def customization_cache(customization_name, value=None, force=False):
 
 
 # CMS structure (data structure). Only developers can change that
-
-class Product(models.Model):
+class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    can_preview = models.BooleanField(default=True)
+    code = models.CharField(max_length=8, unique=True)
+
+    def __str__(self):
+        return self.code
+
+    @staticmethod
+    def by_code(language_code, default_language=None):
+        if language_code:
+            language = Language.objects.filter(code=language_code)
+            if language.exists():
+                return language.first()
+        return default_language
+
+
+class Customization(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    default_language = models.ForeignKey(
+        Language, related_name='default_in_%(class)s')
+    languages = models.ManyToManyField(Language)
+    filter_horizontal = ('languages',)
+
+    PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
+    preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
+    public_release_history = models.BooleanField(default=False)
+    public_downloads = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
+    @property
+    def languages_list(self):
+        return self.languages.values_list('code', flat=True)
+
+    def change_preview_status(self, new_status):
+        self.preview_status = new_status
+        self.save()
+
+
+class ProductType(models.Model):
+    PRODUCT_TYPES = Choices((0, "cloud_portal", "Cloud Portal"),
+                            (1, "vms", "Vms"),
+                            (2, "plugin", "Plugin"),
+                            (3, "integration", "Integration"))
+
+    type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
+
+    def __str__(self):
+        return "{} - {}".format(ProductType.PRODUCT_TYPES[self.type], self.product)
+
+    @staticmethod
+    def get_type_by_name(name):
+        if name[0].islower():
+            return getattr(ProductType.PRODUCT_TYPES, name, ProductType.PRODUCT_TYPES.cloud_portal)
+
+        for index, _name in ProductType.PRODUCT_TYPES:
+            if _name == name:
+                return index
+        return 0
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    can_preview = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        blank=True, related_name='created_%(class)s')
+    customizations = models.ManyToManyField(Customization)
+    product_type = models.ForeignKey(ProductType, default=None)
+
+    def __str__(self):
+        return self.name
+
+    def version_id(self):
+        versions = ContentVersion.objects.filter(product=self)
+        return versions.latest('accepted_date').id if versions.exists() else 0
+
+    def read_global_value(self, record_name):
+        global_contexts = self.product_type.context_set.filter(is_global=True)
+        data_structure = None
+        for context in global_contexts:
+            data_structures = context.datastructure_set.filter(name=record_name)
+            if data_structures.exists():
+                data_structure = data_structures.last()
+                break
+
+        if not data_structure:
+            return None
+
+        return data_structure.find_actual_value(version_id=self.version_id())
+
+    def save(self, *args, **kwargs):
+        need_update = False
+        if self.pk is None:
+            need_update = True
+        else:
+            orig = Product.objects.get(pk=self.pk)
+            if self.customizations.exists():
+                need_update = self.customizations.filter()[0].preview_status == orig.customizations.filter()[0].preview_status
+
+        super(Product, self).save(*args, **kwargs)
+        if need_update and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal and self.customizations.exists():
+            cloud_portal_customization_cache(self.customizations.filter()[0], force=True)  # invalidate cache
+            # TODO: need to update all static right here
+
 
 class Context(models.Model):
-
     class Meta:
         verbose_name = 'page'
         verbose_name_plural = 'pages'
@@ -75,6 +175,7 @@ class Context(models.Model):
         )
 
     product = models.ForeignKey(Product, null=True)
+    product_type = models.ForeignKey(ProductType, null=True)
     name = models.CharField(max_length=1024)
     description = models.TextField(blank=True, default="")
     translatable = models.BooleanField(default=True)
@@ -101,22 +202,6 @@ class Context(models.Model):
 
         # retrieve first available template from the list or return None
         return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
-
-
-class Language(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    code = models.CharField(max_length=8, unique=True)
-
-    def __str__(self):
-        return self.code
-
-    @staticmethod
-    def by_code(language_code, default_language=None):
-        if language_code:
-            language = Language.objects.filter(code=language_code)
-            if language.exists():
-                return language.first()
-        return default_language
 
 
 class ContextTemplate(models.Model):
@@ -181,29 +266,39 @@ class DataStructure(models.Model):
                 return index
         return 0
 
-    def find_actual_value(self, customization, language=None, version_id=None):
+    def find_actual_value(self, customization=None, language=None, version_id=None):
         content_value = ""
         content_record = None
+
+        # try to get by customization
+        if customization and language:
+            content_record = DataRecord.objects \
+                .filter(customization_id=customization.id,
+                        language_id=language.id,
+                        data_structure_id=self.id)
+
+        if not content_record and customization:
+            content_record = DataRecord.objects \
+                .filter(customization_id=customization.id,
+                        data_structure_id=self.id)
+
         # try to get translated content
-        if language and self.translatable:
+        if not content_record and language and self.translatable:
             content_record = DataRecord.objects \
                 .filter(language_id=language.id,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
+                        data_structure_id=self.id)
 
         # if not - get record without language
         if not content_record or not content_record.exists():
             content_record = DataRecord.objects \
                 .filter(language_id=None,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
+                        data_structure_id=self.id)
 
         # if not - get default language
-        if not content_record or not content_record.exists():
+        if customization and (not content_record or not content_record.exists()):
             content_record = DataRecord.objects \
-                .filter(language_id=customization.default_language_id,
-                        data_structure_id=self.id,
-                        customization_id=customization.id)
+                .filter(language_id=customization.default_language.id,
+                        data_structure_id=self.id)
 
         if content_record and content_record.exists():
             if not version_id:
@@ -223,61 +318,6 @@ class DataStructure(models.Model):
         return content_value
 
 # CMS settings. Release engineer can change that
-
-
-class Customization(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    default_language = models.ForeignKey(
-        Language, related_name='default_in_%(class)s')
-    languages = models.ManyToManyField(Language)
-    filter_horizontal = ('languages',)
-
-    PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
-    preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
-    public_release_history = models.BooleanField(default=False)
-    public_downloads = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-    def version_id(self, product_name=settings.PRIMARY_PRODUCT):
-        versions = ContentVersion.objects.filter(customization=self, product__name=product_name)
-        return versions.latest('accepted_date').id if versions.exists() else 0
-
-    @property
-    def languages_list(self):
-        return self.languages.values_list('code', flat=True)
-
-    def change_preview_status(self, new_status):
-        self.preview_status = new_status
-        self.save()
-
-    def save(self, *args, **kwargs):
-        if self.pk is None:
-            need_update = True
-        else:
-            orig = Customization.objects.get(pk=self.pk)
-            need_update = self.preview_status == orig.preview_status
-        # if anything changed about customization except preview_status
-
-        super(Customization, self).save(*args, **kwargs)
-        if need_update:
-            customization_cache(self.name, force=True)  # invalidate cache
-            # TODO: need to update all static right here
-
-    def read_global_value(self, record_name):
-        product = Product.objects.get(name=settings.PRIMARY_PRODUCT)
-        global_contexts = product.context_set.filter(is_global=True)
-        data_structure = None
-        for context in global_contexts:
-            data_structures = context.datastructure_set.filter(name=record_name)
-            if data_structures.exists():
-                data_structure = data_structures.last()
-                break
-
-        if not data_structure:
-            return None
-        return data_structure.find_actual_value(self, version_id=self.version_id(product.name))
 
 
 class UserGroupsToCustomizationPermissions(models.Model):
@@ -329,7 +369,7 @@ class ContentVersion(models.Model):
         if self.accepted_by == None:
             return 'in review'
 
-        version_id = self.customization.version_id(self.product.name)
+        version_id = self.product.version_id()
 
         if version_id > self.id:
             return 'old'

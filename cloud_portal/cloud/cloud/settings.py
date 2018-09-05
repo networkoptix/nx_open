@@ -171,7 +171,7 @@ CACHES = {
         }
     }
 }
-PRIMARY_PRODUCT = "cloud_portal"
+PRIMARY_PRODUCT = "cloud_portal_" + CUSTOMIZATION
 
 if LOCAL_ENVIRONMENT:
     conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'

@@ -83,7 +83,7 @@ def save_content(filename, content):
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
-    skin = customization.read_global_value('%SKIN%')
+    skin = context.product.read_global_value('%SKIN%')
     context_template_text = context.template_for_language(language, customization.default_language, skin)
     if not context_template_text:
         context_template_text = ''
@@ -101,7 +101,8 @@ def read_customized_file(filename, customization_name, language_code=None, versi
     # 1. try to find context for this file
     customization = Customization.objects.get(name=customization_name)
     clean_name = filename.replace(language_code, "{{language}}") if language_code else filename
-    context = Context.objects.filter(file_path=clean_name)
+    context = Context.objects.filter(file_path=clean_name, product__name=settings.PRIMARY_PRODUCT,
+                                     product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
     if context.exists():
         # success -> return process_context
         context = context.first()
@@ -138,7 +139,7 @@ def read_customized_file(filename, customization_name, language_code=None, versi
 def save_context(context, context_path, language_code, customization, preview, version_id, global_contexts):
     content = process_context(context, language_code, customization, preview, version_id, global_contexts)
     language = Language.by_code(language_code, customization.default_language)
-    skin = customization.read_global_value('%SKIN%')
+    skin = context.product.read_global_value('%SKIN%')
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
         # print "save file: " + target_file_name
@@ -152,10 +153,9 @@ def generate_languages_json(customization, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(customization_name, product='cloud_portal'):
+def init_skin(customization_name, product=settings.PRIMARY_PRODUCT):
     # 1. read skin for this customization
-    customization = Customization.objects.get(name=customization_name)
-    skin = customization.read_global_value('%SKIN%')
+    skin = Product.objects.get(name=product).read_global_value('%SKIN%')
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
@@ -166,7 +166,7 @@ def init_skin(customization_name, product='cloud_portal'):
     fill_content(customization_name, product, preview=True, incremental=False)
 
 
-def fill_content(customization_name='default', product_name='cloud_portal',
+def fill_content(customization_name=settings.CUSTOMIZATION, product_name=settings.PRIMARY_PRODUCT,
                  preview=True,
                  version_id=None,
                  incremental=False,
@@ -219,26 +219,26 @@ def fill_content(customization_name='default', product_name='cloud_portal',
                 'Only latest accepted version can be published\
                  without preview flag, version_id id forbidden')
         versions = ContentVersion.objects.filter(
-            customization_id=customization.id, accepted_date__isnull=False)
+            product_id=product.id, accepted_date__isnull=False)
         if versions.exists():
             version_id = versions.latest('accepted_date').id
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-        customization_cache(customization, force=True)
+        cloud_portal_customization_cache(customization, force=True)
 
     if incremental and not changed_context:
         # filter records changed in this version
         # get their datastructures
         # detect their contexts
 
-        changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+        changed_records = DataRecord.objects.filter(version_id=version_id, data_structure__context__product=product)
         # in case version_id is none - we need to filter by customization as well
         if not version_id:  # if version_id is None - check if records are actually latest
             changed_records_ids = [DataRecord.objects.
                                    filter(language_id=record.language_id,
                                           data_structure_id=record.data_structure_id,
-                                          customization_id=customization.id).
+                                          data_structure__context__product=product).
                                    latest('created_date').id for record in changed_records]
             changed_records = changed_records.filter(id__in=changed_records_ids)
 
@@ -255,12 +255,12 @@ def fill_content(customization_name='default', product_name='cloud_portal',
             incremental = False
         else:
             changed_contexts = [changed_context]
-            changed_records = DataRecord.objects.filter(version_id=version_id, customization_id=customization.id)
+            changed_records = DataRecord.objects.filter(version_id=version_id, data_structure__context__product=product)
             if not version_id:
                 changed_records_ids = [DataRecord.objects.
                                            filter(language_id=record.language_id,
                                                   data_structure_id=record.data_structure_id,
-                                                  customization_id=customization.id).
+                                                  data_structure__context__product=product).
                                            latest('created_date').id for record in changed_records]
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
@@ -292,7 +292,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
 
 def zip_context(zip_file, context, customization, language_code, preview, version_id, global_contexts, add_root):
     language = Language.by_code(language_code, customization.default_language)
-    skin = customization.read_global_value('%SKIN%')
+    skin = context.product.read_global_value('%SKIN%')
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         data = process_context(context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
