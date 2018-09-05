@@ -137,18 +137,6 @@ std::optional< AbstractCloudDataProvider::System >
     return it->second;
 }
 
-static QString traceSystems(const std::map< String, AbstractCloudDataProvider::System >& systems)
-{
-    QStringList list;
-    for (const auto sys: systems)
-    {
-        list << lm("%1 (%2 %3)").arg(sys.first)
-            .arg(sys.second.authKey)
-            .arg(sys.second.mediatorEnabled);
-    }
-    return list.join(QLatin1String(", "));
-}
-
 void CloudDataProvider::updateSystemsAsync()
 {
     m_connection->systemManager()->getSystemsFiltered(
@@ -177,8 +165,6 @@ void CloudDataProvider::updateSystemsAsync()
 
                 NX_LOGX(lm("There is(are) %1 system(s) updated")
                     .arg(systems.systems.size()), cl_logDEBUG1);
-                NX_LOGX(lm("Updated: %1")
-                    .arg(traceSystems(m_systemCache)), cl_logDEBUG2);
             }
 
             QnMutexLocker lk(&m_mutex);
