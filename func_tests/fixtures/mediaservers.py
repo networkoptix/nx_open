@@ -11,6 +11,8 @@ from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
 
+pytest_plugins = ['fixtures.vms']
+
 _logger = logging.getLogger(__name__)
 
 

@@ -19,7 +19,6 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = [
-    'fixtures.vms',
     'fixtures.mediaservers',
     'fixtures.cloud',
     'fixtures.layouts',
