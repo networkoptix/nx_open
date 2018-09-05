@@ -126,15 +126,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&uuid](const AnalyticsEventType& event)
-        {
-            return event.typeId == uuid;
-        });
+        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
 
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }

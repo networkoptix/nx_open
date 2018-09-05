@@ -31,8 +31,7 @@ public:
         nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* typeList,
-        int typeListSize) override;
+        const char* const* typeList, int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 

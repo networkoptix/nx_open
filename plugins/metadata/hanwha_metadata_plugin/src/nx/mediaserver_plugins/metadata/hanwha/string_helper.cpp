@@ -11,7 +11,7 @@ namespace hanwha {
 
 QString StringHelper::buildCaption(
     const Hanwha::DriverManifest& /*manifest*/,
-    const QnUuid& /*eventTypeId*/,
+    const QString& /*eventTypeId*/,
     boost::optional<int> /*eventChannel*/,
     boost::optional<int> /*eventRegion*/,
     Hanwha::EventItemType /*eventItemType*/,
@@ -22,7 +22,7 @@ QString StringHelper::buildCaption(
 
 QString StringHelper::buildDescription(
     const Hanwha::DriverManifest& manifest,
-    const QnUuid& eventTypeId,
+    const QString& eventTypeId,
     boost::optional<int> /*eventChannel*/,
     boost::optional<int> eventRegion,
     Hanwha::EventItemType eventItemType,
@@ -30,7 +30,7 @@ QString StringHelper::buildDescription(
 {
     using namespace nx::api;
 
-    const auto& descriptor = manifest.eventDescriptorById(eventTypeId);
+    const auto& descriptor = manifest.eventTypeDescriptorById(eventTypeId);
     QString description = descriptor.description;
     if (description.isEmpty())
         return QString();

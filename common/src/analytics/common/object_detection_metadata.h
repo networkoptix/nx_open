@@ -32,7 +32,7 @@ QString toString(const Attribute&);
 
 struct DetectedObject
 {
-    QnUuid objectTypeId;
+    QString objectTypeId;
     QnUuid objectId;
     /**
      * Coordinates are in range [0;1].

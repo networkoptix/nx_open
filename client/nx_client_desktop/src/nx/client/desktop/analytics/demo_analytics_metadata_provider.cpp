@@ -96,7 +96,7 @@ public:
                     object.objectId = QnUuid::createUuid();
 
                 if (object.objectTypeId.isNull())
-                    object.objectTypeId = QnUuid::createUuid();
+                    object.objectTypeId = QnUuid::createUuid().toString();
 
                 if (object.boundingBox.isNull())
                     object.boundingBox = randomRect();

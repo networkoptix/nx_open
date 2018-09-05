@@ -154,8 +154,8 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     static const std::string kManifestPrefix = (R"json(
         {
-            "driverId": "{2CAE7F92-01E5-478D-ABA4-50938034D46E}",
-            "driverName": {
+            "pluginId": "nx.deepstream",
+            "pluginName": {
                 "value": "DeepStream Driver",
                 "localization": {
                     "ru_RU": "DeepStream driver (translated to Russian)"
@@ -173,12 +173,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        ObjectClassDescription licensePlateDescrition(
+        ObjectClassDescription licensePlateDescription(
             "License Plate",
             "",
             kLicensePlateGuid);
 
-        m_manifest += buildManifestObectTypeString(licensePlateDescrition);
+        m_manifest += buildManifestObectTypeString(licensePlateDescription);
     }
     else
     {
@@ -258,7 +258,7 @@ std::vector<ObjectClassDescription> Plugin::loadObjectClasses() const
 
     std::vector<ObjectClassDescription> result;
     for (auto i = 0; i < labels.size(); ++i)
-        result.emplace_back(/*name*/ labels[i], /*description*/ "", /*guid*/ guids[i]);
+        result.emplace_back(/*name*/ labels[i], /*description*/ "", /*typeId*/ guids[i]);
 
     return result;
 }
@@ -280,9 +280,9 @@ std::vector<std::string> Plugin::loadLabels(const std::string& labelFilePath) co
     return result;
 }
 
-std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePath) const
+std::vector<std::string> Plugin::loadClassGuids(const std::string& guidsFilePath) const
 {
-    std::vector<nxpl::NX_GUID> result;
+    std::vector<std::string> result;
     std::ifstream guidsFile(guidsFilePath, std::ios::in);
 
     std::string line;
@@ -291,11 +291,10 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
         if (trim(&line)->empty())
             continue;
 
-        auto guid = nxpt::NxGuidHelper::fromStdString(line);
-        if (guid == kNullGuid)
+        if (line.empty())
             continue;
 
-        result.push_back(guid);
+        result.push_back(line);
     }
 
     return result;
@@ -304,7 +303,7 @@ std::vector<nxpl::NX_GUID> Plugin::loadClassGuids(const std::string& guidsFilePa
 std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& description) const
 {
     static const std::string kObjectTypeStringPrefix = (R"json({
-        "typeId": ")json");
+        "id": ")json");
     static const std::string kObjectTypeStringMiddle = (R"json(",
         "name": {
             "value": ")json");
@@ -314,7 +313,7 @@ std::string Plugin::buildManifestObectTypeString(const ObjectClassDescription& d
     })json");
 
     return kObjectTypeStringPrefix
-        + nxpt::toStdString(description.guid)
+        + description.typeId
         + kObjectTypeStringMiddle
         + description.name
         + kObjectTypeStringPostfix;

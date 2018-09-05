@@ -22,7 +22,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    const QnUuid objectTypeId(params.value("objectTypeId"));
+    const QString objectTypeId(params.value("objectTypeId"));
     if (objectTypeId.isNull())
     {
         result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing or invalid");
@@ -35,7 +35,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     for (const auto& manifest: manifests)
     {
         AvailableAnalyticsActionsOfPlugin actionsOfPlugin;
-        actionsOfPlugin.driverId = manifest.driverId;
+        actionsOfPlugin.pluginId = manifest.pluginId;
 
         for (const auto& action: manifest.objectActions)
         {

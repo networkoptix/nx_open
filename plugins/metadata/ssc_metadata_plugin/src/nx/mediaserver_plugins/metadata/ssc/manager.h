@@ -34,7 +34,7 @@ public:
     void sendEventPacket(const AnalyticsEventType& event) const;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList, int eventTypeListSize) override;
+        const char* const* tpeList, int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 

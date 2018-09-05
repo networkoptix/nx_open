@@ -21,9 +21,9 @@ class MetadataItem: public nxpl::PluginInterface
 {
 public:
     /**
-     * Human-readable object type (line crossing | human detected | etc.)
+     * Human-readable hierarchical type, e.g. "someCompany.someEngine.lineCrossing".
      */
-    virtual nxpl::NX_GUID typeId() const = 0;
+    virtual const char* typeId() const = 0;
 
     /**
      * Level of confidence in range (0..1]

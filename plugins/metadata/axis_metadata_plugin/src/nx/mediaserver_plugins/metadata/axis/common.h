@@ -22,10 +22,10 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 {
     QString topic;
     QString caption;
-    nxpl::NX_GUID eventTypeIdExternal;
+    QString eventTypeIdExternal;
 
     AnalyticsEventType() = default; //< Fusion needs default constructor.
-    AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent);
+    AnalyticsEventType(const nx::axis::SupportedEventType& supportedEventType);
     QString fullName() const { return topic + QString("/") + caption; }
 };
 #define AxisAnalyticsEventType_Fields AnalyticsEventType_Fields(topic)(name)

@@ -23,15 +23,14 @@ namespace ssc {
 namespace {
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const AnalyticsEventType& event, int logicalId)
+    const AnalyticsEventType& eventType, int logicalId)
 {
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventMetadataPacket();
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(
-        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
-    commonEvent->setDescription(event.name.value.toStdString());
+    commonEvent->setTypeId(eventType.id.toStdString());
+    commonEvent->setDescription(eventType.name.value.toStdString());
     commonEvent->setAuxilaryData(std::to_string(logicalId));
 
     packet->addEvent(commonEvent);
@@ -53,7 +52,7 @@ Manager::Manager(Plugin* plugin,
 {
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.id);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     NX_URL_PRINT << "SSC metadata manager created for camera " << cameraInfo.model;
@@ -89,7 +88,8 @@ void Manager::sendEventPacket(const AnalyticsEventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(
+    const char* const* /*typeList*/, int /*typeListSize*/)
 {
     m_plugin->registerCamera(m_cameraLogicalId, this);
     return nx::sdk::Error::noError;

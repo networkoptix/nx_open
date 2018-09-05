@@ -9,8 +9,8 @@ namespace event {
 
 AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QnResourcePtr& resource,
-    const QnUuid& driverId,
-    const QnUuid& eventId,
+    const QString& pluginId,
+    const QString& eventTypeId,
     EventState toggleState,
     const QString& caption,
     const QString& description,
@@ -18,29 +18,29 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
-    m_driverId(driverId),
-    m_eventId(eventId),
+    m_pluginId(pluginId),
+    m_eventTypeId(eventTypeId),
     m_caption(caption),
     m_description(description),
     m_auxiliaryData(auxiliaryData)
 {
 }
 
-const QnUuid& AnalyticsSdkEvent::driverId() const
+QString AnalyticsSdkEvent::pluginId() const
 {
-    return m_driverId;
+    return m_pluginId;
 }
 
-const QnUuid& AnalyticsSdkEvent::eventId() const
+const QString& AnalyticsSdkEvent::eventTypeId() const
 {
-    return m_eventId;
+    return m_eventTypeId;
 }
 
 EventParameters AnalyticsSdkEvent::getRuntimeParams() const
 {
     EventParameters params = base_type::getRuntimeParams();
-    params.setAnalyticsDriverId(m_driverId);
-    params.setAnalyticsEventId(m_eventId);
+    params.setAnalyticsPluginId(m_pluginId);
+    params.setAnalyticsEventTypeId(m_eventTypeId);
     return params;
 }
 
@@ -55,13 +55,13 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
-    if (!getResource() || m_driverId != params.analyticsDriverId())
+    if (!getResource() || m_pluginId != params.getAnalyticsPluginId())
         return false;
     const auto descriptor = nx::vms::event::AnalyticsHelper(getResource()->commonModule())
-        .eventDescriptor(m_eventId);
+        .eventTypeDescriptor(m_eventTypeId);
 
-    const bool isEventTypeMatched = m_eventId == params.analyticsEventId()
-        || descriptor.groupId == params.analyticsEventId();
+    const bool isEventTypeMatched = m_eventTypeId == params.getAnalyticsEventTypeId()
+        || descriptor.groupId == params.getAnalyticsEventTypeId();
     return isEventTypeMatched
         && checkForKeywords(m_caption, params.caption)
         && checkForKeywords(m_description, params.description);

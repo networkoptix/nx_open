@@ -42,46 +42,47 @@ bool doesMatch(const QString& realEventName, const QString& internalEventName)
 
 } // namespace
 
-QnUuid Hanwha::DriverManifest::eventTypeByName(const QString& eventName) const
+QString Hanwha::DriverManifest::eventTypeIdByName(const QString& eventName) const
 {
-    QnUuid result = m_idByInternalName.value(eventName);
+    QString result = m_eventTypeIdByInternalName.value(eventName);
     if (!result.isNull())
         return result;
 
-    for (const auto& eventDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: outputEventTypes)
     {
-        if (doesMatch(eventName, eventDescriptor.internalName))
+        if (doesMatch(eventName, eventTypeDescriptor.internalName))
         {
-            m_idByInternalName.insert(eventName, eventDescriptor.typeId);
-            return eventDescriptor.typeId;
+            m_eventTypeIdByInternalName.insert(eventName, eventTypeDescriptor.id);
+            return eventTypeDescriptor.id;
         }
     }
 
-    return QUuid();
+    return QString();
 }
 
-const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const QnUuid& id) const
+const Hanwha::EventTypeDescriptor& Hanwha::DriverManifest::eventTypeDescriptorById(
+    const QString& id) const
 {
-    static const Hanwha::EventDescriptor defaultEventDescriptor{};
+    static const Hanwha::EventTypeDescriptor defaultEventTypeDescriptor{};
 
-    auto itr = m_recordById.find(id);
-    if (itr != m_recordById.end())
-        return itr.value();
-    for (const auto& eventDescriptor: outputEventTypes)
+    auto it = m_eventTypeDescriptorById.find(id);
+    if (it != m_eventTypeDescriptorById.end())
+        return it.value();
+    for (const auto& eventTypeDescriptor: outputEventTypes)
     {
-        if (eventDescriptor.typeId == id)
+        if (eventTypeDescriptor.id == id)
         {
-            itr = m_recordById.insert(id, eventDescriptor);
-            return itr.value();
+            it = m_eventTypeDescriptorById.insert(id, eventTypeDescriptor);
+            return it.value();
         }
     }
 
-    return defaultEventDescriptor;
+    return defaultEventTypeDescriptor;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventDescriptor,
-    (json), EventDescriptor_Fields)
+    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventTypeDescriptor,
+    (json), EventTypeDescriptor_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha::DriverManifest,
     (json), DriverManifest_Fields)
 

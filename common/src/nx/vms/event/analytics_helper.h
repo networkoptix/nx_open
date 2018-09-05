@@ -18,54 +18,56 @@ class AnalyticsHelper: public QObject, public QnCommonModuleAware
     using base_type = QObject;
     Q_OBJECT
 public:
-    struct EventDescriptor: public nx::api::Analytics::EventType
+    struct EventTypeDescriptor: public nx::api::Analytics::EventType
     {
         using base_type = nx::api::Analytics::EventType;
 
-        EventDescriptor() {}
-        EventDescriptor(const base_type& value): base_type(value) {}
+        EventTypeDescriptor() {}
+        EventTypeDescriptor(const base_type& value): base_type(value) {}
 
-        QnUuid driverId;
-        nx::api::TranslatableString driverName;
+        QString pluginId;
+        nx::api::TranslatableString pluginName;
     };
 
     AnalyticsHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
 
     /** Get list of all supported analytics events in the system. */
-    QList<EventDescriptor> systemSupportedAnalyticsEvents() const;
+    QList<EventTypeDescriptor> systemSupportedAnalyticsEvents() const;
 
     /** Get list of all camera-independent analytics events in the system. */
-    QList<EventDescriptor> systemCameraIndependentAnalyticsEvents() const;
+    QList<EventTypeDescriptor> systemCameraIndependentAnalyticsEvents() const;
 
-    EventDescriptor eventDescriptor(const QnUuid& eventId) const;
-    nx::api::Analytics::Group groupDescriptor(const QnUuid& groupId) const;
+    EventTypeDescriptor eventTypeDescriptor(const QString& eventTypeId) const;
+    nx::api::Analytics::Group groupDescriptor(const QString& groupId) const;
 
     /** Get list of all supported analytics events for the given cameras. */
-    static QList<EventDescriptor> supportedAnalyticsEvents(
+    static QList<EventTypeDescriptor> supportedAnalyticsEvents(
         const QnVirtualCameraResourceList& cameras);
 
     /** Get list of all camera-independent analytics events from given servers. */
-    static QList<EventDescriptor> cameraIndependentAnalyticsEvents(
+    static QList<EventTypeDescriptor> cameraIndependentAnalyticsEvents(
         const QnMediaServerResourceList& servers);
 
-    static bool hasDifferentDrivers(const QList<EventDescriptor>& events);
+    static bool hasDifferentDrivers(const QList<EventTypeDescriptor>& events);
 
-    static QString eventName(const QnVirtualCameraResourcePtr& camera,
-        const QnUuid& eventTypeId,
+    static QString eventTypeName(
+        const QnVirtualCameraResourcePtr& camera,
+        const QString& eventTypeId,
         const QString& locale);
 
-    static QString objectName(const QnVirtualCameraResourcePtr& camera,
-        const QnUuid& objectTypeId,
+    static QString objectTypeName(
+        const QnVirtualCameraResourcePtr& camera,
+        const QString& objectTypeId,
         const QString& locale);
 
     struct PluginActions
     {
-        QnUuid driverId;
+        QString pluginId;
         QList<nx::api::AnalyticsManifestObjectAction> actions;
     };
 
     static QList<PluginActions> availableActions(
-        const QnMediaServerResourceList& servers, const QnUuid& objectTypeId);
+        const QnMediaServerResourceList& servers, const QString& objectTypeId);
 };
 
 } // namespace event

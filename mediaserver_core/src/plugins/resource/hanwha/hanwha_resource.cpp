@@ -327,9 +327,8 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
-//Taken from Hanwha metadata plugin manifest.json
-static const QnUuid kHanwhaInputPortEventId =
-    QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
+// Taken from Hanwha metadata plugin manifest.json.
+static const QString kHanwhaInputPortEventId = "nx.hanwha.inputPort";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -752,7 +751,7 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
         return false;
 
     const auto parameters = analyticsEvent->getRuntimeParams();
-    if (parameters.analyticsEventId() != kHanwhaInputPortEventId)
+    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventId)
         return false;
 
     emit cameraInput(
@@ -1970,7 +1969,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         return CameraDiagnostics::NoErrorResult();
 
     if (totalProfileNumber)
-        *totalProfileNumber = profiles.size();
+        *totalProfileNumber = (int) profiles.size();
 
     static const auto kAppName = QnAppInfo::productNameLong();
     if (outPrimaryProfile)

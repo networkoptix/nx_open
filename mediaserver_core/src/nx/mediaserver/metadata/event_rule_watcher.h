@@ -23,7 +23,7 @@ public:
     void at_ruleRemoved(const QnUuid& ruleId);
     void at_resourceAdded(const QnResourcePtr& resource);
 
-    QSet<QnUuid> watchedEventsForResource(const QnUuid& resourceId);
+    QSet<QString> watchedEventsForResource(const QnUuid& resourceId) const;
 
 signals:
     void rulesUpdated(const QSet<QnUuid>& affectedResources);

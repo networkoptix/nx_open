@@ -31,16 +31,16 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": "{B14A8D7B-8009-4D38-A60D-04139345432E}",
-            "driverName": {
-                "value": "Tegra Video Driver",
+            "pluginId": "nx.tegraVideo",
+            "pluginName": {
+                "value": "Tegra Video Metadata Plugin",
                 "localization": {
-                    "ru_RU": "Tegra Video driver (translated to Russian)"
+                    "ru_RU": "Tegra Video Metadata Plugin (stub for Russian text)"
                 }
             },
             "outputEventTypes": [
                 {
-                    "typeId": "{7E94CE15-3B69-4719-8DFD-AC1B76E5D8F4}",
+                    "id": "nx.tegraVideo.humanEnteredTheArea",
                     "name": {
                         "value": "Human entered the area.",
                         "localization": {
@@ -49,7 +49,7 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 },
                 {
-                    "typeId": "{B0E64044-FFA3-4B7F-807A-060C1FE5A04C}",
+                    "id": "nx.tegraVideo.humanLeftTheArea",
                     "name": {
                         "value": "Human left the area",
                         "localization": {
@@ -60,7 +60,7 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": "{58AE392F-8516-4B27-AEE1-311139B5A37A}",
+                    "id": "nx.tegraVideo.car",
                     "name": {
                         "value": "Car",
                         "localization": {
@@ -69,7 +69,7 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 },
                 {
-                    "typeId": "{3778A599-FB60-47E9-8EC6-A9949E8E0AE7}",
+                    "id": "nx.tegraVideo.human",
                     "name": {
                         "value": "Human",
                         "localization": {

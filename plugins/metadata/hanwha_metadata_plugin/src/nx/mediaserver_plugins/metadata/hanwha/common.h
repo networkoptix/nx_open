@@ -31,7 +31,7 @@ public:
         t3,
     };
 
-    struct EventDescriptor: public nx::api::Analytics::EventType
+    struct EventTypeDescriptor: public nx::api::Analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
@@ -40,7 +40,7 @@ public:
         QString negativeState;
         QString regionDescription;
     };
-    #define EventDescriptor_Fields AnalyticsEventType_Fields \
+    #define EventTypeDescriptor_Fields AnalyticsEventType_Fields \
         (internalName) \
         (internalMonitoringName) \
         (description) \
@@ -50,13 +50,13 @@ public:
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
     {
-        QList<EventDescriptor> outputEventTypes;
+        QList<EventTypeDescriptor> outputEventTypes;
 
-        QnUuid eventTypeByName(const QString& eventName) const;
-        const Hanwha::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
+        QString eventTypeIdByName(const QString& eventName) const;
+        const Hanwha::EventTypeDescriptor& eventTypeDescriptorById(const QString& id) const;
     private:
-        mutable QMap<QString, QnUuid> m_idByInternalName;
-        mutable QMap<QnUuid, EventDescriptor> m_recordById;
+        mutable QMap<QString, QString> m_eventTypeIdByInternalName;
+        mutable QMap<QString, EventTypeDescriptor> m_eventTypeDescriptorById;
 
     };
     #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
@@ -64,14 +64,14 @@ public:
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Hanwha::EventDescriptor)
+    (Hanwha::EventTypeDescriptor)
     (Hanwha::DriverManifest),
     (json)
 )
 
 struct Event
 {
-    nxpl::NX_GUID typeId;
+    QString typeId;
     QString caption;
     QString description;
     boost::optional<int> channel;

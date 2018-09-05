@@ -26,8 +26,8 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     }
 
     QString missedField;
-    if (actionData.driverId.isNull())
-        missedField = "driverId";
+    if (actionData.pluginId.isEmpty())
+        missedField = "pluginId";
     else if (actionData.actionId.isEmpty())
         missedField = "actionId";
     else if (actionData.objectId.isNull())
@@ -49,7 +49,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         if (!manifest)
             continue; //< The error is already logged.
 
-        if (manifest.get().driverId == actionData.driverId)
+        if (manifest.get().pluginId == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
             QString errorMessage = executeAction(&actionResult, plugin, actionData);
@@ -65,7 +65,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     }
 
     result.setError(QnJsonRestResult::CantProcessRequest,
-        lit("Plugin with driverId %1 not found").arg(actionData.driverId.toString()));
+        lit("Plugin with pluginId \"%1\" not found").arg(actionData.pluginId));
     return nx::network::http::StatusCode::ok;
 }
 

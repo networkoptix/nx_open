@@ -9,7 +9,7 @@ namespace vca {
 
 bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
-    return lh.typeId == rh.typeId;
+    return lh.id == rh.id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),

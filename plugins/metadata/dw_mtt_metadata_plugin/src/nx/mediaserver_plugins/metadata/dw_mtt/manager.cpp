@@ -46,15 +46,14 @@ static const int kBufferCapacity = 512 * 1024;
 static const QByteArray kXmlContentType = "application/xml";
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const AnalyticsEventType& event, bool active)
+    const AnalyticsEventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(
-        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
-    commonEvent->setDescription(event.name.value.toStdString());
+    commonEvent->setTypeId(eventType.id.toStdString());
+    commonEvent->setDescription(eventType.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(event.internalName.toStdString());
+    commonEvent->setAuxilaryData(eventType.internalName.toStdString());
     return commonEvent;
 }
 
@@ -87,7 +86,7 @@ Manager::Manager(Plugin* plugin,
     for (const auto& eventType : typedManifest.outputEventTypes)
     {
         if(!eventType.unsupported)
-            typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
+            typedCameraManifest.supportedEventTypes.push_back(eventType.id);
     }
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
@@ -383,17 +382,17 @@ QByteArray Manager::extractRequestFromBuffer()
     return request;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* eventTypeList, int eventTypeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int typeListSize)
 {
     const QByteArray host = m_url.host().toLatin1();
     m_cameraController.setIp(m_url.host().toLatin1());
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
-    for (int i = 0; i < eventTypeListSize; ++i)
+    // Assuming that the list contains only events, since this plugin does not produce objects.
+    for (int i = 0; i < typeListSize; ++i)
     {
-        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
-        const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
+        const QString id = typeList[i];
+        const AnalyticsEventType* eventType = m_plugin->eventTypeById(id);
         if (!eventType)
             NX_URL_PRINT << "Unknown event type. TypeId = " << id.toStdString();
         else

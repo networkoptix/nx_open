@@ -772,11 +772,11 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
-    QnUuid eventSubtype;
+    QString eventSubtype;
     if (action->getRuntimeParams().eventType == vms::api::EventType::analyticsSdkEvent)
-        eventSubtype = action->getRuntimeParams().analyticsEventId();
+        eventSubtype = action->getRuntimeParams().getAnalyticsEventTypeId();
 
-    auto actionParams = action->getParams();
+    const auto actionParams = action->getParams();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
@@ -787,7 +787,7 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
     insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
-    bindId(&insQuery, ":event_subtype", eventSubtype);
+    insQuery.bindValue(":event_subtype", eventSubtype);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
     bindId(&insQuery, ":action_resource_guid", actionParams.actionResourceId);
 

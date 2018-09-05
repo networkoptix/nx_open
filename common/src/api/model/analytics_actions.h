@@ -14,7 +14,7 @@ struct AnalyticsActionResult
 struct AnalyticsAction
 {
     /** Id of a plugin which should handle the action. */
-    QnUuid driverId;
+    QString pluginId;
 
     QString actionId;
 
@@ -27,14 +27,14 @@ struct AnalyticsAction
 
     QMap<QString, QString> params;
 };
-#define AnalyticsAction_Fields (driverId)(actionId)(objectId)(cameraId)(timestampUs)(params)
+#define AnalyticsAction_Fields (pluginId)(actionId)(objectId)(cameraId)(timestampUs)(params)
 
 struct AvailableAnalyticsActionsOfPlugin
 {
-    QnUuid driverId;
+    QString pluginId;
     QStringList actionIds;
 };
-#define AvailableAnalyticsActionsOfPlugin_Fields (driverId)(actionIds)
+#define AvailableAnalyticsActionsOfPlugin_Fields (pluginId)(actionIds)
 
 struct AvailableAnalyticsActions
 {

@@ -1,309 +1,286 @@
 {
-    "driverId": "{6541F47D-99B8-4049-BF55-697BD6DD1BBD}",
-    "driverName": {
-        "value": "Hanwha metadata driver",
-        "localization": {
-        }
-    },
+    "pluginId": "nx.hanwha", 
+    "pluginName": {
+        "value": "Hanwha metadata driver", 
+        "localization": {}
+    }, 
     "outputEventTypes": [
         {
-            "typeId": "{5DFC6D1B-3B92-4E55-A627-0DB2A2422DB3}",
+            "id": "nx.hanwha.FaceDetection", 
             "name": {
-                "value": "Face detection",
-                "localization": {
-                }
-            },
-
-            "_": "Following fields belong to private plugin implementation.",
-            "internalName": "FaceDetection",
-            "description": "Face %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
+                "value": "Face detection", 
+                "localization": {}
+            }, 
+            "_": "Following fields belong to private plugin implementation.", 
+            "internalName": "FaceDetection", 
+            "description": "Face %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "is not detected", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{95F33B59-0CA8-4CB2-9248-1F5E616483F7}",
+            "id": "nx.hanwha.FogDetection", 
             "name": {
-                "value": "Fog detection",
-                "localization": {
-                }
-            },
-            "internalName": "FogDetection",
-            "description": "Fog %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
+                "value": "Fog detection", 
+                "localization": {}
+            }, 
+            "internalName": "FogDetection", 
+            "description": "Fog %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "is not detected", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{67EDDD6A-A31F-41C4-91B6-B6298FE257A1}",
+            "id": "nx.hanwha.VideoAnalytics.Passing", 
             "name": {
-                "value": "Virtual line crossing",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.Passing",
-            "description": "Virtual line #%1 was crossed",
-            "flags": "regionDependent",
+                "value": "Virtual line crossing", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.Passing", 
+            "description": "Virtual line #%1 was crossed", 
+            "flags": "regionDependent", 
             "regionDescription": "#%1"
-        },
+        }, 
         {
-            "typeId": "{6F602403-CCA4-4F85-8777-F340E8239A23}",
+            "id": "nx.hanwha.VideoAnalytics.Entering", 
             "name": {
-                "value": "Entering the area",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.Entering",
-            "description": "Object has entered %1",
-            "flags": "regionDependent",
+                "value": "Entering the area", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.Entering", 
+            "description": "Object has entered %1", 
+            "flags": "regionDependent", 
             "regionDescription": " the region #%1"
-        },
+        }, 
         {
-            "typeId": "{2C218743-604C-475D-AED9-A848F40F13F9}",
+            "id": "nx.hanwha.VideoAnalytics.Exiting", 
             "name": {
-                "value": "Exiting the area",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.Exiting",
-            "description": "Object has exited %1",
-            "flags": "regionDependent",
+                "value": "Exiting the area", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.Exiting", 
+            "description": "Object has exited %1", 
+            "flags": "regionDependent", 
             "regionDescription": " the region #%1"
-        },
+        }, 
         {
-            "typeId": "{A452E49A-D1D8-44EA-84DA-F581414E8153}",
+            "id": "nx.hanwha.VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing", 
             "name": {
-                "value": "Appearing in the area",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
-            "description": "Object %1 ",
-            "positiveState": "appeared",
+                "value": "Appearing in the area", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing", 
+            "description": "Object %1 ", 
+            "positiveState": "appeared", 
             "regionDescription": "  in the region #%1"
-        },
+        }, 
         {
-            "typeId": "{42D4994A-A267-4C39-98AA-CBC4D41CA42B}",
+            "id": "nx.hanwha.VideoAnalytics.Intrusion", 
             "name": {
-                "value": "Intrusion",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.Intrusion",
-            "description": "Intrusion %1",
+                "value": "Intrusion", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.Intrusion", 
+            "description": "Intrusion %1", 
             "positiveState": "has been detected"
-        },
+        }, 
         {
-            "typeId": "{CABB4644-F6C2-4F09-8EDF-E0FAFCC4F833}",
+            "id": "nx.hanwha.AudioDetection", 
             "name": {
-                "value": "Audio detection",
-                "localization": {
-                }
-            },
-            "internalName": "AudioDetection",
-            "description": "The audio volume level is %1 the threshold",
-            "positiveState": "above",
-            "negativeState": "below",
+                "value": "Audio detection", 
+                "localization": {}
+            }, 
+            "internalName": "AudioDetection", 
+            "description": "The audio volume level is %1 the threshold", 
+            "positiveState": "above", 
+            "negativeState": "below", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{657B39C2-36C1-4644-9357-58593658D567}",
+            "id": "nx.hanwha.Tampering", 
             "name": {
-                "value": "Tampering detection",
-                "localization": {
-                }
-            },
-            "internalName": "Tampering",
-            "description": "Tampering %1",
+                "value": "Tampering detection", 
+                "localization": {}
+            }, 
+            "internalName": "Tampering", 
+            "description": "Tampering %1", 
             "positiveState": "has been detected"
-        },
+        }, 
         {
-            "typeId": "{216668D9-EA9B-483A-A43E-9414ED760A01}",
+            "id": "nx.hanwha.DefocusDetection", 
             "name": {
-                "value": "Defocusing detection",
-                "localization": {
-                }
-            },
-            "internalName": "DefocusDetection",
-            "description": "Defocusing %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
+                "value": "Defocusing detection", 
+                "localization": {}
+            }, 
+            "internalName": "DefocusDetection", 
+            "description": "Defocusing %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}",
+            "id": "nx.hanwha.AlarmInput.,NetworkAlarmInput", 
             "name": {
-                "value": "Dry contact input",
-                "localization": {
-                }
-            },
-            "internalName": "AlarmInput.,NetworkAlarmInput",
-            "description": "Dry contact input has been %1",
-            "positiveState": "activated",
-            "negativeState": "deactivated",
+                "value": "Dry contact input", 
+                "localization": {}
+            }, 
+            "internalName": "AlarmInput.,NetworkAlarmInput", 
+            "description": "Dry contact input has been %1", 
+            "positiveState": "activated", 
+            "negativeState": "deactivated", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{F1F723BB-20C8-453A-AFCE-86F318CBF097}",
+            "id": "nx.hanwha.MotionDetection", 
             "name": {
-                "value": "Motion detection",
-                "localization": {
-                }
-            },
-            "internalName": "MotionDetection",
-            "description": "Motion %1%2",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent | regionDependent",
+                "value": "Motion detection", 
+                "localization": {}
+            }, 
+            "internalName": "MotionDetection", 
+            "description": "Motion %1%2", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
+            "flags": "stateDependent | regionDependent", 
             "regionDescription": "  in the region #%1"
-        },
+        }, 
         {
-            "typeId": "{79F03CE5-AFD1-4942-905C-46A981942422}",
+            "id": "nx.hanwha.AudioAnalytics.Scream", 
             "name": {
-                "value": "Sound - Scream",
-                "localization": {
-                }
-            },
-            "internalName": "AudioAnalytics.Scream",
-            "description": "Scream %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
+                "value": "Sound - Scream", 
+                "localization": {}
+            }, 
+            "internalName": "AudioAnalytics.Scream", 
+            "description": "Scream %1", 
+            "positiveState": "has been detected", 
+            "negativeState": "has ended", 
             "flags": "stateDependent"
-        },
+        }, 
         {
-            "typeId": "{02567E19-33AC-440B-8647-16D95EF6B295}",
+            "id": "nx.hanwha.AudioAnalytics.Gunshot", 
             "name": {
-                "value": "Sound - Gunshot",
-                "localization": {
-                }
-            },
-            "internalName": "AudioAnalytics.Gunshot",
-            "description": "Gunshot %1",
+                "value": "Sound - Gunshot", 
+                "localization": {}
+            }, 
+            "internalName": "AudioAnalytics.Gunshot", 
+            "description": "Gunshot %1", 
             "positiveState": "has been detected"
-        },
+        }, 
         {
-            "typeId": "{BD275A24-F758-4FD5-9239-FBE87B1331CE}",
+            "id": "nx.hanwha.AudioAnalytics.Explosion", 
             "name": {
-                "value": "Sound - Explosion",
-                "localization": {
-                }
-            },
-            "internalName": "AudioAnalytics.Explosion",
-            "description": "Explosion %1",
+                "value": "Sound - Explosion", 
+                "localization": {}
+            }, 
+            "internalName": "AudioAnalytics.Explosion", 
+            "description": "Explosion %1", 
             "positiveState": "has been detected"
-        },
+        }, 
         {
-            "typeId": "{BA9DFE3C-55E6-4298-BC8E-CAA947CB9440}",
+            "id": "nx.hanwha.AudioAnalytics.GlassBreak", 
             "name": {
-                "value": "Sound - Glass break",
-                "localization": {
-                }
-            },
-            "internalName": "AudioAnalytics.GlassBreak",
-            "description": "Glass break %1",
+                "value": "Sound - Glass break", 
+                "localization": {}
+            }, 
+            "internalName": "AudioAnalytics.GlassBreak", 
+            "description": "Glass break %1", 
             "positiveState": "has been detected"
-        },
+        }, 
         {
-            "typeId": "{1B541CB7-E377-4818-8801-323281530E7B}",
+            "id": "nx.hanwha.VideoAnalytics.Loitering", 
             "name": {
-                "value": "Loitering",
-                "localization": {
-                }
-            },
-            "internalName": "VideoAnalytics.Loitering",
-            "description": "Loitering %1%2",
-            "positiveState": "has been detected",
-            "flags": "regionDependent",
+                "value": "Loitering", 
+                "localization": {}
+            }, 
+            "internalName": "VideoAnalytics.Loitering", 
+            "description": "Loitering %1%2", 
+            "positiveState": "has been detected", 
+            "flags": "regionDependent", 
             "regionDescription": " in the region #%1"
-        },
-
+        }, 
         {
-            "eventTypeId": "{ED282564-4C25-45B1-92C3-6797D51769FE}",
-            "eventName": {
-                "value": "Queue 1 high level",
+            "id": "nx.hanwha.Queue.1.Level.High", 
+            "name": {
+                "value": "Queue 1 high level", 
                 "localization": {}
-            },
-            "internalName": "Queue.1.Level.High",
-            "description": "Queue 1 level %1 ",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium"
-            "flags": "stateDependent",
+            }, 
+            "internalName": "Queue.1.Level.High", 
+            "description": "Queue 1 level %1 ", 
+            "positiveState": "is high", 
+            "negativeState": "has decreased to medium", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
-        },
+        }, 
         {
-            "eventTypeId": "{8950220F-717A-4E75-999E-966E7B204089}",
-            "eventName": {
-                "value": "Queue 1 medium level",
+            "id": "nx.hanwha.Queue.1.Level.Medium", 
+            "name": {
+                "value": "Queue 1 medium level", 
                 "localization": {}
-            },
-            "internalName": "Queue.1.Level.Medium",
-            "description": "Queue 1 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low"
-            "flags":"stateDependent",
+            }, 
+            "internalName": "Queue.1.Level.Medium", 
+            "description": "Queue 1 level %1", 
+            "positiveState": "is medium", 
+            "negativeState": "has decreased to low", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
-        },
-
+        }, 
         {
-            "eventTypeId": "{F66BE53F-54AC-4BE0-A44A-9BA3D7D4826A}",
-            "eventName": {
-                "value": "Queue 2 high level",
+            "id": "nx.hanwha.Queue.2.Level.High", 
+            "name": {
+                "value": "Queue 2 high level", 
                 "localization": {}
-            },
-            "internalName": "Queue.2.Level.High",
-            "description": "Queue 2 level %1 ",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium"
-            "flags": "stateDependent",
+            }, 
+            "internalName": "Queue.2.Level.High", 
+            "description": "Queue 2 level %1 ", 
+            "positiveState": "is high", 
+            "negativeState": "has decreased to medium", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
-        },
+        }, 
         {
-            "eventTypeId": "{E9D8945F-45BD-43B7-B443-319AF4A8C747}",
-            "eventName": {
-                "value": "Queue 2 medium level",
+            "id": "nx.hanwha.Queue.2.Level.Medium", 
+            "name": {
+                "value": "Queue 2 medium level", 
                 "localization": {}
-            },
-            "internalName": "Queue.2.Level.Medium",
-            "description": "Queue 2 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low"
-            "flags":"stateDependent",
+            }, 
+            "internalName": "Queue.2.Level.Medium", 
+            "description": "Queue 2 level %1", 
+            "positiveState": "is medium", 
+            "negativeState": "has decreased to low", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
-        },
-
+        }, 
         {
-            "eventTypeId": "{495E9A52-66F9-41A1-A994-8F9D0D16BD18}",
-            "eventName": {
-                "value": "Queue 3 high level",
+            "id": "nx.hanwha.Queue.3.Level.High", 
+            "name": {
+                "value": "Queue 3 high level", 
                 "localization": {}
-            },
-            "internalName": "Queue.3.Level.High",
-            "description": "Queue 3 level %1 ",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium"
-            "flags": "stateDependent",
+            }, 
+            "internalName": "Queue.3.Level.High", 
+            "description": "Queue 3 level %1 ", 
+            "positiveState": "is high", 
+            "negativeState": "has decreased to medium", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
-        },
+        }, 
         {
-            "eventTypeId": "{6F44B0FC-ED45-43E8-BC8B-F361D3F2C361}",
-            "eventName": {
-                "value": "Queue 3 medium level",
+            "id": "nx.hanwha.Queue.3.Level.Medium", 
+            "name": {
+                "value": "Queue 3 medium level", 
                 "localization": {}
-            },
-            "internalName": "Queue.3.Level.Medium",
-            "description": "Queue 3 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low"
-            "flags":"stateDependent",
+            }, 
+            "internalName": "Queue.3.Level.Medium", 
+            "description": "Queue 3 level %1", 
+            "positiveState": "is medium", 
+            "negativeState": "has decreased to low", 
+            "flags": "stateDependent", 
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         }
-    ],
-
+    ], 
     "groups": [
         {
-            "id": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}",
+            "id": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}", 
             "name": {
-                "value": "Queue",
+                "value": "Queue", 
                 "localization": {}
             }
         }

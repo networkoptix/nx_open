@@ -27,14 +27,16 @@
 
 namespace {
 
-nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
-    const QnUuid& driverId, const QnUuid& eventTypeId)
+static nx::api::Analytics::EventType analyticsEventType(
+    const QnVirtualCameraResourcePtr& camera,
+    const QString& pluginId,
+    const QString& eventTypeId)
 {
     NX_EXPECT(camera);
     if (!camera)
         return {};
 
-    if (driverId.isNull())
+    if (pluginId.isNull())
         return {};
 
     auto server = camera->getParentServer();
@@ -44,9 +46,9 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 
     const auto drivers = server->analyticsDrivers();
     const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [driverId](const nx::api::AnalyticsDriverManifest& manifest)
+        [pluginId](const nx::api::AnalyticsDriverManifest& manifest)
         {
-            return manifest.driverId == driverId;
+            return manifest.pluginId == pluginId;
         });
 
     NX_EXPECT(driver != drivers.cend());
@@ -57,7 +59,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::api::Analytics::EventType eventType)
         {
-            return eventType.typeId == eventTypeId;
+            return eventType.id == eventTypeId;
         });
 
     return eventType == types.cend()
@@ -727,16 +729,16 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
-    QnUuid driverId = params.analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
+    const QString pluginId = params.getAnalyticsPluginId();
+    NX_ASSERT(!pluginId.isEmpty());
 
-    QnUuid eventTypeId = params.analyticsEventId();
-    NX_EXPECT(!eventTypeId.isNull());
+    const QString eventTypeId = params.getAnalyticsEventTypeId();
+    NX_ASSERT(!eventTypeId.isEmpty());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
+    const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
     const auto text = eventType.name.text(locale);
 
     return !text.isEmpty()

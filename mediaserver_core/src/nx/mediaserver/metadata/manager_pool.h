@@ -126,7 +126,7 @@ private:
     void fetchMetadataForResourceUnsafe(
         const QnUuid& resourceId,
         ResourceMetadataContext& context,
-        QSet<QnUuid>& eventTypeIds);
+        const QSet<QString>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const

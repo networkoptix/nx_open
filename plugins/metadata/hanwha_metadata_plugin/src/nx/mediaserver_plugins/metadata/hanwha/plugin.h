@@ -78,10 +78,10 @@ private:
     };
 
 private:
-    boost::optional<QList<QnUuid>> fetchSupportedEvents(
+    boost::optional<QList<QString>> fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
 
-    boost::optional<QList<QnUuid>> eventsFromParameters(
+    boost::optional<QList<QString>> eventTypeIdsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
         const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
         int channel) const;

@@ -46,12 +46,13 @@ class CameraManager: public nxpl::PluginInterface
 public:
     /**
      * Start fetching metadata from the resource.
-     * @param eventTypeList pointer to Guid array.
-     * @param eventTypeListSize guid array size.
+     * @param typeList List of types of events and objects as an array of C-style strings; null if
+     *     the array is empty.
+     * @param typeListSize Number of items in typeList array.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error startFetchingMetadata(
-        nxpl::NX_GUID* typeList, int typeListSize) = 0;
+        const char* const* typeList, int typeListSize) = 0;
 
     /**
      * @param handler Processes event metadata and object metadata fetched by the plugin. The
@@ -71,26 +72,26 @@ public:
     /**
      * Provides a 0-terminated UTF-8 string containing the JSON manifest.
      * @return Pointer to a C-style string which MUST be valid untill freeManifest() is invoked.
-     * JSON manifest may have one of the two schemas. First contains only event guids, e.g.:
+     * JSON manifest may have one of the two schemas. First contains only event type ids, e.g.:
      * {
      *     "supportedEventTypes":
      *     [
-     *         "{b37730fe-3e2d-9eb7-bee0-7732877ec61f}",
-     *         "{f83daede-7fae-6a51-2e90-69017dadfd62}",
+     *         "nx.lineCrossing",
+     *         "nx.faceDetected",
      *     ]
      * }
      *
-     * The second contains guids and descriptions, e.g.:
+     * The second contains ids and descriptions, e.g.:
      * {
      *     "outputEventTypes":
      *     [
      *         {
-     *             "eventTypeId": "ae197d39-2fc5-d798-abe6-07329771417f",
-     *             "eventName": { "value": "Create Recording", "localization": { } }
+     *             "eventTypeId": "nx.lineCrossing",
+     *             "eventName": { "value": "Line crossed", "localization": {} }
      *         },
      *         {
-     *             "eventTypeId": "eae2bd46-1690-0c22-8096-53ed3f90ac14",
-     *             "eventName": { "value": "Delete Recording", "localization": { } }
+     *             "eventTypeId": "nx.recordingDeleted",
+     *             "eventName": { "value": "Face detected", "localization": {} }
      *         }
      *     ]
      * }

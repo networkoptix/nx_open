@@ -58,27 +58,24 @@ QnUuid EventParameters::getParamsHash() const
     return guidFromArbitraryData(paramKey);
 }
 
-QnUuid EventParameters::analyticsEventId() const
+QString EventParameters::getAnalyticsEventTypeId() const
 {
-    return QnUuid::fromStringSafe(inputPortId);
+    return inputPortId;
 }
 
-void EventParameters::setAnalyticsEventId(const QnUuid& id)
+void EventParameters::setAnalyticsEventTypeId(const QString& id)
 {
-    inputPortId = id.toString();
+    inputPortId = id;
 }
 
-QnUuid EventParameters::analyticsDriverId() const
+QString EventParameters::getAnalyticsPluginId() const
 {
-    return metadata.instigators.empty()
-        ? QnUuid()
-        : metadata.instigators.front();
+    return analyticsPluginId;
 }
 
-void EventParameters::setAnalyticsDriverId(const QnUuid& id)
+void EventParameters::setAnalyticsPluginId(const QString& id)
 {
-    metadata.instigators.clear();
-    metadata.instigators.push_back(id);
+    analyticsPluginId = id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

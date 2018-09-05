@@ -54,9 +54,7 @@ nx::sdk::Error MetadataManager::setHandler(nx::sdk::metadata::MetadataHandler* h
     return nx::sdk::Error::noError;
 }
 
-Error MetadataManager::startFetchingMetadata(
-    nxpl::NX_GUID* typeList,
-    int typeListSize)
+Error MetadataManager::startFetchingMetadata(const char* const* typeList, int typeListSize)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
@@ -64,7 +62,7 @@ Error MetadataManager::startFetchingMetadata(
             using namespace std::chrono;
             auto packet = new CommonEventsMetadataPacket();
 
-            for (const auto& hikvisionEvent : events)
+            for (const auto& hikvisionEvent: events)
             {
                 if (hikvisionEvent.channel.is_initialized() && hikvisionEvent.channel != m_channel)
                     return;
@@ -73,8 +71,7 @@ Error MetadataManager::startFetchingMetadata(
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .arg(hikvisionEvent.caption).arg(hikvisionEvent.description).arg(m_channel));
 
-                event->setTypeId(
-                    nxpt::NxGuidHelper::fromRawData(hikvisionEvent.typeId.toRfc4122()));
+                event->setTypeId(hikvisionEvent.typeId.toStdString());
                 event->setCaption(hikvisionEvent.caption.toStdString());
                 event->setDescription(hikvisionEvent.description.toStdString());
                 event->setIsActive(hikvisionEvent.isActive);
@@ -92,9 +89,9 @@ Error MetadataManager::startFetchingMetadata(
         };
 
     NX_ASSERT(m_plugin);
-    std::vector<QnUuid> eventTypes;
+    std::vector<QString> eventTypes;
     for (int i = 0; i < typeListSize; ++i)
-        eventTypes.push_back(nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]));
+        eventTypes.push_back(typeList[i]);
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(
             m_plugin->driverManifest(), 

@@ -641,12 +641,13 @@ vms::event::EventParameters QnBusinessRuleViewModel::eventParams() const
 
 void QnBusinessRuleViewModel::setEventParams(const vms::event::EventParameters &params)
 {
-    bool hasChanges = !(m_eventParams == params);
+    const bool hasChanges = !(m_eventParams == params);
 
     if (!hasChanges)
         return;
 
-    bool hasAnalyticsChanges = m_eventParams.analyticsEventId() != params.analyticsEventId();
+    const bool hasAnalyticsChanges =
+        m_eventParams.getAnalyticsEventTypeId() != params.getAnalyticsEventTypeId();
     m_eventParams = params;
     m_modified = true;
     auto fields = Field::eventParams | Field::modified;

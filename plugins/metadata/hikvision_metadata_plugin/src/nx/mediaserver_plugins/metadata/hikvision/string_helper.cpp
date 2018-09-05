@@ -16,7 +16,7 @@ QString buildCaption(
     const Hikvision::DriverManifest& manifest,
     const HikvisionEvent& event)
 {
-    const auto descriptor = manifest.eventDescriptorById(event.typeId);
+    const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
     return descriptor.name.value;
 }
 
@@ -26,7 +26,7 @@ QString buildDescription(
 {
     using namespace nx::api;
 
-    const auto descriptor = manifest.eventDescriptorById(event.typeId);
+    const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
     auto description = descriptor.description;
     if (description.isEmpty())
         return QString();

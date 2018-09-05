@@ -250,7 +250,7 @@ QByteArray VisualMetadataDebugger::makeMetadataString(
     for (const auto& obj : detectionMetadata->objects)
     {
         str += lit("\tObject:%1,%2,%3,%4,%5,%6\n")
-            .arg(obj.objectTypeId.toString())
+            .arg(obj.objectTypeId)
             .arg(obj.objectId.toString())
             .arg(obj.boundingBox.x())
             .arg(obj.boundingBox.y())

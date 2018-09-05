@@ -14,17 +14,18 @@ class AnalyticsSdkEvent: public ProlongedEvent
     using base_type = ProlongedEvent;
 
 public:
-    AnalyticsSdkEvent(const QnResourcePtr& resource,
-        const QnUuid& driverId,
-        const QnUuid& eventId,
+    AnalyticsSdkEvent(
+        const QnResourcePtr& resource,
+        const QString& pluginId,
+        const QString& eventTypeId,
         EventState toggleState,
         const QString& caption,
         const QString& description,
         const QString& auxiliaryData,
         qint64 timeStampUsec);
 
-    const QnUuid& driverId() const;
-    const QnUuid& eventId() const;
+    QString pluginId() const;
+    const QString& eventTypeId() const;
 
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(
@@ -35,8 +36,8 @@ public:
     QString auxiliaryData() const;
 
 private:
-    const QnUuid m_driverId;
-    const QnUuid m_eventId;
+    const QString m_pluginId;
+    const QString m_eventTypeId;
     const QString m_caption;
     const QString m_description;
     const QString m_auxiliaryData;

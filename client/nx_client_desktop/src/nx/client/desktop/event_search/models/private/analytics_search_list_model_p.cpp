@@ -177,8 +177,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
     {
         case Qt::DisplayRole:
         {
-            const auto name = vms::event::AnalyticsHelper::objectName(camera(),
-                object.objectTypeId, kDefaultLocale);
+            const auto name = vms::event::AnalyticsHelper::objectTypeName(
+                camera(), object.objectTypeId, kDefaultLocale);
 
             return name.isEmpty() ? tr("Unknown object") : name;
         }
@@ -721,7 +721,8 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     auto servers = q->cameraHistoryPool()->getCameraFootageData(camera(), true);
     servers.push_back(camera()->getParentServer());
 
-    const auto allActions = vms::event::AnalyticsHelper::availableActions(servers, object.objectTypeId);
+    const auto allActions = vms::event::AnalyticsHelper::availableActions(
+        servers, object.objectTypeId);
     if (allActions.isEmpty())
         return QSharedPointer<QMenu>();
 
@@ -731,15 +732,15 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         if (!menu->isEmpty())
             menu->addSeparator();
 
-        const auto& driverId = driverActions.driverId;
+        const auto& pluginId = driverActions.pluginId;
         for (const auto& action: driverActions.actions)
         {
             const auto name = action.name.text(QString());
             menu->addAction(name,
-                [this, action, object, driverId, guard = QPointer<const Private>(this)]()
+                [this, action, object, pluginId, guard = QPointer<const Private>(this)]()
                 {
                     if (guard)
-                        executePluginAction(driverId, action, object);
+                        executePluginAction(pluginId, action, object);
                 });
         }
     }
@@ -748,7 +749,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 }
 
 void AnalyticsSearchListModel::Private::executePluginAction(
-    const QnUuid& driverId,
+    const QString& pluginId,
     const api::AnalyticsManifestObjectAction& action,
     const analytics::storage::DetectedObject& object) const
 {
@@ -780,7 +781,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
         };
 
     AnalyticsAction actionData;
-    actionData.driverId = driverId;
+    actionData.pluginId = pluginId;
     actionData.actionId = action.id;
     actionData.objectId = object.objectId;
 

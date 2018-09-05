@@ -53,7 +53,7 @@ void NaiveObjectTracker::filterAndTrack(
     outMetadataPackets->push_back(packet);
 }
 
-void NaiveObjectTracker::setObjectTypeId(const QnUuid& objectTypeId)
+void NaiveObjectTracker::setObjectTypeId(const QString& objectTypeId)
 {
     m_objectTypeId = objectTypeId;
 }
@@ -210,7 +210,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         object->setBoundingBox(toSdkRect(cached.rect));
         object->setId(toSdkGuid(cached.id));
         object->setConfidence(1);
-        object->setTypeId(toSdkGuid(m_objectTypeId));
+        object->setTypeId(m_objectTypeId.toStdString());
 
         std::vector<sdk::CommonAttribute> attributes;
         for (const auto& entry: cached.attributes)

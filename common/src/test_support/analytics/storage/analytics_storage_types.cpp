@@ -61,7 +61,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
     filter.objectTypeId.resize(nx::utils::random::number<int>(0, 5));
     std::generate(
         filter.objectTypeId.begin(), filter.objectTypeId.end(),
-        []() { return QnUuid::createUuid(); });
+        []() { return QnUuid::createUuid().toString(); });
 
     if (nx::utils::random::number<bool>())
         filter.objectId = QnUuid::createUuid();
@@ -108,7 +108,7 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
     for (int i = 0; i < eventCount; ++i)
     {
         common::metadata::DetectedObject detectedObject;
-        detectedObject.objectTypeId = QnUuid::createUuid();
+        detectedObject.objectTypeId = QnUuid::createUuid().toString();
         detectedObject.objectId = QnUuid::createUuid();
         detectedObject.boundingBox.setTopLeft(QPointF(
             nx::utils::random::number<float>(0, 1),

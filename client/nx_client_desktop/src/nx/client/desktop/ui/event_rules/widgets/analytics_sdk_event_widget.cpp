@@ -100,9 +100,9 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
+            AnalyticsSdkEventModel::DriverIdRole).value<QString>(),
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>()));
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
 
 void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
@@ -116,18 +116,18 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 
 void AnalyticsSdkEventWidget::updateSelectedEventType()
 {
-    QnUuid driverId = model()->eventParams().analyticsDriverId();
-    QnUuid eventTypeId = model()->eventParams().analyticsEventId();
+    QString pluginId = model()->eventParams().getAnalyticsPluginId();
+    QString eventTypeId = model()->eventParams().getAnalyticsEventTypeId();
 
-    if (driverId.isNull() || eventTypeId.isNull())
+    if (pluginId.isNull() || eventTypeId.isNull())
     {
-        driverId = ui->sdkEventTypeComboBox->itemData(0,
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+        pluginId = ui->sdkEventTypeComboBox->itemData(0,
+            AnalyticsSdkEventModel::DriverIdRole).value<QString>();
 
         eventTypeId = ui->sdkEventTypeComboBox->itemData(0,
-            AnalyticsSdkEventModel::EventTypeIdRole).value<QnUuid>();
+            AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();
 
-        model()->setEventParams(createEventParameters(driverId, eventTypeId));
+        model()->setEventParams(createEventParameters(pluginId, eventTypeId));
     }
 
     auto analyticsModel = ui->sdkEventTypeComboBox->model();
@@ -144,14 +144,14 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
 }
 
 nx::vms::event::EventParameters AnalyticsSdkEventWidget::createEventParameters(
-    const QnUuid& driverId,
-    const QnUuid& analyticsEventTypeId)
+    const QString& pluginId,
+    const QString& analyticsEventTypeId)
 {
     auto eventParams = model()->eventParams();
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
-    eventParams.setAnalyticsEventId(analyticsEventTypeId);
-    eventParams.setAnalyticsDriverId(driverId);
+    eventParams.setAnalyticsEventTypeId(analyticsEventTypeId);
+    eventParams.setAnalyticsPluginId(pluginId);
 
     return eventParams;
 }

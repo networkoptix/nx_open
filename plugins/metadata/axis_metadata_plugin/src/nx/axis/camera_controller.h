@@ -43,16 +43,16 @@ struct NameValueParameter
     std::string toString() const { return name + " = " + value; }
 };
 
-struct SupportedEvent
+struct SupportedEventType
 {
     std::string topic; //< e.g. "tns1:Device"
     std::string name; //< e.g. "tnsaxis:Status/Temperature/Above"
     std::string description; //< e.g. "Above operating temperature"
     bool stateful = false;
 
-    SupportedEvent() = default;
+    SupportedEventType() = default;
 
-    SupportedEvent(const char* topic, const char* name, const char* description, bool stateful):
+    SupportedEventType(const char* topic, const char* name, const char* description, bool stateful):
         topic(topic ? topic : ""),
         name(name ? name : ""),
         description(description ? description : ""),
@@ -215,7 +215,7 @@ public:
     {
         return m_supportedActions;
     }
-    const std::vector<SupportedEvent>& suppotedEvents() const noexcept
+    const std::vector<SupportedEventType>& suppotedEvents() const noexcept
     {
         return m_supportedEvents;
     }
@@ -296,7 +296,7 @@ private:
     std::string m_password;
 
     std::vector<SupportedAction> m_supportedActions;
-    std::vector<SupportedEvent> m_supportedEvents;
+    std::vector<SupportedEventType> m_supportedEvents;
     std::vector<SupportedRecipient> m_supportedRecipients;
 
     std::vector<ActiveAction> m_activeActions;

@@ -160,7 +160,7 @@ private:
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
     void addObjectTypeIdToFilter(
-        const std::vector<QnUuid>& objectTypeIds,
+        const std::vector<QString>& objectTypeIds,
         nx::sql::InnerJoinFilterFields* sqlFilter);
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,

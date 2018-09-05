@@ -50,7 +50,7 @@ public:
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
     std::vector<std::string> loadLabels(const std::string& labelFilePath) const;
-    std::vector<nxpl::NX_GUID> loadClassGuids(const std::string& guidsFilePath) const;
+    std::vector<std::string> loadClassGuids(const std::string& guidsFilePath) const;
 
     std::string buildManifestObectTypeString(const ObjectClassDescription& description) const;
 

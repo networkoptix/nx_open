@@ -18,7 +18,7 @@ public:
     ObjectDisplaySettings();
     virtual ~ObjectDisplaySettings() override;
 
-    QColor objectColor(const QnUuid& objectTypeId);
+    QColor objectColor(const QString& objectTypeId);
     QColor objectColor(const common::metadata::DetectedObject& object);
     std::vector<common::metadata::Attribute> briefAttributes(
         const common::metadata::DetectedObject& object) const;

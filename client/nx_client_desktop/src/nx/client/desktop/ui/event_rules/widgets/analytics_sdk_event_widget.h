@@ -32,8 +32,8 @@ private:
     void updateSdkEventTypesModel();
     void updateSelectedEventType();
     nx::vms::event::EventParameters createEventParameters(
-        const QnUuid& driverId,
-        const QnUuid& analyticsEventTypeId);
+        const QString& pluginId,
+        const QString& analyticsEventTypeId);
 
 private:
     QScopedPointer<Ui::AnalyticsSdkEventWidget> ui;

@@ -28,9 +28,9 @@ void* CommonObject::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nxpl::NX_GUID CommonObject::typeId() const
+const char* CommonObject::typeId() const
 {
-    return m_typeId;
+    return m_typeId.c_str();
 }
 
 float CommonObject::confidence() const
@@ -68,9 +68,9 @@ const char* CommonObject::auxilaryData() const
     return m_auxilaryData.c_str();
 }
 
-void CommonObject::setTypeId(const nxpl::NX_GUID& typeId)
+void CommonObject::setTypeId(std::string typeId)
 {
-    m_typeId = typeId;
+    m_typeId = std::move(typeId);
 }
 
 void CommonObject::setConfidence(float confidence)
@@ -93,9 +93,9 @@ void CommonObject::setAttributes(const std::vector<CommonAttribute>& value)
     m_attributes = value;
 }
 
-void CommonObject::setAuxilaryData(const std::string& auxilaryData)
+void CommonObject::setAuxilaryData(std::string auxilaryData)
 {
-    m_auxilaryData = auxilaryData;
+    m_auxilaryData = std::move(auxilaryData);
 }
 
 void CommonObject::setBoundingBox(const Rect& rect)

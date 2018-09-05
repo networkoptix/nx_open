@@ -14,8 +14,8 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin():
-    CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
+Plugin::Plugin()
+    : CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
@@ -34,7 +34,7 @@ void Plugin::initCapabilities()
         if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
         {
             NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
-                << ini().iniFile() << ": [" << pixelFormatString << "].";
+                     << ini().iniFile() << ": [" << pixelFormatString << "].";
         }
         else
         {
@@ -52,19 +52,19 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": ")json" + nxpt::toStdString(kDriverGuid) + R"json(",
-            "driverName": {
+            "pluginId": "nx.stub",
+            "pluginName": {
                 "value": "Stub Metadata Plugin"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
+                    "id": ")json" + kLineCrossingEventType + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json(",
+                    "id": ")json" + kObjectInTheAreaEventType + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -73,19 +73,20 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + nxpt::toStdString(kCarObjectGuid) + R"json(",
+                    "id": ")json" + kCarObjectType+ R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::toStdString(kHumanFaceObjectGuid) + R"json(",
+                    "id": ")json" + kHumanFaceObjectType+ R"json(",
                     "name": {
                         "value": "Human face"
                     }
                 }
             ],
-            "capabilities": ")json" + m_capabilities + R"json(",
+            "capabilities": ")json" +
+        m_capabilities + R"json(",
             "settings": {
                 "params": [
                     {
@@ -126,7 +127,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
+                        "nx.stub.car"
                     ],
                     "settings": {
                         "params": [
@@ -152,7 +153,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
+                        "nx.stub.car"
                     ]
                 }
             ]
@@ -160,13 +161,9 @@ std::string Plugin::capabilitiesManifest() const
     )json";
 }
 
-void Plugin::settingsChanged()
-{
-    NX_PRINT << __func__ << "()";
-}
+void Plugin::settingsChanged() { NX_PRINT << __func__ << "()"; }
 
-void Plugin::executeAction(
-    const std::string& actionId,
+void Plugin::executeAction(const std::string& actionId,
     nxpl::NX_GUID objectId,
     nxpl::NX_GUID /*cameraId*/,
     int64_t /*timestampUs*/,
@@ -187,9 +184,8 @@ void Plugin::executeAction(
         if (paramBIt != params.cend())
             valueB = paramBIt->second;
 
-        *outMessageToUser = std::string("Your param values are: ")
-            + "paramA: [" + valueA + "], "
-            + "paramB: [" + valueB + "]";
+        *outMessageToUser = std::string("Your param values are: ") + "paramA: [" + valueA + "], " +
+            "paramB: [" + valueB + "]";
 
         NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }

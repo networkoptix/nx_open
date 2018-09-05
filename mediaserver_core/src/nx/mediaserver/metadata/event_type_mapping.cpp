@@ -9,33 +9,34 @@ namespace metadata {
 namespace {
 
 static const std::initializer_list<
-    boost::bimap<nx::vms::api::EventType, QnUuid>::value_type> list = {
+    boost::bimap<nx::vms::api::EventType, QString>::value_type> list = {
     {
         nx::vms::api::EventType::cameraInputEvent,
-        QnUuid(lit("{dda94af6-c699-4b33-acfb-a164830430e7}"))
+        "nx.hanwha.cameraInput"
     }
 };
 
-static const boost::bimap<nx::vms::api::EventType, QnUuid> kEventTypeMapping(list.begin(), list.end());
+static const boost::bimap<nx::vms::api::EventType, QString> kEventTypeMapping(
+    list.begin(), list.end());
 
 } // namespace
 
-QnUuid guidByEventType(nx::vms::api::EventType eventType)
+QString eventTypeIdByEventType(nx::vms::api::EventType eventType)
 {
-    const auto itr = kEventTypeMapping.left.find(eventType);
-    if (itr == kEventTypeMapping.left.end())
-        return QnUuid();
+    const auto it = kEventTypeMapping.left.find(eventType);
+    if (it == kEventTypeMapping.left.end())
+        return QString();
 
-    return itr->second;
+    return it->second;
 }
 
-nx::vms::api::EventType eventTypeByGuid(const QnUuid& eventTypeGuid)
+nx::vms::api::EventType eventTypeByEventTypeId(const QString& eventTypeId)
 {
-    const auto itr = kEventTypeMapping.right.find(eventTypeGuid);
-    if (itr == kEventTypeMapping.right.end())
+    const auto it = kEventTypeMapping.right.find(eventTypeId);
+    if (it == kEventTypeMapping.right.end())
         return nx::vms::api::EventType::undefinedEvent;
 
-    return itr->second;
+    return it->second;
 }
 
 } // namespace metadata

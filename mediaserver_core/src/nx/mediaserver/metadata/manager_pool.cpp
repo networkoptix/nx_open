@@ -42,7 +42,7 @@ namespace api {
 
 uint qHash(const Analytics::EventType& t)
 {
-    return qHash(t.typeId.toByteArray());
+    return qHash(t.id);
 }
 
 } // namespace api
@@ -369,7 +369,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         }
         if (auxiliaryPluginManifest)
         {
-            auxiliaryPluginManifest->driverId = pluginManifest->driverId;
+            auxiliaryPluginManifest->pluginId = pluginManifest->pluginId;
             pluginManifest = mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
@@ -524,7 +524,7 @@ bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
 void ManagerPool::fetchMetadataForResourceUnsafe(
     const QnUuid& resourceId,
     ResourceMetadataContext& context,
-    QSet<QnUuid>& eventTypeIds)
+    const QSet<QString>& eventTypeIds)
 {
     for (auto& data: context.managers())
     {
@@ -538,7 +538,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             if (data.manager->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.driverName.value));
+                    .arg(data.manifest.pluginName.value));
             }
         }
         else
@@ -547,28 +547,35 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             if (data.manager->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.driverName.value));
+                    .arg(data.manifest.pluginName.value));
             }
 
             NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
                 .args(resourceId, eventTypeIds));
 
-            std::vector<nxpl::NX_GUID> eventTypeList;
+            std::vector<std::string> eventTypeList;
+            std::vector<const char*> eventTypePtrs;
             for (const auto& eventTypeId: eventTypeIds)
-                eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
-            auto result = data.manager->startFetchingMetadata(
-                !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
-                static_cast<int>(eventTypeList.size()));
+            {
+                eventTypeList.push_back(eventTypeId.toStdString());
+                eventTypePtrs.push_back(eventTypeList.back().c_str());
+            }                
+            const auto result = data.manager->startFetchingMetadata(
+                eventTypePtrs.empty() ? nullptr : &eventTypePtrs.front(),
+                (int) eventTypePtrs.size());
 
             if (result != Error::noError)
-                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
+            {
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
+                    .arg(data.manifest.pluginName.value));
+            }
         }
     }
 }
 
-uint qHash(const nx::api::Analytics::EventType& t)// noexcept
+static uint qHash(const nx::api::Analytics::EventType& eventType) // noexcept
 {
-    return qHash(t.typeId.toByteArray());
+    return qHash(eventType.id);
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
@@ -617,7 +624,7 @@ void ManagerPool::assignPluginManifestToServer(
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
         {
-            return m.driverId == manifest.driverId;
+            return m.pluginId == manifest.pluginId;
         });
 
     if (it == existingManifests.cend())
@@ -638,7 +645,7 @@ nx::api::AnalyticsDriverManifest ManagerPool::mergePluginManifestToServer(
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
         {
-            return m.driverId == manifest.driverId;
+            return m.pluginId == manifest.pluginId;
         });
 
     if (it == existingManifests.cend())
@@ -652,15 +659,6 @@ nx::api::AnalyticsDriverManifest ManagerPool::mergePluginManifestToServer(
             unite(manifest.outputEventTypes.toSet()).toList();
         result = &*it;
     }
-
-#if defined _DEBUG
-    // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
-    if (!manifest.outputEventTypes.empty() &&
-        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
-    {
-        it->outputEventTypes.clear();
-    }
-#endif
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
@@ -734,10 +732,7 @@ ManagerPool::loadManagerManifest(
             driverManifest->outputEventTypes.cbegin(),
             driverManifest->outputEventTypes.cend(),
             std::back_inserter(deviceManifest->supportedEventTypes),
-            [](const nx::api::Analytics::EventType& driverManifestElement)
-            {
-                return driverManifestElement.typeId;
-            });
+            [](const nx::api::Analytics::EventType& eventType) { return eventType.id; });
         return std::make_pair(deviceManifest, driverManifest);
     }
 
@@ -950,8 +945,8 @@ boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
     if (uncompressedFrameCapabilityCount > 1)
     {
         NX_ERROR(this) << lm(
-            "More than one needUncompressedVideoFrames_... capability found in manifest of \"%1\"")
-            .arg(manifest.driverId);
+            "More than one needUncompressedVideoFrames_... capability found"
+            "in manifest of metadata plugin \"%1\"").arg(manifest.pluginId);
     }
     if (uncompressedFrameCapabilityCount != 1)
         return boost::optional<PixelFormat>{};

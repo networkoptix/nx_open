@@ -397,8 +397,8 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
                     dynamicCast<QnVirtualCameraResource>();
 
                 QString eventName = camera
-                    ? m_analyticsHelper->eventName(camera,
-                        action.eventParams.analyticsEventId(),
+                    ? m_analyticsHelper->eventTypeName(camera,
+                        action.eventParams.getAnalyticsEventTypeId(),
                         qnRuntime->locale())
                     : QString();
 
