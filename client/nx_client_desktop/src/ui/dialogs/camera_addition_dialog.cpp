@@ -743,7 +743,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0)
     {
-        NX_WARNING(this, this, lm("Request failed. Status=%1").arg(status));
+        NX_WARNING(this, lm("Request failed. Status=%1").arg(status));
         setState(Initial);
         QnMessageBox::critical(this, tr("Device search failed"));
         return;
