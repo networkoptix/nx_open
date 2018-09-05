@@ -261,7 +261,7 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
 
                 // Cameras often report strange values below 0 FPS...
                 fpsList.erase(std::remove_if(fpsList.begin(), fpsList.end(),
-                    [](int fps) { return fps == 0; }));
+                    [](int fps) { return fps == 0; }), fpsList.end());
             }
         }
         else if (tag == kFixedBitrateTag)
