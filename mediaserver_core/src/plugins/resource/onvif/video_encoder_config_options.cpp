@@ -181,7 +181,8 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
         }
     }
 
-    for (const auto resolution : options.ResolutionsAvailable)
+    resolutions.reserve(options.ResolutionsAvailable.size());
+    for (const auto resolution: options.ResolutionsAvailable)
     {
         if (resolution)
             resolutions.push_back(QSize(resolution->Width, resolution->Height));
@@ -189,9 +190,10 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
 
     if (options.FrameRatesSupported)
     {
-        QString frameRatesString = QString::fromLatin1(options.GovLengthRange->c_str());
+        QString frameRatesString = QString::fromLatin1(options.FrameRatesSupported->c_str());
         QStringList frameRatesStringList =
             frameRatesString.split(" ", QString::SkipEmptyParts);
+        frameRates.reserve(frameRatesStringList.size());
         for (const auto& item : frameRatesStringList)
         {
             bool ok = false;
