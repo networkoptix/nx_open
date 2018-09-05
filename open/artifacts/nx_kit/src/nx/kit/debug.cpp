@@ -132,25 +132,6 @@ std::string printPrefix(const char* file)
 } // namespace detail
 
 //-------------------------------------------------------------------------------------------------
-// Assertions
-
-namespace detail {
-
-void assertionFailed(
-    PrintFunc printFunc, const char* conditionStr, const char* file, int line)
-{
-    NX_PRINT << "ASSERTION FAILED at line " << __LINE__ << ", file "
-        << nx::kit::debug::relativeSrcFilename(__FILE__) << ": [" << conditionStr << "]";
-
-    #if defined(_DEBUG)
-        // Crash the process to let a dump/core be generated.
-        *reinterpret_cast<volatile int*>(0) = 0;
-    #endif
-}
-
-} // namespace detail
-
-//-------------------------------------------------------------------------------------------------
 // Print info
 
 std::string toString(std::string s)

@@ -45,7 +45,7 @@ void ResourceMetadataContext::clearManagers()
         if (managerContext.manager->stopFetchingMetadata() != Error::noError)
         {
             NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                .arg(managerContext.manifest.pluginName.value));
+                .arg(managerContext.manifest.driverName.value));
         }
     }
     m_managers.clear();

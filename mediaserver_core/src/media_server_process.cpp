@@ -2638,14 +2638,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %param actions List of JSON objects, each describing a set of actions from a particular
      *         metadata plugin.
      *     %param actions[].actionIds List of action ids (strings).
-     *     %param actions[].pluginId Id of a metadata plugin which offers the actions.
+     *     %param actions[].driverId Id of a metadata plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular metadata plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param pluginId Id of a metadata plugin which offers the action.
+     * %param driverId Id of a metadata plugin which offers the action.
      * %param actionId Id of an action to execute.
      * %param objectId Id of a metadata object to which the action is applied.
      * %param cameraId Id of a camera from which the action was triggered.
