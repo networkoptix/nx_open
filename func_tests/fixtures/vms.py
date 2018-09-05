@@ -30,24 +30,24 @@ def vm_types_configuration():
     return configuration['vm_types']
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def host_os_access():
     return local_access
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
     dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)
     return dir
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def hypervisor(host_os_access):
     return VirtualBox(host_os_access)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def vm_types(request, slot, hypervisor, persistent_dir):
     vm_types = {
         vm_type_name: VMType(
@@ -106,25 +106,25 @@ def two_vm_types(request):
     return request.param
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def linux_vm(vm_types):
     with vm_types['linux'].vm_ready('single-linux') as vm:
         yield vm
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def windows_vm(vm_types):
     with vm_types['windows'].vm_ready('single-windows') as vm:
         yield vm
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def one_vm(request, one_vm_type):
     # TODO: If new VM type is added, create separate fixture for it or use factory here.
     return request.getfixturevalue(one_vm_type + '_vm')
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def two_vms(two_vm_types, hypervisor, vm_types):
     first_vm_type, second_vm_type = two_vm_types
     with vm_types[first_vm_type].vm_ready('first-{}'.format(first_vm_type)) as first_vm:
