@@ -19,7 +19,6 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = [
-    'fixtures.mediaservers',
     'fixtures.cloud',
     'fixtures.layouts',
     'fixtures.media',
@@ -29,6 +28,15 @@ pytest_plugins = [
 JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 
 _logger = logging.getLogger(__name__)
+
+
+@pytest.hookimpl()
+def pytest_plugin_registered(plugin, manager):
+    if manager.get_canonical_name(plugin) != __name__:
+        return
+    alternatives = ['fixtures.provisioned_mediaservers', 'fixtures.local_mediaservers']
+    if not any(manager.has_plugin(alternative) for alternative in alternatives):
+        manager.import_plugin(alternatives[0])
 
 
 @pytest.hookimpl(hookwrapper=True)
