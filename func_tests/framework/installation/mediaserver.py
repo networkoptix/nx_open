@@ -12,7 +12,7 @@ from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.installation.installer import InstallerSet
 from framework.installation.make_installation import make_installation
-from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
+from framework.mediaserver_api import MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess
@@ -117,7 +117,7 @@ class Mediaserver(BaseMediaserver):
         self.service = installation.service
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
+        self.api = MediaserverApi('{}:{}'.format(forwarded_address, forwarded_port), alias=name)
 
     def __str__(self):
         return 'Mediaserver {} at {}'.format(self.name, self.api.generic.http.url(''))

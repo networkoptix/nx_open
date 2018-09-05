@@ -6,7 +6,7 @@ import pytest
 import requests
 
 from framework import serving
-from framework.mediaserver_api import GenericMediaserverApi, MediaserverApiRequestError
+from framework.mediaserver_api import MediaserverApi, MediaserverApiRequestError
 
 _logger = logging.getLogger(__name__)
 
@@ -39,8 +39,8 @@ def test_no_auth(one_running_mediaserver):
 
 def test_connection_error(service_ports):
     with serving.reserved_port(service_ports[30:35]) as port:
-        api = GenericMediaserverApi.new('not a server', '127.0.0.1', port)
-        exception_info = pytest.raises(MediaserverApiRequestError, api.get, 'oi')
+        api = MediaserverApi('localhost:{}'.format(port))
+        exception_info = pytest.raises(MediaserverApiRequestError, api.generic.get, 'oi')
         _logger.info(exception_info)
 
 
@@ -53,6 +53,6 @@ def test_timeout(service_ports):
 
     server = serving.WsgiServer(app, service_ports[30:35])
     with server.serving():
-        api = GenericMediaserverApi.new('not a server', '127.0.0.1', server.port)
-        exception_info = pytest.raises(MediaserverApiRequestError, api.get, '', timeout=1)
+        api = MediaserverApi('localhost:{}'.format(server.port))
+        exception_info = pytest.raises(MediaserverApiRequestError, api.generic.get, '', timeout=1)
         _logger.info(exception_info)

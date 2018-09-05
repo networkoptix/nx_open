@@ -273,7 +273,7 @@ def test_non_existent_api_endpoints(one_running_mediaserver, path):
 
 
 def test_https_verification(one_running_mediaserver, ca):
-    url = one_running_mediaserver.api.generic.http.url('/api/ping', secure=True)
+    url = one_running_mediaserver.api.generic.http.secure_url('/api/ping')
     assert url.startswith('https://')
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(ca.cert_path))

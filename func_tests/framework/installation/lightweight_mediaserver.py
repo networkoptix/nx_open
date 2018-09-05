@@ -7,7 +7,7 @@ Libraries required by this binary are taken from mediaserver distribution, *-ser
 
 import logging
 
-from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
+from framework.mediaserver_api import MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .mediaserver import BaseMediaserver
@@ -145,7 +145,7 @@ class LwServer(object):
         self.name = name
         self.port = remote_port
         # TODO: Better construction interface.
-        self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
+        self.api = MediaserverApi('{}:{}'.format(address, local_port), alias=name)
 
     def __repr__(self):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))

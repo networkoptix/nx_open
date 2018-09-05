@@ -11,6 +11,8 @@ import six
 # noinspection PyPackageRequirements
 from Crypto.Cipher import AES
 from netaddr import EUI, IPAddress, IPNetwork
+from typing import Optional, Union
+from urllib3.util import Url, parse_url
 
 from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
@@ -80,15 +82,31 @@ class InappropriateRedirect(Exception):
         super(InappropriateRedirect, self).__init__(self, message)
 
 
-class GenericMediaserverApi(HttpApi):
+class _GenericMediaserverApi(HttpApi):
     """HTTP API that knows conventions and quirks of Mediaserver regardless of endpoint."""
 
-    @classmethod
-    def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
-        return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
+    def __init__(self, raw_base_url, alias=None, ca_cert=None):
+        # type: (Union[str, Url], Optional[str], Optional[str]) -> None
+        """
+        @param raw_base_url: Base URL, probably incomplete, `':7011'`, `'alice-pc'`,
+            `'bob:secret@'` or even `''` and `None` work. Defaults are well-known and sensible.
+            Path, query string and fragment are not preserved.
+        @param alias: Optional alias to use in logs.
+        @param ca_cert: Optional path to CA certificate to trust. If provided, default scheme is
+            HTTPS. (HTTP otherwise.)
+        """
+        incomplete_base_url = parse_url(raw_base_url)
+        complete_base_url = Url(
+            scheme=incomplete_base_url.scheme or ('https' if ca_cert else 'http'),
+            auth=incomplete_base_url.auth or (DEFAULT_API_USER + ':' + INITIAL_API_PASSWORD),
+            host=incomplete_base_url.host or 'localhost',
+            port=incomplete_base_url.port or 7001,
+            )
+        client = HttpClient(complete_base_url, ca_cert=ca_cert)
+        super(_GenericMediaserverApi, self).__init__(alias or complete_base_url.netloc, client)
 
     def __repr__(self):
-        return '<GenericMediaserverApi at {}>'.format(self.http.url(''))
+        return '<_GenericMediaserverApi at {}>'.format(self.http.url(''))
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
@@ -129,9 +147,9 @@ class GenericMediaserverApi(HttpApi):
             raise MediaserverApiError(self.alias, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
+    def request(self, method, path, timeout=None, **kwargs):
         try:
-            response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+            response = self.http.request(method, path, timeout=timeout, **kwargs)
         except (requests.Timeout, requests.ConnectionError) as e:
             raise MediaserverApiRequestError('%r: %s %r: %s' % (self, method, path, e))
         if response.is_redirect:
@@ -164,10 +182,14 @@ class TimePeriod(object):
 class MediaserverApi(object):
     """Collection of front-end methods to work with HTTP API with handy ins and outs."""
 
-    def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
-        # `.generic` should be rarely used, only when no request and/or response processing is required.
-        # Most existing usages of `.generic` should be transformed into methods hereof.
-        self.generic = generic_api
+    def __init__(self, base_url, alias=None, ca_cert=None):
+        # type: (Union[str, Url], Optional[str], Optional[str]) -> None
+        """Parameters are passed further to `_GenericMediaserverApi`."""
+
+        ## `.generic` should be rarely used, only when no request and/or response processing is
+        # required. Most existing usages of `.generic` should be transformed into methods hereof.
+        self.generic = _GenericMediaserverApi(base_url, alias=alias, ca_cert=ca_cert)
+
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
 
     def __str__(self):
