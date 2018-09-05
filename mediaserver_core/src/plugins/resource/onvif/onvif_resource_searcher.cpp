@@ -361,7 +361,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
     {
-        NX_LOG(lit("OnvifResourceSearcher::createResource: no resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("createResource: no resource type for ID = %1").arg(resourceTypeId.toString()));
         return result;
     }
 
@@ -369,7 +369,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     /*
     if (!resourceType->getAllManufacturesIncludeAncessor().contains(manufacture()))
     {
-        qDebug() << "OnvifResourceSearcher::createResource: manufacture " << resourceType->getManufacture()
+        qDebug() << "createResource: manufacture " << resourceType->getManufacture()
                  << " != " << manufacture();
         return result;
     }
@@ -384,7 +384,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
 
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()));
 
     //result->deserialize(parameters);
     result->setCommonModule(serverModule()->commonModule());

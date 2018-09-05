@@ -121,10 +121,9 @@ void SimpleMessageServerConnection::onDataSent(
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to send to %1. %2")
+        NX_VERBOSE(this, lm("Failed to send to %1. %2")
             .arg(m_socket->getForeignAddress())
-            .arg(SystemError::toString(errorCode)),
-            cl_logDEBUG2);
+            .arg(SystemError::toString(errorCode)));
     }
 
     if (!m_keepConnection)

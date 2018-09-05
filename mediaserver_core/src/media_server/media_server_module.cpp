@@ -238,6 +238,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
     m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(commonModule()));
+    m_cameraErrorProcessor = store(new nx::mediaserver::camera::ErrorProcessor(this));
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -524,4 +525,9 @@ QnAuditManager* QnMediaServerModule::auditManager() const
 QnResourceDiscoveryManager* QnMediaServerModule::resourceDiscoveryManager() const
 {
     return m_commonModule->resourceDiscoveryManager();
+}
+
+nx::mediaserver::camera::ErrorProcessor* QnMediaServerModule::cameraErrorProcessor() const
+{
+    return m_cameraErrorProcessor;
 }

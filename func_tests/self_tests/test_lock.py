@@ -5,24 +5,31 @@ from time import sleep
 
 import pytest
 
-from framework.lock import AlreadyAcquired, PortalockerLock, PosixShellFileLock
+from framework.os_access.exceptions import AlreadyAcquired
 from framework.os_access.local_shell import local_shell
+from framework.os_access.posix_access import portalocker_lock_acquired
 
 _logger = logging.getLogger(__name__)
+_default_timeout_sec = 10
 
 
 @pytest.fixture(params=['shell_flock', 'portalocker'])
 def lock(request, node_dir):
+    path = node_dir / 'shell_flock.lock'
     return {
-        'shell_flock': lambda: PosixShellFileLock(local_shell, node_dir / 'shell_flock.lock'),
-        'portalocker': lambda: PortalockerLock(node_dir / 'shell_flock.lock'),
-        }[request.param]()
+        'shell_flock':
+            lambda timeout_sec=_default_timeout_sec:
+            local_shell.lock_acquired(path, timeout_sec=timeout_sec),
+        'portalocker':
+            lambda timeout_sec=_default_timeout_sec:
+            portalocker_lock_acquired(path, timeout_sec=timeout_sec),
+        }[request.param]
 
 
 def test_already_acquired_timed_out(lock):
-    with lock.acquired():
+    with lock():
         with pytest.raises(AlreadyAcquired):
-            with lock.acquired(timeout_sec=2):
+            with lock(timeout_sec=2):
                 pass
 
 
@@ -31,7 +38,7 @@ def test_already_acquired_wait_successfully(lock):
 
     def acquire_wait_release():
         try:
-            with lock.acquired(timeout_sec=2):
+            with lock(timeout_sec=2):
                 sleep(1)
         except Exception as e:
             _logger.exception("Exception in %r.", current_thread())
@@ -51,7 +58,7 @@ def test_already_acquired_wait_successfully(lock):
 
 def _hold_lock(lock, cv):
     cv.acquire()
-    with lock.acquired():
+    with lock():
         cv.notify()
         cv.wait()
 
@@ -63,5 +70,5 @@ def test_cleanup_on_process_termination(lock):
     p.start()
     cv.wait()
     p.terminate()
-    with lock.acquired(timeout_sec=1):
+    with lock(timeout_sec=1):
         pass

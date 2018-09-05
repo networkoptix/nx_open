@@ -459,7 +459,7 @@ void QnAdamModbusIOManager::handleMonitoringError()
 
     qDebug() << "Error occured << " << error;
 
-    NX_LOG(error, cl_logDEBUG2);
+    NX_VERBOSE(this, error);
 
     if (++m_networkFaultsCounter >= kMaxNetworkFaultsNumber)
     {

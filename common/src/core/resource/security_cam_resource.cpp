@@ -263,10 +263,8 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         if (ok)
             return reservedSecondStreamFps;
 
-        NX_LOGX(
-            lm("Wrong reserved second stream fps value for camera %1")
-                .arg(getName()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Wrong reserved second stream fps value for camera %1")
+                .arg(getName()));
     }
 
     auto sharingMethod = streamFpsSharingMethod();

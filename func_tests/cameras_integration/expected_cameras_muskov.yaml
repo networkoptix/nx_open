@@ -92,3 +92,22 @@ BC-AD-28-02-62-EE:
     ins: ['1']
     outs: ['AlarmOut_0']
     connected: True
+
+  ptz_presets:
+
+
+00-09-18-50-00-D4:
+  discovery:
+    vendor: Hanwha Techwin
+    model: XNP-6040H
+
+  authorization:
+    login: admin
+    password: Samsung1
+
+  ptz_presets:
+    - {id: '2:Xstream2', position: '0-195-0-23-1'}
+    - {position: '0-150-0-20-1'}
+    - {id: '4:NxWitness4', position: '0-5-0-19-1'}
+    - {position: '0-100-0-30-1'}
+    - {id: '6:NxWitness6', position: '0-171-0-34-1'}

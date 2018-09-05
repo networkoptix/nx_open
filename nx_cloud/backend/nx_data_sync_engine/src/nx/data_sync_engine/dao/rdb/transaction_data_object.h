@@ -14,6 +14,8 @@ class TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
+    TransactionDataObject(int transactionFormatVersion);
+
     virtual nx::sql::DBResult insertOrReplaceTransaction(
         nx::sql::QueryContext* queryContext,
         const TransactionData& transactionData) override;
@@ -31,6 +33,9 @@ public:
         std::int64_t minSequence,
         std::int64_t maxSequence,
         std::vector<dao::TransactionLogRecord>* const transactions) override;
+
+private:
+    const int m_transactionFormatVersion;
 };
 
 } // namespace rdb

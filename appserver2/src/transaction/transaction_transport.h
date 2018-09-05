@@ -49,10 +49,9 @@ public:
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_bus->commonModule(), m_userAccessData, transaction.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
                 .arg(transaction.toString())
-                .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
+                .arg(remotePeer().id.toString()));
             return;
         }
         sendTransactionImpl(transaction, header);
@@ -69,18 +68,16 @@ public:
 
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
                 .arg(transaction.toString())
-                .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
+                .arg(remotePeer().id.toString()));
             return;
         }
         else if (remoteAccess == RemotePeerAccess::Partial)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check PARTIALLY failed while sending transaction %1 to peer %2")
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Permission check PARTIALLY failed while sending transaction %1 to peer %2")
                 .arg(transaction.toString())
-                .arg(remotePeer().id.toString()),
-                cl_logDEBUG1);
+                .arg(remotePeer().id.toString()));
 
             Cont<Param, A> filteredParams = transaction.params;
             td->filterByReadPermissionFunc(m_bus->commonModule(), m_userAccessData, filteredParams);
@@ -116,7 +113,7 @@ public:
         }
 #endif
         NX_ASSERT(!transaction.isLocal() || remotePeer().isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()));
 
         switch (remotePeer().dataFormat)
         {

@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 
 def pytest_addoption(parser):
     parser.addoption(
-        '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'), type=LocalPath,
+        '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'),
         help="Directory with installers of same version and customization.")
     parser.addoption(
         '--customization',
@@ -24,17 +24,22 @@ def pytest_addoption(parser):
     parser.addoption('--mediaserver-dist-path', help="Ignored.")
 
 
-@pytest.fixture(scope='session')
-def mediaserver_installers_dir(request):
-    return request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+@pytest.fixture()
+def mediaserver_installers_dir(request, metadata):
+    dir = LocalPath(request.config.getoption('--mediaserver-installers-dir'))
+    metadata['Mediaserver Installers Dir'] = dir
+    return dir
 
 
-@pytest.fixture(scope='session')
-def mediaserver_installer_set(mediaserver_installers_dir):
-    return InstallerSet(mediaserver_installers_dir)
+@pytest.fixture()
+def mediaserver_installer_set(mediaserver_installers_dir, metadata):
+    installer_set = InstallerSet(mediaserver_installers_dir)
+    metadata['Mediaserver Version'] = installer_set.version
+    metadata['Mediaserver Customization'] = installer_set.customization.customization_name
+    return installer_set
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def customization(request, mediaserver_installer_set):
     customization_from_argument = request.config.getoption('--customization')
     if customization_from_argument is not None:
@@ -87,7 +92,7 @@ def one_running_mediaserver(one_mediaserver):
     return one_mediaserver
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def required_licenses():
     return [dict(n_cameras=100)]
 

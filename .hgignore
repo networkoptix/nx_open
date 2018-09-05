@@ -5,12 +5,18 @@ syntax: glob
 .git
 tags
 TAGS
+*.swp
 *.kdev4
 .DS_Store
 .vagrant
 
 doc/html
-.tox
+doc/log.txt
+func_tests/.tox
+func_tests/.cache
+func_tests/.rnd
+func_tests/report.html
+func_tests/doc/html
 *.orig
 .vscode
 

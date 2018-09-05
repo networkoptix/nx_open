@@ -60,7 +60,7 @@ protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
-    int mFramesLost;
+    int m_framesLost;
     QnResourcePtr m_mediaResource;
 
 private:

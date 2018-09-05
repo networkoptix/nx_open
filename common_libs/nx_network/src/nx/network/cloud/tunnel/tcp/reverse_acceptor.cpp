@@ -142,8 +142,8 @@ void ReverseAcceptor::saveConnection(String hostName, nx::network::http::HttpSer
         QnMutexLocker lk(&m_dataMutex);
         if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
         {
-            NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2)")
-                .arg(m_keepAliveOptions).arg(socket), cl_logWARNING);
+            NX_WARNING(this, lm("Could not set keepAliveOptions=%1 to new socket(%2)")
+                .arg(m_keepAliveOptions).arg(socket));
 
             return;
         }
@@ -189,7 +189,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     if (hostNameIt == request.headers.end() || hostNameIt->second.isEmpty())
         return handler(nx::network::http::StatusCode::badRequest);
 
-    NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Request from: %1").arg(hostNameIt->second));
     connection->setSendCompletionHandler(
         [connection, acceptor = m_acceptor, hostName = std::move(hostNameIt->second)](
             SystemError::ErrorCode code) mutable

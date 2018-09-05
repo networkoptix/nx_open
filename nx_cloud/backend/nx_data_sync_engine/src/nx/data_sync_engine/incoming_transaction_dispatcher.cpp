@@ -5,6 +5,7 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/utils/log/log.h>
 
+#include "command_descriptor.h"
 #include "serialization/transaction_deserializer.h"
 
 namespace nx {
@@ -51,27 +52,6 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     }
 }
 
-void IncomingTransactionDispatcher::removeHandler(
-    ::ec2::ApiCommand::Value transactionType)
-{
-    std::unique_ptr<TransactionProcessorContext> processor;
-
-    {
-        QnMutexLocker lock(&m_mutex);
-
-        auto processorIter = m_transactionProcessors.find(transactionType);
-        if (processorIter == m_transactionProcessors.end())
-            return;
-        processorIter->second->markedForRemoval = true;
-
-        while (processorIter->second->usageCount.load() > 0)
-            processorIter->second->usageCountDecreased.wait(lock.mutex());
-
-        processor.swap(processorIter->second);
-        m_transactionProcessors.erase(processorIter);
-    }
-}
-
 IncomingTransactionDispatcher::WatchTransactionSubscription&
     IncomingTransactionDispatcher::watchTransactionSubscription()
 {
@@ -91,10 +71,9 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
             &commandHeader,
             transportHeader.transactionFormatVersion))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(dataSource->serializedTransaction.size()), cl_logDEBUG1);
+            .arg(dataSource->serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
@@ -117,20 +96,18 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
     // TODO: #ak put tranObject to some cache for later use
     if (!QJson::deserialize(serializedTransaction, &tranObject))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to parse json transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to parse json transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()), cl_logDEBUG1);
+            .arg(serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
     if (!QJson::deserialize(tranObject["tran"], &commandHeader))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to deserialize json transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialize json transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()), cl_logDEBUG1);
+            .arg(serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
@@ -155,12 +132,13 @@ void IncomingTransactionDispatcher::dispatchTransaction(
     QnMutexLocker lock(&m_mutex);
 
     auto it = m_transactionProcessors.find(commandHeader.command);
-    if (commandHeader.command == ::ec2::ApiCommand::updatePersistentSequence)
+    if (commandHeader.command == command::UpdatePersistentSequence::code)
         return; // TODO: #ak Do something.
+
     if (it == m_transactionProcessors.end() || it->second->markedForRemoval)
     {
         NX_VERBOSE(this, lm("Received unsupported transaction %1")
-            .arg(::ec2::ApiCommand::toString(commandHeader.command)));
+            .arg(commandHeader.command));
         // No handler registered for transaction type.
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -186,6 +164,26 @@ void IncomingTransactionDispatcher::dispatchTransaction(
             it->second->usageCountDecreased.wakeAll();
             completionHandler(resultCode);
         });
+}
+
+void IncomingTransactionDispatcher::removeHandler(int commandCode)
+{
+    std::unique_ptr<TransactionProcessorContext> processor;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        auto processorIter = m_transactionProcessors.find(commandCode);
+        if (processorIter == m_transactionProcessors.end())
+            return;
+        processorIter->second->markedForRemoval = true;
+
+        while (processorIter->second->usageCount.load() > 0)
+            processorIter->second->usageCountDecreased.wait(lock.mutex());
+
+        processor.swap(processorIter->second);
+        m_transactionProcessors.erase(processorIter);
+    }
 }
 
 } // namespace data_sync_engine

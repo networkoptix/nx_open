@@ -1,3 +1,4 @@
+import errno
 import os
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
@@ -98,3 +99,17 @@ class LocalPath(PosixPath, FileSystemPath):
 
     def copy_to(self, destination):
         destination.copy_from(self)
+
+    def take_from(self, local_source_path):
+        destination = self / local_source_path.name
+        if not local_source_path.exists():
+            raise exceptions.CannotDownload("Local file {} doesn't exist.".format(local_source_path))
+        try:
+            os.symlink(str(local_source_path), str(destination))
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+            raise exceptions.AlreadyExists(
+                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
+                destination)
+        return destination

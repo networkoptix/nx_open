@@ -37,7 +37,7 @@ public:
         module.realm = nx::network::AppInfo::realm();
         module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
-        NX_LOGX(lm("New module: %1").arg(module.id), cl_logINFO);
+        NX_INFO(this, lm("New module: %1").arg(module.id));
         return module;
     }
 

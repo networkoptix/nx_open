@@ -321,7 +321,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     {
         possibleCredentials.erase(possibleCredentials.begin() + 1, possibleCredentials.end());
         NX_WARNING(this,
-            lm("Discovery----: strict credentials list for camera %1 to 1 record. because of non zero '%2' parameter.").
+            lm("strict credentials list for camera %1 to 1 record. because of non zero '%2' parameter.").
             arg(getEndpointUrl()).
             arg(Qn::kUnauthrizedTimeoutParamName));
     }
@@ -341,11 +341,10 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     timer.restart();
     auto logTimeout = [&](bool found)
     {
-        NX_LOG(lit("Discovery----: autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
+        NX_DEBUG(this, lit("autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
             arg(getEndpointUrl()).
             arg(timer.elapsed()).
-            arg(found),
-            cl_logDEBUG1);
+            arg(found));
     };
 
     calcTimeDrift();

@@ -74,7 +74,7 @@ QnAbstractPtzController* Camera::createPtzController() const
             .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message, cl_logWARNING);
+        NX_WARNING(this, message);
     }
 
     if((capabilities & Ptz::DevicePositioningPtzCapability)
@@ -86,7 +86,7 @@ QnAbstractPtzController* Camera::createPtzController() const
             .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message.toLatin1(), cl_logERROR);
+        NX_ERROR(this, message.toLatin1());
     }
 
     return result;

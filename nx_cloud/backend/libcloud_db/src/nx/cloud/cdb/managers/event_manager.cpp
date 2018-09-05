@@ -92,7 +92,7 @@ void EventManager::subscribeToEvents(
         return;
     }
 
-    NX_LOGX(lm("System %1 subscribing to events").arg(systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("System %1 subscribing to events").arg(systemId));
 
     auto msgBody =
         std::make_unique<nx::network::http::MultipartMessageBodySource>(

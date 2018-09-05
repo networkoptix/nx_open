@@ -23,6 +23,8 @@ class NX_DATA_SYNC_ENGINE_API TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
+    TransactionDataObject(int transactionFormatVersion);
+
     virtual nx::sql::DBResult insertOrReplaceTransaction(
         nx::sql::QueryContext* queryContext,
         const TransactionData& transactionData) override;
@@ -81,6 +83,7 @@ private:
 
     QnMutex m_mutex;
     TransactionDictionary m_transactions;
+    const int m_transactionFormatVersion;
 };
 
 } // namespace memory

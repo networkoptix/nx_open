@@ -8,7 +8,7 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def os_access(one_vm):
     return one_vm.os_access
 
@@ -34,5 +34,5 @@ def test_networking(os_access):
 
 
 def test_get_set_time(os_access):
-    os_access.get_time()
-    os_access.set_time(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=100))
+    os_access.time.get()
+    os_access.time.set(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=100))

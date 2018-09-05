@@ -18,7 +18,7 @@ from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
 from framework.utils import datetime_utc_to_timestamp
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 from ..switched_logging import with_logger
 
 DEFAULT_HTTP_SCHEMA = 'http'
@@ -55,7 +55,7 @@ class BaseMediaserver(object):
                 raise Exception("Already started")
         else:
             service.start()
-            wait_for_true(
+            wait_for_truthy(
                 self.is_online,
                 description='{} is started'.format(self),
                 timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds(),
@@ -66,7 +66,7 @@ class BaseMediaserver(object):
         service = self.installation.service
         if service.is_running():
             service.stop()
-            wait_for_true(lambda: not service.is_running(), "{} stops".format(service))
+            wait_for_truthy(lambda: not service.is_running(), "{} stops".format(service))
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")

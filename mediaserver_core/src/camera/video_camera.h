@@ -48,7 +48,6 @@ public:
         bool primaryLiveStream,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
-        int cseq,
         bool iFramesOnly) = 0;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(
@@ -117,7 +116,6 @@ public:
         bool primaryLiveStream,
         qint64 skipTime,
         QnDataPacketQueue& dstQueue,
-        int cseq,
         bool iFramesOnly) override;
 
     virtual QnConstCompressedVideoDataPtr getLastVideoFrame(

@@ -12,7 +12,7 @@ from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.os_access.exceptions import CoreDumpError
-from framework.os_access.ssh_access import PhysicalSshAccess
+from framework.os_access.posix_access import PosixAccess
 from framework.utils import flatten_list
 
 _logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def host_from_config(host_config):
     host_name = host_config['name']
     return Host(
         name=host_name,
-        os_access=PhysicalSshAccess(
+        os_access=PosixAccess.to_physical_machine(
             host_name,
             host_config['address'],
             host_config['username'],

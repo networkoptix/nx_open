@@ -21,7 +21,7 @@ MediatorAddressPublisher::MediatorAddressPublisher(
     m_mediatorConnection->setOnReconnectedHandler(
         [this]()
         {
-            NX_LOGX(lm("Mediator client reported reconnect"), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Mediator client reported reconnect"));
             m_publishedAddresses.clear();
             publishAddressesIfNeeded();
         });
@@ -59,7 +59,7 @@ void MediatorAddressPublisher::updateAddresses(
             m_serverAddresses = std::move(addresses);
             if (handler)
                 m_updateHandlers.push_back(std::move(handler));
-            NX_LOGX(lm("New addresses: %1").container(m_serverAddresses), cl_logDEBUG1);
+            NX_DEBUG(this, lm("New addresses: %1").container(m_serverAddresses));
             publishAddressesIfNeeded();
         });
 }
@@ -68,27 +68,26 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
 {
     if (m_publishedAddresses == m_serverAddresses)
     {
-        NX_LOGX(lm("No need to publish addresses: they are already published. Reporting success..."),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("No need to publish addresses: they are already published. Reporting success..."));
         reportResultToTheCaller(hpm::api::ResultCode::ok);
         return;
     }
 
     if (m_isRequestInProgress)
     {
-        NX_LOGX(lm("Publish address request has already been issued. Ignoring new one..."), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Publish address request has already been issued. Ignoring new one..."));
         return;
     }
 
-    NX_LOGX(lm("Issuing bind request to mediator..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Issuing bind request to mediator..."));
 
     m_isRequestInProgress = true;
     m_mediatorConnection->bind(
         nx::hpm::api::BindRequest(m_serverAddresses),
         [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
         {
-            NX_LOGX(lm("Publish addresses (%1) completed with result %2")
-                .container(m_publishedAddresses).arg(resultCode), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Publish addresses (%1) completed with result %2")
+                .container(m_publishedAddresses).arg(resultCode));
 
             m_isRequestInProgress = false;
 

@@ -457,7 +457,7 @@ bool QnFlirEIPResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedP
 
     if (!result)
     {
-        NX_LOG(lit("Error while parsing xml (flir) %1").arg(templateFilename), cl_logWARNING);
+        NX_WARNING(this, lit("Error while parsing xml (flir) %1").arg(templateFilename));
     }
 
     return result;

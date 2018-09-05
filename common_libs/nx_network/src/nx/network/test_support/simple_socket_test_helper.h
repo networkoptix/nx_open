@@ -26,6 +26,9 @@ namespace {
 const QByteArray kTestMessage("Ping");
 const std::chrono::milliseconds kTestTimeout(5000);
 
+struct FunctionsTag{};
+const utils::log::Tag kLogTag(typeid(FunctionsTag));
+
 inline size_t testClientCount()
 {
      return nx::utils::TestOptions::applyLoadMode<size_t>(10);
@@ -36,7 +39,7 @@ template<typename Message>
 static inline void testDebugOutput(const Message& message)
 {
     if (kEnableTestDebugOutput)
-        NX_LOG(lm("nx::network::test: %1").arg(message), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lm("%1"), message);
 }
 
 } // namespace
@@ -142,7 +145,7 @@ private:
 
         auto serverAddress = m_server->getLocalAddress();
 
-        NX_LOGX(lm("Started on %1").arg(serverAddress.toString()), cl_logINFO);
+        NX_INFO(this, lm("Started on %1").arg(serverAddress.toString()));
         startedPromiseGuard.disarm();
         m_startedPromise.set_value(ServerStartResult(true, std::move(serverAddress)));
 
@@ -443,7 +446,7 @@ void socketSyncAsyncSwitch(
         << SystemError::getLastOSErrorText().toStdString();
 
     auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Server address: %1").arg(serverAddress.toString()));
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
@@ -510,7 +513,7 @@ void socketTransferFragmentation(
         << SystemError::getLastOSErrorText().toStdString();
 
     auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Server address: %1").arg(serverAddress.toString()));
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
@@ -524,7 +527,7 @@ void socketTransferFragmentation(
 
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
-        NX_LOG(lm("Start transfer %1").arg(runNumber), cl_logDEBUG1);
+        NX_DEBUG(kLogTag, lm("Start transfer %1").arg(runNumber));
         nx::utils::promise<std::tuple<SystemError::ErrorCode, size_t>> sendPromise;
         client->sendAsync(
             kMessage,
@@ -613,7 +616,7 @@ void socketMultiConnect(
         });
 
     auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Server address: %1").arg(serverAddress.toString()));
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 

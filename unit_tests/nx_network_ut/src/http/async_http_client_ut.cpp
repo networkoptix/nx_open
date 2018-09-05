@@ -182,7 +182,7 @@ protected:
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         nx::utils::promise<void> promise;
-        NX_LOGX(lm("testResult: %1").arg(url), cl_logINFO);
+        NX_INFO(this, lm("testResult: %1").arg(url));
 
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
         auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
@@ -564,7 +564,7 @@ protected:
 
                 ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
                 ASSERT_TRUE(server->listen());
-                NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
+                NX_INFO(this, lm("Server address: %1").arg(server->getLocalAddress()));
                 address.set_value(server->getLocalAddress());
 
                 auto client = server->accept();

@@ -308,7 +308,7 @@ void P2pMessageBusTestBase::waitForSync(int cameraCount)
         ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != m_servers.size() && timer.elapsed() < kMaxSyncTimeoutMs);
-    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
+    NX_INFO(this, lit("Sync data time: %1 ms").arg(timer.elapsed()));
 }
 
 void P2pMessageBusTestBase::setLowDelayIntervals()

@@ -140,7 +140,7 @@ mfxStatus AbstractMFXFrameAllocator::fa_free( mfxHDL pthis, mfxFrameAllocRespons
 //////////////////////////////////////////////////////////
 mfxStatus BaseMFXFrameAllocator::_free( mfxFrameAllocResponse* response )
 {
-    NX_LOG( QString::fromLatin1("BaseMFXFrameAllocator(%1)::_free( %2 )").arg((size_t)this, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("_free( %1 )").arg((size_t)response, 0, 16));
 
     //checking, if we created this response
     std::list<AllocResponseCtx>::iterator responseIter = m_responses.begin();
@@ -171,7 +171,7 @@ void BaseMFXFrameAllocator::allocationResponseSuccessfullyProcessed(
     const mfxFrameAllocRequest& request,
     const mfxFrameAllocResponse& response )
 {
-    NX_LOG( QString::fromLatin1("BaseMFXFrameAllocator(%1)::allocationResponseSuccessfullyProcessed").arg((size_t)this, 0, 16), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("allocationResponseSuccessfullyProcessed"));
 
     AllocResponseCtx ctx;
     ctx.response = response;
@@ -182,7 +182,7 @@ void BaseMFXFrameAllocator::allocationResponseSuccessfullyProcessed(
 
 void BaseMFXFrameAllocator::releaseRemainingFrames()
 {
-    NX_LOG( QString::fromLatin1("BaseMFXFrameAllocator(%1)::releaseRemainingFrames").arg((size_t)this, 0, 16), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("releaseRemainingFrames"));
 
     for( std::list<AllocResponseCtx>::iterator
         it = m_responses.begin();
@@ -197,8 +197,8 @@ void BaseMFXFrameAllocator::releaseRemainingFrames()
 
 bool BaseMFXFrameAllocator::getCachedResponse( mfxFrameAllocRequest* const request, mfxFrameAllocResponse* const response )
 {
-    NX_LOG( QString::fromLatin1("BaseMFXFrameAllocator(%1)::getCachedResponse( %2, %3 )").arg((size_t)this, 0, 16)
-        .arg((size_t)request, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("getCachedResponse( %1, %2 )")
+        .arg((size_t)request, 0, 16).arg((size_t)response, 0, 16));
 
     for( std::list<AllocResponseCtx>::iterator
         it = m_responses.begin();
@@ -218,7 +218,7 @@ bool BaseMFXFrameAllocator::getCachedResponse( mfxFrameAllocRequest* const reque
 
 void BaseMFXFrameAllocator::releaseFrameSurfaces( mfxFrameAllocResponse* const response )
 {
-    NX_LOG( QString::fromLatin1("BaseMFXFrameAllocator(%1)::releaseFrameSurfaces( %2 )").arg((size_t)this, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("releaseFrameSurfaces( %2 )").arg((size_t)response, 0, 16));
 
     for( int i = 0; i < response->NumFrameActual; ++i )
     {
@@ -493,7 +493,7 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     {
         mids[i] = new Direct3DSurfaceContext();
         mids[i]->surface = surfaceArray[i];
-        NX_LOG( QString::fromLatin1("Allocated IDirect3DSurface9 0x%1").arg((size_t)mids[i]->surface, 0, 16), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("Allocated IDirect3DSurface9 0x%1").arg((size_t)mids[i]->surface, 0, 16));
         mids[i]->width = request->Info.Width;
         mids[i]->height = request->Info.Height;
     }
@@ -541,7 +541,7 @@ mfxStatus MFXDirect3DSurfaceAllocator::gethdl( mfxMemId mid, mfxHDL* handle )
 {
     IDirect3DSurface9* surface = static_cast<Direct3DSurfaceContext*>(mid)->surface;
     //ULONG refCount = surface->AddRef();   //documentation says, we MUST do AddRef(), but Intel sample code does not do that...
-    //NX_LOG( QString::fromLatin1("MFXDirect3DSurfaceAllocator::gethdl. surf(%1) ref %2").arg((size_t)surface, 0, 16).arg(refCount), cl_logDEBUG2 );
+    //NX_VERBOSE(this, QString::fromLatin1("MFXDirect3DSurfaceAllocator::gethdl. surf(%1) ref %2").arg((size_t)surface, 0, 16).arg(refCount));
     *handle = surface;
     return MFX_ERR_NONE;
 }
@@ -608,8 +608,8 @@ QString MFXDirect3DSurfaceAllocator::getLastErrorText() const
 void MFXDirect3DSurfaceAllocator::deinitializeFrame( BaseFrameContext* const frameCtx )
 {
     const ULONG refCount = static_cast<Direct3DSurfaceContext*>(frameCtx)->surface->Release();
-    NX_LOG( QString::fromLatin1("MFXDirect3DSurfaceAllocator::deinitializeFrame. surf(%1) ref %2").
-        arg((size_t)static_cast<Direct3DSurfaceContext*>(frameCtx)->surface, 0, 16).arg(refCount), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("deinitializeFrame. surf(%1) ref %2").
+        arg((size_t)static_cast<Direct3DSurfaceContext*>(frameCtx)->surface, 0, 16).arg(refCount));
 }
 
 //bool MFXDirect3DSurfaceAllocator::resetDevice()

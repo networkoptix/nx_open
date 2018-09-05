@@ -65,7 +65,6 @@ enum class TimePolicy
     ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
     forceLocalTime, //< Use local time only.
     forceCameraTime, //< Use camera NPT time only.
-    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
@@ -79,7 +78,7 @@ public:
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
     qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
-    QString getResID() const { return m_resourceId; }
+    QString getResourceId() const { return m_resourceId; }
 
     void setTimePolicy(TimePolicy policy);
 

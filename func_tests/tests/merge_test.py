@@ -14,7 +14,7 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import ExplicitMergeError, INITIAL_API_PASSWORD
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def check_system_settings(server, **kw):
 
 
 def wait_for_settings_merge(one, two):
-    wait_for_true(
+    wait_for_truthy(
         lambda: one.api.get_system_settings() == two.api.get_system_settings(),
         '{} and {} response identically to /api/systemSettings'.format(one, two))
 
@@ -263,13 +263,13 @@ def test_merge_resources(two_separate_mediaservers):
 def test_restart_one_server(one, two, cloud_account, ca):
     merge_systems(one, two)
 
-    wait_for_true(one.api.servers_is_online, timeout_sec=10)
+    wait_for_truthy(one.api.servers_is_online, timeout_sec=10)
 
     # Stop Server2 and clear its database
     guid2 = two.api.get_server_id()
     two.stop()
     two.installation.cleanup(ca.generate_key_and_cert())
-    wait_for_true(one.api.neighbor_is_offline, timeout_sec=10)
+    wait_for_truthy(one.api.neighbor_is_offline, timeout_sec=10)
     two.start()
 
     # Remove Server2 from database on Server1

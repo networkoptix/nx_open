@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "התאמה אישית",
-      "description": "השתמש ב %PRODUCT_NAME% כדי להגדיר הרשאות מותאמות אישית"
+      "description": "השתמש ב %VMS_NAME% כדי להגדיר הרשאות מותאמות אישית"
     },
     "cloudAdmin": {
       "label": "מנהל",
@@ -159,7 +159,7 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "המערכת אינה זמינה",
     "offline": "השרת אינו זמין",
-    "openClient": "פתח ב- %VMS_NAME%",
+    "openClient": "פתח ב %VMS_NAME%",
     "openClientNoSystem": "פתח %VMS_NAME%",
     "confirmMergeAction": "לְמַזֵג",
     "mergeSystemTitle": "מיזוג מערכות",

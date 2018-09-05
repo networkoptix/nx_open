@@ -30,7 +30,6 @@ int MediaServerVideoCameraMock::copyLastGop(
     bool /*primaryLiveStream*/,
     qint64 /*skipTime*/,
     QnDataPacketQueue& /*dstQueue*/,
-    int /*cseq*/,
     bool /*iFramesOnly*/)
 {
     return 0;

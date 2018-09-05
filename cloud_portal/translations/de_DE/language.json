@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %PRODUCT_NAME% Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME% Clientanwendung"
     },
     "cloudAdmin": {
       "label": "Administrator",

@@ -37,8 +37,8 @@ SocketAddress DatagramPipeline::address() const
 
 void DatagramPipeline::startReceivingMessages()
 {
-    NX_LOGX(lm("startReceivingMessages. fd %1. local address %2")
-        .arg(m_socket->handle()).arg(m_socket->getLocalAddress()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("startReceivingMessages. fd %1. local address %2")
+        .arg(m_socket->handle()).arg(m_socket->getLocalAddress()));
 
     using namespace std::placeholders;
     m_readBuffer.resize(0);
@@ -99,8 +99,8 @@ void DatagramPipeline::onBytesRead(
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Error reading from socket. %1")
-            .arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error reading from socket. %1")
+            .arg(SystemError::toString(errorCode)));
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
         ioFailure(errorCode);
@@ -142,9 +142,9 @@ void DatagramPipeline::messageSent(
     NX_ASSERT(!m_sendQueue.empty());
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to send message destinationEndpoint %1. %2").
+        NX_DEBUG(this, lm("Failed to send message destinationEndpoint %1. %2").
             arg(m_sendQueue.front().destinationEndpoint.toString()).
-            arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            arg(SystemError::toString(errorCode)));
     }
     else
     {

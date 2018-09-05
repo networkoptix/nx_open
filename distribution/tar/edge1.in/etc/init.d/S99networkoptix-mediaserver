@@ -7,7 +7,7 @@ SECONDS_TO_WAIT_BEFORE_KILL_9=120
 KILL_MEDIASERVER_IF_HIGH_MEM_USAGE=1
 HIGH_MEM_USAGE_KEEP_FREE_KB=44272 #< Total memory minus the maximum allowed mediaserver memory.
 MEM_TOTAL_KB=$(cat /proc/meminfo |grep 'MemTotal' |awk '{print $2}') #< Total memory in the system.
-MAX_ALLOWED_MEM_USAGE=$(expr "$MEM_TOTAL_KB" - "$HIGH_MEM_USAGE_KEEP_FREE_KB")
+MAX_ALLOWED_MEM_USAGE_KB=$(expr "$MEM_TOTAL_KB" - "$HIGH_MEM_USAGE_KEEP_FREE_KB")
 
 SWAP_FILE="/sdcard/swapfile" #< GDB requires much RAM to process core files.
 SWAP_FILE_SIZE_MB=512
@@ -340,7 +340,7 @@ kill_mediaserver_if_high_mem_usage()
     MEM_USAGE_KB=$(cat /proc/$MSERVER_PID/status \
         |grep VmRSS |cut -d ":" -f2 |tr -d "\t " |cut -d "k" -f 1)
 
-    if [ "$MEM_USAGE_KB" -gt "$MAX_ALLOWED_MEM_USAGE" ]
+    if [ "$MEM_USAGE_KB" -gt "$MAX_ALLOWED_MEM_USAGE_KB" ]
     then
         echo "High mem usage detected: $MEM_USAGE_KB KB; killing mediaserver"
         kill -FPE "$MSERVER_PID"

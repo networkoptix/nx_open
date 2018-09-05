@@ -194,8 +194,8 @@ void AioTaskQueue::addSocketToPollset(
         if (!pollSet->add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(lm("Failed to add %1 to pollset. %2")
-                .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
+            NX_WARNING(this, lm("Failed to add %1 to pollset. %2")
+                .args(socket, SystemError::toString(errorCode)));
 
             socket->impl()->monitoredEvents[eventType].isUsed = false;
             socket->impl()->monitoredEvents[eventType].timeout = boost::none;
@@ -227,7 +227,7 @@ void AioTaskQueue::addSocketToPollset(
 
 void AioTaskQueue::removeSocketFromPollSet(Pollable* sock, aio::EventType eventType)
 {
-    //NX_LOG( QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
+    //NX_DEBUG(this, QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType));
 
     void*& userData = sock->impl()->monitoredEvents[eventType].userData;
     if (userData)
@@ -328,7 +328,7 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
 
         //TODO #ak notify second handler (if any) and if it not removed by first handler
 
-        //NX_LOG( QString::fromLatin1("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType), cl_logDEBUG1 );
+        //NX_DEBUG(this, QString::fromLatin1("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType));
 
         //no need to lock mutex, since data is removed in this thread only
         std::shared_ptr<AioEventHandlingData> handlingData =

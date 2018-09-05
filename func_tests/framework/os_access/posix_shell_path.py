@@ -48,13 +48,13 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def home(cls):
-        return cls(cls._shell.run_sh_script('echo ~').rstrip())
+        # Returning `echo ~` output doesn't work since tests may me run in environment with no
+        # `$HOME` env var, e.g. under `tox`, where `~` is not expanded by shell.
+        return cls('~').expanduser()
 
     @classmethod
     def tmp(cls):
-        temp_dir = cls('/tmp/func_tests')
-        temp_dir.mkdir(parents=True, exist_ok=True)
-        return temp_dir
+        return cls('/tmp/func_tests')
 
     def __repr__(self):
         return '<PosixShellPath {!s} on {!r}>'.format(self, self._shell)
@@ -83,12 +83,13 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         if not self.parts[0].startswith('~'):
             return self
         if self.parts[0] == '~':
-            return self.home().joinpath(*self.parts[1:])
-        user_name = self.parts[0][1:]
+            user_name = self._shell.command(['whoami']).check_output().rstrip('\n')
+        else:
+            user_name = self.parts[0][1:]
         output = self._shell.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
-        user_home_dir = output.split(':')[6]
+        user_home_dir = output.split(':')[5]
         return self.__class__(user_home_dir, *self.parts[1:])
 
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotADir})

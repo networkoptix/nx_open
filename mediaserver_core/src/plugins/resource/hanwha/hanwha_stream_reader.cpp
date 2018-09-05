@@ -82,7 +82,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     }
 
     if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
+        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
     else
         m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
 

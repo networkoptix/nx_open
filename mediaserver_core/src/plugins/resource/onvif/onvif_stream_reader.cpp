@@ -231,11 +231,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
         .arg(*streamUrl)
         .arg(m_resource->getUrl())
-        .arg(getRole()),
-        cl_logINFO);
+        .arg(getRole()));
 
     return result;
 }

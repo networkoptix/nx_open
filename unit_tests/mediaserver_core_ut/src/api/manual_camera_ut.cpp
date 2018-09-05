@@ -23,7 +23,7 @@ TEST(ManualCamera, add)
     manualCameras.password = "test password";
     manualCameras.cameras.append(camera);
 
-    NX_LOG("[TEST] Add a camera via /api/manualCamera/add.", cl_logINFO);
+    NX_INFO(this, "[TEST] Add a camera via /api/manualCamera/add.");
     NX_TEST_API_POST(&launcher, lit("/api/manualCamera/add"), manualCameras);
 
     // NOTE: We cannot easily test that the camera has been added here, because it is only

@@ -492,15 +492,13 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
 
     const QByteArray response = d->response.toString();
 
-    NX_LOG(lit("Server response to %1:\n%2").
+    NX_DEBUG(this, lit("Server response to %1:\n%2").
         arg(d->socket->getForeignAddress().address.toString()).
-        arg(QString::fromLatin1(response)),
-        cl_logDEBUG1);
+        arg(QString::fromLatin1(response)));
 
-    NX_LOG(QnLog::HTTP_LOG_INDEX,
-        lit("Sending response to %1:\n%2\n-------------------\n\n\n").
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, lit("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        arg(QString::fromLatin1(response)));
 
     QnMutexLocker lock(&d->sockMutex);
     sendData(response.constData(), response.size());
@@ -1318,7 +1316,6 @@ int QnRtspConnectionProcessor::composePlay()
                 camera,
                 usePrimaryStream,
                 0, /* skipTime */
-                d->lastPlayCSeq,
                 iFramesOnly);
         }
 
@@ -1338,8 +1335,11 @@ int QnRtspConnectionProcessor::composePlay()
         }
 
         dataQueueLock.unlock();
-        quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
-        d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
+        /**
+         * Ignore rest of the packets (in case if the previous PLAY command was used to play
+         * archive) before new position to make switch from archive to LIVE mode more quicker.
+         */
+        d->dataProcessor->setWaitCSeq(d->startTime, 0);
         d->dataProcessor->setLiveQuality(d->quality);
         d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
@@ -1459,7 +1459,6 @@ int QnRtspConnectionProcessor::composeSetParameter()
                     camera,
                     usePrimaryStream,
                     time,
-                    d->lastPlayCSeq,
                     iFramesOnly); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
@@ -1618,11 +1617,11 @@ void QnRtspConnectionProcessor::run()
         });
 
     auto metrics = commonModule()->metrics();
-    metrics->connections().rtsp()++;
+    metrics->tcpConnections().rtsp()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]()
     {
-        metrics->connections().rtsp()--;
+        metrics->tcpConnections().rtsp()--;
     });
 
 

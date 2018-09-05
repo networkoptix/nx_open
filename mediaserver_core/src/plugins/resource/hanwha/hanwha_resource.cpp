@@ -1408,8 +1408,10 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
         bool hasCapability = true;
         if (!descriptor.supportAttribute.isEmpty())
         {
-            const auto attribute = m_attributes
-                .attribute<bool>(lit("%1/%2").arg(descriptor.supportAttribute).arg(channel));
+            const auto attribute = attributes()
+                .attribute<bool>(lm("%1/%2").args(
+                    descriptor.supportAttribute,
+                    (isBypassSupported() ? 0 : channel)));
 
             hasCapability = attribute != boost::none && *attribute;
         }
@@ -1417,7 +1419,8 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
         if (!hasCapability)
             continue;
 
-        const auto parameter = m_cgiParameters.parameter(descriptor.valueParameter);
+        const auto parameters = cgiParameters();
+        const auto parameter = cgiParameters().parameter(descriptor.valueParameter);
         if (parameter == boost::none || !parameter->isValid())
             continue;
 
@@ -1460,7 +1463,10 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
 
     for (const auto& descriptor: kRangeDescriptors)
     {
-        const auto& parameters = m_cgiParameters;
+        const auto& parameters = descriptor.ptzTypes.testFlag(nx::core::ptz::Type::configurational)
+            ? cgiParameters() //< We can use bypass for configurational ptz.
+            : m_cgiParameters;
+
         if (descriptor.cgiParameter.isEmpty())
         {
             NX_ASSERT(false, "Descriptor should have main CGI parameter.");

@@ -36,7 +36,7 @@ def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     return decorator
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=3))
+@_stage(is_essential=True, timeout=timedelta(minutes=6))
 def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
     if 'mac' not in kwargs:
         kwargs['mac'] = run.id
@@ -48,7 +48,7 @@ def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=2))
+@_stage(is_essential=True, timeout=timedelta(minutes=6))
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.api.set_camera_credentials(run.data['id'], login, password)
@@ -67,7 +67,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def recording(run, fps=30, **streams):  # type: (stage.Run, int, dict) -> Generator[Result]
 
     def stream_field_and_key(key):
@@ -159,7 +159,7 @@ def _ffprobe(stream_url):
         process.kill()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
@@ -195,7 +195,7 @@ def _configure_audio(api, camera_id, camera_advanced_params, codec):
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
 
-@_stage(timeout=timedelta(minutes=3))
+@_stage(timeout=timedelta(minutes=6))
 def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; changes the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
@@ -229,7 +229,8 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage()
-def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Generator[Result]
+def io_events(run, ins, outs, connected=False):
+        # type: (stage.Run, list, list, bool) -> Generator[Result]
     expected_ports = {}
     for id in ins:
         expected_ports['id=' + id] = dict(portType='Input', inputName='Input ' + id)
@@ -257,3 +258,42 @@ def io_events(run, ins=[], outs=[], connected=False):  # type: (stage.Run) -> Ge
             yield expect_values({'eventParams.inputPortId': ins[0]}, events[-1], 'event')
         else:
             yield Failure('No input events from camera')
+
+
+PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
+PTZ_POSITION_KEYS = ('focus', 'pan', 'rotation', 'tilt', 'zoom')
+
+
+@_stage()
+def ptz_presets(run, *presets):  # type: (stage.Run, List[dict]) -> Generator[Result]
+    for name, flag in PTZ_CAPABILITY_FLAGS.items():
+        if run.data['ptzCapabilities'] & flag == 0:
+            raise KeyError('PTZ {}({:b}) capability is not supported in {:b}'.format(
+                name, flag, run.data['ptzCapabilities']))
+
+    def execute(*args, **kwargs):
+        return run.server.api.execute_ptz(run.id, *args, **kwargs)
+
+    checker = Checker()
+    for preset in presets:
+        is_logical = preset.get('is_logical', False)
+        if 'id' in preset:
+            expected = {'id=' + preset['id']: {'name': preset.get('name', preset['id'])}}
+            while not checker.expect_values(expected, execute('GetPresets'), 'presets'):
+                yield checker.result()
+
+            execute('ActivatePreset', speed=100, presetId=preset['id'])
+        else:
+            execute(
+                'AbsoluteLogicalMove' if is_logical else 'AbsoluteDeviceMove', speed=100,
+                **{k: v for k, v in zip(PTZ_POSITION_KEYS, preset['position'].split('-'))})
+
+        def get_position():
+            position = execute('GetLogicalPosition' if is_logical else 'GetDevicePosition')
+            return '-'.join(str(position.get(k)) for k in PTZ_POSITION_KEYS)
+
+        yield Halt('Wait for move to {}'.format(preset['position']))
+        while not checker.expect_values(preset['position'], get_position(), preset.get('id')):
+            yield checker.result()
+
+    yield Success()

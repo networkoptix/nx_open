@@ -93,12 +93,6 @@ public:
 
     QnRtspClient& rtspClient();
 
-    /**
-     * Trust to camera NPT clock if value is true. Remember difference between camera and local clock otherwise.
-     * Default value is false.
-     */
-    void setTrustToCameraTime(bool value);
-
     void setTimePolicy(TimePolicy timePolicy);
 
     void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
@@ -130,6 +124,8 @@ private:
         std::shared_ptr<QnRtpStreamParser> parser;
         int rtcpChannelNumber = 0;
     };
+
+    void updateTimePolicy();
 
     QnRtpStreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
@@ -191,6 +187,7 @@ private:
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
+    TimePolicy m_defaultTimePolicy {TimePolicy::bindCameraTimeToLocalTime};
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

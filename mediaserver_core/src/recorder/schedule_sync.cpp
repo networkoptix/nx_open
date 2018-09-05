@@ -45,7 +45,7 @@ void QnScheduleSync::updateLastSyncChunk()
     auto chunk = findLastSyncChunkUnsafe();
     m_syncTimePoint = chunk.startTimeMs;
     m_syncEndTimePoint = chunk.endTimeMs();
-    NX_LOG(lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint));
 }
 
 DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
@@ -61,8 +61,7 @@ DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
         prevResultChunk = resultChunk;
         resultChunk = chunkKey.chunk;
 
-        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs),
-               cl_logDEBUG2);
+        NX_VERBOSE(this, lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs));
 
         auto toCatalog = serverModule()->backupStorageManager()->getFileCatalog(
             chunkKey.cameraId,
@@ -92,10 +91,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     );
     if (!fromCatalog)
     {
-        NX_LOG(
-            lit("[QnScheduleSync::getOldestChunk] get fromCatalog failed"),
-            cl_logDEBUG1
-        );
+        NX_DEBUG(this, lit("[QnScheduleSync::getOldestChunk] get fromCatalog failed"));
         return ChunkKey();
     }
     int nextFileIndex = fromCatalog->findNextFileIndex(fromTimeMs);
@@ -218,11 +214,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             // source file's been removed by external force.
             if (fromStorage->initOrUpdate() == Qn::StorageInit_Ok)
             {   // File's gone. Log this and skip this file.
-                NX_LOG(
-                    lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
-                        .arg(fromFileFullName),
-                    cl_logWARNING
-                );
+                NX_WARNING(this, lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
+                        .arg(fromFileFullName));
                 return CopyError::SourceFileError;
             }
             else
@@ -260,9 +253,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!toFile) {
-            NX_LOG(lit("[Backup::copyFile] Target file %1 open failed")
-                        .arg(newFileName),
-                   cl_logWARNING);
+            NX_WARNING(this, lit("[Backup::copyFile] Target file %1 open failed")
+                        .arg(newFileName));
             return CopyError::TargetFileError;
         }
 
@@ -376,11 +368,11 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
     if (!serverModule()->backupStorageManager()->getOptimalStorageRoot()) {
-        NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
+        NX_DEBUG(this, "[Backup] No approprirate storages found. Bailing out.");
         return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
 
-    NX_LOG("[Backup] Starting...", cl_logDEBUG2);
+    NX_VERBOSE(this, "[Backup] Starting...");
     QnMutexLocker lock(&m_syncPointMutex);
     auto chunk = findLastSyncChunkUnsafe();
     m_syncTimePoint = chunk.startTimeMs;
@@ -392,24 +384,20 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
         if (!chunkKeyVector) {
-            NX_LOG("[Backup] chunks ended, backup done", cl_logDEBUG2);
+            NX_VERBOSE(this, "[Backup] chunks ended, backup done");
             break;
         }
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
             m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(),
                                       m_syncEndTimePoint);
-            NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint),
-                   cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint));
         }
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
             if (err != CopyError::NoError && err != CopyError::SourceFileError) {
                 m_lastError = err;
-                NX_LOG(
-                    lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
-                    cl_logWARNING
-                );
+                NX_WARNING(this, lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)));
                 switch (err) {
                 case CopyError::NoBackupStorageError:
                 case CopyError::GetCatalogError:
@@ -614,10 +602,7 @@ void QnScheduleSync::run()
                 bool hasRebuildingStorages = serverModule()->normalStorageManager()->hasRebuildingStorages();
                 if (hasRebuildingStorages)
                 {
-                    NX_LOG(
-                        lit("[Backup] Can't start because some of the source storages are being rebuilded."),
-                        cl_logDEBUG1
-                    );
+                    NX_DEBUG(this, lit("[Backup] Can't start because some of the source storages are being rebuilded."));
                 }
                 else if (!hasRebuildingStorages || m_interrupted)
                     break;
