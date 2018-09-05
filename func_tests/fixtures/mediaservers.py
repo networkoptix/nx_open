@@ -94,6 +94,11 @@ def one_running_mediaserver(one_mediaserver):
     return one_mediaserver
 
 
+@pytest.fixture()
+def one_mediaserver_api(one_running_mediaserver):
+    return one_running_mediaserver.api
+
+
 @pytest.fixture(scope='session')
 def required_licenses():
     return [dict(n_cameras=100)]
