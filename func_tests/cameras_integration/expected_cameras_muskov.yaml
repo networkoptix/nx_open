@@ -9,12 +9,12 @@
 
   after if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
+      offlineStatus: 0
       transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
 
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
+      offlineStatus: 0
       transactions: {"errors": 0, "local": [1, 2], "success": [100, 200]}
 
 
