@@ -9,6 +9,8 @@ TAGS
 *.kdev4
 .DS_Store
 .vagrant
+**/node_modules
+**/stage
 
 doc/html
 doc/log.txt
@@ -22,3 +24,11 @@ func_tests/doc/html
 
 build/*
 build-*/*
+
+cloud_portal/env
+cloud_portal/cloud/static
+cloud_portal/front_end/app/images/{favicon.ico,logo.png,logo_small.png,promo/cloud.png}
+cloud_portal/front_end/app/styles/custom
+cloud_portal/robot_tests/{geckodriver.log,venv}
+
+webadmin/static
