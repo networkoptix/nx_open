@@ -684,7 +684,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)
         {
-            return camera->getProperty(QnMediaResource::trustCameraTimeKey()).toInt() > 0;
+            return camera->isTrustCameraTime();
         });
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,

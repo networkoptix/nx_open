@@ -193,9 +193,8 @@ void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& camera
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
 {
-    const auto valueStr = boolToPropertyStr(value);
     for (const auto& camera: cameras)
-        camera->setProperty(QnMediaResource::trustCameraTimeKey(), valueStr);
+        camera->trustCameraTime(value);
 }
 
 void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)

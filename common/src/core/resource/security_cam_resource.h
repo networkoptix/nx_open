@@ -196,6 +196,9 @@ public:
     QString getFirmware() const;
     void setFirmware(const QString &firmware);
 
+    bool isTrustCameraTime() const;
+    void trustCameraTime(bool value);
+
     QString getVendor() const;
     void setVendor(const QString &value);
 

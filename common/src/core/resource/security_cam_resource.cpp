@@ -879,13 +879,24 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty( Qn::FIRMWARE_PARAM_NAME );
+    return getProperty(Qn::FIRMWARE_PARAM_NAME);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty( Qn::FIRMWARE_PARAM_NAME, firmware );
+    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
 }
+
+bool QnSecurityCamResource::isTrustCameraTime() const
+{
+    return QVariant(getProperty(Qn::TRUST_CAMERA_TIME_NAME)).toBool();
+}
+
+void QnSecurityCamResource::trustCameraTime(bool value)
+{
+    setProperty(Qn::TRUST_CAMERA_TIME_NAME, value);
+}
+
 
 QString QnSecurityCamResource::getVendor() const
 {

@@ -511,7 +511,7 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 
-    if (key == QnMediaResource::trustCameraTimeKey())
+    if (key == Qn::TRUST_CAMERA_TIME_NAME)
         updateTimePolicy();
 }
 
@@ -809,7 +809,8 @@ void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
 
 void QnMulticodecRtpReader::updateTimePolicy()
 {
-    if (m_resource && m_resource->getProperty(QnMediaResource::trustCameraTimeKey()).toInt() > 0)
+    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
+    if (secResource && secResource->isTrustCameraTime())
         m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
     else
         m_timeHelper.setTimePolicy(m_defaultTimePolicy);
