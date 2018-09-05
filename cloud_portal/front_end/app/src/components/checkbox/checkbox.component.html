@@ -1,9 +1,8 @@
-<div class="nx-checkbox">
+<label class="nx-checkbox">
     <input type="checkbox" [name]="name" [id]="id" ng-model-options="{ updateOn: 'default', debounce: 0 }">
-    <label [for]="id"
-           class="check"
-           [ngClass]="state"
-           (click)="changeState($event)">
+    <span class="check"
+          [ngClass]="state"
+          (click)="changeState($event)">
 
         <svg viewBox="0 0 20 16">
             <polygon class="box" points="2.5,2.5 2.5,13.5 13.5,13.6 13.5,2.5"></polygon>
@@ -11,10 +10,9 @@
             <polyline class="tick" points="5,7.5 8,10.5 15.5,3"></polyline>
             <line class="tristate" x1="5" y1="8" x2="11" y2="8"></line>
         </svg>
-    </label>
-    <label class="text m-0 ml-1"
-           [for]="id"
-           (click)="changeState($event)">
+    </span>
+    <span class="text m-0 ml-1"
+          (click)="changeState($event)">
         <ng-content></ng-content>
-    </label>
-</div>
+    </span>
+</label>

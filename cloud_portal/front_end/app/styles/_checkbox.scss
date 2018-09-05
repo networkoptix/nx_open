@@ -2,29 +2,28 @@
 
 /* Customize the label (the container) */
 .checkbox {
-    display: block;
-    position: relative;
-    font-size: 1em;
-    min-height: 16px;
-    padding-left: 20px !important;
-    margin-bottom: 5px;
-    font-weight: 400;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    display             : block;
+    position            : relative;
+    font-size           : 1em;
+    min-height          : 16px;
+    padding-left        : 20px !important;
+    margin-bottom       : 5px;
+    font-weight         : 400;
+    cursor              : pointer;
+    -webkit-user-select : none;
+    -moz-user-select    : none;
+    -ms-user-select     : none;
+    user-select         : none;
 
     .text {
         font-family : $font-family-regular;
         user-select : none;
+        color       : $dark9
     }
 
     /* Hide the browser's default checkbox */
     & input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
+        display : none;
     }
 
     /* When the checkbox is checked, add a blue background */
@@ -38,6 +37,28 @@
             polygon.box {
                 display : none;
             }
+        }
+    }
+
+    & input:hover ~ .checkmark {
+        svg polygon.box,
+        svg polyline.box {
+            stroke : $dark1;
+        }
+
+        & ~ .text {
+            color : $dark1;
+        }
+    }
+
+    & input:active ~ .checkmark {
+        svg polygon.box,
+        svg polyline.box {
+            stroke : $dark9 !important;
+        }
+
+        & ~ .text {
+            color : $dark9 !important;
         }
     }
 }

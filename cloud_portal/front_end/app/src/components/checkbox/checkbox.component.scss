@@ -24,6 +24,28 @@ nx-checkbox {
         input[type="checkbox"] {
             display : none;
         }
+
+        input:hover ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
+            }
+        }
     }
 }
 
@@ -31,6 +53,7 @@ nx-checkbox {
     font-family : $font-family-regular;
     cursor      : pointer;
     user-select : none;
+    color       : $dark9;
 }
 
 .check {
