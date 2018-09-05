@@ -1181,10 +1181,8 @@ State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool
     if (state.devicesDescription.hasCustomMediaPortCapability != State::CombinedValue::All)
         return state;
 
-    // TODO: #lbusygin remove or use it? (customMediaPort have 'int' type)
     const int customMediaPortValue = value ? state.expert.customMediaPortDisplayValue : 0;
-
-    state.expert.customMediaPort.setUser(value);
+    state.expert.customMediaPort.setUser(customMediaPortValue);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
