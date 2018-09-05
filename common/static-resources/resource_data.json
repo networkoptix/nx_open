@@ -2828,7 +2828,8 @@
             "Axis|AXISQ3708*",
             "AXIS|AXISQ3708*",
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
-            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*"
+            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
             ],
             "canShareLicenseGroup": true
         },
