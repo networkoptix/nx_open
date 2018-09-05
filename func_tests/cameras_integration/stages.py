@@ -241,7 +241,7 @@ def io_events(run, ins, outs, connected=False):
     while not checker.expect_values(expected_ports, run.data['ioSettings'], 'io'):
         yield checker.result()
 
-    camera_uuid = run.data['id']
+    camera_uuid = run.data['id']  # Event rules work with UUIDs only, physicalId will not work.
     run.server.api.make_event_rule(
         'userDefinedEvent', 'Undefined', 'cameraOutputAction',
         event_condition_resource=run.id, action_resource_ids=[camera_uuid])
