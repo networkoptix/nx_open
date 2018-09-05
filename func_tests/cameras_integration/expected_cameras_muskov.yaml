@@ -36,7 +36,7 @@
 
 
 00-09-18-50-C8-23:
-  discovery if version >= '3.1.1':
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     physicalId: 00-09-18-50-C8-23
     vendor: Hanwha Techwin
     model: SNZ-6320
@@ -58,7 +58,7 @@
 
 
 00-09-18-51-DE-4B:
-  discovery if version >= '3.1.1':
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     physicalId: 00-09-18-51-DE-4B
     vendor: Hanwha Techwin
     model: XND-8080RV
@@ -95,7 +95,7 @@ BC-AD-28-02-62-EE:
 
 
 00-09-18-50-00-D4:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNP-6040H
 

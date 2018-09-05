@@ -20,7 +20,7 @@
 
 
 00-09-18-4E-55-3A:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNP-6120H
 
@@ -64,7 +64,7 @@
     - {point: '127-22-1', preset: '4:NxWitness4'}
 
 00-09-18-4F-74-4E:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: PNM-9020V
 
@@ -99,7 +99,7 @@
 
 
 00-09-18-51-67-55:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: SNP-6321
 
@@ -140,7 +140,7 @@
 
 
 00-16-6C-C5-31-21:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNB-6000
 
