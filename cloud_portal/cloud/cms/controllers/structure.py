@@ -5,31 +5,35 @@ import os
 import re
 from cloud import settings
 from zipfile import ZipFile
-from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, Language
+from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, ProductType
 
 
-def find_or_add_product(name, can_preview):
+def find_or_add_product(name, can_preview, type=ProductType.PRODUCT_TYPES.cloud_portal):
     if Product.objects.filter(name=name).exists():
         product = Product.objects.get(name=name)
         product.can_preview = can_preview
+        product.product_type.type = type
     else:
         product = Product(name=name, can_preview=can_preview)
+        product_type = ProductType(type=type)
+        product_type.save()
+        product.product_type = product_type
     product.save()
     return product
 
 
-def find_or_add_context(context_name, old_name, product_id, has_language, is_global):
-    if old_name and Context.objects.filter(name=old_name, product_id=product_id).exists():
-        context = Context.objects.get(name=old_name, product_id=product_id)
+def find_or_add_context(context_name, old_name, product, has_language, is_global):
+    if old_name and Context.objects.filter(name=old_name, product=product, product_type=product.product_type).exists():
+        context = Context.objects.get(name=old_name, product=product, product_type=product.product_type)
         context.name = context_name
         context.save()
         return context
 
-    if Context.objects.filter(name=context_name, product_id=product_id).exists():
-        return Context.objects.get(name=context_name, product_id=product_id)
+    if Context.objects.filter(name=context_name, product=product, product_type=product.product_type).exists():
+        return Context.objects.get(name=context_name, product=product, product_type=product.product_type)
 
-    context = Context(name=context_name, file_path=context_name,
-                      product_id=product_id, translatable=has_language,
+    context = Context(name=context_name, file_path=context_name, product=product,
+                      product_type=product.product_type, translatable=has_language,
                       is_global=is_global)
     context.save()
     return context
@@ -53,10 +57,15 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 def update_from_object(cms_structure):
     for product in cms_structure:
         product_name = product['product']
+        product_type = ProductType.get_type_by_name(product['type'] if 'type' in product else "")
         can_preview = product['canPreview']
-        product_id = find_or_add_product(product_name, can_preview).id
 
-        default_language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language.code
+        customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+        product_model = find_or_add_product(product_name, can_preview, product_type)
+        product_model.customizations = [customization]
+        product_model.save()
+
+        default_language = customization.default_language.code
         order = 0
 
         for context_data in product['contexts']:
@@ -64,7 +73,7 @@ def update_from_object(cms_structure):
             is_global = context_data["is_global"] if "is_global" in context_data else False
             old_name = context_data["old_name"] if "old_name" in context_data else None
             context = find_or_add_context(
-                context_data["name"], old_name, product_id, has_language, is_global)
+                context_data["name"], old_name, product_model, has_language, is_global)
             if "description" in context_data:
                 context.description = context_data["description"]
             if "file_path" in context_data:
@@ -132,6 +141,7 @@ def update_from_object(cms_structure):
 def read_structure_json(filename):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
+        cms_structure[0]['product'] = settings.PRIMARY_PRODUCT
         update_from_object(cms_structure)
 
 

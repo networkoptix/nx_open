@@ -47,13 +47,12 @@ def iterate_cms_files(skin_name, ignore_not_english):
                 yield file
 
 
-def find_or_add_context_by_file(file_path, product_id, has_language):
-    if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
-        return Context.objects.get(file_path=file_path, product_id=product_id)
+def find_or_add_context_by_file(file_path, product, has_language):
+    if Context.objects.filter(file_path=file_path, product=product, product_type=product.product_type).exists():
+        return Context.objects.get(file_path=file_path, product=product, product_type=product.product_type)
     context = Context(name=file_path, file_path=file_path,
-                      product_id=product_id, translatable=has_language,
-                      hidden=True,
-                      is_global=False)
+                      product=product, product_type = product.product_type,
+                      translatable=has_language, hidden=True, is_global=False)
     context.save()
     return context
 
@@ -73,7 +72,7 @@ def read_cms_strings(filename):
         return data, set(re.findall(pattern, data))
 
 
-def read_structure_file(filename, product_id, global_strings, skin):
+def read_structure_file(filename, product, global_strings, skin):
     context_name, language_code = context_for_file(filename, skin)
 
     # now read file and get records from there.
@@ -85,7 +84,7 @@ def read_structure_file(filename, product_id, global_strings, skin):
 
     # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
-    context = find_or_add_context_by_file(context_name, product_id, bool(language_code))
+    context = find_or_add_context_by_file(context_name, product, bool(language_code))
     context_template = find_or_add_context_template(context, language_code, skin)
     context_template.template = data  # update template for this context
     context_template.save()
@@ -94,13 +93,13 @@ def read_structure_file(filename, product_id, global_strings, skin):
 
 
 def read_structure(product_name):
-    product_id = Product.objects.get(name=product_name).id
+    product = Product.objects.get(name=product_name)
     global_strings = DataStructure.objects.\
-        filter(context__is_global=True, context__product_id=product_id).\
+        filter(context__is_global=True, context__product=product).\
         values_list("name", flat=True)
     for skin in settings.SKINS:
         for file in iterate_cms_files(skin, False):
-            read_structure_file(file, product_id, global_strings, skin)
+            read_structure_file(file, product, global_strings, skin)
 
 
 
@@ -138,7 +137,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         read_languages(settings.DEFAULT_SKIN)
         if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
-            structure.find_or_add_product('cloud_portal', True)
+            structure.find_or_add_product(settings.PRIMARY_PRODUCT, True)
             default_customization = Customization(name=settings.CUSTOMIZATION,
                                                   default_language=Language.by_code('en_US'),
                                                   preview_status=0)
@@ -146,6 +145,6 @@ class Command(BaseCommand):
             default_customization.languages = [Language.by_code('en_US')]
             default_customization.save()
         structure.read_structure_json('cms/cms_structure.json')
-        read_structure('cloud_portal')
+        read_structure(settings.PRIMARY_PRODUCT)
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))

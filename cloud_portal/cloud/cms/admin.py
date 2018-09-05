@@ -33,7 +33,7 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name',)
+    list_display = ('context_actions', 'name', 'product_type')
     list_display_links = ('name',)
 
     def context_actions(self, obj):
@@ -123,12 +123,12 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'product', 'customization',
+    list_display = ('content_version_actions', 'id', 'product',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = ('product', 'customization')
+    list_filter = ('product',)
     search_fields = ('accepted_by__email', 'created_by__email')
     readonly_fields = ('created_by', 'accepted_by',)
 

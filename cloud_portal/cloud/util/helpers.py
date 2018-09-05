@@ -1,15 +1,15 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from api.models import Account
-from cms.models import customization_cache
+from cms.models import cloud_portal_customization_cache
 
 
 def get_languages(customization=None):
     if not customization:
         customization = settings.CUSTOMIZATION
 
-    return customization_cache(customization, 'default_language'), \
-        customization_cache(customization, 'languages')
+    return cloud_portal_customization_cache(customization, 'default_language'), \
+        cloud_portal_customization_cache(customization, 'languages')
 
 
 def detect_language_by_request(request):
