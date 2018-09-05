@@ -37,6 +37,7 @@ struct UpdateItem
     bool legacyUpdateUsed = false;
     bool offline = false;
     bool skipped = false;
+    bool storeUpdates = true;
     // Row in the table
     int row = -1;
 };

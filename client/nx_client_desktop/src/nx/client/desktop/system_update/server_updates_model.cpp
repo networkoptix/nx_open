@@ -179,13 +179,15 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
 
             if (m_latestVersion <= item->server->getVersion())
                 return m_versionColors.latest;
-
-            if (m_updatePlatforms.contains(item->server->getSystemInfo()))
+            else
                 return m_versionColors.target;
+
+            //if (m_updatePlatforms.contains(item->server->getSystemInfo()))
+            //    return m_versionColors.target;
 
             //if (m_updateTargets.contains(item->server->getId()))
             //    return m_versionColors.target;
-
+            // TODO: This color is for the servers that can not be updated.
             return m_versionColors.error;
         }
         else if (column == NameColumn)
@@ -214,6 +216,10 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                     break;
             }
             break;
+        case Qt::CheckStateRole:
+            if (column == StorageSettingsColumn)
+                return item->storeUpdates ? Qt::Checked : Qt::Unchecked;
+            break;
         case Qt::DecorationRole:
             if (column == NameColumn)
                 return qnResIconCache->icon(item->server);
@@ -233,6 +239,8 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
 {
     if (index.column() == ProgressColumn)
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    else if(index.column() == StorageSettingsColumn)
+        return Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return base_type::flags(index);
 }
 

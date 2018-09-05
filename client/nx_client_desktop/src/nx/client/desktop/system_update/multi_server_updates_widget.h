@@ -80,7 +80,7 @@ protected:
     void at_startUpdateAction();
     bool at_cancelCurrentAction();
 
-    void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
+    //void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
 
     void setModeLocalFile();
     void setModeSpecificBuild();
@@ -104,15 +104,15 @@ private:
         // We have no information about remote state right now.
         Initial,
         // We have obtained some state from the servers. We can do some actions now.
+        // Next action depends on m_updateSourceMode, and whether the update
+        // is available for picked update source.
         Ready,
-        // We have started legacy update process. Maybe we do not need this
-        LegacyUpdating,
         // We have issued a command to remote servers to start downloading the updates.
         RemoteDownloading,
         // Download update package locally.
         LocalDownloading,
         // Pushing local update package to server(s).
-        LocalPushing,
+        Pushing,
         // Some servers have downloaded update data and ready to install it.
         ReadyInstall,
         // Some servers are installing an update.
@@ -150,7 +150,6 @@ private:
     bool processRemoteChanges(bool force = false);
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
-
     void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
     void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
 
@@ -183,6 +182,7 @@ private:
     // Downloader needs this strange thing.
     //std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
 
+    // TODO: Move it to ServerUpdateTool
     std::future<ServerUpdateTool::UpdateCheckResult> m_updateCheck;
     nx::update::Information m_updateInfo;
     QString m_updateCheckError;
@@ -196,13 +196,8 @@ private:
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
     WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
 
-    // Was ist das?
+    // Selected changeset from 'specific build' mode.
     QString m_targetChangeset;
-    QString m_localFileName;
-
-    // URL of update path.
-    QUrl m_updateSourcePath;
-
     // Watchdog timer for the case when update has taken too long.
     std::unique_ptr<QTimer> m_longUpdateWarningTimer = nullptr;
 
