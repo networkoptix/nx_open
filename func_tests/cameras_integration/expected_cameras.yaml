@@ -58,6 +58,10 @@
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
 
+  ptz_positions if features.advanced_lens_control:
+    - {point: '192-22-1', preset: '1:NxWitness1'}
+    - {point: '37-25-2', preset: '2:WisenetWAV2'}
+    - {point: '127-22-1', preset: '4:NxWitness4'}
 
 00-09-18-4F-74-4E:
   discovery:
@@ -129,6 +133,10 @@
   io_events:
     ins: ['AlarmInput.1']
     outs: ['AlarmOutput.1']
+
+  ptz_positions if features.advanced_lens_control:
+    - {point: '195-23-1', preset: '1:NxWitness1'}
+    - {point: '279-22-1', preset: '2:NxWitness2'}
 
 
 00-16-6C-C5-31-21:
