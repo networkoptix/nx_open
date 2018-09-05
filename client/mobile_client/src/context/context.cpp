@@ -27,6 +27,8 @@
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/core/utils/operation_manager.h>
+#include <nx/vms/discovery/manager.h>
+#include <finders/systems_finder.h>
 
 using namespace nx::vms::utils;
 
@@ -228,7 +230,10 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& localSystemId, const QString& userName)
+void QnContext::removeSavedConnection(
+    const QString& systemId,
+    const QString& localSystemId,
+    const QString& userName)
 {
     using namespace nx::client::core::helpers;
 
@@ -241,7 +246,28 @@ void QnContext::removeSavedConnection(const QString& localSystemId, const QStrin
     removeCredentials(localId, userName);
 
     if (userName.isEmpty() || !hasCredentials(localId))
+    {
         removeConnection(localId);
+        if (const auto system = qnSystemsFinder->getSystem(systemId))
+        {
+            auto knownConnections = qnClientCoreSettings->knownServerConnections();
+            const auto moduleManager = commonModule()->moduleDiscoveryManager();
+            const auto servers = system->servers();
+            for (const auto info: servers)
+            {
+                const auto moduleId = info.id;
+                moduleManager->forgetModule(moduleId);
+
+                const auto itEnd = std::remove_if(knownConnections.begin(), knownConnections.end(),
+                    [moduleId](const QnClientCoreSettings::KnownServerConnection& connection)
+                    {
+                        return moduleId == connection.serverId;
+                    });
+                knownConnections.erase(itEnd, knownConnections.end());
+            }
+            qnClientCoreSettings->setKnownServerConnections(knownConnections);
+        }
+    }
 
     qnClientCoreSettings->save();
 }

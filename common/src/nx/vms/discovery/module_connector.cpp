@@ -64,6 +64,12 @@ static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
     }
 }
 
+void ModuleConnector::forgetModule(const QnUuid& id)
+{
+    dispatch(
+        [this, id]() { m_modules.erase(id); });
+}
+
 void ModuleConnector::newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id)
 {
     validateEndpoints(&endpoints);
@@ -239,7 +245,11 @@ ModuleConnector::Module::~Module()
     NX_DEBUG(this) << "Delete";
     NX_ASSERT(m_reconnectTimer.isInSelfAioThread());
     m_attemptingReaders.clear();
+    if (!m_connectedReader)
+        return;
+
     m_connectedReader.reset();
+    m_parent->m_disconnectedHandler(m_id);
 }
 
 void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> endpoints)

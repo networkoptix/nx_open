@@ -45,6 +45,7 @@ public:
     std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
     boost::optional<nx::network::SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
     boost::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
+    void forgetModule(const QnUuid& id);
 
     /**
      * Try to find module on the specified endpoint.
