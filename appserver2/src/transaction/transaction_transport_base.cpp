@@ -255,7 +255,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor for object = %1").arg((size_t) this,  0, 16));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Constructor"));
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
@@ -277,7 +277,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Destructor for object = %1").arg((size_t) this,  0, 16));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("Destructor"));
 
     stopWhileInAioThread();
 
