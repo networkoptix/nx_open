@@ -1,4 +1,4 @@
-# Full logging configuration - log everything except some common utilities
+# Almost Full logging configuration - full minus some stdout/stderr/wait debugs
 
 version: 1
 disable_existing_loggers: false
@@ -11,10 +11,13 @@ handlers:
     level: DEBUG
     formatter: default
     stream: ext://sys.stderr
+
 loggers:
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   parse: {level: INFO}
+  framework.vms.hypervisor.virtual_box.manage: {level: INFO}
+
 root:
   level: DEBUG  # Default is `WARNING`.
   handlers: [stderr]
