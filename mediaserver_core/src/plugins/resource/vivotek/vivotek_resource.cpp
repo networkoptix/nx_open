@@ -88,21 +88,19 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
 }
 
 CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
-    Qn::ConnectionRole role,
-    const QnLiveStreamParams& params)
+    Qn::ConnectionRole role)
 {
     bool success = true;
-    const bool isHevcCodec = params.codec.compare(kHevcCodecString, Qt::CaseInsensitive) == 0;
-    if (isHevcCodec && streamSupportsHevc(role))
+    if (streamSupportsHevc(role))
         success = setHevcForStream(role);
 
     if (!success)
     {
         return CameraDiagnostics::RequestFailedResult(
             lit("Set HEVC for stream %1")
-                .arg(role == Qn::ConnectionRole::CR_LiveVideo
-                    ? lit("primary")
-                    : lit("secondary")),
+            .arg(role == Qn::ConnectionRole::CR_LiveVideo
+                ? lit("primary")
+                : lit("secondary")),
             lit("Request failed."));
     }
 

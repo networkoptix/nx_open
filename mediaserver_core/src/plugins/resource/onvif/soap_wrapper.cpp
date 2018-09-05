@@ -40,7 +40,6 @@ namespace {
     static PasswordHelper passwordHelper;
 } // namespace
 
-
 //SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
 //{
 //    {"SOAP-ENV", "http://www.w3.org/2003/05/soap-envelope", "http://schemas.xmlsoap.org/soap/envelope/", NULL},
@@ -495,8 +494,9 @@ DEFINE_RESPONSE_TRAITS(Media2, GetVideoEncoderConfigurationOptions)
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //
 
-DeviceIOWrapper::DeviceIOWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceIOBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+DeviceIOWrapper::DeviceIOWrapper(const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
+    SoapWrapper<DeviceIOBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -716,8 +716,9 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 // -------------------------------------------------------------------------- //
 // Media2SoapWrapper
 // -------------------------------------------------------------------------- //
-Media2SoapWrapper::Media2SoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive) :
-    SoapWrapper<Media2BindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
+Media2SoapWrapper::Media2SoapWrapper(const SoapTimeouts& timeouts,
+    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive) :
+    SoapWrapper<Media2BindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 
 }

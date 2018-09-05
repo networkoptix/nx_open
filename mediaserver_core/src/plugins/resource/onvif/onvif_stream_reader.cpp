@@ -144,14 +144,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
                 m_onvifRes->getPhysicalId(), m_streamUrl));
 
             *streamUrl = m_streamUrl;
-            return m_onvifRes->customStreamConfiguration(getRole(), params);
+            return m_onvifRes->customStreamConfiguration(getRole());
         }
     }
 
     m_onvifRes->beforeConfigureStream(getRole());
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired, params);
-    m_onvifRes->customStreamConfiguration(getRole(), params);
+    m_onvifRes->customStreamConfiguration(getRole());
     m_onvifRes->afterConfigureStream(getRole());
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError)

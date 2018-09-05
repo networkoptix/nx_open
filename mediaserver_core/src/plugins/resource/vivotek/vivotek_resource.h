@@ -38,8 +38,7 @@ public:
         const CapabilitiesResp& onvifCapabilities) override;
 
     virtual CameraDiagnostics::Result customStreamConfiguration(
-        Qn::ConnectionRole role,
-        const QnLiveStreamParams& params) override;
+        Qn::ConnectionRole role) override;
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;

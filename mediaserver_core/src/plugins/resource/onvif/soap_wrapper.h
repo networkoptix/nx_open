@@ -90,7 +90,6 @@ struct SoapTimeouts
     std::chrono::seconds acceptTimeoutSeconds;
 };
 
-
 struct soap;
 class DeviceBindingProxy;
 //class DeviceIOBindingProxy;
@@ -480,17 +479,18 @@ private:
 
 struct RequestParams
 {
+    SoapTimeouts timeouts;
     std::string endpoint;
     QString login;
     QString passwd;
     int timeDrift = 0;
     bool tcpKeepAlive = false;
     RequestParams() = default;
-    RequestParams(std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false):
-        endpoint(std::move(endpoint)), login(std::move(login)), passwd(std::move(passwd)),
+    RequestParams(const SoapTimeouts& timeouts, std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false):
+        timeouts(timeouts), endpoint(std::move(endpoint)), login(std::move(login)), passwd(std::move(passwd)),
         timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
-    RequestParams(std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false):
-        endpoint(std::move(endpoint)), login(auth.user()), passwd(auth.password()),
+    RequestParams(const SoapTimeouts& timeouts, std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false):
+        timeouts(timeouts), endpoint(std::move(endpoint)), login(auth.user()), passwd(auth.password()),
         timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
 };
 
@@ -621,8 +621,8 @@ public:
     using Request = typename ResponseTraits<Response>::Request;
 
     explicit ResponseWrapper(RequestParams params):
-        m_wrapper(std::move(params.endpoint), std::move(params.login), std::move(params.passwd),
-            params.timeDrift, params.tcpKeepAlive)
+        m_wrapper(params.timeouts, std::move(params.endpoint), std::move(params.login),
+            std::move(params.passwd), params.timeDrift, params.tcpKeepAlive)
     {
         m_response.soap_default(m_response.soap);
     }
@@ -805,7 +805,13 @@ public:
 class Media2SoapWrapper : public SoapWrapper<Media2BindingProxy>
 {
 public:
-    Media2SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    Media2SoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
     virtual ~Media2SoapWrapper();
 
     int getVideoEncoderConfigurationOptions(VideoOptionsResp2& response);
