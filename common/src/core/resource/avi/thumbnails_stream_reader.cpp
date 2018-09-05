@@ -93,10 +93,7 @@ void QnThumbnailsStreamReader::run()
         if (data==0 && !m_needStop)
         {
             setNeedKeyData();
-            m_framesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
+            m_stat[0].onEvent(CL_STREAM_ISSUE);
             msleep(30);
             continue;
         }

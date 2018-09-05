@@ -278,11 +278,6 @@ void QnLiveStreamProvider::updateSoftwareMotion()
         QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
 }
 
-bool QnLiveStreamProvider::canChangeStatus() const
-{
-    return m_role == Qn::CR_LiveVideo;
-}
-
 float QnLiveStreamProvider::getDefaultFps() const
 {
     float maxFps = m_cameraRes->getMaxFps();

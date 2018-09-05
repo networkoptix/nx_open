@@ -69,11 +69,6 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     return std::dynamic_pointer_cast<QnAbstractMediaData>(result);
 }
 
-bool QnVMax480LiveProvider::canChangeStatus() const
-{
-    return false; // do not allow to ancessor update status
-}
-
 CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(
     bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {

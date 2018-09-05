@@ -362,12 +362,12 @@ bool ThirdPartyStreamReader::isStreamOpened() const
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
-int ThirdPartyStreamReader::getLastResponseCode() const
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamResult() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
-    return m_liveStreamReader
-        ? nx::network::http::StatusCode::ok
-        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx::network::http::StatusCode::ok);
+    if (!m_liveStreamReader && m_builtinStreamReader)
+        return m_builtinStreamReader->openStreamResult();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const
