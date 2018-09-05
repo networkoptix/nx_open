@@ -239,6 +239,7 @@ should not allow to access /register/success /activate/success by direct input
     Location Should Be    ${url}/
 
 Cannot register email that is already registered
+    [tags]    C41563
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -247,6 +248,7 @@ Cannot register email that is already registered
     Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
 
 Cannot register email that is already activated
+    [tags]    C41563
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
