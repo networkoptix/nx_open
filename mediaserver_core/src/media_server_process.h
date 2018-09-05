@@ -225,7 +225,7 @@ private:
     void loadResourcesFromDatabase();
     void updateRootPassword();
     void createResourceProcessor();
-
+    void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
 private:
     int m_argc = 0;
     char** m_argv = nullptr;

@@ -2366,7 +2366,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         emit storageFailure(fileStorage, nx::vms::api::EventReason::storageIoError);
 }
 
-void QnStorageManager::checkWritableStoragesExists()
+void QnStorageManager::checkWritableStoragesExist()
 {
     auto hasFastScanned = [this]()
         {
@@ -2411,7 +2411,7 @@ void QnStorageManager::startAuxTimerTasks()
     {
         static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
         m_auxTasksTimerManager.addNonStopTimer(
-            [this](nx::utils::TimerId) { checkWritableStoragesExists(); },
+            [this](nx::utils::TimerId) { checkWritableStoragesExist(); },
             kCheckStoragesAvailableInterval,
             kCheckStoragesAvailableInterval);
     }
