@@ -115,6 +115,25 @@ NX_KIT_API std::ostream*& stream();
     if (!(NX_DEBUG_ENABLE_OUTPUT)) {} else NX_PRINT
 
 //-------------------------------------------------------------------------------------------------
+// Assertions
+
+/**
+ * If the condition is false, log the failure with NX_PRINT, and in debug build (i.e. _DEBUG is
+ * defined), crash the process to let a dump/core be generated.
+ *
+ * ATTENTION: Unlike std library assert(), the condition is checked even in Release build to log
+ * the failure.
+ */
+#define NX_KIT_ASSERT(CONDITION) do \
+{ \
+    if (!(CONDITION)) \
+    { \
+        nx::kit::debug::detail::assertionFailed( \
+            NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, __FILE__, __LINE__); \
+    } \
+} while (0)
+
+//-------------------------------------------------------------------------------------------------
 // Print info
 
 /**
@@ -253,6 +272,9 @@ typedef std::function<void(const char*)> PrintFunc;
 
 /** @param file Supply __FILE__. */
 NX_KIT_API std::string printPrefix(const char* file);
+
+NX_KIT_API void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const char* file, int line);
 
 class NX_KIT_API Timer
 {
