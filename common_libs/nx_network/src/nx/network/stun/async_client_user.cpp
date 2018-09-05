@@ -9,15 +9,11 @@ namespace stun {
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
-    NX_VERBOSE(this, "Constructor");
-
     m_client->addOnReconnectedHandler(
         [this, guard = m_asyncGuard.sharedGuard()]()
         {
             if (auto lock = guard->lock())
                 return post(std::bind(&AsyncClientUser::reportReconnect, this));
-
-            NX_DEBUG(this, lm("Ignoring reconnect handler"));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -55,9 +51,6 @@ void AsyncClientUser::sendRequest(
                         handler(code, std::move(message));
                     });
             }
-
-            NX_DEBUG(this, lm("Ignore response %1 handler")
-                .arg(message.header.transactionId.toHex()));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -72,8 +65,6 @@ bool AsyncClientUser::setIndicationHandler(
         {
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
-
-            NX_DEBUG(this, lm("Ignore indication %1 handler").arg(message.header.method));
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -93,8 +84,6 @@ bool AsyncClientUser::setConnectionTimer(
         {
             if (auto lock = guard->lock())
                 return post(std::move(handler));
-
-            NX_DEBUG(this, lm("Ignoring timer handler"));
         },
         m_asyncGuard.sharedGuard().get());
 }
