@@ -11,10 +11,10 @@ from framework.waiting import retry_on_exception
 _logger = logging.getLogger(__name__)
 
 
-def test_port_open(windows_vm):
+def test_port_open(windows_vm_info):
     """Port is open even if OS is still booting."""
-    hostname = windows_vm.port_map.remote.address
-    port = windows_vm.port_map.remote.tcp(5985)
+    hostname = windows_vm_info.port_map.remote.address
+    port = windows_vm_info.port_map.remote.tcp(5985)
     client = socket.socket()
     # Forcefully reset connection when closed.
     # Otherwise, there are FIN-ACK and ACK from other connection before normal handshake in Wireshark.
@@ -30,9 +30,9 @@ def test_port_open(windows_vm):
             timeout_sec=300)
 
 
-def test_http_is_understood(windows_vm):
-    hostname = windows_vm.port_map.remote.address
-    port = windows_vm.port_map.remote.tcp(5985)
+def test_http_is_understood(windows_vm_info):
+    hostname = windows_vm_info.port_map.remote.address
+    port = windows_vm_info.port_map.remote.tcp(5985)
     url = 'http://{}:{}/wsman'.format(hostname, port)
     response = retry_on_exception(
         lambda: requests.get(url),

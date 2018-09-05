@@ -1,4 +1,6 @@
-# Full logging configuration - log everything except some common utilities
+# Default logging configuration.
+# See: https://docs.python.org/2/library/logging.config.html#dictionary-schema-details.
+# Structure is exactly as `logging.config.dictConfig` accepts.
 
 version: 1
 disable_existing_loggers: false
