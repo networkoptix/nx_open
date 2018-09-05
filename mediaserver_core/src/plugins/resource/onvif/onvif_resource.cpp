@@ -1782,7 +1782,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     if (!digitalInputs && digitalInputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
         NX_DEBUG(this, lit("Failed to get relay digital input list. endpoint %1")
-            .arg(QString::fromLatin1(digitalInputs.endpoint())));
+            .arg(digitalInputs.endpoint()));
         return true;
     }
 
@@ -3891,7 +3891,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOut
     //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     if (!relayOutputs && relayOutputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
-        NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(QString::fromLatin1(relayOutputs.endpoint())));
+        NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputs.endpoint()));
         return false;
     }
     auto data = relayOutputs.get();
@@ -3900,7 +3900,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOut
     if (data->RelayOutputs.size() > MAX_IO_PORTS_PER_DEVICE)
     {
         NX_DEBUG(this, lit("Device has too many relay outputs. endpoint %1")
-            .arg(QString::fromLatin1(relayOutputs.endpoint())));
+            .arg(relayOutputs.endpoint()));
         return false;
     }
 
@@ -3917,7 +3917,7 @@ bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOut
         *relayOutputInfoList = m_relayOutputInfo;
 
     NX_DEBUG(this, lit("Successfully got device (%1) output ports info. Found %2 relay output").
-        arg(QString::fromLatin1(relayOutputs.endpoint())).arg(m_relayOutputInfo.size()));
+        arg(relayOutputs.endpoint()).arg(m_relayOutputInfo.size()));
 
     return true;
 }
