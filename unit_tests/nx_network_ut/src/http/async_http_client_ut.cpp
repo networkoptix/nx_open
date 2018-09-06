@@ -248,6 +248,8 @@ private:
     void postSomeBody(bool includeContentLength)
     {
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         client->setRequestBody(std::make_unique<TestMessageBody>(
             "plain/text",
             "Hello, world",
@@ -259,8 +261,6 @@ private:
             [&promise]() { promise.set_value(); });
 
         promise.get_future().wait();
-
-        client->pleaseStopSync();
     }
 
     void onRequestReceived(
@@ -324,11 +324,12 @@ static void testHttpClientForFastRemove(const nx::utils::Url& url)
     for (uint time = 10; time < 500000; time *= 2)
     {
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         client->doGet(url);
 
         // kill the client after some delay
         std::this_thread::sleep_for(std::chrono::microseconds(time));
-        client->pleaseStopSync();
     }
 }
 } // namespace
@@ -351,9 +352,10 @@ TEST_F(HttpClientAsync, FastRemoveBadHost)
     for (int i = 0; i < 99; ++i)
     {
         const auto client = std::make_unique<nx::network::http::AsyncClient>();
+        auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
         client->doGet(url);
         std::this_thread::sleep_for(std::chrono::microseconds(100));
-        client->pleaseStopSync();
     }
 }
 
@@ -631,8 +633,7 @@ TEST_F(HttpClientAsyncCustom, ConnectionBreak)
 
     start(kResponse, true);
     auto client = std::make_unique<nx::network::http::AsyncClient>();
-    auto clientGuard = nx::utils::makeScopeGuard(
-        [&client]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     testGet(client.get(), "test",
         [](nx::network::http::AsyncClient* client)
@@ -675,6 +676,8 @@ TEST_F(HttpClientAsyncCustom, DISABLED_cameraThumbnail)
 
     start(kResponseHeader + kResponseBody, false);
     auto client = std::make_unique<nx::network::http::AsyncClient>();
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
     for (size_t i = 0; i < 5; ++i)
     {
         testGet(client.get(), kRequestQuery,
