@@ -37,6 +37,11 @@ def host_os_access():
 
 
 @pytest.fixture(scope='session')
+def runner_address(hypervisor):
+    return hypervisor.runner_address
+
+
+@pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
     dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)

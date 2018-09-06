@@ -5,6 +5,7 @@ from flask import Flask, request, send_file
 from werkzeug.exceptions import BadRequest, SecurityError
 
 from defaults import defaults
+from framework.cloud_host import resolve_cloud_host_from_registry
 from framework.installation.installer import InstallerSet
 from framework.os_access.local_path import LocalPath
 from framework.serving import WsgiServer
@@ -53,22 +54,22 @@ def _make_updates_wsgi_app(updates_dir, range_header_policy='support'):
 
 
 @pytest.fixture()
-def updates_server_url(service_ports, updates_dir, one_mediaserver):
+def updates_server_url(service_ports, updates_dir, runner_address):
     app = _make_updates_wsgi_app(updates_dir)
 
     wsgi_server = WsgiServer(app, service_ports[10:15])
     # When port is bound and it's known how to access server's address and port, generate.
-    base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, wsgi_server.port)
+    base_url = 'http://{}:{}'.format(runner_address, wsgi_server.port)
     with wsgi_server.serving():
         yield base_url + '/'
 
 
 @pytest.fixture()
-def update_info(updates_dir, updates_server_url, cloud_host):
+def update_info(updates_dir, updates_server_url):
     installer_set = InstallerSet(updates_dir)
     return {
         'version': str(installer_set.version),
-        'cloudHost': cloud_host,
+        'cloudHost': resolve_cloud_host_from_registry('test', installer_set.customization.customization_name),
         'eulaLink': 'http://new.eula.com/eulaText',
         'eulaVersion': 1,
         'releaseNotesUrl': 'http://www.networkoptix.com/all-nx-witness-release-notes',
