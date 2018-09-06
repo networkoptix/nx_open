@@ -56,7 +56,8 @@ class _SSHRun(Run):
         self._logger = logger
 
     def __str__(self):
-        addr, port = self._channel.getpeername()
+        peer_address = self._channel.getpeername()
+        addr, port = peer_address[:2]  # for ipv6 we get (host, port, flowinfo, scopeid)
         return '%s:%d' % (addr, port)
 
     @property
