@@ -26,9 +26,9 @@ class Shell(object):
         self._protocol.close_shell(self._shell_id)
         self._shell_id = None
 
-    def start(self, args):
+    def start(self, args, logger=None):
         assert self._shell_id is not None, "Shell is not opened, use shell with `with` clause"
-        return _WinRMCommand(self._protocol, self._shell_id, args)
+        return _WinRMCommand(self._protocol, self._shell_id, args, logger=logger or _logger)
 
 
 class _WinRMCommandOutcome(CommandOutcome):
@@ -63,12 +63,13 @@ class _WinRMCommandOutcome(CommandOutcome):
 
 
 class _WinRMRun(Run):
-    def __init__(self, protocol, shell_id, args):
+    def __init__(self, protocol, shell_id, args, logger):
 
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
-        _logger.getChild('command').debug(' '.join(args))
+        self._logger = logger
+        self._logger.getChild('command').debug(' '.join(args))
 
         req = {
             'env:Envelope': self._protocol._get_soap_header(
@@ -101,15 +102,14 @@ class _WinRMRun(Run):
 
     @property
     def logger(self):
-        # TODO: pass local logger to constructor and return here
-        return _logger
+        return self._logger
 
     def send(self, stdin_bytes, is_last=False):
         # See: https://msdn.microsoft.com/en-us/library/cc251742.aspx.
         assert not self._is_done
-        _logger.getChild('stdin.size').debug(len(stdin_bytes))
+        self._logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
-            _logger.getChild('stdin.data').debug(bytes(stdin_bytes).decode(errors='backslashreplace'))
+            self._logger.getChild('stdin.data').debug(bytes(stdin_bytes).decode(errors='backslashreplace'))
         # noinspection PyProtectedMember
         rq = {
             'env:Envelope': self._protocol._get_soap_header(
@@ -129,9 +129,9 @@ class _WinRMRun(Run):
         try:
             stdin_text = bytes(stdin_bytes).decode('ascii')
         except UnicodeDecodeError:
-            _logger.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
+            self._logger.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
         else:
-            _logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
+            self._logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
         return sent_bytes
 
     @property
@@ -142,7 +142,7 @@ class _WinRMRun(Run):
         # TODO: Support timeouts.
         if self._is_done:
             return None, None
-        _logger.getChild('stdout').debug("Receive.")
+        self._logger.getChild('stdout').debug("Receive.")
         # noinspection PyProtectedMember
         stdout_chunk, stderr_chunk, exit_code, is_done = self._protocol._raw_get_command_output(
             self._shell_id, self._command_id)
@@ -154,10 +154,10 @@ class _WinRMRun(Run):
             self._is_done = True
         else:
             assert not self._is_done
-        _logger.getChild('stdout.size').debug(len(stdout_chunk))
+        self._logger.getChild('stdout.size').debug(len(stdout_chunk))
         if len(stdout_chunk) < 8192:
-            _logger.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
-        _logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
+            self._logger.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
+        self._logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
         if self._is_done:  # TODO: What if process is done but streams are not closed? Is that possible?
             assert 0 <= exit_code <= 0xFFFFFFFF
             self._outcome = _WinRMCommandOutcome(exit_code)
@@ -181,7 +181,7 @@ class _WinRMRun(Run):
                 }
             }
         response = self._protocol.send_message(xmltodict.unparse(rq))
-        _logger.debug("Terminate response:\n%s", pformat(xmltodict.parse(response)))
+        self._logger.debug("Terminate response:\n%s", pformat(xmltodict.parse(response)))
 
     def terminate(self):
         self._send_signal('ctrl_c')
@@ -190,17 +190,18 @@ class _WinRMRun(Run):
         try:
             self._protocol.cleanup_command(self._shell_id, self._command_id)
         except WinRMTransportError as e:
-            _logger.exception("XML:\n%s", e.response_text)
+            self._logger.exception("XML:\n%s", e.response_text)
 
 
 class _WinRMCommand(Command):
-    def __init__(self, protocol, shell_id, args):
+    def __init__(self, protocol, shell_id, args, logger):
         self._protocol = protocol
         self._shell_id = shell_id
         self._args = args
+        self._logger = logger
 
     def running(self):
-        return closing(_WinRMRun(self._protocol, self._shell_id, self._args))
+        return closing(_WinRMRun(self._protocol, self._shell_id, self._args, self._logger))
 
 
 def receive_stdout_and_stderr_until_done(self):
