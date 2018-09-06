@@ -1,8 +1,6 @@
-#ifndef QN_MAPPED_PTZ_CONTROLLER_H
-#define QN_MAPPED_PTZ_CONTROLLER_H
+#pragma once
 
-#include "proxy_ptz_controller.h"
-#include "ptz_mapper.h"
+#include <core/ptz/proxy_ptz_controller.h>
 
 /**
  * A proxy ptz controller that uses a PTZ space mapper to provide absolute
@@ -38,6 +36,3 @@ private:
     QnPtzMapperPtr m_mapper;
     QnPtzLimits m_limits;
 };
-
-
-#endif // QN_MAPPED_PTZ_CONTROLLER_H

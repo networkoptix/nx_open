@@ -1,9 +1,8 @@
-#ifndef QN_CACHING_PTZ_CONTROLLER_H
-#define QN_CACHING_PTZ_CONTROLLER_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 
-#include "proxy_ptz_controller.h"
+#include <core/ptz/proxy_ptz_controller.h>
 
 class QnCachingPtzController: public QnProxyPtzController
 {
@@ -13,6 +12,8 @@ class QnCachingPtzController: public QnProxyPtzController
 public:
     QnCachingPtzController(const QnPtzControllerPtr& baseController);
     virtual ~QnCachingPtzController();
+
+    virtual void initialize() override;
 
     static bool extends(Ptz::Capabilities capabilities);
 
@@ -48,7 +49,7 @@ protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant& data) override;
 
 private:
-    bool initialize();
+    bool initializeInternal();
 
     template<class T>
     Qn::PtzDataFields updateCacheLocked(
@@ -69,6 +70,3 @@ private:
     mutable QnMutex m_mutex;
     QnPtzData m_data;
 };
-
-
-#endif // QN_CACHING_PTZ_CONTROLLER_H

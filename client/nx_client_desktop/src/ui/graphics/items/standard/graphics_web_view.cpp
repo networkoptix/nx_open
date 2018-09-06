@@ -73,6 +73,7 @@ QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
         setCanGoBack(history()->canGoBack());
     };
 
+    connect(this, &QGraphicsWebView::linkClicked, this, &QnGraphicsWebView::setPageUrl);
     connect(this, &QGraphicsWebView::loadStarted, this, loadStartedHander);
     connect(this, &QGraphicsWebView::loadFinished, this, loadFinishedHandler);
     connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);

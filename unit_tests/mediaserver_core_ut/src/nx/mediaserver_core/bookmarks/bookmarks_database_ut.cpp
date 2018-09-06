@@ -290,6 +290,11 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
 
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(0, result.size());
+
+    result.clear();
+    filter.text = "btag";
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(3, result.size());
 }
 } // namespace test
 } // namespace bookmarks

@@ -28,7 +28,7 @@ namespace
 {
 
 static constexpr int kInvalidSortingColumn = -1;
-static constexpr int kMaxVisibleRows = 1000;
+static constexpr int kMaxVisibleRows = 10 * 1000;
 
 QnBookmarkSortOrder calculateSortOrder(int modelColumn, Qt::SortOrder order)
 {
