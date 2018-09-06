@@ -109,6 +109,6 @@ QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::BackupType, (numeric)(debug))
     (nx::vms::api::StreamDataFilter::motion, "motion") \
     (nx::vms::api::StreamDataFilter::objectDetection, "objects")
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilter, StreamDataFilter_Values )
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilters, StreamDataFilter_Values )
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilter, StreamDataFilter_Values)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, StreamDataFilters, StreamDataFilter_Values)
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::StreamDataFilters, (debug))

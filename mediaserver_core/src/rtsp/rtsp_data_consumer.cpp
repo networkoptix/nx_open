@@ -434,7 +434,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::GENERIC_METADATA:
             return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
         default:
-            NX_ASSERT(0, "Unexpected data type");
+            NX_ASSERT(false, "Unexpected data type");
             return true;
     }
 }

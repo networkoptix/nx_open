@@ -70,8 +70,8 @@ void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
         return;
 
     QnMutexLocker mutex( &m_mutex );
-    for (const auto& dp: m_dataprocessors)
-        dp->putData(data);
+    for (const auto& p: m_dataprocessors)
+        p->putData(data);
 }
 
 void QnAbstractStreamDataProvider::disconnectFromResource()

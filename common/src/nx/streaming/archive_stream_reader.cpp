@@ -14,7 +14,6 @@
 #include <utils/media/frame_type_extractor.h>
 #include <nx/utils/log/log.h>
 
-
 using namespace nx::vms::api;
 
 // used in reverse mode.
@@ -456,7 +455,7 @@ begin_label:
         }
     }
 
-    auto streamDataFilter = m_streamDataFilter;
+    const auto streamDataFilter = m_streamDataFilter;
     if (streamDataFilter != m_prevStreamDataFilter)
     {
         m_delegate->setStreamDataFilter(streamDataFilter);
@@ -935,7 +934,7 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData &&  (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
+    if (m_currentData && (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
     {
         const int channel = m_currentData->channelNumber;
 

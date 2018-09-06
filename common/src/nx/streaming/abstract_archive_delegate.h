@@ -48,7 +48,7 @@ public:
         Flag_SlowSource = 1,
         Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not set, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
-        Flag_CanSendMetadata     = 8,       // support metadata to the stream: motion, analytics e.t.c
+        Flag_CanSendMetadata     = 8,       // supply metadata in the stream: motion, analytics e.t.c
         Flag_CanOfflineRange     = 16,      // delegate can return range immediately without opening archive
         Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediately, without 'open' function call
         Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediately without opening archive
