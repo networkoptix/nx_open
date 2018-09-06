@@ -5,7 +5,7 @@ import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
-from framework.installation.installer import Installer, PackageNameParseError, InstallerSet
+from framework.installation.installer import InstallerSet
 from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
