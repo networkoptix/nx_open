@@ -20,7 +20,7 @@
 
             <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
-                    <div>
+                    <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
