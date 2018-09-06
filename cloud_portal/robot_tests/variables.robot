@@ -77,7 +77,7 @@ ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input
-${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-model='account.accept']
+${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//span[@class="checkmark"]
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$touched && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
