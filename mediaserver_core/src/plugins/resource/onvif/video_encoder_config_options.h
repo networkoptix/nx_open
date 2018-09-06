@@ -28,14 +28,21 @@
 //typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 //typedef onvifXsd__VideoSourceConfiguration VideoSource;
 
-enum class VIDEO_CODEC //< The order is used in sorting.
+//enum class VIDEO_CODEC //< The order is used in sorting.
+
+/**
+ Server understands only limited number of videocodecs.
+ They are listed in UnderstandableVideoCodec enum.
+ Values are used while sorting configurationOptions, so the order of codecs is meaningful.
+ Desirable codec is the codec with the maximum value.
+ */
+enum class UnderstandableVideoCodec
 {
     NONE,
     JPEG,
-    MPEG4,
-    H265,
     H264,
-    COUNT
+    H265,
+    Desirable = H265
 };
 /*
  FYI: is how video encoders are enumerated in onvif:
@@ -43,8 +50,8 @@ enum class VIDEO_CODEC //< The order is used in sorting.
  { JPEG = 0, MPV4_ES = 1, H264 = 2, H265 = 3 };
 */
 
-VIDEO_CODEC VideoCodecFromString(const std::string& name);
-std::string VideoCodecToString(VIDEO_CODEC codec);
+UnderstandableVideoCodec VideoCodecFromString(const std::string& name);
+std::string VideoCodecToString(UnderstandableVideoCodec codec);
 
 std::optional<onvifXsd__VideoEncodingProfiles> EncoderProfileFromString(
         const QString& name);
@@ -64,7 +71,7 @@ struct VideoEncoderConfigOptions
 {
     //required elements
     int mediaWebserviseVersion = 0; // 0 - undefined, 1 - Media1, 2 - Media 2
-    VIDEO_CODEC encoder = VIDEO_CODEC::NONE;
+    UnderstandableVideoCodec encoder = UnderstandableVideoCodec::NONE;
     Range<float> qualityRange;
     Range<int> bitrateRange;
     std::optional<bool> constantBitrateSupported;

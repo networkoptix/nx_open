@@ -1,13 +1,12 @@
 #include "video_encoder_config_options.h"
 
-VIDEO_CODEC VideoCodecFromString(const std::string& name)
+UnderstandableVideoCodec VideoCodecFromString(const std::string& name)
 {
-    VIDEO_CODEC result = VIDEO_CODEC::NONE;
-    static const std::map<std::string, VIDEO_CODEC> kCodecMap = {
-        { "JPEG", VIDEO_CODEC::JPEG },
-        { "MPEG4", VIDEO_CODEC::MPEG4 },
-        { "H264", VIDEO_CODEC::H264 },
-        { "H265", VIDEO_CODEC::H265 }
+    UnderstandableVideoCodec result = UnderstandableVideoCodec::NONE;
+    static const std::map<std::string, UnderstandableVideoCodec> kCodecMap = {
+        { "JPEG", UnderstandableVideoCodec::JPEG },
+        { "H264", UnderstandableVideoCodec::H264 },
+        { "H265", UnderstandableVideoCodec::H265 }
     };
     const auto it = kCodecMap.find(name);
     if (it != kCodecMap.end())
@@ -15,14 +14,13 @@ VIDEO_CODEC VideoCodecFromString(const std::string& name)
     return result;
 }
 
-std::string VideoCodecToString(VIDEO_CODEC codec)
+std::string VideoCodecToString(UnderstandableVideoCodec codec)
 {
     std::string result;
-    static const std::map<VIDEO_CODEC, std::string> kCodecMap = {
-        { VIDEO_CODEC::JPEG, "JPEG" },
-        { VIDEO_CODEC::MPEG4, "MPEG4" },
-        { VIDEO_CODEC::H264, "H264" },
-        { VIDEO_CODEC::H265, "H265" }
+    static const std::map<UnderstandableVideoCodec, std::string> kCodecMap = {
+        { UnderstandableVideoCodec::JPEG, "JPEG" },
+        { UnderstandableVideoCodec::H264, "H264" },
+        { UnderstandableVideoCodec::H265, "H265" }
     };
 
     const auto it = kCodecMap.find(codec);
@@ -53,7 +51,7 @@ std::optional<onvifXsd__VideoEncodingProfiles> EncoderProfileFromString(const QS
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions& options)
 {
     mediaWebserviseVersion = 1;
-    encoder = VIDEO_CODEC::JPEG;
+    encoder = UnderstandableVideoCodec::JPEG;
     // qualityRange: onvifXsd__JpegOptions contains no such information
     // bitrateRange: onvifXsd__JpegOptions contains no such information
     // ConstantBitRateSupported: onvifXsd__JpegOptions contains no such information
@@ -74,8 +72,9 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions
 
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Options& options)
 {
+    NX_ASSERT(0); //< Mgeg4 is not supported.
     mediaWebserviseVersion = 1;
-    encoder = VIDEO_CODEC::MPEG4;
+    //encoder = UnderstandableVideoCodec::MPEG4;
     // qualityRange: onvifXsd__Mpeg4Options contains no such information
     // bitrateRange: onvifXsd__Mpeg4Options contains no such information
     // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information
@@ -114,7 +113,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__Mpeg4Option
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__H264Options& options)
 {
     mediaWebserviseVersion = 1;
-    encoder = VIDEO_CODEC::H264;
+    encoder = UnderstandableVideoCodec::H264;
     // qualityRange: onvifXsd__Mpeg4Options contains no such information
     // bitrateRange: onvifXsd__Mpeg4Options contains no such information
     // ConstantBitRateSupported: onvifXsd__Mpeg4Options contains no such information

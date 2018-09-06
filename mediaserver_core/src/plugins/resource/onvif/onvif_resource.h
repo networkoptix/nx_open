@@ -149,7 +149,7 @@ public:
             const onvifXsd__VideoEncoder2ConfigurationOptions& resp,
             QnBounds frameRateBounds = QnBounds());
 
-        VIDEO_CODEC encoding = VIDEO_CODEC::NONE;
+        UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
         QVector<onvifXsd__H264Profile> h264Profiles;
         QString id;

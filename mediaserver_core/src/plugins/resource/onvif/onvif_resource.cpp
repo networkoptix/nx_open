@@ -147,7 +147,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     isH264 = resp.Options->H264;
     if (isH264)
     {
-        encoding = VIDEO_CODEC::H264;
+        encoding = UnderstandableVideoCodec::H264;
 
         for (uint i = 0; i < resp.Options->H264->H264ProfilesSupported.size(); ++i)
             h264Profiles << resp.Options->H264->H264ProfilesSupported[i];
@@ -169,7 +169,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     }
     else if (resp.Options->JPEG)
     {
-        encoding = VIDEO_CODEC::JPEG;
+        encoding = UnderstandableVideoCodec::JPEG;
 
         if (resp.Options->JPEG->FrameRateRange)
         {
@@ -199,7 +199,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
 
     this->encoding = options.encoder;
 
-    isH264 = (encoding == VIDEO_CODEC::H264);
+    isH264 = (encoding == UnderstandableVideoCodec::H264);
     if (isH264)
     {
         for (auto profile: options.encoderProfiles)
@@ -260,10 +260,6 @@ bool videoOptsGreaterThan(
     const QnPlOnvifResource::VideoOptionsLocal &s1,
     const QnPlOnvifResource::VideoOptionsLocal &s2)
 {
-    //for equal resolutions the rule is : H264 > H265 > JPEG
-    if (s1.encoding != s2.encoding)
-        return s1.encoding > s2.encoding;
-
     int square1Max = 0;
     QSize max1Res;
     for (int i = 0; i < s1.resolutions.size(); ++i)
@@ -291,9 +287,9 @@ bool videoOptsGreaterThan(
     if (square1Max != square2Max)
         return square1Max > square2Max;
 
-//    //for equal resolutions the rule is: H264 > H265 > JPEG
-//    if (s1.encoding != s2.encoding)
-//        return s1.encoding > s2.encoding;
+    //for equal resolutions the rule is: H264 > H265 > JPEG
+    if (s1.encoding != s2.encoding)
+        return s1.encoding > s2.encoding;
 
     if (!s1.usedInProfiles && s2.usedInProfiles)
         return false;
@@ -632,13 +628,13 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
     StreamCapabilityKey key;
     switch (capabilities.encoding)
     {
-        case VIDEO_CODEC::JPEG:
+        case UnderstandableVideoCodec::JPEG:
             key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_MJPEG);
             break;
-        case VIDEO_CODEC::H264:
+        case UnderstandableVideoCodec::H264:
             key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
             break;
-        case VIDEO_CODEC::H265:
+        case UnderstandableVideoCodec::H265:
             key.codec = QnAvCodecHelper::codecIdToString(AV_CODEC_ID_HEVC);
             break;
     }
@@ -1865,6 +1861,9 @@ qreal QnPlOnvifResource::getBestSecondaryCoeff(const QList<QSize> resList, qreal
         return secResSquare / findResSquare;
 }
 
+// #########################
+// Need to be revised.
+// #########################
 int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const
 {
     if (optList.size() < 2 || optList[0].resolutions.isEmpty())
@@ -1872,20 +1871,22 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
 
     qreal bestResCoeff = INT_MAX;
     int bestResIndex = 1;
-    bool bestIsH264 = false;
+    bool bestIsDesirable = false;
 
-    qreal aspectRation = (qreal) optList[0].resolutions[0].width()
+    const qreal aspectRatio = (qreal) optList[0].resolutions[0].width()
         / (qreal) optList[0].resolutions[0].height();
 
     for (int i = 1; i < optList.size(); ++i)
     {
-        qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRation);
+        qreal resCoeff = getBestSecondaryCoeff(optList[i].resolutions, aspectRatio);
         if (resCoeff < bestResCoeff
-            || (resCoeff == bestResCoeff && optList[i].isH264 && !bestIsH264))
+            || (resCoeff == bestResCoeff
+                && optList[i].encoding == UnderstandableVideoCodec::Desirable
+                && !bestIsDesirable))
         {
             bestResCoeff = resCoeff;
             bestResIndex = i;
-            bestIsH264 = optList[i].isH264;
+            bestIsDesirable = (optList[i].encoding == UnderstandableVideoCodec::Desirable);
         }
     }
 
@@ -2220,7 +2221,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
 
     for (const onvifXsd__VideoEncoder2ConfigurationOptions* options: optionsList)
     {
-        if (options)
+        if (options && VideoCodecFromString(options->Encoding) != UnderstandableVideoCodec::NONE)
         {
             *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), *options, frameRateBounds);
         }
@@ -2331,17 +2332,31 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
         m_primaryStreamCapabilities = optionsList[0];
     }
 
-    NX_DEBUG(this, QString(lit("ONVIF debug: got %1 encoders for camera %2"))
-        .arg(optionsList.size()).arg(getHostAddress()));
+    // Now we erase from optionList all but the first options
+    // that correspond to the primary encoder configuration
+    auto it = optionsList.begin();
+    ++it;
+    while (it != optionsList.end())
+    {
+        if (it->id == m_primaryStreamCapabilities.id)
+            it = optionsList.erase(it);
+        else
+            ++it;
+    }
 
-    bool dualStreamingAllowed = optionsList.size() >= 2;
+    NX_DEBUG(this, QString(lit("ONVIF debug: got %1 encoders for camera %2"))
+        .arg(videoEncodersTokenList.size()).arg(getHostAddress()));
+
+    const bool dualStreamingAllowed = !optionsList.empty();
 
     QnMutexLocker lock(&m_mutex);
     m_secondaryStreamCapabilities = VideoOptionsLocal();
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = channelProfileNameList.isEmpty() ? getSecondaryIndex(optionsList) : 1;
-            m_secondaryStreamCapabilities = optionsList[secondaryIndex];
+        const int secondaryIndex = channelProfileNameList.isEmpty()
+            ? getSecondaryIndex(optionsList)
+            : 1;
+        m_secondaryStreamCapabilities = optionsList[secondaryIndex];
     }
 
     return CameraDiagnostics::NoErrorResult();
