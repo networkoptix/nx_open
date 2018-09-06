@@ -631,6 +631,9 @@ TEST_F(HttpClientAsyncCustom, ConnectionBreak)
 
     start(kResponse, true);
     auto client = std::make_unique<nx::network::http::AsyncClient>();
+    auto clientGuard = nx::utils::makeScopeGuard(
+        [&client]() { client->pleaseStopSync(); });
+
     testGet(client.get(), "test",
         [](nx::network::http::AsyncClient* client)
         {
