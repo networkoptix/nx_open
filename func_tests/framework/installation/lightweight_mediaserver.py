@@ -197,4 +197,4 @@ class LwMultiServer(BaseMediaserver):
 
     def _is_synced(self):
         response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
-        return response['serverFlags'] == 'SF_P2pSyncDone'
+        return 'SF_P2pSyncDone' in response['serverFlags'].split('|')
