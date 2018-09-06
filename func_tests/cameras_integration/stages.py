@@ -267,7 +267,7 @@ def io_events(run, ins, outs):
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
 
 
-@_stage()
+@_stage(timeout=timedelta(minutes=2))
 def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:
