@@ -48,6 +48,7 @@ Yunhong Gu, last updated 05/05/2011
 #include <cstring>
 #include <iostream>
 #include <sstream>
+#include <functional>
 
 #include "common.h"
 #include "core.h"

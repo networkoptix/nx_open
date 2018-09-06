@@ -48,6 +48,7 @@ Yunhong Gu, last updated 07/09/2011
 #include <unistd.h>
 #endif
 #include <cstring>
+#include <functional>
 #include "api.h"
 #include "core.h"
 
