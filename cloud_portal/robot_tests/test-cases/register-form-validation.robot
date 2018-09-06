@@ -13,9 +13,9 @@ ${url}    ${ENV}
 ${existing email}              ${EMAIL VIEWER}
 ${no upper password}           adrhartjad
 ${7char password}              asdfghj
-${common password}             yyyyyyyy
+${common password}             qweasd123
 ${weak password}               asqwerdf
-${good password}               qweasd123F
+${fair password}               qweasd1234
 ${valid email}                 noptixqa+valid@gmail.com
 
 *** Test Cases ***                        FIRST       LAST        EMAIL                     PASS                        CHECKED
@@ -74,7 +74,7 @@ Trailing Space Password                   mark        hamill      ${valid email}
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
     [tags]    C41556
 Invalid First Name                        ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
-Empty First Name                          ${EMPTY}    hamill      ${valid email}            ${good password}            True
+Empty First Name                          ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41556
 Invalid Last Name                         mark        ${SPACE}    ${valid email}            ${BASE PASSWORD}            True
 Empty Last Name                           mark        ${EMPTY}    ${valid email}            ${BASE PASSWORD}            True
@@ -98,7 +98,7 @@ Test Register Invalid
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Register Form Validation    ${first}    ${last}    ${email}    ${pass}    ${checked}
-    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}" or "${pass}"=="${good password}"    Check Password Outline    ${pass}
+    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
@@ -124,8 +124,8 @@ Check Password Badge
     ...    ELSE IF    "${pass}"=="${no upper password}" or "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
     ...    ELSE IF    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
     ...    ELSE IF    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
-    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
-    ...    ELSE IF    "${pass}"=="${good password}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
+    ...    ELSE IF    "${pass}"=="${fair password}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
 
 Check Email Outline
     [Arguments]    ${email}

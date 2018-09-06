@@ -11,9 +11,9 @@ Force Tags        form
 ${url}    ${ENV}
 ${no upper password}           adrhartjad
 ${7char password}              asdfghj
-${common password}             yyyyyyyy
+${common password}             qweasd123
 ${weak password}               asqwerdf
-${good password}               qweasd1234Q
+${fair password}               qweasd1234
 
 ${PASSWORD IS REQUIRED}            //span[@ng-if='form.passwordNew.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]
 ${PASSWORD SPECIAL CHARS}          //span[contains(@ng-if, 'form.passwordNew.$error.pattern &&') and contains(@ng-if,'!form.passwordNew.$error.minlength') and contains(text(),'${PASSWORD SPECIAL CHARS TEXT}')]
@@ -32,6 +32,8 @@ Short New Password              ${BASE PASSWORD}          ${7char password}
 Common New Password             ${BASE PASSWORD}          ${common password}
     [tags]    C41578
 Weak New Password               ${BASE PASSWORD}          ${weak password}
+    [tags]    C41578
+Fair New Password               ${EMPTY}                  ${fair password}
     [tags]    C41578
 Cyrillic New Password           ${BASE PASSWORD}          ${CYRILLIC TEXT}
     [tags]    C41578
@@ -87,7 +89,7 @@ Check Old Password Alert
 
 Check New Password Outline
     [Arguments]    ${new pw}
-    Wait Until Element Is Visible    //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[contains(@class, 'ng-invalid') and @type='password']
+    Run Keyword Unless    "${new pw}"=="${fair password}"    Wait Until Element Is Visible    //form[@name='passwordForm']//password-input[@ng-model='pass.newPassword']//input[contains(@class, 'ng-invalid') and @type='password']
     Run Keyword If    "${new pw}"=="${EMPTY}" or "${new pw}"=="${SPACE}"    Element Should Be Visible    ${PASSWORD IS REQUIRED}
     Run Keyword If    "${new pw}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
     Run Keyword If    "${new pw}"=="${CYRILLIC TEXT}" or "${new pw}"=="${SMILEY TEXT}" or "${new pw}"=="${GLYPH TEXT}" or "${new pw}"=="${TM TEXT}" or "${new pw}"=="${SPACE}${BASE PASSWORD}" or "${new pw}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
@@ -101,5 +103,5 @@ Check Password Badge
     ...    ELSE IF    "${pass}"=="${no upper password}" or "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
     ...    ELSE IF    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
     ...    ELSE IF    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
-    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
-    ...    ELSE IF    "${pass}"=="${good password}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
+    ...    ELSE IF    "${pass}"=="${fair password}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
