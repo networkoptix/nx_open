@@ -1,6 +1,5 @@
 #include "node.h"
 
-#include "dao/customer.h"
 #include "dao/structure_updater.h"
 
 namespace nx::data_sync_engine::test {

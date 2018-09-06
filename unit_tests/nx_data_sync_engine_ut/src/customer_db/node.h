@@ -6,10 +6,9 @@
 
 #include "customer_manager.h"
 #include "data.h"
+#include "dao/customer.h"
 
 namespace nx::data_sync_engine::test {
-
-namespace dao { class CustomerManager; }
 
 /**
  * Test instance of data_sync_engine.
