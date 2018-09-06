@@ -212,7 +212,13 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
     moveControllerToThread(controller, executorThread);
-    executeDelayed([controller]() { controller->initialize(); }, kDefaultDelay, executorThread);
+    auto weakRef = controller.toWeakRef();
+    executeDelayed(
+        [weakRef]()
+        {
+            if (auto controller = weakRef.lock())
+                controller->initialize();
+        }, kDefaultDelay, executorThread);
 
     emit q->controllerChanged(resource);
 
