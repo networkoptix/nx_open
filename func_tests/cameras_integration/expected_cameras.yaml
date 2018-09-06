@@ -55,8 +55,8 @@
     #- {'codec': 'G726'} # G711, but expected G726. Server bug?
 
   io_events:
-    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
-    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
+    ins: [{id: 'AlarmInput.1', name: 'Alarm Input #1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
   ptz_positions if features.advanced_lens_control:
     - {point: '192-22-1', preset: '1:NxWitness1'}
@@ -94,8 +94,8 @@
     #- {'codec': 'G726'}
 
   io_events:
-    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
-    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
+    ins: [{id: 'AlarmInput.1', name: 'Alarm Input #1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
 00-09-18-51-67-55:
@@ -131,8 +131,8 @@
     #- {'codec': 'G726'} # codec is 'G711', expected 'G726' - server bug?
 
   io_events:
-    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
-    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
+    ins: [{id: 'AlarmInput.1', name: 'Alarm Input #1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
   ptz_positions if features.advanced_lens_control:
     - {point: '195-23-1', preset: '1:NxWitness1'}
@@ -174,8 +174,8 @@
     #- {'codec': 'G726'} # codec' is 'G711', expected 'G726' server bug?
 
   io_events:
-    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
-    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
+    ins: [{id: 'AlarmInput.1', name: 'Alarm Input #1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
 00-1A-07-0A-3A-88:
