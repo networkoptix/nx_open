@@ -11,7 +11,8 @@ import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'download-history',
-    templateUrl: 'download-history.component.html'
+    templateUrl: 'download-history.component.html',
+    styleUrls: ['download-history.component.scss']
 })
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy {
@@ -28,7 +29,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     downloadsData: any;
     downloadTypes: any;
     linkbase: any;
-    showTabs: string;
 
     location: Location;
 
@@ -47,7 +47,38 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 location: Location) {
 
         this.location = location;
-        this.showTabs = 'visible';
+    }
+
+    private getData () {
+        this.authorizationService
+            .requireLogin()
+            .then(() => {
+                this.cloudApi
+                    .getDownloadsHistory(this.build)
+                    .then(result => {
+                            this.linkbase = result.data.updatesPrefix;
+
+                            if (!this.build) { // only one build
+                                this.activeBuilds = result.data.releases;
+                                this.downloadsData = result.data;
+                            } else {
+                                this.activeBuilds = [result.data];
+                                this.downloadTypes = [result.data.type];
+                                this.downloadsData = {};
+                                this.downloadsData[result.data.type] = this.activeBuilds;
+                            }
+
+                            this.titleService.setTitle(this.downloadTypes[0][0].toUpperCase() + this.downloadTypes[0].substr(1).toLowerCase());
+                            this.activeBuilds = this.downloadsData[this.section];
+
+                        }, () => {
+                            // TODO: Repace this once this page is moved to A5
+                            // AJS and A5 routers freak out about route change *****
+                            // this.router.navigate(['404']); // Can't find downloads.json in specific build
+                            this.location.go('404');
+                        }
+                    );
+            });
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -57,12 +88,10 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.showTabs = 'hidden';
-
         // TODO: Repace this once this page is moved to A5
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/downloads/' + section]);
-        this.document.location.href = '/downloads/' + section;
+        this.location.go('/downloads/' + section);
     };
 
     ngOnInit(): void {
@@ -78,42 +107,17 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 this.section = this.routeParam;
             }
 
-            this.authorizationService
-                .requireLogin()
-                .then(() => {
-                    this.cloudApi
-                        .getDownloadsHistory(this.build)
-                        .then(result => {
-                                this.linkbase = result.data.updatesPrefix;
+            if (!this.build) { // only one build
+                this.downloadTypes = ['releases', 'patches', 'betas'];
+            }
 
-                                if (!this.build) { // only one build
-                                    this.activeBuilds = result.data.releases;
-                                    this.downloadTypes = ['releases', 'patches', 'betas'];
-                                    this.downloadsData = result.data;
-                                } else {
-                                    this.activeBuilds = [result.data];
-                                    this.downloadTypes = [result.data.type];
-                                    this.downloadsData = {};
-                                    this.downloadsData[result.data.type] = this.activeBuilds;
-                                }
+            setTimeout(() => {
+                if (this.tabs) {
+                    this.tabs.select(this.section);
+                }
+            });
 
-                                this.titleService.setTitle(this.downloadTypes[0][0].toUpperCase() + this.downloadTypes[0].substr(1).toLowerCase());
-                                this.activeBuilds = this.downloadsData[this.section];
-
-                                setTimeout(() => {
-                                    if (this.tabs) {
-                                        this.tabs.select(this.section);
-                                    }
-                                });
-
-                            }, error => {
-                                // TODO: Repace this once this page is moved to A5
-                                // AJS and A5 routers freak out about route change *****
-                                // this.router.navigate(['404']); // Can't find downloads.json in specific build
-                                this.document.location.href = '/404';
-                            }
-                        );
-                });
+            this.getData();
         });
     }
 
