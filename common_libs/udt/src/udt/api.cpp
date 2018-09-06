@@ -127,12 +127,9 @@ CUDTUnited::CUDTUnited():
     m_MultiplexerLock(),
     m_pCache(NULL),
     m_bClosing(false),
-    m_GCStopLock(),
-    m_GCStopCond(),
     m_InitLock(),
     m_iInstanceCount(0),
     m_bGCStatus(false),
-    m_GCThread(),
     m_ClosedSockets()
 {
     // Socket ID MUST start from a random value
@@ -204,16 +201,8 @@ int CUDTUnited::startup()
         return true;
 
     m_bClosing = false;
-#ifndef _WIN32
-    pthread_mutex_init(&m_GCStopLock, NULL);
-    pthread_cond_init_monotonic(&m_GCStopCond);
-    pthread_create(&m_GCThread, NULL, garbageCollect, this);
-#else
-    m_GCStopLock = CreateMutex(NULL, false, NULL);
-    m_GCStopCond = CreateEvent(NULL, false, false, NULL);
-    DWORD ThreadID;
-    m_GCThread = CreateThread(NULL, 0, garbageCollect, this, 0, &ThreadID);
-#endif
+
+    m_GCThread = std::thread(std::bind(&CUDTUnited::garbageCollect, this));
 
     m_bGCStatus = true;
 
@@ -233,18 +222,11 @@ int CUDTUnited::cleanup()
         return 0;
 
     m_bClosing = true;
-#ifndef _WIN32
-    pthread_cond_signal(&m_GCStopCond);
-    pthread_join(m_GCThread, NULL);
-    pthread_mutex_destroy(&m_GCStopLock);
-    pthread_cond_destroy(&m_GCStopCond);
-#else
-    SetEvent(m_GCStopCond);
-    WaitForSingleObject(m_GCThread, INFINITE);
-    CloseHandle(m_GCThread);
-    CloseHandle(m_GCStopLock);
-    CloseHandle(m_GCStopCond);
-#endif
+    {
+        std::scoped_lock<std::mutex> lock(m_GCStopLock);
+        m_GCStopCond.notify_all();
+    }
+    m_GCThread.join();
 
     m_bGCStatus = false;
 
@@ -459,7 +441,7 @@ ERR_ROLLBACK:
     }
 
     // wake up a waiting accept() call
-    std::unique_lock<std::mutex> acceptLocker(ls->m_AcceptLock);
+    std::scoped_lock<std::mutex> acceptLocker(ls->m_AcceptLock);
     ls->m_AcceptCond.notify_all();
 
     return 1;
@@ -789,7 +771,7 @@ int CUDTUnited::close(const UDTSOCKET u)
 
         // broadcast all "accept" waiting
         {
-            std::unique_lock<std::mutex> acceptLocker(s->m_AcceptLock);
+            std::scoped_lock<std::mutex> acceptLocker(s->m_AcceptLock);
             s->m_AcceptCond.notify_all();
         }
 
@@ -1451,50 +1433,40 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
     }
 }
 
-static const int kGarbageCollectTickPeriodMs = 100;
+static constexpr std::chrono::milliseconds kGarbageCollectTickPeriod(100);
 
-#ifndef _WIN32
-void* CUDTUnited::garbageCollect(void* p)
-#else
-DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)
-#endif
+void CUDTUnited::garbageCollect()
 {
-    CUDTUnited* self = (CUDTUnited*)p;
+    std::unique_lock<std::mutex> gcguard(m_GCStopLock);
 
-    CGuard gcguard(self->m_GCStopLock);
-
-    while (!self->m_bClosing)
+    while (!m_bClosing)
     {
-        self->checkBrokenSockets();
+        checkBrokenSockets();
 
 #ifdef _WIN32
-        self->checkTLSValue();
+        checkTLSValue();
 #endif
 
-#ifndef _WIN32
-        pthread_cond_wait_monotonic_timeout(&self->m_GCStopCond, &self->m_GCStopLock, kGarbageCollectTickPeriodMs * 1000);
-#else
-        WaitForSingleObject(self->m_GCStopCond, kGarbageCollectTickPeriodMs);
-#endif
+        m_GCStopCond.wait_for(gcguard, kGarbageCollectTickPeriod);
     }
 
     // remove all sockets and multiplexers
     {
-        CGuard controlLocker(self->m_ControlLock);
-        for (map<UDTSOCKET, CUDTSocket*>::iterator i = self->m_Sockets.begin(); i != self->m_Sockets.end(); ++i)
+        CGuard controlLocker(m_ControlLock);
+        for (map<UDTSOCKET, CUDTSocket*>::iterator i = m_Sockets.begin(); i != m_Sockets.end(); ++i)
         {
             i->second->m_pUDT->setIsBroken(true);
             i->second->m_pUDT->close();
             i->second->m_Status = CLOSED;
             i->second->m_TimeStamp = CTimer::getTime();
-            self->m_ClosedSockets[i->first] = i->second;
+            m_ClosedSockets[i->first] = i->second;
 
             // remove from listener's queue
-            map<UDTSOCKET, CUDTSocket*>::iterator ls = self->m_Sockets.find(i->second->m_ListenSocket);
-            if (ls == self->m_Sockets.end())
+            map<UDTSOCKET, CUDTSocket*>::iterator ls = m_Sockets.find(i->second->m_ListenSocket);
+            if (ls == m_Sockets.end())
             {
-                ls = self->m_ClosedSockets.find(i->second->m_ListenSocket);
-                if (ls == self->m_ClosedSockets.end())
+                ls = m_ClosedSockets.find(i->second->m_ListenSocket);
+                if (ls == m_ClosedSockets.end())
                     continue;
             }
 
@@ -1502,9 +1474,9 @@ DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)
             ls->second->m_pQueuedSockets->erase(i->second->m_SocketID);
             ls->second->m_pAcceptSockets->erase(i->second->m_SocketID);
         }
-        self->m_Sockets.clear();
+        m_Sockets.clear();
 
-        for (map<UDTSOCKET, CUDTSocket*>::iterator j = self->m_ClosedSockets.begin(); j != self->m_ClosedSockets.end(); ++j)
+        for (map<UDTSOCKET, CUDTSocket*>::iterator j = m_ClosedSockets.begin(); j != m_ClosedSockets.end(); ++j)
         {
             j->second->m_TimeStamp = 0;
         }
@@ -1512,10 +1484,10 @@ DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)
 
     while (true)
     {
-        self->checkBrokenSockets();
+        checkBrokenSockets();
 
-        CGuard lk(self->m_ControlLock);
-        bool empty = self->m_ClosedSockets.empty();
+        CGuard lk(m_ControlLock);
+        bool empty = m_ClosedSockets.empty();
         lk.unlock();
 
         if (empty)
@@ -1523,12 +1495,6 @@ DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)
 
         CTimer::sleep();
     }
-
-#ifndef _WIN32
-    return NULL;
-#else
-    return 0;
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

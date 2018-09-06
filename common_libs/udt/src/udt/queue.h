@@ -42,13 +42,17 @@ Yunhong Gu, last updated 01/12/2011
 #ifndef __UDT_QUEUE_H__
 #define __UDT_QUEUE_H__
 
+#include <condition_variable>
+#include <list>
+#include <map>
+#include <mutex>
+#include <queue>
+#include <vector>
+#include <thread>
+
 #include "channel.h"
 #include "common.h"
 #include "packet.h"
-#include <list>
-#include <map>
-#include <queue>
-#include <vector>
 
 class CUDT;
 
@@ -208,10 +212,10 @@ private:
     int m_iArrayLength;            // physical length of the array
     int m_iLastEntry;            // position of last entry on the heap array
 
-    pthread_mutex_t m_ListLock;
+    std::mutex m_ListLock;
 
-    pthread_mutex_t* m_pWindowLock;
-    pthread_cond_t* m_pWindowCond;
+    std::mutex* m_pWindowLock = nullptr;
+    std::condition_variable* m_pWindowCond = nullptr;
 
     CTimer* m_pTimer;
 
@@ -397,24 +401,19 @@ public:
     int sendto(const sockaddr* addr, CPacket& packet);
 
 private:
-#ifndef _WIN32
-    static void* worker(void* param);
-#else
-    static DWORD WINAPI worker(LPVOID param);
-#endif
+    void worker();
 
-    pthread_t m_WorkerThread;
+    std::thread m_WorkerThread;
 
 private:
     CSndUList* m_pSndUList;        // List of UDT instances for data sending
     CChannel* m_pChannel;                // The UDP channel for data sending
     CTimer* m_pTimer;            // Timing facility
 
-    pthread_mutex_t m_WindowLock;
-    pthread_cond_t m_WindowCond;
+    std::mutex m_WindowLock;
+    std::condition_variable m_WindowCond;
 
     volatile bool m_bClosing;        // closing the worker
-    pthread_cond_t m_ExitCond;
 
 private:
     CSndQueue(const CSndQueue&);
@@ -457,13 +456,9 @@ public:
     int recvfrom(int32_t id, CPacket& packet);
 
 private:
-#ifndef _WIN32
-    static void* worker(void* param);
-#else
-    static DWORD WINAPI worker(LPVOID param);
-#endif
+    void worker();
 
-    pthread_t m_WorkerThread;
+    std::thread m_WorkerThread;
 
 private:
     CUnitQueue m_UnitQueue;        // The received packet queue
@@ -476,7 +471,6 @@ private:
     int m_iPayloadSize;                  // packet payload size
 
     volatile bool m_bClosing;            // closing the workder
-    pthread_cond_t m_ExitCond;
 
 private:
     int setListener(CUDT* u);
@@ -492,16 +486,16 @@ private:
     void storePkt(int32_t id, CPacket* pkt);
 
 private:
-    pthread_mutex_t m_LSLock;
+    std::mutex m_LSLock;
     CUDT* m_pListener;                                   // pointer to the (unique, if any) listening UDT entity
     CRendezvousQueue* m_pRendezvousQueue;                // The list of sockets in rendezvous mode
 
     std::vector<CUDT*> m_vNewEntry;                      // newly added entries, to be inserted
-    pthread_mutex_t m_IDLock;
+    std::mutex m_IDLock;
 
     std::map<int32_t, std::queue<CPacket*> > m_mBuffer;    // temporary buffer for rendezvous connection request
-    pthread_mutex_t m_PassLock;
-    pthread_cond_t m_PassCond;
+    std::mutex m_PassLock;
+    std::condition_variable m_PassCond;
 
 private:
     CRcvQueue(const CRcvQueue&);
