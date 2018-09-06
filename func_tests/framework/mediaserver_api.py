@@ -17,7 +17,7 @@ from urllib3.util import Url, parse_url
 from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import wait_for_truthy
+from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 from .context_logger import ContextLogger, context_logger
 
 _logger = ContextLogger(__name__, 'mediaserver_api')
@@ -315,12 +315,16 @@ class MediaserverApi(object):
         return response['settings']['primaryTimeServer'] == self.get_server_id()
 
     @contextmanager
-    def waiting_for_restart(self, timeout_sec):
+    def waiting_for_restart(self, timeout_sec=10):
+        """Ask for runtime id, yield, letting the client code do an action that implies a restart,
+        then wait until server starts and reports new runtime id.
+        """
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = timeit.default_timer()
         yield
         failed_connections = 0
+        wait = Wait("{} is restarted", timeout_sec=timeout_sec)
         while True:
             try:
                 response = self.generic.get('api/moduleInformation')
@@ -329,19 +333,20 @@ class MediaserverApi(object):
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
                 _logger.debug("Expected failed connection: %r", e)
                 failed_connections += 1
-                time.sleep(timeout_sec)
-                continue
-            new_runtime_id = response['runtimeId']
-            if new_runtime_id == old_runtime_id:
+            else:
+                new_runtime_id = response['runtimeId']
+                if new_runtime_id != old_runtime_id:
+                    _logger.info(
+                        "%s restarted successfully, new runtime id is %s",
+                        self, new_runtime_id)
+                    break
                 if failed_connections > 0:
-                    assert False, "Runtime id remains same after failed connections."
-                if timeit.default_timer() - started_at > timeout_sec:
-                    assert False, "Mediaserver hasn't stopped, timed out."
-                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
-                time.sleep(timeout_sec)
-                continue
-            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
-            break
+                    raise RuntimeError(
+                        "{}: runtime id remains same after failed connections: {}".format(
+                            self, old_runtime_id))
+                if not wait.again():
+                    raise WaitTimeout(timeout_sec, "{}: hasn't even stopped".format(self))
+                time.sleep(5)
 
     def restart_via_api(self, timeout_sec=10):
         with self.waiting_for_restart(timeout_sec):
