@@ -108,7 +108,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_defaultTimePolicy = TimePolicy::ignoreCameraTimeIfBigJitter;
+            m_defaultTimePolicy = nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter;
     }
     updateTimePolicy();
 }
@@ -809,7 +809,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
     m_RtpSession.setDateTimeFormat(format);
 }
 
-void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
+void QnMulticodecRtpReader::setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy)
 {
     m_defaultTimePolicy = timePolicy;
     updateTimePolicy();
@@ -819,7 +819,7 @@ void QnMulticodecRtpReader::updateTimePolicy()
 {
     auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
     if (secResource && secResource->trustCameraTime())
-        m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
         m_timeHelper.setTimePolicy(m_defaultTimePolicy);
 }

@@ -94,7 +94,7 @@ public:
 
     QnRtspClient& rtspClient();
 
-    void setTimePolicy(TimePolicy timePolicy);
+    void setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy);
 
     void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
@@ -166,7 +166,7 @@ private:
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
-    QnRtspTimeHelper m_timeHelper;
+    nx::streaming::rtp::TimeHelper m_timeHelper;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
@@ -188,7 +188,7 @@ private:
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
-	TimePolicy m_defaultTimePolicy {TimePolicy::bindCameraTimeToLocalTime};
+    nx::streaming::rtp::TimePolicy m_defaultTimePolicy {nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime};
     CameraDiagnostics::Result m_openStreamResult;
 };
 

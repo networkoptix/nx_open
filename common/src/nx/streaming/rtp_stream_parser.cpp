@@ -12,7 +12,7 @@ QnRtpVideoStreamParser::QnRtpVideoStreamParser()
     m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
-void QnRtpStreamParser::setTimeHelper(QnRtspTimeHelper* timeHelper)
+void QnRtpStreamParser::setTimeHelper(nx::streaming::rtp::TimeHelper* timeHelper)
 {
     m_timeHelper = timeHelper;
 }
