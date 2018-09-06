@@ -112,8 +112,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 
     result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized && canChangeStatus())
-        m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
 
@@ -427,8 +425,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
                 << ". URL: " << soapWrapper.getEndpointUrl()
                 << ", uniqueId: " << m_onvifRes->getUniqueId();
         #endif
-        if (soapWrapper.isNotAuthenticated() && canChangeStatus()) {
-            m_onvifRes->setStatus(Qn::Unauthorized);
+        if (soapWrapper.isNotAuthenticated())
+        {
             return CameraDiagnostics::NotAuthorisedResult( soapWrapper.getEndpointUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(

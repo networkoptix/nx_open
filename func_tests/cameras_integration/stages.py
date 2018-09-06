@@ -229,71 +229,75 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage()
-def io_events(run, ins, outs, connected=False):
+def io_events(run, ins, outs):
         # type: (stage.Run, list, list, bool) -> Generator[Result]
-    expected_ports = {}
-    for id in ins:
-        expected_ports['id=' + id] = dict(portType='Input', inputName='Input ' + id)
-    for id in outs:
-        expected_ports['id=' + id] = dict(portType='Output', outputName='Output ' + id)
+    expected_ports = {
+        'id=' + port['id']: {'portType': type_, name: port.get('name', type_ + ' ' + port['id'])}
+        for ports, type_, name in zip((ins, outs), ('Input', 'Output'), ('inputName', 'outputName'))
+        for port in ports
+    }
 
     checker = Checker()
     while not checker.expect_values(expected_ports, run.data['ioSettings'], 'io'):
         yield checker.result()
 
-    camera_uuid = run.data['id']
+    camera_uuid = run.data['id']  # Event rules work with UUIDs only, physicalId will not work.
+    run.server.api.make_event_rule(
+        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
     run.server.api.make_event_rule(
         'userDefinedEvent', 'Undefined', 'cameraOutputAction',
         event_condition_resource=run.id, action_resource_ids=[camera_uuid])
-    run.server.api.make_event_rule(
-        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
 
     run.server.api.create_event(source=run.id)
-    if not connected:
-        yield Success()
+    for port in ins:
+        if not port.get('connected'):
+            continue
 
-    while True:
-        events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
-        if events:
-            yield expect_values({'eventParams.inputPortId': ins[0]}, events[-1], 'event')
-        else:
-            yield Failure('No input events from camera')
+        while True:
+            events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
+            if events:
+                yield expect_values({'eventParams.inputPortId': port['id']}, events[-1], 'event')
+            else:
+                yield Failure('No input events from camera')
+
+    yield Success()
 
 
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
-PTZ_POSITION_KEYS = ('focus', 'pan', 'rotation', 'tilt', 'zoom')
 
 
 @_stage()
-def ptz_presets(run, *presets):  # type: (stage.Run, List[dict]) -> Generator[Result]
+def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:
-            raise KeyError('PTZ {}({:b}) capability is not supported in {:b}'.format(
+            raise KeyError('PTZ {}({:b}) capabilities is not supported in {:b}'.format(
                 name, flag, run.data['ptzCapabilities']))
 
     def execute(*args, **kwargs):
         return run.server.api.execute_ptz(run.id, *args, **kwargs)
 
     checker = Checker()
-    for preset in presets:
-        is_logical = preset.get('is_logical', False)
-        if 'id' in preset:
-            expected = {'id=' + preset['id']: {'name': preset.get('name', preset['id'])}}
-            while not checker.expect_values(expected, execute('GetPresets'), 'presets'):
+    for use_preset in False, True:
+        for index, position in enumerate(positions):
+            point = {k: int(v) for k, v in zip(
+                ('pan', 'tilt', 'zoom'), position['point'].split('-'))}
+            if use_preset:
+                if 'preset' not in position:
+                    continue
+
+                name = position.get('name', position['preset'])
+                expected = {'id=' + position['preset']: {'name': name}}
+                while not checker.expect_values(expected, execute('GetPresets'), 'presets'):
+                    yield checker.result()
+
+                execute('ActivatePreset', speed=100, presetId=position['preset'])
+                title = 'preset[{}]'.format(position['preset'])
+            else:
+                execute('AbsoluteDeviceMove', speed=100, **point)
+                title = 'point[{}]'.format(position['point'])
+
+            yield Halt('Wait for move to {}'.format(point))
+            while not checker.expect_values(point, execute('GetDevicePosition'), title):
                 yield checker.result()
-
-            execute('ActivatePreset', speed=100, presetId=preset['id'])
-        else:
-            execute(
-                'AbsoluteLogicalMove' if is_logical else 'AbsoluteDeviceMove', speed=100,
-                **{k: v for k, v in zip(PTZ_POSITION_KEYS, preset['position'].split('-'))})
-
-        def get_position():
-            position = execute('GetLogicalPosition' if is_logical else 'GetDevicePosition')
-            return '-'.join(str(position.get(k)) for k in PTZ_POSITION_KEYS)
-
-        yield Halt('Wait for move to {}'.format(preset['position']))
-        while not checker.expect_values(preset['position'], get_position(), preset.get('id')):
-            yield checker.result()
 
     yield Success()

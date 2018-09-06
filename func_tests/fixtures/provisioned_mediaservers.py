@@ -11,6 +11,8 @@ from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
 
+pytest_plugins = ['fixtures.vms']
+
 _logger = logging.getLogger(__name__)
 
 
@@ -90,6 +92,11 @@ def one_running_mediaserver(one_mediaserver):
     one_mediaserver.start()
     one_mediaserver.api.setup_local_system()
     return one_mediaserver
+
+
+@pytest.fixture()
+def one_mediaserver_api(one_running_mediaserver):
+    return one_running_mediaserver.api
 
 
 @pytest.fixture(scope='session')

@@ -199,7 +199,7 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
         NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): unsupported platform"));
     #endif
 
-    return true;
+    return false;
 }
 
 NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)

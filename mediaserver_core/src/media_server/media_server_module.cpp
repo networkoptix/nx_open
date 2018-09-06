@@ -80,6 +80,7 @@
 #include "camera/camera_pool.h"
 #include <recorder/schedule_sync.h>
 #include "media_server_process.h"
+#include <camera/camera_error_processor.h>
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -99,6 +100,36 @@ void installTranslations()
 
 } // namespace
 
+class ServerDataProviderFactory:
+    public QnDataProviderFactory,
+    public nx::mediaserver::ServerModuleAware
+{
+public:
+    ServerDataProviderFactory(QnMediaServerModule* serverModule):
+        QnDataProviderFactory(),
+        nx::mediaserver::ServerModuleAware(serverModule)
+    {
+    }
+
+    virtual QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role = Qn::CR_Default) override
+    {
+        auto result = QnDataProviderFactory::createDataProvider(resource, role);
+        auto mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (result);
+        if (mediaProvider)
+        {
+            connect(
+                mediaProvider,
+                &QnAbstractMediaStreamDataProvider::streamError,
+                serverModule()->cameraErrorProcessor(),
+                &nx::mediaserver::camera::ErrorProcessor::onStreamReaderError,
+                Qt::DirectConnection);
+        }
+        return result;
+    }
+
+};
 
 QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments* arguments, QObject* parent)
 {
@@ -158,7 +189,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
 
     m_storageDbPool = store(new QnStorageDbPool(this));
 
-    m_resourceDataProviderFactory = store(new QnDataProviderFactory(this));
+    m_resourceDataProviderFactory = store(new ServerDataProviderFactory(this));
     registerResourceDataProviders();
 
     m_videoCameraPool = store(new QnVideoCameraPool(

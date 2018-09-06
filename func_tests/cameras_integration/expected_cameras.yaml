@@ -10,17 +10,17 @@
 
   after if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
-      transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
+      offlineStatus: 0
+      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
 
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
-      transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
+      offlineStatus: 0]
+      transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
 
 
 00-09-18-4E-55-3A:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNP-6120H
 
@@ -55,12 +55,16 @@
     #- {'codec': 'G726'} # G711, but expected G726. Server bug?
 
   io_events:
-    ins: ['AlarmInput.1']
-    outs: ['AlarmOutput.1']
+    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
 
+  ptz_positions if features.advanced_lens_control:
+    - {point: '192-22-1', preset: '1:NxWitness1'}
+    - {point: '37-25-2', preset: '2:WisenetWAV2'}
+    - {point: '127-22-1', preset: '4:NxWitness4'}
 
 00-09-18-4F-74-4E:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: PNM-9020V
 
@@ -90,12 +94,12 @@
     #- {'codec': 'G726'}
 
   io_events:
-    ins: ['AlarmInput.1']
-    outs: ['AlarmOutput.1']
+    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
 
 
 00-09-18-51-67-55:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: SNP-6321
 
@@ -127,12 +131,16 @@
     #- {'codec': 'G726'} # codec is 'G711', expected 'G726' - server bug?
 
   io_events:
-    ins: ['AlarmInput.1']
-    outs: ['AlarmOutput.1']
+    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
+
+  ptz_positions if features.advanced_lens_control:
+    - {point: '195-23-1', preset: '1:NxWitness1'}
+    - {point: '279-22-1', preset: '2:NxWitness2'}
 
 
 00-16-6C-C5-31-21:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNB-6000
 
@@ -166,8 +174,8 @@
     #- {'codec': 'G726'} # codec' is 'G711', expected 'G726' server bug?
 
   io_events:
-    ins: ['AlarmInput.1']
-    outs: ['AlarmOutput.1']
+    ins: [{id: 'AlarmInput.1', name: 'Input AlarmInput.1'}]
+    outs: [{id: 'AlarmOutput.1', name: 'Output AlarmOutput.1'}]
 
 
 00-1A-07-0A-3A-88:
@@ -246,8 +254,8 @@
     - {'skip_codec_change': True, 'codec': 'G711'} # Not sure if it has audio, but isAudioSupported == 1
 
   io_events:
-    ins: ['1']
-    outs: ['t_RelayOut-0']
+    ins: [{id: '1'}]
+    outs: [{id: 't_RelayOut-0'}]
 
 
 00-1C-A6-01-27-1A:
@@ -282,8 +290,8 @@
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
-    ins: ['1']
-    outs: ['t_RelayOut-0']
+    ins: [{id: '1'}]
+    outs: [{id: 't_RelayOut-0'}]
 
 
 00-50-1A-1A-11-F4:
@@ -327,9 +335,8 @@
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
-    ins: ['1']
-    outs: ['AlarmOut_0']
-    connected: True
+    ins: [{id: '1', connected: 'AlarmOut_0'}]
+    outs: [{id: 'AlarmOut_0'}]
 
 
 4C-BD-8F-E2-1C-87:
@@ -513,8 +520,8 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
-    ins: ['1']
-    outs: ['relay01']
+    ins: [{id: '1'}]
+    outs: [{id: 'relay01'}]
 
 
 urn_uuid_32313534-3532-6666-3338-000df1215452:
@@ -582,5 +589,5 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
-    ins: ['1']
-    outs: ['relay01']
+    ins: [{id: '1'}]
+    outs: [{id: 'relay01'}]

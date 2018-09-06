@@ -12,7 +12,7 @@ loggers:
   paramiko.transport.sftp: {level: WARNING}
   parse: {level: INFO}
   fixtures.mediaservers: {level: INFO}
-  framework.switched_logging: {level: WARNING}
+  framework.context_logger: {level: WARNING}
   framework.ca: {level: INFO}
   framework.lock: {level: WARNING}
   framework.registry: {level: INFO}
@@ -30,10 +30,10 @@ loggers:
   framework.installation.mediaserver.examination: {level: INFO}
   framework.installation.mediaserver.wait: {level: INFO}
   framework.installation.mediaserver.http: {level: INFO}
-  framework.installation.mediaserver.mediaserver_api: {level: INFO}
+  framework.installation.mediaserver.mediaserver_api: {level: DEBUG}
   framework.installation.lightweight_mediaserver.wait: {level: INFO}
-  framework.installation.lightweight_mediaserver.http: {level: INFO}
-  framework.installation.lightweight_mediaserver.mediaserver_api: {level: INFO}
+  framework.installation.lightweight_mediaserver.http: {level: DEBUG}
+  framework.installation.lightweight_mediaserver.mediaserver_api: {level: DEBUG}
 
   scalability_test.create_test_data: {level: INFO}
   scalability_test.merge: {level: INFO}

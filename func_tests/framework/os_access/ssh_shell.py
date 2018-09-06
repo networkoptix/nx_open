@@ -7,7 +7,7 @@ from io import StringIO
 
 import paramiko
 
-from framework import switched_logging
+from framework import context_logger
 from framework.method_caching import cached_getter
 from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
@@ -15,7 +15,7 @@ from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file_using_read_and_write
 from framework.os_access.posix_shell_path import PosixShellPath
 
-_logger = switched_logging.SwitchedLogger('ssh')
+_logger = context_logger.ContextLogger('ssh')
 
 
 class SSHNotConnected(Exception):
@@ -56,7 +56,8 @@ class _SSHRun(Run):
         self._logger = logger
 
     def __str__(self):
-        addr, port = self._channel.getpeername()
+        peer_address = self._channel.getpeername()
+        addr, port = peer_address[:2]  # for ipv6 we get (host, port, flowinfo, scopeid)
         return '%s:%d' % (addr, port)
 
     @property

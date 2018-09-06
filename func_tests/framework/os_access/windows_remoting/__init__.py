@@ -7,6 +7,7 @@ import winrm
 from pathlib2 import PurePath
 from requests import RequestException
 
+from framework.context_logger import ContextLogger
 from framework.method_caching import cached_getter
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.windows_remoting._cim_query import CIMClass
@@ -15,7 +16,7 @@ from ._cmd import Shell
 from ._powershell import run_powershell_script
 from .registry import _WindowsRegistryKey
 
-_logger = logging.getLogger(__name__)
+_logger = ContextLogger(__name__, 'winrm')
 
 
 def command_args_to_str_list(command):
@@ -60,14 +61,14 @@ class WinRM(object):
 
     def command(self, args):
         command_str_list = command_args_to_str_list(args)
-        _logger.debug("Command: %s", list2cmdline(command_str_list))
-        return self._shell().start(*command_str_list)
+        _logger.info("Command: %s", list2cmdline(command_str_list))
+        return self._shell().start(command_str_list, logger=_logger.getChild('cmd'))
 
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.command(command).check_output(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
-        return run_powershell_script(self._shell(), script, variables)
+        return run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))
 
     def wmi_query(
             self,

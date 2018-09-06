@@ -583,9 +583,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotData = false;
 
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
-    const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl, position);
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
-        return result;
+    m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, position);
+    if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return m_openStreamResult;
 
     if (m_RtpSession.isTcpMode())
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
@@ -638,11 +638,14 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     }
 
     m_rtcpReportTimer.restart();
-    if (!audioExist && !videoExist) {
+    if (!audioExist && !videoExist)
+    {
         m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
+        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
+        return m_openStreamResult;
     }
     m_rtpStarted = true;
+    m_openStreamResult = CameraDiagnostics::NoErrorResult();
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -713,6 +716,11 @@ void QnMulticodecRtpReader::closeStream()
 bool QnMulticodecRtpReader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
+}
+
+CameraDiagnostics::Result QnMulticodecRtpReader::openStreamResult() const
+{
+    return m_openStreamResult;
 }
 
 QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const

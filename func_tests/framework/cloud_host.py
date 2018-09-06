@@ -2,6 +2,7 @@ import datetime
 import logging
 
 import requests
+from urllib3.util import Url
 
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.imap import IMAPConnection
@@ -28,8 +29,8 @@ class ServerBindInfo(object):
 
 
 class GenericCloudApi(HttpApi):
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
-        response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+    def request(self, method, path, timeout=None, **kwargs):
+        response = self.http.request(method, path, timeout=timeout, **kwargs)
         response.raise_for_status()
         data = response.json()
         return data
@@ -42,7 +43,8 @@ class CloudAccount(object):
         self.name = name
         self.customization = customization
         self.hostname = hostname
-        self.api = GenericCloudApi('cloud-host:%s' % name, HttpClient(self.hostname, 80, user, password))
+        url = Url(scheme='http', host=hostname, auth=user + ':' + password)
+        self.api = GenericCloudApi('cloud-host:%s' % name, HttpClient(url))
 
     def __repr__(self):
         return '<CloudAccount {self.name} at {self.hostname}>'.format(self=self)

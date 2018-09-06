@@ -65,9 +65,10 @@ public:
 
     /** Implementation of QnAbstractMediaStreamProvider::isStreamOpened. */
     virtual bool isStreamOpened() const override;
+    virtual CameraDiagnostics::Result openStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
-    virtual int getLastResponseCode() const override;
+    int getLastResponseCode() const;
 
     /** Implementation of QnAbstractMediaStreamProvider::getAudioLayout. */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;
@@ -187,7 +188,8 @@ private:
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
-    TimePolicy m_defaultTimePolicy {TimePolicy::bindCameraTimeToLocalTime};
+	TimePolicy m_defaultTimePolicy {TimePolicy::bindCameraTimeToLocalTime};
+    CameraDiagnostics::Result m_openStreamResult;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

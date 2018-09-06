@@ -28,8 +28,7 @@ protected:
 
     virtual void beforeRun() override;
     virtual void afterRun() override;
-
-    virtual bool canChangeStatus() const override;
+    virtual bool reinitResourceOnStreamError() const { return false; }
 
 private:
     QnPlVmax480ResourcePtr m_networkRes;
