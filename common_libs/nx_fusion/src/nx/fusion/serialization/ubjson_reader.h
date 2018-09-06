@@ -125,6 +125,18 @@ public:
         return true;
     }
 
+    bool readUtf8String(std::string* target)
+    {
+        NX_ASSERT(target);
+
+        QByteArray tmp;
+        if (!readUtf8String(&tmp))
+            return false;
+
+        *target = tmp.toStdString();
+        return true;
+    }
+
     bool readBinaryData(QByteArray *target) {
         NX_ASSERT(target);
 
