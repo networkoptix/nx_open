@@ -121,7 +121,7 @@ Page
                             if (buttonId !== "DELETE")
                                 return
 
-                            removeSavedConnection(localSystemId, credentialsEditor.login)
+                            removeSavedConnection(systemId, localSystemId, credentialsEditor.login)
 
                             if (lastCredentials)
                             {

@@ -31,6 +31,7 @@ public:
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
 
+    void forgetModule(const QnUuid& id);
     void newEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id = QnUuid());
     void setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints, const QnUuid& id);
 

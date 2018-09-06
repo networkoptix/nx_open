@@ -109,6 +109,11 @@ boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
     return it->second;
 }
 
+void Manager::forgetModule(const QnUuid& id)
+{
+    m_moduleConnector->forgetModule(id);
+}
+
 void Manager::checkEndpoint(nx::network::SocketAddress endpoint, QnUuid expectedId)
 {
     NX_EXPECT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
