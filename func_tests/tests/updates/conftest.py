@@ -65,11 +65,15 @@ def updates_server_url(service_ports, updates_dir, runner_address):
 
 
 @pytest.fixture()
-def update_info(updates_dir, updates_server_url):
-    installer_set = InstallerSet(updates_dir)
+def updates_set(updates_dir):
+    return InstallerSet(updates_dir)
+
+
+@pytest.fixture()
+def update_info(updates_dir, updates_set, updates_server_url):
     return {
-        'version': str(installer_set.version),
-        'cloudHost': resolve_cloud_host_from_registry('test', installer_set.customization.customization_name),
+        'version': str(updates_set.version),
+        'cloudHost': resolve_cloud_host_from_registry('test', updates_set.customization.customization_name),
         'eulaLink': 'http://new.eula.com/eulaText',
         'eulaVersion': 1,
         'releaseNotesUrl': 'http://www.networkoptix.com/all-nx-witness-release-notes',
@@ -85,7 +89,7 @@ def update_info(updates_dir, updates_server_url):
                 'size': installer.path.stat().st_size,
                 'md5': _calculate_md5_of_file(installer.path),
                 }
-            for installer in installer_set.installers
+            for installer in updates_set.installers
             if installer.component == 'server_update'
             ]
         }

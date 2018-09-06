@@ -16,6 +16,7 @@ from urllib3.util import Url, parse_url
 
 from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
+from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 from .context_logger import ContextLogger, context_logger
@@ -222,6 +223,11 @@ class MediaserverApi(object):
     def get_server_id(self):
         return self.generic.get('/ec2/testConnection')['ecsGuid']
 
+    def get_version(self):
+        response = self.generic.get('/api/moduleInformation')
+        version = Version(response['version'])
+        return version
+
     _setup_logger = _logger.getChild('setup')
 
     @context_logger(_setup_logger, 'framework.waiting')
@@ -373,6 +379,9 @@ class MediaserverApi(object):
 
     def get_update_status(self):
         return self.generic.get('ec2/updateStatus')
+
+    def install_update(self):
+        return self.generic.post('api/installUpdate', {})
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
