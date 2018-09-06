@@ -1,18 +1,10 @@
-////////////////////////////////////////////////////////////
-// 14 aug 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef TASK_SERVER_NEW_H
-#define TASK_SERVER_NEW_H
+#pragma once
 
 #include <memory>
 
-#include <api/applauncher_api.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <utils/ipc/named_pipe_server.h>
-
-#include "blocking_queue.h"
-
+#include <nx/utils/ipc/named_pipe_server.h>
 
 class AbstractRequestProcessor;
 
@@ -49,5 +41,3 @@ private:
 
     void processNewConnection( NamedPipeSocket* clientConnection );
 };
-
-#endif  //TASK_SERVER_NEW_H

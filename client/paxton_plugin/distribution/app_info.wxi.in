@@ -1,0 +1,18 @@
+<Include>
+    <?ifndef includeGuard?>
+        <?define includeGuard="app_info.wxi"?>
+
+        <?define productId = "${paxtonProductId}"?>
+        <?define productUpgradeCode = "${paxtonProductUpgradeCode}"?>
+        <?define bundleUpgradeCode = "${paxtonBundleUpgradeCode}"?>
+        <?define productName = "${paxtonPluginName}"?>
+        <?define manufacturer = "${company.name}"?>
+        <?define productVersion = "${release.version}.${buildNumber}"?>
+        <?define customizationDir = "${customization.dir}"?>
+        <?define libraryName = "${paxtonDriverOutputName}"?>
+        <?define binariesDirectory = "${bin_source_dir}"?>
+        <?define installerLanguage = "${installerLanguage}"?>
+        <?define sourceDirectory = "${CMAKE_CURRENT_SOURCE_DIR}"?>
+        <?define installerMsiFile = "${installerMsiFile}"?>
+     <?endif?>
+</Include>

@@ -14,13 +14,6 @@
                 </RegistryKey>
             </Component>
 
-            <Component Id="AppLauncherConfigurationSystem">
-                <RegistryKey Root="HKLM"
-                         Key="Software\[Manufacturer]\$(var.applauncherName)">
-                    <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
-                </RegistryKey>
-            </Component>
-
             <Component Id="ClientEulaVersion">
                 <RegistryKey Root="HKCU"
                          Key="Software\[Manufacturer]\$(var.clientInternalName)">
@@ -111,6 +104,10 @@
             </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="info_files" Directory="ClientRootDir" Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
         <ComponentGroup Id="shared_qt_gui" Source="$(var.QtDir)" Directory="InstallDirRoot">
@@ -142,7 +139,6 @@
             <ComponentRef Id="MiniLauncherExecutable" />
             <ComponentRef Id="AppLauncherExecutable" />
             <ComponentRef Id="AppLauncherConfigurationUser" />
-            <ComponentRef Id="AppLauncherConfigurationSystem" />
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentRef Id="ClientEulaVersion"/>
@@ -152,6 +148,7 @@
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="info_files"/>
         </Feature>
     </Fragment>
 </Wix>

@@ -44,14 +44,9 @@ set(nxtool.bundleUpgradeCode "{6516fcdc-682b-4548-8fc3-a632473a76d2}")
 
 set(deb.customization.company.name "digitalwatchdog")
 
-set(paxton.className "DWSpectrum")
-set(paxton.classId "{4B70A9BD-DE07-4D84-B57C-BDB71100F95B}")
-set(paxton.interfaceId "{9783176A-3E2B-4F4B-8570-586605655113}")
-set(paxton.eventsId "{18E4C8CE-155C-456A-B398-AE84ADF442AA}")
-set(paxton.typeLibId "{5ADE482A-E57D-4FBD-84D6-CC9129B919E8}")
-set(paxton.appId "{B2CA679F-8014-4DD1-9729-E2A3A1BEBFA9}")
 set(paxton.upgradeCode "{C75D4244-D0B3-4931-96D5-45E96E3EBFA6}")
 set(paxton.bundleUpgradeCode "{03CCE76A-132B-4654-A1AD-6C7E5A795EE1}")
+set(paxtonLibraryName "DigitalWatchdog.DWSpectrum")
 
 set(ios.new_bundle_identifier "tv.dwcc.DwMobile")
 set(ios.sign.identity "iPhone Distribution: Kaltec Electronics, INC (HW58JB7FUF)")

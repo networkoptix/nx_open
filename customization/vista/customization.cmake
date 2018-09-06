@@ -34,7 +34,6 @@ set(android.storepass "5PggyvSp")
 set(android.keypass "RBxeExNL")
 
 # Update parameters
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.vista-cctv.com/updates.json")
 set(releaseNotesUrl "http://updates.vista-cctv.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.vista-cctv.com/updates.json")
@@ -55,14 +54,9 @@ set(nxtool.bundleUpgradeCode "{c141258e-4d8b-40d8-9957-561a425cddbc}")
 
 set(deb.customization.company.name "vista-qulu")
 
-set(paxton.className "Qulu")
-set(paxton.classId "{A40F128A-95D3-4D56-AC98-3734B70016EA}")
-set(paxton.interfaceId "{7D3C1DA4-42F5-453C-8D3E-999460B975CF}")
-set(paxton.eventsId "{90D3C895-8DF3-4206-9229-D09312BB27E4}")
-set(paxton.typeLibId "{691F7736-1669-41EB-8FF7-94567FAE283B}")
-set(paxton.appId "{3248BE1C-BF5C-43B1-B084-49A6F05C1EFB}")
 set(paxton.upgradeCode "{77EC46CB-737C-4BC3-8774-70956550628F}")
 set(paxton.bundleUpgradeCode "{3FAAF04F-2E3F-4B97-96ED-BFAACD6573CC}")
+set(paxtonLibraryName "VistaCCTV.Qulu")
 
 set(ios.new_bundle_identifier "com.vista.quluMobile")
 set(ios.sign.identity "iPhone Distribution: Norbain SD LTD (N3KX2CKR5P)")

@@ -30,7 +30,7 @@ struct QnStreamSynchronizationState
     static QnStreamSynchronizationState live();
 
     bool started;
-    qint64 time;
+    qint64 timeUs;
     qreal speed;
 };
 QN_FUSION_DECLARE_FUNCTIONS(QnStreamSynchronizationState, (json)(metatype))

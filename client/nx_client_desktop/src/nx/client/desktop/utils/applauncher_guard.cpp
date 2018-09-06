@@ -28,13 +28,13 @@ void ApplauncherGuard::timerEvent(QTimerEvent* event)
 {
     // Make sure activeX plugin will not start applaucher. Checking here because we don't know
     // current client mode in the constructor.
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
     {
         killTimer(event->timerId());
         return;
     }
 
-    applauncher::checkOnline();
+    applauncher::api::checkOnline();
 }
 
 } // namespace desktop

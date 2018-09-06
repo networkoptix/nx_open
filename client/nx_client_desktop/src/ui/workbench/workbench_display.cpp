@@ -2480,7 +2480,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
 
 bool QnWorkbenchDisplay::canShowLayoutBackground() const
 {
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return false;
 
     if (m_lightMode & Qn::LightModeNoLayoutBackground)

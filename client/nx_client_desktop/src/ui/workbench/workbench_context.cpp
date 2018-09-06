@@ -381,23 +381,9 @@ QnWorkbenchContext::StartupParametersCode
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
-    else if (!startupParams.delayedDrop.isEmpty())
-    { /* Drop resources if needed. */
-        NX_ASSERT(startupParams.instantDrop.isEmpty());
 
-        QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(action::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.instantDrop.isEmpty())
-    {
-        QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.layoutName.isEmpty())
-    {
-        const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
-        menu()->trigger(action::DelayedDropResourcesAction, parameters);
-    }
+    menu()->trigger(action::ProcessStartupParametersAction,
+        {Qn::StartupParametersRole, startupParams});
 
     /* Show beta version warning message for the main instance only */
     const bool showBetaWarning = QnAppInfo::beta()

@@ -38,10 +38,17 @@ qt_plugins = [
     'audio/qtaudio_windows.dll',
     'platforms/qwindows.dll']
 
-nx_libraries = ['nx_vms_utils', 'nx_utils', 'nx_network', 'nx_kit', 'udt']
+nx_libraries = [
+    'nx_vms_utils',
+    'nx_vms_applauncher_api',
+    'nx_utils',
+    'nx_network',
+    'nx_kit',
+    'udt']
 
 
 def create_client_update_file(
+    config,
     binaries_dir,
     current_binary_dir,
     qt_dir,
@@ -83,6 +90,7 @@ def create_client_update_file(
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, minilauncher_binary_name), minilauncher_binary_name)
         zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
+        zip.write(os.path.join(config['cmake_binary_dir'], 'build_info.txt'), 'build_info.txt')
 
 
 '''
@@ -105,6 +113,7 @@ def main():
     output_file = os.path.join(
         args.output, config['client_update_distribution_name']) + '.zip'
     create_client_update_file(
+        config=config,
         binaries_dir=config['bin_source_dir'],
         current_binary_dir=config['current_binary_dir'],
         qt_dir=config['qt_directory'],

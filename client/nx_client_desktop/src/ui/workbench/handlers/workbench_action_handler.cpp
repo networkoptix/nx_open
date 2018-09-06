@@ -187,17 +187,6 @@ static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
 
 const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
-QnResourcePtr getLayoutByName(const QString& layoutName, QnResourcePool* pool)
-{
-    const auto layouts = pool->getResources<QnLayoutResource>();
-    const auto trimmed = layoutName.trimmed();
-    for (const auto layout: layouts)
-    {
-        if (layout->getName().trimmed() == trimmed)
-            return layout;
-    }
-    return QnResourcePtr();
-}
 } // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -217,8 +206,7 @@ using utils::UnityLauncherWorkaround;
 // -------------------------------------------------------------------------- //
 ActionHandler::ActionHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_delayedDropGuard(false)
+    QnWorkbenchContextAware(parent)
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &ActionHandler::at_context_userChanged);
@@ -306,8 +294,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::RenameResourceAction), &QAction::triggered, this,
         &ActionHandler::at_renameAction_triggered);
     connect(action(action::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
-    connect(action(action::DelayedDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_delayedDropResourcesAction_triggered()));
-    connect(action(action::InstantDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_instantDropResourcesAction_triggered()));
+
     connect(action(action::MoveCameraAction), SIGNAL(triggered()), this, SLOT(at_moveCameraAction_triggered()));
     connect(action(action::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
     connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
@@ -552,57 +539,6 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
     return m_systemAdministrationDialog.data();
 }
 
-void ActionHandler::submitDelayedDrops()
-{
-    if (m_delayedDropGuard)
-        return;
-
-    if (!context()->user())
-        return;
-
-    if (!context()->workbench()->currentLayout()->resource())
-        return;
-
-    QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
-
-    QnResourceList resources;
-    ec2::ApiLayoutTourDataList tours;
-
-    if (!m_delayedDropLayoutName.isEmpty())
-    {
-        if (const auto resource = getLayoutByName(m_delayedDropLayoutName, resourcePool()))
-            resources.append(resource);
-        else
-            NX_EXPECT(false, "Wrong layout name");
-
-        m_delayedDropLayoutName.clear();
-    }
-
-    for (const auto& data: m_delayedDrops)
-    {
-        MimeData mimeData = MimeData::deserialized(data, resourcePool());
-
-        for (const auto& tour: layoutTourManager()->tours(mimeData.entities()))
-            tours.push_back(tour);
-
-        resources.append(mimeData.resources());
-    }
-
-    m_delayedDrops.clear();
-
-    if (resources.empty() && tours.empty())
-        return;
-
-    if (!resources.isEmpty())
-        resourcePool()->addNewResources(resources);
-
-    workbench()->clear();
-    if (!resources.empty())
-        menu()->trigger(action::OpenInNewTabAction, resources);
-    for (const auto& tour: tours)
-        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
-}
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -616,32 +552,6 @@ void ActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
             context()->instance<QnWorkbenchUpdateWatcher>()->stop();
     }
     m_serverRequests.clear();
-
-    if (!user)
-        return;
-
-    /* We should not change state when using "Open in New Window". Otherwise workbench will be
-     * cleared here even if no state is saved. */
-    if (m_delayedDrops.isEmpty() && qnRuntime->isDesktopMode())
-        context()->instance<QnWorkbenchStateManager>()->restoreState();
-
-    /* Sometimes we get here when 'New Layout' has already been added. But all user's layouts must be created AFTER this method.
-    * Otherwise the user will see uncreated layouts in layout selection menu.
-    * As temporary workaround we can just remove that layouts. */
-    // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-    if (user && !qnRuntime->isActiveXMode())
-    {
-        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesByParentId(user->getId()).filtered<QnLayoutResource>())
-        {
-            if (layout->hasFlags(Qn::local) && !layout->isFile())
-                resourcePool()->removeResource(layout);
-        }
-    }
-
-    if (workbench()->layouts().empty())
-        menu()->trigger(action::OpenNewTabAction);
-
-    submitDelayedDrops();
 }
 
 void ActionHandler::at_workbench_cellSpacingChanged()
@@ -1274,48 +1184,6 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     for (const auto& videoWall: videowalls)
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
-}
-
-void ActionHandler::at_delayedDropResourcesAction_triggered()
-{
-    const auto params = menu()->currentParameters(sender());
-    if (params.hasArgument(Qn::SerializedDataRole))
-    {
-        const auto data = params.argument<QByteArray>(Qn::SerializedDataRole);
-        m_delayedDrops.push_back(data);
-    }
-    else if (params.hasArgument(Qn::LayoutNameRole))
-    {
-        m_delayedDropLayoutName = params.argument<QString>(Qn::LayoutNameRole);
-    }
-    else
-    {
-        NX_EXPECT(false, "Wrong delayed drop action paramenters");
-        return;
-    }
-
-    submitDelayedDrops();
-}
-
-void ActionHandler::at_instantDropResourcesAction_triggered()
-{
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    MimeData mimeData = MimeData::deserialized(data, resourcePool());
-
-    if (mimeData.resources().empty())
-        return;
-
-    resourcePool()->addNewResources(mimeData.resources());
-
-    workbench()->clear();
-    bool dropped = menu()->triggerIfPossible(action::OpenInNewTabAction, mimeData.resources());
-    if (dropped)
-        action(action::ResourcesModeAction)->setChecked(true);
-
-    // Security check - just in case.
-    if (workbench()->layouts().empty())
-        menu()->trigger(action::OpenNewTabAction);
 }
 
 void ActionHandler::at_openFileAction_triggered() {
@@ -2161,7 +2029,8 @@ void ActionHandler::closeApplication(bool force) {
     menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);
     qApp->exit(0);
-    applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT);
+    applauncher::api::scheduleProcessKill(QCoreApplication::applicationPid(),
+        PROCESS_TERMINATE_TIMEOUT);
 }
 
 void ActionHandler::at_beforeExitAction_triggered() {
@@ -2374,7 +2243,7 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (commonModule()->isReadOnly())
         return;
 
-    if (qnRuntime->ignoreVersionMismatch())
+    if (!qnRuntime->isDesktopMode())
         return;
 
     if (qnClientShowOnce->testFlag(kVersionMismatchShowOnceKey))
@@ -2506,14 +2375,14 @@ void ActionHandler::at_queueAppRestartAction_triggered()
 
     auto tryToRestartClient = []
         {
-            using namespace applauncher;
+            using namespace applauncher::api;
 
             /* Try to run applauncher if it is not running. */
             if (!checkOnline())
                 return false;
 
             const auto result = restartClient();
-            if (result == applauncher::api::ResultType::Value::ok)
+            if (result == ResultType::Value::ok)
                 return true;
 
             static const int kMaxTries = 5;
@@ -2521,7 +2390,7 @@ void ActionHandler::at_queueAppRestartAction_triggered()
             {
                 QThread::msleep(100);
                 qApp->processEvents();
-                if (restartClient() == applauncher::api::ResultType::ok)
+                if (restartClient() == ResultType::ok)
                     return true;
             }
             return false;

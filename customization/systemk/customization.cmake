@@ -44,15 +44,6 @@ set(customization.fullBundleUpgradeCode "{43131bbd-e2d0-4161-9bfc-ba36f1b22593}"
 
 set(deb.customization.company.name "systemk")
 
-#set(paxton.className "SkVms")
-#set(paxton.classId "{C8BD0665-030C-49D5-85EC-F9DDFD00CC1F}")
-#set(paxton.interfaceId "{9A0BBA76-DCD3-4101-809B-6B55658E13F1}")
-#set(paxton.eventsId "{03A1E0F4-BA43-478B-AE61-079E9F8A031C}")
-#set(paxton.typeLibId "{125C2CC9-9B49-4943-AB95-72D3757C3287}")
-#set(paxton.appId "{BFD59710-DB1A-409F-9C4A-134559A44A20}")
-#set(paxton.upgradeCode "{895F5FF0-2CA9-49A6-AA71-29BF9A2B4EAB}")
-#set(paxton.bundleUpgradeCode "{23AE7DBD-2B8E-4FF0-B5FF-975A69F3287A}")
-
 set(ios.new_bundle_identifier "jp.co.systemk.SkMobile")
 set(ios.group_identifier "group.jp.co.systemk.SkMobile")
 set(ios.sign.identity "iPhone Distribution: SYSTEMK CORPORATION (22S3ZFXRW5)")

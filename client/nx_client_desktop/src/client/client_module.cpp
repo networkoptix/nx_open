@@ -184,7 +184,7 @@ QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
         return lit("self_update");
     }
 
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
     {
         return lit("ax");
     }
@@ -434,7 +434,6 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     qnRuntime->setLocale(qnSettings->locale());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
-    qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
     qnRuntime->setProfilerMode(startupParams.profilerMode);
 
     if (!startupParams.engineVersion.isEmpty())
@@ -462,8 +461,13 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     if (!startupParams.videoWallGuid.isNull())
     {
         qnRuntime->setVideoWallMode(true);
-        qnRuntime->setIgnoreVersionMismatch(true);
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
+    }
+
+    if (startupParams.acsMode)
+    {
+        qnRuntime->setAcsMode(true);
+        qnRuntime->setLightModeOverride(Qn::LightModeACS);
     }
 
     /* Here the value from LightModeOverride will be copied to LightMode */

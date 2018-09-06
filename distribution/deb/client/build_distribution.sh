@@ -263,7 +263,6 @@ buildDistribution()
     echo "Copying client.conf and applauncher.conf"
     mkdir -p "$STAGE/etc/xdg/$FULL_CUSTOMIZATION"
     cp debian/client.conf "$STAGE/etc/xdg/$FULL_CUSTOMIZATION/$FULL_PRODUCT_NAME"
-    cp debian/applauncher.conf "$STAGE/etc/xdg/$FULL_CUSTOMIZATION/$FULL_APPLAUNCHER_NAME"
 
     echo "Copying build_info.txt"
     mkdir -p "$STAGE_MODULE/"

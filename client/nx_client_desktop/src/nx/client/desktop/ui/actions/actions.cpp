@@ -62,13 +62,9 @@ void initialize(Manager* manager, Action* root)
     factory(DelayedOpenVideoWallItemAction)
         .flags(NoTarget);
 
-    factory(DelayedDropResourcesAction)
+    factory(ProcessStartupParametersAction)
         .flags(NoTarget)
-        .mode(DesktopMode);
-
-    factory(InstantDropResourcesAction)
-        .flags(NoTarget)
-        .mode(DesktopMode);
+        .mode(DesktopMode | AcsMode);
 
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)

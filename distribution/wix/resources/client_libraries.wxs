@@ -4,6 +4,7 @@
         <?include BuildVars.wxi ?>
         <ComponentGroup Id="client_nx_libraries" Source="$(var.SourceDir)" Directory="InstallDirRoot">
             <Component><File Name="nx_vms_utils.dll" KeyPath="yes"/></Component>
+            <Component><File Name="nx_vms_applauncher_api.dll" KeyPath="yes"/></Component>
         <!-- 4.0 components
             <Component><File Name="vms_gateway_core.dll" KeyPath="yes"/></Component>
             <Component><File Name="nx_relaying.dll" KeyPath="yes"/></Component>

@@ -250,8 +250,8 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
         !m_mode.testFlag(VideoWallMode))
         return InvisibleAction;
 
-    if (qnRuntime->isActiveXMode() &&
-        !m_mode.testFlag(ActiveXMode))
+    if (qnRuntime->isAcsMode() &&
+        !m_mode.testFlag(AcsMode))
         return InvisibleAction;
 
     int size = parameters.size();
