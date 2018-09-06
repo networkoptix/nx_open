@@ -28,9 +28,7 @@ public:
     virtual bool seek(qint64 offset) override;
     virtual qint64 pos() const override;
     virtual qint64 size() const override;
-
-    virtual qint64 readData(char* data, qint64 maxSize) override;
-    virtual qint64 writeData(const char* data, qint64 maxSize) override;
+    virtual qint64 grossSize() const;
 
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;
@@ -57,7 +55,6 @@ protected:
         qint64 dataSize = 0;
     } m_header;
 #pragma pack(pop)
-
 
     QString m_fileName;
 
@@ -86,10 +83,13 @@ protected:
     QFile m_file;
     mutable QnMutex m_mutex;
 
+    // These functions do all in/out work for the implemented QIODevice interface.
+    virtual qint64 readData(char* data, qint64 maxSize) override;
+    virtual qint64 writeData(const char* data, qint64 maxSize) override;
+
     // Helpers.
-    bool isWriting() const { return (m_openMode | WriteOnly) || (m_openMode | Append); }
-    void flush();
-    void adjustSize();
+    void resetState();
+    bool isWriting() const { return (m_openMode & WriteOnly) || (m_openMode & Append); }
 
     // Internal block functions.
     void readFromBlock(char* data, qint64 count);

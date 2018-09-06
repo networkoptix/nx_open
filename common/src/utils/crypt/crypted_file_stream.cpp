@@ -1,5 +1,7 @@
 #include "crypted_file_stream.h"
 
+#include <algorithm>
+
 namespace nx {
 namespace utils {
 
@@ -42,13 +44,20 @@ bool CryptedFileStream::seek(qint64 offset)
 qint64 CryptedFileStream::pos() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_position.position();
+    return QIODevice::pos();
 }
 
 qint64 CryptedFileStream::size() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_header.dataSize;
+}
+
+qint64 CryptedFileStream::grossSize() const
+{
+    // Calculating block number including "tail" block.
+    return kHeaderSize
+        + ((m_header.dataSize + kCryptoBlockSize - 1) / kCryptoBlockSize) * kCryptoBlockSize;
 }
 
 qint64 CryptedFileStream::readData(char* data, qint64 maxSize)
@@ -85,7 +94,7 @@ qint64 CryptedFileStream::writeData(const char* data, qint64 maxSize)
     qint64 toWrite = maxSize;
 
     const qint64 head = std::min(maxSize, kCryptoBlockSize - m_position.positionInBlock);
-    writeToBlock(data, toWrite);
+    writeToBlock(data, head);
     toWrite -= head;
 
     while (toWrite > kCryptoBlockSize)
@@ -111,8 +120,17 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
     close();
 
     m_file.setFileName(m_fileName);
-    if (!m_file.open(openMode))
+
+    OpenMode fileOpenMode = openMode;
+    // Since we may have to read unfinished blocks, we should never open in WriteOnly mode.
+    // For Append we need to read header and modify last block.
+    if (openMode == WriteOnly || (openMode & Append))
+        fileOpenMode = ReadWrite;
+
+    if (!m_file.open(fileOpenMode))
         return false;
+
+    m_openMode = openMode;
 
     m_enclosure.size = m_enclosure.originalSize;
 
@@ -132,9 +150,13 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
     }
 
     m_openMode = openMode;
-
     QIODevice::open(openMode);
-    seek(0);
+
+    if (openMode & Append)
+        seek(m_header.dataSize);
+    else
+        seek(0);
+
     return true;
 }
 
@@ -142,45 +164,54 @@ void CryptedFileStream::close()
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (isWriting())
-        flush();
-
-    m_file.close();
-
-    m_position = Position();
-    m_header = Header();
-    m_openMode = QIODevice::NotOpen;
-}
-
-void CryptedFileStream::flush()
-{
-    if (isWriting())
+    bool Writing = isWriting();
+    if (m_openMode != NotOpen && isWriting())
     {
         dumpCurrentBlock();
         writeHeader();
     }
+
+    m_file.close();
+    QIODevice::close();
+
+    resetState();
+}
+
+void CryptedFileStream::resetState()
+{
+    m_blockDirty = false;
+    m_position = Position();
+    m_header = Header();
+    memset(m_currentPlainBlock, 0, kCryptoBlockSize);
+    m_openMode = QIODevice::NotOpen;
 }
 
 void CryptedFileStream::readFromBlock(char* data, qint64 count)
 {
     NX_ASSERT(count + m_position.positionInBlock <= kCryptoBlockSize);
     memcpy(data, m_currentPlainBlock + m_position.positionInBlock, count);
+    m_position.positionInBlock += count;
 }
 
 void CryptedFileStream::writeToBlock(const char* data, qint64 count)
 {
+    if (count == 0) //< Nothing to write.
+        return;
+
     NX_ASSERT(count + m_position.positionInBlock <= kCryptoBlockSize);
     memcpy(m_currentPlainBlock + m_position.positionInBlock, data, count);
 
     m_blockDirty = true;
     m_position.positionInBlock += count;
-    adjustSize();
+
+    m_header.dataSize = std::max(m_header.dataSize, m_position.position());
 }
 
 void CryptedFileStream::advanceBlock()
 {
     dumpCurrentBlock();
     m_position.blockIndex ++;
+    m_position.positionInBlock = 0;
     loadCurrentBlock();
 }
 
@@ -192,6 +223,7 @@ void CryptedFileStream::dumpCurrentBlock()
     cryptBlock();
     m_file.seek(m_enclosure.position + kHeaderSize + kCryptoBlockSize * m_position.blockIndex);
     m_file.write(m_currentCryptedBlock, kCryptoBlockSize);
+    m_blockDirty = false;
 }
 
 void CryptedFileStream::loadCurrentBlock()
@@ -206,6 +238,7 @@ void CryptedFileStream::loadCurrentBlock()
     {
         m_file.seek(m_enclosure.position + kHeaderSize + kCryptoBlockSize * m_position.blockIndex);
         m_file.read(m_currentCryptedBlock, kCryptoBlockSize);
+        decryptBlock();
     }
 }
 
