@@ -1,7 +1,8 @@
+import pprint
 import time
 import timeit
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Sequence, Union
 
 from .context_logger import ContextLogger
 
@@ -98,19 +99,45 @@ def wait_for_truthy(get_value, description=None, timeout_sec=30, logger=None):
         wait.sleep()
 
 
+def _get_by_path(composite_value, path):
+    if composite_value is None:
+        return None
+    try:
+        key, next_path = path[0], path[1:]
+    except IndexError:
+        return composite_value
+    try:
+        next_value = composite_value[key]
+    except (KeyError, IndexError):
+        _logger.debug("No %r in:\n%s", key, pprint.pformat(composite_value))
+        return None
+    return _get_by_path(next_value, next_path)
+
+
 def wait_for_equal(
         get_actual,  # type: Callable[[], Any]
         expected,  # type: Any
+        path=(),  # type: Sequence[Union[str, int]]
         actual_desc=None,  # type: str
         expected_desc=None,  # type: str
         timeout_sec=30,  # type: float
         ):
+    """
+    @param path: If returned value is a big structure but only one value should be checked.
+        Specify path to it in this parameter as a sequence of keys/indices:
+        `('reply', 'remoteAddresses', 0)` or `('reply', 'systemInformation', 'platform')`.
+    """
     if actual_desc is None:
         actual_desc = _description_from_func(get_actual)
     if expected_desc is None:
         expected_desc = repr(expected)
-    desc = "{} returns {}".format(actual_desc, expected_desc)
-    wait_for_truthy(lambda: get_actual() == expected, description=desc, timeout_sec=timeout_sec)
+    if path:
+        desc = "{} returns {} by path {}".format(actual_desc, expected_desc, path)
+    else:
+        desc = "{} returns {}".format(actual_desc, expected_desc)
+    wait_for_truthy(
+        lambda: _get_by_path(get_actual(), path) == expected,
+        description=desc, timeout_sec=timeout_sec)
 
 
 class NotPersistent(Exception):
