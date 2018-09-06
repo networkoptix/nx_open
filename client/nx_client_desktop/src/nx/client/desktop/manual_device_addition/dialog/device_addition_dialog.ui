@@ -16,8 +16,8 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">so
-   <string>Add device(s)...</string>
+  <property name="windowTitle">
+   <string>Device Adding</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -291,7 +291,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="startAddressLabel">
             <property name="text">
-             <string>Start Ip</string>
+             <string>Start IP</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -317,7 +317,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>End Ip</string>
+             <string>End IP</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
