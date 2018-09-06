@@ -39,7 +39,7 @@ all detailed information about them is fetched from the progress manager.
 ### NotificationListModel
 Maintains information about system notifications, inherits **EventListModel** class that
 will be refactored in the future (most probably consumed by **NotificationListModel** itself).
-Hold a list of **EventListModel::EventData** structures describing an event for which
+Holds a list of **EventListModel::EventData** structures describing an event for which
 system notification was received. Receives notifications from **WorkbenchNotificationsHandler**.
 
 ## Model with synchronous fetch-on-demand
