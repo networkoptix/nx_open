@@ -29,10 +29,7 @@ bool Settings::attach(const std::shared_ptr<QSettings>& settings)
             continue;
         }
         if (!optionIt->second->load(settings->value(key)))
-        {
             NX_ERROR(this, lit("Failed to load option: %1").arg(key));
-            return false;
-        }
     }
     m_loaded = true;
     return true;
