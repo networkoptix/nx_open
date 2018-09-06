@@ -18,9 +18,9 @@ from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.utils import RunningTime, bool_to_str, str_to_bool
 from framework.waiting import wait_for_truthy
-from .switched_logging import SwitchedLogger, with_logger
+from .context_logger import ContextLogger, context_logger
 
-_logger = SwitchedLogger(__name__, 'mediaserver_api')
+_logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
@@ -224,9 +224,9 @@ class MediaserverApi(object):
 
     _setup_logger = _logger.getChild('setup')
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def setup_local_system(self, system_settings=None):
         system_settings = system_settings or {}
         _logger.info('Setup local system on %s.', self)
@@ -241,9 +241,9 @@ class MediaserverApi(object):
         _logger.info('Setup local system: complete, local system id: %s', self.get_local_system_id())
         return response['settings']
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def setup_cloud_system(self, cloud_account, system_settings=None):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
@@ -520,9 +520,9 @@ class MediaserverApi(object):
 
     _merge_logger = _logger.getChild('merge')
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def merge(
             self,
             remote_api,  # type: MediaserverApi

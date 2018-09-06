@@ -19,7 +19,7 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_truthy
-from ..switched_logging import with_logger
+from ..context_logger import context_logger
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -33,9 +33,9 @@ MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waitin
 _logger = logging.getLogger(__name__)
 
 
-@with_logger(_logger, 'framework.waiting')
-@with_logger(_logger, 'framework.http_api')
-@with_logger(_logger, 'framework.mediaserver_api')
+@context_logger(_logger, 'framework.waiting')
+@context_logger(_logger, 'framework.http_api')
+@context_logger(_logger, 'framework.mediaserver_api')
 class BaseMediaserver(object):
     __metaclass__ = ABCMeta
 

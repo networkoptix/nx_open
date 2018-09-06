@@ -6,7 +6,7 @@ from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
-from framework.switched_logging import with_logger
+from framework.context_logger import context_logger
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
@@ -122,8 +122,8 @@ class VMType(object):
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
         with self.vm_allocated(alias) as vm:
-            with with_logger(_logger, 'framework.networking.linux'):
-                with with_logger(_logger, 'ssh'):
+            with context_logger(_logger, 'framework.networking.linux'):
+                with context_logger(_logger, 'ssh'):
                     vm.hardware.unplug_all()
                     recovering_timeouts_sec = vm.hardware.recovering(self._power_on_timeout_sec)
                     for timeout_sec in recovering_timeouts_sec:

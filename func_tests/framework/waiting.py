@@ -2,9 +2,9 @@ import logging
 import time
 import timeit
 
-from .switched_logging import SwitchedLogger
+from .context_logger import ContextLogger
 
-_logger = SwitchedLogger(__name__, 'wait')
+_logger = ContextLogger(__name__, 'wait')
 
 
 class Wait(object):

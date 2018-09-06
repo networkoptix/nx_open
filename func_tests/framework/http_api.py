@@ -9,9 +9,9 @@ import requests.exceptions
 from requests.auth import HTTPDigestAuth
 from urllib3.util import Url
 
-from .switched_logging import SwitchedLogger
+from .context_logger import ContextLogger
 
-_logger = SwitchedLogger(__name__, 'http')
+_logger = ContextLogger(__name__, 'http')
 
 
 STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files

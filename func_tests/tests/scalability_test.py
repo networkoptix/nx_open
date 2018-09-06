@@ -20,13 +20,13 @@ from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
 from framework.merging import merge_systems
-from framework.switched_logging import SwitchedLogger, with_logger
+from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep
 from memory_usage_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
-_logger = SwitchedLogger(__name__)
+_logger = ContextLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
@@ -94,8 +94,8 @@ def with_traceback(fn):
 
 
 @with_traceback
-@with_logger(_create_test_data_logger, 'framework.http_api')
-@with_logger(_create_test_data_logger, 'framework.mediaserver_api')
+@context_logger(_create_test_data_logger, 'framework.http_api')
+@context_logger(_create_test_data_logger, 'framework.mediaserver_api')
 def create_test_data_on_server(server_tuple):
     config, server, index = server_tuple
     _logger.info('Create test data on server %s:', server)
@@ -253,9 +253,9 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
 
 _merge_logger = _logger.getChild('merge')
 
-@with_logger(_merge_logger, 'framework.waiting')
-@with_logger(_merge_logger, 'framework.http_api')
-@with_logger(_merge_logger, 'framework.mediaserver_api')
+@context_logger(_merge_logger, 'framework.waiting')
+@context_logger(_merge_logger, 'framework.http_api')
+@context_logger(_merge_logger, 'framework.mediaserver_api')
 def wait_for_data_merged(artifact_factory, merge_timeout, env):
     _logger.info('Wait for all data are merged:')
     api_methods_to_check = [
@@ -371,8 +371,8 @@ def env(request, unpacked_mediaserver_factory, config):
 
 _post_check_logger = _logger.getChild('post_check')
 
-@with_logger(_post_check_logger, 'framework.http_api')
-@with_logger(_post_check_logger, 'framework.mediaserver_api')
+@context_logger(_post_check_logger, 'framework.http_api')
+@context_logger(_post_check_logger, 'framework.mediaserver_api')
 def perform_post_checks(env):
     _logger.info('Perform test post checks:')
     if env.real_server_list[0].api.is_online():

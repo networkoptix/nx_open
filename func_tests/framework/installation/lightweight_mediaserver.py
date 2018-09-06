@@ -14,7 +14,7 @@ from .mediaserver import BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..switched_logging import with_logger
+from ..context_logger import context_logger
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_truthy
 
@@ -151,9 +151,9 @@ class LwServer(object):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
-@with_logger(_logger, 'framework.waiting')
-@with_logger(_logger, 'framework.http_api')
-@with_logger(_logger, 'framework.mediaserver_api')
+@context_logger(_logger, 'framework.waiting')
+@context_logger(_logger, 'framework.http_api')
+@context_logger(_logger, 'framework.mediaserver_api')
 class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
