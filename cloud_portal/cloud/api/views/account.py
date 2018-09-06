@@ -42,23 +42,20 @@ def register(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def login(request):
-    user = None
+    # A session exists use params from request.session
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
-        user = django.contrib.auth.authenticate(username=email, password=password)
-
-    if user is None:
-        # authorize user here
-        # return user
+    # No session use params from request.data
+    else:
         require_params(request, ('email', 'password'))
         email = request.data['email'].lower()
         password = request.data['password']
-        user = django.contrib.auth.authenticate(request=request, username=email, password=password)
+
+    user = django.contrib.auth.authenticate(request=request, username=email, password=password)
 
     if user is None:
-        account_blocked = request.session['account_blocked'] if 'account_blocked' in request.session else None
-        if account_blocked:
+        if 'account_blocked' in request.session:
             request.session.pop('account_blocked', None)
             raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
         # try to find user in the DB
@@ -71,7 +68,7 @@ def login(request):
 
     django.contrib.auth.login(request, user)
 
-    #If the user does not have an activated_date set it to the current time
+    # If the user does not have an activated_date set it to the current time
     if not user.activated_date:
         user.activated_date = timezone.now()
         user.save()
