@@ -61,7 +61,7 @@ class WinRM(object):
     def command(self, args):
         command_str_list = command_args_to_str_list(args)
         _logger.debug("Command: %s", list2cmdline(command_str_list))
-        return self._shell().start(*command_str_list)
+        return self._shell().start(command_str_list)
 
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.command(command).check_output(input, timeout_sec=timeout_sec)

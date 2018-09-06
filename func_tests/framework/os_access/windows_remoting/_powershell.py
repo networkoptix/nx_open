@@ -9,10 +9,11 @@ _logger = logging.getLogger(__name__)
 
 def start_raw_powershell_script(shell, script):
     _logger.debug("Run\n%s", script)
-    return shell.start(
+    return shell.start([
         'PowerShell',
         '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Unrestricted',
-        '-EncodedCommand', base64.b64encode(script.encode('utf_16_le')).decode('ascii'))
+        '-EncodedCommand', base64.b64encode(script.encode('utf_16_le'),).decode('ascii'),
+        ])
 
 
 class PowershellError(Exception):

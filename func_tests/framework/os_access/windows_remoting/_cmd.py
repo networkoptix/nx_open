@@ -26,9 +26,9 @@ class Shell(object):
         self._protocol.close_shell(self._shell_id)
         self._shell_id = None
 
-    def start(self, command, *arguments):
+    def start(self, args):
         assert self._shell_id is not None, "Shell is not opened, use shell with `with` clause"
-        return _WinRMCommand(self._protocol, self._shell_id, command, *arguments)
+        return _WinRMCommand(self._protocol, self._shell_id, args)
 
 
 class _WinRMCommandOutcome(CommandOutcome):
@@ -63,12 +63,12 @@ class _WinRMCommandOutcome(CommandOutcome):
 
 
 class _WinRMRun(Run):
-    def __init__(self, protocol, shell_id, command, *arguments):
+    def __init__(self, protocol, shell_id, args):
 
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
-        _logger.getChild('command').debug(' '.join([command] + list(arguments)))
+        _logger.getChild('command').debug(' '.join(args))
 
         req = {
             'env:Envelope': self._protocol._get_soap_header(
@@ -85,7 +85,7 @@ class _WinRMRun(Run):
 
         req['env:Envelope']['env:Body'] = {
             'rsp:CommandLine': {
-                'rsp:Command': '"' + list2cmdline([command] + list(arguments)) + '"',
+                'rsp:Command': '"' + list2cmdline(args) + '"',
                 }
             }
 
@@ -194,14 +194,13 @@ class _WinRMRun(Run):
 
 
 class _WinRMCommand(Command):
-    def __init__(self, protocol, shell_id, command, *arguments):
+    def __init__(self, protocol, shell_id, args):
         self._protocol = protocol
         self._shell_id = shell_id
-        self._command = command
-        self._arguments = arguments
+        self._args = args
 
     def running(self):
-        return closing(_WinRMRun(self._protocol, self._shell_id, self._command, *self._arguments))
+        return closing(_WinRMRun(self._protocol, self._shell_id, self._args))
 
 
 def receive_stdout_and_stderr_until_done(self):
