@@ -1,9 +1,8 @@
-#ifndef QN_CACHING_PTZ_CONTROLLER_H
-#define QN_CACHING_PTZ_CONTROLLER_H
+#pragma once
 
 #include <nx/utils/thread/mutex.h>
 
-#include "proxy_ptz_controller.h"
+#include <core/ptz/proxy_ptz_controller.h>
 
 class QnCachingPtzController: public QnProxyPtzController
 {
@@ -69,6 +68,3 @@ private:
     mutable QnMutex m_mutex;
     QnPtzData m_data;
 };
-
-
-#endif // QN_CACHING_PTZ_CONTROLLER_H
