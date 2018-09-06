@@ -7,7 +7,7 @@ from werkzeug.exceptions import BadRequest, SecurityError
 from defaults import defaults
 from framework.installation.installer import InstallerSet
 from framework.os_access.local_path import LocalPath
-from framework.serving import WsgiServer, make_base_url_for_remote_machine
+from framework.serving import WsgiServer
 
 
 def pytest_addoption(parser):

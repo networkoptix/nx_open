@@ -125,23 +125,6 @@ class _VirtualBoxVm(VmHardware):
                 break
 
     @staticmethod
-    def _parse_host_address(raw_dict):
-        try:
-            nat_network_1_value = raw_dict['natnet1']
-        except KeyError:
-            _logger.info("NIC 1 is not set to NAT.")
-            return None
-        if nat_network_1_value != 'nat':
-            nat_network = IPNetwork(nat_network_1_value)
-        else:
-            # See: https://www.virtualbox.org/manual/ch09.html#idm8375
-            nat_nic_index = 1
-            nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
-        host_address_from_vm = nat_network.ip + 2
-        _logger.debug("Host IP network: %s.", nat_network)
-        return host_address_from_vm
-
-    @staticmethod
     def _parse_macs(raw_dict):
         for nic_index in _INTERNAL_NIC_INDICES:
             try:
@@ -160,7 +143,7 @@ class _VirtualBoxVm(VmHardware):
             if nic_type == 'null':
                 yield nic_index
 
-    def __init__(self, virtual_box, name):
+    def __init__(self, virtual_box, name):  # type: (VirtualBox, str) -> None
         raw_output = virtual_box.manage(['showvminfo', name, '--machinereadable'])
         _logger.debug("Parse raw VM info of %s.", name)
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
@@ -168,19 +151,13 @@ class _VirtualBoxVm(VmHardware):
         is_running = raw_dict['VMState'] == 'running'
         _logger.debug('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
-        host_address = cls._parse_host_address(raw_dict)
-        _logger.debug("VM %s: host IP address: %s.", name, host_address)
         self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
         _logger.debug("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
-        if host_address is None:
-            assert not self._port_forwarding
-            ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
-        else:
-            ports_map = ReciprocalPortMap(
-                OneWayPortMap.forwarding({
-                    (port.protocol, port.guest_port): port.host_port
-                    for port in self._port_forwarding}),
-                OneWayPortMap.direct(host_address))
+        ports_map = ReciprocalPortMap(
+            OneWayPortMap.forwarding({
+                (port.protocol, port.guest_port): port.host_port
+                for port in self._port_forwarding}),
+            OneWayPortMap.direct(virtual_box.runner_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         try:
@@ -209,6 +186,8 @@ class _VirtualBoxVm(VmHardware):
             '--options', 'link',
             '--register',
             ])
+        nat_subnet = self._virtual_box.__class__._nat_subnet
+        self._virtual_box.manage(['modifyvm', self.name, '--natnet1', nat_subnet])
         return self.__class__(self._virtual_box, clone_vm_name)
 
     def setup_mac_addresses(self, make_mac):
@@ -336,8 +315,22 @@ class _VirtualBoxVm(VmHardware):
 class VirtualBox(Hypervisor):
     """Interface for VirtualBox as hypervisor."""
 
-    def __init__(self, host_os_access):
-        super(VirtualBox, self).__init__(host_os_access)
+    ## Network for management. Host, as it's seen from VMs, is the part of this network and its
+    # address, as seen from VMs, is in this network. Host has a special address in NAT network, it
+    # is `(net & mask) + 2`. See: https://www.virtualbox.org/manual/ch09.html#idm8375.
+    _nat_subnet = IPNetwork('192.168.254.0/24')
+
+    def __init__(self, host_os_access, runner_address):
+        """Create VirtualBox hypervisor.
+        @param runner_address: Address of machine this process is running on as seen from machine
+            VirtualBox is working on. If it's the same machine, and the address of the machine is
+            referred to as a local loopback (127.0.0.1), the address has to be changed to the
+            address, by which VMs can access the machine. Otherwise, the address should be
+            accessible from VMs.
+        """
+        if runner_address.is_loopback():
+            runner_address = self.__class__._nat_subnet.ip + 2
+        super(VirtualBox, self).__init__(host_os_access, runner_address)
 
     def import_vm(self, vm_image_path, vm_name):
         self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
