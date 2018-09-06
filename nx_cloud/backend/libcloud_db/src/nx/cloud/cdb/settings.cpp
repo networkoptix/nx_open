@@ -261,7 +261,7 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
-const data_sync_engine::Settings& Settings::p2pDb() const
+const data_sync_engine::SynchronizationSettings& Settings::p2pDb() const
 {
     return m_p2pDb;
 }

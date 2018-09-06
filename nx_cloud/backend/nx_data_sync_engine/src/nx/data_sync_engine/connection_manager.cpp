@@ -27,7 +27,7 @@ namespace data_sync_engine {
 
 ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
-    const Settings& settings,
+    const SynchronizationSettings& settings,
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
     IncomingTransactionDispatcher* const transactionDispatcher,

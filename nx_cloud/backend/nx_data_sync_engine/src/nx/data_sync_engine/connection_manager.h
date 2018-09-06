@@ -41,7 +41,7 @@ class MessageDispatcher;
 namespace nx {
 namespace data_sync_engine {
 
-class Settings;
+class SynchronizationSettings;
 
 class IncomingTransactionDispatcher;
 class OutgoingTransactionDispatcher;
@@ -75,7 +75,7 @@ public:
 
     ConnectionManager(
         const QnUuid& moduleGuid,
-        const Settings& settings,
+        const SynchronizationSettings& settings,
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
         IncomingTransactionDispatcher* const transactionDispatcher,
@@ -170,7 +170,7 @@ private:
     constexpr static const int kConnectionByIdIndex = 0;
     constexpr static const int kConnectionByFullPeerNameIndex = 1;
 
-    const Settings& m_settings;
+    const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
     ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
     TransactionLog* const m_transactionLog;

@@ -10,7 +10,7 @@ namespace data_sync_engine {
 SyncronizationEngine::SyncronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const QnUuid& moduleGuid,
-    const Settings& settings,
+    const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
@@ -108,9 +108,9 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
     subscription.removeSubscription(m_systemDeletedSubscriptionId);
 }
 
-const char* const kEstablishEc2TransactionConnectionPath = "/events/ConnectingStage1";
-const char* const kEstablishEc2P2pTransactionConnectionPath = "/messageBus";
-const char* const kPushEc2TransactionPath = "/forward_events/{sequence}";
+static constexpr char kEstablishEc2TransactionConnectionPath[] = "/events/ConnectingStage1";
+static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/messageBus";
+static constexpr char kPushEc2TransactionPath[] = "/forward_events/{sequence}";
 
 void SyncronizationEngine::registerHttpApi(
     const std::string& pathPrefix,

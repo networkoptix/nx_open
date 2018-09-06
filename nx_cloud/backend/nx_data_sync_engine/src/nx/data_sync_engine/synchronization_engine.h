@@ -18,7 +18,7 @@
 namespace nx {
 namespace data_sync_engine {
 
-class Settings;
+class SynchronizationSettings;
 
 class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
 {
@@ -30,7 +30,7 @@ public:
     SyncronizationEngine(
         const std::string& applicationId,
         const QnUuid& moduleGuid,
-        const Settings& settings,
+        const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
