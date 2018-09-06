@@ -2,6 +2,8 @@ import logging
 import time
 import timeit
 
+from typing import Any, Callable, Optional
+
 from .context_logger import ContextLogger
 
 _logger = ContextLogger(__name__, 'wait')
@@ -9,6 +11,7 @@ _logger = ContextLogger(__name__, 'wait')
 
 class Wait(object):
     def __init__(self, until, timeout_sec=30, attempts_limit=100, logger=None):
+        # type: (str, float, int, ...) -> None
         self._until = until
         assert timeout_sec is not None
         self._timeout_sec = timeout_sec
@@ -67,7 +70,7 @@ class WaitTimeout(Exception):
         self.timeout_sec = timeout_sec
 
 
-def _description_from_func(func):
+def _description_from_func(func):  # type: (Any) -> str
     try:
         object_bound_to = func.__self__
     except AttributeError:
@@ -80,6 +83,7 @@ def _description_from_func(func):
 
 
 def wait_for_truthy(get_value, description=None, timeout_sec=30, logger=None):
+    # type: (Callable[[], Any], Optional, float, ...) -> None
     if description is None:
         description = _description_from_func(get_value)
     wait = Wait(description, timeout_sec=timeout_sec, logger=logger)
@@ -95,7 +99,13 @@ def wait_for_truthy(get_value, description=None, timeout_sec=30, logger=None):
         wait.sleep()
 
 
-def wait_for_equal(get_actual, expected, actual_desc=None, expected_desc=None, timeout_sec=30):
+def wait_for_equal(
+        get_actual,  # type: Callable[[], Any]
+        expected,  # type: Any
+        actual_desc=None,  # type: str
+        expected_desc=None,  # type: str
+        timeout_sec=30,  # type: float
+        ):
     if actual_desc is None:
         actual_desc = _description_from_func(get_actual)
     if expected_desc is None:
