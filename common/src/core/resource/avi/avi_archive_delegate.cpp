@@ -40,15 +40,18 @@ static const std::chrono::microseconds kMaxFaultySeekReopenOffset = std::chrono:
 static const qint64 kSeekError = -1;
 
 /**
+ * Parses h264 NAL unit list to determine if it contains I frame (IDR or non-IDR).
  * Since we may have multiple NAL units without actual data (such as SPS, PPS), we have to iterate
- * them until we meet the one with data to check if it's a key frame. That might be time-consuming,
+ * them until we meet the one with data to check if it's a I frame. That might be time-consuming,
  * so this function should not be used after at least one key frame has been found.
  */
-static bool isIFrame(const void* data, int size)
+static bool isH264IFrame(const QnAbstractMediaDataPtr& data)
 {
-    const quint8* pData = (const quint8*)data;
-    const quint8* pDataEnd = pData + size;
+    if (data->context->getCodecId() != AV_CODEC_ID_H264)
+        return false;
 
+    const quint8* pData = (const quint8*)data->data();
+    const quint8* pDataEnd = pData + data->dataSize();
     while ((pData = NALUnit::findNextNAL(pData, pDataEnd)) != pDataEnd)
     {
         if (NALUnit::isIFrame(pData, pDataEnd - pData))
@@ -266,12 +269,13 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     /**
-     * FFMPEG fills MediaFlags_AVKey for IDR frames but won't do it for non-IDR ones. That's why we
-     * check for such frames manually, but only one time per file open or per seek.
+     * When parsing h264 stream FFMPEG fills MediaFlags_AVKey for IDR frames but won't do it for
+     * non-IDR ones. That's why we check for such frames manually, but only one time per file open
+     * or per seek.
      */
     if (!m_keyFrameFound[data->channelNumber]
         && (data->flags.testFlag(QnAbstractMediaData::MediaFlag::MediaFlags_AVKey)
-            || isIFrame(data->data(), data->dataSize())))
+            || isH264IFrame(data)))
     {
         data->flags |= QnAbstractMediaData::MediaFlag::MediaFlags_AVKey;
         m_keyFrameFound[data->channelNumber] = true;
