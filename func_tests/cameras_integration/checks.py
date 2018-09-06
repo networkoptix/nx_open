@@ -46,10 +46,29 @@ class Halt(Result):
         return dict(condition='halt', **self.__dict__)
 
 
-def expect_values(*args, **kwargs):
+def expect_values(expected, actual, *args, **kwargs):
     checker = Checker()
-    checker.expect_values(*args, **kwargs)
+    checker.expect_values(expected, actual, *args, **kwargs)
     return checker.result()
+
+
+def retry_expect_values(expected_result, call, exceptions=None, *args, **kwargs):
+    while True:
+        try:
+            actual_result = call()
+
+        except exceptions as error:
+            yield Failure(str(error))
+
+        else:
+            if not expected_result:
+                return
+
+            result = expect_values(expected_result, actual_result, *args, **kwargs)
+            if isinstance(result, Success):
+                return
+
+            yield result
 
 
 class Checker(object):

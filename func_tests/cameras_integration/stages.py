@@ -15,8 +15,9 @@ from datetime import timedelta
 import subprocess32 as subprocess
 from typing import Generator, List
 
+from framework.http_api import HttpError
 from . import stage
-from .checks import Checker, Failure, Halt, Result, Success, expect_values
+from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
@@ -270,34 +271,35 @@ PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
 def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:
-            raise KeyError('PTZ {}({:b}) capabilities is not supported in {:b}'.format(
+            raise KeyError('PTZ {}({:b}) capabilities are not supported in {:b}'.format(
                 name, flag, run.data['ptzCapabilities']))
 
-    def execute(*args, **kwargs):
-        return run.server.api.execute_ptz(run.id, *args, **kwargs)
-
-    checker = Checker()
     for use_preset in False, True:
-        for index, position in enumerate(positions):
+        for position in positions:
             point = {k: int(v) for k, v in zip(
                 ('pan', 'tilt', 'zoom'), position['point'].split('-'))}
+
+            def execute(command, expected=None, **kwargs):
+                return retry_expect_values(
+                    expected, lambda: run.server.api.execute_ptz(run.id, command, **kwargs),
+                    HttpError, '<{}>'.format(position['preset' if use_preset else 'point']))
+
             if use_preset:
                 if 'preset' not in position:
                     continue
 
                 name = position.get('name', position['preset'])
-                expected = {'id=' + position['preset']: {'name': name}}
-                while not checker.expect_values(expected, execute('GetPresets'), 'presets'):
-                    yield checker.result()
+                for error in execute('GetPresets', {'id=' + position['preset']: {'name': name}}):
+                    yield error
 
-                execute('ActivatePreset', speed=100, presetId=position['preset'])
-                title = 'preset[{}]'.format(position['preset'])
+                for error in execute('ActivatePreset', speed=100, presetId=position['preset']):
+                    yield error
             else:
-                execute('AbsoluteDeviceMove', speed=100, **point)
-                title = 'point[{}]'.format(position['point'])
+                for error in execute('AbsoluteDeviceMove', speed=100, **point):
+                    yield error
 
             yield Halt('Wait for move to {}'.format(point))
-            while not checker.expect_values(point, execute('GetDevicePosition'), title):
-                yield checker.result()
+            for error in execute('GetDevicePosition'):
+                yield error
 
     yield Success()
