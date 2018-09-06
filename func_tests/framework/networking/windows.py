@@ -1,4 +1,3 @@
-import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
