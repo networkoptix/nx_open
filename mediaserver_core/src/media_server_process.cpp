@@ -3310,7 +3310,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     auto safeDisconnect =
-        [](QObject* src, QObject* dst)
+        [this](QObject* src, QObject* dst)
         {
             if (src && dst)
                 disconnect(src, nullptr, dst, nullptr);

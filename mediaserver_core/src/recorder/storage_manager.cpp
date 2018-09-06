@@ -2102,6 +2102,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 this,
                 lm("Cleanup. Won't cleanup storage %1 because this storage contains no archive")
                     .args(storage->getUrl()));
+            m_diskFullMap[storage->getId()] = true;
             return true;
         }
 
@@ -2163,13 +2164,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         deletedChunk = DeviceFileCatalog::Chunk();
     }
 
-    if (toDelete > 0)
+    if (toDelete > 0 && !useMinArchiveDays)
     {
-        if (!useMinArchiveDays && !m_diskFullWarned[storage->getId()])
-        {
-            emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
-            m_diskFullWarned[storage->getId()] = true;
-        }
+        m_diskFullMap[storage->getId()] = true;
     }
     else
     {
@@ -2182,9 +2179,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 storage->getSpaceLimit());
         }
     }
-
-    if (toDelete <= 0 || useMinArchiveDays)
-        m_diskFullWarned[storage->getId()] = false;
 
     return toDelete <= 0;
 }
@@ -2427,6 +2421,28 @@ void QnStorageManager::startAuxTimerTasks()
         [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
         kCheckSystemStorageSpace,
         kCheckSystemStorageSpace);
+
+    static const std::chrono::minutes kCheckStorageSpace(1);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            QnMutexLocker lock(&m_clearSpaceMutex);
+            /**
+             * Notify a user if a storage doesn't have enough space to write to and clear the
+             * corresponding flag. It (the flag) will be raised again in the clearOldestSpace()
+             * function if the issue persists.
+             */
+            for (const auto& storage: getClearableStorages())
+            {
+                if (m_diskFullMap.contains(storage->getId()) && m_diskFullMap[storage->getId()])
+                {
+                    emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
+                    m_diskFullMap[storage->getId()] = false;
+                }
+            }
+        },
+        kCheckStorageSpace,
+        kCheckStorageSpace);
 
     static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
