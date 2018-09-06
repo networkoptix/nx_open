@@ -13,6 +13,8 @@ public:
     QnCachingPtzController(const QnPtzControllerPtr& baseController);
     virtual ~QnCachingPtzController();
 
+    virtual void initialize() override;
+
     static bool extends(Ptz::Capabilities capabilities);
 
     virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
@@ -47,7 +49,7 @@ protected:
     virtual void baseFinished(Qn::PtzCommand command, const QVariant& data) override;
 
 private:
-    bool initialize();
+    bool initializeInternal();
 
     template<class T>
     Qn::PtzDataFields updateCacheLocked(
