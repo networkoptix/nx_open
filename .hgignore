@@ -32,3 +32,4 @@ cloud_portal/front_end/app/styles/custom
 cloud_portal/robot_tests/{geckodriver.log,venv}
 
 webadmin/static
+CMakeLists.txt.user
