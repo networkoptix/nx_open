@@ -253,7 +253,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
     switch (optName)
     {
         case UDT_LINGER:
-            m_Linger = *(linger*)optval;
+            m_Linger = *(struct linger*)optval;
             return;
 
         default:
@@ -438,11 +438,11 @@ void CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         case UDT_LINGER:
-            if (optlen < (int)(sizeof(linger)))
+            if (optlen < (int)(sizeof(m_Linger)))
                 throw CUDTException(5, 3, 0);
 
-            *(linger*)optval = m_Linger;
-            optlen = sizeof(linger);
+            *(struct linger*)optval = m_Linger;
+            optlen = sizeof(m_Linger);
             break;
 
         case UDP_SNDBUF:
@@ -543,12 +543,12 @@ bool CUDT::isClosing() const
     return m_bClosing;
 }
 
-void CUDT::setIsBroken(bool val)
+void CUDT::setBroken(bool val)
 {
     m_bBroken = val;
 }
 
-bool CUDT::isBroken() const
+bool CUDT::broken() const
 {
     return m_bBroken;
 }
@@ -2057,7 +2057,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (CSeqNo::seqcmp(ack, CSeqNo::incseq(m_iSndCurrSeqNo)) > 0)
             {
                 //this should not happen: attack or bug
-                setIsBroken(true);
+                setBroken(true);
                 m_iBrokenCounter = 0;
                 break;
             }
@@ -2217,7 +2217,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (!secure)
             {
                 //this should not happen: attack or bug
-                setIsBroken(true);
+                setBroken(true);
                 m_iBrokenCounter = 0;
                 break;
             }
@@ -2273,7 +2273,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
         case ControlPacketType::Shutdown:
             m_bShutdown = true;
             setIsClosing(true);
-            setIsBroken(true);
+            setBroken(true);
             m_iBrokenCounter = 60;
 
             //performing ACK on existing data to provide data already-in-buffer to recv
@@ -2664,7 +2664,7 @@ void CUDT::checkTimers(bool forceAck)
             // Application will detect this when it calls any UDT methods next time.
             //
             setIsClosing(true);
-            setIsBroken(true);
+            setBroken(true);
             m_iBrokenCounter = 30;
             m_bShutdown = false;
 

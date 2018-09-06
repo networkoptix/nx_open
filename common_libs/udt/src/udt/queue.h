@@ -163,7 +163,7 @@ public:
     // Returned value:
     //    None.
 
-    void insert(int64_t ts, const CUDT* u);
+    void insert(int64_t ts, CUDT* u);
 
     // Functionality:
     //    Update the timestamp of the UDT instance on the list.
@@ -173,7 +173,7 @@ public:
     // Returned value:
     //    None.
 
-    void update(const CUDT* u, bool reschedule = true);
+    void update(CUDT* u, bool reschedule = true);
 
     // Functionality:
     //    Retrieve the next packet and peer address from the first entry, and reschedule it in the queue.
@@ -192,7 +192,7 @@ public:
     // Returned value:
     //    None.
 
-    void remove(const CUDT* u);
+    void remove(CUDT* u);
 
     // Functionality:
     //    Retrieve the next scheduled processing time.
@@ -204,8 +204,8 @@ public:
     uint64_t getNextProcTime();
 
 private:
-    void insert_(int64_t ts, const CUDT* u);
-    void remove_(const CUDT* u);
+    void insert_(int64_t ts, CUDT* u);
+    void remove_(CUDT* u);
 
 private:
     CSNode** m_pHeap;            // The heap array
@@ -250,7 +250,7 @@ public:
     // Returned value:
     //    None.
 
-    void insert(const CUDT* u);
+    void insert(CUDT* u);
 
     // Functionality:
     //    Remove the UDT instance from the list.
@@ -259,7 +259,7 @@ public:
     // Returned value:
     //    None.
 
-    void remove(const CUDT* u);
+    void remove(CUDT* u);
 
     // Functionality:
     //    Move the UDT instance to the end of the list, if it already exists; otherwise, do nothing.
@@ -268,7 +268,7 @@ public:
     // Returned value:
     //    None.
 
-    void update(const CUDT* u);
+    void update(CUDT* u);
 
 public:
     CRNode* m_pUList;        // the head node

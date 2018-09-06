@@ -331,7 +331,7 @@ CSndUList::~CSndUList()
     delete[] m_pHeap;
 }
 
-void CSndUList::insert(int64_t ts, const CUDT* u)
+void CSndUList::insert(int64_t ts, CUDT* u)
 {
     std::scoped_lock<std::mutex> listguard(m_ListLock);
 
@@ -358,11 +358,11 @@ void CSndUList::insert(int64_t ts, const CUDT* u)
     insert_(ts, u);
 }
 
-void CSndUList::update(const CUDT* u, bool reschedule)
+void CSndUList::update(CUDT* u, bool reschedule)
 {
     std::scoped_lock<std::mutex> listguard(m_ListLock);
 
-    CSNode* n = u->m_pSNode;
+    CSNode* n = u->sNode();
 
     if (n->m_iHeapLoc >= 0)
     {
@@ -398,14 +398,14 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
     CUDT* u = m_pHeap[0]->m_pUDT;
     remove_(u);
 
-    if (!u->m_bConnected || u->m_bBroken)
+    if (!u->connected() || u->broken())
         return -1;
 
     // pack a packet from the socket
     if (u->packData(pkt, ts) <= 0)
         return -1;
 
-    addr = u->m_pPeerAddr;
+    addr = u->peerAddr();
 
     // insert a new entry, ts is the next processing time
     if (ts > 0)
@@ -414,7 +414,7 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
     return 1;
 }
 
-void CSndUList::remove(const CUDT* u)
+void CSndUList::remove(CUDT* u)
 {
     std::scoped_lock<std::mutex> listguard(m_ListLock);
 
@@ -431,9 +431,9 @@ uint64_t CSndUList::getNextProcTime()
     return m_pHeap[0]->m_llTimeStamp;
 }
 
-void CSndUList::insert_(int64_t ts, const CUDT* u)
+void CSndUList::insert_(int64_t ts, CUDT* u)
 {
-    CSNode* n = u->m_pSNode;
+    CSNode* n = u->sNode();
 
     // do not insert repeated node
     if (n->m_iHeapLoc >= 0)
@@ -474,9 +474,9 @@ void CSndUList::insert_(int64_t ts, const CUDT* u)
     }
 }
 
-void CSndUList::remove_(const CUDT* u)
+void CSndUList::remove_(CUDT* u)
 {
-    CSNode* n = u->m_pSNode;
+    CSNode* n = u->sNode();
 
     if (n->m_iHeapLoc >= 0)
     {
@@ -613,9 +613,9 @@ CRcvUList::~CRcvUList()
 {
 }
 
-void CRcvUList::insert(const CUDT* u)
+void CRcvUList::insert(CUDT* u)
 {
-    CRNode* n = u->m_pRNode;
+    CRNode* n = u->rNode();
     CTimer::rdtsc(n->m_llTimeStamp);
 
     if (NULL == m_pUList)
@@ -634,9 +634,9 @@ void CRcvUList::insert(const CUDT* u)
     m_pLast = n;
 }
 
-void CRcvUList::remove(const CUDT* u)
+void CRcvUList::remove(CUDT* u)
 {
-    CRNode* n = u->m_pRNode;
+    CRNode* n = u->rNode();
 
     if (!n->m_bOnList)
         return;
@@ -665,9 +665,9 @@ void CRcvUList::remove(const CUDT* u)
     n->m_pNext = n->m_pPrev = NULL;
 }
 
-void CRcvUList::update(const CUDT* u)
+void CRcvUList::update(CUDT* u)
 {
-    CRNode* n = u->m_pRNode;
+    CRNode* n = u->rNode();
 
     if (!n->m_bOnList)
         return;
@@ -873,26 +873,26 @@ void CRendezvousQueue::updateConnStatus()
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
         // avoid sending too many requests, at most 1 request per 250ms
-        if (CTimer::getTime() - i->m_pUDT->m_llLastReqTime > 250000)
+        if (CTimer::getTime() - i->m_pUDT->lastReqTime() > 250000)
         {
             if (CTimer::getTime() >= i->m_ullTTL)
             {
                 // connection timer expired, acknowledge app via epoll
                 i->m_pUDT->setConnecting(false);
-                CUDT::s_UDTUnited.m_EPoll.update_events(i->m_iID, i->m_pUDT->m_sPollID, UDT_EPOLL_ERR, true);
+                CUDT::s_UDTUnited.m_EPoll.update_events(i->m_iID, i->m_pUDT->pollIds(), UDT_EPOLL_ERR, true);
                 continue;
             }
 
             CPacket request;
-            char* reqdata = new char[i->m_pUDT->m_iPayloadSize];
-            request.pack(ControlPacketType::Handshake, NULL, reqdata, i->m_pUDT->m_iPayloadSize);
+            char* reqdata = new char[i->m_pUDT->payloadSize()];
+            request.pack(ControlPacketType::Handshake, NULL, reqdata, i->m_pUDT->payloadSize());
             // ID = 0, connection request
-            request.m_iID = !i->m_pUDT->m_bRendezvous ? 0 : i->m_pUDT->m_ConnRes.m_iID;
-            int hs_size = i->m_pUDT->m_iPayloadSize;
-            i->m_pUDT->m_ConnReq.serialize(reqdata, hs_size);
+            request.m_iID = !i->m_pUDT->rendezvous() ? 0 : i->m_pUDT->connRes().m_iID;
+            int hs_size = i->m_pUDT->payloadSize();
+            i->m_pUDT->connReq().serialize(reqdata, hs_size);
             request.setLength(hs_size);
-            i->m_pUDT->m_pSndQueue->sendto(i->m_pPeerAddr, request);
-            i->m_pUDT->m_llLastReqTime = CTimer::getTime();
+            i->m_pUDT->sndQueue()->sendto(i->m_pPeerAddr, request);
+            i->m_pUDT->setLastReqTime(CTimer::getTime());
             delete[] reqdata;
         }
     }
@@ -976,7 +976,7 @@ void CRcvQueue::worker()
             if (NULL != ne)
             {
                 m_pRcvUList->insert(ne);
-                m_pHash->insert(ne->m_SocketID, ne);
+                m_pHash->insert(ne->socketId(), ne);
             }
         }
 
@@ -1007,12 +1007,14 @@ void CRcvQueue::worker()
             if (0 == id)
             {
                 if (NULL != m_pListener)
+                {
                     m_pListener->listen(addr, unit->m_Packet);
+                }
                 else if (NULL != (u = m_pRendezvousQueue->retrieveFromRQ(addr, id)))
                 {
                     // asynchronous connect: call connect here
                     // otherwise wait for the UDT socket to retrieve this packet
-                    if (!u->m_bSynRecving)
+                    if (!u->synRecving())
                         u->connect(unit->m_Packet);
                     else
                         storePkt(id, unit->m_Packet.clone());
@@ -1026,9 +1028,9 @@ void CRcvQueue::worker()
 
                 if (NULL != (u = m_pHash->lookup(id)))
                 {
-                    if (CIPAddress::ipcmp(addr, u->m_pPeerAddr, u->m_iIPversion))
+                    if (CIPAddress::ipcmp(addr, u->peerAddr(), u->ipVersion()))
                     {
-                        if (u->m_bConnected && !u->m_bBroken && !u->isClosing())
+                        if (u->connected() && !u->broken() && !u->isClosing())
                         {
                             if (unit->m_Packet.getFlag() == PacketFlag::Data)
                                 u->processData(unit);
@@ -1042,7 +1044,7 @@ void CRcvQueue::worker()
                 }
                 else if (NULL != (u = m_pRendezvousQueue->retrieveFromRQ(addr, id)))
                 {
-                    if (!u->m_bSynRecving)
+                    if (!u->synRecving())
                         u->connect(unit->m_Packet);
                     else
                         storePkt(id, unit->m_Packet.clone());
@@ -1066,7 +1068,7 @@ void CRcvQueue::worker()
         {
             CUDT* u = ul->m_pUDT;
 
-            if (u->m_bConnected && !u->m_bBroken && !u->isClosing())
+            if (u->connected() && !u->broken() && !u->isClosing())
             {
                 u->checkTimers(false);
                 m_pRcvUList->update(u);
@@ -1074,9 +1076,9 @@ void CRcvQueue::worker()
             else
             {
                 // the socket must be removed from Hash table first, then RcvUList
-                m_pHash->remove(u->m_SocketID);
+                m_pHash->remove(u->socketId());
                 m_pRcvUList->remove(u);
-                u->m_pRNode->m_bOnList = false;
+                u->rNode()->m_bOnList = false;
             }
 
             ul = m_pRcvUList->m_pUList;
