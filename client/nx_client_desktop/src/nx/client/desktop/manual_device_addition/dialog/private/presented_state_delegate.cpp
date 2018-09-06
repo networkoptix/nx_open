@@ -44,8 +44,8 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
 
     static constexpr auto kBigStretch = 100;
     const auto currentLayout = new QHBoxLayout(this);
-    currentLayout->addWidget(button);
     currentLayout->addStretch(kBigStretch);
+    currentLayout->addWidget(button);
 
     if (addedState)
     {

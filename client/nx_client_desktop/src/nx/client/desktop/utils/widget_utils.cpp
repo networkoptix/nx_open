@@ -24,6 +24,7 @@ void WidgetUtils::removeLayout(QLayout* layout)
             removeLayout(childLayout);
         delete item;
     }
+    delete layout;
 }
 
 const QWidget* WidgetUtils::graphicsProxiedWidget(const QWidget* widget)
