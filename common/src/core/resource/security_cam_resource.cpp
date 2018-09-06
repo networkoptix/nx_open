@@ -48,6 +48,11 @@ bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
     return value == nx::core::resource::DeviceType::unknown;
 };
 
+QString boolToPropertyStr(bool value)
+{
+    return value ? lit("1") : lit("0");
+}
+
 } // namespace
 
 const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
@@ -887,14 +892,14 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
     setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
 }
 
-bool QnSecurityCamResource::isTrustCameraTime() const
+bool QnSecurityCamResource::trustCameraTime() const
 {
-    return QVariant(getProperty(Qn::TRUST_CAMERA_TIME_NAME)).toBool();
+    return getProperty(Qn::TRUST_CAMERA_TIME_NAME).toInt() > 0;
 }
 
-void QnSecurityCamResource::trustCameraTime(bool value)
+void QnSecurityCamResource::setTrustCameraTime(bool value)
 {
-    setProperty(Qn::TRUST_CAMERA_TIME_NAME, value);
+    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
 }
 
 

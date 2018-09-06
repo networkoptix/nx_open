@@ -684,7 +684,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
         [](const Camera& camera)
         {
-            return camera->isTrustCameraTime();
+            return camera->trustCameraTime();
         });
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,

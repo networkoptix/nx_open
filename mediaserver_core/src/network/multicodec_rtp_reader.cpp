@@ -818,7 +818,7 @@ void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
 void QnMulticodecRtpReader::updateTimePolicy()
 {
     auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource && secResource->isTrustCameraTime())
+    if (secResource && secResource->trustCameraTime())
         m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
     else
         m_timeHelper.setTimePolicy(m_defaultTimePolicy);
