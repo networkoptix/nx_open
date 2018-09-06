@@ -229,13 +229,13 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage()
-def io_events(run, ins, outs, connected=False):
+def io_events(run, ins, outs):
         # type: (stage.Run, list, list, bool) -> Generator[Result]
-    expected_ports = {}
-    for id in ins:
-        expected_ports['id=' + id] = dict(portType='Input', inputName='Input ' + id)
-    for id in outs:
-        expected_ports['id=' + id] = dict(portType='Output', outputName='Output ' + id)
+    expected_ports = {
+        'id=' + port['id']: {'portType': type_, name: port.get('name', type_ + ' ' + port['id'])}
+        for ports, type_, name in zip((ins, outs), ('Input', 'Output'), ('inputName', 'outputName'))
+        for port in ports
+    }
 
     checker = Checker()
     while not checker.expect_values(expected_ports, run.data['ioSettings'], 'io'):
@@ -243,21 +243,24 @@ def io_events(run, ins, outs, connected=False):
 
     camera_uuid = run.data['id']  # Event rules work with UUIDs only, physicalId will not work.
     run.server.api.make_event_rule(
+        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
+    run.server.api.make_event_rule(
         'userDefinedEvent', 'Undefined', 'cameraOutputAction',
         event_condition_resource=run.id, action_resource_ids=[camera_uuid])
-    run.server.api.make_event_rule(
-        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
 
     run.server.api.create_event(source=run.id)
-    if not connected:
-        yield Success()
+    for port in ins:
+        if not port.get('connected'):
+            continue
 
-    while True:
-        events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
-        if events:
-            yield expect_values({'eventParams.inputPortId': ins[0]}, events[-1], 'event')
-        else:
-            yield Failure('No input events from camera')
+        while True:
+            events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
+            if events:
+                yield expect_values({'eventParams.inputPortId': port['id']}, events[-1], 'event')
+            else:
+                yield Failure('No input events from camera')
+
+    yield Success()
 
 
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
