@@ -3,8 +3,8 @@ import pytest
 from framework.ini_config import IniConfig, NameNotFound
 
 
-def test_ini_config(os_access):
-    path = os_access.Path('/tmp/func_tests_dummy.ini')
+def test_ini_config(os_access_node_dir):
+    path = os_access_node_dir / 'dummy.ini'
     ini = IniConfig(path)
     ini.set('a', '1')
     assert ini.get('a') == '1'

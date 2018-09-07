@@ -34,3 +34,13 @@ def os_access(request):
         vm_fixture = request.param + '_vm'
         vm = request.getfixturevalue(vm_fixture)
         return vm.os_access
+
+
+@pytest.fixture
+def os_access_node_dir(os_access, node_dir):
+    if os_access is local_access:
+        return node_dir
+    else:
+        dir = os_access.Path.tmp()
+        dir.mkdir(parents=True, exist_ok=True)
+        return dir
