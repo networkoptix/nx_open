@@ -24,6 +24,7 @@ loggers:
   framework.vms.vm_type.networking.winrm: {level: INFO}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: INFO}
+  framework.os_access.windows_remoting._cim_query: {level: INFO}
   framework.os_access.traffic_capture: {level: INFO}
   framework.mediaserver_api.setup: {level: INFO}
   framework.mediaserver_api.setup.wait: {level: WARNING}

@@ -1,10 +1,17 @@
 import logging
 from pprint import pformat
+from xml.dom import minidom
 
 import xmltodict
-from winrm.exceptions import WinRMTransportError
+from winrm.exceptions import WinRMError, WinRMTransportError
 
 _logger = logging.getLogger(__name__)
+
+
+def pformat_xml(text):
+    dom = minidom.parseString(text)
+    pretty_text = dom.toprettyxml(indent=' '*2)
+    return pretty_text
 
 
 class CIMClass(object):
@@ -90,9 +97,15 @@ class _CimAction(object):
         if timeout_sec is not None:
             rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
         try:
-            response = protocol.send_message(xmltodict.unparse(rq))
+            request_xml = xmltodict.unparse(rq)
+            _logger.debug("Request XML:\n%s", pformat_xml(request_xml))
+            response = protocol.send_message(request_xml)
+            _logger.debug("Response XML:\n%s", pformat_xml(response))
         except WinRMTransportError as e:
             _logger.exception("XML:\n%s", e.response_text)
+            raise
+        except WinRMError as e:
+            _logger.debug("Failed: %s", e)
             raise
 
         response_dict = xmltodict.parse(
@@ -130,8 +143,7 @@ class _Enumeration(object):
         self.enumeration_context = response['n:EnumerateResponse']['n:EnumerationContext']
         self.is_ended = 'w:EndOfSequence' in response['n:EnumerateResponse']
         items = response['n:EnumerateResponse']['w:Items']['w:Item']
-        objects = [item[self.cim_class.name] for item in items]
-        return objects
+        return self._pick_objects(items)
 
     def _pull(self):
         _logger.debug("Continue enumerating %s where %r", self.cim_class, self.selectors)
@@ -148,8 +160,13 @@ class _Enumeration(object):
         self.is_ended = 'n:EndOfSequence' in response['n:PullResponse']
         self.enumeration_context = None if self.is_ended else response['n:PullResponse']['n:EnumerationContext']
         items = response['n:PullResponse']['n:Items']['w:Item']
-        objects = [item[self.cim_class.name] for item in items]
-        return objects
+        return self._pick_objects(items)
+
+    def _pick_objects(self, item_list):
+        object_list = [item[self.cim_class.name] for item in item_list]
+        for object in object_list:
+            _logger.info('\tObject: %r', object)
+        return object_list
 
     def enumerate(self):
         for item in self._start():
@@ -166,11 +183,11 @@ class CIMQuery(object):
         self.selectors = selectors
 
     def enumerate(self, max_elements=32000):
-        _logger.debug("Enumerate %s where %r", self.cim_class, self.selectors)
+        _logger.info("Enumerate %s where %r", self.cim_class, self.selectors)
         return _Enumeration(self.protocol, self.cim_class, self.selectors, max_elements=max_elements).enumerate()
 
     def get(self):
-        _logger.debug("Get %s where %r", self.cim_class, self.selectors)
+        _logger.info("Get %s where %r", self.cim_class, self.selectors)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Get'
         action = _CimAction(self.cim_class, action_url, self.selectors, {})
         outcome = action.perform(self.protocol)
@@ -178,7 +195,7 @@ class CIMQuery(object):
         return instance
 
     def put(self, new_properties_dict):
-        _logger.debug("Put %s where %r: %r", self.cim_class, self.selectors, new_properties_dict)
+        _logger.info("Put %s where %r: %r", self.cim_class, self.selectors, new_properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Put'
         body = {self.cim_class.name: new_properties_dict}
         body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
@@ -189,7 +206,7 @@ class CIMQuery(object):
 
     def create(self, properties_dict):
         assert not self.selectors
-        _logger.debug("Create %r: %r", self.cim_class, properties_dict)
+        _logger.info("Create %r: %r", self.cim_class, properties_dict)
         action_url = 'http://schemas.xmlsoap.org/ws/2004/09/transfer/Create'
         body = {self.cim_class.name: properties_dict}
         body[self.cim_class.name]['@xmlns'] = self.cim_class.uri
@@ -201,7 +218,7 @@ class CIMQuery(object):
         return selector_set
 
     def invoke_method(self, method_name, params, timeout_sec=None):
-        _logger.debug("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
+        _logger.info("Invoke %s.%s(%r) where %r", self.cim_class, method_name, params, self.selectors)
         action_uri = self.cim_class.method_uri(method_name)
         method_input = {'p:' + param_name: param_value for param_name, param_value in params.items()}
         method_input['@xmlns:p'] = self.cim_class.uri
