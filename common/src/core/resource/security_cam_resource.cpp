@@ -894,7 +894,7 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
 
 bool QnSecurityCamResource::trustCameraTime() const
 {
-    return getProperty(Qn::TRUST_CAMERA_TIME_NAME).toInt() > 0;
+    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
 }
 
 void QnSecurityCamResource::setTrustCameraTime(bool value)
