@@ -204,6 +204,7 @@ struct CameraSettingsDialogState
         static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;
         int customMediaPortDisplayValue = kDefaultRtspPort;
+        UserEditableMultiple<bool> trustCameraTime;
     };
     ExpertSettings expert;
     bool isDefaultExpertSettings = false;

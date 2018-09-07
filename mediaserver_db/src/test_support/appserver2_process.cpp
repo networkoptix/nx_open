@@ -160,11 +160,11 @@ int Appserver2Process::exec()
             dbUrl, nx::vms::api::ClientInfoData(), &ec2Connection);
         if (errorCode == ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Connected to local EC2"));
             break;
         }
 
-        NX_LOG(lit("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        NX_ERROR(this, lit("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)));
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 

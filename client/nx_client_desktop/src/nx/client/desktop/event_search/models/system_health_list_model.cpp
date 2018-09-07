@@ -57,9 +57,6 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qn::CommandActionRole:
             return QVariant::fromValue(d->commandAction(index.row()));
 
-        case Qn::ResourceRole:
-            return QVariant::fromValue(d->resource(index.row()));
-
         case Qn::AlternateColorRole:
             return true;
 

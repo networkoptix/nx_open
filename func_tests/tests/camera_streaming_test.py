@@ -5,7 +5,7 @@ import time
 
 import pytest
 
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -81,7 +81,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
         server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
     one, two = two_merged_mediaservers
 
-    camera_id = wait_for_true(
+    camera_id = wait_for_truthy(
         lambda: one.api.find_camera(camera.mac_addr) or two.api.find_camera(camera.mac_addr),
         description="Test Camera is discovered",
         timeout_sec=300)

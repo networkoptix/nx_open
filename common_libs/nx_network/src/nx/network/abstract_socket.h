@@ -386,6 +386,9 @@ class NX_NETWORK_API AbstractStreamSocket:
     public AbstractCommunicatingSocket
 {
 public:
+
+    virtual ~AbstractStreamSocket() override;
+
     /**
      * Set TCP_NODELAY option (disable data aggregation).
      * @return false on error.
@@ -429,6 +432,10 @@ public:
      * NOTE: due to some OS limitations some values might be = 0 (meaning system defaults).
      */
     virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const = 0;
+
+    void setBeforeDestroyCallback(nx::utils::MoveOnlyFunc<void()> callback);
+private:
+    nx::utils::MoveOnlyFunc<void()> m_beforeDestroyCallback = nullptr;
 };
 
 /**

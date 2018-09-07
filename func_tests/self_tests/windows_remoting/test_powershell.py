@@ -21,8 +21,8 @@ def test_start_script(winrm_shell):
         $y = $x * $x
         $y | ConvertTo-Json
         '''
-    with start_raw_powershell_script(winrm_shell, powershell_command) as command:
-        _, stdout, stderr = command.communicate()
+    with start_raw_powershell_script(winrm_shell, powershell_command).running() as run:
+        stdout, stderr = run.communicate()
         assert json.loads(stdout.decode()) == 1234321
 
 

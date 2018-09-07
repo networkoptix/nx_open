@@ -100,8 +100,8 @@ void TunnelAcceptor::connectionAckResult(
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     if (code != hpm::api::ResultCode::ok)
     {
-        NX_LOGX(lm("connectionAck error: %1")
-            .arg(nx::hpm::api::toString(code)), cl_logWARNING);
+        NX_WARNING(this, lm("connectionAck error: %1")
+            .arg(nx::hpm::api::toString(code)));
 
         // TODO: #mux code translation
         return executeAcceptHandler(SystemError::connectionAbort);
@@ -146,10 +146,10 @@ void TunnelAcceptor::startUdtConnection(
     const SocketAddress& target)
 {
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
-    NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
+    NX_VERBOSE(this, lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
         .arg((*socketIt)->getLocalAddress()).arg(target)
-        .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG2);
+        .arg(m_connectionId).arg(m_remotePeerId));
 
     (*socketIt)->connectAsync(
         target,
@@ -158,10 +158,10 @@ void TunnelAcceptor::startUdtConnection(
             auto socket = std::move(*socketIt);
             m_sockets.erase(socketIt);
 
-            NX_LOGX(lm("Rendezvous UDT connection from %1 to %2 result: %3, "
+            NX_DEBUG(this, lm("Rendezvous UDT connection from %1 to %2 result: %3, "
                 "connectionId=%4, remotePeerId=%5")
                 .arg(socket->getLocalAddress()).arg(target).arg(SystemError::toString(code))
-                .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG1);
+                .arg(m_connectionId).arg(m_remotePeerId));
 
             if (code != SystemError::noError)
                 return executeAcceptHandler(code);

@@ -2190,7 +2190,8 @@
             "keys": [
                 "iPIXA|INVDHDW32812IR"
             ],
-            "clearInputsTimeoutSec": 3
+            "clearInputsTimeoutSec": 3,
+            "comment": "considers input state as 0 after specified timeout"
         },
         {
             "keys": [
@@ -2834,7 +2835,8 @@
         },
         {
             "keys": [
-            "VIVOTEK|MA8391*",
+            "9W-H3-3MH-DP1|*",
+            "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
             "AXIS|AXIS P3707*",
             "Axis|AXISP3707*",
             "AXIS|AXISP3707*",
@@ -2844,13 +2846,22 @@
             "AXIS|AXIS Q3708*",
             "Axis|AXISQ3708*",
             "AXIS|AXISQ3708*",
-            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
+            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
             ],
             "canShareLicenseGroup": true
         },
         {
             "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
             "bypassFirmware":"1.0.0"
+        },
+        {
+            "keys": [
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+            ],
+            "clearInputsTimeoutSec": 1,
+            "comment": "considers input state as 0 after specified timeout"
         }
     ]
 }

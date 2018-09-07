@@ -419,7 +419,7 @@ QString QnPlAreconVisionResource::generateRequestString(
         !streamParams.contains("image_right") || !streamParams.contains("image_bottom") ||
         (h264 && !streamParams.contains("streamID")))
     {
-        NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
+        NX_ERROR(this, "Error!!! parameter is missing in stream params.");
         //return QnAbstractMediaDataPtr(0);
     }
 
@@ -570,7 +570,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
             if (rt.isNull())
             {
-                NX_LOG( lit("Unsupported AV resource found: %1").arg(name), cl_logERROR);
+                NX_ERROR(typeid(QnPlAreconVisionResource), lit("Unsupported AV resource found: %1").arg(name));
                 return 0;
             }
         }
@@ -586,7 +586,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMed
 
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
+        NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;
     }
 

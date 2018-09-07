@@ -60,13 +60,17 @@ class WindowsInstallation(Installation):
         self._config_key_backup.create()  # OK if already exists.
         self._config_key.copy_values_to(self._config_key_backup)
 
-    def can_install(self, installer):
-        return installer.platform == 'win64' and installer.path.suffix == '.msi'
+    def _can_install(self, installer):
+        return installer.platform == 'win' and installer.component == 'server'
 
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
+        commands = {
+            '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
+            '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
+            }
+        self.windows_access.winrm.run_command(commands[installer.extension])
         self._backup_configuration()
 
     def parse_core_dump(self, path):

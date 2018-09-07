@@ -353,7 +353,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
         szMsg[strlen(szMsg)-1] = 0;
     }
 
-    NX_LOG( lit("FFMPEG %1").arg(QString::fromLocal8Bit(szMsg)), cl_logERROR);
+    NX_ERROR(kLogTag, lit("FFMPEG %1").arg(QString::fromLocal8Bit(szMsg)));
 }
 
 QHostAddress resolveHost(const QString& hostString)
@@ -367,7 +367,7 @@ QHostAddress resolveHost(const QString& hostString)
     // Can't resolve
     if (info.error() != QHostInfo::NoError)
     {
-        NX_LOG(lit("Couldn't resolve host %1").arg(hostString), cl_logERROR);
+        NX_ERROR(kLogTag, lit("Couldn't resolve host %1").arg(hostString));
         return QHostAddress();
     }
 
@@ -383,7 +383,7 @@ QHostAddress resolveHost(const QString& hostString)
     }
 
     if (host.toIPv4Address() == 0)
-        NX_LOG( lit("No ipv4 address associated with host %1").arg(hostString), cl_logERROR);
+        NX_ERROR(kLogTag, lit("No ipv4 address associated with host %1").arg(hostString));
 
     return host;
 }
@@ -952,7 +952,7 @@ nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
 
-    NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
+    NX_INFO(this, lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)));
     return appServerUrl;
 }
 
@@ -1150,8 +1150,8 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << nx::network::SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
-    NX_LOGX(lit("Update mediaserver addresses: %1")
-            .arg(containerToQString(serverAddresses)), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Update mediaserver addresses: %1")
+            .arg(containerToQString(serverAddresses)));
 
     const nx::utils::Url defaultUrl(m_mediaServer->getApiUrl());
     const nx::network::SocketAddress defaultAddress(defaultUrl.host(), defaultUrl.port());
@@ -1269,8 +1269,8 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
-            NX_LOGX(lit("New external address %1 has been mapped")
-                    .arg(address), cl_logALWAYS);
+            NX_ALWAYS(this, lit("New external address %1 has been mapped")
+                    .arg(address));
 
             it->second = mappedAddress.port;
             updateAddressesList();
@@ -1281,8 +1281,8 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         const auto oldIp = m_forwardedAddresses.find(mappedAddress.address);
         if (oldIp != m_forwardedAddresses.end())
         {
-            NX_LOGX(lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS);
+            NX_ALWAYS(this, lit("External address %1:%2 has been unmapped")
+                   .arg(oldIp->first.toString()).arg(oldIp->second));
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -1349,25 +1349,26 @@ void MediaServerProcess::at_timer()
         camera->cleanCameraIssues();
 }
 
+void MediaServerProcess::setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet)
+{
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(flag, isSet);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+}
+
 void MediaServerProcess::at_storageManager_noStoragesAvailable()
 {
     if (isStopping())
         return;
     serverModule()->eventConnector()->at_noStorages(m_mediaServer);
-
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, true);
-    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+    setRuntimeFlag(nx::vms::api::RuntimeFlag::noStorages, true);
 }
 
 void MediaServerProcess::at_storageManager_storagesAvailable()
 {
     if (isStopping())
         return;
-
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, false);
-    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+    setRuntimeFlag(nx::vms::api::RuntimeFlag::noStorages, false);
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
@@ -2883,18 +2884,17 @@ void MediaServerProcess::performActionsOnExit()
     QString fileName = serverModule()->settings().dataDir() + "/scripts/" + kOnExitScriptName;
     if (!QFile::exists(fileName))
     {
-        NX_LOG(lit("Script '%1' is missing at the server").arg(fileName), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Script '%1' is missing at the server").arg(fileName));
         return;
     }
 
     // Currently, no args are needed, hence the empty list.
     QStringList args{};
 
-    NX_LOG(lit("Calling the script: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Calling the script: %1 %2").arg(fileName).arg(args.join(" ")));
     if (!QProcess::startDetached(fileName, args))
     {
-        NX_LOG(lit("Unable to start script '%1' because of a system error").arg(kOnExitScriptName),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Unable to start script '%1' because of a system error").arg(kOnExitScriptName));
     }
 }
 
@@ -3116,7 +3116,7 @@ void MediaServerProcess::initializeHardwareId()
     if (guid.isNull())
     {
         qDebug() << "Can't save guid. Run once as administrator.";
-        NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
+        NX_ERROR(this, "Can't save guid. Run once as administrator.");
         qApp->quit();
         return;
     }
@@ -3310,7 +3310,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     auto safeDisconnect =
-        [](QObject* src, QObject* dst)
+        [this](QObject* src, QObject* dst)
         {
             if (src && dst)
                 disconnect(src, nullptr, dst, nullptr);
@@ -3492,16 +3492,16 @@ void MediaServerProcess::migrateDataFromOldDir()
     switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
     {
     case nx::misc::MigrateDataResult::WinDirNotFound:
-        NX_LOG(lit("Moving data from the old windows dir. Windows dir not found."), cl_logWARNING);
+        NX_WARNING(this, lit("Moving data from the old windows dir. Windows dir not found."));
         break;
     case nx::misc::MigrateDataResult::NoNeedToMigrate:
-        NX_LOG(lit("Moving data from the old windows dir. Nothing to move"), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Moving data from the old windows dir. Nothing to move"));
         break;
     case nx::misc::MigrateDataResult::MoveDataFailed:
-        NX_LOG(lit("Moving data from the old windows dir. Old data found but move failed."), cl_logWARNING);
+        NX_WARNING(this, lit("Moving data from the old windows dir. Old data found but move failed."));
         break;
     case nx::misc::MigrateDataResult::Ok:
-        NX_LOG(lit("Moving data from the old windows dir. Old data found and successfully moved."), cl_logINFO);
+        NX_INFO(this, lit("Moving data from the old windows dir. Old data found and successfully moved."));
         break;
     }
 #endif
@@ -3564,7 +3564,7 @@ void MediaServerProcess::doMigrationFrom_2_4()
     const auto& settings = serverModule()->settings();
     if (settings.pendingSwitchToClusterMode() == "yes")
     {
-        NX_LOG(QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING);
+        NX_WARNING(this, QString::fromLatin1("Switching to cluster mode and restarting..."));
         SystemName systemName(serverModule(), m_ec2Connection->connectionInfo().systemName);
         systemName.saveToConfig(); //< migrate system name from foreign database via config
         SettingsHelper(serverModule()).setSysIdTime(0);
@@ -3684,7 +3684,7 @@ void MediaServerProcess::connectSignals()
             if (server->setProperty(Qn::UDT_INTERNET_TRFFIC, QString::number(update))
                 && server->saveParams())
             {
-                NX_LOG(lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update), cl_logDEBUG1);
+                NX_DEBUG(kLogTag, lm("%1 is updated to %2").args(Qn::UDT_INTERNET_TRFFIC, update));
                 nx::network::UdtStatistics::global.internetBytesTransfered -= current;
             }
         });

@@ -67,17 +67,16 @@ void CloudMediaServerEndpointVerificator::stopWhileInAioThread()
 
 void CloudMediaServerEndpointVerificator::onHttpRequestDone()
 {
-    NX_LOGX(lm("cross-nat %1. Finished probing %2")
-        .arg(m_connectSessionId).arg(m_httpClient->url()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Finished probing %2")
+        .arg(m_connectSessionId).arg(m_httpClient->url()));
 
     if (m_httpClient->failed() &&
         (m_httpClient->lastSysErrorCode() != SystemError::noError ||
             m_httpClient->response() == nullptr))
     {
-        NX_LOGX(lm("cross-nat %1. Http connect to %2 has failed: %3")
+        NX_VERBOSE(this, lm("cross-nat %1. Http connect to %2 has failed: %3")
             .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
-            .arg(SystemError::toString(m_httpClient->lastSysErrorCode())),
-            cl_logDEBUG2);
+            .arg(SystemError::toString(m_httpClient->lastSysErrorCode())));
         m_lastSystemErrorCode = m_httpClient->lastSysErrorCode();
         return nx::utils::swapAndCall(
             m_completionHandler,
@@ -87,11 +86,10 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
     if (!nx::network::http::StatusCode::isSuccessCode(
             m_httpClient->response()->statusLine.statusCode))
     {
-        NX_LOGX(lm("cross-nat %1. Http request to %2 has failed: %3")
+        NX_VERBOSE(this, lm("cross-nat %1. Http request to %2 has failed: %3")
             .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
             .arg(nx::network::http::StatusCode::toString(
-                m_httpClient->response()->statusLine.statusCode)),
-            cl_logDEBUG2);
+                m_httpClient->response()->statusLine.statusCode)));
         return nx::utils::swapAndCall(
             m_completionHandler,
             VerificationResult::notPassed);
@@ -116,8 +114,8 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
         httpClient->response()->headers, "Content-Type");
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
-        NX_LOGX(lm("cross-nat %1. Received unexpected Content-Type %2 from %3")
-            .args(m_connectSessionId, contentType, httpClient->url()), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("cross-nat %1. Received unexpected Content-Type %2 from %3")
+            .args(m_connectSessionId, contentType, httpClient->url()));
         return false;
     }
 
@@ -125,8 +123,8 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
     if (!QJson::deserialize(httpClient->fetchMessageBodyBuffer(), &restResult)
         || restResult.error != QnRestResult::Error::NoError)
     {
-        NX_LOGX(lm("cross-nat %1. Error response '%2' from %3")
-            .args(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("cross-nat %1. Error response '%2' from %3")
+            .args(m_connectSessionId, restResult.errorString, httpClient->url()));
         return false;
     }
 
@@ -134,9 +132,8 @@ bool CloudMediaServerEndpointVerificator::verifyHostResponse(
     if (!QJson::deserialize(restResult.reply, &moduleInformation)
         || !moduleInformation.cloudId().endsWith(m_targetHostAddress.host.toString()))
     {
-        NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
-            .args(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
+            .args(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host));
         return false;
     }
 

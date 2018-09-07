@@ -71,10 +71,9 @@ void IncomingTransactionDispatcher::dispatchUbjsonTransaction(
             &commandHeader,
             transportHeader.transactionFormatVersion))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialized ubjson transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(dataSource->serializedTransaction.size()), cl_logDEBUG1);
+            .arg(dataSource->serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
@@ -97,20 +96,18 @@ void IncomingTransactionDispatcher::dispatchJsonTransaction(
     // TODO: #ak put tranObject to some cache for later use
     if (!QJson::deserialize(serializedTransaction, &tranObject))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to parse json transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to parse json transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()), cl_logDEBUG1);
+            .arg(serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;
     }
     if (!QJson::deserialize(tranObject["tran"], &commandHeader))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Failed to deserialize json transaction received from (%1, %2). size %3")
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to deserialize json transaction received from (%1, %2). size %3")
             .arg(transportHeader.systemId).arg(transportHeader.endpoint.toString())
-            .arg(serializedTransaction.size()), cl_logDEBUG1);
+            .arg(serializedTransaction.size()));
         m_aioTimer.post(
             [handler = std::move(handler)]{ handler(ResultCode::badRequest); });
         return;

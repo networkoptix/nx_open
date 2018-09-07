@@ -104,7 +104,7 @@ void StreamingChunkTranscoderThread::pleaseStop()
 
 void StreamingChunkTranscoderThread::run()
 {
-    NX_LOG(QLatin1String("StreamingChunkTranscoderThread started"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("started"));
 
 #ifdef SAVE_INPUT_STREAM_TO_FILE
     std::ofstream m_inputFile("c:\\Temp\\chunk.264", std::ios_base::binary);
@@ -154,9 +154,9 @@ void StreamingChunkTranscoderThread::run()
         if (!srcMediaData ||
             std::dynamic_pointer_cast<QnEmptyMediaData>(srcMediaData)) //< QnEmptyMediaData signals end-of-stream
         {
-            NX_LOG(lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
+            NX_DEBUG(this, lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
-                arg(transcodeIter->second->msTranscoded), cl_logDEBUG1);
+                arg(transcodeIter->second->msTranscoded));
             finishTranscoding(&lk, transcodeIter, true);
             continue;
         }
@@ -207,9 +207,9 @@ void StreamingChunkTranscoderThread::run()
         int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket(srcMediaData, &resultStream);
         if (res)
         {
-            NX_LOG(lit("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
+            NX_WARNING(this, lit("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
-                arg(res).arg(transcodeIter->second->msTranscoded), cl_logWARNING);
+                arg(res).arg(transcodeIter->second->msTranscoded));
             removeTranscodingNonSafe(transcodeIter, false, &lk);
             continue;
         }
@@ -237,7 +237,7 @@ void StreamingChunkTranscoderThread::run()
         }
     }
 
-    NX_LOG(QLatin1String("StreamingChunkTranscoderThread stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("stopped"));
 }
 
 void StreamingChunkTranscoderThread::onStreamDataAvailable(AbstractOnDemandDataProvider* dataSource)

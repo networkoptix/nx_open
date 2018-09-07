@@ -19,6 +19,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::networkError, "network error")
     (nx::update::InformationError::httpError, "http error")
     (nx::update::InformationError::jsonError, "json error")
+    (nx::update::InformationError::brokenPackageError, "local update package is broken")
+    (nx::update::InformationError::missingPackageError, "missing files in the update package")
     (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
     (nx::update::InformationError::notFoundError, "not found"))
 

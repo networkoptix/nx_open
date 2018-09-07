@@ -13,7 +13,7 @@
 
 
 const static int     Extended_SAR = 255;
-const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0,     10.0/11.0,     16.0/11.0,     40.0/33.0,     24.0/11.0,     20.0/11.0,     
+const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0,     10.0/11.0,     16.0/11.0,     40.0/33.0,     24.0/11.0,     20.0/11.0,
                                       32.0/11.0,     80.0/33.0,     18.0/11.0,     15.0/11.0,     64.0/33.0,     160.0/99.0, 4.0/3.0,     3.0/2.0,     2.0/1.0};
 
 enum NALUnitType   {nuUnspecified, nuSliceNonIDR, nuSliceA, nuSliceB, nuSliceC,  // 0..4
@@ -30,15 +30,15 @@ const static int SEI_MSG_PIC_TIMING = 1;
 
 #ifndef __TS_MUXER_COMPILE_MODE
 const char* const NALUnitDescr[30] =
-                   {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC", 
-                    "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD", 
-                    "nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1", 
-                    "nuReserved2","nuReserved3","nuReserved4","nuReserved5","nuSliceWithoutPartitioning", 
+                   {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC",
+                    "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD",
+                    "nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1",
+                    "nuReserved2","nuReserved3","nuReserved4","nuReserved5","nuSliceWithoutPartitioning",
                     "nuReserved6","nuReserved7","nuReserved8"," nuReserved9",
                     // ------------------- additional RTP nal units -------------
                     "STAP-A","STAP-B","MTAP16","MTAP24","FU-A","FU-B"
                    };
-                   
+
 #endif
 
 class NALUnit {
@@ -56,8 +56,8 @@ public:
 
     NALUnit() {m_nalBufferLen = 0; m_nalBuffer = 0;}
     //NALUnit(const NALUnit& other);
-    virtual ~NALUnit() { 
-        delete [] m_nalBuffer; 
+    virtual ~NALUnit() {
+        delete [] m_nalBuffer;
     }
 
     static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
@@ -70,7 +70,7 @@ public:
         const quint8* buffer,
         const quint8* end,
         const quint8** startCodePrefix );
-    
+
     static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
     int encodeNAL(quint8* dstBuffer, size_t dstBufferSize);
 
@@ -81,6 +81,8 @@ public:
     static int decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
     //!Decodes from Annex B (removes emulation_prevention_three_byte)
     static QByteArray decodeNAL( const QByteArray& srcBuf );
+    static bool isSliceNal(quint8 nalUnitType);
+    static bool isIFrame(const quint8* data, int dataLen);
     int deserialize(quint8* buffer, quint8* end);
     virtual int serializeBuffer(quint8* dstBuffer, quint8* dstEnd, bool writeStartCode) const;
     virtual int serialize(quint8* dstBuffer);
@@ -292,7 +294,7 @@ public:
         cpb_size_value_minus1 = 0;
         cbr_flag = 0;
         num_units_in_tick_bit_pos = -1;
-        //orig_hrd_parameters_present_flag = 
+        //orig_hrd_parameters_present_flag =
         nal_hrd_parameters_present_flag = -1;
         vcl_hrd_parameters_present_flag = -1;
         pic_struct_present_flag = -1;
@@ -406,7 +408,7 @@ public:
     virtual ~SliceUnit() {
         ;
     }
-    int deserialize(quint8* buffer, quint8* end, 
+    int deserialize(quint8* buffer, quint8* end,
                             const QMap<quint32, const SPSUnit*>& spsMap,
                             const QMap<quint32, const PPSUnit*>& ppsMap);
 

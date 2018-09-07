@@ -4,8 +4,8 @@ import pytest
 from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
-from framework.os_access.exceptions import AlreadyDownloaded
-from framework.serving import WsgiServer, make_base_url_for_remote_machine
+from framework.os_access.exceptions import AlreadyExists
+from framework.serving import WsgiServer
 
 
 @pytest.fixture()
@@ -37,7 +37,7 @@ def _http_url(service_ports, os_access, served_file):
 
     wsgi_server = WsgiServer(app.wsgi_app, service_ports[5:10])
     with wsgi_server.serving():
-        base_url = make_base_url_for_remote_machine(os_access, wsgi_server.port)
+        base_url = 'http://{}:{}'.format(os_access.port_map.local.address, wsgi_server.port)
         yield base_url + '/' + served_file.name
 
 
@@ -61,6 +61,6 @@ def url(request):
 def test_download(os_access, url, downloads_dir):
     path = os_access.download(url, downloads_dir)
     assert path.exists() or path.is_symlink()
-    with pytest.raises(AlreadyDownloaded) as excinfo:
+    with pytest.raises(AlreadyExists) as excinfo:
         os_access.download(url, downloads_dir)
     assert excinfo.value.path == path

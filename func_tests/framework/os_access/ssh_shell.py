@@ -1,30 +1,28 @@
-import logging
 import select
 import socket
 import time
 from abc import ABCMeta
-from contextlib import contextmanager, closing
+from contextlib import closing, contextmanager
 from io import StringIO
 
 import paramiko
 
+from framework import context_logger
 from framework.method_caching import cached_getter
-from framework import switched_logging
+from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file_using_read_and_write
-from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_path import PosixShellPath
-from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
-_logger = switched_logging.SwitchedLogger('ssh')
+_logger = context_logger.ContextLogger('ssh')
 
 
 class SSHNotConnected(Exception):
     pass
 
 
-class _SSHCommandOutcome(PosixOutcome):
+class _SSHCommandOutcome(posix_shell.Outcome):
     def __init__(self, exit_status):
         assert isinstance(exit_status, int)
         assert 0 <= exit_status <= 255 or exit_status == -1
@@ -58,7 +56,8 @@ class _SSHRun(Run):
         self._logger = logger
 
     def __str__(self):
-        addr, port = self._channel.getpeername()
+        peer_address = self._channel.getpeername()
+        addr, port = peer_address[:2]  # for ipv6 we get (host, port, flowinfo, scopeid)
         return '%s:%d' % (addr, port)
 
     @property
@@ -84,7 +83,7 @@ class _SSHRun(Run):
         chunks = []
         for recv in [self._channel.recv, self._channel.recv_stderr]:
             try:
-                chunk = recv(_STREAM_BUFFER_SIZE)
+                chunk = recv(posix_shell.STREAM_BUFFER_SIZE)
             except socket.timeout:  # Non-blocking: times out immediately if no data.
                 chunks.append(b'')
             else:
@@ -145,7 +144,7 @@ class _StraightforwardSSHRun(_SSHRun):
         self._channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
         input = memoryview(input)
         if input:
-            bytes_sent = self._channel.send(input[:_STREAM_BUFFER_SIZE])
+            bytes_sent = self._channel.send(input[:posix_shell.STREAM_BUFFER_SIZE])
             _logger.debug("Chunk of input sent: %d bytes.", bytes_sent)
             if bytes_sent == 0:
                 _logger.warning("Write direction preliminary closed from the other side.")
@@ -181,7 +180,7 @@ class _SSHCommand(Command):
                 yield _StraightforwardSSHRun(channel, self._script, self._logger)
 
 
-class SSH(PosixShell):
+class SSH(posix_shell.Shell):
     def __init__(self, hostname, port, username, key):
         self._hostname = hostname
         self._port = port
@@ -189,19 +188,19 @@ class SSH(PosixShell):
         self._key = key
 
     def __repr__(self):
-        return '<{!s}>'.format(sh_command_to_script([
+        return '<{!s}>'.format(posix_shell.command_to_script([
             'ssh', '{!s}@{!s}'.format(self._username, self._hostname),
             '-p', self._port,
             ]))
 
     def command(self, args, cwd=None, env=None, logger=None, set_eux=True):
-        script = sh_command_to_script(args)
+        script = posix_shell.command_to_script(args)
         return self.sh_script(script, cwd=cwd, env=env, logger=logger, set_eux=set_eux)
 
     def terminal_command(self, args, cwd=None, env=None, logger=None):
         if not logger:
             logger = _logger
-        script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
+        script = posix_shell.augment_script(posix_shell.command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
         return _SSHCommand(self._client(), script, logger, terminal=True)
 
     @cached_getter
@@ -228,7 +227,7 @@ class SSH(PosixShell):
     def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
         if not logger:
             logger = _logger
-        augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
+        augmented_script = posix_shell.augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         return _SSHCommand(self._client(), augmented_script, logger)
 
     def copy_posix_file_to(self, posix_source, destination):

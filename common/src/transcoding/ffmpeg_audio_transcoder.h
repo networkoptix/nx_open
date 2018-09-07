@@ -82,6 +82,7 @@ private:
 
     std::size_t getSampleMultiplyCoefficient(const AVCodecContext* ctx);
     std::size_t getPlanesCount(const AVCodecContext* ctx);
+    bool initResampler();
 
     QnAbstractMediaDataPtr createMediaDataFromAVPacket(const AVPacket& packet);
 

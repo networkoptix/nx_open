@@ -8987,7 +8987,7 @@ to %1</source>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation>Si prega di aggiornare ad una prossima patch o versione disponibile una volta disponibile.</translation>
+      <translation>Si prega di aggiornare alla prossima patch o versione disponibile una volta disponibile.</translation>
     </message>
   </context>
   <context>

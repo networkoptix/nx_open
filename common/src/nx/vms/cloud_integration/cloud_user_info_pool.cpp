@@ -73,9 +73,9 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
             if (key != kCloudAuthInfoKey)
                 return;
 
-            NX_LOGX(lit("Changed for user %1. New value: %2")
+            NX_VERBOSE(this, lit("Changed for user %1. New value: %2")
                 .arg(resource->getName())
-                .arg(resource->getProperty(key)), cl_logDEBUG2);
+                .arg(resource->getProperty(key)));
 
             reportInfoChanged(resource->getName(), resource->getProperty(key));
         });
@@ -97,8 +97,8 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
     if (!deserializeResult)
     {
-        NX_LOGX(lit("User %1. Deserialization failed")
-            .arg(userName), cl_logDEBUG1);
+        NX_DEBUG(this, lit("User %1. Deserialization failed")
+            .arg(userName));
         return;
     }
 
@@ -111,8 +111,8 @@ void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
     if (!userResource)
         return;
 
-    NX_LOGX(lit("User %1 removed. Clearing related data.")
-        .arg(resource->getName()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("User %1 removed. Clearing related data.")
+        .arg(resource->getName()));
     m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
 }
 
@@ -134,9 +134,9 @@ Qn::AuthResult CloudUserInfoPool::authenticate(
 
     if (!CdbNonceFetcher::parseCloudNonce(nonce, &cloudNonce, &nonceTrailer))
     {
-        NX_LOGX(lm("parseCloudNonce() failed. User: %1, nonce: %2")
+        NX_ERROR(this, lm("parseCloudNonce() failed. User: %1, nonce: %2")
             .arg(userName)
-            .arg(nonce), cl_logERROR);
+            .arg(nonce));
         return Qn::Auth_WrongDigest;
     }
 
@@ -219,7 +219,7 @@ void CloudUserInfoPool::logNonceUpdates(
     const std::map<nx::Buffer, int>& nonceToCount,
     const std::map<nx::Buffer, uint64_t>& nonceToMaxTs)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
     {
         QString logMessage;
         QTextStream logStream(&logMessage);

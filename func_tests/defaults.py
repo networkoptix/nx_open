@@ -3,11 +3,10 @@ import logging
 import os
 import socket
 
-from pathlib2 import Path
-
 # Backport provided by package `configparser` from PyPI.
 # noinspection PyUnresolvedReferences,PyCompatibility
 from configparser import ConfigParser, NoSectionError
+from pathlib2 import Path
 
 _logger = logging.getLogger(__name__)
 

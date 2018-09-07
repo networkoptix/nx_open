@@ -5,11 +5,13 @@ import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
-from framework.installation.installer import Installer, PackageNameParseError, InstallerSet
+from framework.installation.installer import InstallerSet
 from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
+
+pytest_plugins = ['fixtures.vms']
 
 _logger = logging.getLogger(__name__)
 
@@ -25,13 +27,18 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installers_dir(request):
-    return request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+def mediaserver_installers_dir(request, metadata):
+    dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+    metadata['Mediaserver Installers Dir'] = dir
+    return dir
 
 
 @pytest.fixture(scope='session')
-def mediaserver_installer_set(mediaserver_installers_dir):
-    return InstallerSet(mediaserver_installers_dir)
+def mediaserver_installer_set(mediaserver_installers_dir, metadata):
+    installer_set = InstallerSet(mediaserver_installers_dir)
+    metadata['Mediaserver Version'] = installer_set.version
+    metadata['Mediaserver Customization'] = installer_set.customization.customization_name
+    return installer_set
 
 
 @pytest.fixture(scope='session')
@@ -43,7 +50,7 @@ def customization(request, mediaserver_installer_set):
                 "Customization name {!r} provided via --customization doesn't match {!r} of {!r}".format(
                     customization_from_argument,
                     mediaserver_installer_set, mediaserver_installer_set.customization))
-    return customization
+    return mediaserver_installer_set.customization
 
 
 @pytest.fixture()
@@ -85,6 +92,11 @@ def one_running_mediaserver(one_mediaserver):
     one_mediaserver.start()
     one_mediaserver.api.setup_local_system()
     return one_mediaserver
+
+
+@pytest.fixture()
+def one_mediaserver_api(one_running_mediaserver):
+    return one_running_mediaserver.api
 
 
 @pytest.fixture(scope='session')

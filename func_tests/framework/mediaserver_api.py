@@ -1,26 +1,27 @@
 import json
-import logging
 import time
 import timeit
-# noinspection PyPackageRequirements
-from Crypto.Cipher import AES
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from uuid import UUID
 
 import pytz
 import requests
+import six
+# noinspection PyPackageRequirements
+from Crypto.Cipher import AES
 from netaddr import EUI, IPAddress, IPNetwork
-from pytz import utc
-from six import string_types
+from typing import Optional, Union
+from urllib3.util import Url, parse_url
 
+from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
-from framework.media_stream import DirectHlsMediaStream, M3uHlsMediaStream, RtspMediaStream, WebmMediaStream
+from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from .switched_logging import SwitchedLogger, with_logger
-from framework.waiting import wait_for_true
+from framework.waiting import Wait, WaitTimeout, wait_for_truthy
+from .context_logger import ContextLogger, context_logger
 
-_logger = SwitchedLogger(__name__, 'mediaserver_api')
+_logger = ContextLogger(__name__, 'mediaserver_api')
 
 DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
@@ -82,15 +83,31 @@ class InappropriateRedirect(Exception):
         super(InappropriateRedirect, self).__init__(self, message)
 
 
-class GenericMediaserverApi(HttpApi):
+class _GenericMediaserverApi(HttpApi):
     """HTTP API that knows conventions and quirks of Mediaserver regardless of endpoint."""
 
-    @classmethod
-    def new(cls, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
-        return cls(alias, HttpClient(hostname, port, username, password, ca_cert=ca_cert))
+    def __init__(self, raw_base_url, alias=None, ca_cert=None):
+        # type: (Union[str, Url], Optional[str], Optional[str]) -> None
+        """
+        @param raw_base_url: Base URL, probably incomplete, `':7011'`, `'alice-pc'`,
+            `'bob:secret@'` or even `''` and `None` work. Defaults are well-known and sensible.
+            Path, query string and fragment are not preserved.
+        @param alias: Optional alias to use in logs.
+        @param ca_cert: Optional path to CA certificate to trust. If provided, default scheme is
+            HTTPS. (HTTP otherwise.)
+        """
+        incomplete_base_url = parse_url(raw_base_url)
+        complete_base_url = Url(
+            scheme=incomplete_base_url.scheme or ('https' if ca_cert else 'http'),
+            auth=incomplete_base_url.auth or (DEFAULT_API_USER + ':' + INITIAL_API_PASSWORD),
+            host=incomplete_base_url.host or 'localhost',
+            port=incomplete_base_url.port or 7001,
+            )
+        client = HttpClient(complete_base_url, ca_cert=ca_cert)
+        super(_GenericMediaserverApi, self).__init__(alias or complete_base_url.netloc, client)
 
     def __repr__(self):
-        return '<GenericMediaserverApi at {}>'.format(self.http.url(''))
+        return '<_GenericMediaserverApi at {}>'.format(self.http.url(''))
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
@@ -131,9 +148,9 @@ class GenericMediaserverApi(HttpApi):
             raise MediaserverApiError(self.alias, response.request.url, error_code, response_data['errorString'])
         return response_data['reply']
 
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
+    def request(self, method, path, timeout=None, **kwargs):
         try:
-            response = self.http.request(method, path, secure=secure, timeout=timeout, **kwargs)
+            response = self.http.request(method, path, timeout=timeout, **kwargs)
         except (requests.Timeout, requests.ConnectionError) as e:
             raise MediaserverApiRequestError('%r: %s %r: %s' % (self, method, path, e))
         if response.is_redirect:
@@ -166,10 +183,14 @@ class TimePeriod(object):
 class MediaserverApi(object):
     """Collection of front-end methods to work with HTTP API with handy ins and outs."""
 
-    def __init__(self, generic_api):  # type: (GenericMediaserverApi) -> None
-        # `.generic` should be rarely used, only when no request and/or response processing is required.
-        # Most existing usages of `.generic` should be transformed into methods hereof.
-        self.generic = generic_api
+    def __init__(self, base_url, alias=None, ca_cert=None):
+        # type: (Union[str, Url], Optional[str], Optional[str]) -> None
+        """Parameters are passed further to `_GenericMediaserverApi`."""
+
+        ## `.generic` should be rarely used, only when no request and/or response processing is
+        # required. Most existing usages of `.generic` should be transformed into methods hereof.
+        self.generic = _GenericMediaserverApi(base_url, alias=alias, ca_cert=ca_cert)
+
         # TODO: Split this class into composing parts: `SystemApi`, `CamerasApi`, etc.
 
     def __str__(self):
@@ -202,11 +223,16 @@ class MediaserverApi(object):
     def get_server_id(self):
         return self.generic.get('/ec2/testConnection')['ecsGuid']
 
+    def get_version(self):
+        response = self.generic.get('/api/moduleInformation')
+        version = Version(response['version'])
+        return version
+
     _setup_logger = _logger.getChild('setup')
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def setup_local_system(self, system_settings=None):
         system_settings = system_settings or {}
         _logger.info('Setup local system on %s.', self)
@@ -217,13 +243,13 @@ class MediaserverApi(object):
             })
         assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
         self.generic.http.set_credentials(self.generic.http.user, DEFAULT_API_PASSWORD)
-        wait_for_true(lambda: self.get_local_system_id() != UUID(int=0), "local system is set up")
+        wait_for_truthy(lambda: self.get_local_system_id() != uuid.UUID(int=0), "local system is set up")
         _logger.info('Setup local system: complete, local system id: %s', self.get_local_system_id())
         return response['settings']
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def setup_cloud_system(self, cloud_account, system_settings=None):
         _logger.info('Setting up server as cloud system %s:', self)
         system_settings = system_settings or {}
@@ -261,7 +287,7 @@ class MediaserverApi(object):
         return old
 
     def get_local_system_id(self):
-        return UUID(self.generic.get('api/ping')['localSystemId'])
+        return uuid.UUID(self.generic.get('api/ping')['localSystemId'])
 
     def set_local_system_id(self, new_id):
         self.generic.get('/api/configure', params={'localSystemId': str(new_id)})
@@ -285,22 +311,26 @@ class MediaserverApi(object):
         return len(this_servers) == 1 and other_servers == other_offline_servers
 
     def get_time(self):
-        started_at = datetime.now(utc)
+        started_at = datetime.now(pytz.utc)
         time_response = self.generic.get('/api/gettime')
-        received = datetime.fromtimestamp(float(time_response['utcTime']) / 1000., utc)
-        return RunningTime(received, datetime.now(utc) - started_at)
+        received = datetime.fromtimestamp(float(time_response['utcTime']) / 1000., pytz.utc)
+        return RunningTime(received, datetime.now(pytz.utc) - started_at)
 
     def is_primary_time_server(self):
         response = self.generic.get('api/systemSettings')
         return response['settings']['primaryTimeServer'] == self.get_server_id()
 
     @contextmanager
-    def waiting_for_restart(self, timeout_sec):
+    def waiting_for_restart(self, timeout_sec=10):
+        """Ask for runtime id, yield, letting the client code do an action that implies a restart,
+        then wait until server starts and reports new runtime id.
+        """
         old_runtime_id = self.generic.get('api/moduleInformation')['runtimeId']
         _logger.info("Runtime id before restart: %s", old_runtime_id)
         started_at = timeit.default_timer()
         yield
         failed_connections = 0
+        wait = Wait("{} is restarted", timeout_sec=timeout_sec)
         while True:
             try:
                 response = self.generic.get('api/moduleInformation')
@@ -309,19 +339,20 @@ class MediaserverApi(object):
                     assert False, "Mediaserver hasn't started, caught %r, timed out." % e
                 _logger.debug("Expected failed connection: %r", e)
                 failed_connections += 1
-                time.sleep(timeout_sec)
-                continue
-            new_runtime_id = response['runtimeId']
-            if new_runtime_id == old_runtime_id:
+            else:
+                new_runtime_id = response['runtimeId']
+                if new_runtime_id != old_runtime_id:
+                    _logger.info(
+                        "%s restarted successfully, new runtime id is %s",
+                        self, new_runtime_id)
+                    break
                 if failed_connections > 0:
-                    assert False, "Runtime id remains same after failed connections."
-                if timeit.default_timer() - started_at > timeout_sec:
-                    assert False, "Mediaserver hasn't stopped, timed out."
-                _logger.warning("Mediaserver hasn't stopped yet, delay is acceptable.")
-                time.sleep(timeout_sec)
-                continue
-            _logger.info("Mediaserver restarted successfully, new runtime id is %s", new_runtime_id)
-            break
+                    raise RuntimeError(
+                        "{}: runtime id remains same after failed connections: {}".format(
+                            self, old_runtime_id))
+                if not wait.again():
+                    raise WaitTimeout(timeout_sec, "{}: hasn't even stopped".format(self))
+                time.sleep(5)
 
     def restart_via_api(self, timeout_sec=10):
         with self.waiting_for_restart(timeout_sec):
@@ -338,12 +369,19 @@ class MediaserverApi(object):
                 return False
             return current_runtime_id != old_runtime_id
 
-        wait_for_true(_mediaserver_has_restarted)
+        wait_for_truthy(_mediaserver_has_restarted)
 
-    def get_updates_state(self):
-        response = self.generic.get('api/updates2/status')
-        status = response['state']
-        return status
+    def start_update(self, update_info):
+        self.generic.post('ec2/startUpdate', update_info)
+
+    def get_update_information(self):
+        return self.generic.get('ec2/updateInformation')
+
+    def get_update_status(self):
+        return self.generic.get('ec2/updateStatus')
+
+    def install_update(self):
+        return self.generic.post('api/installUpdate', {})
 
     def add_camera(self, camera):
         assert not camera.id, 'Already added to a server with id %r' % camera.id
@@ -383,15 +421,15 @@ class MediaserverApi(object):
                 })
 
     @contextmanager
-    def camera_audio(self, camera_id):
+    def camera_audio_enabled(self, camera_id):
         attributes = self.get_camera_user_attributes_list(camera_id)[0]
         attributes['audioEnabled'] = True
-        self.save_camera_user_attributes(**attributes)
+        self.set_camera_user_attributes(**attributes)
         try:
             yield
         finally:
             attributes['audioEnabled'] = False
-            self.save_camera_user_attributes(**attributes)
+            self.set_camera_user_attributes(**attributes)
 
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
@@ -420,32 +458,35 @@ class MediaserverApi(object):
         user = self.generic.http.user
         password = self.generic.http.password
         if stream_type == 'webm':
-            return WebmMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.Webm(server_url, user, password, camera_mac_addr)
         if stream_type == 'rtsp':
-            return RtspMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.Rtsp(server_url, user, password, camera_mac_addr)
         if stream_type == 'hls':
-            return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.M3uHls(server_url, user, password, camera_mac_addr)
         if stream_type == 'direct-hls':
-            return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
+            return media_stream.DirectHls(server_url, user, password, camera_mac_addr)
         assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
     def set_camera_advanced_param(self, camera_id, **params):  # types: (str, dict) -> None
-        """Takes a camera id as a string and a **params dict ({param_name1: param1_value, ...})
-        and performs a GET request to the server to update camera's advanced parameters.
+        """Take a camera id as a string and a **params dict ({param_name1: param1_value, ...})
+        and perform a GET request to the server to update camera's advanced parameters.
         """
         params.update({'cameraId': camera_id})
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
-    def get_camera_user_attributes_list(self, camera_id=''):  # type: (str) -> list
-        """If no camera_id is provided, the reply will contain a list of attributes of all cameras.
-        """
+    def get_camera_user_attributes_list(self, camera_id):  # type: (str) -> list
+        """Get user attributes for a specific camera"""
         return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
 
-    def save_camera_user_attributes(self, **params):  # type: (dict) -> None
-        """**params may contain "'cameraId': camera_id" key:value pair, in this case the
-        method is applied to a specific camera only. Otherwise, it is applied to all cameras.
+    def set_camera_user_attributes(self, camera_id='', **params):  # type: (str, dict) -> None
+        """Sets the camera user attribute(-s) for a specific camera
+           WARNING! camera_id format has to be UUID! MAC doesn't work for this method. If no
+           camera_id is specified, it has to be already in params.
         """
+        if len(camera_id) != 0:
+            params['cameraId'] = camera_id
+        assert 'cameraId' in params
         self.generic.post('ec2/saveCameraUserAttributes', params)
 
     @classmethod
@@ -454,7 +495,7 @@ class MediaserverApi(object):
             return {k: cls._parse_json_fields(v) for k, v in data.items()}
         if isinstance(data, list):
             return [cls._parse_json_fields(i) for i in data]
-        if isinstance(data, string_types):
+        if isinstance(data, six.string_types):
             try:
                 json_data = json.loads(data)
             except ValueError:
@@ -496,9 +537,9 @@ class MediaserverApi(object):
 
     _merge_logger = _logger.getChild('merge')
 
-    @with_logger(_setup_logger, 'framework.waiting')
-    @with_logger(_setup_logger, 'framework.http_api')
-    @with_logger(_setup_logger, _logger.name)
+    @context_logger(_setup_logger, 'framework.waiting')
+    @context_logger(_setup_logger, 'framework.http_api')
+    @context_logger(_setup_logger, _logger.name)
     def merge(
             self,
             remote_api,  # type: MediaserverApi
@@ -532,8 +573,8 @@ class MediaserverApi(object):
                 raise MergeUnauthorized(self, remote_api, e.error, e.error_string)
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
-        wait_for_true(servant_api.credentials_work, timeout_sec=30)
-        wait_for_true(
+        wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
+        wait_for_truthy(
             lambda: servant_api.get_local_system_id() == master_system_id,
             "{} responds with system id {}".format(servant_api, master_system_id),
             timeout_sec=10)
@@ -544,3 +585,52 @@ class MediaserverApi(object):
             if EUI(camera_info['physicalId']) == EUI(camera_mac):
                 _logger.info("Camera %r is discovered by server %r as %r", camera_mac, self, camera_info['id'])
                 return camera_info['id']
+
+    def make_event_rule(
+            self, event_type, event_state, action_type, event_resource_ids=[],
+            event_condition_resource='', action_resource_ids=[]):
+        self.generic.post('ec2/saveEventRule', dict(
+            actionParams=json.dumps(dict(
+                allUsers=False,
+                authType='authBasicAndDigest',
+                durationMs=5000,
+                forced=True,
+                fps=10,
+                needConfirmation=False,
+                playToClient=True,
+                recordAfter=0,
+                recordBeforeMs=1000,
+                requestType='',
+                streamQuality='highest',
+                useSource=False,
+            )),
+            actionResourceIds=action_resource_ids,
+            actionType=action_type,
+            aggregationPeriod=0,
+            comment='',
+            disabled=False,
+            eventCondition=json.dumps(dict(
+                eventTimestampUsec='0',
+                eventType='undefinedEvent',
+                metadata=dict(allUsers=False),
+                reasonCode='none',
+                resourceName=event_condition_resource,
+            )),
+            eventResourceIds=event_resource_ids,
+            eventState=event_state,
+            eventType=event_type,
+            id='{%s}' % uuid.uuid1(),
+            schedule='',
+            system=False,
+        ))
+
+    def create_event(self, **params):
+        self.generic.get('api/createEvent', params)
+
+    def get_events(self, camera_id=None, type_=None, from_='2000-01-01', to_='3000-01-01'):
+        query = {'from': from_, 'to': to_, 'cameraId': camera_id, 'event_type': type_}
+        return self.generic.get('api/getEvents', {k: v for k, v in query.items() if v})
+
+    def execute_ptz(self, camera_id, command, **kwargs):
+        return self.generic.get('api/ptz', dict(
+            cameraId=camera_id, command=command + 'PtzCommand', **kwargs))

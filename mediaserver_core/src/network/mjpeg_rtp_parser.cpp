@@ -501,9 +501,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         if (!resolutionWorkaroundLogged)
         {
             resolutionWorkaroundLogged = true;
-            NX_LOG(lit(
-                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lit(
+                "[mjpeg_rtp_parser] Camera reports resolution 1792 x 112, assuming 3840 x 2160 (~4K)"));
         }
         width = 3840 / 8;
         height = 2160 / 8;
@@ -551,7 +550,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
                 if (!mjpeg16BitWarningLogged)
                 {
                     mjpeg16BitWarningLogged = true;
-                    NX_LOG(lit("16-bit MJPEG is not supported"), cl_logDEBUG1);
+                    NX_DEBUG(this, lit("16-bit MJPEG is not supported"));
                 }
                 return false; //< Only 8-bit MJPEG is supported.
             }

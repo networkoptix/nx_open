@@ -4,10 +4,6 @@
 #include <nx/core/ptz/override.h>
 #include <nx/core/ptz/type.h>
 
-static const QString kPtzOverride("ptzOverride");
-static const QString kOperationalPtzCapabilitiesOverride("operationalPtzCapabilities");
-static const QString kConfigurationalPtzCapabilitiesOverride("configurationalPtzCapabilities");
-
 class QnWorkaroundPtzController: public QnProxyPtzController
 {
     using base_type = QnProxyPtzController;

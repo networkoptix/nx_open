@@ -224,8 +224,8 @@ public:
 
     void print() const
     {
-        NX_LOGX(lm("We have %1 files, %2 time periods")
-            .arg(m_fileCount).arg(m_timeLine.m_timeLine.size()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("We have %1 files, %2 time periods")
+            .arg(m_fileCount).arg(m_timeLine.m_timeLine.size()));
 
         qint64 prevStartTime;
         int prevDuration;

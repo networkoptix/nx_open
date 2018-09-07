@@ -180,7 +180,7 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     if (ipVersion.isEmpty())
         return;
 
-    NX_LOG(lm("SocketFactory::setIpVersion(%1)").arg(ipVersion), cl_logALWAYS);
+    NX_ALWAYS(typeid(SocketFactory), lm("SocketFactory::setIpVersion(%1)").arg(ipVersion));
 
     if (ipVersion == QLatin1String("4"))
     {

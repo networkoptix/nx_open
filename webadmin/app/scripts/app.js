@@ -112,11 +112,21 @@ angular.module('webadminApp', [
         })
         .when('/view', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
+            reloadOnSearch: false,
+            resolve: {
+                test: ['mediaserver', function (mediaserver) {
+                    mediaserver.getUser(true);
+                }]
+            }
         })
         .when('/view/:cameraId', {
             templateUrl: Config.viewsDir + 'view.html',
-            reloadOnSearch: false
+            reloadOnSearch: false,
+            resolve: {
+                test: ['mediaserver', function (mediaserver) {
+                    mediaserver.getUser(true);
+                }]
+            }
         })
         .when('/sdkeula', {
             templateUrl: Config.viewsDir + 'sdkeula.html',

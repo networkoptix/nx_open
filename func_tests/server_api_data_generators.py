@@ -53,8 +53,8 @@ def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
 
 
-def generate_uuid_from_string(salt):
-    return UUID(bytes=md5(salt).digest())
+def generate_formatter_uuid(salt):
+    return '{{{!s}}}'.format(UUID(bytes=md5(salt).digest()))
 
 
 def generate_email(name):
@@ -91,7 +91,7 @@ def generate_camera_data(camera_id, **kw):
         dewarpingParams="",
         groupId='',
         groupName='',
-        id='{{{}}}'.format(generate_uuid_from_string(mac.encode('ascii'))),
+        id=generate_formatter_uuid(mac.encode('ascii')),
         mac=mac,
         manuallyAdded=False,
         maxArchiveDays=0,
@@ -139,7 +139,7 @@ def generate_mediaserver_data(server_id, **kw):
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,
-        authKey='{{{}}}'.format(generate_uuid_from_string(server_name.encode('ascii'))),
+        authKey=generate_formatter_uuid(server_name.encode('ascii')),
         flags='SF_HasPublicIP',
         id=generate_server_guid(server_id),
         name=server_name,

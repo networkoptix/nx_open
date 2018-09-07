@@ -126,12 +126,12 @@ public:
 
     static QnTimePeriodList getRecordedPeriods(
         QnMediaServerModule* serverModule,
-        const QnSecurityCamResourceList &cameras, 
-        qint64 startTime, 
-        qint64 endTime, 
-        qint64 detailLevel, 
+        const QnSecurityCamResourceList &cameras,
+        qint64 startTime,
+        qint64 endTime,
+        qint64 detailLevel,
         bool keepSmallChunks,
-        const QList<QnServer::ChunksCatalog> &catalogs, 
+        const QList<QnServer::ChunksCatalog> &catalogs,
         int limit);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
@@ -279,7 +279,8 @@ private:
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
-    void checkWritableStoragesExists();
+    void checkWritableStoragesExist();
+
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
@@ -299,7 +300,10 @@ private:
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
-    QMap<QnUuid, bool> m_diskFullWarned;
+    /**
+     * Storage id --> 'corresponding storage has too much data not managed by VMS' flag map.
+     */
+    QMap<QnUuid, bool> m_diskFullMap;
 
     QnStorageScanData m_archiveRebuildInfo;
     std::atomic<bool> m_rebuildCancelled;

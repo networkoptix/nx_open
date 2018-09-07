@@ -143,7 +143,7 @@ Stream makeStream(Level level, const Tag& tag)
 
 /**
  * Usage:
- *     NX_<LEVEL>(TAG) MESSAGE [<< ...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
+ *     NX_<LEVEL>(TAG) << MESSAGE [<< ...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
  *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
  *
  * Examples:

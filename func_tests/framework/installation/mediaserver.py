@@ -12,14 +12,14 @@ from framework.camera import Camera, SampleMediaFile
 from framework.installation.installation import Installation
 from framework.installation.installer import InstallerSet
 from framework.installation.make_installation import make_installation
-from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
+from framework.mediaserver_api import MediaserverApi
 from framework.method_caching import cached_property
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import copy_file
-from ..switched_logging import with_logger
 from framework.utils import datetime_utc_to_timestamp
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
+from ..context_logger import context_logger
 
 DEFAULT_HTTP_SCHEMA = 'http'
 
@@ -33,9 +33,9 @@ MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waitin
 _logger = logging.getLogger(__name__)
 
 
-@with_logger(_logger, 'framework.waiting')
-@with_logger(_logger, 'framework.http_api')
-@with_logger(_logger, 'framework.mediaserver_api')
+@context_logger(_logger, 'framework.waiting')
+@context_logger(_logger, 'framework.http_api')
+@context_logger(_logger, 'framework.mediaserver_api')
 class BaseMediaserver(object):
     __metaclass__ = ABCMeta
 
@@ -55,7 +55,7 @@ class BaseMediaserver(object):
                 raise Exception("Already started")
         else:
             service.start()
-            wait_for_true(
+            wait_for_truthy(
                 self.is_online,
                 description='{} is started'.format(self),
                 timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds(),
@@ -66,7 +66,7 @@ class BaseMediaserver(object):
         service = self.installation.service
         if service.is_running():
             service.stop()
-            wait_for_true(lambda: not service.is_running(), "{} stops".format(service))
+            wait_for_truthy(lambda: not service.is_running(), "{} stops".format(service))
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
@@ -117,7 +117,7 @@ class Mediaserver(BaseMediaserver):
         self.service = installation.service
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = MediaserverApi(GenericMediaserverApi.new(name, forwarded_address, forwarded_port))
+        self.api = MediaserverApi('{}:{}'.format(forwarded_address, forwarded_port), alias=name)
 
     def __str__(self):
         return 'Mediaserver {} at {}'.format(self.name, self.api.generic.http.url(''))
@@ -130,7 +130,7 @@ class Mediaserver(BaseMediaserver):
         # type: (OSAccess, InstallerSet, str) -> Mediaserver
         """Get mediaserver as if it hasn't run before."""
         installation = make_installation(os_access, installer_set.customization)
-        installer = installer_set.find_by_filter(installation.can_install)
+        installer = installation.choose_installer(installer_set.installers)
         installation.install(installer)
         mediaserver = cls(os_access.alias, installation)
         mediaserver.stop(already_stopped_ok=True)

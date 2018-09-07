@@ -48,6 +48,11 @@ bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
     return value == nx::core::resource::DeviceType::unknown;
 };
 
+QString boolToPropertyStr(bool value)
+{
+    return value ? lit("1") : lit("0");
+}
+
 } // namespace
 
 const int QnSecurityCamResource::kDefaultSecondStreamFpsLow = 2;
@@ -263,10 +268,8 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         if (ok)
             return reservedSecondStreamFps;
 
-        NX_LOGX(
-            lm("Wrong reserved second stream fps value for camera %1")
-                .arg(getName()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Wrong reserved second stream fps value for camera %1")
+                .arg(getName()));
     }
 
     auto sharingMethod = streamFpsSharingMethod();
@@ -881,13 +884,24 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty( Qn::FIRMWARE_PARAM_NAME );
+    return getProperty(Qn::FIRMWARE_PARAM_NAME);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty( Qn::FIRMWARE_PARAM_NAME, firmware );
+    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
 }
+
+bool QnSecurityCamResource::trustCameraTime() const
+{
+    return getProperty(Qn::TRUST_CAMERA_TIME_NAME).toInt() > 0;
+}
+
+void QnSecurityCamResource::setTrustCameraTime(bool value)
+{
+    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
+}
+
 
 QString QnSecurityCamResource::getVendor() const
 {

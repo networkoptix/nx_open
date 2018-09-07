@@ -41,6 +41,7 @@ Yunhong Gu, last updated 02/28/2012
 #ifndef __UDT_CORE_H__
 #define __UDT_CORE_H__
 
+#include <mutex>
 
 #include "udt.h"
 #include "common.h"
@@ -56,26 +57,46 @@ Yunhong Gu, last updated 02/28/2012
 
 enum UDTSockType { UDT_STREAM = 1, UDT_DGRAM };
 
+/**
+ * Processes handshake requests.
+ */
+class ServerSideConnectionAcceptor
+{
+public:
+    ServerSideConnectionAcceptor(
+        uint64_t startTime,
+        UDTSockType sockType,
+        UDTSOCKET socketId,
+        CSndQueue* sndQueue,
+        std::set<int> pollIds);
+
+    /**
+     * If packet does not contain connection request, non-zero is returned.
+     */
+    int processConnectionRequest(sockaddr* addr, CPacket& packet);
+
+    void addEPoll(const int eid, int eventsToReport);
+    void removeEPoll(const int eid);
+
+private:
+    bool m_closing = false;
+    uint64_t m_StartTime = 0;
+    UDTSockType m_iSockType;
+    UDTSOCKET m_SocketId;
+    CSndQueue* m_pSndQueue = nullptr;
+    std::set<int> m_pollIds;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 class CUDT
 {
-    friend class CUDTSocket;
-    friend class CUDTUnited;
-    friend class CCC;
-    friend struct CUDTComp;
-    friend class CCache<CInfoBlock>;
-    friend class CRendezvousQueue;
-    friend class CSndQueue;
-    friend class CRcvQueue;
-    friend class CSndUList;
-    friend class CRcvUList;
-
-private: // constructor and desctructor
+public: //API
     CUDT();
     CUDT(const CUDT& ancestor);
-    const CUDT& operator=(const CUDT&) { return *this; }
+    CUDT& operator=(const CUDT&) = delete;
     ~CUDT();
 
-public: //API
     static int startup();
     static int cleanup();
     static UDTSOCKET socket(int af, int type = SOCK_STREAM, int protocol = 0);
@@ -118,13 +139,78 @@ public: // internal API
     void setConnecting(bool val);
     bool isConnecting() const;
 
+    bool connected() const { return m_bConnected; }
+    bool listening() const { return m_bListening; }
+    bool shutdown() const { return m_bShutdown; }
+    
+    int decrementBrokenCounter() { return m_iBrokenCounter--; }
+
     void setIsClosing(bool val);
     bool isClosing() const;
 
-    void setIsBroken(bool val);
-    bool isBroken() const;
+    void setBroken(bool val);
+    bool broken() const;
 
-private:
+    CSNode* sNode() { return m_pSNode; }
+    CRNode* rNode() { return m_pRNode; }
+
+    int payloadSize() const { return m_iPayloadSize; }
+
+    int64_t lastReqTime() const { return m_llLastReqTime; }
+    void setLastReqTime(int64_t value) { m_llLastReqTime = value; }
+
+    void addEPoll(const int eid, int eventsToReport);
+    void removeEPoll(const int eid);
+    const std::set<int>& pollIds() const { return m_sPollID; }
+
+    bool rendezvous() const { return m_bRendezvous; }
+
+    const CHandShake& connReq() const { return m_ConnReq; }
+    const CHandShake& connRes() const { return m_ConnRes; }
+
+    UDTSOCKET socketId() const { return m_SocketID; }
+    UDTSockType sockType() const { return m_iSockType; }
+    int ipVersion() const { return m_iIPversion; }
+
+    void setSocket(UDTSOCKET socketId, UDTSockType sockType, int ipVersion)
+    {
+        m_SocketID = socketId;
+        m_iSockType = sockType;
+        m_iIPversion = ipVersion;
+    }
+
+    UDTSOCKET peerId() const { return m_PeerID; }
+
+    CSndQueue* sndQueue() { return m_pSndQueue; }
+    void setSndQueue(CSndQueue* value) { m_pSndQueue = value; }
+    CRcvQueue* rcvQueue() { return m_pRcvQueue; }
+    void setRcvQueue(CRcvQueue* value) { m_pRcvQueue = value; }
+    
+    CSndBuffer* sndBuffer() { return m_pSndBuffer; }
+    CRcvBuffer* rcvBuffer() { return m_pRcvBuffer; }
+
+    bool synRecving() const { return m_bSynRecving; }
+    bool synSending() const { return m_bSynSending; }
+    sockaddr* peerAddr() { return m_pPeerAddr; };
+    const uint32_t* selfIp() const { return m_piSelfIP; }
+
+    int32_t isn() const { return m_iISN; }
+    int mss() const { return m_iMSS; }
+    int flightFlagSize() const { return m_iFlightFlagSize; }
+    int sndBufSize() const { return m_iSndBufSize; }
+    int rcvBufSize() const { return m_iRcvBufSize; }
+
+    struct linger linger() const { return m_Linger; }
+    int udpSndBufSize() const { return m_iUDPSndBufSize; }
+    int udpRcvBufSize() const { return m_iUDPRcvBufSize; }
+
+    uint64_t lingerExpiration() const { return m_ullLingerExpiration; }
+    void setLingerExpiration(uint64_t value) { m_ullLingerExpiration = value; }
+
+    bool reuseAddr() const { return m_bReuseAddr; }
+
+    void setCache(CCache<CInfoBlock>* value) { m_pCache = value; }
+
     // Functionality:
     //    initialize a UDT entity and bind to a local address.
     // Parameters:
@@ -278,18 +364,27 @@ private:
 
     void sample(CPerfMon* perf, bool clear = true);
 
-private:
+    // Generation and processing of packets
+    void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void processCtrl(CPacket& ctrlpkt);
+    int packData(CPacket& packet, uint64_t& ts);
+    int processData(CUnit* unit);
+
+    void checkTimers(bool forceAck);
+
+    static const int m_iSYNInterval;             // Periodical Rate Control Interval, 10000 microsecond
+    static const int m_iSelfClockInterval;       // ACK interval for self-clocking
     static CUDTUnited s_UDTUnited;               // UDT global management base
 
 public:
     static const UDTSOCKET INVALID_SOCK;         // invalid socket descriptor
     static const int ERROR;                      // socket api error returned value
+    static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Identification
     UDTSOCKET m_SocketID;                        // UDT socket number
     UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
     UDTSOCKET m_PeerID;                // peer id, for multiplexer
-    static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Packet sizes
     int m_iPktSize;                              // Maximum/regular packet size, in bytes
@@ -302,7 +397,7 @@ private: // Options
     int m_iFlightFlagSize;                       // Maximum number of packets in flight from the peer side
     int m_iSndBufSize;                           // Maximum UDT sender buffer size
     int m_iRcvBufSize;                           // Maximum UDT receiver buffer size
-    linger m_Linger;                             // Linger information on close
+    struct linger m_Linger;                             // Linger information on close
     int m_iUDPSndBufSize;                        // UDP sending buffer size
     int m_iUDPRcvBufSize;                        // UDP receiving buffer size
     int m_iIPversion;                            // IP version
@@ -379,7 +474,7 @@ private: // Receiving related data
     int32_t m_iPeerISN;                          // Initial Sequence Number of the peer side
 
 private: // synchronization: mutexes and conditions
-    pthread_mutex_t m_ConnectionLock;            // used to synchronize connection operation
+    std::mutex m_ConnectionLock;            // used to synchronize connection operation
 
     pthread_cond_t m_SendBlockCond;              // used to block "send" call
     pthread_mutex_t m_SendBlockLock;             // lock associated to m_SendBlockCond
@@ -395,13 +490,6 @@ private: // synchronization: mutexes and conditions
     void initSynch();
     void destroySynch();
     void releaseSynch();
-
-private: // Generation and processing of packets
-    void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
-    void processCtrl(CPacket& ctrlpkt);
-    int packData(CPacket& packet, uint64_t& ts);
-    int processData(CUnit* unit);
-    int listen(sockaddr* addr, CPacket& packet);
 
 private: // Trace
     uint64_t m_StartTime;                        // timestamp when the UDT entity is started
@@ -432,9 +520,6 @@ private: // Trace
 private: // Timers
     uint64_t m_ullCPUFrequency;                  // CPU clock frequency, used for Timer, ticks per microsecond
 
-    static const int m_iSYNInterval;             // Periodical Rate Control Interval, 10000 microsecond
-    static const int m_iSelfClockInterval;       // ACK interval for self-clocking
-
     uint64_t m_ullNextACKTime;            // Next ACK time, in CPU clock cycles, same below
     uint64_t m_ullNextNAKTime;            // Next NAK time
 
@@ -451,8 +536,6 @@ private: // Timers
 
     uint64_t m_ullTargetTime;            // scheduled time of next packet sending
 
-    void checkTimers(bool forceAck);
-
 private: // for UDP multiplexer
     CSndQueue* m_pSndQueue;            // packet sending queue
     CRcvQueue* m_pRcvQueue;            // packet receiving queue
@@ -460,12 +543,10 @@ private: // for UDP multiplexer
     uint32_t m_piSelfIP[4];            // local UDP IP address
     CSNode* m_pSNode;                // node information for UDT list used in snd queue
     CRNode* m_pRNode;                            // node information for UDT list used in rcv queue
+    std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll
     std::set<int> m_sPollID;                     // set of epoll ID to trigger
-    void addEPoll(const int eid, int eventsToReport);
-    void removeEPoll(const int eid);
 };
-
 
 #endif

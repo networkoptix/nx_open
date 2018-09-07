@@ -181,8 +181,8 @@ void* CyclicAllocator::alloc( size_t size )
     validateBlock( m_allocatedBlocks, posPtr - AllocationHeader::ALLOCATION_HEADER_SIZE, spaceRequired );
     m_allocatedBlocks.emplace( posPtr - AllocationHeader::ALLOCATION_HEADER_SIZE, spaceRequired );
 
-    NX_LOG( lit("Allocated %1 bytes at %2. free mem start pos %3, arena %4").
-        arg(size).arg((size_t)posPtr, 0, 16).arg(m_freeMemStart.pos).arg((size_t)m_freeMemStart.arena, 0, 16), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Allocated %1 bytes at %2. free mem start pos %3, arena %4").
+        arg(size).arg((size_t)posPtr, 0, 16).arg(m_freeMemStart.pos).arg((size_t)m_freeMemStart.arena, 0, 16));
 #endif
 
     return posPtr;
@@ -215,9 +215,9 @@ void CyclicAllocator::release( void* ptr )
 
 #ifdef CA_DEBUG
     m_allocatedBlocks.erase( static_cast<uint8_t*>(ptr) - AllocationHeader::ALLOCATION_HEADER_SIZE );
-    NX_LOG( lit("Released block %1 of size %2. Left most allocated block is at %3, arena %4").
+    NX_DEBUG(this, lit("Released block %1 of size %2. Left most allocated block is at %3, arena %4").
         arg((size_t)ptr, 0, 16).arg(header.size).
-        arg(m_leftMostAllocatedBlock.pos).arg((size_t)m_leftMostAllocatedBlock.arena, 0, 16), cl_logDEBUG1 );
+        arg(m_leftMostAllocatedBlock.pos).arg((size_t)m_leftMostAllocatedBlock.arena, 0, 16));
 #endif
 
     skipFreedBlocks();

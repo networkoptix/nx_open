@@ -60,7 +60,7 @@ void QnServerConnector::removeConnection(const QnUuid& id)
     if (moduleUrl.isNull())
         return;
 
-    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
+    NX_INFO(this, lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)));
     commonModule()->ec2Connection()->deleteRemotePeer(id);
 
     const auto server = resourcePool()->getResourceById(id);

@@ -9,16 +9,11 @@ namespace stun {
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
-    NX_LOGX("AsyncClientUser()", cl_logDEBUG2);
-
     m_client->addOnReconnectedHandler(
         [this, guard = m_asyncGuard.sharedGuard()]()
         {
             if (auto lock = guard->lock())
                 return post(std::bind(&AsyncClientUser::reportReconnect, this));
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg((void*)this), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -56,9 +51,6 @@ void AsyncClientUser::sendRequest(
                         handler(code, std::move(message));
                     });
             }
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignore response %2 handler")
-                .arg((void*)this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -73,9 +65,6 @@ bool AsyncClientUser::setIndicationHandler(
         {
             if (auto lock = guard->lock())
                 return post(std::bind(std::move(handler), std::move(message)));
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignore indication %2 handler")
-                .arg((void*)this).arg(message.header.method), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -95,9 +84,6 @@ bool AsyncClientUser::setConnectionTimer(
         {
             if (auto lock = guard->lock())
                 return post(std::move(handler));
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring timer handler")
-                .arg((void*)this), cl_logDEBUG1);
         },
         m_asyncGuard.sharedGuard().get());
 }
@@ -132,7 +118,7 @@ void AsyncClientUser::disconnectFromClient()
             guard.reset();
         });
 
-    NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Disconnected from client"));
     m_asyncGuard.reset();
 }
 

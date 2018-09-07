@@ -314,7 +314,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
 
         m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+        NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()));
 
         //checking url type and creating corresponding data provider
 
@@ -362,12 +362,12 @@ bool ThirdPartyStreamReader::isStreamOpened() const
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
-int ThirdPartyStreamReader::getLastResponseCode() const
+CameraDiagnostics::Result ThirdPartyStreamReader::openStreamResult() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
-    return m_liveStreamReader
-        ? nx::network::http::StatusCode::ok
-        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx::network::http::StatusCode::ok);
+    if (!m_liveStreamReader && m_builtinStreamReader)
+        return m_builtinStreamReader->openStreamResult();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const
@@ -538,7 +538,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     if (m_needCorrectTime && rez)
     {
         if (auto helper = timeHelper(rez))
-            rez->timestamp = helper->getTimeUs(rez->timestamp);
+            rez->timestamp = helper->getCurrentTimeUs(rez->timestamp);
     }
 
     return rez;

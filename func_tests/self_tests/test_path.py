@@ -82,10 +82,6 @@ def existing_remote_dir(remote_test_dir):
     return path
 
 
-def test_tmp(path_cls):
-    assert path_cls.tmp().exists()
-
-
 def test_home(path_cls):
     assert path_cls.home().exists()
 
@@ -124,8 +120,8 @@ def test_rmtree_mkdir_exists(dirty_remote_test_dir, depth):
 
 
 _tricky_bytes = [
-    ('chr0_to_chr255', bytearray(range(0x100))),
-    ('chr0_to_chr255_100times', bytearray(range(0x100)) * 100),
+    ('chr0_to_chr255', bytes(bytearray(range(0x100)))),
+    ('chr0_to_chr255_100times', bytes(bytearray(range(0x100)) * 100)),
     ('whitespace', whitespace),
     ('windows_newlines', '\r\n' * 100),
     ('linux_newlines', '\n' * 100),
@@ -267,7 +263,9 @@ def remote_file_path(request, path_type, name):
         vm_fixture_name = 'windows_vm'
     vm = request.getfixturevalue(vm_fixture_name)
     path_class = vm.os_access.Path
-    base_remote_dir = path_class.tmp().joinpath(__name__ + '-remote')
+    tmp_dir = path_class.tmp()
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)
 
 def path_type_to_path(request, node_dir, ssh_path_cls, path_type, name):

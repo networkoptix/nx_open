@@ -2,14 +2,14 @@ import logging
 from abc import ABCMeta
 from io import StringIO
 
-from framework.ini_config import IniConfig
-from framework.installation.installation import Installation, OsNotSupported
-from framework.os_access.posix_access import PosixAccess
-from framework.os_access.posix_shell import PosixShell
-
 # Backport provided by package `configparser` from PyPI.
 # noinspection PyUnresolvedReferences,PyCompatibility
 from configparser import ConfigParser
+
+from framework.ini_config import IniConfig
+from framework.installation.installation import Installation, OsNotSupported
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.posix_shell import Shell
 
 _logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class DebInstallation(Installation):
             core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
             )
-        self._posix_shell = os_access.shell  # type: PosixShell
+        self._posix_shell = os_access.shell  # type: Shell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
         self.posix_access = os_access  # type: PosixAccess
@@ -53,8 +53,8 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    def can_install(self, installer):
-        return installer.platform == 'linux64' and installer.path.suffix == '.deb'
+    def _can_install(self, installer):
+        return installer.platform_variant == 'ubuntu' and installer.component == 'server'
 
     def parse_core_dump(self, path):
         return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')

@@ -15,6 +15,10 @@ QnAbstractPtzController::~QnAbstractPtzController()
 {
 }
 
+void QnAbstractPtzController::initialize()
+{
+}
+
 QnResourcePtr QnAbstractPtzController::resource() const
 {
     return m_resource;

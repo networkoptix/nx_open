@@ -100,7 +100,6 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         m_isdCam->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        m_isdCam->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( m_isdCam->getHostAddress() );
         requestedUrl.setPort( port );
@@ -136,7 +135,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     }
 
     m_isdCam->updateSourceUrl(url, getRole());
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()));
 
     m_rtpStreamParser.setRequest(url);
 	m_isdCam->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
