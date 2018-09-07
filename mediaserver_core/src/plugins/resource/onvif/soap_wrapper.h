@@ -13,9 +13,9 @@
 #include <plugins/resource/onvif/onvif_helper.h>
 #include <plugins/resource/onvif/onvif_namespace_registrar.h>
 #include <plugins/resource/onvif/soap_helpers.h>
-#include <onvif\soapDeviceIOBindingProxy.h>
-#include <onvif\soapMediaBindingProxy.h>
-#include <onvif\soapMedia2BindingProxy.h>
+#include <onvif/soapDeviceIOBindingProxy.h>
+#include <onvif/soapMediaBindingProxy.h>
+#include <onvif/soapMedia2BindingProxy.h>
 
 struct SoapTimeouts
 {
@@ -563,6 +563,9 @@ DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
 DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
 DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
+DECLARE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
+DECLARE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
 DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
 
 DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2, onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
@@ -648,7 +651,7 @@ public:
         return receiveBySoap(empryRequest);
     }
 
-    bool receiveBySoap(/*const*/ Request& request) //< gsoap does not guarantee immutability
+    bool receiveBySoap(Request& request) //< gsoap does not guarantee immutability of "request"
     {
         NX_CRITICAL(responseHolderCount == 0);
 
@@ -659,6 +662,11 @@ public:
             m_wrapper.m_soapProxy, m_wrapper.m_endpoint, nullptr, &request, m_response);
 
         return soapError() == SOAP_OK;
+    }
+
+    bool performRequest(Request& request) //< Just another name.
+    {
+        return receiveBySoap(request);
     }
 
     void reset()
@@ -703,7 +711,7 @@ public:
     }
 
     operator bool() const noexcept { return soapError() == SOAP_OK; }
-    const SoapWrapper<BindingProxy>& innerWrapper() const noexcept { return m_wrapper; }
+    SoapWrapper<BindingProxy>& innerWrapper() noexcept { return m_wrapper; }
     QString endpoint() const { return QString::fromLatin1(m_wrapper.endpoint()); }
 
 protected:
@@ -724,6 +732,9 @@ namespace Media {
 
     using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationsResponse>;
     using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
+    using VideoEncoderConfigurationSetter = ResponseWrapper<_onvifMedia__SetVideoEncoderConfigurationResponse>;
+    using AudioEncoderConfigurations = ResponseWrapper<_onvifMedia__GetAudioEncoderConfigurationsResponse>;
+    using AudioEncoderConfigurationSetter = ResponseWrapper<_onvifMedia__SetAudioEncoderConfigurationResponse>;
     using Profiles = ResponseWrapper<_onvifMedia__GetProfilesResponse>;
 }// namespace Media2
 
@@ -731,6 +742,7 @@ namespace Media2 {
 
 using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationsResponse>;
 using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
+
 }// namespace Media2
 
 //#TODO szaitsev: Replace DeviceIO::GetRelayOutputs with DeviceIO::GetRelayOutputs and so on.

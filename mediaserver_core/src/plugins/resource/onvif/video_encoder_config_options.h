@@ -40,9 +40,9 @@ enum class UnderstandableVideoCodec
 {
     NONE,
     JPEG,
-    H264,
     H265,
-    Desirable = H265
+    H264,
+    Desirable = H264
 };
 /*
  FYI: is how video encoders are enumerated in onvif:

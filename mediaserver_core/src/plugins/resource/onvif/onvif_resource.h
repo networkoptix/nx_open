@@ -399,7 +399,8 @@ protected:
 
     boost::optional<onvifXsd__H264Profile> getH264StreamProfile(
         const VideoOptionsLocal& videoOptionsLocal);
-    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
+    CameraDiagnostics::Result sendVideoEncoderToCamera(
+        onvifXsd__VideoEncoderConfiguration& encoderConfig);
 
     CameraDiagnostics::Result fetchAndSetVideoResourceOptions();
     CameraDiagnostics::Result fetchAndSetAudioResourceOptions();

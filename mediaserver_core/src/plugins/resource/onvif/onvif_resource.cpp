@@ -3231,35 +3231,21 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
     return sendVideoEncoderToCamera(encoder);
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__VideoEncoderConfiguration& encoderConfig)
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
-
-    auto proxy = soapWrapper.getProxy();
-    proxy->soap->recv_timeout = getOnvifRequestsRecieveTimeout();
-    proxy->soap->send_timeout = getOnvifRequestsSendTimeout();
+    Media::VideoEncoderConfigurationSetter vecSetter(makeRequestParams());
 
     SetVideoConfigReq request;
-    SetVideoConfigResp response;
-    request.Configuration = &encoder;
+    request.Configuration = &encoderConfig;
     request.ForcePersistence = false;
-
-    int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
-    if (soapRes != SOAP_OK)
+    vecSetter.performRequest(request);
+    if (!vecSetter)
     {
-        if (soapWrapper.isNotAuthenticated())
+        if (vecSetter.innerWrapper().isNotAuthenticated())
             setStatus(Qn::Unauthorized);
-
-#ifdef PL_ONVIF_DEBUG
-        qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: "
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-#endif
-        if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));   // TODO: #ak find param name
+        // #TODO: Log.
+        if (vecSetter.innerWrapper().getLastError().contains("not possible to set"))
+            return CameraDiagnostics::CannotConfigureMediaStreamResult("fps");   // TODO: #ak find param name
         else
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QString("'stream profile parameters'"));
     }
