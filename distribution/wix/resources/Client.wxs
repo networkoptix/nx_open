@@ -104,10 +104,11 @@
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="info_files" Directory="ClientRootDir" Source="$(var.CMAKE_BINARY_DIR)">
+        <ComponentGroup Id="info_files"
+                Directory="InstallDirRoot"
+                Source="$(var.CMAKE_BINARY_DIR)">
             <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
         </ComponentGroup>
-
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
         <ComponentGroup Id="shared_qt_gui" Source="$(var.QtDir)" Directory="InstallDirRoot">
