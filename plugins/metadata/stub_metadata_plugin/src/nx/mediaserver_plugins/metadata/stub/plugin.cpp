@@ -14,8 +14,8 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin()
-    : CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
+Plugin::Plugin():
+    CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
@@ -34,7 +34,7 @@ void Plugin::initCapabilities()
         if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
         {
             NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
-                     << ini().iniFile() << ": [" << pixelFormatString << "].";
+                << ini().iniFile() << ": [" << pixelFormatString << "].";
         }
         else
         {
@@ -85,8 +85,7 @@ std::string Plugin::capabilitiesManifest() const
                     }
                 }
             ],
-            "capabilities": ")json" +
-        m_capabilities + R"json(",
+            "capabilities": ")json" + m_capabilities + R"json(",
             "settings": {
                 "params": [
                     {
@@ -127,7 +126,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        "nx.stub.car"
+                        ")json" + kCarObjectType+ R"json("
                     ],
                     "settings": {
                         "params": [
@@ -153,7 +152,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        "nx.stub.car"
+                        ")json" + kCarObjectType+ R"json("
                     ]
                 }
             ]
@@ -161,9 +160,13 @@ std::string Plugin::capabilitiesManifest() const
     )json";
 }
 
-void Plugin::settingsChanged() { NX_PRINT << __func__ << "()"; }
+void Plugin::settingsChanged()
+{
+    NX_PRINT << __func__ << "()";
+}
 
-void Plugin::executeAction(const std::string& actionId,
+void Plugin::executeAction(
+    const std::string& actionId,
     nxpl::NX_GUID objectId,
     nxpl::NX_GUID /*cameraId*/,
     int64_t /*timestampUs*/,
@@ -184,8 +187,9 @@ void Plugin::executeAction(const std::string& actionId,
         if (paramBIt != params.cend())
             valueB = paramBIt->second;
 
-        *outMessageToUser = std::string("Your param values are: ") + "paramA: [" + valueA + "], " +
-            "paramB: [" + valueB + "]";
+        *outMessageToUser = std::string("Your param values are: ")
+            + "paramA: [" + valueA + "], "
+            + "paramB: [" + valueB + "]";
 
         NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }
