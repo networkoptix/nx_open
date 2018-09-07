@@ -1,17 +1,20 @@
 #pragma once
 
-#include <nx/network/http/custom_headers.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/model_functions.h>
 
 #include "../access_control/authorization_manager.h"
 #include "../access_control/auth_types.h"
+#include "../access_control/security_manager.h"
+#include "../access_control/transport_security_manager.h"
 #include "../managers/managers_types.h"
 #include "../stree/cdb_ns.h"
 #include "../stree/http_request_attr_reader.h"
@@ -32,19 +35,21 @@ public:
     BasicHttpRequestHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
         m_entityType(entityType),
         m_actionType(actionType),
-        m_authorizationManager(authorizationManager)
+        m_securityManager(securityManager)
     {
     }
 
-protected:
-    const EntityType m_entityType;
-    const DataActionType m_actionType;
-    const AuthorizationManager& m_authorizationManager;
+    virtual ~BasicHttpRequestHandler()
+    {
+        if (m_responseTimer)
+            m_responseTimer->pleaseStopSync();
+    }
 
+protected:
     virtual void processRawHttpRequest(
         nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
@@ -52,6 +57,11 @@ protected:
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
+        m_connectionAioThread = connection->getAioThread();
+
+        m_securityActions = m_securityManager.transportSecurityManager().analyze(
+            *connection, request);
+
         base_type::processRawHttpRequest(
             connection,
             std::move(authInfo),
@@ -60,8 +70,23 @@ protected:
             std::move(completionHandler));
     }
 
-    virtual void sendRawHttpResponse(nx::network::http::RequestResult requestResult) override
+    virtual void sendRawHttpResponse(
+        nx::network::http::RequestResult requestResult) override
     {
+        if (m_securityActions.responseDelay)
+        {
+            m_responseTimer = std::make_unique<nx::network::aio::Timer>();
+            m_responseTimer->bindToAioThread(m_connectionAioThread);
+            m_responseTimer->start(
+                *m_securityActions.responseDelay,
+                [this, requestResult = std::move(requestResult)]() mutable
+                {
+                    m_responseTimer.reset();
+                    base_type::sendRawHttpResponse(std::move(requestResult));
+                });
+            return;
+        }
+
         base_type::sendRawHttpResponse(std::move(requestResult));
     }
 
@@ -78,7 +103,7 @@ protected:
         // Performing authorization.
         // Authorization is performed here since it can depend on input data which
         // needs to be deserialized depending on request type.
-        if (!m_authorizationManager.authorize(
+        if (!m_securityManager.authorizer().authorize(
                 authenticationData,
                 nx::utils::stree::MultiSourceResourceReader(
                     socketResources,
@@ -109,6 +134,14 @@ protected:
         }
         return true;
     }
+
+private:
+    const EntityType m_entityType;
+    const DataActionType m_actionType;
+    const SecurityManager& m_securityManager;
+    nx::network::aio::AbstractAioThread* m_connectionAioThread = nullptr;
+    std::unique_ptr<nx::network::aio::Timer> m_responseTimer;
+    SecurityActions m_securityActions;
 };
 
 } // namespace detail
@@ -125,12 +158,12 @@ public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
         detail::BasicHttpRequestHandler<Input, Output...>(
             entityType,
             actionType,
-            authorizationManager)
+            securityManager)
     {
     }
 
@@ -188,13 +221,13 @@ public:
     FiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
         AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }
@@ -227,12 +260,12 @@ public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
         detail::BasicHttpRequestHandler<void, Output...>(
             entityType,
             actionType,
-            authorizationManager)
+            securityManager)
     {
     }
 
@@ -281,13 +314,13 @@ public:
     FiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
         AbstractFiniteMsgBodyHttpHandler<void, Output...>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }
@@ -324,13 +357,13 @@ public:
     AbstractFreeMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
         detail::BasicHttpRequestHandler<InputData..., void>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }

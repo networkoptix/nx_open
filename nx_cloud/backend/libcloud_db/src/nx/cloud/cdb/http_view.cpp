@@ -23,13 +23,13 @@ HttpView::HttpView(
     m_settings(settings),
     m_controller(controller),
     m_multiAddressHttpServer(
-        &controller->authenticationManager(),
+        &controller->securityManager().authenticator(),
         &m_httpMessageDispatcher,
         false,  //< TODO: #ak enable ssl when it works properly.
         nx::network::NatTraversalSupport::disabled)
 {
     registerApiHandlers(
-        controller->authorizationManager(),
+        controller->securityManager(),
         &controller->accountManager(),
         &controller->systemManager(),
         &controller->systemHealthInfoProvider(),
@@ -42,7 +42,7 @@ HttpView::HttpView(
 
     // TODO: #ak Remove eventManager.registerHttpHandlers and register in registerApiHandlers.
     controller->eventManager().registerHttpHandlers(
-        controller->authorizationManager(),
+        controller->securityManager(),
         &m_httpMessageDispatcher);
 
     if (settings.http().connectionInactivityPeriod > std::chrono::milliseconds::zero())
@@ -105,7 +105,7 @@ void HttpView::registerStatisticsApiHandlers(
 }
 
 void HttpView::registerApiHandlers(
-    const AuthorizationManager& authorizationManager,
+    const SecurityManager& securityManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
@@ -118,9 +118,9 @@ void HttpView::registerApiHandlers(
 {
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::Ping>(
         http_handler::Ping::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<http_handler::Ping>
+        [&securityManager]() -> std::unique_ptr<http_handler::Ping>
         {
-            return std::make_unique<http_handler::Ping>(authorizationManager);
+            return std::make_unique<http_handler::Ping>(securityManager);
         });
 
     //---------------------------------------------------------------------------------------------
@@ -273,7 +273,7 @@ void HttpView::registerApiHandlers(
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDeprecatedCloudModuleXmlPath,
-        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+        [&cloudModuleUrlProviderDeprecated]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {
             return std::make_unique<http_handler::GetCloudModulesXml>(
@@ -282,7 +282,7 @@ void HttpView::registerApiHandlers(
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kAnotherDeprecatedCloudModuleXmlPath,
-        [&authorizationManager, &cloudModuleUrlProviderDeprecated]()
+        [&cloudModuleUrlProviderDeprecated]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {
             return std::make_unique<http_handler::GetCloudModulesXml>(
@@ -291,7 +291,7 @@ void HttpView::registerApiHandlers(
 
     m_httpMessageDispatcher.registerRequestProcessor<http_handler::GetCloudModulesXml>(
         kDiscoveryCloudModuleXmlPath,
-        [&authorizationManager, &cloudModuleUrlProvider]()
+        [&cloudModuleUrlProvider]()
             -> std::unique_ptr<http_handler::GetCloudModulesXml>
         {
             return std::make_unique<http_handler::GetCloudModulesXml>(
@@ -324,7 +324,7 @@ void HttpView::registerHttpHandler(
             return std::make_unique<HttpHandlerType>(
                 entityType,
                 dataActionType,
-                m_controller->authorizationManager(),
+                m_controller->securityManager(),
                 std::bind(managerFunc, manager, _1, _2, _3));
         });
 }
@@ -355,7 +355,7 @@ void HttpView::registerHttpHandler(
             return std::make_unique<HttpHandlerType>(
                 entityType,
                 dataActionType,
-                m_controller->authorizationManager(),
+                m_controller->securityManager(),
                 std::bind(managerFunc, manager, _1, _2));
         });
 }
@@ -378,10 +378,10 @@ public:
     WriteOnlyRestHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         HandlerFunc func)
         :
-        base_type(entityType, actionType, authorizationManager),
+        base_type(entityType, actionType, securityManager),
         m_func(std::move(func))
     {
     }
@@ -422,7 +422,7 @@ void HttpView::registerWriteOnlyRestHandler(
             return std::make_unique<HttpHandlerType>(
                 entityType,
                 dataActionType,
-                m_controller->authorizationManager(),
+                m_controller->securityManager(),
                 handler);
         },
         method);

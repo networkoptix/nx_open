@@ -9,6 +9,8 @@
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
+#include "access_control/security_manager.h"
+#include "access_control/transport_security_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/vms_p2p_command_bus.h"
 #include "managers/account_manager.h"
@@ -60,9 +62,7 @@ public:
 
     CloudModuleUrlProvider& cloudModuleUrlProvider();
 
-    AuthenticationManager& authenticationManager();
-
-    AuthorizationManager& authorizationManager();
+    SecurityManager& securityManager();
 
 private:
     const conf::Settings& m_settings;
@@ -88,6 +88,8 @@ private:
     std::unique_ptr<nx::network::http::AuthMethodRestrictionList> m_authRestrictionList;
     std::unique_ptr<AuthenticationManager> m_authenticationManager;
     std::unique_ptr<AuthorizationManager> m_authorizationManager;
+    std::unique_ptr<TransportSecurityManager> m_transportSecurityManager;
+    std::unique_ptr<SecurityManager> m_securityManager;
 
     void performDataMigrations();
     void generateUserAuthRecords(nx::sql::QueryContext* queryContext);

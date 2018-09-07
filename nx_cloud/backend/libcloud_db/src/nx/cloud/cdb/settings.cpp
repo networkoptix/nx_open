@@ -31,11 +31,19 @@ const bool kDefaultNotificationEnabled = true;
 
 //-------------------------------------------------------------------------------------------------
 // Account manager settings
-const QLatin1String kAccountActivationCodeExpirationTimeout("accountManager/accountActivationCodeExpirationTimeout");
-const std::chrono::seconds kDefaultAccountActivationCodeExpirationTimeout = std::chrono::hours(3*24);
+const QLatin1String kAccountActivationCodeExpirationTimeout(
+    "accountManager/accountActivationCodeExpirationTimeout");
+const std::chrono::seconds kDefaultAccountActivationCodeExpirationTimeout =
+    std::chrono::hours(3*24);
 
-const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeout");
-const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
+const QLatin1String kPasswordResetCodeExpirationTimeout(
+    "accountManager/passwordResetCodeExpirationTimeout");
+const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout =
+    std::chrono::hours(24);
+
+const QLatin1String kLoginExistenceConcealDelay(
+    "accountManager/loginExistenceConcealDelay");
+const auto kDefaultLoginExistenceConcealDelay = std::chrono::seconds(1);
 
 //-------------------------------------------------------------------------------------------------
 // System manager settings
@@ -148,7 +156,8 @@ Notification::Notification():
 
 AccountManager::AccountManager():
     accountActivationCodeExpirationTimeout(kDefaultAccountActivationCodeExpirationTimeout),
-    passwordResetCodeExpirationTimeout(kDefaultPasswordResetCodeExpirationTimeout)
+    passwordResetCodeExpirationTimeout(kDefaultPasswordResetCodeExpirationTimeout),
+    loginExistenceConcealDelay(kDefaultLoginExistenceConcealDelay)
 {
 }
 
@@ -336,6 +345,11 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kPasswordResetCodeExpirationTimeout).toString(),
             kDefaultPasswordResetCodeExpirationTimeout));
+
+    m_accountManager.loginExistenceConcealDelay =
+        nx::utils::parseTimerDuration(
+            settings().value(kLoginExistenceConcealDelay).toString(),
+            kDefaultLoginExistenceConcealDelay);
 
     //system manager
     m_systemManager.reportRemovedSystemPeriod = duration_cast<seconds>(
