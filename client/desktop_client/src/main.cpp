@@ -132,7 +132,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     if (startupParams.customUri.isValid())
         sendCloudPortalConfirmation(startupParams.customUri, application);
 
-    /* Running updater after QApplication and NX_LOG are initialized. */
+    /* Running updater after QApplication and logging are initialized. */
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
     {
         /* All functionality is in the constructor. */

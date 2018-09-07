@@ -24,21 +24,27 @@ public:
     void init(const Config& config);
 
     /**
-     * @return return array of buffers(allocated internally) to write sample data or nullptr when
-     * error occured.
+     * Reserves space in this buffer to write given sample count and returns a pointer to the
+     * reserved memory. This function is to be used when some external mechanism is employed for
+     * writing into memory. 'finishWriting()' must be called after external writing operation is
+     * complete.
+     *
+     * @param sampleCount Number of samples to reserve for writing.
+     * @returns Pointer to the reserved memory.
      */
-    uint8_t** getBuffer(uint64_t sampleCount);
+    uint8_t** startWriting(uint64_t sampleCount);
 
     /**
-     * Confirm written sample count.
+     * @param sampleCount Number of samples that were appended to this
+     * array using external mechanisms.
      */
-    void commit(uint64_t sampleCount);
+    void finishWriting(uint64_t sampleCount);
 
     /**
-     * Fill the buffers array by pointers to internal buffers with sample data
+     * Fills the buffers array by pointers to internal buffers with samples data
      * @return true if buffer contain requested sampleCount, otherwise false.
      */
-    bool getData(uint64_t sampleCount, uint8_t** buffers);
+    bool popData(uint64_t sampleCount, uint8_t** buffers);
 
     uint32_t sampleCount() const { return m_dataSize / m_sampleSize; }
     uint32_t planeCount() const { return m_planeCount; }
@@ -51,7 +57,7 @@ private:
 
 private:
     Config m_config;
-    uint64_t m_size = 0;
+    uint64_t m_bufferSize = 0;
     uint64_t m_dataOffset = 0;
     uint64_t m_dataSize = 0;
     uint32_t m_planeCount = 0;

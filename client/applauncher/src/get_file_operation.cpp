@@ -106,7 +106,7 @@ namespace detail
 
     void GetFileOperation::asyncStatDone( SystemError::ErrorCode errorCode, qint64 fileSize )
     {
-        NX_LOG( QString::fromLatin1("GetFileOperation::asyncStatDone. file %1, result %2").arg(entryPath).arg(SystemError::toString(errorCode)), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("asyncStatDone. file %1, result %2").arg(entryPath).arg(SystemError::toString(errorCode)));
 
         std::unique_lock<std::mutex> lk( m_mutex );
 
@@ -183,8 +183,8 @@ namespace detail
             std::unique_lock<std::mutex> lk( m_mutex );
             m_state = State::sFinished;
         }
-        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1, bytes written %2, result %3").
-            arg(entryPath).arg(m_totalBytesWritten).arg(ResultCode::toString(result())), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1, bytes written %2, result %3").
+            arg(entryPath).arg(m_totalBytesWritten).arg(ResultCode::toString(result())));
 
 #ifndef _WIN32
         //setting execution rights to file
@@ -228,7 +228,7 @@ namespace detail
 
     void GetFileOperation::onResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
     {
-        NX_LOG( QString::fromLatin1("GetFileOperation::onResponseReceived. file %1").arg(entryPath), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("onResponseReceived. file %1").arg(entryPath));
 
         m_responseReceivedCalled = true;
 
@@ -311,8 +311,8 @@ namespace detail
 
     void GetFileOperation::onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
     {
-        NX_LOG( QString::fromLatin1("GetFileOperation::onHttpDone. file %1, state %2. http result %3").
-            arg(entryPath).arg((int)m_state).arg(!httpClient->failed()), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("onHttpDone. file %1, state %2. http result %3").
+            arg(entryPath).arg((int)m_state).arg(!httpClient->failed()));
 
         switch( m_state )
         {
@@ -326,7 +326,7 @@ namespace detail
                     setErrorText( httpClient->response() ? httpClient->response()->statusLine.reasonPhrase : "FAILURE" );    //TODO proper error text
                     m_state = State::sFinished;
                 }
-                NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation::onHttpDone. Failed to get file %1 size").arg(entryPath), cl_logDEBUG2 );
+                NX_VERBOSE(this, QString::fromLatin1("RDirSyncher. GetFileOperation::onHttpDone. Failed to get file %1 size").arg(entryPath));
                 m_handler->operationDone( shared_from_this() );
                 return;
 
@@ -419,7 +419,7 @@ namespace detail
 
     void GetFileOperation::checkIfFileDownloadRequired()
     {
-        NX_LOG( QString::fromLatin1("GetFileOperation::checkIfFileDownloadRequired. file %1").arg(entryPath), cl_logDEBUG2 );
+        NX_VERBOSE(this, QString::fromLatin1("checkIfFileDownloadRequired. file %1").arg(entryPath));
 
         NX_ASSERT( m_localFileSize && m_remoteFileSize );
         NX_ASSERT( m_state == State::sCheckingLocalFile );
@@ -431,19 +431,19 @@ namespace detail
                 std::unique_lock<std::mutex> lk( m_mutex );
                 m_state = State::sFinished;
             }
-            NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1 with size %2 already exists, no need to download").arg(entryPath).arg(m_localFileSize.get()), cl_logDEBUG2 );
+            NX_VERBOSE(this, QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1 with size %2 already exists, no need to download").arg(entryPath).arg(m_localFileSize.get()));
             m_handler->operationDone( shared_from_this() );
             return;
         }
 
         if( m_localFileSize == (qint64)-1 )
         {
-            NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation. File %1 not found. Downloading...").arg(entryPath), cl_logDEBUG2 );
+            NX_VERBOSE(this, QString::fromLatin1("RDirSyncher. GetFileOperation. File %1 not found. Downloading...").arg(entryPath));
         }
         else
         {
-            NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation. File %1 not valid: local size %2, remote size %3. Downloading...").
-                arg(entryPath).arg(m_localFileSize.get()).arg(m_remoteFileSize.get()), cl_logDEBUG2 );
+            NX_VERBOSE(this, QString::fromLatin1("RDirSyncher. GetFileOperation. File %1 not valid: local size %2, remote size %3. Downloading...").
+                arg(entryPath).arg(m_localFileSize.get()).arg(m_remoteFileSize.get()));
         }
 
         startFileDownload();

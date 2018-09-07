@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 
 class QnRuntimeInfoManager;
+struct QnPeerRuntimeInfo;
 
 namespace ec2 {
 
@@ -30,6 +31,15 @@ private:
     QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
 
     void onNewConnectionEstablished(QnAbstractTransactionTransport* transport);
+
+    void loadQueryParams(
+        QnPeerRuntimeInfo* peerRuntimeInfo,
+        const std::multimap<QString, QString>& queryParams);
+
+    bool loadQueryParam(
+        const std::multimap<QString, QString>& queryParams,
+        const QString& name,
+        QnUuid* value);
 };
 
 } // namespace ec2

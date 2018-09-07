@@ -6,7 +6,7 @@ from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
-from .checks import Failure, Result, Success, Halt
+from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class Run(object):
         self.server = server
         self.id = camera_id
         self.data = None  # type: dict
-        self.media_url = server.api.generic.http.url(camera_id, media=True, with_auth=True)
+        self.media_url = server.api.generic.http.media_url(camera_id)
 
     def update_data(self):
         self.data = self.server.api.get_resource('CamerasEx', self.id)

@@ -33,7 +33,7 @@ public:
     bool init(const Config& config);
     bool pushFrame(AVFrame* inputFrame);
     AVFrame* nextFrame();
-    bool haveFrame() const;
+    bool hasFrame() const;
 
 private:
     uint64_t getOutputSampleCount(uint64_t inputSampleCount);

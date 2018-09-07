@@ -368,9 +368,9 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     m_udtStreamSocket = std::move(udtStreamSocket);
     m_udtStreamServerSocket = std::move(udtStreamServerSocket);
 
-    NX_LOGX(lm("Starting rendezvous connect from %1 to %2")
+    NX_VERBOSE(this, lm("Starting rendezvous connect from %1 to %2")
         .arg(m_udtStreamSocket->getLocalAddress())
-        .arg(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
+        .arg(m_connectionRequestedData.udpEndpointList.front()));
 
     using namespace std::placeholders;
     m_udtStreamSocket->connectAsync(

@@ -195,6 +195,43 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
     return dstBuffer - initDstBuffer;
 }
 
+bool NALUnit::isSliceNal(quint8 nalUnitType)
+{
+    return nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
+}
+
+bool NALUnit::isIFrame(const quint8* data, int dataLen)
+{
+    if (dataLen < 2)
+        return false;
+
+    quint8 nalType = *data & 0x1f;
+    bool isSlice = isSliceNal(nalType);
+    if (!isSlice)
+        return false;
+
+    if (nalType == nuSliceIDR)
+        return true;
+
+    BitStreamReader bitReader;
+    bitReader.setBuffer(data + 1, data + dataLen);
+    try
+    {
+        //extract first_mb_in_slice
+        NALUnit::extractUEGolombCode(bitReader);
+
+        int slice_type = NALUnit::extractUEGolombCode(bitReader);
+        if (slice_type >= 5)
+            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+        return (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE);
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
 QByteArray NALUnit::decodeNAL( const QByteArray& srcBuf )
 {
     QByteArray decodedStreamBuf;

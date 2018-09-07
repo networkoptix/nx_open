@@ -1,4 +1,4 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 #pragma once
 
 /**@file
@@ -25,80 +25,72 @@ namespace test {
     static const int unused_##TEST_CASE##_##TEST_NAME = \
         nx::kit::test::detail::regTest(testDescriptor_##TEST_CASE##_##TEST_NAME); \
     static void test_##TEST_CASE##_##TEST_NAME()
-    // Function body follows the macro.
+    // Function body follows the TEST macro.
 
-#define ASSERT_TRUE(COND) \
-    nx::kit::test::detail::assertBool(true, (COND), #COND, __FILE__, __LINE__)
+#define ASSERT_TRUE(CONDITION) \
+    nx::kit::test::detail::assertBool(true, (CONDITION), #CONDITION, __FILE__, __LINE__)
 
-#define ASSERT_FALSE(COND) \
-    nx::kit::test::detail::assertBool(false, (COND), #COND, __FILE__, __LINE__)
+#define ASSERT_FALSE(CONDITION) \
+    nx::kit::test::detail::assertBool(false, (CONDITION), #CONDITION, __FILE__, __LINE__)
 
 #define ASSERT_EQ(EXPECTED, ACTUAL) \
     nx::kit::test::detail::assertEq( \
         (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, __LINE__)
 
-#define ASSERT_STREQ(EXPECTED, ACTUAL) \
+#define ASSERT_EQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
     nx::kit::test::detail::assertEq( \
-        std::string(EXPECTED), #EXPECTED, \
-        std::string(ACTUAL), #ACTUAL, __FILE__, __LINE__)
+        (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, (LINE))
+
+#define ASSERT_STREQ(EXPECTED, ACTUAL) \
+    nx::kit::test::detail::assertStrEq( \
+        nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
+        nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, __LINE__)
+
+#define ASSERT_STREQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
+    nx::kit::test::detail::assertStrEq( \
+        nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
+        nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, (LINE))
+
+/**
+ * @return Path to the directory to create temp files in, including the trailing path separator:
+ *     "base-temp-dir/case.test/", where "base-temp-dir" can be assigned with "--tmp" command line
+ *     option and by default is "system-temp-dir/nx_kit_test_#", where # is a random number. The
+ *     directory is created (if already exists - a fatal error is produced).
+ */
+NX_KIT_API const char* tempDir();
 
 /**
  * Usage: call from main():
  * <pre><code>
- *     return nx::kit::test::runAllTests();
+ *
+ *     int main(int argc, const char* const argv[])
+ *     {
+ *         return nx::kit::test::runAllTests("myTests", argc, argv);
+ *     }
+ *
  * </code></pre>
  * @return Number of failed tests.
  */
-NX_KIT_API int runAllTests();
+NX_KIT_API int runAllTests(const char* testSuiteName, int argc, const char* const argv[]);
 
-//-------------------------------------------------------------------------------------------------
-// Temp files
-
-/**
- * @return Path for the dir to create temp files, including the trailing path separator.
- */
-NX_KIT_API std::string tempDir();
-
-/**
- * Generates a random unique file name to avoid collisions in the tests. The file will be deleted
- * in the destructor, unless an exception is thrown (e.g. a test has failed), or
- * NX_KIT_TEST_KEEP_TEMP_FILES macro is defined (useful for debugging).
- *
- * ATTENTION: No safety is guaranteed - the uniqueness is based only on rand(), randomized with the
- * current time. A safer but more complex implementation could be based on std::tmpfile().
- */
-class NX_KIT_API TempFile
-{
-public:
-    TempFile(const std::string& prefix, const std::string& suffix);
-    ~TempFile();
-
-    std::string filename() const { return m_filename; }
-
-    /*private*/ struct KeepFilesInitializer { KeepFilesInitializer() { keepFiles() = true; } };
-
-private:
-    static bool& keepFiles(); /**< @return Reference to its internal static bool variable. */
-
-private:
-    std::string m_filename;
-};
+NX_KIT_API void createFile(const char* filename, const char* content);
 
 //-------------------------------------------------------------------------------------------------
 // Implementation
 
 #if defined(NX_KIT_TEST_KEEP_TEMP_FILES)
-    namespace {
+    namespace
+    {
         static const nx::kit::test::TempFile::KeepFilesInitializer tempFileKeepFilesInitializer;
-    } // namespace
+    }
 #endif
 
 namespace detail {
 
 NX_KIT_API void failEq(
-    const std::string& expectedValue, const char* expectedExpr,
-    const std::string& actualValue, const char* actualExpr,
-    const char* const file, int line);
+    const char* expectedValue, const char* expectedExpr,
+    const char* actualValue, const char* actualExpr,
+    const char* file, int line);
 
 typedef std::function<void()> TestFunc;
 
@@ -107,18 +99,19 @@ struct Test
     std::string testCase;
     std::string testName;
     TestFunc testFunc;
+    std::string tempDir;
 };
 
 NX_KIT_API int regTest(const Test& test);
 
 NX_KIT_API void assertBool(
-    bool expected, bool cond, const char* const condStr, const char* const file, int line);
+    bool expected, bool condition, const char* conditionStr, const char* file, int line);
 
 template<typename Expected, typename Actual>
 void assertEq(
     const Expected& expected, const char* expectedExpr,
     const Actual& actual, const char* actualExpr,
-    const char* const file, int line)
+    const char* file, int line)
 {
     if (!(expected == actual)) //< Require only operator==().
     {
@@ -127,8 +120,25 @@ void assertEq(
         std::ostringstream actualValue;
         actualValue << actual;
         detail::failEq(
-            expectedValue.str(), expectedExpr, actualValue.str(), actualExpr, file, line);
+            expectedValue.str().c_str(), expectedExpr,
+            actualValue.str().c_str(), actualExpr,
+            file, line);
     }
+}
+
+NX_KIT_API void assertStrEq(
+    const char* expectedValue, const char* expectedExpr,
+    const char* actualValue, const char* actualExpr,
+    const char* file, int line);
+
+inline const char* toCStr(const std::string& s)
+{
+    return s.c_str();
+}
+
+inline const char* toCStr(const char* s)
+{
+    return s;
 }
 
 } // namespace detail

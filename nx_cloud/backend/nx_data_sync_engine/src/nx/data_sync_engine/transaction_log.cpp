@@ -121,7 +121,7 @@ void TransactionLog::readTransactions(
 void TransactionLog::clearTransactionLogCacheForSystem(
     const nx::String& systemId)
 {
-    NX_LOGX(lm("Cleaning transaction log for system %1").arg(systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
 
     QnMutexLocker lock(&m_mutex);
     m_systemIdToTransactionLog.erase(systemId);
@@ -190,9 +190,8 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
 
     if (!selectTransactionStateQuery.exec())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("Error loading transaction log. %1")
-            .arg(selectTransactionStateQuery.lastError().text()), cl_logERROR);
+        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this), lm("Error loading transaction log. %1")
+            .arg(selectTransactionStateQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -295,11 +294,9 @@ nx::sql::DBResult TransactionLog::saveToDb(
     const QByteArray& transactionHash,
     const QByteArray& ubjsonData)
 {
-    NX_LOG(
-        QnLog::EC2_TRAN_LOG,
+    NX_DEBUG(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Saving transaction %2 (%3, hash %4) to log")
-            .args(systemId, transaction.command, transaction, transactionHash),
-        cl_logDEBUG1);
+            .args(systemId, transaction.command, transaction, transactionHash));
 
     auto dbResult = m_transactionDataObject->insertOrReplaceTransaction(
         queryContext,

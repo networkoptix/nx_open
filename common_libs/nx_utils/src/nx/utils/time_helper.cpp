@@ -1,5 +1,7 @@
 #include "time_helper.h"
+
 #include <nx/utils/log/log_main.h>
+#include <nx/kit/debug.h>
 
 namespace {
 
@@ -11,11 +13,10 @@ static const std::chrono::seconds kTimeResyncThreshold(10);
 namespace nx {
 namespace utils {
 
-
 QnMutex TimeHelper::m_camClockMutex;
 QMap<QString, std::shared_ptr<TimeHelper::CamSyncInfo>> TimeHelper::m_camClock;
 
-TimeHelper::TimeHelper(const QString& resourceId, GetTimeUsFunction getTime):
+TimeHelper::TimeHelper(const QString& resourceId, GetCurrentTimeFunc getTime):
     m_resourceId(resourceId),
     m_getTime(getTime)
 {
@@ -81,7 +82,7 @@ static QString deltaMs(qint64 baseUs, qint64 valueUs)
         return QString("%1 ms").arg(deltaMs);
 }
 
-qint64 TimeHelper::getTimeUs(const qint64 cameraTimeUs)
+qint64 TimeHelper::getCurrentTimeUs(const qint64 cameraTimeUs)
 {
     return getTimeUsInternal(cameraTimeUs, /*recursionAllowed*/ true);
 }
@@ -129,6 +130,34 @@ qint64 TimeHelper::getTimeUsInternal(const qint64 cameraTimeUs, bool recursionAl
         NX_VERBOSE(this, lm("END -> %1 (after recursion)").arg(resultUs));
     }
     return resultUs;
+}
+
+/*static*/ qint64 TimeHelper::unloopCameraPtsWithModulus(
+    GetCurrentTimeFunc getCurrentTimeFunc,
+    qint64 absentPtsUsValue,
+    int modulusUs,
+    qint64 ptsUs,
+    qint64 prevPtsUs,
+    qint64* periodStartUs)
+{
+    if (ptsUs < 0)
+        NX_PRINT << "WARNING: PTS is less than zero: " << ptsUs;
+
+    if (prevPtsUs == absentPtsUsValue)
+    {
+        // First frame received.
+        const qint64 nowUs = std::chrono::microseconds(getCurrentTimeFunc()).count();
+        *periodStartUs = (nowUs / modulusUs - 1) * modulusUs;
+        NX_PRINT << "First frame: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
+    }
+    else if (prevPtsUs > ptsUs)
+    {
+        // Looping - first frame of the period received.
+        *periodStartUs += modulusUs;
+        NX_PRINT << "Looping: ptsUs " << ptsUs << ", periodStartUs " << *periodStartUs;
+    }
+
+    return *periodStartUs + ptsUs % modulusUs;
 }
 
 } // namespace utils

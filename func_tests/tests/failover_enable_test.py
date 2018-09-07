@@ -16,7 +16,7 @@ import server_api_data_generators as generator
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
 
@@ -138,7 +138,7 @@ def online_camera_macs_on_server(server):
 
 
 def wait_until_cameras_on_server_reduced_to(server, camera_mac_set):
-    wait_for_true(
+    wait_for_truthy(
         lambda: online_camera_macs_on_server(server) == camera_mac_set,
         'cameras on server {} were not reduced to {} in {:d} seconds'.format(
             server, sorted(camera_mac_set), CAMERA_SWITCHING_PERIOD_SEC),
@@ -146,7 +146,7 @@ def wait_until_cameras_on_server_reduced_to(server, camera_mac_set):
 
 
 def wait_until_camera_count_is_online(server, camera_count):
-    wait_for_true(
+    wait_for_truthy(
         lambda: len(online_camera_macs_on_server(server)) >= camera_count,
         '{:d} cameras did not become online on {} in {:d} seconds'.format(
             camera_count, server, CAMERA_SWITCHING_PERIOD_SEC),
@@ -154,7 +154,7 @@ def wait_until_camera_count_is_online(server, camera_count):
 
 
 def wait_until_cameras_are_online(server, camera_mac_set):
-    wait_for_true(
+    wait_for_truthy(
         lambda: online_camera_macs_on_server(server) >= camera_mac_set,
         'Cameras {} did not become online on {} in {:d} seconds'.format(
             sorted(camera_mac_set), server, CAMERA_SWITCHING_PERIOD_SEC),

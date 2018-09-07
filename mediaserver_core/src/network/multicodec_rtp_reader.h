@@ -65,9 +65,10 @@ public:
 
     /** Implementation of QnAbstractMediaStreamProvider::isStreamOpened. */
     virtual bool isStreamOpened() const override;
+    virtual CameraDiagnostics::Result openStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
-    virtual int getLastResponseCode() const override;
+    int getLastResponseCode() const;
 
     /** Implementation of QnAbstractMediaStreamProvider::getAudioLayout. */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;
@@ -93,13 +94,7 @@ public:
 
     QnRtspClient& rtspClient();
 
-    /**
-     * Trust to camera NPT clock if value is true. Remember difference between camera and local clock otherwise.
-     * Default value is false.
-     */
-    void setTrustToCameraTime(bool value);
-
-    void setTimePolicy(TimePolicy timePolicy);
+    void setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy);
 
     void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
@@ -130,6 +125,8 @@ private:
         std::shared_ptr<QnRtpStreamParser> parser;
         int rtcpChannelNumber = 0;
     };
+
+    void updateTimePolicy();
 
     QnRtpStreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
@@ -169,7 +166,7 @@ private:
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
-    QnRtspTimeHelper m_timeHelper;
+    nx::streaming::rtp::TimeHelper m_timeHelper;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
@@ -191,6 +188,8 @@ private:
     boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
+    nx::streaming::rtp::TimePolicy m_defaultTimePolicy {nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime};
+    CameraDiagnostics::Result m_openStreamResult;
 };
 
 #endif // defined(ENABLE_DATA_PROVIDERS)

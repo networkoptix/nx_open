@@ -76,13 +76,13 @@ void OnvifResourceSearcherMdns::findResources(QnResourceList& result, const Onvi
     {
         QString log;
         QTextStream(&log) << "OnvifResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
-        NX_LOG(log, cl_logDEBUG1);
+        NX_DEBUG(this, log);
 
         for (int i = 0; i < localAddresses.size();++i)
         {
             QString slog;
             QTextStream(&slog) << localAddresses.at(i).toString();
-            NX_LOG(slog, cl_logDEBUG1);
+            NX_DEBUG(this, slog);
         }
     }
 #endif

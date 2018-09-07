@@ -152,7 +152,22 @@ bool QnFfmpegAudioTranscoder::isOpened() const
 
 bool QnFfmpegAudioTranscoder::existMoreData() const
 {
-    return m_resampler.haveFrame();
+    return m_resampler.hasFrame();
+}
+
+bool QnFfmpegAudioTranscoder::initResampler()
+{
+    FfmpegAudioResampler::Config config {
+        m_decoderCtx->sample_rate,
+        static_cast<int64_t>(m_decoderCtx->channel_layout),
+        m_decoderCtx->sample_fmt,
+        m_encoderCtx->sample_rate,
+        static_cast<int64_t>(m_encoderCtx->channel_layout),
+        m_encoderCtx->sample_fmt,
+        static_cast<uint32_t>(m_encoderCtx->frame_size),
+        m_encoderCtx->channels};
+
+    return m_resampler.init(config);
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(
@@ -172,17 +187,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(
         tuneContextsWithMedia(m_decoderCtx, m_encoderCtx, media);
         if (!m_resamplerInitialized)
         {
-            FfmpegAudioResampler::Config config {
-                    m_decoderCtx->sample_rate,
-                    static_cast<int64_t>(m_decoderCtx->channel_layout),
-                    m_decoderCtx->sample_fmt,
-                    m_encoderCtx->sample_rate,
-                    static_cast<int64_t>(m_encoderCtx->channel_layout),
-                    m_encoderCtx->sample_fmt,
-                    static_cast<uint32_t>(m_encoderCtx->frame_size),
-                    m_encoderCtx->channels
-            };
-            if (!m_resampler.init(config))
+            if (!initResampler())
                 return AVERROR(EINVAL);
             m_resamplerInitialized = true;
         }

@@ -18,10 +18,9 @@ namespace test {
 
 CdbFunctionalTest::CdbFunctionalTest()
 {
-    NX_LOG(lm("============== Running test %1.%2 ==============")
+    NX_DEBUG(this, lm("============== Running test %1.%2 ==============")
         .arg(::testing::UnitTest::GetInstance()->current_test_info()->test_case_name())
-        .arg(::testing::UnitTest::GetInstance()->current_test_info()->name()),
-        cl_logDEBUG1);
+        .arg(::testing::UnitTest::GetInstance()->current_test_info()->name()));
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()

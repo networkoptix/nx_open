@@ -56,24 +56,24 @@ int QnDetachFromSystemRestHandler::execute(
     using namespace nx::cdb;
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    NX_LOGX(lm("Detaching server from system started."), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Detaching server from system started."));
 
     if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
-        NX_LOGX(lm("Cannot detach server from system while in safe mode."), cl_logWARNING);
+        NX_WARNING(this, lm("Cannot detach server from system while in safe mode."));
         return QnPermissionsHelper::safeModeError(result);
     }
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
     {
-        NX_LOGX(lm("Cannot detach from system. Owner permissions are required."), cl_logWARNING);
+        NX_WARNING(this, lm("Cannot detach from system. Owner permissions are required."));
         return QnPermissionsHelper::notOwnerError(result);
     }
 
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
-        NX_LOGX(lm("Cannot detach from system. Password check failed.")
-            , cl_logDEBUG1);
+        NX_DEBUG(this, lm("Cannot detach from system. Password check failed.")
+            );
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx::network::http::StatusCode::ok;
     }

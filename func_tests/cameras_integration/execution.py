@@ -196,30 +196,26 @@ class Stand(object):
             time.sleep(cycle_delay.total_seconds())
 
     def _stage_rules(self, rules):  # (dict) -> dict
-        conditional = {}
         for name, rule in rules.items():
             try:
                 base_name, condition = name.split(' if ')
+                base_name = base_name.strip()
+
             except ValueError:
                 pass
+
             else:
                 del rules[name]
-                if eval(condition, dict(features=SpecificFeatures(self.server_features), **self.server_information)):
-                    base_rule = conditional.setdefault(base_name.strip(), {})
-                    self._merge_stage_rule(base_rule, rule, may_override=False)
-
-        for name, rule in conditional.items():
-            base_rule = rules.setdefault(name, {})
-            self._merge_stage_rule(base_rule, rule, may_override=True)
+                if eval(condition, dict(features=SpecificFeatures(
+                        self.server_features), **self.server_information)):
+                    self._merge_dict(rules, base_name, rule)
 
         return rules
 
     @classmethod
-    def _merge_stage_rule(cls, destination, source, may_override):
-        for key, value in source.items():
-            if isinstance(value, dict):
-                cls._merge_stage_rule(destination.setdefault(key, {}), value, may_override)
-            else:
-                if key in destination and not may_override:
-                    raise ValueError('Conflict in stage')
-                destination[key] = value
+    def _merge_dict(cls, container, key, value):
+        if not isinstance(value, dict):
+            container[key] = value
+        else:
+            for sub_key, sub_value in value.items():
+                cls._merge_dict(container.setdefault(key, {}), sub_key, sub_value)

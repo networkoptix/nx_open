@@ -18,16 +18,16 @@ void FfmpegAudioBuffer::init(const Config& config)
     m_temporaryBufferPointers.resize(m_planeCount);
 }
 
-uint8_t** FfmpegAudioBuffer::getBuffer(uint64_t sampleCount)
+uint8_t** FfmpegAudioBuffer::startWriting(uint64_t sampleCount)
 {
-    uint64_t size = m_sampleSize * sampleCount;
-    if (m_sampleBuffers == nullptr || size > m_size - m_dataSize)
+    uint64_t requestedSize = m_sampleSize * sampleCount;
+    if (m_sampleBuffers == nullptr || requestedSize > m_bufferSize - m_dataSize)
     {
         if (!allocBuffers(sampleCount + m_dataSize / m_sampleSize))
             return nullptr;
     }
 
-    if (size > m_size - m_dataSize - m_dataOffset)
+    if (requestedSize > m_bufferSize - m_dataSize - m_dataOffset)
         moveDataToStart();
 
     for (uint32_t i = 0; i < m_planeCount; ++i)
@@ -36,22 +36,22 @@ uint8_t** FfmpegAudioBuffer::getBuffer(uint64_t sampleCount)
     return m_temporaryBufferPointers.data();
 }
 
-void FfmpegAudioBuffer::commit(uint64_t sampleCount)
+void FfmpegAudioBuffer::finishWriting(uint64_t sampleCount)
 {
     m_dataSize += m_sampleSize * sampleCount;
 }
 
-bool FfmpegAudioBuffer::getData(uint64_t sampleCount, uint8_t** buffers)
+bool FfmpegAudioBuffer::popData(uint64_t sampleCount, uint8_t** buffers)
 {
-    uint64_t size = m_sampleSize * sampleCount;
-    if (m_sampleBuffers == nullptr || size > m_dataSize)
+    uint64_t requestedSize = m_sampleSize * sampleCount;
+    if (m_sampleBuffers == nullptr || requestedSize > m_dataSize)
         return false;
 
     for (uint32_t i = 0; i < m_planeCount; ++i)
         buffers[i] = m_sampleBuffers[i] + m_dataOffset;
 
-    m_dataOffset += size;
-    m_dataSize -= size;
+    m_dataOffset += requestedSize;
+    m_dataSize -= requestedSize;
     return true;
 }
 
@@ -84,7 +84,7 @@ bool FfmpegAudioBuffer::allocBuffers(uint64_t sampleCount)
         releaseBuffers();
     }
     m_sampleBuffers = buffers;
-    m_size = linesize;
+    m_bufferSize = linesize;
     m_dataOffset = 0;
     return true;
 }

@@ -1,7 +1,4 @@
-from contextlib import closing
-
 import pytest
-from netaddr import IPAddress
 from pathlib2 import Path
 
 from defaults import defaults
@@ -14,9 +11,6 @@ def pytest_addoption(parser):
         'media sample file path, default is %(default)s at binary directory'))
     parser.addoption('--media-stream-path', type=Path, default=defaults['media_stream_path'], help=(
         'media sample test camera stream, relative to bin dir [%(default)s]'))
-    parser.addoption('--vm-address', type=IPAddress, help=(
-        'IP address virtual machines bind to. '
-        'Test camera discovery will answer only to this address if this option is specified.'))
 
 
 @pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
@@ -24,13 +18,8 @@ def stream_type(request):
     return request.param
 
 
-@pytest.fixture(scope='session')
-def vm_address(request):
-    return request.config.getoption('--vm-address')
-
-
 @pytest.fixture()
-def camera_pool(request, bin_dir, vm_address, sample_media_file, service_ports):
+def camera_pool(request, bin_dir, sample_media_file, service_ports):
     stream_path = bin_dir / request.config.getoption('--media-stream-path')
     assert stream_path.exists(), '%s is expected at %s' % (stream_path.name, stream_path.parent)
     duration = sample_media_file.duration.total_seconds()

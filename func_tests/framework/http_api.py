@@ -1,17 +1,17 @@
 import base64
 import hashlib
 import json
-import logging
 from abc import ABCMeta, abstractmethod
 from pprint import pformat
 
 import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
+from urllib3.util import Url
 
-from .switched_logging import SwitchedLogger
+from .context_logger import ContextLogger
 
-_logger = SwitchedLogger(__name__, 'http')
+_logger = ContextLogger(__name__, 'http')
 
 
 STANDARD_PASSWORDS = ['admin', 'qweasd123']  # do not mask these passwords in log files
@@ -30,24 +30,27 @@ class HttpError(Exception):
 
 
 class HttpClient(object):
-    def __init__(self, hostname, port, username, password, ca_cert=None):
-        self._port = port
-        self._hostname = hostname
+    def __init__(self, base_url, ca_cert=None):
+        self._base_url = base_url  # type: Url
         self.ca_cert = ca_cert
         if self.ca_cert is not None:
             _logger.info("Trust CA cert: %s.", self.ca_cert)
+        username, password = self._base_url.auth.split(':', 1)
         self._auth = HTTPDigestAuth(username, password)
         self.user = username  # Only for interface.
         self.password = password  # Only for interface.
 
     def __repr__(self):
-        password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
-        return "<HttpClient {} {}:{}>".format(self.url(''), self._auth.username, password_display)
+        assert isinstance(self._base_url, Url)
+        # noinspection PyProtectedMember
+        return "<HttpClient {}>".format(self._base_url._replace(auth=None))
 
     def set_credentials(self, username, password):
         """If credentials were changed"""
         self.user = username
         self.password = password
+        # noinspection PyProtectedMember
+        self._base_url = self._base_url._replace(auth='{}:{}'.format(username, password))
         self._auth = HTTPDigestAuth(username, password)
 
     def auth_key(self, method, path, realm, nonce):
@@ -60,16 +63,22 @@ class HttpClient(object):
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]).encode())
         return key.decode('ascii')
 
-    def url(self, path, secure=False, media=False, with_auth=False):
-        return '{}://{}{}:{}/{}'.format(
-            'rtsp' if media else ('https' if secure else 'http'),
-            '{}:{}@'.format(self.user, self.password) if with_auth else '',
-            self._hostname, self._port, path.lstrip('/'))
+    def url(self, path):
+        # noinspection PyProtectedMember
+        return self._base_url._replace(auth=None, path='/' + path.lstrip('/')).url
 
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
-        url = self.url(path, secure=secure)
+    def secure_url(self, path):
+        # noinspection PyProtectedMember
+        return self._base_url._replace(scheme='https', auth=None, path='/' + path.lstrip('/')).url
+
+    def media_url(self, path):
+        # noinspection PyProtectedMember
+        return self._base_url._replace(scheme='rtsp', path='/' + path.lstrip('/')).url
+
+    def request(self, method, path, timeout=None, **kwargs):
+        # noinspection PyProtectedMember
         response = requests.request(
-            method, url,
+            method, self._base_url._replace(path='/' + path.lstrip('/')),
             auth=self._auth,
             verify=str(self.ca_cert),
             allow_redirects=False,
@@ -86,7 +95,7 @@ class HttpApi(object):
         self.http = http_client
 
     @abstractmethod
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
+    def request(self, method, path, timeout=None, **kwargs):
         return {}
 
     def get(self, path, params=None, **kwargs):

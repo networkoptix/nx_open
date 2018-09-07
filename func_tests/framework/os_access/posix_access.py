@@ -1,32 +1,100 @@
-from abc import ABCMeta, abstractproperty
+import datetime
+import errno
 import logging
+from abc import ABCMeta
+from contextlib import contextmanager
+
+import portalocker
+import tzlocal
+from netaddr import EUI
+from typing import Container
 
 from framework.method_caching import cached_getter
+from framework.networking.linux import LinuxNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.os_access_interface import OSAccess
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.local_path import LocalPath
+from framework.os_access.local_shell import local_shell
+from framework.os_access.os_access_interface import OSAccess, ReciprocalPortMap, OneWayPortMap
+from framework.os_access.posix_shell import ReadOnlyTime, Time
+from framework.os_access.posix_shell_path import PosixShellPath
+from framework.os_access.ssh_shell import SSH
+from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 
 _logger = logging.getLogger(__name__)
 
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
+class _LocalTime(object):
+    def __init__(self):
+        self._tz = tzlocal.get_localzone()
+
+    def get(self):
+        now = datetime.datetime.now(tz=self._tz)
+        return now
+
+
+local_time = _LocalTime()
+
+
 class PosixAccess(OSAccess):
     __metaclass__ = ABCMeta
+
+    def __init__(
+            self,
+            alias,
+            port_map,
+            shell, time, traffic_capture, lock_acquired,
+            Path, networking):
+        super(PosixAccess, self).__init__(
+            alias,
+            port_map,
+            networking, time, traffic_capture, lock_acquired,
+            Path)
+        self.shell = shell
+
+    @staticmethod
+    def _make_ssh(port_map, user_name, private_key):
+        address = port_map.remote.address
+        port = port_map.remote.tcp(22)
+        ssh = SSH(address, port, user_name, private_key)
+        return ssh
+
+    @classmethod
+    def to_vm(cls, vm_alias, port_map, macs, ssh_user_name, ssh_private_key):
+        # type: (str, ReciprocalPortMap, str, str, Container[EUI]) -> PosixAccess
+        ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
+        Path = PosixShellPath.specific_cls(ssh)
+        traffic_capture = SSHTrafficCapture(ssh, Path.tmp() / 'traffic_capture')
+        return cls(
+            vm_alias,
+            port_map,
+            ssh, Time(ssh), traffic_capture, ssh.lock_acquired, Path,
+            LinuxNetworking(ssh, macs))
+
+    @classmethod
+    def to_physical_machine(cls, alias, address, ssh_user_name, ssh_private_key):
+        # type: (str, ReciprocalPortMap, str, str) -> PosixAccess
+        port_map = ReciprocalPortMap(OneWayPortMap.direct(address), OneWayPortMap.empty())
+        ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
+        return cls(
+            alias,
+            port_map,
+            ssh, ReadOnlyTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
+            None)
+
+    def is_accessible(self):
+        return self.shell.is_working()
 
     @cached_getter
     def env_vars(self):
         output = self.run_command(['env'])
         result = {}
-        for line in output.rstrip().splitlines():
-            name, value = line.split('=', 1)
+        for line in output.decode('ascii').rstrip().splitlines():
+            name, value = line.split(u'=', 1)
             result[name] = value
         return result
-
-    @abstractproperty
-    def shell(self):
-        return PosixShell()
 
     def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         return self.shell.run_command(command, input=input, logger=logger, timeout_sec=timeout_sec)
@@ -84,7 +152,7 @@ class PosixAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise exceptions.AlreadyDownloaded(
+            raise exceptions.AlreadyExists(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         try:
@@ -104,7 +172,7 @@ class PosixAccess(OSAccess):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
-            raise exceptions.AlreadyDownloaded(
+            raise exceptions.AlreadyExists(
                 "Cannot download file {!s} from {!s} to {!s}".format(
                     source_path, source_hostname, destination_dir),
                 destination)
@@ -123,3 +191,23 @@ class PosixAccess(OSAccess):
         except exceptions.NonZeroExitStatus as e:
             raise exceptions.CannotDownload(e.stderr)
         return destination
+
+
+@contextmanager
+def portalocker_lock_acquired(path, timeout_sec=10):
+    try:
+        with portalocker.utils.Lock(str(path), timeout=timeout_sec):
+            yield
+    except portalocker.exceptions.LockException as e:
+        while not isinstance(e, IOError):
+            e, = e.args
+        if e.errno != errno.EAGAIN:
+            raise e
+        raise exceptions.AlreadyAcquired()
+
+
+local_access = PosixAccess(
+    'localhost',
+    ReciprocalPortMap(OneWayPortMap.local(), OneWayPortMap.local()),
+    local_shell, local_time, None, portalocker_lock_acquired, LocalPath,
+    None)

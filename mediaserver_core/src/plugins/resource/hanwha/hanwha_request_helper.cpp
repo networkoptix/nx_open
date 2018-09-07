@@ -141,12 +141,14 @@ void HanwhaRequestHelper::setGroupBy(const QString& groupBy)
     m_groupBy = groupBy;
 }
 
+/*static*/
 utils::Url HanwhaRequestHelper::buildRequestUrl(
     nx::utils::Url deviceUrl,
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    const HanwhaRequestHelper::Parameters& parameters)
+    const HanwhaRequestHelper::Parameters& parameters,
+    const boost::optional<int>& bypassChannel)
 {
     QUrlQuery query;
 
@@ -170,10 +172,12 @@ nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     return buildRequestUrl(m_resourceContext->url(), cgi, submenu, action, std::move(parameters));
 }
 
+/*static*/
 nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     const HanwhaSharedResourceContext* sharedContext,
     const QString& path,
-    const Parameters& parameters)
+    const Parameters& parameters,
+    const boost::optional<int> bypassChannel)
 {
     NX_ASSERT(sharedContext, lit("No shared context provided."));
     if (!sharedContext)
@@ -193,6 +197,8 @@ nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
         query.addQueryItem(parameter.first, parameter.second);
 
     url.setQuery(query);
+    if (bypassChannel != boost::none)
+        return makeBypassUrl(url, *bypassChannel);
     return url;
 }
 
@@ -224,7 +230,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeout(kHttpTimeout);
     httpClient.setResponseReadTimeout(kHttpTimeout);
 
-    auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url);
+    auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url, *m_bypassChannel);
 
     nx::utils::RwLocker lock(m_resourceContext->requestLock(), requestType);
     if (!httpClient.doGet(realUrl))
@@ -274,20 +280,16 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     return doRequest(split[0], split[1], action, requestType, parameters);
 }
 
-nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
+/*static*/
+nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url, int bypassChannel)
 {
-    const bool isChannelCorrect = m_bypassChannel != boost::none;
-    NX_ASSERT(isChannelCorrect);
-    if (!isChannelCorrect)
-        return nx::utils::Url();
-
     nx::utils::Url bypassUrl(url);
     bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
 
     QUrlQuery bypassQuery;
     bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
     bypassQuery.addQueryItem(lit("action"), lit("control"));
-    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel.get()));
+    bypassQuery.addQueryItem(lit("Channel"), QString::number(bypassChannel));
 
     nx::utils::Url proxiedUrl(url);
     QUrlQuery proxiedUrlQuery(proxiedUrl.query());

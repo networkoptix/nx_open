@@ -123,12 +123,11 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             {
                 if (status == CL_HTTP_AUTH_REQUIRED)
                 {
-                    getResource()->setStatus(Qn::Unauthorized);
                     return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
                 }
                 else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned)
                 {
-                    NX_LOG(lit("Axis camera must be have old firmware!!!!  ip = %1").arg(m_axisRes->getHostAddress()), cl_logERROR);
+                    NX_ERROR(this, lit("Axis camera must be have old firmware!!!!  ip = %1").arg(m_axisRes->getHostAddress()));
                     m_oldFirmwareWarned = true;
                     return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String("old firmware"));
                 }
@@ -186,8 +185,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             const int httpStatus = http.doGET(requestPath);    //ignoring error code
             if (httpStatus != CL_HTTP_SUCCESS)
             {
-                NX_LOG(lit("Failed to remove old Axis profile %1 on camera %2").
-                    arg(QLatin1String(profileToRemove)).arg(m_axisRes->getHostAddress()), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Failed to remove old Axis profile %1 on camera %2").
+                    arg(QLatin1String(profileToRemove)).arg(m_axisRes->getHostAddress()));
             }
         }
 
@@ -229,7 +228,6 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
-                getResource()->setStatus(Qn::Unauthorized);
                 return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
             }
             else if (status != CL_HTTP_SUCCESS)
@@ -256,7 +254,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     streamUrl.setPath("/axis-media/media.amp");
     streamUrl.setQuery(query);
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl.toString()).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl.toString()).arg(m_resource->getUrl()).arg(getRole()));
 
     // ============== requesting a video ==========================
     m_rtpStreamParser.setRequest(streamUrl.toString());

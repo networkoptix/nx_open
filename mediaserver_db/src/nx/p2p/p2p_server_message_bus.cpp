@@ -164,7 +164,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
         {
             connectionContext->localPeersMessage = data;
             connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printPeersMessage();
             connection->sendMessage(data);
         }
@@ -397,6 +397,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
@@ -405,6 +406,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         remotePeer,
         localPeerEx(),
         std::move(webSocket),
+        requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
@@ -527,7 +529,7 @@ void ServerMessageBus::resubscribePeers(
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
 
             QVector<SubscribeRecord> request;
@@ -592,7 +594,7 @@ bool ServerMessageBus::selectAndSendTransactions(
     context(connection)->sendDataInProgress = !isFinished;
     context(connection)->remoteSubscription = newSubscription;
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
     {
         for (const auto& serializedTran : serializedTransactions)
         {

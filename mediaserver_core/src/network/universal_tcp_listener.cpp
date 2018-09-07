@@ -161,7 +161,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     if (!m_multipleServerSocket)
         return;
 
-    NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
+    NX_INFO(this, lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud));
     if (m_boundToCloud)
     {
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;

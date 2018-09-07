@@ -75,7 +75,8 @@ void ServerTransactionMessageBus::printTranState(const nx::vms::api::TranState& 
 
     for (auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().id.toString()).arg(itr.key().persistentId.toString()).arg(itr.value()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("key=%1 (dbID=%2) need after=%3"),
+            itr.key().id.toString(), itr.key().persistentId.toString(), itr.value());
     }
 }
 
@@ -93,9 +94,9 @@ bool ServerTransactionMessageBus::gotAliveData(
             // check current persistent state
             if (!m_db->transactionLog()->contains(aliveData.persistentState))
             {
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
-                    arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("peer state:"), cl_logDEBUG1);
+                NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
+                    arg(transport->remotePeer().id.toString()));
+                NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("peer state:"));
                 printTranState(aliveData.persistentState);
                 resyncWithPeer(transport);
             }
@@ -124,8 +125,8 @@ bool ServerTransactionMessageBus::checkSequence(
     {
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
-                arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING);
+            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Got transaction from peer %1 while sync with peer %2 in progress").
+                arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()));
         }
     }
 
@@ -134,8 +135,8 @@ bool ServerTransactionMessageBus::checkSequence(
         if (transport->isSyncDone())
         {
             // gap in persistent data detect, do resync
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
-                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence));
 
             if (!transport->remotePeer().isClient() && !vms::api::PeerData::isClient(m_localPeerType))
                 queueSyncRequest(transport);
@@ -145,8 +146,8 @@ bool ServerTransactionMessageBus::checkSequence(
         }
         else
         {
-            NX_LOG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
-                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1);
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
+                arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence));
         }
     }
     return true;
@@ -182,9 +183,12 @@ void ServerTransactionMessageBus::onGotTransactionSyncRequest(
 
     if (errorCode == ErrorCode::ok)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("got sync request from peer %1. Need transactions after:"),
+            sender->remotePeer().id.toString());
         printTranState(tran.params.persistentState);
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("exist %1 new transactions"),
+            serializedTransactions.size());
 
         NX_ASSERT(m_connections.contains(sender->remotePeer().id));
         NX_ASSERT(sender->getState() >= QnTransactionTransport::ReadyForStreaming);
@@ -248,7 +252,9 @@ void ServerTransactionMessageBus::queueSyncRequest(QnTransactionTransport* trans
     requestTran.params.persistentState = m_db->transactionLog()->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("send syncRequest to peer %1"),
+        transport->remotePeer().id.toString());
+
     printTranState(requestTran.params.persistentState);
     transport->sendTransaction(requestTran, vms::api::PeerSet(
             {transport->remotePeer().id, commonModule()->moduleGUID()}));
@@ -384,7 +390,7 @@ void ServerTransactionMessageBus::fillExtraAliveTransactionParams(
 
 void ServerTransactionMessageBus::logTransactionState()
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), "Current transaction state:");
     printTranState(m_db->transactionLog()->getTransactionsState());
 }
 
@@ -532,13 +538,9 @@ void ServerTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, Q
         case ErrorCode::containsBecauseSequence:
             return; // do not proxy if transaction already exists
         default:
-            NX_LOG(
-                QnLog::EC2_TRAN_LOG,
-                lit("Can't handle transaction %1: %2. Reopening connection...")
+            NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Can't handle transaction %1: %2. Reopening connection...")
                 .arg(ApiCommand::toString(tran.command))
-                .arg(ec2::toString(errorCode)),
-                cl_logWARNING
-            );
+                .arg(ec2::toString(errorCode)));
             sender->setState(QnTransactionTransport::Error);
             return;
         }

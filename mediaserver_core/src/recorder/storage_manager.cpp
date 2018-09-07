@@ -316,11 +316,11 @@ public:
                     filter.scanPeriod.startTimeMs = itr.value();
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
                     qint64 scanPeriodDuration = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
-                    NX_LOG(lit("[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)")
+                    NX_VERBOSE(this, lit("[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)")
                             .arg(scanData.storage->getUrl())
                             .arg(itr.key()->cameraUniqueId())
                             .arg(scanPeriodDuration)
-                            .arg(scanPeriodDuration / (1000 * 60 * 60)), cl_logDEBUG2);
+                            .arg(scanPeriodDuration / (1000 * 60 * 60)));
                     filter.scanPeriod.durationMs = scanPeriodDuration;
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
                     if (needToStop() || QnResource::isStopping())
@@ -329,7 +329,7 @@ public:
                 }
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
-                NX_LOG(lit("[Scan]: Partial scan for storage %1 has been finished").arg(scanData.storage->getUrl()), cl_logDEBUG2);
+                NX_VERBOSE(this, lit("[Scan]: Partial scan for storage %1 has been finished").arg(scanData.storage->getUrl()));
             }
             else
             {
@@ -582,7 +582,7 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
         if (doAdd)
             camerasToAdd.push_back(camera);
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
         {
             QString logMessage;
             QTextStream logStream(&logMessage);
@@ -591,7 +591,7 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
             for (const auto& prop: camera.properties)
                 logStream << "\t" << prop.name << " : " << prop.value << endl << endl;
 
-            NX_LOG(logMessage, cl_logDEBUG2);
+            NX_VERBOSE(this, logMessage);
         }
     }
 
@@ -747,11 +747,9 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb.setDatabaseName(fileName);
     if (!sqlDb.open())
     {
-        NX_LOG(
-            lit("%1 : Migration from sqlite DB failed. Can't open database file %2")
+        NX_WARNING(this, lit("%1 : Migration from sqlite DB failed. Can't open database file %2")
                 .arg(Q_FUNC_INFO)
-                .arg(fileName),
-            cl_logWARNING);
+                .arg(fileName));
         return;
     }
     int storageIndex = storageDbPool()->getStorageIndex(storage);
@@ -764,10 +762,8 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     if (!query.exec())
     {
-        NX_LOG(
-            lit("%1 : Migration from sqlite DB failed. Select query exec failed")
-                .arg(Q_FUNC_INFO),
-            cl_logWARNING);
+        NX_WARNING(this, lit("%1 : Migration from sqlite DB failed. Select query exec failed")
+                .arg(Q_FUNC_INFO));
         return;
     }
     QSqlRecord queryInfo = query.record();
@@ -834,14 +830,14 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
 
     QString depracatedFileName = fileName + lit("_deprecated");
     if (!QFile::remove(depracatedFileName))
-        NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+        NX_WARNING(this, lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
             .arg(Q_FUNC_INFO)
-            .arg(depracatedFileName), cl_logWARNING);
+            .arg(depracatedFileName));
 
     if (!QFile::rename(fileName, depracatedFileName))
-        NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+        NX_WARNING(this, lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
             .arg(Q_FUNC_INFO)
-            .arg(fileName), cl_logWARNING);
+            .arg(fileName));
 
     auto sdb = storageDbPool()->getSDB(storage);
     if (!sdb)
@@ -937,7 +933,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
                 storagesToScan << storage;
         }
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
         {
             QString logString;
             QTextStream logStream(&logString);
@@ -951,7 +947,7 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
             for (const auto& s: storagesToScan)
                 logStream << "\t" << s->getUrl() << "\n";
 
-            NX_LOG(logString, cl_logDEBUG1);
+            NX_DEBUG(this, logString);
         }
 
         if (storagesToScan.isEmpty())
@@ -971,7 +967,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
         return;
     m_rebuildCancelled = true;
     m_rebuildArchiveThread->cancelFullScanTasks();
-    NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
+    NX_INFO(this, "Catalog rebuild operation is canceled");
 }
 
 bool QnStorageManager::needToStopMediaScan() const
@@ -1102,7 +1098,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     int storageIndex = storageDbPool()->getStorageIndex(storage);
-    NX_LOG(QString("Adding storage. Path: %1").arg(storage->getUrl()), cl_logINFO);
+    NX_INFO(this, QString("Adding storage. Path: %1").arg(storage->getUrl()));
 
     removeStorage(storage); // remove existing storage record if exists
     storage->setStatus(Qn::Offline); // we will check status after
@@ -1190,10 +1186,10 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
         {
             if (itr.value()->getId() == storage->getId()) {
                 storageIndex = itr.key();
-                NX_LOG(lit("%1 Removing storage %2 from %3 StorageManager")
+                NX_DEBUG(this, lit("%1 Removing storage %2 from %3 StorageManager")
                         .arg(Q_FUNC_INFO)
                         .arg(storage->getUrl())
-                        .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup"), cl_logDEBUG1);
+                        .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup"));
                 itr = m_storageRoots.erase(itr);
                 break;
             }
@@ -1222,10 +1218,10 @@ void QnStorageManager::at_storageRoleChanged(const QnResourcePtr &resource)
     if (!storage)
         return;
 
-    NX_LOG(lit("%1 role: %2, storage role: %3")
+    NX_DEBUG(this, lit("%1 role: %2, storage role: %3")
             .arg(Q_FUNC_INFO)
             .arg(m_role == QnServer::StoragePool::Normal ? "Main" : "Backup")
-            .arg(storage->isBackup() ? "Backup" : "Main"), cl_logDEBUG1);
+            .arg(storage->isBackup() ? "Backup" : "Main"));
 
     if (hasStorage(storage))
     {
@@ -1553,8 +1549,8 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
                 {
                     if (depthLimit == 0)
                     {
-                        NX_LOGX(lm("Directory depth is above the limit, corrupted file system? %1")
-                            .arg(entry.absoluteFilePath()), cl_logERROR);
+                        NX_ERROR(this, lm("Directory depth is above the limit, corrupted file system? %1")
+                            .arg(entry.absoluteFilePath()));
 
                         return false;
                     }
@@ -1659,8 +1655,8 @@ void QnStorageManager::clearSpace(bool forced)
 
     for (const auto& storage: getUsedWritableStorages()) {
         if (!storages.contains(storage)) {
-            NX_LOG(lit("[Cleanup]: Storage %1 is being fast scanned. Skipping")
-                    .arg(storage->getUrl()), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Cleanup]: Storage %1 is being fast scanned. Skipping")
+                    .arg(storage->getUrl()));
             allStoragesReady = false;
         }
     }
@@ -1672,11 +1668,11 @@ void QnStorageManager::clearSpace(bool forced)
     qint64 toDeleteTotal = 0;
     std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now();
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose))
     {
-        NX_LOG(lit("[Cleanup, measure]: %1 storages are ready for a cleanup").arg(storages.size()), cl_logDEBUG2);
-        NX_LOG(lit("[Cleanup, measure]: Starting cleanup routine for %1 storage manager")
-                .arg((m_role == QnServer::StoragePool::Normal ? lit("main") : lit("backup"))), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("[Cleanup, measure]: %1 storages are ready for a cleanup").arg(storages.size()));
+        NX_VERBOSE(this, lit("[Cleanup, measure]: Starting cleanup routine for %1 storage manager")
+                .arg((m_role == QnServer::StoragePool::Normal ? lit("main") : lit("backup"))));
 
         for (const auto& storage: storages)
         {
@@ -1684,28 +1680,28 @@ void QnStorageManager::clearSpace(bool forced)
                 (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile)
                     != QnAbstractStorageResource::cap::RemoveFile)
             {
-                NX_LOG(lit("[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping")
+                NX_VERBOSE(this, lit("[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping")
                         .arg(storage->getUrl())
                         .arg(storage->getSpaceLimit())
-                        .arg((storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) == QnAbstractStorageResource::cap::RemoveFile), cl_logDEBUG2);
+                        .arg((storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) == QnAbstractStorageResource::cap::RemoveFile));
                 continue;
             }
 
             qint64 toDeleteForStorage = storage->getSpaceLimit() - storage->getFreeSpace();
-            NX_LOG(lit("[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4")
+            NX_VERBOSE(this, lit("[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4")
                     .arg(storage->getUrl())
                     .arg(storage->getSpaceLimit())
                     .arg(storage->getFreeSpace())
-                    .arg(toDeleteForStorage), cl_logDEBUG2);
+                    .arg(toDeleteForStorage));
 
             if (toDeleteForStorage > 0)
                 toDeleteTotal += toDeleteForStorage;
         }
 
-        NX_LOG(lit("[Cleanup, measure]: Total bytes to cleanup: %1 (%2 Mb) (%3 Gb)")
+        NX_VERBOSE(this, lit("[Cleanup, measure]: Total bytes to cleanup: %1 (%2 Mb) (%3 Gb)")
                 .arg(toDeleteTotal)
                 .arg(toDeleteTotal / (1024 * 1024))
-                .arg(toDeleteTotal / (1024 * 1024 * 1024)), cl_logDEBUG2);
+                .arg(toDeleteTotal / (1024 * 1024 * 1024)));
     }
 
     QnStorageResourceList delAgainList;
@@ -1716,7 +1712,7 @@ void QnStorageManager::clearSpace(bool forced)
     for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false, storage->getSpaceLimit());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2) && toDeleteTotal > 0)
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose) && toDeleteTotal > 0)
     {
         QString clearSpaceLogMessage;
         QTextStream clearSpaceLogStream(&clearSpaceLogMessage);
@@ -1735,7 +1731,7 @@ void QnStorageManager::clearSpace(bool forced)
         clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was "
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
                             << endl;
-        NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
+        NX_VERBOSE(this, clearSpaceLogMessage);
     }
 
     // 4. DB cleanup
@@ -1782,7 +1778,7 @@ void QnStorageManager::clearSpace(bool forced)
 
 bool QnStorageManager::clearSpaceForFile(const QString& path, qint64 size)
 {
-    NX_LOG(lit("Clearing %1 bytes for file \"%2\".").arg(size).arg(path), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("Clearing %1 bytes for file \"%2\".").arg(size).arg(path));
 
     QStorageInfo volume(path);
     if (!volume.isValid())
@@ -2106,12 +2102,13 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 this,
                 lm("Cleanup. Won't cleanup storage %1 because this storage contains no archive")
                     .args(storage->getUrl()));
+            m_diskFullMap[storage->getId()] = true;
             return true;
         }
 
-        NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
+        NX_DEBUG(this, lit("Cleanup. Starting for storage %1. %2 Mb to clean")
               .arg(storage->getUrl())
-              .arg(toDelete / (1024 * 1024)), cl_logDEBUG1);
+              .arg(toDelete / (1024 * 1024)));
     }
 
     DeviceFileCatalog::Chunk deletedChunk;
@@ -2167,13 +2164,9 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         deletedChunk = DeviceFileCatalog::Chunk();
     }
 
-    if (toDelete > 0)
+    if (toDelete > 0 && !useMinArchiveDays)
     {
-        if (!useMinArchiveDays && !m_diskFullWarned[storage->getId()])
-        {
-            emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
-            m_diskFullWarned[storage->getId()] = true;
-        }
+        m_diskFullMap[storage->getId()] = true;
     }
     else
     {
@@ -2186,9 +2179,6 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 storage->getSpaceLimit());
         }
     }
-
-    if (toDelete <= 0 || useMinArchiveDays)
-        m_diskFullWarned[storage->getId()] = false;
 
     return toDelete <= 0;
 }
@@ -2349,14 +2339,14 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 {
     //QnMutexLocker lock( &m_mutexStorages );
     if (status == Qn::Online && fileStorage->getStatus() == Qn::Offline) {
-        NX_LOG(QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
-            arg(fileStorage->getUrl()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+        NX_INFO(this, QString("Storage. Path: %1. Goes to the online state. SpaceLimit: %2MiB. Currently available: %3MiB").
+            arg(fileStorage->getUrl()).arg(fileStorage->getSpaceLimit() / 1024 / 1024).arg(fileStorage->getFreeSpace() / 1024 / 1024));
 
         // add data before storage goes to the writable state
         doMigrateCSVCatalog(fileStorage);
         migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
-        NX_LOG(lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()));
         {
             QnMutexLocker lock(&m_mutexRebuild);
             if (m_rebuildArchiveThread)
@@ -2370,7 +2360,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         emit storageFailure(fileStorage, nx::vms::api::EventReason::storageIoError);
 }
 
-void QnStorageManager::checkWritableStoragesExists()
+void QnStorageManager::checkWritableStoragesExist()
 {
     auto hasFastScanned = [this]()
         {
@@ -2415,7 +2405,7 @@ void QnStorageManager::startAuxTimerTasks()
     {
         static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
         m_auxTasksTimerManager.addNonStopTimer(
-            [this](nx::utils::TimerId) { checkWritableStoragesExists(); },
+            [this](nx::utils::TimerId) { checkWritableStoragesExist(); },
             kCheckStoragesAvailableInterval,
             kCheckStoragesAvailableInterval);
     }
@@ -2431,6 +2421,28 @@ void QnStorageManager::startAuxTimerTasks()
         [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
         kCheckSystemStorageSpace,
         kCheckSystemStorageSpace);
+
+    static const std::chrono::minutes kCheckStorageSpace(1);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            QnMutexLocker lock(&m_clearSpaceMutex);
+            /**
+             * Notify a user if a storage doesn't have enough space to write to and clear the
+             * corresponding flag. It (the flag) will be raised again in the clearOldestSpace()
+             * function if the issue persists.
+             */
+            for (const auto& storage: getClearableStorages())
+            {
+                if (m_diskFullMap.contains(storage->getId()) && m_diskFullMap[storage->getId()])
+                {
+                    emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
+                    m_diskFullMap[storage->getId()] = false;
+                }
+            }
+        },
+        kCheckStorageSpace,
+        kCheckStorageSpace);
 
     static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
@@ -2505,8 +2517,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     auto emitFailureAndReturnNullStorage = [this](int optimalStorageIndex)
     {
-        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex),
-               cl_logDEBUG2);
+        NX_VERBOSE(this, lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex));
         return QnStorageResourcePtr();
     };
 
@@ -2526,7 +2537,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     result = getStorageByIndex(optimalStorageIndex);
     if (result)
     {
-        NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()));
         return result;
     }
 

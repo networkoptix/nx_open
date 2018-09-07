@@ -83,6 +83,12 @@ class SharedContextPool;
 
 } // namespace resource
 
+namespace camera {
+
+class ErrorProcessor;
+
+} // namespace camera
+
 } // namespace mediaserver
 
 class CommonUpdateManager;
@@ -157,6 +163,8 @@ public:
     QnResourceAccessManager* resourceAccessManager() const;
     QnAuditManager* auditManager() const;
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
+    nx::mediaserver::camera::ErrorProcessor* cameraErrorProcessor() const;
+
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -202,4 +210,5 @@ private:
     HostSystemPasswordSynchronizer* m_hostSystemPasswordSynchronizer = nullptr;
     QnPtzControllerPool* m_ptzControllerPool = nullptr;
     QnFileDeletor* m_fileDeletor = nullptr;
+    nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor;
 };

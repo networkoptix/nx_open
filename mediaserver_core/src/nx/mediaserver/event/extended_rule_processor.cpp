@@ -551,14 +551,14 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
     auto resource = resourcePool()->getResourceById(action->getParams().actionResourceId);
     if (!resource)
     {
-        NX_LOG(lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING);
+        NX_WARNING(this, lit("Received BA_CameraOutput with no resource reference. Ignoring..."));
         return false;
     }
     QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(resource.data());
     if (!securityCam)
     {
-        NX_LOG(lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId().toString()), cl_logWARNING);
+        NX_WARNING(this, lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+            arg(resource->getId().toString()));
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
@@ -607,13 +607,13 @@ bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr
 
     if (recipients.isEmpty())
     {
-        NX_LOG(lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getRuleId().toString()), cl_logWARNING);
-        NX_LOG(lit("All recipients: ") + recipients.join(QLatin1String("; ")), cl_logWARNING);
+        NX_WARNING(this, lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getRuleId().toString()));
+        NX_WARNING(this, lit("All recipients: ") + recipients.join(QLatin1String("; ")));
         return false;
     }
 
-    NX_LOG(lit("Processing action SendMail. Sending mail to %1").
-        arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Processing action SendMail. Sending mail to %1").
+        arg(recipients.join(QLatin1String("; "))));
 
     const auto sendMailFunction =
         [this, action, recipients, aggregatedResCount]()
@@ -742,7 +742,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
     {
         vms::event::AbstractActionPtr action(new vms::event::SystemHealthAction(QnSystemHealth::EmailSendError));
         broadcastAction(action);
-        NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
+        NX_WARNING(this, lit("Error processing action SendMail."));
     }
 }
 
@@ -794,7 +794,7 @@ void ExtendedRuleProcessor::sendAggregationEmail(const SendEmailAggregationKey& 
 
     if (!sendMailInternal(aggregatedActionIter->action, aggregatedActionIter->eventCount))
     {
-        NX_LOG(lit("Failed to send aggregated email"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Failed to send aggregated email"));
     }
 
     m_aggregatedEmails.erase(aggregatedActionIter);

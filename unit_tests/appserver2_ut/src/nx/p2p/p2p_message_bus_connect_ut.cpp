@@ -147,7 +147,7 @@ protected:
                 getIntParam(args, kUserCountParamName, kDefaultUsersCount));
             addRuntimeData(server);
         }
-        NX_LOG(lit("Create test data time: %1 ms").arg(t.elapsed()), cl_logINFO);
+        NX_INFO(this, lit("Create test data time: %1 ms").arg(t.elapsed()));
 
         serverConnectFunc(m_servers);
 

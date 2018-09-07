@@ -1,7 +1,7 @@
 from functools import partial
-from itertools import combinations_with_replacement
 
 import pytest
+from netaddr import IPAddress
 from netaddr.ip import IPNetwork
 from parse import parse
 from pathlib2 import Path
@@ -9,7 +9,7 @@ from pylru import lrudecorator
 
 from defaults import defaults
 from framework.networking import setup_flat_network
-from framework.os_access.local_access import local_access
+from framework.os_access.posix_access import local_access
 from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
 from framework.vms.vm_type import VMType
@@ -37,6 +37,11 @@ def host_os_access():
 
 
 @pytest.fixture(scope='session')
+def runner_address(hypervisor):
+    return hypervisor.runner_address
+
+
+@pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
     dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)
@@ -45,7 +50,7 @@ def persistent_dir(slot, host_os_access):
 
 @pytest.fixture(scope='session')
 def hypervisor(host_os_access):
-    return VirtualBox(host_os_access)
+    return VirtualBox(host_os_access, IPAddress('127.0.0.1'))
 
 
 @pytest.fixture(scope='session')
@@ -88,21 +93,20 @@ def vm_types(request, slot, hypervisor, persistent_dir):
     return vm_types
 
 
-def vm_type_list():
-    return [name for name, conf in vm_types_configuration().items()
-            if not conf.get('is_custom', False)]
-
-
 @pytest.fixture(
     scope='session',
-    params=vm_type_list())
+    params=['linux', 'windows'])
 def one_vm_type(request):
     return request.param
 
 
 @pytest.fixture(
     scope='session',
-    params=combinations_with_replacement(vm_type_list(), 2),
+    params=[
+        ('linux', 'linux'),
+        ('linux', 'windows'),
+        ('windows', 'windows'),
+        ],
     ids='-'.join)
 def two_vm_types(request):
     return request.param

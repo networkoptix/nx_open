@@ -19,7 +19,7 @@ loggers:
   paramiko.transport.sftp: {level: WARNING}
   parse: {level: INFO}
   fixtures.mediaservers: {level: INFO}
-  framework.switched_logging: {level: DEBUG}
+  framework.context_logger: {level: DEBUG}
   framework.ca: {level: INFO}
   framework.lock: {level: WARNING}
   framework.registry: {level: INFO}

@@ -863,11 +863,11 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = resourcePool()->getResourceById(id))
         {
-            NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+            NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
                     .arg(resource->getId().toString())
                     .arg(resource->getName())
-                    .arg(resource->getUrl()), cl_logDEBUG2);
+                    .arg(resource->getUrl()));
             emit resource->statusChanged(resource, Qn::StatusChangeReason::Local);
         }
     }
@@ -928,7 +928,7 @@ void QnCommonMessageProcessor::updateResource(
     QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
     {
-        NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
+        NX_WARNING(this, lit("Invalid server layout with url %1").arg(layout.url));
         auto fixed = layout;
         fixed.url = QString();
         ec2::fromApiToResource(fixed, qnLayout);

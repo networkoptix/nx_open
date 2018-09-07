@@ -8,7 +8,7 @@ set(display.product.name "NTN")
 set(product.name.short "dwspectrum")
 set(product.appName "ntnspectrum")
 set(company.name "NuTech National")
-set(uri.protocol "dw-vms")
+set(uri.protocol "ntn-vms")
 set(cloudName "NTN Cloud")
 set(installer.name "ntnspectrum")
 

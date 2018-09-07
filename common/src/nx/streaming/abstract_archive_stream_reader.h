@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_ARCHIVE_STREAM_READER_H
-#define ABSTRACT_ARCHIVE_STREAM_READER_H
+#pragma once
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/abstract_archive_delegate.h>
@@ -12,7 +11,9 @@ class QnTimePeriodList;
 class AbstractArchiveIntegrityWatcher;
 class AbstractMediaDataFilter;
 
-class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
+class QnAbstractArchiveStreamReader: 
+    public QnAbstractMediaStreamDataProvider, 
+    public QnAbstractNavigator
 {
     Q_OBJECT
 
@@ -132,5 +133,3 @@ private:
     bool m_enabled = true;
     std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };
-
-#endif // ABSTRACT_ARCHIVE_STREAM_READER_H

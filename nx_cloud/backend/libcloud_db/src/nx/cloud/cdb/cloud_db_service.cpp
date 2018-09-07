@@ -74,10 +74,10 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     nx::utils::CurrentProcess::changeUser(settings.changeUser());
 
     view.listen();
-    NX_LOGX(lm("Listening on %1").container(view.endpoints()), cl_logINFO);
+    NX_INFO(this, lm("Listening on %1").container(view.endpoints()));
 
-    NX_LOG(lm("%1 has been started")
-        .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
+    NX_ALWAYS(this, lm("%1 has been started")
+        .arg(QnLibCloudDbAppInfo::applicationDisplayName()));
 
     const auto result = runMainLoop();
 

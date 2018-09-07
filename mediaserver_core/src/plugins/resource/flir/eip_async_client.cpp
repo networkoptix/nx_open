@@ -131,9 +131,8 @@ void EIPAsyncClient::processHeaderBytes()
     }
     else
     {
-        NX_LOG(lit("Async Ethernet/IP client got error. EIP error code: %1")
-            .arg(header.status),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Async Ethernet/IP client got error. EIP error code: %1")
+            .arg(header.status));
         m_currentState = EIPClientState::Error;
     }
     
@@ -172,8 +171,8 @@ void EIPAsyncClient::processSessionBytes()
     }
     else
     {
-        NX_LOG(lit("Async Ethernet/IP client failed to obtain session. EIP status: %1")
-            .arg(header.status), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Async Ethernet/IP client failed to obtain session. EIP status: %1")
+            .arg(header.status));
         m_currentState = EIPClientState::Error;
     }
 }

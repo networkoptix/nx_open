@@ -109,8 +109,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
 
-    NX_LOG( lm("Created third party resource (manufacturer %1, res type id %2)").
-        arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
+    NX_VERBOSE(this, lm("Created third party resource (manufacturer %1, res type id %2)").
+        arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()));
 
     return result;
 }

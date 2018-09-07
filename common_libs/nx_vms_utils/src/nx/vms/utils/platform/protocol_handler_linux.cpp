@@ -12,6 +12,9 @@
 
 namespace {
 
+struct ProtocolHandlerFunctionsTag{};
+static const nx::utils::log::Tag kLogTag(typeid(ProtocolHandlerFunctionsTag));
+
 const auto kAssociationsSection = QByteArray("Added Associations");
 
 bool registerMimeType(const QString& protocol)
@@ -204,12 +207,12 @@ bool registerSystemUriProtocolHandler(
         }
     }
 
-    NX_INFO(kTag, lm("Scheme handler file updated: %1").arg(handlerFile));
+    NX_INFO(kLogTag, lm("Scheme handler file updated: %1").arg(handlerFile));
 
     if (!registerMimeType(protocol))
         return false;
 
-    NX_INFO(kTag, lm("MimeType %1 has been registered").arg(protocol));
+    NX_INFO(kLogTag, lm("MimeType %1 has been registered").arg(protocol));
 
     return true;
 }

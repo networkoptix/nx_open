@@ -68,10 +68,9 @@ void RendezvousConnectorWithVerification::notifyAboutChoosingConnection(
     ConnectCompletionHandler completionHandler)
 {
     NX_ASSERT(m_requestPipeline);
-    NX_LOGX(lm("cross-nat %1. Notifying host %2 on connection choice")
+    NX_VERBOSE(this, lm("cross-nat %1. Notifying host %2 on connection choice")
         .arg(connectSessionId())
-        .arg(m_requestPipeline->socket()->getForeignAddress().toString()),
-        cl_logDEBUG2);
+        .arg(m_requestPipeline->socket()->getForeignAddress().toString()));
 
     m_connectCompletionHandler = std::move(completionHandler);
 
@@ -107,9 +106,8 @@ void RendezvousConnectorWithVerification::closeConnection(
 {
     NX_ASSERT(connection == m_requestPipeline.get());
 
-    NX_LOGX(lm("cross-nat %1 error: %2")
-        .arg(connectSessionId()).arg(SystemError::toString(closeReason)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1 error: %2")
+        .arg(connectSessionId()).arg(SystemError::toString(closeReason)));
     m_requestPipeline.reset();
 }
 
@@ -120,9 +118,8 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
 
     std::unique_ptr<UdtStreamSocket> connection = RendezvousConnector::takeConnection();
 
-    NX_LOGX(lm("cross-nat %1 completed. result: %2")
-        .arg(connectSessionId()).arg(SystemError::toString(errorCode)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1 completed. result: %2")
+        .arg(connectSessionId()).arg(SystemError::toString(errorCode)));
 
     if (errorCode != SystemError::noError)
     {
@@ -160,9 +157,8 @@ void RendezvousConnectorWithVerification::onMessageReceived(
 {
     if (message.header.messageClass != stun::MessageClass::successResponse)
     {
-        NX_LOGX(lm("cross-nat %1. Received error instead of syn-ack from %2")
-            .arg(connectSessionId()).arg(remoteAddress().toString()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. Received error instead of syn-ack from %2")
+            .arg(connectSessionId()).arg(remoteAddress().toString()));
         return processError(SystemError::connectionReset);
     }
 
@@ -175,10 +171,9 @@ void RendezvousConnectorWithVerification::onMessageReceived(
             return processTunnelConnectionChosen(std::move(message));
 
         default:
-            NX_LOGX(lm("cross-nat %1. Received unexpected message %2 from %3. Ignoring...")
+            NX_VERBOSE(this, lm("cross-nat %1. Received unexpected message %2 from %3. Ignoring...")
                 .arg(connectSessionId()).arg(message.header.method)
-                .arg(remoteAddress().toString()),
-                cl_logDEBUG2);
+                .arg(remoteAddress().toString()));
             return;
     }
 }
@@ -189,25 +184,22 @@ void RendezvousConnectorWithVerification::processUdpHolePunchingSynAck(
     hpm::api::UdpHolePunchingSynResponse synResponse;
     if (!synResponse.parse(message))
     {
-        NX_LOGX(lm("cross-nat %1. Error parsing syn-ack from %2: %3")
+        NX_DEBUG(this, lm("cross-nat %1. Error parsing syn-ack from %2: %3")
             .arg(connectSessionId()).arg(remoteAddress().toString())
-            .arg(synResponse.errorText()),
-            cl_logDEBUG1);
+            .arg(synResponse.errorText()));
         return processError(SystemError::connectionReset);
     }
 
     if (synResponse.connectSessionId != connectSessionId())
     {
-        NX_LOGX(lm("cross-nat %1. Error. Unexpected connection id (%2) in syn-ack from %3")
+        NX_DEBUG(this, lm("cross-nat %1. Error. Unexpected connection id (%2) in syn-ack from %3")
             .arg(connectSessionId()).arg(synResponse.connectSessionId)
-            .arg(remoteAddress().toString()),
-            cl_logDEBUG1);
+            .arg(remoteAddress().toString()));
         return processError(SystemError::connectionReset);
     }
 
-    NX_LOGX(lm("cross-nat %1. Successfully verified connection to %2")
-        .arg(connectSessionId()).arg(remoteAddress().toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Successfully verified connection to %2")
+        .arg(connectSessionId()).arg(remoteAddress().toString()));
 
     nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
@@ -218,24 +210,22 @@ void RendezvousConnectorWithVerification::processTunnelConnectionChosen(
     hpm::api::TunnelConnectionChosenResponse responseData;
     if (!responseData.parse(message))
     {
-        NX_LOGX(lm("cross-nat %1. Error parsing TunnelConnectionChosenResponse from %2: %3")
+        NX_DEBUG(this, lm("cross-nat %1. Error parsing TunnelConnectionChosenResponse from %2: %3")
             .arg(connectSessionId()).arg(remoteAddress().toString())
-            .arg(responseData.errorText()),
-            cl_logDEBUG1);
+            .arg(responseData.errorText()));
         return processError(SystemError::connectionReset);
     }
 
-    NX_LOGX(lm("cross-nat %1. Successfully notified host %2 about udp tunnel choice")
-        .arg(connectSessionId()).arg(remoteAddress().toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Successfully notified host %2 about udp tunnel choice")
+        .arg(connectSessionId()).arg(remoteAddress().toString()));
 
     nx::utils::swapAndCall(m_connectCompletionHandler, SystemError::noError);
 }
 
 void RendezvousConnectorWithVerification::onTimeout(nx::String requestName)
 {
-    NX_LOGX(lm("cross-nat %1. Error. %2 timeout has expired while waiting for %3")
-        .arg(connectSessionId()).arg(m_timeout).arg(requestName), cl_logDEBUG1);
+    NX_DEBUG(this, lm("cross-nat %1. Error. %2 timeout has expired while waiting for %3")
+        .arg(connectSessionId()).arg(m_timeout).arg(requestName));
 
     processError(SystemError::timedOut);
 }

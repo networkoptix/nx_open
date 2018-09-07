@@ -1,5 +1,6 @@
 import logging
 from argparse import ArgumentTypeError
+from pprint import pformat
 
 import pytest
 
@@ -23,7 +24,13 @@ def lightweight_mediaserver_installer(mediaserver_installers_dir):
 @pytest.fixture()
 def unpacked_mediaserver_factory(
         request, ca, artifacts_dir, mediaserver_installer_set, lightweight_mediaserver_installer):
-    mediaserver_installer = mediaserver_installer_set.find_by_platform('linux64')
+    for installer in mediaserver_installer_set.installers:
+        if installer.platform_variant == 'ubuntu' and installer.arch == 'x64':
+            mediaserver_installer = installer
+            break
+    else:
+        raise ValueError("Cannot find suitable installer among: {}".format(pformat(
+            mediaserver_installer_set.installers)))
     return UnpackedMediaserverFactory(
         artifacts_dir, ca, mediaserver_installer, lightweight_mediaserver_installer,
         clean=request.config.getoption('--clean'))

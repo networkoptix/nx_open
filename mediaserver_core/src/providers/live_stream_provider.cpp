@@ -90,11 +90,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
     m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
     NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
     m_resolutionCheckTimer.invalidate();
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
-        m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+        m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
         QnMutexLocker lock(&m_liveMutex);
         updateSoftwareMotion();
     });
@@ -276,11 +276,6 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 #endif
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
-}
-
-bool QnLiveStreamProvider::canChangeStatus() const
-{
-    return m_role == Qn::CR_LiveVideo;
 }
 
 float QnLiveStreamProvider::getDefaultFps() const
@@ -718,8 +713,8 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
         m_cameraRes->saveParamsAsync();
-        NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
-                .arg(QnLexical::serialized(info.encoderIndex)), cl_logINFO);
+        NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
+                .arg(QnLexical::serialized(info.encoderIndex)));
     }
 }
 

@@ -138,7 +138,7 @@ public:
         if (m_stream.device())
             m_stream << t;
         else
-            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+            NX_WARNING(this, "[media db] attempt to use null file stream");
 
         return *this;
     }
@@ -149,7 +149,7 @@ public:
         if (m_stream.device())
             m_stream >> t;
         else
-            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+            NX_WARNING(this, "[media db] attempt to use null file stream");
 
         return *this;
     }
@@ -169,7 +169,7 @@ public:
         if (m_stream.device())
             return m_stream.writeRawData(s, len);
 
-        NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+        NX_WARNING(this, "[media db] attempt to use null file stream");
         return -1;
     }
 
@@ -186,7 +186,7 @@ public:
     bool atEnd() const
     {
         if (!m_stream.device())
-            NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+            NX_WARNING(this, "[media db] attempt to use null file stream");
 
         return m_stream.atEnd();
     }
@@ -196,7 +196,7 @@ public:
         if (m_stream.device())
             return m_stream.readRawData(s, len);
 
-        NX_LOG("[media db] attempt to use null file stream", cl_logWARNING);
+        NX_WARNING(this, "[media db] attempt to use null file stream");
         return -1;
     }
 

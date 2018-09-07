@@ -97,12 +97,13 @@ public:
                 transaction.get(),
                 transactionHash))
         {
-            NX_LOGX(
-                QnLog::EC2_TRAN_LOG,
+            NX_DEBUG(
+                QnLog::EC2_TRAN_LOG.join(this),
                 lm("systemId %1. Transaction %2 (%3, hash %4) is skipped")
                     .arg(systemId).arg(CommandDescriptor::name).arg(transaction.get())
-                    .arg(CommandDescriptor::hash(transaction.get().params)),
-                cl_logDEBUG1);
+                    .arg(CommandDescriptor::hash(transaction.get().params)));
+
+
             // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
             return nx::sql::DBResult::cancelled;
         }
@@ -149,12 +150,12 @@ public:
         lock.unlock();
 
         const auto transactionHash = CommandDescriptor::hash(transaction.params);
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
+        NX_DEBUG(
+            QnLog::EC2_TRAN_LOG.join(this),
             lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
                 .arg(systemId).arg(CommandDescriptor::name)
-                .arg(transaction).arg(transactionHash),
-            cl_logDEBUG1);
+                .arg(transaction).arg(transactionHash));
+
 
         // Serializing transaction.
         auto serializedTransaction = QnUbjson::serialized(transaction);

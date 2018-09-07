@@ -40,6 +40,8 @@
 #include "rest/server/json_rest_result.h"
 #include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/data_provider_factory.h>
+#include <nx/metrics/metrics_storage.h>
+#include <nx/utils/scope_guard.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -99,7 +101,6 @@ public:
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
             m_dataQueue,
-            /*cseq*/ 0,
             /*iFramesOnly*/ false);
         m_dataQueue.setMaxSize(m_dataQueue.size() + MAX_QUEUE_SIZE);
     }
@@ -183,8 +184,8 @@ protected:
 
         if( !resultPtr )
         {
-            NX_LOG( lit("Insufficient bandwidth to %1. Skipping frame...").
-                arg(m_owner->getForeignAddress().toString()), cl_logDEBUG2 );
+            NX_VERBOSE(this, lit("Insufficient bandwidth to %1. Skipping frame...").
+                arg(m_owner->getForeignAddress().toString()));
         }
         int errCode = m_owner->getTranscoder()->transcodePacket(
             media,
@@ -196,8 +197,8 @@ protected:
         }
         else
         {
-            NX_LOG( lit("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
-                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->getForeignAddress().toString()).arg(errCode), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("Terminating progressive download (url %1) connection from %2 due to transcode error (%3)").
+                arg(m_owner->getDecodedUrl().toString()).arg(m_owner->getForeignAddress().toString()).arg(errCode));
             m_needStop = true;
         }
 
@@ -385,9 +386,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(
     d->foreignAddress = d->socket->getForeignAddress().address.toString();
     d->foreignPort = d->socket->getForeignAddress().port;
 
-    NX_LOG( lit("Established new progressive downloading session by %1:%2. Current session count %3").
+    NX_DEBUG(this, lit("Established new progressive downloading session by %1:%2. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
-        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
+        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1));
 
     const int sessionLiveTimeoutSec =
         d->serverModule->settings().progressiveDownloadSessionLiveTimeSec();
@@ -403,9 +404,9 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
     Q_D(QnProgressiveDownloadingConsumer);
 
-    NX_LOG( lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
+    NX_DEBUG(this, lit("Progressive downloading session %1:%2 disconnected. Current session count %3").
         arg(d->foreignAddress).arg(d->foreignPort).
-        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
+        arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(-1)-1));
 
     quint64 killTimerID = 0;
     {
@@ -494,6 +495,13 @@ void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
+    auto metrics = d->serverModule->commonModule()->metrics();
+    metrics->tcpConnections().progressiveDownloading()++;
+    auto metricsGuard = nx::utils::makeScopeGuard(
+        [metrics]()
+        {
+            metrics->tcpConnections().progressiveDownloading()--;
+        });
 
     if (commonModule()->isTranscodeDisabled())
     {
@@ -829,11 +837,11 @@ void QnProgressiveDownloadingConsumer::run()
         while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
             readRequest(); // just reading socket to determine client connection is closed
 
-        NX_LOG( lit("Done with progressive download (url %1) connection from %2. Reason: %3").
+        NX_DEBUG(this, lit("Done with progressive download (url %1) connection from %2. Reason: %3").
             arg(getDecodedUrl().toString()).arg(d->socket->getForeignAddress().toString()).
             arg((!dataConsumer.isRunning() ? lit("Data consumer stopped") :
                 (!d->socket->isConnected() ? lit("Connection has been closed") :
-                 lit("Terminated")))), cl_logDEBUG1 );
+                 lit("Terminated")))));
 
         dataConsumer.pleaseStop();
 

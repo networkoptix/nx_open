@@ -77,14 +77,14 @@ QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
     m_inMiddleOfStream(false),
     m_startTimeOffset(0)
 {
-    NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
-    NX_LOG( lit("Destroying ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Destroying ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1));
     closeFfmpegContext();
 }
 
@@ -138,7 +138,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (videoStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_LOG(m_lastErrMessage, cl_logERROR);
+            NX_ERROR(this, m_lastErrMessage);
             return -1;
         }
 
@@ -218,7 +218,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (audioStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_LOG(m_lastErrMessage, cl_logERROR);
+            NX_ERROR(this, m_lastErrMessage);
             return -1;
         }
 
@@ -263,7 +263,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     {
         closeFfmpegContext();
         m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
-        NX_LOG(m_lastErrMessage, cl_logERROR);
+        NX_ERROR(this, m_lastErrMessage);
         return -3;
     }
 

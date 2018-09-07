@@ -1,12 +1,14 @@
 import logging
 import logging.config
 import mimetypes
+import sys
 from datetime import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 import yaml
 from pathlib2 import Path
+from six.moves import shlex_quote
 
 from defaults import defaults
 from framework.artifact import Artifact, ArtifactFactory, ArtifactType
@@ -17,8 +19,6 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 
 pytest_plugins = [
-    'fixtures.vms',
-    'fixtures.mediaservers',
     'fixtures.cloud',
     'fixtures.layouts',
     'fixtures.media',
@@ -30,6 +30,15 @@ JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
 _logger = logging.getLogger(__name__)
 
 
+@pytest.hookimpl()
+def pytest_plugin_registered(plugin, manager):
+    if manager.get_canonical_name(plugin) != __name__:
+        return
+    alternatives = ['fixtures.provisioned_mediaservers', 'fixtures.local_mediaservers']
+    if not any(manager.has_plugin(alternative) for alternative in alternatives):
+        manager.import_plugin(alternatives[0])
+
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
     outcome = yield
@@ -37,6 +46,12 @@ def pytest_pyfunc_call(pyfuncitem):
         _, e, _ = outcome.excinfo
         if isinstance(e, NotImplementedError):
             pytest.skip(str(e))
+
+
+@pytest.mark.optionalhook
+def pytest_metadata(metadata):
+    command_line = ' '.join(map(shlex_quote, sys.argv))
+    metadata["Command Line"] = command_line
 
 
 def pytest_addoption(parser):
@@ -79,28 +94,33 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope='session')
-def slot(request):
-    return request.config.getoption('--slot')
+def slot(request, metadata):
+    slot = request.config.getoption('--slot')
+    metadata['Slot'] = slot
+    return slot
 
 
 @pytest.fixture(scope='session')
 def service_ports(slot):
     begin = 40000 + 100 * slot
-    return range(begin, begin + 100)
+    ports = range(begin, begin + 100)
+    return ports
 
 
 @pytest.fixture(scope='session')
-def work_dir(request):
+def work_dir(request, metadata):
     work_dir = request.config.getoption('--work-dir').expanduser()
     # Don't create parents to fail fast if work dir is misconfigured.
     work_dir.mkdir(exist_ok=True, parents=False)
+    metadata['Work Dir'] = work_dir
     return work_dir
 
 
 @pytest.fixture(scope='session')
-def run_dir(work_dir):
+def run_dir(work_dir, metadata):
     prefix = 'run_'
     this = work_dir / '{}{:%Y%m%d_%H%M%S}'.format(prefix, datetime.now())
+    metadata['Run Dir'] = this
     this.mkdir(parents=False, exist_ok=False)
     latest = work_dir / 'latest'
     try:
@@ -164,10 +184,7 @@ def ca(request, work_dir):
 def init_logging(request, run_dir):
     logging_config_path = request.config.getoption('--logging-config')
     if logging_config_path:
-        if logging_config_path.is_absolute():
-            full_path = logging_config_path
-        else:
-            full_path = Path(__file__).parent / 'logging-config' / logging_config_path
+        full_path = Path(__file__).parent / 'logging-config' / logging_config_path
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)

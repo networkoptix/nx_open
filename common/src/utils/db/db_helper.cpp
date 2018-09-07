@@ -155,9 +155,9 @@ bool QnDbHelper::QnDbTransactionLocker::commit()
     m_committed = m_tran->commit();
     if (!m_committed)
     {
-        NX_LOG(lit("%1. Commit failed: %2").
+        NX_ERROR(this, lit("%1. Commit failed: %2").
             arg(m_tran->m_database.databaseName()).
-            arg(m_tran->m_database.lastError().text()), cl_logERROR);
+            arg(m_tran->m_database.lastError().text()));
     }
     return m_committed;
 }
@@ -191,7 +191,7 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
     QFileInfo dirInfo(fileName);
     if (!QDir().mkpath(dirInfo.absoluteDir().path()))
-        NX_LOG(lit("can't create folder for sqlLite database!\n %1").arg(fileName), cl_logERROR);
+        NX_ERROR(this, lit("can't create folder for sqlLite database!\n %1").arg(fileName));
     m_connectionName = dbname;
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
@@ -233,7 +233,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
-            NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Applying SQL update %1").arg(fileName));
             if (!beforeInstallUpdate(fileName))
                 return false;
             if (!nx::sql::SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
@@ -248,8 +248,8 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
             insQuery.addBindValue(QDateTime::currentDateTime());
             if (!insQuery.exec())
             {
-                NX_LOG(lit("Can not register SQL update. SQL error: %1").
-                    arg(insQuery.lastError().text()), cl_logERROR);
+                NX_ERROR(this, lit("Can not register SQL update. SQL error: %1").
+                    arg(insQuery.lastError().text()));
                 return false;
             }
         }

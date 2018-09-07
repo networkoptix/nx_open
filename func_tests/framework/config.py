@@ -3,6 +3,7 @@ import datetime
 import logging
 import re
 
+import six
 import yaml
 from pathlib2 import Path
 
@@ -147,12 +148,7 @@ class SingleTestConfig(object):
 
     @staticmethod
     def _cast_value(value, t):
-        try:
-            # noinspection PyUnresolvedReferences
-            string_types = (str, unicode)
-        except NameError:
-            string_types = (bytes, str)
-        if not isinstance(value, string_types):
+        if not isinstance(value, six.string_types):
             return value
         if t is int:
             return int(value)

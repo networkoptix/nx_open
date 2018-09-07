@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 
 def test_install(one_vm, mediaserver_installer_set):
     installation = make_installation(one_vm.os_access, mediaserver_installer_set.customization)
-    installer = mediaserver_installer_set.find_by_filter(installation.can_install)
+    installer = installation.choose_installer(mediaserver_installer_set.installers)
     installation.install(installer)
     assert installation.is_valid()
 
@@ -101,14 +101,13 @@ def test_lws_core_dump(artifacts_dir, config, groups):
     'path',
     [
         PurePath('/tmp/nxwitness-server-3.2.0.20805-linux64.deb'),
-        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta-test.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-demo.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-test.deb'),
         PurePath('/tmp/nxwitness-server-4.0.0.2049-win64-beta-test.exe'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-mac-beta-test.dmg'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-bpi-beta-test.tar.gz'),
         PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.exe'),
-        PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.zip'),
-        PurePath('/tmp/wave-server-3.2.0.40235-bananapi-beta-test.zip'),
-        PurePath('/tmp/dwspectrum-server-3.2.0.40235-edge1-beta-test.zip'),
+        PurePath('/tmp/wave-server-3.2.0.40235-linux86-beta-test.zip'),
+        PurePath('/tmp/dwspectrum-server-3.2.0.40235-linux86-beta-test.zip'),
         PurePath('/tmp/wave-server-3.2.0.40238-win86-beta-test.msi'),
         ],
     ids=lambda path: path.name

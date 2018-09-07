@@ -1,5 +1,4 @@
-#ifndef server_push_stream_reader_h2055
-#define server_push_stream_reader_h2055
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -19,8 +18,6 @@ class CLServerPushStreamReader
     public QnLiveStreamProvider,
     public QnAbstractMediaStreamProvider
 {
-    Q_OBJECT
-
 public:
     CLServerPushStreamReader(
         const nx::mediaserver::resource::CameraPtr& dev);
@@ -35,6 +32,7 @@ public:
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
+    virtual CameraDiagnostics::Result openStreamResult() const override;
 private:
     void at_audioEnabledChanged(const QnResourcePtr& res);
 
@@ -44,7 +42,6 @@ protected:
     virtual void pleaseReopenStream() override;
     virtual void beforeRun() override;
     virtual void afterRun() override;
-    virtual bool canChangeStatus() const;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) = 0;
 
 private:
@@ -65,11 +62,8 @@ private:
     int m_openStreamCounter = 0;
     QnWaitCondition m_cond;
     QnMutex m_openStreamMutex;
-    int m_FrameCnt = 0;
     QElapsedTimer m_needControlTimer;
     bool m_openedWithStreamCtrl = false;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //server_push_stream_reader_h2055
