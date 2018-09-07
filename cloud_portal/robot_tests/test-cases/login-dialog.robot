@@ -31,16 +31,27 @@ can be opened in anonymous state
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
-can be closed after clicking on background
-    [tags]    not-ready
+can be closed by clicking on background
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    Click Element At Coordinates    //ngb-modal-backdrop    100    100
+    # used instead of click because it's more generic and allows the dismissal of the dialog
+    # using "click element" would require the element to be on the top layer or it would throw an error
+    # I am clicking on the header here because it is the only thing I am sure will always be visible and not part of the modal
+    Mouse Down    //header
+    Mouse Up    //header
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
-    Page Should Not Contain Element    ${LOG IN MODAL}
+
+can be closed by clicking on the X
+    [tags]    C24212
+    Wait Until Element Is Visible    ${LOG IN NAV BAR}
+    Click Link    ${LOG IN NAV BAR}
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN CLOSE BUTTON}
+    Click Button    ${LOG IN CLOSE BUTTON}
+    Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
+    [tags]    C24212
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
@@ -57,8 +68,7 @@ after log In, display user's email and menu in top right corner
     Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
+    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}/span[text()="${email}"]
 
 allows log in with existing email in uppercase
     ${email uppercase}    Convert To Uppercase    ${email}
@@ -70,10 +80,8 @@ allows log in with 'Remember Me checkmark' switched off
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}/..   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Click Element    ${REMEMBER ME CHECKBOX}/..
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    input text    ${EMAIL INPUT}    ${email}
-    input text    ${PASSWORD INPUT}    ${password}
-    click button    ${LOG IN BUTTON}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Log In    ${email}    ${password}    None
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form
@@ -206,6 +214,6 @@ handles two tabs, updates second tab state if logout is done on first
     Validate Log Out
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
-    Location Should Be    ${url}/content/eula
+    Location Should Be    ${url}/systems
     Reload Page
     Validate Log Out

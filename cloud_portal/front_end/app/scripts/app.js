@@ -90,6 +90,15 @@ window.L = {};
                     dataType: 'json'
                 }).done(function(response){
                     appState.trafficRelayHost = response.trafficRelayHost;
+                    angular.extend(CONFIG, appState);
+                });
+
+                $.ajax({
+                    url: 'api/utils/settings',
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response){
+                    appState.trafficRelayHost = response.trafficRelayHost;
                     appState.publicDownloads = response.publicDownloads;
                     angular.extend(CONFIG, appState);
                 });
