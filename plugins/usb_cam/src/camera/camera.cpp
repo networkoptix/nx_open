@@ -10,6 +10,46 @@
 namespace nx {
 namespace usb_cam {
 
+namespace {
+
+size_t getPriorityCodecIndex(
+    const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
+    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
+{
+    for (const auto codecID : videoCodecPriorityList)
+    {
+        size_t index = 0;
+        for (const auto& descriptor : codecDescriptorList)
+        {
+            if (codecID == descriptor->toNxCompressionType())
+                return index;
+            ++index;
+        }
+    }
+    return codecDescriptorList.size();
+}
+
+device::CompressionTypeDescriptorPtr getPriorityDescriptor(
+    const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
+    const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
+{
+    size_t index = getPriorityCodecIndex(videoCodecPriorityList, codecDescriptorList);
+    if (index < codecDescriptorList.size())
+        return codecDescriptorList[index];
+    else if (codecDescriptorList.size() > 0)
+        return codecDescriptorList[0];
+    return nullptr;
+}
+
+} // namespace 
+
+
+const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = {
+    nxcip::AV_CODEC_ID_H264,
+    nxcip::AV_CODEC_ID_H263,
+    nxcip::AV_CODEC_ID_MJPEG
+};
+
 Camera::Camera(
     nxpl::TimeProvider* const timeProvider,
     const nxcip::CameraInfo& info)
@@ -20,8 +60,13 @@ Camera::Camera(
     m_lastError(0)
 {
     auto codecList = device::getSupportedCodecs(url().c_str());
-    m_compressionTypeDescriptor = utils::getPriorityDescriptor(codecList);
+    m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
     assignDefaultParams(m_compressionTypeDescriptor);
+
+    std::string video = std::string("VIDEO url: ") + m_info.url;
+    std::string audio = std::string("AUDIO url: ") + m_info.auxiliaryData;
+    std::string both = video + "\n" + audio;
+    std::cout << both << std::endl;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -114,6 +159,14 @@ std::string Camera::url() const
 CodecParameters Camera::codecParameters() const
 {
     return m_videoCodecParams;
+}
+
+std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
+{
+    std::vector<AVCodecID> ffmpegCodecList;
+    for (const auto & nxCodecID : kVideoCodecPriorityList)
+        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecID(nxCodecID));
+    return ffmpegCodecList;
 }
 
 void Camera::assignDefaultParams(const device::CompressionTypeDescriptorPtr& descriptor)

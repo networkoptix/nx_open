@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
-
-#include "device/device_data.h"
+#include <string>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -14,12 +12,7 @@ namespace utils {
 
 std::string decodeCameraInfoUrl(const char * url);
 
-std::string encodeCameraInfoUrl( const char * url);
-
-std::vector<AVCodecID> ffmpegCodecPriorityList();
-
-std::shared_ptr<device::AbstractCompressionTypeDescriptor> getPriorityDescriptor(
-    const std::vector<std::shared_ptr<device::AbstractCompressionTypeDescriptor>>& codecDescriptorList);
+std::string encodeCameraInfoUrl(const char * url);
 
 } // namespace utils
 } // namespace usb_cam

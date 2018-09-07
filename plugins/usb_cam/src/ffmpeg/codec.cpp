@@ -218,6 +218,21 @@ AVPixelFormat Codec::pixelFormat() const
     return m_codecContext->pix_fmt;
 }
 
+AVSampleFormat Codec::sampleFormat() const
+{
+    return m_codecContext->sample_fmt;
+}
+
+int Codec::sampleRate() const
+{
+    return m_codecContext->sample_rate;
+}
+
+int Codec::frameSize() const
+{
+    return m_codecContext->frame_size;
+}
+
 void Codec::flush() const
 {
     if (!avcodec_is_open(m_codecContext))
@@ -232,7 +247,7 @@ void Codec::flush() const
     }
     else
     {
-        Packet packet(AV_CODEC_ID_NONE);
+        Packet packet(AV_CODEC_ID_NONE, AVMEDIA_TYPE_UNKNOWN);
         int returnCode = sendFrame(nullptr);
         while (returnCode != AVERROR_EOF)
             returnCode = receivePacket(packet.packet());

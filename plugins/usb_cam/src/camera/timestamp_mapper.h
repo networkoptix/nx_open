@@ -8,12 +8,12 @@ namespace usb_cam {
 class TimeStampMapper
 {
 public:
-    void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp)
+    void addTimeStamp(int64_t ffmpegPts, uint64_t nxTimeStamp)
     {
-        m_timeStamps.insert(std::pair<int64_t, int64_t>(ffmpegPts, nxTimeStamp));
+        m_timeStamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimeStamp));
     }
 
-    bool getNxTimeStamp(int64_t ffmpegPts, int64_t * outNxTimeStamp, bool eraseEntry = true)
+    bool getNxTimeStamp(int64_t ffmpegPts, uint64_t * outNxTimeStamp, bool eraseEntry = true)
     {
         *outNxTimeStamp = 0;
         auto it = m_timeStamps.find(ffmpegPts);
@@ -28,7 +28,7 @@ public:
     }
 
 private:
-    std::map<int64_t /*ffmpeg pts*/, int64_t /*nx timeStamp*/> m_timeStamps;
+    std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timeStamp*/> m_timeStamps;
 };
 
 } // namespace usb_cam

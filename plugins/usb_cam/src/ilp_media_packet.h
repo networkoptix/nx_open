@@ -15,6 +15,8 @@ public:
     ILPMediaPacket(
         CyclicAllocator* const allocator,
         int channelNumber,
+        nxcip::DataPacketType dataType,
+        nxcip::CompressionType compressionType,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
         unsigned int cSeq);
@@ -34,10 +36,6 @@ public:
     virtual unsigned int cSeq() const override;
     virtual nxcip::Picture* getMotionData() const override;
 
-
-    void setMediaType(nxcip::DataPacketType mediaType);
-    void setCodecType(nxcip::CompressionType codecType);
-
     /*!
         \note Does keep contents of current buffer
     */
@@ -53,8 +51,8 @@ private:
     size_t m_bufSize;
     unsigned int m_flags;
     unsigned int m_cSeq;
-    nxcip::CompressionType m_codecType;
-    nxcip::DataPacketType m_mediaType;
+    nxcip::CompressionType m_compressionType;
+    nxcip::DataPacketType m_dataType;
 };
 
 } // namespace usb_cam

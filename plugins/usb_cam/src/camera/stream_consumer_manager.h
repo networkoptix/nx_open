@@ -52,7 +52,6 @@ public:
     virtual size_t removeConsumer(const std::weak_ptr<StreamConsumer>& consumer) override;
     size_t addConsumer(const std::weak_ptr<StreamConsumer>& consumer, bool waitForKeyPacket);
     void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
-    const std::vector<bool>& waitForKeyPacket() const;
     
 private:
     /* 

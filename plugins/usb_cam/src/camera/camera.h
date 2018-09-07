@@ -44,7 +44,11 @@ public:
     std::string url() const;
     CodecParameters codecParameters() const;
 
+    std::vector<AVCodecID> ffmpegCodecPriorityList();
+
 private:
+    static const std::vector<nxcip::CompressionType> kVideoCodecPriorityList;
+
     nxpl::TimeProvider * const m_timeProvider;
     nxcip::CameraInfo m_info;
     CodecParameters m_videoCodecParams;

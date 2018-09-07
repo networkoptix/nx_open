@@ -71,8 +71,11 @@ std::weak_ptr<VideoConsumer> StreamConsumerManager::largestBitrate(int * outBitr
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
             {
-                largest = vc->bitrate() > largest ? vc->bitrate() : largest;
-                videoConsumer = vc;
+                if (largest < vc->bitrate())
+                {
+                    largest = vc->bitrate();
+                    videoConsumer = vc;
+                }
             }
         }
     }
@@ -91,8 +94,11 @@ std::weak_ptr<VideoConsumer> StreamConsumerManager::largestFps(float * outFps) c
         {
             if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
             {
-                largest = vc->fps() > largest ? vc->fps() : largest;
-                videoConsumer = vc;
+                if (largest < vc->fps())
+                {
+                    largest = vc->fps();
+                    videoConsumer = vc;
+                }
             }
         }
     }
@@ -190,11 +196,6 @@ void PacketConsumerManager::givePacket(const std::shared_ptr<ffmpeg::Packet>& pa
             }
         }
     }
-}
-
-const std::vector<bool>& PacketConsumerManager::waitForKeyPacket() const
-{
-    return m_waitForKeyPacket;
 }
 
 } // namespace usb_cam

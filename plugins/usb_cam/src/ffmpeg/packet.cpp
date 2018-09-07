@@ -18,24 +18,22 @@ namespace {
 uint8_t firstDigit(uint8_t n)
 {
     int result = 0;
-    while (n % 10 != 0)
-    {
-        --n;
+    while (n-- % 10 != 0)
         ++result;
-    }
     return result;
 }
 
 }
 
-Packet::Packet(AVCodecID codecID, const std::shared_ptr<std::atomic_int>& packetCount):
-    m_packet(av_packet_alloc()),
+Packet::Packet(AVCodecID codecID, AVMediaType mediaType, const std::shared_ptr<std::atomic_int>& packetCount):
     m_codecID(codecID),
+    m_mediaType(mediaType),
     m_packetCount(packetCount),
-    m_timeStamp(0)
+    m_timeStamp(0),
 #ifdef _WIN32
-    ,m_parseNalUnitsVisited(false)
+    m_parseNalUnitsVisited(false),
 #endif
+    m_packet(av_packet_alloc())
 {
     if (m_packetCount)
         ++(*m_packetCount);
@@ -91,9 +89,19 @@ void Packet::unreference()
     av_packet_unref(m_packet); 
 }
 
+int Packet::newPacket(int size)
+{
+    return av_new_packet(m_packet, size);
+}
+
 AVCodecID Packet::codecID() const 
 {
     return m_codecID; 
+}
+
+AVMediaType Packet::mediaType() const
+{
+    return m_mediaType;
 }
 
 uint64_t Packet::timeStamp() const 

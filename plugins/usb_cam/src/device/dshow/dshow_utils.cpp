@@ -461,7 +461,7 @@ HRESULT getResolutionList(IMoniker *pMoniker,
             {
                 if (viHeader->AvgTimePerFrame)
                 {
-                    float fps = 10000000.0 / viHeader->AvgTimePerFrame;
+                    float fps = 10000000 / viHeader->AvgTimePerFrame;
                     resolutionList.push_back(
                         ResolutionData(bmiHeader->biWidth, bmiHeader->biHeight, fps));
                 }

@@ -14,12 +14,16 @@ namespace usb_cam {
 ILPMediaPacket::ILPMediaPacket(
     CyclicAllocator* const allocator,
     int channelNumber,
+    nxcip::DataPacketType dataType,
+    nxcip::CompressionType compressionType,
     nxcip::UsecUTCTimestamp _timestamp,
     unsigned int flags,
     unsigned int cSeq )
 :
     m_refManager( this ),
     m_allocator( allocator ),
+    m_dataType(dataType),
+    m_compressionType(compressionType),
     m_channelNumber( channelNumber ),
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
@@ -77,7 +81,7 @@ nxcip::UsecUTCTimestamp ILPMediaPacket::timestamp() const
 
 nxcip::DataPacketType ILPMediaPacket::type() const
 {
-    return m_mediaType;
+    return m_dataType;
 }
 
 const void* ILPMediaPacket::data() const
@@ -97,7 +101,7 @@ unsigned int ILPMediaPacket::channelNumber() const
 
 nxcip::CompressionType ILPMediaPacket::codecType() const
 {
-    return m_codecType;
+    return m_compressionType;
 }
 
 unsigned int ILPMediaPacket::flags() const
@@ -113,16 +117,6 @@ unsigned int ILPMediaPacket::cSeq() const
 nxcip::Picture* ILPMediaPacket::getMotionData() const
 {
     return NULL;
-}
-
-void ILPMediaPacket::setMediaType(nxcip::DataPacketType mediaType)
-{
-    m_mediaType = mediaType;
-}
-
-void ILPMediaPacket::setCodecType(nxcip::CompressionType codecType)
-{
-    m_codecType = codecType;
 }
 
 void ILPMediaPacket::resizeBuffer( size_t bufSize )

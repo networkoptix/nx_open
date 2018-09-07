@@ -10,8 +10,7 @@ namespace ffmpeg {
 
 Frame::Frame(const std::shared_ptr<std::atomic_int>& frameCount):
     m_frame(av_frame_alloc()),
-    m_frameCount(frameCount),
-    m_allocated(false)
+    m_frameCount(frameCount)
 {
     if (m_frameCount)
         ++(*m_frameCount);
@@ -54,49 +53,14 @@ int64_t Frame::pts() const
     return m_frame->pts;
 }
 
-int Frame::allocateImage(int width, int height, AVPixelFormat format, int align)
+int64_t Frame::packetPts() const
 {
-    // int result = av_image_alloc(m_frame->data, m_frame->linesize, width, height, format, align);
-    // if (result < 0)
-    //     return result;
-
-    m_frame->width = width;
-    m_frame->height = height;
-    m_frame->format = format;
-
-    int result = av_frame_get_buffer(m_frame, align);
-    
-    m_allocated = true;
-    return result;
+    return m_frame->pkt_pts;
 }
 
-int Frame::allocateAudio(int nbChannels, int nbSamples, AVSampleFormat format, int align)
+int Frame::nbSamples() const
 {
-    // int result = 
-    //     av_samples_alloc(m_frame->data, m_frame->linesize, nbChannels, nbSamples, format, align);
-    // if (result < 0)
-    //     return result;
-
-    av_frame_set_channels(m_frame, nbChannels);
-    m_frame->nb_samples = nbSamples;
-    m_frame->format = format;
-    
-    int result = av_frame_get_buffer(m_frame, align);
-    if(result < 0)
-        return result;
-
-    m_allocated = true;
-    //return result;
-    return 0;
-}
-
-void Frame::freeData()
-{
-    if (m_allocated)
-    {
-        av_freep(&m_frame->data[0]);
-        m_allocated = false;
-    }
+    return m_frame->nb_samples;
 }
 
 int Frame::getBuffer(AVPixelFormat format, int width, int height, int align)

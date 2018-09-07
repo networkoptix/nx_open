@@ -57,8 +57,7 @@ private:
     std::unique_ptr<StreamReaderPrivate> m_streamReader;
 };
 
-class StreamReaderPrivate
-{
+class StreamReaderPrivate{
 public:
     StreamReaderPrivate(
         int encoderIndex,
@@ -74,25 +73,21 @@ public:
     virtual void setResolution(const nxcip::Resolution& resolution);
     virtual void setBitrate(int bitrate);
 
-
     virtual void ensureConsumerAdded();
 
 protected:
-    CyclicAllocator m_allocator;
-
     int m_encoderIndex;
     CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
+    std::shared_ptr<BufferedAudioVideoPacketConsumer> m_avConsumer;
 
-    std::shared_ptr<BufferedPacketConsumer> m_audioConsumer;
+    CyclicAllocator m_allocator;
 
     bool m_consumerAdded;
     bool m_interrupted;
 
 protected:
-    std::unique_ptr<ILPMediaPacket> toNxPacket(
-        ffmpeg::Packet *packet,
-        nxcip::DataPacketType mediaType);
+    std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
 };
 
 } // namespace usb_cam

@@ -110,7 +110,7 @@ StreamReaderPrivate::StreamReaderPrivate(
     m_encoderIndex(encoderIndex),
     m_codecParams(codecParams),
     m_camera(camera),
-    m_audioConsumer(std::make_shared<BufferedPacketConsumer>()),
+    m_avConsumer(new BufferedAudioVideoPacketConsumer(camera->videoStream(), codecParams)),
     m_consumerAdded(false),
     m_interrupted(false)
 {
@@ -118,14 +118,15 @@ StreamReaderPrivate::StreamReaderPrivate(
 
 StreamReaderPrivate::~StreamReaderPrivate()
 {
-    m_camera->audioStream()->removePacketConsumer(m_audioConsumer);
+    interrupt();
 }
 
 void StreamReaderPrivate::interrupt()
 {
-    m_camera->audioStream()->removePacketConsumer(m_audioConsumer);
-    m_audioConsumer->interrupt();
-    m_audioConsumer->flush();
+    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
+    m_avConsumer->interrupt();
+    m_avConsumer->flush();
+
     m_interrupted = true;
     m_consumerAdded = false;
 }
@@ -149,26 +150,23 @@ void StreamReaderPrivate::ensureConsumerAdded()
 {
     if (!m_consumerAdded)
     {
-        m_camera->audioStream()->addPacketConsumer(m_audioConsumer);
+        m_camera->audioStream()->addPacketConsumer(m_avConsumer);
         m_consumerAdded = true;
     }
 }
 
-std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(
-    ffmpeg::Packet *packet,
-    nxcip::DataPacketType mediaType)
+std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Packet *packet)
 {
     int keyPacket = packet->keyPacket() ? nxcip::MediaDataPacket::fKeyPacket : 0;
 
     std::unique_ptr<ILPMediaPacket> nxPacket(new ILPMediaPacket(
         &m_allocator,
         0,
+        ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
+        ffmpeg::utils::toNxCompressionType(packet->codecID()),
         packet->timeStamp() * kMsecToUsec,
         keyPacket,
         0));
-
-    nxPacket->setCodecType(ffmpeg::utils::toNxCompressionType(packet->codecID()));
-    nxPacket->setMediaType(mediaType);
 
     nxPacket->resizeBuffer(packet->size());
     if (nxPacket->data())

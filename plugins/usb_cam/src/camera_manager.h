@@ -53,7 +53,8 @@ protected:
     nxpt::CommonRefManager m_refManager;
     nxpt::ScopedRef<Plugin> m_pluginRef;
     unsigned int m_capabilities;
-    std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
+    static int constexpr kEncoderCount = 2;
+    std::unique_ptr<MediaEncoder> m_encoders[kEncoderCount];
 
     bool m_audioEnabled;
     std::shared_ptr<Camera> m_camera;

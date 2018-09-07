@@ -9,7 +9,6 @@
 #include <condition_variable>
 
 #include "stream_consumer_manager.h"
-#include "timestamp_mapper.h"
 #include "ffmpeg/input_format.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
@@ -64,8 +63,9 @@ private:
         struct SwrContext * m_resampleContext;
 
         std::shared_ptr<std::atomic_int> m_packetCount;
-
-        TimeStampMapper m_timeStamps;
+        
+        int m_bufferMaxSize;
+        std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetBuffer;
 
     private:
         std::string ffmpegUrl() const;
@@ -81,9 +81,12 @@ private:
         int decodeNextFrame(AVFrame * outFrame);
         int resample(const AVFrame * frame, AVFrame * outFrame);
         std::shared_ptr<ffmpeg::Packet> getNextData(int * outError);
+        std::shared_ptr<ffmpeg::Packet> addToBuffer(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
         void start();
         void stop();
         void run();
+
+        int timePerVideoFrame() const;
     };
 
 public:

@@ -15,12 +15,6 @@
 namespace nx {
 namespace usb_cam {
 
-namespace {
-
-int constexpr kEncoderCount = 2;
-
-}
-
 CameraManager::CameraManager(
     const nxcip::CameraInfo& info,
     nxpl::TimeProvider *const timeProvider)
@@ -35,9 +29,6 @@ CameraManager::CameraManager(
         nxcip::BaseCameraManager::audioCapability),
     m_audioEnabled(false)
 {
-    /* adding nullptr so we can check for it in getEncoder() */
-    for(int i = 0; i < kEncoderCount; ++i)
-        m_encoders.push_back(nullptr);
 }
 
 CameraManager::~CameraManager()
@@ -94,6 +85,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if (!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
+                //m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     refManager(),
                     encoderIndex,
                     m_camera));

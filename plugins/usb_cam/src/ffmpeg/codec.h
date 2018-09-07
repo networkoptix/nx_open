@@ -49,7 +49,14 @@ public:
     AVCodecContext * codecContext() const;
     AVCodec * codec() const;
     AVCodecID codecID() const;
+
+    // video
     AVPixelFormat pixelFormat() const;
+    
+    //audio
+    AVSampleFormat sampleFormat() const;
+    int sampleRate() const;
+    int frameSize() const;
 
     void flush() const;
 

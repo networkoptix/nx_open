@@ -41,7 +41,7 @@ public:
     void removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
 
     AVPixelFormat decoderPixelFormat() const;
-    int fps() const;
+    float fps() const;
 
     void updateFps();
     void updateBitrate();

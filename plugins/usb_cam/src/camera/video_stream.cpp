@@ -135,8 +135,13 @@ void VideoStream::updateFpsUnlocked()
     frameConsumer = m_frameConsumerManager.largestFps(&frameFps);
 
     auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
-    if (!videoConsumer.lock())
+    if (videoConsumer.expired())
         return;
+
+    int width = 0;
+    int height = 0;
+    float fps = videoConsumer.lock()->fps();
+    videoConsumer.lock()->resolution(&width, &height);
 
     CodecParameters codecParams = closestSupportedResolution(videoConsumer);
     updateStreamConfiguration(codecParams);
@@ -223,7 +228,7 @@ AVPixelFormat VideoStream::decoderPixelFormat() const
     return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
 }
 
-int VideoStream::fps() const
+float VideoStream::fps() const
 {
     return m_codecParams.fps;
 }
@@ -272,7 +277,11 @@ void VideoStream::run()
             continue;
         }
 
-        auto packet = std::make_shared<ffmpeg::Packet>(m_inputFormat->videoCodecID(), m_packetCount);
+        auto packet = std::make_shared<ffmpeg::Packet>(
+            m_inputFormat->videoCodecID(),
+            AVMEDIA_TYPE_VIDEO,
+            m_packetCount);
+
         int readCode = m_inputFormat->readFrame(packet->packet());
         if (readCode < 0)
             continue;
@@ -353,9 +362,6 @@ int VideoStream::initializeInputFormat()
     setInputFormatOptions(inputFormat);
 
     result = inputFormat->open(ffmpegUrl().c_str());
-    std::string audio = m_camera.lock()->audioStream()->url();
-    audio = std::string("audio ") + audio;
-    std::cout << audio << std::endl;
     if (result < 0)
         return result;
 
@@ -392,8 +398,8 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     /**
      * Attempt to avoid "real-time buffer too full" error messages in Windows
      */
-    inputFormat->setEntry("thread_queue_size", 2048);
-    inputFormat->setEntry("rtbufsize", "100M");
+    inputFormat->setEntry("thread_queue_size", 5096);
+//    inputFormat->setEntry("rtbufsize", "100M");
     inputFormat->setEntry("threads", (int64_t)0);
 #endif
 }
@@ -429,7 +435,7 @@ int VideoStream::initializeDecoder()
      * and on some cameras they are very infrequent. Initializing the decoder with the first packet read from the 
      * camera prevent numerous "non exisiting PPS 0 referenced" errors on some cameras.
      */
-    ffmpeg::Packet packet(m_inputFormat->videoCodecID());
+    ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
     m_inputFormat->readFrame(packet.packet());
     ffmpeg::Frame frame;
     decode(&packet, &frame);
@@ -461,9 +467,13 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     if (result < 0)
         return nullptr;
 
-    int64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(frame->pts(), &nxTimeStamp, true/*eraseEntry*/))
-        nxTimeStamp = m_timeProvider->millisSinceEpoch();
+    uint64_t nxTimeStamp;
+    if (!m_timeStamps.getNxTimeStamp(frame->packetPts(), &nxTimeStamp, true/*eraseEntry*/))
+    {
+        //std::cout << "missing timestamp during video decode" << std::endl;
+        if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true))
+            nxTimeStamp = m_timeProvider->millisSinceEpoch();
+    }
     frame->setTimeStamp(nxTimeStamp);
 
     return frame;
@@ -475,6 +485,7 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
     bool gotFrame = false;
     while (!gotFrame)
     {
+
         result = m_decoder->sendPacket(packet->packet());
         bool needReceive = result == 0 || result == AVERROR(EAGAIN);
         while (needReceive) // ready to or requires parsing a frame
@@ -502,7 +513,6 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 
 CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<VideoConsumer>& consumer) const
 {
-    NX_ASSERT(consumer.lock());
     if (!consumer.lock())
         return CodecParameters();
 
@@ -511,6 +521,7 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     std::vector<device::ResolutionData>resolutionList;
     if (auto cam = m_camera.lock())
         resolutionList = cam->getResolutionList();
+    //assumes list is in ascending resolution order
 
     int width = 0;
     int height = 0;
@@ -520,7 +531,7 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     // try to find an exact match first
     for (const auto & resolution : resolutionList)
     {
-        if (fps == resolution.fps && width == resolution.width && height == resolution.height)
+        if (resolution.width == width && resolution.height == height && resolution.fps == fps)
             return CodecParameters(
                 m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
     }
@@ -531,18 +542,26 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     {
         if (aspectRatio == resolution.aspectRatio())
         {
-            if (width * height >= resolution.width * resolution.height && resolution.fps >= fps)
+            if (resolution.width * resolution.height >= width * height && resolution.fps >= fps)
                 return CodecParameters(
-                    m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                    m_codecParams.codecID,
+                    resolution.fps,
+                    consumerPtr->bitrate(),
+                    resolution.width,
+                    resolution.height);
         }
     }
 
     //any resolution or fps higher than requested
     for (const auto & resolution : resolutionList)
     {
-        if (width * height >= resolution.width * resolution.height && resolution.fps >= fps)
+        if (resolution.width * resolution.height >= width * height && resolution.fps >= fps)
             return CodecParameters(
-                m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                m_codecParams.codecID,
+                resolution.fps,
+                consumerPtr->bitrate(),
+                resolution.width,
+                resolution.height);
     }
 
     return m_codecParams;

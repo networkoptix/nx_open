@@ -44,29 +44,23 @@ private:
 
     uint64_t m_lastVideoTimeStamp;
     uint64_t m_timePerFrame;
-    int m_framesToDrop;
-    int m_frameDropCount;
-    std::shared_ptr<BufferedVideoFrameConsumer> m_consumer;
+    std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
+    std::vector<std::shared_ptr<ffmpeg::Packet>> m_videoPackets;
     
     std::unique_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
     TimeStampMapper m_timeStamps;
 
-    bool m_needFramesDropped;
-    
-    std::shared_ptr<ffmpeg::Packet> m_encodedVideoPacket;
-    bool m_checkNextAudio;
-
 private:
+    bool shouldDrop(const ffmpeg::Frame * frame) const;
     std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
     void scaleNextFrame(const ffmpeg::Frame * frame, int * outNxError);
     void encode(ffmpeg::Packet * outPacket, int * outNxError);
     void flush();
-    void addTimeStamp(int64_t ffmpegPts, int64_t nxTimeStamp);
-    int64_t getNxTimeStamp(int64_t ffmpegPts);
+    uint64_t getNxTimeStamp(int64_t ffmpegPts);
 
-    std::shared_ptr<ffmpeg::Packet> nextPacket(nxcip::DataPacketType * outMediaType, int * outNxError);
+    std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();
     void ensureConsumerAdded() override;
