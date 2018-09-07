@@ -86,12 +86,12 @@ public:
      *     "outputEventTypes":
      *     [
      *         {
-     *             "eventTypeId": "nx.lineCrossing",
-     *             "eventName": { "value": "Line crossed", "localization": {} }
+     *             "id": "nx.lineCrossing",
+     *             "name": { "value": "Line crossed", "localization": {} }
      *         },
      *         {
-     *             "eventTypeId": "nx.recordingDeleted",
-     *             "eventName": { "value": "Face detected", "localization": {} }
+     *             "id": "nx.faceDetected",
+     *             "name": { "value": "Face detected", "localization": {} }
      *         }
      *     ]
      * }
