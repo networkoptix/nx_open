@@ -16,7 +16,7 @@ def _pretty_format_xml(text):
 
 # Some error codes of interest to us
 # https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants
-# https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes--4000-5999-
+# https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes
 # https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
 _win32_error_codes = {
     0x80071392L: 'ERROR_OBJECT_ALREADY_EXISTS',
