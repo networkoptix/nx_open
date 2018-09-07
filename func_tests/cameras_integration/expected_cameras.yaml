@@ -161,8 +161,8 @@
 
   stream_parameters:
     primary:
-      - {'codec': 'H264', 'resolution': '1920x1080'} # no fps setting for primary
-      - {'codec': 'H265', 'resolution': '1280x1024'} # basing on all_cameras.json
+      - {'codec': 'H264', 'resolution': '1920x1080'}
+      - {'codec': 'H265', 'resolution': '1280x1024'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
       - {'codec': 'H264', 'resolution': '640x360', 'fps': [4, 8]}
@@ -194,7 +194,8 @@
     secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
   audio:
-    - {'skip_codec_change': True, 'codec': 'G711'} # I am not sure if this one has got audio in. The doc is very sparse.
+    - {'skip_codec_change': True, 'codec': 'G711'} # I am not sure if this one has got audio in.
+                                                   # The doc is very sparse.
 
 
 00-1C-A6-01-20-A4:
@@ -251,7 +252,8 @@
       - {'codec': 'H264', 'resolution': '320x240', 'fps': [17, 23]}
 
   audio:
-    - {'skip_codec_change': True, 'codec': 'G711'} # Not sure if it has audio, but isAudioSupported == 1
+    - {'skip_codec_change': True, 'codec': 'G711'} # Not sure if it has audio,
+                                                   # but isAudioSupported == 1
 
   io_events:
     ins: [{id: '1'}]
@@ -358,7 +360,7 @@
 
   stream_parameters:
     primary:
-      - {'codec': 'H264', 'resolution': '2688x1520'} # no fps advanced setting for primary
+      - {'codec': 'H264', 'resolution': '2688x1520'}
       - {'codec': 'H264', 'resolution': '1920x1080'}
     secondary:
       - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
@@ -437,15 +439,16 @@ ACTI_E924-A-XX-15C-00035:
 # FFprobe hangs for this camera
 #  stream_parameters:
 #    primary:
-#      - {'codec': 'H264', 'resolution': '2592x1944'} # no fps advanced setting for primary
+#      - {'codec': 'H264', 'resolution': '2592x1944'}
 #      - {'codec': 'MJPEG', 'resolution': '1920x1080'}
 #    secondary:
 #      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
 #      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
 
   audio: # Dunno which codecs are supported
-    - {'skip_codec_change': True, 'codec': 'G711'} # has got volume and sensitivity advanced settings, but not codec
-                        # (additional settings tests may be implemented if needed)
+    - {'skip_codec_change': True, 'codec': 'G711'} # has got volume and sensitivity advanced
+                                                   # settings, but not codec. Additional settings
+                                                   # tests may be implemented if needed
 
 
 F0-7D-68-09-3E-BA:
@@ -480,7 +483,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
 
   stream_parameters:
     primary:
-      - {'codec': 'H264', 'resolution': '1920x1080'} # no fps settings for primary in all_cameras.json
+      - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'H264', 'resolution': '1280x720'} # !resolution range is empty in all_cameras.json
     secondary:
       - {'codec': 'H264', 'resolution': '480x360', 'fps': [3, 9]} # !resolution range is empty in all_cameras.json
@@ -573,8 +576,9 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
 
   recording:
     primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [20, 35]}
-    secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]} # although in all_cameras.json range is "352x240,352x288,
-    # 640x480,704x480,704x576", 352x240 is applied when trying to use 352x288. Bug on the server or camera?
+    secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]} # although in
+    #all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240 is applied when
+    # trying to use 352x288. Bug on the server or camera?
 
   # No normal specs, fps/res may require adjusting
   stream_parameters:

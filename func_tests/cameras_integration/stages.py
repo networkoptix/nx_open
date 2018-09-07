@@ -89,10 +89,17 @@ def _ffprobe(stream_url):
     try:
         out, err = process.communicate(timeout=15)
         if process.returncode != 0:
-            raise FFProbeError("FFprobe returned non-zero return code")
-        return json.loads(out.decode('utf-8'))
+            _logger.debug("FFprobe returned non-zero return code")
+
+        result = json.loads(out.decode('utf-8'))
+        if not result:
+            _logger.debug("FFprobe returned none")
+            return
+
+        return result.get('streams')
+
     except subprocess.TimeoutExpired:
-        _logger.info('FFprobe timeout reached. Killing FFprobe')
+        _logger.debug('FFprobe timeout reached. Killing FFprobe')
         process.kill()
 
 
@@ -106,7 +113,7 @@ def _metadata(stream):
     return metadata
 
 
-@_stage(timeout=timedelta(minutes=2))
+@_stage(timeout=timedelta(minutes=6))
 def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     checker = Checker()
     # Checking if the camera is recording already
@@ -133,24 +140,14 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                     run.media_url,
                     {'primary': 0, 'secondary': 1}[profile],
                     int(time_since_epoch.total_seconds() * 1000))
-                _logger.info('Archive request url for stream {}:{}'.format(
+                _logger.info('Archive request url for stream {}: {}'.format(
                     profile, archive_url))
 
-                try:
+                while True:
                     streams = _ffprobe(archive_url)
                     if not streams:
-                        yield Failure('ffprobe returned None, trying again')
                         continue
-                    stream = streams['streams'][0]
-                    _logger.info(
-                        "FFprobe output for videostream, profile {}:\n{}"
-                        .format(profile, stream)
-                        )
-                except FFProbeError:
-                    yield Failure('ffprobe error: trying to run ffprobe again')
-                    continue
-
-                yield expect_values(configuration, _metadata(stream), '{}'.format(profile))
+                    yield expect_values(configuration, _metadata(streams[0]), '{}'.format(profile))
 
 
 
@@ -197,18 +194,12 @@ def stream_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gene
             _configure_video(
                 run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
             while True:
-                try:
-                    streams = _ffprobe(stream_url).get('streams')
-                    if not streams:
-                        yield Failure('No video stream was found by ffprobe, trying again')
-                        continue
-                    stream = streams[0]
-                except FFProbeError:
-                    _logger.info('ffprobe error: trying to run ffprobe again')
+                streams = _ffprobe(stream_url)
+                if not streams:
                     continue
 
                 yield expect_values(
-                    configuration, _metadata(stream), '{}[{}]'.format(profile, index))
+                    configuration, _metadata(streams[0]), '{}[{}]'.format(profile, index))
 
     yield Success()
 
@@ -224,7 +215,7 @@ def _configure_audio(api, camera_id, camera_advanced_params, codec):
 
 @_stage(timeout=timedelta(minutes=6))
 def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
-    """Enable audio on the camera; changes the audio codec; check if the audio codec
+    """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
     """
     with run.server.api.camera_audio_enabled(run.id):
@@ -237,20 +228,17 @@ def audio(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
             _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
-                    audio_stream = _ffprobe(run.media_url)['streams'][1]
-                    _logger.info('Audio stream params retrieved by ffprobe: {}'
-                                 .format(audio_stream))
-                except FFProbeError:
-                    yield Halt('ffprobe error: trying to run ffprobe again')
-                    continue
+                    streams = _ffprobe(run.media_url)
+                    if not streams:
+                        continue
+                    audio_stream = streams[1]
                 except IndexError:
                     yield Halt('Audio stream was not discovered by ffprobe.')
                     continue
 
-                result = expect_values(configuration, {'codec': audio_stream.get('codec_name')
-                                       .upper()}, index)
+                yield expect_values(
+                    configuration, {'codec': audio_stream.get('codec_name').upper()}, index)
 
-                yield result
 
 
 @_stage()
