@@ -42,19 +42,20 @@ def register(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def login(request):
-    # A session exists use params from request.session
+    user = None
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
-    # No session use params from request.data
-    else:
+        user = django.contrib.auth.authenticate(request=request, username=email, password=password)
+
+    if user is None:
         require_params(request, ('email', 'password'))
         email = request.data['email'].lower()
         password = request.data['password']
-
-    user = django.contrib.auth.authenticate(request=request, username=email, password=password)
+        user = django.contrib.auth.authenticate(request=request, username=email, password=password)
 
     if user is None:
+        # If account was blocked we put it in the session to log the login error
         if 'account_blocked' in request.session:
             request.session.pop('account_blocked', None)
             raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
