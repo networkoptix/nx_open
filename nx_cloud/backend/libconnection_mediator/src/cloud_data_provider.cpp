@@ -168,8 +168,7 @@ void CloudDataProvider::updateSystemsAsync()
                             sys.cloudConnectionSubscriptionStatus));
                 }
 
-                NX_DEBUG(this, lm("There is(are) %1 system(s) updated")
-ZZ                    .arg(systems.systems.size()));
+                NX_DEBUG(this, lm("There is(are) %1 system(s) updated").arg(systems.systems.size()));
             }
 
             QnMutexLocker lk(&m_mutex);
