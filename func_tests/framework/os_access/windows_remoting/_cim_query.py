@@ -14,6 +14,14 @@ def pformat_xml(text):
     return pretty_text
 
 
+# Some error codes of interest to us
+# https://docs.microsoft.com/en-us/windows/desktop/WmiSdk/wmi-error-constants
+# https://docs.microsoft.com/en-us/windows/desktop/debug/system-error-codes--4000-5999-
+# https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
+_win32_error_codes = {
+    0x80071392L: 'ERROR_OBJECT_ALREADY_EXISTS',
+    }
+
 class CIMClass(object):
     default_namespace = 'root/cimv2'
     default_root_uri = 'http://schemas.microsoft.com/wbem/wsman/1/wmi'
@@ -227,6 +235,14 @@ class CIMQuery(object):
         response = action.perform(self.protocol, timeout_sec=timeout_sec)
         method_output = response[method_name + '_OUTPUT']
         if method_output[u'ReturnValue'] != u'0':
-            raise RuntimeError('Non-zero return value of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
-                self.cim_class.name, method_name, params, self.selectors, pformat(method_output)))
+            error_code = int(method_output[u'ReturnValue'])
+            raise RuntimeError('Non-zero return value 0x{:X} ({}) of {!s}.{!s}({!r}) where {!r}:\n{!s}'.format(
+                error_code,
+                _win32_error_codes.get(error_code, 'unknown'),
+                self.cim_class.name,
+                method_name,
+                params,
+                self.selectors,
+                pformat(method_output),
+                ))
         return method_output
