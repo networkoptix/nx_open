@@ -178,7 +178,10 @@ void MotionSearchListModel::Private::fetchMore()
 
     const auto remaining = periods.size() - oldCount;
     if (remaining == 0)
+    {
+        q->finishFetch(FetchResult::complete);
         return;
+    }
 
     const auto delta = qMin(remaining, q->fetchBatchSize());
     const auto newCount = oldCount + delta;
@@ -188,6 +191,10 @@ void MotionSearchListModel::Private::fetchMore()
 
     for (auto chunk = range.first; chunk != range.second; ++chunk)
         m_data.push_front(*chunk);
+
+    q->finishFetch(remaining > q->fetchBatchSize()
+        ? FetchResult::incomplete
+        : FetchResult::complete);
 }
 
 int MotionSearchListModel::Private::totalCount() const

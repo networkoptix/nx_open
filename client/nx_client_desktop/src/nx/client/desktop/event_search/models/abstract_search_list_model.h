@@ -4,9 +4,7 @@
 
 #include <recording/time_period.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
  * Abstract Right Panel data model that provides interface and basic mechanics of sliding window
@@ -64,8 +62,17 @@ public:
     virtual bool fetchInProgress() const;
     virtual bool cancelFetch();
 
+    enum class FetchResult
+    {
+        complete, //< Successful. There's no more data to fetch.
+        incomplete, //< Successful. There's more data to fetch.
+        failed, //< Unsuccessful.
+        cancelled //< Cancelled.
+    };
+    Q_ENUM(FetchResult)
+
 signals:
-    void fetchFinished(bool cancelled, QPrivateSignal);
+    void fetchFinished(FetchResult result, QPrivateSignal);
 
 protected:
     // These functions must be overridden in derived classes.
@@ -91,7 +98,7 @@ protected:
     void setFetchedTimeWindow(const QnTimePeriod& value);
 
     /** Should be called at the end of every fetch to emit fetchFinished signal. */
-    void finishFetch(bool cancelled);
+    void finishFetch(FetchResult result);
 
     /** Sets whether underlying data store can be populated with new items in live mode. */
     void setLive(bool value);
@@ -107,6 +114,6 @@ private:
     QnTimePeriod m_fetchedTimeWindow; //< Time window of currently fetched data.
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
+
+Q_DECLARE_METATYPE(nx::client::desktop::AbstractSearchListModel::FetchResult)

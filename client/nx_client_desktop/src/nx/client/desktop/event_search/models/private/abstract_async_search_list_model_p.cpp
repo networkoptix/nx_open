@@ -37,22 +37,26 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
 {
     return prefetch(
         [this, guard = QPointer<AbstractAsyncSearchListModel>(q)](
-            const QnTimePeriod& fetchedPeriod, bool cancelled)
+            const QnTimePeriod& fetchedPeriod, FetchResult result)
         {
             if (!guard)
                 return;
 
-            if (!cancelled)
+            auto timeWindow = q->fetchedTimeWindow();
+            timeWindow.addPeriod(fetchedPeriod);
+            q->setFetchedTimeWindow(timeWindow);
+
+            if (result == FetchResult::complete || result == FetchResult::incomplete)
                 commit(fetchedPeriod);
 
-            q->finishFetch(cancelled);
+            q->finishFetch(result);
         });
 }
 
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
     if (m_request.id && m_prefetchCompletionHandler)
-        m_prefetchCompletionHandler({}, true);
+        m_prefetchCompletionHandler({}, FetchResult::cancelled);
 
     m_request = {};
 }
@@ -116,17 +120,12 @@ void AbstractAsyncSearchListModel::Private::commit(const QnTimePeriod& periodToC
 
     NX_VERBOSE(this) << "Commit id:" << m_request.id;
 
-    if (commitPrefetch(periodToCommit))
-    {
-        auto timeWindow = q->fetchedTimeWindow();
-        timeWindow.addPeriod(periodToCommit);
-        q->setFetchedTimeWindow(timeWindow);
+    commitPrefetch(periodToCommit);
 
-        if (count() > q->maximumCount())
-        {
-            NX_VERBOSE(this) << "Truncating to maximum count";
-            q->truncateToMaximumCount();
-        }
+    if (count() > q->maximumCount())
+    {
+        NX_VERBOSE(this) << "Truncating to maximum count";
+        q->truncateToMaximumCount();
     }
 
     m_request = {};
@@ -145,24 +144,34 @@ const AbstractAsyncSearchListModel::Private::FetchInformation&
 }
 
 void AbstractAsyncSearchListModel::Private::completePrefetch(
-    const QnTimePeriod& actuallyFetched, bool fetchedAll)
+    const QnTimePeriod& actuallyFetched, bool success, int fetchedCount)
 {
     NX_ASSERT(currentRequest().direction == q->fetchDirection());
 
-    NX_VERBOSE(q) << "Actually fetched"
-        << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
-        << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+    if (fetchedCount == 0)
+    {
+        NX_VERBOSE(q) << "Pre-fetched no items";
+    }
+    else
+    {
+        NX_VERBOSE(q) << "Pre-fetched" << fetchedCount << "items from"
+            << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
+            << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+    }
 
-    NX_VERBOSE(q) << "Fetched all:" << fetchedAll;
+    const bool fetchedAll = success && fetchedCount < m_request.batchSize;
 
     const auto fetchedPeriod =
-        [&]()
+        [this, &actuallyFetched, success, fetchedAll]() -> QnTimePeriod
         {
+            if (!success)
+                return {};
+
             auto result = m_request.period;
             if (result.isNull())
                 return result;
 
-            auto fetched = actuallyFetched;
+            auto fetched = result.intersected(actuallyFetched);
             if (fetched.isNull())
                 fetched = q->fetchedTimeWindow();
 
@@ -189,8 +198,14 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
             return result;
         };
 
+    const auto result = success
+        ? (fetchedAll ? FetchResult::complete : FetchResult::incomplete)
+        : FetchResult::failed;
+
+    NX_VERBOSE(q) << "Fetch result:" << QVariant::fromValue(result).toString();
+
     NX_ASSERT(m_prefetchCompletionHandler);
-    m_prefetchCompletionHandler(fetchedPeriod(), false);
+    m_prefetchCompletionHandler(fetchedPeriod(), result);
     m_prefetchCompletionHandler = {};
 }
 

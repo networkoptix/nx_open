@@ -5,9 +5,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
     base_type(parent)
@@ -154,9 +152,10 @@ void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)
     m_fetchedTimeWindow = value;
 }
 
-void AbstractSearchListModel::finishFetch(bool cancelled)
+void AbstractSearchListModel::finishFetch(FetchResult result)
 {
-    emit fetchFinished(cancelled, {});
+    NX_VERBOSE(this) << "Finish fetch;" << QVariant::fromValue(result).toString();
+    emit fetchFinished(result, {});
 }
 
 void AbstractSearchListModel::clear()
@@ -168,6 +167,4 @@ void AbstractSearchListModel::clear()
     clearData();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

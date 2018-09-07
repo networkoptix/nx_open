@@ -279,32 +279,23 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
             if (!requestId || requestId != currentRequest().id)
                 return;
 
-            m_prefetch = success ? std::move(data) : LookupResult();
+            QnTimePeriod actuallyFetched;
+            m_prefetch = analytics::storage::LookupResult();
 
-            const auto actuallyFetched = m_prefetch.empty()
-                ? QnTimePeriod()
-                : QnTimePeriod::fromInterval(
-                    startTime(m_prefetch.back()), startTime(m_prefetch.front()));
+            if (success)
+            {
+                m_prefetch = std::move(data);
+                NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
 
-            if (actuallyFetched.isNull())
-            {
-                NX_VERBOSE(q) << "Pre-fetched no analytics";
-            }
-            else
-            {
-                NX_VERBOSE(q) << "Pre-fetched" << m_prefetch.size() << "analytics from"
-                    << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
-                    << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+                if (!m_prefetch.empty())
+                {
+                    actuallyFetched = QnTimePeriod::fromInterval(
+                        startTime(m_prefetch.back()), startTime(m_prefetch.front()));
+                }
             }
 
-            NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().track.empty());
-            const bool fetchedAll = success && m_prefetch.size() < currentRequest().batchSize;
-            completePrefetch(actuallyFetched, fetchedAll);
+            completePrefetch(actuallyFetched, success, m_prefetch.size());
         };
-
-    NX_VERBOSE(q) << "Requesting analytics from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs());
 
     return getObjects(period, dataReceived, currentRequest().batchSize);
 }
@@ -392,6 +383,11 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.sortOrder = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
+
+    NX_VERBOSE(q) << "Requesting analytics from"
+        << utils::timestampToDebugString(period.startTimeMs) << "to"
+        << utils::timestampToDebugString(period.endTimeMs()) << "in"
+        << QVariant::fromValue(request.sortOrder).toString();
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)](

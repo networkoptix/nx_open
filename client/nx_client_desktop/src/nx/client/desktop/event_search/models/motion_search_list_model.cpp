@@ -130,7 +130,6 @@ bool MotionSearchListModel::canFetch() const
 void MotionSearchListModel::requestFetch()
 {
     d->fetchMore();
-    finishFetch(false);
 }
 
 void MotionSearchListModel::clearData()

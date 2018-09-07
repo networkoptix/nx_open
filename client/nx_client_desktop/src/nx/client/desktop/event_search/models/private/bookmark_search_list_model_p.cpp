@@ -170,8 +170,8 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
 
     NX_VERBOSE(q) << "Requesting bookmarks from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs()) << "order"
-        << filter.orderBy.order;
+        << utils::timestampToDebugString(period.endTimeMs()) << "in"
+        << QVariant::fromValue(filter.orderBy.order).toString();
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
         [this, period, guard = QPointer<QObject>(this)](
@@ -182,26 +182,20 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
             if (!guard || !requestId || requestId != currentRequest().id)
                 return;
 
-            m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
+            QnTimePeriod actuallyFetched;
+            m_prefetch = QnCameraBookmarkList();
 
-            const auto actuallyFetched = m_prefetch.empty()
-                ? QnTimePeriod()
-                : currentRequest().period.intersected(QnTimePeriod::fromInterval(
-                    m_prefetch.back().startTimeMs, m_prefetch.front().startTimeMs));
-
-            if (actuallyFetched.isNull())
+            if (success)
             {
-                NX_VERBOSE(q) << "Pre-fetched no bookmarks";
-            }
-            else
-            {
-                NX_VERBOSE(q) << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
-                    << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
-                    << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+                m_prefetch = std::move(bookmarks);
+                if (!m_prefetch.empty())
+                {
+                    actuallyFetched = QnTimePeriod::fromInterval(
+                        m_prefetch.back().startTimeMs, m_prefetch.front().startTimeMs);
+                }
             }
 
-            const bool fetchedAll = success && m_prefetch.size() < currentRequest().batchSize;
-            completePrefetch(actuallyFetched, fetchedAll);
+            completePrefetch(actuallyFetched, success, m_prefetch.size());
         });
 }
 

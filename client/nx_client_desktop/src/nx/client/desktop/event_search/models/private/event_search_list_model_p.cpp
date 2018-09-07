@@ -152,31 +152,21 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
             if (!requestId || requestId != currentRequest().id)
                 return;
 
-            m_prefetch = success ? std::move(data) : ActionDataList();
+            QnTimePeriod actuallyFetched;
+            m_prefetch = vms::event::ActionDataList();
 
-            const auto actuallyFetched = m_prefetch.empty()
-                ? QnTimePeriod()
-                : QnTimePeriod::fromInterval(
-                    startTime(m_prefetch.back()), startTime(m_prefetch.front()));
-
-            if (actuallyFetched.isNull())
+            if (success)
             {
-                NX_VERBOSE(q) << "Pre-fetched no events";
-            }
-            else
-            {
-                NX_VERBOSE(q) << "Pre-fetched" << m_prefetch.size() << "events from"
-                    << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
-                    << utils::timestampToDebugString(actuallyFetched.endTimeMs());
+                m_prefetch = std::move(data);
+                if (!m_prefetch.empty())
+                {
+                    actuallyFetched = QnTimePeriod::fromInterval(
+                        startTime(m_prefetch.back()), startTime(m_prefetch.front()));
+                }
             }
 
-            const bool fetchedAll = success && m_prefetch.size() < currentRequest().batchSize;
-            completePrefetch(actuallyFetched, fetchedAll);
+            completePrefetch(actuallyFetched, success, int(m_prefetch.size()));
         };
-
-    NX_VERBOSE(q) << "Requesting events from"
-        << utils::timestampToDebugString(period.startTimeMs) << "to"
-        << utils::timestampToDebugString(period.endTimeMs());
 
     return getEvents(period, eventsReceived, currentRequest().batchSize);
 }
@@ -260,6 +250,11 @@ rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period
     request.order = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
+
+    NX_VERBOSE(q) << "Requesting events from"
+        << utils::timestampToDebugString(period.startTimeMs) << "to"
+        << utils::timestampToDebugString(period.endTimeMs()) << "in"
+        << QVariant::fromValue(request.order).toString();
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)](

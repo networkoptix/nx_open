@@ -415,7 +415,7 @@ void UnifiedSearchWidget::requestFetch()
 
 void UnifiedSearchWidget::updatePlaceholderState()
 {
-    const bool hidden = m_model && m_model->relevantCount() > 0;
+    const bool hidden = m_model && m_model->rowCount() > 0;
     if (!hidden)
     {
         ui->placeholderText->setText(m_model && m_model->isConstrained()

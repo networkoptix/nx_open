@@ -95,6 +95,7 @@ void VisualSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 
 void VisualSearchListModel::handleFetchFinished()
 {
+    qDebug() << fetchDirection() << canFetchMore();
     relevantIndicatorModel()->setVisible(canFetchMore());
 }
 
