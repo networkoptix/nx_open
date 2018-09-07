@@ -18,7 +18,7 @@ from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import Wait, WaitTimeout, wait_for_truthy
+from framework.waiting import Wait, WaitTimeout, wait_for_truthy, wait_for_equal
 from .context_logger import ContextLogger, context_logger
 
 _logger = ContextLogger(__name__, 'mediaserver_api')
@@ -569,10 +569,7 @@ class MediaserverApi(object):
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
         wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
-        wait_for_truthy(
-            lambda: servant_api.get_local_system_id() == master_system_id,
-            "{} responds with system id {}".format(servant_api, master_system_id),
-            timeout_sec=10)
+        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=10)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
