@@ -36,8 +36,8 @@
     ptzCapabilities: 428825855
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
+    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [3, 10]}
 
   stream_parameters:
     primary:

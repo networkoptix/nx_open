@@ -47,6 +47,7 @@ class Halt(Result):
 
 
 def expect_values(expected, actual, *args, **kwargs):
+        # type: (object, object) -> object
     checker = Checker()
     checker.expect_values(expected, actual, *args, **kwargs)
     return checker.result()
@@ -133,7 +134,7 @@ class Checker(object):
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
-        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},  # used to also contain 'MP2': 'G711' - probably not correct
+        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},
     }
 
     @classmethod

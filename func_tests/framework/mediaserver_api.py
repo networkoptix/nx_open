@@ -422,14 +422,11 @@ class MediaserverApi(object):
 
     @contextmanager
     def camera_audio_enabled(self, camera_id):
-        attributes = self.get_camera_user_attributes_list(camera_id)[0]
-        attributes['audioEnabled'] = True
-        self.set_camera_user_attributes(**attributes)
+        self.change_camera_user_attributes(camera_id, audioEnabled=True)
         try:
             yield
         finally:
-            attributes['audioEnabled'] = False
-            self.set_camera_user_attributes(**attributes)
+            self.change_camera_user_attributes(camera_id, audioEnabled=False)
 
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
@@ -475,19 +472,17 @@ class MediaserverApi(object):
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
-    def get_camera_user_attributes_list(self, camera_id):  # type: (str) -> list
+    def get_camera_user_attributes(self, camera_id):  # type: (str) -> list
         """Get user attributes for a specific camera"""
-        return self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
+        result = self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
+        assert len(result) == 1
+        return result[0]
 
-    def set_camera_user_attributes(self, camera_id='', **params):  # type: (str, dict) -> None
-        """Sets the camera user attribute(-s) for a specific camera
-           WARNING! camera_id format has to be UUID! MAC doesn't work for this method. If no
-           camera_id is specified, it has to be already in params.
-        """
-        if len(camera_id) != 0:
-            params['cameraId'] = camera_id
-        assert 'cameraId' in params
-        self.generic.post('ec2/saveCameraUserAttributes', params)
+    def change_camera_user_attributes(self, camera_id, **kwargs):
+        attributes = self.get_camera_user_attributes(camera_id)
+        attributes.update(kwargs)
+        self.generic.post('ec2/saveCameraUserAttributes', attributes)
+
 
     @classmethod
     def _parse_json_fields(cls, data):
