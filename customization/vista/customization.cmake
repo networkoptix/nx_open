@@ -54,9 +54,10 @@ set(nxtool.bundleUpgradeCode "{c141258e-4d8b-40d8-9957-561a425cddbc}")
 
 set(deb.customization.company.name "vista-qulu")
 
-set(paxton.upgradeCode "{77EC46CB-737C-4BC3-8774-70956550628F}")
-set(paxton.bundleUpgradeCode "{3FAAF04F-2E3F-4B97-96ED-BFAACD6573CC}")
 set(paxtonLibraryName "VistaCCTV.Qulu")
+set(paxtonProductId "{eb4d1899-42dc-49ea-ae5b-810e07cf9409}")
+set(paxtonProductUpgradeCode "{77EC46CB-737C-4BC3-8774-70956550628F}")
+set(paxtonBundleUpgradeCode "{3FAAF04F-2E3F-4B97-96ED-BFAACD6573CC}")
 
 set(ios.new_bundle_identifier "com.vista.quluMobile")
 set(ios.sign.identity "iPhone Distribution: Norbain SD LTD (N3KX2CKR5P)")

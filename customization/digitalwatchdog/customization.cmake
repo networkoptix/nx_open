@@ -44,9 +44,11 @@ set(nxtool.bundleUpgradeCode "{6516fcdc-682b-4548-8fc3-a632473a76d2}")
 
 set(deb.customization.company.name "digitalwatchdog")
 
-set(paxton.upgradeCode "{C75D4244-D0B3-4931-96D5-45E96E3EBFA6}")
-set(paxton.bundleUpgradeCode "{03CCE76A-132B-4654-A1AD-6C7E5A795EE1}")
+# Paxton section
 set(paxtonLibraryName "DigitalWatchdog.DWSpectrum")
+set(paxtonProductId "{f7bc9204-ed9c-4224-af25-62fd6ef6f078}")
+set(paxtonProductUpgradeCode "{C75D4244-D0B3-4931-96D5-45E96E3EBFA6}")
+set(paxtonBundleUpgradeCode "{03CCE76A-132B-4654-A1AD-6C7E5A795EE1}")
 
 set(ios.new_bundle_identifier "tv.dwcc.DwMobile")
 set(ios.sign.identity "iPhone Distribution: Kaltec Electronics, INC (HW58JB7FUF)")

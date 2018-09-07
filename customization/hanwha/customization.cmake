@@ -42,9 +42,10 @@ set(customization.fullBundleUpgradeCode "{E20892D8-1438-478E-94EF-A23380B96A01}"
 
 set(deb.customization.company.name "hanwha")
 
-set(paxton.upgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
-set(paxton.bundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
 set(paxtonLibraryName "Hanwha.WisenetWAVE")
+set(paxtonProductId "{6248adba-4a8d-4899-98f6-334757f19926}")
+set(paxtonProductUpgradeCode "{2BEF566D-CB71-44F5-8A77-CEB10C5DA9FA}")
+set(paxtonBundleUpgradeCode "13FC4A9F-DBBD-4CAF-B139-93894AE82F74")
 
 set(ios.new_bundle_identifier "com.hanwhasecurity.wisenetwave")
 set(ios.group_identifier "group.com.hanwhasecurity.wisenetwave")
