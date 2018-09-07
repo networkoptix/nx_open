@@ -6,7 +6,7 @@ RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/
 
 installDeb()
 {
-    dpkg -i "$1"
+    dpkg -i "$1" || sudo dpkg -i "$1"
 }
 
 update()
