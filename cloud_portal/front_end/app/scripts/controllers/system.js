@@ -113,11 +113,13 @@ angular.module('cloudApp')
 
             function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
-            systemsProvider.forceUpdateSystems().then(function(){$timeout(function(){$location.path('/systems')})});
-                    $timeout(function () {
-                        $location.path('/systems')
-                    })
-                });
+                systemsProvider
+                    .forceUpdateSystems()
+                    .then(function () {
+                        $timeout(function () {
+                            $location.path('/systems')
+                        })
+                    });
             }
 
             $scope.disconnect = function () {

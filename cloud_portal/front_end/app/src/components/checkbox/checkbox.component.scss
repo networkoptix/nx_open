@@ -22,7 +22,9 @@ nx-checkbox {
         display : flex;
 
         input[type="checkbox"] {
-            display : none;
+            position : absolute;
+            opacity  : 0;
+            cursor   : pointer;
         }
 
         input:hover ~ .check {

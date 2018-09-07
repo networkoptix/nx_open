@@ -12,7 +12,9 @@ nx-radio {
         display : flex;
 
         input[type="radio"] {
-            display : none;
+            position : absolute;
+            opacity  : 0;
+            cursor   : pointer;
         }
 
         input:hover ~ .check {

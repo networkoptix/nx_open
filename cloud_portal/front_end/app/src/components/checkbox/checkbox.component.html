@@ -1,5 +1,7 @@
 <label class="nx-checkbox">
-    <input type="checkbox" [name]="name" [id]="id" ng-model-options="{ updateOn: 'default', debounce: 0 }">
+    <input type="checkbox" [name]="name" [id]="id"
+           ng-model-options="{ updateOn: 'default', debounce: 0 }"
+           [attr.disabled]="disabled ? '' : null">
     <span class="check"
           [ngClass]="state"
           (click)="changeState($event)">

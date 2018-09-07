@@ -43,7 +43,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
     @Input() name: string;
     @Input() required: any;
     @Input() checked: boolean;
-    @Input() disabled: string;
+    @Input() disabled: any;
     @Output() onClick = new EventEmitter<string>();
 
     private touched: boolean;
@@ -84,7 +84,9 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
     }
 
     ngOnInit() {
+        this.disabled = (this.disabled !== undefined);  // optional param
         this.required = (this.required !== undefined);  // optional param
+
         setTimeout(() => {
             // set state after model was updated
             this.value = this.checked || false;
@@ -128,7 +130,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
     }
 
     changeState() {
-        if (this.disabled !== undefined) {
+        if (this.disabled) {
             return
         }
 

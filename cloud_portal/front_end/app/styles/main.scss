@@ -48,8 +48,29 @@ body {
     }
 }
 
-[data-whatintent='keyboard'] input[type=checkbox]:focus {
+[data-whatintent='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
     & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatintent='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatintent='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
+    & + .check {
+        outline : none !important;
+        @extend #outline;
+    }
+}
+
+[data-whatintent='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+    & + .check {
         outline : none !important;
         @extend #outline;
     }
