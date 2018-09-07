@@ -336,8 +336,8 @@ angular.module('webadminApp')
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
-            disconnectFromSystem:function(currentPassord){
-                return wrapPost(proxy + '/web/api/detachFromSystem',{currentPassord:currentPassord});
+            disconnectFromSystem:function(currentPassword){
+                return wrapPost(proxy + '/web/api/detachFromSystem',{currentPassword:currentPassword});
             },
             restoreFactoryDefaults:function(currentPassword){
                 return wrapPost(proxy + '/web/api/restoreState', {
