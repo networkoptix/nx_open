@@ -8,7 +8,7 @@ from winrm.exceptions import WinRMError, WinRMTransportError
 _logger = logging.getLogger(__name__)
 
 
-def pformat_xml(text):
+def _pretty_format_xml(text):
     dom = minidom.parseString(text)
     pretty_text = dom.toprettyxml(indent=' '*2)
     return pretty_text
@@ -106,9 +106,9 @@ class _CimAction(object):
             rq['env:Envelope']['w:OperationTimeout'] = 'PT{}S'.format(timeout_sec)
         try:
             request_xml = xmltodict.unparse(rq)
-            _logger.debug("Request XML:\n%s", pformat_xml(request_xml))
+            _logger.debug("Request XML:\n%s", _pretty_format_xml(request_xml))
             response = protocol.send_message(request_xml)
-            _logger.debug("Response XML:\n%s", pformat_xml(response))
+            _logger.debug("Response XML:\n%s", _pretty_format_xml(response))
         except WinRMTransportError as e:
             _logger.exception("XML:\n%s", e.response_text)
             raise
