@@ -307,7 +307,7 @@ class _VirtualBoxVm(VmHardware):
         _logger.warning("Recover %r: reason unknown, try reboot.", self)
         self.power_off()
         self.power_on()
-        _logger.warning("Recover %r: allow %d sec: booting.", power_on_timeout_sec, self)
+        _logger.warning("Recover %r: allow %d sec: booting.", self, power_on_timeout_sec)
         yield power_on_timeout_sec
         raise VmUnresponsive("Recover %r: couldn't recover.".format(self))
 
