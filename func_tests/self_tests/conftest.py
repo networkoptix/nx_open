@@ -37,7 +37,7 @@ def os_access(request):
 
 
 @pytest.fixture
-def os_access_node_dir(os_access, node_dir):
+def os_access_temp_dir(os_access, node_dir):
     if os_access is local_access:
         return node_dir
     else:
