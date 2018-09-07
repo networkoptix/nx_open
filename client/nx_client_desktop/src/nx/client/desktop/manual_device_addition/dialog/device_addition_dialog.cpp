@@ -11,6 +11,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <nx/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/client/desktop/common/widgets/password_preview_button.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
@@ -72,6 +73,11 @@ DeviceAdditionDialog::~DeviceAdditionDialog()
 
 void DeviceAdditionDialog::initializeControls()
 {
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->tableHolder);
+    scrollBar->setUseItemViewPaddingWhenVisible(true);
+    scrollBar->setUseMaximumSpace(true);
+    ui->foundDevicesTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,

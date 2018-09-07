@@ -35,17 +35,19 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
 
     const int first = rowCount();
     const int last = rowCount() + truncatedIds.size() - 1;
-    const ScopedInsertRows guard(this, QModelIndex(), first, last);
     bool hasNewDevices = false;
-    for (const auto& newDevice: devices)
     {
-        if (truncatedIds.contains(newDevice.uniqueId))
+        const ScopedInsertRows guard(this, QModelIndex(), first, last);
+        for (const auto& newDevice: devices)
         {
-            hasNewDevices = true;
-            m_devices.append(newDevice);
-            m_checked.insert(newDevice.uniqueId, false);
-            m_presentedState.insert(newDevice.uniqueId,
-                newDevice.existsInPool ? alreadyAddedState : notPresentedState);
+            if (truncatedIds.contains(newDevice.uniqueId))
+            {
+                hasNewDevices = true;
+                m_devices.append(newDevice);
+                m_checked.insert(newDevice.uniqueId, false);
+                m_presentedState.insert(newDevice.uniqueId,
+                    newDevice.existsInPool ? alreadyAddedState : notPresentedState);
+            }
         }
     }
 
