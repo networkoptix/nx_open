@@ -1,6 +1,4 @@
 # Default logging configuration.
-# See: https://docs.python.org/2/library/logging.config.html#dictionary-schema-details.
-# Structure is exactly as `logging.config.dictConfig` accepts.
 
 version: 1
 disable_existing_loggers: false
@@ -16,7 +14,7 @@ handlers:
 
 loggers:
   urllib3.connectionpool: {level: INFO}
-  SMB.SMBConnection: {level: INFO}
+  SMB.SMBConnection: {level: WARNING}
   paramiko.transport: {level: INFO}
   paramiko.transport.sftp: {level: WARNING}
   parse: {level: INFO}
@@ -30,6 +28,7 @@ loggers:
   framework.vms.vm_type.ssh: {level: WARNING}
   framework.vms.vm_type.winrm: {level: WARNING}
   framework.vms.vm_type.networking.ssh: {level: WARNING}
+  framework.vms.vm_type.networking.winrm: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
   framework.os_access.traffic_capture: {level: INFO}

@@ -8,7 +8,9 @@ _logger = logging.getLogger(__name__)
 
 
 def start_raw_powershell_script(shell, script, logger=None):
-    _logger.debug("Run\n%s", script)
+    if not logger:
+        logger = _logger
+    logger.debug("Run\n%s", script)
     return shell.start([
         'PowerShell',
         '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Unrestricted',

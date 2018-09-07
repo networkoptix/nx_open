@@ -18,8 +18,10 @@ loggers:
   framework.registry: {level: INFO}
   framework.vms.vm_type: {level: INFO}
   framework.vms.vm_type.wait: {level: WARNING}
-  framework.vms.vm_type.ssh: {level: WARNING}
-  framework.vms.vm_type.networking.ssh: {level: WARNING}
+  framework.vms.vm_type.ssh: {level: INFO}
+  framework.vms.vm_type.winrm: {level: INFO}
+  framework.vms.vm_type.networking.ssh: {level: INFO}
+  framework.vms.vm_type.networking.winrm: {level: INFO}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: INFO}
   framework.os_access.traffic_capture: {level: INFO}

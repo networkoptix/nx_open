@@ -126,6 +126,7 @@ class VMType(object):
         with self.vm_allocated(alias) as vm:
             with ExitStack() as stack:
                 stack.enter_context(context_logger(_logger, 'framework.networking.linux'))
+                stack.enter_context(context_logger(_logger, 'framework.networking.windows'))
                 stack.enter_context(context_logger(_logger, 'ssh'))
                 stack.enter_context(context_logger(_logger, 'framework.os_access.windows_remoting'))
 
