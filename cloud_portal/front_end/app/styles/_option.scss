@@ -16,8 +16,9 @@
     user-select         : none;
 
     .text {
-        font-family : $font-family-light;
+        font-family : $font-family-regular;
         user-select : none;
+        color       : $dark9
     }
 
     /* Hide the browser's default checkbox */
@@ -33,6 +34,26 @@
             circle {
                 display : block;
             }
+        }
+    }
+
+    & input:hover ~ .optionmark {
+        svg path.circle {
+            fill : $dark1;
+        }
+
+        & ~ .text {
+            color : $dark1;
+        }
+    }
+
+    & input:active ~ .optionmark {
+        svg path.circle {
+            fill : $dark9 !important;
+        }
+
+        & ~ .text {
+            color : $dark9 !important;
         }
     }
 }

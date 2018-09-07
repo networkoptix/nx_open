@@ -9,7 +9,7 @@ import { Component, Input, OnInit } from '@angular/core';
 @Component({
     selector: 'nx-pre-loader',
     templateUrl: 'pre-loader.component.html',
-    styleUrls: []
+    styleUrls: ['pre-loader.component.scss']
 })
 export class NxPreLoaderComponent implements OnInit {
     @Input() type: string;

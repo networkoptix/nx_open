@@ -25,12 +25,15 @@
                             delayedUpdateSystemInfo();
 
                             $scope.hasCameras = false;
-                            $scope.system.getCameras().then(function (cameras) {
-                                if (cameras.data.length > 0) {
-                                    $scope.hasCameras = true;
+
+                            if ($scope.currentSystem.isOnline) {
+                                $scope.system.getCameras().then(function (cameras) {
+                                    $scope.hasCameras = (cameras.data.length > 0);
                                     $scope.systemReady = true;
-                                }
-                            });
+                                });
+                            } else {
+                                $scope.systemReady = true;
+                            }
 
                             // Set footer visibility according to system status
                             $rootScope.$emit('nx.layout.footer', $scope.currentSystem.isOnline);

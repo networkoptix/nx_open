@@ -27,7 +27,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
     downloads: any;
     downloadsData: any;
     platformMatch: {};
-    showTabs: string;
     canSeeHistory: boolean;
 
     location: Location;
@@ -37,7 +36,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.showTabs = 'visible';
         this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
 
@@ -109,12 +107,10 @@ export class DownloadComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.showTabs = 'hidden';
-
         // TODO: Repace this once 'register' page is moved to A5
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/download', platform]);
-        this.document.location.href = '/download/' + platform;
+        this.location.go('/download/' + platform);
     }
 
     private getDownloads () {
@@ -147,7 +143,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
             });
 
             if (this.platform && !foundPlatform) {
-                this.router.navigate(['404']);
+                this.location.go('404');
 
                 return;
             }
@@ -155,12 +151,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
             if (!foundPlatform) {
                 this.downloads.groups[0].active = true;
             }
-
-            this.account
-                .get()
-                .then(result => {
-                    this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
-                });
         });
 
         this.getDownloadersPer(this.platform);
@@ -174,11 +164,16 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.account
+            .get()
+            .then(result => {
+                this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+            });
 
         if (!this.configService.publicDownloads) {
             this.authorizationService
                 .requireLogin()
-                .then((result) => {
+                .then(result => {
                     if (!result) {
                         this.document.location.href = this.configService.config.redirectUnauthorised;
                         return;
@@ -196,4 +191,3 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.sub.unsubscribe();
     }
 }
-
