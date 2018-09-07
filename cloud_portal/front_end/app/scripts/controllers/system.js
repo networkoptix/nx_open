@@ -113,7 +113,7 @@ angular.module('cloudApp')
 
             function updateAndGoToSystems() {
                 $scope.userDisconnectSystem = true;
-                systemsProvider.forceUpdateSystems().then(function () {
+            systemsProvider.forceUpdateSystems().then(function(){$timeout(function(){$location.path('/systems')})});
                     $timeout(function () {
                         $location.path('/systems')
                     })
@@ -267,3 +267,4 @@ angular.module('cloudApp')
             var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
     }]);
+

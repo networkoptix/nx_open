@@ -11,14 +11,6 @@ ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
 *** Keywords ***
-Check Bad Email Input
-    [arguments]    ${email}
-    Wait Until Elements Are Visible    ${REGISTER EMAIL INPUT}    ${CREATE ACCOUNT BUTTON}
-    Input Text    ${REGISTER EMAIL INPUT}    ${email}
-    Click Button    ${CREATE ACCOUNT BUTTON}
-    ${class}    Get Element Attribute    ${REGISTER EMAIL INPUT}/../..    class
-    Should Contain    ${class}    has-error
-
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -56,8 +48,10 @@ should open register page in anonymous state by clicking Register button on home
 
 #I am assuming this means directly going to the /register url and not clicking a button
 should open register page in anonymous state
+    [tags]    C24211
     Go To    ${url}/register
     Location should be    ${url}/register
+    Wait Until Element Is Visible    //form[@name="registerForm"]
 
 should register user with correct credentials
     ${email}    Get Random Email    ${BASE EMAIL}
@@ -66,24 +60,28 @@ should register user with correct credentials
     Validate Register Success
 
 should register user with cyrillic First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
     Validate Register Success
 
 should register user with smiley First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
     Validate Register Success
 
 should register user with glyph First and Last names and correct credentials
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
     Validate Register Success
 
 should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
+    [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
@@ -94,6 +92,53 @@ should allow !#$%&'*+-/=?^_`{|}~ in email field
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success
+
+allows register with leading space in email
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${SPACE}${email}    ${password}
+    Validate Register Success
+
+allows register with trailing space in email
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}${SPACE}    ${password}
+    Validate Register Success
+
+with valid inputs no errors are displayed
+    [tags]    C41557
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
+    Click Link    ${CREATE ACCOUNT HEADER}
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    Input Text    ${REGISTER FIRST NAME INPUT}    ${TEST FIRST NAME}
+    Input Text    ${REGISTER LAST NAME INPUT}    ${TEST LAST NAME}
+    ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Click Element    ${REGISTER FORM}
+    @{list}    Set Variable    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD SPECIAL CHARS}    ${PASSWORD TOO SHORT}    ${PASSWORD TOO COMMON}    ${PASSWORD IS WEAK}    ${EMAIL INVALID}
+    : FOR    ${element}    IN    @{list}
+    \    Element Should Not Be Visible    ${element}
+
+displays password masked, shows password and changes eye icon when clicked
+    [tags]    C24211
+    Go To    ${url}/register
+    Wait Until Elements Are Visible    ${REGISTER PASSWORD INPUT}    ${REGISTER EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
+    Click Element    ${REGISTER EYE ICON OPEN}
+    Wait Until Element Is Visible    ${REGISTER EYE ICON CLOSED}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'text'
+    Click Element    ${REGISTER EYE ICON CLOSED}
+    Wait Until Element Is Visible    ${REGISTER EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${REGISTER PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
 
 should respond to Enter key and save data
     ${email}    Get Random Email    ${BASE EMAIL}
@@ -108,6 +153,7 @@ should respond to Enter key and save data
     Validate Register Success
 
 should respond to Tab key
+    [tags]    C41867
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
     Click Link    ${CREATE ACCOUNT HEADER}
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}
@@ -120,12 +166,34 @@ should respond to Tab key
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
     Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
+
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-not-empty") and @ng-model='account.accept']
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-empty") and @ng-model='account.accept']
+
     Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS LINK}    ${ENTER}
+    Element Should Be Focused    ${TERMS AND CONDITIONS LINK}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[1]
+    Location Should Be    ${url}/content/eula
+    Select Window    @{tabs}[0]
     Press Key    ${TERMS AND CONDITIONS LINK}    ${TAB}
+    Element Should Be Focused    ${PRIVACY POLICY LINK}
+    Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
+    ${tabs}    Get Window Handles
+    Select Window    @{tabs}[2]
+    Location Should Be    ${url}/content/privacy
+    Select Window    @{tabs}[0]
+
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
+    Press Key    ${CREATE ACCOUNT BUTTON}    ${ENTER}
+    Wait Until Elements Are Visible    ${FIRST NAME IS REQUIRED}    ${LAST NAME IS REQUIRED}    ${EMAIL IS REQUIRED}    ${PASSWORD IS REQUIRED}
 
 should open Terms and conditions in a new page
+    [tags]    C41558
     Go To    ${url}/register
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS LINK}
     Click Link    ${TERMS AND CONDITIONS LINK}
@@ -133,6 +201,14 @@ should open Terms and conditions in a new page
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/eula
+
+should open Privacy Policy in a new page
+    [tags]    C41558
+    Go To    ${url}/register
+    Wait Until Element Is Visible    ${PRIVACY POLICY LINK}
+    Click Link    ${PRIVACY POLICY LINK}
+    Sleep    2    #This is specifically for Firefox
+    Location Should Be    ${url}/content/privacy
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}
@@ -178,3 +254,42 @@ should not allow to access /register/success /activate/success by direct input
     Go To    ${url}/activate/success
     Wait Until Element Is Visible    ${JUMBOTRON}
     Location Should Be    ${url}/
+
+Cannot register email that is already registered
+    [tags]    C41563
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
+
+Cannot register email that is already activated
+    [tags]    C41563
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
+
+Check registration email links
+    [tags]    C24211
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
+    ${email text}    Get Email Body    ${email}
+    Log   ${email text}
+    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
+    ${links}    Get Links From Email    ${email}
+    log    ${links}
+    @{expected links}    Set Variable    ${SUPPORT_URL}    ${WEBSITE_URL}    ${ENV}    ${ENV}/activate
+    : FOR    ${link}  IN  @{links}
+    \    check in list    ${expected links}    ${link}
+    Delete Email    ${email}
+    Close Mailbox

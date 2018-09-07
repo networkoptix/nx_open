@@ -2,7 +2,7 @@
     "YOU HAVE NO SYSTEMS TEXT"             :    "You have no Systems connected to %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT"                  :    "Log Out",
     "ACCOUNT SETTINGS BUTTON TEXT"         :    "Account Settings",
-    "RELEASE HISTORY BUTTON TEXT"          :    "Release History",
+    "RELEASE HISTORY BUTTON TEXT"          :    "Other releases, patches and beta versions",
     "RESET EMAIL SENT MESSAGE TEXT"        :    "Password reset instructions are sent to Email %email%",
     "CREATE ACCOUNT BUTTON TEXT"           :    "Create Account",
     "TERMS AND CONDITIONS LINK TEXT"       :    "Terms and Conditions",
@@ -27,10 +27,11 @@
     "WRONG PASSWORD"                       :    "Wrong password",
     "ACCOUNT NOT FOUND TEXT"               :    "Account not found",
     "CANNOT SEND CONFIRMATION EMAIL"       :    "Cannot send confirmation Email:",
+    "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
     "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
-    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, configure cameras, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"        :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the %VMS_NAME% Client application to set up custom permissions",
@@ -79,5 +80,12 @@
     "RELEASES TEXT"                        :    "Releases",
     "PATCHES TEXT"                         :    "Patches",
     "BETAS TEXT"                           :    "Betas",
-    "CLIENT ONLY TEXT"                     :    "Client only" 
+    "CLIENT ONLY TEXT"                     :    "Client only",
+            
+    "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
+    "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",
+    "PASSWORD IS WEAK BADGE TEXT"          :    "weak",
+    "PASSWORD IS FAIR BADGE TEXT"          :    "fair",
+    "PASSWORD IS GOOD BADGE TEXT"          :    "good",
+    "PASSWORD INCORRECT BADGE TEXT"        :    "incorrect"
 }

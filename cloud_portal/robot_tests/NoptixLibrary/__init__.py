@@ -3,6 +3,7 @@
 
 import imaplib
 import re
+from platform import system
 import email.header
 from email.parser import HeaderParser
 import os.path
@@ -61,6 +62,23 @@ class NoptixLibrary(object):
                 not_found = "No element found with text " + expected
             time.sleep(.2)
         raise AssertionError(not_found)
+
+    def wait_until_element_has_style(self, locator, styleAttribute, expected, timeout=10):
+        seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
+        timeout = timeout + time.time()
+        not_found = None
+
+        while time.time() < timeout:
+            try:
+                element = seleniumlib.find_element(locator)
+                value = element.value_of_css_property(styleAttribute)
+                if value == expected:
+                    return
+            except:
+                not_found = "No element found with style " + expected
+            time.sleep(.2)  
+        raise AssertionError(not_found)
+
 
     def check_online_or_offline(self, elements, offlineText):
         for element in elements:
@@ -121,3 +139,20 @@ class NoptixLibrary(object):
             return
         else:
             raise Exception("File does not appear to be available.")
+
+    def check_in_list(self, expected, found):
+        for url in expected:
+            if url in found:
+                return
+        raise Exception(url+ " was not in the email.")
+
+    def get_os(self):
+        plat = system()
+        if plat == "Windows":
+            return "Windows"
+        elif plat == "Darwin":
+            return "MacOS"
+        elif plat == "Linux":
+            return "Linux"
+        else:
+            raise Exception("Mismatched platform")

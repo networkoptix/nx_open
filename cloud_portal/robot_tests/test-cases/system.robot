@@ -8,6 +8,7 @@ Suite Teardown    Close All Browsers
 Force Tags        system
 
 *** Variables ***
+${email}       ${EMAIL OWNER}
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
 
@@ -46,7 +47,7 @@ Restart
 systems dropdown should allow you to go back to the systems page
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEMS DROPDOWN}
-    Click Link    ${SYSTEMS DROPDOWN}
+    Click Button    ${SYSTEMS DROPDOWN}
     Wait Until Element Is Visible    ${ALL SYSTEMS}
     Click Link    ${ALL SYSTEMS}
     Location Should Be    ${url}/systems
@@ -191,54 +192,45 @@ should open System page by link not authorized user, and show alert if logs in a
 should display same user data as user provided during registration (stress to cyrillic)
     [tags]    email
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
-    Activate    ${email}
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${random email}    ${ADMIN TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
 #verify user was added with appropriate name
-    Log In    ${email}    ${password}
+    Log In    ${random email}    ${password}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
 #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should display same user data as showed in user account (stress to cyrillic)
-    [tags]    email
+    [tags]    email    C41573    C41842
 #create user
-    ${email}    Get Random Email    ${BASE EMAIL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    mark    hamill    ${email}    ${password}
-    Activate    ${email}
+    Register    mark    hamill    ${random email}    ${password}
+    Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Click Button    ${SHARE BUTTON SYSTEMS}
-    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE PERMISSIONS DROPDOWN}
-    Input Text    ${SHARE EMAIL}    ${email}
-    Select From List By Label    ${SHARE PERMISSIONS DROPDOWN}    ${ADMIN TEXT}
-    Wait Until Element Is Visible    ${SHARE BUTTON MODAL}
-    Click Button    ${SHARE BUTTON MODAL}
+    Share To    ${random email}    ${VIEWER TEXT}
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Log Out
 
     Go To    ${url}/account
-    Log In    ${email}    ${password}    None
+    Log In    ${random email}    ${password}    None
     Validate Log In
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
+    # sometimes the text field refills itself if I don't wait a second
+    sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
@@ -247,13 +239,16 @@ should display same user data as showed in user account (stress to cyrillic)
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Log Out
+    Validate Log Out
+
+    Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
 
     #remove new user from system
     Log Out
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Remove User Permissions    ${email}
+    Remove User Permissions    ${random email}
 
 should show "your system" for owner and "owner's name" for non-owners
     Log in to Auto Tests System    ${EMAIL OWNER}
