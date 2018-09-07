@@ -113,4 +113,4 @@ class ContextAdapter(logging.LoggerAdapter):
         super(ContextAdapter, self).__init__(base_logger, dict(context=context))
 
     def process(self, msg, kwargs):
-        return ("[%s] %s" % (self.extra['context'], msg), kwargs)
+        return ("%s: %s" % (self.extra['context'], msg), kwargs)
