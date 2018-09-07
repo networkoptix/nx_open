@@ -58,9 +58,9 @@ int Service::serviceMain(const utils::AbstractServiceSettings& abstractSettings)
     //nx::utils::CurrentProcess::changeUser(settings.changeUser());
 
     view.listen();
-    NX_LOGX(lm("Listening on %1").container(httpEndpoints()), cl_logINFO);
+    NX_INFO(this, lm("Listening on %1").container(httpEndpoints()));
 
-    NX_LOG(lm("%1 has been started").arg(applicationDisplayName()), cl_logALWAYS);
+    NX_ALWAYS(this, lm("%1 has been started").arg(applicationDisplayName()));
 
     const auto result = runMainLoop();
 
