@@ -18,7 +18,7 @@ TEST(Settings, getSimpleOption)
     QFile file (kSettingsFilename);
     file.remove();
     std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
-    ASSERT_TRUE(settings.attach(qSettings));
+    settings.attach(qSettings);
     ASSERT_EQ(settings.option1(), QString("qwerty"));
     ASSERT_EQ(settings.option2(), 7);
     ASSERT_FALSE(settings.option1.present());
@@ -41,7 +41,7 @@ TEST(Settings, loadSave)
     std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
     qSettings->setValue("option1", "loaded value");
     qSettings->setValue("option3", "300");
-    ASSERT_TRUE(settings.attach(qSettings));
+    settings.attach(qSettings);
     ASSERT_TRUE(settings.option1.present());
     ASSERT_EQ(settings.option1(), QString("loaded value"));
     ASSERT_FALSE(settings.option2.present());
@@ -55,6 +55,11 @@ TEST(Settings, loadSave)
     settings.option1.remove();
     ASSERT_FALSE(qSettings->contains("option1"));
     ASSERT_FALSE(qSettings->contains("option2"));
+
+    QString stringWithCommas = "info,debug[nx::network],verbose[nx::utils , nx::mediaserver]";
+    qSettings->setValue("option1", stringWithCommas);
+    settings.attach(qSettings);
+    ASSERT_EQ(settings.option1(), stringWithCommas);
 }
 
 TEST(Settings, getWithLambda)
@@ -87,7 +92,7 @@ TEST(Settings, getWithLambda)
     std::shared_ptr<QSettings> qSettings(new QSettings(kSettingsFilename, QSettings::IniFormat));
     qSettings->setValue("option2", 10);
     Settings settings;
-    ASSERT_TRUE(settings.attach(qSettings));
+    settings.attach(qSettings);
     ASSERT_EQ(settings.option1(), QString("qwerty"));
     ASSERT_EQ(settings.option2(), 10);
 }

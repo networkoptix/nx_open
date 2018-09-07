@@ -16,7 +16,7 @@ void Settings::add(const QString& name, BaseOption* option)
     m_options.emplace(name, option);
 }
 
-bool Settings::attach(const std::shared_ptr<QSettings>& settings)
+void Settings::attach(const std::shared_ptr<QSettings>& settings)
 {
     m_qtSettings = settings;
     QStringList keys = settings->allKeys();
@@ -32,7 +32,6 @@ bool Settings::attach(const std::shared_ptr<QSettings>& settings)
             NX_ERROR(this, lit("Failed to load option: %1").arg(key));
     }
     m_loaded = true;
-    return true;
 }
 
 QJsonObject Settings::buildDocumentation() const
