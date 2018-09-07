@@ -333,7 +333,7 @@ CSndUList::~CSndUList()
 
 void CSndUList::insert(int64_t ts, CUDT* u)
 {
-    std::scoped_lock<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_ListLock);
 
     // increase the heap array size if necessary
     if (m_iLastEntry == m_iArrayLength - 1)
@@ -360,7 +360,7 @@ void CSndUList::insert(int64_t ts, CUDT* u)
 
 void CSndUList::update(CUDT* u, bool reschedule)
 {
-    std::scoped_lock<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_ListLock);
 
     CSNode* n = u->sNode();
 
@@ -384,7 +384,7 @@ void CSndUList::update(CUDT* u, bool reschedule)
 
 int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
 {
-    std::scoped_lock<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_ListLock);
 
     if (-1 == m_iLastEntry)
         return -1;
@@ -416,14 +416,14 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
 
 void CSndUList::remove(CUDT* u)
 {
-    std::scoped_lock<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_ListLock);
 
     remove_(u);
 }
 
 uint64_t CSndUList::getNextProcTime()
 {
-    std::scoped_lock<std::mutex> listguard(m_ListLock);
+    std::lock_guard<std::mutex> listguard(m_ListLock);
 
     if (-1 == m_iLastEntry)
         return 0;
@@ -469,7 +469,7 @@ void CSndUList::insert_(int64_t ts, CUDT* u)
     // first entry, activate the sending queue
     if (0 == m_iLastEntry)
     {
-        std::scoped_lock<std::mutex> lock(*m_pWindowLock);
+        std::lock_guard<std::mutex> lock(*m_pWindowLock);
         m_pWindowCond->notify_all();
     }
 }
@@ -530,7 +530,7 @@ CSndQueue::~CSndQueue()
     m_bClosing = true;
 
     {
-        std::scoped_lock<std::mutex> lock(m_WindowLock);
+        std::lock_guard<std::mutex> lock(m_WindowLock);
         m_WindowCond.notify_all();
     }
 
@@ -907,7 +907,6 @@ CRcvQueue::CRcvQueue():
     m_pTimer(NULL),
     m_iPayloadSize(),
     m_bClosing(false),
-    m_pListener(NULL),
     m_pRendezvousQueue(NULL),
     m_vNewEntry(),
     m_mBuffer()
@@ -936,6 +935,14 @@ CRcvQueue::~CRcvQueue()
             i->second.pop();
         }
     }
+}
+
+void CRcvQueue::stop()
+{
+    m_bClosing = true;
+
+    if (m_WorkerThread.joinable())
+        m_WorkerThread.join();
 }
 
 void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* cc, CTimer* t)
@@ -1006,11 +1013,17 @@ void CRcvQueue::worker()
             // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
             if (0 == id)
             {
-                if (NULL != m_pListener)
+                decltype(m_listener) listener;
                 {
-                    m_pListener->listen(addr, unit->m_Packet);
+                    std::unique_lock<std::mutex> lock(m_LSLock);
+                    listener = m_listener;
                 }
-                else if (NULL != (u = m_pRendezvousQueue->retrieveFromRQ(addr, id)))
+
+                if (listener)
+                {
+                    listener->processConnectionRequest(addr, unit->m_Packet);
+                }
+                else if (u = m_pRendezvousQueue->retrieveFromRQ(addr, id))
                 {
                     // asynchronous connect: call connect here
                     // otherwise wait for the UDT socket to retrieve this packet
@@ -1138,23 +1151,23 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
     return packet.getLength();
 }
 
-int CRcvQueue::setListener(CUDT* u)
+int CRcvQueue::setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener)
 {
-    std::scoped_lock<std::mutex> lock(m_LSLock);
+    std::lock_guard<std::mutex> lock(m_LSLock);
 
-    if (NULL != m_pListener)
+    if (m_listener)
         return -1;
 
-    m_pListener = u;
+    m_listener = listener;
     return 0;
 }
 
-void CRcvQueue::removeListener(const CUDT* u)
+void CRcvQueue::removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener)
 {
-    std::scoped_lock<std::mutex> lock(m_LSLock);
+    std::unique_lock<std::mutex> lock(m_LSLock);
 
-    if (u == m_pListener)
-        m_pListener = NULL;
+    if (m_listener == listener)
+        m_listener = nullptr;
 }
 
 void CRcvQueue::registerConnector(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
@@ -1166,7 +1179,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 {
     m_pRendezvousQueue->removeFromRQ(id);
 
-    std::scoped_lock<std::mutex> bufferlock(m_PassLock);
+    std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
     map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
     if (i != m_mBuffer.end())
@@ -1183,7 +1196,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
 
 void CRcvQueue::setNewEntry(CUDT* u)
 {
-    std::scoped_lock<std::mutex> lock(m_IDLock);
+    std::lock_guard<std::mutex> lock(m_IDLock);
     m_vNewEntry.push_back(u);
 }
 
@@ -1194,7 +1207,7 @@ bool CRcvQueue::ifNewEntry()
 
 CUDT* CRcvQueue::getNewEntry()
 {
-    std::scoped_lock<std::mutex> lock(m_IDLock);
+    std::lock_guard<std::mutex> lock(m_IDLock);
 
     if (m_vNewEntry.empty())
         return NULL;
@@ -1207,7 +1220,7 @@ CUDT* CRcvQueue::getNewEntry()
 
 void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
 {
-    std::scoped_lock<std::mutex> bufferlock(m_PassLock);
+    std::lock_guard<std::mutex> bufferlock(m_PassLock);
 
     map<int32_t, std::queue<CPacket*> >::iterator i = m_mBuffer.find(id);
 

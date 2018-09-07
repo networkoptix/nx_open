@@ -41,6 +41,7 @@ Yunhong Gu, last updated 02/28/2012
 #ifndef __UDT_CORE_H__
 #define __UDT_CORE_H__
 
+#include <mutex>
 
 #include "udt.h"
 #include "common.h"
@@ -55,6 +56,38 @@ Yunhong Gu, last updated 02/28/2012
 #include "queue.h"
 
 enum UDTSockType { UDT_STREAM = 1, UDT_DGRAM };
+
+/**
+ * Processes handshake requests.
+ */
+class ServerSideConnectionAcceptor
+{
+public:
+    ServerSideConnectionAcceptor(
+        uint64_t startTime,
+        UDTSockType sockType,
+        UDTSOCKET socketId,
+        CSndQueue* sndQueue,
+        std::set<int> pollIds);
+
+    /**
+     * If packet does not contain connection request, non-zero is returned.
+     */
+    int processConnectionRequest(sockaddr* addr, CPacket& packet);
+
+    void addEPoll(const int eid, int eventsToReport);
+    void removeEPoll(const int eid);
+
+private:
+    bool m_closing = false;
+    uint64_t m_StartTime = 0;
+    UDTSockType m_iSockType;
+    UDTSOCKET m_SocketId;
+    CSndQueue* m_pSndQueue = nullptr;
+    std::set<int> m_pollIds;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class CUDT
 {
@@ -336,7 +369,6 @@ public: // internal API
     void processCtrl(CPacket& ctrlpkt);
     int packData(CPacket& packet, uint64_t& ts);
     int processData(CUnit* unit);
-    int listen(sockaddr* addr, CPacket& packet);
 
     void checkTimers(bool forceAck);
 
@@ -347,12 +379,12 @@ public: // internal API
 public:
     static const UDTSOCKET INVALID_SOCK;         // invalid socket descriptor
     static const int ERROR;                      // socket api error returned value
+    static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Identification
     UDTSOCKET m_SocketID;                        // UDT socket number
     UDTSockType m_iSockType;                     // Type of the UDT connection (SOCK_STREAM or SOCK_DGRAM)
     UDTSOCKET m_PeerID;                // peer id, for multiplexer
-    static const int m_iVersion;                 // UDT version, for compatibility use
 
 private: // Packet sizes
     int m_iPktSize;                              // Maximum/regular packet size, in bytes
@@ -442,7 +474,7 @@ private: // Receiving related data
     int32_t m_iPeerISN;                          // Initial Sequence Number of the peer side
 
 private: // synchronization: mutexes and conditions
-    pthread_mutex_t m_ConnectionLock;            // used to synchronize connection operation
+    std::mutex m_ConnectionLock;            // used to synchronize connection operation
 
     pthread_cond_t m_SendBlockCond;              // used to block "send" call
     pthread_mutex_t m_SendBlockLock;             // lock associated to m_SendBlockCond
@@ -511,10 +543,10 @@ private: // for UDP multiplexer
     uint32_t m_piSelfIP[4];            // local UDP IP address
     CSNode* m_pSNode;                // node information for UDT list used in snd queue
     CRNode* m_pRNode;                            // node information for UDT list used in rcv queue
+    std::shared_ptr<ServerSideConnectionAcceptor> m_synPacketHandler;
 
 private: // for epoll
     std::set<int> m_sPollID;                     // set of epoll ID to trigger
 };
-
 
 #endif

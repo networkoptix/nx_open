@@ -124,7 +124,6 @@ CUDTUnited::CUDTUnited():
     m_IDLock(),
     m_SocketID(0),
     m_TLSError(),
-    m_mMultiplexer(),
     m_MultiplexerLock(),
     m_pCache(NULL),
     m_bClosing(false),
@@ -222,9 +221,9 @@ int CUDTUnited::cleanup()
     if (!m_bGCStatus)
         return 0;
 
-    m_bClosing = true;
     {
-        std::scoped_lock<std::mutex> lock(m_GCStopLock);
+        std::lock_guard<std::mutex> lock(m_GCStopLock);
+        m_bClosing = true;
         m_GCStopCond.notify_all();
     }
     m_GCThread.join();
@@ -448,7 +447,7 @@ ERR_ROLLBACK:
     }
 
     // wake up a waiting accept() call
-    std::scoped_lock<std::mutex> acceptLocker(ls->m_AcceptLock);
+    std::lock_guard<std::mutex> acceptLocker(ls->m_AcceptLock);
     ls->m_AcceptCond.notify_all();
 
     return 1;
@@ -778,7 +777,7 @@ int CUDTUnited::close(const UDTSOCKET u)
 
         // broadcast all "accept" waiting
         {
-            std::scoped_lock<std::mutex> acceptLocker(s->m_AcceptLock);
+            std::lock_guard<std::mutex> acceptLocker(s->m_AcceptLock);
             s->m_AcceptCond.notify_all();
         }
 
@@ -1230,6 +1229,8 @@ void CUDTUnited::checkBrokenSockets()
     for (auto& multiplexer : multiplexersToRemove)
     {
         multiplexer.m_pChannel->shutdown();
+        if (multiplexer.m_pRcvQueue)
+            multiplexer.m_pRcvQueue->stop();
         delete multiplexer.m_pSndQueue;
         delete multiplexer.m_pRcvQueue;
         delete multiplexer.m_pTimer;
@@ -1281,8 +1282,8 @@ void CUDTUnited::removeSocket(
     m_ClosedSockets.erase(i);
 
     map<int, CMultiplexer>::iterator m;
-    m = m_mMultiplexer.find(mid);
-    if (m == m_mMultiplexer.end())
+    m = m_mMultiplexers.find(mid);
+    if (m == m_mMultiplexers.end())
     {
         //something is wrong!!!
         return;
@@ -1292,7 +1293,7 @@ void CUDTUnited::removeSocket(
     if (0 == m->second.m_iRefCount)
     {
         multiplexersToRemove->push_back(m->second);
-        m_mMultiplexer.erase(m);
+        m_mMultiplexers.erase(m);
     }
 }
 
@@ -1362,7 +1363,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET*
         int port = (AF_INET == s->m_pUDT->ipVersion()) ? ntohs(((sockaddr_in*)addr)->sin_port) : ntohs(((sockaddr_in6*)addr)->sin6_port);
 
         // find a reusable address
-        for (map<int, CMultiplexer>::iterator i = m_mMultiplexer.begin(); i != m_mMultiplexer.end(); ++i)
+        for (map<int, CMultiplexer>::iterator i = m_mMultiplexers.begin(); i != m_mMultiplexers.end(); ++i)
         {
             if ((i->second.m_iIPversion == s->m_pUDT->ipVersion()) && (i->second.m_iMSS == s->m_pUDT->mss()) && i->second.m_bReusable)
 
@@ -1418,7 +1419,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET*
     m.m_pRcvQueue = new CRcvQueue;
     m.m_pRcvQueue->init(32, s->m_pUDT->payloadSize(), m.m_iIPversion, 1024, m.m_pChannel, m.m_pTimer);
 
-    m_mMultiplexer[m.m_iID] = m;
+    m_mMultiplexers[m.m_iID] = m;
 
     s->m_pUDT->setSndQueue(m.m_pSndQueue);
     s->m_pUDT->setRcvQueue(m.m_pRcvQueue);
@@ -1432,7 +1433,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
     int port = (AF_INET == ls->m_iIPversion) ? ntohs(((sockaddr_in*)ls->m_pSelfAddr)->sin_port) : ntohs(((sockaddr_in6*)ls->m_pSelfAddr)->sin6_port);
 
     // find the listener's address
-    for (map<int, CMultiplexer>::iterator i = m_mMultiplexer.begin(); i != m_mMultiplexer.end(); ++i)
+    for (map<int, CMultiplexer>::iterator i = m_mMultiplexers.begin(); i != m_mMultiplexers.end(); ++i)
     {
         if (i->second.m_iPort == port)
         {

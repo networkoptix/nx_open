@@ -45,6 +45,7 @@ Yunhong Gu, last updated 01/12/2011
 #include <condition_variable>
 #include <list>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -61,6 +62,8 @@ struct CUnit
     CPacket m_Packet;        // packet
     int m_iFlag;            // 0: free, 1: occupied, 2: msg read but not freed (out-of-order), 3: msg dropped
 };
+
+class ServerSideConnectionAcceptor;
 
 class CUnitQueue
 {
@@ -429,6 +432,8 @@ public:
     CRcvQueue();
     ~CRcvQueue();
 
+    void stop();
+
 public:
 
     // Functionality:
@@ -473,8 +478,9 @@ private:
     volatile bool m_bClosing;            // closing the workder
 
 private:
-    int setListener(CUDT* u);
-    void removeListener(const CUDT* u);
+    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
+    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
 
     void registerConnector(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl);
     void removeConnector(const UDTSOCKET& id);
@@ -487,13 +493,13 @@ private:
 
 private:
     std::mutex m_LSLock;
-    CUDT* m_pListener;                                   // pointer to the (unique, if any) listening UDT entity
+    std::shared_ptr<ServerSideConnectionAcceptor> m_listener;    // pointer to the (unique, if any) listening UDT entity
     CRendezvousQueue* m_pRendezvousQueue;                // The list of sockets in rendezvous mode
 
     std::vector<CUDT*> m_vNewEntry;                      // newly added entries, to be inserted
     std::mutex m_IDLock;
 
-    std::map<int32_t, std::queue<CPacket*> > m_mBuffer;    // temporary buffer for rendezvous connection request
+    std::map<int32_t, std::queue<CPacket*> > m_mBuffer;  // temporary buffer for rendezvous connection request
     std::mutex m_PassLock;
     std::condition_variable m_PassCond;
 

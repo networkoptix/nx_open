@@ -104,6 +104,7 @@ class CUDTUnited
 {
     friend class CUDT;
     friend class CRendezvousQueue;
+    friend class ServerSideConnectionAcceptor;
 
 public:
     CUDTUnited();
@@ -241,7 +242,7 @@ private:
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
-    std::map<int, CMultiplexer> m_mMultiplexer;        // UDP multiplexer
+    std::map<int, CMultiplexer> m_mMultiplexers;        // UDP multiplexer
     pthread_mutex_t m_MultiplexerLock;
 
 private:
