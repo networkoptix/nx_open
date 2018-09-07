@@ -1,5 +1,15 @@
 -- Replace event type GUIDs with hierarchical strings in vms_businessrule::event_condition.
 
+-- Metadata plugin "nx.stub".
+UPDATE vms_businessrule SET event_condition = replace(event_condition,
+    '{7e94ce15-3b69-4719-8dfd-ac1b76e5d8f4}', 'nx.stub.lineCrossing');
+UPDATE vms_businessrule SET event_condition = replace(event_condition,
+    '{b0e64044-ffa3-4b7f-807a-060c1fe5a04c}', 'nx.stub.objectInTheArea');
+UPDATE vms_businessrule SET event_condition = replace(event_condition,
+    '{153dd879-1cd2-46b7-add6-7c6b48eac1fc}', 'nx.stub.car');
+UPDATE vms_businessrule SET event_condition = replace(event_condition,
+    '{c23def4d-04f7-4b4c-994e-0c0e6e8b12cb}', 'nx.stub.humanFace');
+
 -- Metadata plugin "nx.hanwha".
 UPDATE vms_businessrule SET event_condition = replace(event_condition,
     '{5dfc6d1b-3b92-4e55-a627-0db2a2422db3}', 'nx.hanwha.FaceDetection');
