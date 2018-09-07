@@ -399,8 +399,25 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
 void AuthenticationHelper::updateUserLockoutState(
     network::server::UserLocker::AuthResult authResult)
 {
-    if (m_userLocker)
-        m_userLocker->updateLockoutState(m_userLockKey, authResult);
+    if (!m_userLocker)
+        return;
+
+    switch (m_userLocker->updateLockoutState(m_userLockKey, authResult))
+    {
+        case nx::network::server::LockUpdateResult::locked:
+            NX_WARNING(this, lm("Login %1 blocked for host %2 for %3")
+                .args(std::get<0>(m_userLockKey), std::get<1>(m_userLockKey),
+                    m_userLocker->settings().lockPeriod));
+            break;
+
+        case nx::network::server::LockUpdateResult::unlocked:
+            NX_INFO(this, lm("Login %1 unblocked for host %2")
+                .args(std::get<0>(m_userLockKey), std::get<1>(m_userLockKey)));
+            break;
+
+        default:
+            break;
+    }
 }
 
 } // namespace detail

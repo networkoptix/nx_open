@@ -14,27 +14,35 @@ UserLocker::UserLocker(
 {
 }
 
-void UserLocker::updateLockoutState(AuthResult authResult)
+LockUpdateResult UserLocker::updateLockoutState(AuthResult authResult)
 {
     const auto now = nx::utils::monotonicTime();
+    
+    LockUpdateResult result = LockUpdateResult::noChange;
 
     // If there is an expired lock, resetting.
     if (m_userLockedUntil && *m_userLockedUntil <= now)
     {
         m_userLockedUntil = std::nullopt;
         m_failedAuthCountCalculator.reset();
+        result = LockUpdateResult::unlocked;
     }
 
     if (authResult == AuthResult::failure)
     {
         m_failedAuthCountCalculator.add(1);
         if (m_failedAuthCountCalculator.getSumPerLastPeriod() >= m_settings.authFailureCount)
+        {
             m_userLockedUntil = now + m_settings.lockPeriod;
+            result = LockUpdateResult::locked;
+        }
     }
     else
     {
         m_failedAuthCountCalculator.reset();
     }
+
+    return result;
 }
 
 bool UserLocker::isLocked() const
@@ -52,7 +60,7 @@ UserLockerPool::UserLockerPool(const UserLockerSettings& settings):
 {
 }
 
-void UserLockerPool::updateLockoutState(
+LockUpdateResult UserLockerPool::updateLockoutState(
     const Key& key,
     UserLocker::AuthResult authResult)
 {
@@ -64,12 +72,12 @@ void UserLockerPool::updateLockoutState(
     const auto exists = it != m_userLockers.end() && it->first == key;
 
     if (authResult == UserLocker::AuthResult::success && !exists)
-        return;
+        return LockUpdateResult::noChange;
 
     if (!exists)
         it = m_userLockers.emplace_hint(it, key, m_settings);
 
-    it->second.updateLockoutState(authResult);
+    const auto result = it->second.updateLockoutState(authResult);
 
     if (authResult == UserLocker::AuthResult::success && !it->second.isLocked())
     {
@@ -80,6 +88,8 @@ void UserLockerPool::updateLockoutState(
     {
         m_timers.addTimer(key, m_unusedLockerExpirationPeriod);
     }
+
+    return result;
 }
 
 bool UserLockerPool::isLocked(const Key& key) const
@@ -99,6 +109,11 @@ std::map<UserLockerPool::Key, UserLocker> UserLockerPool::userLockers() const
     m_timers.processTimers();
 
     return m_userLockers;
+}
+
+const UserLockerSettings& UserLockerPool::settings() const
+{
+    return m_settings;
 }
 
 void UserLockerPool::removeLocker(const Key& key)
