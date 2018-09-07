@@ -697,16 +697,17 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
 
 static StringType kSetCookieHeaderName("Set-Cookie");
 
-void Response::setCookie(const StringType& name, const StringType& value, const StringType& path)
+void Response::setCookie(
+        const StringType& name, const StringType& value, bool secure, const StringType& path)
 {
-    insertHeader(&headers,
-        {kSetCookieHeaderName, name + "=" + value + "; Path=" + path});
+    insertHeader(&headers, {kSetCookieHeaderName,
+        name + "=" + value + "; Path=" + path + (secure ? "; Secure" : "")});
 }
 
 void Response::setDeletedCookie(const StringType& name)
 {
-    insertHeader(&headers,
-        {kSetCookieHeaderName,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+    insertHeader(&headers, {kSetCookieHeaderName,
+        name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
 }
 
 std::map<StringType, StringType> Response::getCookies() const

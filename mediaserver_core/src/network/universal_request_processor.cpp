@@ -237,9 +237,7 @@ void QnUniversalRequestProcessor::run()
 bool QnUniversalRequestProcessor::hasSecurityIssue()
 {
     Q_D(QnUniversalRequestProcessor);
-    const auto secureSocket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(
-        d->socket.get());
-    if (!secureSocket || !secureSocket->isEncryptionEnabled())
+    if (!isConnectionSecure())
     {
         const auto settings = commonModule()->globalSettings();
         const auto protocol = d->request.requestLine.version.protocol.toUpper();
