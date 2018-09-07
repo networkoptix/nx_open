@@ -7,19 +7,12 @@ networks:
     second:
   10.254.3.0/24:
     second:
-    proxy-2:
-  10.254.4.0/24:
-    proxy-2:
     first:
 mergers:
   first:
     proxy-1:
       network: 10.254.1.0/24
       settings: remote
-    proxy-2:
-      network: 10.254.4.0/24
-      settings: remote
-  proxy-1:
     second:
-      network: 10.254.2.0/24
+      network: 10.254.3.0/24
       settings: remote

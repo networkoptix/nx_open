@@ -380,6 +380,12 @@ class MediaserverApi(object):
     def get_update_status(self):
         return self.generic.get('ec2/updateStatus')
 
+    def updates_are_ready_to_install(self):
+        system_status = self.get_update_status()
+        return all(
+            server_status['code'] == 'readyToInstall'
+            for server_status in system_status)
+
     def install_update(self):
         return self.generic.post('api/installUpdate', {})
 
