@@ -152,8 +152,8 @@ Edit User Permissions In Systems
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
-    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
-    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
+    Wait Until Element Is Visible    ${EDIT PERMISSIONS DROPDOWN}
+    Click Element    ${EDIT PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${permissions}']/..
     Click Button    ${EDIT PERMISSIONS SAVE}

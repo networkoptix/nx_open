@@ -9,7 +9,7 @@ Suite Teardown    Clean up
 *** Variables ***
 ${password}            ${BASE PASSWORD}
 ${symbol password}     pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
-${space password}      qweasd 123
+${space password}      qwea sd 123
 ${email}               ${EMAIL VIEWER}
 ${url}                 ${ENV}
 

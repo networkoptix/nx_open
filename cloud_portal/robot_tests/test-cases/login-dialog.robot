@@ -68,8 +68,7 @@ after log In, display user's email and menu in top right corner
     Set Window Size    1920    1080
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Element Text Should Be    ${ACCOUNT DROPDOWN}    ${email}
+    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}/span[text()="${email}"]
 
 allows log in with existing email in uppercase
     ${email uppercase}    Convert To Uppercase    ${email}
@@ -81,10 +80,8 @@ allows log in with 'Remember Me checkmark' switched off
     Click Link    ${LOG IN NAV BAR}
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}/..   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
     Click Element    ${REMEMBER ME CHECKBOX}/..
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    input text    ${EMAIL INPUT}    ${email}
-    input text    ${PASSWORD INPUT}    ${password}
-    click button    ${LOG IN BUTTON}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Log In    ${email}    ${password}    None
     Validate Log In
 
 contains 'I forgot password' link that leads to Restore Password page with pre-filled email from log In form

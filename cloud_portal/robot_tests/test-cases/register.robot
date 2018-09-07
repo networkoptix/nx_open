@@ -208,8 +208,6 @@ should open Privacy Policy in a new page
     Wait Until Element Is Visible    ${PRIVACY POLICY LINK}
     Click Link    ${PRIVACY POLICY LINK}
     Sleep    2    #This is specifically for Firefox
-    ${tabs}    Get Window Handles
-    Select Window    @{tabs}[1]
     Location Should Be    ${url}/content/privacy
 
 should suggest user to log out, if he was logged in and goes to registration link

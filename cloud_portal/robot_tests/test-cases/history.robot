@@ -34,6 +34,7 @@ Log in to downloads/history
 
 loop expanders
     #get the first release number for targeting purposes
+    Wait Until Element Is Visible    ${RELEASE NUMBER}
     ${first number}    Get Text    ${RELEASE NUMBER}
     #create an element to reference that will always refer to elements in the first section of each tab
     ${first section}    Set Variable If    ${FULL}==False    //div[contains(@class,"active")]//div[@ng-repeat="release in activeBuilds"]//h1/b[text()='${first number}']
@@ -55,20 +56,19 @@ loop links
     \    Check File Exists    ${link}
 
 *** Test Cases ***
-History link is not in the account dropdown for user without access
+History link is not in the downloads page for user without access
     Log In    ${EMAIL VIEWER}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
     Register Keyword To Run On Failure    NONE
     Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RELEASE HISTORY BUTTON}
 
-History link is in the account dropdown for user with access and takes you to /downloads/history
+History link is in the downloads page for user with access and takes you to /downloads/history
     Log In    ${email}    ${password}
     Validate Log In
-    Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
-    Register Keyword To Run On Failure    NONE
+    Wait Until Element Is Visible    ${DOWNLOAD LINK}
+    Click Link    ${DOWNLOAD LINK}
     Wait Until Element Is Visible    ${RELEASE HISTORY BUTTON}
     Click Link    ${RELEASE HISTORY BUTTON}
     Location Should Be    ${url}/downloads/history
