@@ -78,6 +78,8 @@ void DeviceAdditionDialog::initializeControls()
     scrollBar->setUseMaximumSpace(true);
     ui->foundDevicesTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
+    ui->foundDevicesTable->setSortingEnabled(false);
+
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,
