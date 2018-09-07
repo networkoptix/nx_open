@@ -1,4 +1,4 @@
-Hello {{message.fullName}}
+Hello, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) megosztotta hozzáférését Önnel "{{message.system_name}}" rendszeréhez.

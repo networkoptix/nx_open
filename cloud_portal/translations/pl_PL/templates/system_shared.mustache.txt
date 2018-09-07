@@ -1,4 +1,4 @@
-Witaj {{message.fullName}}
+Hello, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) udostępnia Ci system zarządzania wideo "{{message.system_name}}".

@@ -1,4 +1,4 @@
-Hola,
+Hello {{message.userFullName}},
 
   Haga clic en el botón para confirmar su dirección de correo electrónico y activar la cuenta.
 

@@ -1,4 +1,4 @@
-Привіт, {{message.fullName}}
+Hello, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) надав вам доступ до системи "{{message.system_name}}".
