@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='product_type',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='cms.ProductType'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='cms.ProductType'),
         ),
     ]

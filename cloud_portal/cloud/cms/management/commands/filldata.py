@@ -9,6 +9,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
+        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
 
     def handle(self, *args, **options):
         if 'customization' not in options:
@@ -17,10 +18,10 @@ class Command(BaseCommand):
                 'Initiated static content for ' + settings.CUSTOMIZATION))
         elif options['customization'] == 'all':
             for custom in Customization.objects.all():
-                filldata.init_skin(custom.name)
+                filldata.init_skin(custom.name, 'cloud_portal_{}'.format(custom.name))
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + custom.name))
         else:
-            filldata.init_skin(options['customization'])
+            filldata.init_skin(options['customization'], options['product'])
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + options['customization']))
 

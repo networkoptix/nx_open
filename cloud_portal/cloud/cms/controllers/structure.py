@@ -54,13 +54,13 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
     return data
 
 
-def update_from_object(cms_structure):
+def update_from_object(cms_structure, customization_name=settings.CUSTOMIZATION):
     for product in cms_structure:
         product_name = product['product']
         product_type = ProductType.get_type_by_name(product['type'] if 'type' in product else "")
         can_preview = product['canPreview']
 
-        customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+        customization = Customization.objects.get(name=customization_name)
         product_model = find_or_add_product(product_name, can_preview, product_type)
         product_model.customizations = [customization]
         product_model.save()
@@ -138,11 +138,11 @@ def update_from_object(cms_structure):
                 data_structure.save()
 
 
-def read_structure_json(filename):
+def read_structure_json(filename, product_name=settings.PRIMARY_PRODUCT, customizaion_name=settings.CUSTOMIZATION):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
-        cms_structure[0]['product'] = settings.PRIMARY_PRODUCT
-        update_from_object(cms_structure)
+        cms_structure[0]['product'] = product_name
+        update_from_object(cms_structure, customizaion_name)
 
 
 def process_zip(file_descriptor, user, update_structure, update_content):

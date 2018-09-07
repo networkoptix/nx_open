@@ -134,17 +134,23 @@ class Command(BaseCommand):
     help = 'Creates initial structure for CMS in ' \
            'the database (contexts, datastructure)'
 
+    def add_arguments(self, parser):
+        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
+        parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
+
     def handle(self, *args, **options):
+        customization = options['customization']
+        product = options['product']
         read_languages(settings.DEFAULT_SKIN)
-        if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
-            structure.find_or_add_product(settings.PRIMARY_PRODUCT, True)
-            default_customization = Customization(name=settings.CUSTOMIZATION,
+        if not Customization.objects.filter(name=customization).exists():
+            structure.find_or_add_product(product, True)
+            default_customization = Customization(name=customization,
                                                   default_language=Language.by_code('en_US'),
                                                   preview_status=0)
             default_customization.save()
             default_customization.languages = [Language.by_code('en_US')]
             default_customization.save()
-        structure.read_structure_json('cms/cms_structure.json')
-        read_structure(settings.PRIMARY_PRODUCT)
+        structure.read_structure_json('cms/cms_structure.json', product, customization)
+        read_structure(product)
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))

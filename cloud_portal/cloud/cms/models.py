@@ -108,7 +108,7 @@ class ProductType(models.Model):
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):
-        return "{} - {}".format(ProductType.PRODUCT_TYPES[self.type], self.product)
+        return "{} - {}".format(ProductType.PRODUCT_TYPES[self.type], self.product_set.all()[0])
 
     @staticmethod
     def get_type_by_name(name):
@@ -128,7 +128,7 @@ class Product(models.Model):
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s')
     customizations = models.ManyToManyField(Customization)
-    product_type = models.ForeignKey(ProductType, default=None)
+    product_type = models.ForeignKey(ProductType, default=None, null=True)
 
     def __str__(self):
         return self.name
