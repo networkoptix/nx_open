@@ -22,11 +22,14 @@ namespace cdb {
 namespace detail {
 
 template<typename Input = void, typename Output = void>
-class BaseFiniteMsgBodyHttpHandler:
+class BasicHttpRequestHandler:
     public nx::network::http::AbstractFusionRequestHandler<Input, Output>
 {
+    using base_type = 
+        nx::network::http::AbstractFusionRequestHandler<Input, Output>;
+
 public:
-    BaseFiniteMsgBodyHttpHandler(
+    BasicHttpRequestHandler(
         EntityType entityType,
         DataActionType actionType,
         const AuthorizationManager& authorizationManager)
@@ -41,6 +44,26 @@ protected:
     const EntityType m_entityType;
     const DataActionType m_actionType;
     const AuthorizationManager& m_authorizationManager;
+
+    virtual void processRawHttpRequest(
+        nx::network::http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override
+    {
+        base_type::processRawHttpRequest(
+            connection,
+            std::move(authInfo),
+            std::move(request),
+            response,
+            std::move(completionHandler));
+    }
+
+    virtual void sendRawHttpResponse(nx::network::http::RequestResult requestResult) override
+    {
+        base_type::sendRawHttpResponse(std::move(requestResult));
+    }
 
     bool authorize(
         nx::network::http::HttpServerConnection* const connection,
@@ -94,7 +117,7 @@ protected:
 
 template<typename Input, typename ... Output>
 class AbstractFiniteMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>
+    public detail::BasicHttpRequestHandler<Input, Output...>
 {
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
@@ -104,7 +127,7 @@ public:
         DataActionType actionType,
         const AuthorizationManager& authorizationManager)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>(
+        detail::BasicHttpRequestHandler<Input, Output...>(
             entityType,
             actionType,
             authorizationManager)
@@ -196,7 +219,7 @@ private:
  */
 template<typename... Output>
 class AbstractFiniteMsgBodyHttpHandler<void, Output...>:
-    public detail::BaseFiniteMsgBodyHttpHandler<void, Output...>
+    public detail::BasicHttpRequestHandler<void, Output...>
 {
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
@@ -206,7 +229,7 @@ public:
         DataActionType actionType,
         const AuthorizationManager& authorizationManager)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<void, Output...>(
+        detail::BasicHttpRequestHandler<void, Output...>(
             entityType,
             actionType,
             authorizationManager)
@@ -285,7 +308,7 @@ private:
 
 template<typename... InputData>
 class AbstractFreeMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<InputData...>
+    public detail::BasicHttpRequestHandler<InputData...>
 {
     static_assert(sizeof...(InputData) <= 1, "Specify input data type or leave blank");
 
@@ -304,7 +327,7 @@ public:
         const AuthorizationManager& authorizationManager,
         ExecuteRequestFunc requestFunc)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<InputData..., void>(
+        detail::BasicHttpRequestHandler<InputData..., void>(
             entityType,
             actionType,
             authorizationManager),
