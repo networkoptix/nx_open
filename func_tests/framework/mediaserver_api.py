@@ -530,6 +530,14 @@ class MediaserverApi(object):
             for interface in response]
         return networks
 
+    def system_mediaservers_status(self):
+        all_info = self.generic.get('/ec2/getMediaServersEx')
+        ids = {uuid.UUID(info['id']): info['status'] for info in all_info}
+        return ids
+
+    def system_mediaserver_ids(self):
+        return set(self.system_mediaservers_status().keys())
+
     _merge_logger = _logger.getChild('merge')
 
     @context_logger(_setup_logger, 'framework.waiting')
@@ -553,6 +561,9 @@ class MediaserverApi(object):
         logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)
+        servant_ids = servant_api.system_mediaserver_ids()
+        master_ids = master_api.system_mediaserver_ids()
+        assert not servant_ids & master_ids
         try:
             self.generic.post('api/mergeSystems', {
                 'url': 'http://{}:{}/'.format(remote_address, remote_port),
@@ -570,6 +581,10 @@ class MediaserverApi(object):
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
         wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
         wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=10)
+        all_ids = master_ids | servant_ids
+        all_online = {id: 'Online' for id in all_ids}
+        wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
+        wait_for_equal(master_api.system_mediaservers_status, all_online, timeout_sec=30)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
