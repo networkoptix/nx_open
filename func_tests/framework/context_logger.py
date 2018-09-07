@@ -105,3 +105,12 @@ class ContextLogger(object):
 
     def getChild(self, name):
         return self._get_current_logger().getChild(name)
+
+
+class ContextAdapter(logging.LoggerAdapter):
+
+    def __init__(self, base_logger, context):
+        super(ContextAdapter, self).__init__(base_logger, dict(context=context))
+
+    def process(self, msg, kwargs):
+        return ("[%s] %s" % (self.extra['context'], msg), kwargs)
