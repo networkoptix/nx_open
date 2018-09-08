@@ -13,6 +13,14 @@ events {
     accept_mutex off;
 }
 
+# Expires map
+map $sent_http_content_type $expires {
+    default                    off;
+    text/html                  epoch;
+    text/css                   epoch;
+    application/javascript     epoch;
+}
+
 http {
     include mime.types;
     default_type application/octet-stream;
@@ -29,6 +37,8 @@ http {
 
     server {
         listen 80 default;
+
+        expires $expires;
 
         client_max_body_size 4G;
         server_name _;
