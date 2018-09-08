@@ -62,7 +62,7 @@ bool AbstractHttpRequestHandler::processRequest(
     auto httpRequestProcessedHandler =
         [this](RequestResult requestResult)
         {
-            requestDone(std::move(requestResult));
+            sendResponse(std::move(requestResult));
         };
 
     processRequest(
@@ -85,12 +85,7 @@ const std::vector<StringType>& AbstractHttpRequestHandler::requestPathParams() c
     return m_requestPathParams;
 }
 
-nx::network::http::Response* AbstractHttpRequestHandler::response()
-{
-    return m_responseMsg.response;
-}
-
-void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
+void AbstractHttpRequestHandler::sendResponse(RequestResult requestResult)
 {
     m_responseMsg.response->statusLine.statusCode =
         requestResult.statusCode;
@@ -107,6 +102,11 @@ void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
         std::move(responseMsgLocal),
         std::move(dataSourceLocal),
         std::move(requestResult.connectionEvents));
+}
+
+nx::network::http::Response* AbstractHttpRequestHandler::response()
+{
+    return m_responseMsg.response;
 }
 
 } // namespace nx
