@@ -22,7 +22,31 @@ nx-checkbox {
         display : flex;
 
         input[type="checkbox"] {
-            display : none;
+            position : absolute;
+            opacity  : 0;
+            cursor   : pointer;
+        }
+
+        input:hover ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark1;
+            }
+
+            & ~ .text {
+                color : $dark1;
+            }
+        }
+
+        input:active ~ .check {
+            svg polygon.box,
+            svg polyline.box {
+                stroke : $dark9 !important;
+            }
+
+            & ~ .text {
+                color : $dark9 !important;
+            }
         }
 
         input:hover ~ .check {

@@ -90,6 +90,15 @@ window.L = {};
                     dataType: 'json'
                 }).done(function(response){
                     appState.trafficRelayHost = response.trafficRelayHost;
+                    angular.extend(CONFIG, appState);
+                });
+
+                $.ajax({
+                    url: 'api/utils/settings',
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response){
+                    appState.trafficRelayHost = response.trafficRelayHost;
                     appState.publicDownloads = response.publicDownloads;
                     angular.extend(CONFIG, appState);
                 });
@@ -322,8 +331,10 @@ window.L = {};
                             })
                             .when('/download', {
                                 template: '<download-component></download-component>'
+                                // template: ''
                             })
                             .when('/download/:platform', {
+                                // template: '',
                                 template: '<download-component [route-param-platform]="platform"></download-component>',
                                 controller: [ '$scope', 'getPlatform', function ($scope, getPlatform) {
                                     $scope.platform = getPlatform;

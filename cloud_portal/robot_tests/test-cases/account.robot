@@ -13,7 +13,7 @@ ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && a
 
 *** Keywords ***
 Verify In Account Page
-    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT DROPDOWN}
+    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT DROPDOWN}
     sleep    .5
 
 Restart
@@ -31,6 +31,7 @@ Reset DB and Open New Browser On Failure
 
 *** Test Cases ***
 Can access the account page from dropdown
+    [tags]    C41573
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -55,73 +56,14 @@ Accessing the account page from a direct link while logged out asks for login, o
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
+    Go To    ${url}/account
     Verify in account page
 
-Subscribe check box is automatically checked after registering
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    "${checked}"
-
-Unchecking check box and saving maintains that setting
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-
-    Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
-    Click Button    ${ACCOUNT SAVE}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
-    Open Browser and go to URL    ${url}/account
-    Log In    ${random email}    ${password}    button=None
-    Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
-    Wait Until Element Is Visible    ${ACCOUNT SUBSCRIBE CHECKBOX}
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Not Be True    "${checked}"=="true"
-
-Checking check box and saving maintains that setting
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}    false
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
-    Click Button    ${ACCOUNT SAVE}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
-    Open Browser and go to URL    ${url}/account
-    Log In    ${random email}    ${password}    button=None
-    Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    "${checked}"
-
 Changing first name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    nameChanged
@@ -131,22 +73,19 @@ Changing first name and saving maintains that setting
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
+    sleep    2
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
-
 Changing last name and saving maintains that setting
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Input Text    ${ACCOUNT LAST NAME}    nameChanged
     Click Button    ${ACCOUNT SAVE}
@@ -155,8 +94,6 @@ Changing last name and saving maintains that setting
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
     Input Text    ${ACCOUNT LAST NAME}    ${TEST LAST NAME}
@@ -164,11 +101,10 @@ Changing last name and saving maintains that setting
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 First name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${EMPTY}
     Click Button    ${ACCOUNT SAVE}
@@ -176,11 +112,10 @@ First name is required
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Last name is required
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Input Text    ${ACCOUNT LAST NAME}    ${EMPTY}
     Click Button    ${ACCOUNT SAVE}
@@ -188,11 +123,10 @@ Last name is required
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 SPACE for first name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     Input Text    ${ACCOUNT FIRST NAME}    ${SPACE}
     Click Button    ${ACCOUNT SAVE}
@@ -200,46 +134,62 @@ SPACE for first name is not valid
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 SPACE for last name is not valid
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
-    Validate Log In    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
+    Input Text    ${ACCOUNT FIRST NAME}    Mark
     Input Text    ${ACCOUNT LAST NAME}    ${SPACE}
     Click Button    ${ACCOUNT SAVE}
     Wait Until Element Is Visible    ${ACCOUNT LAST NAME}/parent::div/parent::div[contains(@class, "has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Email field is un-editable
+    [tags]    C41573
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
     Verify In Account Page
     ${read only}    Get Element Attribute    ${ACCOUNT EMAIL}    readOnly
     Should Be True    "${read only}"
 
-Langauge is changeable on the account page
+Should respond to tab and go in the correct order
+    [tags]    C41838
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
-    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
-    Go To    ${url}/account
-    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
-    \  Sleep    1
-    \  Verify In Account Page
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${lang}']
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/span[@lang='${lang}']/..
-#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
-    \  Sleep    1    #to allow the system to change languages
-    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
-    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
-    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
-    Click Element    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
-    Click Button    ${ACCOUNT SAVE}
-    Sleep    1
     Verify In Account Page
-    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
+    Press Key    ${ACCOUNT DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT EMAIL}
+    Press Key    ${ACCOUNT EMAIL}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT FIRST NAME}
+    Press Key    ${ACCOUNT FIRST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LAST NAME}
+    Press Key    ${ACCOUNT LAST NAME}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT LANGUAGE DROPDOWN}
+    Press Key    ${ACCOUNT LANGUAGE DROPDOWN}    ${TAB}
+    Element Should Be Focused    ${ACCOUNT SAVE}
+
+#Langauge is changeable on the account page
+#    Go To    ${url}/account
+#    Log In    ${EMAIL NOPERM}    ${password}    button=None
+#    Validate Log In
+#    ######## TEMPORARYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+#    Go To    ${url}/account
+#    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES ACCOUNT TEXT LIST}
+#    \  Sleep    1
+#    \  Verify In Account Page
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${lang}']
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //form[@name='accountForm']//button/span[@lang='${lang}']/..
+##    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${ACCOUNT SAVE}
+#    \  Sleep    1    #to allow the system to change languages
+#    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+#    Wait Until Element Is Visible    ${ACCOUNT LANGUAGE DROPDOWN}
+#    Click Button    ${ACCOUNT LANGUAGE DROPDOWN}
+#    Wait Until Element Is Visible    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
+#    Click Element    //form[@name='accountForm']//button/span[@lang='${LANGUAGE}']
+#    Click Button    ${ACCOUNT SAVE}
+#    Sleep    1
+#    Verify In Account Page
+#    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']

@@ -2,8 +2,7 @@
     <h1 translate>Download</h1>
 
     <div class="p-0">
-        <ngb-tabset (tabChange)="beforeChange($event)" #tabs
-                    [style.visibility]="showTabs">
+        <ngb-tabset (tabChange)="beforeChange($event)" #tabs>
 
             <ngb-tab *ngFor="let platform of downloads.groups"
                      [id]="platform.os || platform.name">
@@ -33,10 +32,8 @@
                                             </div>
                                             <div class="media-body text-left">
                                                 <h3 translate>Download %VMS_NAME%</h3>
-                                                <div class="h7 installer-name">
-                                                    {{language.lang.downloads.groups[platform.name].shortLabel ||
-                    language.lang.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}
-                                                </div>
+                                                <div class="h7 installer-name">{{language.lang.downloads.groups[platform.name].shortLabel ||
+                    language.lang.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</div>
                                             </div>
                                         </a>
                                         <p *ngIf="language.lang.downloads.groups[platform.name].supported"

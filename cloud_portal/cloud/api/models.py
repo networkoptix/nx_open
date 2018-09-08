@@ -60,6 +60,14 @@ class Account(PermissionsMixin):
             permissions.extend([permission.codename for permission in perm_group.group.permissions.all()])
         return permissions
 
+    @property
+    def permissions(self):
+        user_groups = self.groups.all()
+        permissions = []
+        for group in user_groups:
+            permissions.extend([permission.codename for permission in group.permissions.all()])
+        return permissions
+
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)
 

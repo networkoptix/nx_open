@@ -58,13 +58,16 @@ should show system's state for systems if they are offline. Otherwise - button O
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
-    ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered']
+    ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
 
 should open system page (users list) when clicked on system
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
+    # Sometimes the name fields refill if you empty them too fast
+    sleep    2
+    Wait Until Page Does Not Contain Element    //div[@class='preloader']
     Click Element    ${AUTO TESTS TITLE}
     Verify In System    Auto Tests
 

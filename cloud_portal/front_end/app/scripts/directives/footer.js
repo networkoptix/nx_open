@@ -19,7 +19,6 @@
             link       : function (scope) {
                 scope.viewFooter = true;
                 scope.canViewHistory = false;
-
                 account.get().then(function (account) {
                     user = account;
                     if (user.permissions.indexOf('can_view_release') > -1) {
