@@ -38,7 +38,7 @@ namespace conf
 {
     class Settings;
 }
-class AuthorizationManager;
+class SecurityManager;
 
 class EventManager
 {
@@ -47,7 +47,7 @@ public:
     virtual ~EventManager();
 
     void registerHttpHandlers(
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         nx::network::http::server::rest::MessageDispatcher* const httpMessageDispatcher);
 
     void subscribeToEvents(

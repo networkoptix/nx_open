@@ -20,6 +20,13 @@ struct UserLockerSettings
     std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
 };
 
+enum class LockUpdateResult
+{
+    noChange,
+    locked,
+    unlocked,
+};
+
 /**
  * If there were not less than authFailureCount login failures during last checkPeriod,
  * then username is locked for another lockPeriod.
@@ -35,7 +42,7 @@ public:
 
     UserLocker(const UserLockerSettings& settings);
 
-    void updateLockoutState(AuthResult authResult);
+    LockUpdateResult updateLockoutState(AuthResult authResult);
     bool isLocked() const;
 
 private:
@@ -53,10 +60,14 @@ public:
 
     UserLockerPool(const UserLockerSettings& settings);
 
-    void updateLockoutState(const Key& key, UserLocker::AuthResult authResult);
+    LockUpdateResult updateLockoutState(
+        const Key& key,
+        UserLocker::AuthResult authResult);
     bool isLocked(const Key& key) const;
 
     std::map<Key, UserLocker> userLockers() const;
+
+    const UserLockerSettings& settings() const;
 
 private:
     const UserLockerSettings m_settings;
