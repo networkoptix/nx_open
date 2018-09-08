@@ -38,28 +38,6 @@ void AbstractProxyHandler::processRequest(
         std::bind(&AbstractProxyHandler::startProxying, this, _1, _2));
 }
 
-void AbstractProxyHandler::sendResponse(
-    nx::network::http::RequestResult requestResult,
-    boost::optional<nx::network::http::Response> responseMessage)
-{
-    if (responseMessage)
-    {
-        *response() = std::move(*responseMessage);
-
-        // Removing Keep-alive connection related headers to let
-        // local HTTP server to implement its own keep-alive policy.
-        response()->headers.erase("Keep-alive");
-        auto connectionHeaderIter = response()->headers.find("Connection");
-        if (connectionHeaderIter != response()->headers.end() &&
-            connectionHeaderIter->second.toLower() == "keep-alive")
-        {
-            response()->headers.erase(connectionHeaderIter);
-        }
-    }
-
-    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
-}
-
 void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
@@ -141,18 +119,42 @@ void AbstractProxyHandler::onConnected(
 void AbstractProxyHandler::proxyRequestToTarget(
     std::unique_ptr<AbstractStreamSocket> connection)
 {
+    using namespace std::placeholders;
+
     m_requestProxyWorker = std::make_unique<nx::network::http::server::proxy::ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         m_isIncomingConnectionEncrypted ? http::kSecureUrlSchemeName : http::kUrlSchemeName,
         std::exchange(m_request, {}),
-        this,
         std::move(connection));
     if (m_targetConnectionInactivityTimeout)
     {
         m_requestProxyWorker->setTargetHostConnectionInactivityTimeout(
             *m_targetConnectionInactivityTimeout);
     }
-    m_requestProxyWorker->start();
+    m_requestProxyWorker->start(
+        std::bind(&AbstractProxyHandler::sendTargetServerResponse, this, _1, _2));
+}
+
+void AbstractProxyHandler::sendTargetServerResponse(
+    nx::network::http::RequestResult requestResult,
+    boost::optional<nx::network::http::Response> responseMessage)
+{
+    if (responseMessage)
+    {
+        *response() = std::move(*responseMessage);
+
+        // Removing Keep-alive connection related headers to let
+        // local HTTP server to implement its own keep-alive policy.
+        response()->headers.erase("Keep-alive");
+        auto connectionHeaderIter = response()->headers.find("Connection");
+        if (connectionHeaderIter != response()->headers.end() &&
+            connectionHeaderIter->second.toLower() == "keep-alive")
+        {
+            response()->headers.erase(connectionHeaderIter);
+        }
+    }
+
+    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
 void AbstractProxyHandler::establishSecureConnectionToTheTarget(

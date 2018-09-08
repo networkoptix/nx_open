@@ -16,8 +16,7 @@ static const char* const kStaticResourcePath = "/ProxyWorker/static";
 static const char* const kEmptyResourcePath = "/ProxyWorker/noContent";
 
 class ProxyWorker:
-    public ::testing::Test,
-    public AbstractResponseSender
+    public ::testing::Test
 {
 public:
     ~ProxyWorker()
@@ -83,9 +82,9 @@ private:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
-    virtual void sendResponse(
+    void proxyResponse(
         nx::network::http::RequestResult requestResult,
-        boost::optional<nx::network::http::Response> response) override
+        boost::optional<nx::network::http::Response> response)
     {
         m_proxiedResponse = response;
 
@@ -98,6 +97,8 @@ private:
 
     void initializeProxyWorker(const nx::String& path)
     {
+        using namespace std::placeholders;
+
         nx::network::http::Request translatedRequest;
         translatedRequest.requestLine.method = nx::network::http::Method::get;
         translatedRequest.requestLine.url = path;
@@ -112,9 +113,10 @@ private:
             "not_used_in_streaming_mode",
             http::kUrlSchemeName,
             std::move(translatedRequest),
-            this,
             std::move(tcpSocket));
-        m_requestProxyWorker->start();
+
+        m_requestProxyWorker->start(
+            std::bind(&ProxyWorker::proxyResponse, this, _1, _2));
     }
 
     void startReadingMessageBody()

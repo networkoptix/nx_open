@@ -21,8 +21,7 @@ enum class SslMode
 };
 
 class NX_NETWORK_API AbstractProxyHandler:
-    public AbstractHttpRequestHandler,
-    public AbstractResponseSender
+    public AbstractHttpRequestHandler
 {
 public:
     virtual void processRequest(
@@ -31,10 +30,6 @@ public:
         nx::network::http::Request request,
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler) override;
-
-    virtual void sendResponse(
-        nx::network::http::RequestResult requestResult,
-        boost::optional<nx::network::http::Response> response) override;
 
     void setTargetHostConnectionInactivityTimeout(
         std::optional<std::chrono::milliseconds> timeout);
@@ -94,6 +89,10 @@ private:
         std::unique_ptr<network::AbstractStreamSocket> connection);
 
     void proxyRequestToTarget(std::unique_ptr<AbstractStreamSocket> connection);
+
+    void sendTargetServerResponse(
+        nx::network::http::RequestResult requestResult,
+        boost::optional<nx::network::http::Response> response);
 
     void establishSecureConnectionToTheTarget(
         std::unique_ptr<AbstractStreamSocket> connection);
