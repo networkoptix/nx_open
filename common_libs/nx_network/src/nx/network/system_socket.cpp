@@ -1668,8 +1668,8 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
-        qWarning() << "failed to join multicast group" << multicastGroup
-            << "from IF" << multicastIF << ". " << SystemError::getLastOSErrorText();
+        NX_WARNING(this, "Failed to join multicast group %1 from IF %2. %3",
+                   multicastGroup, multicastIF, SystemError::getLastOSErrorText());
         return false;
     }
     return true;

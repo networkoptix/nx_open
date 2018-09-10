@@ -297,6 +297,16 @@ QSet<QString> getLocalIpV4AddressList()
     return result;
 }
 
+// TODO: should write unit test
+// NOTE: contains redundant conversion: QHostAddress -> QString -> HostAddress
+std::set<HostAddress> getLocalHostAddressList()
+{
+    std::set<HostAddress> localIpList;
+    for (const auto& ip: nx::network::getLocalIpV4AddressList())
+        localIpList.insert(ip);
+    return localIpList;
+}
+
 bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_enty_list)
 {
 
