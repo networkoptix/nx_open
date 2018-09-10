@@ -122,7 +122,7 @@ void UdpMulticastFinder::addNewSenders()
     }
 }
 
-void UdpMulticastFinder::updateInterfaces()
+void UdpMulticastFinder::updateInterfacesInner()
 {
     std::set<nx::network::HostAddress> localIpList = nx::network::getLocalHostAddressList();
     if (!m_receiver)
@@ -133,7 +133,13 @@ void UdpMulticastFinder::updateInterfaces()
     addNewSenders();
 
     NX_VERBOSE(this, lm("Schedule update interfaces in %1").arg(m_updateInterfacesInterval));
-    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfaces(); });
+    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfacesInner(); });
+}
+
+void UdpMulticastFinder::updateInterfaces()
+{
+    // Make sure everything is called inside binded thread
+    m_updateTimer.post([this]() { updateInterfacesInner(); });
 }
 
 void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
@@ -174,7 +180,7 @@ void UdpMulticastFinder::joinMulticastGroup(const nx::network::HostAddress& ip)
         return; //< Ok.
     }
 
-    m_receiver.reset(); // TODO: make sure it is called from io thread
+    m_receiver.reset();
     NX_DEBUG(this, "Could not join socket %1 to multicast group: %2",
         ip, SystemError::getLastOSErrorText());
 }
@@ -231,7 +237,6 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
         multicastEndpoint.port = m_receiver->getLocalAddress().port;
     }
 
-    // TODO: check and delete one of destionation or multicastEndpoint
     socket->sendToAsync(m_ownModuleInformation, multicastEndpoint,
         [this, senderIterator, socket](
             SystemError::ErrorCode code, nx::network::SocketAddress destination, size_t)
