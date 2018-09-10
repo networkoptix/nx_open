@@ -57,7 +57,7 @@ Going to the downloads page anonymous asks for login and closing takes you back 
     Click Link    ${DOWNLOAD LINK}
     Wait Until Element Is Visible    ${LOG IN CLOSE BUTTON}
     Click Button    ${LOG IN CLOSE BUTTON}
-    Location Should Be    ${url}
+    Location Should Be    ${url}/
 
 Going to the downloads page anonymous asks for login and login shows downloads page
     Go to download page
