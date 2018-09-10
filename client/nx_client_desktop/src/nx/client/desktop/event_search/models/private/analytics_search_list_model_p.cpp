@@ -313,7 +313,7 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(
         periodToCommit.startTime(), upperBoundPredicate);
 
     // In live mode "later" direction events are requested with 1 ms overlap. Handle overlap here.
-    if (q->effectiveIsLive() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
+    if (q->effectiveLiveSupported() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
     {
         const auto last = m_data.front();
         const auto lastTimeUs = last.firstAppearanceTimeUsec;

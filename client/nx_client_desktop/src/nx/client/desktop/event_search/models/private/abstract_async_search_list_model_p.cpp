@@ -97,7 +97,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     {
         NX_ASSERT(m_request.direction == FetchDirection::later);
         m_request.period.startTimeMs = q->fetchedTimeWindow().endTimeMs();
-        if (!q->effectiveIsLive()) //< In live mode there can be overlap, otherwise cannot.
+        if (!q->effectiveLiveSupported()) //< In live mode there can be overlap, otherwise cannot.
             ++m_request.period.startTimeMs;
 
         m_request.period.setEndTimeMs(q->relevantTimePeriod().endTimeMs());
@@ -179,7 +179,7 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
             {
                 if (!fetchedAll)
                     result.truncateFront(fetched.startTimeMs + 1);
-                if (q->effectiveIsLive())
+                if (q->effectiveLiveSupported())
                     result.truncate(fetched.endTimeMs());
             }
             else
@@ -187,7 +187,7 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
                 NX_ASSERT(m_request.direction == FetchDirection::later);
                 if (!fetchedAll)
                     result.truncate(fetched.endTimeMs() - 1);
-                else if (q->effectiveIsLive())
+                else if (q->effectiveLiveSupported())
                     result.truncate(fetched.endTimeMs());
             }
 

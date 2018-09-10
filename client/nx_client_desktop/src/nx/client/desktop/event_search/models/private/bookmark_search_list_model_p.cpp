@@ -236,7 +236,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
     if (currentRequest().direction == FetchDirection::earlier)
         return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
 
-    NX_ASSERT(!q->isLive()); //< We don't handle any overlaps as this model is not live-updated.
+    NX_ASSERT(!q->liveSupported()); //< We don't handle overlaps as this model is not live-updated.
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
     return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
 }

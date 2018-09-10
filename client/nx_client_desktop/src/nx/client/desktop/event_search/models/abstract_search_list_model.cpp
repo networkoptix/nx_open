@@ -119,22 +119,45 @@ void AbstractSearchListModel::setFetchBatchSize(int value)
     m_fetchBatchSize = value;
 }
 
-bool AbstractSearchListModel::isLive() const
+bool AbstractSearchListModel::liveSupported() const
 {
-    return m_live;
+    return m_liveSupported;
 }
 
-bool AbstractSearchListModel::effectiveIsLive() const
+bool AbstractSearchListModel::effectiveLiveSupported() const
 {
-    return isLive() && relevantTimePeriod().isInfinite();
+    return liveSupported() && relevantTimePeriod().isInfinite();
+}
+
+bool AbstractSearchListModel::isLive() const
+{
+    return m_liveSupported && m_live;
 }
 
 void AbstractSearchListModel::setLive(bool value)
 {
-    if (m_live == value)
+    if (value == m_live)
         return;
 
+    if (value)
+    {
+        const bool supported = effectiveLiveSupported();
+        NX_ASSERT(supported);
+        if (!supported)
+            return;
+    }
+
     m_live = value;
+}
+
+void AbstractSearchListModel::setLiveSupported(bool value)
+{
+    if (m_liveSupported == value)
+        return;
+
+    m_liveSupported = value;
+    m_live = m_live && m_liveSupported;
+
     clear();
 }
 

@@ -9,7 +9,7 @@ AnalyticsSearchListModel::AnalyticsSearchListModel(QObject* parent):
     base_type([this]() { return new Private(this); }, parent),
     d(qobject_cast<Private*>(d_func()))
 {
-    setLive(true);
+    setLiveSupported(true);
 }
 
 QRectF AnalyticsSearchListModel::filterRect() const

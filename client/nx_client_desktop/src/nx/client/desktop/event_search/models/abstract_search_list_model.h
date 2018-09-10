@@ -45,9 +45,13 @@ public:
     int fetchBatchSize() const;
     void setFetchBatchSize(int value);
 
-    /** Returns whether underlying data store can be populated with new items in live mode. */
+    /** Whether underlying data store can be populated with new items in live mode. */
+    bool liveSupported() const;
+    bool effectiveLiveSupported() const; //< liveSupported() && relevantTimePeriod().isInfinite()
+
+    /** Whether the model is in live mode, i.e. receives newly happening events in realtime. */
     bool isLive() const;
-    bool effectiveIsLive() const; //< isLive && relevantTimePeriod().isInfinite()
+    void setLive(bool value);
 
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;
@@ -101,15 +105,16 @@ protected:
     void finishFetch(FetchResult result);
 
     /** Sets whether underlying data store can be populated with new items in live mode. */
-    void setLive(bool value);
+    void setLiveSupported(bool value);
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime(); //< Time period of interest.
     int m_maximumCount = 1000; //< Maximum item count.
     int m_fetchBatchSize = 100; //< Item count acquired by one fetch.
-    bool m_live = false; //< Whether underlying data store can be updated in live.
+    bool m_liveSupported = false; //< Whether underlying data store can be updated in live.
+    bool m_live = false; //< Live mode enabled state.
 
-    FetchDirection m_fetchDirection = FetchDirection::earlier;
+    FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
 
     QnTimePeriod m_fetchedTimeWindow; //< Time window of currently fetched data.
 };
