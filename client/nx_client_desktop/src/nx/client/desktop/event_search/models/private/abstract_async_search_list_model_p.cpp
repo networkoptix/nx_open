@@ -107,7 +107,7 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
     if (!m_request.id)
         return false;
 
-    NX_VERBOSE(this) << "Prefetch id:" << m_request.id;
+    NX_VERBOSE(q) << "Prefetch id:" << m_request.id;
 
     m_prefetchCompletionHandler = completionHandler;
     return true;
@@ -118,13 +118,13 @@ void AbstractAsyncSearchListModel::Private::commit(const QnTimePeriod& periodToC
     if (!fetchInProgress())
         return;
 
-    NX_VERBOSE(this) << "Commit id:" << m_request.id;
+    NX_VERBOSE(q) << "Commit id:" << m_request.id;
 
     commitPrefetch(periodToCommit);
 
     if (count() > q->maximumCount())
     {
-        NX_VERBOSE(this) << "Truncating to maximum count";
+        NX_VERBOSE(q) << "Truncating to maximum count";
         q->truncateToMaximumCount();
     }
 
@@ -146,7 +146,7 @@ const AbstractAsyncSearchListModel::Private::FetchInformation&
 void AbstractAsyncSearchListModel::Private::completePrefetch(
     const QnTimePeriod& actuallyFetched, bool success, int fetchedCount)
 {
-    NX_ASSERT(currentRequest().direction == q->fetchDirection());
+    NX_ASSERT(m_request.direction == q->fetchDirection());
 
     if (fetchedCount == 0)
     {
@@ -160,6 +160,7 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
     }
 
     const bool fetchedAll = success && fetchedCount < m_request.batchSize;
+    const bool mayGoLive = fetchedAll && m_request.direction == FetchDirection::later;
 
     const auto fetchedPeriod =
         [this, &actuallyFetched, success, fetchedAll]() -> QnTimePeriod
@@ -207,6 +208,10 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
     NX_ASSERT(m_prefetchCompletionHandler);
     m_prefetchCompletionHandler(fetchedPeriod(), result);
     m_prefetchCompletionHandler = {};
+
+    // If top is reached, go to live mode.
+    if (mayGoLive)
+        q->setLive(q->effectiveLiveSupported());
 }
 
 } // namespace desktop

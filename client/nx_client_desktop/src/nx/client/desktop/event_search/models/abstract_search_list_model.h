@@ -77,6 +77,7 @@ public:
 
 signals:
     void fetchFinished(FetchResult result, QPrivateSignal);
+    void liveChanged(bool isLive, QPrivateSignal);
 
 protected:
     // These functions must be overridden in derived classes.

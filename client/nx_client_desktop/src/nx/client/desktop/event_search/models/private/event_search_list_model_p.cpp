@@ -19,18 +19,19 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/event/strings_helper.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
 using nx::vms::event::ActionData;
 using nx::vms::event::ActionDataList;
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
 namespace {
 
-using namespace std::chrono;
+static constexpr auto kLiveUpdateInterval = 15s;
 
 static milliseconds startTime(const ActionData& event)
 {
@@ -54,8 +55,11 @@ static const auto upperBoundPredicate =
 EventSearchListModel::Private::Private(EventSearchListModel* q):
     base_type(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(q->commonModule()))
+    m_helper(new vms::event::StringsHelper(q->commonModule())),
+    m_liveUpdateTimer(new QTimer())
 {
+    connect(m_liveUpdateTimer.data(), &QTimer::timeout, this, &Private::fetchLive);
+    m_liveUpdateTimer->start(kLiveUpdateInterval);
 }
 
 EventSearchListModel::Private::~Private()
@@ -104,7 +108,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::PreviewTimeRole:
             if (!hasPreview(event.eventParams.eventType))
                 return QVariant();
-            /*fallthrough*/
+            [[fallthrough]];
         case Qn::TimestampRole:
             return QVariant::fromValue(event.eventParams.eventTimestampUsec);
 
@@ -127,6 +131,7 @@ void EventSearchListModel::Private::clearData()
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
+    m_liveFetch = {};
 }
 
 void EventSearchListModel::Private::truncateToMaximumCount()
@@ -147,7 +152,7 @@ bool EventSearchListModel::Private::hasAccessRights() const
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     const auto eventsReceived =
-        [this, period](bool success, rest::Handle requestId, ActionDataList&& data)
+        [this](bool success, rest::Handle requestId, ActionDataList&& data)
         {
             if (!requestId || requestId != currentRequest().id)
                 return;
@@ -168,23 +173,24 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
             completePrefetch(actuallyFetched, success, int(m_prefetch.size()));
         };
 
-    return getEvents(period, eventsReceived, currentRequest().batchSize);
+    const auto sortOrder = currentRequest().direction == FetchDirection::earlier
+        ? Qt::DescendingOrder
+        : Qt::AscendingOrder;
+
+    return getEvents(period, eventsReceived, sortOrder, currentRequest().batchSize);
 }
 
 template<typename Iter>
-bool EventSearchListModel::Private::commitPrefetch(
-    const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
+bool EventSearchListModel::Private::commitInternal(const QnTimePeriod& periodToCommit,
+    Iter prefetchBegin, Iter prefetchEnd, int position, bool handleOverlaps)
 {
-    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
-
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);
 
     auto end = std::upper_bound(prefetchBegin, prefetchEnd,
         periodToCommit.startTime(), upperBoundPredicate);
 
-    // In live mode "later" direction events are requested with 1 ms overlap. Handle overlap here.
-    if (q->effectiveLiveSupported() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
+    if (!m_data.empty() && handleOverlaps)
     {
         const auto& last = m_data.front();
         const auto lastTimeUs = last.eventParams.eventTimestampUsec;
@@ -224,15 +230,61 @@ bool EventSearchListModel::Private::commitPrefetch(
 
 bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
+    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
+
     if (currentRequest().direction == FetchDirection::earlier)
-        return commitPrefetch(periodToCommit, m_prefetch.begin(), m_prefetch.end(), count());
+        return commitInternal(periodToCommit, m_prefetch.begin(), m_prefetch.end(), count(), false);
 
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
-    return commitPrefetch(periodToCommit, m_prefetch.rbegin(), m_prefetch.rend(), 0);
+    return commitInternal(
+        periodToCommit, m_prefetch.rbegin(), m_prefetch.rend(), 0, q->effectiveLiveSupported());
 }
 
-rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period,
-    GetCallback callback, int limit)
+void EventSearchListModel::Private::fetchLive()
+{
+    if (m_liveFetch.id || !q->isLive())
+        return;
+
+    const milliseconds from = (m_data.empty() ? 0ms : startTime(m_data.front()));
+    m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());
+    m_liveFetch.direction = FetchDirection::later;
+    m_liveFetch.batchSize = q->fetchBatchSize();
+
+    const auto liveEventsReceived =
+        [this](bool success, rest::Handle requestId, ActionDataList&& data)
+        {
+            const auto scopedClear = nx::utils::makeScopeGuard([this]() { m_liveFetch = {}; });
+
+            if (!success || data.empty() || !q->isLive() || !requestId || requestId != m_liveFetch.id)
+                return;
+
+            auto periodToCommit = QnTimePeriod::fromInterval(
+                startTime(data.back()), startTime(data.front()));
+
+            if (data.size() >= m_liveFetch.batchSize)
+            {
+                periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
+                q->clear(); //< Otherwise there will be a gap between live and archive events.
+            }
+
+            NX_VERBOSE(q) << "Live update commit";
+            commitInternal(periodToCommit, data.begin(), data.end(), 0, true);
+
+            if (count() > q->maximumCount())
+            {
+                NX_VERBOSE(q) << "Truncating to maximum count";
+                truncateToMaximumCount();
+            }
+        };
+
+    NX_VERBOSE(q) << "Live update request";
+
+    m_liveFetch.id = getEvents(m_liveFetch.period, liveEventsReceived, Qt::DescendingOrder,
+        m_liveFetch.batchSize);
+}
+
+rest::Handle EventSearchListModel::Private::getEvents(
+    const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
 {
     if (!camera() || !callback)
         return false;
@@ -247,9 +299,7 @@ rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period
     request.filter.period = period;
     request.filter.eventType = m_selectedEventType;
     request.limit = limit;
-    request.order = currentRequest().direction == FetchDirection::earlier
-        ? Qt::DescendingOrder
-        : Qt::AscendingOrder;
+    request.order = order;
 
     NX_VERBOSE(q) << "Requesting events from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
@@ -362,6 +412,4 @@ bool EventSearchListModel::Private::hasPreview(vms::api::EventType eventType)
     }
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

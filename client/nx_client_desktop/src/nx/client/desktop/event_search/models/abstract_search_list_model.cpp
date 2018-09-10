@@ -14,7 +14,9 @@ AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() ? false : canFetch();
+    return parent.isValid() || (isLive() && fetchDirection() == FetchDirection::later)
+        ? false
+        : canFetch();
 }
 
 void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
@@ -67,6 +69,9 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
         cancelFetch();
         truncateToRelevantTimePeriod();
         setFetchedTimeWindow(m_relevantTimePeriod);
+
+        if (!m_relevantTimePeriod.isInfinite())
+            setLive(false);
     }
 }
 
@@ -147,7 +152,10 @@ void AbstractSearchListModel::setLive(bool value)
             return;
     }
 
+    NX_VERBOSE(this) << "Setting live mode to" << value;
     m_live = value;
+
+    emit liveChanged(m_live, {});
 }
 
 void AbstractSearchListModel::setLiveSupported(bool value)
@@ -156,7 +164,7 @@ void AbstractSearchListModel::setLiveSupported(bool value)
         return;
 
     m_liveSupported = value;
-    m_live = m_live && m_liveSupported;
+    setLive(m_live && m_liveSupported);
 
     clear();
 }
@@ -184,10 +192,13 @@ void AbstractSearchListModel::finishFetch(FetchResult result)
 void AbstractSearchListModel::clear()
 {
     NX_VERBOSE(this) << "Clear model";
+
     setFetchDirection(FetchDirection::earlier);
     setFetchedTimeWindow({});
     cancelFetch();
     clearData();
+
+    setLive(effectiveLiveSupported());
 }
 
 } // namespace nx::client::desktop

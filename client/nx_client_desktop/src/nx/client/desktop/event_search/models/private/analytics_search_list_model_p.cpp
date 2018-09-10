@@ -294,26 +294,23 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
                 }
             }
 
-            completePrefetch(actuallyFetched, success, m_prefetch.size());
+            completePrefetch(actuallyFetched, success, (int)m_prefetch.size());
         };
 
     return getObjects(period, dataReceived, currentRequest().batchSize);
 }
 
 template<typename Iter>
-bool AnalyticsSearchListModel::Private::commitPrefetch(
-    const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
+bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& periodToCommit,
+    Iter prefetchBegin, Iter prefetchEnd, int position, bool handleOverlaps)
 {
-    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
-
     const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
         periodToCommit.endTime(), lowerBoundPredicate);
 
     auto end = std::upper_bound(prefetchBegin, prefetchEnd,
         periodToCommit.startTime(), upperBoundPredicate);
 
-    // In live mode "later" direction events are requested with 1 ms overlap. Handle overlap here.
-    if (q->effectiveLiveSupported() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
+    if (handleOverlaps && !m_data.empty())
     {
         const auto last = m_data.front();
         const auto lastTimeUs = last.firstAppearanceTimeUsec;
@@ -359,11 +356,14 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(
 
 bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
+    const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
+
     if (currentRequest().direction == FetchDirection::earlier)
-        return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
+        return commitInternal(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count(), false);
 
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
-    return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
+    return commitInternal(
+        periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0, q->effectiveLiveSupported());
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,

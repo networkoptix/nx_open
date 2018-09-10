@@ -174,7 +174,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         << QVariant::fromValue(filter.orderBy.order).toString();
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
-        [this, period, guard = QPointer<QObject>(this)](
+        [this, guard = QPointer<QObject>(this)](
             bool success,
             const QnCameraBookmarkList& bookmarks,
             int requestId)

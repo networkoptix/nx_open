@@ -66,8 +66,8 @@ private:
     int indexOf(const QnUuid& objectId) const;
 
     template<typename Iter>
-    bool commitPrefetch(
-        const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position);
+    bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
+        int position, bool handleOverlaps);
 
     void emitDataChangedIfNeeded();
     void advanceObject(analytics::storage::DetectedObject& object,

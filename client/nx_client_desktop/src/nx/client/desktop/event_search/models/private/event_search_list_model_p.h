@@ -17,12 +17,9 @@
 class QTimer;
 class QnUuid;
 
-namespace nx {
+namespace nx::vms::event { class StringsHelper; }
 
-namespace vms { namespace event { class StringsHelper; }}
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class EventSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -50,12 +47,14 @@ protected:
 
 private:
     using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
-    rest::Handle getEvents(const QnTimePeriod& period, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
+    rest::Handle getEvents(
+        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit);
+
+    void fetchLive();
 
     template<typename Iter>
-    bool commitPrefetch(
-        const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position);
+    bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
+        int position, bool handleOverlaps);
 
     QString title(vms::api::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
@@ -70,8 +69,9 @@ private:
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;
+
+    QScopedPointer<QTimer> m_liveUpdateTimer;
+    FetchInformation m_liveFetch;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

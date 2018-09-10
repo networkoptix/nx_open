@@ -137,6 +137,9 @@ void AbstractAsyncSearchListModel::Private::truncateDataToMaximumCount(DataConta
             std::for_each(data.begin(), removeEnd, itemCleanup);
 
         data.erase(data.begin(), removeEnd);
+
+        // If top is truncated, go out of live mode.
+        q->setLive(false);
     }
     else
     {
