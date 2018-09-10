@@ -5,9 +5,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 AbstractAsyncSearchListModel::Private::Private(AbstractAsyncSearchListModel* q):
     base_type(),
@@ -214,6 +212,4 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
         q->setLive(q->effectiveLiveSupported());
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

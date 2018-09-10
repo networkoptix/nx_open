@@ -7,9 +7,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AbstractAsyncSearchListModel::Private: public QObject
 {
@@ -163,6 +161,4 @@ void AbstractAsyncSearchListModel::Private::truncateDataToMaximumCount(DataConta
     q->setFetchedTimeWindow(timeWindow);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

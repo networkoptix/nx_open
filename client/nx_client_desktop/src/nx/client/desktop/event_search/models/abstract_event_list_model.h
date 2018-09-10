@@ -6,9 +6,7 @@
 
 #include <nx/utils/scoped_model_operations.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
  * Base model for all Right Panel data models. Provides action activation via setData.
@@ -35,6 +33,4 @@ protected:
     virtual bool activateLink(const QModelIndex& index, const QString& link);
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

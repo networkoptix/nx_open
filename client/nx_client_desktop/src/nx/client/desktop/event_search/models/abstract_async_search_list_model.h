@@ -9,9 +9,7 @@
 
 #include <nx/client/desktop/event_search/models/abstract_search_list_model.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
  * Abstract Right Panel data model that provides basic mechanics of sliding window asynchronous
@@ -51,6 +49,4 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -2,9 +2,7 @@
 
 #include <nx/client/desktop/event_search/models/abstract_async_search_list_model.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class BookmarkSearchListModel: public AbstractAsyncSearchListModel
 {
@@ -25,6 +23,4 @@ private:
     Private* const d = nullptr;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

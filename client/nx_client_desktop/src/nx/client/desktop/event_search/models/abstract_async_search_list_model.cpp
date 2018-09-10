@@ -5,9 +5,7 @@
 
 #include <nx/utils/log/log.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(CreatePrivate dCreator, QObject* parent):
     base_type(parent),
@@ -96,6 +94,4 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     return handled ? result : base_type::data(index, role);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

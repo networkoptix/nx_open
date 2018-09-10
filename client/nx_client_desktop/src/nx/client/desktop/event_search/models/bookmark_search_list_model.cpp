@@ -1,9 +1,7 @@
 #include "bookmark_search_list_model.h"
 #include "private/bookmark_search_list_model_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 BookmarkSearchListModel::BookmarkSearchListModel(QObject* parent):
     base_type([this]() { return new Private(this); }, parent),
@@ -25,6 +23,4 @@ bool BookmarkSearchListModel::isConstrained() const
     return !filterText().isEmpty() || base_type::isConstrained();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

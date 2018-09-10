@@ -10,9 +10,7 @@
 
 #include <nx/utils/datetime.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 AbstractEventListModel::AbstractEventListModel(QObject* parent):
     base_type(parent),
@@ -118,6 +116,4 @@ bool AbstractEventListModel::activateLink(const QModelIndex& index, const QStrin
     return defaultAction(index);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

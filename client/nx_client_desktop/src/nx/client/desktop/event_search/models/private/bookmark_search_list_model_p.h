@@ -14,12 +14,9 @@
 
 class QnUuid;
 
-namespace nx {
+namespace nx::utils { class PendingOperation; }
 
-namespace utils { class PendingOperation; }
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class BookmarkSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -72,6 +69,4 @@ private:
     QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

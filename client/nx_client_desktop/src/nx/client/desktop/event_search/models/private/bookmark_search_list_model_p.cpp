@@ -18,9 +18,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 namespace {
 
@@ -354,6 +352,4 @@ QColor BookmarkSearchListModel::Private::color()
     return QPalette().color(QPalette::Light);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
