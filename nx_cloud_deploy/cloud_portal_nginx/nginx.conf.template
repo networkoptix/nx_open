@@ -23,7 +23,7 @@ http {
     server_tokens off;
 
     # Expires map
-    map $sent_http_content_type $expires {
+    map ${DOLLAR}sent_http_content_type ${DOLLAR}expires {
         default                    off;
         text/html                  epoch;
         text/css                   epoch;
@@ -38,7 +38,7 @@ http {
     server {
         listen 80 default;
 
-        expires $expires;
+        expires ${DOLLAR}expires;
 
         client_max_body_size 4G;
         server_name _;
