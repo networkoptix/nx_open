@@ -89,7 +89,7 @@ QnClientInstallationPtr QnClientInstallation::installationForPath(const QString&
                 .split(L'\n', QString::SkipEmptyParts);
             for (const auto& item: details)
             {
-                if (pattern.indexIn(item.trimmed()) != -1)
+                if (pattern.exactMatch(item.trimmed()))
                 {
                     QString key = pattern.cap(1).trimmed();
                     QString value = pattern.cap(2).trimmed();
