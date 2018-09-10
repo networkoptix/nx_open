@@ -466,9 +466,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    //ProfilesReq request;
-    //ProfilesResp response;
-
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useExistingProfiles = resData.value<bool>(
         Qn::USE_EXISTING_ONVIF_PROFILES_PARAM_NAME);
@@ -481,22 +478,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
         return profiles.requestFailedResult();
     }
 
-    //int soapRes = soapWrapper.getProfiles(request, response);
-    //if (soapRes != SOAP_OK) {
-    //#if defined(PL_ONVIF_DEBUG)
-    //    qCritical() << "QnOnvifStreamReader::fetchUpdateProfile: can't get profiles from camera ("
-    //        << (isPrimary? "primary": "secondary") << "). Gsoap error: " << soapRes
-    //        << ". Description: " << soapWrapper.getLastError()
-    //        << ". URL: " << soapWrapper.getEndpointUrl()
-    //        << ", uniqueId: " << m_onvifRes->getUniqueId();
-    //#endif
-    //    return CameraDiagnostics::RequestFailedResult(
-    //        QLatin1String("getProfiles"), soapWrapper.getLastError());
-    //}
-
     onvifXsd__Profile* profile = selectExistingProfile(
         profiles.getEphemeralReference().Profiles, isPrimary, info);
-    if (profile) {
+    if (profile)
+    {
         info.profileToken = QString::fromStdString(profile->token);
     }
     else
@@ -522,31 +507,19 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(
     const QString& name, const QString& token) const
 {
-    QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(
-        m_onvifRes->onvifTimeouts(),
-        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
-        auth.password(), m_onvifRes->getTimeDrift());
+    Media::ProfileCreator profileCreator(m_onvifRes->makeRequestParams());
     std::string stdStrToken = token.toStdString();
 
-    CreateProfileReq request;
-    CreateProfileResp response;
-
+    Media::ProfileCreator::Request request;
     request.Name = name.toStdString();
     request.Token = &stdStrToken;
-
-    int soapRes = soapWrapper.createProfile(request, response);
-    if (soapRes != SOAP_OK) {
-    #if defined(PL_ONVIF_DEBUG)
-        qCritical() << "QnOnvifStreamReader::sendProfileToCamera: can't create profile "
-            << request.Name.c_str() << "Gsoap error: "
-            << soapRes << ", description: " << soapWrapper.getLastError()
-            << ". URL: " << soapWrapper.getEndpointUrl()
-            << ", uniqueId: " << m_onvifRes->getUniqueId();
-    #endif
-        return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("createProfile"), soapWrapper.getLastError());
+    profileCreator.performRequest(request);
+    if (!profileCreator)
+    {
+        // LOG.
+        return profileCreator.requestFailedResult();
     }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -913,7 +886,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(
     onvifXsd__AudioEncoderConfiguration& encoderConfig) const
 {
     Media::AudioEncoderConfigurationSetter setter(m_onvifRes->makeRequestParams());
-    SetAudioConfigReq request;
+    Media::AudioEncoderConfigurationSetter::Request request;
     request.Configuration = &encoderConfig;
     request.ForcePersistence = false;
 

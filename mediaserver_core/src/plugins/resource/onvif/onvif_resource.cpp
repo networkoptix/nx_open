@@ -2203,11 +2203,10 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), response, frameRateBounds);
 #else
     // New code - Media2.
-    onvifMedia2__GetConfiguration request;
-    request.ConfigurationToken = const_cast<std::string*>(&token);
-    request.ProfileToken = nullptr;
 
     Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+    Media2::VideoEncoderConfigurationOptions::Request request;
+    request.ConfigurationToken = const_cast<std::string*>(&token);
     videoEncoderConfigurationOptions.receiveBySoap(request);
 
     if (!videoEncoderConfigurationOptions)

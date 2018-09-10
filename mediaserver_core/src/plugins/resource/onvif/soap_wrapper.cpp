@@ -391,28 +391,28 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
 /**
  Generate code that initializes static constant member "requestFunc".
  The example of generated code:
-const ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
-    ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
+const RequestTraits<_onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
+    RequestTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
     = &DeviceIOBindingProxy::GetDigitalInputs;
  */
 #define DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
-    const ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
-        ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::requestFunc = \
+    const RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
+        RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::requestFunc = \
         &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
     \
-    const char ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::funcName[64] = \
+    const char RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::funcName[64] = \
         #FUNCTION;
 
-#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, RESPONSE) \
-    const ResponseTraits<RESPONSE>::RequestFunc \
-        ResponseTraits<RESPONSE>::requestFunc = \
+#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, REQUEST, RESPONSE) \
+    const RequestTraits<REQUEST, RESPONSE>::RequestFunc \
+        RequestTraits<REQUEST, RESPONSE>::requestFunc = \
         &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
     \
-    const char ResponseTraits<RESPONSE>::funcName[64] = \
+    const char RequestTraits<REQUEST, RESPONSE>::funcName[64] = \
         #FUNCTION;
 
 DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
 DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
 DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
@@ -421,9 +421,17 @@ DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
 DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
 DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
 DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
+DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
 
-DEFINE_RESPONSE_TRAITS(Media2, GetVideoEncoderConfigurations)
-DEFINE_RESPONSE_TRAITS(Media2, GetVideoEncoderConfigurationOptions)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurations,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurationOptions,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
+    _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
+DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
+DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
+
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //

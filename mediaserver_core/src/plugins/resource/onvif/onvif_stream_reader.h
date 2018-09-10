@@ -88,8 +88,8 @@ private:
 
     void updateAudioEncoder(AudioEncoder& encoder) const;
 
-    CameraDiagnostics::Result sendProfileToCamera(
-        CameraInfoParams& info, onvifXsd__Profile& profile, bool create = false) const;
+    //CameraDiagnostics::Result sendProfileToCamera(
+    //    CameraInfoParams& info, onvifXsd__Profile& profile, bool create = false) const; //< unused
     CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource& source) const;
     CameraDiagnostics::Result sendAudioEncoderToCamera(
         onvifXsd__AudioEncoderConfiguration& encoderConfig) const;

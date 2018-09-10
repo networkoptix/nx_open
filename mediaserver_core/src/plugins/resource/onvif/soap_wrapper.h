@@ -494,14 +494,14 @@ struct RequestParams
         timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
 };
 
-template<class Response>
-class ResponseTraits;
+template<class Request, class Response>
+class RequestTraits;
 
 /**
 Generate code of the traits class
 The example of code generated:
 template<>
-class ResponseTraits<_onvifDeviceIO__GetDigitalInputsResponse>
+class RequestTraits<_onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse>
 {
 public:
     using BindingProxy = DeviceIOBindingProxy;
@@ -523,7 +523,7 @@ public:
 
 #define DECLARE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
 template<> \
-class ResponseTraits<MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)> \
+class RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)> \
 { \
 public: \
     using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
@@ -541,7 +541,7 @@ public: \
 
 #define DECLARE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, REQUEST, RESPONSE) \
 template<> \
-class ResponseTraits<RESPONSE> \
+class RequestTraits<REQUEST, RESPONSE> \
 { \
 public: \
     using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
@@ -558,7 +558,8 @@ public: \
 };
 
 DECLARE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
-DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO,
+    _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
 DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
 DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
@@ -567,19 +568,28 @@ DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
 DECLARE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
 DECLARE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
 DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
+DECLARE_RESPONSE_TRAITS(Media, CreateProfile)
 
-DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2, onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
-DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2, onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
+DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+    _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
+DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
+DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template<class Response>
-class ResponseWrapper;
+template<class RequestType, class ResponseType>
+class RequestWrapper;
 
-template<class Response>
+template<class RequestT, class ResponseT>
 class ResponseHolder
 {
 public:
-    ResponseHolder(ResponseWrapper<Response>* owner):
+    using Request = RequestT;
+    using Response = ResponseT;
+    ResponseHolder(RequestWrapper<Request, Response>* owner):
         m_responseOwner(owner)
     {
         ++m_responseOwner->responseHolderCount;
@@ -605,37 +615,38 @@ public:
         NX_CRITICAL(m_responseOwner);
         return &m_responseOwner->m_response;
     }
-    // Forbidden to suppress error-prone code.
+    // Forbidden in order to suppress error-prone code.
     //const Response& operator*() const
     //{
     //    NX_CRITICAL(m_responseOwner);
     //    return m_responseOwner->m_response;
     //}
 private:
-    ResponseWrapper<Response>* m_responseOwner;
+    RequestWrapper<Request, Response>* m_responseOwner;
 };
 
-template<class Response>
-class ResponseWrapper
+template<class RequestT, class ResponseT>
+class RequestWrapper
 {
-    friend class ResponseHolder<Response>;
 public:
-    using BindingProxy = typename ResponseTraits<Response>::BindingProxy;
-    using Request = typename ResponseTraits<Response>::Request;
+    using Request = RequestT;
+    using Response = ResponseT;
+    friend class ResponseHolder<Request, Response>;
+    using BindingProxy = typename RequestTraits<Request, Response>::BindingProxy;
 
-    explicit ResponseWrapper(RequestParams params):
+    explicit RequestWrapper(RequestParams params):
         m_wrapper(params.timeouts, std::move(params.endpoint), std::move(params.login),
             std::move(params.passwd), params.timeDrift, params.tcpKeepAlive)
     {
         m_response.soap_default(m_response.soap);
     }
 
-    ResponseWrapper(const ResponseWrapper&) = delete;
-    ResponseWrapper(ResponseWrapper&&) = delete;
-    ResponseWrapper& operator=(const ResponseWrapper&) = delete;
-    ResponseWrapper& operator=(ResponseWrapper&&) = delete;
+    RequestWrapper(const RequestWrapper&) = delete;
+    RequestWrapper(RequestWrapper&&) = delete;
+    RequestWrapper& operator=(const RequestWrapper&) = delete;
+    RequestWrapper& operator=(RequestWrapper&&) = delete;
 
-    ~ResponseWrapper()
+    ~RequestWrapper()
     {
         NX_CRITICAL(responseHolderCount == 0);
         if (m_wrapper.m_invoked)
@@ -647,8 +658,8 @@ public:
 
     bool receiveBySoap()
     {
-        Request empryRequest;
-        return receiveBySoap(empryRequest);
+        Request emptyRequest;
+        return receiveBySoap(emptyRequest);
     }
 
     bool receiveBySoap(Request& request) //< gsoap does not guarantee immutability of "request"
@@ -658,7 +669,7 @@ public:
         m_wrapper.beforeMethodInvocation<Request>();
         const char* ptr = m_wrapper.m_endpoint;
 
-        std::invoke(ResponseTraits<Response>::requestFunc,
+        std::invoke(RequestTraits<Request, Response>::requestFunc,
             m_wrapper.m_soapProxy, m_wrapper.m_endpoint, nullptr, &request, m_response);
 
         return soapError() == SOAP_OK;
@@ -683,9 +694,9 @@ public:
 
     }
 
-    ResponseHolder<Response> get()
+    ResponseHolder<Request, Response> get()
     {
-        return ResponseHolder<Response>(this);
+        return ResponseHolder<Request, Response>(this);
     }
 
     Response& getEphemeralReference()
@@ -695,7 +706,7 @@ public:
 
     const char* requestFunctionName() const
     {
-        return ResponseTraits<Response>::funcName;
+        return RequestTraits<Request, Response>::funcName;
     }
 
     int soapError() const noexcept { return m_wrapper.m_soapProxy->soap->error; }
@@ -720,32 +731,74 @@ protected:
     int responseHolderCount = 0;
 };
 
-namespace DeviceIO {
+namespace DeviceIO
+{
+    using DigitalInputs = RequestWrapper<
+        _onvifDeviceIO__GetDigitalInputs,
+        _onvifDeviceIO__GetDigitalInputsResponse>;
 
-using DigitalInputs = ResponseWrapper<_onvifDeviceIO__GetDigitalInputsResponse>;
-using RelayOutputs = ResponseWrapper<_onvifDevice__GetRelayOutputsResponse>;
+    using RelayOutputs = RequestWrapper<
+        _onvifDevice__GetRelayOutputs,
+        _onvifDevice__GetRelayOutputsResponse>;
 
-using RelayOutputSettingsSettingResult = ResponseWrapper<_onvifDeviceIO__SetRelayOutputSettingsResponse>;
-}// namespace DeviceIO
+    using RelayOutputSettingsSettingResult = RequestWrapper<
+        _onvifDeviceIO__SetRelayOutputSettings,
+        _onvifDeviceIO__SetRelayOutputSettingsResponse>;
+}
 
-namespace Media {
+namespace Media
+{
+    using VideoEncoderConfigurations = RequestWrapper<
+        _onvifMedia__GetVideoEncoderConfigurations,
+        _onvifMedia__GetVideoEncoderConfigurationsResponse>;
 
-    using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationsResponse>;
-    using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
-    using VideoEncoderConfigurationSetter = ResponseWrapper<_onvifMedia__SetVideoEncoderConfigurationResponse>;
-    using AudioEncoderConfigurations = ResponseWrapper<_onvifMedia__GetAudioEncoderConfigurationsResponse>;
-    using AudioEncoderConfigurationSetter = ResponseWrapper<_onvifMedia__SetAudioEncoderConfigurationResponse>;
-    using Profiles = ResponseWrapper<_onvifMedia__GetProfilesResponse>;
-}// namespace Media2
+    using VideoEncoderConfigurationOptions = RequestWrapper<
+        _onvifMedia__GetVideoEncoderConfigurationOptions,
+        _onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
 
-namespace Media2 {
+    using VideoEncoderConfigurationSetter = RequestWrapper<
+        _onvifMedia__SetVideoEncoderConfiguration,
+        _onvifMedia__SetVideoEncoderConfigurationResponse>;
 
-using VideoEncoderConfigurations = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationsResponse>;
-using VideoEncoderConfigurationOptions = ResponseWrapper<_onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
+    using AudioEncoderConfigurations = RequestWrapper<
+        _onvifMedia__GetAudioEncoderConfigurations,
+        _onvifMedia__GetAudioEncoderConfigurationsResponse>;
 
-}// namespace Media2
+    using AudioEncoderConfigurationSetter = RequestWrapper<
+        _onvifMedia__SetAudioEncoderConfiguration,
+        _onvifMedia__SetAudioEncoderConfigurationResponse>;
 
-//#TODO szaitsev: Replace DeviceIO::GetRelayOutputs with DeviceIO::GetRelayOutputs and so on.
+    using Profiles = RequestWrapper<
+        _onvifMedia__GetProfiles,
+        _onvifMedia__GetProfilesResponse>;
+
+    using ProfileCreator = RequestWrapper<
+        _onvifMedia__CreateProfile,
+        _onvifMedia__CreateProfileResponse>;
+}
+
+namespace Media2
+{
+    using VideoEncoderConfigurations = RequestWrapper<
+        onvifMedia2__GetConfiguration,
+        _onvifMedia2__GetVideoEncoderConfigurationsResponse>;
+
+    using VideoEncoderConfigurationOptions =
+        RequestWrapper<onvifMedia2__GetConfiguration,
+        _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
+
+    using VideoEncoderConfigurationSetter = RequestWrapper<
+        _onvifMedia2__SetVideoSourceConfiguration,
+        onvifMedia2__SetConfigurationResponse>;
+
+    using Profiles = RequestWrapper<
+        _onvifMedia2__GetProfiles,
+        _onvifMedia2__GetProfilesResponse>;
+
+    using ProfileCreator = RequestWrapper<
+        _onvifMedia2__CreateProfile,
+        _onvifMedia2__CreateProfileResponse>;
+}
 
 class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
 {
