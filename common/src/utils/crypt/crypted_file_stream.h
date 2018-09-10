@@ -22,10 +22,11 @@ public:
     class Key;
 
     CryptedFileStream(const QString& fileName, const QString& password);
-
     virtual ~CryptedFileStream();
 
     void setEnclosure(qint64 position, qint64 size);
+
+    void setPassword(const QString& password);
 
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;
@@ -95,6 +96,8 @@ protected:
 
     char m_currentPlainBlock[kCryptoBlockSize];
     char m_currentCryptedBlock[kCryptoBlockSize];
+    void* m_context; //< Using void* because EVP_CIPHER_CTX is a OpenSSL typedef.
+    Key m_IV;
     bool m_blockDirty = false; //< Data in decrypted block was not flushed.
 
     QFile m_file;

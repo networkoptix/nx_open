@@ -4,23 +4,30 @@
 #include <vector>
 #include <random>
 
-//#include <openssl/evp.h>
+#include <openssl/evp.h>
 
 using Key = nx::utils::CryptedFileStream::Key;
 
 namespace {
 
 constexpr size_t kKeySize = nx::utils::CryptedFileStream::kKeySize;
+constexpr int kHashCount = 4242; //< Arbitrary value.
 
-const Key kHashSalt{
+const Key kHashSalt {
     0x89, 0x1e, 0xed, 0x37, 0xb9, 0x5f, 0xcc, 0x9f, 0xd0, 0x3b, 0x29, 0x7e, 0x59, 0x6d, 0xed, 0xe,
     0x9c, 0x3a, 0x25, 0x2f, 0xf8, 0xb8, 0xc8, 0x98, 0x1f, 0xa3, 0xbb, 0x31, 0x67, 0x10, 0x7a, 0x52
 };
 
-const Key kPasswordSalt{
+const Key kPasswordSalt {
     0x31, 0xc6, 0x82, 0x69, 0xbc, 0x8d, 0xf7, 0x91, 0x2e, 0xd8, 0x2d, 0xd7, 0xbf, 0x5b, 0x99, 0xe,
     0x83, 0xc6, 0xe9, 0x9e, 0xdf, 0x69, 0x5e, 0x4e, 0x8b, 0xa5, 0xd7, 0xbc, 0x8b, 0xb3, 0xf2, 0x6
 };
+
+const Key IV {  //< Actually makes little sense because first 8 bytes of IV are overwritten with block index.
+    0xf1, 0x8a, 0xdb, 0x71, 0x8b, 0x86, 0xb, 0x7c, 0xf1, 0xa6, 0xb8, 0xff, 0x81, 0x81, 0x64, 0x66,
+    0x48, 0xb6, 0x30, 0xfb, 0x3, 0xbc, 0xa2, 0xd, 0x3d, 0xf1, 0xa1, 0xf4, 0xfd, 0xf1, 0xe7, 0xb4
+};
+
 
 Key adaptPassword(const char* password)
 {
@@ -45,9 +52,28 @@ Key xorKeys(const Key& key1, const Key& key2)
 
 Key getKeyHash(const Key& key)
 {
-    Key xored = xorKeys(key, kHashSalt);
-    // SHA goes here;
-    return xored;
+
+    EVP_MD_CTX* mdctx = EVP_MD_CTX_create();
+    NX_ASSERT(mdctx);
+    auto result = EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL);
+    NX_ASSERT(result);
+
+    Key xored = key;
+    for (int i = 0; i < kHashCount; i++)
+    {
+        xored = xorKeys(xored, kHashSalt);
+        result = EVP_DigestUpdate(mdctx, xored.data(), kKeySize);
+    }
+    NX_ASSERT(result);
+
+    Key hash;
+    unsigned int len;
+    result = EVP_DigestFinal_ex(mdctx, hash.data(), &len);
+    NX_ASSERT(len == kKeySize);
+
+    EVP_MD_CTX_destroy(mdctx);
+
+    return hash;
 }
 
 // This function generates salt; need not to be cryptographically strong random.
@@ -72,14 +98,20 @@ namespace utils {
 CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& password):
     m_fileName(fileName),
     m_file(fileName),
-    m_mutex(QnMutex::Recursive)
+    m_mutex(QnMutex::Recursive),
+    m_IV(IV)
 {
+    m_context = EVP_CIPHER_CTX_new();
+    NX_ASSERT(m_context);
+    NX_ASSERT(EVP_MD_size(EVP_sha256()) == kKeySize);
+
     resetState();
-    m_passwordKey = adaptPassword(password.toUtf8().constData()); //< Convert to utf8 and adapt to Key.
+    setPassword(password);
 }
 
 CryptedFileStream::~CryptedFileStream()
 {
+    EVP_CIPHER_CTX_free((EVP_CIPHER_CTX*) m_context);
     close();
 }
 
@@ -89,6 +121,11 @@ void CryptedFileStream::setEnclosure(qint64 position, qint64 size)
     m_enclosure.position = position;
     m_enclosure.size = size;
     m_enclosure.originalSize = size;
+}
+
+void CryptedFileStream::setPassword(const QString& password)
+{
+    m_passwordKey = adaptPassword(password.toUtf8().constData()); //< Convert to utf8 and adapt to Key.
 }
 
 bool CryptedFileStream::open(QIODevice::OpenMode openMode)
@@ -341,14 +378,39 @@ void CryptedFileStream::writeHeader()
     m_file.write(zeroes, kHeaderSize - sizeof(m_header));
 }
 
+// Actual encrypring & decrypting.
 void CryptedFileStream::cryptBlock()
 {
-    memcpy(m_currentCryptedBlock, m_currentPlainBlock,  kCryptoBlockSize);
+    *(qint64*) &(*m_IV.begin()) = m_position.blockIndex; //< Slightly (actually, fully) modifying IV.
+    auto result = EVP_EncryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(), NULL, m_key.data(), m_IV.data());
+    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
+    NX_ASSERT(result == 1);
+
+    int len;
+    result = EVP_EncryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentCryptedBlock, &len,
+        (unsigned char *) m_currentPlainBlock, kCryptoBlockSize);
+    NX_ASSERT(result == 1);
+
+    unsigned char dummy[32]; //< Actually 16 is enough for AES.
+    result = EVP_EncryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &len);
+    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to crypted buffer.
 }
 
 void CryptedFileStream::decryptBlock()
 {
-    memcpy(m_currentPlainBlock, m_currentCryptedBlock, kCryptoBlockSize);
+    *(qint64*) &(*m_IV.begin()) = m_position.blockIndex; //< Slightly (actually, fully) modifying IV.
+    auto result = EVP_DecryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(), NULL, m_key.data(), m_IV.data());
+    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
+    NX_ASSERT(result == 1);
+
+    int len;
+    result = EVP_DecryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentPlainBlock, &len,
+        (unsigned char *) m_currentCryptedBlock, kCryptoBlockSize);
+    NX_ASSERT(result == 1);
+
+    unsigned char dummy[32];
+    result = EVP_DecryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &len);
+    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to crypted buffer.
 }
 
 } // namespace utils
