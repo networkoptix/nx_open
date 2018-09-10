@@ -1,5 +1,7 @@
 #include "found_devices_model.h"
 
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace {
@@ -28,12 +30,15 @@ namespace client {
 namespace desktop {
 
 FoundDevicesModel::FoundDevicesModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
 void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
 {
+    const auto pool = commonModule()->resourcePool();
+
     auto newIds = extractIds(devices);
     const auto currentIds = extractIds(m_devices);
     const auto truncatedIds = newIds.subtract(currentIds);
@@ -45,15 +50,30 @@ void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
     bool hasNewDevices = false;
     {
         const ScopedInsertRows guard(this, QModelIndex(), first, last);
-        for (const auto& newDevice: devices)
+        for (const auto& device: devices)
         {
-            if (truncatedIds.contains(newDevice.uniqueId))
+            const auto& id = device.uniqueId;
+            if (truncatedIds.contains(id))
             {
                 hasNewDevices = true;
-                m_devices.append(newDevice);
-                m_checked.insert(newDevice.uniqueId, false);
-                m_presentedState.insert(newDevice.uniqueId,
-                    newDevice.existsInPool ? alreadyAddedState : notPresentedState);
+                m_devices.append(device);
+                m_checked.insert(id, false);
+                m_presentedState.insert(id,
+                    device.existsInPool ? alreadyAddedState : notPresentedState);
+
+                if (!device.existsInPool)
+                    continue;
+
+                const auto camera = pool->getResourceByUniqueId<QnVirtualCameraResource>(id);
+                if (!camera)
+                    continue;
+
+                const ColumnDifference difference({
+                    {brandColumn, device.vendor.trimmed() != camera->getVendor().trimmed()},
+                    {modelColumn, device.name.trimmed() != camera->getModel().trimmed()},
+                    {addressColumn, device.url.trimmed() != camera->sourceUrl(Qn::CR_LiveVideo).trimmed()}});
+
+                m_fieldsDifference.insert(id, difference);
             }
         }
     }
@@ -92,6 +112,7 @@ void FoundDevicesModel::removeDevices(QStringList ids)
         m_checked.remove(id);
         m_presentedState.remove(id);
         m_devices.erase(it);
+        m_fieldsDifference.remove(id);
         someDevicesRemoved = true;
     }
 
@@ -186,9 +207,36 @@ QVariant FoundDevicesModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(device(index));
         case presentedStateRole:
             return m_presentedState[device(index).uniqueId];
+        case Qt::TextColorRole:
+            return QPalette().color(getColorRole(index));
         default:
             return QVariant();
     }
+}
+
+QPalette::ColorRole FoundDevicesModel::getColorRole(const QModelIndex& index) const
+{
+    static const auto kUsualColor = QPalette::WindowText;
+    static const auto kHighlightedColor = QPalette::Light;
+
+    const auto column = index.column();
+    if (column == presentedStateColumn || column == checkboxColumn)
+        return kUsualColor;
+
+    const auto deviceId = device(index).uniqueId;
+    if (m_presentedState[deviceId] != alreadyAddedState)
+        return kHighlightedColor;
+
+    const auto diffIt = m_fieldsDifference.find(deviceId);
+    if (diffIt == m_fieldsDifference.end())
+        return kUsualColor;
+
+    const auto& difference = diffIt.value();
+    const auto diffValueIt = difference.find(column);
+    if (diffValueIt == difference.end())
+        return kUsualColor;
+
+    return diffValueIt.value() ? kHighlightedColor : kUsualColor;
 }
 
 bool FoundDevicesModel::setData(

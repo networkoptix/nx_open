@@ -2,6 +2,7 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <common/common_module_aware.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <nx/utils/scoped_model_operations.h>
 
@@ -9,7 +10,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class FoundDevicesModel: public ScopedModelOperations<QAbstractListModel>
+class FoundDevicesModel:
+    public ScopedModelOperations<QAbstractListModel>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;
@@ -79,12 +82,17 @@ private:
 
     int newDevicesCount() const;
 
+    QPalette::ColorRole getColorRole(const QModelIndex& index) const;
+
 private:
     using DeviceCheckedStateHash = QHash<QString, bool>;
     using PresentedStateHash = QHash<QString, PresentedState>;
+    using ColumnDifference = QHash<int, bool>;
+    using FieldsDifferenceHash = QHash<QString, ColumnDifference>;
 
     DeviceCheckedStateHash m_checked;
     PresentedStateHash m_presentedState;
+    FieldsDifferenceHash m_fieldsDifference;
 
     QnManualResourceSearchList m_devices;
 };

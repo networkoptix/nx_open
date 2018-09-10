@@ -282,7 +282,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     resetButtonStyle(ui->searchButton);
 
-    m_model.reset(new FoundDevicesModel());
+    m_model.reset(new FoundDevicesModel(ui->foundDevicesTable));
 
     updateResultsWidgetState();
 
