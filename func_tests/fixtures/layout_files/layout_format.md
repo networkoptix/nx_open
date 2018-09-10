@@ -31,7 +31,7 @@ networks:
 
 `first` and `second` cannot access each other by IP.
 
-```
+```{.yaml}
 networks:
   10.254.0.0/28:
     first:
@@ -79,7 +79,7 @@ IP accessibility:
 - `outer` can access:
   - `router-1` directly.
 
-```
+```{.yaml}
 networks:
   10.254.1.0/24:
     outer:
@@ -95,7 +95,7 @@ networks:
 Repeated addresses are supported and work fine unless there is a machine, which interfaces look
 two networks with overlapped addresses.
 
-```
+```{.yaml}
 networks:
   10.254.1.0/24:  # Duplicated network address.
     first:
@@ -112,7 +112,7 @@ networks:
 
 Merging scheme is not tree-like as networks scheme. It has fixed number of levels.
 
-```
+```{.yaml}
 mergers:
   remote:  # Root URL of this server is sent in HTTP request.
     local:  # HTTP request goes to this server.
