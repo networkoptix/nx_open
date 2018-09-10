@@ -179,7 +179,7 @@ void DeviceAdditionDialog::setupTable()
 {
     const auto table = ui->foundDevicesTable;
 
-    table->setCheckboxColumn(FoundDevicesModel::checkboxColumn, true);
+    table->setCheckboxColumn(FoundDevicesModel::checkboxColumn);
     table->setPersistentDelegateForColumn(FoundDevicesModel::presentedStateColumn,
         new PresentedStateDelegate(table));
 }

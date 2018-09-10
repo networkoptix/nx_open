@@ -14,6 +14,13 @@ IdsSet extractIds(const QnManualResourceSearchList& devices)
     return result;
 }
 
+QFont selectionColumnFont()
+{
+    QFont result;
+    result.setPixelSize(13);
+    return result;
+}
+
 } // namespace
 
 namespace nx {
@@ -215,6 +222,21 @@ QVariant FoundDevicesModel::headerData(
     Qt::Orientation orientation,
     int role) const
 {
+    if (section == Columns::presentedStateColumn)
+    {
+        switch(role)
+        {
+            case Qt::FontRole:
+                return selectionColumnFont();
+            case Qt::TextColorRole:
+                return QPalette().color(QPalette::Light);
+            case Qt::TextAlignmentRole:
+                return Qt::AlignRight;
+            default:
+                break;
+        }
+    }
+
     if (role != Qt::DisplayRole)
         return base_type::headerData(section, orientation, role);
 
