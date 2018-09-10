@@ -82,9 +82,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     }
 
     if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
+        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
-        m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
+        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));

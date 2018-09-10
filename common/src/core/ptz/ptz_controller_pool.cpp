@@ -14,6 +14,7 @@
 #include <common/common_module.h>
 
 #include <utils/common/delete_later.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -211,6 +212,13 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
     moveControllerToThread(controller, executorThread);
+    auto weakRef = controller.toWeakRef();
+    executeDelayed(
+        [weakRef]()
+        {
+            if (auto controller = weakRef.lock())
+                controller->initialize();
+        }, kDefaultDelay, executorThread);
 
     emit q->controllerChanged(resource);
 

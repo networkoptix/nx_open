@@ -1,5 +1,6 @@
 #pragma once
-#include "abstract_ptz_controller.h"
+
+#include <core/ptz/abstract_ptz_controller.h>
 
 class QnFallbackPtzController: public QnAbstractPtzController
 {

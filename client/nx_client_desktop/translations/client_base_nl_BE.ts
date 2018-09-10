@@ -995,7 +995,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n schermindeling</numerusform>
+        <numerusform>%n schermindelingen</numerusform>
         <numerusform>%n schermindelingen</numerusform>
       </translation>
     </message>
@@ -1079,7 +1079,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n schermindeling</numerusform>
+        <numerusform>%n schermindelingen</numerusform>
         <numerusform>%n schermindelingen</numerusform>
       </translation>
     </message>
@@ -3629,7 +3629,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation>Ongeldige invoerafbeelding.</translation>
+      <translation>Ongeldige afbeelding.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7869,7 +7869,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Niet genoeg schijfruimte op de server</translation>
     </message>
   </context>
   <context>
@@ -8982,11 +8982,11 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+      <translation>Waarschuwing! Deze versie is alleen voor testdoeleinden!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>

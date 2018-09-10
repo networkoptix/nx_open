@@ -108,7 +108,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_defaultTimePolicy = TimePolicy::ignoreCameraTimeIfBigJitter;
+            m_defaultTimePolicy = nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter;
     }
     updateTimePolicy();
 }
@@ -809,7 +809,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
     m_RtpSession.setDateTimeFormat(format);
 }
 
-void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
+void QnMulticodecRtpReader::setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy)
 {
     m_defaultTimePolicy = timePolicy;
     updateTimePolicy();
@@ -818,8 +818,8 @@ void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
 void QnMulticodecRtpReader::updateTimePolicy()
 {
     auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
-    if (secResource && secResource->isTrustCameraTime())
-        m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
+    if (secResource && secResource->trustCameraTime())
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
         m_timeHelper.setTimePolicy(m_defaultTimePolicy);
 }
@@ -889,14 +889,9 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
-    const auto extensionNtpTime = parseOnvifNtpExtensionTime(
+    rtcpStaticstics.ntpOnvifExtensionTime = parseOnvifNtpExtensionTime(
         (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
         rtpPacketSize);
-
-    if (extensionNtpTime.is_initialized())
-        m_lastOnvifNtpExtensionTime = extensionNtpTime;
-
-    rtcpStaticstics.ntpOnvifExtensionTime = m_lastOnvifNtpExtensionTime;
 
     return rtcpStaticstics;
 }

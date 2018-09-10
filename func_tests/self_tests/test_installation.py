@@ -1,5 +1,4 @@
 import logging
-from pprint import pformat
 
 import pytest
 from netaddr import IPNetwork

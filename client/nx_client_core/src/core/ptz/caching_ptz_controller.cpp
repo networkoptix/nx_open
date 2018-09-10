@@ -4,35 +4,14 @@
 
 #include <core/resource/resource.h>
 
+#include <utils/common/delayed.h>
+
 #include <nx/utils/algorithm/index_of.h>
 
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr& baseController):
     base_type(baseController),
     m_initialized(false)
 {
-    if (initialize())
-        return;
-
-    /* Well, this is hacky. Sync can fail because we're behind a remote
-     * PTZ controller for an offline camera. But strictly speaking,
-     * we don't know that. Should probably be fixed by adding a signal to
-     * PTZ controller. */ // TODO: #Elric
-
-    QPointer<QnCachingPtzController> guard(this);
-
-    /**
-     * Prevents calling "initialize" function on removed "this". Controller could be removed
-     * from QnPtzControllerPool after signals of resource emitted but not delivered.
-     */
-    const auto safeInitialize =
-        [guard]()
-        {
-            if (guard)
-                guard->initialize();
-        };
-
-    connect(resource(), &QnResource::statusChanged, this, safeInitialize);
-    connect(resource(), &QnResource::parentIdChanged, this, safeInitialize);
 }
 
 QnCachingPtzController::~QnCachingPtzController()
@@ -293,18 +272,35 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         emit changed(changedFields);
 }
 
-bool QnCachingPtzController::initialize()
+bool QnCachingPtzController::initializeInternal()
 {
     /* Note that this field is accessed from this object's thread only,
      * so there is no need to lock. */
     if (m_initialized)
         return true;
 
-    if (resource()->hasFlags(Qn::foreigner))
-        return false;
-
     QnPtzData data;
     return getData(Qn::AllPtzFields, &data, {nx::core::ptz::Type::operational});
+}
+
+void QnCachingPtzController::initialize()
+{
+    QPointer<QnCachingPtzController> guard(this);
+
+    /**
+     * Prevents calling "initialize" function on removed "this". Controller could be removed
+     * from QnPtzControllerPool after signals of resource emitted but not delivered.
+     */
+    const auto safeInitialize =
+        [guard]()
+        {
+            if (guard)
+                guard->initializeInternal();
+        };
+
+    connect(resource(), &QnResource::statusChanged, this, safeInitialize);
+    connect(resource(), &QnResource::parentIdChanged, this, safeInitialize);
+    initializeInternal();
 }
 
 template<class T>

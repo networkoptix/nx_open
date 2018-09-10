@@ -39,7 +39,7 @@ class TrafficCapture(object):
                 time.sleep(1)
                 run.terminate()
                 _logger.info('Stop capturing traffic to file %s', capture_file)
-                stdout, stderr = run.communicate(timeout_sec=5)  # Time to cleanup.
+                stdout, stderr = run.communicate(timeout_sec=30)  # Time to cleanup.
                 _logger.debug("Outcome: %s", run.outcome)
                 _logger.debug("STDOUT:\n%s", stdout)
                 _logger.debug("STDERR:\n%s", stderr)

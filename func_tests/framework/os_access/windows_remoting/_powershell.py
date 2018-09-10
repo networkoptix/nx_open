@@ -8,11 +8,13 @@ _logger = logging.getLogger(__name__)
 
 
 def start_raw_powershell_script(shell, script, logger=None):
-    _logger.debug("Run\n%s", script)
+    if not logger:
+        logger = _logger
+    logger.debug("Run\n%s", script)
     return shell.start([
         'PowerShell',
         '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Unrestricted',
-        '-EncodedCommand', base64.b64encode(script.encode('utf_16_le'),).decode('ascii'),
+        '-EncodedCommand', base64.b64encode(script.encode('utf_16_le')).decode('ascii'),
         ], logger=logger)
 
 
@@ -26,11 +28,12 @@ class PowershellError(Exception):
 
 # TODO: Rename to power_shell.
 def run_powershell_script(shell, script, variables, logger=None):
-    with start_raw_powershell_script(
-            shell,
-            power_shell_augment_script(script, variables),
-            logger=logger,
-            ).running() as run:
+    command = start_raw_powershell_script(
+        shell,
+        power_shell_augment_script(script, variables),
+        logger=logger,
+        )
+    with command.running() as run:
         stdout, _ = run.communicate()
     outcome, data = json.loads(stdout.decode())
     if outcome == 'success':

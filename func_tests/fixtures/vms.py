@@ -1,6 +1,7 @@
 from functools import partial
 
 import pytest
+from netaddr import IPAddress
 from netaddr.ip import IPNetwork
 from parse import parse
 from pathlib2 import Path
@@ -36,6 +37,11 @@ def host_os_access():
 
 
 @pytest.fixture(scope='session')
+def runner_address(hypervisor):
+    return hypervisor.runner_address
+
+
+@pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
     dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)
@@ -44,7 +50,7 @@ def persistent_dir(slot, host_os_access):
 
 @pytest.fixture(scope='session')
 def hypervisor(host_os_access):
-    return VirtualBox(host_os_access)
+    return VirtualBox(host_os_access, IPAddress('127.0.0.1'))
 
 
 @pytest.fixture(scope='session')

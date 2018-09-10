@@ -158,14 +158,9 @@ CloudModuleUrlProvider& Controller::cloudModuleUrlProvider()
     return m_cloudModuleUrlProvider;
 }
 
-AuthenticationManager& Controller::authenticationManager()
+SecurityManager& Controller::securityManager()
 {
-    return *m_authenticationManager;
-}
-
-AuthorizationManager& Controller::authorizationManager()
-{
-    return *m_authorizationManager;
+    return *m_securityManager;
 }
 
 void Controller::performDataMigrations()
@@ -228,6 +223,14 @@ void Controller::initializeSecurity()
         m_systemManager,
         m_systemManager,
         m_tempPasswordManager);
+
+    m_transportSecurityManager = 
+        std::make_unique<TransportSecurityManager>(m_settings);
+
+    m_securityManager = std::make_unique<SecurityManager>(
+        m_authenticationManager.get(),
+        *m_authorizationManager,
+        *m_transportSecurityManager);
 }
 
 void Controller::initializeDataSynchronizationEngine()

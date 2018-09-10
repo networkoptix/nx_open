@@ -217,5 +217,5 @@ class ReadOnlyTime(object):
 class Time(ReadOnlyTime):
     def set(self, new_time):
         started_at = datetime.datetime.now(pytz.utc)
-        self._shell.command(['date', '--set', new_time.isoformat()])
+        self._shell.command(['date', '--set', new_time.isoformat()]).check_output()
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)

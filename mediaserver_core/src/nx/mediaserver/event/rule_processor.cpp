@@ -184,18 +184,14 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
 void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
     const QnResourcePtr& res)
 {
-    if (needProxyAction(action, res))
-    {
-        doProxyAction(action, res);
-    }
-    else
-    {
-        auto actionCopy = vms::event::ActionFactory::cloneAction(action);
-        if (res)
-            actionCopy->getParams().actionResourceId = res->getId();
+    auto actionCopy = vms::event::ActionFactory::cloneAction(action);
+    if (res)
+        actionCopy->getParams().actionResourceId = res->getId();
 
+    if (needProxyAction(action, res))
+        doProxyAction(actionCopy, res);
+    else
         executeActionInternal(actionCopy);
-    }
 }
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)

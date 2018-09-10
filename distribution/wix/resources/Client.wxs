@@ -106,12 +106,7 @@
 
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
-        <ComponentGroup Id="shared_qt_gui" Source="$(var.QtDir)" Directory="InstallDirRoot">
-            <Component><File Name="Qt5Widgets.dll" KeyPath="yes" DiskId="2"/></Component>
-        </ComponentGroup>
-        <ComponentGroup Id="shared_qt_platforms" Source="$(var.QtPluginsDir)\platforms" Directory="platforms">
-            <Component><File Name="qwindows.dll" KeyPath="yes" DiskId="2"/></Component>
-        </ComponentGroup>
+
 
         <Feature Id="ClientFeature" Title="$(var.productName) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
@@ -119,7 +114,6 @@
             <ComponentGroupRef Id="shared_nx_libraries"/>
             <ComponentGroupRef Id="shared_misc_libraries"/>
             <ComponentGroupRef Id="shared_qt_libraries"/>
-            <ComponentGroupRef Id="shared_qt_gui"/>
             <ComponentGroupRef Id="shared_qt_platforms"/>
             <ComponentGroupRef Id="shared_icu_libraries"/>
             <ComponentGroupRef Id="client_nx_libraries"/>

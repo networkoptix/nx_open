@@ -46,10 +46,30 @@ class Halt(Result):
         return dict(condition='halt', **self.__dict__)
 
 
-def expect_values(*args, **kwargs):
+def expect_values(expected, actual, *args, **kwargs):
+        # type: (object, object) -> object
     checker = Checker()
-    checker.expect_values(*args, **kwargs)
+    checker.expect_values(expected, actual, *args, **kwargs)
     return checker.result()
+
+
+def retry_expect_values(expected_result, call, exceptions=None, *args, **kwargs):
+    while True:
+        try:
+            actual_result = call()
+
+        except exceptions as error:
+            yield Failure(str(error))
+
+        else:
+            if not expected_result:
+                return
+
+            result = expect_values(expected_result, actual_result, *args, **kwargs)
+            if isinstance(result, Success):
+                return
+
+            yield result
 
 
 class Checker(object):
@@ -114,7 +134,7 @@ class Checker(object):
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
         'encoderIndex': {0: 'primary', 1: 'secondary'},
-        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},  # used to also contain 'MP2': 'G711' - probably not correct
+        'codec': {8: 'MJPEG', 28: 'H264', 'HEVC': 'H265', 'acc': 'ACC'},
     }
 
     @classmethod

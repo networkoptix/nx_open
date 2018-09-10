@@ -280,6 +280,7 @@ private:
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
+
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
@@ -299,7 +300,10 @@ private:
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
-    QMap<QnUuid, bool> m_diskFullWarned;
+    /**
+     * Storage id --> 'corresponding storage has too much data not managed by VMS' flag map.
+     */
+    QMap<QnUuid, bool> m_diskFullMap;
 
     QnStorageScanData m_archiveRebuildInfo;
     std::atomic<bool> m_rebuildCancelled;

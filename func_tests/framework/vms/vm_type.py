@@ -25,6 +25,8 @@ class VM(object):
         self.port_map = hardware.port_map  # TODO: Remove.
         self.hardware = hardware
         self.os_access = os_access
+        # IPAddress list; TODO: Populate by methods other than setup_flat_network
+        self.ip_address_list = []
 
 
 class UnknownOsFamily(Exception):
@@ -126,6 +128,7 @@ class VMType(object):
         with self.vm_allocated(alias) as vm:
             with ExitStack() as stack:
                 stack.enter_context(context_logger(_logger, 'framework.networking.linux'))
+                stack.enter_context(context_logger(_logger, 'framework.networking.windows'))
                 stack.enter_context(context_logger(_logger, 'ssh'))
                 stack.enter_context(context_logger(_logger, 'framework.os_access.windows_remoting'))
 
