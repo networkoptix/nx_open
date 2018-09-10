@@ -86,6 +86,21 @@ void DeviceAdditionDialog::initializeControls()
         this, &DeviceAdditionDialog::stopSearch);
     connect(ui->addDevicesButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleAddDevicesClicked);
+
+    connect(ui->tabWidget, &QTabWidget::tabBarClicked, this,
+        [this](int index)
+        {
+            if (index == -1)
+                return;
+
+            // We reset minimum height for current widget to prevent tab widget height stuck.
+            ui->tabWidget->widget(index ? 0 : 1)->setFixedHeight(0);
+
+            // We manually set new hight to prevent content blinking when page is changed.
+            const auto widget = ui->tabWidget->widget(index);
+            widget->setFixedHeight(widget->layout()->minimumSize().height());
+        });
+
     connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &DeviceAdditionDialog::handleSearchTypeChanged);
 
