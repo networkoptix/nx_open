@@ -13,14 +13,6 @@ events {
     accept_mutex off;
 }
 
-# Expires map
-map $sent_http_content_type $expires {
-    default                    off;
-    text/html                  epoch;
-    text/css                   epoch;
-    application/javascript     epoch;
-}
-
 http {
     include mime.types;
     default_type application/octet-stream;
@@ -29,6 +21,14 @@ http {
 
     # don't send the nginx version number in error pages and Server header
     server_tokens off;
+
+    # Expires map
+    map $sent_http_content_type $expires {
+        default                    off;
+        text/html                  epoch;
+        text/css                   epoch;
+        application/javascript     epoch;
+    }
 
     upstream app_server {
         # For a TCP configuration:
