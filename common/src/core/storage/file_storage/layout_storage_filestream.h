@@ -9,7 +9,9 @@
 #include "layout_storage_resource.h"
 
 // This layout storage stream is used when no encryption is involved.
-class QnLayoutPlainStream: public QIODevice, public QnLayoutStreamSupport
+class QnLayoutPlainStream:
+    public QIODevice,
+    public QnLayoutStreamSupport
 {
 public:
     QnLayoutPlainStream(QnLayoutFileStorageResource& storageResource, const QString& fileName);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QString>
 #include <QtCore/QFile>
 
@@ -17,21 +19,36 @@ namespace utils {
 class CryptedFileStream : public QIODevice
 {
 public:
-    struct Stream;
+    class Key;
 
-    CryptedFileStream(const QString& fileName);
+    CryptedFileStream(const QString& fileName, const QString& password);
 
     virtual ~CryptedFileStream();
 
     void setEnclosure(qint64 position, qint64 size);
+
+    virtual bool open(QIODevice::OpenMode openMode) override;
+    virtual void close() override;
 
     virtual bool seek(qint64 offset) override;
     virtual qint64 pos() const override;
     virtual qint64 size() const override;
     virtual qint64 grossSize() const;
 
-    virtual bool open(QIODevice::OpenMode openMode) override;
-    virtual void close() override;
+    constexpr static size_t kKeySize = 32; //< Key size in bytes.
+
+    class Key : public std::vector<unsigned char>
+    {
+    public:
+        Key() { resize(kKeySize); }
+        Key(std::initializer_list<unsigned char> l): std::vector<unsigned char>(l) { NX_ASSERT(l.size() == kKeySize); }
+        explicit Key(const unsigned char * data): std::vector<unsigned char>(data, data + kKeySize) {};
+    };
+
+protected:
+    constexpr static int kCryptoStreamVersion = 1;
+    constexpr static int kCryptoBlockSize = 1024;
+    constexpr static int kHeaderSize = 1024;
 
     // Equivalent to QnLayoutFileStorageResource::Stream, but there are no common headers.
     struct Stream
@@ -43,20 +60,20 @@ public:
         bool isNull() { return (position == 0) && (size == 0);}
     } m_enclosure;
 
-protected:
-    constexpr static int kCryptoStreamVersion = 1;
-    constexpr static int kCryptoBlockSize = 1024;
-    constexpr static int kHeaderSize = 1024;
-
 #pragma pack(push, 4)
     struct Header
     {
         qint64 version = kCryptoStreamVersion;
+        qint64 minReadVersion = kCryptoStreamVersion; //< Minimal reader version to access the stream.
         qint64 dataSize = 0;
+        unsigned char salt[kKeySize];
+        unsigned char keyHash[kKeySize];
     } m_header;
 #pragma pack(pop)
 
     QString m_fileName;
+    Key m_passwordKey; //< Hash of adapted password
+    Key m_key;
 
     struct Position
     {
@@ -89,7 +106,7 @@ protected:
 
     // Helpers.
     void resetState();
-    bool isWriting() const { return (m_openMode & WriteOnly) || (m_openMode & Append); }
+    bool isWriting() const { return (m_openMode & WriteOnly); }
 
     // Internal block functions.
     void readFromBlock(char* data, qint64 count);

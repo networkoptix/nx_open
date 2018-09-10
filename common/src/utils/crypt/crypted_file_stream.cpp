@@ -1,16 +1,81 @@
 #include "crypted_file_stream.h"
 
 #include <algorithm>
+#include <vector>
+#include <random>
+
+//#include <openssl/evp.h>
+
+using Key = nx::utils::CryptedFileStream::Key;
+
+namespace {
+
+constexpr size_t kKeySize = nx::utils::CryptedFileStream::kKeySize;
+
+const Key kHashSalt{
+    0x89, 0x1e, 0xed, 0x37, 0xb9, 0x5f, 0xcc, 0x9f, 0xd0, 0x3b, 0x29, 0x7e, 0x59, 0x6d, 0xed, 0xe,
+    0x9c, 0x3a, 0x25, 0x2f, 0xf8, 0xb8, 0xc8, 0x98, 0x1f, 0xa3, 0xbb, 0x31, 0x67, 0x10, 0x7a, 0x52
+};
+
+const Key kPasswordSalt{
+    0x31, 0xc6, 0x82, 0x69, 0xbc, 0x8d, 0xf7, 0x91, 0x2e, 0xd8, 0x2d, 0xd7, 0xbf, 0x5b, 0x99, 0xe,
+    0x83, 0xc6, 0xe9, 0x9e, 0xdf, 0x69, 0x5e, 0x4e, 0x8b, 0xa5, 0xd7, 0xbc, 0x8b, 0xb3, 0xf2, 0x6
+};
+
+Key adaptPassword(const char* password)
+{
+    static char zero = 0;
+    if (!password) //< Just in case - we need password[0] to be valid.
+        password = &zero;
+
+    const size_t passLength = std::max((size_t) 1, strlen(password));
+    Key key = kPasswordSalt;
+    for (size_t i = 0; i < std::max(passLength, kKeySize); i++)
+        key[i % kKeySize] = password[i % passLength] ^ key[i % kKeySize];
+    return key;
+}
+
+Key xorKeys(const Key& key1, const Key& key2)
+{
+    Key key;
+    for (int i = 0; i < kKeySize; i++)
+        key[i] = key1[i] ^ key2[i];
+    return key;
+}
+
+Key getKeyHash(const Key& key)
+{
+    Key xored = xorKeys(key, kHashSalt);
+    // SHA goes here;
+    return xored;
+}
+
+// This function generates salt; need not to be cryptographically strong random.
+Key getRandomSalt()
+{
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0, 255);
+    generator.seed(time(nullptr));
+
+    Key key;
+    for (int i = 0; i < kKeySize; i++)
+        key[i] = distribution(generator);
+
+    return key;
+}
+
+} // namespace
 
 namespace nx {
 namespace utils {
 
-CryptedFileStream::CryptedFileStream(const QString& fileName):
+CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& password):
     m_fileName(fileName),
     m_file(fileName),
     m_mutex(QnMutex::Recursive)
 {
-    memset(m_currentPlainBlock, 0, kCryptoBlockSize);
+    resetState();
+    m_passwordKey = adaptPassword(password.toUtf8().constData()); //< Convert to utf8 and adapt to Key.
 }
 
 CryptedFileStream::~CryptedFileStream()
@@ -26,38 +91,64 @@ void CryptedFileStream::setEnclosure(qint64 position, qint64 size)
     m_enclosure.originalSize = size;
 }
 
-bool CryptedFileStream::seek(qint64 offset)
+bool CryptedFileStream::open(QIODevice::OpenMode openMode)
 {
+    // TODO: Add error-checking.
     QnMutexLocker lock(&m_mutex);
+    close();
 
-    if (!isWriting() && (offset > m_header.dataSize))
+    m_file.setFileName(m_fileName);
+
+    OpenMode fileOpenMode = openMode && (~OpenMode(Text)); //< Clear Text flag from underlying file.
+    // Since we may have to read unfinished blocks, we should never open in WriteOnly mode.
+    // For Append we need to read header and modify last block.
+    if (openMode == WriteOnly || (openMode & Append))
+        fileOpenMode = ReadWrite;
+
+    if (!m_file.open(fileOpenMode))
         return false;
 
-    dumpCurrentBlock();
-    m_position.setPosition(offset);
-    loadCurrentBlock();
+    m_openMode = openMode;
 
-    QIODevice::seek(offset);
+    m_enclosure.size = m_enclosure.originalSize;
+
+    if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
+        m_enclosure.size = m_file.size();
+
+    if (openMode == WriteOnly)
+        createHeader();
+    else
+    {
+        if (!readHeader())
+            return false;
+    }
+
+    m_openMode = openMode;
+    QIODevice::open(openMode);
+
+    if (openMode & Append)
+        seek(m_header.dataSize);
+    else
+        seek(0);
+
     return true;
 }
 
-qint64 CryptedFileStream::pos() const
+void CryptedFileStream::close()
 {
     QnMutexLocker lock(&m_mutex);
-    return QIODevice::pos();
-}
 
-qint64 CryptedFileStream::size() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_header.dataSize;
-}
+    bool Writing = isWriting();
+    if (m_openMode != NotOpen && isWriting())
+    {
+        dumpCurrentBlock();
+        writeHeader();
+    }
 
-qint64 CryptedFileStream::grossSize() const
-{
-    // Calculating block number including "tail" block.
-    return kHeaderSize
-        + ((m_header.dataSize + kCryptoBlockSize - 1) / kCryptoBlockSize) * kCryptoBlockSize;
+    m_file.close();
+    QIODevice::close();
+
+    resetState();
 }
 
 qint64 CryptedFileStream::readData(char* data, qint64 maxSize)
@@ -113,68 +204,38 @@ qint64 CryptedFileStream::writeData(const char* data, qint64 maxSize)
     return maxSize;
 }
 
-bool CryptedFileStream::open(QIODevice::OpenMode openMode)
+bool CryptedFileStream::seek(qint64 offset)
 {
-    // TODO: Add error-checking.
     QnMutexLocker lock(&m_mutex);
-    close();
 
-    m_file.setFileName(m_fileName);
-
-    OpenMode fileOpenMode = openMode;
-    // Since we may have to read unfinished blocks, we should never open in WriteOnly mode.
-    // For Append we need to read header and modify last block.
-    if (openMode == WriteOnly || (openMode & Append))
-        fileOpenMode = ReadWrite;
-
-    if (!m_file.open(fileOpenMode))
+    if (!isWriting() && (offset > m_header.dataSize))
         return false;
 
-    m_openMode = openMode;
+    dumpCurrentBlock();
+    m_position.setPosition(offset);
+    loadCurrentBlock();
 
-    m_enclosure.size = m_enclosure.originalSize;
-
-    if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
-        m_enclosure.size = m_file.size();
-
-    // Default to whole file if no enclosure provided.
-    if (!isWriting())
-    {
-        if (!readHeader())
-            return false;
-    }
-    else
-    {
-        if (openMode == WriteOnly || !readHeader()) //< Drop header if WriteOnly or attempt to read it.
-            createHeader();
-    }
-
-    m_openMode = openMode;
-    QIODevice::open(openMode);
-
-    if (openMode & Append)
-        seek(m_header.dataSize);
-    else
-        seek(0);
-
+    QIODevice::seek(offset);
     return true;
 }
 
-void CryptedFileStream::close()
+qint64 CryptedFileStream::pos() const
 {
     QnMutexLocker lock(&m_mutex);
+    return QIODevice::pos();
+}
 
-    bool Writing = isWriting();
-    if (m_openMode != NotOpen && isWriting())
-    {
-        dumpCurrentBlock();
-        writeHeader();
-    }
+qint64 CryptedFileStream::size() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_header.dataSize;
+}
 
-    m_file.close();
-    QIODevice::close();
-
-    resetState();
+qint64 CryptedFileStream::grossSize() const
+{
+    // Calculating block number including "tail" block.
+    return kHeaderSize
+        + ((m_header.dataSize + kCryptoBlockSize - 1) / kCryptoBlockSize) * kCryptoBlockSize;
 }
 
 void CryptedFileStream::resetState()
@@ -183,7 +244,8 @@ void CryptedFileStream::resetState()
     m_position = Position();
     m_header = Header();
     memset(m_currentPlainBlock, 0, kCryptoBlockSize);
-    m_openMode = QIODevice::NotOpen;
+    memset(m_header.salt, 0, kKeySize);
+    m_openMode = NotOpen;
 }
 
 void CryptedFileStream::readFromBlock(char* data, qint64 count)
@@ -245,7 +307,12 @@ void CryptedFileStream::loadCurrentBlock()
 void CryptedFileStream::createHeader()
 {
     m_header = Header();
-    // Create salt here.
+
+    Key salt = getRandomSalt();
+    std::copy_n(salt.begin(), kKeySize, m_header.salt);
+    m_key = xorKeys(m_passwordKey, salt);
+    Key keyHash = getKeyHash(m_key);
+    std::copy_n(keyHash.begin(), kKeySize, m_header.keyHash);
 
     writeHeader();
 }
@@ -254,8 +321,14 @@ bool CryptedFileStream::readHeader()
 {
     if (m_enclosure.size < kHeaderSize)
         return false;
+
     m_file.seek(m_enclosure.position);
-    return m_file.read((char *)&m_header, sizeof(m_header)) == sizeof(m_header);
+    if (m_file.read((char *)&m_header, sizeof(m_header)) != sizeof(m_header))
+        return false;
+
+    m_key = xorKeys(m_passwordKey, Key(m_header.salt));
+
+    return getKeyHash(m_key) == Key(m_header.keyHash);
 }
 
 void CryptedFileStream::writeHeader()
