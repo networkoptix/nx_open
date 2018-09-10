@@ -123,14 +123,14 @@ def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca):
     def cm(vm):
         mediaserver = Mediaserver.setup(
             vm.os_access, mediaserver_installer_set, ca.generate_key_and_cert())
-        with mediaserver.os_access.traffic_capture.capturing() as cap:
-            yield mediaserver
-
-        mediaserver.examine()
         mediaserver_artifacts_dir = artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
-        mediaserver.collect_artifacts(mediaserver_artifacts_dir)
-        if cap.exists():
-            copy_file(cap, mediaserver_artifacts_dir / '{}.cap'.format(vm.alias))
+        capture_file = mediaserver_artifacts_dir / '{}.cap'.format(vm.alias)
+        try:
+            with mediaserver.os_access.traffic_capture.capturing(capture_file):
+                yield mediaserver
+        finally:
+            mediaserver.examine()
+            mediaserver.collect_artifacts(mediaserver_artifacts_dir)
 
     return cm
