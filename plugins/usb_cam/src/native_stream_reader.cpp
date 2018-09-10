@@ -4,12 +4,23 @@
 
 #include <nx/utils/log/log.h>
 
+#include "utils.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/packet.h"
 
 namespace nx {
 namespace usb_cam {
+
+namespace {
+
+uint64_t kMsecInSec = 1000;
+
+uint64_t now = 0;
+uint64_t earlier = 0;
+
+
+}
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
@@ -30,10 +41,6 @@ NativeStreamReader::~NativeStreamReader()
     interrupt();
 }
 
-uint64_t now = 0;
-uint64_t earlier = 0;
-uint64_t lastTs = 0;
-
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
@@ -51,14 +58,14 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!packet)
         return nxcip::NX_OTHER_ERROR;
 
-   /*now = m_camera->millisSinceEpoch();
+    now = m_camera->millisSinceEpoch();
     std::stringstream ss;
-    ss << now - earlier
-        << ", " << packet->timeStamp() - lastTs
+    ss << packet->timeStamp()
+        << ", " << now - earlier
+        << ", " << packet->timeStamp() - m_lastTs
         << ", " << ffmpeg::utils::codecIDToName(packet->codecID());
     std::cout << ss.str() << std::endl;
     earlier = now;
-    lastTs = packet->timeStamp();*/
 
     *lpPacket = toNxPacket(packet.get()).release();
 
@@ -100,7 +107,7 @@ void NativeStreamReader::ensureConsumerAdded()
 
 void NativeStreamReader::maybeDropPackets()
 {
-    if (m_avConsumer->timeSpan() > 1000)
+    if (m_avConsumer->timeSpan() > kMsecInSec)
         m_avConsumer->flush();
 }
 
@@ -108,9 +115,8 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
     if (m_camera->audioEnabled())
     {
-        //static constexpr uint64_t bufferSizeMsec = 500;
-        //if (!m_avConsumer->waitForTimeStampDifference(bufferSizeMsec))
-        if (!m_avConsumer->wait(11))
+        uint64_t msecPerFrame = utils::msecPerFrame(m_camera->videoStream()->fps());
+        if( !m_avConsumer->waitForTimeSpan(msecPerFrame))
             return nullptr;
     }
    

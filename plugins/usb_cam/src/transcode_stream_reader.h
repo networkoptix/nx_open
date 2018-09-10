@@ -55,11 +55,9 @@ private:
 private:
     bool shouldDrop(const ffmpeg::Frame * frame) const;
     std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
-    void scaleNextFrame(const ffmpeg::Frame * frame, int * outNxError);
-    void encode(ffmpeg::Packet * outPacket, int * outNxError);
-    void flush();
-    uint64_t getNxTimeStamp(int64_t ffmpegPts);
+    int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
+    void waitForTimeSpan(uint64_t msec);
     std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();
@@ -69,8 +67,8 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
-    void dropIfBuffersTooFull();
-    int scale(AVFrame * frame, AVFrame* outFrame);
+    void maybeDrop();
+    int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
     int framesToDrop();
 };

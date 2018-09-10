@@ -86,6 +86,8 @@ protected:
     bool m_consumerAdded;
     bool m_interrupted;
 
+    uint64_t m_lastTs;
+
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
 };

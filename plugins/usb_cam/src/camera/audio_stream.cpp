@@ -47,7 +47,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_terminated(false),
     m_resampleContext(nullptr),
     m_packetCount(std::make_shared<std::atomic_int>()),
-    m_bufferMaxSize(4)
+    m_bufferMaxSize(3)
 {
     std::cout << "AudioStreamPrivate" << std::endl;
     start();
@@ -186,7 +186,6 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
      * Attempt to avoid "real-time buffer too full" error messages in Windows
      */
     inputFormat->setEntry("thread_queue_size", 2048);
-    //inputFormat->setEntry("rtbufsize", "10M");
     inputFormat->setEntry("threads", (int64_t) 0);
 #endif
 
@@ -358,7 +357,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
             returnData(result, nullptr);
     }
     
-    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
     if (auto pkt = addToBuffer(packet, &result))
         returnData(result, pkt);
 
@@ -366,20 +364,22 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
 }
 
 /**
-* AAC audio encoder puts out too many packets, bogging down the fps during the call to
-* to /aStreamReader::getNextData(). providing less packets fixes the issue, but we don't want to 
-* lose any, so copy multiple packets into one and then provide just the one.
+* AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets fixes
+* the issue, but we don't want to lose any, so copy multiple packets into one and then provide 
+* just the one.
 */
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError)
+std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
+    const std::shared_ptr<ffmpeg::Packet>& packet,
+    int * outFfmpegError)
 {
     *outFfmpegError = 0;
 
     m_packetBuffer.push_back(packet);
-    //if (m_packetBuffer.size() < m_bufferMaxSize)
-    if (m_timeProvider->millisSinceEpoch() - m_packetBuffer[0]->timeStamp() < timePerVideoFrame())
+    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+    if (packet->timeStamp() - m_packetBuffer[0]->timeStamp() < timePerVideoFrame())
         return nullptr;
 
-    size_t size = 0;
+    int size = 0;
     for (const auto& pkt : m_packetBuffer)
         size += pkt->size();
 
@@ -398,6 +398,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(con
         data += pkt->size();
     }
 
+    newPacket->setTimeStamp(packet->timeStamp());
     m_packetBuffer.clear();
     return newPacket;
 }
@@ -441,8 +442,6 @@ void AudioStream::AudioStreamPrivate::run()
         auto packet = getNextData(&result);
         if (result < 0 || !packet)
             continue;
-
-        packet->setTimeStamp(m_camera.lock()->millisSinceEpoch());
 
         std::lock_guard<std::mutex> lock(m_mutex);
         m_packetConsumerManager->givePacket(packet);

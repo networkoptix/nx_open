@@ -85,7 +85,6 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if (!m_encoders[encoderIndex])
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
-                //m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     refManager(),
                     encoderIndex,
                     m_camera));

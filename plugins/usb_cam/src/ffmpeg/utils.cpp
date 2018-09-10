@@ -266,7 +266,7 @@ void toFraction(float number, int * outNumerator, int * outDenominator)
     *outDenominator = den;
 }
 
-int suggestChannelLayout(AVCodec *codec)
+uint64_t suggestChannelLayout(AVCodec *codec)
 {
     if (!codec->channel_layouts)
         return AV_CH_LAYOUT_STEREO;

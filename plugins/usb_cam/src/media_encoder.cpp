@@ -23,7 +23,7 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     m_refManager(parentRefManager), 
     m_encoderIndex(encoderIndex),
     m_camera(camera),
-    m_codecParams(camera->codecParameters())
+    m_codecParams(camera->defaultVideoParameters())
 {
 }
 

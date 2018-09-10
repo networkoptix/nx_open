@@ -76,7 +76,7 @@ void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& p
     pushBack(packet->timeStamp(), packet);
 }
 
-bool BufferedPacketConsumer::waitForTimeStampDifference(uint64_t difference)
+bool BufferedPacketConsumer::waitForTimeSpan(uint64_t msecDifference)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     m_wait.wait(lock,
@@ -84,9 +84,7 @@ bool BufferedPacketConsumer::waitForTimeStampDifference(uint64_t difference)
     {
         if (!m_buffer.empty())
         {
-            uint64_t oldest = m_buffer.begin()->first;
-            uint64_t newest = m_buffer.rbegin()->first;
-            return newest - oldest >= difference;
+            return m_buffer.rbegin()->first - m_buffer.begin()->first >= msecDifference;
         }
         return m_interrupted;
     });
@@ -99,6 +97,7 @@ uint64_t BufferedPacketConsumer::timeSpan() const
     if (m_buffer.empty())
         return 0;
 
+    // largest key minus smallest key
     return m_buffer.rbegin()->first - m_buffer.begin()->first;
 }
 
@@ -118,6 +117,7 @@ BufferedAudioVideoPacketConsumer::BufferedAudioVideoPacketConsumer(
 void BufferedAudioVideoPacketConsumer::pushBack(const uint64_t & timeStamp, const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     BufferedPacketConsumer::pushBack(timeStamp, packet);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (packet)
     {
         if (packet->mediaType() == AVMEDIA_TYPE_VIDEO)
@@ -130,6 +130,7 @@ void BufferedAudioVideoPacketConsumer::pushBack(const uint64_t & timeStamp, cons
 std::shared_ptr<ffmpeg::Packet> BufferedAudioVideoPacketConsumer::popFront(uint64_t timeOut)
 {
     auto packet = BufferedPacketConsumer::popFront(timeOut);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (packet) // could be null if interrupted while waiting or timeout
     {
         if (packet->mediaType() == AVMEDIA_TYPE_VIDEO)
@@ -142,10 +143,12 @@ std::shared_ptr<ffmpeg::Packet> BufferedAudioVideoPacketConsumer::popFront(uint6
 
 int BufferedAudioVideoPacketConsumer::videoCount() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_videoCount;
 }
 int BufferedAudioVideoPacketConsumer::audioCount() const
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_audioCount;
 }
 
@@ -167,7 +170,6 @@ void BufferedVideoFrameConsumer::flush()
 void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
     pushBack(frame->timeStamp(), frame);
- //   pushBack(frame);
 }
 
 } // namespace usb_cam

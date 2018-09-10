@@ -6,7 +6,9 @@ namespace nx {
 namespace ffmpeg {
 
 InputFormat::InputFormat():
-    Options()
+    Options(),
+    m_actualTimePerFrame(0),
+    m_lastPts(0)
 {    
 }
 
@@ -54,7 +56,10 @@ void InputFormat::close()
 
 int InputFormat::readFrame(AVPacket * outPacket)
 {
-    return av_read_frame(m_formatContext, outPacket);
+    int result = av_read_frame(m_formatContext, outPacket);
+    if (result >= 0)
+        calculateActualTimePerFrame(outPacket);
+    return result;
 }
 
 int InputFormat::setFps(float fps)
@@ -126,6 +131,23 @@ void InputFormat::resolution(int * width, int * height) const
     AVStream * stream = findStream(AVMEDIA_TYPE_VIDEO);
     *width =  stream ? stream->codecpar->width : 0;
     *height = stream ? stream->codecpar->height : 0;
+}
+
+int InputFormat::actualTimePerFrame() const
+{
+    return m_actualTimePerFrame;
+}
+
+void InputFormat::calculateActualTimePerFrame(AVPacket * packet)
+{
+    if (!m_lastPts)
+        m_lastPts = packet->pts;
+
+    int actualTpf = packet->pts - m_lastPts;
+    if (actualTpf > m_actualTimePerFrame)
+        m_actualTimePerFrame = actualTpf;
+
+    m_lastPts = packet->pts;
 }
 
 } // namespace ffmpeg

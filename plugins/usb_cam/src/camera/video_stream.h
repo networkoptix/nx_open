@@ -42,6 +42,7 @@ public:
 
     AVPixelFormat decoderPixelFormat() const;
     float fps() const;
+    int actualTimePerFrame() const;
 
     void updateFps();
     void updateBitrate();
@@ -102,8 +103,8 @@ private:
     int initializeDecoder();
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
-    CodecParameters closestSupportedResolution(const std::weak_ptr<VideoConsumer>& consumer) const;
-    void updateStreamConfiguration(const CodecParameters& codecParams);
+    CodecParameters closestHardwareConfiguration(const std::weak_ptr<VideoConsumer>& consumer) const;
+    void setCodecParameters(const CodecParameters& codecParams);
 };
 
 } // namespace usb_cam

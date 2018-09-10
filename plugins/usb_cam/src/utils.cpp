@@ -28,6 +28,11 @@ std::string encodeCameraInfoUrl(const char * url)
     //return QByteArray(kWebcamUrlPrefix.c_str()).append(nx::utils::Url::toPercentEncoding(url)).data();
 }
 
+float msecPerFrame(float fps)
+{
+    return 1.0 / fps * 1000;
+}
+
 } // namespace utils
 } // namespace usb_cam
 } // namespace nx

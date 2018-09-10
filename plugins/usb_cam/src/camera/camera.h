@@ -42,7 +42,7 @@ public:
     device::CompressionTypeDescriptorConstPtr compressionTypeDescriptor() const;
 
     std::string url() const;
-    CodecParameters codecParameters() const;
+    CodecParameters defaultVideoParameters() const;
 
     std::vector<AVCodecID> ffmpegCodecPriorityList();
 
@@ -51,7 +51,7 @@ private:
 
     nxpl::TimeProvider * const m_timeProvider;
     nxcip::CameraInfo m_info;
-    CodecParameters m_videoCodecParams;
+    CodecParameters m_defaultVideoParams;
 
     mutable std::mutex m_mutex;
     std::shared_ptr<AudioStream> m_audioStream;
@@ -63,7 +63,9 @@ private:
     device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
 
 private:
-    void assignDefaultParams(const device::CompressionTypeDescriptorPtr& descriptor);
+    CodecParameters getDefaultVideoParameters(
+        const std::string& url,
+        const device::CompressionTypeDescriptorPtr& descriptor);
 };
 
 } // namespace usb_cams

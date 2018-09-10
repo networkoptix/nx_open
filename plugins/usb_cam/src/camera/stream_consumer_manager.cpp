@@ -174,7 +174,12 @@ size_t PacketConsumerManager::addConsumer(
     /* this addConsumer() call needs to be the parent's to avoid recursion*/
     size_t index = StreamConsumerManager::addConsumer(consumer);
     if (index != -1)
-        m_waitForKeyPacket.insert(m_waitForKeyPacket.begin() + index, waitForKeyPacket);
+    {
+        if (m_waitForKeyPacket.empty())
+            m_waitForKeyPacket.push_back(waitForKeyPacket);
+        else
+            m_waitForKeyPacket.insert(m_waitForKeyPacket.begin() + index, waitForKeyPacket);
+    }
     return index;
 }
 

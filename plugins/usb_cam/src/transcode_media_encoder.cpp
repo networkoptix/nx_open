@@ -45,8 +45,8 @@ int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, in
 
     CodecParameters secondary = calculateSecondaryCodecParams(list);
 
-    size_t index = list.size() < nxcip::MAX_RESOLUTION_LIST_SIZE
-        ? list.size()
+    int index = list.size() < nxcip::MAX_RESOLUTION_LIST_SIZE
+        ? (int)list.size()
         : nxcip::MAX_RESOLUTION_LIST_SIZE - 1;
 
     infoList[index].resolution.width = secondary.width;
@@ -91,7 +91,7 @@ CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
     if (resolutionList.empty())
         return CodecParameters(AV_CODEC_ID_NONE, 30, kDefaultBitrate, kTargetWidth, kTargetWidth*9/16);
 
-    const auto& resolution = resolutionList[0];
+    const auto& resolution = resolutionList[resolutionList.size() - 1];
     float aspectRatio = (float) resolution.width / resolution.height;
 
     AVCodecID codecID = ffmpeg::utils::toAVCodecID(

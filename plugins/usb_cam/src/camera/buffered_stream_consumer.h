@@ -10,7 +10,8 @@
 namespace nx {
 namespace usb_cam {
 
-//////////////////////////////////////////// Buffer<T> /////////////////////////////////////////////
+
+/////////////////////////////////////////// Map<K, V> /////////////////////////////////////////////
 
 template<typename K, typename V>
 class Map
@@ -75,10 +76,10 @@ public:
         return v;
     }
 
-    bool wait(size_t minimumBufferSize = 0, uint64_t timeOut = 0)
+    bool wait(size_t minimumBufferSize = 0, uint64_t timeOutMsec = 0)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        return wait(lock, minimumBufferSize, timeOut);
+        return wait(lock, minimumBufferSize, timeOutMsec);
     }
 
     void interrupt()
@@ -86,6 +87,16 @@ public:
         std::lock_guard<std::mutex> lock(m_mutex);
         m_interrupted = true;
         m_wait.notify_all();
+    }  
+
+    std::vector<K> keys() const
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        std::vector<K> keys;
+        keys.reserve(m_buffer.size());
+        for (const auto & item : m_buffer)
+            keys.push_back(item.first);
+        return keys;
     }
 
 protected:
@@ -95,13 +106,13 @@ protected:
     bool m_interrupted;
 
 protected:
-    bool wait(std::unique_lock<std::mutex>& lock, size_t minimumBufferSize = 0, uint64_t timeOut = 0)
+    bool wait(std::unique_lock<std::mutex>& lock, size_t minimumBufferSize = 0, uint64_t timeOutMsec = 0)
     {
-        if (timeOut > 0)
+        if (timeOutMsec > 0)
         {
             m_wait.wait_for(
                 lock,
-                std::chrono::milliseconds(timeOut),
+                std::chrono::milliseconds(timeOutMsec),
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
         else
@@ -123,6 +134,9 @@ protected:
         return false;
     }
 };
+
+
+//////////////////////////////////////////// Buffer<T> ////////////////////////////////////////////
 
 template<typename T> 
 class Buffer
@@ -235,7 +249,7 @@ public:
     virtual void flush() override;
     virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) override;
 
-    bool waitForTimeStampDifference(uint64_t difference); 
+    bool waitForTimeSpan(uint64_t difference); 
     uint64_t timeSpan() const;
 
     int dropOldNonKeyPackets();
@@ -277,7 +291,6 @@ private:
 class BufferedVideoFrameConsumer 
     :
     public Map<uint64_t, std::shared_ptr<ffmpeg::Frame>>,
-    //public Buffer<std::shared_ptr<ffmpeg::Frame>>,
     public AbstractVideoConsumer,
     public FrameConsumer
 {

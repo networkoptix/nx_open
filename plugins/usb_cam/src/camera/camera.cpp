@@ -61,7 +61,7 @@ Camera::Camera(
 {
     auto codecList = device::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
-    assignDefaultParams(m_compressionTypeDescriptor);
+    m_defaultVideoParams = getDefaultVideoParameters(url(), m_compressionTypeDescriptor);
 
     std::string video = std::string("VIDEO url: ") + m_info.url;
     std::string audio = std::string("AUDIO url: ") + m_info.auxiliaryData;
@@ -89,7 +89,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
     {
         m_videoStream = std::make_shared<VideoStream>(
             url(),
-            m_videoCodecParams,
+            m_defaultVideoParams,
             weak_from_this());
     }
     return m_videoStream;
@@ -156,9 +156,9 @@ std::string Camera::url() const
     return utils::decodeCameraInfoUrl(m_info.url);
 }
 
-CodecParameters Camera::codecParameters() const
+CodecParameters Camera::defaultVideoParameters() const
 {
-    return m_videoCodecParams;
+    return m_defaultVideoParams;
 }
 
 std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
@@ -169,20 +169,17 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
     return ffmpegCodecList;
 }
 
-void Camera::assignDefaultParams(const device::CompressionTypeDescriptorPtr& descriptor)
+CodecParameters Camera::getDefaultVideoParameters(
+    const std::string& url,
+    const device::CompressionTypeDescriptorPtr& descriptor)
 {
-    std::string url = this->url();
-    NX_ASSERT(descriptor);
     if (!descriptor)
-    {
-        m_videoCodecParams = CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
-        return;
-    }
+        return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
 
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
 
-    auto resolutionList = device::getResolutionList(url.c_str(), m_compressionTypeDescriptor);
+    auto resolutionList = device::getResolutionList(url.c_str(), descriptor);
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::ResolutionData& a, const device::ResolutionData& b)
     {
@@ -192,7 +189,7 @@ void Camera::assignDefaultParams(const device::CompressionTypeDescriptorPtr& des
     if (it != resolutionList.end())
     {
         int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
-        m_videoCodecParams =  CodecParameters(
+        return CodecParameters(
             ffmpegCodecID,
             it->fps,
             maxBitrate,
@@ -200,10 +197,7 @@ void Camera::assignDefaultParams(const device::CompressionTypeDescriptorPtr& des
             it->height);
     }
     else
-    {
-        NX_ASSERT(false);
-        m_videoCodecParams = CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
-    }
+        return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
 }
 
 } // namespace usb_cam

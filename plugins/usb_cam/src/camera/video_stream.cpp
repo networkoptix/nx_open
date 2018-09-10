@@ -143,8 +143,8 @@ void VideoStream::updateFpsUnlocked()
     float fps = videoConsumer.lock()->fps();
     videoConsumer.lock()->resolution(&width, &height);
 
-    CodecParameters codecParams = closestSupportedResolution(videoConsumer);
-    updateStreamConfiguration(codecParams);
+    CodecParameters codecParams = closestHardwareConfiguration(videoConsumer);
+    setCodecParameters(codecParams);
 }
 
 void VideoStream::updateResolutionUnlocked()
@@ -169,8 +169,8 @@ void VideoStream::updateResolutionUnlocked()
     if (!videoConsumer.lock())
         return;
 
-    CodecParameters codecParams = closestSupportedResolution(videoConsumer);
-    updateStreamConfiguration(codecParams);
+    CodecParameters codecParams = closestHardwareConfiguration(videoConsumer);
+    setCodecParameters(codecParams);
 }
 
 void VideoStream::updateBitrateUnlocked()
@@ -231,6 +231,12 @@ AVPixelFormat VideoStream::decoderPixelFormat() const
 float VideoStream::fps() const
 {
     return m_codecParams.fps;
+}
+
+int VideoStream::actualTimePerFrame() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_inputFormat ? m_inputFormat->actualTimePerFrame() : 0;
 }
 
 void VideoStream::updateFps()
@@ -429,17 +435,17 @@ int VideoStream::initializeDecoder()
     m_waitForKeyPacket = true;
     m_decoder = std::move(decoder);
 
-#ifdef _WIN32
     /**
-     * dshow implementation does not set the key packet flag for sps/pps frames that are not IFrames,
-     * and on some cameras they are very infrequent. Initializing the decoder with the first packet read from the 
-     * camera prevent numerous "non exisiting PPS 0 referenced" errors on some cameras.
+     * Some cameras have infrequent I-frames. Initializing the decoder with the first packet read
+     * from the camera (presumably an I-frame) prevents numerous "non exisiting PPS 0 referenced"
+     * errors on some cameras.
      */
     ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
-    m_inputFormat->readFrame(packet.packet());
-    ffmpeg::Frame frame;
-    decode(&packet, &frame);
-#endif
+    if (m_inputFormat->readFrame(packet.packet()) >= 0)
+    {
+        ffmpeg::Frame frame;
+        decode(&packet, &frame);
+    }
 
     return 0;
 }
@@ -467,8 +473,11 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     if (result < 0)
         return nullptr;
 
+    if (frame->pts() == AV_NOPTS_VALUE)
+        frame->frame()->pts = frame->packetPts();
+
     uint64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(frame->packetPts(), &nxTimeStamp, true/*eraseEntry*/))
+    if (!m_timeStamps.getNxTimeStamp(frame->pts(), &nxTimeStamp, true/*eraseEntry*/))
     {
         //std::cout << "missing timestamp during video decode" << std::endl;
         if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true))
@@ -483,37 +492,16 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
     int result = 0;
     bool gotFrame = false;
-    while (!gotFrame)
-    {
-
-        result = m_decoder->sendPacket(packet->packet());
-        bool needReceive = result == 0 || result == AVERROR(EAGAIN);
-        while (needReceive) // ready to or requires parsing a frame
-        {
-            result = m_decoder->receiveFrame(frame->frame());
-            if (result == 0)
-            {
-                // got a frame or need to send more packets to decoder
-                gotFrame = true;
-                break;
-            }
-            else // something very bad happened or the decoder needs more input
-            {
-                return result;
-            }
-        }
-        if (!needReceive) // something very bad happened
-        {
-            return result;
-        }
-    }
-
+    result = m_decoder->sendPacket(packet->packet());
+    if(result == 0 || result == AVERROR(EAGAIN))
+        return m_decoder->receiveFrame(frame->frame());
     return result;
 }
 
-CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<VideoConsumer>& consumer) const
+CodecParameters VideoStream::closestHardwareConfiguration(
+    const std::weak_ptr<VideoConsumer>& consumer) const
 {
-    if (!consumer.lock())
+    if (!consumer.lock()) // should never happen
         return CodecParameters();
 
     auto consumerPtr = consumer.lock();
@@ -567,7 +555,7 @@ CodecParameters VideoStream::closestSupportedResolution(const std::weak_ptr<Vide
     return m_codecParams;
 }
 
-void VideoStream::updateStreamConfiguration(const CodecParameters& codecParams)
+void VideoStream::setCodecParameters(const CodecParameters& codecParams)
 {
     if (m_codecParams.fps != codecParams.fps
         || m_codecParams.width * m_codecParams.height != codecParams.width * codecParams.height)

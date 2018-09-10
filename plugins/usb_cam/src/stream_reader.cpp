@@ -5,9 +5,10 @@
 
 #include "ffmpeg/utils.h"
 #include "camera/buffered_stream_consumer.h"
+#include "utils.h"
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
-#include "nx/utils/app_info.h"
+
 
 namespace nx {
 namespace usb_cam {
@@ -112,7 +113,8 @@ StreamReaderPrivate::StreamReaderPrivate(
     m_camera(camera),
     m_avConsumer(new BufferedAudioVideoPacketConsumer(camera->videoStream(), codecParams)),
     m_consumerAdded(false),
-    m_interrupted(false)
+    m_interrupted(false),
+    m_lastTs(0)
 {
 }
 
@@ -171,6 +173,8 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
     nxPacket->resizeBuffer(packet->size());
     if (nxPacket->data())
         memcpy(nxPacket->data(), packet->data(), packet->size());
+
+    m_lastTs = packet->timeStamp();
 
     return nxPacket;
 }
