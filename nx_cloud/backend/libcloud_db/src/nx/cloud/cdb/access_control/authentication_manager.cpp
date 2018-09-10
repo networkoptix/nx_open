@@ -415,7 +415,7 @@ void AuthenticationHelper::updateUserLockoutState(
                 .args(std::get<1>(m_userLockKey), std::get<0>(m_userLockKey)));
             break;
 
-        default:
+        case nx::network::server::LockUpdateResult::noChange:
             break;
     }
 }
