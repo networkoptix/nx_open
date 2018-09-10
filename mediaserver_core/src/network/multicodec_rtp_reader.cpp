@@ -889,14 +889,9 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
-    const auto extensionNtpTime = parseOnvifNtpExtensionTime(
+    rtcpStaticstics.ntpOnvifExtensionTime = parseOnvifNtpExtensionTime(
         (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
         rtpPacketSize);
-
-    if (extensionNtpTime.is_initialized())
-        m_lastOnvifNtpExtensionTime = extensionNtpTime;
-
-    rtcpStaticstics.ntpOnvifExtensionTime = m_lastOnvifNtpExtensionTime;
 
     return rtcpStaticstics;
 }
