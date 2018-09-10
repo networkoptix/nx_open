@@ -5,14 +5,12 @@
 #include <utils/media/bitStream.h>
 #include <nx/streaming/rtp/rtp.h>
 
-namespace nx {
-namespace streaming {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 // See: ONVIF Streaming Specification Ver. 17.06 (6.3 RTP header extension)
 struct OnvifHeaderExtension
 {
-    static const int kSize = RtpHeaderExtension::kSize + 12;
+    static constexpr int kSize = RtpHeaderExtension::kSize + 12;
 
     bool read(const uint8_t* data, int size);
     int write(uint8_t* data, int size) const;
@@ -25,7 +23,4 @@ struct OnvifHeaderExtension
     uint8_t cSeq = 0;
 };
 
-
-} // namespace rtp
-} // namespace streaming
-} // namespace nx
+}  // namespace rtp::streaming::nx
