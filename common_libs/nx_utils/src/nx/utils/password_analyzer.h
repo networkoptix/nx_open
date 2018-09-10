@@ -10,6 +10,9 @@ struct NX_UTILS_API PasswordLimitations
     /** Minimal length of a password. */
     static constexpr int kMinimumLength = 8;
 
+    /** Maximal length of any password. */
+    static constexpr int kMaximumLength = 255;
+
     /** Maximal length of a camera password. */
     static constexpr int kMaximumLengthForCamera = 15;
 
