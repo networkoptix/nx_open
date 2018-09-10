@@ -26,7 +26,7 @@ def network(hypervisor, vm_types, layout):
         networks_structure = layout['networks']
         reachability = layout.get('reachability', {})
         vms, _ = setup_networks(allocate_vm, hypervisor, networks_structure, reachability)
-    return vms
+        yield vms
 
 
 @pytest.fixture()
