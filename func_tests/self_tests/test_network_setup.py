@@ -63,15 +63,14 @@ def test_setup_basic(allocate_machine, hypervisor):
 
 def test_two_vms(two_vms, hypervisor):
     first_vm, second_vm = two_vms
-    ips = setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
-    second_vm_ip = ips[second_vm.alias]
-    wait_for_truthy(
-        lambda: first_vm.os_access.networking.can_reach(second_vm_ip),
-        "{} can ping {} by {}".format(first_vm, second_vm, second_vm_ip))
-    first_vm_ip = ips[first_vm.alias]
-    wait_for_truthy(
-        lambda: second_vm.os_access.networking.can_reach(first_vm_ip),
-        "{} can ping {} by {}".format(second_vm, first_vm, first_vm_ip))
+    for first_vm_ip in first_vm.ip_address_list:
+        wait_for_truthy(
+            lambda: second_vm.os_access.networking.can_reach(first_vm_ip),
+            "{} can reach {} by {}".format(second_vm, first_vm, first_vm_ip))
+    for second_vm_ip in second_vm.ip_address_list:
+        wait_for_truthy(
+            lambda: first_vm.os_access.networking.can_reach(second_vm_ip),
+            "{} can reach {} by {}".format(first_vm, second_vm, second_vm_ip))
 
 
 def test_big_flat_network(big_flat_network):
