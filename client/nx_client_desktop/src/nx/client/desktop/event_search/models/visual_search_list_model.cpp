@@ -4,6 +4,8 @@
 
 #include <nx/client/desktop/event_search/models/abstract_search_list_model.h>
 #include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::client::desktop {
 
@@ -22,11 +24,21 @@ VisualSearchListModel::VisualSearchListModel(
         m_sourceModel,
         m_tailIndicatorModel});
 
+    m_headIndicatorModel->setObjectName("head");
+    m_tailIndicatorModel->setObjectName("tail");
+
     m_headIndicatorModel->setVisible(false);
     m_tailIndicatorModel->setVisible(true);
 
     connect(m_sourceModel, &AbstractSearchListModel::fetchFinished,
         this, &VisualSearchListModel::handleFetchFinished);
+
+    connect(m_sourceModel, &AbstractSearchListModel::liveChanged, this,
+        [this](bool isLive)
+        {
+            if (isLive)
+                m_headIndicatorModel->setVisible(false);
+        });
 }
 
 VisualSearchListModel::~VisualSearchListModel()
@@ -55,7 +67,7 @@ void VisualSearchListModel::setFetchDirection(FetchDirection value)
 
     auto prevIndicator = relevantIndicatorModel();
     prevIndicator->setActive(false);
-    prevIndicator->setVisible(true);
+    prevIndicator->setVisible(canFetchMore());
 
     m_sourceModel->setFetchDirection(value);
 }
@@ -95,8 +107,9 @@ void VisualSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 
 void VisualSearchListModel::handleFetchFinished()
 {
-    qDebug() << fetchDirection() << canFetchMore();
-    relevantIndicatorModel()->setVisible(canFetchMore());
+    const auto indicator = relevantIndicatorModel();
+    indicator->setVisible(canFetchMore());
+    indicator->setActive(false);
 }
 
 } // namespace nx::client::desktop

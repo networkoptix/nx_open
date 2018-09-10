@@ -4,6 +4,19 @@
 
 namespace nx::client::desktop {
 
+namespace {
+
+QString debugId(BusyIndicatorModel* model)
+{
+    const auto name = model->objectName();
+    if (name.isEmpty())
+        return {};
+
+    return QString("[%1]").arg(name);
+}
+
+} // namespace
+
 bool BusyIndicatorModel::active() const
 {
     return m_active;
@@ -14,7 +27,7 @@ void BusyIndicatorModel::setActive(bool value)
     if (m_active == value)
         return;
 
-    NX_VERBOSE(this) << "Setting active to" << value;
+    NX_VERBOSE(this) << "Setting active to" << value << debugId(this);
 
     m_active = value;
     if (!m_visible)
@@ -34,7 +47,7 @@ void BusyIndicatorModel::setVisible(bool value)
     if (m_visible == value)
         return;
 
-    NX_VERBOSE(this) << "Setting visible to" << value;
+    NX_VERBOSE(this) << "Setting visible to" << value <<  debugId(this);
 
     ScopedReset reset(this);
     m_visible = value;
