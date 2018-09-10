@@ -193,7 +193,7 @@ void Authenticator::setAccessCookie(
         return m_sessionKeys.addOrUpdate(sessionKey, access); //< Use existing if possible.
 
     const auto newSessionKey = m_sessionKeys.make(access);
-    response->setCookie(kCookieRuntimeGuid, newSessionKey, secure);
+    response->setCookie(kCookieRuntimeGuid, newSessionKey, "/", secure);
 }
 
 void Authenticator::removeAccessCookie(

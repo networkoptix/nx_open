@@ -698,7 +698,7 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
 static StringType kSetCookieHeaderName("Set-Cookie");
 
 void Response::setCookie(
-        const StringType& name, const StringType& value, bool secure, const StringType& path)
+    const StringType& name, const StringType& value, const StringType& path, bool secure)
 {
     insertHeader(&headers, {kSetCookieHeaderName,
         name + "=" + value + "; Path=" + path + (secure ? "; Secure" : "")});

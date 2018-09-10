@@ -341,7 +341,7 @@ public:
 
     void setCookie(
         const StringType& name, const StringType& value,
-        bool secure = false, const StringType& path = "/");
+        const StringType& path = "/", bool secure = false);
 
     void setDeletedCookie(const StringType& name);
     std::map<StringType, StringType> getCookies() const;
