@@ -583,7 +583,6 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
 {
     Error error = Error::noError;
     // TODO: #mike: Consider a dedicated mechanism for localization.
-    // TODO: #mike: Refactor GUIDs to be string-based hierarchical ids (e.g. "nx.eventType.LineCrossing").
 
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
