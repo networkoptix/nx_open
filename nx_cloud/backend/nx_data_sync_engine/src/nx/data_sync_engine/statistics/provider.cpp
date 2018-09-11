@@ -51,6 +51,7 @@ Statistics Provider::statistics() const
     const auto connections = m_connectionManager.getConnections();
 
     Statistics data;
+    data.connectedServerCount = static_cast<int>(connections.size());
     for (const auto& connection: connections)
         ++data.connectedServerCountByVersion[connection.userAgent];
 

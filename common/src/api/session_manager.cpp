@@ -31,9 +31,8 @@ QnSessionManager::QnSessionManager(QObject* parent):
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
-    auto httpPool = nx::network::http::ClientPool::instance();
     Qn::directConnect(
-        httpPool, &nx::network::http::ClientPool::done,
+        httpClientPool(), &nx::network::http::ClientPool::done,
         this, &QnSessionManager::onHttpClientDone);
 }
 
@@ -46,9 +45,8 @@ QnSessionManager::~QnSessionManager()
     auto requestInProgress = std::move(m_requestInProgress);
     lk.unlock();
 
-    auto httpPool = nx::network::http::ClientPool::instance();
     for (auto& httpClientAndRequestInfo : requestInProgress)
-        httpPool->terminate(httpClientAndRequestInfo.first);
+        httpClientPool()->terminate(httpClientAndRequestInfo.first);
 }
 
 void QnSessionManager::start()
@@ -143,8 +141,8 @@ int QnSessionManager::sendAsyncRequest(
     NX_ASSERT(qnHasEventLoop(QThread::currentThread()) || (!target));
     if (!qnHasEventLoop(QThread::currentThread()) && target)
     {
-        NX_LOG(QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
-            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)), cl_logERROR);
+        NX_ERROR(this, QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)));
         std::cout << "QnSessionManager::sendAsyncRequest. No event loop in current thread, "
             "but response is awaited. target " << target << ", slot " << slot << std::endl;
     }
@@ -256,16 +254,14 @@ int QnSessionManager::sendAsyncRequest(
     requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
     requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());
 
-    auto httpPool = nx::network::http::ClientPool::instance();
-
     const auto msgBodyContentType =
         nx::network::http::getHeaderValue(headers, nx::network::http::header::kContentType);
     headers.emplace(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
 
     if (method == nx::network::http::Method::get)
-        requestInfo.handle = httpPool->doGet(requestUrl, std::move(headers));
+        requestInfo.handle = httpClientPool()->doGet(requestUrl, std::move(headers));
     else
-        requestInfo.handle = httpPool->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));
+        requestInfo.handle = httpClientPool()->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));
 
     QnMutexLocker lk(&m_mutex);
     m_requestInProgress.emplace(requestInfo.handle, requestInfo);

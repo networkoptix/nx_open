@@ -1,7 +1,7 @@
 import logging
 import threading
 
-from framework.waiting import Wait, wait_for_true
+from framework.waiting import Wait, wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def test_stop_timeout(two_merged_mediaservers):
 
     if not service.status().is_running:
         service.start()
-    wait_for_true(mediaserver.api.is_online)
+    wait_for_truthy(mediaserver.api.is_online)
     status_before = service.status()
     thread = threading.Thread(target=check_and_make_core_dump, args=(status_before,))
     thread.start()

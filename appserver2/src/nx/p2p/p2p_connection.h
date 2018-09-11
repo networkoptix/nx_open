@@ -21,9 +21,12 @@ public:
         const vms::api::PeerDataEx& remotePeer,
         const vms::api::PeerDataEx& localPeer,
         nx::network::WebSocketPtr webSocket,
+        const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::unique_ptr<QObject> opaqueObject,
         ConnectionLockGuard connectionLockGuard);
+
+    virtual ~Connection() override;
 
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;

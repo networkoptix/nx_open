@@ -19,7 +19,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/widgets/views/resource_list_view.h>
-#include <ui/widgets/default_password_alert_bar.h>
+#include <nx/client/desktop/resource_properties/camera/widgets/default_password_alert_bar.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
@@ -47,7 +47,7 @@ using namespace ui;
 
 LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
     base_type(parent),
-    m_defaultPasswordAlert(new QnDefaultPasswordAlertBar(this)),
+    m_defaultPasswordAlert(new DefaultPasswordAlertBar(this)),
     m_ignoreAccept(false)
 {
     setMinimumWidth(kMinimumWidth);
@@ -85,9 +85,9 @@ LegacyCameraSettingsDialog::LegacyCameraSettingsDialog(QWidget *parent):
     auto separator = new QFrame(this);
     separator->setFrameStyle(QFrame::HLine | QFrame::Sunken);
 
-    connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::changeDefaultPasswordRequest,
+    connect(m_defaultPasswordAlert, &DefaultPasswordAlertBar::changeDefaultPasswordRequest,
         this, &LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest);
-    connect(m_defaultPasswordAlert, &QnDefaultPasswordAlertBar::targetCamerasChanged,
+    connect(m_defaultPasswordAlert, &DefaultPasswordAlertBar::targetCamerasChanged,
         this, &LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
 
     QVBoxLayout *layout = new QVBoxLayout(this);

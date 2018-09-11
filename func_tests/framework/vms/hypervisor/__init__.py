@@ -15,8 +15,11 @@ class VmHardware(object):
         self._vacant_nics = list(reversed(vacant_nics))
         self.description = description
 
+    def __str__(self):
+        return 'VM {!s}'.format(self.name)
+
     def __repr__(self):
-        return '<VM {!s}>'.format(self.name)
+        return '<{!s}>'.format(self)
 
     def _find_vacant_nic(self):
         return self._vacant_nics.pop()

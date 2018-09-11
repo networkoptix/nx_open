@@ -29,10 +29,9 @@ bool DbConnectionHolder::open()
 {
     if (!m_connection.open())
     {
-        NX_LOG(lm("Failed to establish connection to DB %1 at %2:%3. %4").
+        NX_WARNING(this, lm("Failed to establish connection to DB %1 at %2:%3. %4").
             arg(connectionOptions().dbName).arg(connectionOptions().hostName).
-            arg(connectionOptions().port).arg(toString(m_connection.lastError())),
-            cl_logWARNING);
+            arg(connectionOptions().port).arg(toString(m_connection.lastError())));
         return false;
     }
 
@@ -83,9 +82,8 @@ bool DbConnectionHolder::tuneMySqlConnection()
         }
         catch (const Exception& e)
         {
-            NX_LOGX(lm("Failed to set connection character set to \"%1\". %2")
-                .args(connectionOptions().encoding, e.what()),
-                cl_logWARNING);
+            NX_WARNING(this, lm("Failed to set connection character set to \"%1\". %2")
+                .args(connectionOptions().encoding, e.what()));
             return false;
         }
     }

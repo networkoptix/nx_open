@@ -60,31 +60,36 @@ class WindowsInstallation(Installation):
         self._config_key_backup.create()  # OK if already exists.
         self._config_key.copy_values_to(self._config_key_backup)
 
-    def can_install(self, installer):
-        return installer.platform == 'win64' and installer.path.suffix == '.msi'
+    def _can_install(self, installer):
+        return installer.platform == 'win' and installer.component == 'server'
 
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
+        commands = {
+            '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
+            '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
+            }
+        self.windows_access.winrm.run_command(commands[installer.extension])
         self._backup_configuration()
 
     def parse_core_dump(self, path):
         symbols_path = str.format(
-            r'cache*;'
-            # By some obscure reason, when run via WinRM, `cdb` cannot fetch `.pdb` from Microsoft Symbol Server.
-            # (Same command, copied from `procmon`, works like a charm.)
-            # Hope symbols exported from DLLs will suffice.
-            # r'srv*;'
-            r'{build_dir}\{build}\{customization}\windows-x64\bin;'
-            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins;'
-            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional;'
-            ,
+            ';'.join([
+                r'cache*',
+                # By some obscure reason, when run via WinRM, `cdb` cannot fetch `.pdb` from Microsoft Symbol Server.
+                # (Same command, copied from `procmon`, works like a charm.)
+                # Hope symbols exported from DLLs will suffice.
+                # r'srv*',
+                r'{build_dir}\{build}\{customization}\windows-x64\bin',
+                # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins',
+                # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional',
+                ]),
             build_dir=r'\\cinas\beta-builds\repository\v1\develop\vms',
             build=self.identity().version.build,
             customization=self.identity().customization.customization_name,
             )
-        self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
+        return self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
 
     def _restore_conf(self):
         self._config_key_backup.copy_values_to(self._config_key)

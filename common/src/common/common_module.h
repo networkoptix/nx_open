@@ -33,12 +33,15 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
+class QnAuditManager;
+class CameraDriverRestrictionList;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
+namespace nx::network::http { class ClientPool; }
 
 struct BeforeRestoreDbData
 {
@@ -78,7 +81,6 @@ public:
         QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
-    //using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
@@ -240,10 +242,10 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
 
-    template <class MessageProcessorType>
-    MessageProcessorType* createMessageProcessor()
+    template <class MessageProcessorType, typename ...Args>
+    MessageProcessorType* createMessageProcessor(Args... args)
     {
-        const auto processor = new MessageProcessorType(this);
+        const auto processor = new MessageProcessorType(args...);
         createMessageProcessorInternal(processor);
         return processor;
     }
@@ -265,7 +267,12 @@ public:
 
     nx::metrics::Storage* metrics() const;
 
+    void setAuditManager(QnAuditManager* auditManager);
+    QnAuditManager* auditManager() const;
+    nx::network::http::ClientPool* httpClientPool() const;
     /** instanceCounter used for unit test purpose only */
+
+    CameraDriverRestrictionList* cameraDriverRestrictionList() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -306,6 +313,7 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
+    nx::network::http::ClientPool* m_httpClientPool = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
@@ -323,6 +331,8 @@ private:
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
+    QnAuditManager* m_auditManager = nullptr;
+    CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
 
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;

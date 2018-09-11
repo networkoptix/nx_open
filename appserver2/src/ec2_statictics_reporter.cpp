@@ -80,10 +80,7 @@ namespace ec2
             return errCode;
 
         for (auto& cam: cameras)
-        {
-            if (cam.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId)
-                outData->cameras.push_back(std::move(cam));
-        }
+            outData->cameras.emplace_back(std::move(cam));
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -124,16 +121,22 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+        if (outData->systemId.isNull())
+            outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
         return ErrorCode::ok;
     }
 
-    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
+    ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(
+        const ApiStatisticsServerArguments& arguments, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         outData->status = lit("initiated");
-        return initiateReport(&outData->url);
+        outData->systemId = arguments.randomSystemId
+            ? QnUuid::createUuid()
+            : helpers::currentSystemLocalId(m_ec2Connection->commonModule());
+
+        return initiateReport(&outData->url, &outData->systemId);
     }
 
     void Ec2StaticticsReporter::setupTimer()
@@ -145,7 +148,7 @@ namespace ec2
                 std::bind(&Ec2StaticticsReporter::timerEvent, this),
                 std::chrono::milliseconds(m_timerCycle));
 
-            NX_LOGX(lm("Timer is set with delay %1").arg(m_timerCycle), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Timer is set with delay %1").arg(m_timerCycle));
         }
     }
 
@@ -183,7 +186,7 @@ namespace ec2
         if (!settings->isStatisticsAllowed()
             || settings->isNewSystem())
         {
-            NX_LOGX(lm("Automatic report system is disabled"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Automatic report system is disabled"));
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();
@@ -228,9 +231,9 @@ namespace ec2
                       timeCycle * kMinDelayRatio / 100,
                       timeCycle * kMaxdelayRation / 100));
 
-                NX_LOGX(lm("Last reported version is '%1' while running '%2', plan early report for %3")
+                NX_DEBUG(this, lm("Last reported version is '%1' while running '%2', plan early report for %3")
                     .arg(reportedVersion).arg(currentVersion)
-                    .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logDEBUG1);
+                    .arg(m_plannedReportTime->toString(Qt::ISODate)));
 
                 return *m_plannedReportTime;
             }
@@ -247,24 +250,27 @@ namespace ec2
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
                 nx::utils::random::number<uint>(minDelay, maxDelay));
 
-            NX_LOGX(lm("Last report was at %1, the next planned for %2")
+            NX_INFO(this, lm("Last report was at %1, the next planned for %2")
                .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
-               .arg(m_plannedReportTime->toString(Qt::ISODate)), cl_logINFO);
+               .arg(m_plannedReportTime->toString(Qt::ISODate)));
         }
 
         return *m_plannedReportTime;
     }
 
-    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
+    ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi, QnUuid* systemId)
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         ApiSystemStatistics data;
         data.reportInfo.number = settings->statisticsReportLastNumber();
+        if (systemId)
+            data.reportInfo.id = *systemId;
+
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
-            NX_LOGX(lm("Could not collect data, error: %1")
-                   .arg(toString(res)), cl_logWARNING);
+            NX_WARNING(this, lm("Could not collect data, error: %1")
+                   .arg(toString(res)));
             return res;
         }
 
@@ -281,8 +287,8 @@ namespace ec2
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
-        NX_LOGX(lm("Sending statistics asynchronously to %1")
-               .arg(url.toString(QUrl::RemovePassword)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Sending statistics asynchronously to %1")
+               .arg(url.toString(QUrl::RemovePassword)));
 
         if (reportApi)
             *reportApi = url.toString();
@@ -297,8 +303,8 @@ namespace ec2
         if (httpClient->hasRequestSucceeded())
         {
             m_timerCycle = kInitialTimerCycle;
-            NX_LOGX(lm("Statistics report successfully sent to %1")
-                .arg(httpClient->url()), cl_logINFO);
+            NX_INFO(this, lm("Statistics report successfully sent to %1")
+                .arg(httpClient->url()));
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
@@ -314,8 +320,8 @@ namespace ec2
             if ((m_timerCycle *= 2) > kMaxTimerCycle)
                 m_timerCycle = kMaxTimerCycle;
 
-            NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
-                .arg(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
+            NX_WARNING(this, lm("doPost to %1 has failed, update timer cycle to %2")
+                .arg(httpClient->url()).arg(m_timerCycle));
         }
 
         setupTimer();

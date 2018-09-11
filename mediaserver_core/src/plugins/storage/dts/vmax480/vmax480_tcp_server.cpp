@@ -363,7 +363,7 @@ void QnVMax480ConnectionProcessor::run()
 
 }
 
-QnVMax480Server::QnVMax480Server():
+QnVMax480Server::QnVMax480Server(QObject* /*parent*/):
     QnTcpListener(
         nullptr,
         QHostAddress(QLatin1String("127.0.0.1")),

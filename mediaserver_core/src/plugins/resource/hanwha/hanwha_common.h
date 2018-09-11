@@ -232,8 +232,9 @@ static const int kMaxPossibleFps = 1000;
 
 static const QString kHanwhaProxiedIdParamName = lit("proxiedId");
 
-static const QString kHanwhaMinimalBypassFirmware = lit("2.10");
+static const QString kHanwhaDefaultMinimalBypassFirmware = lit("2.10");
 static const QString kHanwhaBypassOverrideParameterName = lit("bypassOverride");
+static const QString kHanwhaMinimalBypassFirmwareParameterName = lit("bypassFirmware");
 
 // TODO: #dmishin get rid of the properties below and move Hanwha driver to the standard
 // profile configuration mechanism.

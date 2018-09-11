@@ -4,5 +4,5 @@ Hallo,
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Als u zich niet voor %PRODUCT_NAME% heeft geregistreerd, kunt u deze e-mail negeren.
+Als u zich niet voor %PRODUCT_NAME% heeft geregistreerd, kunt u deze Email negeren.
 Deel het bericht of de link met niemand.

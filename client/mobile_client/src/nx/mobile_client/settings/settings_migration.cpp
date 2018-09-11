@@ -38,13 +38,13 @@ static void migrateFrom24To25()
 
     if (importedSessions.isEmpty())
     {
-        NX_LOG("Settings migration is skipped.", cl_logDEBUG1);
+        NX_DEBUG(typeid(QnMigratedSession), "Settings migration is skipped.");
         return;
     }
 
     if (!success)
     {
-        NX_LOG("Settings migration failed.", cl_logERROR);
+        NX_ERROR(typeid(QnMigratedSession), "Settings migration failed.");
         return;
     }
 
@@ -65,7 +65,7 @@ static void migrateFrom24To25()
 
     qnSettings->setSavedSessions(sessions);
 
-    NX_LOG(lit("Imported %1 sessions.").arg(importedSessions.size()), cl_logINFO);
+    NX_INFO(typeid(QnMigratedSession), lit("Imported %1 sessions.").arg(importedSessions.size()));
 
     qnSettings->setSettingsMigrated(true);
 }

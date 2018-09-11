@@ -94,6 +94,15 @@ namespace std
 
 Q_DECLARE_METATYPE(QnUuid);
 
+namespace nx::utils {
+
+NX_UTILS_API QString changedGuidByteOrder(const QString& guid);
+
+} // namespace nx::utils
+
+using QnUuidSet = QSet<QnUuid>;
+using QnUuidList = QList<QnUuid>;
+
 NX_UTILS_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
 NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
 NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);

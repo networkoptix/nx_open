@@ -74,8 +74,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>987</width>
-        <height>784</height>
+        <width>979</width>
+        <height>768</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -415,6 +415,13 @@
                  </spacer>
                 </item>
                </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="trustCameraTimeCheckBox">
+               <property name="text">
+                <string>Trust camera timestamp</string>
+               </property>
               </widget>
              </item>
             </layout>

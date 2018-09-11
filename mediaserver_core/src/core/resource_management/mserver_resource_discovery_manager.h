@@ -1,18 +1,19 @@
-#ifndef QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
-#define QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <QtCore/QTime>
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
+class QnMServerResourceDiscoveryManager:
+    public QnResourceDiscoveryManager
 {
     Q_OBJECT
 public:
     typedef QnResourceDiscoveryManager base_type;
 
-    QnMServerResourceDiscoveryManager(QnCommonModule* commonModule);
+    QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule);
     virtual ~QnMServerResourceDiscoveryManager();
 
     //!Implementation of QnResourceFactory::createResource
@@ -33,6 +34,8 @@ private:
 
     void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);
 
+    bool shouldAddNewlyDiscoveredResource(const QnNetworkResourcePtr& newResource) const;
+
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
@@ -49,5 +52,3 @@ private:
     QElapsedTimer m_startupTimer;
     int m_discoveryCounter = 0;
 };
-
-#endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

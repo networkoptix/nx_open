@@ -200,13 +200,13 @@ class NX_NETWORK_API Method
 public:
     typedef StringType ValueType;
 
+    static const StringType connect;
     static const StringType get;
     static const StringType head;
     static const StringType post;
     static const StringType put;
     static const StringType delete_;
     static const StringType options;
-    static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
     static bool isMessageBodyAllowedInResponse(
@@ -398,6 +398,7 @@ namespace header {
 /** Common header name constants. */
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
+extern NX_NETWORK_API const StringType kAccept;
 
 //!Http authentication scheme enumeration
 namespace AuthScheme
@@ -721,6 +722,24 @@ public:
     bool parse(const StringType& str);
 
     bool operator==(const Forwarded& right) const;
+};
+
+struct NX_NETWORK_API ContentType
+{
+    static const StringType NAME;
+
+    static const StringType kAny;
+    static const StringType kDefaultCharset;
+
+    static const ContentType kPlain;
+    static const ContentType kHtml;
+    static const ContentType kJson;
+
+    StringType value;
+    StringType charset;
+
+    ContentType(const StringType& headerValue = kPlain.toString());
+    StringType toString() const;
 };
 
 } // namespace header

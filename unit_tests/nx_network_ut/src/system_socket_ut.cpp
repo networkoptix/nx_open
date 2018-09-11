@@ -153,10 +153,10 @@ static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
     ASSERT_TRUE(socket->setKeepAlive(KeepAliveOptions(
         std::chrono::seconds(10), std::chrono::seconds(5), 3)));
 
-    NX_LOG(lm("waitForKeepAliveDisconnect recv"), cl_logINFO);
+    NX_INFO(typeid(TcpSocket), lm("waitForKeepAliveDisconnect recv"));
     EXPECT_LT(socket->recv(buffer.data(), buffer.size()), 0);
     EXPECT_NE(SystemError::noError, SystemError::getLastOSErrorCode());
-    NX_LOG(lm("waitForKeepAliveDisconnect end"), cl_logINFO);
+    NX_INFO(typeid(TcpSocket), lm("waitForKeepAliveDisconnect end"));
 }
 
 TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
@@ -165,7 +165,7 @@ TEST_F(TcpSocket, DISABLED_KeepAliveOptionsServer)
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
     ASSERT_TRUE(server->listen(testClientCount()));
-    NX_LOGX(lm("Server address: %1").arg(server->getLocalAddress()), cl_logINFO);
+    NX_INFO(this, lm("Server address: %1").arg(server->getLocalAddress()));
 
     auto client = server->accept();
     ASSERT_TRUE(client != nullptr);

@@ -15,8 +15,8 @@ class LilinResource: public QnPlOnvifResource
     using AbstractRemoteArchiveManager = nx::core::resource::AbstractRemoteArchiveManager;
 
 public:
-    LilinResource();
-    virtual ~LilinResource() override;
+    LilinResource(QnMediaServerModule* serverModule);
+    virtual ~LilinResource() = default;
 
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 

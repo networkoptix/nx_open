@@ -14,5 +14,5 @@ int QnDiscoveredPeersRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     result.setReply(ec2::getServers(owner->commonModule()->moduleDiscoveryManager()));
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

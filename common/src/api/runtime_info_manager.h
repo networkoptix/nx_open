@@ -64,6 +64,7 @@ public:
 
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
     void updateLocalItem(const QnPeerRuntimeInfo& value);
+    void updateRemoteItem(const QnPeerRuntimeInfo& value);
 
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo& data);
@@ -74,6 +75,8 @@ private:
     virtual Qn::Notifier storedItemAdded(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnPeerRuntimeInfo& item) override;
     virtual Qn::Notifier storedItemChanged(const QnPeerRuntimeInfo& item) override;
+
+    void updateItem(const QnPeerRuntimeInfo& value);
 
 private:
     /** Mutex that is to be used when accessing items. */

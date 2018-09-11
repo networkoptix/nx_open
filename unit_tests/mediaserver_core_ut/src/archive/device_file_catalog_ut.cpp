@@ -2,13 +2,18 @@
 
 #include <recorder/device_file_catalog.h>
 #include <recording/time_period_list.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace test {
 
 TEST(DeviceFileCatalog, catalogRange)
 {
-    DeviceFileCatalog catalog(QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
+    QnMediaServerModule serverModule;
+
+    DeviceFileCatalog catalog(
+        &serverModule,
+        QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
 
     DeviceFileCatalog::Chunk chunk1;
     chunk1.startTimeMs = 1400000000LL * 1000;
@@ -65,7 +70,10 @@ TEST(DeviceFileCatalog, catalogRange)
 
 TEST(DeviceFileCatalog, mergeData)
 {
-    DeviceFileCatalog catalog(QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
+    QnMediaServerModule serverModule;
+    DeviceFileCatalog catalog(
+        &serverModule,
+        QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
     static const int kRecordsToTest = 1000;
 
     std::deque<DeviceFileCatalog::Chunk> chunks1;

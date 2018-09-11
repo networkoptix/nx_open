@@ -19,7 +19,8 @@
 
 const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
-QnAdamResource::QnAdamResource()
+QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     Qn::directConnect(
         this, &QnResource::propertyChanged,

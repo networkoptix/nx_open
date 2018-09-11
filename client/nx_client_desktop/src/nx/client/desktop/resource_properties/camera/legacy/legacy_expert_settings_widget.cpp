@@ -362,6 +362,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
+    ui->checkBoxDisableNativePtzPresets->setEnabled(supportedNativePtzCount != 0);
     if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
     else if (disabledNativePtzCount != 0)

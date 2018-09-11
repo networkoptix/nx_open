@@ -1,5 +1,4 @@
-#ifndef __TEST_CAMERA_STREAM_READER_H__
-#define __TEST_CAMERA_STREAM_READER_H__
+#pragma once
 
 #ifdef ENABLE_TEST_CAMERA
 
@@ -13,7 +12,8 @@
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnTestCameraStreamReader(const QnTestCameraResourcePtr& res);
+    QnTestCameraStreamReader(
+        const QnTestCameraResourcePtr& res);
     virtual ~QnTestCameraStreamReader();
 
 protected:
@@ -29,4 +29,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_TEST_CAMERA
-#endif // __TEST_CAMERA_STREAM_READER_H__

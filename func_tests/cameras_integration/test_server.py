@@ -2,7 +2,7 @@ import json
 from datetime import timedelta
 
 import pytest
-import yaml
+import oyaml as yaml
 from pathlib2 import Path
 
 from . import execution

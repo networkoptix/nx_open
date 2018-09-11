@@ -39,6 +39,8 @@
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
 
 using namespace nx;
 
@@ -252,9 +254,10 @@ bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
 
     if (eventType >= EventType::userDefinedEvent)
     {
-        for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
+        for (const auto& flexibleId: action.eventParams.metadata.cameraRefs)
         {
-            if (resourcePool()->getResourceById(id) && hasAccessToCamera(id))
+            auto id = camera_id_helper::flexibleIdToId(resourcePool(), flexibleId);
+            if (!id.isNull() && hasAccessToCamera(id))
                 return true;
         }
     }
@@ -618,7 +621,8 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
         if (resource)
             result << resource;
     }
-    result << resourcePool()->getResourcesByIds(action.eventParams.metadata.cameraRefs);
+    QnResourceList extraResources = resourcePool()->getCamerasByFlexibleIds(action.eventParams.metadata.cameraRefs);
+    result << extraResources;
     return result;
 }
 

@@ -764,23 +764,19 @@ Qn::AuthResult Authenticator::tryAuthRecord(
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
         return Qn::Auth_WrongDigest;
 
-    QnResourcePtr res;
-    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
-    std::tie(errCode, res) = m_userDataProvider->authorize(
+    auto [errorCode, resource] = m_userDataProvider->authorize(
         method,
         authorization,
         &response.headers);
-    if (!res)
-        return Qn::Auth_WrongLogin;
 
-    if (auto user = res.dynamicCast<QnUserResource>())
+    if (const auto user = resource.dynamicCast<QnUserResource>())
     {
         if (accessRights)
             *accessRights = Qn::UserAccessData(user->getId());
     }
 
-    saveLoginResult(authorization.digest->userid, clientIp, errCode);
-    return errCode;
+    saveLoginResult(authorization.digest->userid, clientIp, errorCode);
+    return errorCode;
 }
 
 QnUserResourcePtr Authenticator::findUserByName(const QByteArray& nxUserName) const

@@ -21,6 +21,8 @@ constexpr int MAX_MSG_LEN = 1024 * 64; //64K ought to be enough for anybody
 constexpr int kDefaultTimeoutMs = 3000;
 constexpr int kZipInstallationTimeoutMs = 30000;
 
+struct FunctionsTag{};
+
 } // namespace
 
 static api::ResultType::Value sendCommandToLauncher(
@@ -31,8 +33,7 @@ static api::ResultType::Value sendCommandToLauncher(
     NamedPipeSocket sock;
     SystemError::ErrorCode resultCode = sock.connectToServerSync(launcherPipeName());
     if( resultCode != SystemError::noError )
-    {
-        NX_LOG( lit("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
+    {        NX_WARNING (typeid(FunctionsTag), lit("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)));
         return api::ResultType::connectError;
     }
 
@@ -43,7 +44,7 @@ static api::ResultType::Value sendCommandToLauncher(
     resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
     if( resultCode != SystemError::noError )
     {
-        NX_LOG( lit("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
+        NX_WARNING (typeid(FunctionsTag), lit("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)));
         return api::ResultType::connectError;
     }
 
@@ -52,7 +53,7 @@ static api::ResultType::Value sendCommandToLauncher(
     resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);  //ignoring return code
     if( resultCode != SystemError::noError )
     {
-        NX_LOG( lit("Failed to read response from local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
+        NX_WARNING (typeid(FunctionsTag), lit("Failed to read response from local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)));
         return api::ResultType::connectError;
     }
     if( response )

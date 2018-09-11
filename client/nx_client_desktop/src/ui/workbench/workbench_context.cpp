@@ -65,13 +65,15 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 
     // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
+    const auto coreUserWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+        [this, coreUserWatcher](const QnUserResourcePtr& user)
         {
+            coreUserWatcher->setUser(user);
             if (m_accessController)
                 m_accessController->setUser(user);
             emit userChanged(user);
@@ -231,7 +233,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
-            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to cloud"));
             qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
             break;
         }
@@ -244,7 +246,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
-            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);
             systemUrl.setPassword(auth.password);
@@ -252,7 +254,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             if (systemIsCloud)
             {
                 qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Custom URI: System is cloud, connecting to cloud first"));
             }
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
@@ -271,7 +273,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 bool QnWorkbenchContext::showEulaMessage() const
 {
     const bool acceptedEula =
-        [this]()
+        [this]() -> bool
         {
             const QString eulaHtmlStyle = QString::fromLatin1(R"(
             <style media="screen" type="text/css">
@@ -290,18 +292,13 @@ bool QnWorkbenchContext::showEulaMessage() const
             QString eulaText = QString::fromUtf8(eula.readAll());
 
             // Regexp to dig out a title from html with EULA.
-            QRegExp headerRx("<\\b(title|TITLE)\\b>(.*)</\\b(title|TITLE)\\b>");
+            QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
+            headerRegExp.setMinimal(true);
 
             QString eulaHeader;
-            if (headerRx.indexIn(eulaText) != -1 && headerRx.captureCount() == 3)
+            if (headerRegExp.indexIn(eulaText) != -1)
             {
-                // We are expecting to get 4 strings, like
-                //  0: "<title>Magnificent EULA caption</title>"
-                //  1: "title"
-                //  2: "Magnificent EULA caption"
-                //  3: "title"
-                // `headerRx.captureCount()` returns 3 in this case.
-                QString title = headerRx.cap(2);
+                QString title = headerRegExp.cap(1);
                 eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
             }
             else
@@ -367,12 +364,6 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 QnWorkbenchContext::StartupParametersCode
     QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
-    const bool showEula = qnRuntime->isDesktopMode()
-        && qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
-
-    if (showEula && !showEulaMessage())
-        return forcedExit;
-
     /* Process input files. */
     bool haveInputFiles = false;
     {

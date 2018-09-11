@@ -391,6 +391,8 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+	void updateWatermark();
+
     using ButtonHandler = void (QnMediaResourceWidget::*)(bool checked);
     void createActionAndButton(
         const char* iconName,

@@ -47,7 +47,7 @@ void sendInstallRequest(
 
     for (const auto& server: allServers)
     {
-        if (server->getId() == qnServerModule->commonModule()->moduleGUID())
+        if (server->getId() == commonModule->moduleGUID())
             continue;
 
         const nx::utils::Url apiUrl = detail::getServerApiUrl(path, server, context);
@@ -80,6 +80,11 @@ void sendInstallRequest(
 
 } // namespace
 
+QnInstallUpdateRestHandler::QnInstallUpdateRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnInstallUpdateRestHandler::executePost(
     const QString& path,
     const QnRequestParamList& params,
@@ -107,7 +112,7 @@ int QnInstallUpdateRestHandler::executePost(
             request,
             processor->owner()->getPort());
 
-        sendInstallRequest(qnServerModule->commonModule(), path, srcBodyContentType, &context);
+        sendInstallRequest(serverModule()->commonModule(), path, srcBodyContentType, &context);
     }
 
     return nx::network::http::StatusCode::ok;
@@ -123,5 +128,5 @@ void QnInstallUpdateRestHandler::afterExecute(
     if (result.error != QnRestResult::NoError)
         return;
 
-    qnServerModule->updateManager()->install(owner->authSession());
+    serverModule()->updateManager()->install(owner->authSession());
 }

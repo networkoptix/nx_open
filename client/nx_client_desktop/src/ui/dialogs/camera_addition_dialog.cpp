@@ -17,6 +17,7 @@
 #include <ui/help/help_topics.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/client/desktop/common/widgets/password_preview_button.h>
 #include <ui/workbench/workbench_context.h>
 #include <nx/utils/log/log.h>
 
@@ -102,6 +103,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     ui->serverStatusLabel->setVisible(false);
 
     ui->progressWidget->setVisible(false);
+
+    PasswordPreviewButton::createInline(ui->passwordLineEdit);
 
     auto aligner = new Aligner(this);
     aligner->addWidgets({
@@ -740,7 +743,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0)
     {
-        NX_LOG(this, lm("Request failed. Status=%1").arg(status), cl_logWARNING);
+        NX_WARNING(this, lm("Request failed. Status=%1").arg(status));
         setState(Initial);
         QnMessageBox::critical(this, tr("Device search failed"));
         return;

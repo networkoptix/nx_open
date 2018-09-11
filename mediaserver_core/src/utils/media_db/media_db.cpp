@@ -279,10 +279,10 @@ void DbHelper::run()
         QnMutexLocker lk(&m_mutex);
         while ((m_writeQueue.empty() || m_mode == Mode::Read) && !needToStop())
         {
-            NX_LOG(lit("media_db: run is going to sleep. Write queue size: %1. Mode = %2. Need to stop = %3")
+            NX_VERBOSE(this, lit("run is going to sleep. Write queue size: %1. Mode = %2. Need to stop = %3")
                     .arg(m_writeQueue.size())
                     .arg(m_mode == Mode::Read ? "Read" : m_mode == Mode::Write ? "Write" : "Unknown")
-                    .arg(m_needStop), cl_logDEBUG2);
+                    .arg(m_needStop));
             m_cond.wait(lk.mutex());
         }
 
@@ -442,8 +442,8 @@ void DbHelper::writeRecord(const WriteRecordType &record)
     QnMutexLocker lk(&m_mutex);
     while (m_writeQueue.size() > kMaxWriteQueueSize)
     {
-        NX_LOG(lit("media_db: Write queue overflow detected. WriteRecord is going to sleep. Write queue size: %1.")
-                .arg(m_writeQueue.size()), cl_logDEBUG2);
+        NX_VERBOSE(this, lit("Write queue overflow detected. WriteRecord is going to sleep. Write queue size: %1.")
+                .arg(m_writeQueue.size()));
         m_writerDoneCond.wait(lk.mutex());
     }
 
@@ -465,9 +465,9 @@ void DbHelper::setMode(Mode mode)
 
     while (!m_writeQueue.empty() && mode == Mode::Read)
     {
-        NX_LOG(lit("media_db: SetMode is going to sleep. Write queue size: %1. Mode = %2")
+        NX_VERBOSE(this, lit("SetMode is going to sleep. Write queue size: %1. Mode = %2")
                 .arg(m_writeQueue.size())
-                .arg(m_mode == Mode::Read ? "Read" : m_mode == Mode::Write ? "Write" : "Unknown"), cl_logDEBUG2);
+                .arg(m_mode == Mode::Read ? "Read" : m_mode == Mode::Write ? "Write" : "Unknown"));
         m_writerDoneCond.wait(lk.mutex());
     }
 

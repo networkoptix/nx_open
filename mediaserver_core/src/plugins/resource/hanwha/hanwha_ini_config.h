@@ -10,7 +10,7 @@ struct HanwhaIni: public nx::kit::IniConfig
 {
     HanwhaIni(): IniConfig("hanwha.ini") { reload(); }
 
-    NX_INI_FLAG(0, enableEdge, "Enable import from SD card.");
+    NX_INI_FLAG(1, enableEdge, "Enable import from SD card.");
     NX_INI_FLAG(0, disableBypass, "Disable bypass for all NVRs.");
     NX_INI_FLAG(0, forceLensControl, "Force lens control for any Hanwha camera.");
     NX_INI_STRING(
@@ -53,7 +53,7 @@ struct HanwhaIni: public nx::kit::IniConfig
         "Forces RTSP port for Hanwha cameras");
 
     NX_INI_FLAG(
-        0,
+        1,
         allowNormalizedPtzSpeed,
         "Allows normalized speed usage for continuous movement "
         "(if it is supported by the camera)");

@@ -173,8 +173,8 @@ bool modelHasZoom(const QString& cameraModel) {
     return true;
 }
 
-QnDigitalWatchdogResource::QnDigitalWatchdogResource():
-    QnPlOnvifResource(),
+QnDigitalWatchdogResource::QnDigitalWatchdogResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule),
     m_hasZoom(false),
     m_cproApiClient(std::make_unique<CproApiClient>(this))
 {
@@ -356,6 +356,9 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
     if (useOnvifAdvancedParameterProviders())
         return result;
 
+    if (!m_cameraProxy)
+        return result;
+
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
         result.insert(value.id);
 
@@ -376,7 +379,9 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
 {
     QAuthenticator auth = getAuth();
     // TODO: #vasilenko UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
+    DeviceSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
 
     DeviceInfoReq request;
     DeviceInfoResp response;

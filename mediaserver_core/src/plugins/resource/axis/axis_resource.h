@@ -37,7 +37,7 @@ public:
 
     static const QString MANUFACTURE;
 
-    QnPlAxisResource();
+    QnPlAxisResource(QnMediaServerModule* serverModule);
     ~QnPlAxisResource();
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync

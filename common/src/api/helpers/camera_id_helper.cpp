@@ -1,15 +1,17 @@
 #include "camera_id_helper.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
 namespace camera_id_helper {
 
+struct FunctionsTag{};
+
 void findAllCamerasByFlexibleIds(
     QnResourcePool* resourcePool,
-    QnSecurityCamResourceList* cameras,
+    QnVirtualCameraResourceList* cameras,
     const QnRequestParamList& params,
     const QStringList& flexibleIdParamNames)
 {
@@ -18,7 +20,7 @@ void findAllCamerasByFlexibleIds(
         allFlexibleIds.append(params.allValues(idParamName));
     if (allFlexibleIds.isEmpty()) // No params found.
     {
-        NX_LOG(lit("Bad request: No 'cameraId' params specified"), cl_logWARNING);
+        NX_WARNING(typeid(FunctionsTag), lit("Bad request: No 'cameraId' params specified"));
         return;
     }
 
@@ -27,11 +29,12 @@ void findAllCamerasByFlexibleIds(
         if (auto camera = findCameraByFlexibleId(resourcePool, flexibleId))
             *cameras << camera;
         else
-            NX_LOG(lit("Camera not found by id %1, ignoring").arg(flexibleId), cl_logWARNING);
+            NX_WARNING(typeid(FunctionsTag),
+                lit("Camera not found by id %1, ignoring").arg(flexibleId));
     }
 }
 
-QnSecurityCamResourcePtr findCameraByFlexibleIds(
+QnVirtualCameraResourcePtr findCameraByFlexibleIds(
     QnResourcePool* resourcePool,
     QString* outNotFoundCameraId,
     const QnRequestParams& params,
@@ -46,18 +49,18 @@ QnSecurityCamResourcePtr findCameraByFlexibleIds(
         {
             if (!flexibleIdParamName.isNull()) // More than one param specified.
             {
-                NX_LOG(lit(
+                NX_WARNING(typeid(FunctionsTag), lit(
                     "Bad request: Both %1 and %2 specified to identify a camera")
-                    .arg(flexibleIdParamName).arg(idParamName), cl_logWARNING);
-                return QnSecurityCamResourcePtr(nullptr);
+                    .arg(flexibleIdParamName).arg(idParamName));
+                return QnVirtualCameraResourcePtr(nullptr);
             }
             flexibleIdParamName = idParamName;
         }
     }
     if (flexibleIdParamName.isNull()) // No params found.
     {
-        NX_LOG(lit("Bad request: 'cameraId' param missing"), cl_logWARNING);
-        return QnSecurityCamResourcePtr(nullptr);
+        NX_WARNING(typeid(FunctionsTag), lit("Bad request: 'cameraId' param missing"));
+        return QnVirtualCameraResourcePtr(nullptr);
     }
 
     QString flexibleId = params.value(flexibleIdParamName);
@@ -73,31 +76,31 @@ QnSecurityCamResourcePtr findCameraByFlexibleIds(
 }
 
 QnUuid flexibleIdToId(
-    QnResourcePool* resourcePool,
+    const QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
     auto camera = findCameraByFlexibleId(resourcePool, flexibleId);
     return camera ? camera->getId() : QnUuid();
 }
 
-QnSecurityCamResourcePtr findCameraByFlexibleId(
-    QnResourcePool* resourcePool,
+QnVirtualCameraResourcePtr findCameraByFlexibleId(
+    const QnResourcePool* resourcePool,
     const QString& flexibleId)
 {
     if (const QnUuid uuid = QnUuid::fromStringSafe(flexibleId); !uuid.isNull())
     {
-        if (auto camera = resourcePool->getResourceById<QnSecurityCamResource>(uuid))
+        if (auto camera = resourcePool->getResourceById<QnVirtualCameraResource>(uuid))
             return camera;
     }
 
     if (auto camera = resourcePool->getNetResourceByPhysicalId(flexibleId)
-        .dynamicCast<QnSecurityCamResource>())
+        .dynamicCast<QnVirtualCameraResource>())
     {
         return camera;
     }
 
     if (auto camera = resourcePool->getResourceByMacAddress(flexibleId)
-        .dynamicCast<QnSecurityCamResource>())
+        .dynamicCast<QnVirtualCameraResource>())
     {
         return camera;
     }
@@ -105,12 +108,12 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
     if (const int logicalId = flexibleId.toInt(); logicalId > 0)
     {
         auto cameraList = resourcePool->getResourcesByLogicalId(logicalId)
-            .filtered<QnSecurityCamResource>();
+            .filtered<QnVirtualCameraResource>();
         if (!cameraList.isEmpty())
             return cameraList.front();
     }
 
-    return QnSecurityCamResourcePtr();
+    return QnVirtualCameraResourcePtr();
 }
 
 } // namespace camera_id_helper

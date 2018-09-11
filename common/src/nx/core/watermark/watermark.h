@@ -15,7 +15,7 @@ struct Watermark
 };
 #define Watermark_Fields (settings)(text)
 
-QN_FUSION_DECLARE_FUNCTIONS(Watermark, (json))
+QN_FUSION_DECLARE_FUNCTIONS(Watermark, (json)(eq))
 
 } // namespace core
 } // namespace nx

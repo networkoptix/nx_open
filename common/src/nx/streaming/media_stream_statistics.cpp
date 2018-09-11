@@ -1,4 +1,11 @@
 #include "media_stream_statistics.h"
+#include <utils/common/synctime.h>
+
+namespace {
+
+    static const int kMaxErrorsToReportIssue = 2;
+
+} // namespace
 
 QnMediaStreamStatistics::QnMediaStreamStatistics()
 {
@@ -31,13 +38,12 @@ void QnMediaStreamStatistics::resetStatistics()
 
     m_first_ondata_call = true;
 
-    m_connectionLost = false;
-
+    setConnectionLost(false);
 }
 
 void QnMediaStreamStatistics::stop()
 {
-    if (!m_runing) return; 
+    if (!m_runing) return;
     QnMutexLocker locker( &m_mutex );
     m_stopTime = QDateTime::currentDateTime();
     m_runing = false;
@@ -45,7 +51,7 @@ void QnMediaStreamStatistics::stop()
 
 void QnMediaStreamStatistics::onData(unsigned int datalen, bool isKeyFrame)
 {
-    if (!m_runing) return; 
+    if (!m_runing) return;
     QnMutexLocker locker( &m_mutex );
 
     if (datalen)
@@ -55,7 +61,7 @@ void QnMediaStreamStatistics::onData(unsigned int datalen, bool isKeyFrame)
             ++m_keyFrames;
 
         m_dataTotal+=datalen;
-        m_connectionLost = false;
+        setConnectionLost(false);
     }
 
     if (m_first_ondata_call)
@@ -135,7 +141,7 @@ float QnMediaStreamStatistics::getAverageGopSize() const
 
 void QnMediaStreamStatistics::onBadSensor()
 {
-    if (!m_runing) return; 
+    if (!m_runing) return;
     m_badsensor = true;
 }
 bool QnMediaStreamStatistics::badSensor() const
@@ -145,17 +151,24 @@ bool QnMediaStreamStatistics::badSensor() const
 
 void QnMediaStreamStatistics::onEvent(QnMediaStreamStatisticsEvent event)
 {
-    if (!m_runing) return; 
+    if (!m_runing)
+        return;
+
+    onData(0, /*isKeyFrame*/ false);
+
     QnMutexLocker locker( &m_mutex );
 
-    QDateTime current = QDateTime::currentDateTime();
     m_events[event].amount++;
 
-    if (m_events[event].amount==1)
-        m_events[event].firstTime = current;
+    if (event == CL_STAT_DATA)
+    {
+        setConnectionLost(false);
+        return;
+    }
 
-    m_events[event].lastTime = current;
-
+    // Error event processing
+    if (m_events[event].amount  % kMaxErrorsToReportIssue == 0)
+        setConnectionLost(true);
 }
 
 unsigned long QnMediaStreamStatistics::totalEvents(QnMediaStreamStatisticsEvent event) const
@@ -169,7 +182,7 @@ float QnMediaStreamStatistics::eventsPerHour(QnMediaStreamStatisticsEvent event)
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
 
-    unsigned long seconds = m_startTime.secsTo(current); 
+    unsigned long seconds = m_startTime.secsTo(current);
     if (seconds==0)
         seconds = 1; // // to avoid devision by zero
 
@@ -177,23 +190,11 @@ float QnMediaStreamStatistics::eventsPerHour(QnMediaStreamStatisticsEvent event)
     return m_events[event].amount/hours;
 }
 
-QDateTime QnMediaStreamStatistics::firstOccurred(QnMediaStreamStatisticsEvent event) const
-{
-    QnMutexLocker locker( &m_mutex );
-    return m_events[event].firstTime;
-}
-
-QDateTime QnMediaStreamStatistics::lastOccurred(QnMediaStreamStatisticsEvent event) const
-{
-    QnMutexLocker locker( &m_mutex );
-    return m_events[event].lastTime;
-}
-
 float QnMediaStreamStatistics::getavBitrate() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    unsigned long seconds = m_startTime.secsTo(current); 
+    unsigned long seconds = m_startTime.secsTo(current);
 
     if (seconds==0)
         seconds = 1; // // to avoid devision by zero
@@ -206,7 +207,7 @@ float QnMediaStreamStatistics::getavFrameRate() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    unsigned long seconds = m_startTime.secsTo(current); 
+    unsigned long seconds = m_startTime.secsTo(current);
 
     if (seconds==0)
         seconds = 1; // // to avoid devision by zero
@@ -219,15 +220,17 @@ unsigned long QnMediaStreamStatistics::totalSecs() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-    return m_startTime.secsTo(current); 
+    return m_startTime.secsTo(current);
 
 }
 
-void QnMediaStreamStatistics::onLostConnection()
+void QnMediaStreamStatistics::setConnectionLost(bool value)
 {
-    QnMutexLocker locker( &m_mutex );
-    m_connectionLost = true;
-    m_connectionLostTime = QDateTime::currentDateTime();
+    if (value)
+        emit connectionLost(); //< Send signal periodically.
+    else if (m_connectionLost)
+        emit connectionBackToNormal(); //< Send signal once.
+    m_connectionLost = value;
 }
 
 bool QnMediaStreamStatistics::isConnectionLost() const
@@ -235,9 +238,7 @@ bool QnMediaStreamStatistics::isConnectionLost() const
     return m_connectionLost;
 }
 
-int QnMediaStreamStatistics::connectionLostSec() const
+qint64 QnMediaStreamStatistics::getTotalData() const
 {
-    QnMutexLocker locker( &m_mutex );
-    QDateTime current = QDateTime::currentDateTime();
-    return m_connectionLostTime.secsTo(current); 
+    return m_dataTotal;
 }

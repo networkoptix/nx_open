@@ -1,14 +1,24 @@
 #pragma once
 
-#include <nx_ec/ec_proto_version.h>
-
 namespace nx {
 namespace data_sync_engine {
 
-static const int kMinSupportedProtocolVersion = 3024;
-static const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
+class NX_DATA_SYNC_ENGINE_API ProtocolVersionRange
+{
+public:
+    /**
+     * Both boundaries are inclusive.
+     */
+    ProtocolVersionRange(int begin, int end);
 
-NX_DATA_SYNC_ENGINE_API bool isProtocolVersionCompatible(int version);
+    int begin() const;
+    int currentVersion() const;
+    bool isCompatible(int version) const;
+
+private:
+    int m_begin = 0;
+    int m_end = 0;
+};
 
 } // namespace data_sync_engine
 } // namespace nx

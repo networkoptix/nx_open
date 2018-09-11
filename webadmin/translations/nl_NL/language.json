@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
-        "useTextEmailFormat": "Verstuur e-mails met platte tekst"
+        "useTextEmailFormat": "Verstuur e-mails met platte tekst",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

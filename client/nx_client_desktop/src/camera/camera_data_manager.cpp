@@ -19,7 +19,7 @@ QnCameraDataManager::QnCameraDataManager(QnCommonModule* commonModule, QObject* 
         {
             if (QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>())
             {
-                NX_LOG(lit("removing loader %1").arg(resource->getName()), cl_logDEBUG1);
+                NX_DEBUG(this, lit("removing loader %1").arg(resource->getName()));
                 m_loaderByResource.remove(mediaResource);
             }
 

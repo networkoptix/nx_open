@@ -40,6 +40,12 @@ public:
      */
     virtual QnResourcePtr resource() const;
 
+    /**
+     * This method will be invoked after the controller is moved to the executor thread.
+     * Note: invocation is done through the event loop in the executor thread.
+     */
+    virtual void initialize();
+
 public slots: //< Class is exposed to QML. All functions in section below are invokable
     /**
      * @param capabilities Capabilities to check.

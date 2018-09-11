@@ -371,8 +371,8 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
     m_exportMediaSettings.fileName = filename;
     m_exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
 
-    bool needTranscoding =
-        isTranscodingRequested() || m_exportMediaPersistentSettings.areFiltersForced();
+    bool needTranscoding = m_exportMediaSettings.transcodingSettings.watermark.visible()
+        || isTranscodingRequested() || m_exportMediaPersistentSettings.areFiltersForced();
 
     if (m_exportMediaPersistentSettings.setTranscoding(needTranscoding))
     {

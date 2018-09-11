@@ -122,7 +122,7 @@ bool AnyAccessibleAddressConnector::establishDirectConnection(const SocketAddres
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying direct connection to %1").arg(endpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Trying direct connection to %1").arg(endpoint));
 
     auto tcpSocket = createTcpSocket(m_ipVersion);
     tcpSocket->bindToAioThread(getAioThread());
@@ -159,8 +159,8 @@ void AnyAccessibleAddressConnector::onConnectDone(
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
-    NX_LOGX(lm("Connection completed with result %1")
-        .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Connection completed with result %1")
+        .arg(SystemError::toString(sysErrorCode)));
 
     if (sysErrorCode == SystemError::noError)
     {
@@ -177,8 +177,8 @@ void AnyAccessibleAddressConnector::onConnectDone(
     --m_awaitedConnectOperationCount;
     if (m_awaitedConnectOperationCount > 0 && sysErrorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Waiting for another %1 connections to complete...")
-            .arg(m_awaitedConnectOperationCount), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Waiting for another %1 connections to complete...")
+            .arg(m_awaitedConnectOperationCount));
         return; //< Waiting for other operations to finish.
     }
 
@@ -195,7 +195,7 @@ void AnyAccessibleAddressConnector::establishCloudConnection(const AddressEntry&
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Trying cloud connection to %1").arg(dnsEntry.host), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Trying cloud connection to %1").arg(dnsEntry.host));
 
     auto cloudConnector = std::make_unique<CloudAddressConnector>(
         dnsEntry,
@@ -234,14 +234,13 @@ void AnyAccessibleAddressConnector::cleanUpAndReportResult(
 {
     if (sysErrorCode == SystemError::noError)
     {
-        NX_LOGX(lm("Reporting connect success. Address %1")
-            .arg(containerString(m_entries)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Reporting connect success. Address %1")
+            .arg(containerString(m_entries)));
     }
     else
     {
-        NX_LOGX(lm("Reporting connect failure (%1). Address %2")
-            .arg(SystemError::toString(sysErrorCode)).arg(containerString(m_entries)),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Reporting connect failure (%1). Address %2")
+            .arg(SystemError::toString(sysErrorCode)).arg(containerString(m_entries)));
     }
 
     NX_ASSERT(isInSelfAioThread());

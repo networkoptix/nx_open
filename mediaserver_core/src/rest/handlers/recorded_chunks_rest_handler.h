@@ -3,12 +3,17 @@
 #include <QtCore/QRect>
 
 #include <rest/server/request_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnRecordedChunksRestHandler: public QnRestRequestHandler
+class QnRecordedChunksRestHandler:
+    public QnRestRequestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
+    QnRecordedChunksRestHandler(QnMediaServerModule* serverModule);
+
     virtual int executeGet(
         const QString& path, const QnRequestParamList& params, QByteArray& result,
         QByteArray& contentType, const QnRestConnectionProcessor* /*owner*/) override;

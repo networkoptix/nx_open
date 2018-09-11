@@ -1,11 +1,12 @@
-#ifndef __THIRD_PARTY_STORAGE_RESOURCE_H__
-#define __THIRD_PARTY_STORAGE_RESOURCE_H__
+#pragma once
 
 #include <memory>
 
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/third_party/third_party_storage.h"
 #include <nx/utils/thread/mutex.h>
+
+namespace nx::mediaserver{ class Settings; }
 
 class QnThirdPartyStorageResource: public QnStorageResource
 {
@@ -30,19 +31,22 @@ public: // static funcs
     static QnStorageResource* instance(
         QnCommonModule* commonModule,
         const QString               &url,
-        const StorageFactoryPtrType &sf
+        const StorageFactoryPtrType &sf,
+        const nx::mediaserver::Settings* settings
     );
 
 public: //ctors, dtor
     QnThirdPartyStorageResource(
         QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
-        const QString               &storageUrl
+        const QString               &storageUrl,
+        const nx::mediaserver::Settings* settings
     );
 
     QnThirdPartyStorageResource(); //designates invalid storagere source
 
-    ~QnThirdPartyStorageResource();
+
+    ~QnThirdPartyStorageResource() = default;
 
 public: // inherited interface overrides
     virtual QIODevice *open(
@@ -74,6 +78,5 @@ private:
     StoragePtrType                      m_storage;
     mutable QnMutex                      m_mutex;
     bool                                m_valid;
+    const nx::mediaserver::Settings* m_settings = nullptr;
 }; // QnThirdPartyStorageResource
-
-#endif

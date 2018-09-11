@@ -4,35 +4,35 @@
 #include <nx/mediaserver/metadata/event_type_mapping.h>
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/event/rule_manager.h>
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-using namespace nx::vms;
+using namespace nx::vms::event;
 
-EventRuleWatcher::EventRuleWatcher(QObject* parent):
-    Connective<QObject>(parent),
-    m_ruleHolder(qnServerModule->commonModule())
+EventRuleWatcher::EventRuleWatcher(QnMediaServerModule* serverModule):
+    Connective<QObject>(serverModule),
+    ServerModuleAware(serverModule),
+    m_ruleHolder(serverModule->commonModule())
 {
-    auto ruleManager = qnServerModule
-        ->commonModule()
-        ->eventRuleManager();
+    auto ruleManager = serverModule->commonModule()->eventRuleManager();
 
-    auto resourcePool = qnServerModule
+    auto resourcePool = serverModule
         ->commonModule()
         ->resourcePool();
 
     connect(
-        ruleManager, &event::RuleManager::rulesReset,
+        ruleManager, &RuleManager::rulesReset,
         this, &EventRuleWatcher::at_rulesReset);
 
     connect(
-        ruleManager, &event::RuleManager::ruleAddedOrUpdated,
+        ruleManager, &RuleManager::ruleAddedOrUpdated,
         this, &EventRuleWatcher::at_ruleAddedOrUpdated);
 
     connect(
-        ruleManager, &event::RuleManager::ruleRemoved,
+        ruleManager, &RuleManager::ruleRemoved,
         this, &EventRuleWatcher::at_ruleRemoved);
 
     connect(
@@ -44,12 +44,12 @@ EventRuleWatcher::~EventRuleWatcher()
 {
 }
 
-void EventRuleWatcher::at_rulesReset(const event::RuleList& rules)
+void EventRuleWatcher::at_rulesReset(const RuleList& rules)
 {
     emit rulesUpdated(m_ruleHolder.resetRules(rules));
 }
 
-void EventRuleWatcher::at_ruleAddedOrUpdated(const event::RulePtr& rule, bool added)
+void EventRuleWatcher::at_ruleAddedOrUpdated(const RulePtr& rule, bool added)
 {
     if (added)
         emit rulesUpdated(m_ruleHolder.addRule(rule));

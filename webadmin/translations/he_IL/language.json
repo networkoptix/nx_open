@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "סינכרון זמן מאופשר",
         "updateNotificationsEnabled": "עדכון ההתראות מופעל",
         "upnpPortMappingEnabled": "מיפוי יציאת UPNP מאופשר",
-        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל"
+        "useTextEmailFormat": "לשלוח הודעות דואר אלקטרוני טקסט רגיל",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

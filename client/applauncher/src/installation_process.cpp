@@ -211,7 +211,7 @@ void InstallationProcess::onHttpDone( nx::network::http::AsyncHttpClientPtr http
         m_httpClient.reset();
         if( m_status == applauncher::api::InstallationStatus::failed )
         {
-            NX_LOG( m_errorText, cl_logERROR );
+            NX_ERROR (this, m_errorText);
         }
     };
     std::unique_ptr<InstallationProcess, decltype(scopedExitFunc)> removeHttpClientGuard( this, scopedExitFunc );
@@ -291,7 +291,7 @@ void InstallationProcess::onHttpDone( nx::network::http::AsyncHttpClientPtr http
 
 
     nx::utils::stree::ResourceContainer result;
-    NX_LOG( QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)));
     m_currentTree->get( inputData, &result );
 
     std::forward_list<nx::utils::Url> mirrorList;

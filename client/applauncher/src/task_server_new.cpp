@@ -47,7 +47,7 @@ bool TaskServerNew::listen( const QString& pipeName )
     NX_ASSERT( singleApp );
     if( singleApp->isRunning() )
     {
-        NX_LOG( QString::fromLatin1("Application instance already running. Not listening to pipe"), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Application instance already running. Not listening to pipe"));
         return false;
     }
 
@@ -60,13 +60,13 @@ bool TaskServerNew::listen( const QString& pipeName )
     const SystemError::ErrorCode osError = m_server.listen( pipeName );
     if( osError != SystemError::noError )
     {
-        NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to listen to pipe %1. %2").arg(pipeName).arg(SystemError::toString(osError)));
         return false;
     }
 
     m_pipeName = pipeName;
 
-    NX_LOG( QString::fromLatin1("Listening pipe %1").arg(pipeName), cl_logDEBUG1 );
+    NX_DEBUG(this, QString::fromLatin1("Listening pipe %1").arg(pipeName));
 
     start();    //launching thread
 
@@ -113,14 +113,14 @@ void TaskServerNew::processNewConnection( NamedPipeSocket* clientConnection )
     SystemError::ErrorCode result = clientConnection->read( msgBuf, MAX_MSG_SIZE, &bytesRead );
     if( result != SystemError::noError )
     {
-        NX_LOG( QString::fromLatin1("Failed to receive task data. %1").arg(SystemError::toString(result)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to receive task data. %1").arg(SystemError::toString(result)));
         return;
     }
 
     applauncher::api::BaseTask* task = NULL;
     if( !applauncher::api::deserializeTask( QByteArray::fromRawData(msgBuf, bytesRead), &task ) )
     {
-        NX_LOG( QString::fromLatin1("Failed to deserialize received task data"), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to deserialize received task data"));
         return;
     }
 

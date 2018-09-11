@@ -3,7 +3,7 @@ from contextlib2 import ExitStack
 from netaddr import IPAddress, IPNetwork
 
 from framework.networking import setup_flat_network, setup_networks
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 pytest_plugins = ['fixtures.big_flat_networks']
 
@@ -65,11 +65,11 @@ def test_two_vms(two_vms, hypervisor):
     first_vm, second_vm = two_vms
     ips = setup_flat_network([first_vm, second_vm], IPNetwork('10.254.254.0/28'), hypervisor)
     second_vm_ip = ips[second_vm.alias]
-    wait_for_true(
+    wait_for_truthy(
         lambda: first_vm.os_access.networking.can_reach(second_vm_ip),
         "{} can ping {} by {}".format(first_vm, second_vm, second_vm_ip))
     first_vm_ip = ips[first_vm.alias]
-    wait_for_true(
+    wait_for_truthy(
         lambda: second_vm.os_access.networking.can_reach(first_vm_ip),
         "{} can ping {} by {}".format(second_vm, first_vm, first_vm_ip))
 

@@ -2,6 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include <core/resource_access/user_access_data.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 struct PasswordData;
 namespace nx { namespace vms { namespace cloud_integration { class CloudConnectionManager; } } }
@@ -9,12 +10,15 @@ namespace ec2 {
     class AbstractTransactionMessageBus;
 }
 
-class QnDetachFromSystemRestHandler: public QnJsonRestHandler
+class QnDetachFromSystemRestHandler:
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
     QnDetachFromSystemRestHandler(
+        QnMediaServerModule* serverModule,
         nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
         ec2::AbstractTransactionMessageBus* messageBus);
 

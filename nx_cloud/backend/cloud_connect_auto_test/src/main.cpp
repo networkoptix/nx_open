@@ -54,8 +54,8 @@ int main(int /*argc*/, char* /*argv*/[])
     for (const TestAddressDescriptor& addressDescriptor: kCloudAddressList)
     {
         const auto startConnectingTimepoint = std::chrono::steady_clock::now();
-        NX_LOG(lm("Connecting to %1 (%2)").arg(addressDescriptor.description)
-            .arg(addressDescriptor.address), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Connecting to %1 (%2)").arg(addressDescriptor.description)
+            .arg(addressDescriptor.address));
 
         std::cout<<"Connecting to "<<addressDescriptor.description<<" >>   ";
         QUrl url(lit("http://%1/api/ping").arg(addressDescriptor.address));
@@ -68,10 +68,9 @@ int main(int /*argc*/, char* /*argv*/[])
         if (!result)
         {
             succeeded = false;
-            NX_LOG(lm("FAILURE (%1ms). %2")
+            NX_DEBUG(this, lm("FAILURE (%1ms). %2")
                 .arg(duration_cast<milliseconds>(connectDuration).count())
-                .arg(SystemError::toString(httpClient.lastSysErrorCode())),
-                cl_logDEBUG1);
+                .arg(SystemError::toString(httpClient.lastSysErrorCode())));
             std::cout << "FAILURE (" 
                 << duration_cast<milliseconds>(connectDuration).count() <<" ms). "
                 << SystemError::toString(httpClient.lastSysErrorCode()).toStdString()
@@ -87,9 +86,8 @@ int main(int /*argc*/, char* /*argv*/[])
 
         if (nx::network::http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
         {
-            NX_LOG(lm("SUCCESS (%1ms)")
-                .arg(duration_cast<milliseconds>(connectDuration).count()),
-                cl_logDEBUG1);
+            NX_DEBUG(this, lm("SUCCESS (%1ms)")
+                .arg(duration_cast<milliseconds>(connectDuration).count()));
             std::cout << "SUCCESS ("
                 << duration_cast<milliseconds>(connectDuration).count()
                 << "ms)" << std::endl;
@@ -97,9 +95,9 @@ int main(int /*argc*/, char* /*argv*/[])
         else
         {
             succeeded = false;
-            NX_LOG(lm("PARTIAL SUCCESS (%1ms). %2")
+            NX_DEBUG(this, lm("PARTIAL SUCCESS (%1ms). %2")
                 .arg(duration_cast<milliseconds>(connectDuration).count())
-                .arg(httpClient.response()->statusLine.statusCode), cl_logDEBUG1);
+                .arg(httpClient.response()->statusLine.statusCode));
             std::cout << "PARTIAL SUCCESS ("
                 << duration_cast<milliseconds>(connectDuration).count() <<"ms). "
                 << httpClient.response()->statusLine.statusCode

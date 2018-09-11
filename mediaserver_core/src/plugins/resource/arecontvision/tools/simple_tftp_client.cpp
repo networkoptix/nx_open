@@ -27,7 +27,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     m_sock->setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
     if (!m_sock->setDestAddr(m_resolvedAddress, kDefaultTFTPPort))
     {
-        qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << SystemError::getLastOSErrorText();
+        NX_WARNING(this, lm("setDestAddr() failed: %1"), SystemError::getLastOSErrorText());
     }
 }
 
@@ -120,7 +120,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             for (i = 0; i < m_retry; ++i)
             {
 
-                //NX_LOG("sending... ", blk_cam_sending, cl_logWARNING);
+                //NX_VERBOSE(this, "sending... ", blk_cam_sending);
 
                 m_prevResult = CameraDiagnostics::NoErrorResult();
                 if (!m_sock->send(buff_send,len_send))
@@ -129,7 +129,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                     return 0;
                 }
 
-                //NX_LOG("send ", blk_cam_sending, cl_logWARNING);
+                //NX_VERBOSE(this, "send ", blk_cam_sending);
 
                 while(1)
                 {
@@ -148,7 +148,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                         blk_cam_sending = buff_recv[2]*256 + buff_recv[3];
 
-                        //NX_LOG("got ", blk_cam_sending, cl_logWARNING);
+                        //NX_VERBOSE(this, "got ", blk_cam_sending);
 
                         int data_len = len_recv-4;
 
@@ -165,7 +165,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         len+=data_len;
                         if (len>CL_MAX_DATASIZE)
                         {
-                            NX_LOG("Image is too big!!", cl_logERROR);
+                            NX_ERROR(this, "Image is too big!!");
                             m_status = time_out;
                             break;
                         }
@@ -179,7 +179,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         else
                         {
                             // this is 3 times we got option ack; need to resend ack0?
-                            NX_LOG("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
+                            NX_DEBUG(this, "this is 3 times we got option ack; need to resend ack0?");
 
                             if (len_recv<13) // unexpected answer
                                 continue;

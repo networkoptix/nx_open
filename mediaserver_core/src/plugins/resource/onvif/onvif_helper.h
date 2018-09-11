@@ -6,16 +6,13 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
-#include <nx/utils/singleton.h>
 #include <utils/common/credentials.h>
 
 struct SOAP_ENV__Fault;
 
 using CredentialsList = QList<nx::common::utils::Credentials>;
 
-class PasswordHelper:
-    public QObject,
-    public Singleton<PasswordHelper>
+class PasswordHelper: public QObject
 {
     Q_OBJECT
 

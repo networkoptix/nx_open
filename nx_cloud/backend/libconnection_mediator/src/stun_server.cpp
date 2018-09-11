@@ -87,14 +87,14 @@ bool StunServer::bind()
 {
     if (m_settings.stun().addrToListenList.empty())
     {
-        NX_LOGX("No STUN address to listen", cl_logALWAYS);
+        NX_ALWAYS(this, "No STUN address to listen");
         return false;
     }
 
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
-        NX_LOGX(lit("Cannot bind to TCP endpoint(s): %1")
-            .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
+        NX_ERROR(this, lit("Cannot bind to TCP endpoint(s): %1")
+            .arg(containerString(m_settings.stun().addrToListenList)));
         return false;
     }
 
@@ -109,8 +109,8 @@ bool StunServer::bind()
 
     if (!m_udpStunServer->bind(m_settings.stun().udpAddrToListenList))
     {
-        NX_LOGX(lit("Cannot bind to UDP endpoint(s): %1")
-            .arg(containerString(m_settings.stun().udpAddrToListenList)), cl_logERROR);
+        NX_ERROR(this, lit("Cannot bind to UDP endpoint(s): %1")
+            .arg(containerString(m_settings.stun().udpAddrToListenList)));
         return false;
     }
 

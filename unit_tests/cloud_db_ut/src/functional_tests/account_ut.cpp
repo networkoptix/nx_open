@@ -17,6 +17,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
+#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
@@ -1027,6 +1028,73 @@ TEST_F(AccountNewTest, account_timestamps)
 
 //-------------------------------------------------------------------------------------------------
 
+class AccountPasswordReset:
+    public AccountNewTest
+{
+    using base_type = AccountNewTest;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        givenActivatedAccount();
+    }
+
+    void setLargeLoginExistenceConcealDelay()
+    {
+        args().erase(
+            std::remove_if(
+                args().begin(), args().end(),
+                [](char* arg) { return strstr(arg, "accountManager/loginExistenceConcealDelay") != nullptr; }),
+            args().end());
+
+        addArg("--accountManager/loginExistenceConcealDelay=1h");
+        whenRestartedCloudDb();
+    }
+
+    void whenRestorePassword()
+    {
+        using namespace std::placeholders;
+
+        m_cdbConnection = connection("", "");
+        m_cdbConnection->accountManager()->resetPassword(
+            {account().email},
+            std::bind(&AccountPasswordReset::saveResetPasswordResult, this, _1, _2));
+    }
+
+    void thenResponseIsNotReceived()
+    {
+        static constexpr std::chrono::milliseconds kWaitPeriod = std::chrono::seconds(1);
+
+        ASSERT_FALSE(m_resetPasswordResults.pop(kWaitPeriod));
+    }
+
+private:
+    using Result = std::tuple<api::ResultCode, api::AccountConfirmationCode>;
+
+    std::unique_ptr<nx::cdb::api::Connection> m_cdbConnection;
+    nx::utils::SyncQueue<Result> m_resetPasswordResults;
+
+    void saveResetPasswordResult(
+        api::ResultCode resultCode,
+        api::AccountConfirmationCode confirmationCode)
+    {
+        m_resetPasswordResults.push(
+            std::make_tuple(resultCode, std::move(confirmationCode)));
+    }
+};
+
+TEST_F(AccountPasswordReset, password_reset_response_is_delayed_based_on_settings)
+{
+    setLargeLoginExistenceConcealDelay();
+
+    whenRestorePassword();
+    thenResponseIsNotReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 class AccountFailedAuthenticationResultCodes:
     public AccountNewTest
 {
@@ -1380,7 +1448,7 @@ class AccountLockoutEnabled:
 public:
     AccountLockoutEnabled()
     {
-        m_settings.lockPeriod = std::chrono::seconds(3);
+        m_settings.lockPeriod = std::chrono::hours(1);
 
         addArg("--loginLockout/enabled=true");
 

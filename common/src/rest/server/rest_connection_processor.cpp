@@ -119,12 +119,12 @@ void QnRestConnectionProcessor::run()
             QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
                 return;
             }
             if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
                 return;
             }
         }

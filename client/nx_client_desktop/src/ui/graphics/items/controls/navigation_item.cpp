@@ -100,7 +100,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_syncButton->setPreferredSize(52, 24);
 
     m_bookmarksModeButton = newActionButton(action::BookmarksModeAction);
-    m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
+    m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_bookmarksModeButton->setPreferredSize(52, 24);
 
     m_calendarButton = newActionButton(action::ToggleCalendarAction);

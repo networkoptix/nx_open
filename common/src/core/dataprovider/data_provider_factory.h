@@ -15,7 +15,7 @@ public:
     explicit QnDataProviderFactory(QObject* parent = nullptr);
     virtual ~QnDataProviderFactory() override;
 
-    QnAbstractStreamDataProvider* createDataProvider(
+    virtual QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role = Qn::CR_Default);
 
@@ -28,10 +28,10 @@ public:
         registerResourceType(T::staticMetaObject, T::createDataProvider);
     }
 
-private:
     void registerResourceType(
         const QMetaObject& metaobject,
         DataProviderGenerator&& generator);
+private:
 
     struct Private;
     QScopedPointer<Private> d;

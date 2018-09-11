@@ -14,6 +14,7 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/model_functions.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver {
@@ -22,10 +23,11 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-MetadataHandler::MetadataHandler()
+MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
     connect(this, &MetadataHandler::sdkEventTriggered,
-        qnEventRuleConnector, &event::EventConnector::at_analyticsSdkEvent,
+        serverModule->eventConnector(), &event::EventConnector::at_analyticsSdkEvent,
         Qt::QueuedConnection);
 }
 
@@ -55,9 +57,9 @@ void MetadataHandler::handleMetadata(
 			<< (int) error << "; ignoring";
         return;
 	}
-    
+
     bool handled = false;
-    
+
     nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
         metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)
@@ -65,19 +67,19 @@ void MetadataHandler::handleMetadata(
         handleEventsPacket(std::move(eventsPacket));
         handled = true;
     }
-    
+
     nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
         metadata->queryInterface(IID_ObjectsMetadataPacket));
     if (objectsPacket)
     {
         handleObjectsPacket(std::move(objectsPacket));
         handled = true;
-    }           
-	
+    }
+
 	if (!handled)
     {
         NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
-            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec() 
+            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec()
             << "; ignoring";
     }
 }
@@ -92,7 +94,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
             break;
 
 		++eventsCount;
-		
+
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
@@ -104,7 +106,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
             NX_VERBOSE(this) << __func__ << "(): ERROR: Received event does not implement Event";
         }
     }
-	
+
 	if (eventsCount == 0)
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }

@@ -15,6 +15,7 @@
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
 #include "recording/playbackmask_helper.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 class VMaxStreamFetcherPtr;
 class QnVmax480DataConsumer

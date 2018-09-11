@@ -21,14 +21,6 @@ namespace
                 version=\"1\"                                             \
                 unique_id=\"eedd2bfd-39fb-49ae-85ce-f5f47124e39b\">       \
             <parameters>                                                  \
-                <group name=\"Main\">                                     \
-                    <param                                                \
-                        id=\"rtsp_url\"                                   \
-                        name=\"RTSP URL\"                                 \
-                        description=\"Original URL of the stream\"        \
-                        dataType=\"String\"                               \
-                        readOnly=\"true\"/>                               \
-                </group>                                                  \
             </parameters>                                                 \
         </plugin>";
 }

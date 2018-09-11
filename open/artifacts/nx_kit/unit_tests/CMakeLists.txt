@@ -1,15 +1,17 @@
+#--------------------------------------------------------------------------------------------------
 # Test for disabled (via -DNX_INI_CONFIG_DISABLED) ini_config.
 
 add_library(disabled_ini_config_ut SHARED
+    ../src/nx/kit/ini_config.h
     ../src/nx/kit/ini_config.cpp
+    ../src/nx/kit/test.h
     ../src/nx/kit/test.cpp
     src/ini_config_ut.cpp
+    src/disabled_ini_config_ut.h
     src/disabled_ini_config_ut.cpp
 )
 
-target_include_directories(disabled_ini_config_ut
-    PRIVATE ../src
-)
+target_include_directories(disabled_ini_config_ut PRIVATE ../src)
 
 if(WIN32)
     set(DISABLED_INI_CONFIG_UT_API_IMPORT_MACRO "__declspec(dllimport)")
@@ -26,13 +28,18 @@ target_compile_definitions(disabled_ini_config_ut
     PRIVATE NX_KIT_API= #< nx_kit sources are statically linked into lib disabled_ini_config_ut.
 )
 
+#--------------------------------------------------------------------------------------------------
 # Executable for all tests.
 
 add_executable(nx_kit_ut
-    src/ini_config_ut.cpp
     src/debug_ut.cpp
+    src/ini_config_ut.cpp
+    src/ini.h
     src/ini.cpp
-    src/ini_config_c_ut.c
+    src/ini_config_c_usage.h
+    src/ini_config_c_usage.c
+    src/ini_config_c_ut.cpp
+    src/test_ut.cpp
     src/main.cpp
 )
 

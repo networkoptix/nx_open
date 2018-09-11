@@ -354,11 +354,11 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
-        NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+        NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(sharedThis->getId().toString())
                 .arg(sharedThis->getName())
-                .arg(sharedThis->getUrl()), cl_logDEBUG2);
+                .arg(sharedThis->getUrl()));
 
         emit statusChanged(sharedThis, reason);
     }
@@ -632,8 +632,9 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance()
+QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
 {
+    initResPool()->setMaxThreadCount(threadCount);
     return initResPool();
 }
 // -----------------------------------------------------------------------------

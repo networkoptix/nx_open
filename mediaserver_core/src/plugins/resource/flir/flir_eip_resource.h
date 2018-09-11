@@ -25,7 +25,7 @@ class QnFlirEIPResource:
     Q_OBJECT
 public:
 
-    QnFlirEIPResource();
+    QnFlirEIPResource(QnMediaServerModule* serverModule);
     ~QnFlirEIPResource();
 
     struct PortTimerEntry

@@ -1,5 +1,4 @@
-#ifndef isd_device_server_h_1936
-#define isd_device_server_h_1936
+#pragma once
 
 #ifdef ENABLE_ISD
 
@@ -8,14 +7,18 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <nx/utils/url.h>
+#include <nx/mediaserver/server_module_aware.h>
+
+class QnMediaServerModule;
 
 class QnPlISDResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 
 public:
-    QnPlISDResourceSearcher(QnCommonModule* commonModule);
+    QnPlISDResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnPlISDResourceSearcher() override;
 
     virtual QnResourcePtr createResource(
@@ -70,5 +73,4 @@ private:
     mutable QnMutex m_mutex;
 };
 
-#endif // #ifdef ENABLE_ISD
-#endif //isd_device_server_h_1936
+#endif // ENABLE_ISD

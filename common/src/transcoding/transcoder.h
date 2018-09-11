@@ -17,7 +17,6 @@ extern "C"
 
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
-#include <common/common_module_aware.h>
 
 class CLVideoDecoderOutput;
 namespace nx { namespace metrics { struct Storage; } }

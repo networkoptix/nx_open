@@ -257,7 +257,7 @@ namespace detail
         QBuffer xmlFile( &contentsXml );
         if( !xmlFile.open( QIODevice::ReadOnly ) )
         {
-            NX_LOG( QString::fromLatin1( "Failed to open contents.xml buffer. %1" ).arg(xmlFile.errorString()), cl_logERROR );
+            NX_ERROR (this, QString::fromLatin1( "Failed to open contents.xml buffer. %1" ).arg(xmlFile.errorString()));
             setResult( ResultCode::downloadFailure );
             m_handler->operationDone( shared_from_this() );
             return;
@@ -265,7 +265,7 @@ namespace detail
         QXmlInputSource input( &xmlFile );
         if( !reader.parse( &input ) )
         {
-            NX_LOG( QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString(QUrl::RemovePassword)).arg(xmlHandler.errorString()), cl_logERROR );
+            NX_ERROR (this, QString::fromLatin1( "Failed to parse contents.xml from remote folder %1. %2" ).arg(m_downloadUrl.toString(QUrl::RemovePassword)).arg(xmlHandler.errorString()));
             setResult( ResultCode::downloadFailure );
             m_handler->operationDone( shared_from_this() );
             return;

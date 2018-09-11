@@ -6,9 +6,9 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace QnNotificationLevel { enum class Value; }
+
+namespace nx::client::desktop {
 
 class EventTile;
 
@@ -26,6 +26,7 @@ public:
     virtual ~EventPanel() override;
 
 signals:
+    void unreadCountChanged(int count, QnNotificationLevel::Value importance);
     void tileHovered(const QModelIndex& index, const EventTile* tile);
 
 private:
@@ -36,6 +37,4 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -107,9 +107,10 @@ private:
 } // namespace
 
 
-QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
+QnCameraSettingsRestHandler::QnCameraSettingsRestHandler(QnResourceCommandProcessor* commandProcessor):
     base_type(),
-    m_paramsReader(new QnCachingCameraAdvancedParamsReader())
+    m_paramsReader(new QnCachingCameraAdvancedParamsReader()),
+    m_commandProcessor(commandProcessor)
 {
 }
 
@@ -131,7 +132,7 @@ int QnCameraSettingsRestHandler::executeGet(
             .dynamicCast<nx::mediaserver::resource::Camera>();
     if (!camera)
     {
-        NX_LOG(this, lm("Camera not found"), cl_logWARNING);
+        NX_WARNING(this, lm("Camera not found"));
         if (notFoundCameraId.isNull())
         {
             result.setError(QnRestResult::MissingParameter, lit("Camera is not specified"));
@@ -187,7 +188,7 @@ int QnCameraSettingsRestHandler::executeGet(
             return nx::network::http::StatusCode::forbidden;
         }
 
-        qnServerModule->resourceCommandProcessor()->putData(
+        m_commandProcessor->putData(
                 std::make_shared<GetAdvancedParametersCommand>(
                     camera,
                     values.ids(),
@@ -218,7 +219,7 @@ int QnCameraSettingsRestHandler::executeGet(
             return nx::network::http::StatusCode::forbidden;
         }
 
-        qnServerModule->resourceCommandProcessor()->putData(
+        m_commandProcessor->putData(
                 std::make_shared<SetAdvancedParametersCommand>(
                     camera,
                     values,

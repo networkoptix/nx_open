@@ -73,10 +73,9 @@ def send_email(user_email, type, message, customization, queue="", attempt=1):
 # For testing we dont want to send emails to everyone so we need to set
 # "BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
 @shared_task
-def send_to_all_users(notification_id, message, force=False):
+def send_to_all_users(notification_id, message, customizations, force=False):
     # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.exclude(activated_date=None, last_login=None)
-
+    users = Account.objects.exclude(activated_date=None, last_login=None).filter(customization__in=customizations)
     if not force:
         users = users.filter(subscribe=True)
 

@@ -10,12 +10,17 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
 add_library(nx_kit ${nxKitLibraryType}
-    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/debug.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/ini_config.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/test.cpp
+    src/nx/kit/debug.h
+    src/nx/kit/debug.cpp
+    src/nx/kit/ini_config.h
+    src/nx/kit/ini_config.cpp
+    src/nx/kit/test.h
+    src/nx/kit/test.cpp
+    src/ini_config_c.h
+    src/ini_config_c_impl.h
 )
-target_include_directories(nx_kit
-    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
+
+target_include_directories(nx_kit PUBLIC src)
 
 set(NX_KIT_API_IMPORT_MACRO "")
 set(NX_KIT_API_EXPORT_MACRO "")
@@ -35,5 +40,6 @@ target_compile_definitions(nx_kit
 
 set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
 if(nxKitWithTests)
+    enable_testing()
     add_subdirectory(unit_tests)
 endif()

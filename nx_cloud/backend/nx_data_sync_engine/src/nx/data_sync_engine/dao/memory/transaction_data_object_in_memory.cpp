@@ -42,6 +42,11 @@ bool TransactionDataObject::TransactionKey::operator<(const TransactionKey& rhs)
 //-------------------------------------------------------------------------------------------------
 // TransactionDataObject
 
+TransactionDataObject::TransactionDataObject(int transactionFormatVersion):
+    m_transactionFormatVersion(transactionFormatVersion)
+{
+}
+
 nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     nx::sql::QueryContext* /*queryContext*/,
     const dao::TransactionData& transactionData)
@@ -95,7 +100,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
         logRecord.hash = tranIter->hash;
         logRecord.serializer = std::make_unique<UbjsonTransactionPresentation>(
             tranIter->ubjsonSerializedTransaction,
-            nx_ec::EC2_PROTO_VERSION);
+            m_transactionFormatVersion);
         transactions->push_back(std::move(logRecord));
     }
 

@@ -11,6 +11,8 @@
 #include <nx/vms/event/event_parameters.h>
 #include <nx/fusion/model_functions_fwd.h>
 
+class QnResourcePool;
+
 namespace nx {
 namespace vms {
 namespace event {
@@ -82,7 +84,7 @@ public:
     const QVector<QnUuid>& getResources() const;
 
     /** Source resource of the action (including custom for generic events). */
-    QVector<QnUuid> getSourceResources() const;
+    QVector<QnUuid> getSourceResources(QnResourcePool* resourcePool) const;
 
     void setParams(const ActionParameters& params);
     const ActionParameters& getParams() const;

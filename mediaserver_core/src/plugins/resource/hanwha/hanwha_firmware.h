@@ -21,6 +21,12 @@ public:
 
     bool operator>(const HanwhaFirmware& other) const;
 
+    bool operator<(const HanwhaFirmware& other) const;
+
+    bool operator<=(const HanwhaFirmware& other) const;
+
+    bool operator>=(const HanwhaFirmware& other) const;
+
 private:
     void parse(const QString& firmwareString);
 

@@ -120,7 +120,6 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        getResource()->setStatus(Qn::Unauthorized);
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
@@ -147,7 +146,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()));
     if (m_profile.codec.contains("264"))
     {
         QString rtspUrl(m_profile.url);

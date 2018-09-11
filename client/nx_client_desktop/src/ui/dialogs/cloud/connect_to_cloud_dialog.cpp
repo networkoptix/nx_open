@@ -75,7 +75,15 @@ public:
     QnConnectToCloudDialogPrivate(QnConnectToCloudDialog *parent);
 
     void updateUi();
-    void lockUi(bool locked);
+
+    enum class LockMode
+    {
+        Unlocked,       //< OK is accessible.
+        Locked,         //< OK is locked, status is shown.
+        Waiting,        //< OK is locked, status is hidden.
+    };
+
+    void lockUi(LockMode mode);
     void bindSystem();
 
     void showCredentialsError(const QString& text);
@@ -157,7 +165,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
         d, &QnConnectToCloudDialogPrivate::at_bindFinished, Qt::QueuedConnection);
     setWarningStyle(ui->invalidCredentialsLabel);
 
-    d->lockUi(false);
+    d->lockUi(QnConnectToCloudDialogPrivate::LockMode::Unlocked);
     d->updateUi();
     setResizeToContentsMode(Qt::Vertical);
 }
@@ -217,20 +225,19 @@ void QnConnectToCloudDialogPrivate::showCredentialsError(const QString& text)
     q->ui->credentialsWidget->layout()->activate();
 }
 
-void QnConnectToCloudDialogPrivate::lockUi(bool locked)
+void QnConnectToCloudDialogPrivate::lockUi(LockMode mode)
 {
     Q_Q(QnConnectToCloudDialog);
-    const bool enabled = !locked;
+    const bool enabled = mode != LockMode::Waiting;
 
     q->ui->credentialsWidget->setEnabled(enabled);
     q->ui->enterCloudAccountLabel->setEnabled(enabled);
 
-    q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
+    q->ui->linksWidget->graphicsEffect()->setEnabled(mode == LockMode::Waiting);
 
-    indicatorButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
+    indicatorButton->setEnabled(mode == LockMode::Unlocked);
     indicatorButton->setFocus();
-
-    indicatorButton->showIndicator(locked);
+    indicatorButton->showIndicator(mode == LockMode::Waiting);
 }
 
 void QnConnectToCloudDialogPrivate::bindSystem()
@@ -246,7 +253,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
         return;
     }
 
-    lockUi(true);
+    lockUi(LockMode::Waiting);
     indicatorButton->setEnabled(false);
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
@@ -296,7 +303,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
             .arg(nx::network::AppInfo::cloudName()),
         message);
 
-    lockUi(false);
+    lockUi(LockMode::Locked);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(
@@ -339,7 +346,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
                 qnCloudStatusWatcher->suppressCloudInteraction(kSuppressCloudTimeout);
         }
 
-        lockUi(false);
+        lockUi(result == api::ResultCode::accountBlocked ? LockMode::Unlocked : LockMode::Locked);
         return;
     }
 

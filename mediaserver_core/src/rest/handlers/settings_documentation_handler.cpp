@@ -1,6 +1,12 @@
 #include "settings_documentation_handler.h"
 
-#include "media_server/media_server_module.h"
+#include <nx/mediaserver/settings.h>
+
+QnSettingsDocumentationHandler::QnSettingsDocumentationHandler(
+    const nx::mediaserver::Settings* settings):
+    m_settings(settings)
+{
+}
 
 int QnSettingsDocumentationHandler::executeGet(
     const QString& /*path*/,
@@ -8,6 +14,6 @@ int QnSettingsDocumentationHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    result.setReply(qnServerModule->settings().buildDocumentation());
+    result.setReply(m_settings->buildDocumentation());
     return nx::network::http::StatusCode::ok;
 }

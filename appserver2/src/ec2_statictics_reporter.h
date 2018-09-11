@@ -5,6 +5,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/optional.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
 
@@ -23,7 +24,8 @@ namespace ec2
         ErrorCode collectReportData(std::nullptr_t, ApiSystemStatistics* const outData);
 
         /** Collects \class ApiSystemStatistics and sends it to the statistics server */
-        ErrorCode triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData);
+        ErrorCode triggerStatisticsReport(
+            const ApiStatisticsServerArguments& arguments, ApiStatisticsServerInfo* const outData);
 
         // server information
         static const QString DEFAULT_SERVER_API;
@@ -38,7 +40,7 @@ namespace ec2
         void timerEvent();
 
         QDateTime plannedReportTime(const QDateTime& now);
-        ErrorCode initiateReport(QString* reportApi = 0);
+        ErrorCode initiateReport(QString* reportApi = 0, QnUuid* systemId = 0);
 
     private:
         void finishReport(nx::network::http::AsyncHttpClientPtr httpClient);

@@ -7,6 +7,7 @@
 #include <QtWidgets/QStyleOptionSpinBox>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -59,6 +60,19 @@ public:
                     break;
                 }
 
+                case QEvent::Wheel:
+                {
+                    const auto wheelEvent = static_cast<QWheelEvent*>(event);
+                    if (wheelEvent->angleDelta().y() > 0)
+                    {
+                        setDefaultValue(spinBox);
+                        event->accept();
+                        return true;
+                    }
+
+                    break;
+                }
+
                 case QEvent::KeyPress:
                 {
                     const auto keyEvent = static_cast<QKeyEvent*>(event);
@@ -73,6 +87,7 @@ public:
                         default:
                             break;
                     }
+
                     break;
                 }
 

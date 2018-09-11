@@ -58,16 +58,16 @@ private:
     void registerApiHandlers();
     void registerCompatibilityHandlers();
 
-    template<typename Handler, typename ... Arg>
+    template<typename Handler, typename ... Args>
     void registerApiHandler(
         const nx::network::http::StringType& method,
-        Arg... arg);
+        Args... args);
 
-    template<typename Handler, typename ... Arg>
+    template<typename Handler, typename ... Args>
     void registerApiHandler(
         const char* path,
         const nx::network::http::StringType& method,
-        Arg... arg);
+        Args... args);
 
     void initializeProxy();
 

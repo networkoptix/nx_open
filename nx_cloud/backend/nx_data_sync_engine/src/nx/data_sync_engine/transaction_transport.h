@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <nx/network/aio/timer.h>
@@ -7,7 +8,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <nx/vms/api/data/tran_state_data.h>
-#include <nx_ec/ec_proto_version.h>
+
 #include <transaction/transaction_transport_base.h>
 
 #include "abstract_transaction_transport.h"
@@ -15,6 +16,11 @@
 #include "transaction_processor.h"
 #include "transaction_log_reader.h"
 #include "transaction_transport_header.h"
+
+namespace ec2 {
+class QnTransactionTransportBase;
+class ConnectionGuardSharedState;
+} // namespace ec2
 
 namespace nx {
 namespace data_sync_engine {
@@ -40,6 +46,7 @@ public:
      * Initializer for incoming connection.
      */
     TransactionTransport(
+        const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         TransactionLog* const transactionLog,
@@ -86,7 +93,8 @@ public:
         TransactionProcessedHandler handler);
 
 private:
-    ::ec2::QnTransactionTransportBase m_baseTransactionTransport;
+    const ProtocolVersionRange m_protocolVersionRange;
+    std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
@@ -133,9 +141,9 @@ private:
     void restartInactivityTimer();
     void onInactivityTimeout();
 
-    template<class T>
+    template<typename CommandDescriptor>
     void sendTransaction(
-        Command<T> transaction,
+        Command<typename CommandDescriptor::Data> transaction,
         TransactionTransportHeader transportHeader);
 };
 

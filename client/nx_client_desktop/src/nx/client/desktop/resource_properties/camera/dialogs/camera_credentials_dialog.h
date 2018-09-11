@@ -10,8 +10,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsDialogStore;
-
 class CameraCredentialsDialog: public QnButtonBoxDialog
 {
     Q_OBJECT

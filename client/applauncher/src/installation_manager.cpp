@@ -98,13 +98,13 @@ InstallationManager::InstallationManager(QObject *parent):
 
 void InstallationManager::updateInstalledVersionsInformation()
 {
-    NX_LOG("Entered update installed versions", cl_logDEBUG1);
+    NX_DEBUG(this, "Entered update installed versions");
 
     QMap<SoftwareVersion, QnClientInstallationPtr> installations;
 
     // Detect current installation.
-    NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(
-        QnAppInfo::applicationVersion()), cl_logDEBUG1);
+    NX_DEBUG(this, QString::fromLatin1("Checking current version (%1)").arg(
+        QnAppInfo::applicationVersion()));
 
     const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
@@ -115,8 +115,8 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
     else
     {
-        NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(
-            QCoreApplication::applicationDirPath()), cl_logWARNING);
+        NX_WARNING(this, QString::fromLatin1("Can't find client binary in %1").arg(
+            QCoreApplication::applicationDirPath()));
     }
 
     const auto fillInstallationFromDir =
@@ -132,15 +132,14 @@ void InstallationManager::updateInstalledVersionsInformation()
 
             if (verify && !installation->verify())
             {
-                NX_LOG(QString::fromLatin1("Compatibility version %1 was not verified").arg(version),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, QString::fromLatin1("Compatibility version %1 was not verified").arg(version));
                 return;
             }
 
             installation->setVersion(SoftwareVersion(version));
             installations.insert(installation->version(), installation);
 
-            NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(version), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("Compatibility version %1 found").arg(version));
         };
 
     const auto fillInstallationsFromDir =
@@ -178,7 +177,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     lk.unlock();
 
     if (m_installationByVersion.empty())
-        NX_LOG(lit("No client versions found"), cl_logWARNING);
+        NX_WARNING(this, lit("No client versions found"));
 
     createGhosts();
 }
@@ -368,14 +367,13 @@ QString InstallationManager::installationDirForVersion(const SoftwareVersion& ve
 
 bool InstallationManager::installZip(const SoftwareVersion& version, const QString &fileName)
 {
-    NX_LOG(lit("InstallationManager: Installing update %1 from %2")
-        .arg(version.toString()).arg(fileName), cl_logDEBUG1);
+    NX_DEBUG(this, lit("InstallationManager: Installing update %1 from %2")
+        .arg(version.toString()).arg(fileName));
 
     QnClientInstallationPtr installation = installationForVersion(version, true);
     if (installation && installation->verify())
     {
-        NX_LOG(lit("InstallationManager: Version %1 is already installed").arg(version.toString()),
-            cl_logINFO);
+        NX_INFO(this, lit("InstallationManager: Version %1 is already installed").arg(version.toString()));
         return true;
     }
 
@@ -386,8 +384,7 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
 
     if (!QDir().mkdir(targetDir.absolutePath()))
     {
-        NX_LOG(lit("InstallationManager: Cannot create directory %1").arg(targetDir.absolutePath()),
-            cl_logERROR);
+        NX_ERROR(this, lit("InstallationManager: Cannot create directory %1").arg(targetDir.absolutePath()));
         return false;
     }
 
@@ -395,8 +392,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
     const int errorCode = extractor.extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
-        NX_LOG(lit("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
-            .arg(fileName).arg(targetDir.absolutePath()).arg(errorCode), cl_logERROR);
+        NX_ERROR(this, lit("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
+            .arg(fileName).arg(targetDir.absolutePath()).arg(errorCode));
         return false;
     }
 
@@ -404,8 +401,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
     if (installation.isNull() || !installation->exists())
     {
         targetDir.removeRecursively();
-        NX_LOG(lit("InstallationManager: Update package %1 (%2) is invalid")
-            .arg(version.toString()).arg(fileName), cl_logERROR);
+        NX_ERROR(this, lit("InstallationManager: Update package %1 (%2) is invalid")
+            .arg(version.toString()).arg(fileName));
         return false;
     }
 
@@ -415,8 +412,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
     if (!installation->createInstallationDat())
     {
         targetDir.removeRecursively();
-        NX_LOG(lit("InstallationManager: Cannot create verification file for %1.")
-            .arg(version.toString()).arg(fileName), cl_logERROR);
+        NX_ERROR(this, lit("InstallationManager: Cannot create verification file for %1.")
+            .arg(version.toString()).arg(fileName));
         return false;
     }
 
@@ -426,8 +423,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
 
     createGhosts();
 
-    NX_LOG(lit("InstallationManager: Version %1 has been installed successfully to %2")
-        .arg(version.toString()).arg(targetDir.absolutePath()), cl_logINFO);
+    NX_INFO(this, lit("InstallationManager: Version %1 has been installed successfully to %2")
+        .arg(version.toString()).arg(targetDir.absolutePath()));
 
     return true;
 }

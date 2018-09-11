@@ -221,11 +221,14 @@ void WearablePreparer::handlePrepareFinished(bool success, const QnWearablePrepa
             payload.status = WearablePayload::ChunksTakenOnServer;
     }
 
-    if (reply.storageCleanupNeeded)
+    if (reply.storageCleanupNeeded || reply.storageFull)
     {
+        WearablePayload::Status newStatus = reply.storageFull
+            ? WearablePayload::NoSpaceOnServer
+            : WearablePayload::StorageCleanupNeeded;
         for (WearablePayload& payload : d->upload.elements)
             if (payload.status == WearablePayload::Valid)
-                payload.status = WearablePayload::StorageCleanupNeeded;
+                payload.status = newStatus;
     }
 
     emit finished(d->upload);

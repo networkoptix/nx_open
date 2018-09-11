@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx_ec/ec_proto_version.h>
 #include <nx/network/buffer.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_message.h>
@@ -19,8 +18,8 @@ public:
     CommandTransportHeader vmsTransportHeader;
     int transactionFormatVersion;
 
-    TransactionTransportHeader():
-        transactionFormatVersion(nx_ec::EC2_PROTO_VERSION)
+    TransactionTransportHeader(int transactionVersion):
+        transactionFormatVersion(transactionVersion)
     {
     }
 

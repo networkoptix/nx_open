@@ -4,7 +4,7 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/rtp/time_helper.h>
 
 class QnRtspStatistic;
 
@@ -76,7 +76,7 @@ public:
         bool& gotData) = 0;
 
     // used for sync audio/video streams
-    void setTimeHelper(QnRtspTimeHelper* timeHelper);
+    void setTimeHelper(nx::streaming::rtp::TimeHelper* timeHelper);
 
     int logicalChannelNum() const;
     void setLogicalChannelNum(int value);
@@ -85,7 +85,7 @@ signals:
     void packetLostDetected(quint32 prev, quint32 next);
 
 protected:
-    QnRtspTimeHelper* m_timeHelper = nullptr;
+    nx::streaming::rtp::TimeHelper* m_timeHelper = nullptr;
     int m_logicalChannelNum = 0;
 };
 

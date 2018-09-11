@@ -119,8 +119,8 @@ void QnWorkbenchLayoutSynchronizer::deinitialize() {
 
     m_update = m_submit = false;
 
-    disconnect(m_layout, NULL, this, NULL);
-    disconnect(m_resource, NULL, this, NULL);
+    m_layout->disconnect(this);
+    m_resource->disconnect(this);
 
     qn_synchronizerByLayoutResource()->remove(m_resource.data());
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
@@ -328,7 +328,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    disconnect(item, NULL, this, NULL);
+    item->disconnect(this);
 
     if(!m_submit)
         return;

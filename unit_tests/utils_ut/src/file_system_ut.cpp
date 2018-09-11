@@ -5,8 +5,9 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/file_system.h>
+#include <nx/utils/test_support/test_options.h>
 
-static const QString kTestDirectoryName("__tmp_fs_test");
+static const QString kTestDirectoryName("__tmp_fs_test"); //< TODO: Remove it.
 static const QString kSourceDirectoryName("src");
 static const QString kTargetDirectoryName("dst");
 
@@ -19,7 +20,8 @@ class CopyTest: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        QDir rootDir(QDir::temp().absoluteFilePath(kTestDirectoryName));
+        QDir tempDir(nx::utils::TestOptions::temporaryDirectoryPath());
+        QDir rootDir(tempDir.absoluteFilePath(kTestDirectoryName));
 
         rootDir.removeRecursively();
         ASSERT_TRUE(QDir().mkdir(rootDir.absolutePath()));

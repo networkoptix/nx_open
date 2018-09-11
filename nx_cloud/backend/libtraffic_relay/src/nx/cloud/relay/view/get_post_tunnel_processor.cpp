@@ -68,14 +68,12 @@ template<typename RequestSpecificData>
 void GetPostTunnelProcessor<RequestSpecificData>::prepareCreateDownTunnelResponse(
     network::http::Response* const response)
 {
-    //--
     api::BeginListeningResponse responseData;
     responseData.preemptiveConnectionCount =
         m_settings.listeningPeer().recommendedPreemptiveConnectionCount;
     responseData.keepAliveOptions = m_settings.listeningPeer().tcpKeepAlive;
 
     serializeToHeaders(&response->headers, responseData);
-    //--
 
     response->headers.emplace("Content-Type", "application/octet-stream");
     response->headers.emplace("Content-Length", "10000000000");

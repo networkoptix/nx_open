@@ -2,18 +2,21 @@
 
 #include <core/resource_access/user_access_data.h>
 #include <rest/server/json_rest_handler.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 struct CloudCredentialsData;
 namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 class QnCommonModule;
 
 class QnSaveCloudSystemCredentialsHandler:
-    public QnJsonRestHandler
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
     QnSaveCloudSystemCredentialsHandler(
+        QnMediaServerModule* serverModule,
         nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup);
 
     virtual int executePost(
@@ -29,7 +32,6 @@ public:
         const QnRestConnectionProcessor* owner);
 
 private:
-    QnCommonModule* m_commonModule = nullptr;
     nx::vms::cloud_integration::CloudManagerGroup* m_cloudManagerGroup = nullptr;
 
     bool authorize(

@@ -28,6 +28,7 @@
 
 #include <core/resource_access/resource_access_filter.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -1087,8 +1088,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (m_widgets.size() >= maxItems)
     {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
-            .arg(maxItems), cl_logDEBUG1);
+        NX_DEBUG(this, lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
+            .arg(maxItems));
         qnDeleteLater(item);
         return false;
     }
@@ -2426,7 +2427,10 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
-            targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
+        {
+            QnResourceList cameras = resourcePool()->getCamerasByFlexibleIds(eventParams.metadata.cameraRefs);
+            targetResources.unite(cameras.toSet());
+        }
     }
 
     for (const QnResourcePtr &resource : targetResources)

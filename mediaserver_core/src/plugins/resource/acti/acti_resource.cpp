@@ -53,7 +53,8 @@ const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
 
 } // namespace
 
-QnActiResource::QnActiResource() :
+QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_desiredTransport(RtpTransport::_auto),
     m_rtspPort(DEFAULT_RTSP_PORT),
     m_hasAudio(false),
@@ -522,7 +523,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
                 .arg(getModel())
                 .arg(getUrl());
 
-            NX_LOG(message, cl_logDEBUG1);
+            NX_DEBUG(this, message);
 
             return CameraDiagnostics::RequestFailedResult(
                 lit("/cgi-bin/encoder?VIDEO_STREAM=FISHEYE_VIEW"),
@@ -541,7 +542,7 @@ CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
                 .arg(getModel())
                 .arg(getUrl());
 
-            NX_LOG(message, cl_logDEBUG1);
+            NX_DEBUG(this, message);
 
             dualStreaming = false;
         }
@@ -1447,7 +1448,7 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
     if (!result)
     {
-        NX_LOG(lit("Error while parsing xml (acti) %1").arg(templateFilename), cl_logWARNING);
+        NX_WARNING(this, lit("Error while parsing xml (acti) %1").arg(templateFilename));
     }
 
     return result;

@@ -1,4 +1,5 @@
 from hashlib import md5
+from uuid import UUID
 
 from netaddr import IPAddress
 
@@ -52,9 +53,8 @@ def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
 
 
-def generate_uuid_from_string(salt):
-    v = md5(salt).digest()
-    return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" % tuple(ord(b) for b in v)
+def generate_formatter_uuid(salt):
+    return '{{{!s}}}'.format(UUID(bytes=md5(salt).digest()))
 
 
 def generate_email(name):
@@ -72,47 +72,46 @@ def generate_ip_v4_endpoint(id):
 
 def generate_password_and_digest(name):
     password = name
-    d = md5("%s:NetworkOptix:%s" % (name, password)).digest()
-    return password, ''.join('%02x' % ord(i) for i in d)
+    d = md5(b"%s:NetworkOptix:%s" % (name.encode('ascii'), password.encode('ascii'))).hexdigest()
+    return password, d
 
 
 def generate_password_hash(password):
-    salt = 'd0d7971d'
-    d = md5(salt + password).digest()
-    md5_digest = ''.join('%02x' % ord(i) for i in d)
-    return "md5$%s$%s" % (salt, md5_digest)
+    salt = b'd0d7971d'
+    md5_digest = md5(salt + password.encode('ascii')).hexdigest()
+    return "md5$%s$%s" % (salt.decode('ascii'), md5_digest)
 
 
 def generate_camera_data(camera_id, **kw):
     mac = kw.get('physicalId', generate_mac(camera_id))
     camera_name = kw.get('name', generate_name('ec2_test_cam', camera_id))
     default_camera_data = dict(
-       audioEnabled=camera_id % 2,
-       controlEnabled=camera_id % 3,
-       dewarpingParams="",
-       groupId='',
-       groupName='',
-       id=generate_uuid_from_string(mac),
-       mac=mac,
-       manuallyAdded=False,
-       maxArchiveDays=0,
-       minArchiveDays=0,
-       model=camera_name,
-       motionMask='',
-       motionType='MT_Default',
-       name=camera_name,
-       parentId=generate_camera_server_guid(camera_id),
-       physicalId=mac,
-       preferedServerId='{00000000-0000-0000-0000-000000000000}',
-       scheduleEnabled=False,
-       scheduleTasks=[],
-       secondaryStreamQuality='SSQualityLow',
-       status='Unauthorized',
-       statusFlags='CSF_NoFlags',
-       typeId='{1b7181ce-0227-d3f7-9443-c86aab922d96}',
-       # typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
-       url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
-       vendor="NetworkOptix")
+        audioEnabled=camera_id % 2,
+        controlEnabled=camera_id % 3,
+        dewarpingParams="",
+        groupId='',
+        groupName='',
+        id=generate_formatter_uuid(mac.encode('ascii')),
+        mac=mac,
+        manuallyAdded=False,
+        maxArchiveDays=0,
+        minArchiveDays=0,
+        model=camera_name,
+        motionMask='',
+        motionType='MT_Default',
+        name=camera_name,
+        parentId=generate_camera_server_guid(camera_id),
+        physicalId=mac,
+        preferedServerId='{00000000-0000-0000-0000-000000000000}',
+        scheduleEnabled=False,
+        scheduleTasks=[],
+        secondaryStreamQuality='SSQualityLow',
+        status='Unauthorized',
+        statusFlags='CSF_NoFlags',
+        typeId='{1b7181ce-0227-d3f7-9443-c86aab922d96}',
+        # typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
+        url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
+        vendor="NetworkOptix")
     return dict(default_camera_data, **kw)
 
 
@@ -140,7 +139,7 @@ def generate_mediaserver_data(server_id, **kw):
     default_server_data = dict(
         apiUrl=server_address,
         url='rtsp://%s' % server_address,
-        authKey=generate_uuid_from_string(server_name),
+        authKey=generate_formatter_uuid(server_name.encode('ascii')),
         flags='SF_HasPublicIP',
         id=generate_server_guid(server_id),
         name=server_name,

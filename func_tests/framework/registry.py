@@ -1,7 +1,7 @@
 import logging
 from contextlib import contextmanager
 
-from framework.lock import AlreadyAcquired
+from framework.os_access.exceptions import AlreadyAcquired
 from framework.os_access.os_access_interface import OSAccess
 
 _logger = logging.getLogger(__name__)
@@ -40,9 +40,10 @@ class Registry(object):
     def taken(self, alias):
         for index, name, lock_path in self.possible_entries():
             try:
-                with self._os_access.lock(lock_path).acquired(timeout_sec=0):
-                    _logger.info("%r: %s taken with %r.", self, lock_path, alias)
+                with self._os_access.lock_acquired(lock_path, timeout_sec=0):
+                    _logger.info("%s: %s is taken with %r.", self, name, alias)
                     yield index, name
+                    _logger.info("%s: %s is released from %r.", self, name, alias)
                     break
             except AlreadyAcquired:
                 _logger.debug("%r: %s already acquired.", self, lock_path)

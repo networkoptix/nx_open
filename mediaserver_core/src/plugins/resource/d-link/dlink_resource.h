@@ -50,7 +50,7 @@ class QnPlDlinkResource: public nx::mediaserver::resource::Camera
 public:
     static const QString MANUFACTURE;
 
-    QnPlDlinkResource();
+    QnPlDlinkResource(QnMediaServerModule* serverModule);
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;

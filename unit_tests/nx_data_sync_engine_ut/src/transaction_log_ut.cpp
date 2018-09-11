@@ -16,9 +16,11 @@
 #include <nx/data_sync_engine/outgoing_transaction_dispatcher.h>
 #include <nx/data_sync_engine/transaction_log.h>
 
+#include <nx/cloud/cdb/controller.h>
 #include <nx/cloud/cdb/data/account_data.h>
 #include <nx/cloud/cdb/data/system_data.h>
 #include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/ec2/vms_command_descriptor.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 #include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
@@ -40,14 +42,17 @@ public:
         dbConnectionOptions().maxConnectionCount = 100;
         initializeDatabase();
 
-        data_sync_engine::dao::TransactionDataObjectFactory::setDataObjectType(dataObjectType);
+        m_factoryFuncBak =
+             data_sync_engine::dao::TransactionDataObjectFactory::instance()
+                .setDataObjectType(dataObjectType);
 
         initializeTransactionLog();
     }
 
     ~TransactionLog()
     {
-        data_sync_engine::dao::TransactionDataObjectFactory::resetToDefaultFactory();
+        data_sync_engine::dao::TransactionDataObjectFactory::instance()
+            .setCustomFunc(std::move(m_factoryFuncBak));
     }
 
     void givenRandomSystem()
@@ -95,11 +100,15 @@ private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
+    data_sync_engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
 
     void initializeTransactionLog()
     {
         m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
             m_peerId,
+            ProtocolVersionRange(
+                nx::cdb::kMinSupportedProtocolVersion,
+                nx::cdb::kMaxSupportedProtocolVersion),
             &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
@@ -164,7 +173,7 @@ protected:
             m_transactionData);
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
-        transactionLog()->saveLocalTransaction(
+        transactionLog()->saveLocalTransaction<nx::cdb::ec2::command::SaveUser>(
             queryContext.get(),
             m_systemId.c_str(),
             std::move(transaction));
@@ -231,10 +240,11 @@ protected:
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
 
-        const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog(
-            queryContext.get(),
-            m_systemId.c_str(),
-            data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
+        const auto resultCode = transactionLog()->checkIfNeededAndSaveToLog
+            <nx::cdb::ec2::command::SaveUser>(
+                queryContext.get(),
+                m_systemId.c_str(),
+                data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
@@ -371,10 +381,13 @@ private:
     void saveTransaction(Command<vms::api::UserData> transaction)
     {
         auto queryContext = getQueryContext();
-        const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog(
-            queryContext.get(),
-            m_systemId.c_str(),
-            data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(std::move(transaction)));
+        const auto dbResult = transactionLog()->checkIfNeededAndSaveToLog
+            <nx::cdb::ec2::command::SaveUser>(
+                queryContext.get(),
+                m_systemId.c_str(),
+                data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
+                    std::move(transaction),
+                    nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }
@@ -609,11 +622,11 @@ private:
         cdb::ec2::convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
-        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog(
-            queryContext,
-            m_sharing.systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            std::move(userData));
+        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog
+            <cdb::ec2::command::SaveUser>(
+                queryContext,
+                m_sharing.systemId.c_str(),
+                std::move(userData));
         ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
@@ -765,11 +778,11 @@ private:
         cdb::ec2::convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = transactionLog()->generateTransactionAndSaveToLog(
-            queryContext,
-            sharing.systemId.c_str(),
-            ::ec2::ApiCommand::saveUser,
-            std::move(userData));
+        auto dbResult = transactionLog()->generateTransactionAndSaveToLog
+            <cdb::ec2::command::SaveUser>(
+                queryContext,
+                sharing.systemId.c_str(),
+                std::move(userData));
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
 
         // Making sure transactions are completed in the order

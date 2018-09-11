@@ -26,7 +26,7 @@ public:
 
     ConnectorExecutor(
         const AddressEntry& targetAddress,
-        const nx::String& connectSessionId,
+        const std::string& connectSessionId,
         const hpm::api::ConnectResponse& response,
         std::unique_ptr<UDPSocket> udpSocket);
 
@@ -46,7 +46,7 @@ private:
         std::unique_ptr<aio::Timer> timer;
     };
 
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     hpm::api::ConnectResponse m_response;
     std::list<ConnectorContext> m_connectors;
     std::chrono::milliseconds m_connectTimeout{0};

@@ -17,6 +17,8 @@
 #include "core/ptz/activity_ptz_controller.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
 #include "ui/workaround/widgets_signals_workaround.h"
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 
 using namespace nx;
 
@@ -69,7 +71,8 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
     fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
 
-    if (QnPtzControllerPtr serverController = qnPtzPool->controller(camera))
+    auto ptzPool = qnClientCoreModule->ptzControllerPool();
+    if (QnPtzControllerPtr serverController = ptzPool->controller(camera))
     {
         serverController.reset(new QnActivityPtzController(commonModule(),
             QnActivityPtzController::Client, serverController));

@@ -107,7 +107,7 @@ bool RDirSyncher::startAsync()
 {
     std::lock_guard<std::mutex> lk( m_mutex );
 
-    NX_LOG( QString::fromLatin1("RDirSyncher. Starting synchronization from %1 to %2").arg(m_mirrors.front().toString()).arg(m_localDirPath), cl_logDEBUG1 );
+    NX_DEBUG(this, QString::fromLatin1("Starting synchronization from %1 to %2").arg(m_mirrors.front().toString()).arg(m_localDirPath));
 
     m_syncTasks.push_back( SynchronizationTask("/", detail::RSyncOperationType::listDirectory) );
     std::shared_ptr<detail::RDirSynchronizationOperation> operation;
@@ -148,8 +148,8 @@ void RDirSyncher::downloadProgress(
 
     //TODO/IMPL report progress not very often
 
-    //NX_LOG( QString::fromLatin1("File %1 download progress: %2 bytes of %3 have been downloaded").
-    //    arg(operation->entryPath).arg(bytesDownloaded).arg(remoteFileSize), cl_logDEBUG2 );
+    //NX_VERBOSE(this, QString::fromLatin1("File %1 download progress: %2 bytes of %3 have been downloaded").
+    //    arg(operation->entryPath).arg(bytesDownloaded).arg(remoteFileSize));
 
     m_eventReceiver->fileProgress(
         shared_from_this(),
@@ -190,8 +190,8 @@ RSyncEventTriggerImpl<_Func>* allocEventTrigger( const _Func& f )
 
 void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizationOperation>& operation )
 {
-    NX_LOG( QString::fromLatin1("RDirSyncher. Operation %1 %2").arg((int)operation->type).
-        arg(operation->success() ? QLatin1String("completed successfully") : QLatin1String("failed")), cl_logDEBUG2 );
+    NX_VERBOSE(this, QString::fromLatin1("Operation %1 %2").arg((int)operation->type).
+        arg(operation->success() ? QLatin1String("completed successfully") : QLatin1String("failed")));
 
     std::list<RSyncEventTrigger*> eventsToTrigger;
     //creating auto guard which will trigger all events stored in eventsToTrigger

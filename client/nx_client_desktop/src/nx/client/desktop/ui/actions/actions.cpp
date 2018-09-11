@@ -1171,6 +1171,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
+        .requiredTargetPermissions(Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to..."));
 
     factory.beginSubMenu();
@@ -1540,6 +1541,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | NoTarget)
         .childFactory(new AspectRatioFactory(manager))
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Cell Aspect Ratio..."))
         .condition(!ConditionWrapper(new VideoWallReviewModeCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))

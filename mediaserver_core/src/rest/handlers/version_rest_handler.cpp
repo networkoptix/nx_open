@@ -12,7 +12,7 @@
 int QnAppInfoRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& /*contentType*/, const QnRestConnectionProcessor*)
 {
     result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(qnStaticCommon->engineVersion().toString()).arg(QCoreApplication::applicationVersion()).toUtf8());
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnAppInfoRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result,

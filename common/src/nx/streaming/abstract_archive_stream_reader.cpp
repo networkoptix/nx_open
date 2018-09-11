@@ -127,9 +127,7 @@ void QnAbstractArchiveStreamReader::run()
                 m_noDataHandler();
 
             setNeedKeyData();
-            mFramesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
+            m_stat[0].onEvent(CL_STREAM_ISSUE);
 
             QnSleep::msleep(30);
             continue;

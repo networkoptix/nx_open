@@ -116,8 +116,8 @@ protected:
             m_connectionAddress,
             [this, count](SystemError::ErrorCode code)
             {
-                NX_LOGX(lm("Connect result: %1")
-                    .arg(SystemError::toString(code)), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("Connect result: %1")
+                    .arg(SystemError::toString(code)));
 
                 m_connectResults.push(code);
                 if (code == SystemError::noError)

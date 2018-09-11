@@ -11,6 +11,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
@@ -36,12 +37,11 @@
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialog::Private
 {
+    CameraSettingsDialog* const q;
     QPointer<CameraSettingsDialogStore> store;
     QPointer<CameraSettingsLicenseWatcher> licenseWatcher;
     QPointer<CameraSettingsReadOnlyWatcher> readOnlyWatcher;
@@ -49,6 +49,8 @@ struct CameraSettingsDialog::Private
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
+
+    Private(CameraSettingsDialog* q): q(q) {}
 
     bool hasChanges() const
     {
@@ -89,7 +91,7 @@ struct CameraSettingsDialog::Private
         store->loadCameras(cameras);
     }
 
-    void handleAction(CameraSettingsDialog* q, ui::action::IDType action)
+    void handleAction(ui::action::IDType action)
     {
         switch (action)
         {
@@ -124,9 +126,33 @@ struct CameraSettingsDialog::Private
                 q->menu()->trigger(action);
                 break;
 
+            case ui::action::ChangeDefaultCameraPasswordAction:
+            {
+                const auto cameras =
+                    QnVirtualCameraResourceList(q->ui->defaultPasswordAlert->cameras().toList());
+                const auto parameters = ui::action::Parameters(cameras).withArgument(
+                    Qn::ForceShowCamerasList, q->ui->defaultPasswordAlert->useMultipleForm());
+                q->menu()->trigger(ui::action::ChangeDefaultCameraPasswordAction, parameters);
+                break;
+            }
+
             default:
                 NX_ASSERT(false, Q_FUNC_INFO, "Unsupported action request");
         }
+    }
+
+    void handleCamerasWithDefaultPasswordChanged()
+    {
+        const auto defaultPasswordWatcher = q->context()->instance<DefaultPasswordCamerasWatcher>();
+        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+            .intersect(cameras.toSet());
+
+        if (!troublesomeCameras.empty())
+            q->setCurrentPage(int(CameraSettingsTab::general));
+
+        q->ui->tabWidget->setEnabled(troublesomeCameras.empty());
+        q->ui->defaultPasswordAlert->setUseMultipleForm(cameras.size() > 1);
+        q->ui->defaultPasswordAlert->setCameras(troublesomeCameras);
     }
 };
 
@@ -134,7 +160,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     base_type(parent),
     QnSessionAwareDelegate(parent, InitializationMode::lazy),
     ui(new Ui::CameraSettingsDialog()),
-    d(new Private())
+    d(new Private(this))
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
@@ -160,13 +186,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(generalTab, &CameraSettingsGeneralTabWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(this, action); });
+        [this](ui::action::IDType action) { d->handleAction(action); });
 
     auto recordingTab = new CameraScheduleWidget(
         d->licenseWatcher->licenseUsageProvider(), d->store, ui->tabWidget);
 
     connect(recordingTab, &CameraScheduleWidget::actionRequested, this,
-        [this](ui::action::IDType action) { d->handleAction(this, action); });
+        [this](ui::action::IDType action) { d->handleAction(action); });
 
     addPage(
         int(CameraSettingsTab::general),
@@ -240,6 +266,13 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
             }
         });
 
+    connect(ui->defaultPasswordAlert, &DefaultPasswordAlertBar::changeDefaultPasswordRequest, this,
+        [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
+
+    const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+        [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
+
     // Make sure we will not handle stateChanged, triggered when creating watchers.
     connect(d->store, &CameraSettingsDialogStore::stateChanged, this,
         &CameraSettingsDialog::loadState);
@@ -296,6 +329,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
         ? cameras.front()
         : QnVirtualCameraResourcePtr());
 
+    d->handleCamerasWithDefaultPasswordChanged();
     return true;
 }
 
@@ -398,6 +432,4 @@ void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
         && state.devicesDescription.isIoModule == CombinedValue::None);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

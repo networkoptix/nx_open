@@ -227,7 +227,6 @@
             "description": "Queue 1 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         },
         {
@@ -240,7 +239,6 @@
             "description": "Queue 1 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "flags":"stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         },
 
@@ -254,7 +252,6 @@
             "description": "Queue 2 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         },
         {
@@ -267,7 +264,6 @@
             "description": "Queue 2 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "flags":"stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         },
 
@@ -281,7 +277,6 @@
             "description": "Queue 3 level %1 ",
             "positiveState": "is high",
             "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         },
         {
@@ -294,7 +289,6 @@
             "description": "Queue 3 level %1",
             "positiveState": "is medium",
             "negativeState": "has decreased to low",
-            "flags":"stateDependent",
             "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
         }
     ],

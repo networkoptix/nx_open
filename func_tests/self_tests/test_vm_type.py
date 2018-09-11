@@ -31,6 +31,7 @@ def vm_type(slot, hypervisor, node_dir, template_url):
     if registry_path.exists():
         registry_path.unlink()
     vm_type = VMType(
+        'test_vm_type',
         hypervisor,
         'linux',
         120,

@@ -11,7 +11,7 @@ class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
     using base_type = QnMdnsResourceSearcher;
 public:
-    QnPlAxisResourceSearcher(QnCommonModule* commonModule);
+    QnPlAxisResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
@@ -35,7 +35,8 @@ private:
 
     template<typename T>
     void addMultichannelResources(QList<T>& result);
-
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // #ifdef ENABLE_AXIS

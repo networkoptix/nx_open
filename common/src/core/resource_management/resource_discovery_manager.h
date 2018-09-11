@@ -11,7 +11,6 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/utils/thread/long_runnable.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
 #include <nx/network/nettools.h>
 

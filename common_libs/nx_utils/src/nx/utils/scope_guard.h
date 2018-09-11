@@ -39,7 +39,7 @@ public:
     }
 
     /** Fires this guard. */
-    ~ScopeGuard() //noexcept
+    virtual ~ScopeGuard() //noexcept
     {
         fire();
     }
@@ -79,7 +79,8 @@ ScopeGuard<Func> makeScopeGuard(Func func)
 
 //-------------------------------------------------------------------------------------------------
 
-using SharedGuard = ScopeGuard<nx::utils::MoveOnlyFunc<void()>>;
+using SharedGuardCallback = nx::utils::MoveOnlyFunc<void()>;
+using SharedGuard = ScopeGuard<SharedGuardCallback>;
 
 using SharedGuardPtr = std::shared_ptr<SharedGuard>;
 

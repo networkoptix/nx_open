@@ -177,7 +177,7 @@ void AIOThread::run()
     static const std::chrono::seconds kErrorResetTimeout(1);
 
     initSystemThreadId();
-    NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("AIO thread started"));
 
     while (!needToStop())
     {
@@ -219,7 +219,7 @@ void AIOThread::run()
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             if (errorCode == SystemError::interrupted)
                 continue;
-            NX_LOG(QString::fromLatin1("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            NX_DEBUG(this, QString::fromLatin1("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)));
             std::this_thread::sleep_for(kErrorResetTimeout);
             continue;
         }
@@ -242,7 +242,7 @@ void AIOThread::run()
             continue;
     }
 
-    NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("AIO thread stopped"));
 }
 
 bool AIOThread::getSocketTimeout(

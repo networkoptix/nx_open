@@ -21,6 +21,8 @@ namespace nx {
 namespace vms {
 namespace utils {
 
+struct VmsUtilsFunctionsTag{};
+
 QString makeNextUniqueName(const QString& prefix, int build)
 {
     QString fileName;
@@ -43,7 +45,7 @@ bool backupDatabase(
     const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync(fileName);
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        NX_ERROR(typeid(VmsUtilsFunctionsTag), lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)));
         return false;
     }
     return true;
@@ -61,7 +63,7 @@ bool configureLocalPeerAsPartOfASystem(
             commonModule->moduleGUID());
     if (!server)
     {
-        NX_LOG("Cannot find self server resource!", cl_logERROR);
+        NX_ERROR(typeid(VmsUtilsFunctionsTag), "Cannot find self server resource!");
         return false;
     }
 
@@ -111,7 +113,7 @@ bool configureLocalPeerAsPartOfASystem(
     ec2::fromResourceToApi(server, apiServer);
     if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
     {
-        NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);
+        NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to update server auth key while configuring system");
     }
 
     if (!data.foreignServer.id.isNull())
@@ -119,7 +121,7 @@ bool configureLocalPeerAsPartOfASystem(
         // add foreign server to pass auth if admin user is disabled
         if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
         {
-            NX_LOG("Failed to add foreign server while configuring system", cl_logWARNING);
+            NX_WARNING(typeid(VmsUtilsFunctionsTag), "Failed to add foreign server while configuring system");
         }
     }
 
@@ -136,7 +138,8 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
         passwordData.cryptSha512Hash.isEmpty() == passwordData.realm.isEmpty()))
     {
         // These values MUST be all filled or all NOT filled.
-        NX_LOG(lit("All password hashes MUST be supplied all together along with realm"), cl_logDEBUG2);
+        NX_VERBOSE(typeid(VmsUtilsFunctionsTag),
+            lit("All password hashes MUST be supplied all together along with realm"));
 
         if (errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
@@ -231,12 +234,12 @@ bool updateUserCredentials(
 
 bool resetSystemToStateNew(QnCommonModule* commonModule)
 {
-    NX_LOG(lit("Resetting system to the \"new\" state"), cl_logINFO);
+    NX_INFO(typeid(VmsUtilsFunctionsTag), lit("Resetting system to the \"new\" state"));
 
     commonModule->globalSettings()->setLocalSystemId(QnUuid());   //< Marking system as a "new".
     if (!commonModule->globalSettings()->synchronizeNowSync())
     {
-        NX_LOG(lit("Error saving changes to global settings"), cl_logINFO);
+        NX_INFO(typeid(VmsUtilsFunctionsTag), lit("Error saving changes to global settings"));
         return false;
     }
 

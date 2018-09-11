@@ -1,5 +1,4 @@
-#ifndef av_singlesensor_h_1252
-#define av_singlesensor_h_1252
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -10,14 +9,12 @@
 class CLArecontSingleSensorResource : public QnPlAreconVisionResource
 {
 public:
-    CLArecontSingleSensorResource(const QString& name);
+    CLArecontSingleSensorResource(QnMediaServerModule* serverModule, const QString& name);
     bool getDescription();
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
-    
+
 
 };
 
 #endif
-
-#endif // av_singlesensor_h_1252

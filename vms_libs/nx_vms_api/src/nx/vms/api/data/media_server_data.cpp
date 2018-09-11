@@ -33,35 +33,25 @@ const DeprecatedFieldNames* MediaServerUserAttributesData::getDeprecatedFieldNam
     return &kDeprecatedFieldNames;
 }
 
-MediaServerDataEx::MediaServerDataEx(const MediaServerDataEx& mediaServerData) :
-    MediaServerData(mediaServerData)
+MediaServerDataEx::MediaServerDataEx(const MediaServerData& slice):
+    MediaServerData(slice)
 {
 }
 
-MediaServerDataEx::MediaServerDataEx(MediaServerData&& mediaServerData) :
-    MediaServerData(std::move(mediaServerData))
+MediaServerDataEx::MediaServerDataEx(MediaServerData&& slice):
+    MediaServerData(std::move(slice))
 {
 }
 
-MediaServerDataEx::MediaServerDataEx(MediaServerDataEx&& mediaServerData) :
-    MediaServerData(std::move(mediaServerData)),
-    MediaServerUserAttributesData(std::move(mediaServerData)),
-    status(mediaServerData.status),
-    addParams(std::move(mediaServerData.addParams)),
-    storages(std::move(mediaServerData.storages))
+MediaServerDataEx& MediaServerDataEx::operator=(const MediaServerData& slice)
 {
+    static_cast<MediaServerData&>(*this) = slice;
+    return *this;
 }
 
-MediaServerDataEx& MediaServerDataEx::operator=(MediaServerDataEx&& mediaServerData)
+MediaServerDataEx& MediaServerDataEx::operator=(MediaServerData&& slice)
 {
-    static_cast<MediaServerData&>(*this) =
-        std::move(static_cast<MediaServerData&&>(mediaServerData));
-    static_cast<MediaServerUserAttributesData&>(*this) =
-        std::move(static_cast<MediaServerUserAttributesData&&>(mediaServerData));
-
-    status = mediaServerData.status;
-    addParams = std::move(mediaServerData.addParams);
-    storages = std::move(mediaServerData.storages);
+    static_cast<MediaServerData&>(*this) = std::move(slice);
     return *this;
 }
 

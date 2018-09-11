@@ -41,11 +41,12 @@ def get_context_and_language(request, context_id, language_code, customization):
 
     # If we are using a GET request and no language is set then we much set it to the users session or the default one
     if not language:
-        if 'language' in request.session:
-            language = Language.by_code(request.session['language'])
+        if 'admin_language' in request.session:
+            language = Language.by_code(request.session['admin_language'])
         else:
             language = customization.default_language
 
+    request.session['admin_language'] = language.code
     return context, language
 
 
@@ -93,7 +94,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
                 db_record_value = data_structure[0].default
 
             if request_data[ds_name] != db_record_value:
-                    return True
+                return True
 
     return False
 
@@ -132,11 +133,11 @@ def context_editor_action(request, context_id, language_code):
                 send_version_for_review(customization, context.product, request.user)
                 saved_msg += " A new version has been created."
 
-    if upload_errors:
-        add_upload_error_messages(request, upload_errors)
-    else:
-        messages.success(request, saved_msg)
-        preview_link = generate_preview_link(context)
+        if upload_errors:
+            add_upload_error_messages(request, upload_errors)
+        else:
+            messages.success(request, saved_msg)
+            preview_link = generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(context, customization, language, request.user)
@@ -214,13 +215,16 @@ def version_action(request, version_id=None):
 @permission_required('cms.change_contentversion')
 def version(request, version_id=None):
     preview_link = ""
-    if 'preview' in request.GET:
-        preview_link = generate_preview_link()
     version = ContentVersion.objects.get(id=version_id)
     contexts = get_records_for_version(version)
     #else happens when the user makes a revision without any changes
     if contexts.values():
         product = contexts.values()[0][0].data_structure.context.product
+        context = None
+        if 'preview' in request.GET:
+            if len(contexts) == 1:
+                context = Context.objects.get(name=contexts.keys()[0])
+            preview_link = generate_preview_link(context)
     else:
         product = {'can_preview': False, 'name': ""}
     return render(request, 'review_records.html', {'version': version,

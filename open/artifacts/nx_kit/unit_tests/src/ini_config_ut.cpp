@@ -1,4 +1,10 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
+
+/**@file
+ * NOTE: Intended to be compiled twice - both with and without -DNX_INI_CONFIG_DISABLED. This is
+ * needed to test ini_config in both Enabled and Disabled modes. To avoid symbol clashing, one or
+ * both of the two compilations should produce a dynamic library.
+ */
 
 #include <iostream>
 #include <fstream>
@@ -10,26 +16,11 @@
 
 using namespace nx::kit;
 
-/**
- * Generate a unique .ini file name to avoid collisions in this test.
- */
-static std::string uniqueIniFileName()
-{
-    static bool randomized = false;
-    if (!randomized)
-    {
-        srand((unsigned int) time(nullptr));
-        randomized = true;
-    }
-    constexpr int kMaxIniFileNameLen = 100;
-    char iniFileName[kMaxIniFileNameLen];
-    snprintf(iniFileName, kMaxIniFileNameLen, "%d_test.ini", rand());
-    return std::string(iniFileName);
-}
+static constexpr char kIniFile[] = "test.ini";
 
-struct TestIniConfig: IniConfig
+struct TestIni: IniConfig
 {
-    using IniConfig::IniConfig;
+    TestIni(): IniConfig(kIniFile) {}
 
     NX_INI_FLAG(0, enableOutput, "Enable Output.");
     NX_INI_FLAG(1, enableTime, "Enable Time.");
@@ -44,21 +35,19 @@ struct TestIniConfig: IniConfig
     NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
 };
 
-static const TestIniConfig defaultIni("will_not_load_from_file.ini");
-
-static const std::string iniFileName = uniqueIniFileName();
+static const TestIni defaultIni; //< Source of default values for comparison.
 
 // Using a static instance just to test this possibility.
-static TestIniConfig& ini()
+static TestIni& ini()
 {
-    static TestIniConfig ini(iniFileName.c_str());
+    static TestIni ini;
     return ini;
 }
 
-// Intended to be saved to file, but not to be loaded from file.
-struct SavedIniConfig: IniConfig
+// Intended to be saved to the same file as TestIni, but not to be loaded from file.
+struct SavedIni: IniConfig
 {
-    using IniConfig::IniConfig;
+    SavedIni(): IniConfig(ini().iniFile()) {}
 
     NX_INI_STRING(nullptr, nullStr, "Null string."); //< Test the recovery from null values.
 
@@ -76,96 +65,71 @@ struct SavedIniConfig: IniConfig
 };
 
 template<class ExpectedIni, class ActualIni>
-static void assertIniEquals(const ExpectedIni& expected, const ActualIni& actual, int line)
+static void assertIniEquals(int line, const ExpectedIni& expected, const ActualIni& actual)
 {
-    bool failed = false;
+    #define ASSERT_INI_PARAM_EQ(PARAM) ASSERT_EQ_AT_LINE(line, expected.PARAM, actual.PARAM)
+    #define ASSERT_INI_PARAM_STREQ(PARAM) ASSERT_STREQ_AT_LINE(line, expected.PARAM, actual.PARAM)
 
-    #define NX_TEST_INI_EQ(PARAM, COND) do \
-    { \
-        if (!(COND)) \
-        { \
-            failed = true; \
-            std::cerr << "Test FAILED at line " << line << ": " << #PARAM << " expected {" \
-                << expected.PARAM << "}, actual {" << actual.PARAM << "}" << std::endl; \
-        } \
-    } while (0)
+    ASSERT_INI_PARAM_EQ(enableOutput);
+    ASSERT_INI_PARAM_EQ(enableTime);
+    ASSERT_INI_PARAM_EQ(enableFps);
+    ASSERT_INI_PARAM_STREQ(str1);
+    ASSERT_INI_PARAM_STREQ(str2);
+    ASSERT_INI_PARAM_STREQ(str3);
+    ASSERT_INI_PARAM_STREQ(str4);
+    ASSERT_INI_PARAM_STREQ(str5);
+    ASSERT_INI_PARAM_EQ(number);
+    ASSERT_INI_PARAM_EQ(floatNumber);
+    ASSERT_INI_PARAM_EQ(doubleNumber);
 
-    #define NX_TEST_INI_EQ_VAL(PARAM) \
-        NX_TEST_INI_EQ(PARAM, expected.PARAM == actual.PARAM)
-
-    #define NX_TEST_INI_EQ_STR(PARAM) \
-        NX_TEST_INI_EQ(PARAM, strcmp(expected.PARAM, actual.PARAM) == 0)
-
-    NX_TEST_INI_EQ_VAL(enableOutput);
-    NX_TEST_INI_EQ_VAL(enableTime);
-    NX_TEST_INI_EQ_VAL(enableFps);
-    NX_TEST_INI_EQ_VAL(number);
-    NX_TEST_INI_EQ_STR(str1);
-    NX_TEST_INI_EQ_STR(str2);
-    NX_TEST_INI_EQ_STR(str3);
-    NX_TEST_INI_EQ_STR(str4);
-    NX_TEST_INI_EQ_STR(str5);
-
-    #undef NX_TEST_INI_EQ_STR
-    #undef NX_TEST_INI_EQ_VAL
-    #undef NX_TEST_INI_EQ
-
-    ASSERT_TRUE(!failed);
+    #undef ASSERT_INI_PARAM_EQ
+    #undef ASSERT_INI_PARAM_STREQ
 }
 
 /**
- * Create a temporary .ini file with the specified contents; delete the file in the destructor.
+ * Create a .ini file with the contents from the supplied IniConfig object.
  */
-struct IniFile
+void generateIniFile(const SavedIni& ini)
 {
-    const std::string iniFilePath;
+    std::ostringstream content;
 
-    template<class Ini>
-    IniFile(const Ini& ini):
-        iniFilePath(ini.iniFilePath())
-    {
-        std::ofstream file(iniFilePath); //< Create .ini file.
-        ASSERT_TRUE(file.good());
+    const auto outputStr = //< Enquote the string if and only if it contains any quotes.
+        [&content](const char* value, const char* paramName)
+        {
+            content << paramName << "=";
+            if (strchr(value, '"') != nullptr)
+                content << '"' << value << '"';
+            else
+                content << value;
+            content << std::endl;
+        };
 
-        const auto outputStr = //< Enquote the string if and only if it contains any quotes.
-            [&file](const char* value, const char* paramName)
-            {
-                file << paramName << "=";
-                if (strchr(value, '"') != nullptr)
-                    file << '"' << value << '"';
-                else
-                    file << value;
-                file << std::endl;
-            };
+    #define GENERATE_INI_PARAM_VAL(PARAM) content << #PARAM << "=" << ini.PARAM << std::endl
+    #define GENERATE_INI_PARAM_STR(PARAM) outputStr(ini.PARAM, #PARAM)
 
-        #define NX_TEST_INI_OUTPUT_VAL(PARAM) file << #PARAM << "=" << ini.PARAM << std::endl
-        #define NX_TEST_INI_OUTPUT_STR(PARAM) outputStr(ini.PARAM, #PARAM)
+    GENERATE_INI_PARAM_VAL(enableOutput);
+    GENERATE_INI_PARAM_VAL(enableTime);
+    GENERATE_INI_PARAM_VAL(enableFps);
+    GENERATE_INI_PARAM_STR(str1);
+    GENERATE_INI_PARAM_STR(str2);
+    GENERATE_INI_PARAM_STR(str3);
+    GENERATE_INI_PARAM_STR(str4);
+    GENERATE_INI_PARAM_STR(str5);
+    GENERATE_INI_PARAM_VAL(number);
+    GENERATE_INI_PARAM_VAL(floatNumber);
+    GENERATE_INI_PARAM_VAL(doubleNumber);
 
-        NX_TEST_INI_OUTPUT_VAL(enableOutput);
-        NX_TEST_INI_OUTPUT_VAL(enableTime);
-        NX_TEST_INI_OUTPUT_VAL(enableFps);
-        NX_TEST_INI_OUTPUT_VAL(number);
-        NX_TEST_INI_OUTPUT_STR(str1);
-        NX_TEST_INI_OUTPUT_STR(str2);
-        NX_TEST_INI_OUTPUT_STR(str3);
-        NX_TEST_INI_OUTPUT_STR(str4);
-        NX_TEST_INI_OUTPUT_STR(str5);
+    #undef GENERATE_INI_PARAM_STR
+    #undef GENERATE_INI_PARAM_VAL
 
-        #undef NX_TEST_INI_OUTPUT_STR
-        #undef NX_TEST_INI_OUTPUT_VAL
-    }
-
-    ~IniFile()
-    {
-        remove(iniFilePath.c_str()); //< Delete .ini file.
-    }
-};
+    nx::kit::test::createFile(ini.iniFilePath(), content.str().c_str());
+}
 
 enum class Output { silent, verbose };
 
 template<class ExpectedIni>
 static void testReload(
-    Output reloadOutput, const ExpectedIni& expectedIni, const char* caseTitle, int line)
+    int line, Output reloadOutput, const ExpectedIni& expectedIni, const char* caseTitle)
 {
     std::cerr << std::endl;
     if (reloadOutput == Output::silent)
@@ -174,11 +138,11 @@ static void testReload(
         std::cerr << "+++++++ BEGIN Verbose: " << caseTitle << ":" << std::endl;
 
     std::ostringstream output;
-    TestIniConfig::setOutput(&output);
+    IniConfig::setOutput(&output);
 
     ini().reload();
 
-    TestIniConfig::setOutput(&std::cerr); //< Restore global setting.
+    IniConfig::setOutput(&std::cerr); //< Restore global setting.
     const std::string outputStr = output.str();
 
     std::cerr << outputStr; //< Print what reload() has produced (if anything).
@@ -198,43 +162,34 @@ static void testReload(
     }
 
     if (IniConfig::isEnabled())
-        assertIniEquals(expectedIni, ini(), line);
+        assertIniEquals(line, expectedIni, ini());
     else
-        assertIniEquals(defaultIni, ini(), line); //< If disabled, values never change.
+        assertIniEquals(line, defaultIni, ini()); //< If disabled, values never change.
 }
+
+#include <nx/kit/debug.h>
 
 TEST(iniConfig, test)
 {
     std::cerr << "IniConfig::isEnabled() -> " << (IniConfig::isEnabled() ? "true" : "false")
         << std::endl;
 
+    // Avoiding nx::kit::test::tempDir() for disabled ini_config to avoid dir name conflict.
+    static const char* const tempDir = IniConfig::isEnabled() ? nx::kit::test::tempDir() : "stub";
+    IniConfig::setIniFilesDir(tempDir);
+    ASSERT_STREQ(tempDir, IniConfig::iniFilesDir());
+
     // Check path properties of IniConfig.
-    ASSERT_STREQ(iniFileName, ini().iniFile());
-    ASSERT_TRUE(IniConfig::iniFilesDir() != nullptr);
-    if (IniConfig::isEnabled())
-        ASSERT_TRUE(IniConfig::iniFilesDir()[0] != '\0');
-    ASSERT_EQ(std::string(IniConfig::iniFilesDir()) + iniFileName, ini().iniFilePath());
+    ASSERT_STREQ(kIniFile, ini().iniFile());
+    ASSERT_STREQ(std::string(IniConfig::iniFilesDir()) + kIniFile, ini().iniFilePath());
 
-    // Create directory for ini files. Works for Windows as well.
-    if (IniConfig::isEnabled())
-    {
-        if (system((std::string("mkdir ") + IniConfig::iniFilesDir()).c_str()) != 0)
-        {
-            // Ignore the error - most likely the directory already exists.
-        }
-    }
-
-    std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).
-
-    testReload(Output::verbose, defaultIni, "first reload(), .ini file not found", __LINE__);
-    testReload(Output::silent, defaultIni, ".ini file still not found", __LINE__);
+    testReload(__LINE__, Output::verbose, defaultIni, "first reload(), .ini file not found");
+    testReload(__LINE__, Output::silent, defaultIni, ".ini file still not found");
 
     // Create/delete ini file with different values.
-    {
-        SavedIniConfig savedIni(ini().iniFile()); //< Create on the stack to test this possibility.
-        IniFile iniFile(savedIni);
-
-        testReload(Output::verbose, savedIni, "values changed", __LINE__);
-        testReload(Output::silent, savedIni, "values not changed", __LINE__);
-    }
+    SavedIni savedIni; //< Create on the stack to test this possibility.
+    if (IniConfig::isEnabled())
+        generateIniFile(savedIni);
+    testReload(__LINE__, Output::verbose, savedIni, "values changed");
+    testReload(__LINE__, Output::silent, savedIni, "values not changed");
 }

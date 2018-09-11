@@ -1,5 +1,4 @@
-#ifndef __MOTION_HELPER_H__
-#define __MOTION_HELPER_H__
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
@@ -8,13 +7,15 @@
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
 #include "core/resource/resource_fwd.h"
-#include <nx/utils/singleton.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnTimePeriodList;
 
-class QnMotionHelper: public Singleton<QnMotionHelper>
+class QnMotionHelper: public QObject
 {
+    Q_OBJECT
 public:
+    QnMotionHelper(const QString& dataDir, QObject* parent = nullptr);
     virtual ~QnMotionHelper();
 
     // write motion data to file
@@ -26,14 +27,14 @@ public:
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
-    static QString getMotionDir(const QDate& date, const QString& cameraUniqueId);
-    static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& cameraUniqueId);
-    static QList<QDate> recordedMonth(const QString& cameraUniqueId);
+    QString getMotionDir(const QDate& date, const QString& cameraUniqueId) const;
+    void deleteUnusedFiles(const QList<QDate>& chunks, const QString& cameraUniqueId) const;
+    QList<QDate> recordedMonth(const QString& cameraUniqueId) const;
 
     QnMotionHelper();
-    static QString getBaseDir();
+    QString getBaseDir() const;
 private:
-    static QString getBaseDir(const QString& cameraUniqueId);
+    QString getBaseDir(const QString& cameraUniqueId) const;
 
     // create Find mask by region
     void createMask(const QRegion& region);
@@ -52,7 +53,5 @@ private:
     typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;
     QnMutex m_mutex;
+    const QString m_dataDir;
 };
-
-
-#endif // __MOTION_HELPER_H__

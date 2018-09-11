@@ -1,7 +1,7 @@
 import pytest
 
 from defaults import defaults
-from framework.os_access.local_access import local_access
+from framework.os_access.posix_access import local_access
 
 
 def pytest_addoption(parser):
@@ -23,7 +23,7 @@ def winrm_shell(winrm):
 
 @pytest.fixture(scope='session')
 def ssh(linux_vm):
-    return linux_vm.os_access.ssh
+    return linux_vm.os_access.shell
 
 
 @pytest.fixture(scope='session', params=['linux', 'windows', 'local'])

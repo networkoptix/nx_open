@@ -1,10 +1,15 @@
 #include "camera_mock.h"
 #include "live_stream_provider_mock.h"
+#include <nx/mediaserver/resource/camera.h>
 
 namespace nx {
 namespace mediaserver {
 namespace resource {
 namespace test {
+
+CameraMock::CameraMock(QnMediaServerModule* serverModule): Camera(serverModule)
+{
+}
 
 CameraDiagnostics::Result CameraMock::initialize()
 {
@@ -124,7 +129,6 @@ QnAbstractStreamDataProvider* CameraMock::createLiveDataProvider()
 {
     return new LiveStreamProviderMock(toSharedPointer(this));
 }
-
 CameraDiagnostics::Result CameraMock::initializeCameraDriver()
 {
     return CameraDiagnostics::NoErrorResult();
@@ -192,30 +196,29 @@ bool CameraMock::hasDualStreaming() const
 {
     return true;
 }
-
-QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(CameraMock*)> setup)
+QnSharedResourcePointer<CameraMock> CameraTest::newCamera(
+    std::function<void(CameraMock*)> setup) const
 {
-    QnSharedResourcePointer<CameraMock> camera(new CameraMock());
+    QnSharedResourcePointer<CameraMock> camera(new CameraMock(serverModule()));
     setup(camera.data());
     return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
 }
 
 void CameraTest::SetUp()
 {
-    m_dataProviderFactory.reset(new QnDataProviderFactory());
-    m_dataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+    m_serverModule = std::make_unique<QnMediaServerModule>();
+    m_serverModule->dataProviderFactory()->registerResourceType<Camera>();
 }
 
 void CameraTest::TearDown()
 {
-    m_dataProviderFactory.reset();
+    m_serverModule.reset();
 }
 
-QnDataProviderFactory* CameraTest::dataProviderFactory() const
+QnMediaServerModule* CameraTest::serverModule() const
 {
-    return m_dataProviderFactory.data();
+    return m_serverModule.get();
 }
-
 } // namespace test
 } // namespace resource
 } // namespace mediaserver

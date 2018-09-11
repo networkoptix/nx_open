@@ -32,13 +32,11 @@ public:
     virtual void SetUp() override
     {
         m_staticCommonModule = std::make_unique<QnStaticCommonModule>();
-        m_commonModule = std::make_unique<QnCommonModule>(
-            /*clientMode*/ false,
-            nx::core::access::Mode::direct);
+        m_serverModule = std::make_unique<QnMediaServerModule>();
 
-        m_pool = new ptz::ServerPtzControllerPool(m_commonModule.get());
-        m_camera.reset(new test::CameraMock());
-        m_camera->setCommonModule(m_commonModule.get());
+        m_pool = new ptz::ServerPtzControllerPool(m_serverModule->commonModule());
+        m_camera.reset(new test::CameraMock(m_serverModule.get()));
+        m_camera->setCommonModule(m_serverModule->commonModule());
         m_camera->initialize();
     }
 
@@ -112,7 +110,7 @@ public:
 
 private:
     std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
-    std::unique_ptr<QnCommonModule> m_commonModule;
+    std::unique_ptr<QnMediaServerModule> m_serverModule;
     QnPtzControllerPool* m_pool;
     QnSharedResourcePointer<test::CameraMock> m_camera;
     QnPtzControllerPtr m_controller;

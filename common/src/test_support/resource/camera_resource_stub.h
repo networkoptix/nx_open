@@ -22,6 +22,7 @@ public:
     void markCameraAsNvr();
     void markCameraAsVMax();
 
+    void setLicenseType(Qn::LicenseType licenseType);
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 

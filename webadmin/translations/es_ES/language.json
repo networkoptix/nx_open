@@ -112,7 +112,8 @@
         "timeSynchronizationEnabled": "Sincronización de tiempo habilitada",
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
-        "useTextEmailFormat": "Enviar correos electrónicos de texto plano"
+        "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
+        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
     },
     "info": {
         "tabs": {

@@ -22,8 +22,10 @@
 #include "system_settings_handler.h"
 
 QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
+    QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }
@@ -53,7 +55,7 @@ int QnSetupCloudSystemRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult& result)
 {
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);

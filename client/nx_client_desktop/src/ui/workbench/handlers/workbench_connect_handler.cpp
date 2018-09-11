@@ -329,19 +329,19 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
     if (m_connecting.handle != handle)
     {
-        NX_LOG("handleConnectReply: waiting for another request, ignore", cl_logDEBUG1);
+        NX_DEBUG(this, "handleConnectReply: waiting for another request, ignore");
         return;
     }
 
     if (m_logicalState == LogicalState::disconnected)
     {
-        NX_LOG("handleConnectReply: already disconnected, ignore", cl_logDEBUG1);
+        NX_DEBUG(this, "handleConnectReply: already disconnected, ignore");
         return;
     }
 
     if (m_physicalState != PhysicalState::testing)
     {
-        NX_LOG(lm("handleConnectReply: invalid physical state %1").arg(physicalToString(m_physicalState)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("handleConnectReply: invalid physical state %1").arg(physicalToString(m_physicalState)));
         return;
     }
 
@@ -352,7 +352,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     NX_ASSERT(!context()->closingDown());
     if (context()->closingDown())
     {
-        NX_LOG("handleConnectReply: closing application", cl_logDEBUG1);
+        NX_DEBUG(this, "handleConnectReply: closing application");
         return;
     }
 
@@ -368,7 +368,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         ? QnConnectionValidator::validateConnection(connectionInfo, errorCode)
         : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, mainWindowWidget());
     NX_ASSERT(connection || status != Qn::SuccessConnectionResult);
-    NX_LOG(lm("handleConnectReply: connection status %1").arg(status), cl_logDEBUG1);
+    NX_DEBUG(this, lm("handleConnectReply: connection status %1").arg(status));
 
     if (m_logicalState == LogicalState::reconnecting)
     {

@@ -21,7 +21,10 @@ const int kDefaultChannelCount = 4;
 
 } // namespace
 
-QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
+QnArecontPanoramicResource::QnArecontPanoramicResource(
+    QnMediaServerModule* serverModule, const QString& name)
+    :
+    QnPlAreconVisionResource(serverModule)
 {
     setName(name);
     m_isRotated = false;
@@ -41,12 +44,12 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
 {
     if (isRTSPSupported())
     {
-        NX_LOG(lit("Arecont panoramic. Creating live RTSP provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Arecont panoramic. Creating live RTSP provider for camera %1").arg(getHostAddress()));
         return new QnArecontRtspStreamReader(toSharedPointer(this));
     }
     else
     {
-        NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Create live provider for camera %1").arg(getHostAddress()));
         return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer(this));
     }
 }

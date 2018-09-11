@@ -27,7 +27,7 @@ class NX_NETWORK_API DirectEndpointConnector:
 public:
     DirectEndpointConnector(
         AddressEntry targetHostAddress,
-        nx::String connectSessionId);
+        std::string connectSessionId);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -56,7 +56,7 @@ private:
     using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;
 
     const AddressEntry m_targetHostAddress;
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
     Verificators m_verificators;
     static bool s_needVerification;

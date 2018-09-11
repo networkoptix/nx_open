@@ -1,0 +1,23 @@
+# Almost Full logging configuration - full minus some stdout/stderr/wait debugs
+
+version: 1
+disable_existing_loggers: false
+formatters:
+  default:
+    format: '%(asctime)-15s %(name)s %(levelname)s %(message)s'
+handlers:
+  stderr:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+    stream: ext://sys.stderr
+
+loggers:
+  SMB.SMBConnection: {level: INFO}
+  paramiko.transport: {level: INFO}
+  parse: {level: INFO}
+  framework.vms.hypervisor.virtual_box.manage: {level: INFO}
+
+root:
+  level: DEBUG  # Default is `WARNING`.
+  handlers: [stderr]

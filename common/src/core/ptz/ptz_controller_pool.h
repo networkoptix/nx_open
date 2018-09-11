@@ -16,8 +16,7 @@ class QnPtzControllerPoolPrivate;
 
 class QnPtzControllerPool:
     public Connective<QObject>,
-    public QnCommonModuleAware,
-    public Singleton<QnPtzControllerPool>
+    public QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -65,4 +64,3 @@ private:
     QScopedPointer<QnPtzControllerPoolPrivate> d;
 };
 
-#define qnPtzPool (QnPtzControllerPool::instance())

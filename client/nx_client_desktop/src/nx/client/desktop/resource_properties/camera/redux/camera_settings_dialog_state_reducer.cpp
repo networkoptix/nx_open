@@ -103,15 +103,6 @@ QString calculateWebPage(const Camera& camera)
     return lit("<a href=\"%1\">%1</a>").arg(webPageAddress);
 }
 
-State::FisheyeCalibrationSettings fisheyeCalibrationSettings(const QnMediaDewarpingParams& params)
-{
-    State::FisheyeCalibrationSettings calibration;
-    calibration.offset = QPointF(params.xCenter - 0.5, params.yCenter - 0.5);
-    calibration.radius = params.radius;
-    calibration.aspectRatio = params.hStretch;
-    return calibration;
-}
-
 bool isMotionDetectionEnabled(const Camera& camera)
 {
     const auto motionType = camera->getMotionType();
@@ -391,6 +382,9 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+    if (state.expert.trustCameraTime())
+        return false;
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -558,11 +552,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
         }
 
         const auto fisheyeParams = firstCamera->getDewarpingParams();
-        state.singleCameraSettings.enableFisheyeDewarping.setBase(fisheyeParams.enabled);
-        state.singleCameraSettings.fisheyeMountingType.setBase(fisheyeParams.viewMode);
-        state.singleCameraSettings.fisheyeFovRotation.setBase(fisheyeParams.fovRot);
-        state.singleCameraSettings.fisheyeCalibrationSettings.setBase(
-            fisheyeCalibrationSettings(fisheyeParams));
+        state.singleCameraSettings.fisheyeDewarping.setBase(fisheyeParams);
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
@@ -689,6 +679,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return QnLexical::deserialized<vms::api::RtpTransportType>(
                 camera->getProperty(QnMediaResource::rtpTransportKey()),
                 vms::api::RtpTransportType::automatic);
+        });
+
+    fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
+        [](const Camera& camera)
+        {
+            return camera->trustCameraTime();
         });
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,
@@ -1059,12 +1055,7 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 State CameraSettingsDialogStateReducer::setFisheyeSettings(
     State state, const QnMediaDewarpingParams& value)
 {
-    state.singleCameraSettings.enableFisheyeDewarping.setUserIfChanged(value.enabled);
-    state.singleCameraSettings.fisheyeMountingType.setUserIfChanged(value.viewMode);
-    state.singleCameraSettings.fisheyeFovRotation.setUserIfChanged(value.fovRot);
-    state.singleCameraSettings.fisheyeCalibrationSettings.setUserIfChanged(
-        fisheyeCalibrationSettings(value));
-
+    state.singleCameraSettings.fisheyeDewarping.setUser(value);
     state.hasChanges = true;
     return state;
 }
@@ -1191,7 +1182,7 @@ State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool
         return state;
 
     const int customMediaPortValue = value ? state.expert.customMediaPortDisplayValue : 0;
-    state.expert.customMediaPort.setUser(value);
+    state.expert.customMediaPort.setUser(customMediaPortValue);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -1205,6 +1196,14 @@ State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int valu
 
     state.expert.customMediaPort.setUser(value);
     state.expert.customMediaPortDisplayValue = value;
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setTrustCameraTime(State state, bool value)
+{
+    state.expert.trustCameraTime.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;

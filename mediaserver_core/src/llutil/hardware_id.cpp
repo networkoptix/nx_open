@@ -16,6 +16,9 @@
 
 #include <nx/utils/log/log.h>
 #include "licensing/hardware_info.h"
+#include <media_server/media_server_module.h>
+
+class QnMediaServerModule;
 
 namespace
 {
@@ -30,7 +33,9 @@ namespace
 
 namespace LLUtil {
 
-    void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
+    void fillHardwareIds(
+        QnMediaServerModule* serverModule,
+        HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
 
     void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareInfo& hardwareInfo, int version)
     {
@@ -118,11 +123,11 @@ namespace LLUtil {
         return QString(lit("0%1%2")).arg(version).arg(QString(md5Hash.result().toHex()));
     }
 
-    void initHardwareId(QSettings* settings)
+    void initHardwareId(QnMediaServerModule* serverModule)
     {
         if (g_hardwareIdInitialized)
             return;
-
+        auto settings = serverModule->roSettings();
         try
         {
             // Add old hardware id first
@@ -134,14 +139,14 @@ namespace LLUtil {
             macHardwareIds << MacAndItsHardwareIds(kEmptyMac, oldHardwareIds);
             g_hardwareId << macHardwareIds;
 
-            fillHardwareIds(g_hardwareId, g_hardwareInfo);
+            fillHardwareIds(serverModule, g_hardwareId, g_hardwareInfo);
             NX_ASSERT(g_hardwareId.size() == LATEST_HWID_VERSION + 1);
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
             if (macs.isEmpty())
             {
-                NX_LOG(QnLog::HWID_LOG, "No network cards detected.", cl_logERROR);
+                NX_ERROR(QnLog::HWID_LOG, "No network cards detected.");
             }
 
             g_storedMac = saveMac(macs, settings);
@@ -150,12 +155,12 @@ namespace LLUtil {
 
             g_hardwareIdInitialized = true;
 
-            NX_LOG(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed(), cl_logINFO);
-            NX_LOG(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")), cl_logINFO);
+            NX_INFO(QnLog::HWID_LOG, QString::fromUtf8(QJson::serialized(g_hardwareInfo)).trimmed());
+            NX_INFO(QnLog::HWID_LOG, QString("Hardware IDs: [\"%1\"]").arg(getAllHardwareIds().join("\", \"")));
         }
         catch (const LLUtil::HardwareIdError& err)
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): %1")).arg(err.what()), cl_logERROR);
+            NX_ERROR(QnLog::HWID_LOG, QString(lit("getHardwareId(): %1")).arg(err.what()));
         }
     }
 
@@ -166,7 +171,7 @@ namespace LLUtil {
     {
         if (version < 0 || version >= g_hardwareId.size())
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: %1")).arg(version) , cl_logERROR);
+            NX_ERROR(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: %1")).arg(version) );
             return QStringList();
         }
 

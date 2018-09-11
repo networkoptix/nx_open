@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <nx/network/cloud/tunnel/tcp/tunnel_tcp_abstract_endpoint_verificator.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 
@@ -9,7 +11,7 @@ class CloudMediaServerEndpointVerificator:
     using base_type = nx::network::cloud::tcp::AbstractEndpointVerificator;
 
 public:
-    CloudMediaServerEndpointVerificator(const nx::String& connectSessionId);
+    CloudMediaServerEndpointVerificator(const std::string& connectSessionId);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -28,7 +30,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
     boost::optional<std::chrono::milliseconds> m_timeout;
     nx::network::http::AsyncHttpClientPtr m_httpClient;

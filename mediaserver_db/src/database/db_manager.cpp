@@ -1613,13 +1613,13 @@ bool QnDbManager::encryptKvPairs()
 
     if(!query.prepare(queryStr))
     {
-        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()));
         return false;
     }
 
     if (!query.exec())
     {
-        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()));
         return false;
     }
 
@@ -1651,7 +1651,7 @@ bool QnDbManager::encryptKvPairs()
 
             if (!insQuery.exec())
             {
-                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logERROR);
+                NX_ERROR(this, lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()));
                 return false;
             }
         }
@@ -1889,7 +1889,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
-    NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
+    if (updateName.endsWith(lit("/99_20180413_remove_extra_buisiness_rules.sql")))
+    {
+        for (const auto& rule: vms::event::Rule::getDisabledRulesUpd43())
+            removeBusinessRule(rule->id());
+        return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
+    NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
 }
 
@@ -1949,7 +1956,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
-        NX_LOG(lit("Create new database"), cl_logINFO);
+        NX_INFO(this, lit("Create new database"));
 
         m_dbJustCreated = true;
 
@@ -1962,7 +1969,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-        NX_LOG(lit("Update database to v 2.3"), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Update database to v 2.3"));
 
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
@@ -1995,11 +2002,11 @@ bool QnDbManager::createDatabase()
 
     if (!applyUpdates(":/updates"))
     {
-        NX_LOG(lit("%1 Applying migration updates failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 Applying migration updates failed").arg(Q_FUNC_INFO));
         return false;
     }
 
-    NX_LOG(lit("%1 Applying migration updates succeded").arg(Q_FUNC_INFO), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 Applying migration updates succeded").arg(Q_FUNC_INFO));
 
     if (!lockStatic.commit())
         return false;
@@ -2070,7 +2077,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter,
 
     if( !query.prepare( queryStr ) )
     {
-        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -2080,7 +2087,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter,
         query.bindValue(QLatin1String(":parentGuid"), resParentID.toRfc4122());
     if (!query.exec())
     {
-        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -2153,7 +2160,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const UserData& data, qint32 internal
         QnSql::bind(data, &profileQuery);
         if (data.isLdap && data.isCloud)
         {
-            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
+            NX_WARNING(this, lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId));
             profileQuery.bindValue(":isCloud", false);
         }
 
@@ -2284,7 +2291,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const CameraAttributesDat
     QnSql::bind(data, query.get());
     if( !query->exec() )
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(query->lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(query->lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -2341,7 +2348,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<StorageDat
     if (tran.params.parentId.isNull())
     {
         // TODO: Improve error reporting. Currently HTTP 500 with empty error text is returned.
-        NX_LOG(lit("saveStorage: parentId is null"), cl_logERROR);
+        NX_ERROR(this, lit("saveStorage: parentId is null"));
         return ErrorCode::unsupported;
     }
 
@@ -2625,7 +2632,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const MediaServe
 
     if( !insQuery.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -2639,7 +2646,7 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
     query.bindValue(":guid", guid.toRfc4122());
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -3753,7 +3760,7 @@ ErrorCode QnDbManager::doQueryNoLock(
         .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -3775,14 +3782,27 @@ ErrorCode QnDbManager::doQueryNoLock(
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
+    CameraDataExList& cameraExList)
 {
     QSqlQuery queryCameras( m_sdb );
     queryCameras.setForwardOnly(true);
 
+    QStringList filters;
+
+    // Skip desktop cameras from the most of queries.
+    if (!query.showDesktopCameras)
+    {
+        filters.push_back(QString("r.xtype_guid != %1")
+            .arg(guidToSqlString(CameraData::kDesktopCameraTypeId)));
+    }
+
+    if (!query.id.isNull())
+        filters.push_back(QString("r.guid = %1").arg(guidToSqlString(query.id)));
+
     QString filterStr;
-    if (!id.isNull())
-        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+    if (!filters.empty())
+        filterStr = QString("WHERE %1").arg(filters.join(" AND "));
 
     const QString queryStr = R"sql(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId,
@@ -3822,7 +3842,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraE
       .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()));
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(queryCameras, &cameraExList);
@@ -3976,7 +3996,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, MediaServerUserAtt
     ").arg(filterStr));
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()));
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(query, &serverAttrsList);
@@ -4338,13 +4358,13 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()));
         return ErrorCode::dbError;
     }
 
     if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()));
         return ErrorCode::dbError;
     }
 
@@ -4375,13 +4395,13 @@ ErrorCode QnDbManager::doQuery(
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()));
         return ErrorCode::dbError;
     }
 
     if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()));
         return ErrorCode::dbError;
     }
 

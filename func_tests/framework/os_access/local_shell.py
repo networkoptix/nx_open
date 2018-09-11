@@ -8,14 +8,13 @@ import time
 from collections import namedtuple
 from contextlib import closing
 
+from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
-from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
-from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script, sh_convert_env_values_to_str
 
 _logger = logging.getLogger(__name__)
 
 
-class _LocalCommandOutcome(PosixOutcome):
+class _LocalCommandOutcome(posix_shell.Outcome):
     def __init__(self, pythons_popen_returncode):
         assert isinstance(pythons_popen_returncode, int)
         assert -31 <= pythons_popen_returncode <= 255  # See: https://bugs.python.org/issue27167
@@ -68,7 +67,7 @@ class _LocalRun(Run):
     def send(self, bytes_buffer, is_last=False):
         # Blocking call, no need to use polling functionality.
         try:
-            bytes_written = os.write(self._process.stdin.fileno(), bytes_buffer[:_STREAM_BUFFER_SIZE])
+            bytes_written = os.write(self._process.stdin.fileno(), bytes_buffer[:posix_shell.STREAM_BUFFER_SIZE])
             if bytes_buffer:
                 assert 0 < bytes_written <= len(bytes_buffer)
             else:
@@ -119,7 +118,7 @@ class _LocalRun(Run):
                         stream.logger.debug("Ended; ready.")
                     else:
                         stream.logger.debug("Ready.")
-                    chunk = os.read(fd, _STREAM_BUFFER_SIZE)
+                    chunk = os.read(fd, posix_shell.STREAM_BUFFER_SIZE)
                     assert chunk, "Must be some data: see local variable `mode`"
                     name2data[stream.name] = chunk
                 elif mode & select.POLLHUP:
@@ -152,7 +151,7 @@ class _LocalCommand(Command):
         return closing(_LocalRun(self._logger, *self.popenargs, **self.popenkwargs))
 
 
-class _LocalShell(PosixShell):
+class _LocalShell(posix_shell.Shell):
     def __repr__(self):
         return '<LocalShell>'
 
@@ -175,20 +174,20 @@ class _LocalShell(PosixShell):
         if not logger:
             logger = _logger
         if set_eux:
-            return cls.sh_script(sh_command_to_script(command), cwd=cwd, env=env, set_eux=set_eux)
+            return cls.sh_script(posix_shell.command_to_script(command), cwd=cwd, env=env, set_eux=set_eux)
         kwargs = cls._make_kwargs(cwd, env)
         command = [str(arg) for arg in command]
-        logger.info('Run local command:\n%s', sh_command_to_script(command))
+        logger.info('Run local command:\n%s', posix_shell.command_to_script(command))
         return _LocalCommand(logger, command, shell=False, **kwargs)
 
     @classmethod
     def sh_script(cls, script, cwd=None, env=None, logger=None, set_eux=True):
         if not logger:
             logger = _logger
-        augmented_script_to_run = sh_augment_script(script, set_eux=set_eux)
-        augmented_script_to_log = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
+        augmented_script_to_run = posix_shell.augment_script(script, set_eux=set_eux)
+        augmented_script_to_log = posix_shell.augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         logger.info('Run local script:\n%s', augmented_script_to_log)
-        kwargs = cls._make_kwargs(cwd, sh_convert_env_values_to_str(env) if env else None)
+        kwargs = cls._make_kwargs(cwd, posix_shell.env_values_to_str(env) if env else None)
         return _LocalCommand(logger, augmented_script_to_run, shell=True, **kwargs)
 
 

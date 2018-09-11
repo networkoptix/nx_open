@@ -11,6 +11,8 @@
 #include <nx/p2p/connection_context.h>
 #include <nx/vms/api/data/tran_state_data.h>
 
+#include "compatible_ec2_protocol_version.h"
+
 namespace nx {
 namespace data_sync_engine {
 
@@ -22,7 +24,7 @@ class WebSocketTransactionTransport:
 {
 public:
     WebSocketTransactionTransport(
-        nx::network::aio::AbstractAioThread* aioThread,
+        const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
         const nx::String& systemId,
         const QnUuid& connectionId,
@@ -62,6 +64,7 @@ private:
     void readTransactions();
 
 private:
+    const ProtocolVersionRange m_protocolVersionRange;
     TransactionTransportHeader m_commonTransactionHeader;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;

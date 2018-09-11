@@ -82,5 +82,5 @@ class ArtifactFactory(object):
 
     def save_as_json(self, value, encoder=None):
         path = self.make_artifact(artifact_type=JSON_ARTIFACT_TYPE).produce_file_path()
-        path.write_bytes(json.dumps(value, indent=4, cls=encoder))
+        path.write_bytes(json.dumps(value, indent=4, cls=encoder).encode('ascii'))
         return path

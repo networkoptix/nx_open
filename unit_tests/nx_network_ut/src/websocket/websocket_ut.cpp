@@ -919,16 +919,6 @@ TEST_F(WebSocket_PingPong, Close)
     ASSERT_FALSE(serverWebSocket);
 }
 
-TEST_F(WebSocket, ContinueWorkAfterTimeout)
-{
-    givenServerClientWebSocketsWithDifferentTimeouts();
-    whenServerDoesntAnswerPings();
-    thenClientSocketShouldReceiveTimeoutErrorInReadHandler();
-
-    whenServerStartsAnsweringPings();
-    thenNoNewErrorsShouldHappen();
-}
-
 TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
 {
     givenClientModes(SendMode::multiFrameMessage, ReceiveMode::frame);

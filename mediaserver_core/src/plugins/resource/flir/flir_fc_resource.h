@@ -28,7 +28,7 @@ class FcResource: public nx::mediaserver::resource::Camera
     };
 
 public:
-    FcResource();
+    FcResource(QnMediaServerModule* serverModule);
     virtual ~FcResource();
 
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(

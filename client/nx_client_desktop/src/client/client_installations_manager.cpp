@@ -27,8 +27,8 @@ QStringList QnClientInstallationsManager::clientInstallRoots()
 
         if (!QFileInfo::exists(clientBinary))
         {
-            NX_LOG(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);
-            NX_LOG(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
+            NX_INFO(typeid(QnClientInstallationsManager), lit("Could not find client binary in %1").arg(clientBinary));
+            NX_INFO(typeid(QnClientInstallationsManager), lit("Skip client root: %1").arg(clientRoot));
             continue;
         }
 

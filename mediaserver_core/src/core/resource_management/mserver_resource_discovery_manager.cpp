@@ -38,12 +38,13 @@ static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
 
 } // namespace
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
-    QnResourceDiscoveryManager(commonModule)
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnMediaServerModule* serverModule):
+    QnResourceDiscoveryManager(serverModule->commonModule())
 {
-    connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
-        qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = qnServerModule->settings().redundancyTimeout() * 1000;
+    connect(
+        this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
+        serverModule->eventConnector(), &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
+    m_serverOfflineTimeout = serverModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
 }
@@ -74,7 +75,8 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        NX_LOG( lit("Discovery----: %1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
+        NX_INFO(typeid(QnMServerResourceDiscoveryManager),
+            lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()));
     }
 }
 
@@ -197,27 +199,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
 
+        // Handle newly discovered resources.
         if (!rpResource)
         {
-            // Do not auto-discover camera channel resources which do not belong to this server.
-            if (newCamRes &&
-                !newCamRes->isManuallyAdded() &&
-                !newCamRes->getGroupId().isEmpty())
-            {
-                const auto otherCamFromGroup =
-                        resourcePool()->getResourceByMacAddress(newCamRes->getMAC().toString());
-                if(otherCamFromGroup &&
-                   otherCamFromGroup->getParentId() != commonModule()->moduleGUID())
-                {
-                    NX_VERBOSE(this, lm("%1 Camera channel from another server was discovered and ignored: (%2)")
-                               .arg(FL1(Q_FUNC_INFO))
-                               .arg(NetResString(newCamRes)));
-                    it = resources.erase(it);
-                    continue;
-                }
-            }
+            if (shouldAddNewlyDiscoveredResource(newNetRes))
+                ++it;
+            else
+                it = resources.erase(it);
 
-            ++it; // keep new resource in a list
             continue;
         }
 
@@ -421,7 +410,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
-                } else 
+                } else
                 {
                     NX_VERBOSE(this,
                         lm("Mark resource %1 as offline because it doesn't response to discovery any more.").arg(NetResString(camRes)));
@@ -442,6 +431,36 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkReso
 {
     if (!rpNetRes->isInitialized() && !rpNetRes->hasFlags(Qn::foreigner))
         rpNetRes->initAsync(false); // wait for initialization
+}
+
+bool QnMServerResourceDiscoveryManager::shouldAddNewlyDiscoveredResource(
+    const QnNetworkResourcePtr &newResource) const
+{
+    const auto newCameraResource = newResource.dynamicCast<QnVirtualCameraResource>();
+
+    if (!newCameraResource)
+        return true;
+
+    if (newCameraResource->isManuallyAdded())
+        return true;
+
+    const auto knownCameraChannels =
+        resourcePool()->getResourcesBySharedId(newCameraResource->getSharedId());
+    if (knownCameraChannels.empty())
+        return true;
+
+    // If there is another channel for the camera on this server, we can add another one.
+    const auto it = std::find_if(knownCameraChannels.begin(), knownCameraChannels.end(),
+        [this](const QnSecurityCamResourcePtr& camera)
+        {
+            return camera->getParentId() == commonModule()->moduleGUID();
+        });
+    if (it != knownCameraChannels.end())
+        return true;
+
+    NX_VERBOSE(this, lm("Other channels of resource '%1' belong to other servers, do nothing."),
+        NetResString(newCameraResource));
+    return false;
 }
 
 void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)

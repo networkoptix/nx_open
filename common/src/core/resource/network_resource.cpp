@@ -313,7 +313,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 {
     // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 
-    NX_LOG(QLatin1String("Geting device info..."), cl_logDEBUG1);
+    NX_DEBUG(this, QLatin1String("Geting device info..."));
     QTime time;
     time.start();
 
@@ -332,10 +332,10 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
     CL_LOG(cl_logDEBUG1)
     {
-        NX_LOG(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
+        NX_DEBUG(this, QLatin1String("Done. Time elapsed: "), time.elapsed());
 
         for(const QnResourcePtr& res: lst)
-            NX_LOG(res->toString(), cl_logDEBUG1);
+            NX_DEBUG(this, res->toString());
 
     }
 

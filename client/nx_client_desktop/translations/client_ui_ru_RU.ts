@@ -1426,11 +1426,6 @@
     </message>
     <message>
       <location/>
-      <source>Fixed Size</source>
-      <translation type="unfinished">Fixed Size</translation>
-    </message>
-    <message>
-      <location/>
       <source>Width</source>
       <translation type="unfinished">Width</translation>
     </message>
@@ -1453,6 +1448,11 @@
       <location/>
       <source>Reset</source>
       <translation>Сброс</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Minimal Size</source>
+      <translation type="unfinished">Minimal Size</translation>
     </message>
   </context>
   <context>
@@ -2311,24 +2311,6 @@
       <location/>
       <source>Enable timeline on video wall</source>
       <translation type="unfinished">Enable timeline on video wall</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWatermarkPreviewDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/watermark_preview_dialog.ui"/>
-      <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Opacity</source>
-      <translation>Прозрачность</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
   <context>
@@ -3226,6 +3208,24 @@
       <location/>
       <source>Note: Schedule is based on server time.</source>
       <translation>Примечание: Расписание по серверному времени.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation type="unfinished">Watermark preview</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Прозрачность</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
 </TS>

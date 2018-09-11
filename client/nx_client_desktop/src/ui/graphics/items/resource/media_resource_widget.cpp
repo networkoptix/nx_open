@@ -272,7 +272,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 emit licenseStatusChanged();
             });
 
-        connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
                 // Make sure we will not handle resource removing.
@@ -369,20 +370,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     initSoftwareTriggers();
 
-    auto updateWatermark =
-        [this, context]()
-        {
-            // Ini guard; remove on release.
-            auto settings = globalSettings()->watermarkSettings();
-            if (!client::desktop::ini().enableWatermark)
-                settings.useWatermark = false;
-
-            m_watermarkPainter->setWatermark(nx::core::Watermark
-                { settings, context->user() ? context->user()->getName() : QString()});
-        };
     updateWatermark();
-    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
-    connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged,
+        this, &QnMediaResourceWidget::updateWatermark);
+    connect(context, &QnWorkbenchContext::userChanged,
+        this, &QnMediaResourceWidget::updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -443,11 +435,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
             if (const auto reader = display()->archiveReader())
             {
                 const auto timestampUSec = data.toLongLong();
-                const auto timestampMs = timestampUSec == DATETIME_NOW
-                    ? DATETIME_NOW
-                    : timestampUSec * 1000;
-
-                reader->jumpTo(timestampMs, 0);
+                reader->jumpTo(timestampUSec, 0);
             }
             break;
         }
@@ -841,7 +829,8 @@ void QnMediaResourceWidget::updatePtzController()
 
     if (d->camera)
     {
-        if (QnPtzControllerPtr serverController = qnPtzPool->controller(d->camera))
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        if (QnPtzControllerPtr serverController = ptzPool->controller(d->camera))
         {
             serverController.reset(new QnActivityPtzController(commonModule(),
                 QnActivityPtzController::Client, serverController));
@@ -2924,6 +2913,43 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 
 }
 
+void QnMediaResourceWidget::updateWatermark()
+{
+    // Ini guard; remove on release. Default watermark is invisible.
+    auto settings = globalSettings()->watermarkSettings();
+    if (!client::desktop::ini().enableWatermark)
+        return;
+
+    // First create normal watermark according to current client state.
+    nx::core::Watermark watermark{ settings,
+        context()->user() ? context()->user()->getName() : QString() };
+
+    // Force using layout watermark if it exists and is visible.
+    bool useLayoutWatermark = false;
+    if (item() && item()->layout())
+    {
+        auto watermarkVariant = item()->layout()->data(Qn::LayoutWatermarkRole);
+        if (watermarkVariant.isValid())
+        {
+            auto layoutWatermark = watermarkVariant.value<nx::core::Watermark>();
+            if (layoutWatermark.visible())
+            {
+                watermark = layoutWatermark;
+                useLayoutWatermark = true;
+            }
+        }
+    }
+
+    // Do not set watermark for admins but ONLY if it is not embedded in layout.
+    if (accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+        && !useLayoutWatermark)
+    {
+        return;
+    }
+
+    m_watermarkPainter->setWatermark(watermark);
+}
+
 void QnMediaResourceWidget::createActionAndButton(const char* iconName,
     bool checked,
     const QString& shortcut,
@@ -3132,8 +3158,8 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
 
             if (!success)
             {
-                NX_LOG(tr("Failed to invoke trigger %1 (%2)")
-                    .arg(id).arg(result.errorString), cl_logERROR);
+                NX_ERROR(this, tr("Failed to invoke trigger %1 (%2)")
+                    .arg(id).arg(result.errorString));
             }
 
             if (resultHandler)

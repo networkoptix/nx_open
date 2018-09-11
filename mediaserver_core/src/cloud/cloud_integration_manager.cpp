@@ -9,19 +9,20 @@
 #include "server/server_globals.h"
 
 CloudIntegrationManager::CloudIntegrationManager(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     ::ec2::AbstractTransactionMessageBus* transactionMessageBus,
     nx::vms::auth::AbstractNonceProvider* defaultNonceFetcher)
     :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudConnector(transactionMessageBus),
     m_cloudManagerGroup(
-        commonModule,
+        serverModule->commonModule(),
         defaultNonceFetcher,
         &m_cloudConnector,
-        std::make_unique<GenericUserDataProvider>(commonModule),
-        nx::utils::parseTimerDuration(qnServerModule->settings().delayBeforeSettingMasterFlag()))
+        std::make_unique<GenericUserDataProvider>(serverModule->commonModule()),
+        nx::utils::parseTimerDuration(settings().delayBeforeSettingMasterFlag()))
 {
-    const auto cdbEndpoint = qnServerModule->settings().cdbEndpoint();
+    const auto cdbEndpoint = settings().cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
     {
         m_cloudManagerGroup.setCloudDbUrl(
@@ -43,7 +44,7 @@ nx::vms::cloud_integration::CloudManagerGroup& CloudIntegrationManager::cloudMan
 
 void CloudIntegrationManager::onCloudBindingStatusChanged(bool isBound)
 {
-    qnServerModule->roSettings()->setValue(
+    serverModule()->roSettings()->setValue(
         QnServer::kIsConnectedToCloudKey,
         isBound ? "yes" : "no");
 }

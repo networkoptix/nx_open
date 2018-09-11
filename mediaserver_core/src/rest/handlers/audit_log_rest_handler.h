@@ -1,15 +1,19 @@
-#ifndef QN_AUDIT_LOG_REST_HANDLER_H
-#define QN_AUDIT_LOG_REST_HANDLER_H
+#pragma once
 
 
 #include "rest/server/json_rest_handler.h"
 #include "rest/server/fusion_rest_handler.h"
+#include <nx/mediaserver/server_module_aware.h>
 
-
-class QnAuditLogRestHandler: public QnFusionRestHandler
+class QnAuditLogRestHandler: public QnFusionRestHandler, public nx::mediaserver::ServerModuleAware
 {
 public:
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-};
+    QnAuditLogRestHandler(QnMediaServerModule* serverModule);
 
-#endif // QN_AUDIT_LOG_REST_HANDLER_H
+    virtual int executeGet(
+        const QString& path, 
+        const QnRequestParamList& params, 
+        QByteArray& result, 
+        QByteArray& contentType, 
+        const QnRestConnectionProcessor*) override;
+};

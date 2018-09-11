@@ -118,7 +118,7 @@ public:
         const nx::utils::Url& url,
         std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes)
     {
-        NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
+        NX_INFO(this, lm("testProxyUrl(%1)").arg(url));
         httpClient->setResponseReadTimeout(std::chrono::minutes(17));
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_TRUE(

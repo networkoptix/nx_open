@@ -45,7 +45,7 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("Requested system %1 health history").arg(systemId.systemId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Requested system %1 health history").arg(systemId.systemId));
 
     auto resultData = std::make_unique<api::SystemHealthHistory>();
     auto resultDataPtr = resultData.get();
@@ -81,8 +81,8 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
             nx::sql::DBResult dbResult)
         {
-            NX_LOGX(lm("Save system %1 history item finished with result %2")
-                .arg(systemId).arg(dbResult), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Save system %1 history item finished with result %2")
+                .arg(systemId).arg(dbResult));
         });
 }
 

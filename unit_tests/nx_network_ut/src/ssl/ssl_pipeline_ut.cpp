@@ -81,7 +81,7 @@ public:
                     dataToSend.remove(0, bytesWritten);
                 else if (bytesWritten == 0)
                     ; // TODO
-                else if (bytesWritten != utils::bstream::StreamIoError::wouldBlock)
+                else if (bytesWritten != utils::bstream::StreamIoError::wouldBlock || !receiverActive)
                     senderActive = false;
             }
 
@@ -94,7 +94,7 @@ public:
                     result += readBuffer.mid(0, bytesRead);
                 else if (bytesRead == 0)
                     ; // TODO
-                else if (bytesRead != utils::bstream::StreamIoError::wouldBlock)
+                else if (bytesRead != utils::bstream::StreamIoError::wouldBlock || !senderActive)
                     receiverActive = false;
             }
         }

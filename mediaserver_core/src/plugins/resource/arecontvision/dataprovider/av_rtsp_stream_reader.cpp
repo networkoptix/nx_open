@@ -56,9 +56,9 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     // TODO: advanced params control is not implemented for this driver yet
 
     int channels = 1;
-    auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
-    NX_ASSERT(res);
-    if (auto layout = res->getVideoLayout())
+    const auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+    NX_CRITICAL(resource);
+    if (auto layout = resource->getVideoLayout())
         channels = layout->channelCount();
 
     const auto maxResolution = getMaxSensorSize();

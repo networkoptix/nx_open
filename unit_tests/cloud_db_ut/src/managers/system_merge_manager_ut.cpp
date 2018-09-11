@@ -10,6 +10,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/cloud/cdb/controller.h>
 #include <nx/cloud/cdb/managers/system_merge_manager.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
@@ -200,8 +201,12 @@ private:
         m_ownerAccount = insertRandomAccount();
 
         m_syncronizationEngine = std::make_unique<data_sync_engine::SyncronizationEngine>(
+            std::string(),
             QnUuid::createUuid(),
             m_settings.p2pDb(),
+            nx::data_sync_engine::ProtocolVersionRange(
+                kMinSupportedProtocolVersion,
+                kMaxSupportedProtocolVersion),
             &queryExecutor());
 
         m_systemMergeManager = std::make_unique<cdb::SystemMergeManager>(

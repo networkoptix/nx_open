@@ -76,7 +76,7 @@ void RemoteArchiveStreamSynchronizationTask::createArchiveReaderThreadUnsafe(
                 lm("Can not synchronize time period: %1-%2, error: %3")
                     .args(timePeriod.startTimeMs, timePeriod.endTimeMs(), errorString));
 
-            qnEventRuleConnector->at_remoteArchiveSyncError(
+            serverModule()->eventConnector()->at_remoteArchiveSyncError(
                 m_resource,
                 errorString);
 

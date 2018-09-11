@@ -25,3 +25,12 @@ public:
     QnLayoutUuid() = default;
     QnLayoutUuid(const QnUuid& id): QnUuid(id) {}
 };
+
+/**
+ * Api structure for getCamerasEx request to filter out desktop cameras from the result.
+ */
+struct QnCameraDataExQuery
+{
+    QnCameraUuid id;
+    bool showDesktopCameras = false;
+};
