@@ -21,7 +21,7 @@ class CryptedFileStream : public QIODevice
 public:
     class Key;
 
-    CryptedFileStream(const QString& fileName, const QString& password);
+    CryptedFileStream(const QString& fileName, const QString& password = QString());
     virtual ~CryptedFileStream();
 
     void setEnclosure(qint64 position, qint64 size);
@@ -89,10 +89,6 @@ protected:
     } m_position;
 
     OpenMode m_openMode = NotOpen;
-
-    // These are used for store/restore functionality that is used for NOV files moving.
-    qint64 m_storedPosition = 0;
-    OpenMode m_storedOpenMode = NotOpen;
 
     char m_currentPlainBlock[kCryptoBlockSize];
     char m_currentCryptedBlock[kCryptoBlockSize];

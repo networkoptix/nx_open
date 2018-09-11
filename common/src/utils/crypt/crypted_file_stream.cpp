@@ -23,7 +23,7 @@ const Key kPasswordSalt {
     0x83, 0xc6, 0xe9, 0x9e, 0xdf, 0x69, 0x5e, 0x4e, 0x8b, 0xa5, 0xd7, 0xbc, 0x8b, 0xb3, 0xf2, 0x6
 };
 
-const Key IV {  //< Actually makes little sense because first 8 bytes of IV are overwritten with block index.
+const Key IV { //< Actually makes little sense because first 8 bytes of IV are overwritten with block index.
     0xf1, 0x8a, 0xdb, 0x71, 0x8b, 0x86, 0xb, 0x7c, 0xf1, 0xa6, 0xb8, 0xff, 0x81, 0x81, 0x64, 0x66,
     0x48, 0xb6, 0x30, 0xfb, 0x3, 0xbc, 0xa2, 0xd, 0x3d, 0xf1, 0xa1, 0xf4, 0xfd, 0xf1, 0xe7, 0xb4
 };
@@ -175,7 +175,6 @@ void CryptedFileStream::close()
 {
     QnMutexLocker lock(&m_mutex);
 
-    bool Writing = isWriting();
     if (m_openMode != NotOpen && isWriting())
     {
         dumpCurrentBlock();
@@ -270,6 +269,7 @@ qint64 CryptedFileStream::size() const
 
 qint64 CryptedFileStream::grossSize() const
 {
+    QnMutexLocker lock(&m_mutex);
     // Calculating block number including "tail" block.
     return kHeaderSize
         + ((m_header.dataSize + kCryptoBlockSize - 1) / kCryptoBlockSize) * kCryptoBlockSize;
@@ -363,6 +363,9 @@ bool CryptedFileStream::readHeader()
     if (m_file.read((char *)&m_header, sizeof(m_header)) != sizeof(m_header))
         return false;
 
+    if (m_header.minReadVersion > kCryptoStreamVersion) //< The file is too new.
+        return false;
+
     m_key = xorKeys(m_passwordKey, Key(m_header.salt));
 
     return getKeyHash(m_key) == Key(m_header.keyHash);
@@ -410,7 +413,7 @@ void CryptedFileStream::decryptBlock()
 
     unsigned char dummy[32];
     result = EVP_DecryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &len);
-    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to crypted buffer.
+    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to decrypted buffer.
 }
 
 } // namespace utils
