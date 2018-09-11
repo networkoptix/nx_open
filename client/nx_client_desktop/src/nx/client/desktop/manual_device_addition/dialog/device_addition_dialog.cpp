@@ -16,6 +16,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <api/server_rest_connection.h>
 
@@ -168,7 +169,6 @@ void DeviceAdditionDialog::initializeControls()
 
     updateResultsWidgetState();
 
-    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum), true);
     handleTabClicked(ui->tabWidget->currentIndex());
 }
 
@@ -209,16 +209,32 @@ void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value
 
 void DeviceAdditionDialog::handleTabClicked(int index)
 {
+    // We need two functions below to prevent blinking when page is changed.
+    static const auto resetPageSize = [](QWidget* widget) { widget->setFixedHeight(0); };
+    const auto setHeightFromLayout =
+        [this](QWidget* widget)
+        {
+            const auto layout = widget->layout();
+            widget->setFixedHeight(layout->minimumSize().height());
+            executeLater(
+                [widget, layout]() { widget->setMaximumHeight(layout->maximumSize().height()); },
+                this);
+        };
+
     if (index)
     {
         ui->addressEdit->setValidator(TextValidateFunction(), true);
         ui->startAddressEdit->setFocus();
+        resetPageSize(ui->knownAddressesPage);
+        setHeightFromLayout(ui->subnetScanPage);
     }
     else
     {
         ui->addressEdit->setValidator(
             defaultNonEmptyValidator(tr("Address field can't be empty")));
         ui->addressEdit->setFocus();
+        resetPageSize(ui->subnetScanPage);
+        setHeightFromLayout(ui->knownAddressesPage);
     }
 }
 

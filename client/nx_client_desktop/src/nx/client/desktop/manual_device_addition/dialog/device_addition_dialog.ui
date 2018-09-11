@@ -176,7 +176,7 @@
              <item>
               <widget class="QStackedWidget" name="knownAddressPortSpinWidget">
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="knownAddressSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -193,6 +193,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <item>
                   <widget class="QLineEdit" name="lineEdit">
+                   <property name="focusPolicy">
+                    <enum>Qt::NoFocus</enum>
+                   </property>
                    <property name="text">
                     <string>Auto</string>
                    </property>
@@ -366,8 +369,11 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QStackedWidget" name="subnetScanPortSpinWidget">
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="subnetScanSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
@@ -384,6 +390,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
                  <item>
                   <widget class="QLineEdit" name="lineEdit_2">
+                   <property name="focusPolicy">
+                    <enum>Qt::NoFocus</enum>
+                   </property>
                    <property name="text">
                     <string>Auto</string>
                    </property>
