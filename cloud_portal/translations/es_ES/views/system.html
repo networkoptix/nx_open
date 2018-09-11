@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Error al acceder al sistema</h1>
-        <p>Este enlace está roto,<br>
+        <h3>Este enlace está roto,<br>
             Sistema podriá estar desconectado de %PRODUCT_NAME%,<br>
             El acceso a este Sistema puede ser revocado, <br>
-            o puede que haya iniciado sesión en una cuenta diferente</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Lista de Sistemas disponible</a>
+            o puede que haya iniciado sesión en una cuenta diferente
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Lista de Sistemas disponible</a>
         </p>
     </div>
 

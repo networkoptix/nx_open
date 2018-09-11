@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Türk",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Gelişmiş Görüntüleyici",
-      "description": "Canlı vidyo izleyebilir, arşivi görüntüleyebilir, kameraları ayarlayabilir, PTZ'yi kontrol edebilir"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Yönetici",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Sil",
     "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Tüm sistemler",
     "systems": "Sistemler"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Yüksek çözünürlük",
+      "lowStream": "Düşük çözünürlük",
+      "transcoding": "Dönüştürme",
+      "unknown": "Belirtilmemiş",
+      "copyToClipboard": "panoya yapıştır",
+      "copyDefaultText": "kopyala",
+      "copyActiveText": "panoya kopyalandı"
+    },
+    "systemOffline": "Sistem çevrimdışı",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Çevrimdışı",
+      "error": "Hata",
+      "unauthorized": "Kimlik doğrulaması gerekli",
+      "noData": "Veri bulunamadı",
+      "iosVideoTooLarge": "iOS, fullHD'den daha büyük videoyu desteklemez (2MP: 1920x1080).",
+      "flashRequired": "Videoları oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>'i yükleyin.",
+      "flashOrWebmRequired": "Internet Explorer'da video oynatmak için lütfen <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> veya<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec'i</a> yükleyin.",
+      "noArmSupport": "Bu tarayıcı veya aygıt, ARM tabanlı sunuculardan video oynatmayı desteklemez.",
+      "noFormat": "Bu tarayıcı bu kameradan video oynatmayı desteklemiyor.",
+      "ieNoWebm": "Internet Explorer için <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> yükleyin.",
+      "ieWin10": "Lütfen, Microsoft Edge veya Google Chrome tarayıcılarını kullanın.",
+      "ubuntuNX": "Bu tarayıcı, ARM tabanlı sunuculardan gelen videoyu desteklemez. Bunun yerine, Chromium tarayıcıyı kullanın."
+    },
+    "searchCamPlaceholder": "Arama",
+    "resolution": {
+      "auto": "Oto",
+      "high": "Yüksek",
+      "low": "Düşük"
+    },
+    "chromeCastWarning": "Chromecast kaynak yoğunluğudur ve sunucunuzda sorunlara neden olabilir.",
+    "voiceCommands": {
+      "play": "oynat",
+      "pause": "duraklat",
+      "live": "go to live | show me live",
+      "view": "görüntüle + [kamera adı]",
+      "search": "find + [text for searchbar]",
+      "clear search": "aramayı temizle",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "tüm sunucuları genişlet",
+      "collapse all servers": "tüm sunucuları daralt",
+      "stop listening": "dinlemeyi durdur",
+      "help": "help | show commands"
+    }
   }
 }

@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Magyar",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Adminisztrátor",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Törlés",
     "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "{{email}} engedélyei vissavonva"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Minden rendszer",
     "systems": "Rendszerek"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Elsődleges stream",
+      "lowStream": "Másodlagos stream",
+      "transcoding": "Transzkódolás",
+      "unknown": "Ismeretlen",
+      "copyToClipboard": "másolás vágólapra",
+      "copyDefaultText": "másolás",
+      "copyActiveText": "vágólapra másolva"
+    },
+    "systemOffline": "A rendszer offline",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Hiba",
+      "unauthorized": "Hitelesítés szükséges",
+      "noData": "Nincs adat",
+      "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+      "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához.",
+      "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+      "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+      "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
+      "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+      "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+      "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt."
+    },
+    "searchCamPlaceholder": "Keresés",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Elsődleges",
+      "low": "Alacsony"
+    },
+    "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
+    "voiceCommands": {
+      "play": "letjátszás",
+      "pause": "szünet",
+      "live": "go to live | show me live",
+      "view": "nézet + [kamera neve]",
+      "search": "keresés + [szöveg a keresősávhoz]",
+      "clear search": "keresés törlése",
+      "expand server": "szerver kibontása + [szerver neve]",
+      "collapse server": "szerver összecsukása + [szerver neve]",
+      "expand all servers": "összes szerver kibontása",
+      "collapse all servers": "összes szerver összecsukása",
+      "stop listening": "figyelés leállítása",
+      "help": "súgó | parancsok megjelenítése"
+    }
   }
 }

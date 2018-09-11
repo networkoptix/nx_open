@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Просмотр и настройка",
-      "description": "Может смотреть видео в реальном времени, архив, изменять настройки камер, управлять PTZ и т. д"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Администратор",
@@ -177,6 +177,7 @@
     "confirmUnshareAction": "Удалить",
     "successDisconnected": "Система успешно отключена от %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успешно удалена из вашей учетной записи",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "{{email}} был лишен полномочий"
   },
   "account": {
@@ -268,50 +269,51 @@
     "systems": "Системы"
   },
   "common": {
-    "cameraLinks"         : {
-      "highStream"     : "Выс. кач-во",
-      "lowStream"      : "Низ. кач-во",
-      "transcoding"    : "Перекодирование",
-      "unknown"        : "Неизвестный",
-      "copyToClipboard": "копировать в буфер",
+    "cameraLinks": {
+      "highStream": "Выс. кач-во",
+      "lowStream": "Низ. кач-во",
+      "transcoding": "Перекодирование",
+      "unknown": "Неизвестный",
+      "copyToClipboard": "скопировать в буфер обмена",
       "copyDefaultText": "копировать",
-      "copyActiveText" : "скопировано в буфер обмена"
+      "copyActiveText": "скопировано в буфер обмена"
     },
-    "systemOffline"       : "Система не в сети",
-    "cameraStates"        : {
-      "offline"            : "Не в сети",
-      "error"              : "Ошибка",
-      "unauthorized"       : "Требуется аутентификация",
-      "noData"             : "Нет данных",
-      "iosVideoTooLarge"   : "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-      "flashRequired"      : "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео.",
+    "systemOffline": "Система не в сети",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Не в сети",
+      "error": "Ошибка",
+      "unauthorized": "Требуется аутентификация",
+      "noData": "Нет данных",
+      "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
+      "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео.",
       "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
-      "noArmSupport"       : "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-      "noFormat"           : "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
-      "ieNoWebm"           : "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
-      "ieWin10"            : "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
-      "ubuntuNX"           : "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
+      "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
+      "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
+      "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
+      "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
+      "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium."
     },
     "searchCamPlaceholder": "Поиск",
-    "resolution"          : {
+    "resolution": {
       "auto": "Авто",
-      "high": "Выс",
-      "low" : "Низ"
+      "high": "Высокая",
+      "low": "Низкая"
     },
-    "chromeCastWarning"   : "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
-    "voiceCommands"       : {
-      "play"                : "воспроизвести",
-      "pause"               : "пауза",
-      "live"                : "go to live | show me live",
-      "view"                : "view + [camera name]",
-      "search"              : "find + [text for searchbar]",
-      "clear search"        : "clear search",
-      "expand server"       : "expand server + [server name]",
-      "collapse server"     : "collapse server + [server name]",
-      "expand all servers"  : "expand all servers",
-      "collapse all servers": "collapse all servers",
-      "stop listening"      : "stop listening",
-      "help"                : "help | show commands"
+    "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
+    "voiceCommands": {
+      "play": "воспроизвести",
+      "pause": "пауза",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "очистить поиск",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "развернуть все серверы",
+      "collapse all servers": "свернуть все серверы",
+      "stop listening": "прекратить прослушивание",
+      "help": "help | show commands"
     }
   }
 }
