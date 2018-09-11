@@ -291,8 +291,8 @@ Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() 
     if (qnRuntime->isVideoWallMode())
         return Qn::GlobalVideoWallModePermissionSet;
 
-    if (qnRuntime->isActiveXMode())
-        return Qn::GlobalActiveXModePermissionSet;
+    if (qnRuntime->isAcsMode())
+        return Qn::GlobalAcsModePermissionSet;
 
     if (!m_user)
         return Qn::NoGlobalPermissions;

@@ -7,7 +7,6 @@ add_subdirectory(nx_network_ut)
 
 if(withDesktopClient)
     add_subdirectory(client_ut)
-    add_subdirectory(vms_utils_ut)
 endif()
 
 if(withMediaServer)

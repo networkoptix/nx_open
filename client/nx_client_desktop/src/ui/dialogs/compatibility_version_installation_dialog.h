@@ -1,10 +1,4 @@
-/**********************************************************
-* 30 sep 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
-#define COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 
@@ -13,37 +7,32 @@
 #include <update/updates_common.h>
 #include <ui/dialogs/common/dialog.h>
 
-class QnCompatibilityVersionInstallationTool;
 class QnMediaServerUpdateTool;
 
 namespace Ui {
-    class QnCompatibilityVersionInstallationDialog;
+class QnCompatibilityVersionInstallationDialog;
 }
 
 // TODO: #dklychkov rename class in 2.4
-class CompatibilityVersionInstallationDialog : public Connective<QnDialog> {
+class CompatibilityVersionInstallationDialog: public Connective<QnDialog>
+{
     Q_OBJECT
+    using base_type = Connective<QnDialog>;
 
-    typedef Connective<QnDialog> base_type;
 public:
-    CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
+    CompatibilityVersionInstallationDialog(const QnSoftwareVersion& version,
+        QWidget* parent = nullptr);
     virtual ~CompatibilityVersionInstallationDialog();
 
     bool installationSucceeded() const;
 
     virtual int exec() override;
-
-    static bool useUpdate(const QnSoftwareVersion &version);
-
-public slots:
     virtual void reject() override;
 
-private slots:
-    void at_compatibilityTool_statusChanged(int status);
+private:
     void at_updateTool_updateFinished(QnUpdateResult result);
 
 private:
-    int installCompatibilityVersion();
     int installUpdate();
     void setMessage(const QString& message);
 
@@ -51,10 +40,7 @@ private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
 
     QnSoftwareVersion m_versionToInstall;
-    QScopedPointer<QnCompatibilityVersionInstallationTool> m_compatibilityTool;
     QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
-    bool m_installationOk;
+    bool m_installationOk = false;
 };
-
-#endif  //COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H

@@ -258,12 +258,14 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     QList<QnSoftwareVersion>* versions)
 {
+    using namespace applauncher::api;
+
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::checkOnline())
+    if (!checkOnline())
         return false;
 
-    const auto result = applauncher::getInstalledVersions(versions);
-    if (result == applauncher::api::ResultType::ok)
+    const auto result = getInstalledVersions(versions);
+    if (result == ResultType::ok)
         return true;
 
     static const int kMaxTries = 5;
@@ -271,7 +273,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::getInstalledVersions(versions) == applauncher::api::ResultType::ok)
+        if (getInstalledVersions(versions) == ResultType::ok)
             return true;
     }
     return false;
@@ -293,10 +295,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QString& extraText)
 {
     const QString clientVersion = qnStaticCommon->engineVersion().toString();
-    const QString serverVersion = serverInfo.version.toString(
-        CompatibilityVersionInstallationDialog::useUpdate(serverInfo.version)
-        ? QnSoftwareVersion::FullFormat
-        : QnSoftwareVersion::MinorFormat);
+    const QString serverVersion = serverInfo.version.toString();
 
     QString devModeText;
     if (qnRuntime->isDevMode())
@@ -347,10 +346,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     {
         if (!isInstalled)
         {
-            QString versionString = connectionInfo.version.toString(
-                CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::MinorFormat);
+            QString versionString = connectionInfo.version.toString();
 
             auto extras = getDiffVersionFullExtras(connectionInfo,
                 tr("You have to download another version of %1 to "
@@ -401,7 +397,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);
 
-        switch (applauncher::restartClient(connectionInfo.version, authString))
+        switch (applauncher::api::restartClient(connectionInfo.version, authString))
         {
             case applauncher::api::ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;

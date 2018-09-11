@@ -158,7 +158,7 @@ void WorkbenchExportHandler::unlockFile(const QString &filename)
 bool WorkbenchExportHandler::isBinaryExportSupported() const
 {
     if (nx::utils::AppInfo::isWindows())
-        return !qnRuntime->isActiveXMode();
+        return !qnRuntime->isAcsMode();
     return false;
 }
 
@@ -325,7 +325,7 @@ bool WorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& e
         previousDir = qnSettings->mediaFolder();
 
     QString baseName = layout->getName();
-    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+    if (qnRuntime->isAcsMode() || baseName.isEmpty())
         baseName = tr("exported");
     QString suggestion = nx::utils::replaceNonFileNameCharacters(baseName, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());

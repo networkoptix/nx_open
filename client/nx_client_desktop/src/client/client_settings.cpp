@@ -272,7 +272,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isAcsMode())
         return;
 
     switch(id)

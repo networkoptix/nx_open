@@ -841,7 +841,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                               GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
+        GlobalAcsModePermissionSet = GlobalViewerPermissionSet | GlobalUserInputPermission,
     };
 
     Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)

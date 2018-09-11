@@ -7,8 +7,6 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QThread>
 
-#include <api/applauncher_api.h>
-
 #include <client/client_app_info.h>
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
@@ -229,12 +227,12 @@ bool SelfUpdater::updateApplauncher()
     static const int kWaitProcessDeathMs = 100;
 
     /* Check if no applauncher instance is running. If there is, try to kill it. */
-    auto killApplauncherResult = applauncher::quitApplauncher();
+    auto killApplauncherResult = applauncher::api::quitApplauncher();
     int retriesLeft = kKillApplauncherRetries;
     while (retriesLeft > 0 && killApplauncherResult != ResultType::connectError) // Not running.
     {
         QThread::msleep(kRetryMs);
-        killApplauncherResult = applauncher::quitApplauncher();
+        killApplauncherResult = applauncher::api::quitApplauncher();
         --retriesLeft;
     }
 

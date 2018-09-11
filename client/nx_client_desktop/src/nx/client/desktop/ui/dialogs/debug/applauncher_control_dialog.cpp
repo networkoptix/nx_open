@@ -16,7 +16,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
 {
     ui->setupUi(this);
 
-    using namespace applauncher;
+    using namespace applauncher::api;
 
     connect(ui->checkVersionButton, &QPushButton::clicked, this,
         [this]
@@ -32,7 +32,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
                 lit("Version %1: %2 (%3)")
                 .arg(v.toString())
                 .arg(isInstalled ? lit("Installed") : lit("Not Installed"))
-                .arg(QString::fromUtf8(api::ResultType::toString(errCode)))
+                .arg(QString::fromUtf8(ResultType::toString(errCode)))
             );
         });
 
@@ -48,7 +48,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
 
             ui->getVersionsLabel->setText(
                 lit("Result %1:\n %2")
-                .arg(QString::fromUtf8(api::ResultType::toString(errCode)))
+                .arg(QString::fromUtf8(ResultType::toString(errCode)))
                 .arg(text.join(L'\n'))
             );
         });

@@ -625,7 +625,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     d->setLayout(layout, palette);
 
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
-    if (qnRuntime->isActiveXMode() || baseName.isEmpty())
+    if (qnRuntime->isAcsMode() || baseName.isEmpty())
         baseName = tr("exported");
     Filename baseFileName = d->exportLayoutSettings().filename;
     baseFileName.name = baseName;

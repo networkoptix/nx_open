@@ -114,9 +114,6 @@ protected:
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
 protected slots:
-
-    void submitDelayedDrops();
-
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();
@@ -136,8 +133,6 @@ protected slots:
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
-    void at_delayedDropResourcesAction_triggered();
-    void at_instantDropResourcesAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
@@ -248,12 +243,6 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
-
-    bool m_delayedDropGuard;
-    /** List of serialized resources that are to be dropped on the scene once
-    * the user logs in. */
-    QList<QByteArray> m_delayedDrops;
-    QString m_delayedDropLayoutName;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;

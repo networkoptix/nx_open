@@ -10,8 +10,9 @@ nx_add_target(applauncher EXECUTABLE SIGNED
         "applauncher.rc"
     PUBLIC_LIBS
         qtsinglecoreapplication
-        nx_kit
         common
+        nx_vms_applauncher_api
+        nx_kit
 )
 
 string(REPLACE ".exe" "" binary_name ${applauncher.binary.name})

@@ -367,7 +367,7 @@ void QnUpdateProcess::installClientUpdate()
     NX_LOG(lit("Update: QnUpdateProcess: Installing client update [%1] from %2.")
         .arg(m_target.version.toString())
         .arg(m_clientUpdateFile->fileName), cl_logDEBUG1);
-    QFuture<ResultType::Value> future = QtConcurrent::run(&applauncher::installZip,
+    QFuture<ResultType::Value> future = QtConcurrent::run(&applauncher::api::installZip,
         m_target.version, m_clientUpdateFile->fileName);
 
     auto futureWatcher = new QFutureWatcher<ResultType::Value>(this);

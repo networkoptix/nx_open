@@ -184,6 +184,7 @@ add_subdirectory(dependencies)
 
 if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
     add_subdirectory(common_libs)
+    add_subdirectory(vms_libs)
     add_subdirectory(common)
     add_subdirectory(appserver2)
     add_subdirectory(nx_cloud)
@@ -218,9 +219,7 @@ if(withTrayTool)
     add_subdirectory(traytool)
 endif()
 
-if(withDesktopClient OR withMobileClient)
-    add_subdirectory(client)
-endif()
+add_subdirectory(client)
 
 if(withNxTool)
     add_subdirectory(nxtool)

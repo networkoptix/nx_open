@@ -50,14 +50,10 @@ set(nxtool.bundleUpgradeCode "{222b19dc-f75f-4096-9cf2-807e309ce06b}")
 set(deb.customization.company.name "networkoptix")
 
 # Paxton section
-set(paxton.className "NxWitness")
-set(paxton.classId "{930BF2FA-8BEB-4975-A04E-7FD63A4825AB}")
-set(paxton.interfaceId "{5C0BD575-9376-4CF0-B34F-044AC58BD8AB}")
-set(paxton.eventsId "{F220AAEC-AE9E-4771-9397-09F6F00C3B89}")
-set(paxton.typeLibId "{534EA078-DCAF-4EF0-B982-95B5656D87B3}")
-set(paxton.appId "{B21774A2-4417-4F07-84DC-37439C9B1063}")
-set(paxton.upgradeCode "{44777DB8-96B1-4B09-9746-6D0390288C84}")
-set(paxton.bundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
+set(paxtonLibraryName "NetworkOptix.NxWitness")
+set(paxtonProductId "{234bf98e-b18c-4798-9cb5-a0e90269ef9f}")
+set(paxtonProductUpgradeCode "{44777db8-96b1-4b09-9746-6d0390288c84}")
+set(paxtonBundleUpgradeCode "{f72abad4-21ca-4c1f-845e-fe437f2859e4}")
 
 set(ios.new_bundle_identifier "com.networkoptix.NxMobile")
 set(ios.group_identifier "group.com.networkoptix.NxMobile")

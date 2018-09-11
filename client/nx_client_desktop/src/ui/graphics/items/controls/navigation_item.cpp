@@ -7,6 +7,8 @@
 
 #include <common/common_globals.h>
 
+#include <client/client_runtime_settings.h>
+
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
@@ -424,8 +426,10 @@ void QnNavigationItem::updateBookButtonEnabled()
     const bool motionSearchMode = (currentWidget
         && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
 
-    const bool bookmarksEnabled = accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission)
-        && (currentWidget && currentWidget->resource()->flags().testFlag(Qn::live));
+    const bool bookmarksEnabled =
+        accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission)
+        && (currentWidget && currentWidget->resource()->flags().testFlag(Qn::live))
+        && !qnRuntime->isAcsMode();
 
     const auto layout = workbench()->currentLayout();
     const bool bookmarkMode = (bookmarksEnabled && !motionSearchMode

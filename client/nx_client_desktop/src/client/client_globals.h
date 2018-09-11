@@ -193,10 +193,11 @@ namespace Qn
         CustomPanelDescriptionRole,
         CustomPanelActionsRole,
 
-        /* Arguments. */
         ActionIdRole,
-        LayoutNameRole,                             /**< Role for layout delayed drop */
-        SerializedDataRole,
+
+        /** Role for command-line startup parameters. */
+        StartupParametersRole,
+
         ConnectionInfoRole,
         FocusElementRole,
         FocusTabRole,                               /**< Role for selecting tab in the tabbed dialogs. Value of type int. */
@@ -400,10 +401,14 @@ namespace Qn
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
-        LightModeActiveX            = LightModeSmallWindow | LightModeNoSceneBackground
-                                    | LightModeNoNotifications | LightModeNoShadows
-                                    | LightModeNoNewWindow | LightModeNoLayoutBackground
-                                    | LightModeNoZoomWindows,
+        LightModeACS = LightModeSmallWindow
+            | LightModeNoSceneBackground
+            | LightModeNoNotifications
+            | LightModeNoShadows
+            | LightModeNoNewWindow
+            | LightModeNoLayoutBackground
+            | LightModeNoZoomWindows,
+
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows,
         LightModeFull               = 0x7FFFFFFF
 
