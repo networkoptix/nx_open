@@ -51,12 +51,19 @@ void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
     return NULL;
 }
 
-unsigned int MediaEncoder::addRef() { return m_refManager.addRef(); }
+unsigned int MediaEncoder::addRef() 
+{
+    return m_refManager.addRef(); 
+}
 
-unsigned int MediaEncoder::releaseRef() { return m_refManager.releaseRef(); }
+unsigned int MediaEncoder::releaseRef()
+{
+    return m_refManager.releaseRef();
+}
 
 int MediaEncoder::getMediaUrl(char* urlBuf) const
 {
+    //strncpy(urlBuf, m_camera->info().url, nxcip::MAX_TEXT_LEN - 1);
     strcpy(urlBuf, m_camera->info().url);
     return nxcip::NX_NO_ERROR;
 }
@@ -88,8 +95,7 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
             return a.fps < b.fps;
         });
 
-    size_t size = resolutionList.size();
-    int actualFps = 0;
+    float actualFps = 0;
     for (const auto& resolutionData : resolutionList)
     {
         if (resolutionData.fps >= fps)

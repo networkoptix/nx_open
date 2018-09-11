@@ -46,17 +46,11 @@ AVCodecID codecNameToID(const char * codecName)
     return AV_CODEC_ID_NONE;
 }
 
-AVPixelFormat suggestPixelFormat(AVCodecID codecID)
+AVPixelFormat suggestPixelFormat(const AVCodec* codec)
 {
-    switch (codecID)
-    {
-        case AV_CODEC_ID_H264:
-            return AV_PIX_FMT_YUV420P;
-        case AV_CODEC_ID_MJPEG:
-            return AV_PIX_FMT_YUVJ420P;
-        default:
-            return AV_PIX_FMT_YUV420P;
-    }
+    if(codec)
+        return codec->pix_fmts ? codec->pix_fmts[0] : AV_PIX_FMT_NONE;
+    return AV_PIX_FMT_NONE;
 }
 
 AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat)
@@ -84,7 +78,8 @@ nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType)
             return nxcip::dptVideo;
         case AVMEDIA_TYPE_AUDIO:
             return nxcip::dptAudio;
-        default: return nxcip::dptEmpty;
+        default: 
+            return nxcip::dptEmpty;
     }
 }
 
@@ -96,7 +91,8 @@ AVMediaType toAVMediaType(nxcip::DataPacketType mediaType)
             return AVMEDIA_TYPE_VIDEO;
         case nxcip::dptAudio:
             return AVMEDIA_TYPE_AUDIO;
-        default: return AVMEDIA_TYPE_UNKNOWN;
+        default:
+            return AVMEDIA_TYPE_UNKNOWN;
     }
 }
 

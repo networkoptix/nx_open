@@ -18,7 +18,7 @@ std::string errorToString(int errorCode);
 std::string codecIDToName(AVCodecID codecID);
 AVCodecID codecNameToID(const char * codecName);
 
-AVPixelFormat suggestPixelFormat(AVCodecID codecID);
+AVPixelFormat suggestPixelFormat(const AVCodec* codec);
 AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 
 nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType);

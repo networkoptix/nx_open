@@ -264,10 +264,11 @@ std::vector<ResolutionData> getResolutionList(
         };
 
     DeviceInitializer initializer(devicePath);
+    if(initializer.fileDescriptor == -1)
+        return {};
 
     if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
         return RPI_RESOLUTION_LIST;
-
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -321,6 +322,9 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*t
         return;
 
     DeviceInitializer initializer(devicePath);
+    if(initializer.fileDescriptor == -1)
+        return;
+
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec {0};
     ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
@@ -335,6 +339,9 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*t
 int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
 {
     DeviceInitializer initializer(devicePath);
+    if(initializer.fileDescriptor == -1)
+        return 10000000;
+
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec = {0};
     ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
