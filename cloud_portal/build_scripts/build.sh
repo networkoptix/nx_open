@@ -16,12 +16,12 @@ then
     if [ -e "cloud_portal" ]
     then
         pushd cloud_portal
-            for entry in $(ls -A $VMS_REPOSITORY/cloud_portal/)
+            for entry in $(ls -A $NX_VMS/cloud_portal/)
             do
                 if [ "$entry" = "front_end" ]
                 then
                     pushd $entry
-                    for element in $(ls -A $VMS_REPOSITORY/cloud_portal/$entry/)
+                    for element in $(ls -A $NX_VMS/cloud_portal/$entry/)
                     do
                         echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
@@ -82,7 +82,7 @@ for dir in ../skins/*/
 do
     dir=${dir%*/}
     SKIN=${dir/..\/skins\//}
-    ./build_skin.sh $SKIN $VMS_REPOSITORY
+    ./build_skin.sh $SKIN $NX_VMS
 done
 
 cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
