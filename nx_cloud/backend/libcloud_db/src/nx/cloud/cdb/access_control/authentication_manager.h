@@ -135,7 +135,7 @@ private:
         const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
         nx::utils::stree::ResourceContainer* const authProperties);
 
-    void updateUserLockoutState(network::server::UserLocker::AuthResult authResult);
+    void updateUserLockoutState(network::server::AuthResult authResult);
 };
 
 } // namespace detail

@@ -249,7 +249,7 @@ api::ResultCode AuthenticationHelper::authenticateRequestDigest(
     const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
     nx::utils::stree::ResourceContainer* const authProperties)
 {
-    using AuthResult = nx::network::server::UserLocker::AuthResult;
+    using AuthResult = nx::network::server::AuthResult;
 
     api::ResultCode authResultCode = api::ResultCode::notAuthorized;
     if (streeQueryFoundPasswordMatchesRequestDigest())
@@ -397,7 +397,7 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
 }
 
 void AuthenticationHelper::updateUserLockoutState(
-    network::server::UserLocker::AuthResult authResult)
+    network::server::AuthResult authResult)
 {
     if (!m_userLocker)
         return;
