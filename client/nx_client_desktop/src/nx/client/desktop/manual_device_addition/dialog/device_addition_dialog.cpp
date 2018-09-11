@@ -16,12 +16,19 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
-
+#include <utils/common/scoped_value_rollback.h>
 #include <api/server_rest_connection.h>
 
 namespace {
 
 using namespace nx::client::desktop;
+
+QHostAddress fixedAddress(const QnIpLineEdit* edit)
+{
+    auto fixed = edit->text();
+    edit->validator()->fixup(fixed);
+    return QHostAddress(fixed);
+}
 
 bool isKnownAddressPage(QTabWidget* tabWidget)
 {
@@ -80,6 +87,9 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->foundDevicesTable->setSortingEnabled(false);
 
+    ui->searchButton->setFocusPolicy(Qt::StrongFocus);
+    ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
+
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,
@@ -87,20 +97,8 @@ void DeviceAdditionDialog::initializeControls()
     connect(ui->addDevicesButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleAddDevicesClicked);
 
-    connect(ui->tabWidget, &QTabWidget::tabBarClicked, this,
-        [this](int index)
-        {
-            if (index == -1)
-                return;
-
-            // We reset minimum height for current widget to prevent tab widget height stuck.
-            ui->tabWidget->widget(index ? 0 : 1)->setFixedHeight(0);
-
-            // We manually set new hight to prevent content blinking when page is changed.
-            const auto widget = ui->tabWidget->widget(index);
-            widget->setFixedHeight(widget->layout()->minimumSize().height());
-        });
-
+    connect(ui->tabWidget, &QTabWidget::tabBarClicked,
+        this, &DeviceAdditionDialog::handleTabClicked);
     connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &DeviceAdditionDialog::handleSearchTypeChanged);
 
@@ -115,12 +113,22 @@ void DeviceAdditionDialog::initializeControls()
     for (const auto server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
 
-    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->startAddressEdit->setPlaceholderText(tr("Start address"));
+    ui->startAddressEdit->setText(lit("0.0.0.0"));
     ui->endAddressEdit->setPlaceholderText(tr("End address"));
+    ui->endAddressEdit->setText(lit("0.0.0.255"));
+    connect(ui->startAddressEdit, &QLineEdit::textChanged,
+        this, &DeviceAdditionDialog::handleStartAddressFieldTextChanged);
+    connect(ui->startAddressEdit, &QLineEdit::editingFinished,
+        this, &DeviceAdditionDialog::handleStartAddressEditingFinished);
+    connect(ui->endAddressEdit, &QLineEdit::textChanged,
+        this, &DeviceAdditionDialog::handleEndAddressFieldTextChanged);
 
-    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->hintLabel->setToolTip(tr("Examples:")
+    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
+    ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
+    ui->addressHint->setVisible(false);
+    ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->explanationLabel->setToolTip(tr("Examples:")
         + lit("\n192.168.1.15\n"
               "www.example.com:8080\n"
               "http://example.com:7090/image.jpg\n"
@@ -138,7 +146,6 @@ void DeviceAdditionDialog::initializeControls()
         this, &DeviceAdditionDialog::handleSelectedServerChanged);
 
     ui->serverOfflineAlertBar->setText(tr("Server offline"));
-
     updateSelectedServerButtonVisibility();
     connect(&m_serversWatcher, &CurrentSystemServers::serversCountChanged,
         this, &DeviceAdditionDialog::updateSelectedServerButtonVisibility);
@@ -160,6 +167,59 @@ void DeviceAdditionDialog::initializeControls()
     PasswordPreviewButton::createInline(ui->subnetScanPasswordEdit);
 
     updateResultsWidgetState();
+
+    autoResizePagesToContents(ui->tabWidget, QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum), true);
+    handleTabClicked(ui->tabWidget->currentIndex());
+}
+
+void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
+{
+    if (m_addressEditing)
+        return;
+
+    QnScopedValueRollback rollback(&m_addressEditing, true);
+    ui->endAddressEdit->setText(fixedAddress(ui->startAddressEdit).toString());
+}
+
+void DeviceAdditionDialog::handleStartAddressEditingFinished()
+{
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    if (startAddress % 256 == 0)
+        ui->endAddressEdit->setText(QHostAddress(startAddress + 255).toString());
+}
+
+void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
+{
+    if (m_addressEditing)
+        return;
+
+    QnScopedValueRollback rollback(&m_addressEditing, true);
+
+    const auto startAddress = fixedAddress(ui->startAddressEdit);
+    const auto endAddress = fixedAddress(ui->endAddressEdit);
+
+    const quint32 startSubnet = startAddress.toIPv4Address() >> 8;
+    const quint32 endSubnet = endAddress.toIPv4Address() >> 8;
+    if (startSubnet != endSubnet)
+    {
+        const QHostAddress fixed(startAddress.toIPv4Address() + ((endSubnet - startSubnet) << 8));
+        ui->startAddressEdit->setText(fixed.toString());
+    }
+}
+
+void DeviceAdditionDialog::handleTabClicked(int index)
+{
+    if (index)
+    {
+        ui->addressEdit->setValidator(TextValidateFunction(), true);
+        ui->startAddressEdit->setFocus();
+    }
+    else
+    {
+        ui->addressEdit->setValidator(
+            defaultNonEmptyValidator(tr("Address field can't be empty")));
+        ui->addressEdit->setFocus();
+    }
 }
 
 void DeviceAdditionDialog::updateSelectedServerButtonVisibility()
@@ -270,13 +330,19 @@ QString DeviceAdditionDialog::login() const
 }
 
 void DeviceAdditionDialog::handleStartSearchClicked()
-{
+{    
     if (m_currentSearch)
         stopSearch();
 
-    const bool isKnownAddressTabPage = isKnownAddressPage(ui->tabWidget);
-    if (isKnownAddressTabPage)
+    if (isKnownAddressPage(ui->tabWidget))
     {
+        if (!ui->addressEdit->isValid())
+        {
+            ui->addressEdit->setFocus();
+            ui->addressEdit->validate();
+            return;
+        }
+
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->addressEdit->text().simplified(), login(), password(), port()));
     }
@@ -316,6 +382,8 @@ void DeviceAdditionDialog::handleStartSearchClicked()
         m_model, &FoundDevicesModel::addDevices);
     connect(m_currentSearch, &ManualDeviceSearcher::devicesRemoved,
         m_model, &FoundDevicesModel::removeDevices);
+
+    ui->stopSearchButton->setFocus();
 }
 
 void DeviceAdditionDialog::handleAddDevicesClicked()
