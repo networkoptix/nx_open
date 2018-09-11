@@ -43,8 +43,8 @@ public:
 protected:
     nxpt::CommonRefManager m_refManager;
     int m_encoderIndex;
-    CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
+    CodecParameters m_codecParams;
 
     std::shared_ptr<StreamReader> m_streamReader;
 

@@ -16,20 +16,20 @@ ILPMediaPacket::ILPMediaPacket(
     int channelNumber,
     nxcip::DataPacketType dataType,
     nxcip::CompressionType compressionType,
-    nxcip::UsecUTCTimestamp _timestamp,
+    nxcip::UsecUTCTimestamp timestamp,
     unsigned int flags,
-    unsigned int cSeq )
+    unsigned int cSeq)
 :
     m_refManager( this ),
     m_allocator( allocator ),
+    m_channelNumber( channelNumber ),
     m_dataType(dataType),
     m_compressionType(compressionType),
-    m_channelNumber( channelNumber ),
-    m_timestamp( _timestamp ),
-    m_buffer( NULL ),
-    m_bufSize( 0 ),
+    m_timestamp( timestamp ),
     m_flags( flags ),
-    m_cSeq( cSeq )
+    m_cSeq( cSeq ),
+    m_buffer( nullptr ),
+    m_bufSize( 0 )
 {
 }
 

@@ -17,7 +17,7 @@ public:
         int channelNumber,
         nxcip::DataPacketType dataType,
         nxcip::CompressionType compressionType,
-        nxcip::UsecUTCTimestamp _timestamp,
+        nxcip::UsecUTCTimestamp timestamp,
         unsigned int flags,
         unsigned int cSeq);
     virtual ~ILPMediaPacket();
@@ -46,13 +46,13 @@ private:
     nxpt::CommonRefManager m_refManager;
     CyclicAllocator* const m_allocator;
     const int m_channelNumber;
+    nxcip::DataPacketType m_dataType;
+    nxcip::CompressionType m_compressionType;
     nxcip::UsecUTCTimestamp m_timestamp;
-    void* m_buffer;
-    size_t m_bufSize;
     unsigned int m_flags;
     unsigned int m_cSeq;
-    nxcip::CompressionType m_compressionType;
-    nxcip::DataPacketType m_dataType;
+    void* m_buffer;
+    size_t m_bufSize;
 };
 
 } // namespace usb_cam

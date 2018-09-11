@@ -10,6 +10,13 @@
 namespace nx {
 namespace device {
 
+/////////////////////////////////// AudioDiscoveryManagerPrivate ///////////////////////////////////
+
+AudioDiscoveryManagerPrivate::~AudioDiscoveryManagerPrivate()
+{
+    // required by gcc
+}
+
 ////////////////////////////////////// AudioDiscoveryManager ///////////////////////////////////////
 
 AudioDiscoveryManager::AudioDiscoveryManager()

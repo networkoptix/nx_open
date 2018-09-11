@@ -13,7 +13,10 @@ namespace ffmpeg {
 class Packet
 {
 public:
-    Packet(AVCodecID codecID, AVMediaType mediaType, const std::shared_ptr<std::atomic_int>& packetCount = nullptr);
+    Packet(
+        AVCodecID codecID,
+        AVMediaType mediaType,
+        const std::shared_ptr<std::atomic_int>& packetCount = nullptr);
     ~Packet();
 
     int size() const;
@@ -36,11 +39,11 @@ public:
     bool keyPacket() const;
 
 private:
-    AVPacket* m_packet;
     AVCodecID m_codecID;
     AVMediaType m_mediaType;
     std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timeStamp;
+    AVPacket* m_packet;
 
 #ifdef _WIN32
 private:
