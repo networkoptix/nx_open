@@ -19,13 +19,13 @@ struct NX_UTILS_API PasswordLimitations
     /** Maximum length of a consecutive characters sequence. */
     static constexpr int kConsecutiveCharactersLimit = 4;
 
-    /** Maximum number of repating characters/ */
+    /** Maximum number of repating characters. */
     static constexpr int kRepeatingCharactersLimit = 4;
 
-    /* Minimal acceptable number of character categories: */
+    /** Minimum acceptable number of character categories. */
     static constexpr int kMinimumCategories = 2;
 
-    /* Preferred number of character categories: */
+    /** Preferred number of character categories. */
     static constexpr int kPreferredCategories = 3;
 
     static const QByteArray kAllowedSymbols;
