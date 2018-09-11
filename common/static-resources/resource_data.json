@@ -2217,6 +2217,7 @@
             "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2466,6 +2467,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2492,6 +2494,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2545,6 +2548,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2678,6 +2682,7 @@
             "keys": [
                 "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
