@@ -36,12 +36,12 @@
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://itunes.apple.com/us/app/ez-pro-mobile/id1167886315</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>
       <translation>https://play.google.com/store/apps/details?id=com.ioezio.ezpromobile</translation>
-    </message>     
+    </message>
     <message>
       <source>{{COMPANY_NAME}}</source>
       <translation>EZ Pro</translation>

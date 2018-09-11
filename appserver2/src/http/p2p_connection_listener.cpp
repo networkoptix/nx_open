@@ -110,12 +110,13 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
             .arg(remotePeer.systemId));
         return false;
     }
-    if (remotePeer.peerType != Qn::PT_MobileClient)
+    if (remotePeer.dataFormat == Qn::UbjsonFormat)
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
             NX_LOG(this,
-                lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
+                lm("Reject incoming P2P connection using UBJSON "
+                    "from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
                 .arg(nx_ec::EC2_PROTO_VERSION)
@@ -147,9 +148,8 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
     ec2::ApiPeerDataEx remotePeer;
     QUrlQuery query(d->request.requestLine.url.query());
 
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
-        QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
+        QnLexical::deserialize(query.queryItemValue("format"), &remotePeer.dataFormat);
 
     if (auto peerDataHeaderIter = d->request.headers.find(Qn::EC2_PEER_DATA);
         peerDataHeaderIter != d->request.headers.end())
@@ -158,9 +158,9 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
 
         bool success = false;
         peerData = QByteArray::fromBase64(peerData);
-        if (dataFormat == Qn::JsonFormat)
+        if (remotePeer.dataFormat == Qn::JsonFormat)
             remotePeer = QJson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
-        else if (dataFormat == Qn::UbjsonFormat)
+        else if (remotePeer.dataFormat == Qn::UbjsonFormat)
             remotePeer = QnUbjson::deserialized(peerData, ec2::ApiPeerDataEx(), &success);
     }
     else

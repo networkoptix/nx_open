@@ -66,11 +66,11 @@ namespace ec2
             while (!m_runningHttpRequests.empty())
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
+                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
                 httpClient->pleaseStopSync(checkForLocks);
                 //it is garanteed that no http event handler is running currently and no handler will be called
                 lk.relock();
-                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
             }
         }
 
@@ -158,8 +158,9 @@ namespace ec2
             std::function<void()> handler;
             {
                 QnMutexLocker lk( &m_mutex );
-                auto it = m_runningHttpRequests.find( httpClient );
-                NX_ASSERT( it != m_runningHttpRequests.end() );
+                auto it = m_runningHttpRequests.find(httpClient);
+                if(it == m_runningHttpRequests.end())
+                    return; //< ClientQueryProcessor is about to stop.
                 handler = std::move(it->second);
                 httpClient->pleaseStopSync();
                 m_runningHttpRequests.erase( it );

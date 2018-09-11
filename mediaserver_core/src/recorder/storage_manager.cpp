@@ -64,7 +64,7 @@ static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
 #ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 1000 * 1000 * 1000LL;
+const qint64 kMinSystemStorageFreeSpace = 500 * 1000 * 1000LL;
 #else
 const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
 #endif

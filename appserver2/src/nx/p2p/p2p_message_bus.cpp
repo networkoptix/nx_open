@@ -237,11 +237,11 @@ void MessageBus::gotConnectionFromRemotePeer(
     connectSignals(connection);
     startReading(connection);
 
-    if (!remotePeer.isServer())
+    if (remotePeer.isClient())
     {
         // Clients use simplified logic. They are started and subscribed to all updates immediately.
         context(connection)->isLocalStarted = true;
-        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
+        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1, localPeer()));
         sendInitialDataToClient(connection);
     }
     context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;

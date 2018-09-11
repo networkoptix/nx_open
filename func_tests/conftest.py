@@ -80,6 +80,7 @@ def pytest_addoption(parser):
     parser.addoption('--mediaserver-dist-path', type=expand_path,
                      help='path to mediaserver distributive (.deb), default is %s in bin-dir' % DEFAULT_MEDIASERVER_DIST_FNAME)
     parser.addoption('--mediaserver-installers-dir', help='Unused. For forward compatibility with vms 4.0 funtests.')
+    parser.addoption('--mediaserver-updates-dir', help='Unused. For forward compatibility with vms 4.0 funtests.')
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH, type=expand_path,
                      help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
     parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH, type=expand_path,

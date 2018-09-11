@@ -174,6 +174,8 @@ void Camera::setUrl(const QString &urlStr)
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
     QnMutexLocker lock(&m_initMutex);
+    if (!isInitialized())
+        return {};
 
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
@@ -230,6 +232,8 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QnMutexLocker lock(&m_initMutex);
+    if (!isInitialized())
+        return {};
 
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
@@ -302,6 +306,9 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         [&](Qn::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
+            if (!isInitialized())
+                return QnLiveStreamParams();
+
             const auto it = m_streamCapabilityAdvancedProviders.find(streamIndex);
             if (it == m_streamCapabilityAdvancedProviders.end())
                 return QnLiveStreamParams();
