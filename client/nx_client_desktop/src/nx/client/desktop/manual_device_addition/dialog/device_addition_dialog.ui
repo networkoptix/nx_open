@@ -204,7 +204,11 @@
                <widget class="QWidget" name="knownAddressSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
                  <item>
-                  <widget class="QSpinBox" name="knownAddressPortSpinBox"/>
+                  <widget class="QSpinBox" name="knownAddressPortSpinBox">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -361,7 +365,11 @@
                <widget class="QWidget" name="subnetScanSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
                  <item>
-                  <widget class="QSpinBox" name="subnetScanPortSpinBox"/>
+                  <widget class="QSpinBox" name="subnetScanPortSpinBox">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
