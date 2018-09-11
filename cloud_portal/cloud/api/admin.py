@@ -59,11 +59,6 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
             qs = qs.filter(customization=settings.CUSTOMIZATION)
         return qs
 
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super(AccountAdmin, self).get_search_results(request, queryset, search_term)
-        queryset |= self.model.objects.filter(email__icontains=search_term.lower())
-        return queryset, use_distinct
-
     def has_add_permission(self, request):  # No adding users in admin
         return False
 
