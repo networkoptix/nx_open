@@ -8,6 +8,8 @@
 #include <common/common_module.h>
 #include <transaction/message_bus_adapter.h>
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 ClientRegistrar::ClientRegistrar(
@@ -45,7 +47,7 @@ void ClientRegistrar::onNewConnectionEstablished(
     m_runtimeInfoManager->updateRemoteItem(peerRuntimeInfo);
 
     auto commonModule = m_messageBus->commonModule();
-    ec2::QnTransaction<ec2::ApiRuntimeData> tran(
+    ec2::QnTransaction<api::RuntimeData> tran(
         ec2::ApiCommand::runtimeInfoChanged, commonModule->moduleGUID());
     tran.params = peerRuntimeInfo.data;
     commonModule->ec2Connection()->messageBus()->sendTransaction(tran);
