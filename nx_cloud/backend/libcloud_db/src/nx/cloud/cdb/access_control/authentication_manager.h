@@ -45,7 +45,6 @@ class AuthenticationManager:
 {
 public:
     AuthenticationManager(
-        const conf::Settings& settings,
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree,
@@ -63,7 +62,6 @@ private:
     const StreeManager& m_stree;
     AccessBlocker* m_transportSecurityManager;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
-    std::unique_ptr<network::server::UserLockerPool> m_userLocker;
 
     nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
     nx::Buffer generateNonce();
@@ -77,7 +75,6 @@ public:
     AuthenticationHelper(
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         AccessBlocker* accessBlocker,
-        network::server::UserLockerPool* userLocker,
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
         nx::network::http::server::AuthenticationCompletionHandler handler);
@@ -92,6 +89,7 @@ public:
         std::optional<nx::utils::stree::ResourceContainer> authProperties = std::nullopt);
 
     void reportFailure(
+        AuthenticationType authenticationType,
         api::ResultCode resultCode,
         std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate = std::nullopt);
 
@@ -110,7 +108,6 @@ public:
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     AccessBlocker* m_transportSecurityManager;
-    network::server::UserLockerPool* m_userLocker;
     const nx::network::http::HttpServerConnection& m_connection;
     const nx::network::http::Request& m_request;
     nx::network::http::server::AuthenticationCompletionHandler m_handler;
@@ -140,8 +137,6 @@ private:
     api::ResultCode authenticateInDataManagers(
         const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
         nx::utils::stree::ResourceContainer* const authProperties);
-
-    void updateUserLockoutState(network::server::AuthResult authResult);
 };
 
 } // namespace detail
