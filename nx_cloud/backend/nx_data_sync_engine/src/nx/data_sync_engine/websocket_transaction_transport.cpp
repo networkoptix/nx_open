@@ -106,7 +106,8 @@ void WebSocketTransactionTransport::onGotMessage(
             break;
         }
         default:
-            NX_ASSERT(0, "Not implemented!");
+            NX_ASSERT(0, lm("P2P message type '%1' is not allowed for cloud connect!")
+                .arg(toString(messageType)));
             break;
     }
 }

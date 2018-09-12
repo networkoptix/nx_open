@@ -331,6 +331,11 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 {
     if (remotePeer().isClient())
         NX_ASSERT(messageType == MessageType::pushTransactionData);
+    if (remotePeer().isCloudServer())
+    {
+        NX_ASSERT(messageType == MessageType::pushTransactionData
+            || messageType == MessageType::subscribeAll);
+    }
 
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
