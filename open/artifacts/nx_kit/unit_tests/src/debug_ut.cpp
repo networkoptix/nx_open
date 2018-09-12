@@ -87,13 +87,19 @@ TEST(debug, assertSuccess)
 {
     static const bool trueCondition = true;
     NX_KIT_ASSERT(trueCondition);
+    NX_KIT_ASSERT(trueCondition, "This assertion with a message should not fail.");
 }
 
-TEST(debug, assertFailure)
+TEST(debug, assertFailureInRelease)
 {
-    // Test should pass in Release but will crash in Debug.
-    static const bool falseCondition = false;
-    NX_KIT_ASSERT(falseCondition);
+    #if defined(NDEBUG)
+        static const bool condition = false;
+    #else
+        static const bool condition = true;
+    #endif
+
+    NX_KIT_ASSERT(condition, "This and the previous assertions should fail in Debug.");
+    NX_KIT_ASSERT(condition);
 }
 
 TEST(debug, show)
