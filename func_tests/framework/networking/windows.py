@@ -143,6 +143,7 @@ class WindowsNetworking(Networking):
             raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
 
     def list_ips(self):
+        # -PolicyStore:PersistentStore filters out first NATed address
         result = self._winrm.run_powershell_script(
             # language=PowerShell
             '''

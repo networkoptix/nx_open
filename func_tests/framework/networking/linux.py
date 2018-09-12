@@ -79,11 +79,13 @@ class LinuxNetworking(Networking):
         output = self._ssh.run_sh_script('ip address show scope global | grep -w inet')
         # output consists of lines like this:
         # inet 172.21.0.1/16 brd 172.21.255.255 scope global br-1c9c92bad510
+        # 'scope global' filters out localhost address
         ip_address_list = [
             IPNetwork(line.split()[1]).ip
             for line in output.splitlines()
             ]
-        # Skip first address - usually this is NATed one. Although this is not really guaranteed anywhere.
+        # To be consistent with windows version:
+        # skip first address - usually this is NATed one. Although this is not really guaranteed anywhere.
         return ip_address_list[1:]
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
