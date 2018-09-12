@@ -34,7 +34,6 @@ namespace cdb {
 using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
-    const conf::Settings& settings,
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree,
@@ -45,8 +44,6 @@ AuthenticationManager::AuthenticationManager(
     m_transportSecurityManager(accessBlocker),
     m_authDataProviders(std::move(authDataProviders))
 {
-    if (auto userLockerSettings = settings.loginLockout())
-        m_userLocker = std::make_unique<network::server::UserLockerPool>(*userLockerSettings);
 }
 
 void AuthenticationManager::authenticate(
@@ -57,13 +54,16 @@ void AuthenticationManager::authenticate(
     detail::AuthenticationHelper authenticatorHelper(
         m_authRestrictionList,
         m_transportSecurityManager,
-        m_userLocker.get(),
         connection,
         request,
         std::move(handler));
 
     if (authenticatorHelper.userLocked())
-        return authenticatorHelper.reportFailure(api::ResultCode::accountBlocked);
+    {
+        return authenticatorHelper.reportFailure(
+            AuthenticationType::other,
+            api::ResultCode::accountBlocked);
+    }
 
     authenticatorHelper.queryStaticAuthenticationRulesTree(m_stree);
     if (authenticatorHelper.authenticatedByStaticRules())
@@ -72,6 +72,7 @@ void AuthenticationManager::authenticate(
     if (!authenticatorHelper.requestContainsValidDigest())
     {
         return authenticatorHelper.reportFailure(
+            AuthenticationType::other,
             api::ResultCode::notAuthorized,
             prepareWwwAuthenticateHeader());
     }
@@ -89,7 +90,9 @@ void AuthenticationManager::authenticate(
     }
     else
     {
-        return authenticatorHelper.reportFailure(authResultCode);
+        return authenticatorHelper.reportFailure(
+            AuthenticationType::credentials,
+            authResultCode);
     }
 }
 
@@ -127,14 +130,12 @@ namespace detail {
 AuthenticationHelper::AuthenticationHelper(
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     AccessBlocker* accessBlocker,
-    network::server::UserLockerPool* userLocker,
     const nx::network::http::HttpServerConnection& connection,
     const nx::network::http::Request& request,
     nx::network::http::server::AuthenticationCompletionHandler handler)
     :
     m_authRestrictionList(authRestrictionList),
     m_transportSecurityManager(accessBlocker),
-    m_userLocker(userLocker),
     m_connection(connection),
     m_request(request),
     m_handler(std::move(handler))
@@ -173,13 +174,7 @@ const std::optional<header::DigestAuthorization>& AuthenticationHelper::authzHea
 
 bool AuthenticationHelper::userLocked() const
 {
-    if (!m_username.empty() && m_userLocker && m_userLocker->isLocked(m_userLockKey))
-        return true;
-
-    if (m_transportSecurityManager->isBlocked(m_connection, m_username, m_request))
-        return true;
-
-    return false;
+    return m_transportSecurityManager->isBlocked(m_connection, m_username);
 }
 
 void AuthenticationHelper::reportSuccess(
@@ -198,13 +193,14 @@ void AuthenticationHelper::reportSuccess(
 }
 
 void AuthenticationHelper::reportFailure(
+    AuthenticationType authenticationType,
     api::ResultCode resultCode,
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
     m_transportSecurityManager->onAuthenticationFailure(
+        authenticationType,
         m_connection,
-        m_username,
-        m_request);
+        m_username);
 
     nx::utils::swapAndCall(
         m_handler,
@@ -271,8 +267,6 @@ api::ResultCode AuthenticationHelper::authenticateRequestDigest(
     const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
     nx::utils::stree::ResourceContainer* const authProperties)
 {
-    using AuthResult = nx::network::server::AuthResult;
-
     api::ResultCode authResultCode = api::ResultCode::notAuthorized;
     if (streeQueryFoundPasswordMatchesRequestDigest())
     {
@@ -284,11 +278,6 @@ api::ResultCode AuthenticationHelper::authenticateRequestDigest(
             authDataProviders,
             authProperties);
     }
-
-    if (authResultCode == api::ResultCode::ok)
-        updateUserLockoutState(AuthResult::success);
-    else if (authResultCode == api::ResultCode::notAuthorized) //< I.e., wrong digest.
-        updateUserLockoutState(AuthResult::failure);
 
     return authResultCode;
 }
@@ -354,7 +343,6 @@ bool AuthenticationHelper::validateNonce(
     return nonce.size() < 31;
 }
 
-
 bool AuthenticationHelper::streeQueryFoundPasswordMatchesRequestDigest()
 {
     if (auto foundHa1 = m_authTraversalResult.get(attr::ha1))
@@ -416,30 +404,6 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
     }
 
     return api::ResultCode::notAuthorized;
-}
-
-void AuthenticationHelper::updateUserLockoutState(
-    network::server::AuthResult authResult)
-{
-    if (!m_userLocker)
-        return;
-
-    switch (m_userLocker->updateLockoutState(m_userLockKey, authResult))
-    {
-        case nx::network::server::LockUpdateResult::locked:
-            NX_WARNING(this, lm("Login %1 blocked for host %2 for %3")
-                .args(std::get<1>(m_userLockKey), std::get<0>(m_userLockKey),
-                    m_userLocker->settings().lockPeriod));
-            break;
-
-        case nx::network::server::LockUpdateResult::unlocked:
-            NX_INFO(this, lm("Login %1 unblocked for host %2")
-                .args(std::get<1>(m_userLockKey), std::get<0>(m_userLockKey)));
-            break;
-
-        case nx::network::server::LockUpdateResult::noChange:
-            break;
-    }
 }
 
 } // namespace detail
