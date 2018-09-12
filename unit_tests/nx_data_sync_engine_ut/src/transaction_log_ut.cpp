@@ -67,7 +67,7 @@ public:
         insertRandomSystem(getAccount(0));
 
         // Initializing system's transaction log.
-        const nx::String systemId = getSystem(0).id.c_str();
+        const std::string systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
             std::bind(&data_sync_engine::TransactionLog::updateTimestampHiForSystem,
                 m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));

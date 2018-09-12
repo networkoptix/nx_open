@@ -49,12 +49,12 @@ private:
 
     nx::sql::DBResult processSaveCustomer(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<Customer> command);
 
     nx::sql::DBResult processRemoveCustomer(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<Id> command);
 };
 

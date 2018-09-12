@@ -188,7 +188,7 @@ private:
     void removeConnection(const std::string& connectionId);
 
     void onGotTransaction(
-        const nx::String& connectionId,
+        const std::string& connectionId,
         Qn::SerializationFormat tranFormat,
         QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);

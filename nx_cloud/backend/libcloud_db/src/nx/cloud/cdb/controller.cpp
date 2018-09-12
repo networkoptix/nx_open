@@ -242,7 +242,7 @@ void Controller::initializeDataSynchronizationEngine()
         <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
-                const nx::String& /*systemId*/,
+                const std::string& /*systemId*/,
                 data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);

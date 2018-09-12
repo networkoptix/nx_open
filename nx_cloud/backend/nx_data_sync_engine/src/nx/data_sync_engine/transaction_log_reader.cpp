@@ -7,7 +7,7 @@ namespace data_sync_engine {
 
 TransactionLogReader::TransactionLogReader(
     TransactionLog* const transactionLog,
-    nx::String systemId,
+    const std::string& systemId,
     Qn::SerializationFormat dataFormat)
     :
     m_transactionLog(transactionLog),
@@ -91,7 +91,7 @@ vms::api::TranState TransactionLogReader::getCurrentState() const
     return m_transactionLog->getTransactionState(m_systemId);
 }
 
-nx::String TransactionLogReader::systemId() const
+std::string TransactionLogReader::systemId() const
 {
     return m_systemId;
 }

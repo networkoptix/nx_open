@@ -100,7 +100,7 @@ void ConnectionManager::dispatchTransaction(
     std::size_t connectionCount = 0;
     std::array<AbstractTransactionTransport*, 7> connectionsToSendTo;
     for (auto connectionIt = connectionBySystemIdAndPeerIdIndex
-            .lower_bound(FullPeerName{systemId, nx::String()});
+            .lower_bound(FullPeerName{systemId, std::string()});
         connectionIt != connectionBySystemIdAndPeerIdIndex.end()
             && connectionIt->fullPeerName.systemId == systemId;
         ++connectionIt)
@@ -242,7 +242,7 @@ bool ConnectionManager::addNewConnection(
     context.connection->setOnGotTransaction(
         std::bind(
             &ConnectionManager::onGotTransaction, this,
-            context.connection->connectionGuid().toByteArray(), _1, _2, _3));
+            context.connection->connectionGuid().toByteArray().toStdString(), _1, _2, _3));
 
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Adding new transaction connection %1 from %2")
             .arg(context.connectionId)
@@ -398,7 +398,7 @@ void ConnectionManager::removeConnection(const std::string& connectionId)
 }
 
 void ConnectionManager::onGotTransaction(
-    const nx::String& connectionId,
+    const std::string& connectionId,
     Qn::SerializationFormat tranFormat,
     QByteArray serializedTransaction,
     TransactionTransportHeader transportHeader)
@@ -410,7 +410,7 @@ void ConnectionManager::onGotTransaction(
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             ResultCode resultCode)
         {
-            onTransactionDone(connectionId.toStdString(), resultCode);
+            onTransactionDone(connectionId, resultCode);
         });
 }
 

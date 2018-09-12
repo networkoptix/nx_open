@@ -11,7 +11,7 @@ namespace data_sync_engine {
 namespace test {
 
 void TestOutgoingTransactionDispatcher::dispatchTransaction(
-    const nx::String& systemId,
+    const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     const auto delayMillis = nx::utils::random::number<int>(

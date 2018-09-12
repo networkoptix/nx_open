@@ -71,7 +71,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
 
 nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
     nx::sql::QueryContext* /*queryContext*/,
-    const nx::String& /*systemId*/,
+    const std::string& /*systemId*/,
     quint64 /*newValue*/)
 {
     return nx::sql::DBResult::ok;
@@ -79,7 +79,7 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
 
 nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     nx::sql::QueryContext* /*queryContext*/,
-    const nx::String& systemId,
+    const std::string& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
     std::int64_t minSequence,

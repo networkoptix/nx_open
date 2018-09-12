@@ -110,7 +110,7 @@ nx::sql::DBResult CustomerManager::removeCustomerFromDb(
 
 nx::sql::DBResult CustomerManager::processSaveCustomer(
     nx::sql::QueryContext* queryContext,
-    const nx::String& /*systemId*/,
+    const std::string& /*systemId*/,
     data_sync_engine::Command<Customer> command)
 {
     m_customerDao->saveCustomer(queryContext, command.params);
@@ -119,7 +119,7 @@ nx::sql::DBResult CustomerManager::processSaveCustomer(
 
 nx::sql::DBResult CustomerManager::processRemoveCustomer(
     nx::sql::QueryContext* queryContext,
-    const nx::String& /*systemId*/,
+    const std::string& /*systemId*/,
     data_sync_engine::Command<Id> command)
 {
     m_customerDao->removeCustomer(queryContext, command.params.id);

@@ -211,7 +211,7 @@ public:
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction)>;
+            nx::sql::QueryContext*, std::string /*systemId*/, Ec2Transaction)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
