@@ -29,13 +29,14 @@ NX_UTILS_API void crashProgram();
 template<typename Reason>
 log::Message assertLog(const char* file, int line, const char* condition, const Reason& message)
 {
-   #if defined(ANDROID) || defined(__ANDROID__)
-       const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
-           .arg(file).arg(line).arg(condition).arg(message).arg(buildBacktrace());
-   #else
+    // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
+    #if defined(ANDROID) || defined(__ANDROID__)
+        const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
+            .arg(file).arg(line).arg(condition).arg(message).arg(buildBacktrace());
+    #else
         const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4")
             .arg(file).arg(line).arg(condition).arg(message);
-   #endif
+    #endif
 
     logAssert(out);
     return out;
@@ -47,11 +48,11 @@ void assertCrash(const char* file, int line, const char* condition, const Reason
     std::cerr << std::endl << ">>>"
         << assertLog(file, line, condition, message).toStdString() << std::endl;
 
-    #ifdef _WIN32
-        // Copy error text to stack variable so it is present in mini dump.
-        char textOnStack[256] = { 0 };
+    #if defined(_WIN32)
+        // Copy error text to a stack variable so it is present in the mini-dump.
+        char textOnStack[256] = {0};
         const auto text = lm("%1").arg(message).toStdString();
-        std::memcpy(textOnStack, text.c_str(), std::min(text.size() + 1, sizeof(textOnStack)));
+        strncpy(textOnStack, text.c_str(), sizeof(textOnStack) - 1);
     #endif
 
     crashProgram();
