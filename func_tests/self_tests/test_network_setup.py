@@ -4,7 +4,7 @@ import pytest
 from contextlib2 import ExitStack
 from netaddr import IPAddress, IPNetwork
 
-from framework.networking import setup_flat_network, setup_networks
+from framework.vms.networks import setup_flat_network, setup_networks
 from framework.waiting import wait_for_truthy
 
 pytest_plugins = ['fixtures.big_flat_networks']

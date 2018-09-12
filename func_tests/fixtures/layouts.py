@@ -3,8 +3,8 @@ from contextlib2 import ExitStack
 from pathlib2 import Path
 
 from framework.merging import setup_system
-from framework.networking import setup_networks
 from framework.serialize import load
+from framework.vms.networks import setup_networks
 
 _layout_files_dir = Path(__file__).with_name('layout_files')
 
