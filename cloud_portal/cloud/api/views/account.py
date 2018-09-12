@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_ip(request):
-    x_forward_ip = request.META.get('HTTP_X_REAL_IP')
+    x_forward_ip = request.META.get('HTTP_X_FORWARDED_FOR')
     user = request.session['email'] if 'email' in request.session else ""
     if not user:
         user = request.data['email'] if 'email' in request.data else ""
