@@ -7,7 +7,7 @@ namespace utils {
 
 struct NX_UTILS_API PasswordLimitations
 {
-    /** Maximum length of a password. */
+    /** Minimum length of a password. */
     static constexpr int kMinimumLength = 8;
 
     /** Maximum length of any password. */
