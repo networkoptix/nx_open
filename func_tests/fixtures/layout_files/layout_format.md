@@ -129,14 +129,14 @@ Merging scheme is not tree-like as networks scheme. It has fixed number of level
 
 ```{.yaml}
 mergers:
-  remote:  # Root URL of this server is sent in HTTP request.
-    local:  # HTTP request goes to this server.
-      settings: remote  # Optional.
-      network: 10.254.1.0/24  # Required if there are many interfaces in `remote`.
-    another_local:
-    one_more_local:
-  one_more_remote:
-    local:
-    settings: remote
+- local: first # HTTP request goes to this server.
+  remote: second  # Root URL of this server is sent in HTTP request.
+  settings: remote  # Optional.
+  network: 10.254.1.0/24  # Optional. Required if there are many interfaces on `remote`.
+- local: first
+  remote: third
+- local: first
+  remote: fourth
+  settings: remote
 ```
 
