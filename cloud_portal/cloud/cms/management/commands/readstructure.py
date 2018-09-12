@@ -135,8 +135,8 @@ class Command(BaseCommand):
            'the database (contexts, datastructure)'
 
     def add_arguments(self, parser):
-        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
         parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
+        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
 
     def handle(self, *args, **options):
         customization = options['customization']
