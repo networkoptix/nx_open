@@ -82,8 +82,8 @@ void WebSocketTransactionTransport::onGotMessage(
         {
             TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
             cdbTransportHeader.endpoint = remoteSocketAddr();
-            cdbTransportHeader.systemId = m_transactionLogReader->systemId();
-            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
+            cdbTransportHeader.systemId = m_transactionLogReader->systemId().toStdString();
+            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
             cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
             m_gotTransactionEventHandler(

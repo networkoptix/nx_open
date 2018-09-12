@@ -80,7 +80,7 @@ ConnectionManager::~ConnectionManager()
 }
 
 void ConnectionManager::dispatchTransaction(
-    const nx::String& systemId,
+    const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Dispatching transaction %2")
@@ -173,7 +173,7 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
     const auto& connectionBySystemIdAndPeerIdIndex =
         m_connections.get<kConnectionByFullPeerNameIndex>();
     const auto systemIter = connectionBySystemIdAndPeerIdIndex.lower_bound(
-        FullPeerName{nx::String(systemId.c_str()), nx::String()});
+        FullPeerName{systemId, std::string()});
 
     return
         systemIter != connectionBySystemIdAndPeerIdIndex.end() &&
@@ -188,7 +188,7 @@ unsigned int ConnectionManager::getConnectionCountBySystemId(
 }
 
 void ConnectionManager::closeConnectionsToSystem(
-    const nx::String& systemId,
+    const std::string& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing all connections to system %1").args(systemId));
@@ -201,7 +201,7 @@ void ConnectionManager::closeConnectionsToSystem(
     auto& connectionBySystemIdAndPeerIdIndex =
         m_connections.get<kConnectionByFullPeerNameIndex>();
     auto it = connectionBySystemIdAndPeerIdIndex.lower_bound(
-        FullPeerName{systemId, nx::String()});
+        FullPeerName{systemId, std::string()});
     while (it != connectionBySystemIdAndPeerIdIndex.end() &&
            it->fullPeerName.systemId == systemId)
     {

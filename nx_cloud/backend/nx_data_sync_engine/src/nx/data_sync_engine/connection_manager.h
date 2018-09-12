@@ -116,7 +116,7 @@ public:
      * Dispatches transaction to corresponding peers.
      */
     void dispatchTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     std::vector<SystemConnectionInfo> getConnections() const;
@@ -126,7 +126,7 @@ public:
     unsigned int getConnectionCountBySystemId(const std::string& systemId) const;
 
     void closeConnectionsToSystem(
-        const nx::String& systemId,
+        const std::string& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     SystemStatusChangedSubscription& systemStatusChangedSubscription();

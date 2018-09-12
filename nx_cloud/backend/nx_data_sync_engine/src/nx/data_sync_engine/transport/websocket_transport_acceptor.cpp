@@ -114,8 +114,8 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
 
     ConnectionManager::ConnectionContext context{
         std::move(transactionTransport),
-        connectionId.toSimpleByteArray(),
-        {systemId.c_str(), remotePeerInfo.id.toByteArray()},
+        connectionId.toSimpleByteArray().toStdString(),
+        {systemId, remotePeerInfo.id.toByteArray().toStdString()},
         userAgent};
 
     if (!m_connectionManager->addNewConnection(

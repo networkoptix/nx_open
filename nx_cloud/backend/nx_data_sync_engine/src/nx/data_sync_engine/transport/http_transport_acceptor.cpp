@@ -171,7 +171,7 @@ bool HttpTransportAcceptor::fetchDataFromConnectRequest(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
         return false;
-    connectionRequestAttributes->connectionId = connectionIdIter->second;
+    connectionRequestAttributes->connectionId = connectionIdIter->second.toStdString();
 
     if (!nx::network::http::readHeader(
             request.headers,
@@ -295,9 +295,10 @@ void HttpTransportAcceptor::postTransactionToTransport(
         dynamic_cast<TransactionTransport*>(transportConnection);
     if (!transactionTransport)
     {
-        foundConnectionOfExpectedType = false;
+        *foundConnectionOfExpectedType = false;
         return;
     }
+    *foundConnectionOfExpectedType = true;
 
     transactionTransport->post(
         [transactionTransport,

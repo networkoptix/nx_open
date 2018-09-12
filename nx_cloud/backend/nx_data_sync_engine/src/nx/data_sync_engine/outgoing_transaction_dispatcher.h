@@ -17,7 +17,7 @@ public:
     virtual ~AbstractOutgoingTransactionDispatcher() = default;
 
     virtual void dispatchTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) = 0;
 };
 
@@ -29,13 +29,13 @@ class NX_DATA_SYNC_ENGINE_API OutgoingTransactionDispatcher:
 {
 public:
     typedef nx::utils::Subscription<
-        const nx::String&,
+        const std::string&,
         std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
 
     OutgoingTransactionDispatcher();
 
     virtual void dispatchTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     OnNewTransactionSubscription& onNewTransactionSubscription();
