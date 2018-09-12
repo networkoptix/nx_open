@@ -17,7 +17,7 @@ from framework.http_api import HttpError
 from . import stage
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
-from helper_functions import ffprobe, metadata, configure_video, configure_audio
+from .camera_actions import ffprobe_streams, ffprobe_metadata, configure_video, configure_audio
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
@@ -99,10 +99,11 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                     profile, archive_url))
 
                 while True:
-                    streams = ffprobe(archive_url)
+                    streams = ffprobe_streams(archive_url)
                     if not streams:
+                        yield Failure('FFprobe returned no valid stream info')
                         continue
-                    yield expect_values(configuration, metadata(streams[0]), '{}'.format(profile))
+                    yield expect_values(configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
 
 
 @_stage(timeout=timedelta(minutes=6))
@@ -113,12 +114,12 @@ def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gener
             configure_video(
                 run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
             while True:
-                streams = ffprobe(stream_url)
+                streams = ffprobe_streams(stream_url)
                 if not streams:
                     continue
 
                 yield expect_values(
-                    configuration, metadata(streams[0]), '{}[{}]'.format(profile, index))
+                    configuration, ffprobe_metadata(streams[0]), '{}[{}]'.format(profile, index))
 
     yield Success()
 
@@ -138,7 +139,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
-                    streams = ffprobe(run.media_url)
+                    streams = ffprobe_streams(run.media_url)
                     if not streams:
                         continue
                     audio_stream = streams[1]

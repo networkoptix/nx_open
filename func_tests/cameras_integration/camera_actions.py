@@ -3,6 +3,10 @@
 import os
 import logging
 import json
+import subprocess
+
+from framework.os_access.local_shell import local_shell
+from framework.os_access.exceptions import Timeout, NonZeroExitStatus
 
 _logger = logging.getLogger(__name__)
 
@@ -17,14 +21,18 @@ def _fps_avg(fps):
     return fps_average
 
 
-def ffprobe(stream_url):
-    args = '-show_format -show_streams -of json'
-    dir_path = os.path.dirname(os.path.abspath(__file__))
-    out = os.popen('{}/ffprobe.sh {} {}'.format(dir_path, args, stream_url)).read()
-
-    if out == 1:
-        _logger.debug("FFprobe is hanging. Killing FFprobe")
+def ffprobe_streams(stream_url):
+    try:
+        out = local_shell.run_sh_script(
+            #language=Bash
+            '''
+                ffprobe -show_format -show_streams -of json "$URL"
+                ''',
+            env={'URL': stream_url}, timeout_sec=10)
+    except (AssertionError, Timeout, NonZeroExitStatus) as error:
+        _logger.debug("FFprobe error: %s", str(error))
         return
+
     try:
         result = json.loads(out.decode('utf-8'))
     except ValueError:
@@ -33,11 +41,10 @@ def ffprobe(stream_url):
     if not result:
         _logger.debug("FFprobe returned None")
         return
-
     return result.get('streams')
 
 
-def metadata(stream):
+def ffprobe_metadata(stream):
     fps = int(stream['r_frame_rate'].split('/')[0]) / int(stream['r_frame_rate'].split('/')[1])
     metadata = {
         'resolution': '{}x{}'.format(stream['width'], stream['height']),

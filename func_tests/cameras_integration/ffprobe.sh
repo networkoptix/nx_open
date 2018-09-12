@@ -2,7 +2,7 @@
 
 ffprobe "$@" & pid=$!
 for i in `seq 1 150`; do
-    if ps aux | awk '{print $2}' | grep $pid; then
+    if ps aux | awk '{print $2}' | grep $pid >/dev/null 2>&1; then
         sleep 0.1
     else
         exit 0
