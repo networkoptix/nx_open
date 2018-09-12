@@ -81,6 +81,8 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Elements Are Visible    ${DISCONNECT MODAL WARNING}    ${DISCONNECT MODAL DISCONNECT BUTTON}
     Click Button    ${DISCONNECT MODAL DISCONNECT BUTTON}
+    ${SYSYEM DELETED FROM ACCOUNT}    Replace String    ${SYSYEM DELETED FROM ACCOUNT}    {{message.system_name}}    ${AUTO TESTS}
+    Check For Alert    ${SYSYEM DELETED FROM ACCOUNT}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
     Log Out
     Log In    ${EMAIL OWNER}    ${password}
