@@ -22,8 +22,8 @@
                 LicenseUrl="license.html"
                 ShowFilesInUse="yes"
                 SuppressRepair="yes"
-                ThemeFile="theme.xml"
-                LocalizationFile="$(var.sourceDirectory)/theme_$(var.installerLanguage).wxl"
+                ThemeFile="$(var.themeFile)"
+                LocalizationFile="$(var.localizationFile)"
                 SuppressDowngradeFailure="yes"/>
         </BootstrapperApplicationRef>
 

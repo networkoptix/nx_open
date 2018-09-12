@@ -1,5 +1,7 @@
 set(installerLanguage "en_US")
 set(installerMsiFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.msi")
+set(themeFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme.xml")
+set(localizationFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme_${installerLanguage}.wxl")
 
 if(codeSigning)
     set(installerUnsignedExeFile "${CMAKE_CURRENT_BINARY_DIR}/${paxton_plugin_distribution_name}-unsigned.exe")
@@ -8,7 +10,6 @@ else()
 endif()
 
 nx_configure_file(app_info.wxi.in ${CMAKE_CURRENT_BINARY_DIR}/app_info.wxi)
-nx_configure_file(theme.xml.in ${CMAKE_CURRENT_BINARY_DIR}/theme.xml)
 
 add_custom_command(
     OUTPUT package.wixobj
@@ -46,7 +47,7 @@ add_custom_command(
     MAIN_DEPENDENCY
         ${CMAKE_CURRENT_SOURCE_DIR}/bundle.wxs
     DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/theme_${installerLanguage}.wxl
+        ${localizationFile}
         ${CMAKE_CURRENT_BINARY_DIR}/app_info.wxi
 )
 
@@ -61,7 +62,7 @@ add_custom_command(
     MAIN_DEPENDENCY
         bundle.wixobj
     DEPENDS
-        ${CMAKE_CURRENT_BINARY_DIR}/theme.xml
+        ${themeFile}
         ${installerMsiFile}
 )
 

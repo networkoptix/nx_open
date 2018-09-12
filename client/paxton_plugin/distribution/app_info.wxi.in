@@ -12,7 +12,8 @@
         <?define libraryName = "${paxtonDriverOutputName}"?>
         <?define binariesDirectory = "${bin_source_dir}"?>
         <?define installerLanguage = "${installerLanguage}"?>
-        <?define sourceDirectory = "${CMAKE_CURRENT_SOURCE_DIR}"?>
         <?define installerMsiFile = "${installerMsiFile}"?>
+        <?define themeFile = "${themeFile}"?>
+        <?define localizationFile = "${localizationFile}"?>
      <?endif?>
 </Include>
