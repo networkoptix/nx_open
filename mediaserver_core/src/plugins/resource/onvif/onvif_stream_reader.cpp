@@ -411,10 +411,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         {
             //LOG.
             if (veConfigurations.innerWrapper().isNotAuthenticated())
-            {
                 return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
-            }
-            return veConfigurations.requestFailedResult();
+            else
+                return veConfigurations.requestFailedResult();
         }
 
         // The pointer currentVEConfig points to the object that is valid until
@@ -450,12 +449,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         if (!veConfigurations)
         {
             //LOG.
-            if (veConfigurations.innerWrapper().isNotAuthenticated() && canChangeStatus())
-            {
-                m_onvifRes->setStatus(Qn::Unauthorized);
+            if (veConfigurations.innerWrapper().isNotAuthenticated())
                 return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
-            }
-            return veConfigurations.requestFailedResult();
+            else
+                return veConfigurations.requestFailedResult();
         }
 
         // The pointer currentVEConfig points to the object that is valid until
