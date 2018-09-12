@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 from contextlib2 import ExitStack
 from netaddr import IPAddress, IPNetwork
@@ -6,6 +8,8 @@ from framework.networking import setup_flat_network, setup_networks
 from framework.waiting import wait_for_truthy
 
 pytest_plugins = ['fixtures.big_flat_networks']
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
@@ -63,11 +67,13 @@ def test_setup_basic(allocate_machine, hypervisor):
 
 def test_two_vms(two_vms, hypervisor):
     first_vm, second_vm = two_vms
-    for first_vm_ip in first_vm.ip_address_list:
+    for first_vm_ip in first_vm.os_access.networking.list_ips():
+        _logger.info('Checking first vm ip address: %r', first_vm_ip)
         wait_for_truthy(
             lambda: second_vm.os_access.networking.can_reach(first_vm_ip),
             "{} can reach {} by {}".format(second_vm, first_vm, first_vm_ip))
-    for second_vm_ip in second_vm.ip_address_list:
+    for second_vm_ip in second_vm.os_access.networking.list_ips():
+        _logger.info('Checking second vm ip address: %r', second_vm_ip)
         wait_for_truthy(
             lambda: first_vm.os_access.networking.can_reach(second_vm_ip),
             "{} can reach {} by {}".format(first_vm, second_vm, second_vm_ip))

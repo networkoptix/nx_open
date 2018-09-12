@@ -77,5 +77,4 @@ def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup 
         mac = machine.hardware.plug_internal(network_uuid)
         ip_address = host_ips[machine.alias]
         machine.os_access.networking.setup_ip(mac, ip_address, network_ip.prefixlen)
-        machine.ip_address_list.append(ip_address)
     return host_ips
