@@ -88,7 +88,7 @@ private:
     std::unique_ptr<nx::network::http::AuthMethodRestrictionList> m_authRestrictionList;
     std::unique_ptr<AuthenticationManager> m_authenticationManager;
     std::unique_ptr<AuthorizationManager> m_authorizationManager;
-    std::unique_ptr<TransportSecurityManager> m_transportSecurityManager;
+    std::unique_ptr<AccessBlocker> m_transportSecurityManager;
     std::unique_ptr<SecurityManager> m_securityManager;
 
     void performDataMigrations();

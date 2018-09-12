@@ -7,9 +7,8 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
 
 #include "libcloud_db_app_info.h"
 
@@ -192,7 +191,7 @@ VmsGateway::VmsGateway():
 
 Settings::Settings():
     base_type(
-        QnAppInfo::organizationNameForSettings(),
+        nx::utils::AppInfo::organizationNameForSettings(),
         QnLibCloudDbAppInfo::applicationName(),
         kModuleName)
 {
@@ -292,6 +291,11 @@ const Http& Settings::http() const
 const VmsGateway& Settings::vmsGateway() const
 {
     return m_vmsGateway;
+}
+
+const LoginEnumerationProtectionSettings& Settings::loginEnumerationProtectionSettings() const
+{
+    return m_loginEnumerationProtectionSettings;
 }
 
 void Settings::setDbConnectionOptions(

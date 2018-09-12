@@ -6,17 +6,16 @@
 
 #include <nx/network/connection_server/user_locker.h>
 #include <nx/network/socket_common.h>
+#include <nx/sql/types.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
-#include <nx/sql/types.h>
 #include <nx/utils/std/optional.h>
 
 #include <nx/data_sync_engine/p2p_sync_settings.h>
 
-#include <utils/common/command_line_parser.h>
-#include <utils/email/email.h>
+#include "access_control/login_enumeration_protector.h"
 
 namespace nx {
 namespace cdb {
@@ -151,6 +150,7 @@ public:
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
     const VmsGateway& vmsGateway() const;
+    const LoginEnumerationProtectionSettings& loginEnumerationProtectionSettings() const;
 
     void setDbConnectionOptions(const nx::sql::ConnectionOptions& options);
 
@@ -169,6 +169,7 @@ private:
     ModuleFinder m_moduleFinder;
     Http m_http;
     VmsGateway m_vmsGateway;
+    LoginEnumerationProtectionSettings m_loginEnumerationProtectionSettings;
 
     virtual void loadSettings() override;
 

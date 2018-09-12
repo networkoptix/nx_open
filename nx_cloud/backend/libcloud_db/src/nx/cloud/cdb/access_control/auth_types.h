@@ -19,6 +19,12 @@ enum class AccessRole
     cloudDB,
 };
 
+enum class AuthenticationType
+{
+    credentials,
+    other,
+};
+
 /**
  * Contains information about authenticated user.
  * NOTE: This information plus requested action type is enough to perform authorization.

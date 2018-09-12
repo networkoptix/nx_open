@@ -11,6 +11,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 
 #include "auth_types.h"
+#include "transport_security_manager.h"
 #include "../settings.h"
 
 namespace nx {
@@ -47,7 +48,8 @@ public:
         const conf::Settings& settings,
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-        const StreeManager& stree);
+        const StreeManager& stree,
+        AccessBlocker* transportSecurityManager);
 
     virtual void authenticate(
         const nx::network::http::HttpServerConnection& connection,
@@ -59,6 +61,7 @@ public:
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
+    AccessBlocker* m_transportSecurityManager;
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
     std::unique_ptr<network::server::UserLockerPool> m_userLocker;
 
@@ -73,6 +76,7 @@ class AuthenticationHelper
 public:
     AuthenticationHelper(
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
+        AccessBlocker* transportSecurityManager,
         network::server::UserLockerPool* userLocker,
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
@@ -84,6 +88,7 @@ public:
     bool userLocked() const;
 
     void reportSuccess(
+        AuthenticationType authenticationType,
         std::optional<nx::utils::stree::ResourceContainer> authProperties = std::nullopt);
 
     void reportFailure(
@@ -104,6 +109,7 @@ public:
 
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
+    AccessBlocker* m_transportSecurityManager;
     network::server::UserLockerPool* m_userLocker;
     const nx::network::http::HttpServerConnection& m_connection;
     const nx::network::http::Request& m_request;

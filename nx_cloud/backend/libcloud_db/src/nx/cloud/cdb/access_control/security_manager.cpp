@@ -5,7 +5,7 @@ namespace nx::cdb {
 SecurityManager::SecurityManager(
     AuthenticationManager* authenticator,
     const AuthorizationManager& authorizer,
-    const TransportSecurityManager& transportSecurityManager)
+    const AccessBlocker& transportSecurityManager)
     :
     m_authenticator(authenticator),
     m_authorizer(authorizer),
@@ -23,7 +23,7 @@ const AuthenticationManager& SecurityManager::authenticator() const
     return *m_authenticator;
 }
 
-const TransportSecurityManager& SecurityManager::transportSecurityManager() const
+const AccessBlocker& SecurityManager::transportSecurityManager() const
 {
     return m_transportSecurityManager;
 }
