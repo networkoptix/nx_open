@@ -688,6 +688,12 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
         if (peer == localPeer)
             continue;
 
+        if (auto connection = findConnectionById(peer))
+        {
+            if (connection->remotePeer().isClient())
+                continue;
+        }
+
         //auto subscribedVia = currentSubscription.value(peer);
         while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
             ++currentSubscriptionItr;
