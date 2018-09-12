@@ -245,9 +245,9 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::analyticsSdkEvent:
             if (!params.caption.isEmpty())
             {
-                return lit("%1 - %2")
-                    .arg(getAnalyticsSdkEventName(params))
-                    .arg(params.caption);
+                const auto eventName = getAnalyticsSdkEventName(params);
+                NX_ASSERT(!eventName.isEmpty());
+                return lit("%1 - %2").arg(eventName).arg(params.caption);
             }
 
             return tr("%1 at %2", "Analytics Event at some camera")
