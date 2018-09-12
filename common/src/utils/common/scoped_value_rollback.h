@@ -1,5 +1,4 @@
-#ifndef QN_SCOPED_VALUE_ROLLBACK_H
-#define QN_SCOPED_VALUE_ROLLBACK_H
+#pragma once
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QObject>
@@ -13,7 +12,6 @@
 #endif
 
 #include "typed_accessors.h"
-
 
 class QnGenericScopedValueRollbackBase {};
 
@@ -29,7 +27,9 @@ public:
     {
     }
 
-    QnGenericScopedValueRollback(Object* object, Setter&& setter, const Getter& getter, const T& newValue):
+    QnGenericScopedValueRollback(
+        Object* object, Setter&& setter, const Getter& getter, const T& newValue)
+        :
         m_object(object),
         m_setter(std::forward<Setter>(setter)),
         m_rollbackValue(getter(object)),
@@ -105,10 +105,11 @@ namespace detail {
 } // namespace detail
 
 template<class T>
-class QnScopedValueRollback: public QnGenericScopedValueRollback<T, T, detail::VariableSetterGetter, detail::VariableSetterGetter>
+class QnScopedValueRollback: public QnGenericScopedValueRollback<
+    T, T, ::detail::VariableSetterGetter, ::detail::VariableSetterGetter>
 {
-    typedef detail::VariableSetterGetter sg_type;
-    typedef QnGenericScopedValueRollback<T, T, sg_type, sg_type> base_type;
+    using sg_type = ::detail::VariableSetterGetter;
+    using base_type = QnGenericScopedValueRollback<T, T, sg_type, sg_type>;
 
 public:
     QnScopedValueRollback(T *variable):
@@ -123,9 +124,11 @@ public:
 };
 
 
-class QnScopedPropertyRollback: public QnGenericScopedValueRollback<QVariant, QObject, detail::PropertySetterGetter, detail::PropertySetterGetter> {
-    typedef detail::PropertySetterGetter sg_type;
-    typedef QnGenericScopedValueRollback<QVariant, QObject, sg_type, sg_type> base_type;
+class QnScopedPropertyRollback: public QnGenericScopedValueRollback<
+    QVariant, QObject, ::detail::PropertySetterGetter, ::detail::PropertySetterGetter>
+{
+    using sg_type = ::detail::PropertySetterGetter;
+    using base_type = QnGenericScopedValueRollback<QVariant, QObject, sg_type, sg_type>;
 
 public:
     QnScopedPropertyRollback(QObject *object, const char *name):
@@ -140,13 +143,15 @@ public:
 };
 
 template<class T, class Object>
-class QnScopedTypedPropertyRollback : public QnGenericScopedValueRollback<T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>>
+class QnScopedTypedPropertyRollback: public QnGenericScopedValueRollback<
+    T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>>
 {
-    typedef QnGenericScopedValueRollback<T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>> base_type;
+    using base_type = QnGenericScopedValueRollback<
+        T, Object, QnExternalSetterAggregator<T, Object>, QnExternalGetterAggregator<T, Object>>;
 
 public:
     template<class Get, class Set>
-    QnScopedTypedPropertyRollback(Object* object, Set set, Get get) : base_type(
+    QnScopedTypedPropertyRollback(Object* object, Set set, Get get): base_type(
         object,
         new QnExternalSetter<T, Object, Set>(set),
         new QnExternalGetter<T, Object, Get>(get))
@@ -154,7 +159,7 @@ public:
     }
 
     template<class Get, class Set>
-    QnScopedTypedPropertyRollback(Object* object, Set set, Get get, const T& newValue) : base_type(
+    QnScopedTypedPropertyRollback(Object* object, Set set, Get get, const T& newValue): base_type(
         object,
         new QnExternalSetter<T, Object, Set>(set),
         new QnExternalGetter<T, Object, Get>(get),
@@ -178,5 +183,3 @@ public:
 #define QN_GENERIC_SCOPED_ROLLBACK(...)
 #define QN_SCOPED_VALUE_ROLLBACK(...)
 #endif // Q_MOC_RUN
-
-#endif // QN_SCOPED_VALUE_ROLLBACK_H
