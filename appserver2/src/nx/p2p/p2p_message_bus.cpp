@@ -690,7 +690,7 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
 
         if (auto connection = findConnectionById(peer))
         {
-            if (connection->remotePeer().isClient())
+            if (!connection->remotePeer().isServer())
                 continue;
         }
 
