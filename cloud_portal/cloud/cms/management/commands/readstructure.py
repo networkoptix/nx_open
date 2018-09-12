@@ -9,7 +9,7 @@ import json
 import codecs
 from cloud import settings
 from ...controllers import structure
-from ...models import Product, Context, Language, ContextTemplate, DataStructure, Customization
+from ...models import Product, Context, Language, ContextTemplate, DataStructure, Customization, ProductType
 from django.core.management.base import BaseCommand
 
 
@@ -47,11 +47,10 @@ def iterate_cms_files(skin_name, ignore_not_english):
                 yield file
 
 
-def find_or_add_context_by_file(file_path, product, has_language):
-    if Context.objects.filter(file_path=file_path, product=product, product_type=product.product_type).exists():
-        return Context.objects.get(file_path=file_path, product=product, product_type=product.product_type)
-    context = Context(name=file_path, file_path=file_path,
-                      product=product, product_type = product.product_type,
+def find_or_add_context_by_file(file_path, product_type, has_language):
+    if Context.objects.filter(file_path=file_path, product_type=product_type).exists():
+        return Context.objects.get(file_path=file_path, product_type=product_type)
+    context = Context(name=file_path, file_path=file_path, product_type =product_type,
                       translatable=has_language, hidden=True, is_global=False)
     context.save()
     return context
@@ -72,7 +71,7 @@ def read_cms_strings(filename):
         return data, set(re.findall(pattern, data))
 
 
-def read_structure_file(filename, product, global_strings, skin):
+def read_structure_file(filename, product_type, global_strings, skin):
     context_name, language_code = context_for_file(filename, skin)
 
     # now read file and get records from there.
@@ -84,7 +83,7 @@ def read_structure_file(filename, product, global_strings, skin):
 
     # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
-    context = find_or_add_context_by_file(context_name, product, bool(language_code))
+    context = find_or_add_context_by_file(context_name, product_type, bool(language_code))
     context_template = find_or_add_context_template(context, language_code, skin)
     context_template.template = data  # update template for this context
     context_template.save()
@@ -92,14 +91,14 @@ def read_structure_file(filename, product, global_strings, skin):
         structure.find_or_add_data_structure(string, None, context.id, bool(language_code))
 
 
-def read_structure(product_name):
-    product = Product.objects.get(name=product_name)
+def read_structure(product_type):
+    product_type = structure.find_or_add_product_type(type=product_type)
     global_strings = DataStructure.objects.\
-        filter(context__is_global=True, context__product=product).\
+        filter(context__is_global=True, context__product_type=product_type).\
         values_list("name", flat=True)
     for skin in settings.SKINS:
         for file in iterate_cms_files(skin, False):
-            read_structure_file(file, product, global_strings, skin)
+            read_structure_file(file, product_type, global_strings, skin)
 
 
 
@@ -135,22 +134,19 @@ class Command(BaseCommand):
            'the database (contexts, datastructure)'
 
     def add_arguments(self, parser):
-        parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
-        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
+        parser.add_argument('product_type', nargs='?', default='cloud_portal')
 
     def handle(self, *args, **options):
-        customization = options['customization']
-        product = options['product']
+        product_type = ProductType.get_type_by_name(options['product_type'])
         read_languages(settings.DEFAULT_SKIN)
-        if not Customization.objects.filter(name=customization).exists():
-            structure.find_or_add_product(product, True)
-            default_customization = Customization(name=customization,
+        if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
+            default_customization = Customization(name=settings.CUSTOMIZATION,
                                                   default_language=Language.by_code('en_US'),
                                                   preview_status=0)
             default_customization.save()
             default_customization.languages = [Language.by_code('en_US')]
             default_customization.save()
-        structure.read_structure_json('cms/cms_structure.json', product, customization)
-        read_structure(product)
+        structure.read_structure_json('cms/cms_structure.json')
+        read_structure(product_type)
         self.stdout.write(self.style.SUCCESS(
             'Successfully initiated data structure for CMS'))

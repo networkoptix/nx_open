@@ -3,9 +3,21 @@ import json
 import codecs
 import os
 import re
+
+from django.core.exceptions import ObjectDoesNotExist
 from cloud import settings
 from zipfile import ZipFile
 from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, ProductType
+
+
+def find_or_add_product_type(product_type):
+    try:
+        product_type = ProductType.objects.get(type=product_type)
+    except ObjectDoesNotExist:
+        product_type = ProductType(type=product_type)
+        product_type.save()
+
+    return product_type
 
 
 def find_or_add_product(name, can_preview, type=ProductType.PRODUCT_TYPES.cloud_portal):
@@ -22,19 +34,18 @@ def find_or_add_product(name, can_preview, type=ProductType.PRODUCT_TYPES.cloud_
     return product
 
 
-def find_or_add_context(context_name, old_name, product, has_language, is_global):
-    if old_name and Context.objects.filter(name=old_name, product=product, product_type=product.product_type).exists():
-        context = Context.objects.get(name=old_name, product=product, product_type=product.product_type)
+def find_or_add_context(context_name, old_name, product_type, has_language, is_global):
+    if old_name and Context.objects.filter(name=old_name, product_type=product_type).exists():
+        context = Context.objects.get(name=old_name, product_type=product_type)
         context.name = context_name
         context.save()
         return context
 
-    if Context.objects.filter(name=context_name, product=product, product_type=product.product_type).exists():
-        return Context.objects.get(name=context_name, product=product, product_type=product.product_type)
+    if Context.objects.filter(name=context_name, product_type=product_type).exists():
+        return Context.objects.get(name=context_name, product_type=product_type)
 
-    context = Context(name=context_name, file_path=context_name, product=product,
-                      product_type=product.product_type, translatable=has_language,
-                      is_global=is_global)
+    context = Context(name=context_name, file_path=context_name, product_type=product_type,
+                      translatable=has_language, is_global=is_global)
     context.save()
     return context
 
@@ -54,18 +65,11 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
     return data
 
 
-def update_from_object(cms_structure, customization_name=settings.CUSTOMIZATION):
+def update_from_object(cms_structure):
     for product in cms_structure:
-        product_name = product['product']
-        product_type = ProductType.get_type_by_name(product['type'] if 'type' in product else "")
-        can_preview = product['canPreview']
-
-        customization = Customization.objects.get(name=customization_name)
-        product_model = find_or_add_product(product_name, can_preview, product_type)
-        product_model.customizations = [customization]
-        product_model.save()
-
-        default_language = customization.default_language.code
+        product_type_name = product['type'] if 'type' in product else ""
+        print product_type_name
+        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
         order = 0
 
         for context_data in product['contexts']:
@@ -73,7 +77,7 @@ def update_from_object(cms_structure, customization_name=settings.CUSTOMIZATION)
             is_global = context_data["is_global"] if "is_global" in context_data else False
             old_name = context_data["old_name"] if "old_name" in context_data else None
             context = find_or_add_context(
-                context_data["name"], old_name, product_model, has_language, is_global)
+                context_data["name"], old_name, product_type, has_language, is_global)
             if "description" in context_data:
                 context.description = context_data["description"]
             if "file_path" in context_data:
@@ -126,7 +130,7 @@ def update_from_object(cms_structure, customization_name=settings.CUSTOMIZATION)
 
                     # this is used to convert source images into b64 strings
                     file_path = os.path.join('static', '_source', 'blue', name)
-                    file_path = file_path.replace("{{language}}", default_language)
+                    file_path = file_path.replace("{{language}}", 'en_US')
                     try:
                         with open(file_path, 'r') as file:
                             value = base64.b64encode(file.read())
@@ -138,11 +142,10 @@ def update_from_object(cms_structure, customization_name=settings.CUSTOMIZATION)
                 data_structure.save()
 
 
-def read_structure_json(filename, product_name=settings.PRIMARY_PRODUCT, customizaion_name=settings.CUSTOMIZATION):
+def read_structure_json(filename):
     with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         cms_structure = json.load(file_descriptor)
-        cms_structure[0]['product'] = product_name
-        update_from_object(cms_structure, customizaion_name)
+        update_from_object(cms_structure)
 
 
 def process_zip(file_descriptor, user, update_structure, update_content):
