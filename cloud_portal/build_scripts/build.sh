@@ -6,8 +6,8 @@ set -e
 # or from cloud_portal "./build_scripts/build.sh"
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
-NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
-[[ "$NX_VMS" =~ (.*)\/cloud_portal.* ]]; REPO=${BASH_REMATCH[1]}
+VMS_REPOSITORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+[[ "$VMS_REPOSITORY" =~ (.*)\/cloud_portal.* ]]; REPO=${BASH_REMATCH[1]}
 
 #If we are not using the repository we should update necessary files
 if [[ ! $PWD =~ $REPO ]]
@@ -25,32 +25,32 @@ then
                     do
                         echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
-                        cp -pr "$NX_VMS/cloud_portal/$entry/$element" "$element"
+                        cp -pr "$VMS_REPOSITORY/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
                     echo "copy $entry"
                     [ -e "$entry" ] && rm -rf "$entry"
-                    cp -pr "$NX_VMS/cloud_portal/$entry" "$entry"
+                    cp -pr "$VMS_REPOSITORY/cloud_portal/$entry" "$entry"
                 fi
             done
         popd
     else
-        cp -pr $NX_VMS/cloud_portal cloud_portal
+        cp -pr $VMS_REPOSITORY/cloud_portal cloud_portal
     fi
 
     mkdir -p webadmin
     pushd webadmin
         [ -d 'app/styles' ] && rm -rf app/styles
-        mkdir -p app/styles && cp -pr $NX_VMS/webadmin/app/styles/* "$_"
+        mkdir -p app/styles && cp -pr $VMS_REPOSITORY/webadmin/app/styles/* "$_"
 
         [ -e 'package.json' ] && rm -rf 'package.json'
-        cp $NX_VMS/webadmin/package.json ./
+        cp $VMS_REPOSITORY/webadmin/package.json ./
     popd
     cd cloud_portal
 else
     echo "In repository skip copying sources"
-    cd $NX_VMS/cloud_portal
+    cd $VMS_REPOSITORY/cloud_portal
 fi
 
 echo "pip install requirements"

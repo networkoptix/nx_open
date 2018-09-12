@@ -100,15 +100,17 @@ should allow activation, if user is registered by link /register/?from=mobile
 link works and suggests to log out user, if he was logged in, buttons operate correctly
     [tags]    email    C41564
     ${email1}    Get Random Email    ${BASE EMAIL}
+    # This sleep is so that the emails don't get the same timestamp
+    Sleep    .01
     ${email2}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email1}    ${password}
+   ${link1}    Get Email Link    ${email1}    activate
     Go To    ${url}/register
     Register    mark    hamill    ${email2}    ${password}
+    ${link2}    Get Email Link    ${email2}    activate
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    ${link1}    Get Email Link    ${email1}    activate
-    ${link2}    Get Email Link    ${email2}    activate
     Go To    ${link1}
     Wait Until Page Contains Element    ${ACTIVATION SUCCESS}
     Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}

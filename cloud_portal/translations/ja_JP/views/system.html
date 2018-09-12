@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>システムへのアクセスに失敗しました</h1>
-        <p>このリンクは壊れています<br>
+        <h3>このリンクは壊れています<br>
             システムは%PRODUCT_NAME% から切断します<br>
             このシステムへのアクセスは取り消されたか<br>
-            または別のアカウントにログインしている可能性があります</p>
-        <p>
-            <a href="/systems" class="btn btn-default">使用可能なシステム の一覧</a>
+            または別のアカウントにログインしている可能性があります
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">使用可能なシステム の一覧</a>
         </p>
     </div>
 

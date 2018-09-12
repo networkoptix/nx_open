@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Belépés sikertelen</h1>
-        <p>Nincs kapcsolat,<br>
+        <h3>Nincs kapcsolat,<br>
             A rendszer és %PRODUCT_NAME% között nincs kapcsolat,<br>
             A rendszerhez való hozzáférést visszavonták, <br>
-            vagy más fiókba van bejelentkezve</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Rendelkezésre álló rendszerek listája</a>
+            vagy más fiókba van bejelentkezve
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Rendelkezésre álló rendszerek listája</a>
         </p>
     </div>
 

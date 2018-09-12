@@ -109,21 +109,21 @@
         "systemName": "Nazwa systemu",
         "takeCameraOwnershipWithoutLock": "Nie blokuj kamery przy podłączaniu",
         "timeSynchronizationEnabled": "Synchronizacja czasu włączona",
-        "primaryTimeServer": "Primary time synchronization server",
-        "osTimeChangeCheckPeriodMs": "OS time change check period",
-        "syncTimeExchangePeriod": "Sync time exchange period",
-        "maxWearableArchiveSynchronizationThreads": "Max wearable camera archive sync threads",
+        "primaryTimeServer": "Podstawowy serwer synchronizacji czasu",
+        "osTimeChangeCheckPeriodMs": "Okres sprawdzania zmiany czasu systemu",
+        "syncTimeExchangePeriod": "Okres synchronizacji czasu",
+        "maxWearableArchiveSynchronizationThreads": "Max liczba wątków synchronizacji nagrań kamery przenośnej",
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
         "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
-        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Chunk message body timeout",
-        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: Chunk response timeout",
-        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Show alternative PTZ controls on tile",
-        "trafficEncryptionForced": "Force traffic encryption",
-        "videoTrafficEncryptionForced": "Force video traffic encryption",
-        "updateStatus": "Update status",
-        "watermarkSettings": "Watermark settings"
+        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
+        "hanwhaChunkReaderMessageBodyTimeoutSeconds": "Hanwha: Limit czasu fragmentacji wiadomości",
+        "hanwhaChunkReaderResponseTimeoutSeconds": "Hanwha: limit czasu odpowiedzi na fragment",
+        "showHanwhaAlternativePtzControlsOnTile": "Hanwha: Pokaż alternatywne sterowanie PTZ na obrazie",
+        "trafficEncryptionForced": "Wymuszaj szyfrowanie transmisji",
+        "videoTrafficEncryptionForced": "Wymuszaj szyfrowanie transmisji wideo",
+        "updateStatus": "Aktualizacja statusu",
+        "watermarkSettings": "Ustawienia znaku wodnego"
     },
     "info": {
         "tabs": {
@@ -156,7 +156,7 @@
     },
     "login": {
         "incorrectPassword": "Nieprawidłowy login lub hasło",
-        "authLockout": "Too many attempts. Try again in a minute."
+        "authLockout": "Zbyt wiele prób. Spróbuj ponownie za minutę."
     },
     "navigaion": {
         "cannotGetUser": "Błąd serwera: nie można pobrać danych bieżącego użytkownika"

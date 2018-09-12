@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Čeština",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Pokročilý prohlížeč",
-      "description": "Můžete sledovat živé video, prohlížet archiv, konfigurovat kamery, ovládat PTZ atd"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Administrator",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Smazat",
     "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Všechny systémy",
     "systems": "Systémy"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Hlavní stream",
+      "lowStream": "Vedlejší stream",
+      "transcoding": "Překódování",
+      "unknown": "Neznámý",
+      "copyToClipboard": "kopírovat do schránky",
+      "copyDefaultText": "kopírovat",
+      "copyActiveText": "zkopírováno do schránky"
+    },
+    "systemOffline": "Systém je offline",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Chyba",
+      "unauthorized": "Ověření je vyžadováno",
+      "noData": "Žádná data",
+      "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
+      "flashRequired": "Pro přehrání videa si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a>.",
+      "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
+      "noArmSupport": "Tento prohlížeč nebo zařízení nepodporuje přehrávání videa ze serverů se systémem ARM.",
+      "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
+      "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
+      "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
+      "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium."
+    },
+    "searchCamPlaceholder": "Hledat",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Vysoká",
+      "low": "Nízký"
+    },
+    "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
+    "voiceCommands": {
+      "play": "přehrát",
+      "pause": "pauza",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "smazat hledání",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "rozbalit všechny servery",
+      "collapse all servers": "sbalit všechny servery",
+      "stop listening": "zastavení poslech",
+      "help": "help | show commands"
+    }
   }
 }
