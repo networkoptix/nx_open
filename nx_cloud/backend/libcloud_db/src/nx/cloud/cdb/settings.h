@@ -51,9 +51,6 @@ public:
     std::chrono::seconds accountActivationCodeExpirationTimeout;
     std::chrono::seconds passwordResetCodeExpirationTimeout;
 
-    // TODO: #ak Remove this setting. Replace with some smarter configuration.
-    std::chrono::milliseconds loginExistenceConcealDelay;
-
     AccountManager();
 };
 
