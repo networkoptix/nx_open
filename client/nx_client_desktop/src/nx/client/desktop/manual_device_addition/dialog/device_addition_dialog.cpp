@@ -509,26 +509,6 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         {
             if (guard && success)
                 appendAddingDevices(addingDevices);
-
-//            auto states = prevStates;
-//            if (success && result.error == QnRestResult::NoError)
-//            {
-//                for (auto& state: states)
-//                    state = FoundDevicesModel::alreadyAddedState;
-//            }
-//            else
-//            {
-//                showAdditionFailedDialog(toFakeResourcesList(devices));
-//            }
-
-//            for (auto it = states.begin(); it != states.end(); ++it)
-//            {
-//                const auto id = it.key();
-//                const auto state = it.value();
-//                const auto index = m_model->indexByUniqueId(
-//                    id, FoundDevicesModel::presentedStateColumn);
-//                m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
-//            }
         }, QThread::currentThread());
 }
 
