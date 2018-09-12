@@ -83,7 +83,7 @@ class LinuxNetworking(Networking):
             IPNetwork(line.split()[1]).ip
             for line in output.splitlines()
             ]
-        # first is always NATed one - skip it
+        # Skip first address - usually this is NATed one. Although this is not really guaranteed anywhere.
         return ip_address_list[1:]
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
