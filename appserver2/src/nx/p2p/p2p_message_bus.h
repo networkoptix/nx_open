@@ -232,6 +232,16 @@ protected:
             if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
                 continue; //< Already processed by remote peer
 
+            if (!connection->shouldTransactionBeSentToPeer(tran))
+            {
+                NX_ASSERT(false,
+                    lm("Transaction '%1' can't be send to peer %2 (%3)")
+                    .arg(toString(tran.command))
+                    .arg(connection->remotePeer().id.toString())
+                    .arg(QnLexical::serialized(connection->remotePeer().peerType)));
+                return; //< This peer doesn't handle transactions of such type.
+            }
+
             if (connection->remotePeer().isClient())
             {
                 if (transportHeader.dstPeers.size() != 1
