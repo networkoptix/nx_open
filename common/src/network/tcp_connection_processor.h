@@ -69,6 +69,7 @@ public:
     bool readSingleRequest();
     virtual void parseRequest();
 
+    bool isConnectionSecure() const;
     std::unique_ptr<nx::network::AbstractStreamSocket> takeSocket();
     //void releaseSocket();
 
