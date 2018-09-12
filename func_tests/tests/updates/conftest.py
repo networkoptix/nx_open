@@ -5,9 +5,10 @@ from flask import Flask, request, send_file
 from werkzeug.exceptions import BadRequest, SecurityError
 
 from defaults import defaults
+from framework.cloud_host import resolve_cloud_host_from_registry
 from framework.installation.installer import InstallerSet
 from framework.os_access.local_path import LocalPath
-from framework.serving import WsgiServer, make_base_url_for_remote_machine
+from framework.serving import WsgiServer
 
 
 def pytest_addoption(parser):
@@ -53,22 +54,26 @@ def _make_updates_wsgi_app(updates_dir, range_header_policy='support'):
 
 
 @pytest.fixture()
-def updates_server_url(service_ports, updates_dir, one_mediaserver):
+def updates_server_url(service_ports, updates_dir, runner_address):
     app = _make_updates_wsgi_app(updates_dir)
 
     wsgi_server = WsgiServer(app, service_ports[10:15])
     # When port is bound and it's known how to access server's address and port, generate.
-    base_url = make_base_url_for_remote_machine(one_mediaserver.os_access, wsgi_server.port)
+    base_url = 'http://{}:{}'.format(runner_address, wsgi_server.port)
     with wsgi_server.serving():
         yield base_url + '/'
 
 
 @pytest.fixture()
-def update_info(updates_dir, updates_server_url, cloud_host):
-    installer_set = InstallerSet(updates_dir)
+def updates_set(updates_dir):
+    return InstallerSet(updates_dir)
+
+
+@pytest.fixture()
+def update_info(updates_dir, updates_set, updates_server_url):
     return {
-        'version': str(installer_set.version),
-        'cloudHost': cloud_host,
+        'version': str(updates_set.version),
+        'cloudHost': resolve_cloud_host_from_registry('test', updates_set.customization.customization_name),
         'eulaLink': 'http://new.eula.com/eulaText',
         'eulaVersion': 1,
         'releaseNotesUrl': 'http://www.networkoptix.com/all-nx-witness-release-notes',
@@ -84,7 +89,7 @@ def update_info(updates_dir, updates_server_url, cloud_host):
                 'size': installer.path.stat().st_size,
                 'md5': _calculate_md5_of_file(installer.path),
                 }
-            for installer in installer_set.installers
+            for installer in updates_set.installers
             if installer.component == 'server_update'
             ]
         }

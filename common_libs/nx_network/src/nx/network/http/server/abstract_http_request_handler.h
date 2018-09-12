@@ -77,14 +77,14 @@ protected:
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler) = 0;
 
+    virtual void sendResponse(RequestResult requestResult);
+
     nx::network::http::Response* response();
 
 private:
     nx::network::http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
     std::vector<StringType> m_requestPathParams;
-
-    void requestDone(RequestResult requestResult);
 };
 
 } // namespace nx

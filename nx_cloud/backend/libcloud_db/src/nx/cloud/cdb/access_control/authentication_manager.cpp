@@ -14,6 +14,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/random_cryptographic_device.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/time.h>
@@ -31,6 +32,86 @@ namespace nx {
 namespace cdb {
 
 using namespace nx::network::http;
+
+AuthenticationManager::AuthenticationManager(
+    const conf::Settings& settings,
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
+    const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
+    const StreeManager& stree)
+:
+    m_authRestrictionList(authRestrictionList),
+    m_stree(stree),
+    m_authDataProviders(std::move(authDataProviders))
+{
+    if (auto userLockerSettings = settings.loginLockout())
+        m_userLocker = std::make_unique<network::server::UserLockerPool>(*userLockerSettings);
+}
+
+void AuthenticationManager::authenticate(
+    const nx::network::http::HttpServerConnection& connection,
+    const nx::network::http::Request& request,
+    nx::network::http::server::AuthenticationCompletionHandler handler)
+{
+    detail::AuthenticationHelper authenticatorHelper(
+        m_authRestrictionList,
+        m_userLocker.get(),
+        connection,
+        request,
+        std::move(handler));
+
+    if (authenticatorHelper.userLocked())
+        return authenticatorHelper.reportFailure(api::ResultCode::accountBlocked);
+
+    authenticatorHelper.queryStaticAuthenticationRulesTree(m_stree);
+    if (authenticatorHelper.authenticatedByStaticRules())
+        return authenticatorHelper.reportSuccess();
+
+    if (!authenticatorHelper.requestContainsValidDigest())
+    {
+        return authenticatorHelper.reportFailure(
+            api::ResultCode::notAuthorized,
+            prepareWwwAuthenticateHeader());
+    }
+
+    nx::utils::stree::ResourceContainer authProperties;
+    const auto authResultCode = authenticatorHelper.authenticateRequestDigest(
+        m_authDataProviders,
+        &authProperties);
+
+    if (authResultCode == api::ResultCode::ok)
+        return authenticatorHelper.reportSuccess(std::move(authProperties));
+    else
+        return authenticatorHelper.reportFailure(authResultCode);
+}
+
+nx::String AuthenticationManager::realm()
+{
+    return nx::network::AppInfo::realm().toUtf8();
+}
+
+nx::network::http::header::WWWAuthenticate
+    AuthenticationManager::prepareWwwAuthenticateHeader()
+{
+    nx::network::http::header::WWWAuthenticate wwwAuthenticate;
+
+    wwwAuthenticate.authScheme = header::AuthScheme::digest;
+    wwwAuthenticate.params.emplace("nonce", generateNonce());
+    wwwAuthenticate.params.emplace("realm", realm());
+    wwwAuthenticate.params.emplace("algorithm", "MD5");
+
+    return wwwAuthenticate;
+}
+
+nx::Buffer AuthenticationManager::generateNonce()
+{
+    const auto nonce =
+        nx::utils::random::number<nx::utils::random::CryptographicDevice, uint64_t>(
+            nx::utils::random::CryptographicDevice::instance())
+        | nx::utils::timeSinceEpoch().count();
+    return nx::Buffer::number((qulonglong)nonce);
+}
+
+//-------------------------------------------------------------------------------------------------
 
 namespace detail {
 
@@ -318,91 +399,28 @@ api::ResultCode AuthenticationHelper::authenticateInDataManagers(
 void AuthenticationHelper::updateUserLockoutState(
     network::server::UserLocker::AuthResult authResult)
 {
-    if (m_userLocker)
-        m_userLocker->updateLockoutState(m_userLockKey, authResult);
+    if (!m_userLocker)
+        return;
+
+    switch (m_userLocker->updateLockoutState(m_userLockKey, authResult))
+    {
+        case nx::network::server::LockUpdateResult::locked:
+            NX_WARNING(this, lm("Login %1 blocked for host %2 for %3")
+                .args(std::get<0>(m_userLockKey), std::get<1>(m_userLockKey),
+                    m_userLocker->settings().lockPeriod));
+            break;
+
+        case nx::network::server::LockUpdateResult::unlocked:
+            NX_INFO(this, lm("Login %1 unblocked for host %2")
+                .args(std::get<0>(m_userLockKey), std::get<1>(m_userLockKey)));
+            break;
+
+        default:
+            break;
+    }
 }
 
 } // namespace detail
-
-//-------------------------------------------------------------------------------------------------
-
-AuthenticationManager::AuthenticationManager(
-    const conf::Settings& settings,
-    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-    const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-    const StreeManager& stree)
-:
-    m_authRestrictionList(authRestrictionList),
-    m_stree(stree),
-    m_authDataProviders(std::move(authDataProviders))
-{
-    if (auto userLockerSettings = settings.loginLockout())
-        m_userLocker = std::make_unique<network::server::UserLockerPool>(*userLockerSettings);
-}
-
-void AuthenticationManager::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
-    const nx::network::http::Request& request,
-    nx::network::http::server::AuthenticationCompletionHandler handler)
-{
-    detail::AuthenticationHelper authenticatorHelper(
-        m_authRestrictionList,
-        m_userLocker.get(),
-        connection,
-        request,
-        std::move(handler));
-
-    if (authenticatorHelper.userLocked())
-        return authenticatorHelper.reportFailure(api::ResultCode::accountBlocked);
-
-    authenticatorHelper.queryStaticAuthenticationRulesTree(m_stree);
-    if (authenticatorHelper.authenticatedByStaticRules())
-        return authenticatorHelper.reportSuccess();
-
-    if (!authenticatorHelper.requestContainsValidDigest())
-    {
-        return authenticatorHelper.reportFailure(
-            api::ResultCode::notAuthorized,
-            prepareWwwAuthenticateHeader());
-    }
-
-    nx::utils::stree::ResourceContainer authProperties;
-    const auto authResultCode = authenticatorHelper.authenticateRequestDigest(
-        m_authDataProviders,
-        &authProperties);
-
-    if (authResultCode == api::ResultCode::ok)
-        return authenticatorHelper.reportSuccess(std::move(authProperties));
-    else
-        return authenticatorHelper.reportFailure(authResultCode);
-}
-
-nx::String AuthenticationManager::realm()
-{
-    return nx::network::AppInfo::realm().toUtf8();
-}
-
-nx::network::http::header::WWWAuthenticate
-    AuthenticationManager::prepareWwwAuthenticateHeader()
-{
-    nx::network::http::header::WWWAuthenticate wwwAuthenticate;
-
-    wwwAuthenticate.authScheme = header::AuthScheme::digest;
-    wwwAuthenticate.params.emplace("nonce", generateNonce());
-    wwwAuthenticate.params.emplace("realm", realm());
-    wwwAuthenticate.params.emplace("algorithm", "MD5");
-
-    return wwwAuthenticate;
-}
-
-nx::Buffer AuthenticationManager::generateNonce()
-{
-    const auto nonce =
-        nx::utils::random::number<nx::utils::random::CryptographicDevice, uint64_t>(
-            nx::utils::random::CryptographicDevice::instance())
-        | nx::utils::timeSinceEpoch().count();
-    return nx::Buffer::number((qulonglong)nonce);
-}
 
 } // namespace cdb
 } // namespace nx

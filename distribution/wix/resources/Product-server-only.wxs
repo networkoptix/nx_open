@@ -144,23 +144,47 @@
 
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
-        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[TrayToolRootDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
-        <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <CustomAction Id="CloseTrayToolAction2_Cmd" Property="CloseTrayToolAction2"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM traytool.exe' Execute="immediate" />
-        <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
+        <CustomAction Id="CloseTrayToolAction_Cmd"
+            Property="CloseTrayToolAction"
+            Value="&quot;[InstallDirRoot]traytool.exe&quot; &quot;quit&quot;"
+            Execute="immediate" />
 
-        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate"
-                      Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName);Software\[Manufacturer]\version;"/>
+        <CustomAction Id="CloseTrayToolAction"
+            BinaryKey="WixCA"
+            DllEntry="CAQuietExec"
+            Execute="deferred"
+            Return="ignore"
+            Impersonate="no" />
 
-        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
-                      Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
+        <CustomAction Id="CloseTrayToolAction2_Cmd"
+            Property="CloseTrayToolAction2"
+            Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM traytool.exe'
+            Execute="immediate" />
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="TrayToolRootDir" ExeCommand="[TrayToolRootDir]traytool.exe"/>
+        <CustomAction Id="CloseTrayToolAction2"
+            BinaryKey="WixCA"
+            DllEntry="CAQuietExec"
+            Execute="deferred"
+            Return="ignore"
+            Impersonate="no" />
+
+        <CustomAction Id="BackupDatabaseFile_Cmd"
+            Property="BackupDatabaseFile"
+            Execute="immediate"
+            Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName);Software\[Manufacturer]\version;"/>
+
+        <CustomAction Id="DeleteDatabaseFile_Cmd"
+            Property="DeleteDatabaseFile"
+            Execute="immediate"
+            Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
+
+        <CustomAction Id="LaunchTrayTool"
+            Execute="immediate"
+            Impersonate="yes"
+            Return="asyncNoWait"
+            Directory="InstallDirRoot"
+            ExeCommand="[InstallDirRoot]traytool.exe"/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 

@@ -120,7 +120,6 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        getResource()->setStatus(Qn::Unauthorized);
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 

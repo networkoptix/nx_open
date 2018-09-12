@@ -2,13 +2,13 @@ import json
 from datetime import timedelta
 
 import pytest
-import yaml
+import oyaml as yaml
 from pathlib2 import Path
 
 from . import execution
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def one_vm_type():
     return 'linux'
 

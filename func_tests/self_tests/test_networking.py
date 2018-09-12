@@ -1,12 +1,12 @@
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def networking(one_vm):
     return one_vm.os_access.networking
 
 
-@pytest.fixture()
+@pytest.fixture
 def macs(one_vm):
     return one_vm.hardware.macs
 

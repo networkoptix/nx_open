@@ -6,14 +6,14 @@ Usage example:
 Module 'master':
 
 _logger = logging.getLogger('master')
-@with_logger(_logger, 'slave')
+@context_logger(_logger, 'slave')
 def do_stuff():
     do_other_stuff()
 
 
 Module 'slave':
 
-_logger = SwitchedLogger('slave')
+_logger = ContextLogger('slave')
 def do_other_stuff():
     _logger.info('Do stuff')
 
@@ -33,7 +33,7 @@ _switched_loggers = {}
 
 # https://stackoverflow.com/questions/9213600/function-acting-as-both-decorator-and-context-manager-in-python
 # contextlib.ContextDecorator doesn't support class wrapping, so we use our own implementation here.
-class with_logger(object):
+class context_logger(object):
 
     def __init__(self, parent_logger, child_logger_name):
         self._parent_logger = parent_logger
@@ -73,7 +73,7 @@ class with_logger(object):
         return cls
 
 
-class SwitchedLogger(object):
+class ContextLogger(object):
 
     def __init__(self, name, context_name=None):
         self.name = name
@@ -105,3 +105,12 @@ class SwitchedLogger(object):
 
     def getChild(self, name):
         return self._get_current_logger().getChild(name)
+
+
+class ContextAdapter(logging.LoggerAdapter):
+
+    def __init__(self, base_logger, context):
+        super(ContextAdapter, self).__init__(base_logger, dict(context=context))
+
+    def process(self, msg, kwargs):
+        return ("%s: %s" % (self.extra['context'], msg), kwargs)

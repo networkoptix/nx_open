@@ -10,7 +10,7 @@ from framework.networking.windows import WindowsNetworking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyExists, CannotDownload, exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess
-from framework.os_access.smb_path import SMBConnectionPool, SMBPath
+from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars

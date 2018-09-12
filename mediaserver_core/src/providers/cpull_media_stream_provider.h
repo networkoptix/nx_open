@@ -18,7 +18,6 @@ public:
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:
-    bool canChangeStatus() const;
     virtual void beforeRun() override;
     virtual bool isCameraControlRequired() const = 0;
 

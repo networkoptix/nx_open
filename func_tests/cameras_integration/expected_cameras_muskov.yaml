@@ -9,12 +9,12 @@
 
   after if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
+      offlineStatus: 0
       transactions: {"errors": 0, "local": [1, 2], "success": [50, 100]}
 
   delayed if features.mediaserver_metrics:
     api/metrics?brief:
-      offlineStatus: [0, 5]
+      offlineStatus: 0
       transactions: {"errors": 0, "local": [1, 2], "success": [100, 200]}
 
 
@@ -36,7 +36,7 @@
 
 
 00-09-18-50-C8-23:
-  discovery if version >= '3.1.1':
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     physicalId: 00-09-18-50-C8-23
     vendor: Hanwha Techwin
     model: SNZ-6320
@@ -58,7 +58,7 @@
 
 
 00-09-18-51-DE-4B:
-  discovery if version >= '3.1.1':
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     physicalId: 00-09-18-51-DE-4B
     vendor: Hanwha Techwin
     model: XND-8080RV
@@ -89,15 +89,12 @@ BC-AD-28-02-62-EE:
     firmware: 'V5.3.0 build 151016'
 
   io_events:
-    ins: ['1']
-    outs: ['AlarmOut_0']
-    connected: True
-
-  ptz_presets:
+    ins: [{id: '1', connected: 'AlarmOut_0'}]
+    outs: [{id: 'AlarmOut_0'}]
 
 
 00-09-18-50-00-D4:
-  discovery:
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
     vendor: Hanwha Techwin
     model: XNP-6040H
 
@@ -105,9 +102,7 @@ BC-AD-28-02-62-EE:
     login: admin
     password: Samsung1
 
-  ptz_presets:
-    - {id: '2:Xstream2', position: '0-195-0-23-1'}
-    - {position: '0-150-0-20-1'}
-    - {id: '4:NxWitness4', position: '0-5-0-19-1'}
-    - {position: '0-100-0-30-1'}
-    - {id: '6:NxWitness6', position: '0-171-0-34-1'}
+  ptz_positions if features.advanced_lens_control:
+    - {point: '195-23-1', preset: '2:Xstream2'}
+    - {point: '5-19-1', preset: '4:NxWitness4'}
+    - {point: '171-34-1', preset: '6:NxWitness6'}

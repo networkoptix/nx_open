@@ -30,7 +30,6 @@ static const QString dynamicVideoLayoutKey = lit("dynamicVideoLayout");
 static const QString motionStreamKey = lit("motionStream");
 static const QString rotationKey = lit("rotation");
 static const QString panicRecordingKey = lit("panic_mode");
-static const QString trustCameraTimeKey = lit("trust_camera_time");
 
 using nx::vms::api::MotionStreamType;
 static const QString primaryStreamValue = QnLexical::serialized(MotionStreamType::primary);
@@ -262,11 +261,6 @@ QString QnMediaResource::dontRecordSecondaryStreamKey()
 QString QnMediaResource::rtpTransportKey()
 {
     return ::rtpTransportKey;
-}
-
-QString QnMediaResource::trustCameraTimeKey()
-{
-    return ::trustCameraTimeKey;
 }
 
 QString QnMediaResource::panicRecordingKey()

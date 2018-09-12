@@ -1524,19 +1524,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>Probleem met de opslagruimte</translation>
+      <translation>Opslag probleem</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>Opslagruimteprobleem bij %1</translation>
+      <translation>Opslag probleem op %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Schakelen naar volledige schermweergave</translation>
+      <translation>Volledige schermweergave activeren</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Volledige schermweergave afsluiten</translation>
+      <translation>Volledige schermweergave sluiten</translation>
     </message>
   </context>
   <context>

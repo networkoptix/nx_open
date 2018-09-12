@@ -41,13 +41,10 @@ private:
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
-    bool isSliceNal(quint8 nalUnitType) const;
     bool isFirstSliceNal(const quint8 nalType, const quint8* data, int dataLen) const;
     bool isPacketStartsNewFrame(
         const quint8* curPtr,
         const quint8* bufferEnd) const;
-
-    bool isIFrame(const quint8* data, int dataLen) const;
 
     QnCompressedVideoDataPtr createVideoData(
         const quint8* rtpBuffer,

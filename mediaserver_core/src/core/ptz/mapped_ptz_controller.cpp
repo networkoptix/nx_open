@@ -1,5 +1,7 @@
 #include "mapped_ptz_controller.h"
 
+#include <core/ptz/ptz_mapper.h>
+
 QnMappedPtzController::QnMappedPtzController(const QnPtzMapperPtr &mapper, const QnPtzControllerPtr &baseController):
     QnProxyPtzController(baseController),
     m_mapper(mapper)

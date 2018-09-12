@@ -264,7 +264,7 @@ private:
 class WorkerPool
 {
 public:
-    WorkerPool(size_t size = 16): m_workers(size)
+    explicit WorkerPool(size_t size = 16): m_workers(size)
     {
     }
 
@@ -323,12 +323,12 @@ public:
     }
 
 private:
-    int m_fd;
+    int m_fd = -1;
 };
 
 static void* reallocCallback(void* ctx, ssize_t size)
 {
-    std::string* buf = (std::string*) ctx;
+    auto buf = (std::string*) ctx;
     buf->resize(size);
     return buf->data();
 }
@@ -339,7 +339,7 @@ int main(int argc, const char** argv)
     CommandsFactory commandsFactory;
     registerCommands(commandsFactory, &systemCommands);
 
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 
     if (argc > 1 && strcmp("--help", argv[1]) == 0)
     {

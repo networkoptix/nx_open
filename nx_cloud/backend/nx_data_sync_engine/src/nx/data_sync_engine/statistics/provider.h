@@ -25,13 +25,14 @@ NX_DATA_SYNC_ENGINE_API void serialize(
 
 struct Statistics
 {
+    int connectedServerCount = 0;
     std::map<std::string, int> connectedServerCountByVersion;
     CommandStatistics incomingCommands;
     CommandStatistics outgoingCommands;
 };
 
 #define Statistics_data_sync_engine_Fields \
-    (connectedServerCountByVersion)(incomingCommands)(outgoingCommands)
+    (connectedServerCount)(connectedServerCountByVersion)(incomingCommands)(outgoingCommands)
 
 NX_DATA_SYNC_ENGINE_API bool deserialize(
     QnJsonContext*, const QJsonValue&, Statistics*);

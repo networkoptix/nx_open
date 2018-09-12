@@ -1,47 +1,49 @@
-#ifndef MEDIA_STREAM_STATISTICS_H
-#define MEDIA_STREAM_STATISTICS_H
+#pragma once
 
 #include <QtCore/QDateTime>
-#include <nx/utils/thread/mutex.h>
 
-#define CL_STATISTICS_WINDOW_MS 2000
-#define CL_STATISTICS_UPDATE_PERIOD_MS 700
-#define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
+#include <nx/utils/thread/mutex.h>
 
 // TODO: #Elric #enum
 enum QnMediaStreamStatisticsEvent
 {
     CL_STAT_DATA,
-    CL_STAT_FRAME_LOST,
-    CL_STAT_CAMRESETED,
+    CL_STREAM_ISSUE,
     CL_STAT_END //< Must not be used in onEvent.
 };
 
-class QnMediaStreamStatistics
+class QnMediaStreamStatistics: public QObject
 {
+    Q_OBJECT
+
+    static const int CL_STATISTICS_WINDOW_MS = 2000;
+    static const int CL_STATISTICS_UPDATE_PERIOD_MS = 700;
+    static const int CL_STATS_NUM = (CL_STATISTICS_WINDOW_MS / CL_STATISTICS_UPDATE_PERIOD_MS + 1);
+
     struct EventStat
     {
-        EventStat(): amount(0) {}
+        EventStat() = default;
 
-        QDateTime firstTime;
-        QDateTime lastTime;
-        unsigned long amount;
+        unsigned long amount = 0;
     };
 
     struct StatHelper
     {
-        StatHelper(): total_data(0), frames(0) {}
+        StatHelper() = default;
 
-        unsigned long total_data;
-        unsigned long frames;
+        unsigned long total_data = 0;
+        unsigned long frames = 0;
     };
-
+signals:
+    void connectionLost();
+    void connectionBackToNormal();
 public:
     QnMediaStreamStatistics();
 
     void resetStatistics(); // resets statistics; and make it runing
     void stop(); // stops the statistic;
 
+    qint64 getTotalData() const;
     void onData(unsigned int datalen, bool isKeyFrame);// must be called then new data from cam arrived; if datalen==0 => timeout
     float getBitrateMbps() const; // returns instant bitrate at megabits
     float getFrameRate() const;// returns instant framerate
@@ -54,18 +56,14 @@ public:
     void onBadSensor();
     bool badSensor() const;
 
-    void onLostConnection();
     bool isConnectionLost() const;
-    int connectionLostSec() const;
 
     void onEvent(QnMediaStreamStatisticsEvent event);
     unsigned long totalEvents(QnMediaStreamStatisticsEvent event) const;
     float eventsPerHour(QnMediaStreamStatisticsEvent event) const;
-    QDateTime firstOccurred(QnMediaStreamStatisticsEvent event) const;
-    QDateTime lastOccurred(QnMediaStreamStatisticsEvent event) const;
 
-    // ========
-
+private:
+    void setConnectionLost(bool value);
 private:
     mutable QnMutex m_mutex;
 
@@ -75,8 +73,7 @@ private:
     unsigned long long m_dataTotal;
 
     bool m_badsensor;
-    bool m_connectionLost;
-    QDateTime m_connectionLostTime;
+    std::atomic<bool> m_connectionLost{false};
 
     EventStat m_events[CL_STAT_END];
 
@@ -90,5 +87,3 @@ private:
 
     bool m_runing;
 };
-
-#endif // MEDIA_STREAM_STATISTICS_H

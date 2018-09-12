@@ -34,25 +34,12 @@ ServerTimeSyncManager::ServerTimeSyncManager(
         [this](qint64 syncTimeMs)
         {
             const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
-            auto connection = this->commonModule()->ec2Connection();
-            vms::api::MiscData deltaData(
-                kTimeDeltaParamName,
-                QByteArray::number(systemTimeDeltaMs));
-
-            // Avoid passing this to async callback.
-            auto logTag = nx::utils::log::Tag(this);
-            connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
-                deltaData, this,
-                [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
-            {
-                if (errorCode != ec2::ErrorCode::ok)
-                    NX_WARNING(logTag, lm("Failed to save time delta data to the database"));
-            });
+            saveSystemTimeDeltaMs(systemTimeDeltaMs);
 
             auto primaryTimeServerId = getPrimaryTimeServerId();
             if (primaryTimeServerId == this->commonModule()->moduleGUID())
             {
-                NX_VERBOSE(logTag,
+                NX_VERBOSE(this,
                     lm("Peer %1 broadcast time has changed to %2")
                     .arg(qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID()))
                     .arg(QDateTime::fromMSecsSinceEpoch(syncTimeMs).toString(Qt::ISODate)));
@@ -201,8 +188,37 @@ QnRoute ServerTimeSyncManager::routeToNearestServerWithInternet()
     return result;
 }
 
+void ServerTimeSyncManager::saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs)
+{
+    m_systemTimeDeltaMs = systemTimeDeltaMs;
+    auto connection = this->commonModule()->ec2Connection();
+    vms::api::MiscData deltaData(
+        kTimeDeltaParamName,
+        QByteArray::number(systemTimeDeltaMs));
+
+    // Avoid passing this in async callback.
+    auto logTag = nx::utils::log::Tag(this);
+    connection->getMiscManager(Qn::kSystemAccess)->saveMiscParam(
+        deltaData, this,
+        [logTag](int /*reqID*/, ec2::ErrorCode errorCode)
+    {
+        if (errorCode != ec2::ErrorCode::ok)
+            NX_WARNING(logTag, lm("Failed to save time delta data to the database"));
+    });
+}
+
+void ServerTimeSyncManager::updateSyncTimeToOsTimeDelta()
+{
+    const qint64 systemTimeDeltaMs = qAbs(
+        std::chrono::milliseconds(getSyncTime() - m_systemClock->millisSinceEpoch()).count());
+    if (qAbs(m_systemTimeDeltaMs - systemTimeDeltaMs) > kMaxJitterForLocalClock.count())
+        saveSystemTimeDeltaMs(systemTimeDeltaMs);
+}
+
 void ServerTimeSyncManager::updateTime()
 {
+    updateSyncTimeToOsTimeDelta();
+
     const auto primaryTimeServerId = getPrimaryTimeServerId();
     const auto ownId = commonModule()->moduleGUID();
     bool syncWithInternel = commonModule()->globalSettings()->isSynchronizingTimeWithInternet();
@@ -259,8 +275,8 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
     {
         NX_WARNING(this, "Failed to load time delta parameter from the database");
     }
-    auto timeDelta = std::chrono::milliseconds(deltaData.value.toLongLong());
-    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + timeDelta);
+    m_systemTimeDeltaMs = deltaData.value.toLongLong();
+    setSyncTimeInternal(m_systemClock->millisSinceEpoch() + std::chrono::milliseconds(m_systemTimeDeltaMs));
 }
 
 } // namespace time_sync

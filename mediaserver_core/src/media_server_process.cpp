@@ -1349,25 +1349,26 @@ void MediaServerProcess::at_timer()
         camera->cleanCameraIssues();
 }
 
+void MediaServerProcess::setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet)
+{
+    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
+    localInfo.data.flags.setFlag(flag, isSet);
+    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+}
+
 void MediaServerProcess::at_storageManager_noStoragesAvailable()
 {
     if (isStopping())
         return;
     serverModule()->eventConnector()->at_noStorages(m_mediaServer);
-
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, true);
-    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+    setRuntimeFlag(nx::vms::api::RuntimeFlag::noStorages, true);
 }
 
 void MediaServerProcess::at_storageManager_storagesAvailable()
 {
     if (isStopping())
         return;
-
-    QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.flags.setFlag(nx::vms::api::RuntimeFlag::noStorages, false);
-    commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
+    setRuntimeFlag(nx::vms::api::RuntimeFlag::noStorages, false);
 }
 
 void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
@@ -3309,7 +3310,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 void MediaServerProcess::stopObjects()
 {
     auto safeDisconnect =
-        [](QObject* src, QObject* dst)
+        [this](QObject* src, QObject* dst)
         {
             if (src && dst)
                 disconnect(src, nullptr, dst, nullptr);

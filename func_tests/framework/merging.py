@@ -3,14 +3,14 @@ import logging
 from netaddr import IPNetwork
 
 from framework.installation.mediaserver import Mediaserver
-from .switched_logging import with_logger
+from .context_logger import context_logger
 
 _logger = logging.getLogger(__name__)
 _merge_logger = logging.getLogger('framework.mediaserver_api.merge')
 
 
-@with_logger(_merge_logger, 'framework.http_api')
-@with_logger(_merge_logger, 'framework.mediaserver_api')
+@context_logger(_merge_logger, 'framework.http_api')
+@context_logger(_merge_logger, 'framework.mediaserver_api')
 def merge_systems(
         local,  # type: Mediaserver  # Request will be sent to this.
         remote,  # type: Mediaserver

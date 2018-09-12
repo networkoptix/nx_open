@@ -185,6 +185,15 @@ QStringList QnPtzRestHandler::cameraIdUrlParams() const
     return kCameraIdParams;
 }
 
+int QnPtzRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    return executePost(path, params, {}, result, owner);
+}
+
 int QnPtzRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,

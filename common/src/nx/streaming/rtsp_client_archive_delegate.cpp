@@ -892,13 +892,10 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
 void QnRtspClientArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
     m_streamDataFilter = filter;
-    m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME,
-        QnLexical::serialized(filter).toUtf8());
+    const auto value = QnLexical::serialized(filter).toUtf8();
+    m_rtspSession->setAdditionAttribute(Qn::RTSP_DATA_FILTER_HEADER_NAME, value);
     if (m_rtspSession->isOpened())
-    {
-        m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME,
-            QnLexical::serialized(filter).toUtf8());
-    }
+        m_rtspSession->sendSetParameter(Qn::RTSP_DATA_FILTER_HEADER_NAME, value);
 }
 
 nx::vms::api::StreamDataFilters QnRtspClientArchiveDelegate::streamDataFilter() const

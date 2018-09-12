@@ -69,6 +69,7 @@ namespace {
 
 static const QByteArray ENDL("\r\n");
 static const std::chrono::hours kNativeRtspConnectionSendTimeout(1);
+static const QByteArray kSendMotionHeaderName("x-send-motion");
 
 }
 
@@ -1194,7 +1195,7 @@ StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders() const
 {
     Q_D(const QnRtspConnectionProcessor);
     QString deprecatedSendMotion = nx::network::http::getHeaderValue(
-        d->request.headers, "x-send-motion");
+        d->request.headers, kSendMotionHeaderName);
     QString dataFilterStr = nx::network::http::getHeaderValue(
         d->request.headers, Qn::RTSP_DATA_FILTER_HEADER_NAME);
 
@@ -1467,7 +1468,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return nx::network::http::StatusCode::ok;
         }
-        else if (normParam.startsWith("x-send-motion"))
+        else if (normParam.startsWith(kSendMotionHeaderName))
         {
             QByteArray value = vals[1].trimmed();
             StreamDataFilters filter = StreamDataFilter::mediaOnly;

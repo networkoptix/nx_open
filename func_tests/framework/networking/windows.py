@@ -1,14 +1,14 @@
-import logging
 from pprint import pformat
 
 from netaddr import EUI, IPNetwork, mac_eui48
 from winrm.exceptions import WinRMError
 
+from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
 
-_logger = logging.getLogger(__name__)
+_logger = ContextLogger(__name__, 'networking')
 
 
 class PingError(Exception):
@@ -17,6 +17,7 @@ class PingError(Exception):
         self.ip = ip
 
 
+@context_logger(_logger, 'framework.os_access.windows_remoting')
 class WindowsNetworking(Networking):
     _firewall_rule_name = 'NX-TestStandNetwork'
     _firewall_rule_display_name = 'NX Test Stand Network'

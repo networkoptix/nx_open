@@ -18,6 +18,7 @@ namespace {
 using State = CameraSettingsDialogState;
 using Cameras = QnVirtualCameraResourceList;
 
+//TODO #lbusygin: move conversion to resource layer
 QString boolToPropertyStr(bool value)
 {
     return value ? lit("1") : lit("0");
@@ -193,9 +194,8 @@ void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& camera
 
 void setTrustCameraTime(bool value, const Cameras& cameras)
 {
-    const auto valueStr = boolToPropertyStr(value);
     for (const auto& camera: cameras)
-        camera->setProperty(QnMediaResource::trustCameraTimeKey(), valueStr);
+        camera->setTrustCameraTime(value);
 }
 
 void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)

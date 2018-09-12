@@ -1,5 +1,10 @@
 # Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
+
+if(POLICY CMP0068)
+    cmake_policy(SET CMP0068 NEW)
+endif()
+
 project(nx_kit_test)
 
 set(CMAKE_CXX_STANDARD 11)

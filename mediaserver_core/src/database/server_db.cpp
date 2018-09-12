@@ -1228,8 +1228,23 @@ bool QnServerDb::getBookmarksInternal(
 
     if (!filter.text.isEmpty())
     {
+        const auto getFilterValue =
+            [](const QString& text)
+            {
+                // The asterisk allows prefix search.
+                static const QString filterTemplate = lit("%1*");
+                static const QChar delimiter = L' ';
+
+                QStringList result;
+                const auto list = text.split(delimiter);
+                for (const auto& item: list)
+                    result.push_back(filterTemplate.arg(item));
+
+                return result.join(delimiter);
+            };
+
         addFilter(
-            "rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH ?)", filter.text);
+            "rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH ?)", getFilterValue(filter.text));
     }
 
     QString queryStr = queryTemplate

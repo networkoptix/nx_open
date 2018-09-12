@@ -100,7 +100,6 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         m_isdCam->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        m_isdCam->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( m_isdCam->getHostAddress() );
         requestedUrl.setPort( port );

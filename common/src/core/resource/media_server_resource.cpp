@@ -386,6 +386,8 @@ nx::network::SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
+    if (m_url.isEmpty())
+        return nx::network::SocketAddress();
     return nx::network::url::getEndpoint(nx::utils::Url(m_url));
 }
 

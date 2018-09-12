@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 
 # we are expecting only one appserver2_ut in --mediaserver-installers-dir, for linux-x64 platform
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def lightweight_mediaserver_installer(mediaserver_installers_dir):
     path = mediaserver_installers_dir / LWS_BINARY_NAME
     if not path.exists():

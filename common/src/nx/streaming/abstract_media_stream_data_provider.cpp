@@ -15,7 +15,7 @@
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
-:
+    :
     QnAbstractStreamDataProvider(res),
     m_numberOfchannels(0)
 {
@@ -24,8 +24,14 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
     NX_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
     m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
-    //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
-    //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
+
+    connect(
+        &m_stat[0], &QnMediaStreamStatistics::connectionLost,
+        this, [this] { emit streamError(this, ErrorCode::streamIssue); }, Qt::DirectConnection);
+
+    connect(
+        &m_stat[0], &QnMediaStreamStatistics::connectionBackToNormal,
+        this, [this] { emit streamError(this, ErrorCode::noError); }, Qt::DirectConnection);
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
@@ -84,81 +90,12 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
 void QnAbstractMediaStreamDataProvider::beforeRun()
 {
     setNeedKeyData();
-    m_framesLost = 0;
+    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
+        m_stat[i].resetStatistics();
 }
 
 void QnAbstractMediaStreamDataProvider::afterRun()
 {
-    for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
-    {
-        m_stat[i].resetStatistics();
-    }
-}
-
-
-bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketPtr& d)
-{
-
-    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.get());
-
-    if (data==0)
-    {
-        setNeedKeyData();
-        ++m_framesLost;
-        m_stat[0].onData(0, false);
-        m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
-        if (m_framesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
-            m_stat[0].onLostConnection();
-
-        QnSleep::msleep(10);
-
-        return false;
-    }
-
-    const QnCompressedVideoData* videoData = dynamic_cast<const QnCompressedVideoData*>(data);
-
-    if (m_framesLost > 0) // we are alive again
-    {
-        if (m_framesLost >= MAX_LOST_FRAME)
-        {
-            m_stat[0].onEvent(CL_STAT_CAMRESETED);
-        }
-
-        m_framesLost = 0;
-    }
-
-    if (videoData && needKeyData())
-    {
-        // I do not like; need to do smth with it
-        if (videoData->flags & AV_PKT_FLAG_KEY)
-        {
-            if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
-            {
-                NX_ASSERT(false);
-                return false;
-            }
-
-            m_gotKeyFrame[videoData->channelNumber]++;
-        }
-        else
-        {
-            // need key data but got not key data
-            return false;
-        }
-    }
-
-    if(data)
-        data->dataProvider = this;
-
-    if (videoData)
-        m_stat[videoData->channelNumber].onData(
-            static_cast<unsigned int>(data->dataSize()),
-            videoData->flags & AV_PKT_FLAG_KEY);
-
-    return true;
-
-
 }
 
 const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel) const

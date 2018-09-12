@@ -7,14 +7,14 @@ Libraries required by this binary are taken from mediaserver distribution, *-ser
 
 import logging
 
-from framework.mediaserver_api import GenericMediaserverApi, MediaserverApi
+from framework.mediaserver_api import MediaserverApi
 from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .mediaserver import BaseMediaserver
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..switched_logging import with_logger
+from ..context_logger import context_logger
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_truthy
 
@@ -145,15 +145,15 @@ class LwServer(object):
         self.name = name
         self.port = remote_port
         # TODO: Better construction interface.
-        self.api = MediaserverApi(GenericMediaserverApi.new(name, address, local_port))
+        self.api = MediaserverApi('{}:{}'.format(address, local_port), alias=name)
 
     def __repr__(self):
         return '<LwMediaserver {} at {}>'.format(self.name, self.api.generic.http.url(''))
 
 
-@with_logger(_logger, 'framework.waiting')
-@with_logger(_logger, 'framework.http_api')
-@with_logger(_logger, 'framework.mediaserver_api')
+@context_logger(_logger, 'framework.waiting')
+@context_logger(_logger, 'framework.http_api')
+@context_logger(_logger, 'framework.mediaserver_api')
 class LwMultiServer(BaseMediaserver):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
@@ -197,4 +197,4 @@ class LwMultiServer(BaseMediaserver):
 
     def _is_synced(self):
         response = self[0].api.generic.get('/api/moduleInformation', timeout=LWS_SYNC_CHECK_TIMEOUT_SEC)
-        return response['serverFlags'] == 'SF_P2pSyncDone'
+        return 'SF_P2pSyncDone' in response['serverFlags'].split('|')

@@ -254,44 +254,12 @@ bool CLH264RtpParser::clearInternalBuffer()
     return false;
 }
 
-bool CLH264RtpParser::isIFrame(const quint8* data, int dataLen) const
-{
-    if (dataLen < 2)
-        return false;
-
-    quint8 nalType = *data & 0x1f;
-    bool isSlice = isSliceNal(nalType);
-    if (!isSlice)
-        return false;
-
-    if (nalType == nuSliceIDR)
-        return true;
-
-    BitStreamReader bitReader;
-    bitReader.setBuffer(data+1, data + dataLen);
-    try
-    {
-        //extract first_mb_in_slice
-        NALUnit::extractUEGolombCode(bitReader);
-
-        int slice_type = NALUnit::extractUEGolombCode(bitReader);
-        if (slice_type >= 5)
-            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
-
-        return (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE);
-    }
-    catch (...)
-    {
-        return false;
-    }
-}
-
 bool CLH264RtpParser::isFirstSliceNal(
     const quint8 nalType,
     const quint8* data,
     int dataLen ) const
 {
-    bool isSlice = isSliceNal(nalType);
+    bool isSlice = NALUnit::isSliceNal(nalType);
     if(!isSlice)
         return false;
 
@@ -322,7 +290,7 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
             m_builtinSpsFound = true;
         else if (nalUnitType == nuPPS)
             m_builtinPpsFound = true;
-        else if (isSliceNal(nalUnitType))
+        else if (NALUnit::isSliceNal(nalUnitType))
         {
             m_frameExists = true;
             if (nalUnitType == nuSliceIDR)
@@ -334,7 +302,7 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
                         ++m_idrCounter;
                 }
             }
-            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && isIFrame(data, dataLen))
+            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && NALUnit::isIFrame(data, dataLen))
             {
                 m_keyDataExists = true;
             }
@@ -385,12 +353,7 @@ bool CLH264RtpParser::isPacketStartsNewFrame(
     }
 
     auto nalUnitType = *curPtr & 0x1f;
-    return !isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
-}
-
-bool CLH264RtpParser::isSliceNal(quint8 nalUnitType) const
-{
-    return nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
+    return !NALUnit::isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
 }
 
 bool CLH264RtpParser::processData(

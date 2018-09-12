@@ -7773,7 +7773,7 @@ to %1</source>
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation>サーバーのストレージの空き容量が不足しています</translation>
+      <translation>サーバーストレージに十分なスペースがありません</translation>
     </message>
   </context>
   <context>
@@ -8859,7 +8859,7 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation>警告! このビルドはテスト目的のみ!</translation>
+      <translation>警告！このビルドはテスト目的のみのものです！</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>

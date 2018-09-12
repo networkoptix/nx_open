@@ -123,7 +123,6 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             {
                 if (status == CL_HTTP_AUTH_REQUIRED)
                 {
-                    getResource()->setStatus(Qn::Unauthorized);
                     return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
                 }
                 else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned)
@@ -229,7 +228,6 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
-                getResource()->setStatus(Qn::Unauthorized);
                 return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
             }
             else if (status != CL_HTTP_SUCCESS)

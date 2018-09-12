@@ -5,18 +5,20 @@ import pytest
 
 import framework.licensing as licensing
 from defaults import defaults
-from framework.installation.installer import Installer, PackageNameParseError, InstallerSet
+from framework.installation.installer import InstallerSet
 from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
+
+pytest_plugins = ['fixtures.vms']
 
 _logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
     parser.addoption(
-        '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'),
+        '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'), type=LocalPath,
         help="Directory with installers of same version and customization.")
     parser.addoption(
         '--customization',
@@ -24,14 +26,14 @@ def pytest_addoption(parser):
     parser.addoption('--mediaserver-dist-path', help="Ignored.")
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def mediaserver_installers_dir(request, metadata):
-    dir = LocalPath(request.config.getoption('--mediaserver-installers-dir'))
+    dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
     metadata['Mediaserver Installers Dir'] = dir
     return dir
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def mediaserver_installer_set(mediaserver_installers_dir, metadata):
     installer_set = InstallerSet(mediaserver_installers_dir)
     metadata['Mediaserver Version'] = installer_set.version
@@ -39,7 +41,7 @@ def mediaserver_installer_set(mediaserver_installers_dir, metadata):
     return installer_set
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def customization(request, mediaserver_installer_set):
     customization_from_argument = request.config.getoption('--customization')
     if customization_from_argument is not None:
@@ -93,6 +95,11 @@ def one_running_mediaserver(one_mediaserver):
 
 
 @pytest.fixture()
+def one_mediaserver_api(one_running_mediaserver):
+    return one_running_mediaserver.api
+
+
+@pytest.fixture(scope='session')
 def required_licenses():
     return [dict(n_cameras=100)]
 
@@ -116,14 +123,14 @@ def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca):
     def cm(vm):
         mediaserver = Mediaserver.setup(
             vm.os_access, mediaserver_installer_set, ca.generate_key_and_cert())
-        with mediaserver.os_access.traffic_capture.capturing() as cap:
-            yield mediaserver
-
-        mediaserver.examine()
         mediaserver_artifacts_dir = artifacts_dir / mediaserver.name
         mediaserver_artifacts_dir.ensure_empty_dir()
-        mediaserver.collect_artifacts(mediaserver_artifacts_dir)
-        if cap.exists():
-            copy_file(cap, mediaserver_artifacts_dir / '{}.cap'.format(vm.alias))
+        capture_file = mediaserver_artifacts_dir / '{}.cap'.format(vm.alias)
+        try:
+            with mediaserver.os_access.traffic_capture.capturing(capture_file):
+                yield mediaserver
+        finally:
+            mediaserver.examine()
+            mediaserver.collect_artifacts(mediaserver_artifacts_dir)
 
     return cm

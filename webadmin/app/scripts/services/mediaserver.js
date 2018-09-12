@@ -170,7 +170,8 @@ angular.module('webadminApp')
 
 
         mediaserver = {
-            checkCurrentPassword:function(password){
+            // TODO: remove this method and all usages in 4.1 release or later. We keep it for now to simplify merges
+            /*checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
                 var nonce = $localStorage.nonce;
@@ -180,7 +181,7 @@ angular.module('webadminApp')
                     return $q.when(true);
                 }
                 return $q.reject();
-            },
+            },*/
             getNonce:function(login, url){
                 var params = {
                     userName:login
@@ -278,11 +279,7 @@ angular.module('webadminApp')
                 return proxy;
             },
             logUrl:function(name, lines){
-                name = name ? "?name=" + name : '';
-                lines = lines ? "lines=" + lines : '';
-                if(lines)
-                    lines = (name ? "&": "?") + lines;
-                return proxy + '/web/api/showLog' + name + lines;
+                return proxy + '/web/api/showLog?' + $.param({name: name, lines: lines});
             },
             authForMedia:function(){
                 return $localStorage.auth;
@@ -356,16 +353,17 @@ angular.module('webadminApp')
                     };
                 });
             },
-            disconnectFromCloud:function(ownerLogin,ownerPassword){
+            disconnectFromCloud:function(currentPassword, ownerLogin,ownerPassword){
                 var params = ownerPassword ? {
+                    currentPassword: currentPassword,
                     password: ownerPassword,
                     login: ownerLogin
-                }: null;
+                }: {currentPassword:currentPassword};
                 return wrapPost(proxy + '/web/api/detachFromCloud',params);
 
             },
-            disconnectFromSystem:function(){
-                return wrapPost(proxy + '/web/api/detachFromSystem');
+            disconnectFromSystem:function(currentPassord){
+                return wrapPost(proxy + '/web/api/detachFromSystem',{currentPassord:currentPassord});
             },
             restoreFactoryDefaults:function(currentPassword){
                 return wrapPost(proxy + '/web/api/restoreState', {
@@ -412,7 +410,7 @@ angular.module('webadminApp')
                 });
             },
 
-            mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
+            mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem, currentPassword){
                 // 1. get remote nonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
@@ -433,7 +431,8 @@ angular.module('webadminApp')
                         getKey: getKey,
                         postKey: postKey,
                         url: url,
-                        takeRemoteSettings: !keepMySystem
+                        takeRemoteSettings: !keepMySystem,
+                        currentPassword: currentPassword
                     });
                 });
             },
@@ -482,15 +481,18 @@ angular.module('webadminApp')
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
             },
-            logLevel:function(logId, loggerName, level){
-                logId = logId ? '?id=' + logId : '';
-                loggerName = loggerName ? '?name=' + loggerName: '';
-                level = level ? '&value=' + level : '';
-                // Prioritize name of the logger over logger id
-                var query = loggerName ? loggerName + level : "";
-                query = !query && logId ? logId + level : query;
-                
-                return wrapGet(proxy + '/web/api/logLevel' + query);
+            logLevel:function(logId, loggerName, level) {
+                var query = {};
+                if(logId) {
+                    query.id = logId;
+                }
+                if(loggerName) {
+                    query.name = loggerName;
+                }
+                if(level) {
+                    query.value = level;
+                }
+                return wrapGet(proxy + '/web/api/logLevel?' + $.param(query));
             },
 
 

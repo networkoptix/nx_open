@@ -19,7 +19,7 @@ class Run(object):
         self.server = server
         self.id = camera_id
         self.data = None  # type: dict
-        self.media_url = server.api.generic.http.url(camera_id, media=True, with_auth=True)
+        self.media_url = server.api.generic.http.media_url(camera_id)
 
     def update_data(self):
         self.data = self.server.api.get_resource('CamerasEx', self.id)

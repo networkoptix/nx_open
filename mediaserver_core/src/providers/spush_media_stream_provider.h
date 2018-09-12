@@ -1,5 +1,4 @@
-#ifndef server_push_stream_reader_h2055
-#define server_push_stream_reader_h2055
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -9,7 +8,6 @@
 
 #include <core/dataprovider/abstract_media_stream_provider.h>
 #include "live_stream_provider.h"
-#include <camera/camera_error_processor.h>
 
 #include <nx/mediaserver/resource/resource_fwd.h>
 
@@ -20,8 +18,6 @@ class CLServerPushStreamReader
     public QnLiveStreamProvider,
     public QnAbstractMediaStreamProvider
 {
-    Q_OBJECT
-
 public:
     CLServerPushStreamReader(
         const nx::mediaserver::resource::CameraPtr& dev);
@@ -35,18 +31,8 @@ public:
         \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
-    virtual bool canChangeStatus() const;
 
-    int lostFramesCount() const;
-    void setLostFramesCount(int count);
-    void reportConnectionLost();
-    int totalFramesCount() const;
-
-signals:
-    void streamError(
-        CLServerPushStreamReader* streamReader,
-        nx::mediaserver::camera::ErrorProcessor::Code ecode);
-
+    virtual CameraDiagnostics::Result openStreamResult() const override;
 private:
     void at_audioEnabledChanged(const QnResourcePtr& res);
 
@@ -76,11 +62,8 @@ private:
     int m_openStreamCounter = 0;
     QnWaitCondition m_cond;
     QnMutex m_openStreamMutex;
-    int m_framesCount = 0;
     QElapsedTimer m_needControlTimer;
     bool m_openedWithStreamCtrl = false;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif //server_push_stream_reader_h2055

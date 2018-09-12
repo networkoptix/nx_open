@@ -10,7 +10,6 @@
 #include <camera/video_camera.h>
 #include <camera/camera_pool.h>
 #include <utils/common/synctime.h>
-#include <providers/spush_media_stream_provider.h>
 #include <nx/network/http/http_types.h>
 
 namespace nx::mediaserver::camera {
@@ -21,16 +20,32 @@ ErrorProcessor::ErrorProcessor(QnMediaServerModule* serverModule)
 /**
  * General sink for various stream errors signals. Dispatched further according to the error CODE.
  */
-void ErrorProcessor::onStreamReaderError(CLServerPushStreamReader* streamReader, Code code)
+void ErrorProcessor::onStreamReaderError(
+    QnAbstractMediaStreamDataProvider* streamReader,
+    QnAbstractMediaStreamDataProvider::ErrorCode code)
 {
     switch (code)
     {
-        case Code::frameLost:
-            processFrameLostError(streamReader);
+        case QnAbstractMediaStreamDataProvider::ErrorCode::streamIssue:
+            processStreamIssueError(streamReader);
+            break;
+        case QnAbstractMediaStreamDataProvider::ErrorCode::noError:
+            processNoError(streamReader);
             break;
         default:
             break;
     }
+}
+
+void ErrorProcessor::processNoError(QnAbstractMediaStreamDataProvider* streamReader)
+{
+    auto camera = streamReader->getResource().dynamicCast<resource::Camera>();
+    NX_ASSERT(camera);
+    if (!camera)
+        return;
+    camera->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
+    if (camera->getStatus() == Qn::Unauthorized || camera->getStatus() == Qn::Offline)
+        camera->setStatus(Qn::Online);
 }
 
 /**
@@ -42,60 +57,56 @@ void ErrorProcessor::onStreamReaderError(CLServerPushStreamReader* streamReader,
  *     No frames last few seconds from other streams -> set owner's status to OFFLINE
  *     Otherwise -> keep working
  */
-void ErrorProcessor::processFrameLostError(CLServerPushStreamReader* streamReader)
+void ErrorProcessor::processStreamIssueError(QnAbstractMediaStreamDataProvider* streamReader)
 {
-    streamReader->setNeedKeyData();
+    auto ownerResource = streamReader->getResource().dynamicCast<resource::Camera>();
+    NX_ASSERT(ownerResource);
+    if (!ownerResource || !ownerResource->isInitialized())
+        return;
+
     auto videoCamera = streamReader->getOwner().dynamicCast<QnVideoCamera>();
     NX_ASSERT(videoCamera);
     if (!videoCamera)
         return;
 
-    auto ownerResource = videoCamera->resource().dynamicCast<resource::Camera>();
-    NX_ASSERT(ownerResource);
-    if (!ownerResource || !ownerResource->isInitialized())
-        return;
-
-    streamReader->setLostFramesCount(streamReader->lostFramesCount() + 1);
-    if (streamReader->lostFramesCount() < MAX_LOST_FRAME)
-        return;
-
-    if (!streamReader->canChangeStatus() || ownerResource->getStatus() == Qn::Unauthorized)
+    if (!ownerResource->getStatus() == Qn::Unauthorized)
         return; //< Avoid offline->unauthorized->offline loop.
 
-    if (streamReader->getLastResponseCode() == network::http::StatusCode::unauthorized)
+    auto mediaStreamProvider = dynamic_cast<QnAbstractMediaStreamProvider*>(streamReader);
+
+    if (mediaStreamProvider
+        && mediaStreamProvider->openStreamResult().errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
     {
         ownerResource->setStatus(Qn::Unauthorized);
-        streamReader->setLostFramesCount(0);
+        return;
     }
-    else
-    {
-        const auto kMaxTimeFromPreviousFrameUs = 5 * 1000 * 1000;
-        auto nowUs = qnSyncTime->currentMSecsSinceEpoch() * 1000LL;
-        bool hasUpToDateFrames = false;
 
-        for (int i = 0; i < ownerResource->getVideoLayout()->channelCount(); ++i)
+    if (!streamReader->reinitResourceOnStreamError())
+        return;
+
+    const auto kMaxTimeFromPreviousFrameUs = 5 * 1000 * 1000;
+    auto hasGopData = [&](Qn::StreamIndex streamIndex)
         {
-            auto lastPrimaryFrame = videoCamera->getLastVideoFrame(true, i);
-            auto lastSecondaryFrame = videoCamera->getLastVideoFrame(false, i);
-            if ((lastPrimaryFrame && lastPrimaryFrame->timestamp - nowUs < kMaxTimeFromPreviousFrameUs)
-                || (lastSecondaryFrame && lastSecondaryFrame->timestamp - nowUs < kMaxTimeFromPreviousFrameUs))
+            const auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
+            for (int i = 0; i < ownerResource->getVideoLayout()->channelCount(); ++i)
             {
-                hasUpToDateFrames = true;
-                break;
+                auto lastFrame = videoCamera->getLastVideoFrame(streamIndex == Qn::StreamIndex::primary, i);
+                if (lastFrame && nowUs - lastFrame->timestamp < kMaxTimeFromPreviousFrameUs)
+                    return true;
             }
-        }
+            return false;
+        };
+    bool gotVideoFrameRecently =
+        hasGopData(Qn::StreamIndex::primary) || hasGopData(Qn::StreamIndex::secondary);
 
-        if (!hasUpToDateFrames)
-        {
-            if (streamReader->totalFramesCount() > 0)
-                ownerResource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
-            else
-                ownerResource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
+    if (!gotVideoFrameRecently)
+    {
+        if (streamReader->getStatistics(0)->getTotalData() > 0)
+            ownerResource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
+        else
+            ownerResource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
 
-            ownerResource->setStatus(Qn::Offline);
-            streamReader->setLostFramesCount(0);
-            streamReader->reportConnectionLost();
-        }
+        ownerResource->setStatus(Qn::Offline);
     }
 }
 

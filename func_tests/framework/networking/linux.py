@@ -7,10 +7,10 @@ from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_shell import SSH
-from framework.switched_logging import SwitchedLogger, with_logger
+from framework.context_logger import ContextLogger, context_logger
 from framework.waiting import wait_for_truthy
 
-_logger = SwitchedLogger(__name__, 'networking')
+_logger = ContextLogger(__name__, 'networking')
 
 
 _iptables_rules = [
@@ -22,7 +22,7 @@ _iptables_rules = [
     ]
 
 
-@with_logger(_logger, 'ssh')
+@context_logger(_logger, 'ssh')
 class LinuxNetworking(Networking):
     def __init__(self, ssh, macs):
         super(LinuxNetworking, self).__init__()

@@ -21,11 +21,11 @@ class Ping:
 public:
     static const QString kHandlerPath;
 
-    Ping(const AuthorizationManager& authorizationManager):
+    Ping(const SecurityManager& securityManager):
         FiniteMsgBodyHttpHandler<void, api::ModuleInfo>(
             EntityType::module,
             DataActionType::fetch,
-            authorizationManager,
+            securityManager,
             std::bind(
                 &Ping::processPing, this,
                 std::placeholders::_1, std::placeholders::_2))
