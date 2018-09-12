@@ -191,7 +191,7 @@ void Plugin::executeAction(Action* action, Error* outError)
     // Do nothing.
 }
 
-boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
+boost::optional<QList<QString>> Plugin::fetchSupportedEvents(
     const CameraInfo& cameraInfo)
 {
     using namespace nx::mediaserver_core::plugins;
@@ -209,10 +209,10 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
+    return eventTypeIdsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
-boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
+boost::optional<QList<QString>> Plugin::eventTypeIdsFromParameters(
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
     const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
     int channel) const
@@ -226,14 +226,14 @@ boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
     if (!supportedEventsParameter.is_initialized())
         return boost::none;
 
-    QSet<QnUuid> result;
+    QSet<QString> result;
 
     const auto& supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName: supportedEvents)
     {
-        auto guid = m_driverManifest.eventTypeByName(eventName);
-        if (!guid.isNull())
-            result.insert(guid);
+        auto eventTypeId = m_driverManifest.eventTypeIdByName(eventName);
+        if (!eventTypeId.isNull())
+            result.insert(eventTypeId);
 
         const auto altEventName = specialEventName(eventName);
         if (!altEventName.isEmpty())
@@ -247,15 +247,15 @@ boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
 
                 if (isMatched)
                 {
-                    guid = m_driverManifest.eventTypeByName(fullEventName);
-                    if (!guid.isNull())
-                        result.insert(guid);
+                    eventTypeId = m_driverManifest.eventTypeIdByName(fullEventName);
+                    if (!eventTypeId.isNull())
+                        result.insert(eventTypeId);
                 }
             }
         }
     }
 
-    return QList<QnUuid>::fromSet(result);
+    return QList<QString>::fromSet(result);
 }
 
 const Hanwha::DriverManifest& Plugin::driverManifest() const

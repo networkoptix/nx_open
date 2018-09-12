@@ -21,7 +21,8 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Empty value means that the directory containing .ini files will be used.");
 
     NX_INI_STRING("", metadataPluginCameraManagerSettingsPath,
-        "Path to {plugin_name}_camera_manager.json: array of objects with name and value strings.\n"
+        "Path to {plugin_name}_camera_manager_for_{camera_physical_id}.json:\n"
+        "array of objects with name and value strings.\n"
         "Empty value means that the directory containing .ini files will be used.");
 
     NX_INI_STRING("", metadataPluginManifestOutputPath,

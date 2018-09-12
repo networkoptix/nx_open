@@ -130,6 +130,35 @@ std::string printPrefix(const char* file)
 } // namespace detail
 
 //-------------------------------------------------------------------------------------------------
+// Assertions
+
+namespace detail {
+
+void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line)
+{
+    printFunc((std::string("\n")
+        + ">>> ASSERTION FAILED: "
+        + nx::kit::debug::relativeSrcFilename(file) + ":" + nx::kit::debug::toString(line)
+        + " (" + conditionStr + ") " + message
+    ).c_str());
+
+    #if !defined(NDEBUG)
+        #if defined(_WIN32)
+            // Copy error text to a stack variable so it is present in the mini-dump.
+            char textOnStack[256] = {0};
+            strncpy(textOnStack, sizeof(textOnStack) - 1, message.c_str());
+        #endif
+
+        // Crash the process to let a dump/core be generated.
+        *reinterpret_cast<volatile int*>(0) = 0;
+    #endif
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 // Print info
 
 std::string toString(std::string s)
@@ -175,9 +204,12 @@ std::string toString(char* s)
 
 std::string toString(const void* ptr)
 {
-    if (ptr == nullptr)
-        return "null";
-    return format("%p", ptr);
+    return ptr ? format("%p", ptr) : "null";
+}
+
+std::string toString(bool b)
+{
+    return b ? "true" : "false";
 }
 
 namespace detail {

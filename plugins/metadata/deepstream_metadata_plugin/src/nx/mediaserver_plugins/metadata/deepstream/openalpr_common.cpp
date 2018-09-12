@@ -1,13 +1,11 @@
-#pragma once
-
-#include <string>
+#include "openalpr_common.h"
 
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace deepstream {
 
-extern const std::string kLicensePlateGuid;
+const std::string kLicensePlateGuid = "nx.openalpr.licencePlate";
 
 } // namespace deepstream
 } // namespace metadata

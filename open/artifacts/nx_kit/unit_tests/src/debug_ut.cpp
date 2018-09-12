@@ -83,6 +83,25 @@ TEST(debug, overrideStreamPreproc)
     ASSERT_EQ("[" + debug::fileBaseNameWithoutExt(__FILE__) + "] TEST\n", stringStream.str());
 }
 
+TEST(debug, assertSuccess)
+{
+    static const bool trueCondition = true;
+    NX_KIT_ASSERT(trueCondition);
+    NX_KIT_ASSERT(trueCondition, "This assertion with a message should not fail.");
+}
+
+TEST(debug, assertFailureInRelease)
+{
+    #if defined(NDEBUG)
+        static const bool condition = false;
+    #else
+        static const bool condition = true;
+    #endif
+
+    NX_KIT_ASSERT(condition, "This and the previous assertions should fail in Debug.");
+    NX_KIT_ASSERT(condition);
+}
+
 TEST(debug, show)
 {
     const char charValue = 'z';

@@ -12,10 +12,10 @@ namespace nx {
 namespace api {
 
 // TODO: Rename all classes replacing "driver" with "plugin".
-
-// TODO: Rename to MetadataPluginManifestBase.
+// TODO: Consider changing namespaces.
+// TODO: Rename to MetadataPluginManifestBase or similar, considering namespaces.
 /**
- * Description of the analytics driver, which can generate different events.
+ * Description of the mediaserver metadata plugin.
  */
 struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifestBase
 {
@@ -38,8 +38,8 @@ public:
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
-    QnUuid driverId;
-    TranslatableString driverName;
+    QString pluginId;
+    TranslatableString pluginName;
     QStringList acceptedDataTypes;
     QStringList supportedCodecs;
     QStringList supportedHandleTypes;
@@ -49,14 +49,14 @@ public:
 Q_DECLARE_OPERATORS_FOR_FLAGS(AnalyticsDriverManifestBase::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 
-#define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)\
+#define AnalyticsDriverManifestBase_Fields (pluginId)(pluginName)(acceptedDataTypes)\
     (supportedCodecs)(supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
 struct AnalyticsManifestObjectAction
 {
     QString id;
     TranslatableString name;
-    QList<QnUuid> supportedObjectTypeIds;
+    QList<QString> supportedObjectTypeIds;
     // TODO: Add settings.
 };
 #define AnalyticsManifestObjectAction_Fields \
@@ -65,7 +65,7 @@ struct AnalyticsManifestObjectAction
 struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
     QList<Analytics::EventType> outputEventTypes;
-    QList<Analytics::EventType> outputObjectTypes;
+    QList<Analytics::ObjectType> outputObjectTypes;
     QList<AnalyticsManifestObjectAction> objectActions;
     QList<Analytics::Group> groups;
     // TODO: #mike: Add other fields, see stub_metadata_plugin.

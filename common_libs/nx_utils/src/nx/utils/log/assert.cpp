@@ -26,10 +26,10 @@ void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 void crashProgram(const log::Message& message)
 {
     #if defined(_WIN32)
-        // Copy error text to stack variable so it is present in mini dump.
-        char textOnStack[256] = { 0 };
-        const auto text = message.toStdString();
-        std::memcpy(textOnStack, text.c_str(), std::min(text.size() + 1, sizeof(textOnStack)));
+        // Copy error text to a stack variable so it is present in the mini-dump.
+        char textOnStack[256] = {0};
+        const auto text = lm("%1").arg(message).toStdString();
+        strncpy(textOnStack, text.c_str(), sizeof(textOnStack) - 1);
     #else
         unused(message);
     #endif

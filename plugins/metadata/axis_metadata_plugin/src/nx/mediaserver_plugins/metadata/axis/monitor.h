@@ -73,14 +73,14 @@ public:
         nx::sdk::metadata::MetadataHandler* handler);
     virtual ~Monitor();
 
-    void addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize);
+    void addRules(const nx::network::SocketAddress& localAddress,
+        const char* const* eventTypeList, int eventTypeListSize);
 
     void removeRules();
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    nx::sdk::Error startMonitoring(nxpl::NX_GUID* eventTypeList, int eventTypeListSize);
+    nx::sdk::Error startMonitoring(const char* const* typeList, int typeListSize);
 
     void stopMonitoring();
 

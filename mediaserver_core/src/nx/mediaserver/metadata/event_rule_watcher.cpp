@@ -67,7 +67,7 @@ void EventRuleWatcher::at_resourceAdded(const QnResourcePtr& resource)
     emit rulesUpdated(m_ruleHolder.addResource(resource));
 }
 
-QSet<QnUuid> EventRuleWatcher::watchedEventsForResource(const QnUuid& resourceId)
+QSet<QString> EventRuleWatcher::watchedEventsForResource(const QnUuid& resourceId) const
 {
     return m_ruleHolder.watchedEvents(resourceId);
 }

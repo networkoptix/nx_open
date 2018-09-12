@@ -149,20 +149,20 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
 
-        const auto& objectDescriptions = pipeline->objectClassDescriptions();
+        const auto& objectClassDescriptions = pipeline->objectClassDescriptions();
         const auto objectClassId = roiMeta.class_id;
 
-        if (objectClassId < objectDescriptions.size())
+        if (objectClassId < objectClassDescriptions.size())
         {
-            detectedObject->setTypeId(objectDescriptions[objectClassId].guid);
+            detectedObject->setTypeId(objectClassDescriptions[objectClassId].typeId);
             attributes.emplace_front(
                 nx::sdk::AttributeType::string,
                 "Type",
-                objectDescriptions[objectClassId].name);
+                objectClassDescriptions[objectClassId].name);
         }
         else
         {
-            detectedObject->setTypeId(kNullGuid);
+            detectedObject->setTypeId("");
         }
 
         if (ini().showGuids)
