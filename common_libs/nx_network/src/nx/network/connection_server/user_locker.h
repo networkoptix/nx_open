@@ -9,6 +9,8 @@
 #include <nx/utils/math/sum_per_period.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "access_blocker_pool.h"
+
 namespace nx {
 namespace network {
 namespace server {
@@ -20,13 +22,6 @@ struct UserLockerSettings
     std::chrono::milliseconds lockPeriod = std::chrono::minutes(1);
 };
 
-enum class LockUpdateResult
-{
-    noChange,
-    locked,
-    unlocked,
-};
-
 /**
  * If there were not less than authFailureCount login failures during last checkPeriod,
  * then username is locked for another lockPeriod.
@@ -34,12 +29,6 @@ enum class LockUpdateResult
 class NX_NETWORK_API UserLocker
 {
 public:
-    enum class AuthResult
-    {
-        success,
-        failure,
-    };
-
     UserLocker(const UserLockerSettings& settings);
 
     LockUpdateResult updateLockoutState(AuthResult authResult);
@@ -53,30 +42,23 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_NETWORK_API UserLockerPool
+using UserAccessBlockerPool = AccessBlockerPool<
+    std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>,
+    UserLocker,
+    UserLockerSettings>;
+
+class UserLockerPool:
+    public UserAccessBlockerPool
 {
+    using base_type = UserAccessBlockerPool;
+
 public:
-    using Key = std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>;
-
-    UserLockerPool(const UserLockerSettings& settings);
-
-    LockUpdateResult updateLockoutState(
-        const Key& key,
-        UserLocker::AuthResult authResult);
-    bool isLocked(const Key& key) const;
-
-    std::map<Key, UserLocker> userLockers() const;
-
-    const UserLockerSettings& settings() const;
-
-private:
-    const UserLockerSettings m_settings;
-    mutable QnMutex m_mutex;
-    std::map<Key, UserLocker> m_userLockers;
-    mutable utils::ElapsedTimerPool<Key> m_timers;
-    const std::chrono::milliseconds m_unusedLockerExpirationPeriod;
-
-    void removeLocker(const Key& key);
+    UserLockerPool(const UserLockerSettings& settings):
+        base_type(
+            settings,
+            std::max(settings.checkPeriod, settings.lockPeriod))
+    {
+    }
 };
 
 } // namespace server

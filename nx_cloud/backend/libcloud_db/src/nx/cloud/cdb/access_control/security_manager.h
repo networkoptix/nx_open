@@ -4,7 +4,7 @@ namespace nx::cdb {
 
 class AuthenticationManager;
 class AuthorizationManager;
-class TransportSecurityManager;
+class AccessBlocker;
 
 class SecurityManager
 {
@@ -12,19 +12,19 @@ public:
     SecurityManager(
         AuthenticationManager* authenticator,
         const AuthorizationManager& authorizer,
-        const TransportSecurityManager& transportSecurityManager);
+        const AccessBlocker& accessBlocker);
 
     AuthenticationManager& authenticator();
     const AuthenticationManager& authenticator() const;
 
-    const TransportSecurityManager& transportSecurityManager() const;
+    const AccessBlocker& accessBlocker() const;
 
     const AuthorizationManager& authorizer() const;
 
 private:
     AuthenticationManager* m_authenticator;
     const AuthorizationManager& m_authorizer;
-    const TransportSecurityManager& m_transportSecurityManager;
+    const AccessBlocker& m_transportSecurityManager;
 };
 
 } // namespace nx::cdb
