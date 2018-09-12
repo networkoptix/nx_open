@@ -8,7 +8,5 @@ networks:
     proxy-1:
     second:
 mergers:
-  first:
-    proxy-1:
-      settings: remote
-    second:
+- {local: proxy-1, remote: first, settings: remote}
+- {local: second, remote: first}

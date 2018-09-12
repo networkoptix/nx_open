@@ -3,10 +3,8 @@ machines:
 - {alias: second, type: linux}
 - {alias: proxy, type: linux}
 mergers:
-  first:
-    proxy:
-  second:
-    proxy:
+- {local: proxy, remote: first}
+- {local: proxy, remote: second}
 networks:
   10.254.0.0/28:
     first:
