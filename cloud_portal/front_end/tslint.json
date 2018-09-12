@@ -57,7 +57,7 @@
         "jsdoc-format"                    : true,
         "linebreak-style"                 : [
             true,
-            "CRLF"
+            "LF"
         ],
         "next-line"                       : [
             true,

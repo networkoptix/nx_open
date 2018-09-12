@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = 'runserver' in sys.argv
+LOCAL_ENVIRONMENT = False and 'runserver' in sys.argv
 conf = get_config()
 
 sys.stderr.write ("Loaded config: \n" + json.dumps(conf, indent=4, sort_keys=True) + "\n")
@@ -31,9 +31,9 @@ CUSTOMIZATION = os.getenv('CUSTOMIZATION')
 if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
 
-assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
+# assert ('trafficRelay' in conf), 'Ivan, please add traffic relay to config for this instance'
 
-TRAFFIC_RELAY_HOST = '{systemId}.' + conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
+TRAFFIC_RELAY_HOST = '{systemId}.' #+ conf['trafficRelay']['host']  # {systemId}.relay-bur.vmsproxy.hdw.mx
 TRAFFIC_RELAY_PROTOCOL = 'https://'
 
 # Quick-start development settings - unsuitable for production
@@ -43,7 +43,7 @@ TRAFFIC_RELAY_PROTOCOL = 'https://'
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
+DEBUG = True or 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
@@ -340,8 +340,8 @@ AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 CORS_ORIGIN_ALLOW_ALL = DEBUG
 CORS_ALLOW_CREDENTIALS = DEBUG
 
-SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
-CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
+#SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
+#CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 
 USE_ASYNC_QUEUE = True
 

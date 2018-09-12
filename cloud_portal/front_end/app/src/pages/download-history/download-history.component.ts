@@ -8,7 +8,6 @@ import { DOCUMENT, Location }           from '@angular/common';
 import { isNumeric }                    from 'rxjs/util/isNumeric';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
-
 @Component({
     selector: 'download-history',
     templateUrl: 'download-history.component.html',
@@ -21,7 +20,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
     private sub: any;
     private build: any;
-    private deviceInfo = null;
+    private userAuthorized: boolean;
 
     user: any;
     downloads: any;
@@ -47,12 +46,14 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 location: Location) {
 
         this.location = location;
+        this.userAuthorized = false;
     }
 
     private getData () {
         this.authorizationService
             .requireLogin()
             .then(() => {
+                this.userAuthorized = true;
                 this.cloudApi
                     .getDownloadsHistory(this.build)
                     .then(result => {
@@ -82,7 +83,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        let section = $event.nextId;
+        const section = $event.nextId;
 
         if (this.location.path() === '/downloads/' + section) {
             return;
@@ -92,13 +93,13 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
         // AJS and A5 routers freak out about route change *****
         // this.router.navigate(['/downloads/' + section]);
         this.location.go('/downloads/' + section);
-    };
+    }
 
     ngOnInit(): void {
         this.downloads = this.configService.config.downloads;
 
         this.sub = this.route.params.subscribe(params => {
-            //this.build = params['build'];
+            // this.build = params['build'];
 
             this.routeParam = this.routeParam || 'releases';
             if (isNumeric(this.routeParam)) {
