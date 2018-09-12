@@ -13,6 +13,7 @@ export class NxSandboxComponent implements OnInit, OnDestroy {
     group: string;
     agree: boolean;
     show: boolean;
+    show5: boolean;
     edit: boolean;
 
     submitted = false;
@@ -22,6 +23,7 @@ export class NxSandboxComponent implements OnInit, OnDestroy {
     private setupDefaults() {
 
         this.show = false;
+        this.show5 = false;
         this.blah = 'blah1';
         this.group = 'Tsanko';
         this.agree = false;

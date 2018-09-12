@@ -39,10 +39,9 @@ import {
     encapsulation: ViewEncapsulation.None
 })
 export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Validator {
-    @Input() id: string;
-    @Input() name: string;
+    @Input() compId: string;
     @Input() required: any;
-    @Input() checked: boolean;
+    @Input() checked: any;
     @Input() disabled: any;
     @Output() onClick = new EventEmitter<string>();
 
@@ -89,7 +88,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
 
         setTimeout(() => {
             // set state after model was updated
-            this.value = this.checked || false;
+            this.value = (this.checked !== undefined) || false;
             this.setState();
         });
     }
@@ -98,7 +97,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
      * Write a new (model) value to the element.
      */
     writeValue(value: any) {
-        if (value !== null) {
+        if (value !== null && !this.disabled) {
             this.value = value;
             this.state = this.cbxStates[this.value];
         }
@@ -129,7 +128,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
         this.onClick.emit(this.value);
     }
 
-    changeState() {
+    changeState(event) {
         if (this.disabled) {
             return
         }
