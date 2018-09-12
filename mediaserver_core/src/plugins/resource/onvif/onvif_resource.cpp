@@ -144,8 +144,8 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
         for (uint i = 0; i < srcVector->size(); ++i)
             resolutions << QSize(srcVector->at(i)->Width, srcVector->at(i)->Height);
     }
-    isH264 = resp.Options->H264;
-    if (isH264)
+
+    if (resp.Options->H264)
     {
         encoding = UnderstandableVideoCodec::H264;
 
@@ -199,8 +199,7 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
 
     this->encoding = options.encoder;
 
-    isH264 = (encoding == UnderstandableVideoCodec::H264);
-    if (isH264)
+    if (encoding == UnderstandableVideoCodec::H264)
     {
         for (auto profile: options.encoderProfiles)
         {
@@ -223,6 +222,12 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
 
         }
         std::sort(h264Profiles.begin(), h264Profiles.end());
+    }
+    if (encoding == UnderstandableVideoCodec::H265)
+    {
+        for (const auto profile: options.encoderProfiles)
+            h265Profiles.push_back(profile);
+        std::sort(h265Profiles.begin(), h265Profiles.end());
     }
 
     if (!options.frameRates.empty())
@@ -763,9 +768,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     }
 
     QString media2ServiceUrl;
-    result = fetchOnvifMedia2Url(&media2ServiceUrl);
-    if (!result)
-        return result;
+    fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
+    // because old devices may not support Device::getServices request
 
     setMedia2Url(media2ServiceUrl);
 
@@ -2090,29 +2094,10 @@ bool QnPlOnvifResource::trustMaxFPS()
     return result;
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(
-    Media::VideoEncoderConfigurations* videoEncoderConfigurations, QStringList* tokenList)
+bool QnPlOnvifResource::getVideoEncoderTokens(
+    const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
+    QStringList* tokenList)
 {
-    tokenList->clear();
-
-    videoEncoderConfigurations->receiveBySoap();
-    if (!*videoEncoderConfigurations)
-    {
-#ifdef PL_ONVIF_DEBUG
-        qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: "
-            << "can't get list of video encoders from camera (URL: "
-            << soapWrapper.getEndpointUrl()
-            << ", UniqueId: " << getUniqueId()
-            << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-#endif
-        return videoEncoderConfigurations->requestFailedResult();
-    }
-
-    if (m_appStopping)
-        return CameraDiagnostics::ServerTerminatedResult();
-
-    const auto& configurations = videoEncoderConfigurations->get()->Configurations;
-
     int confRangeStart = 0;
     int confRangeEnd = (int)configurations.size();
     if (m_maxChannels > 1)
@@ -2127,18 +2112,19 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(
             qWarning() << "invalid channel number " << getChannel() + 1
                 << "for camera" << getHostAddress() << "max channels=" << m_maxChannels;
 #endif
-            return videoEncoderConfigurations->requestFailedResult();
+            return false;
+
         }
     }
 
     for (int i = confRangeStart; i < confRangeEnd; ++i)
     {
-        onvifXsd__VideoEncoderConfiguration* configuration = configurations[i];
+        const onvifXsd__VideoEncoderConfiguration* configuration = configurations[i];
         if (configuration)
             tokenList->push_back(QString::fromStdString(configuration->token));
     }
 
-    return CameraDiagnostics::NoErrorResult();
+    return true;
 }
 
 QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
@@ -2171,61 +2157,65 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
 CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds)
 {
-#if 0
-    // Old code - Media.
-    _onvifMedia__GetVideoEncoderConfigurationOptions request;
-    request.ConfigurationToken = const_cast<std::string*>(&token);
-
-    Media::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
-    videoEncoderConfigurationOptions.receiveBySoap(request);
-
-    if (!videoEncoderConfigurationOptions)
+    if (m_serviceUrls.media2ServiceUrl.isEmpty())
     {
-        // #TODO log
-        return videoEncoderConfigurationOptions.requestFailedResult(); // Soap data receiving failed.
-    }
-    const onvifXsd__VideoEncoderConfigurationOptions* options =
-        videoEncoderConfigurationOptions.get()->Options;
-    if (!options)
-    {
-        // #TODO log
-        return CameraDiagnostics::NoErrorResult(); // Soap data receiving succeeded, but no options-data available.
-    }
+        // Old code - Media.
+        _onvifMedia__GetVideoEncoderConfigurationOptions request;
+        request.ConfigurationToken = const_cast<std::string*>(&token);
 
-    if (!options->H264 && !options->JPEG)
-    {
-        // #TODO log
-        return CameraDiagnostics::NoErrorResult(); // Soap data receiving succeeded, but no needed options-data available.
-    }
+        Media::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+        videoEncoderConfigurationOptions.receiveBySoap(request);
 
-    const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response =
-        videoEncoderConfigurationOptions.getEphemeralReference();
-    *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), response, frameRateBounds);
-#else
-    // New code - Media2.
-
-    Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
-    Media2::VideoEncoderConfigurationOptions::Request request;
-    request.ConfigurationToken = const_cast<std::string*>(&token);
-    videoEncoderConfigurationOptions.receiveBySoap(request);
-
-    if (!videoEncoderConfigurationOptions)
-    {
-        // #TODO log
-        return videoEncoderConfigurationOptions.requestFailedResult(); // Soap data receiving failed.
-    }
-
-    std::vector<onvifXsd__VideoEncoder2ConfigurationOptions *>& optionsList =
-        videoEncoderConfigurationOptions.getEphemeralReference().Options;
-
-    for (const onvifXsd__VideoEncoder2ConfigurationOptions* options: optionsList)
-    {
-        if (options && VideoCodecFromString(options->Encoding) != UnderstandableVideoCodec::NONE)
+        if (!videoEncoderConfigurationOptions)
         {
-            *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), *options, frameRateBounds);
+            // #TODO log
+            return videoEncoderConfigurationOptions.requestFailedResult(); // Soap data receiving failed.
         }
+        const onvifXsd__VideoEncoderConfigurationOptions* options =
+            videoEncoderConfigurationOptions.get()->Options;
+        if (!options)
+        {
+            // #TODO log
+            return CameraDiagnostics::NoErrorResult(); // Soap data receiving succeeded, but no options-data available.
+        }
+
+        if (!options->H264 && !options->JPEG)
+        {
+            // #TODO log
+            return CameraDiagnostics::NoErrorResult(); // Soap data receiving succeeded, but no needed options-data available.
+        }
+
+        const _onvifMedia__GetVideoEncoderConfigurationOptionsResponse& response =
+            videoEncoderConfigurationOptions.getEphemeralReference();
+        *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), response, frameRateBounds);
+}
+    else
+    {
+        // New code - Media2.
+
+        Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+        Media2::VideoEncoderConfigurationOptions::Request request;
+        request.ConfigurationToken = const_cast<std::string*>(&token);
+        videoEncoderConfigurationOptions.receiveBySoap(request);
+
+        if (!videoEncoderConfigurationOptions)
+        {
+            // #TODO log
+            return videoEncoderConfigurationOptions.requestFailedResult(); // Soap data receiving failed.
+        }
+
+        std::vector<onvifXsd__VideoEncoder2ConfigurationOptions *>& optionsList =
+            videoEncoderConfigurationOptions.getEphemeralReference().Options;
+
+        for (const onvifXsd__VideoEncoder2ConfigurationOptions* options : optionsList)
+        {
+            if (options && VideoCodecFromString(options->Encoding) != UnderstandableVideoCodec::NONE)
+            {
+                *dstOptionsList << VideoOptionsLocal(QString::fromStdString(token), *options, frameRateBounds);
+            }
+        }
+
     }
-#endif
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2246,9 +2236,24 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     }
     else
     {
-        auto result = getVideoEncoderTokens(&videoEncoderConfigurations, &videoEncodersTokenList);
+        if (m_appStopping)
+            return CameraDiagnostics::ServerTerminatedResult();
+
+        videoEncoderConfigurations.receiveBySoap();
+        if (!videoEncoderConfigurations)
+        {
+            // LOG.
+            return videoEncoderConfigurations.requestFailedResult();
+        }
+
+        auto result = getVideoEncoderTokens(
+            videoEncoderConfigurations.getEphemeralReference().Configurations,
+            &videoEncodersTokenList);
         if (!result)
-            return result;
+        {
+            // LOG.
+            return videoEncoderConfigurations.requestFailedResult();
+        }
     }
 
     // Step 2. Extract video encoder options for every token into optionsList.
@@ -3223,11 +3228,19 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters()
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCameraEx(
-    VideoEncoder& encoder,
+    onvifXsd__VideoEncoderConfiguration& encoder,
     Qn::StreamIndex /*streamIndex*/,
     const QnLiveStreamParams& /*params*/)
 {
     return sendVideoEncoderToCamera(encoder);
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCameraEx(
+    onvifXsd__VideoEncoder2Configuration& encoder,
+    Qn::StreamIndex /*streamIndex*/,
+    const QnLiveStreamParams& /*params*/)
+{
+    return sendVideoEncoder2ToCamera(encoder);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__VideoEncoderConfiguration& encoderConfig)
@@ -3236,7 +3249,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__
 
     SetVideoConfigReq request;
     request.Configuration = &encoderConfig;
-    request.ForcePersistence = false;
+    request.ForcePersistence = false; //##########??? The ForcePersistence element is obsolete and should always be assumed to be true.
     vecSetter.performRequest(request);
     if (!vecSetter)
     {
@@ -3251,6 +3264,24 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__
     return CameraDiagnostics::NoErrorResult();
 }
 
+CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCamera(onvifXsd__VideoEncoder2Configuration& encoderConfig)
+{
+    Media2::VideoEncoderConfigurationSetter vecSetter(makeRequestParams());
+    Media2::VideoEncoderConfigurationSetter::Request request;
+    request.Configuration = &encoderConfig;
+    vecSetter.performRequest(request);
+    if (!vecSetter)
+    {
+        if (vecSetter.innerWrapper().isNotAuthenticated())
+            setStatus(Qn::Unauthorized);
+        // #TODO: Log.
+        if (vecSetter.innerWrapper().getLastError().contains("not possible to set"))
+            return CameraDiagnostics::CannotConfigureMediaStreamResult("fps");   // TODO: #ak find param name
+        else
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QString("'stream profile parameters'"));
+    }
+    return CameraDiagnostics::NoErrorResult();
+}
 void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 {
     QnMutexLocker lk(&m_ioPortMutex);
@@ -4449,7 +4480,7 @@ void QnPlOnvifResource::setMaxChannels(int value)
 }
 
 void QnPlOnvifResource::updateVideoEncoder(
-    VideoEncoder& encoder,
+    onvifXsd__VideoEncoderConfiguration& encoder,
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
@@ -4481,10 +4512,20 @@ void QnPlOnvifResource::updateVideoEncoder(
         ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
 
     const auto codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
-    encoder.Encoding = capabilities.isH264 && codecId != AV_CODEC_ID_MJPEG
-        ? onvifXsd__VideoEncoding::H264 : onvifXsd__VideoEncoding::JPEG;
-
-    Qn::StreamQuality quality = params.quality;
+    switch (codecId)
+    {
+        case AV_CODEC_ID_MJPEG:
+            encoder.Encoding = onvifXsd__VideoEncoding::JPEG;
+            break;
+        case AV_CODEC_ID_H264:
+            encoder.Encoding = onvifXsd__VideoEncoding::H264;
+            break;
+        default:
+            // ONVIF Media1 interface doesn't support other codecs
+            // (except MPEG4, but VMS doesn't support it), so we use JPEG in this case,
+            // because it is usually supported by all devices
+            encoder.Encoding = onvifXsd__VideoEncoding::JPEG;
+    }
 
     if (encoder.Encoding == onvifXsd__VideoEncoding::H264)
     {
@@ -4523,6 +4564,7 @@ void QnPlOnvifResource::updateVideoEncoder(
         encoder.RateControl->BitrateLimit = params.bitrateKbps;
     }
 
+    const Qn::StreamQuality quality = params.quality;
     if (quality != Qn::StreamQuality::preset)
         encoder.Quality = innerQualityToOnvif(quality, capabilities.minQ, capabilities.maxQ);
 
@@ -4537,6 +4579,134 @@ void QnPlOnvifResource::updateVideoEncoder(
         encoder.Resolution->Width = params.resolution.width();
         encoder.Resolution->Height = params.resolution.height();
     }
+}
+
+void QnPlOnvifResource::updateVideoEncoder2(
+    onvifXsd__VideoEncoder2Configuration& encoder,
+    Qn::StreamIndex streamIndex,
+    const QnLiveStreamParams& streamParams)
+{
+    QnLiveStreamParams params = streamParams;
+    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+
+    bool useEncodingInterval = resourceData.value<bool>
+        (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
+
+    if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
+    {
+        bool forcedAR = resourceData.value<bool>(QString("forceArFromPrimaryStream"), false);
+        if (forcedAR && params.resolution.height() > 0)
+        {
+            QnAspectRatio ar(params.resolution.width(), params.resolution.height());
+            setCustomAspectRatio(ar);
+        }
+
+        QString defaultAR = resourceData.value<QString>(QString("defaultAR"));
+        QStringList parts = defaultAR.split(L'x');
+        if (parts.size() == 2)
+        {
+            QnAspectRatio ar(parts[0].toInt(), parts[1].toInt());
+            setCustomAspectRatio(ar);
+        }
+        saveParams();
+    }
+    const auto capabilities = (streamIndex == Qn::StreamIndex::primary)
+        ? m_primaryStreamCapabilities : m_secondaryStreamCapabilities;
+
+    const AVCodecID codecId = QnAvCodecHelper::codecIdFromString(streamParams.codec);
+    static const std::map<AVCodecID,std::string> kMedia2EncodingMap =
+        { {AV_CODEC_ID_MJPEG, "JPEG"}, {AV_CODEC_ID_H264, "H264"}, {AV_CODEC_ID_HEVC, "H265"} };
+    static const std::string defaultCodec = "JPEG";
+    const auto it = kMedia2EncodingMap.find(codecId);
+
+    encoder.Encoding = (it != kMedia2EncodingMap.end()) ? it->second : defaultCodec;
+#if 1
+
+    ///if (encoder.H264 == 0)
+    ///    encoder.H264 = m_tmpH264Conf.get();
+
+    if (!encoder.GovLength)
+    {
+        if (!m_govLength)
+            m_govLength.reset(new int);
+        encoder.GovLength = m_govLength.get();
+    }
+    *encoder.GovLength = qBound(capabilities.govMin, DEFAULT_IFRAME_DISTANCE, capabilities.govMax);
+
+    if (capabilities.encoding == UnderstandableVideoCodec::H264)
+    {
+        auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+        auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
+
+        if (!encoder.Profile)
+        {
+            if (!m_profile)
+                m_profile.reset(new std::string);
+            encoder.Profile = m_profile.get();
+        }
+
+        if (!desiredH264Profile.isEmpty())
+        {
+            *encoder.Profile = desiredH264Profile.toStdString();
+        }
+        else
+        {
+            if (capabilities.h264Profiles.size())
+            {
+                *encoder.Profile = H264ProfileToString(capabilities.h264Profiles[0]);
+            }
+        }
+    }
+    else if (capabilities.encoding == UnderstandableVideoCodec::H265)
+    {
+        if (capabilities.h265Profiles.size())
+        {
+            if (!encoder.Profile)
+            {
+                if (!m_profile)
+                    m_profile.reset(new std::string);
+                encoder.Profile = m_profile.get();
+            }
+            *encoder.Profile = VideoEncoderProfileToString(capabilities.h265Profiles[0]);
+        }
+    }
+
+    if (!encoder.RateControl)
+    {
+        // LOG.
+    }
+    else
+    {
+        if (!useEncodingInterval)
+        {
+            encoder.RateControl->FrameRateLimit = params.fps;
+        }
+        else
+        {
+            int fpsBase = resourceData.value<int>(Qn::FPS_BASE_PARAM_NAME);
+            params.fps = getClosestAvailableFps(params.fps);
+            encoder.RateControl->FrameRateLimit = fpsBase;
+            //encoder.RateControl->EncodingInterval = static_cast<int>(
+            //    fpsBase / params.fps + 0.5);
+        }
+
+        encoder.RateControl->BitrateLimit = params.bitrateKbps;
+    }
+
+    const Qn::StreamQuality quality = params.quality;
+    if (quality != Qn::StreamQuality::preset)
+        encoder.Quality = innerQualityToOnvif(quality, capabilities.minQ, capabilities.maxQ);
+
+    if (!encoder.Resolution)
+    {
+        // LOG.
+    }
+    else
+    {
+        encoder.Resolution->Width = params.resolution.width();
+        encoder.Resolution->Height = params.resolution.height();
+    }
+#endif
 }
 
 QnPlOnvifResource::VideoOptionsLocal QnPlOnvifResource::primaryVideoCapabilities() const

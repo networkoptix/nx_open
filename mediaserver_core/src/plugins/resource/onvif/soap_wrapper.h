@@ -788,7 +788,7 @@ namespace Media2
         _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
 
     using VideoEncoderConfigurationSetter = RequestWrapper<
-        _onvifMedia2__SetVideoSourceConfiguration,
+        _onvifMedia2__SetVideoEncoderConfiguration,
         onvifMedia2__SetConfigurationResponse>;
 
     using Profiles = RequestWrapper<

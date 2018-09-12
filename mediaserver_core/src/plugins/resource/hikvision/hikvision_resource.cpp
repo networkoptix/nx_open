@@ -169,7 +169,7 @@ void HikvisionResource::setResolutionList(
         ? secondaryVideoCapabilities() : primaryVideoCapabilities();
     capabilities.resolutions = QList<QSize>::fromVector(QVector<QSize>::fromStdVector(
         channelCapabilities.resolutions));
-    capabilities.isH264 = true;
+    capabilities.encoding = UnderstandableVideoCodec::H264;
     if (role == Qn::CR_SecondaryLiveVideo)
         setSecondaryVideoCapabilities(capabilities);
     else

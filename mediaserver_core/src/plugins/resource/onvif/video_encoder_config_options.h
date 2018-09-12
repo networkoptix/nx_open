@@ -11,25 +11,6 @@
 
 #include "soap_wrapper.h"
 
-//class onvifXsd__AudioEncoderConfigurationOption;
-//class onvifXsd__VideoSourceConfigurationOptions;
-//class onvifXsd__VideoEncoderConfigurationOptions;
-//class onvifXsd__VideoEncoderConfiguration;
-//class oasisWsnB2__NotificationMessageHolderType;
-//class onvifXsd__VideoSourceConfiguration;
-//class onvifXsd__EventCapabilities;
-//
-//class onvifXsd__VideoEncoder2ConfigurationOptions;
-//class _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse;
-//
-//typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
-//typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
-//typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
-//typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
-//typedef onvifXsd__VideoSourceConfiguration VideoSource;
-
-//enum class VIDEO_CODEC //< The order is used in sorting.
-
 /**
  Server understands only limited number of videocodecs.
  They are listed in UnderstandableVideoCodec enum.
@@ -40,9 +21,9 @@ enum class UnderstandableVideoCodec
 {
     NONE,
     JPEG,
-    H265,
     H264,
-    Desirable = H264
+    H265,
+    Desirable = H265
 };
 /*
  FYI: is how video encoders are enumerated in onvif:
@@ -53,8 +34,11 @@ enum class UnderstandableVideoCodec
 UnderstandableVideoCodec VideoCodecFromString(const std::string& name);
 std::string VideoCodecToString(UnderstandableVideoCodec codec);
 
-std::optional<onvifXsd__VideoEncodingProfiles> EncoderProfileFromString(
-        const QString& name);
+std::optional<onvifXsd__VideoEncodingProfiles> VideoEncoderProfileFromString(const std::string& name);
+std::string VideoEncoderProfileToString(onvifXsd__VideoEncodingProfiles profile);
+
+std::optional<onvifXsd__H264Profile> H264ProfileFromString(const std::string& name);
+std::string H264ProfileToString(onvifXsd__H264Profile profile);
 
 // This class should be moved somewhere into utils.
 template<class T>

@@ -404,53 +404,117 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (!isCameraControlRequired || m_mustNotConfigureResource)
         return CameraDiagnostics::NoErrorResult(); //< Do not update video encoder configuration.
 
-    Media::VideoEncoderConfigurations veConfigurations(m_onvifRes->makeRequestParams());
-    veConfigurations.receiveBySoap();
-    if (!veConfigurations)
+    if (m_onvifRes->m_serviceUrls.media2ServiceUrl.isEmpty())
     {
-        //LOG.
-        if (veConfigurations.innerWrapper().isNotAuthenticated() && canChangeStatus())
+        // Use old Media1 interface.
+        Media::VideoEncoderConfigurations veConfigurations(m_onvifRes->makeRequestParams());
+        veConfigurations.receiveBySoap();
+        if (!veConfigurations)
         {
-            m_onvifRes->setStatus(Qn::Unauthorized);
-            return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
+            //LOG.
+            if (veConfigurations.innerWrapper().isNotAuthenticated() && canChangeStatus())
+            {
+                m_onvifRes->setStatus(Qn::Unauthorized);
+                return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
+            }
+            return veConfigurations.requestFailedResult();
         }
-        return veConfigurations.requestFailedResult();
+
+        // The pointer currentVEConfig points to the object that is valid until
+        // veConfigurations destructor is called.
+        onvifXsd__VideoEncoderConfiguration* currentVEConfig = selectVideoEncoderConfig(
+            veConfigurations.getEphemeralReference().Configurations, isPrimary);
+
+        if (!currentVEConfig)
+            return CameraDiagnostics::RequestFailedResult("selectVideoEncoderConfig", QString());
+
+        // TODO: #vasilenko UTF unuse std::string
+        outInfo->videoEncoderId = QString::fromStdString(currentVEConfig->token);
+
+        auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
+        m_onvifRes->updateVideoEncoder(*currentVEConfig, streamIndex, params);
+
+        int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
+        while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
+        {
+            result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
+            if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+                msleep(300);
+        }
+
+        return result;
     }
-
-    // The pointer currentVEConfig points to the object that is valid until
-    // veConfigurations destructor is called.
-    onvifXsd__VideoEncoderConfiguration* currentVEConfig = selectVideoEncoderConfig(
-        veConfigurations.getEphemeralReference().Configurations, isPrimary);
-
-    if (!currentVEConfig)
-        return CameraDiagnostics::RequestFailedResult("selectVideoEncoderConfig", QString());
-
-    // TODO: #vasilenko UTF unuse std::string
-    outInfo->videoEncoderId = QString::fromStdString(currentVEConfig->token);
-
-    auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
-    m_onvifRes->updateVideoEncoder(*currentVEConfig, streamIndex, params);
-
-    int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
-    CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
-    while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
+    else
     {
-        result = m_onvifRes->sendVideoEncoderToCameraEx(*currentVEConfig, streamIndex, params);
-        if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
-            msleep(300);
-    }
+        // Use old Media2 interface.
+        Media2::VideoEncoderConfigurations veConfigurations(m_onvifRes->makeRequestParams());
+        veConfigurations.receiveBySoap();
+        if (!veConfigurations)
+        {
+            //LOG.
+            if (veConfigurations.innerWrapper().isNotAuthenticated() && canChangeStatus())
+            {
+                m_onvifRes->setStatus(Qn::Unauthorized);
+                return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
+            }
+            return veConfigurations.requestFailedResult();
+        }
 
-    return result;
+        // The pointer currentVEConfig points to the object that is valid until
+        // veConfigurations destructor is called.
+        onvifXsd__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
+            veConfigurations.getEphemeralReference().Configurations, isPrimary);
+
+        if (!currentVEConfig)
+            return CameraDiagnostics::RequestFailedResult("selectVideoEncoder2Config", QString());
+
+        outInfo->videoEncoderId = QString::fromStdString(currentVEConfig->token);
+
+        auto streamIndex = isPrimary ? Qn::StreamIndex::primary : Qn::StreamIndex::secondary;
+        m_onvifRes->updateVideoEncoder2(*currentVEConfig, streamIndex, params);
+
+        int triesLeft = m_onvifRes->getMaxOnvifRequestTries();
+        CameraDiagnostics::Result result = CameraDiagnostics::UnknownErrorResult();
+
+        while ((result.errorCode != CameraDiagnostics::ErrorCode::noError) && --triesLeft >= 0)
+        {
+            result = m_onvifRes->sendVideoEncoder2ToCameraEx(*currentVEConfig, streamIndex, params);
+            if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
+                msleep(300);
+        }
+
+        return result;
+    }
 }
 
 onvifXsd__VideoEncoderConfiguration* QnOnvifStreamReader::selectVideoEncoderConfig(
     std::vector<onvifXsd__VideoEncoderConfiguration *>& configs, bool isPrimary) const
 {
-    QString id = isPrimary ? m_onvifRes->primaryVideoCapabilities().id : m_onvifRes->secondaryVideoCapabilities().id;
+    const QString id = isPrimary
+        ? m_onvifRes->primaryVideoCapabilities().id
+        : m_onvifRes->secondaryVideoCapabilities().id;
 
     for (auto itr = configs.begin(); itr != configs.end(); ++itr)
     {
-        VideoEncoder* conf = *itr;
+        onvifXsd__VideoEncoderConfiguration* conf = *itr;
+        if (conf && id == QString::fromStdString(conf->token))
+            return conf;
+    }
+
+    return nullptr;
+}
+
+onvifXsd__VideoEncoder2Configuration* QnOnvifStreamReader::selectVideoEncoder2Config(
+    std::vector<onvifXsd__VideoEncoder2Configuration *>& configs, bool isPrimary) const
+{
+    const QString id = isPrimary
+        ? m_onvifRes->primaryVideoCapabilities().id
+        : m_onvifRes->secondaryVideoCapabilities().id;
+
+    for (auto itr = configs.begin(); itr != configs.end(); ++itr)
+    {
+        onvifXsd__VideoEncoder2Configuration* conf = *itr;
         if (conf && id == QString::fromStdString(conf->token))
             return conf;
     }

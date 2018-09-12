@@ -1,51 +1,114 @@
 #include "video_encoder_config_options.h"
 
-UnderstandableVideoCodec VideoCodecFromString(const std::string& name)
+namespace
 {
-    UnderstandableVideoCodec result = UnderstandableVideoCodec::NONE;
-    static const std::map<std::string, UnderstandableVideoCodec> kCodecMap = {
+
+/**
+  The string constants for profiles are taken from onvid.xsd schema [version="18.06"]
+  (https://www.onvif.org/ver10/schema/onvif.xsd)
+  form the <xs:simpleType name="VideoEncodingMimeNames"> type description.
+  There is one more name mentioned there - MPV4-ES - but our software doesn't support it.
+ */
+static const std::vector<std::pair<std::string, UnderstandableVideoCodec>>
+    kCodecMap = {
         { "JPEG", UnderstandableVideoCodec::JPEG },
         { "H264", UnderstandableVideoCodec::H264 },
         { "H265", UnderstandableVideoCodec::H265 }
     };
-    const auto it = kCodecMap.find(name);
-    if (it != kCodecMap.end())
-        result = it->second;
-    return result;
+
+/**
+  The string constants for profiles are taken from onvid.xsd schema [version="18.06"]
+  (https://www.onvif.org/ver10/schema/onvif.xsd)
+  form the <xs:simpleType name="H264Profile"> type description.
+  All other values are not correct and can not pass xsd validation.
+ */
+static const std::vector<std::pair<std::string, onvifXsd__H264Profile>>
+    kH264Profiles = {
+        { "Baseline", onvifXsd__H264Profile::Baseline },
+        { "Main", onvifXsd__H264Profile::Main },
+        { "Extended", onvifXsd__H264Profile::Extended },
+        { "High", onvifXsd__H264Profile::High }
+    };
+
+/**
+  The string constants for profiles are taken from onvid.xsd schema [version="18.06"]
+  (https://www.onvif.org/ver10/schema/onvif.xsd)
+  form the <xs:simpleType name="VideoEncodingProfiles"> type description.
+  All other values are not correct and can not pass xsd validation.
+ */
+static const std::vector<std::pair<std::string, onvifXsd__VideoEncodingProfiles>>
+    kVideoEncoderProfiles = {
+        { "Simple", onvifXsd__VideoEncodingProfiles::Simple }, //< MPEG4 SP
+        { "AdvancedSimple", onvifXsd__VideoEncodingProfiles::AdvancedSimple }, //< MPEG4 ASP
+        { "Baseline", onvifXsd__VideoEncodingProfiles::Baseline }, //< H264 Baseline
+        { "Main", onvifXsd__VideoEncodingProfiles::Main }, //< H264 Main, H265 Main
+        { "Main10", onvifXsd__VideoEncodingProfiles::Main10 }, //< H265 Main 10
+        { "Extended", onvifXsd__VideoEncodingProfiles::Extended }, //< H264 Extended
+        { "High", onvifXsd__VideoEncodingProfiles::High } //< H264 High
+    };
+
+} //namespace
+
+UnderstandableVideoCodec VideoCodecFromString(const std::string& name)
+{
+    for (const auto& pair: kCodecMap)
+    {
+        if (pair.first == name)
+            return pair.second;
+    }
+    return UnderstandableVideoCodec::NONE;
 }
 
 std::string VideoCodecToString(UnderstandableVideoCodec codec)
 {
-    std::string result;
-    static const std::map<UnderstandableVideoCodec, std::string> kCodecMap = {
-        { UnderstandableVideoCodec::JPEG, "JPEG" },
-        { UnderstandableVideoCodec::H264, "H264" },
-        { UnderstandableVideoCodec::H265, "H265" }
-    };
-
-    const auto it = kCodecMap.find(codec);
-    if (it != kCodecMap.end())
-        result = it->second;
-    return result;
+    for (const auto& pair : kCodecMap)
+    {
+        if (pair.second == codec)
+            return pair.first;
+    }
+    return std::string();
 }
 
-std::optional<onvifXsd__VideoEncodingProfiles> EncoderProfileFromString(const QString& name)
+std::optional<onvifXsd__H264Profile> H264ProfileFromString(const std::string& name)
 {
-    std::optional<onvifXsd__VideoEncodingProfiles> result;
-    static const std::map<QString, onvifXsd__VideoEncodingProfiles> kProfileMap = {
-        { "Simple", onvifXsd__VideoEncodingProfiles::Simple },
-        { "AdvancedSimple", onvifXsd__VideoEncodingProfiles::AdvancedSimple },
-        { "Baseline", onvifXsd__VideoEncodingProfiles::Baseline },
-        { "Base", onvifXsd__VideoEncodingProfiles::Baseline },
-        { "Main", onvifXsd__VideoEncodingProfiles::Main },
-        { "Main10", onvifXsd__VideoEncodingProfiles::Main10 },
-        { "Extended", onvifXsd__VideoEncodingProfiles::Extended },
-        { "High", onvifXsd__VideoEncodingProfiles::High }
-    };
-    const auto it = kProfileMap.find(name);
-    if (it != kProfileMap.end())
-        *result = it->second;
-    return result;
+    for (const auto& pair : kH264Profiles)
+    {
+        if (pair.first == name)
+            return std::make_optional(pair.second);
+    }
+    return std::nullopt;
+}
+
+std::string H264ProfileToString(onvifXsd__H264Profile profile)
+{
+    for (const auto& pair : kH264Profiles)
+    {
+        if (pair.second == profile)
+            return pair.first;
+    }
+    NX_ASSERT(0); //< unexpected onvifXsd__VideoEncodingProfiles value
+    return std::string();
+}
+
+std::optional<onvifXsd__VideoEncodingProfiles> VideoEncoderProfileFromString(const std::string& name)
+{
+    for (const auto& pair: kVideoEncoderProfiles)
+    {
+        if (pair.first == name)
+            return std::make_optional(pair.second);
+    }
+    return std::nullopt;
+}
+
+std::string VideoEncoderProfileToString(onvifXsd__VideoEncodingProfiles profile)
+{
+    for (const auto& pair : kVideoEncoderProfiles)
+    {
+        if (pair.second == profile)
+            return pair.first;
+    }
+    NX_ASSERT(0); //< unexpected onvifXsd__VideoEncodingProfiles value
+    return std::string();
 }
 
 VideoEncoderConfigOptions::VideoEncoderConfigOptions(const onvifXsd__JpegOptions& options)
@@ -167,7 +230,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
         bitrateRange = Range<int>(options.BitrateRange->Min, options.BitrateRange->Max);
 
     if (options.ConstantBitRateSupported)
-        *constantBitrateSupported = *options.ConstantBitRateSupported;
+        constantBitrateSupported = *options.ConstantBitRateSupported;
 
     if (options.GovLengthRange)
     {
@@ -211,7 +274,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
         {
             bool ok = false;
             std::optional<onvifXsd__VideoEncodingProfiles> profile =
-                EncoderProfileFromString(item);
+                VideoEncoderProfileFromString(item.toStdString());
             if (profile)
                 encoderProfiles.push_back(*profile);
         }

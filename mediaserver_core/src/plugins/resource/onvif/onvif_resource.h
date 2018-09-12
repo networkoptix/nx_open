@@ -151,10 +151,18 @@ public:
 
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
-        QVector<onvifXsd__H264Profile> h264Profiles;
+        // profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
+        // or by Media2 (from onvifXsd__VideoEncodingProfiles)
+        QVector<onvifXsd__H264Profile> h264Profiles; //< filled for h264 codec
+
+        // Profiles for h265 codec. May be read only by Media2.
+        // Only two values are appropriate: Main and Main10.
+        // Usually is empty (this obviously means, Main is used).
+        QVector<onvifXsd__VideoEncodingProfiles> h265Profiles; //< filled for h265 codec
+
         QString id;
         QList<QSize> resolutions;
-        bool isH264 = false;
+        //bool isH264 = false;
         int minQ = -1;
         int maxQ = 1;
         int frameRateMin = -1;
@@ -306,9 +314,15 @@ public:
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
     virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
-        VideoEncoder& encoder,
+        onvifXsd__VideoEncoderConfiguration& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& params);
+
+    virtual CameraDiagnostics::Result sendVideoEncoder2ToCameraEx(
+        onvifXsd__VideoEncoder2Configuration& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& params);
+
     virtual int suggestBitrateKbps(
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
@@ -333,7 +347,12 @@ public:
     }
 
     void updateVideoEncoder(
-        VideoEncoder& encoder,
+        onvifXsd__VideoEncoderConfiguration& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams);
+
+    void updateVideoEncoder2(
+        onvifXsd__VideoEncoder2Configuration& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams);
 
@@ -401,6 +420,8 @@ protected:
         const VideoOptionsLocal& videoOptionsLocal);
     CameraDiagnostics::Result sendVideoEncoderToCamera(
         onvifXsd__VideoEncoderConfiguration& encoderConfig);
+    CameraDiagnostics::Result sendVideoEncoder2ToCamera(
+        onvifXsd__VideoEncoder2Configuration& encoderConfig);
 
     CameraDiagnostics::Result fetchAndSetVideoResourceOptions();
     CameraDiagnostics::Result fetchAndSetAudioResourceOptions();
@@ -577,6 +598,9 @@ private:
     std::vector<QString> m_portAliases;
     std::unique_ptr<onvifXsd__H264Configuration> m_tmpH264Conf;
 
+    std::unique_ptr<int> m_govLength;
+    std::unique_ptr<std::string> m_profile;
+
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
@@ -609,8 +633,9 @@ private:
         CapabilitiesResp* response );
     CameraDiagnostics::Result fetchOnvifMedia2Url(QString* url);
     void fillFullUrlInfo( const CapabilitiesResp& response );
-    CameraDiagnostics::Result getVideoEncoderTokens(
-        Media::VideoEncoderConfigurations* videoEncoderConfigurations, QStringList* tokenList);
+    bool getVideoEncoderTokens(
+        const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
+        QStringList* tokenList);
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
@@ -619,8 +644,9 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
-    mutable QnOnvifServiceUrls m_serviceUrls;
     mutable QnResourceVideoLayoutPtr m_videoLayout;
+public:
+    mutable QnOnvifServiceUrls m_serviceUrls;
 
 protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;

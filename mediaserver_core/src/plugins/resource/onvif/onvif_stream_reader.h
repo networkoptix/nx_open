@@ -80,6 +80,8 @@ private:
     // (For all functions in the following block.)
     onvifXsd__VideoEncoderConfiguration* selectVideoEncoderConfig(
         std::vector<onvifXsd__VideoEncoderConfiguration *>& configs, bool isPrimary) const;
+    onvifXsd__VideoEncoder2Configuration* selectVideoEncoder2Config(
+        std::vector<onvifXsd__VideoEncoder2Configuration *>& configs, bool isPrimary) const;
 
     onvifXsd__AudioEncoderConfiguration* selectAudioEncoderConfig(
         std::vector<onvifXsd__AudioEncoderConfiguration *>& configs, bool isPrimary) const;
