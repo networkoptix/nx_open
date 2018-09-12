@@ -44,8 +44,10 @@ class NoptixLibrary(object):
             time.sleep(.2)
         return emails
 
-    def get_random_symbol_email(self):
-        return '''!#$%&'*+-/=?^_`{|}~''' + str(time.time()) + "@gmail.com"
+    def get_random_symbol_email(self, email):
+        index = email.find('@')
+        email = email[:index] + "+!#$%'*-/=?^_`{|}~" + str(time.time()) + email[index:]
+        return email
 
     def wait_until_textfield_contains(self, locator, expected, timeout=10):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')

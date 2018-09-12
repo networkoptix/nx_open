@@ -59,52 +59,11 @@ should register user with correct credentials
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success
 
-should register user with cyrillic First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should register user with smiley First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should register user with glyph First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
-    Validate Register Success
-
 should allow !#$%&'*+-/=?^_`{|}~ in email field
-    ${email}    Get Random Symbol Email
+    [documentation]    This is here because testing activation with the '&' freaks out Python's imaplib so we test that our form accepts it.
+    ${email}    Get Random Symbol Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success
-
-allows register with leading space in email
-    [tags]    C41557
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${SPACE}${email}    ${password}
-    Validate Register Success
-
-allows register with trailing space in email
-    [tags]    C41557
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${email}${SPACE}    ${password}
     Validate Register Success
 
 with valid inputs no errors are displayed
@@ -282,14 +241,20 @@ Check registration email links
     Go To    ${url}/register
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+
+
+
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
     Log   ${email text}
+    Check Email Body    ${email text}    ${email color}    ${TEST FIRST NAME}    ${TEST LAST NAME}
+
+
+
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
     ${links}    Get Links From Email    ${email}
-    log    ${links}
     @{expected links}    Set Variable    ${SUPPORT_URL}    ${WEBSITE_URL}    ${ENV}    ${ENV}/activate
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}

@@ -32,6 +32,69 @@ Register and Activate
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
+allows activate user with cyrillic First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate user with smiley First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate user with glyph First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate +!#$%'*-/=?^_`{|}~ in email field
+#ampersand was removed from this test because imaplib could not handle it
+    ${email}    Get Random Symbol Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate with leading space in email
+    [tags]    C41557    C41864
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${SPACE}${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows activate with trailing space in email
+    [tags]    C41557    C41864
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}${SPACE}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
 should show error if same link is used twice
     [tags]    email    C41566
     ${email}    Get Random Email    ${BASE EMAIL}
