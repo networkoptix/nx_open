@@ -24,7 +24,7 @@ def _fps_avg(fps):
 def ffprobe_streams(stream_url):
     try:
         out = local_shell.run_sh_script(
-            #language=Bash
+            # language=Bash
             '''
                 ffprobe -show_format -show_streams -of json "$URL"
                 ''',

@@ -489,7 +489,6 @@ class MediaserverApi(object):
         attributes.update(kwargs)
         self.generic.post('ec2/saveCameraUserAttributes', attributes)
 
-
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
