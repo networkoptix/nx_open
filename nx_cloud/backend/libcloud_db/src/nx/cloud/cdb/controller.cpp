@@ -208,6 +208,9 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
+    m_transportSecurityManager =
+        std::make_unique<AccessBlocker>(m_settings);
+
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&m_accountManager);
     authDataProviders.push_back(&m_systemManager);
@@ -215,7 +218,8 @@ void Controller::initializeSecurity()
         m_settings,
         std::move(authDataProviders),
         *m_authRestrictionList,
-        m_streeManager);
+        m_streeManager,
+        m_transportSecurityManager.get());
 
     m_authorizationManager = std::make_unique<AuthorizationManager>(
         m_streeManager,
@@ -223,9 +227,6 @@ void Controller::initializeSecurity()
         m_systemManager,
         m_systemManager,
         m_tempPasswordManager);
-
-    m_transportSecurityManager = 
-        std::make_unique<TransportSecurityManager>(m_settings);
 
     m_securityManager = std::make_unique<SecurityManager>(
         m_authenticationManager.get(),
