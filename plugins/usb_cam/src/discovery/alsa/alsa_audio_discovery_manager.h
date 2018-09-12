@@ -19,10 +19,10 @@ class AlsaAudioDiscoveryManager : public AudioDiscoveryManagerPrivate
 private:
     enum IOType
     {
-        kNone = 0,
-        kInput = 1,
-        kOutput = 2,
-        kInputOutput = kInput | kOutput
+        iotNone = 0,
+        iotInput = 1,
+        iotOutput = 2,
+        iotInputOutput = iotInput | iotOutput
     };
 
     struct DeviceDescriptor
@@ -35,7 +35,7 @@ private:
         bool sysDefault;
 
         DeviceDescriptor():
-            ioType(kNone),
+            ioType(iotNone),
             isDefault(false),
             sysDefault(false)
         {   
@@ -47,8 +47,7 @@ private:
                 path == rhs.path
                 && name == rhs.name
                 && cardIndex == rhs.cardIndex
-                && ioType == rhs.ioType
-                && isDefault == rhs.isDefault;
+                && ioType == rhs.ioType;
         } 
 
         bool isCameraAudioInput(const nxcip::CameraInfo& info) const
@@ -58,7 +57,7 @@ private:
 
         bool isInput() const
         {
-            return ioType & kInput;
+            return ioType & iotInput;
         }
     };
 

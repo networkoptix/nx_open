@@ -1,14 +1,9 @@
 #ifdef __linux__
 #include "alsa_audio_discovery_manager.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
 #include <limits.h>
 #include <algorithm>
-
-#include <iostream>
+#include <map>
 
 #include <alsa/asoundlib.h>
 
@@ -17,53 +12,58 @@ namespace device {
 
 namespace {
 
-const std::vector<const char *> DEVICE_TYPES = 
-{
-    //"card",
-    "pcm"
-    //,"seq" , "hwdep", "mixer", "rawmidi", "timer"
-};
+    std::vector<std::string> kMotherBoardAudioList = {
+        "HDA Intel PCH"
+        // AMD? builtin audio card goes here
+    };
 
-} // namespace
-
-///////////////////////////////////////////// Discovery ////////////////////////////////////////////
+} //namespace
 
 void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
 {
     std::vector<DeviceDescriptor> devices = getDevices();
+    std::map<DeviceDescriptor*, bool> audioTaken;
     std::vector<DeviceDescriptor*> defaults;
     std::vector<nxcip::CameraInfo*> muteCameras;
 
-   for (int i = 0; i < cameraCount; ++i)
-   {
+    for (int i = 0; i < devices.size(); ++i)
+    {
+        audioTaken.insert(std::pair<DeviceDescriptor*, bool>(&devices[i], false));
+
+        if ((devices[i].isDefault || devices[i].sysDefault) && devices[i].isInput())
+            defaults.push_back(&devices[i]);
+    }
+
+    for (auto camera = cameras; camera < cameras + cameraCount; ++camera)
+    {
         bool mute = true;
         for (int j = 0; j < devices.size(); ++j)
         {
-            if(devices[j].isDefault && devices[j].isInput())
-            {
-                if(std::find(defaults.begin(), defaults.end(), &devices[j]) == defaults.end())
-                    defaults.push_back(&devices[j]);
-            }
-
-            if (devices[j].isCameraAudioInput(cameras[i]) && devices[j].sysDefault)
+            DeviceDescriptor * device = &devices[j];
+            
+            if (!audioTaken[device] && device->isCameraAudioInput(*camera) && device->sysDefault)
             {
                 mute = false;
+                audioTaken[device] = true;
                 strncpy(
-                    cameras[i].auxiliaryData,
-                    devices[j].path.c_str(),
-                    sizeof(cameras[i].auxiliaryData) - 1);
+                    camera->auxiliaryData,
+                    device->path.c_str(),
+                    sizeof(camera->auxiliaryData) - 1);
                 break;
             }
         }
         if (mute)
-            muteCameras.push_back(&cameras[i]);
+            muteCameras.push_back(camera);
     }
 
     if (!muteCameras.empty() && !defaults.empty())
     {
         for (const auto & muteCamera : muteCameras)
         {
-            strncpy(muteCamera->auxiliaryData, defaults[0]->path.c_str(), sizeof(muteCamera->auxiliaryData) - 1);
+            strncpy(
+                muteCamera->auxiliaryData,
+                defaults[0]->path.c_str(),
+                sizeof(muteCamera->auxiliaryData) - 1);
         }
     }
 }
@@ -71,55 +71,76 @@ void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, in
 std::vector<AlsaAudioDiscoveryManager::DeviceDescriptor> 
 AlsaAudioDiscoveryManager::getDevices() const
 {
+    std::vector<DeviceDescriptor> motherBoardDevices;
     std::vector<DeviceDescriptor> devices;
     int card = -1;
+
     while(snd_card_next(&card) == 0 && card != -1)
     {
         char * cardName;
         snd_card_get_name(card, &cardName);
-        for (const auto & deviceType : DEVICE_TYPES)
+        char ** hints;
+        if (snd_device_name_hint(card, "pcm", (void***)&hints) != 0)
+            continue;
+
+        char ** hint = hints;
+        for (; *hint; ++hint)
         {
-            char ** hints;
-            if (snd_device_name_hint(card, deviceType, (void***)&hints) != 0)
-                continue;
+            DeviceDescriptor device;
+            if (cardName)
+                device.name = cardName;
 
-            char ** hint = hints;
-            for (; *hint; ++hint)
+            device.cardIndex = card;
+
+            if (char * nameHint = snd_device_name_get_hint(*hint, "NAME"))
             {
-                DeviceDescriptor device;
-                if (cardName)
-                    device.name = cardName;
-                    device.cardIndex = card;
+                device.path = nameHint;
+                device.sysDefault = strstr(nameHint, "sysdefault") != nullptr;
+                device.isDefault = !device.sysDefault && strstr(nameHint, "default") != nullptr;
+                free(nameHint);
+            }
 
-                if (char * nameHint = snd_device_name_get_hint(*hint, "NAME"))
-                {
-                    device.path = nameHint;
-                    device.sysDefault = strstr(nameHint, "sysdefault") != nullptr;
-                    device.isDefault = !device.sysDefault && strstr(nameHint, "default") != nullptr;
-                    free(nameHint);
-                }
+            if (char * ioHint = snd_device_name_get_hint(*hint, "IOID"))
+            {
+                device.ioType = strcmp(ioHint, "Input") == 0 ? iotInput : iotOutput;
+                free(ioHint);
+            }
+            else
+            {
+                device.ioType = iotInputOutput;
+            }
 
-                if (char * ioHint = snd_device_name_get_hint(*hint, "IOID"))
-                {
-                    device.ioType = strcmp(ioHint, "Input") == 0 ? kInput : kOutput;
-                    free(ioHint);
-                }
-                else
-                {
-                    device.ioType = kInputOutput;
-                }
+            if ((device.isDefault || device.sysDefault))
+            {
+                bool builtin = false;
+                for(const auto & motherBoardAudio : kMotherBoardAudioList)
+                    builtin = device.name.find(motherBoardAudio) != std::string::npos;
 
-                if ((device.isDefault || device.sysDefault) 
-                    && std::find(devices.begin(), devices.end(), device) == devices.end())
+                auto it = std::find(motherBoardDevices.begin(), motherBoardDevices.end(), device);
+                if(builtin && it == motherBoardDevices.end())
                 {
-                    devices.push_back(device);   
+                    motherBoardDevices.push_back(device);
+                }
+                else if(std::find(devices.begin(), devices.end(), device) == devices.end())
+                {
+                    devices.push_back(device);
                 }
             }
-            snd_device_name_free_hint((void**)hints);
         }
+        snd_device_name_free_hint((void**)hints);
+
         if (cardName)
             free(cardName);
     }
+
+    /**
+     * We want builtin mother board audio devices at the back of the list because they are
+     * registered even with nothing plugged into them. Audio capture devices that are actually
+     * present should get priority.
+     */
+    for(const auto motherBoardDevice : motherBoardDevices)
+        devices.push_back(motherBoardDevice);
+
     return devices;
 }
 
