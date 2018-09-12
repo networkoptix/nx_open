@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 13 mar 2013    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "installation_manager.h"
 
 #include <QtCore/QStandardPaths>
@@ -23,7 +19,7 @@
 
 namespace {
 
-static QRegExp kVersionDirRegExp("\\d+\\.\\d+(?:\\.\\d+\\.\\d+){0,1}");
+static QRegExp kVersionDirRegExp(R"(\d+\.\d+(?:\.\d+\.\d+){0,1})");
 
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
 QString kInstallationPathPrefix = ".local/share";
@@ -35,15 +31,14 @@ QString versionToString(const nx::utils::SoftwareVersion& version)
 {
     if (version < nx::utils::SoftwareVersion(2, 2))
         return version.toString(nx::utils::SoftwareVersion::MinorFormat);
-    else
-        return version.toString();
+    return version.toString();
 }
 
 QString applicationRootPath()
 {
     const QDir dir(qApp->applicationDirPath());
 
-    if (QnAppInfo::applicationPlatform() == lit("linux"))
+    if (QnAppInfo::applicationPlatform() == "linux")
         return dir.absoluteFilePath("..");
 
     return dir.absolutePath();
@@ -52,14 +47,14 @@ QString applicationRootPath()
 #if defined(Q_OS_MACX)
 QString extractVersion(const QString& fullPath)
 {
-    static const auto kShortVersionTag = lit("CFBundleShortVersionString");
-    static const auto kBundleVersionTag = lit("CFBundleVersion");
+    static const auto kShortVersionTag = "CFBundleShortVersionString";
+    static const auto kBundleVersionTag = "CFBundleVersion";
 
     const auto url = cf::QnCFUrl::createFileUrl(fullPath);
     const cf::QnCFDictionary infoPlist(CFBundleCopyInfoDictionaryInDirectory(url.ref()));
     const auto shortVersion = infoPlist.getStringValue(kShortVersionTag);
     const auto bundleVersion = infoPlist.getStringValue(kBundleVersionTag);
-    return lit("%1.%2").arg(shortVersion, bundleVersion);
+    return QString("%1.%2").arg(shortVersion, bundleVersion);
 }
 #endif
 
@@ -67,17 +62,20 @@ QString extractVersion(const QString& fullPath)
 
 QString InstallationManager::defaultDirectoryForInstallations()
 {
-    QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(
+        QStandardPaths::HomeLocation);
     if (!defaultDirectoryForNewInstallations.isEmpty())
     {
-        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/client/%3/").arg(
-            kInstallationPathPrefix, QnAppInfo::organizationName(), QnAppInfo::customizationName());
+        defaultDirectoryForNewInstallations += QString("/%1/%2/client/%3/").arg(
+            kInstallationPathPrefix,
+            QnAppInfo::organizationName(),
+            QnAppInfo::customizationName());
     }
 
     return defaultDirectoryForNewInstallations;
 }
 
-void InstallationManager::removeInstallation(const SoftwareVersion& version)
+void InstallationManager::removeInstallation(const nx::utils::SoftwareVersion& version)
 {
     QDir installationDir = installationDirForVersion(version);
     if (installationDir.exists())
@@ -87,7 +85,7 @@ void InstallationManager::removeInstallation(const SoftwareVersion& version)
     m_installationByVersion.remove(version);
 }
 
-InstallationManager::InstallationManager(QObject *parent):
+InstallationManager::InstallationManager(QObject* parent):
     QObject(parent)
 {
     //TODO/IMPL disguise writable install directories for different modules.
@@ -100,97 +98,89 @@ void InstallationManager::updateInstalledVersionsInformation()
 {
     NX_DEBUG(this, "Entered update installed versions");
 
-    QMap<SoftwareVersion, QnClientInstallationPtr> installations;
+    QMap<nx::utils::SoftwareVersion, QnClientInstallationPtr> installations;
 
-    // Detect current installation.
-    NX_DEBUG(this, QString::fromLatin1("Checking current version (%1)").arg(
-        QnAppInfo::applicationVersion()));
+    // detect current installation
+    NX_DEBUG(this, lm("Checking current version (%1)").arg(QnAppInfo::applicationVersion()));
 
     const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
     {
-        current->setVersion(SoftwareVersion(QnAppInfo::applicationVersion()));
-        current->setNeedsVerification(false);
+        if (current->version().isNull())
+            current->setVersion(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()));
         installations.insert(current->version(), current);
     }
     else
     {
-        NX_WARNING(this, QString::fromLatin1("Can't find client binary in %1").arg(
-            QCoreApplication::applicationDirPath()));
+        NX_WARNING(this, lm("Can't find client binary in %1")
+            .arg(QCoreApplication::applicationDirPath()));
     }
 
     const auto fillInstallationFromDir =
-        [this, &installations](const QString& path, bool verify, const QString& version)
-        {
-            const QnClientInstallationPtr installation =
-                QnClientInstallation::installationForPath(path);
+        [this, &installations](const QString& path, const QString& version)
+	    {
+	        const QnClientInstallationPtr installation =
+	            QnClientInstallation::installationForPath(path);
 
-            if (installation.isNull())
-                return;
+	        if (installation.isNull())
+	            return;
 
-            installation->setNeedsVerification(verify);
+	        NX_DEBUG(this, lm("Compatibility version %1 was not verified").arg(version));
+            installation->setVersion(nx::utils::SoftwareVersion(version));
+	        installations.insert(installation->version(), installation);
 
-            if (verify && !installation->verify())
-            {
-                NX_DEBUG(this, QString::fromLatin1("Compatibility version %1 was not verified").arg(version));
-                return;
-            }
-
-            installation->setVersion(SoftwareVersion(version));
-            installations.insert(installation->version(), installation);
-
-            NX_DEBUG(this, QString::fromLatin1("Compatibility version %1 found").arg(version));
-        };
+	        NX_DEBUG(this, lm("Compatibility version %1 found").arg(version));
+	    };
 
     const auto fillInstallationsFromDir =
-        [fillInstallationFromDir](const QDir& root, bool verify)
-        {
-            const QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-            for (const QString &entry : entries)
-            {
-                if (kVersionDirRegExp.exactMatch(entry))
-                {
-                    const auto fullPath = root.absoluteFilePath(entry);
-                    fillInstallationFromDir(fullPath, verify, entry);
-                }
-            }
-        };
+        [fillInstallationFromDir](const QDir& root)
+	    {
+	        const QStringList entries = root.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	        for (const QString& entry: entries)
+	        {
+	            if (kVersionDirRegExp.exactMatch(entry))
+	            {
+	                const auto fullPath = root.absoluteFilePath(entry);
+	                fillInstallationFromDir(fullPath, entry);
+	            }
+	        }
+	    };
 
     // find other versions
-#if defined(Q_OS_MACX)
-    static const auto kPathPostfix = QString();
-#else
-    static const auto kPathPostfix = lit("/client/"); //< Default client install location.
-#endif
+    #if defined(Q_OS_MACX)
+    	static const auto kPathPostfix = QString();
+    #else
+	    static const auto kPathPostfix = "/client/"; /*< Default client install location. */
+    #endif
     QString baseRoot = QnApplauncherAppInfo::installationRoot() + kPathPostfix;
-    fillInstallationsFromDir(m_installationsDir, true);
+    fillInstallationsFromDir(m_installationsDir);
 
-    // We should verify downloaded installations only.
-#if defined(Q_OS_MACX)
-    const auto version = extractVersion(baseRoot + QnApplauncherAppInfo::bundleName());
-    fillInstallationFromDir(baseRoot, false, version);
-#else
-    fillInstallationsFromDir(baseRoot, false); //< We should verify downloaded installations only.
-#endif
+    #if defined(Q_OS_MACX)
+    	const auto version = extractVersion(baseRoot + QnApplauncherAppInfo::bundleName());
+	    fillInstallationFromDir(baseRoot, version);
+    #else
+    	fillInstallationsFromDir(baseRoot);
+    #endif
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion = std::move(installations);
     lk.unlock();
 
     if (m_installationByVersion.empty())
-        NX_WARNING(this, lit("No client versions found"));
+        NX_WARNING(this, lm("No client versions found"));
 
     createGhosts();
 }
 
 void InstallationManager::createGhosts()
 {
-    SoftwareVersion latest = latestVersion();
+    nx::utils::SoftwareVersion latest = latestVersion();
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    QList<SoftwareVersion> versions = m_installationByVersion.keys();
+    QList<nx::utils::SoftwareVersion> versions = m_installationByVersion.keys();
     lk.unlock();
 
-    foreach (const SoftwareVersion& version, versions) {
+    for (const auto& version: versions)
+    {
         if (version == latest)
             continue;
 
@@ -198,10 +188,10 @@ void InstallationManager::createGhosts()
     }
 }
 
-void InstallationManager::createGhostsForVersion(const SoftwareVersion& version)
+void InstallationManager::createGhostsForVersion(const nx::utils::SoftwareVersion& version)
 {
     // Applauncher doesn't need to affect versions >= 2.2 because they can communicate to applauncher.
-    if (version >= SoftwareVersion(2, 2))
+    if (version >= nx::utils::SoftwareVersion(2, 2))
         return;
 
     QnClientInstallationPtr installation = installationForVersion(version);
@@ -212,10 +202,10 @@ void InstallationManager::createGhostsForVersion(const SoftwareVersion& version)
     targetDir.cdUp();
 
     QSet<QString> entries = QSet<QString>::fromList(targetDir.entryList(QDir::Files));
-    entries.remove(version.toString(SoftwareVersion::MinorFormat));
+    entries.remove(version.toString(nx::utils::SoftwareVersion::MinorFormat));
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    QList<SoftwareVersion> versions = m_installationByVersion.keys();
+    QList<nx::utils::SoftwareVersion> versions = m_installationByVersion.keys();
     lk.unlock();
 
     for (const auto& ghostVersion: versions)
@@ -223,7 +213,7 @@ void InstallationManager::createGhostsForVersion(const SoftwareVersion& version)
         if (ghostVersion == version)
             continue;
 
-        QString ghostVersionString = ghostVersion.toString(SoftwareVersion::MinorFormat);
+        QString ghostVersionString = ghostVersion.toString(nx::utils::SoftwareVersion::MinorFormat);
 
         if (entries.contains(ghostVersionString))
         {
@@ -253,20 +243,32 @@ int InstallationManager::count() const
     return m_installationByVersion.size();
 }
 
-nx::utils::SoftwareVersion InstallationManager::latestVersion() const
+nx::utils::SoftwareVersion InstallationManager::latestVersion(int protocolVersion) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
-    return m_installationByVersion.empty() ? SoftwareVersion() : m_installationByVersion.lastKey();
+    if (m_installationByVersion.empty())
+        return {};
+
+    nx::utils::SoftwareVersion result;
+    for (const auto& installation: m_installationByVersion)
+    {
+        // Map is sorted by version, so versions order strictly rises.
+        if (protocolVersion == 0 || installation->protocolVersion() == protocolVersion)
+            result = installation->version();
+    }
+
+    return result;
 }
 
-bool InstallationManager::isVersionInstalled(const SoftwareVersion& version, bool strict) const
+bool InstallationManager::isVersionInstalled(const nx::utils::SoftwareVersion& version, bool strict) const
 {
     QnClientInstallationPtr installation = installationForVersion(version, strict);
 
     if (installation.isNull())
         return false;
 
-    if (!installation->exists()) {
+    if (!installation->exists())
+    {
         std::unique_lock<std::mutex> lk(m_mutex);
         m_installationByVersion.remove(installation->version());
         return false;
@@ -282,21 +284,22 @@ QList<nx::utils::SoftwareVersion> InstallationManager::installedVersions() const
 }
 
 nx::utils::SoftwareVersion InstallationManager::nearestInstalledVersion(
-    const SoftwareVersion& version) const
+    const nx::utils::SoftwareVersion& version) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
 
     if (m_installationByVersion.isEmpty())
-        return SoftwareVersion();
+        return nx::utils::SoftwareVersion();
 
     if (m_installationByVersion.contains(version))
         return version;
 
     auto it = m_installationByVersion.end();
-    do {
+    do
+    {
         --it;
 
-        SoftwareVersion v = it.key();
+        nx::utils::SoftwareVersion v = it.key();
         // too early
         if (v.major() > version.major())
             continue;
@@ -315,13 +318,15 @@ nx::utils::SoftwareVersion InstallationManager::nearestInstalledVersion(
 
         // got it!
         return it.key();
-    } while (it != m_installationByVersion.begin());
+    }
+    while (it != m_installationByVersion.begin());
 
-    return SoftwareVersion();
+    return nx::utils::SoftwareVersion();
 }
 
 QnClientInstallationPtr InstallationManager::installationForVersion(
-    const SoftwareVersion& version, bool strict) const
+    const nx::utils::SoftwareVersion& version,
+    bool strict) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
     QnClientInstallationPtr installation = m_installationByVersion.value(version);
@@ -330,7 +335,7 @@ QnClientInstallationPtr InstallationManager::installationForVersion(
     if (!installation)
     {
         //maybe installation is actually there but we do not know about it?
-            //scanning dir once again
+        //scanning dir once again
         const_cast<InstallationManager*>(this)->updateInstalledVersionsInformation();
 
         std::unique_lock<std::mutex> lk(m_mutex);
@@ -343,7 +348,8 @@ QnClientInstallationPtr InstallationManager::installationForVersion(
     if (strict)
         return QnClientInstallationPtr();
 
-    SoftwareVersion ver = nearestInstalledVersion(SoftwareVersion(version.major(), version.minor()));
+    nx::utils::SoftwareVersion ver = nearestInstalledVersion(
+        nx::utils::SoftwareVersion(version.major(), version.minor()));
     if (ver.isNull())
         return QnClientInstallationPtr();
 
@@ -356,7 +362,8 @@ QString InstallationManager::rootInstallationDirectory() const
     return m_installationsDir.absolutePath();
 }
 
-QString InstallationManager::installationDirForVersion(const SoftwareVersion& version) const
+QString InstallationManager::installationDirForVersion(
+    const nx::utils::SoftwareVersion& version) const
 {
     std::unique_lock<std::mutex> lk(m_mutex);
     if (!m_installationsDir.exists())
@@ -365,15 +372,17 @@ QString InstallationManager::installationDirForVersion(const SoftwareVersion& ve
     return m_installationsDir.absoluteFilePath(versionToString(version));
 }
 
-bool InstallationManager::installZip(const SoftwareVersion& version, const QString &fileName)
+bool InstallationManager::installZip(const nx::utils::SoftwareVersion& version,
+    const QString& fileName)
 {
-    NX_DEBUG(this, lit("InstallationManager: Installing update %1 from %2")
+    NX_DEBUG(this, lm("InstallationManager: Installing update %1 from %2")
         .arg(version.toString()).arg(fileName));
 
     QnClientInstallationPtr installation = installationForVersion(version, true);
-    if (installation && installation->verify())
+    if (installation)
     {
-        NX_INFO(this, lit("InstallationManager: Version %1 is already installed").arg(version.toString()));
+        NX_INFO(this, lm("InstallationManager: Version %1 is already installed")
+            .arg(version.toString()));
         return true;
     }
 
@@ -384,7 +393,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
 
     if (!QDir().mkdir(targetDir.absolutePath()))
     {
-        NX_ERROR(this, lit("InstallationManager: Cannot create directory %1").arg(targetDir.absolutePath()));
+        NX_ERROR(this, lm("InstallationManager: Cannot create directory %1")
+            .arg(targetDir.absolutePath()));
         return false;
     }
 
@@ -392,8 +402,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
     const int errorCode = extractor.extractZip();
     if (errorCode != QnZipExtractor::Ok)
     {
-        NX_ERROR(this, lit("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
-            .arg(fileName).arg(targetDir.absolutePath()).arg(errorCode));
+        NX_ERROR(this, lm("InstallationManager: Cannot extract zip %1 to %2, errorCode = %3")
+            .args(fileName, targetDir.absolutePath(), errorCode));
         return false;
     }
 
@@ -401,21 +411,13 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
     if (installation.isNull() || !installation->exists())
     {
         targetDir.removeRecursively();
-        NX_ERROR(this, lit("InstallationManager: Update package %1 (%2) is invalid")
-            .arg(version.toString()).arg(fileName));
+        NX_ERROR(this, lm("InstallationManager: Update package %1 (%2) is invalid")
+            .args(version.toString(), fileName));
         return false;
     }
 
     installation->setVersion(version);
-    targetDir.remove(lit("update.json"));
-
-    if (!installation->createInstallationDat())
-    {
-        targetDir.removeRecursively();
-        NX_ERROR(this, lit("InstallationManager: Cannot create verification file for %1.")
-            .arg(version.toString()).arg(fileName));
-        return false;
-    }
+    targetDir.remove("update.json");
 
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion.insert(installation->version(), installation);
@@ -423,8 +425,8 @@ bool InstallationManager::installZip(const SoftwareVersion& version, const QStri
 
     createGhosts();
 
-    NX_INFO(this, lit("InstallationManager: Version %1 has been installed successfully to %2")
-        .arg(version.toString()).arg(targetDir.absolutePath()));
+    NX_INFO(this, lm("InstallationManager: Version %1 has been installed successfully to %2")
+        .args(version.toString(), targetDir.absolutePath()));
 
     return true;
 }

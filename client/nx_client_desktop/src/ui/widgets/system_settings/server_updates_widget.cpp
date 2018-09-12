@@ -638,12 +638,14 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
 bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& version)
 {
+    using namespace applauncher::api;
+
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::checkOnline())
+    if (!checkOnline())
         return false;
 
-    const auto result = applauncher::restartClient(version);
-    if (result == applauncher::api::ResultType::ok)
+    const auto result = restartClient(version);
+    if (result == ResultType::ok)
         return true;
 
     static const int kMaxTries = 5;
@@ -651,7 +653,7 @@ bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& vers
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::restartClient(version) == applauncher::api::ResultType::ok)
+        if (applauncher::api::restartClient(version) == ResultType::ok)
             return true;
     }
     return false;
@@ -897,7 +899,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     else
                     {
                         qApp->exit(0);
-                        applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), kProcessTerminateTimeoutMs);
+                        applauncher::api::scheduleProcessKill(QCoreApplication::applicationPid(),
+                            kProcessTerminateTimeoutMs);
                     }
                 }
 
