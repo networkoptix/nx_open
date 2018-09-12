@@ -12,7 +12,8 @@ public:
     LoginEnumerationProtector():
         m_timeShift(nx::utils::test::ClockType::steady)
     {
-        m_settings.blockPeriod = std::chrono::hours(1);
+        m_settings.minBlockPeriod = std::chrono::hours(1);
+        m_settings.maxBlockPeriod = std::chrono::hours(1);
         m_blocker = std::make_unique<cdb::LoginEnumerationProtector>(m_settings);
     }
 
@@ -35,7 +36,7 @@ protected:
     
     void whenLockExpirationPeriodPasses()
     {
-        m_timeShift.applyRelativeShift(m_settings.blockPeriod);
+        m_timeShift.applyRelativeShift(m_settings.maxBlockPeriod);
     }
 
     void thenBlockHasBeenSet()

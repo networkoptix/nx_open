@@ -7,7 +7,11 @@ LoginEnumerationProtector::LoginEnumerationProtector(
     :
     m_settings(settings),
     m_authenticatedLoginsPerPeriod(settings.period),
-    m_unauthenticatedLoginsPerPeriod(settings.period)
+    m_unauthenticatedLoginsPerPeriod(settings.period),
+    m_delayCalculator(nx::utils::ProgressiveDelayPolicy(
+        m_settings.minBlockPeriod,
+        2,
+        m_settings.maxBlockPeriod))
 {
 }
 
@@ -70,7 +74,8 @@ void LoginEnumerationProtector::setLockIfAppropriate()
         return;
     }
 
-    m_lockExpiration = nx::utils::monotonicTime() + m_settings.blockPeriod;
+    m_lockExpiration =
+        nx::utils::monotonicTime() + m_delayCalculator.calculateNewDelay();
 }
 
 } // namespace nx::cdb

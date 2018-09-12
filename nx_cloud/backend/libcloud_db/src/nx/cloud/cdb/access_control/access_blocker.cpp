@@ -14,7 +14,9 @@ AccessBlocker::AccessBlocker(
     m_settings(settings),
     m_hostLockerPool(
         settings.loginEnumerationProtectionSettings(),
-        settings.loginEnumerationProtectionSettings().period)
+        std::max(
+            settings.loginEnumerationProtectionSettings().period,
+            settings.loginEnumerationProtectionSettings().maxBlockPeriod))
 {
 }
 
