@@ -161,65 +161,6 @@ void ConnectionManager::createTransactionConnection(
     completionHandler(std::move(requestResult));
 }
 
-void ConnectionManager::createWebsocketTransactionConnection(
-    nx::network::http::HttpServerConnection* const connection,
-    const std::string& systemId,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
-    nx::network::http::RequestProcessedHandler completionHandler)
-{
-    using namespace std::placeholders;
-    using namespace nx::network;
-
-    auto remotePeerInfo = p2p::deserializePeerData(request);
-
-    if (systemId.empty())
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring createWebsocketTransactionConnection request without systemId from peer %1")
-            .arg(connection->socket()->getForeignAddress()));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    if (!m_protocolVersionRange.isCompatible(remotePeerInfo.protoVersion))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
-            lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
-            .args(remotePeerInfo.id, systemId, connection->socket()->getForeignAddress(),
-                remotePeerInfo.protoVersion));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    vms::api::PeerDataEx localPeer;
-    localPeer.assign(m_localPeerData);
-    localPeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-    localPeer.protoVersion = remotePeerInfo.protoVersion;
-    p2p::serializePeerData(*response, localPeer, remotePeerInfo.dataFormat);
-
-    auto error = websocket::validateRequest(request, response);
-    if (error != websocket::Error::noError)
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Can't upgrade request from peer %1 to webSocket. Error: %2")
-            .arg(connection->socket()->getForeignAddress())
-            .arg((int) error));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
-    result.connectionEvents.onResponseHasBeenSent =
-        [this, localPeer = std::move(localPeer), remotePeerInfo = std::move(remotePeerInfo),
-            request = std::move(request), systemId](
-                network::http::HttpServerConnection* connection) mutable
-        {
-            addWebSocketTransactionTransport(
-                connection->takeSocket(),
-                std::move(localPeer),
-                std::move(remotePeerInfo),
-                systemId,
-                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
-        };
-    completionHandler(std::move(result));
-}
-
 void ConnectionManager::pushTransaction(
     nx::network::http::HttpServerConnection* const connection,
     const std::string& /*systemId*/,
@@ -742,41 +683,6 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
             boost::none);
 
     return requestResult;
-}
-
-void ConnectionManager::addWebSocketTransactionTransport(
-    std::unique_ptr<network::AbstractStreamSocket> connection,
-    vms::api::PeerDataEx localPeerInfo,
-    vms::api::PeerDataEx remotePeerInfo,
-    const std::string& systemId,
-    const std::string& userAgent)
-{
-    const auto remoteAddress = connection->getForeignAddress();
-    auto webSocket = std::make_unique<network::websocket::WebSocket>(
-        std::move(connection));
-
-    auto connectionId = QnUuid::createUuid();
-
-    auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
-        m_protocolVersionRange,
-        m_transactionLog,
-        systemId.c_str(),
-        connectionId,
-        std::move(webSocket),
-        localPeerInfo,
-        remotePeerInfo);
-
-    ConnectionContext context{
-        std::move(transactionTransport),
-        connectionId.toSimpleByteArray(),
-        {systemId.c_str(), remotePeerInfo.id.toByteArray()},
-        userAgent};
-
-    if (!addNewConnection(std::move(context), remotePeerInfo))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")
-            .arg(remotePeerInfo.id).arg(systemId).arg(remoteAddress).arg(connectionId));
-    }
 }
 
 } // namespace data_sync_engine

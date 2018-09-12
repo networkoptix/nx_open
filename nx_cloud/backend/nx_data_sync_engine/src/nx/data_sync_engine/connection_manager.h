@@ -70,6 +70,27 @@ struct SystemConnectionInfo
 class NX_DATA_SYNC_ENGINE_API ConnectionManager
 {
 public:
+    struct FullPeerName
+    {
+        nx::String systemId;
+        nx::String peerId;
+
+        bool operator<(const FullPeerName& rhs) const
+        {
+            return systemId != rhs.systemId
+                ? systemId < rhs.systemId
+                : peerId < rhs.peerId;
+        }
+    };
+
+    struct ConnectionContext
+    {
+        std::unique_ptr<AbstractTransactionTransport> connection;
+        nx::String connectionId;
+        FullPeerName fullPeerName;
+        std::string userAgent;
+    };
+
     using SystemStatusChangedSubscription =
         nx::utils::Subscription<std::string /*systemId*/, SystemStatusDescriptor>;
 
@@ -82,17 +103,14 @@ public:
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
 
+    bool addNewConnection(
+        ConnectionContext connectionContext,
+        const vms::api::PeerDataEx& remotePeerInfo);
+
     /**
      * Mediaserver calls this method to open 2-way transaction exchange channel.
      */
     void createTransactionConnection(
-        nx::network::http::HttpServerConnection* const connection,
-        const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler);
-
-    void createWebsocketTransactionConnection(
         nx::network::http::HttpServerConnection* const connection,
         const std::string& systemId,
         nx::network::http::Request request,
@@ -129,28 +147,6 @@ public:
     SystemStatusChangedSubscription& systemStatusChangedSubscription();
 
 private:
-    class FullPeerName
-    {
-    public:
-        nx::String systemId;
-        nx::String peerId;
-
-        bool operator<(const FullPeerName& rhs) const
-        {
-            return systemId != rhs.systemId
-                ? systemId < rhs.systemId
-                : peerId < rhs.peerId;
-        }
-    };
-
-    struct ConnectionContext
-    {
-        std::unique_ptr<AbstractTransactionTransport> connection;
-        nx::String connectionId;
-        FullPeerName fullPeerName;
-        std::string userAgent;
-    };
-
     typedef boost::multi_index::multi_index_container<
         ConnectionContext,
         boost::multi_index::indexed_by<
@@ -182,10 +178,6 @@ private:
     nx::utils::Counter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
     SystemStatusChangedSubscription m_systemStatusChangedSubscription;
-
-    bool addNewConnection(
-        ConnectionContext connectionContext,
-        const vms::api::PeerDataEx& remotePeerInfo);
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
@@ -233,13 +225,6 @@ private:
     nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response);
-
-    void addWebSocketTransactionTransport(
-        std::unique_ptr<network::AbstractStreamSocket> connection,
-        vms::api::PeerDataEx localPeerInfo,
-        vms::api::PeerDataEx remotePeerInfo,
-        const std::string& systemId,
-        const std::string& userAgent);
 };
 
 } // namespace data_sync_engine
