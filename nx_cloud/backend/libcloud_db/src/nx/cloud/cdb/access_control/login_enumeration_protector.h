@@ -29,9 +29,9 @@ public:
     bool isLocked() const;
 
 private:
+    const LoginEnumerationProtectionSettings m_settings;
     nx::utils::math::UniqueValueCountPerPeriod<std::string> m_authenticatedLoginsPerPeriod;
     nx::utils::math::UniqueValueCountPerPeriod<std::string> m_unauthenticatedLoginsPerPeriod;
-    const LoginEnumerationProtectionSettings m_settings;
     std::optional<std::chrono::steady_clock::time_point> m_lockExpiration;
 
     bool removeExpiredLock();
