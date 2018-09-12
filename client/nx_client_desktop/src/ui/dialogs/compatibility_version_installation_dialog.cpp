@@ -7,7 +7,8 @@
 
 
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
-    const nx::vms::api::SoftwareVersion &version, QWidget* parent)
+    const nx::utils::SoftwareVersion& version,
+    QWidget* parent)
     :
     base_type(parent),
     m_ui(new Ui::QnCompatibilityVersionInstallationDialog),

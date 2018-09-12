@@ -6,7 +6,7 @@
 #include <update/updates_common.h>
 #include <ui/dialogs/common/dialog.h>
 
-#include <nx/vms/api/data/software_version.h>
+#include <nx/utils/software_version.h>
 
 class QnMediaServerUpdateTool;
 
@@ -22,7 +22,7 @@ class CompatibilityVersionInstallationDialog: public Connective<QnDialog>
 
 public:
     CompatibilityVersionInstallationDialog(
-        const nx::vms::api::SoftwareVersion& version, QWidget* parent = nullptr);
+        const nx::utils::SoftwareVersion& version, QWidget* parent = nullptr);
     virtual ~CompatibilityVersionInstallationDialog();
 
     bool installationSucceeded() const;
@@ -40,7 +40,7 @@ private:
 private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
 
-    nx::vms::api::SoftwareVersion m_versionToInstall;
+    nx::utils::SoftwareVersion m_versionToInstall;
     QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
     bool m_installationOk = false;

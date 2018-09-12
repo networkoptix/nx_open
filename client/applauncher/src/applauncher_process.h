@@ -21,8 +21,7 @@
 #include <nx/utils/software_version.h>
 
 
-class ApplauncherProcess
-    :
+class ApplauncherProcess:
     public QObject,
     public QnStoppable,
     public AbstractRequestProcessor,

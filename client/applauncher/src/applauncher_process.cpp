@@ -182,15 +182,23 @@ bool ApplauncherProcess::startApplication(
 {
     NX_VERBOSE(this, lm("Entered LaunchingApplication"));
 
-    QnClientInstallationPtr installation = m_installationManager->installationForVersion(
-        task->version);
-    if (installation.isNull())
+    auto installation = m_installationManager->installationForVersion(task->version);
+
+    if (!installation)
+    {
+        installation = m_installationManager->installationForVersion(
+            m_installationManager->nearestInstalledVersion(task->version));
+    }
+
+    if (!installation)
+    {
         installation = m_installationManager->installationForVersion(
             m_installationManager->latestVersion());
+    }
 
     if (installation.isNull())
     {
-        NX_DEBUG(this, lm("Failed to find installed version %1 path")
+        NX_DEBUG(this, lm("Failed to find installed version %1")
             .arg(task->version.toString()));
         response->result = ResultType::versionNotInstalled;
         return false;
@@ -274,9 +282,7 @@ bool ApplauncherProcess::installZip(
     Response* const response)
 {
     const bool ok = m_installationManager->installZip(request->version, request->zipFileName);
-    response->result = ok
-        ? ResultType::ok
-        : ResultType::otherError;
+    response->result = ok ? ResultType::ok : ResultType::otherError;
     return ok;
 }
 
