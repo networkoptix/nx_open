@@ -38,11 +38,11 @@ AuthenticationManager::AuthenticationManager(
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree,
-    AccessBlocker* transportSecurityManager)
+    AccessBlocker* accessBlocker)
 :
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
-    m_transportSecurityManager(transportSecurityManager),
+    m_transportSecurityManager(accessBlocker),
     m_authDataProviders(std::move(authDataProviders))
 {
     if (auto userLockerSettings = settings.loginLockout())
@@ -126,14 +126,14 @@ namespace detail {
 
 AuthenticationHelper::AuthenticationHelper(
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-    AccessBlocker* transportSecurityManager,
+    AccessBlocker* accessBlocker,
     network::server::UserLockerPool* userLocker,
     const nx::network::http::HttpServerConnection& connection,
     const nx::network::http::Request& request,
     nx::network::http::server::AuthenticationCompletionHandler handler)
     :
     m_authRestrictionList(authRestrictionList),
-    m_transportSecurityManager(transportSecurityManager),
+    m_transportSecurityManager(accessBlocker),
     m_userLocker(userLocker),
     m_connection(connection),
     m_request(request),

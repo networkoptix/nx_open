@@ -12,12 +12,12 @@ public:
     SecurityManager(
         AuthenticationManager* authenticator,
         const AuthorizationManager& authorizer,
-        const AccessBlocker& transportSecurityManager);
+        const AccessBlocker& accessBlocker);
 
     AuthenticationManager& authenticator();
     const AuthenticationManager& authenticator() const;
 
-    const AccessBlocker& transportSecurityManager() const;
+    const AccessBlocker& accessBlocker() const;
 
     const AuthorizationManager& authorizer() const;
 

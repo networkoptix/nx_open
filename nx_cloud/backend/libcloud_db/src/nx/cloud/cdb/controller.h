@@ -10,7 +10,7 @@
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "access_control/security_manager.h"
-#include "access_control/transport_security_manager.h"
+#include "access_control/access_blocker.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/vms_p2p_command_bus.h"
 #include "managers/account_manager.h"

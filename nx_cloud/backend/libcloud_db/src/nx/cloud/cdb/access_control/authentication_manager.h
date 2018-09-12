@@ -11,7 +11,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 
 #include "auth_types.h"
-#include "transport_security_manager.h"
+#include "access_blocker.h"
 #include "../settings.h"
 
 namespace nx {
@@ -49,7 +49,7 @@ public:
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree,
-        AccessBlocker* transportSecurityManager);
+        AccessBlocker* accessBlocker);
 
     virtual void authenticate(
         const nx::network::http::HttpServerConnection& connection,
@@ -76,7 +76,7 @@ class AuthenticationHelper
 public:
     AuthenticationHelper(
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-        AccessBlocker* transportSecurityManager,
+        AccessBlocker* accessBlocker,
         network::server::UserLockerPool* userLocker,
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
