@@ -28,9 +28,11 @@ protected:
     {
         for (int i = 0; i < m_settings.unsuccessfulLoginsThreshold+1; ++i)
         {
+            std::chrono::milliseconds lockPeriod;
             m_blocker->updateLockoutState(
                 nx::network::server::AuthResult::failure,
-                nx::utils::generateRandomName(7).toStdString());
+                nx::utils::generateRandomName(7).toStdString(),
+                &lockPeriod);
         }
     }
     

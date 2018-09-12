@@ -24,9 +24,13 @@ public:
     LoginEnumerationProtector(
         const LoginEnumerationProtectionSettings& settings);
 
+    /**
+     * @param lockPeriod Set to lock period if lock is set.
+     */
     nx::network::server::LockUpdateResult updateLockoutState(
         nx::network::server::AuthResult authResult,
-        const std::string& login);
+        const std::string& login,
+        std::chrono::milliseconds* lockPeriod);
 
     bool isLocked() const;
 
@@ -43,7 +47,7 @@ private:
         nx::network::server::AuthResult authResult,
         const std::string& login);
 
-    void setLockIfAppropriate();
+    void setLockIfAppropriate(std::chrono::milliseconds* lockPeriod);
 };
 
 } // namespace nx::cdb

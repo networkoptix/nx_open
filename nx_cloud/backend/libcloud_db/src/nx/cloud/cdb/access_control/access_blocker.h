@@ -52,6 +52,11 @@ private:
     LoginEnumerationProtectorPool m_hostLockerPool;
 
     std::string tryFetchLoginFromRequest(const nx::network::http::Request& request);
+
+    void updateHostLockoutState(
+        const nx::network::HostAddress& host,
+        nx::network::server::AuthResult authenticationResult,
+        const std::string& login);
 };
 
 } // namespace nx::cdb

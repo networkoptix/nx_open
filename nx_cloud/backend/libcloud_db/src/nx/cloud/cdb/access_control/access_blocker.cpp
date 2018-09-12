@@ -46,13 +46,10 @@ void AccessBlocker::onAuthenticationSuccess(
         return;
     }
 
-    if (!login.empty())
-    {
-        m_hostLockerPool.updateLockoutState(
-            connection.clientEndpoint().address,
-            nx::network::server::AuthResult::success,
-            login);
-    }
+    updateHostLockoutState(
+        connection.clientEndpoint().address,
+        nx::network::server::AuthResult::success,
+        login);
 }
 
 void AccessBlocker::onAuthenticationFailure(
@@ -60,13 +57,10 @@ void AccessBlocker::onAuthenticationFailure(
     const std::string& login,
     const nx::network::http::Request& /*request*/)
 {
-    if (!login.empty())
-    {
-        m_hostLockerPool.updateLockoutState(
-            connection.clientEndpoint().address,
-            nx::network::server::AuthResult::failure,
-            login);
-    }
+    updateHostLockoutState(
+        connection.clientEndpoint().address,
+        nx::network::server::AuthResult::failure,
+        login);
 }
 
 std::string AccessBlocker::tryFetchLoginFromRequest(
@@ -82,6 +76,35 @@ std::string AccessBlocker::tryFetchLoginFromRequest(
         return value.toString().toStdString();
 
     return std::string();
+}
+
+void AccessBlocker::updateHostLockoutState(
+    const nx::network::HostAddress& host,
+    nx::network::server::AuthResult authenticationResult,
+    const std::string& login)
+{
+    if (login.empty())
+        return;
+
+    std::chrono::milliseconds lockPeriod{0};
+    const auto result = m_hostLockerPool.updateLockoutState(
+        host,
+        authenticationResult,
+        login,
+        &lockPeriod);
+    switch (result)
+    {
+        case nx::network::server::LockUpdateResult::locked:
+            NX_WARNING(this, lm("Host %1 blocked for %2").args(host, lockPeriod));
+            break;
+
+        case nx::network::server::LockUpdateResult::unlocked:
+            NX_INFO(this, lm("Host %1 unblocked").args(host));
+            break;
+
+        case nx::network::server::LockUpdateResult::noChange:
+            break;
+    }
 }
 
 } // namespace nx::cdb

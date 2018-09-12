@@ -17,7 +17,8 @@ LoginEnumerationProtector::LoginEnumerationProtector(
 
 nx::network::server::LockUpdateResult LoginEnumerationProtector::updateLockoutState(
     nx::network::server::AuthResult authResult,
-    const std::string& login)
+    const std::string& login,
+    std::chrono::milliseconds* lockPeriod)
 {
     auto result = nx::network::server::LockUpdateResult::noChange;
 
@@ -29,7 +30,7 @@ nx::network::server::LockUpdateResult LoginEnumerationProtector::updateLockoutSt
 
     updateCounters(authResult, login);
 
-    setLockIfAppropriate();
+    setLockIfAppropriate(lockPeriod);
     if (isLocked())
         result = nx::network::server::LockUpdateResult::locked;
 
@@ -64,7 +65,8 @@ void LoginEnumerationProtector::updateCounters(
         m_unauthenticatedLoginsPerPeriod.add(login);
 }
 
-void LoginEnumerationProtector::setLockIfAppropriate()
+void LoginEnumerationProtector::setLockIfAppropriate(
+    std::chrono::milliseconds* lockPeriod)
 {
     if (m_unauthenticatedLoginsPerPeriod.count() <= m_settings.unsuccessfulLoginsThreshold)
         return;
@@ -74,8 +76,9 @@ void LoginEnumerationProtector::setLockIfAppropriate()
         return;
     }
 
+    *lockPeriod = m_delayCalculator.calculateNewDelay();
     m_lockExpiration =
-        nx::utils::monotonicTime() + m_delayCalculator.calculateNewDelay();
+        nx::utils::monotonicTime() + *lockPeriod;
 }
 
 } // namespace nx::cdb
