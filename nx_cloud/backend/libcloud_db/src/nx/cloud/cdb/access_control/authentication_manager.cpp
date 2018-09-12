@@ -84,7 +84,7 @@ void AuthenticationManager::authenticate(
     if (authResultCode == api::ResultCode::ok)
     {
         return authenticatorHelper.reportSuccess(
-            AuthenticationType::other,
+            AuthenticationType::credentials,
             std::move(authProperties));
     }
     else
