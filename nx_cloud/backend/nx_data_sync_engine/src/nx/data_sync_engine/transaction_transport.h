@@ -29,9 +29,9 @@ class TransactionLog;
 
 struct ConnectionRequestAttributes
 {
-    nx::String connectionId;
+    std::string connectionId;
     vms::api::PeerData remotePeer;
-    nx::String contentEncoding;
+    std::string contentEncoding;
     int remotePeerProtocolVersion = 0;
 };
 
@@ -51,7 +51,7 @@ public:
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
         TransactionLog* const transactionLog,
         const ConnectionRequestAttributes& connectionRequestAttributes,
-        const nx::String& systemId,
+        const std::string& systemId,
         const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
@@ -98,8 +98,8 @@ private:
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
-    const nx::String m_systemId;
-    const nx::String m_connectionId;
+    const std::string m_systemId;
+    const std::string m_connectionId;
     const network::SocketAddress m_connectionOriginatorEndpoint;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     /**

@@ -70,8 +70,8 @@ class NX_DATA_SYNC_ENGINE_API ConnectionManager
 public:
     struct FullPeerName
     {
-        nx::String systemId;
-        nx::String peerId;
+        std::string systemId;
+        std::string peerId;
 
         bool operator<(const FullPeerName& rhs) const
         {
@@ -123,7 +123,7 @@ public:
     std::size_t getConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
-    unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
+    unsigned int getConnectionCountBySystemId(const std::string& systemId) const;
 
     void closeConnectionsToSystem(
         const nx::String& systemId,
@@ -169,7 +169,7 @@ private:
 
     unsigned int getConnectionCountBySystemId(
         const QnMutexLockerBase& lk,
-        const nx::String& systemId) const;
+        const std::string& systemId) const;
 
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
@@ -183,7 +183,7 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
 
-    void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
+    void sendSystemOfflineNotificationIfNeeded(const std::string& systemId);
 
     void removeConnection(const std::string& connectionId);
 
@@ -197,7 +197,7 @@ private:
 
     template<typename TransactionDataType>
     void processSpecialTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         const TransactionTransportHeader& transportHeader,
         Command<TransactionDataType> data,
         TransactionProcessedHandler handler);

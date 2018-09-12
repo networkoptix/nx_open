@@ -12,7 +12,7 @@ namespace data_sync_engine {
 class TransactionTransportHeader
 {
 public:
-    nx::String systemId;
+    std::string systemId;
     network::SocketAddress endpoint;
     std::string connectionId;
     CommandTransportHeader vmsTransportHeader;

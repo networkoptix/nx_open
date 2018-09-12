@@ -152,7 +152,7 @@ std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
     {
         result.push_back({
-            it->fullPeerName.systemId.toStdString(),
+            it->fullPeerName.systemId,
             it->connection->remoteSocketAddr(),
             it->userAgent});
     }
@@ -181,7 +181,7 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
 }
 
 unsigned int ConnectionManager::getConnectionCountBySystemId(
-    const nx::String& systemId) const
+    const std::string& systemId) const
 {
     QnMutexLocker lock(&m_mutex);
     return getConnectionCountBySystemId(lock, systemId);
@@ -248,7 +248,7 @@ bool ConnectionManager::addNewConnection(
             .arg(context.connectionId)
             .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
-    const auto systemId = context.fullPeerName.systemId.toStdString();
+    const auto systemId = context.fullPeerName.systemId;
 
     if (!m_connections.insert(std::move(context)).second)
     {
@@ -304,13 +304,13 @@ bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
 
 unsigned int ConnectionManager::getConnectionCountBySystemId(
     const QnMutexLockerBase& /*lk*/,
-    const nx::String& systemId) const
+    const std::string& systemId) const
 {
     const auto& connectionByFullPeerName =
         m_connections.get<kConnectionByFullPeerNameIndex>();
 
     auto it = connectionByFullPeerName.lower_bound(
-        FullPeerName{systemId, nx::String()});
+        FullPeerName{systemId, std::string()});
     unsigned int activeConnections = 0;
     for (; it != connectionByFullPeerName.end(); ++it)
     {
@@ -379,13 +379,13 @@ void ConnectionManager::removeConnectionByIter(
 }
 
 void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
-    const nx::String systemId)
+    const std::string& systemId)
 {
     if (getConnectionCountBySystemId(systemId) > 0)
         return;
 
     m_systemStatusChangedSubscription.notify(
-        systemId.toStdString(), { false /*offline*/, 0 });
+        systemId, { false /*offline*/, 0 });
 }
 
 void ConnectionManager::removeConnection(const std::string& connectionId)
@@ -432,7 +432,7 @@ void ConnectionManager::onTransactionDone(
 
 template<typename TransactionDataType>
 void ConnectionManager::processSpecialTransaction(
-    const nx::String& /*systemId*/,
+    const std::string& /*systemId*/,
     const TransactionTransportHeader& transportHeader,
     Command<TransactionDataType> data,
     TransactionProcessedHandler handler)

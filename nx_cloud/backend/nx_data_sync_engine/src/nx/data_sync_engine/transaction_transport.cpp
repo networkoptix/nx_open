@@ -21,7 +21,7 @@ TransactionTransport::TransactionTransport(
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     TransactionLog* const transactionLog,
     const ConnectionRequestAttributes& connectionRequestAttributes,
-    const nx::String& systemId,
+    const std::string& systemId,
     const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
@@ -39,12 +39,12 @@ TransactionTransport::TransactionTransport(
         connectionRequestAttributes.remotePeer,
         ::ec2::ConnectionType::incoming,
         request,
-        connectionRequestAttributes.contentEncoding,
+        connectionRequestAttributes.contentEncoding.c_str(),
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount)),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
-        systemId,
+        systemId.c_str(),
         connectionRequestAttributes.remotePeer.dataFormat)),
     m_systemId(systemId),
     m_connectionId(connectionRequestAttributes.connectionId),

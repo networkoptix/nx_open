@@ -76,14 +76,13 @@ void HttpTransportAcceptor::createConnection(
             connectionRequestAttributes.connectionId));
 
     // newTransport MUST be ready to accept connections before sending response.
-    const nx::String systemIdLocal(systemId.c_str());
     auto newTransport = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
         connection->getAioThread(),
         &m_connectionGuardSharedState,
         m_transactionLog,
         connectionRequestAttributes,
-        systemIdLocal,
+        systemId,
         m_localPeerData,
         connection->socket()->getForeignAddress(),
         request);
@@ -91,7 +90,7 @@ void HttpTransportAcceptor::createConnection(
     ConnectionManager::ConnectionContext context{
         std::move(newTransport),
         connectionRequestAttributes.connectionId,
-        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()},
+        {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
         network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
 
     vms::api::PeerDataEx remotePeer;
@@ -236,7 +235,7 @@ nx::network::http::RequestResult
         ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE);
     response->headers.emplace(
         "Content-Encoding",
-        connectionRequestAttributes.contentEncoding);
+        connectionRequestAttributes.contentEncoding.c_str());
     response->headers.emplace(
         Qn::EC2_GUID_HEADER_NAME,
         m_localPeerData.id.toByteArray());
@@ -257,7 +256,7 @@ nx::network::http::RequestResult
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         std::bind(&HttpTransportAcceptor::startOutgoingChannel, this,
-            connectionRequestAttributes.connectionId.toStdString(),
+            connectionRequestAttributes.connectionId,
             std::placeholders::_1);
 
     requestResult.dataSource =
