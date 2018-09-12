@@ -70,9 +70,8 @@ int MediaEncoder::getMediaUrl(char* urlBuf) const
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 {
-    std::string url = utils::decodeCameraInfoUrl(m_camera->info().url);
-    nxcip::CompressionType nxCodecID = ffmpeg::utils::toNxCompressionType(m_codecParams.codecID);
-    *maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID) / 1000;
+    std::string url = m_camera->url();
+    *maxBitrate = device::getMaxBitrate(url.c_str(), m_camera->compressionTypeDescriptor()) / 1000;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -120,10 +119,10 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
 int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 {
     // the plugin uses bits per second internally, so convert to that first
-    int bitratebps = bitrateKbps * 1000;
-    m_codecParams.bitrate = bitratebps;
+    int bitrate = bitrateKbps * 1000;
+    m_codecParams.bitrate = bitrate;
     if (m_streamReader)
-        m_streamReader->setBitrate(bitratebps);
+        m_streamReader->setBitrate(bitrate);
     *selectedBitrateKbps = bitrateKbps;
     return nxcip::NX_NO_ERROR;
 }

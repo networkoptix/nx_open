@@ -12,7 +12,6 @@ public:
 };
 
 typedef std::shared_ptr<AbstractCompressionTypeDescriptor> CompressionTypeDescriptorPtr;
-typedef std::shared_ptr<const AbstractCompressionTypeDescriptor> CompressionTypeDescriptorConstPtr;
 
 } // namespace device
 } // namespace nx

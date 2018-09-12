@@ -39,7 +39,7 @@ public:
     uint64_t millisSinceEpoch() const;
     nxpl::TimeProvider * const timeProvider() const;
 
-    device::CompressionTypeDescriptorConstPtr compressionTypeDescriptor() const;
+    const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
 
     std::string url() const;
     CodecParameters defaultVideoParameters() const;

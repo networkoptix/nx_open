@@ -92,12 +92,12 @@ std::vector<DeviceData> getDeviceList()
     return devices;
 }
 
-std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath)
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath)
 {
     //todo figure out how to avoid this init everytime
     DShowInitializer init;
 
-    std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> codecList;
+    std::vector<device::CompressionTypeDescriptorPtr> codecList;
 
     IMoniker * pMoniker = NULL;
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
@@ -112,7 +112,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodec)
+    const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     //todo figure out how to avoid this init everytime
     DShowInitializer init;
@@ -133,7 +133,7 @@ std::vector<ResolutionData> getResolutionList(
     return resolutionList;
 }
 
-void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodec)
+void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
@@ -163,6 +163,9 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType tar
     if (FAILED(result))
         return;
 
+    auto dshowCodec = std::dynamic_pointer_cast<DShowCompressionTypeDescriptor>(targetCodec);
+    BITMAPINFOHEADER * targetHeader = dshowCodec->videoInfoBitMapHeader();
+
     BYTE *array = new BYTE[iSize];
     AM_MEDIA_TYPE *mediaType;
     for (int i = 0; i < capCount; ++i)
@@ -170,12 +173,10 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType tar
         result = pConfig->GetStreamCaps(i, &mediaType, array);
         if (SUCCEEDED(result))
         {
-            bool formatType = mediaType->formattype == FORMAT_VideoInfo ||
-                mediaType->formattype == FORMAT_VideoInfo2;
-            if (formatType && mediaType->pbFormat != NULL)
+            if (isVideoInfo(mediaType) && targetHeader)
             {
                 VIDEOINFO * info = reinterpret_cast<VIDEOINFO*>(mediaType->pbFormat);
-                if (info && toNxCodecID(info->bmiHeader.biCompression) == targetCodec)
+                if (info->bmiHeader.biCompression == targetHeader->biCompression)
                 {
                     info->dwBitRate = bitrate;
                     pConfig->SetFormat(mediaType);
@@ -189,7 +190,7 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType tar
     delete[] array;
 }
 
-int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodec)
+int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
@@ -478,7 +479,7 @@ HRESULT getResolutionList(IMoniker *pMoniker,
 
 HRESULT getBitrateList(IMoniker *pMoniker,
     std::vector<int>* outBitrateList,
-    nxcip::CompressionType targetCodec)
+    const device::CompressionTypeDescriptorPtr& targetCodec)
 {
     IEnumMediaTypes * enumMediaTypes = NULL;
     HRESULT result = enumerateMediaTypes(pMoniker, &enumMediaTypes);
@@ -487,15 +488,17 @@ HRESULT getBitrateList(IMoniker *pMoniker,
 
     std::vector<int> bitrateList;
 
+    auto dshowCodec = std::dynamic_pointer_cast<DShowCompressionTypeDescriptor>(targetCodec);
+    BITMAPINFOHEADER * targetHeader = dshowCodec->videoInfoBitMapHeader();
+
     AM_MEDIA_TYPE* mediaType = NULL;
     while (S_OK == enumMediaTypes->Next(1, &mediaType, NULL))
     {
-        if (isVideoInfo(mediaType))
+        if (isVideoInfo(mediaType) && targetHeader)
         {
             auto viHeader = reinterpret_cast<VIDEOINFOHEADER*>(mediaType->pbFormat);
 
-            nxcip::CompressionType codecID = toNxCodecID(viHeader->bmiHeader.biCompression);
-            if (codecID == targetCodec)
+            if (viHeader->bmiHeader.biCompression == targetHeader->bmiCompression)
             {
                 int bitrate = (int) viHeader->dwBitRate;
                 if (std::find(bitrateList.begin(), bitrateList.end(), bitrate) == bitrateList.end())

@@ -342,7 +342,10 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         {
             result = decodeNextFrame(m_decodedFrame->frame());
             if (result < 0)
+            {
+                m_terminated = result == AVERROR(ENODEV);
                 returnData(result, nullptr);
+            }
 
             result = resample(m_decodedFrame->frame(), m_resampledFrame->frame());
             if(result < 0)
@@ -373,6 +376,12 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
     int * outFfmpegError)
 {
     *outFfmpegError = 0;
+
+    if(m_encoder->codecID() == AV_CODEC_ID_PCM_S16LE)
+    {
+        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+        return packet;
+    }
 
     m_packetBuffer.push_back(packet);
     packet->setTimeStamp(m_timeProvider->millisSinceEpoch());

@@ -47,17 +47,17 @@ struct DShowInitializer{
 
 std::string getDeviceName(const char * devicePath);
 
-std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
 
 std::vector<DeviceData> getDeviceList();
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID);
+    const device::CompressionTypeDescriptorPtr& targetCodecID);
 
-void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
+void setBitrate(const char * devicePath, int bitrate, const CompressionTypeDescriptorPtr& targetCodecID);
 
-int getMaxBitrate(const char * devicePath, nxcip::CompressionType targetCodecID);
+int getMaxBitrate(const char * devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
 
 
 /////////////////////////////////////// api helper functions //////////////////////////////////////

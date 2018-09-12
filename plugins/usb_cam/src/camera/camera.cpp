@@ -145,10 +145,9 @@ nxpl::TimeProvider * const Camera::timeProvider() const
     return m_timeProvider;
 }
 
-device::CompressionTypeDescriptorConstPtr Camera::compressionTypeDescriptor() const
+const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() const
 {
-    return std::const_pointer_cast<const device::AbstractCompressionTypeDescriptor>(
-        m_compressionTypeDescriptor);
+    return m_compressionTypeDescriptor;
 }
 
 std::string Camera::url() const
@@ -188,7 +187,7 @@ CodecParameters Camera::getDefaultVideoParameters(
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = device::getMaxBitrate(url.c_str(), nxCodecID);
+        int maxBitrate = device::getMaxBitrate(url.c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
             it->fps,

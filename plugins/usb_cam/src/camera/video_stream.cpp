@@ -30,11 +30,6 @@ const char * deviceType()
 #endif
 }
 
-void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType codecID)
-{
-    device::setBitrate(devicePath, bitrate, codecID);
-}
-
 const int kRetryLimit = 10;
 
 } // namespace
@@ -187,12 +182,13 @@ void VideoStream::updateBitrateUnlocked()
     frameConsumer = m_frameConsumerManager.largestBitrate(&frameBitrate);
 
     std::weak_ptr<VideoConsumer> videoConsumer = frameBitrate > packetBitrate 
-        ? packetConsumer 
-        : frameConsumer;
+        ? frameConsumer
+        : packetConsumer;
+        
 
-    if (!videoConsumer.lock())
+    if (videoConsumer.expired())
         return;
-    
+
     if (m_codecParams.bitrate != videoConsumer.lock()->bitrate())
     {
         m_codecParams.bitrate = videoConsumer.lock()->bitrate();
@@ -288,9 +284,12 @@ void VideoStream::run()
             AVMEDIA_TYPE_VIDEO,
             m_packetCount);
 
-        int readCode = m_inputFormat->readFrame(packet->packet());
-        if (readCode < 0)
+        int result = m_inputFormat->readFrame(packet->packet());
+        if (result < 0)
+        {
+            m_terminated = result = AVERROR(ENODEV);
             continue;
+        }
 
         packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
         m_timeStamps.addTimeStamp(packet->pts(), packet->timeStamp());
@@ -391,13 +390,16 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
 
     if (m_codecParams.bitrate > 0)
     {
-        /**
-         * ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
-         */
-        setBitrate(
-            m_url.c_str(),
-            m_codecParams.bitrate,
-            ffmpeg::utils::toNxCompressionType(m_codecParams.codecID));
+        if(auto cam = m_camera.lock())
+        {
+            /**
+             * ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
+             */
+            device::setBitrate(
+                m_url.c_str(),
+                m_codecParams.bitrate,
+                cam->compressionTypeDescriptor());
+        }
     }
 
 #ifdef WIN32
@@ -405,7 +407,6 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
      * Attempt to avoid "real-time buffer too full" error messages in Windows
      */
     inputFormat->setEntry("thread_queue_size", 5096);
-//    inputFormat->setEntry("rtbufsize", "100M");
     inputFormat->setEntry("threads", (int64_t)0);
 #endif
 }
@@ -441,7 +442,7 @@ int VideoStream::initializeDecoder()
      * errors on some cameras.
      */
     ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
-    if (m_inputFormat->readFrame(packet.packet()) >= 0)
+    if (m_inputFormat->readFrame(packet.packet()) == 0)
     {
         ffmpeg::Frame frame;
         decode(&packet, &frame);
@@ -521,7 +522,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(
     {
         if (resolution.width == width && resolution.height == height && resolution.fps == fps)
             return CodecParameters(
-                m_codecParams.codecID, fps, consumerPtr->bitrate(), width, height);
+                m_codecParams.codecID, fps, m_codecParams.bitrate, width, height);
     }
 
     // then a match with similar aspect ratio whose resolution and fps are higher than requested
@@ -534,7 +535,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(
                 return CodecParameters(
                     m_codecParams.codecID,
                     resolution.fps,
-                    consumerPtr->bitrate(),
+                    m_codecParams.bitrate,
                     resolution.width,
                     resolution.height);
         }
@@ -547,7 +548,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(
             return CodecParameters(
                 m_codecParams.codecID,
                 resolution.fps,
-                consumerPtr->bitrate(),
+                m_codecParams.bitrate,
                 resolution.width,
                 resolution.height);
     }

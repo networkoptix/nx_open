@@ -22,7 +22,7 @@ namespace impl {
 
 namespace {
 
-const std::vector<ResolutionData> RPI_RESOLUTION_LIST = {
+const std::vector<ResolutionData> kRaspberryPiResolutionList = {
     {1920, 1080, 30},
     {1920, 1080, 25},
     {1920, 1080, 20},
@@ -91,7 +91,7 @@ bool isRpiMmal(const char * deviceName)
 {
     std::string lower(deviceName);
     std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != lower.npos;
+    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != std::string::npos;
 }
 
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
@@ -112,7 +112,6 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
-    //return std::string(reinterpret_cast<char*> (deviceCapability.card));
     return std::string(deviceCapability.card, deviceCapability.card + sizeof(deviceCapability.card));
 };
 
@@ -246,7 +245,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID)
+    const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
     const auto getResolution =
         [](const v4l2_frmsizeenum& enumerator, int * width, int * height)
@@ -268,7 +267,7 @@ std::vector<ResolutionData> getResolutionList(
         return {};
 
     if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
-        return RPI_RESOLUTION_LIST;
+        return kRaspberryPiResolutionList;
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -316,13 +315,16 @@ std::vector<ResolutionData> getResolutionList(
     return resolutionList;
 }
 
-void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*targetCodecID*/)
+void setBitrate(
+    const char * devicePath,
+    int bitrate,
+    const device::CompressionTypeDescriptorPtr& /*targetCodecID*/)
 {
-    if(!isRpiMmal(getDeviceName(devicePath).c_str()))
+    if (!isRpiMmal(getDeviceName(devicePath).c_str()))
         return;
 
     DeviceInitializer initializer(devicePath);
-    if(initializer.fileDescriptor == -1)
+    if (initializer.fileDescriptor == -1)
         return;
 
     struct v4l2_ext_controls ecs = {0};
@@ -336,11 +338,16 @@ void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType /*t
     ioctl(initializer.fileDescriptor, VIDIOC_S_EXT_CTRLS, &ecs);
 }
 
-int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
+int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
+    static constexpr int kRpiBitrate = 10000000;
+
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
-        return 10000000;
+        return kRpiBitrate;
+
+    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
+        return kRpiBitrate;
 
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec = {0};
@@ -359,7 +366,7 @@ int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID)
             return ec.value;
     }
     
-    return 10000000; // not sure what else to do here
+    return kRpiBitrate; // not sure what else to do here
 }
 
 } // namespace impl

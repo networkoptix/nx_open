@@ -39,7 +39,7 @@ std::vector<DeviceData> getDeviceList();
 /*!
 * Get a list of codecs supported by this device
 */
-std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath);
+std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
 
 /*!
 * Get the list of supported resolutions for the device with the given path.
@@ -49,20 +49,20 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 */
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
-    const std::shared_ptr<AbstractCompressionTypeDescriptor>& targetCodecID);
+    const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /*!
 * Set the bitrate for the device with the given path.
 * On Linux, this corresponds to the devices's /dev/video* entry.
 * @param[in] bitrate - the bitrate to set in bits per second.
 */ 
-void setBitrate(const char * devicePath, int bitrate, nxcip::CompressionType targetCodecID);
+void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 /*!
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
 */ 
-int getMaxBitrate(const char * devicePath, nxcip::CompressionType tagetCodecID);
+int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& tagetCodecID);
 
 } // namespace impl
 } // namespace device
