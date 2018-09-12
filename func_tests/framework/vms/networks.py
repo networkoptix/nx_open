@@ -1,24 +1,27 @@
-from netaddr import IPNetwork
+from netaddr import IPAddress, IPNetwork
+from typing import Any, Mapping
 
+from framework.vms.hypervisor.hypervisor import Hypervisor
+from framework.vms.vm_type import VM
 from framework.waiting import wait_for_truthy
 
 
-def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
+def setup_networks(machines, hypervisor, networks_tree, reachability):
+    # type: (Mapping[VM], Hypervisor, Any, Any) -> Mapping[str, Mapping[IPNetwork, IPAddress]]
     """Assign IP addresses on all machines and setup NAT on router machines
 
     Doesn't know what machines are given. Used OS-agnostic interfaces only.
     Doesn't know whether machines are created and given as dict or are created as requested.
 
-    :param allocate_machine: Callable to allocate a machine.
+    :param machines: Callable to allocate a machine.
     :param hypervisor: Hypervisor interface, e.g. VirtualBox.
     :param networks_tree: Nested dict of specific format.
     :param reachability: Check what is expected to be reachable from what.
-    :return: Machines which actually participated and their addresses.
+    :return: IP addresses.
     """
 
     # TODO: Consistent and sensible names.
     nodes_ips = {}
-    allocated_machines = {}
 
     def setup_tree(tree, router_alias, reachable_networks):
         for network_name in tree:
@@ -30,10 +33,7 @@ def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
             if router_alias is not None:
                 nodes[router_alias] = router_ip_address
             for alias, ip in nodes.items():
-                try:
-                    machine = allocated_machines[alias]
-                except KeyError:
-                    allocated_machines[alias] = machine = allocate_machine(alias)
+                machine = machines[alias]
                 mac = machine.hardware.plug_internal(network_uuid)
                 machine.os_access.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:
@@ -53,7 +53,7 @@ def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
     for alias, ips in nodes_ips.items():
         for ip in ips.values():
             wait_for_truthy(
-                lambda: allocated_machines[alias].os_access.networking.can_reach(ip, timeout_sec=1),
+                lambda: machines[alias].os_access.networking.can_reach(ip, timeout_sec=1),
                 "machine {} can reach itself by {}".format(alias, ip),
                 timeout_sec=20)
     for destination_net in reachability:
@@ -61,11 +61,11 @@ def setup_networks(allocate_machine, hypervisor, networks_tree, reachability):
             for source_alias in reachability[destination_net][destination_alias]:
                 destination_ip = nodes_ips[destination_alias][IPNetwork(destination_net)]
                 wait_for_truthy(
-                    lambda: allocated_machines[source_alias].os_access.networking.can_reach(destination_ip, timeout_sec=1),
+                    lambda: machines[source_alias].os_access.networking.can_reach(destination_ip, timeout_sec=1),
                     "machine {} can reach {} by {}".format(source_alias, destination_alias, destination_ip),
                     timeout_sec=60)
 
-    return allocated_machines, nodes_ips
+    return nodes_ips
 
 
 def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup networks.

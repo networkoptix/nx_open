@@ -4,6 +4,7 @@ from pathlib2 import Path
 
 from framework.merging import setup_system
 from framework.serialize import load
+from framework.vms.bulk import many_allocated
 from framework.vms.networks import setup_networks
 
 _layout_files_dir = Path(__file__).with_name('layout_files')
@@ -17,16 +18,10 @@ def layout(layout_file):
 
 @pytest.fixture()
 def network(hypervisor, vm_types, layout):
-    machine_types = layout.get('machines', {})
-    with ExitStack() as stack:
-        def allocate_vm(alias):
-            type = machine_types.get(alias, 'linux')
-            vm = stack.enter_context(vm_types[type].vm_ready(alias))
-            return vm
-        networks_structure = layout['networks']
+    with many_allocated(vm_types, layout['machines']) as machines:
         reachability = layout.get('reachability', {})
-        vms, _ = setup_networks(allocate_vm, hypervisor, networks_structure, reachability)
-        yield vms
+        setup_networks(machines, hypervisor, layout['networks'], reachability)
+        yield machines
 
 
 @pytest.fixture()

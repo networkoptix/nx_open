@@ -1,3 +1,6 @@
+machines:
+- {alias: first, type: linux}
+- {alias: second, type: linux}
 mergers:
   first:
   second:

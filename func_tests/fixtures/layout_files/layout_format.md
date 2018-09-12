@@ -1,8 +1,23 @@
 # Layout Format
 
 Layout files consist of following parts:
+- machines:
+  currently only VMs are supported, but there is nothing VM-specific herein,
 - networks,
 - mergers.
+
+## Machines
+
+List of machine configurations (dictionaries):
+```
+machines:
+- {alias: first, type: linux}
+- {alias: second, type: linux}
+```
+
+Fields:
+- alias (unique string, required) – identifier of machine in the current test,
+- type (string) – type from VM types configurations.
 
 ## Networks
 

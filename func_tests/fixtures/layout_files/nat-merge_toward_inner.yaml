@@ -1,3 +1,7 @@
+machines:
+- {alias: outer, type: linux}
+- {alias: inner, type: linux}
+- {alias: router, type: linux}
 mergers:
   outer:
     inner:
