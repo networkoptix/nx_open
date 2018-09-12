@@ -1,0 +1,10 @@
+networks:
+  10.254.1.0/24:
+    first:
+    proxy-1:
+    second:
+mergers:
+  first:
+    proxy-1:
+      settings: remote
+    second:

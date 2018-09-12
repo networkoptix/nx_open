@@ -502,7 +502,7 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
-
+    result.dataFormat = dataFormat;
     return result;
 }
 

@@ -586,7 +586,7 @@ class MediaserverApi(object):
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
         wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
-        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=10)
+        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
         all_ids = master_ids | servant_ids
         all_online = {id: 'Online' for id in all_ids}
         wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)

@@ -256,13 +256,9 @@ case "$1" in
 
         if [ '@withRootTool@' = 'true' ]
         then
-            SUDOERS_LINE="${SYSTEM_USER} ALL=NOPASSWD: /usr/bin/dpkg"
-            if ! grep -Fxq "${SUDOERS_LINE}" /etc/sudoers
-            then
-                echo "${SUDOERS_LINE}" >> /etc/sudoers
-            fi
+            chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
+            chmod u+s "${BIN_DIR}/root-tool-bin"
             setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
-
         fi
 
         touch "$RUNTIME_CONFIG_FILE"

@@ -32,6 +32,7 @@ public:
     virtual ~DeviceAdditionDialog() override;
 
     void setServer(const QnMediaServerResourcePtr& server);
+    void setMainPageActive();
 
 private:
     using SearcherPtr = QSharedPointer<ManualDeviceSearcher>;
@@ -59,7 +60,13 @@ private:
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
 
+    void handleStartAddressFieldTextChanged(const QString& value);
+    void handleStartAddressEditingFinished();
+    void handleEndAddressFieldTextChanged(const QString& value);
+
     void showAdditionFailedDialog(const FakeResourceList& resources);
+
+    void handleTabClicked(int index);
 
     int port() const;
     QString password() const;
@@ -78,6 +85,7 @@ private:
     SearchersList m_unfinishedSearches;
 
     QScopedPointer<FoundDevicesModel> m_model;
+    bool m_addressEditing;
 };
 
 } // namespace desktop

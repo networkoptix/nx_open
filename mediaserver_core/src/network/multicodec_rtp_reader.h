@@ -141,12 +141,6 @@ private:
 
     void calcStreamUrl();
 
-    boost::optional<std::chrono::microseconds> parseOnvifNtpExtensionTime(
-        quint8* bufferStart,
-        int length) const;
-
-    bool isOnvifNtpExtensionId(uint16_t id) const;
-
     QnRtspStatistic rtspStatistics(
         int rtpBufferOffset,
         int rtpPacketSize,

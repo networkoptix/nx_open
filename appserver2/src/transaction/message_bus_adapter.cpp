@@ -57,7 +57,9 @@ QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
 QnUuid TransactionMessageBusAdapter::routeToPeerVia(
     const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
-    return m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress);
+    // This method can be called asynchronously after connection has been closed from the
+    // QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer (QtConcurrent call).
+    return m_bus ? m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress) : QnUuid();
 }
 
 int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const

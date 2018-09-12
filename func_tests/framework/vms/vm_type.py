@@ -25,8 +25,6 @@ class VM(object):
         self.port_map = hardware.port_map  # TODO: Remove.
         self.hardware = hardware
         self.os_access = os_access
-        # IPAddress list; TODO: Populate by methods other than setup_flat_network
-        self.ip_address_list = []
 
 
 class UnknownOsFamily(Exception):

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ffprobe "$@" & $pid=$!
-for i in 1..150; then
+ffprobe "$@" & pid=$!
+for i in `seq 1 150`; do
     if ps aux | awk '{print $2}' | grep $pid; then
         sleep 0.1
     else

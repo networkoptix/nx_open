@@ -11,6 +11,7 @@
 
 #include <nx/client/desktop/common/utils/accessor.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 namespace nx {
 namespace client {
@@ -54,6 +55,8 @@ public:
             : normalTextPlaceholder);
     }
 
+    void initializeControls();
+
 public:
     BaseInputField* parent = nullptr;
     QLabel* title = nullptr;
@@ -73,6 +76,7 @@ public:
     const BaseInputField::AccessorPtr textAccessor;
     const BaseInputField::AccessorPtr readOnlyAccessor;
     const BaseInputField::AccessorPtr placeholderAccessor;
+    bool externalControls = false;
 
 private:
     ValidationResult lastResult;
@@ -98,6 +102,11 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     readOnlyAccessor(readOnlyAccessor),
     placeholderAccessor(placeholderAccessor),
     lastResult(QValidator::Intermediate)
+{
+    initializeControls();
+}
+
+void BaseInputFieldPrivate::initializeControls()
 {
     hint->setOpenExternalLinks(true);
     input->installEventFilter(this);
@@ -301,6 +310,25 @@ BaseInputField::BaseInputField(
 
 BaseInputField::~BaseInputField()
 {
+}
+
+void BaseInputField::setExternalControls(
+    QLabel* titleLabel,
+    QnWordWrappedLabel* hintLabel)
+{
+    Q_D(BaseInputField);
+
+    if (!d->externalControls)
+    {
+        delete d->title;
+        delete d->hint;
+    }
+
+    d->externalControls = true;
+    d->title = titleLabel;
+    d->hint = hintLabel;
+
+    d->initializeControls();
 }
 
 QWidget* BaseInputField::input() const

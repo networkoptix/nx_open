@@ -23,7 +23,7 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
     SystemSocketAddress()
 {
     // TODO: #ak Following check does not belong here.
-    if (SocketGlobals::ini().isHostDisabled(endpoint.address))
+    if (SocketGlobals::instance().isHostBlocked(endpoint.address))
     {
         SystemError::setLastErrorCode(SystemError::noPermission);
         return;

@@ -35,11 +35,15 @@ public:
 
     void start()
     {
+        {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            NX_CRITICAL(m_status == Status::idle);
+            m_status = Status::starting;
+            m_condition.notify_all();
+        }
+
         nx::utils::promise<void> moduleInstantiatedCreatedPromise;
         auto moduleInstantiatedCreatedFuture = moduleInstantiatedCreatedPromise.get_future();
-
-        m_moduleStartedPromise = std::make_unique<nx::utils::promise<bool>>();
-
         m_moduleProcessThread = nx::utils::thread(
             [this, &moduleInstantiatedCreatedPromise]()->int
             {
@@ -53,8 +57,12 @@ public:
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {
-                        m_moduleStartedPromise->set_value(isStarted);
+                        std::unique_lock<std::mutex> lock(m_mutex);
+                        NX_CRITICAL(m_status == Status::starting);
+                        m_status = isStarted ? Status::running : Status::failed;
+                        m_condition.notify_all();
                     });
+
                 moduleInstantiatedCreatedPromise.set_value();
                 auto result = m_moduleInstance->exec();
 
@@ -79,27 +87,30 @@ public:
         // NOTE: Valgrind does not stand small timeouts.
         static const std::chrono::minutes initializedMaxWaitTime(1);
 
-        auto moduleStartedFuture = m_moduleStartedPromise->get_future();
-        if (moduleStartedFuture.wait_for(initializedMaxWaitTime) !=
-            std::future_status::ready)
-        {
-            return false;
-        }
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_condition.wait_for(lock, initializedMaxWaitTime,
+            [this]() { return m_status != Status::starting; });
 
-        return moduleStartedFuture.get();
+        return m_status == Status::running;
     }
 
     void stop()
     {
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            if (!m_moduleInstance)
+            std::unique_lock<std::mutex> lock(m_mutex);
+            if (m_status == Status::idle)
                 return;
-            m_moduleInstance->pleaseStop();
+
+            m_condition.wait(lock, [this]() { return m_status != Status::starting; });
         }
 
+        m_moduleInstance->pleaseStop();
         m_moduleProcessThread.join();
         m_moduleInstance.reset();
+
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_status = Status::idle;
+        m_condition.notify_all();
     }
 
     //!restarts process
@@ -149,11 +160,21 @@ protected:
     virtual void afterModuleDestruction() {}
 
 private:
+    enum class Status
+    {
+        idle,
+        starting,
+        running,
+        failed,
+    };
+
+private:
     std::vector<char*> m_args;
     std::unique_ptr<ModuleProcessType> m_moduleInstance;
     nx::utils::thread m_moduleProcessThread;
-    std::unique_ptr<nx::utils::promise<bool /*result*/>> m_moduleStartedPromise;
     mutable std::mutex m_mutex;
+    std::condition_variable m_condition;
+    Status m_status = Status::idle;
 };
 
 }   // namespace test

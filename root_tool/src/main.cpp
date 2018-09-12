@@ -1,5 +1,4 @@
-#include "command_factory.h"
-#include "command.h"
+#include "commands.h"
 #include <assert.h>
 #include <string>
 #include <fstream>
@@ -10,6 +9,8 @@
 #include <cstdio>
 #include <condition_variable>
 #include <functional>
+#include <iostream>
+#include <iomanip>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/types.h>
@@ -17,6 +18,7 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <fcntl.h>
+#include <grp.h>
 #include <nx/system_commands.h>
 #include <nx/system_commands/domain_socket/read_linux.h>
 #include <nx/system_commands/domain_socket/send_linux.h>
@@ -44,11 +46,10 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
         };
 
     factory.reg({"mkdir"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)));
-    factory.reg({"rm"}, {"path"},
-        oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)));
-
-    factory.reg(
+        oneArgAction(std::bind(&nx::SystemCommands::makeDirectory, systemCommands, _1)))
+    .reg({"rm"}, {"path"},
+        oneArgAction(std::bind(&nx::SystemCommands::removePath, systemCommands, _1)))
+    .reg(
         {"chown"}, {"path", "uid", "gid", "opt_recursive"},
         [systemCommands](const std::string& command, int transportFd)
         {
@@ -62,9 +63,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                 (bool) isRecursive);
             sendInt64(transportFd, result);
             return result ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg(
+        })
+    .reg(
         {"mount"}, {"url", "path", "opt_user", "opt_password"},
         [systemCommands](const std::string& command, int transportFd)
         {
@@ -77,9 +77,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             auto result = systemCommands->mount(url, path, user, password);
             sendInt64(transportFd, (int64_t) result);
             return (result == nx::SystemCommands::MountCode::ok) ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"mv"}, {"source_path", "target_path"},
+        })
+    .reg({"mv"}, {"source_path", "target_path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string source, target;
@@ -89,9 +88,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             bool result = systemCommands->rename(source, target);
             sendInt64(transportFd, (int64_t) result);
             return result ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"open"}, {"file_path", "mode"},
+        })
+    .reg({"open"}, {"file_path", "mode"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path, mode;
@@ -101,9 +99,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             int resultFd = systemCommands->open(path, std::stoi(mode));
             sendFd(transportFd, resultFd);
             return resultFd > 0 ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"freeSpace"}, {"path"},
+        })
+    .reg({"freeSpace"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -113,9 +110,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             auto result = systemCommands->freeSpace(path);
             sendInt64(transportFd, result);
             return result > 0 ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"totalSpace"}, {"path"},
+        })
+    .reg({"totalSpace"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -125,9 +121,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             auto result = systemCommands->totalSpace(path);
             sendInt64(transportFd, result);
             return result > 0 ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"exists"}, {"path"},
+        })
+    .reg({"exists"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -137,9 +132,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             bool result = systemCommands->isPathExists(path);
             sendInt64(transportFd, (int64_t) result);
             return result ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"list"}, {"path"},
+        })
+    .reg({"list"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -149,9 +143,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             std::string result = systemCommands->serializedFileList(path);
             sendBuffer(transportFd, result.data(), result.size());
             return Result::ok;
-        });
-
-    factory.reg({"devicePath"}, {"path"},
+        })
+    .reg({"devicePath"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -161,9 +154,8 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             std::string result = systemCommands->devicePath(path);
             sendBuffer(transportFd, result.data(), result.size());
             return !result.empty() ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"size"}, {"path"},
+        })
+    .reg({"size"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -173,17 +165,15 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             int64_t result = systemCommands->fileSize(path);
             sendInt64(transportFd, (int64_t) result);
             return result >= 0 ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"dmiInfo"}, {},
+        })
+    .reg({"dmiInfo"}, {},
         [systemCommands](const std::string& /*command*/, int transportFd)
         {
             std::string result = systemCommands->serializedDmiInfo();
             sendBuffer(transportFd, result.data(), result.size());
             return !result.empty() ? Result::ok : Result::execFailed;
-        });
-
-    factory.reg({"umount", "unmount"}, {"path"},
+        })
+    .reg({"umount", "unmount"}, {"path"},
         [systemCommands](const std::string& command, int transportFd)
         {
             std::string path;
@@ -193,7 +183,25 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
             auto result = systemCommands->unmount(path);
             sendInt64(transportFd, (int64_t) result);
             return result == nx::SystemCommands::UnmountCode::ok ? Result::ok : Result::execFailed;
-        });
+        })
+    .reg({"install"}, {"deb_path"},
+         [systemCommands](const std::string& command, int /*transportFd*/)
+         {
+             std::string debPath;
+             if (!parseCommand(command, &debPath))
+                 return Result::invalidArg;
+
+             std::stringstream commandStream;
+             commandStream << "dpkg -i " << debPath;
+             int result = ::system(commandStream.str().c_str());
+             return result == 0 ? Result::ok : Result::execFailed;
+         }, true)
+    .reg({"help"}, {},
+         [&factory](const std::string& command, int /*transportFd*/)
+         {
+             std::cout << factory.help() << std::endl;
+             return Result::ok;
+         }, true);
 }
 
 class Worker
@@ -312,7 +320,27 @@ public:
             return false;
         }
 
-        chmod(nx::SystemCommands::kDomainSocket, 0777);
+        chmod(nx::SystemCommands::kDomainSocket, 0660);
+        #if defined(NX_USER_NAME)
+            #define STRINGIFY(v) #v
+            #define STRINGIFY2(v) STRINGIFY(v)
+            auto groupPtr = getgrnam(STRINGIFY2(NX_USER_NAME));
+            if (groupPtr)
+            {
+                if (chown(nx::SystemCommands::kDomainSocket, geteuid(), groupPtr->gr_gid))
+                {
+                    perror("chown socket");
+                    return false;
+                }
+            }
+            else
+            {
+                perror("getgrnam");
+                return false;
+            }
+            #undef STRINGIFY
+            #undef STRINGIFY2
+        #endif
 
         return true;
     }
@@ -333,6 +361,72 @@ static void* reallocCallback(void* ctx, ssize_t size)
     return buf->data();
 }
 
+/**
+ * Makes a command-with-args string from the ARGV to make the following processing of commands
+ * received via command-line interface uniform with the ones received via socket connection.
+ */
+static std::string makeCommandString(const char** argv)
+{
+    std::stringstream commandStream;
+    while (*(++argv))
+        commandStream << *argv << " ";
+
+    return commandStream.str();
+}
+
+/**
+ * Command string processing wrapper. COMMAND_STRING might be obtained from 2 sources: the command
+ * line or a socket connection.
+ */
+static int executeCommand(
+    const CommandsFactory& commandsFactory,
+    const std::string& commandString,
+    boost::optional<int> transportSocket)
+{
+    auto command = commandsFactory.get(commandString, transportSocket);
+    if (!command)
+    {
+        std::fprintf(stdout, "Command %s not found\n", commandString.c_str());
+        return -1;
+    }
+
+    auto result = execute(command);
+    if (!isDirect(command))
+        std::fprintf(stdout, "%s --> %s\n", commandString.c_str(), toString(result).c_str());
+
+    switch (result)
+    {
+        case Result::execFailed:
+        case Result::invalidArg:
+            return -1;
+        case Result::ok:
+            return 0;
+    }
+
+    return -1;
+}
+
+/**
+ * This is needed to allow a non-root (Nx) user to execute commands which require super user access
+ * such as 'dpkg' as a child process of the root-tool.
+ */
+static bool setupIds()
+{
+    if (setreuid(geteuid(), geteuid()) != 0)
+    {
+        perror("setreuid");
+        return false;
+    }
+
+    if (setregid(getegid(), getegid()) != 0)
+    {
+        perror("setregid");
+        return false;
+    }
+
+    return true;
+}
+
 int main(int argc, const char** argv)
 {
     nx::SystemCommands systemCommands;
@@ -341,10 +435,11 @@ int main(int argc, const char** argv)
 
     setvbuf(stdout, nullptr, _IONBF, 0);
 
-    if (argc > 1 && strcmp("--help", argv[1]) == 0)
+    if (argc > 1)
     {
-        std::fprintf(stdout, "%s", commandsFactory.help().c_str());
-        return 0;
+        if (!setupIds())
+            return -1;
+        return executeCommand(commandsFactory, makeCommandString(argv), boost::none);
     }
 
     WorkerPool workerPool;
@@ -355,28 +450,21 @@ int main(int argc, const char** argv)
     using namespace nx::system_commands::domain_socket;
     while (true)
     {
-        int clientFd = acceptor.accept();
-        if (clientFd == -1)
+        int transportFd = acceptor.accept();
+        if (transportFd == -1)
         {
             perror("accept");
             continue;
         }
 
         workerPool.post(
-            [clientFd, &commandsFactory]()
+            [transportFd, &commandsFactory]()
             {
-                std::string buf;
-                if (!readBuffer(clientFd, &reallocCallback, &buf))
+                std::string commandBuf;
+                if (!readBuffer(transportFd, &reallocCallback, &commandBuf))
                     return;
 
-                Command* command = commandsFactory.get(buf);
-                if (command == nullptr)
-                {
-                    std::fprintf(stdout, "Command %s not found\n", buf.c_str());
-                    return;
-                }
-
-                command->exec(buf, clientFd);
+                executeCommand(commandsFactory, commandBuf, transportFd);
             });
     }
 
