@@ -2,6 +2,7 @@ set(installerLanguage "en_US")
 set(installerMsiFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.msi")
 set(themeFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme.xml")
 set(localizationFile "${CMAKE_SOURCE_DIR}/distribution/wix/common/theme_${installerLanguage}.wxl")
+set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 if(codeSigning)
     set(installerUnsignedExeFile "${CMAKE_CURRENT_BINARY_DIR}/${paxton_plugin_distribution_name}-unsigned.exe")

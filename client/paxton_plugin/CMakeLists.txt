@@ -2,7 +2,6 @@ project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
-set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 set(referenceList
     "System"
