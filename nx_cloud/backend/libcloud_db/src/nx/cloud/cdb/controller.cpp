@@ -205,7 +205,6 @@ void Controller::initializeSecurity()
     authDataProviders.push_back(&m_accountManager);
     authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
-        m_settings,
         std::move(authDataProviders),
         *m_authRestrictionList,
         m_streeManager,

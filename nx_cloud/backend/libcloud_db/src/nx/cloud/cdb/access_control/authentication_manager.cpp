@@ -34,7 +34,6 @@ namespace cdb {
 using namespace nx::network::http;
 
 AuthenticationManager::AuthenticationManager(
-    const conf::Settings& settings,
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree,
@@ -268,8 +267,6 @@ api::ResultCode AuthenticationHelper::authenticateRequestDigest(
     const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
     nx::utils::stree::ResourceContainer* const authProperties)
 {
-    using AuthResult = nx::network::server::AuthResult;
-
     api::ResultCode authResultCode = api::ResultCode::notAuthorized;
     if (streeQueryFoundPasswordMatchesRequestDigest())
     {

@@ -45,7 +45,6 @@ class AuthenticationManager:
 {
 public:
     AuthenticationManager(
-        const conf::Settings& settings,
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree,
