@@ -1437,7 +1437,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         }
         else if (noRecordedPeriodsFound)
         {
-            if (qnRuntime->isActiveXMode())
+            if (qnRuntime->isAcsMode())
             {
                 /* Set to default value. */
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
@@ -1529,7 +1529,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
             {
-                timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+                timeUSec = m_streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
             }
             else if (mediaWidget->resource()->toResource()->flags().testFlag(Qn::local_media))
             {
@@ -2061,7 +2061,7 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
         return;
 
     /* This option should never be cleared in ActiveX mode */
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return;
 
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());

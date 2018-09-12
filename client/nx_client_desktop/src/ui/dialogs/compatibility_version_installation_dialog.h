@@ -1,7 +1,3 @@
-/**********************************************************
-* 30 sep 2013
-* a.kolesnikov
-***********************************************************/
 #pragma once
 
 #include <QtWidgets/QDialog>
@@ -12,11 +8,10 @@
 
 #include <nx/vms/api/data/software_version.h>
 
-class QnCompatibilityVersionInstallationTool;
 class QnMediaServerUpdateTool;
 
 namespace Ui {
-    class QnCompatibilityVersionInstallationDialog;
+class QnCompatibilityVersionInstallationDialog;
 }
 
 // TODO: #dklychkov rename class in 2.4
@@ -33,18 +28,12 @@ public:
     bool installationSucceeded() const;
 
     virtual int exec() override;
-
-    static bool useUpdate(const nx::vms::api::SoftwareVersion& version);
-
-public slots:
     virtual void reject() override;
 
-private slots:
-    void at_compatibilityTool_statusChanged(int status);
+private:
     void at_updateTool_updateFinished(QnUpdateResult result);
 
 private:
-    int installCompatibilityVersion();
     int installUpdate();
     void setMessage(const QString& message);
 
@@ -52,8 +41,7 @@ private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
 
     nx::vms::api::SoftwareVersion m_versionToInstall;
-    QScopedPointer<QnCompatibilityVersionInstallationTool> m_compatibilityTool;
     QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
-    bool m_installationOk;
+    bool m_installationOk = false;
 };

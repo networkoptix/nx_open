@@ -11,7 +11,6 @@
 #include <qtsinglecoreapplication.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/ipc/named_pipe_socket.h>
 
 #include "abstract_request_processor.h"
 
@@ -41,7 +40,7 @@ bool TaskServerNew::listen( const QString& pipeName )
         wait();
     }
 
-    //on windows multiple m_taskServer can listen single pipe, 
+    //on windows multiple m_taskServer can listen single pipe,
         //on linux unix socket can hang after server crash (because of socket file not removed)
     QtSingleCoreApplication* singleApp = qobject_cast<QtSingleCoreApplication*>(QCoreApplication::instance());
     NX_ASSERT( singleApp );

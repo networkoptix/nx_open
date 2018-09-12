@@ -87,8 +87,9 @@ nx::utils::SoftwareVersion minimalVersionForUpdatePackage(const QString& fileNam
 
 nx::utils::SoftwareVersion maximumAvailableVersion()
 {
+    using namespace applauncher::api;
     QList<nx::utils::SoftwareVersion> versions;
-    if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
+    if (getInstalledVersions(&versions) != ResultType::ok)
         versions.append(nx::utils::SoftwareVersion(qApp->applicationVersion()));
 
     return *std::max_element(versions.begin(), versions.end());

@@ -1365,12 +1365,14 @@ void MultiServerUpdatesWidget::autoCheckForUpdates()
 
 bool MultiServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& version)
 {
+    using namespace applauncher::api;
+
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::checkOnline())
+    if (!checkOnline())
         return false;
 
-    const auto result = applauncher::restartClient(version);
-    if (result == applauncher::api::ResultType::ok)
+    const auto result = restartClient(version);
+    if (result == ResultType::ok)
         return true;
 
     static const int kMaxTries = 5;
@@ -1378,7 +1380,7 @@ bool MultiServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& v
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::restartClient(version) == applauncher::api::ResultType::ok)
+        if (restartClient(version) == ResultType::ok)
             return true;
     }
     return false;

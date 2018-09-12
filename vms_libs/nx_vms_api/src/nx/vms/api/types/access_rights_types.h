@@ -57,8 +57,8 @@ enum class GlobalPermission
     videowallModePermissions = liveViewerPermissions | viewArchive | userInput
         | controlVideowall | viewBookmarks,
 
-    /* Actions in ActiveX plugin mode are limited. */
-    activeXModePermissions = viewerPermissions | userInput
+    /* Actions in ACS mode are limited. */
+    acsModePermissions = viewerPermissions | userInput
 };
 
 Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)

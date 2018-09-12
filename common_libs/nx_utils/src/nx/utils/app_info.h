@@ -2,6 +2,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/literal.h>
+
 namespace nx {
 namespace utils {
 

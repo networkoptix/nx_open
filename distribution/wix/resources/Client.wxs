@@ -104,6 +104,11 @@
             </Directory>
         </DirectoryRef>
 
+        <ComponentGroup Id="info_files"
+                Directory="InstallDirRoot"
+                Source="$(var.CMAKE_BINARY_DIR)">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+        </ComponentGroup>
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
 
@@ -139,6 +144,7 @@
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
             <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
+            <ComponentGroupRef Id="info_files"/>
         </Feature>
     </Fragment>
 </Wix>
