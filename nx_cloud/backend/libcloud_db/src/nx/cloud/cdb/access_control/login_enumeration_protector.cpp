@@ -48,7 +48,7 @@ bool LoginEnumerationProtector::removeExpiredLock()
 {
     if (m_lockExpiration && *m_lockExpiration < nx::utils::monotonicTime())
     {
-        m_lockExpiration.reset();
+        m_lockExpiration = std::nullopt;
         return true;
     }
 
