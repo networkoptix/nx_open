@@ -1,9 +1,7 @@
 #include "connection_manager.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/p2p/p2p_serialization.h>
@@ -81,138 +79,6 @@ ConnectionManager::~ConnectionManager()
     m_startedAsyncCallsCounter.wait();
 }
 
-void ConnectionManager::createTransactionConnection(
-    nx::network::http::HttpServerConnection* const connection,
-    const std::string& systemId,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
-    nx::network::http::RequestProcessedHandler completionHandler)
-{
-    // GET /ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
-    //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
-    // TODO: #ak
-
-    if (systemId.empty())
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Ignoring createTransactionConnection request without systemId from %1")
-            .arg(connection->socket()->getForeignAddress()));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    ConnectionRequestAttributes connectionRequestAttributes;
-    if (!fetchDataFromConnectRequest(request, &connectionRequestAttributes))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
-            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
-            .arg(connection->socket()->getForeignAddress()));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    if (!m_protocolVersionRange.isCompatible(
-            connectionRequestAttributes.remotePeerProtocolVersion))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
-            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
-            .arg(connection->socket()->getForeignAddress())
-            .arg(connectionRequestAttributes.remotePeerProtocolVersion));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
-        .arg(connectionRequestAttributes.remotePeer.id).arg(systemId).arg(connection->socket()->getForeignAddress())
-        .arg(connectionRequestAttributes.connectionId));
-
-    // newTransport MUST be ready to accept connections before sending response.
-    const nx::String systemIdLocal(systemId.c_str());
-    auto newTransport = std::make_unique<TransactionTransport>(
-        m_protocolVersionRange,
-        connection->getAioThread(),
-        &m_connectionGuardSharedState,
-        m_transactionLog,
-        connectionRequestAttributes,
-        systemIdLocal,
-        m_localPeerData,
-        connection->socket()->getForeignAddress(),
-        request);
-
-    ConnectionContext context{
-        std::move(newTransport),
-        connectionRequestAttributes.connectionId,
-        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()},
-        network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
-
-    vms::api::PeerDataEx remotePeer;
-    remotePeer.assign(connectionRequestAttributes.remotePeer);
-    remotePeer.protoVersion = connectionRequestAttributes.remotePeerProtocolVersion;
-    remotePeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-
-    if (!addNewConnection(std::move(context), remotePeer))
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
-            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
-            .arg(connection->socket()->getForeignAddress()).arg(connectionRequestAttributes.connectionId));
-        return completionHandler(nx::network::http::StatusCode::forbidden);
-    }
-
-    auto requestResult =
-        prepareOkResponseToCreateTransactionConnection(
-            connectionRequestAttributes,
-            response);
-    completionHandler(std::move(requestResult));
-}
-
-void ConnectionManager::pushTransaction(
-    nx::network::http::HttpServerConnection* const connection,
-    const std::string& /*systemId*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
-    nx::network::http::RequestProcessedHandler completionHandler)
-{
-    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
-    if (connectionIdIter == request.headers.end())
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 without required header %3")
-            .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-            .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME));
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-    const auto connectionId = connectionIdIter->second;
-
-    QnMutexLocker lk(&m_mutex);
-    // Reporting received transaction(s) to the corresponding connection.
-    const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
-    auto connectionIter = connectionByIdIndex.find(connectionId);
-    if (connectionIter == connectionByIdIndex.end())
-    {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 for unknown connection %3")
-            .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-            .arg(connectionId));
-        return completionHandler(nx::network::http::StatusCode::notFound);
-    }
-
-    auto transactionTransport =
-        dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
-    if (!transactionTransport)
-    {
-        return completionHandler(nx::network::http::StatusCode::badRequest);
-    }
-
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Received %1 request from %2 for connection %3")
-        .arg(request.requestLine.url.path()).arg(connection->socket()->getForeignAddress())
-        .arg(connectionId));
-
-    transactionTransport->post(
-        [transactionTransport,
-            request = std::move(request)]() mutable
-        {
-            transactionTransport->receivedTransaction(
-                std::move(request.headers),
-                std::move(request.messageBody));
-        });
-
-    completionHandler(nx::network::http::StatusCode::ok);
-}
-
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
@@ -250,7 +116,7 @@ void ConnectionManager::dispatchTransaction(
         if (connectionCount < connectionsToSendTo.size())
             continue;
 
-        for (auto& connection : connectionsToSendTo)
+        for (auto& connection: connectionsToSendTo)
         {
             connection->sendTransaction(
                 transportHeader,
@@ -401,6 +267,21 @@ bool ConnectionManager::addNewConnection(
     return true;
 }
 
+bool ConnectionManager::modifyConnectionByIdSafe(
+    const std::string& connectionId,
+    std::function<void(AbstractTransactionTransport* connection)> func)
+{
+    QnMutexLocker lk(&m_mutex);
+
+    const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
+    auto connectionIter = connectionByIdIndex.find(connectionId);
+    if (connectionIter == connectionByIdIndex.end())
+        return false; //< Connection could be removed while accepting another connection.
+
+    func(connectionIter->connection.get());
+    return true;
+}
+
 bool ConnectionManager::isOneMoreConnectionFromSystemAllowed(
     const QnMutexLockerBase& lk,
     const ConnectionContext& context) const
@@ -507,9 +388,10 @@ void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
         systemId.toStdString(), { false /*offline*/, 0 });
 }
 
-void ConnectionManager::removeConnection(const nx::String& connectionId)
+void ConnectionManager::removeConnection(const std::string& connectionId)
 {
-    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Removing connection %1").args(connectionId));
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+        lm("Removing connection %1").args(connectionId));
 
     QnMutexLocker lock(&m_mutex);
     removeExistingConnection<kConnectionByIdIndex>(lock, connectionId);
@@ -528,80 +410,24 @@ void ConnectionManager::onGotTransaction(
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             ResultCode resultCode)
         {
-            onTransactionDone(connectionId, resultCode);
+            onTransactionDone(connectionId.toStdString(), resultCode);
         });
 }
 
 void ConnectionManager::onTransactionDone(
-    const nx::String& connectionId,
+    const std::string& connectionId,
     ResultCode resultCode)
 {
     if (resultCode != ResultCode::ok)
     {
-        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing connection %1 due to failed transaction (result code %2)")
-                .arg(connectionId).arg(toString(resultCode)));
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+            lm("Closing connection %1 due to failed transaction (result code %2)")
+                .args(connectionId, toString(resultCode)));
 
         // Closing connection in case of failure.
         QnMutexLocker lock(&m_mutex);
-        removeExistingConnection<kConnectionByIdIndex, nx::String>(lock, connectionId);
+        removeExistingConnection<kConnectionByIdIndex, std::string>(lock, connectionId);
     }
-}
-
-bool ConnectionManager::fetchDataFromConnectRequest(
-    const nx::network::http::Request& request,
-    ConnectionRequestAttributes* connectionRequestAttributes)
-{
-    auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
-    if (connectionIdIter == request.headers.end())
-        return false;
-    connectionRequestAttributes->connectionId = connectionIdIter->second;
-
-    if (!nx::network::http::readHeader(
-            request.headers,
-            Qn::EC2_PROTO_VERSION_HEADER_NAME,
-            &connectionRequestAttributes->remotePeerProtocolVersion))
-    {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("Missing required header %1").arg(Qn::EC2_PROTO_VERSION_HEADER_NAME));
-        return false;
-    }
-
-    QUrlQuery query = QUrlQuery(request.requestLine.url.query());
-    const bool isClient = query.hasQueryItem("isClient");
-    const bool isMobileClient = query.hasQueryItem("isMobile");
-    QnUuid remoteGuid = QnUuid::fromStringSafe(query.queryItemValue("guid"));
-    QnUuid remoteRuntimeGuid = QnUuid::fromStringSafe(query.queryItemValue("runtime-guid"));
-    if (remoteGuid.isNull())
-        remoteGuid = QnUuid::createUuid();
-
-    const vms::api::PeerType peerType = isMobileClient
-        ? vms::api::PeerType::mobileClient
-        : (isClient ? vms::api::PeerType::desktopClient : vms::api::PeerType::server);
-
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
-    if (query.hasQueryItem("format"))
-        if (!QnLexical::deserialize(query.queryItemValue("format"), &dataFormat))
-        {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Invalid value of \"format\" field: %1")
-                .arg(query.queryItemValue("format")));
-            return false;
-        }
-
-    // Checking content encoding requested by remote peer.
-    auto acceptEncodingHeaderIter = request.headers.find("Accept-Encoding");
-    if (acceptEncodingHeaderIter != request.headers.end())
-    {
-        nx::network::http::header::AcceptEncodingHeader acceptEncodingHeader(
-            acceptEncodingHeaderIter->second);
-        if (acceptEncodingHeader.encodingIsAllowed("identity"))
-            connectionRequestAttributes->contentEncoding = "identity";
-        else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
-            connectionRequestAttributes->contentEncoding = "gzip";
-    }
-
-    connectionRequestAttributes->remotePeer =
-        vms::api::PeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
-
-    return true;
 }
 
 template<typename TransactionDataType>
@@ -635,54 +461,6 @@ void ConnectionManager::processSpecialTransaction(
             std::move(data),
             std::move(handler));
     }
-}
-
-nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionConnection(
-    const ConnectionRequestAttributes& connectionRequestAttributes,
-    nx::network::http::Response* const response)
-{
-    response->headers.emplace("Content-Type", ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE);
-    response->headers.emplace("Content-Encoding", connectionRequestAttributes.contentEncoding);
-    response->headers.emplace(Qn::EC2_GUID_HEADER_NAME, m_localPeerData.id.toByteArray());
-    response->headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        m_localPeerData.instanceId.toByteArray());
-
-    NX_ASSERT(m_protocolVersionRange.isCompatible(
-        connectionRequestAttributes.remotePeerProtocolVersion));
-    response->headers.emplace(
-        Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx::String::number(connectionRequestAttributes.remotePeerProtocolVersion));
-    response->headers.emplace("X-Nx-Cloud", "true");
-    response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
-
-    nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
-
-    requestResult.connectionEvents.onResponseHasBeenSent =
-        [this, connectionId = connectionRequestAttributes.connectionId](
-            nx::network::http::HttpServerConnection* connection)
-        {
-            QnMutexLocker lk(&m_mutex);
-
-            const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
-            auto connectionIter = connectionByIdIndex.find(connectionId);
-            if (connectionIter == connectionByIdIndex.end())
-                return; //< Connection can be removed at any moment while accepting another connection.
-
-            auto transactionTransport =
-                dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
-            if (transactionTransport)
-            {
-                transactionTransport->setOutgoingConnection(connection->takeSocket());
-                transactionTransport->startOutgoingChannel();
-            }
-        };
-    requestResult.dataSource =
-        std::make_unique<nx::network::http::EmptyMessageBodySource>(
-            ::ec2::QnTransactionTransportBase::TUNNEL_CONTENT_TYPE,
-            boost::none);
-
-    return requestResult;
 }
 
 } // namespace data_sync_engine

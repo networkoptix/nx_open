@@ -30,6 +30,11 @@ SyncronizationEngine::SyncronizationEngine(
         &m_transactionLog,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
+    m_httpTransportAcceptor(
+        moduleGuid,
+        supportedProtocolRange,
+        &m_transactionLog,
+        &m_connectionManager),
     m_webSocketAcceptor(
         moduleGuid,
         supportedProtocolRange,
@@ -123,14 +128,14 @@ void SyncronizationEngine::registerHttpApi(
 {
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kEstablishEc2TransactionConnectionPath),
-        &ConnectionManager::createTransactionConnection,
-        &m_connectionManager,
+        &transport::HttpTransportAcceptor::createConnection,
+        &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
-        &ConnectionManager::pushTransaction,
-        &m_connectionManager,
+        &transport::HttpTransportAcceptor::pushTransaction,
+        &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(

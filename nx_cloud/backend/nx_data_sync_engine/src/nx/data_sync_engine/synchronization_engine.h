@@ -14,6 +14,7 @@
 #include "outgoing_transaction_dispatcher.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
+#include "transport/http_transport_acceptor.h"
 #include "transport/websocket_transport_acceptor.h"
 
 namespace nx {
@@ -65,6 +66,7 @@ private:
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
+    transport::HttpTransportAcceptor m_httpTransportAcceptor;
     transport::WebSocketTransportAcceptor m_webSocketAcceptor;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;

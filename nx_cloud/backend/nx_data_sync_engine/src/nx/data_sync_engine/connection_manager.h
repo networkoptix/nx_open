@@ -19,8 +19,6 @@
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 
-#include <transaction/connection_guard_shared_state.h>
-
 #include "compatible_ec2_protocol_version.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_processor.h"
@@ -86,7 +84,7 @@ public:
     struct ConnectionContext
     {
         std::unique_ptr<AbstractTransactionTransport> connection;
-        nx::String connectionId;
+        std::string connectionId;
         FullPeerName fullPeerName;
         std::string userAgent;
     };
@@ -108,24 +106,11 @@ public:
         const vms::api::PeerDataEx& remotePeerInfo);
 
     /**
-     * Mediaserver calls this method to open 2-way transaction exchange channel.
+     * @return false If connectionId does not refer to an existing connection.
      */
-    void createTransactionConnection(
-        nx::network::http::HttpServerConnection* const connection,
-        const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler);
-
-    /**
-     * Mediaserver uses this method to push transactions.
-     */
-    void pushTransaction(
-        nx::network::http::HttpServerConnection* const connection,
-        const std::string& systemId,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler);
+    bool modifyConnectionByIdSafe(
+        const std::string& connectionId,
+        std::function<void(AbstractTransactionTransport* connection)> func);
 
     /**
      * Dispatches transaction to corresponding peers.
@@ -153,7 +138,7 @@ private:
             // Indexing by connectionId.
             boost::multi_index::ordered_unique<boost::multi_index::member<
                 ConnectionContext,
-                nx::String,
+                std::string,
                 &ConnectionContext::connectionId>>,
             // Indexing by (systemId, peerId).
             boost::multi_index::ordered_unique<boost::multi_index::member<
@@ -168,7 +153,6 @@ private:
 
     const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
-    ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
     TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
@@ -201,7 +185,7 @@ private:
 
     void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
 
-    void removeConnection(const nx::String& connectionId);
+    void removeConnection(const std::string& connectionId);
 
     void onGotTransaction(
         const nx::String& connectionId,
@@ -209,11 +193,7 @@ private:
         QByteArray serializedTransaction,
         TransactionTransportHeader transportHeader);
 
-    void onTransactionDone(const nx::String& connectionId, ResultCode resultCode);
-
-    bool fetchDataFromConnectRequest(
-        const nx::network::http::Request& request,
-        ConnectionRequestAttributes* connectionRequestAttributes);
+    void onTransactionDone(const std::string& connectionId, ResultCode resultCode);
 
     template<typename TransactionDataType>
     void processSpecialTransaction(
@@ -221,10 +201,6 @@ private:
         const TransactionTransportHeader& transportHeader,
         Command<TransactionDataType> data,
         TransactionProcessedHandler handler);
-
-    nx::network::http::RequestResult prepareOkResponseToCreateTransactionConnection(
-        const ConnectionRequestAttributes& connectionRequestAttributes,
-        nx::network::http::Response* const response);
 };
 
 } // namespace data_sync_engine

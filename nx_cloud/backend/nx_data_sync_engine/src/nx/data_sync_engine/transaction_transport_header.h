@@ -14,7 +14,7 @@ class TransactionTransportHeader
 public:
     nx::String systemId;
     network::SocketAddress endpoint;
-    nx::String connectionId;
+    std::string connectionId;
     CommandTransportHeader vmsTransportHeader;
     int transactionFormatVersion;
 
