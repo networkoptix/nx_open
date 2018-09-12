@@ -8,8 +8,8 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 from django.dispatch import receiver
 
 from cloud import settings
-import models
 
+import models
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
 
@@ -34,7 +34,8 @@ class AccountBackend(ModelBackend):
     @staticmethod
     def authenticate(request=None, username=None, password=None):
         try:
-            user = Account.get(username, password)  # first - check cloud_db
+            ip = request.session.pop('ip', "")
+            user = Account.get(username, password, ip)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if request and exception.error_code == ErrorCodes.account_blocked:
                 request.session['account_blocked'] = True
@@ -81,13 +82,15 @@ class AccountManager(db.models.Manager):
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
 
+        print extra_fields
+        ip = extra_fields.pop("ip", "")
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
         code = extra_fields.pop("code", None)
 
         # this line will send request to cloud_db and raise an exception if fails:
         try:
-            Account.register(email, password, first_name, last_name, code=code)
+            Account.register(ip, email, password, first_name, last_name, code=code)
         except APIException as a:
             if a.error_code == ErrorCodes.account_exists and not AccountBackend.is_email_in_portal(email):
                 raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)

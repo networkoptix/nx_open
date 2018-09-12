@@ -163,20 +163,24 @@ class Account(object):
 
     @staticmethod
     @lower_case_email
-    def register(email, password, first_name, last_name, code=None):
+    def register(ip, email, password, first_name, last_name, code=None):
         logger.debug('cloud_api.Account.register: ' + email)
+
+        headers = {
+            'X-Forwarded-For': ip
+        }
 
         @validate_response
         def _update(login, password, params):
             request = CLOUD_DB_URL + '/account/update'
             logger.debug('cloud_api.Account.register - making request: ' + request)
-            return requests.post(request, json=params, auth=HTTPDigestAuth(login, password))
+            return requests.post(request, json=params, auth=HTTPDigestAuth(login, password), headers=headers)
 
         @validate_response
         def _register(params):
             request = CLOUD_DB_URL + '/account/register'
             logger.debug('cloud_api.Account.register - making request: ' + request)
-            return requests.post(request, json=params)
+            return requests.post(request, json=params, headers=headers)
 
         customization = settings.CLOUD_CONNECT['customization']
         password_ha1, password_ha1_sha256 = Account.encode_password(email, password)
@@ -233,12 +237,15 @@ class Account(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def reset_password(user_email):
+    def reset_password(ip, user_email):
         params = {
             'email': user_email
         }
+        headers ={
+            'X-Forwarded-For': ip
+        }
         request = CLOUD_DB_URL + '/account/resetPassword'
-        return requests.post(request, json=params)
+        return requests.post(request, json=params, headers=headers)
 
     @staticmethod
     @validate_response
@@ -272,7 +279,13 @@ class Account(object):
     @staticmethod
     @validate_response
     @lower_case_email
-    def get(email=None, password=None):
+    def get(email=None, password=None, ip=None):
         # TODO: create wrappers
+        # ip is not always provided here because of Zapier integration.
+        # If someone fails to login to many times we don't want to block all requests from Zapier.
+        headers = {}
+        if ip:
+            headers['X-Forwarded-For'] = ip
+
         request = CLOUD_DB_URL + '/account/get'
-        return requests.get(request, auth=HTTPDigestAuth(email, password))
+        return requests.get(request, auth=HTTPDigestAuth(email, password), headers=headers)
