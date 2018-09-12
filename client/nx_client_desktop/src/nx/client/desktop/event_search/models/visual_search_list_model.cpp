@@ -38,6 +38,8 @@ VisualSearchListModel::VisualSearchListModel(
         {
             if (isLive)
                 m_headIndicatorModel->setVisible(false);
+
+            emit liveChanged(isLive);
         });
 }
 

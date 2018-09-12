@@ -38,6 +38,9 @@ public:
 
     int relevantCount() const;
 
+signals:
+    void liveChanged(bool isLive);
+
 private:
     BusyIndicatorModel* relevantIndicatorModel() const;
     void handleFetchFinished();

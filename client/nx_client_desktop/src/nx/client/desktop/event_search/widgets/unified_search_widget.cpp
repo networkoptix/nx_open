@@ -228,6 +228,9 @@ void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
     *m_modelConnections << connect(value, &QAbstractItemModel::rowsInserted,
         this, &UnifiedSearchWidget::updatePlaceholderState);
 
+    *m_modelConnections << connect(value, &VisualSearchListModel::liveChanged,
+        ui->ribbon, &EventRibbon::setLive);
+
     // For busy indicator going on/off.
     *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);

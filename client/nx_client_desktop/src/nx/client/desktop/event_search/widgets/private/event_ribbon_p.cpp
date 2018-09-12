@@ -449,9 +449,12 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
-    // TODO: FIXME!!! #vkutin Implement live/non-live modes.
     const int kThreshold = 100;
-    if (!m_live && position < m_scrollBar->value() + kThreshold)
+    const int kLiveThreshold = 10;
+
+    const bool live = m_live && index == 0 && m_scrollBar->value() < kLiveThreshold;
+
+    if (!live && position < m_scrollBar->value() + kThreshold)
     {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
         updateMode = UpdateMode::instant;
@@ -710,13 +713,7 @@ bool EventRibbon::Private::live() const
 
 void EventRibbon::Private::setLive(bool value)
 {
-    if (m_live == value)
-        return;
-
     m_live = value;
-
-    if (m_live)
-        m_scrollBar->setValue(0);
 }
 
 void EventRibbon::Private::updateScrollRange()
@@ -775,9 +772,6 @@ void EventRibbon::Private::doUpdateView()
         updateHover(false, QPoint());
         return;
     }
-
-    if (m_scrollBar->value() > 0)
-        setLive(false);
 
     if (!q->isVisible())
     {
