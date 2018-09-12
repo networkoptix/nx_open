@@ -1,10 +1,4 @@
-/**********************************************************
-* 2 june 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef ABSTRACT_MEDIA_STREAM_PROVIDER_H
-#define ABSTRACT_MEDIA_STREAM_PROVIDER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -25,7 +19,7 @@ public:
     };
 
     virtual CameraDiagnostics::Result openStream() = 0;
-    virtual CameraDiagnostics::Result openStreamResult() const = 0;
+    virtual CameraDiagnostics::Result lastOpenStreamResult() const = 0;
     virtual void closeStream() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     virtual bool isStreamOpened() const = 0;
@@ -38,5 +32,3 @@ public:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  //ABSTRACT_MEDIA_STREAM_PROVIDER_H

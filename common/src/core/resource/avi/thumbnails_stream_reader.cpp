@@ -93,7 +93,7 @@ void QnThumbnailsStreamReader::run()
         if (data==0 && !m_needStop)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(CL_STREAM_ISSUE);
+            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
             msleep(30);
             continue;
         }
