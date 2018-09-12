@@ -258,7 +258,10 @@ bool FoundDevicesModel::setData(
     {
         const auto uniqueId = device(index).uniqueId;
         m_presentedState[uniqueId] = value.value<PresentedState>();
+
         emit dataChanged(index, index, {presentedStateRole});
+        emit headerDataChanged(Qt::Horizontal,
+            FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
         return true;
     }
 
@@ -314,8 +317,8 @@ int FoundDevicesModel::columnCount(const QModelIndex& parent) const
 
 int FoundDevicesModel::newDevicesCount() const
 {
-    const auto addedDevicesCount = std::count_if(m_devices.begin(), m_devices.end(),
-        [](const QnManualResourceSearchEntry& entry) { return entry.existsInPool; });
+    const auto addedDevicesCount = std::count_if(m_presentedState.begin(), m_presentedState.end(),
+        [](PresentedState state) { return state == alreadyAddedState; });
 
     return rowCount() - addedDevicesCount;
 }

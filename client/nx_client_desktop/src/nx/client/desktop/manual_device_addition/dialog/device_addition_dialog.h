@@ -8,6 +8,7 @@
 #include <nx/client/desktop/resource_views/models/fake_resource_list_model.h>
 
 class QStackedWidget;
+class QnResourcePool;
 
 namespace Ui {
 class DeviceAdditionDialog;
@@ -68,12 +69,18 @@ private:
 
     void handleTabClicked(int index);
 
+    using AddingDevicesSet = QSet<QString>;
+    void appendAddingDevices(const AddingDevicesSet& value);
+    void setDeviceAdded(const QString& uniqueId);
+    void handleDeviceRemoved(const QString& uniqueId);
+
     int port() const;
     QString password() const;
     QString login() const;
     QString progressMessage() const;
 
 private:
+    const QPointer<QnResourcePool> m_pool;
     CurrentSystemServers m_serversWatcher;
     ServerOnlineStatusWatcher m_serverStatusWatcher;
 
@@ -85,6 +92,7 @@ private:
     SearchersList m_unfinishedSearches;
 
     QScopedPointer<FoundDevicesModel> m_model;
+    AddingDevicesSet m_addingDevices;
     bool m_addressEditing;
 };
 

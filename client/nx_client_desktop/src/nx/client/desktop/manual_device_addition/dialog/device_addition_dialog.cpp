@@ -19,6 +19,9 @@
 #include <utils/common/delayed.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
 
 namespace {
 
@@ -57,6 +60,20 @@ FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
     return result;
 }
 
+
+using ResourceCallback = std::function<void (const QnResourcePtr& resource)>;
+using CameraCallback = std::function<void (const QnVirtualCameraResourcePtr& camera)>;
+
+ResourceCallback createCameraCallback(const CameraCallback& cameraCallback)
+{
+    return
+        [cameraCallback](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                cameraCallback(camera);
+        };
+}
+
 } // namespace
 
 namespace nx {
@@ -65,6 +82,7 @@ namespace desktop {
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
+    m_pool(commonModule()->resourcePool()),
     m_serversWatcher(parent),
     m_serverStatusWatcher(this),
     ui(new Ui::DeviceAdditionDialog())
@@ -72,6 +90,19 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     ui->setupUi(this);
 
     initializeControls();
+
+    connect(m_pool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                setDeviceAdded(camera->getUniqueId());
+        });
+    connect(m_pool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                handleDeviceRemoved(camera->getUniqueId());
+        });
 }
 
 DeviceAdditionDialog::~DeviceAdditionDialog()
@@ -402,6 +433,37 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     ui->stopSearchButton->setFocus();
 }
 
+void DeviceAdditionDialog::appendAddingDevices(const AddingDevicesSet& value)
+{
+    m_addingDevices += value;
+}
+
+void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
+{
+    if (!m_addingDevices.remove(uniqueId))
+        return;
+
+    const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
+    if (!index.isValid())
+        return;
+
+    m_model->setData(
+        index, FoundDevicesModel::alreadyAddedState, FoundDevicesModel::presentedStateRole);
+}
+
+void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
+{
+    const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
+    if (!index.isValid())
+        return;
+
+    const auto state = index.data(FoundDevicesModel::presentedStateRole);
+    if (state == FoundDevicesModel::alreadyAddedState)
+        m_model->setData(index, FoundDevicesModel::notPresentedState, FoundDevicesModel::presentedStateRole);
+    else
+        NX_ASSERT(false, "Wrong presented state");
+}
+
 void DeviceAdditionDialog::handleAddDevicesClicked()
 {
     const auto server = ui->selectServerMenuButton->currentServer();
@@ -410,7 +472,7 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
     QnManualResourceSearchList devices;
 
-    QHash<QString, FoundDevicesModel::PresentedState> prevStates;
+    AddingDevicesSet addingDevices;
 
     const bool checkSelection = ui->foundDevicesTable->getCheckedCount();
     const int rowsCount = m_model->rowCount();
@@ -420,17 +482,20 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         if (checkSelection && !m_model->data(choosenIndex, Qt::CheckStateRole).toBool())
             continue;
 
+        const auto stateIndex = m_model->index(row, FoundDevicesModel::presentedStateColumn);
+        const auto presentedState = stateIndex.data(FoundDevicesModel::presentedStateRole);
+        if (presentedState == FoundDevicesModel::alreadyAddedState)
+            continue;
+
         const auto dataIndex = m_model->index(row);
         const auto device = m_model->data(dataIndex, FoundDevicesModel::dataRole)
             .value<QnManualResourceSearchEntry>();
 
-        const auto stateIndex = m_model->index(row, FoundDevicesModel::presentedStateColumn);
-        prevStates[device.uniqueId] = stateIndex.data(FoundDevicesModel::presentedStateRole)
-            .value<FoundDevicesModel::PresentedState>();
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
 
         devices.append(device);
+        addingDevices.insert(device.uniqueId);
     }
 
     if (devices.isEmpty())
@@ -439,31 +504,31 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     const auto login = m_currentSearch->login();
     const auto password = m_currentSearch->password();
     server->restConnection()->addCamera(devices, login, password,
-        [this, prevStates, devices, guard = QPointer<DeviceAdditionDialog>(this)]
+        [this, addingDevices, devices, guard = QPointer<DeviceAdditionDialog>(this)]
             (bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            if (!guard)
-                return;
+            if (guard && success)
+                appendAddingDevices(addingDevices);
 
-            auto states = prevStates;
-            if (success && result.error == QnRestResult::NoError)
-            {
-                for (auto& state: states)
-                    state = FoundDevicesModel::alreadyAddedState;
-            }
-            else
-            {
-                showAdditionFailedDialog(toFakeResourcesList(devices));
-            }
+//            auto states = prevStates;
+//            if (success && result.error == QnRestResult::NoError)
+//            {
+//                for (auto& state: states)
+//                    state = FoundDevicesModel::alreadyAddedState;
+//            }
+//            else
+//            {
+//                showAdditionFailedDialog(toFakeResourcesList(devices));
+//            }
 
-            for (auto it = states.begin(); it != states.end(); ++it)
-            {
-                const auto id = it.key();
-                const auto state = it.value();
-                const auto index = m_model->indexByUniqueId(
-                    id, FoundDevicesModel::presentedStateColumn);
-                m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
-            }
+//            for (auto it = states.begin(); it != states.end(); ++it)
+//            {
+//                const auto id = it.key();
+//                const auto state = it.value();
+//                const auto index = m_model->indexByUniqueId(
+//                    id, FoundDevicesModel::presentedStateColumn);
+//                m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
+//            }
         }, QThread::currentThread());
 }
 
