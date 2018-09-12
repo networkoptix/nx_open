@@ -18,13 +18,18 @@ AccessBlocker::AccessBlocker(
             settings.loginEnumerationProtectionSettings().period,
             settings.loginEnumerationProtectionSettings().maxBlockPeriod))
 {
+    if (auto userLockerSettings = settings.loginLockout())
+        m_userLocker = std::make_unique<network::server::UserLockerPool>(*userLockerSettings);
 }
 
 bool AccessBlocker::isBlocked(
     const nx::network::http::HttpServerConnection& connection,
-    const std::string& /*login*/,
-    const nx::network::http::Request& /*request*/) const
+    const std::string& login) const
 {
+    const auto userLockKey = std::make_tuple(connection.clientEndpoint().address, login);
+    if (!login.empty() && m_userLocker && m_userLocker->isLocked(userLockKey))
+        return true;
+
     return m_hostLockerPool.isLocked(connection.clientEndpoint().address);
 }
 
@@ -37,12 +42,19 @@ void AccessBlocker::onAuthenticationSuccess(
     if (login.empty())
         login = tryFetchLoginFromRequest(request);
 
-    if (authenticationType != AuthenticationType::credentials)
+    if (authenticationType == AuthenticationType::credentials)
+    {
+        updateUserLockoutState(
+            network::server::AuthResult::success,
+            connection.clientEndpoint().address,
+            login);
+    }
+    else
     {
         // Request has not been authenticated actually.
         // So, not giving any preference to the client that issued such a request.
         // Counting it as an authentication failure to be on safe side.
-        onAuthenticationFailure(connection, login, request);
+        onAuthenticationFailure(authenticationType, connection, login);
         return;
     }
 
@@ -53,10 +65,18 @@ void AccessBlocker::onAuthenticationSuccess(
 }
 
 void AccessBlocker::onAuthenticationFailure(
+    AuthenticationType authenticationType,
     const nx::network::http::HttpServerConnection& connection,
-    const std::string& login,
-    const nx::network::http::Request& /*request*/)
+    const std::string& login)
 {
+    if (authenticationType == AuthenticationType::credentials)
+    {
+        updateUserLockoutState(
+            network::server::AuthResult::failure,
+            connection.clientEndpoint().address,
+            login);
+    }
+
     updateHostLockoutState(
         connection.clientEndpoint().address,
         nx::network::server::AuthResult::failure,
@@ -76,6 +96,32 @@ std::string AccessBlocker::tryFetchLoginFromRequest(
         return value.toString().toStdString();
 
     return std::string();
+}
+
+void AccessBlocker::updateUserLockoutState(
+    network::server::AuthResult authResult,
+    const nx::network::HostAddress& host,
+    const std::string& login)
+{
+    if (!m_userLocker)
+        return;
+
+    switch (m_userLocker->updateLockoutState(
+        std::make_tuple(host, login),
+        authResult))
+    {
+        case nx::network::server::LockUpdateResult::locked:
+            NX_WARNING(this, lm("Login %1 blocked for host %2 for %3")
+                .args(login, host, m_userLocker->settings().lockPeriod));
+            break;
+
+        case nx::network::server::LockUpdateResult::unlocked:
+            NX_INFO(this, lm("Login %1 unblocked for host %2").args(login, host));
+            break;
+
+        case nx::network::server::LockUpdateResult::noChange:
+            break;
+    }
 }
 
 void AccessBlocker::updateHostLockoutState(
