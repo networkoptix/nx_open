@@ -46,8 +46,6 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
-    set(paxton_distribution_name
-        "${prefix}-paxton-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(paxton_plugin_distribution_name
         "${prefix}-paxton_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(cdb_distribution_name
