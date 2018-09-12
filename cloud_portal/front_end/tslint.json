@@ -1,6 +1,9 @@
 {
     "extends"       : "tslint:latest",
     // "rulesDirectory": "built/local/tslint/rules",
+    "rulesDirectory": [
+        "node_modules/tslint-eslint-rules/dist/rules"
+    ],
     "rules"         : {
         "no-unnecessary-type-assertion"   : true,
         "array-type"                      : [
@@ -86,8 +89,9 @@
         "prefer-const"                    : true,
         "quotemark"                       : [
             true,
-            "double",
-            "avoid-escape"
+            "single",
+            "avoid-escape",
+            "avoid-template"
         ],
         "semicolon"                       : [
             true,
@@ -156,6 +160,7 @@
         "no-submodule-imports"            : false,
         "no-var-requires"                 : false,
         "ordered-imports"                 : false,
+        "import-spacing"                  : false,
         "prefer-conditional-expression"   : false,
         "radix"                           : false,
         "trailing-comma"                  : false,

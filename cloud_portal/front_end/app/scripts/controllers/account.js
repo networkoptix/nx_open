@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
     'use strict';
 
@@ -37,7 +37,7 @@
             return cloudApi.accountPost($scope.account)
                 .then(function (result) {
                     systemsProvider.forceUpdateSystems();
-                    if (languageService.lang.language != $scope.account.language) {
+                    if (languageService.lang.language !== $scope.account.language) {
                         $localStorage.langChanged = true;
                         //Need to reload page
                         window.location.reload(true); // reload window to catch new language

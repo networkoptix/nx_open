@@ -1,26 +1,21 @@
-import { Injectable, NgModule }                  from '@angular/core';
-import { CommonModule }                          from '@angular/common';
-import { BrowserModule }                         from '@angular/platform-browser';
-import { downgradeComponent, UpgradeModule }     from '@angular/upgrade/static';
-import { Router, Resolve, RouterModule, Routes } from '@angular/router';
+import { NgModule }             from '@angular/core';
+import { CommonModule }         from '@angular/common';
+import { BrowserModule }        from '@angular/platform-browser';
+import { UpgradeModule }        from '@angular/upgrade/static';
+import { RouterModule, Routes } from '@angular/router';
+import { FormsModule }          from '@angular/forms';
+import { NgbModule }            from '@ng-bootstrap/ng-bootstrap';
+import { TranslateModule }      from '@ngx-translate/core';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
-import { NxSandboxComponent }           from './sandbox.component';
-import { Observable, EMPTY as empty }  from 'rxjs';
-import { DeviceDetectorService }       from 'ngx-device-detector';
-import { FormsModule, EmailValidator } from '@angular/forms';
-
-import { TranslateModule }  from '@ngx-translate/core';
-import { ComponentsModule } from '../../components/components.module';
-
+import { NxSandboxComponent } from './sandbox.component';
+import { ComponentsModule }   from '../../components/components.module';
 
 const appRoutes: Routes = [
-    {path: 'sandbox', component: NxSandboxComponent}
+    { path: 'sandbox', component: NxSandboxComponent }
 ];
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         BrowserModule,
         UpgradeModule,
@@ -31,16 +26,15 @@ const appRoutes: Routes = [
 
         RouterModule.forChild(appRoutes)
     ],
-    providers: [
-    ],
-    declarations: [
+    providers      : [],
+    declarations   : [
         NxSandboxComponent,
     ],
-    bootstrap: [],
+    bootstrap      : [],
     entryComponents: [
         NxSandboxComponent
     ],
-    exports: [
+    exports        : [
         NxSandboxComponent
     ]
 })
