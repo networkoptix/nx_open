@@ -98,7 +98,6 @@ int Service::exec()
         writeStartInfo();
         auto startInfoFileGuard = nx::utils::makeScopeGuard([this]() { removeStartInfoFile(); });
 
-        triggerOnStartedEventHandlerGuard.fire();
         return serviceMain(*settings);
     }
     catch (const std::exception& e)
