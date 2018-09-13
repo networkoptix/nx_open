@@ -11,7 +11,6 @@
 using namespace nx::client::desktop::node_view;
 using namespace nx::client::desktop::node_view::details;
 
-#include <QDebug>
 namespace {
 
 static constexpr int kDefaultTextColumn = 0;
