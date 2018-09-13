@@ -13,11 +13,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(WIN32)
-    # Suppress MSVC warnings about potentially unsafe standard library functions line getenv().
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
 add_library(nx_kit ${nxKitLibraryType}
