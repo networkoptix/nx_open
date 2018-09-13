@@ -34,7 +34,7 @@ class AccountBackend(ModelBackend):
     @staticmethod
     def authenticate(request=None, username=None, password=None):
         try:
-            ip = request.session.pop('ip', "")
+            ip = request.session.pop('IP', "")
             user = Account.get(username, password, ip)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if request and exception.error_code == ErrorCodes.account_blocked:
@@ -82,8 +82,7 @@ class AccountManager(db.models.Manager):
                                       error_data={'email': ['This field is required.']})
         email = email.lower()
 
-        print extra_fields
-        ip = extra_fields.pop("ip", "")
+        ip = extra_fields.pop("IP", "")
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")
         code = extra_fields.pop("code", None)

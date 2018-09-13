@@ -38,7 +38,7 @@ def register(request):
     lang = detect_language_by_request(request)
     data = request.data
     data['language'] = lang
-    data['ip'] = get_ip(request)
+    data['IP'] = get_ip(request)
     AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
@@ -54,7 +54,7 @@ def register(request):
 @handle_exceptions
 def login(request):
     user = None
-    request.session['ip'] = get_ip(request)
+    request.session['IP'] = get_ip(request)
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
