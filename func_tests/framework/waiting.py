@@ -9,16 +9,20 @@ from .context_logger import ContextLogger
 _logger = ContextLogger(__name__, 'wait')
 
 
+DEFAULT_MAX_DELAY_SEC = 2
+
+
 class Wait(object):
-    def __init__(self, until, timeout_sec=30, logger=None):
+    def __init__(self, until, timeout_sec=30, max_delay_sec=DEFAULT_MAX_DELAY_SEC, logger=None):
         # type: (str, float, int, ...) -> None
         self._until = until
         assert timeout_sec is not None
         self._timeout_sec = timeout_sec
+        self._max_delay_sec = max_delay_sec
         self._started_at = timeit.default_timer()
         self._last_checked_at = self._started_at
         self._attempts_made = 0
-        self.delay_sec = 0.5
+        self.delay_sec = max_delay_sec / 16.
         self._logger = logger or _logger
         self._logger.info(
             "Waiting until %s: %.1f sec.",
@@ -39,7 +43,7 @@ class Wait(object):
                 self._until, since_start_sec, self._timeout_sec, self._attempts_made, self.delay_sec)
             return True
         self._attempts_made += 1
-        self.delay_sec = min(2, self.delay_sec * 2)
+        self.delay_sec = min(self._max_delay_sec, self.delay_sec * 2)
         self._logger.debug(
             "Continue waiting until %s: %.1f/%.1f sec, %d attempts, delay %.1f sec.",
             self._until, since_start_sec, self._timeout_sec, self._attempts_made, self.delay_sec)
@@ -51,8 +55,15 @@ class Wait(object):
         time.sleep(self.delay_sec)
 
 
-def retry_on_exception(func, exception_type, until, timeout_sec=10, logger=None):
-    wait = Wait(until, timeout_sec=timeout_sec, logger=logger)
+def retry_on_exception(
+        func,
+        exception_type,
+        until,
+        timeout_sec=10,
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        logger=None,
+        ):
+    wait = Wait(until, timeout_sec, max_delay_sec, logger=logger)
     while True:
         try:
             return func()
@@ -81,11 +92,17 @@ def _description_from_func(func):  # type: (Any) -> str
     return '{func.__self__!r}.{func.__name__!s}'.format(func=func)
 
 
-def wait_for_truthy(get_value, description=None, timeout_sec=30, logger=None):
+def wait_for_truthy(
+        get_value,
+        description=None,
+        timeout_sec=30,
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        logger=None,
+        ):
     # type: (Callable[[], Any], Optional, float, ...) -> None
     if description is None:
         description = _description_from_func(get_value)
-    wait = Wait(description, timeout_sec=timeout_sec, logger=logger)
+    wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
     while True:
         result = get_value()
         if result:
@@ -120,6 +137,7 @@ def wait_for_equal(
         actual_desc=None,  # type: str
         expected_desc=None,  # type: str
         timeout_sec=30,  # type: float
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
         ):
     """
     @param path: If returned value is a big structure but only one value should be checked.
@@ -143,10 +161,16 @@ class NotPersistent(Exception):
     pass
 
 
-def ensure_persistence(condition_is_true, description, timeout_sec=10, logger=None):
+def ensure_persistence(
+        condition_is_true,
+        description,
+        timeout_sec=10,
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        logger=None,
+        ):
     if description is None:
         description = _description_from_func(condition_is_true)
-    wait = Wait(description, timeout_sec=timeout_sec, logger=logger)
+    wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
     while True:
         if not condition_is_true():
             raise NotPersistent("Have waited until " + description)
