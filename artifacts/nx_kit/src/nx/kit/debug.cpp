@@ -148,7 +148,7 @@ void assertionFailed(
         #if defined(_WIN32)
             // Copy error text to a stack variable so it is present in the mini-dump.
             char textOnStack[256] = {0};
-            strncpy(textOnStack, sizeof(textOnStack) - 1, message.c_str());
+            strncpy(textOnStack, message.c_str(), sizeof(textOnStack) - 1);
         #endif
 
         // Crash the process to let a dump/core be generated.
