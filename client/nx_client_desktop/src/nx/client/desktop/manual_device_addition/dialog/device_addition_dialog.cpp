@@ -1,6 +1,8 @@
 #include "device_addition_dialog.h"
 #include "ui_device_addition_dialog.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
@@ -208,7 +210,7 @@ void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& val
     if (m_addressEditing)
         return;
 
-    QnScopedValueRollback rollback(&m_addressEditing, true);
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
     ui->endAddressEdit->setText(fixedAddress(ui->startAddressEdit).toString());
 }
 
@@ -224,7 +226,7 @@ void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value
     if (m_addressEditing)
         return;
 
-    QnScopedValueRollback rollback(&m_addressEditing, true);
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
 
     const auto startAddress = fixedAddress(ui->startAddressEdit);
     const auto endAddress = fixedAddress(ui->endAddressEdit);
@@ -377,7 +379,7 @@ QString DeviceAdditionDialog::login() const
 }
 
 void DeviceAdditionDialog::handleStartSearchClicked()
-{    
+{
     if (m_currentSearch)
         stopSearch();
 
