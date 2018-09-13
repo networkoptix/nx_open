@@ -47,12 +47,12 @@ public:
         Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
     ~WebSocket();
-    
+
     virtual void readSomeAsync(
-        nx::Buffer* const buffer, 
+        nx::Buffer* const buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void sendAsync(
-        const nx::Buffer& buffer, 
+        const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
     /**
@@ -95,8 +95,8 @@ private:
     void processReadData();
     bool isDataFrame() const;
     void sendPreparedMessage(
-        nx::Buffer* buffer, 
-        int writeSize, 
+        nx::Buffer* buffer,
+        int writeSize,
         std::function<void(SystemError::ErrorCode, size_t)> handler);
     void sendControlResponse(FrameType requestType, FrameType responseType);
     void sendControlRequest(FrameType type);

@@ -103,7 +103,7 @@ namespace detail {
 
 nx::Buffer makeAcceptKey(const nx::Buffer& requestKey)
 {
-    nx::Buffer result = nx::Buffer::fromBase64(requestKey);
+    nx::Buffer result = requestKey;
     result += kMagic;
     nx::utils::QnCryptographicHash hash(nx::utils::QnCryptographicHash::Sha1);
     hash.addData(result);

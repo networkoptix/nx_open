@@ -146,6 +146,7 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
 {
     Q_D(const QnTCPConnectionProcessor);
     ec2::ApiPeerDataEx remotePeer;
+    remotePeer.dataFormat = Qn::JsonFormat;
     QUrlQuery query(d->request.requestLine.url.query());
 
     if (query.hasQueryItem("format"))
@@ -171,12 +172,11 @@ ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
             remotePeer.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
     }
 
-    if (remotePeer.peerType == Qn::PT_NotDefined &&
-        query.hasQueryItem("peerType"))
+    if (remotePeer.peerType == Qn::PT_NotDefined)
     {
         remotePeer.peerType = QnLexical::deserialized<Qn::PeerType>(
             query.queryItemValue("peerType"),
-            Qn::PT_NotDefined);
+            Qn::PT_DesktopClient);
     }
 
     if (remotePeer.id.isNull())
