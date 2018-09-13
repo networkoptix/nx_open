@@ -103,7 +103,8 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                     if not streams:
                         yield Failure('FFprobe returned no valid stream info')
                         continue
-                    yield expect_values(configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
+                    yield expect_values(
+                        configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
 
 
 @_stage(timeout=timedelta(minutes=6))
