@@ -1,13 +1,13 @@
 import csv
 from pprint import pformat
 
-from netaddr import IPNetwork, EUI
+from netaddr import EUI, IPNetwork
 
+from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_shell import SSH
-from framework.context_logger import ContextLogger, context_logger
 from framework.waiting import wait_for_truthy
 
 _logger = ContextLogger(__name__, 'networking')

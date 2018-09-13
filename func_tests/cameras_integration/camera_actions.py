@@ -1,12 +1,10 @@
 """"This file contains helper funcs used in stages.py"""
 
-import os
-import logging
 import json
-import subprocess
+import logging
 
+from framework.os_access.exceptions import NonZeroExitStatus, Timeout
 from framework.os_access.local_shell import local_shell
-from framework.os_access.exceptions import Timeout, NonZeroExitStatus
 
 _logger = logging.getLogger(__name__)
 

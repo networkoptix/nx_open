@@ -15,7 +15,7 @@ from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
-from framework.os_access.os_access_interface import OSAccess, ReciprocalPortMap, OneWayPortMap
+from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_shell import ReadOnlyTime, Time
 from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH

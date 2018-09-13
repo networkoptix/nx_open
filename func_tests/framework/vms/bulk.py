@@ -1,4 +1,4 @@
-from contextlib2 import contextmanager, ExitStack
+from contextlib2 import ExitStack, contextmanager
 from typing import Mapping, Sequence
 
 from framework.vms.vm_type import VMType

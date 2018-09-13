@@ -10,7 +10,7 @@ from pathlib2 import PurePath
 from six.moves import shlex_quote
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import exit_status_error_cls, AlreadyAcquired
+from framework.os_access.exceptions import AlreadyAcquired, exit_status_error_cls
 from framework.os_access.path import copy_file_using_read_and_write
 from framework.utils import RunningTime
 

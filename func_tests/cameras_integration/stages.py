@@ -9,15 +9,15 @@ Stop iteration = Failure, last error is returned.
 """
 
 import logging
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+
 import pytz
 from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
+from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
-
-from .camera_actions import ffprobe_streams, ffprobe_metadata, configure_video, configure_audio
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
