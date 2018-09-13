@@ -649,7 +649,7 @@ bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
     if (!checkOnline())
         return false;
 
-    const auto result = restartClient(version);
+    const auto result = applauncher::api::restartClient(version);
     if (result == ResultType::ok)
         return true;
 
