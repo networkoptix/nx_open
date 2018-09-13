@@ -235,7 +235,7 @@ void QnConnectToCloudDialogPrivate::lockUi(LockMode mode)
 
     q->ui->linksWidget->graphicsEffect()->setEnabled(mode == LockMode::Waiting);
 
-    indicatorButton->setEnabled(mode == LockMode::Unlocked);
+    indicatorButton->setEnabled(mode == LockMode::Waiting);
     indicatorButton->setFocus();
     indicatorButton->showIndicator(mode == LockMode::Waiting);
 }
