@@ -7,7 +7,6 @@
 
 #include <utils/common/util.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <nx/utils/string.h>
 
@@ -377,7 +376,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
+    QScopedValueRollback<bool> guard(m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

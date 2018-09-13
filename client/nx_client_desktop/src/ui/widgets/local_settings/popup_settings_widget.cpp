@@ -18,7 +18,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -91,7 +90,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 {
     if (m_updating)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     bool all = true;
 
@@ -127,7 +126,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 void QnPopupSettingsWidget::applyChanges()
 {
     NX_ASSERT(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (context()->user())
     {

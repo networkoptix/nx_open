@@ -35,7 +35,6 @@
 #include <update/media_server_update_tool.h>
 #include <update/low_free_space_warning.h>
 #include <utils/applauncher_utils.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include <nx/network/app_info.h>

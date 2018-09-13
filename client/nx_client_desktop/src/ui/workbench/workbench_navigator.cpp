@@ -65,7 +65,6 @@ extern "C"
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -1407,7 +1406,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         return;
 
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
+    QScopedValueRollback<bool> guard(m_updatingSliderFromReader, true);
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
@@ -1830,7 +1829,7 @@ void QnWorkbenchNavigator::updateSliderFromScrollBar()
     if (!m_timeSlider)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromScrollBar, true);
+    QScopedValueRollback<bool> guard(m_updatingSliderFromScrollBar, true);
 
     m_timeSlider->setWindow(milliseconds(m_timeScrollBar->value()),
         milliseconds(m_timeScrollBar->value() + m_timeScrollBar->pageStep()));
@@ -1845,7 +1844,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider()
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingScrollBarFromSlider, true);
+        QScopedValueRollback<bool> guard(m_updatingScrollBarFromSlider, true);
 
         milliseconds windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 

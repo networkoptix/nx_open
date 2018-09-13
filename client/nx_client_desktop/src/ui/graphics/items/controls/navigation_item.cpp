@@ -12,7 +12,6 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -364,7 +363,7 @@ void QnNavigationItem::updateSpeedSliderParametersFromNavigator()
     }
 
     /* The calls that follow may change speed */
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
+    QScopedValueRollback<bool> guard(m_updatingSpeedSliderFromNavigator, true);
 
     m_speedSlider->setSpeedRange(minimalSpeed, maximalSpeed);
     m_speedSlider->setMinimalSpeedStep(speedStep);
@@ -376,7 +375,7 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator()
     if (m_updatingNavigatorFromSpeedSlider)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
+    QScopedValueRollback<bool> guard(m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(navigator()->speed());
     updatePlayButtonChecked();
 }
@@ -386,7 +385,7 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider()
     if (m_updatingSpeedSliderFromNavigator)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
+    QScopedValueRollback<bool> guard(m_updatingNavigatorFromSpeedSlider, true);
     navigator()->setSpeed(m_speedSlider->roundedSpeed());
 }
 

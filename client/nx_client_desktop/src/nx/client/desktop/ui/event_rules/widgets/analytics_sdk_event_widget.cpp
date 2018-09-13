@@ -11,7 +11,6 @@
 #include <nx/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
@@ -72,7 +71,7 @@ void AnalyticsSdkEventWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventResources))
         updateSdkEventTypesModel();
@@ -96,7 +95,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(

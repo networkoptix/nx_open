@@ -35,8 +35,6 @@
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>

@@ -49,7 +49,6 @@
 
 #include <utils/applauncher_utils.h>
 #include <utils/common/html.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>

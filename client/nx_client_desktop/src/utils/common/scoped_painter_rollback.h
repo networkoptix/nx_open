@@ -1,5 +1,4 @@
-#ifndef QN_SCOPED_PAINTER_ROLLBACK_H
-#define QN_SCOPED_PAINTER_ROLLBACK_H
+#pragma once
 
 #include "scoped_value_rollback.h"
 #include <QtGui/QPainter>
@@ -141,26 +140,23 @@ namespace detail
 
 } // namespace detail
 
-typedef QnGenericScopedPainterRollback<QPen,        detail::PainterPenAccessor>                                             QnScopedPainterPenRollback;
-typedef QnGenericScopedPainterRollback<QBrush,      detail::PainterBrushAccessor>                                           QnScopedPainterBrushRollback;
-typedef QnGenericScopedPainterRollback<QTransform,  detail::PainterTransformAccessor>                                       QnScopedPainterTransformRollback;
-typedef QnGenericScopedPainterRollback<QFont,       detail::PainterFontAccessor>                                            QnScopedPainterFontRollback;
-typedef QnGenericScopedPainterRollback<qreal,       detail::PainterOpacityAccessor>                                         QnScopedPainterOpacityRollback;
-typedef QnGenericScopedPainterClipRollback<QRegion, detail::PainterClipRegionAccessor>                                      QnScopedPainterClipRegionRollback;
-typedef QnGenericScopedPainterClipRollback<QPainterPath, detail::PainterClipPathAccessor>                                   QnScopedPainterClipPathRollback;
-typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::Antialiasing> >             QnScopedPainterAntialiasingRollback;
-typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
-typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform> >    QnScopedPainterSmoothPixmapTransformRollback;
-
-#define QN_SCOPED_PAINTER_PEN_ROLLBACK(PAINTER, ... /* PEN */)                  \
-    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QPen, detail::PainterPenAccessor>), PAINTER, ##__VA_ARGS__)
-
-#define QN_SCOPED_PAINTER_BRUSH_ROLLBACK(PAINTER, ... /* BRUSH */)              \
-    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QBrush, detail::PainterBrushAccessor>), PAINTER, ##__VA_ARGS__)
-
-#define QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(PAINTER, ... /* TRANSFORM */)      \
-    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QTransform, detail::PainterTransformAccessor>), PAINTER, ##__VA_ARGS__)
-
-// TODO: #Elric complete the list and remove typedefs
-
-#endif // QN_SCOPED_PAINTER_ROLLBACK_H
+using QnScopedPainterPenRollback = QnGenericScopedPainterRollback<QPen,
+    detail::PainterPenAccessor>;
+using QnScopedPainterBrushRollback = QnGenericScopedPainterRollback<QBrush,
+    detail::PainterBrushAccessor>;
+using QnScopedPainterTransformRollback = QnGenericScopedPainterRollback<QTransform,
+    detail::PainterTransformAccessor>;
+using QnScopedPainterFontRollback = QnGenericScopedPainterRollback<QFont,
+    detail::PainterFontAccessor>;
+using QnScopedPainterOpacityRollback = QnGenericScopedPainterRollback<qreal,
+    detail::PainterOpacityAccessor>;
+using QnScopedPainterClipRegionRollback = QnGenericScopedPainterClipRollback<QRegion,
+    detail::PainterClipRegionAccessor>;
+using QnScopedPainterClipPathRollback = QnGenericScopedPainterClipRollback<QPainterPath,
+    detail::PainterClipPathAccessor>;
+using QnScopedPainterAntialiasingRollback = QnGenericScopedPainterRollback<bool,
+    detail::PainterRenderHintAccessor<QPainter::Antialiasing>>;
+using QnScopedPainterNonCosmeticDefaultPenRollback = QnGenericScopedPainterRollback<bool,
+    detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen>>;
+using QnScopedPainterSmoothPixmapTransformRollback = QnGenericScopedPainterRollback<bool,
+    detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform>>;

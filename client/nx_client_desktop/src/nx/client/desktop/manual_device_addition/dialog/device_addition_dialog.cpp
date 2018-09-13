@@ -19,7 +19,6 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>

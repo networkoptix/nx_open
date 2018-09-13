@@ -3,13 +3,9 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtCore/QScopedValueRollback>
 
 #include <type_traits>
-
-#ifndef Q_MOC_RUN
-#include <boost/preprocessor/cat.hpp>
-#include <boost/preprocessor/tuple/enum.hpp>
-#endif
 
 #include "typed_accessors.h"
 
@@ -167,19 +163,3 @@ public:
     {
     }
 };
-
-#ifndef Q_MOC_RUN
-
-#define QN_GENERIC_SCOPED_ROLLBACK_I(TYPE, NAME, ... /* CONSTRUCTOR */) \
-    BOOST_PP_TUPLE_ENUM(TYPE) NAME(__VA_ARGS__); Q_UNUSED(NAME);
-
-#define QN_GENERIC_SCOPED_ROLLBACK(TYPE, ... /* CONSTRUCTOR */)         \
-    QN_GENERIC_SCOPED_ROLLBACK_I(TYPE, BOOST_PP_CAT(scoped_rollback_, __LINE__), ##__VA_ARGS__)
-
-#define QN_SCOPED_VALUE_ROLLBACK(VARIABLE, ... /* VALUE */)                     \
-    QN_GENERIC_SCOPED_ROLLBACK((QnScopedValueRollback<std::remove_reference<decltype(*(VARIABLE))>::type>), VARIABLE, ##__VA_ARGS__)
-
-#else // Q_MOC_RUN
-#define QN_GENERIC_SCOPED_ROLLBACK(...)
-#define QN_SCOPED_VALUE_ROLLBACK(...)
-#endif // Q_MOC_RUN

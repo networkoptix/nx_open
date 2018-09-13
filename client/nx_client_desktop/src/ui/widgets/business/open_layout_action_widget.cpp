@@ -20,8 +20,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include "nx/client/desktop/ui/event_rules/layout_selection_dialog.h"
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/strings_helper.h>

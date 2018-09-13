@@ -157,7 +157,6 @@
 #include <nx/utils/string.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>

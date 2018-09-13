@@ -106,7 +106,6 @@
 
 #include <client_core/client_core_module.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
@@ -484,7 +483,7 @@ void MainWindow::setFullScreen(bool fullScreen) {
      */
     if (m_inFullscreenTransition)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_inFullscreenTransition, true);
+    QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
 
     if(fullScreen) {
