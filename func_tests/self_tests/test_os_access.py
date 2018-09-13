@@ -36,3 +36,12 @@ def test_networking(os_access):
 def test_get_set_time(os_access):
     os_access.time.get()
     os_access.time.set(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=100))
+
+
+def test_disk_space(os_access):
+    before = os_access.free_disk_space_bytes()
+    should_be = 1000 * 1000 * 1000
+    os_access.consume_disk_space(should_be)
+    assert os_access.free_disk_space_bytes() == pytest.approx(should_be, rel=0.001, abs=1000000)
+    os_access.cleanup_disk_space()
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.001, abs=1000000)

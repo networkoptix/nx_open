@@ -149,6 +149,17 @@ class WindowsAccess(OSAccess):
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
 
+    def free_disk_space_bytes(self):
+        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
+        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
+        return int(disk_c['FreeSpace'])
+
+    def consume_disk_space(self, should_leave_bytes):
+        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        holder_path = self._disk_space_holder()
+        args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
+        self.winrm.command(args).check_call()
+
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name

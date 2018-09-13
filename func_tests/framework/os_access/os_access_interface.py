@@ -154,6 +154,20 @@ class OSAccess(object):
     def make_fake_disk(self, name, size_bytes):
         return self.path_cls()
 
+    def _disk_space_holder(self):  # type: () -> FileSystemPath
+        return self.path_cls.tmp() / 'space_holder.tmp'
+
+    @abstractmethod
+    def free_disk_space_bytes(self):  # type: () -> int
+        pass
+
+    @abstractmethod
+    def consume_disk_space(self, should_leave_bytes):  # type: (int) -> None
+        pass
+
+    def cleanup_disk_space(self):
+        self._disk_space_holder().unlink()
+
     def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)
         if source_url.startswith('http://') or source_url.startswith('https://'):

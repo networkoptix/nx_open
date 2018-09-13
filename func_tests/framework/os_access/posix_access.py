@@ -188,6 +188,24 @@ class PosixAccess(OSAccess):
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
 
+    def free_disk_space_bytes(self):
+        command = self.shell.command([
+            'df',
+            '--output=target,avail',  # Only mount point (target) and free (available) space.
+            '--block-size=1',  # By default it's 1024 and all values are in kilobytes.
+            ])
+        output = command.check_output()
+        for line in output.splitlines()[1:]:  # Mind header.
+            mount_point, free_space_raw = line.split()
+            if mount_point == '/':
+                return int(free_space_raw)
+        raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
+
+    def consume_disk_space(self, should_leave_bytes):
+        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        holder_path = self._disk_space_holder()
+        self.shell.command(['fallocate', '-l', to_consume_bytes, holder_path]).check_call()
+
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name

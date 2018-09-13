@@ -206,6 +206,10 @@ class Command(object):
     def running(self):
         yield Run()
 
+    def check_call(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        """Shortcut."""
+        self.check_output(input=input, timeout_sec=timeout_sec)
+
     def check_output(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         """Shortcut."""
         with self.running() as run:
