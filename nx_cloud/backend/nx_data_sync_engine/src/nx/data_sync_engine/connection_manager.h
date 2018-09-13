@@ -96,7 +96,6 @@ public:
         const QnUuid& moduleGuid,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& protocolVersionRange,
-        TransactionLog* const transactionLog,
         IncomingTransactionDispatcher* const transactionDispatcher,
         OutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
     virtual ~ConnectionManager();
@@ -153,7 +152,6 @@ private:
 
     const SynchronizationSettings& m_settings;
     const ProtocolVersionRange m_protocolVersionRange;
-    TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     const vms::api::PeerData m_localPeerData;

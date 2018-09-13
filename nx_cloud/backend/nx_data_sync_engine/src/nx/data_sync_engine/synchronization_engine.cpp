@@ -28,7 +28,6 @@ SyncronizationEngine::SyncronizationEngine(
         moduleGuid,
         settings,
         m_supportedProtocolRange,
-        &m_transactionLog,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_httpTransportAcceptor(

@@ -275,7 +275,7 @@ void HttpTransportAcceptor::startOutgoingChannel(
 {
     m_connectionManager->modifyConnectionByIdSafe(
         connectionId,
-        [this, connection](AbstractTransactionTransport* transportConnection)
+        [connection](AbstractTransactionTransport* transportConnection)
         {
             auto transactionTransport =
                 dynamic_cast<TransactionTransport*>(transportConnection);
@@ -303,8 +303,7 @@ void HttpTransportAcceptor::postTransactionToTransport(
     *foundConnectionOfExpectedType = true;
 
     transactionTransport->post(
-        [transactionTransport,
-            request = std::move(request)]() mutable
+        [transactionTransport, request = std::move(request)]() mutable
         {
             transactionTransport->receivedTransaction(
                 std::move(request.headers),

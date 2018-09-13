@@ -27,13 +27,11 @@ ConnectionManager::ConnectionManager(
     const QnUuid& moduleGuid,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& protocolVersionRange,
-    TransactionLog* const transactionLog,
     IncomingTransactionDispatcher* const transactionDispatcher,
     OutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :
     m_settings(settings),
     m_protocolVersionRange(protocolVersionRange),
-    m_transactionLog(transactionLog),
     m_transactionDispatcher(transactionDispatcher),
     m_outgoingTransactionDispatcher(outgoingTransactionDispatcher),
     m_localPeerData(
