@@ -7,9 +7,12 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/http/tunneling/server.h>
 
 #include "authentication_manager.h"
 #include "get_post_tunnel_processor.h"
+#include "client_connection_tunneling.h"
+#include "listening_peer_connection_tunneling.h"
 
 namespace nx {
 namespace cloud {
@@ -48,6 +51,8 @@ private:
     Controller* m_controller;
     view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
     view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
+    view::ListeningPeerConnectionTunnelingServer m_listeningPeerConnectionTunnelingServer;
+    view::ClientConnectionTunnelingServer m_clientConnectionTunnelingServer;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;

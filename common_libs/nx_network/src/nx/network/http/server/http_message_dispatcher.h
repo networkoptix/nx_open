@@ -128,13 +128,13 @@ public:
     template<typename Func>
     bool registerRequestProcessorFunc(
         const nx::network::http::StringType& method,
-        const QString& path,
+        const std::string& path,
         Func func)
     {
         using Handler = server::handler::CustomRequestHandler<Func>;
 
         return registerRequestProcessor<Handler>(
-            path,
+            path.c_str(),
             [func]() { return std::make_unique<Handler>(std::move(func)); },
             method);
     }

@@ -26,7 +26,7 @@ public:
      * an implementation is allowed to invoke completionHandler within this call.
      */
     virtual void authorize(
-        RequestContext requestContext,
+        const RequestContext* requestContext,
         CompletionHandler completionHandler) = 0;
 };
 

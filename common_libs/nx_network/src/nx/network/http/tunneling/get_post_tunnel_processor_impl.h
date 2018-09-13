@@ -37,10 +37,7 @@ private:
     typename TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
 
     void processTunnelInitiationRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
     void onTunnelAutorizationCompleted(
@@ -77,8 +74,7 @@ void GetPostTunnelProcessorImpl<ApplicationData>::registerRequestHandlers(
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,
         url::joinPath(basePath, path),
-        std::bind(&GetPostTunnelProcessorImpl::processTunnelInitiationRequest, this,
-            _1, _2, _3, _4, _5));
+        std::bind(&GetPostTunnelProcessorImpl::processTunnelInitiationRequest, this, _1, _2));
 }
 
 template<typename ApplicationData>
@@ -98,19 +94,13 @@ void GetPostTunnelProcessorImpl<ApplicationData>::onTunnelCreated(
 
 template<typename ApplicationData>
 void GetPostTunnelProcessorImpl<ApplicationData>::processTunnelInitiationRequest(
-    nx::network::http::HttpServerConnection* const connection,
-    nx::utils::stree::ResourceContainer authInfo,
-    nx::network::http::Request request,
-    nx::network::http::Response* const response,
+    RequestContext requestContextOriginal,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     using namespace std::placeholders;
 
     auto requestContext = std::make_unique<RequestContext>(
-        connection,
-        std::move(authInfo),
-        std::move(request),
-        response);
+        std::move(requestContextOriginal));
 
     if (m_tunnelAuthorizer)
     {
@@ -118,8 +108,17 @@ void GetPostTunnelProcessorImpl<ApplicationData>::processTunnelInitiationRequest
 
         m_tunnelAuthorizer->authorize(
             requestContextPtr,
-            std::bind(&GetPostTunnelProcessorImpl::onTunnelAutorizationCompleted, this,
-                _1, _2, std::move(requestContext), std::move(completionHandler)));
+            [this, requestContext = std::move(requestContext),
+                completionHandler = std::move(completionHandler)](
+                    StatusCode::Value result,
+                    ApplicationData applicationData) mutable
+            {
+                onTunnelAutorizationCompleted(
+                    result,
+                    std::move(applicationData),
+                    std::move(requestContext),
+                    std::move(completionHandler));
+            });
     }
     else
     {
@@ -137,7 +136,7 @@ void GetPostTunnelProcessorImpl<ApplicationData>::onTunnelAutorizationCompleted(
     std::unique_ptr<RequestContext> requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    if (!StatusCode::isSuccess(authorizationResult))
+    if (!StatusCode::isSuccessCode(authorizationResult))
     {
         nx::utils::swapAndCall(completionHandler, authorizationResult);
         return;

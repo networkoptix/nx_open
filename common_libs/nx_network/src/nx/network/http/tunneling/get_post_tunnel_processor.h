@@ -10,6 +10,7 @@
 #include "abstract_tunnel_authorizer.h"
 #include "../http_types.h"
 #include "../server/http_server_connection.h"
+#include "../server/http_stream_socket_server.h"
 
 namespace nx::network::http::tunneling {
 

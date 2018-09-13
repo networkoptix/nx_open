@@ -56,6 +56,10 @@ View::View(
     m_model(model),
     m_controller(controller),
     m_getPostServerTunnelProcessor(&model->listeningPeerPool()),
+    m_listeningPeerConnectionTunnelingServer(
+        m_settings,
+        &model->listeningPeerPool()),
+    m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
@@ -128,15 +132,23 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerApiHandler<view::CreateGetPostServerTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_settings,
-        &m_getPostServerTunnelProcessor);
+    //registerApiHandler<view::CreateGetPostServerTunnelHandler>(
+    //    nx::network::http::Method::get,
+    //    &m_settings,
+    //    &m_getPostServerTunnelProcessor);
 
-    registerApiHandler<view::CreateGetPostClientTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_controller->connectSessionManager(),
-        &m_getPostClientTunnelProcessor);
+    m_listeningPeerConnectionTunnelingServer.registerHandlers(
+        api::kServerTunnelBasePath,
+        &m_httpMessageDispatcher);
+
+    //registerApiHandler<view::CreateGetPostClientTunnelHandler>(
+    //    nx::network::http::Method::get,
+    //    &m_controller->connectSessionManager(),
+    //    &m_getPostClientTunnelProcessor);
+
+    m_clientConnectionTunnelingServer.registerHandlers(
+        api::kClientTunnelBasePath,
+        &m_httpMessageDispatcher);
 
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
