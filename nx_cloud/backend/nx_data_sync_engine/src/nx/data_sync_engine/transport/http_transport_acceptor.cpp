@@ -25,7 +25,9 @@ HttpTransportAcceptor::HttpTransportAcceptor(
         moduleGuid,
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
-        Qn::UbjsonFormat)
+        Qn::UbjsonFormat),
+    m_connectionGuardSharedState(
+        std::make_shared<::ec2::ConnectionGuardSharedState>())
 {
 }
 
@@ -79,7 +81,7 @@ void HttpTransportAcceptor::createConnection(
     auto newTransport = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
         connection->getAioThread(),
-        &m_connectionGuardSharedState,
+        m_connectionGuardSharedState,
         m_transactionLog,
         connectionRequestAttributes,
         systemId,

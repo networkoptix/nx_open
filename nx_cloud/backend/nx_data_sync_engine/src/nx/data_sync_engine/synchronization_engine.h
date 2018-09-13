@@ -61,6 +61,7 @@ public:
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
+    const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     dao::rdb::StructureUpdater m_structureUpdater;
     TransactionLog m_transactionLog;

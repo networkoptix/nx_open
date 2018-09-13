@@ -48,7 +48,7 @@ public:
     TransactionTransport(
         const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
-        ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
+        std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
         TransactionLog* const transactionLog,
         const ConnectionRequestAttributes& connectionRequestAttributes,
         const std::string& systemId,
@@ -94,6 +94,7 @@ public:
 
 private:
     const ProtocolVersionRange m_protocolVersionRange;
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
     std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include <nx/network/http/http_types.h>
@@ -52,7 +53,7 @@ private:
     TransactionLog* m_transactionLog;
     ConnectionManager* m_connectionManager;
     const vms::api::PeerData m_localPeerData;
-    ::ec2::ConnectionGuardSharedState m_connectionGuardSharedState;
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
 
     bool fetchDataFromConnectRequest(
         const nx::network::http::Request& request,

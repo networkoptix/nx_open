@@ -14,10 +14,11 @@ SyncronizationEngine::SyncronizationEngine(
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
+    m_supportedProtocolRange(supportedProtocolRange),
     m_structureUpdater(dbManager),
     m_transactionLog(
         moduleGuid,
-        supportedProtocolRange,
+        m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(
@@ -26,18 +27,18 @@ SyncronizationEngine::SyncronizationEngine(
     m_connectionManager(
         moduleGuid,
         settings,
-        supportedProtocolRange,
+        m_supportedProtocolRange,
         &m_transactionLog,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_httpTransportAcceptor(
         moduleGuid,
-        supportedProtocolRange,
+        m_supportedProtocolRange,
         &m_transactionLog,
         &m_connectionManager),
     m_webSocketAcceptor(
         moduleGuid,
-        supportedProtocolRange,
+        m_supportedProtocolRange,
         &m_transactionLog,
         &m_connectionManager),
     m_statisticsProvider(

@@ -18,7 +18,7 @@ constexpr static const int kMaxTransactionsPerIteration = 17;
 TransactionTransport::TransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
-    ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
     TransactionLog* const transactionLog,
     const ConnectionRequestAttributes& connectionRequestAttributes,
     const std::string& systemId,
@@ -27,12 +27,13 @@ TransactionTransport::TransactionTransport(
     const nx::network::http::Request& request)
     :
     m_protocolVersionRange(protocolVersionRange),
+    m_connectionGuardSharedState(connectionGuardSharedState),
     m_baseTransactionTransport(std::make_unique<::ec2::QnTransactionTransportBase>(
         QnUuid(), //< localSystemId. Not used here
         QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
         ::ec2::ConnectionLockGuard(
             localPeer.id,
-            connectionGuardSharedState,
+            connectionGuardSharedState.get(),
             connectionRequestAttributes.remotePeer.id,
             ::ec2::ConnectionLockGuard::Direction::Incoming),
         localPeer,
