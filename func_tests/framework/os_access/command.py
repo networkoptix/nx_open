@@ -176,7 +176,6 @@ class Run(object):
         wait = Wait(
             "data received on stdout and stderr",
             timeout_sec=timeout_sec,
-            attempts_limit=10000,
             logger=self.logger.getChild('wait'),
             )
         while True:

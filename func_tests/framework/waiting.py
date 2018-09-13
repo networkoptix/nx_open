@@ -10,40 +10,39 @@ _logger = ContextLogger(__name__, 'wait')
 
 
 class Wait(object):
-    def __init__(self, until, timeout_sec=30, attempts_limit=100, logger=None):
+    def __init__(self, until, timeout_sec=30, logger=None):
         # type: (str, float, int, ...) -> None
         self._until = until
         assert timeout_sec is not None
         self._timeout_sec = timeout_sec
         self._started_at = timeit.default_timer()
         self._last_checked_at = self._started_at
-        self._attempts_limit = attempts_limit
         self._attempts_made = 0
         self.delay_sec = 0.5
         self._logger = logger or _logger
         self._logger.info(
-            "Waiting until %s: %.1f sec, %d attempts.",
-            self._until, self._timeout_sec, self._attempts_limit)
+            "Waiting until %s: %.1f sec.",
+            self._until, self._timeout_sec)
 
     def again(self):
         now = timeit.default_timer()
         since_start_sec = timeit.default_timer() - self._started_at
-        if since_start_sec > self._timeout_sec or self._attempts_made >= self._attempts_limit:
+        if since_start_sec > self._timeout_sec:
             self._logger.warning(
-                "Timed out waiting until %s: %g/%g sec, %d/%d attempts.",
-                self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit)
+                "Timed out waiting until %s: %g/%g sec, %d attempts.",
+                self._until, since_start_sec, self._timeout_sec, self._attempts_made)
             return False
         since_last_checked_sec = now - self._last_checked_at
         if since_last_checked_sec < self.delay_sec:
             self._logger.debug(
-                "Continue waiting (asked earlier) until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
-                self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
+                "Continue waiting (asked earlier) until %s: %.1f/%.1f sec, %d attempts, delay %.1f sec.",
+                self._until, since_start_sec, self._timeout_sec, self._attempts_made, self.delay_sec)
             return True
         self._attempts_made += 1
         self.delay_sec = min(2, self.delay_sec * 2)
         self._logger.debug(
-            "Continue waiting until %s: %.1f/%.1f sec, %d/%d attempts, delay %.1f sec.",
-            self._until, since_start_sec, self._timeout_sec, self._attempts_made, self._attempts_limit, self.delay_sec)
+            "Continue waiting until %s: %.1f/%.1f sec, %d attempts, delay %.1f sec.",
+            self._until, since_start_sec, self._timeout_sec, self._attempts_made, self.delay_sec)
         self._last_checked_at = now
         return True
 
