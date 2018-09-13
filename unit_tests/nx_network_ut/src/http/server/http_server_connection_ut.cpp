@@ -102,7 +102,7 @@ private:
 
         m_httpServer.registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2, _3, _4, _5));
+            std::bind(&HttpServerConnection::provideEmptyMessageBody, this, _1, _2));
     }
 
     void performRequest(const char* urlScheme)
@@ -115,10 +115,7 @@ private:
     }
 
     void provideEmptyMessageBody(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        Request /*request*/,
-        Response* const /*response*/,
+        RequestContext /*requestContext*/,
         RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
@@ -191,7 +188,7 @@ protected:
         httpServer().registerRequestProcessorFunc(
             kTestPath,
             std::bind(&HttpServerConnectionClientEndpoint::saveHttpClientEndpoint, this,
-                _1, _2, _3, _4, _5));
+                _1, _2));
     }
 
     void whenIssueRequest()
@@ -251,13 +248,10 @@ private:
     }
 
     void saveHttpClientEndpoint(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        Request /*request*/,
-        Response* const /*response*/,
+        RequestContext requestContext,
         RequestProcessedHandler completionHandler)
     {
-        m_httpClientEndpoints.push(connection->clientEndpoint());
+        m_httpClientEndpoints.push(requestContext.connection->clientEndpoint());
 
         completionHandler(StatusCode::ok);
     }

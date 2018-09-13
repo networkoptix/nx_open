@@ -97,7 +97,7 @@ protected:
         ASSERT_TRUE(
             m_testHttpServer->registerRequestProcessorFunc(
                 "/saveRequest",
-                std::bind(&AsyncHttpClient::onRequestReceived, this, _1, _2, _3, _4, _5)));
+                std::bind(&AsyncHttpClient::onRequestReceived, this, _1, _2)));
     }
 
     void whenPostSomeBodyWithContentLength()
@@ -226,13 +226,10 @@ private:
     }
 
     void onRequestReceived(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_receivedRequests.push(std::move(request));
+        m_receivedRequests.push(std::move(requestContext.request));
         completionHandler(nx::network::http::StatusCode::ok);
     }
 };
@@ -776,7 +773,7 @@ private:
             testHttpServer().registerRequestProcessorFunc(
                 testPath(),
                 std::bind(&AsyncHttpClientRequestValidation::onRequestReceived, this,
-                    _1, _2, _3, _4, _5)));
+                    _1, _2)));
 
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
@@ -787,14 +784,11 @@ private:
     }
 
     void onRequestReceived(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_urlsFromReceivedRequests.push(request.requestLine.url);
-        m_receivedRequests.push(std::move(request));
+        m_urlsFromReceivedRequests.push(requestContext.request.requestLine.url);
+        m_receivedRequests.push(std::move(requestContext.request));
         completionHandler(nx::network::http::StatusCode::ok);
     }
 };
@@ -994,7 +988,7 @@ protected:
 
         auto httpHandlerFunc =
             std::bind(&AsyncHttpClientReusingConnection::delayedConnectionClosureHttpHandlerFunc,
-                this, _1, _2, _3, _4, _5);
+                this, _1, _2);
         NX_GTEST_ASSERT_TRUE(
             testHttpServer().registerRequestProcessorFunc(
                 testPath, std::move(httpHandlerFunc)));
@@ -1065,10 +1059,7 @@ private:
     }
 
     void delayedConnectionClosureHttpHandlerFunc(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
@@ -1076,7 +1067,7 @@ private:
         HttpConnectionContext* connectionContext = nullptr;
         {
             QnMutexLocker lock(&m_mutex);
-            auto p = m_connectionToContext.emplace(connection, nullptr);
+            auto p = m_connectionToContext.emplace(requestContext.connection, nullptr);
             if (p.second)
                 p.first->second = std::make_unique<HttpConnectionContext>();
             connectionContext = p.first->second.get();
@@ -1085,9 +1076,9 @@ private:
         ++connectionContext->requestsReceived;
 
         requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&AsyncHttpClientReusingConnection::onResponseSent, this, connection);
-        connection->registerCloseHandler(
-            std::bind(&AsyncHttpClientReusingConnection::onConnectionClosed, this, connection));
+            std::bind(&AsyncHttpClientReusingConnection::onResponseSent, this, requestContext.connection);
+        requestContext.connection->registerCloseHandler(
+            std::bind(&AsyncHttpClientReusingConnection::onConnectionClosed, this, requestContext.connection));
 
         completionHandler(std::move(requestResult));
     }

@@ -251,7 +251,7 @@ protected:
         m_testHttpServer->registerRequestProcessorFunc(
             kTestPath,
             std::bind(&HttpAsyncServerConnectionUpgrade::processRequest, this,
-                _1, _2, _3, _4, _5));
+                _1, _2));
 
         ASSERT_TRUE(m_testHttpServer->bindAndListen());
     }
@@ -302,10 +302,7 @@ private:
     nx::network::http::Response m_httpResponse;
 
     void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         completionHandler(nx::network::http::StatusCode::switchingProtocols);
