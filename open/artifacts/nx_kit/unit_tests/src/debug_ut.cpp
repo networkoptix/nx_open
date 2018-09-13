@@ -98,7 +98,7 @@ TEST(debug, assertFailureInRelease)
         static const bool condition = true;
     #endif
 
-    NX_KIT_ASSERT(condition, "This and the previous assertions should fail in Debug.");
+    NX_KIT_ASSERT(condition, "This and the next assertions should fail in Debug.");
     NX_KIT_ASSERT(condition);
 }
 

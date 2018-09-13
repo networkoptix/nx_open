@@ -1,6 +1,7 @@
 # Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
 
+# Needed for proper RPATH in MacOS.
 if(POLICY CMP0068)
     cmake_policy(SET CMP0068 NEW)
 endif()
@@ -11,6 +12,11 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+if(WIN32)
+    # Suppress MSVC warnings about potentially unsafe standard library functions line getenv().
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
