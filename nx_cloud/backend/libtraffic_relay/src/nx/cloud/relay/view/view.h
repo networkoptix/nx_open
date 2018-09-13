@@ -10,7 +10,6 @@
 #include <nx/network/http/tunneling/server.h>
 
 #include "authentication_manager.h"
-#include "get_post_tunnel_processor.h"
 #include "client_connection_tunneling.h"
 #include "listening_peer_connection_tunneling.h"
 
@@ -49,8 +48,6 @@ private:
     const conf::Settings& m_settings;
     Model* m_model;
     Controller* m_controller;
-    view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
-    view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
     view::ListeningPeerConnectionTunnelingServer m_listeningPeerConnectionTunnelingServer;
     view::ClientConnectionTunnelingServer m_clientConnectionTunnelingServer;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
