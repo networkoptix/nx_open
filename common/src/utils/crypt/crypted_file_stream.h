@@ -58,7 +58,7 @@ protected:
         qint64 size = 0;
         qint64 originalSize = 0; //< This one is only to make open() reentrant on error.
 
-        bool isNull() { return (position == 0) && (size == 0);}
+        bool isNull() const { return (position == 0) && (size == 0);}
     } m_enclosure;
 
 #pragma pack(push, 4)
@@ -67,8 +67,8 @@ protected:
         qint64 version = kCryptoStreamVersion;
         qint64 minReadVersion = kCryptoStreamVersion; //< Minimal reader version to access the stream.
         qint64 dataSize = 0;
-        unsigned char salt[kKeySize];
-        unsigned char keyHash[kKeySize];
+        unsigned char salt[kKeySize] = {};
+        unsigned char keyHash[kKeySize] = {};
     } m_header;
 #pragma pack(pop)
 
@@ -93,6 +93,7 @@ protected:
     char m_currentPlainBlock[kCryptoBlockSize];
     char m_currentCryptedBlock[kCryptoBlockSize];
     void* m_context; //< Using void* because EVP_CIPHER_CTX is a OpenSSL typedef.
+    void* m_mdContext; //< Using void* because EVP_MD_CTX is a OpenSSL typedef.
     Key m_IV;
     bool m_blockDirty = false; //< Data in decrypted block was not flushed.
 

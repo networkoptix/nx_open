@@ -30,8 +30,7 @@ public:
 
 private:
     QnLayoutFileStorageResource& m_storageResource;
-    QString m_fileName;
-    QnLayoutFileStorageResource::Stream m_enclosure;
+    QString m_streamName;
 
     // Used for store/restore functionality that is used for NOV files moving.
     OpenMode m_storedOpenMode = NotOpen;

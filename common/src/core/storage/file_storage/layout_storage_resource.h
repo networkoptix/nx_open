@@ -68,9 +68,11 @@ public:
     // Searches for a stream with the given name.
     Stream findStream(const QString& fileName);
     // Called from a output stream when it is closed.
-    void finalizeWrittenStream();
+    void finalizeWrittenStream(qint64 pos);
     void registerFile(QnLayoutStreamSupport* file);
     void unregisterFile(QnLayoutStreamSupport* file);
+
+    void dumpStructure();
 
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;

@@ -1,5 +1,6 @@
 #include "layout_storage_resource.h"
 #include "layout_storage_filestream.h"
+#include "layout_storage_cryptostream.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
@@ -53,7 +54,8 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     }
 #endif
 
-    QnLayoutPlainStream* rez = new QnLayoutPlainStream(*this, url);
+//    QIODevice* rez = new QnLayoutPlainStream(*this, url);
+    QIODevice* rez = new QnLayoutCryptoStream(*this, url, "helloworld");
     if (!rez->open(openMode))
     {
         delete rez;
@@ -312,7 +314,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::addStream(const
     file.write(utf8FileName);
     if (m_novFileOffset > 0)
         addBinaryPostfix(file);
-    return Stream{fileSize, 0};
+    return Stream{fileSize + utf8FileName.size() + 1, 0};
 }
 
 QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(const QString& fileName)
@@ -334,15 +336,15 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
         {
             file.seek(m_index.entries[i].offset + m_novFileOffset);
             char tmpBuffer[1024]; // buffer size is max file len
-            int readed = file.read(tmpBuffer, sizeof(tmpBuffer));
-            QByteArray readedFileName(tmpBuffer, qMin(readed, utf8FileName.length()));
-            if (utf8FileName == readedFileName)
+            int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
+            QByteArray actualFileName(tmpBuffer, qMin(readBytes, utf8FileName.length()));
+            if (utf8FileName == actualFileName)
             {
                 Stream stream;
                 stream.position = m_index.entries[i].offset + m_novFileOffset
                     + fileName.toUtf8().length() + 1;
                 if (i < m_index.entryCount-1)
-                    stream.size = m_index.entries[i+1].offset + m_novFileOffset - stream.position;
+                    stream.size = m_index.entries[i + 1].offset + m_novFileOffset - stream.position;
                 else
                 {
                     qint64 endPos = file.size() - getPostfixSize();
@@ -355,12 +357,13 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
     return Stream();
 }
 
-void QnLayoutFileStorageResource::finalizeWrittenStream()
+void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 {
     if (m_novFileOffset > 0)
     {
         QFile file(getUrl());
         file.open(QIODevice::Append);
+        file.seek(pos);
         addBinaryPostfix(file);
     }
 }
@@ -431,4 +434,30 @@ QString QnLayoutFileStorageResource::itemUniqueId(const QString& layoutUrl,
 QString QnLayoutFileStorageResource::getPath() const
 {
     return getUrl();
+}
+
+// The one who requests to remove this function will become a permanent maintainer of this class.
+void QnLayoutFileStorageResource::dumpStructure()
+{
+    if (!getUrl().contains(".exe"))
+        return;
+
+    qDebug() << "Logging" << getUrl();
+    QFile file(getUrl());
+    file.open(QIODevice::ReadOnly);
+
+    if (m_index.entryCount == 0)
+        return;
+
+    for(int i = 0; i < m_index.entryCount - 1 ; i++)
+    {
+        char tmpBuffer[1024]; // buffer size is max file len
+        file.seek(m_index.entries[i].offset + m_novFileOffset);
+        int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
+        QByteArray actualFileName(tmpBuffer, readBytes);
+        qDebug() << "Entry" << i << QString(actualFileName)
+            << "size:" << hex <<m_index.entries[i + 1].offset - m_index.entries[i].offset
+            << "adjusted:" << hex << m_index.entries[i + 1].offset - m_index.entries[i].offset -
+            strlen(actualFileName.data()) - 1;
+    }
 }

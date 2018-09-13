@@ -37,11 +37,6 @@ qint64 QnLayoutPlainStream::size() const
     return m_fileSize;
 }
 
-// qint64 QnLayoutFile::grossSize() const
-// {
-//     return size();
-// }
-
 qint64 QnLayoutPlainStream::readData(char* data, qint64 maxSize)
 {
     QnMutexLocker lock(&m_mutex);
@@ -88,9 +83,14 @@ bool QnLayoutPlainStream::open(QIODevice::OpenMode openMode)
 void QnLayoutPlainStream::close()
 {
     QnMutexLocker lock(&m_mutex);
+
     m_file.close();
     if (m_openMode & QIODevice::WriteOnly)
-        m_storageResource.finalizeWrittenStream();
+        m_storageResource.finalizeWrittenStream(m_fileOffset + m_fileSize);
+
+    m_openMode = NotOpen;
+    QIODevice::close();
+
     m_storageResource.unregisterFile(this);
 }
 

@@ -1,5 +1,6 @@
 #include "crypted_file_stream.h"
 
+#include <stdexcept>
 #include <algorithm>
 #include <vector>
 #include <random>
@@ -52,7 +53,6 @@ Key xorKeys(const Key& key1, const Key& key2)
 
 Key getKeyHash(const Key& key)
 {
-
     EVP_MD_CTX* mdctx = EVP_MD_CTX_create();
     NX_ASSERT(mdctx);
     auto result = EVP_DigestInit_ex(mdctx, EVP_sha256(), NULL);
@@ -105,14 +105,18 @@ CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& pas
     NX_ASSERT(m_context);
     NX_ASSERT(EVP_MD_size(EVP_sha256()) == kKeySize);
 
+    m_mdContext = EVP_MD_CTX_create();
+    NX_ASSERT(m_mdContext);
+
     resetState();
     setPassword(password);
 }
 
 CryptedFileStream::~CryptedFileStream()
 {
-    EVP_CIPHER_CTX_free((EVP_CIPHER_CTX*) m_context);
     close();
+    EVP_CIPHER_CTX_free((EVP_CIPHER_CTX*) m_context);
+    EVP_MD_CTX_destroy((EVP_MD_CTX*) m_mdContext);
 }
 
 void CryptedFileStream::setEnclosure(qint64 position, qint64 size)
@@ -136,28 +140,40 @@ bool CryptedFileStream::open(QIODevice::OpenMode openMode)
 
     m_file.setFileName(m_fileName);
 
-    OpenMode fileOpenMode = openMode && (~OpenMode(Text)); //< Clear Text flag from underlying file.
+    OpenMode fileOpenMode = openMode & (~OpenMode(Text)); //< Clear Text flag from underlying file.
     // Since we may have to read unfinished blocks, we should never open in WriteOnly mode.
     // For Append we need to read header and modify last block.
     if (openMode == WriteOnly || (openMode & Append))
         fileOpenMode = ReadWrite;
 
-    if (!m_file.open(fileOpenMode))
-        return false;
-
-    m_openMode = openMode;
-
-    m_enclosure.size = m_enclosure.originalSize;
-
-    if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
-        m_enclosure.size = m_file.size();
-
-    if (openMode == WriteOnly)
-        createHeader();
-    else
+    try
     {
-        if (!readHeader())
-            return false;
+        if (!m_file.open(fileOpenMode))
+            throw std::runtime_error(m_file.errorString().toUtf8());
+
+        m_openMode = openMode;
+
+        m_enclosure.size = m_enclosure.originalSize;
+
+        // Check for probably truncated file or damaged stream.
+        if (m_enclosure.size != 0 && (m_enclosure.size - kHeaderSize) % kCryptoBlockSize != 0)
+            throw std::runtime_error(tr("Wrong crypted stream size.").toUtf8());
+
+        if (m_enclosure.isNull() && openMode != WriteOnly) //< Adjust to file size except if WriteOnly.
+            m_enclosure.size = m_file.size();
+
+        if (openMode == WriteOnly)
+            createHeader();
+        else
+        {
+            if (!readHeader())
+                throw std::runtime_error(tr("Damaged crypted stream header.").toUtf8());
+        }
+    }
+    catch (const std::exception& e)
+    {
+        setErrorString(e.what());
+        return false;
     }
 
     m_openMode = openMode;
@@ -327,9 +343,9 @@ void CryptedFileStream::dumpCurrentBlock()
 
 void CryptedFileStream::loadCurrentBlock()
 {
-    bool shouldRead = isWriting()
+    const bool shouldRead = isWriting()
         // Will load if there is any data in the block.
-        ? ((m_position.blockIndex + 1) * kCryptoBlockSize - m_header.dataSize > 0)
+        ? m_position.blockIndex * kCryptoBlockSize < m_header.dataSize
         // Will load if entire block fits into enclosure.
         : ((m_position.blockIndex + 1) * kCryptoBlockSize <= m_enclosure.size);
 
@@ -384,36 +400,56 @@ void CryptedFileStream::writeHeader()
 // Actual encrypring & decrypting.
 void CryptedFileStream::cryptBlock()
 {
-    *(qint64*) &(*m_IV.begin()) = m_position.blockIndex; //< Slightly (actually, fully) modifying IV.
-    auto result = EVP_EncryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(), NULL, m_key.data(), m_IV.data());
-    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
-    NX_ASSERT(result == 1);
+    // Create IV from block index.
+    auto result = EVP_DigestInit_ex((EVP_MD_CTX*) m_mdContext, EVP_sha256(), nullptr);
+    NX_ASSERT(result);
+    result = EVP_DigestUpdate((EVP_MD_CTX*) m_mdContext, &m_position.blockIndex, sizeof(qint64));
+    NX_ASSERT(result);
+    unsigned int mdLen;
+    result = EVP_DigestFinal_ex((EVP_MD_CTX*) m_mdContext, m_IV.data(), &mdLen);
+    NX_ASSERT(result && mdLen <= m_IV.size());
 
-    int len;
-    result = EVP_EncryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentCryptedBlock, &len,
+    // Encrypt block.
+    result = EVP_EncryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(),
+        nullptr, m_key.data(), m_IV.data());
+    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
+    NX_ASSERT(result);
+
+    int cryptlen;
+    result = EVP_EncryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentCryptedBlock, &cryptlen,
         (unsigned char *) m_currentPlainBlock, kCryptoBlockSize);
-    NX_ASSERT(result == 1);
+    NX_ASSERT(result);
 
     unsigned char dummy[32]; //< Actually 16 is enough for AES.
-    result = EVP_EncryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &len);
-    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to crypted buffer.
+    result = EVP_EncryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &cryptlen);
+    NX_ASSERT(result && (cryptlen == 0)); //< No extra bytes should be written to crypted buffer.
 }
 
 void CryptedFileStream::decryptBlock()
 {
-    *(qint64*) &(*m_IV.begin()) = m_position.blockIndex; //< Slightly (actually, fully) modifying IV.
-    auto result = EVP_DecryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(), NULL, m_key.data(), m_IV.data());
-    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
-    NX_ASSERT(result == 1);
+    // Create IV from block index.
+    auto result = EVP_DigestInit_ex((EVP_MD_CTX*) m_mdContext, EVP_sha256(), nullptr);
+    NX_ASSERT(result);
+    result = EVP_DigestUpdate((EVP_MD_CTX*) m_mdContext, &m_position.blockIndex, sizeof(qint64));
+    NX_ASSERT(result);
+    unsigned int mdLen;
+    result = EVP_DigestFinal_ex((EVP_MD_CTX*) m_mdContext, m_IV.data(), &mdLen);
+    NX_ASSERT(result && mdLen <= m_IV.size());
 
-    int len;
-    result = EVP_DecryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentPlainBlock, &len,
+    // Decrypt block.
+    result = EVP_DecryptInit_ex((EVP_CIPHER_CTX*) m_context , EVP_aes_256_cbc(),
+        nullptr, m_key.data(), m_IV.data());
+    EVP_CIPHER_CTX_set_padding((EVP_CIPHER_CTX*) m_context, 0);
+    NX_ASSERT(result);
+
+    int cryptLen;
+    result = EVP_DecryptUpdate((EVP_CIPHER_CTX*) m_context, (unsigned char *) m_currentPlainBlock, &cryptLen,
         (unsigned char *) m_currentCryptedBlock, kCryptoBlockSize);
-    NX_ASSERT(result == 1);
+    NX_ASSERT(result);
 
     unsigned char dummy[32];
-    result = EVP_DecryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &len);
-    NX_ASSERT((result == 1) && (len == 0)); //< No extra bytes should be written to decrypted buffer.
+    result = EVP_DecryptFinal_ex((EVP_CIPHER_CTX*) m_context, dummy, &cryptLen);
+    NX_ASSERT(result && (cryptLen == 0)); //< No extra bytes should be written to decrypted buffer.
 }
 
 } // namespace utils

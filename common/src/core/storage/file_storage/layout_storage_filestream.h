@@ -22,8 +22,6 @@ public:
     virtual qint64 pos() const override;
     virtual qint64 size() const override;
 
-    // virtual qint64 grossSize() const override; //< Same as size() for this class.
-
     virtual qint64 readData(char* data, qint64 maxSize) override;
     virtual qint64 writeData(const char* data, qint64 maxSize) override;
 

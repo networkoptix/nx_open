@@ -9,7 +9,7 @@ QnLayoutCryptoStream::QnLayoutCryptoStream(QnLayoutFileStorageResource& storageR
     m_storageResource(storageResource)
 
 {
-    m_fileName = fileName.mid(fileName.lastIndexOf(QLatin1Char('?')) + 1);
+    m_streamName = fileName.mid(fileName.lastIndexOf(QLatin1Char('?')) + 1);
 }
 
 QnLayoutCryptoStream::~QnLayoutCryptoStream()
@@ -25,16 +25,16 @@ bool QnLayoutCryptoStream::open(QIODevice::OpenMode openMode)
     bool emptyStream = false;
     if (openMode & QIODevice::WriteOnly)
     {
-        if (!m_storageResource.findStream(m_fileName).valid())
+        if (!m_storageResource.findStream(m_streamName).valid())
         {
-            if (!m_storageResource.addStream(m_fileName).valid())
+            if (!m_storageResource.addStream(m_streamName).valid())
                 return false;
 
             emptyStream = true;
         }
     }
 
-    QnLayoutFileStorageResource::Stream enclosure  = m_storageResource.findStream(m_fileName);
+    QnLayoutFileStorageResource::Stream enclosure  = m_storageResource.findStream(m_streamName);
     if (!enclosure.valid())
         return false;
 
@@ -52,14 +52,15 @@ void QnLayoutCryptoStream::close()
 
     const auto openMode = m_openMode;
     const bool wasWriting = isWriting();
+    const qint64 totalSize = grossSize();
 
     CryptedFileStream::close(); //< Will change m_openMode. Unconditionally closes underlying file.
 
-    if (openMode == QIODevice::NotOpen)
+    if (openMode == NotOpen)
         return;
 
-    if (wasWriting)
-        m_storageResource.finalizeWrittenStream();
+    if (wasWriting) // This definetly requires refactoring (VMS-11578).
+        m_storageResource.finalizeWrittenStream(m_enclosure.position + totalSize);
 
     m_storageResource.unregisterFile(this);
 }
