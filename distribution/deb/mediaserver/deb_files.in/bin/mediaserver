@@ -32,10 +32,10 @@ echo --- Starting: $EXE $ARGS
 
 if [ "@withRootTool@" = "true" ]
 then
-	exec start-stop-daemon --start \
-	    --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
-	    -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+    exec start-stop-daemon --start \
+        --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
+        -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
 else
-	exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
+    exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
 fi
 

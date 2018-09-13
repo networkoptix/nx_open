@@ -79,7 +79,7 @@ void QnResourceTreeModelLayoutNodeManager::handleResourceAdded(const QnResourceP
     const auto loading = m_loadingLayouts;
     for (auto node: loading)
     {
-        NX_EXPECT(!node->itemsLoaded());
+        NX_ASSERT(!node->itemsLoaded());
 
         const auto layout = node->resource().dynamicCast<QnLayoutResource>();
         NX_ASSERT(layout);

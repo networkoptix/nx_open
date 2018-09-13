@@ -91,7 +91,12 @@
                         </param>
                         <param>
                             <name>speed</name>
-                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1.</description>
+                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1. The special value 'max' means streaming without delay</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>multiple_payload_types</name>
+                            <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
                             <optional>true</optional>
                         </param>
                     </params>

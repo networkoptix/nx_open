@@ -64,6 +64,7 @@ protected:
     static bool checkDistance(const MessageBus* bus, const vms::api::PersistentIdData& peer);
     bool checkRuntimeInfo(const MessageBus* bus, const vms::api::PersistentIdData& /*peer*/);
 
+    void setLowDelayIntervals();
 protected:
     std::vector<Appserver2Ptr> m_servers;
 };

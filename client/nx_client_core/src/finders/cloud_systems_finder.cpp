@@ -5,7 +5,7 @@
 
 #include <utils/common/delayed.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
@@ -211,7 +211,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                                 systemDescription->removeServer(current.id);
                         };
 
-                    auto clearServersTask = QnRaiiGuard::createDestructible(clearServers);
+                    auto clearServersTask = nx::utils::makeScopeGuard(clearServers);
                     if (failed)
                         return;
 
@@ -229,7 +229,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (cloudSystemId != moduleInformation.cloudSystemId)
                         return;
 
-                    clearServersTask->disableDestructionHandler();
+                    clearServersTask.disarm();
 
                     const auto serverId = moduleInformation.id;
                     if (systemDescription->containsServer(serverId))

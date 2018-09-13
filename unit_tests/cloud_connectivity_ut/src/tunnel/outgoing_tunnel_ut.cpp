@@ -489,7 +489,7 @@ TEST_F(OutgoingTunnel, general)
 
         AddressEntry addressEntry("nx_test.com:12345");
         cloud::OutgoingTunnel tunnel(std::move(addressEntry));
-        auto tunnelGuard = makeScopeGuard([&tunnel]() { tunnel.pleaseStopSync(); });
+        auto tunnelGuard = nx::utils::makeScopeGuard([&tunnel]() { tunnel.pleaseStopSync(); });
 
         setConnectorFactoryFunc(
             [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
@@ -782,7 +782,7 @@ TEST_F(OutgoingTunnel, connectTimeout2)
 TEST_F(OutgoingTunnel, pool)
 {
     OutgoingTunnelPool tunnelPool;
-    auto tunnelPoolGuard = makeScopeGuard(
+    auto tunnelPoolGuard = nx::utils::makeScopeGuard(
         [&tunnelPool]() { tunnelPool.pleaseStopSync(); });
 
     AddressEntry addressEntry("nx_test.com:12345");

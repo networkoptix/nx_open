@@ -9,7 +9,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/event/event_fwd.h>
 
 namespace nx {
@@ -96,7 +96,7 @@ void MotionSearchListModel::Private::reset()
     m_data.clear();
 
     int newTotalCount = 0;
-    QnRaiiGuard updateTotalCount(
+    auto updateTotalCount = nx::utils::makeScopeGuard(
         [this, &newTotalCount]()
         {
             if (newTotalCount == m_totalCount)
@@ -190,8 +190,8 @@ void MotionSearchListModel::Private::fetchMore()
     if (remaining == 0)
         return;
 
-    QnRaiiGuard finishFetch(
-        [this]() { q->beginFinishFetch(); },
+    q->beginFinishFetch();
+    auto finishFetch = nx::utils::makeScopeGuard(
         [this]() { q->endFinishFetch(); });
 
     const auto delta = qMin(remaining, kFetchBatchSize);

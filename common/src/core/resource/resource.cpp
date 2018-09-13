@@ -17,6 +17,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/metrics/metrics_storage.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -334,6 +335,9 @@ Qn::ResourceStatus QnResource::getStatus() const
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
+    if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
+        commonModule()->metrics()->offlineStatus()++;
+
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
@@ -350,11 +354,11 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
-        NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+        NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(sharedThis->getId().toString())
                 .arg(sharedThis->getName())
-                .arg(sharedThis->getUrl()), cl_logDEBUG2);
+                .arg(sharedThis->getUrl()));
 
         emit statusChanged(sharedThis, reason);
     }
@@ -368,7 +372,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_EXPECT(commonModule());
     if (!commonModule())
         return;
 
@@ -517,7 +520,7 @@ QString QnResource::getResourceProperty(
     // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    NX_EXPECT(commonModule);
+    NX_ASSERT(commonModule);
     QString value = commonModule
         ? commonModule->propertyDictionary()->value(resourceId, key)
         : QString();
@@ -553,7 +556,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     }
 
     NX_ASSERT(!getId().isNull());
-    NX_EXPECT(commonModule());
+    NX_ASSERT(commonModule());
 
     bool isModified = commonModule() && commonModule()->propertyDictionary()->setValue(
         getId(), key, value, markDirty, replaceIfExists);
@@ -628,8 +631,9 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance()
+QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
 {
+    initResPool()->setMaxThreadCount(threadCount);
     return initResPool();
 }
 // -----------------------------------------------------------------------------
@@ -786,7 +790,7 @@ QString QnResource::idForToStringFromPtr() const
 
 bool QnResource::saveParams()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParams(getId());
     return false;
@@ -794,7 +798,7 @@ bool QnResource::saveParams()
 
 int QnResource::saveParamsAsync()
 {
-    NX_EXPECT(commonModule() && !getId().isNull());
+    NX_ASSERT(commonModule() && !getId().isNull());
     if (auto module = commonModule())
         return module->propertyDictionary()->saveParamsAsync(getId());
     return false;

@@ -9,8 +9,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class WatermarkPainter;
-
 namespace Ui { class WatermarkPreviewDialog;}
 
 class WatermarkPreviewDialog: public QnButtonBoxDialog
@@ -21,7 +19,7 @@ public:
     WatermarkPreviewDialog(QWidget* parent);
     ~WatermarkPreviewDialog();
 
-    /** returns true if settings were changed */
+    /** Returns true if settings were changed. */
     static bool editSettings(QnWatermarkSettings& settings, QWidget* parent);
 
 private:
@@ -36,7 +34,6 @@ private:
     QScopedPointer<Ui::WatermarkPreviewDialog> ui;
 
     QnWatermarkSettings m_settings;
-    QScopedPointer<WatermarkPainter> m_painter;
     QScopedPointer<QPixmap> m_baseImage;
     bool m_lockUpdate = false;
 };

@@ -328,7 +328,7 @@ ActionVisibility Condition::check(const Parameters& parameters, QnWorkbenchConte
         case LayoutItemType:
             return check(parameters.layoutItems(), context);
         default:
-            NX_EXPECT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
+            NX_ASSERT(false, lm("Invalid parameter type '%1'.").arg(parameters.items().typeName()));
             return InvisibleAction;
     }
 }
@@ -1247,8 +1247,11 @@ ActionVisibility PtzCondition::check(const Parameters& parameters, QnWorkbenchCo
 ActionVisibility PtzCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
     foreach(const QnResourcePtr &resource, resources)
-        if (!check(qnPtzPool->controller(resource)))
+    {
+        auto ptzPool = resource->commonModule()->findInstance<QnPtzControllerPool>();
+        if (!check(ptzPool->controller(resource)))
             return InvisibleAction;
+    }
 
     if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
         return DisabledAction;
@@ -1747,7 +1750,7 @@ ConditionWrapper canSavePtzPosition()
         [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
             auto widget = qobject_cast<const QnMediaResourceWidget*>(parameters.widget());
-            NX_EXPECT(widget);
+            NX_ASSERT(widget);
             if (!widget)
                 return false;
 

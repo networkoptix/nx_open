@@ -126,6 +126,7 @@ nx_create_dev_qt_conf()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
+    list(APPEND CMAKE_INSTALL_RPATH ${QT_DIR}/lib)
 endif()
 if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
@@ -220,7 +221,6 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    # Comment/uncomment below to disable/enable root_tool building.
     if(withRootTool)
         add_subdirectory(root_tool)
     endif()
@@ -238,9 +238,7 @@ if(withTrayTool)
     add_subdirectory(traytool)
 endif()
 
-if(withDesktopClient OR withMobileClient)
-    add_subdirectory(client)
-endif()
+add_subdirectory(client)
 
 if(withNxTool)
     add_subdirectory(nxtool)

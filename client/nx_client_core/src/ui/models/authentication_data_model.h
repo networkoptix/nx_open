@@ -5,6 +5,8 @@
 
 #include <utils/common/encoded_credentials.h>
 
+namespace nx::client::core {
+
 class AuthenticationDataModel: public QAbstractListModel
 {
     Q_OBJECT
@@ -22,7 +24,7 @@ public:
     };
 
     AuthenticationDataModel(QObject* parent = nullptr);
-    ~AuthenticationDataModel();
+    virtual ~AuthenticationDataModel() override;
 
 public:
     QUuid systemId() const;
@@ -45,3 +47,5 @@ private:
     QUuid m_systemId;
     QList<QnEncodedCredentials> m_credentialsList;
 };
+
+} // namespace nx::client::core

@@ -15,8 +15,6 @@
 
 #include <ui/workbench/workbench.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
@@ -55,7 +53,7 @@ protected:
 Action* checkSender(QObject* sender)
 {
     auto result = qobject_cast<Action*>(sender);
-    NX_EXPECT(result, "Cause cannot be determined for non-Action senders.");
+    NX_ASSERT(result, "Cause cannot be determined for non-Action senders.");
     return result;
 }
 
@@ -63,7 +61,7 @@ bool checkType(const QVariant& items)
 {
     ActionParameterType type = ParameterTypes::type(items);
     const bool result = (type != OtherType);
-    NX_EXPECT(result, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
+    NX_ASSERT(result, lm("Unrecognized action target type '%1'.").arg(items.typeName()));
     return result;
 }
 
@@ -102,7 +100,7 @@ void Manager::setTargetProvider(TargetProvider* targetProvider)
 
 void Manager::registerAction(Action* action)
 {
-    NX_EXPECT(action);
+    NX_ASSERT(action);
     if (!action)
     {
         return;
@@ -113,7 +111,7 @@ void Manager::registerAction(Action* action)
 
     if (m_actionById.contains(action->id()))
     {
-        NX_EXPECT(false, lm("Action with id '%1' is already registered with this action manager.")
+        NX_ASSERT(false, lm("Action with id '%1' is already registered with this action manager.")
             .arg(action->id()));
         return;
     }
@@ -128,7 +126,7 @@ void Manager::registerAlias(IDType id, IDType targetId)
 {
     if (id == targetId)
     {
-        NX_EXPECT(false, "Action cannot be an alias of itself.");
+        NX_ASSERT(false, "Action cannot be an alias of itself.");
         return;
     }
 
@@ -136,7 +134,7 @@ void Manager::registerAlias(IDType id, IDType targetId)
     if (action && action->id() == id)
     {
         // Note that re-registration with different target is OK.
-        NX_EXPECT(false, lm("Id '%1' is already taken by non-alias action '%2'.")
+        NX_ASSERT(false, lm("Id '%1' is already taken by non-alias action '%2'.")
             .args(id, action->text()));
         return;
     }
@@ -144,7 +142,7 @@ void Manager::registerAlias(IDType id, IDType targetId)
     Action* targetAction = this->action(targetId);
     if (!targetAction)
     {
-        NX_EXPECT(false, lm("Action with id '%1' is not registered with this action manager.")
+        NX_ASSERT(false, lm("Action with id '%1' is not registered with this action manager.")
             .arg(targetId));
         return;
     }
@@ -184,15 +182,15 @@ void Manager::trigger(IDType id, const Parameters& parameters)
 bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
 {
     Action* action = m_actionById.value(id);
-    NX_EXPECT(action);
+    NX_ASSERT(action);
     if (!action)
         return false;
 
     if (action->checkCondition(action->scope(), parameters) != EnabledAction)
         return false;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
-    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
+    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
     action->trigger();
     return true;
 }
@@ -200,12 +198,12 @@ bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
 void Manager::triggerForced(IDType id, const Parameters& parameters)
 {
     Action* action = m_actionById.value(id);
-    NX_EXPECT(action);
+    NX_ASSERT(action);
     if (!action)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
-    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
+    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
     action->trigger();
 }
 
@@ -214,7 +212,7 @@ QMenu* Manager::integrateMenu(QMenu* menu, const Parameters& parameters)
     if (!menu)
         return nullptr;
 
-    NX_EXPECT(!m_parametersByMenu.contains(menu));
+    NX_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
 
@@ -245,7 +243,7 @@ QMenu* Manager::newMenu(
     CreationOptions options)
 {
     Action* rootAction = rootId == NoAction ? m_root : action(rootId);
-    NX_EXPECT(rootAction);
+    NX_ASSERT(rootAction);
     if (!rootAction)
         return nullptr;
 
@@ -401,7 +399,7 @@ Parameters Manager::currentParameters(Action* action) const
 
     if (!m_parametersByMenu.contains(m_lastClickedMenu))
     {
-        NX_EXPECT(false, "No active menu, no target exists.");
+        NX_ASSERT(false, "No active menu, no target exists.");
         return Parameters();
     }
 

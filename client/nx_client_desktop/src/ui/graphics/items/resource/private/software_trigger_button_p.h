@@ -11,15 +11,9 @@ class HoverFocusProcessor;
 class QnStyledTooltipWidget;
 class QTimer;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class BusyIndicatorGraphicsWidget;
-
-namespace ui {
-namespace graphics {
-
 class SoftwareTriggerButton;
 
 class SoftwareTriggerButtonPrivate: public QObject
@@ -102,8 +96,4 @@ private:
     QPixmap m_goToLivePixmapPressed;
 };
 
-} // namespace graphics
-} // namespace ui
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

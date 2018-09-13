@@ -32,10 +32,12 @@ static const float DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN = 30.0;
 const QString QnThirdPartyResource::AUX_DATA_PARAM_NAME = QLatin1String("aux_data");
 
 QnThirdPartyResource::QnThirdPartyResource(
+    QnMediaServerModule* serverModule,
     const nxcip::CameraInfo& camInfo,
     nxcip::BaseCameraManager* camManager,
     const nxcip_qt::CameraDiscoveryManager& discoveryManager )
-:
+    :
+    nx::mediaserver::resource::Camera(serverModule),
     m_camInfo( camInfo ),
     m_camManager( camManager ? new nxcip_qt::BaseCameraManager(camManager) : nullptr ),
     m_discoveryManager( discoveryManager ),
@@ -186,7 +188,7 @@ QnAbstractStreamDataProvider* QnThirdPartyResource::createLiveDataProvider()
     if( !m_camManager )
         return nullptr;
     m_camManager->getRef()->addRef();
-    auto result = new ThirdPartyStreamReader( toSharedPointer(this), m_camManager->getRef() );
+    auto result = new ThirdPartyStreamReader(toSharedPointer(this), m_camManager->getRef() );
     unsigned int camCapabilities = 0;
     if (m_camManager->getCameraCapabilities(&camCapabilities) == nxcip::NX_NO_ERROR)
         result->setNeedCorrectTime(camCapabilities & nxcip::BaseCameraManager::relativeTimestampCapability);
@@ -489,9 +491,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     if( result != nxcip::NX_NO_ERROR )
     {
         if( false )
-        NX_LOG( lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
+        NX_DEBUG(this, lit("Error getting camera info from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()));
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -502,9 +504,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     result = m_camManager->getEncoderCount( &m_encoderCount );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( lit("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
+        NX_DEBUG(this, lit("Error getting encoder count from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()));
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
@@ -512,8 +514,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
 
     if( m_encoderCount <= 0 )
     {
-        NX_LOG( lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
-            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
+            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)));
         m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -526,9 +528,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     result = m_camManager->getCameraCapabilities( &cameraCapabilities );
     if( result != nxcip::NX_NO_ERROR )
     {
-        NX_LOG( lit("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
+        NX_DEBUG(this, lit("Error reading camera capabilities from third-party camera %1:%2 (url %3). %4").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
+            arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()));
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
         return CameraDiagnostics::UnknownErrorResult();
     }
@@ -631,9 +633,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         }
         if( result != nxcip::NX_NO_ERROR )
         {
-            NX_LOG( lit("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
+            NX_DEBUG(this, lit("Failed to get resolution list of third-party camera %1:%2 encoder %3. %4").
                 arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
-                arg(encoderNumber).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
+                arg(encoderNumber).arg(m_camManager->getLastErrorString()));
             if( result == nxcip::NX_NOT_AUTHORIZED )
                 setStatus( Qn::Unauthorized );
             return CameraDiagnostics::CannotConfigureMediaStreamResult(lit("resolution"));
@@ -698,12 +700,12 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
                 bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
 
                 if (!success) {
-                    NX_LOG( lit("Error while parsing xml for the camera (third party) %1 %2 %3")
+                    NX_WARNING(this, lit("Error while parsing xml for the camera (third party) %1 %2 %3")
                         .arg(getVendor())
                         .arg(getModel())
-                        .arg(getPhysicalId()), cl_logWARNING);
+                        .arg(getPhysicalId()));
 
-                    NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
+                    NX_WARNING(this, lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)));
                 }
 
                 if (success)
@@ -712,7 +714,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
                     m_advancedParametersProvider.clear();
             }
             else {
-                NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );
+                NX_WARNING (this, lit("Could not validate camera parameters description xml"));
             }
         }
     }
@@ -756,8 +758,8 @@ bool QnThirdPartyResource::initializeIOPorts()
     nxcip::CameraRelayIOManager* camIOManager = m_camManager->getCameraRelayIOManager();
     if( !camIOManager )
     {
-        NX_LOG( lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
-            arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
+            arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)));
         setCameraCapability( Qn::RelayInputCapability, false );
         setCameraCapability( Qn::RelayOutputCapability, false );
         return false;

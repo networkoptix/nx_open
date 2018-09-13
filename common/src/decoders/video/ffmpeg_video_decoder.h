@@ -117,7 +117,6 @@ private:
     int m_forceSliceDecoding;
     // I have used vector instead map because of 2-3 elements is typical size
     typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
-    QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;

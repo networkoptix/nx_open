@@ -274,7 +274,7 @@ void ManualDeviceSearcher::updateProgress()
             if (!success || result.error != QnRestResult::NoError)
                 return;
 
-            NX_EXPECT(!m_searchProcessId.isNull());
+            NX_ASSERT(!m_searchProcessId.isNull());
 
             const auto reply = result.deserialized<QnManualCameraSearchReply>();
             setProgress(static_cast<QnManualResourceSearchStatus::State>(reply.status.state));

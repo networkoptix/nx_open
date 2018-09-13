@@ -10,13 +10,14 @@
 #include <camera/video_camera.h>
 #include <camera/camera_pool.h>
 #include <utils/common/sleep.h>
-#include <nx/streaming/rtsp_client.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 #include <recorder/recording_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/streaming/rtp/rtp.h>
+#include <media_server/media_server_module.h>
 
 using namespace nx::vms::api;
 
@@ -29,6 +30,7 @@ bool needSecondaryStream(MediaQuality q)
 
 static const int kTcpSendBlockSize = 1024 * 16;
 static const int kRtpTcpHeaderSize = 4;
+static const uint32_t kMetaDataSsrc = 40000;
 
 } // namespace
 
@@ -117,6 +119,12 @@ void QnRtspDataConsumer::setLastSendTime(qint64 time)
 {
     m_lastMediaTime = m_lastSendTime = time;
 }
+
+/**
+ * CSeq is a "Command sequence number". It is used to choose which packets to give out. Packets
+ * with the other CSeq (usually a small number of packets left from the previous command) will be
+ * ignored.
+ */
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 {
     QnMutexLocker lock( &m_mutex );
@@ -162,7 +170,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
 }
 
 void QnRtspDataConsumer::getEdgePackets(
-    const QnDataPacketQueue::RandomAccess& unsafeQueue,
+    const QnDataPacketQueue::RandomAccess<>& unsafeQueue,
     qint64& firstVTime,
     qint64& lastVTime,
     bool checkLQ) const
@@ -208,7 +216,7 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
 
 static const int MAX_DATA_QUEUE_SIZE = 120;
 
-void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch)
+void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch)
 {
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
@@ -324,129 +332,6 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
         m_newLiveQuality = liveQuality;
 }
 
-/*
-QnMediaContextPtr QnRtspDataConsumer::getGeneratedContext(AVCodecID compressionType)
-{
-    QMap<AVCodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
-    if (itr != m_generatedContext.end())
-        return itr.value();
-    QnMediaContextPtr result(new QnMediaContext(compressionType));
-    AVCodecContext* ctx = result->ctx();
-    m_generatedContext.insert(compressionType, result);
-    return result;
-}
-
-void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel)
-{
-    quint16 flags = media->flags;
-    int cseq = media->opaque;
-
-    if (m_owner->isLiveDP(media->dataProvider)) {
-        flags |= QnAbstractMediaData::MediaFlags_LIVE;
-        cseq = m_liveMarker;
-    }
-    if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        m_ctxSended.clear();
-
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (isLive) {
-        if (!m_gotLivePacket)
-            flags |= QnAbstractMediaData::MediaFlags_BOF;
-        m_gotLivePacket = true;
-    }
-
-
-    // one video channel may has several subchannels (video combined with frames from difference codecContext)
-    // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
-
-    quint32 ssrc = BASIC_FFMPEG_SSRC + media->channelNumber * MAX_CONTEXTS_AT_VIDEO*2;
-
-    ssrc += media->subChannelNumber*2;
-    int subChannelNumber = media->subChannelNumber;
-
-    QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(media);
-
-    if (!metadata && media->compressionType)
-    {
-        QList<QnMediaContextPtr>& ctxData = m_ctxSended[media->channelNumber];
-        while (ctxData.size() <= subChannelNumber)
-            ctxData << QnMediaContextPtr(0);
-
-        QnMediaContextPtr currentContext = media->context;
-        if (currentContext == 0)
-            currentContext = getGeneratedContext(media->compressionType);
-        int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
-        if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
-        {
-            ctxData[subChannelNumber] = currentContext;
-            QByteArray codecCtxData;
-            QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &codecCtxData);
-            buildRtspTcpHeader(rtpTcpChannel, ssrc + 1, codecCtxData.size(), true, 0, RTP_FFMPEG_GENERIC_CODE); // ssrc+1 - switch data subchannel to context subchannel
-            sendBuffer.write(m_rtspTcpHeader, rtpHeaderSize);
-            NX_ASSERT(!codecCtxData.isEmpty());
-            m_owner->bufferData(codecCtxData);
-        }
-    }
-
-    // send data with RTP headers
-    QnCompressedVideoData *video = media.dynamicCast<QnCompressedVideoData>().data();
-    const char* curData = media->data.data();
-    int sendLen = 0;
-    int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
-    if (video)
-        ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
-    else if (metadata)
-        ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
-
-    if (m_lastSendTime != DATETIME_NOW)
-        m_lastSendTime = media->timestamp;
-    m_lastMediaTime = media->timestamp;
-
-    m_mutex.unlock();
-
-    for (int dataRest = media->data.size(); dataRest > 0 || ffHeaderSize; dataRest -= sendLen)
-    {
-        while (m_pauseNetwork && !m_needStop)
-        {
-            QnSleep::msleep(1);
-        }
-
-        sendLen = qMin(MAX_RTSP_DATA_LEN - ffHeaderSize, dataRest);
-        buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QnMutexLocker lock( &m_owner->getSockMutex() );
-        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-        if (ffHeaderSize)
-        {
-            quint8 packetType = media->dataType;
-            m_owner->bufferData((const char*) &packetType, 1);
-            quint32 timestampHigh = htonl(media->timestamp >> 32);
-            m_owner->bufferData((const char*) &timestampHigh, 4);
-            quint8 cseq8 = cseq;
-            m_owner->bufferData((const char*) &cseq8, 1);
-            flags = htons(flags);
-            m_owner->bufferData((const char*) &flags, 2);
-            if (video)
-            {
-                quint32 videoHeader = htonl(video->data.size() & 0x00ffffff);
-                m_owner->bufferData(((const char*) &videoHeader)+1, 3);
-            }
-            else if (metadata) {
-                quint32 metadataHeader = htonl(metadata->m_duration/1000);
-                m_owner->bufferData((const char*) &metadataHeader, 4);
-            }
-            ffHeaderSize = 0;
-        }
-
-        if(sendLen > 0)
-            m_owner->bufferData(curData, sendLen);
-        curData += sendLen;
-
-        m_owner->sendBuffer();
-        m_owner->clearBuffer();
-    }
-}
-*/
-
 void QnRtspDataConsumer::setStreamingSpeed(int speed)
 {
     NX_ASSERT( speed > 0 );
@@ -481,7 +366,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize);
         char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
         m_sendBuffer.resize(m_sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE);
-        QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetaDataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
         if (m_owner->isTcpMode())
@@ -513,7 +398,7 @@ QByteArray QnRtspDataConsumer::getRangeHeaderIfChanged()
     if (!archiveDP)
         return QByteArray();
     qint64 endTime = archiveDP->endTime();
-    if (QnRecordingManager::instance()->isCameraRecoring(archiveDP->getResource()))
+    if (m_owner->serverModule()->recordingManager()->isCameraRecoring(archiveDP->getResource()))
         endTime = DATETIME_NOW;
 
     if (archiveDP->startTime() != m_prevStartTime || endTime != m_prevEndTime) {
@@ -549,7 +434,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::GENERIC_METADATA:
             return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
         default:
-            NX_ASSERT(0, "Unexpected data type");
+            NX_ASSERT(false, "Unexpected data type");
             return true;
     }
 }
@@ -567,7 +452,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
 
-    const auto flushBuffer = makeScopeGuard(
+    const auto flushBuffer = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
@@ -614,10 +499,36 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
         if (isLive)
         {
-            if (!needSecondaryStream(m_liveQuality) && isSecondaryProvider)
-                return true; // data for other live quality stream
-            else if (needSecondaryStream(m_liveQuality) && !isSecondaryProvider)
-                return true; // data for other live quality stream
+            if (media->channelNumber >= 0 && media->channelNumber < CL_MAX_CHANNELS)
+            {
+                m_lastLiveFrameTime[media->channelNumber][isSecondaryProvider ? 1 : 0] =
+                    qnSyncTime->currentUSecsSinceEpoch();
+            }
+
+            MediaQuality currentQuality = m_currentQuality[media->channelNumber];
+            MediaQuality prefferredQuality = preferredLiveStreamQuality(media->channelNumber);
+
+            // Switching quality only if the current frame is a key frame.
+            if (prefferredQuality != m_currentQuality[media->channelNumber] && isKeyFrame)
+                m_currentQuality[media->channelNumber] = prefferredQuality;
+
+            const bool isCurrentQualityLow =
+                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_Low;
+            const bool isCurrentQualityHigh =
+                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_High;
+
+            const bool isMediaFrameQualityAppropriate =
+                (isCurrentQualityLow && isSecondaryProvider)
+                || (isCurrentQualityHigh && !isSecondaryProvider);
+
+            if (!isMediaFrameQualityAppropriate)
+                return true; //< Skip this frame.
+
+            // Live stream has just been started. Let's wait for the first key frame before switch.
+            if (!m_isLive && !isKeyFrame)
+                return true;
+
+            m_isLive = true;
 
             if (isVideo)
             {
@@ -632,6 +543,10 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 }
             }
         }
+        else
+        {
+            m_isLive = false;
+        }
     }
 
     int trackNum = media->channelNumber;
@@ -641,7 +556,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     if (trackInfo == nullptr || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
-    QnRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
+    AbstractRtspEncoderPtr codecEncoder = trackInfo->getEncoder();
     if (!codecEncoder)
         return true; // skip data (for example audio is disabled)
     {
@@ -682,7 +597,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.data());
+    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.get());
     if (ffmpegEncoder)
     {
         ffmpegEncoder->setAdditionFlags(0);
@@ -698,9 +613,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     codecEncoder->setDataPacket(media);
     if (trackInfo->firstRtpTime == -1)
         trackInfo->firstRtpTime = media->timestamp;
-    static AVRational r = {1, 1000000};
-    AVRational time_base = {1, (int)codecEncoder->getFrequency() };
-
     m_owner->notifyMediaRangeUsed(media->timestamp);
 
     while(!m_needStop)
@@ -717,6 +629,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
+
         if (m_waitSCeq != -1)
         {
             m_sendBuffer.clear(); //< New seek is received.
@@ -724,15 +637,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
 
         bool isRtcp = false;
-        if (codecEncoder->isRtpHeaderExists())
-        {
-            RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
-            isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
-        }
-        else {
-            const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-            QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++);
-        }
+        RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
+        isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
 
         if (m_owner->isTcpMode())
         {
@@ -777,6 +683,40 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
+/**
+ * Determines preferred stream quality for the live stream. Result depends on the stream quality,
+ * desired by the user and on the corresponding camera stream state. If, for example, user-desired
+ * quality is Hi, but the primary stream reader is idle we return LowQuality as a result.
+ */
+MediaQuality QnRtspDataConsumer::preferredLiveStreamQuality(int channelNumber) const
+{
+    const auto kMaxTimeFromPreviousFrameUs = 1 * 1000 * 1000;
+    auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
+    const bool isPrimaryStreamReaderOpened =
+        m_lastLiveFrameTime[channelNumber][0] > nowUs - kMaxTimeFromPreviousFrameUs;
+
+    const bool isSecondaryStreamReaderOpened =
+        m_lastLiveFrameTime[channelNumber][1] > nowUs - kMaxTimeFromPreviousFrameUs;
+
+    MediaQuality prefferredQuality = MEDIA_Quality_None;
+    if (!needSecondaryStream(m_liveQuality))
+    {
+        if (isPrimaryStreamReaderOpened)
+            prefferredQuality = MediaQuality::MEDIA_Quality_High;
+        else
+            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
+    }
+    else
+    {
+        if (isSecondaryStreamReaderOpened)
+            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
+        else
+            prefferredQuality = MediaQuality::MEDIA_Quality_High;
+    }
+
+    return prefferredQuality;
+}
+
 void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
 {
     int bytesRead = 0;
@@ -812,14 +752,13 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
     QnVideoCameraPtr camera,
     bool usePrimaryStream,
     qint64 skipTime,
-    quint32 cseq,
     bool iFramesOnly)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     int copySize = 0;
     if (camera) // && !res->hasFlags(Qn::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq, iFramesOnly);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

@@ -95,11 +95,10 @@ QnConstResourceAudioLayoutPtr QnSyncPlayArchiveDelegate::getAudioLayout()
     return m_ownerDelegate->getAudioLayout();
 }
 
-AVCodecContext* QnSyncPlayArchiveDelegate::setAudioChannel(int num)
+bool QnSyncPlayArchiveDelegate::setAudioChannel(unsigned num)
 {
     // play synchronized movies without audio // ??
-    m_ownerDelegate->setAudioChannel(num);
-    return 0;
+    return m_ownerDelegate->setAudioChannel(num);
 }
 
 QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()

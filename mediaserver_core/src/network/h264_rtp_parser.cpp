@@ -254,44 +254,12 @@ bool CLH264RtpParser::clearInternalBuffer()
     return false;
 }
 
-bool CLH264RtpParser::isIFrame(const quint8* data, int dataLen) const
-{
-    if (dataLen < 2)
-        return false;
-
-    quint8 nalType = *data & 0x1f;
-    bool isSlice = isSliceNal(nalType);
-    if (!isSlice)
-        return false;
-
-    if (nalType == nuSliceIDR)
-        return true;
-
-    BitStreamReader bitReader;
-    bitReader.setBuffer(data+1, data + dataLen);
-    try
-    {
-        //extract first_mb_in_slice
-        NALUnit::extractUEGolombCode(bitReader);
-
-        int slice_type = NALUnit::extractUEGolombCode(bitReader);
-        if (slice_type >= 5)
-            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
-
-        return (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE);
-    }
-    catch (...)
-    {
-        return false;
-    }
-}
-
 bool CLH264RtpParser::isFirstSliceNal(
     const quint8 nalType,
     const quint8* data,
     int dataLen ) const
 {
-    bool isSlice = isSliceNal(nalType);
+    bool isSlice = NALUnit::isSliceNal(nalType);
     if(!isSlice)
         return false;
 
@@ -322,7 +290,7 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
             m_builtinSpsFound = true;
         else if (nalUnitType == nuPPS)
             m_builtinPpsFound = true;
-        else if (isSliceNal(nalUnitType))
+        else if (NALUnit::isSliceNal(nalUnitType))
         {
             m_frameExists = true;
             if (nalUnitType == nuSliceIDR)
@@ -334,7 +302,7 @@ void CLH264RtpParser::updateNalFlags(const quint8* data, int dataLen)
                         ++m_idrCounter;
                 }
             }
-            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && isIFrame(data, dataLen))
+            else if (m_idrCounter < kMinIdrCountToDetectIFrameByIdr && NALUnit::isIFrame(data, dataLen))
             {
                 m_keyDataExists = true;
             }
@@ -385,12 +353,7 @@ bool CLH264RtpParser::isPacketStartsNewFrame(
     }
 
     auto nalUnitType = *curPtr & 0x1f;
-    return !isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
-}
-
-bool CLH264RtpParser::isSliceNal(quint8 nalUnitType) const
-{
-    return nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
+    return !NALUnit::isSliceNal(nalUnitType) || isFirstSliceNal(nalUnitType, curPtr, nalLen);
 }
 
 bool CLH264RtpParser::processData(
@@ -431,7 +394,7 @@ bool CLH264RtpParser::processData(
 
     if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
-        NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
+        NX_WARNING(this, "Too large RTP/H.264 frame. Truncate video buffer");
         clearInternalBuffer();
         isPacketLost = true;
     }
@@ -439,14 +402,14 @@ bool CLH264RtpParser::processData(
     auto processPacketLost = [this, sequenceNum]()
     {
         if (m_timeHelper) {
-            NX_LOG(QString(
+            NX_WARNING(this, QString(
                 lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
-                .arg(m_timeHelper->getResID())
+                .arg(m_timeHelper->getResourceId())
                 .arg(m_prevSequenceNum)
-                .arg(sequenceNum), cl_logWARNING);
+                .arg(sequenceNum));
         }
         else {
-            NX_LOG("RTP Packet loss detected!!!!", cl_logWARNING);
+            NX_WARNING(this, "RTP Packet loss detected!!!!");
         }
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
@@ -565,7 +528,7 @@ bool CLH264RtpParser::processData(
         case MTAP24_PACKET:
         {
             // Not implemented
-            NX_LOG("Got MTAP packet. Not implemented yet", cl_logWARNING);
+            NX_WARNING(this, "Got MTAP packet. Not implemented yet");
             return clearInternalBuffer();
         }
         default:

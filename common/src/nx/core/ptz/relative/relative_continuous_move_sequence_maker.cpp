@@ -91,8 +91,7 @@ TimedCommand makeComponentCommand(
         milliseconds((int)(length * cycleDuration.count() + 0.5))
         - (accelerationTime + decelerationTime) / 2;
 
-    const milliseconds commandDuration = fullSpeedMovementTime
-        + accelerationTime;
+    const milliseconds commandDuration = fullSpeedMovementTime + accelerationTime;
 
     ptz::Vector command;
     command.setComponent((value > 0) ? speed : -speed, componentType);
@@ -114,7 +113,7 @@ CommandSequence makeCommandSequence(
     };
 
     std::map<double, CommandSequence> commandBySpeed;
-    for (const auto& component : kComponents)
+    for (const auto& component: kComponents)
     {
         const auto value = *component.first;
         if (qFuzzyIsNull(value))

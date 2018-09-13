@@ -66,7 +66,8 @@ void commonHooks(EndpointAdditionalInfo* outInfo)
         name = manufacturer;
         manufacturer = lit("DLink");
     }
-    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("sd8363")))
+    else if (lowerName == lit("networkcamera") &&
+        (manufacturer.toLower().startsWith(lit("sd8363")) || manufacturer.toLower().startsWith(lit("fd8"))))
     {
         name = manufacturer;
         manufacturer = lit("VIVOTEK");

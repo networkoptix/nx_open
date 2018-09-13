@@ -42,10 +42,11 @@ static QByteArray extractWord(int index, const QByteArray& rawData)
 
 } // namespace
 
-QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    SearchAutoHandler(kUpnpBasicDeviceType)
+QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    SearchAutoHandler(kUpnpBasicDeviceType),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
     NX_DEBUG(this, "Constructed");
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
@@ -70,7 +71,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(const QnUuid &resourceType
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
+    result = QnVirtualCameraResourcePtr(new QnPlIsdResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
     NX_DEBUG(this, lm("Create resource with type %1").arg(resourceTypeId));
@@ -234,7 +235,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         return QList<QnResourcePtr>();
     }
 
-    QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
+    QnPlIsdResourcePtr resource (new QnPlIsdResource(serverModule()));
     auto isDW = resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL);
 
     vendor = isDW ? kDwFullVendorName : vendor;
@@ -246,7 +247,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     resource->setVendor(vendor);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(nx::network::QnMacAddress(mac));
+    resource->setMAC(nx::utils::MacAddress(mac));
     resource->setDefaultAuth(auth);
     if (port == 80)
         resource->setHostAddress(host);
@@ -364,10 +365,10 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
             return QnResourcePtr(); // already found;
     }
 
-    QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
+    QnPlIsdResourcePtr resource (new QnPlIsdResource(serverModule()));
 
     QAuthenticator cameraAuth;
-    if (auto existingRes = resourcePool()->getResourceByMacAddress( smac ) )
+    if (auto existingRes = serverModule()->resourcePool()->getResourceByMacAddress( smac ) )
         cameraAuth = existingRes->getAuth();
 
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
@@ -391,7 +392,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(nx::network::QnMacAddress(smac));
+    resource->setMAC(nx::utils::MacAddress(smac));
 
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -443,9 +444,9 @@ bool QnPlISDResourceSearcher::processPacket(
     NX_VERBOSE(this, lm("UPnP from %1 vendor: %2, model: %3").args(
         deviceEndpoint, devInfo.manufacturer, devInfo.modelName));
 
-    nx::network::QnMacAddress cameraMAC(devInfo.serialNumber);
+    nx::utils::MacAddress cameraMAC(devInfo.serialNumber);
     QString model(devInfo.modelName);
-    QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress( devInfo.serialNumber );
+    QnNetworkResourcePtr existingRes = serverModule()->resourcePool()->getResourceByMacAddress(devInfo.serialNumber);
     QAuthenticator cameraAuth;
 
     if ( existingRes )
@@ -497,7 +498,7 @@ bool QnPlISDResourceSearcher::processPacket(
 
 void QnPlISDResourceSearcher::createResource(
     const nx::network::upnp::DeviceInfo& devInfo,
-    const nx::network::QnMacAddress& mac,
+    const nx::utils::MacAddress& mac,
     const QAuthenticator& auth,
     QnResourceList& result )
 {
@@ -531,7 +532,7 @@ void QnPlISDResourceSearcher::createResource(
         lit("ISD-") + devInfo.modelName :
         devInfo.modelName;
 
-    QnPlIsdResourcePtr resource( new QnPlIsdResource() );
+    QnPlIsdResourcePtr resource(new QnPlIsdResource(serverModule()));
 
     resource->setTypeId(rt);
     resource->setVendor(vendor);

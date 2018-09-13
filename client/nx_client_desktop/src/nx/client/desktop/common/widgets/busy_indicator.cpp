@@ -13,7 +13,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BusyIndicatorBase
 
 BusyIndicatorBase::BusyIndicatorBase(QObject* parent) :
@@ -28,7 +28,7 @@ BusyIndicatorBase::~BusyIndicatorBase()
 {
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BusyIndicator::Private
 
 struct BusyIndicator::Private
@@ -102,7 +102,7 @@ public:
     QSize indicatorSize;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BusyIndicator
 
 BusyIndicator::BusyIndicator(QObject* parent) :
@@ -315,7 +315,7 @@ void BusyIndicator::tick(int deltaMs)
     emit updated();
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BusyIndicatorWidget
 
 BusyIndicatorWidget::BusyIndicatorWidget(QWidget* parent):
@@ -413,7 +413,7 @@ QRect BusyIndicatorWidget::indicatorRect() const
         m_indicator->size(), contentsRect());
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // BusyIndicatorGraphicsWidget
 
 BusyIndicatorGraphicsWidget::BusyIndicatorGraphicsWidget(

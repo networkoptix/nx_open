@@ -20,8 +20,10 @@ struct QnPtzData {
     QnPtzData() {}
     QnPtzData(Qn::PtzDataFields query, Qn::PtzDataFields fields): query(query), fields(fields) {}
 
-    Qn::PtzDataFields query;    /**< Fields that were queried from the underlying PTZ controller to fill this data object. */
-    Qn::PtzDataFields fields;   /**< Fields that are valid in this data object. */
+    /** Fields that were queried from the underlying PTZ controller to fill this data object. */
+    Qn::PtzDataFields query;
+    /** Fields that are valid in this data object. */
+    Qn::PtzDataFields fields;
     Ptz::Capabilities capabilities;
     nx::core::ptz::Vector logicalPosition;
     nx::core::ptz::Vector devicePosition;
@@ -34,7 +36,8 @@ struct QnPtzData {
     QnPtzObject homeObject;
     QnPtzAuxilaryTraitList auxilaryTraits;
 };
-#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
+#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)\
+    (logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
 
 Q_DECLARE_METATYPE(QnPtzData)
 

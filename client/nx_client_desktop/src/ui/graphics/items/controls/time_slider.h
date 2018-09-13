@@ -250,7 +250,7 @@ public:
 
     bool positionMarkerVisible() const;
 
-    QGraphicsItem * screenshotCursor();
+    QGraphicsItem* screenshotCursor();
     // Used when exact position is available and the cursor is definitely visible.
     void showScreenshotCursor(QPointF screenPosition, bool lazy = false);
     // Deduces cursor visibility and position quering mouse coordinates. Lazy.

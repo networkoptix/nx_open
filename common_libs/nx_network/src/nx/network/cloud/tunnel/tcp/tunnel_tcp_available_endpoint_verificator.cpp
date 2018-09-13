@@ -9,7 +9,7 @@ namespace cloud {
 namespace tcp {
 
 AvailableEndpointVerificator::AvailableEndpointVerificator(
-    const nx::String& connectSessionId)
+    const std::string& connectSessionId)
     :
     m_connectSessionId(connectSessionId)
 {

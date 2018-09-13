@@ -124,7 +124,7 @@ private:
     QnLiveStreamParams m_parameters;
 };
 
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 template<typename ApiProvider>
 ApiAdvancedParametersProvider<ApiProvider>::ApiAdvancedParametersProvider(ApiProvider* api)

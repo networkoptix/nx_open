@@ -35,7 +35,6 @@
 #include <update/media_server_update_tool.h>
 #include <update/low_free_space_warning.h>
 #include <utils/applauncher_utils.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include <nx/network/app_info.h>
@@ -164,11 +163,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     connect(m_updateTool, &QnMediaServerUpdateTool::updatesCheckCanceled,
         this, &QnServerUpdatesWidget::at_tool_updatesCheckCanceled);
 
-    setWarningStyle(ui->errorLabel);
     setWarningStyle(ui->longUpdateWarning);
-
-    ui->infoStackedWidget->setCurrentWidget(ui->errorPage);
-    ui->errorLabel->setText(QString());
 
     ui->dayWarningBanner->setBackgroundRole(QPalette::AlternateBase);
     ui->dayWarningLabel->setForegroundRole(QPalette::Text);
@@ -179,7 +174,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 
     ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
     ui->releaseDescriptionLabel->setText(QString());
-    ui->releaseDescriptionLabel->setVisible(false);
+    ui->infoWidget->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -220,6 +215,8 @@ QnServerUpdatesWidget::~QnServerUpdatesWidget()
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)
 {
     m_updateTool->cancelUpdatesCheck();
+    // Cleaning release notes. There can be quite a lot of text and it affects UI size.
+    ui->releaseDescriptionLabel->setText(QString());
     return true;
 }
 
@@ -398,8 +395,7 @@ void QnServerUpdatesWidget::updateVersionPage()
         ? ui->latestVersionPage
         : ui->versionPage);
 
-    if (hasLatestVersion)
-        ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
+    ui->infoWidget->setVisible(!hasLatestVersion);
 }
 
 bool QnServerUpdatesWidget::cancelUpdate()
@@ -522,7 +518,7 @@ bool QnServerUpdatesWidget::beginChecking()
     ui->selectUpdateTypeButton->setEnabled(false);
     ui->targetVersionLabel->setPalette(palette());
     ui->versionStackedWidget->setCurrentWidget(ui->checkingPage);
-    ui->errorLabel->setText(QString());
+    ui->infoWidget->setVisible(false);
 
     return true;
 }
@@ -544,6 +540,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     ui->downloadButton->setEnabled(true);
 
     m_updatesModel->setCheckResult(result);
+    ui->infoWidget->setVisible(true);
 
     const auto displayVersion = result.version.isNull()
         ? m_latestVersion
@@ -552,7 +549,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     QString detail;
     auto versionText = displayVersion.isNull() ? kNoVersionNumberText : displayVersion.toString();
 
-    setWarningStyle(ui->errorLabel);
+    setWarningStyle(ui->releaseNotesLabel);
 
     switch (result.result)
     {
@@ -564,7 +561,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         }
 
         case QnCheckForUpdateResult::NoNewerVersion:
-            setPaletteColor(ui->errorLabel, QPalette::WindowText, qnGlobals->successTextColor());
+            setPaletteColor(ui->releaseNotesLabel, QPalette::WindowText, qnGlobals->successTextColor());
             detail = m_targetVersion.isNull()
                 ? tr("All components in your System are up to date.")
                 : tr("All components in your System are up to this version.");
@@ -614,14 +611,22 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             NX_ASSERT(false); // should never get here
     }
 
-    ui->errorLabel->setText(detail);
-    ui->infoStackedWidget->setCurrentWidget(detail.isEmpty() ? ui->releaseNotesPage : ui->errorPage);
-
     m_releaseNotesUrl = result.releaseNotesUrl;
-    ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
 
-    ui->releaseDescriptionLabel->setText(result.description);
-    ui->releaseDescriptionLabel->setVisible(!result.description.isEmpty());
+    if (detail.isEmpty())
+    {
+        resetStyle(ui->releaseNotesLabel);
+        ui->releaseNotesLabel->setVisible(!m_releaseNotesUrl.isEmpty());
+        ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+        ui->releaseDescriptionLabel->setText(result.description);
+    }
+    else
+    {
+        // Got some error here
+        ui->releaseNotesLabel->setVisible(true);
+        ui->releaseNotesLabel->setText(detail);
+        ui->releaseDescriptionLabel->setText(QString());
+    }
 
     ui->targetVersionLabel->setText(versionText);
 
@@ -632,12 +637,14 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
 bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& version)
 {
+    using namespace applauncher::api;
+
     /* Try to run applauncher if it is not running. */
-    if (!applauncher::checkOnline())
+    if (!checkOnline())
         return false;
 
-    const auto result = applauncher::restartClient(version);
-    if (result == applauncher::api::ResultType::ok)
+    const auto result = restartClient(version);
+    if (result == ResultType::ok)
         return true;
 
     static const int kMaxTries = 5;
@@ -645,7 +652,7 @@ bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& vers
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::restartClient(version) == applauncher::api::ResultType::ok)
+        if (applauncher::api::restartClient(version) == ResultType::ok)
             return true;
     }
     return false;
@@ -891,7 +898,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     else
                     {
                         qApp->exit(0);
-                        applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), kProcessTerminateTimeoutMs);
+                        applauncher::api::scheduleProcessKill(QCoreApplication::applicationPid(),
+                            kProcessTerminateTimeoutMs);
                     }
                 }
 

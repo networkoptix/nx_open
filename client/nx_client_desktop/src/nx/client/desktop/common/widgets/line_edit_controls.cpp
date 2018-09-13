@@ -23,7 +23,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // LineEditControls::Private.
 
 struct LineEditControls::Private
@@ -235,7 +235,7 @@ struct LineEditControls::Private
     QnDisconnectHelperPtr disconnectHelper = QnDisconnectHelper::create();
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // LineEditControls.
 
 LineEditControls::LineEditControls(QLineEdit* lineEdit):

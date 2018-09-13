@@ -34,6 +34,8 @@ public:
 
     QnRestResult::Error prevMergeResult() const;
 
+    std::vector<std::unique_ptr<PeerWrapper>> takeServers();
+
 private:
     QString m_tmpDir;
     std::vector<std::unique_ptr<PeerWrapper>> m_servers;

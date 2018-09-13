@@ -42,7 +42,7 @@ bool MediaStreamCache::canAcceptData() const
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     std::vector<std::function<void()>> eventsToDeliver;
-    auto eventsToDeliverGuard = makeScopeGuard(
+    auto eventsToDeliverGuard = nx::utils::makeScopeGuard(
         [&eventsToDeliver, this]()
         {
             for (auto& deliverEvent: eventsToDeliver)
@@ -53,8 +53,8 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.get());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
-    NX_LOG(lit("HLS. MediaStreamCache. got frame %1, is_key_frame=%2").
-        arg(data->timestamp).arg(isKeyFrame), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("HLS. MediaStreamCache. got frame %1, is_key_frame=%2").
+        arg(data->timestamp).arg(isKeyFrame));
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
 

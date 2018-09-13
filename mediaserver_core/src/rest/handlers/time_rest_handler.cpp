@@ -33,5 +33,5 @@ int QnTimeRestHandler::executeGet(
     reply.realm = nx::network::AppInfo::realm();
 
     result.setReply(reply);
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

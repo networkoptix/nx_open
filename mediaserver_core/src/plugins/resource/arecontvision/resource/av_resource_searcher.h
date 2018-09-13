@@ -1,21 +1,22 @@
-#ifndef av_device_server_h_2107
-#define av_device_server_h_2107
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/resource/arecontvision/resource/av_resource.h"
-
+#include <nx/mediaserver/server_module_aware.h>
 #include <array>
 
 class QnCommonModule;
 
-class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlArecontResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     typedef std::array<unsigned char, 6> MacArray;
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnPlArecontResourceSearcher(QnCommonModule* commonModule);
+    QnPlArecontResourceSearcher(QnMediaServerModule* serverModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
         const QnResourceParams& params) override;
@@ -35,5 +36,3 @@ private:
 };
 
 #endif  // ENABLE_ARECONT
-
-#endif

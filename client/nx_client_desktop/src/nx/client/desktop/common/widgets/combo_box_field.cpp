@@ -127,13 +127,13 @@ bool ComboBoxField::setRowHidden(int index, bool value)
     const auto listView = qobject_cast<QListView*>(combobox()->view());
     if (!listView)
     {
-        NX_EXPECT(false, "Invalid item view delegate");
+        NX_ASSERT(false, "Invalid item view delegate");
         return false;
     }
 
     if (!qBetween(0, index, combobox()->count()))
     {
-        NX_EXPECT(false, "Invalid index value");
+        NX_ASSERT(false, "Invalid index value");
         return false;
     }
 

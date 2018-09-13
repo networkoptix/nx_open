@@ -1,4 +1,4 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 
 #include <algorithm>
 #include <cstring>
@@ -98,7 +98,7 @@ TEST(debug, assertFailureInRelease)
         static const bool condition = true;
     #endif
 
-    NX_KIT_ASSERT(condition, "This and the previous assertions should fail in Debug.");
+    NX_KIT_ASSERT(condition, "This and the next assertions should fail in Debug.");
     NX_KIT_ASSERT(condition);
 }
 

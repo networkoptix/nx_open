@@ -71,10 +71,12 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
     QnCommonModule* commonModule,
-    peer_selection::AbstractPeerSelectorPtr peerSelector)
+    peer_selection::AbstractPeerSelectorPtr peerSelector,
+    bool isClient)
     :
     QnCommonModuleAware(commonModule),
-    m_peerSelector(std::move(peerSelector))
+    m_peerSelector(std::move(peerSelector)),
+    m_isClient(isClient)
 {
 }
 
@@ -124,6 +126,9 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
 
 bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
 {
+    // Note: peerId can be a client id..
+    if (m_isClient)
+        return true;
     const auto& server = getServer(peerId);
     NX_ASSERT(server);
     if (!server)

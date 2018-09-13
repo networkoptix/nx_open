@@ -104,9 +104,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
 enum class BackupType
 {
-    manual,
-    realtime,
-    scheduled
+    manual = 0,
+    realtime = 1,
+    scheduled = 2
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
 
@@ -133,11 +133,11 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamDataFilter)
 } // namespace vms
 } // namespace nx
 
-API_DECLARE_TYPE(CameraStatusFlag)
-API_DECLARE_TYPE(CameraStatusFlags)
-API_DECLARE_TYPE(CameraBackupQuality)
-API_DECLARE_TYPE(CameraBackupQualities)
-API_DECLARE_TYPE(ServerFlag)
-API_DECLARE_TYPE(ServerFlags)
-API_DECLARE_TYPE(StreamDataFilter)
-API_DECLARE_TYPE(StreamDataFilters)
+NX_VMS_API_DECLARE_TYPE(CameraStatusFlag)
+NX_VMS_API_DECLARE_TYPE(CameraStatusFlags)
+NX_VMS_API_DECLARE_TYPE(CameraBackupQuality)
+NX_VMS_API_DECLARE_TYPE(CameraBackupQualities)
+NX_VMS_API_DECLARE_TYPE(ServerFlag)
+NX_VMS_API_DECLARE_TYPE(ServerFlags)
+NX_VMS_API_DECLARE_TYPE(StreamDataFilter)
+NX_VMS_API_DECLARE_TYPE(StreamDataFilters)

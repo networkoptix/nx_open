@@ -34,6 +34,7 @@
         <?define clientRegPath = "Software\${company.name}\${client.name}"?>
         <?define nxtoolName = "${nxtool.name}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
+        <?define trayToolName = "${traytool.name}"?>
         <?define productName = "${display.product.name}"?>
         <?define applauncherName = "${applauncher.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
@@ -45,7 +46,6 @@
         <?define clientExeName = "${display.product.name}"?>
         <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
 
-        <?define mirrorListUrl = "${mirrorListUrl}"?>
         <?define quicksync = "${quicksync}"?>
         <?define defaultTranslation = "${defaultTranslation}"?>
         <?define companyInstallPath = "${windowsInstallPath}"?>

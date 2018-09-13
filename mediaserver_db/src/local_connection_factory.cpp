@@ -30,6 +30,7 @@
 #include <rest/handlers/ec2_update_http_handler.h>
 #include "rest/server/rest_connection_processor.h"
 #include "rest/request_type_wrappers.h"
+#include "client_registrar.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
@@ -97,6 +98,10 @@ LocalConnectionFactory::LocalConnectionFactory(
     }
 
     m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
+
+    m_clientRegistrar = std::make_unique<ClientRegistrar>(
+        m_bus.get(),
+        commonModule->runtimeInfoManager());
 
     m_dbManager->setTransactionLog(m_transactionLog.get());
 
@@ -170,7 +175,7 @@ void LocalConnectionFactory::registerTransactionListener(
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+            "*", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
@@ -708,6 +713,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
      *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
      *     supported for certain cameras). If omitted, return data for all cameras.
+     * %param[opt]:boolean showDesktopCameras Whether desktop cameras should be listed. False by
+     *     default.
      * %return List of camera information objects in the requested format.
      *     %// From struct ApiResourceData:
      *     %param id Camera unique id.
@@ -831,12 +838,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         such information as full ONVIF URL, camera maximum FPS, etc.
      * %// AbstractCameraManager::getCamerasEx
      */
-    regGet<QnCameraUuid, CameraDataExList>(p, ApiCommand::getCamerasEx);
+    regGet<QnCameraDataExQuery, CameraDataExList>(p, ApiCommand::getCamerasEx);
 
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
      * %param[default] format
-     * %param[opt] id Parent server unique id. If omitted, return storages for all servers.
+     * %param[opt]:uuid id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
      *     %param id Storage unique id.
      *     %param parentId Id of a server to which the storage belongs.
@@ -940,7 +947,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %//param eventCondition.metadata (object) Imposes filtering based on the event
      *             metadata fields. The object contains the following fields:
      *             %//param eventCondition.metadata.cameraRefs cameraRefs (list of strings) Camera
-     *                 ids. Empty means any.
+     *                 id list. Empty means any. Camera id can be obtained from "id", "physicalId"
+     *                 or "logicalId" field via request '/ec2/getCamerasEx'.
+     *
      *     %param eventState One of the fixed values.
      *         %value inactive
      *         %value active
@@ -1301,7 +1310,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt] id Layout unique ID or logical ID. If omitted, return data for all layouts.
+     * %param[opt]:string id Layout unique ID or logical ID. If omitted, return data for all layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
@@ -1339,8 +1348,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
@@ -1408,8 +1417,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].rotation Degree of image tilt; a positive value rotates
      *         counter-clockwise (floating-point, 0..360).
      *     %param items[].resourceId Camera unique id.
-     *     %param items[].resourcePath If the item represents a local file - URL of
-     *         the file, otherwise is empty.
+     *     %param items[].resourcePath If the item represents a local file - URL of the file,
+     *         otherwise is empty. Can be filled with the camera logical id when saving layout.
      *     %param items[].zoomLeft Left coordinate of the displayed window inside
      *         the camera image, as a fraction of the image width
      *         (floating-point, 0..1).
@@ -1595,20 +1604,20 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // Ec2StaticticsReporter
     regFunctor<std::nullptr_t, ApiSystemStatistics>(p, ApiCommand::getStatisticsReport,
         [this](std::nullptr_t, ApiSystemStatistics* const out, const Qn::UserAccessData&)
-    {
-        if (!m_directConnection)
-            return ErrorCode::failure;
-        return m_directConnection->getStaticticsReporter()->collectReportData(
-            nullptr, out);
-    });
-    regFunctor<std::nullptr_t, ApiStatisticsServerInfo>(p, ApiCommand::triggerStatisticsReport,
-        [this](std::nullptr_t, ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
-    {
-        if (!m_directConnection)
-            return ErrorCode::failure;
-        return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(
-            nullptr, out);
-    });
+        {
+            if (!m_directConnection)
+                return ErrorCode::failure;
+            return m_directConnection->getStaticticsReporter()->collectReportData(nullptr, out);
+        });
+    regFunctor<ApiStatisticsServerArguments, ApiStatisticsServerInfo>(
+        p, ApiCommand::triggerStatisticsReport,
+        [this](const ApiStatisticsServerArguments& in,
+            ApiStatisticsServerInfo* const out, const Qn::UserAccessData&)
+        {
+            if (!m_directConnection)
+                return ErrorCode::failure;
+            return m_directConnection->getStaticticsReporter()->triggerStatisticsReport(in, out);
+        });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
 
@@ -1655,6 +1664,7 @@ int LocalConnectionFactory::establishDirectConnection(
             else
             {
                 connectionInitializationResult = ErrorCode::dbError;
+                messageBus()->removeHandler(m_directConnection->notificationManager());
                 m_directConnection.reset();
             }
 
@@ -1830,8 +1840,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
         if (infoList.size() > 0
             && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
         {
-            NX_LOG(lit("LocalConnectionFactory: New client had already been registered with the same params"),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lit("New client had already been registered with the same params"));
             return ErrorCode::ok;
         }
 
@@ -1841,13 +1850,12 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
         {
             if (result == ErrorCode::ok)
             {
-                NX_LOG(lit("LocalConnectionFactory: New client has been registered"),
-                    cl_logINFO);
+                NX_INFO(this, lit("New client has been registered"));
             }
             else
             {
-                NX_LOG(lit("LocalConnectionFactory: New client transaction has failed %1")
-                    .arg(toString(result)), cl_logERROR);
+                NX_ERROR(this, lit("New client transaction has failed %1")
+                    .arg(toString(result)));
             }
         });
     }

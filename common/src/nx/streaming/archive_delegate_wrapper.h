@@ -25,7 +25,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() override;
     virtual bool hasVideo() const override;
-    virtual AVCodecContext* setAudioChannel(int num) override;
+    virtual bool setAudioChannel(unsigned num) override;
     virtual void setSpeed(qint64 displayTime, double value) override;
     virtual void setSingleshotMode(bool value) override;
     virtual bool setQuality(

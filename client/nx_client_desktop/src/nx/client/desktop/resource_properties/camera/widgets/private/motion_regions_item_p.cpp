@@ -22,7 +22,7 @@ static constexpr qreal kFontSizeMultiplier = 1.2; //< Multiplier for cell height
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private
 
 MotionRegionsItem::Private::Private(MotionRegionsItem* q):
@@ -444,7 +444,7 @@ void MotionRegionsItem::Private::updateLabelPositions()
     m_labelsDirty = true;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private::State
 
 bool MotionRegionsItem::Private::State::operator==(const State& other) const
@@ -460,7 +460,7 @@ bool MotionRegionsItem::Private::State::operator!=(const State& other) const
     return !(*this == other);
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private::Shader
 
 const char* MotionRegionsItem::Private::Shader::vertexShader() const

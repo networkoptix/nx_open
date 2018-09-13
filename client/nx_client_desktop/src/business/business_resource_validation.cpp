@@ -514,7 +514,7 @@ bool hasAccessToSource(const nx::vms::event::EventParameters& params,
 
 } // namespace QnBusiness
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnSubjectValidationPolicy
 
 QnSubjectValidationPolicy::QnSubjectValidationPolicy(bool allowEmptySelection):
@@ -647,7 +647,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
         : QString();
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnDefaultSubjectValidationPolicy
 
 QnDefaultSubjectValidationPolicy::QnDefaultSubjectValidationPolicy(bool allowEmptySelection) :
@@ -665,7 +665,7 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
     return true;
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
@@ -731,7 +731,7 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
         validRoles, invalidRoles, intermediateRoles,
         validUsers, invalidUsers);
 
-    NX_EXPECT(intermediateRoles.empty()); //< Unused in this policy.
+    NX_ASSERT(intermediateRoles.empty()); //< Unused in this policy.
 
     if (invalidRoles.size() > 0)
     {

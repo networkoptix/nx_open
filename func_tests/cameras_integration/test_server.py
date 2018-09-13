@@ -1,7 +1,8 @@
 import json
+from datetime import timedelta
 
+import oyaml as yaml
 import pytest
-import yaml
 from pathlib2 import Path
 
 from . import execution
@@ -18,7 +19,9 @@ def config(test_config):
         CAMERAS_INTERFACE='enp3s0',
         CAMERAS_NETWORK='192.168.200.111/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
-        CYCLE_DELAY_S=1,
+        CAMERA_CYCLE_DELAY=timedelta(seconds=1),
+        SERVER_STAGE_DELAY=timedelta(minutes=1),
+        STAGE_HARD_TIMEOUT=timedelta(hours=1),
         )
 
 
@@ -36,10 +39,12 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     if not expected_cameras.is_absolute():
         expected_cameras = Path(__file__).parent / expected_cameras
 
-    stand = execution.Stand(one_licensed_mediaserver, yaml.load(expected_cameras.read_bytes()))
+    stand = execution.Stand(
+        one_licensed_mediaserver,
+        yaml.load(expected_cameras.read_bytes()),
+        config.STAGE_HARD_TIMEOUT)
     try:
-        stand.run_all_stages(config.CYCLE_DELAY_S)
-
+        stand.run_all_stages(config.CAMERA_CYCLE_DELAY, config.SERVER_STAGE_DELAY)
     finally:
         save_result('module_information', stand.server_information)
         save_result('all_cameras', stand.all_cameras())

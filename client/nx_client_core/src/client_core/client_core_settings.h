@@ -64,9 +64,6 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(SystemAuthenticationDataHash,
-            systemAuthenticationData, setSystemAuthenticationData,
-            SystemAuthenticationData, SystemAuthenticationDataHash())
         QN_DECLARE_RW_PROPERTY(RecentLocalConnectionsHash,
            recentLocalConnections, setRecentLocalConnections,
            RecentLocalConnections, RecentLocalConnectionsHash())
@@ -76,12 +73,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())
-        QN_DECLARE_RW_PROPERTY(QString,
-            cloudLogin, setCloudLogin,
-            CloudLogin, QString())
-        QN_DECLARE_RW_PROPERTY(QString,
-            cloudPassword, setCloudPassword,
-            CloudPassword, QString())
         QN_DECLARE_RW_PROPERTY(QnCloudSystemList,
             recentCloudSystems, setRecentCloudSystems,
             RecentCloudSystems, QnCloudSystemList())
@@ -103,6 +94,15 @@ private:
         QN_DECLARE_RW_PROPERTY(QList<nx::utils::Url>,
             knownServerUrls, setKnownServerUrls,
             KnownServerUrls, QList<nx::utils::Url>())
+        QN_DECLARE_RW_PROPERTY(SystemAuthenticationDataHash,
+            systemAuthenticationData, setSystemAuthenticationData,
+            SystemAuthenticationData, SystemAuthenticationDataHash())
+        QN_DECLARE_RW_PROPERTY(QString,
+            cloudLogin, setCloudLogin,
+            CloudLogin, QString())
+        QN_DECLARE_RW_PROPERTY(QString,
+            cloudPassword, setCloudPassword,
+            CloudPassword, QString())
     QN_END_PROPERTY_STORAGE()
 
 private:

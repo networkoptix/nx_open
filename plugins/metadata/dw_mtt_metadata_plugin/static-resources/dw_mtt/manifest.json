@@ -66,14 +66,13 @@
         {
             "id": "nx.dw_mtt.OSC", 
             "name": {
-                "value": "Object Removal [exclusive]", 
+                "value": ""Object Status Changed [exclusive]", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 
             "internalName": "OSC", 
             "alarmName": "oscAlarm", 
-            "group": 1, 
-            "unsupported": true
+            "group": 1
         }, 
         {
             "id": "nx.dw_mtt.AVD", 
@@ -84,34 +83,34 @@
             "flags": "stateDependent", 
             "internalName": "AVD", 
             "alarmName": "sceneChange", 
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         }, 
         {
             "id": "nx.dw_mtt.AVD", 
             "name": {
-                "value": "Clarity Abnormal", 
+                "value": "Video Blur Detection", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 
             "internalName": "AVD", 
             "alarmName": "clarityAbnormal", 
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         }, 
         {
             "id": "nx.dw_mtt.AVD", 
             "name": {
-                "value": "Color Abnormal", 
+                "value": "Video Cast Detection", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 
             "internalName": "AVD", 
             "alarmName": "colorAbnormal", 
-            "_comment": "AVD is responsible for all three: Scene Change, Clarity Abnormal and Color Abnormal"
+            "_comment": "AVD is responsible for all three: Scene Change, Video Blur Detection and Video Cast Detection"
         }, 
         {
             "id": "nx.dw_mtt.CPC", 
             "name": {
-                "value": "People Counting [exclusive]", 
+                "value": "Cross-line People Counting [exclusive]", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 
@@ -122,7 +121,7 @@
         {
             "id": "nx.dw_mtt.IPD", 
             "name": {
-                "value": "People Intrusion [exclusive]", 
+                "value": "Intruding People Detection [exclusive]", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 

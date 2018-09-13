@@ -44,6 +44,10 @@
 #include <nx/vms/event/rule_manager.h>
 
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/metrics/metrics_storage.h>
+#include <audit/audit_manager.h>
+#include <api/http_client_pool.h>
+#include <core/resource_management/camera_driver_restriction_list.h>
 
 using namespace nx;
 
@@ -130,8 +134,9 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
 
+    m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
+    m_httpClientPool = new nx::network::http::ClientPool(this);
     m_sessionManager = new QnSessionManager(this);
-
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
@@ -142,6 +147,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
     m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
+    m_metrics = std::make_shared<nx::metrics::Storage>(); //< Depends on nothing.
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
     // Depends on resource pool.
@@ -442,6 +448,7 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
 void QnCommonModule::createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor)
 {
     m_messageProcessor = messageProcessor;
+    m_messageProcessor->initializeContext(this);
     m_runtimeInfoManager->setMessageProcessor(messageProcessor);
     m_cameraHistory->setMessageProcessor(messageProcessor);
 }
@@ -492,7 +499,32 @@ void QnCommonModule::setStandAloneMode(bool value)
     }
 }
 
+nx::metrics::Storage* QnCommonModule::metrics() const
+{
+    return m_metrics.get();
+}
+
 bool QnCommonModule::isStandAloneMode() const
 {
     return m_standaloneMode;
+}
+
+void QnCommonModule::setAuditManager(QnAuditManager* auditManager)
+{
+    m_auditManager = auditManager;
+}
+
+QnAuditManager* QnCommonModule::auditManager() const
+{
+    return m_auditManager;
+}
+
+nx::network::http::ClientPool* QnCommonModule::httpClientPool() const
+{
+    return m_httpClientPool;
+}
+
+CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
+{
+    return m_cameraDriverRestrictionList;
 }

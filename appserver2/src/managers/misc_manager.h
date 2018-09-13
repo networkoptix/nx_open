@@ -116,7 +116,7 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::cleanupDatabase,
-	    data,
+        data,
         [handler, reqId](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);

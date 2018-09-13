@@ -17,9 +17,7 @@ set(android.keypass "S6rtgPMk")
 # Support section
 set(companyUrl "http://www.xccelo.com")
 set(productUrl "http://www.xccelo.com/xstream")
-set(supportUrl "")
 set(supportEmail "support.xstream@xccelo.com")
-set(supportPhone "")
 set(licenseEmail "licensing.xstream@xccelo.com")
 # end of Support section
 

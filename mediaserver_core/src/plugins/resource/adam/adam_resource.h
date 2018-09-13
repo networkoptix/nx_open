@@ -24,7 +24,7 @@ class QnAdamResource:
 public:
     static const QString kManufacture;
 
-    QnAdamResource();
+    QnAdamResource(QnMediaServerModule* serverModule);
     virtual ~QnAdamResource();
 
     virtual void setIframeDistance(int frames, int timeMs) override;

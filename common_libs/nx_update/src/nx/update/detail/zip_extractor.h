@@ -2,9 +2,7 @@
 
 #include <utils/update/zip_utils.h>
 
-namespace nx {
-namespace update {
-namespace detail {
+namespace nx::update::detail {
 
 using ExtractHandler = std::function<void(QnZipExtractor::Error, const QString& /*outputPath*/)>;
 
@@ -17,6 +15,4 @@ public:
         ExtractHandler extractHandler);
 };
 
-} // namespace detail
-} // namespace update
-} // namespace nx
+} // namespace nx::update::detail

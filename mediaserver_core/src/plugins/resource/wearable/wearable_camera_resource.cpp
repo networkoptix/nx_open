@@ -7,7 +7,8 @@
 const QString QnWearableCameraResource::kManufacture = lit("WEARABLE_CAMERA");
 using namespace nx::mediaserver::resource;
 
-QnWearableCameraResource::QnWearableCameraResource()
+QnWearableCameraResource::QnWearableCameraResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     removeFlags(Qn::live | Qn::network | Qn::streamprovider | Qn::motion);
     addFlags(Qn::wearable_camera);

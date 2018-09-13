@@ -18,8 +18,6 @@ struct MountHelperDelegates
     std::function<SystemCommands::MountCode(const std::string&)> osMount;
     std::function<bool(const std::string&)> isPathAllowed;
     std::function<std::string(const std::string&, const std::string&)> credentialsFileName;
-    std::function<uid_t()> gid;
-    std::function<uid_t()> uid;
 };
 
 class MountHelper

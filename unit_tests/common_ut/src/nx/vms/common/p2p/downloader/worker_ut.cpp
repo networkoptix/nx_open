@@ -74,7 +74,7 @@ protected:
         defaultPeer = createPeer("Default Peer");
         peerById[defaultPeer->id] = defaultPeer;
 
-        NX_LOG(lm("Default Peer worker: %1").arg(defaultPeer->worker), cl_logINFO);
+        NX_INFO(this, lm("Default Peer worker: %1").arg(defaultPeer->worker));
 
         commonPeerManager->start();
     }
@@ -320,27 +320,6 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
     ASSERT_TRUE(newFileInfo.isValid());
     ASSERT_EQ(newFileInfo.size, fileInfo.size);
     ASSERT_EQ(newFileInfo.md5, fileInfo.md5);
-}
-
-TEST_F(DistributedFileDownloaderWorkerTest, validateFail)
-{
-    auto fileInfo = createTestFile();
-    fileInfo.url = "http://test.org/testFile";
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
-
-    commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
-    commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
-    commonPeerManager->setValidateShouldFail();
-
-    nx::utils::promise<bool> readyPromise;
-    auto readyFuture = readyPromise.get_future();
-    QObject::connect(defaultPeer->worker.get(), &Worker::failed,
-        [&readyPromise] { readyPromise.set_value(true); });
-
-    defaultPeer->peerManager->setPeerList(defaultPeer->peerManager->getAllPeers());
-    defaultPeer->worker->start();
-
-    ASSERT_TRUE(readyFuture.get());
 }
 
 TEST_F(DistributedFileDownloaderWorkerTest, chunkDownloadFailedAndRecovered)

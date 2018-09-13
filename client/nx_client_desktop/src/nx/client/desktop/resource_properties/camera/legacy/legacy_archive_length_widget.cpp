@@ -11,7 +11,7 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/widgets/hint_button.h>
 #include <core/resource/device_dependent_strings.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
@@ -39,8 +39,8 @@ QnArchiveLengthWidget::QnArchiveLengthWidget(QWidget* parent):
     archiveGroupHint->addHintLine(tr("If \"Auto\" option is enabled, the oldest footage among all cameras will be deleted first."));
     setHelpTopic(archiveGroupHint, Qn::CameraSettings_Recording_ArchiveLength_Help);
 
-    CheckboxUtils::autoClearTristate(ui->checkBoxMinArchive);
-    CheckboxUtils::autoClearTristate(ui->checkBoxMaxArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMinArchive);
+    check_box_utils::autoClearTristate(ui->checkBoxMaxArchive);
 
     auto notifyChanged =
         [this]
@@ -239,7 +239,7 @@ void QnArchiveLengthWidget::updateMinDays(const QnVirtualCameraResourceList& cam
                     : camera->minDays() == minDays;
             });
 
-        CheckboxUtils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
+        check_box_utils::setupTristateCheckbox(ui->checkBoxMinArchive, sameMinDays, isAuto);
         ui->spinBoxMinDays->setValue(calcMinDays(minDays));
 }
 
@@ -269,6 +269,6 @@ void QnArchiveLengthWidget::updateMaxDays(const QnVirtualCameraResourceList& cam
                     : camera->maxDays() == maxDays;
             });
 
-        CheckboxUtils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
+        check_box_utils::setupTristateCheckbox(ui->checkBoxMaxArchive, sameMaxDays, isAuto);
         ui->spinBoxMaxDays->setValue(calcMaxDays(maxDays));
 }

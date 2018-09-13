@@ -90,7 +90,7 @@ struct ChannelStatusResponse final
     QString audioInputType;
     int speakerVolume = 0;
     bool noiseReduce = false;
-    int sampleRateKHz = 0;
+    int sampleRateHz = 0;
 };
 
 struct OpenChannelResponse final
@@ -105,7 +105,7 @@ struct CommonResponse final
     QString subStatusCode;
 };
 
-QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz);
+QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz);
 
 std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
     nx::network::http::StringType message);

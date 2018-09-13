@@ -79,7 +79,7 @@ void requestRemotePeers(
 void checkUpdateStatusRemotely(
     QnCommonModule* commonModule,
     const QString& path,
-    QList<nx::UpdateStatus>* reply,
+    QList<nx::update::Status>* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
 } // namespace detail

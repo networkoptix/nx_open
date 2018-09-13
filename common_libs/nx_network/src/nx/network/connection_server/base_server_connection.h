@@ -215,7 +215,7 @@ public:
      */
     void setInactivityTimeout(std::optional<std::chrono::milliseconds> value)
     {
-        NX_EXPECT(m_streamSocket->pollable()->isInSelfAioThread());
+        NX_ASSERT(m_streamSocket->pollable()->isInSelfAioThread());
         m_inactivityTimeout = value;
 
         if (value)

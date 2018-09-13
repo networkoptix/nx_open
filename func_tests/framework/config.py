@@ -3,10 +3,10 @@ import datetime
 import logging
 import re
 
+import six
 import yaml
 from pathlib2 import Path
 
-from .server_physical_host import PhysicalInstallationHostConfig
 from .utils import SimpleNamespace
 
 _logger = logging.getLogger(__name__)
@@ -79,9 +79,8 @@ class TestsConfig(object):
 
     @classmethod
     def from_dict(cls, d):
-        installations = map(PhysicalInstallationHostConfig.from_dict, d.get('hosts') or [])
         tests = d.get('tests')
-        return cls(installations, tests)
+        return cls(tests)
 
     @classmethod
     def merge_config_list(cls, config_list, test_params):
@@ -97,9 +96,7 @@ class TestsConfig(object):
             config._update_with_tests_params(test_params)
         return config
 
-    def __init__(self, physical_installation_host_list=None, tests=None):
-        # PhysicalInstallationHostConfig list
-        self.physical_installation_host_list = physical_installation_host_list or []
+    def __init__(self, tests=None):
         self.tests = tests or {}  # {}, full test name -> {}
 
     def _update_with_tests_params(self, test_params):
@@ -108,7 +105,6 @@ class TestsConfig(object):
 
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
-        self.physical_installation_host_list += other.physical_installation_host_list
         self.tests.update(other.tests)
 
     def get_test_config(self, full_node_id):
@@ -152,16 +148,16 @@ class SingleTestConfig(object):
 
     @staticmethod
     def _cast_value(value, t):
-        if not isinstance(value, (str, unicode)):
+        if not isinstance(value, six.string_types):
             return value
         if t is int:
             return int(value)
         if t is bool:
-            if value in ['true', 'yes', 'on']:
+            if value.lower() in ['true', 'yes', 'on']:
                 return True
-            if value in ['false', 'no', 'off']:
+            if value.lower() in ['false', 'no', 'off']:
                 return False
-            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value
+            assert False, 'Invalid bool value: %r; Accepted values are: true, false, yes, no, on, off' % value.lower()
         if t is datetime.timedelta:
             return str_to_timedelta(value)
         return value

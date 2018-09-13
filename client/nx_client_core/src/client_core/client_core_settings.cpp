@@ -5,7 +5,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/url.h>
 

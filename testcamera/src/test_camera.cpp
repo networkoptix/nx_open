@@ -8,7 +8,6 @@
 #include "nx/streaming/media_data_packet.h"
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/avi_archive_delegate.h>
-#include "core/resource/test_camera/testcamera_const.h"
 
 #include "utils/common/sleep.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -40,7 +39,7 @@ QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileNam
 
     qDebug() << "Start buffering file" << fileName << "...";
 
-    while (media = aviDelegate.getNextData())
+    while ((media = aviDelegate.getNextData()))
     {
         QnCompressedVideoDataPtr video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
         if (!video)

@@ -5,6 +5,7 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module_aware.h>
+#include <common/common_module.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
@@ -23,6 +24,7 @@
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/metrics/metrics_storage.h>
 
 struct BeforeRestoreDbData;
 
@@ -115,9 +117,16 @@ namespace detail
             }
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
+            {
+                commonModule()->metrics()->transactions().errors()++;
                 return result;
+            }
+            commonModule()->metrics()->transactions().success()++;
             if (tran.isLocal())
+            {
+                commonModule()->metrics()->transactions().local()++;
                 return ErrorCode::ok;
+            }
             return m_tranLog->saveTransaction( tran, serializedTran);
         }
 
@@ -137,8 +146,8 @@ namespace detail
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
                 {
-                    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
-                        arg(toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
+                    NX_WARNING(QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
+                        arg(toString(result)).arg(m_sdb.lastError().text()));
                     return ErrorCode::dbError;
                 }
             }
@@ -272,7 +281,8 @@ namespace detail
             nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnCameraDataExQuery& query,
+			nx::vms::api::CameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::MediaServerDataList& serverList);
@@ -949,10 +959,9 @@ public:
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
         {
-            NX_LOG(lit("User %1 has not permission to execute transaction %2")
+            NX_WARNING(this, lit("User %1 has not permission to execute transaction %2")
                 .arg(m_userAccessData.userId.toString())
-                .arg(toString(tran.command)),
-                cl_logWARNING);
+                .arg(toString(tran.command)));
             return ErrorCode::forbidden;
         }
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));

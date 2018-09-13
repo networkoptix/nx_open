@@ -21,6 +21,7 @@
 #include <health/system_health.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
+#include <api/helpers/camera_id_helper.h>
 
 using namespace nx;
 
@@ -111,11 +112,11 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     connect(commonModule()->resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
     {
 
-        NX_LOG(lit("%1 statusChanged signal received for resource %2, %3, %4")
+        NX_VERBOSE(this, lit("%1 statusChanged signal received for resource %2, %3, %4")
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(resource->getId().toString())
                 .arg(resource->getName())
-                .arg(resource->getUrl()), cl_logDEBUG2);
+                .arg(resource->getUrl()));
 
         QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
         if (cam)
@@ -168,7 +169,13 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
                             if (eventParams.metadata.cameraRefs.empty())
                                 return;
 
-                            cameras = eventParams.metadata.cameraRefs;
+                            for (const auto& flexibleId: eventParams.metadata.cameraRefs)
+                            {
+                                auto camera =
+                                    camera_id_helper::findCameraByFlexibleId(resourcePool(), flexibleId);
+                                if (camera)
+                                    cameras.push_back(camera->getId());
+                            }
                         }
                         else
                         {
@@ -254,7 +261,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
 
     QnChunksRequestData request;
     request.format = Qn::UbjsonFormat;
-    request.resList << camera;
+    request.resList << camera.dynamicCast<QnVirtualCameraResource>();
 
     {
         QnMutexLocker lock(&m_mutex);

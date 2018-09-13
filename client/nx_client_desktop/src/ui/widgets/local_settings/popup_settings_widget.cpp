@@ -14,13 +14,13 @@
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -34,7 +34,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(this);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
@@ -90,7 +90,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 {
     if (m_updating)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     bool all = true;
 
@@ -126,7 +126,7 @@ void QnPopupSettingsWidget::loadDataToUi()
 void QnPopupSettingsWidget::applyChanges()
 {
     NX_ASSERT(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (context()->user())
     {

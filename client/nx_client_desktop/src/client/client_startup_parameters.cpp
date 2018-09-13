@@ -55,7 +55,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.screen, kScreenKey);
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
-    addParserParam(commandLineParser, &result.layoutName, "--layout-name");
+    addParserParam(commandLineParser, &result.layoutRef, "--layout-name");
 
     /* Development options */
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
@@ -75,14 +75,13 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
     addParserParam(commandLineParser, &result.logFile, "--log-file");
     addParserParam(commandLineParser, &result.ec2TranLogLevel, "--ec2-tran-log-level", lit("none"));
-    addParserParam(commandLineParser, &result.exceptionFilters, "--exception-filters");
 
     addParserParam(commandLineParser, &result.clientUpdateDisabled, "--no-client-update");
     addParserParam(commandLineParser, &result.vsyncDisabled, "--no-vsync");
     addParserParam(commandLineParser, &result.profilerMode, "--profiler");
 
     /* Runtime settings */
-    addParserParam(commandLineParser, &result.ignoreVersionMismatch, "--no-version-mismatch-check");
+    addParserParam(commandLineParser, &result.acsMode, "--acs");
 
     /* Custom uri handling */
     QString strCustomUri;
@@ -104,15 +103,15 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     {
         /* Restore protocol part that was cut out. */
         QString fixedUri = lit("%1://%2").arg(nx::vms::utils::AppInfo::nativeUriProtocol()).arg(strCustomUri);
-        NX_LOG(lit("Run with custom URI %1").arg(fixedUri), cl_logDEBUG1);
+        NX_DEBUG(typeid(QnStartupParameters), lit("Run with custom URI %1").arg(fixedUri));
         result.customUri = nx::vms::utils::SystemUri(fixedUri);
-        NX_LOG(lit("Parsed to %1").arg(result.customUri.toString()), cl_logDEBUG1);
+        NX_DEBUG(typeid(QnStartupParameters), lit("Parsed to %1").arg(result.customUri.toString()));
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     // First unparsed entry is the application path.
-    NX_EXPECT(!unparsed.empty());
+    NX_ASSERT(!unparsed.empty());
     for (int i = 1; i < unparsed.size(); ++i)
     {
         const auto source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion

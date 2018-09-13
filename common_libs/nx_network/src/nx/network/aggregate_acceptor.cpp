@@ -64,7 +64,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
                     continue;
 
                 source.isAccepting = true;
-                NX_LOGX(lm("Accept on source(%1)").arg(&source), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("Accept on source(%1)").arg(&source));
 
                 using namespace std::placeholders;
                 source.acceptor->acceptAsync(std::bind(
@@ -79,7 +79,7 @@ void AggregateAcceptor::acceptAsync(AcceptCompletionHandler handler)
 
 void AggregateAcceptor::cancelIOSync()
 {
-    NX_LOGX(lm("Cancelling async IO synchronously..."), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Cancelling async IO synchronously..."));
     nx::utils::promise<void> ioCancelledPromise;
     dispatch(
         [this, &ioCancelledPromise]() mutable
@@ -93,7 +93,7 @@ void AggregateAcceptor::cancelIOSync()
 
 bool AggregateAcceptor::add(std::unique_ptr<AbstractStreamSocketAcceptor> socket)
 {
-    NX_LOGX(lm("Add socket(%1)").arg(socket), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Add socket(%1)").arg(socket));
 
     nx::utils::promise<void> socketAddedPromise;
     dispatch(
@@ -105,7 +105,7 @@ bool AggregateAcceptor::add(std::unique_ptr<AbstractStreamSocketAcceptor> socket
             {
                 AcceptorContext& source = m_acceptors.back();
                 source.isAccepting = true;
-                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Accept on source(%1) when added").arg(&source));
 
                 using namespace std::placeholders;
                 source.acceptor->acceptAsync(std::bind(
@@ -121,7 +121,7 @@ bool AggregateAcceptor::add(std::unique_ptr<AbstractStreamSocketAcceptor> socket
 
 void AggregateAcceptor::removeAt(size_t pos)
 {
-    NX_LOGX(lm("Remove socket(%1)").arg(pos), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Remove socket(%1)").arg(pos));
 
     removeByIterator(
         [this, pos]()
@@ -172,8 +172,8 @@ void AggregateAcceptor::accepted(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractStreamSocket> socket)
 {
-    NX_LOGX(lm("Accepted socket(%1) (%2) from source(%3)")
-        .arg(socket.get()).arg(SystemError::toString(code)).arg(source), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Accepted socket(%1) (%2) from source(%3)")
+        .arg(socket.get()).arg(SystemError::toString(code)).arg(source));
 
     if (source)
     {
@@ -193,7 +193,7 @@ void AggregateAcceptor::accepted(
 
     // TODO: #ak Better not cancel accepts on every socket accepted.
 
-    NX_LOGX(lm("Cancel all other accepts"), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Cancel all other accepts"));
     for (auto& socketContext: m_acceptors)
         socketContext.stopAccepting();
 
@@ -234,8 +234,8 @@ void AggregateAcceptor::removeByIterator(FindIteratorFunc findIterator)
             m_acceptors.erase(itemToRemoveIter);
             serverSocketContext.acceptor->pleaseStopSync();
 
-            NX_LOGX(lm("Acceptor(%1) is removed")
-                .arg(serverSocketContext.acceptor), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Acceptor(%1) is removed")
+                .arg(serverSocketContext.acceptor));
             socketRemovedPromise.set_value();
         });
 

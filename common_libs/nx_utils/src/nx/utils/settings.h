@@ -48,7 +48,7 @@ class NX_UTILS_API Settings
 {
 public:
     Settings() = default;
-    bool attach(const std::shared_ptr<QSettings>& settings);
+    void attach(const std::shared_ptr<QSettings>& settings);
 
     QJsonObject buildDocumentation() const;
 
@@ -124,7 +124,7 @@ protected:
     private:
         virtual bool load(const QVariant& value) override
         {
-            if (!fromQVariant(value, m_value))
+            if (!fromQVariant(value, &m_value))
                 return false;
 
             isPresent = true;
@@ -141,12 +141,12 @@ protected:
             return toQVariant(m_defaultValue);
         }
 
-        static bool fromQVariant(const QVariant& value, T& result)
+        static bool fromQVariant(const QVariant& qVariant, T* outValue)
         {
-            if (!value.isValid() || !value.canConvert<T>())
+            if (!qVariant.isValid() || !qVariant.canConvert<T>())
                 return false;
 
-            result = value.value<T>();
+            *outValue = qVariant.value<T>();
             return true;
         }
 
@@ -177,14 +177,26 @@ private:
     std::shared_ptr<QSettings> m_qtSettings;
 };
 
+
+// Override string loader to workaround StringList parsing when input string contains comma
+template<>
+inline bool Settings::Option<QString>::fromQVariant(const QVariant& value, QString* result)
+{
+    if (!value.isValid())
+        return false;
+
+    *result = value.toString();
+    return true;
+}
+
 template<>
 inline bool Settings::Option<std::chrono::milliseconds>::fromQVariant(
-    const QVariant& value, std::chrono::milliseconds& result)
+    const QVariant& value, std::chrono::milliseconds* result)
 {
     if (!value.isValid() || !value.canConvert<quint64>())
         return false;
 
-    result = std::chrono::milliseconds(value.value<quint64>());
+    *result = std::chrono::milliseconds(value.value<quint64>());
     return true;
 }
 

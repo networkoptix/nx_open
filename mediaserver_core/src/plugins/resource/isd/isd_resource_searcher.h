@@ -1,5 +1,4 @@
-#ifndef isd_device_server_h_1936
-#define isd_device_server_h_1936
+#pragma once
 
 #ifdef ENABLE_ISD
 
@@ -8,14 +7,18 @@
 #include <plugins/resource/mdns/mdns_listener.h>
 #include <nx/network/upnp/upnp_search_handler.h>
 #include <nx/utils/url.h>
+#include <nx/mediaserver/server_module_aware.h>
+
+class QnMediaServerModule;
 
 class QnPlISDResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
-	public nx::network::upnp::SearchAutoHandler
+    public QnAbstractNetworkResourceSearcher,
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
 {
 
 public:
-    QnPlISDResourceSearcher(QnCommonModule* commonModule);
+    QnPlISDResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnPlISDResourceSearcher() override;
 
     virtual QnResourcePtr createResource(
@@ -43,7 +46,7 @@ private:
 
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::utils::MacAddress& mac,
         const QAuthenticator& auth,
         QnResourceList& result );
 
@@ -65,10 +68,9 @@ private:
         const QnResourceList& alreadyFoundResources);
 
 private:
-	QnResourceList m_foundUpnpResources;
-	std::set<QString> m_alreadyFoundMacAddresses;
-	mutable QnMutex m_mutex;
+    QnResourceList m_foundUpnpResources;
+    std::set<QString> m_alreadyFoundMacAddresses;
+    mutable QnMutex m_mutex;
 };
 
-#endif // #ifdef ENABLE_ISD
-#endif //isd_device_server_h_1936
+#endif // ENABLE_ISD

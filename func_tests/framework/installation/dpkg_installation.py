@@ -11,13 +11,13 @@ _logger = logging.getLogger(__name__)
 class DpkgInstallation(DebInstallation):
     """Install mediaserver using dpkg, control it as upstart service"""
 
-    def __init__(self, posix_access, dir):
-        dir = posix_access.Path('/opt', dir)
-        super(DpkgInstallation, self).__init__(posix_access, dir)
+    def __init__(self, os_access, dir):
+        dir = os_access.Path('/opt', dir)
+        super(DpkgInstallation, self).__init__(os_access, dir)
 
     @cached_property
     def service(self):
-        service_name = self.identity.customization.linux_service_name
+        service_name = self.identity().customization.linux_service_name
         stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
         return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
 
@@ -44,4 +44,3 @@ class DpkgInstallation(DebInstallation):
                 'CONFIG_INITIAL': self._config_initial,
                 })
         assert self.is_valid()
-        self._identity = installer.identity

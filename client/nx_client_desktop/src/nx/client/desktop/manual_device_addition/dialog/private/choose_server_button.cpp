@@ -36,7 +36,7 @@ bool QnChooseServerButton::setCurrentServer(const QnMediaServerResourcePtr& serv
 {
     if (server && !actionForServer(server->getId()))
     {
-        NX_EXPECT(false, "Can't find action for specified server");
+        NX_ASSERT(false, "Can't find action for specified server");
         return false;
     }
 
@@ -60,7 +60,7 @@ void QnChooseServerButton::addServer(const QnMediaServerResourcePtr& server)
 {
     if (actionForServer(server->getId()))
     {
-        NX_EXPECT(false, "Server exists already");
+        NX_ASSERT(false, "Server exists already");
         return;
     }
 
@@ -72,7 +72,7 @@ void QnChooseServerButton::removeServer(const QnUuid& id)
     if (const auto action = actionForServer(id))
         menu()->removeAction(action);
     else
-        NX_EXPECT(false, "Server does not exist");
+        NX_ASSERT(false, "Server does not exist");
 }
 
 void QnChooseServerButton::handleSelectedServerOnlineStatusChanged()

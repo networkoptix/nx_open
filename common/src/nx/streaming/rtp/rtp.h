@@ -58,6 +58,26 @@ inline std::pair<uint32_t, uint32_t> makeFraction(uint64_t value, uint64_t denom
     return result;
 }
 
+inline void buildRtpHeader(
+    char* buffer,
+    quint32 ssrc,
+    int markerBit,
+    quint32 timestamp,
+    quint8 payloadType,
+    quint16 sequence)
+{
+    RtpHeader* rtp = (RtpHeader*)buffer;
+    rtp->version = RtpHeader::kVersion;
+    rtp->padding = 0;
+    rtp->extension = 0;
+    rtp->CSRCCount = 0;
+    rtp->marker  =  markerBit;
+    rtp->payloadType = payloadType;
+    rtp->sequence = htons(sequence);
+    rtp->timestamp = htonl(timestamp);
+    rtp->ssrc = htonl(ssrc);
+}
+
 } // namespace rtp
 } // namespace streaming
 } // namespace nx

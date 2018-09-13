@@ -11,6 +11,7 @@
 #include <nx/network/stun/stun_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/stree/node.h>
 #include <nx/utils/stree/resourcenameset.h>
 #include <nx/utils/stree/resourcecontainer.h>
@@ -54,28 +55,12 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-// TODO: #ak This class is an work around socket_global.h header dependency problem. Will be resolved in 4.0.
-class NX_NETWORK_API VeryBasicCloudModuleUrlFetcher:
-    public aio::BasicPollable
-{
-public:
-    VeryBasicCloudModuleUrlFetcher();
-
-    /**
-     * NOTE: Default value is taken from application settings.
-     */
-    void setModulesXmlUrl(nx::utils::Url url);
-
-protected:
-    nx::utils::Url m_modulesXmlUrl;
-};
-
 /**
  * Looks up online API url of a specified cloud module.
  */
 template<typename Handler>
 class BasicCloudModuleUrlFetcher:
-    public VeryBasicCloudModuleUrlFetcher
+    public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 
@@ -106,6 +91,11 @@ public:
         m_httpClient.reset();
     }
 
+    void setModulesXmlUrl(nx::utils::Url url)
+    {
+        m_modulesXmlUrl = std::move(url);
+    }
+
     void addAdditionalHttpHeaderForGetRequest(
         nx::String name, nx::String value)
     {
@@ -133,6 +123,14 @@ protected:
         using namespace std::chrono;
         using namespace std::placeholders;
 
+        if (!m_modulesXmlUrl)
+        {
+            post(
+                [this, handler = std::move(handler)]()
+                { invokeHandler(handler, http::StatusCode::badRequest); });
+            return;
+        }
+
         // If async resolve is already started, should wait for its completion.
         m_resolveHandlers.emplace_back(std::move(handler));
 
@@ -158,7 +156,7 @@ protected:
         m_requestIsRunning = true;
 
         m_httpClient->doGet(
-            m_modulesXmlUrl,
+            *m_modulesXmlUrl,
             std::bind(&BasicCloudModuleUrlFetcher::onHttpClientDone, this, _1));
     }
 
@@ -196,6 +194,7 @@ protected:
     }
 
 private:
+    std::optional<nx::utils::Url> m_modulesXmlUrl;
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     const CloudInstanceSelectionAttributeNameset m_nameset;
     std::vector<Handler> m_resolveHandlers;
@@ -210,7 +209,7 @@ private:
         nx::network::http::StatusCode::Value resultCode =
             nx::network::http::StatusCode::ok;
         // Invoking handlers with mutex not locked.
-        auto scope = makeScopeGuard(
+        auto scope = nx::utils::makeScopeGuard(
             [this, &resultCode]() { signalWaitingHandlers(resultCode); });
 
         QnMutexLocker lk(&m_mutex);

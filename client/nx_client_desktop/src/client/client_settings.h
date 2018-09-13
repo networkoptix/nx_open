@@ -59,6 +59,12 @@ public:
         /** Url for get to updates.json. */
         UPDATE_FEED_URL,
 
+        /**
+         * Url to update combiner.
+         * It overrides value in QnAppInfo::updateGeneratorUrl()
+         */
+        UPDATE_COMBINER_URL,
+
         /** ??? // TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
 
@@ -153,6 +159,8 @@ public:
         /** Version of the latest read and accepted EULA. */
         ACCEPTED_EULA_VERSION,
 
+        ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
+
         VARIABLE_COUNT
     };
 
@@ -207,6 +215,7 @@ private:
 
         /* Updates-related settings */
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
         QN_DECLARE_RW_PROPERTY(QnUpdateInfo,                latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         QnUpdateInfo())
@@ -248,6 +257,8 @@ private:
         // Was used earlier. Kept to migrate old settings.
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
+
+        QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

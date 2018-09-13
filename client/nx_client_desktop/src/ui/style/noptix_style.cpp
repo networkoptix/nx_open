@@ -16,6 +16,7 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QAbstractButton>
 
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/style/noptix_style_animator.h>
@@ -29,24 +30,24 @@
 #include <utils/math/color_transformations.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/customization/customizer.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
 
     // We don't have icons for 3x scaling. Thus we have to turn on smooth mode
     // on painter.
-    const QnRaiiGuardPtr make3xHiDpiWorkaround(QPainter *painter)
+    nx::utils::SharedGuardPtr make3xHiDpiWorkaround(QPainter *painter)
     {
         if (!painter || !painter->device() || painter->device()->devicePixelRatio() <= 2)
-            return QnRaiiGuardPtr();
+            return nullptr;
 
         const bool isSmooth = painter->testRenderHint(QPainter::SmoothPixmapTransform);
         if (isSmooth)
-            return QnRaiiGuardPtr();
+            return nullptr;
 
-        return QnRaiiGuard::create(
-            [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform); },
+        painter->setRenderHint(QPainter::SmoothPixmapTransform);
+        return nx::utils::makeSharedGuard(
             [painter]() { painter->setRenderHint(QPainter::SmoothPixmapTransform, false); });
 
     }
@@ -216,52 +217,49 @@ bool QnNoptixStyle::drawMenuItemControl(const QStyleOption *option, QPainter *pa
 {
     const auto workaround = make3xHiDpiWorkaround(painter);
 
-    const QStyleOptionMenuItem *itemOption = qstyleoption_cast<const QStyleOptionMenuItem *>(option);
-    if(!itemOption)
+    const auto itemOption = qstyleoption_cast<const QStyleOptionMenuItem*>(option);
+    if (!itemOption)
         return false;
 
-    const QMenu *menu = qobject_cast<const QMenu *>(widget);
-    if(!menu)
+    const auto menu = qobject_cast<const QMenu*>(widget);
+    if (!menu)
         return false;
 
-    /* There are cases when we want an action to be checkable, but do not want the checkbox displayed in the menu.
-     * So we introduce an internal property for this. */
-    QAction *action = menu->actionAt(option->rect.center());
-    if(!action || !action->property(Qn::HideCheckBoxInMenu).toBool())
+    // There are cases when we want an action to be checkable, but do not want the checkbox
+    // displayed in the menu. So we introduce an internal property for this.
+    QAction* action = menu->actionAt(option->rect.center());
+    if (!action || !action->property(Qn::HideCheckBoxInMenu).toBool())
         return false;
 
-    QStyleOptionMenuItem::CheckType checkType = itemOption->checkType;
-    QStyleOptionMenuItem *localOption = const_cast<QStyleOptionMenuItem *>(itemOption);
-    localOption->checkType = QStyleOptionMenuItem::NotCheckable;
-    base_type::drawControl(CE_MenuItem, option, painter, widget);
-    localOption->checkType = checkType;
+    auto localOption = *itemOption;
+    localOption.checkType = QStyleOptionMenuItem::NotCheckable;
+    base_type::drawControl(CE_MenuItem, &localOption, painter, widget);
     return true;
 }
 
-bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+bool QnNoptixStyle::drawItemViewItemControl(
+    const QStyleOption* option, QPainter* painter, const QWidget* widget) const
 {
     const auto workaround = make3xHiDpiWorkaround(painter);
 
-    const QStyleOptionViewItemV4 *itemOption = qstyleoption_cast<const QStyleOptionViewItemV4 *>(option);
-    if(!itemOption)
+    const auto itemOption = qstyleoption_cast<const QStyleOptionViewItem*>(option);
+    if (!itemOption)
         return false;
 
-    const QAbstractItemView *view = qobject_cast<const QAbstractItemView *>(widget);
-    if(view == NULL)
+    const auto view = qobject_cast<const QAbstractItemView*>(widget);
+    if (!view)
         return false;
 
-    QWidget *editor = view->indexWidget(itemOption->index);
-    if(editor == NULL)
+    const QWidget* editor = view->indexWidget(itemOption->index);
+    if (!editor)
         return false;
 
-    /* If an editor is opened, don'h draw item's text.
-     * Editor's background may be transparent, and item text will shine through. */
+    // If an editor is opened, don'h draw item's text. Editor background may be transparent, and
+    // item text will shine through.
 
-    QStyleOptionViewItemV4 *localOption = const_cast<QStyleOptionViewItemV4 *>(itemOption);
-    QString text = localOption->text;
-    localOption->text = QString();
-    base_type::drawControl(CE_ItemViewItem, option, painter, widget);
-    localOption->text = text;
+    auto localOption = *itemOption;
+    localOption.text = QString();
+    base_type::drawControl(CE_ItemViewItem, &localOption, painter, widget);
     return true;
 }
 

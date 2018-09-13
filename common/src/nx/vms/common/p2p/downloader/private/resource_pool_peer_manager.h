@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 
@@ -21,7 +22,7 @@ class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModule
 public:
     ResourcePoolPeerManager(
         QnCommonModule* commonModule,
-        peer_selection::AbstractPeerSelectorPtr peerSelector);
+        peer_selection::AbstractPeerSelectorPtr peerSelector, bool isClient = false);
 
     virtual QnUuid selfId() const override;
 
@@ -69,6 +70,8 @@ private:
     rest::Handle m_currentSelfRequestHandle = 0;
     QHash<rest::Handle, nx::network::http::AsyncHttpClientPtr> m_httpClientByHandle;
     peer_selection::AbstractPeerSelectorPtr m_peerSelector;
+
+    bool m_isClient = false;
 };
 
 class ResourcePoolPeerManagerFactory:

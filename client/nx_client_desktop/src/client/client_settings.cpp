@@ -5,14 +5,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-
-#include <QtCore/QJsonDocument>
-
 #include <utils/common/util.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <nx/utils/string.h>
 
@@ -34,12 +28,10 @@
 
 namespace {
 
-static const QString kXorKey = lit("ItIsAGoodDayToDie");
-
 static const auto kNameTag = lit("name");
 static const auto kUrlTag = lit("url");
 static const auto kLocalId = lit("localId");
-static const auto kPasswordTag = lit("pwd");
+
 
 static const QString k30TranslationPath = lit("translationPath");
 
@@ -64,9 +56,6 @@ QnConnectionData readConnectionData(QSettings *settings)
     connection.url.setScheme(nx::network::http::urlSheme(useHttps));
     connection.name = settings->value(kNameTag).toString();
     connection.localId = settings->value(kLocalId).toUuid();
-    const auto password = settings->value(kPasswordTag).toString();
-    if (!password.isEmpty())
-        connection.url.setPassword(nx::utils::xorDecrypt(password, kXorKey));
 
     return connection;
 }
@@ -74,15 +63,9 @@ QnConnectionData readConnectionData(QSettings *settings)
 void writeConnectionData(QSettings *settings, const QnConnectionData &connection)
 {
     nx::utils::Url url = connection.url;
-
-    QString password;
-    if (!url.password().isEmpty())
-        password = nx::utils::xorEncrypt(url.password(), kXorKey);
-
     url.setPassword(QString()); /* Don't store password in plain text. */
 
     settings->setValue(kNameTag, connection.name);
-    settings->setValue(kPasswordTag, password);
     settings->setValue(kUrlTag, url.toString());
     settings->setValue(kLocalId, connection.localId.toQUuid());
 }
@@ -273,7 +256,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isAcsMode())
         return;
 
     switch(id)
@@ -318,6 +301,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
         }
 
         case UPDATE_FEED_URL:
+        case UPDATE_COMBINER_URL:
         case GL_VSYNC:
         case LIGHT_MODE:
         case NO_CLIENT_UPDATE:
@@ -392,7 +376,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
+    QScopedValueRollback<bool> guard(m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

@@ -94,10 +94,10 @@ Error MetadataManager::startFetchingMetadata(const char* const* typeList, int ty
         eventTypes.push_back(typeList[i]);
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(
-            m_plugin->driverManifest(), 
+            m_plugin->driverManifest(),
             QJson::deserialized<nx::api::AnalyticsDeviceManifest>(m_deviceManifest),
-            m_url, 
-            m_auth, 
+            m_url,
+            m_auth,
             eventTypes);
 
     m_monitor->addHandler(m_uniqueId, monitorHandler);
@@ -114,8 +114,6 @@ Error MetadataManager::stopFetchingMetadata()
     NX_ASSERT(m_plugin);
 
     m_monitor = nullptr;
-    m_handler = nullptr;
-
     return Error::noError;
 }
 

@@ -606,7 +606,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    ScopeGuard<std::function<void()>> socketModeGuard;
+    nx::utils::ScopeGuard<std::function<void()>> socketModeGuard;
 
     boost::optional<bool> newRecvMode;
     if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
@@ -616,7 +616,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         if (!setRecvMode(*newRecvMode))
             return -1;
-        socketModeGuard = ScopeGuard<std::function<void()>>(
+        socketModeGuard = nx::utils::makeScopeGuard<std::function<void()>>(
             [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 

@@ -41,8 +41,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, false))
 
-QnAvigilonResource::QnAvigilonResource()
-:
+QnAvigilonResource::QnAvigilonResource(QnMediaServerModule* serverModule)
+    :
+    QnPlOnvifResource(serverModule),
     m_inputMonitored( false ),
     m_checkInputPortStatusTimerID( 0 )
 {
@@ -140,9 +141,9 @@ void QnAvigilonResource::onCheckPortRequestDone( nx::network::http::AsyncHttpCli
         httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok )
     {
         const auto& msgBody = httpClient->fetchMessageBodyBuffer();
-        const QnAvigilonCheckInputPortResponse inputPortsData = 
+        const QnAvigilonCheckInputPortResponse inputPortsData =
             QJson::deserialized<QnAvigilonCheckInputPortResponse>( msgBody );
-    
+
         if( m_relayInputStates.size() != inputPortsData.inputs.size() )
             m_relayInputStates.resize( inputPortsData.inputs.size() );
         for( size_t i = 0; i < inputPortsData.inputs.size(); ++i )

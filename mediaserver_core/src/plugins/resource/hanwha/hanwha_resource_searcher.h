@@ -5,22 +5,26 @@
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <nx/network/upnp/upnp_search_handler.h>
-#include <nx/network/mac_address.h>
+#include <nx/utils/mac_address.h>
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
+#include <nx/mediaserver/server_module_aware.h>
+
+class QnMediaServerModule;
 
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-
 class HanwhaResourceSearcher:
-	public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public QnAbstractNetworkResourceSearcher,
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
+
 {
 public:
-    HanwhaResourceSearcher(QnCommonModule* commonModule);
-    virtual ~HanwhaResourceSearcher() = default;
+    HanwhaResourceSearcher(QnMediaServerModule* serverModule);
+    virtual ~HanwhaResourceSearcher() override = default;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,
@@ -49,7 +53,7 @@ public:
 private:
     void createResource(
         const nx::network::upnp::DeviceInfo& devInfo,
-        const nx::network::QnMacAddress& mac,
+        const nx::utils::MacAddress& mac,
         QnResourceList& result );
 
     bool isHanwhaCamera(const nx::network::upnp::DeviceInfo& devInfo) const;
@@ -68,7 +72,7 @@ private:
     struct SunApiData: public nx::network::upnp::DeviceInfo
     {
         SunApiData() { timer.restart(); }
-        nx::network::QnMacAddress macAddress;
+        nx::utils::MacAddress macAddress;
         QElapsedTimer timer;
     };
     bool parseSunApiData(const QByteArray& data, SunApiData* outData);
@@ -109,7 +113,7 @@ private:
     std::vector<std::unique_ptr<nx::network::AbstractDatagramSocket>> m_sunApiSocketList;
     std::unique_ptr<nx::network::AbstractDatagramSocket> m_sunapiReceiveSocket;
     QList<nx::network::QnInterfaceAndAddr> m_lastInterfaceList;
-    QMap<nx::network::QnMacAddress, SunApiData> m_sunapiDiscoveredDevices;
+    QMap<nx::utils::MacAddress, SunApiData> m_sunapiDiscoveredDevices;
 };
 
 } // namespace plugins

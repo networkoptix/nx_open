@@ -130,7 +130,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsAdmin)
     resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::WritePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -162,7 +162,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsAdminSafeMode)
     resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::WritePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -195,7 +195,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewer)
     resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::WritePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -227,7 +227,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
     resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
+    Qn::Permissions forbidden = Qn::RemovePermission | Qn::WritePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);
@@ -432,7 +432,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLockedLayout)
     resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
-    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission
+        | Qn::WritePermission
+        | Qn::WriteNamePermission;
     desired &= ~forbidden;
 
     checkPermissions(layout, desired, forbidden);

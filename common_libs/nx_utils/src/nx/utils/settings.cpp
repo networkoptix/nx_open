@@ -16,7 +16,7 @@ void Settings::add(const QString& name, BaseOption* option)
     m_options.emplace(name, option);
 }
 
-bool Settings::attach(const std::shared_ptr<QSettings>& settings)
+void Settings::attach(const std::shared_ptr<QSettings>& settings)
 {
     m_qtSettings = settings;
     QStringList keys = settings->allKeys();
@@ -25,24 +25,20 @@ bool Settings::attach(const std::shared_ptr<QSettings>& settings)
         auto optionIt = m_options.find(key);
         if (optionIt == m_options.end())
         {
-            NX_LOG(lit("Unknown option: %1").arg(key), cl_logWARNING);
+            NX_WARNING(this, lit("Unknown option: %1").arg(key));
             continue;
         }
         if (!optionIt->second->load(settings->value(key)))
-        {
-            NX_LOG(lit("Failed to load option: %1").arg(key), cl_logERROR);
-            return false;
-        }
+            NX_ERROR(this, lit("Failed to load option: %1").arg(key));
     }
     m_loaded = true;
-    return true;
 }
 
 QJsonObject Settings::buildDocumentation() const
 {
     QJsonObject documentation;
     QJsonArray settings;
-    for (auto& option: m_options)
+    for (const auto& option: m_options)
     {
         QJsonObject description;
         description.insert("name", option.first);

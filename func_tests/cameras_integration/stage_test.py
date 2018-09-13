@@ -1,19 +1,25 @@
-import pytest
-
 import time
 from datetime import timedelta
 
-from .stage import *
-from .checks import *
+import pytest
 
-_CAMERA_ID='TEST_CAMERA'
-_CAMERA_DATA={'id': _CAMERA_ID, 'name': 'camera_name'}
-_STAGE_NAME='test_stage'
-_STAGE_RULES={'key1': 'value1', 'key2': 'value2'}
+from cameras_integration.checks import Failure, Halt, Success
+from cameras_integration.stage import Executor, Stage
+
+_CAMERA_ID = 'TEST_CAMERA'
+_CAMERA_DATA = {'id': _CAMERA_ID, 'name': 'camera_name'}
+_STAGE_NAME = 'test_stage'
+_STAGE_RULES = {'key1': 'value1', 'key2': 'value2'}
 
 
 class FakeServer(object):
     class api(object):
+        class generic(object):
+            class http(object):
+                @staticmethod
+                def url(*args, **kwargs):
+                    return 'http://127.0.0.1:7001/rtsp/' + _CAMERA_ID
+
         @staticmethod
         def get_resource(path, camera_id):
             assert path == 'CamerasEx'
@@ -22,7 +28,10 @@ class FakeServer(object):
             return _CAMERA_DATA
 
 
-def make_stage(temporary_results = [], is_success=False, sleep_s=None):
+def make_stage(temporary_results=None, is_success=False, sleep_s=None):
+    if temporary_results is None:
+        temporary_results = []
+
     def actions(run, **kwargs):
         assert kwargs == _STAGE_RULES
         assert run.id == _CAMERA_ID
@@ -54,7 +63,7 @@ def test_execution(temporary_results, is_success):
     with pytest.raises(StopIteration):
         steps.next()
 
-    assert is_success == executor.is_successful
+    assert is_success == executor.is_successful, executor.report
     assert executor.report['duration'] > '0:00:00'
     if not is_success:
         for key, value in temporary_results[-1].report.items():

@@ -2,11 +2,10 @@
 
 #include <QtNetwork/QHostAddress>
 #include <nx/utils/thread/mutex.h>
-#include "network/ffmpeg_sdp.h"
 #include "network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>
 #include "nx/streaming/media_data_packet.h"
-#include "rtsp/rtsp_encoder.h"
+#include "rtsp/abstract_rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -42,18 +41,13 @@ struct RtspServerTrackInfo
 
     bool openServerSocket(const QString& peerAddress);
 
-    quint32 getSSRC() const {
-        QnMutexLocker lock(&m_mutex);
-        return encoder ? encoder->getSSRC() : 0;
-    }
-
-    void setEncoder(const QnRtspEncoderPtr& value)
+    void setEncoder(AbstractRtspEncoderPtr value)
     {
         QnMutexLocker lock(&m_mutex);
-        encoder = value;
+        encoder = std::move(value);
     }
 
-    QnRtspEncoderPtr getEncoder() const
+    AbstractRtspEncoderPtr getEncoder() const
     {
         QnMutexLocker lock(&m_mutex);
         return encoder;
@@ -68,7 +62,7 @@ struct RtspServerTrackInfo
     MediaType mediaType;
 
 private:
-    QnRtspEncoderPtr encoder;
+    AbstractRtspEncoderPtr encoder;
     mutable QnMutex m_mutex;
     static QnMutex m_createSocketMutex;
 };
@@ -78,16 +72,19 @@ typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 class QnRtspFfmpegEncoder;
+class QnMediaServerModule;
 enum class PlaybackMode;
 
-class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
+class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(
+        QnMediaServerModule* serverModule,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -102,11 +99,9 @@ public:
     QByteArray getRangeStr();
     int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
-    //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
-    //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
-
+    QnMediaServerModule* serverModule() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();
@@ -137,8 +132,13 @@ private:
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution);
-    QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
+    AbstractRtspEncoderPtr createEncoderByMediaData(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        MediaQuality quality,
+        QSize resolution);
+    QnConstAbstractMediaDataPtr getCameraData(
+        QnAbstractMediaData::DataType dataType, MediaQuality quality);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);

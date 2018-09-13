@@ -29,6 +29,7 @@
 
 #include "soap_wrapper.h"
 
+struct SoapTimeouts;
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
@@ -171,7 +172,7 @@ public:
     static const QString fetchMacAddress(
         const NetIfacesResp& response, const QString& senderIpAddress);
 
-    QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
+    QnPlOnvifResource(QnMediaServerModule* serverModule);
     virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
@@ -252,14 +253,17 @@ public:
 
     /** calculate clock diff between camera and local clock at seconds. */
     void calcTimeDrift(int* outSoapRes = nullptr) const;
-    static int calcTimeDrift(const QString& deviceUrl,
+    static int calcTimeDrift(
+        const SoapTimeouts& timeouts, const QString& deviceUrl,
         int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
-    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl,
+    static CameraDiagnostics::Result readDeviceInformation(
+        const SoapTimeouts& onvifTimeouts,
+        const QString& onvifUrl,
         const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
     CameraDiagnostics::Result getFullUrlInfo();
@@ -294,7 +298,9 @@ public:
     QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
     virtual void afterConfigureStream(Qn::ConnectionRole role);
-    virtual CameraDiagnostics::Result customStreamConfiguration(Qn::ConnectionRole role);
+    virtual CameraDiagnostics::Result customStreamConfiguration(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& params);
 
     double getClosestAvailableFps(double desiredFps);
 
@@ -312,6 +318,8 @@ public:
         const QnLiveStreamParams& streamParams);
 
     QString audioOutputConfigurationToken() const;
+    SoapTimeouts onvifTimeouts() const;
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 

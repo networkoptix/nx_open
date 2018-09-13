@@ -8,6 +8,7 @@
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_chunk_reader.h"
 #include <nx/utils/scope_guard.h>
+#include <nx/mediaserver/resource/camera.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -24,10 +25,8 @@ static const std::chrono::seconds kEdgeStartTimeCorrection(1);
 
 using namespace std::chrono;
 
-HanwhaArchiveDelegate::HanwhaArchiveDelegate(const QnResourcePtr& resource)
+HanwhaArchiveDelegate::HanwhaArchiveDelegate(const HanwhaResourcePtr& hanwhaRes)
 {
-    auto hanwhaRes = resource.dynamicCast<HanwhaResource>();
-    NX_ASSERT(hanwhaRes);
     m_streamReader.reset(new HanwhaStreamReader(hanwhaRes));
     m_streamReader->setRole(Qn::CR_Archive);
     m_streamReader->setSessionType(HanwhaSessionType::archive);
@@ -178,7 +177,7 @@ void HanwhaArchiveDelegate::updateCurrentPositionUsec(
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
-    makeScopeGuard(
+    nx::utils::makeScopeGuard(
         [this, timeUsec]()
         {
             updateCurrentPositionUsec(timeUsec, isForwardDirection(), /*force*/ true);
@@ -269,24 +268,22 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
-    static const QString kPlayCommand("PLAY");
-
     m_playbackMode = mode;
     m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
-    rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Require", "onvif-replay"));
-    rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Immediate", "yes"));
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Require", "onvif-replay"));
+    rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Immediate", "yes"));
     switch (mode)
     {
         case PlaybackMode::ThumbNails:
-            rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Frames", "Intra"));
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Frames", "Intra"));
             m_streamReader->setSessionType(HanwhaSessionType::preview);
             break;
         case PlaybackMode::Edge:
             m_isSeekAlignedByChunkBorder = false;
             //< break is intentionally missing.
         case PlaybackMode::Export:
-            rtspClient.addRequestHeader(kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
+            rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
             break;
         default:

@@ -14,7 +14,6 @@
 #include <utils/media/frame_type_extractor.h>
 #include <nx/utils/log/log.h>
 
-
 using namespace nx::vms::api;
 
 // used in reverse mode.
@@ -285,6 +284,7 @@ bool QnArchiveStreamReader::init()
 
     if (!opened)
         return false;
+
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     m_jumpMtx.lock();
@@ -403,7 +403,7 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
-    //NX_LOG(lit("QnArchiveStreamReader::getNextData()"), cl_logDEBUG2);
+    //NX_VERBOSE(this, lit("QnArchiveStreamReader::getNextData()"));
 
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
@@ -455,7 +455,7 @@ begin_label:
         }
     }
 
-    auto streamDataFilter = m_streamDataFilter;
+    const auto streamDataFilter = m_streamDataFilter;
     if (streamDataFilter != m_prevStreamDataFilter)
     {
         m_delegate->setStreamDataFilter(streamDataFilter);
@@ -526,7 +526,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            NX_LOG(s, cl_logALWAYS);
+            NX_ALWAYS(this, s);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
@@ -910,7 +910,19 @@ begin_label:
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
             m_eof = false;
         }
-        if (m_BOF) {
+
+        /**
+         * Consumers, such as CamDisplay, skip data frames if data with MediaFlags_BOF flag has
+         * not been received yet. On the other hand, QnAbstractArchiveStreamReader drops non-key
+         * frames if it hasn't received one. So, without this condition below
+         * (&& m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)) we may end up
+         * with a frame with MediaFlags_BOF flag being dropped because it is not a key frame and
+         * consumer won't never get a BOF frame.
+         * Above is true only for the video packets => '!videoData' condition.
+         */
+        if (m_BOF
+            && (!videoData || m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)))
+        {
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
             m_BOF = false;
         }
@@ -924,7 +936,7 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData &&  (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
+    if (m_currentData && (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
     {
         const int channel = m_currentData->channelNumber;
 
@@ -1013,7 +1025,6 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     {
 
         result = m_delegate->getNextData();
-
         if (result == 0 && !needToStop())
         {
             if (m_cycleMode)
@@ -1042,7 +1053,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     return result;
 }
 
-unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
+unsigned QnArchiveStreamReader::getCurrentAudioChannel() const
 {
     return m_selectedAudioChannel;
 }
@@ -1055,12 +1066,13 @@ QStringList QnArchiveStreamReader::getAudioTracksInfo() const
     return rez;
 }
 
-bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
+bool QnArchiveStreamReader::setAudioChannel(unsigned num)
 {
-    AVCodecContext* audioContext = m_delegate->setAudioChannel(num);
-    if (audioContext)
-        m_selectedAudioChannel = num;
-    return audioContext != 0;
+    if (!m_delegate->setAudioChannel(num))
+        return false;
+
+    m_selectedAudioChannel = num;
+    return true;
 }
 
 void QnArchiveStreamReader::setSpeedInternal(double value, qint64 currentTimeHint)

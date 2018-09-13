@@ -10,29 +10,22 @@ using QnClientInstallationPtr = QSharedPointer<QnClientInstallation>;
 class QnClientInstallation
 {
 public:
-    QnClientInstallation() = default;
-
     bool exists() const;
     nx::utils::SoftwareVersion version() const;
     void setVersion(const nx::utils::SoftwareVersion& version);
+    int protocolVersion() const;
     QString rootPath() const;
     QString binaryPath() const;
     QString executableFilePath() const;
     QString libraryPath() const;
 
-    bool verify() const;
-
-    static QnClientInstallationPtr installationForPath(const QString &rootPath);
-    bool createInstallationDat();
-
-    bool isNeedsVerification() const;
-    void setNeedsVerification(bool f);
+    static QnClientInstallationPtr installationForPath(const QString& rootPath);
 
 private:
     nx::utils::SoftwareVersion m_version;
+    int m_protoVersion = 0;
 
     QString m_rootPath;
     QString m_binaryPath;
     QString m_libPath;
-    bool m_needsVerification = true;
 };

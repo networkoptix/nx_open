@@ -20,6 +20,11 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 
+QnRecordedChunksRestHandler::QnRecordedChunksRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnRecordedChunksRestHandler::executeGet(
     const QString& /*path*/,
     const QnRequestParamList& params,
@@ -48,13 +53,13 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("<root>\n");
             result.append(errText);
             result.append("</root>\n");
-            return CODE_INVALID_PARAMETER;
+            return nx::network::http::StatusCode::invalidParameter;
         };
 
     if (!errStr.isEmpty())
         return errLog(errStr);
 
-    QnTimePeriodList periods = QnChunksRequestHelper::load(request);
+    QnTimePeriodList periods = QnChunksRequestHelper(serverModule()).load(request);
 
     switch (static_cast<ChunkFormat>(request.format))
     {
@@ -109,7 +114,7 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("]");
     }
 
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }
 
 int QnRecordedChunksRestHandler::executePost(

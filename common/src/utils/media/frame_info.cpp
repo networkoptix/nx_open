@@ -23,7 +23,6 @@ extern "C" {
 #endif
 };
 
-
 namespace {
 
 bool convertImageFormat(
@@ -54,18 +53,17 @@ bool convertImageFormat(
 //  class QnSysMemPictureData
 /////////////////////////////////////////////////////
 
-
 /////////////////////////////////////////////////////
 //  class QnOpenGLPictureData
 /////////////////////////////////////////////////////
 QnOpenGLPictureData::QnOpenGLPictureData(
     SynchronizationContext* const syncCtx,
 //	GLXContext _glContext,
-	unsigned int _glTexture )
+    unsigned int _glTexture )
 :
     QnAbstractPictureDataRef( syncCtx ),
 //	m_glContext( _glContext ),
-	m_glTexture( _glTexture )
+    m_glTexture( _glTexture )
 {
 }
 
@@ -80,7 +78,6 @@ unsigned int QnOpenGLPictureData::glTexture() const
 {
     return m_glTexture;
 }
-
 
 /////////////////////////////////////////////////////
 //  class CLVideoDecoderOutput
@@ -253,7 +250,6 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     }
 }
 
-
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
     if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format)
@@ -378,7 +374,6 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
         }
     }
 }
-
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
@@ -649,4 +644,3 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 }
 
 #endif // ENABLE_DATA_PROVIDERS
-

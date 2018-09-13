@@ -45,6 +45,7 @@ Yunhong Gu, last updated 09/28/2010
 #include <condition_variable>
 #include <map>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 #include "udt.h"
@@ -103,6 +104,7 @@ class CUDTUnited
 {
     friend class CUDT;
     friend class CRendezvousQueue;
+    friend class ServerSideConnectionAcceptor;
 
 public:
     CUDTUnited();
@@ -240,7 +242,7 @@ private:
     void updateMux(CUDTSocket* s, const CUDTSocket* ls);
 
 private:
-    std::map<int, CMultiplexer> m_mMultiplexer;        // UDP multiplexer
+    std::map<int, CMultiplexer> m_mMultiplexers;        // UDP multiplexer
     pthread_mutex_t m_MultiplexerLock;
 
 private:
@@ -248,19 +250,16 @@ private:
 
 private:
     volatile bool m_bClosing;
-    pthread_mutex_t m_GCStopLock;
-    pthread_cond_t m_GCStopCond;
+    std::mutex m_GCStopLock;
+    std::condition_variable m_GCStopCond;
 
     pthread_mutex_t m_InitLock;
     int m_iInstanceCount;                // number of startup() called by application
     bool m_bGCStatus;                    // if the GC thread is working (true)
 
-    pthread_t m_GCThread;
-#ifndef _WIN32
-    static void* garbageCollect(void*);
-#else
-    static DWORD WINAPI garbageCollect(LPVOID);
-#endif
+    std::thread m_GCThread;
+
+    void garbageCollect();
 
     std::map<UDTSOCKET, CUDTSocket*> m_ClosedSockets;   // temporarily store closed sockets
 

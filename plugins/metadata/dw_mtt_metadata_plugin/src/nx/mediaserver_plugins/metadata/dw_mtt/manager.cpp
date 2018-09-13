@@ -101,6 +101,7 @@ Manager::~Manager()
 
 void Manager::prepareHttpClient()
 {
+    NX_ASSERT(!m_httpClient);
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->setUserName(m_auth.user());
     m_httpClient->setUserPassword(m_auth.password());
@@ -142,6 +143,8 @@ void Manager::makeSubscription()
 
 void Manager::makeDeferredSubscription()
 {
+    m_httpClient.reset();
+    m_tcpSocket.reset();
     m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
 }
 
@@ -161,7 +164,8 @@ void Manager::onSubsctiptionDone()
         return;
     }
 
-    const auto statusCode = m_httpClient->response()->statusLine.statusCode;
+    const nx::network::http::Response* response = m_httpClient->response();
+    const int statusCode = response->statusLine.statusCode;
     if (statusCode != nx::network::http::StatusCode::ok)
     {
         NX_URL_PRINT << lm("Http request %1 failed with status code %2")
@@ -174,22 +178,34 @@ void Manager::onSubsctiptionDone()
     SystemError::ErrorCode err = m_httpClient->lastSysErrorCode();
     nx::network::http::AsyncClient::State s = m_httpClient->state();
 
-    const nx::network::http::Response* response = m_httpClient->response();
-
     NX_URL_PRINT << lm("Http request %1 succeeded with status code %2")
         .args(m_httpClient->contentLocationUrl(), m_httpClient->lastSysErrorCode()).toStdString();
-
-    QByteArray body = m_httpClient->fetchMessageBodyBuffer();
 
     m_buffer.clear();
     m_buffer.reserve(kBufferCapacity);
 
-    m_httpClient->socket()->readSomeAsync(
+    m_tcpSocket = m_httpClient->takeSocket();
+    m_httpClient.reset();
+
+    readNextNotificationAsync();
+}
+
+void Manager::readNextNotificationAsync()
+{
+    NX_ASSERT(m_tcpSocket);
+
+    if (!m_tcpSocket)
+    {
+        makeDeferredSubscription();
+        return;
+    }
+    m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
     {
         this->onReceive(errorCode, size);
     });
+
 }
 
 /*
@@ -202,18 +218,13 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
 
     if (code == SystemError::timedOut || code == SystemError::again)
     {
-        m_httpClient->socket()->readSomeAsync(
-            &m_buffer,
-            [this](SystemError::ErrorCode errorCode, size_t size)
-        {
-            this->onReceive(errorCode, size);
-        });
+        readNextNotificationAsync();
         return;
     }
 
     if (code != SystemError::noError || size == 0) //< connection broken or closed
     {
-        NX_URL_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in"
+        NX_URL_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in "
             << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
         makeDeferredSubscription();
         return;
@@ -226,11 +237,24 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
     {
         httpRequest = extractRequestFromBuffer();
         if (httpRequest.isEmpty())
-            break;
+        {
+            if (m_buffer.size() == m_buffer.capacity())
+            {
+                NX_URL_PRINT << "Reading buffer is full, but no complete message found. "
+                    << "Connection will be closed. Next connection attempt in "
+                    << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
+                makeDeferredSubscription();
+                return;
+            }
+            else
+            {
+                break;
+            }
+        }
 
         NX_URL_PRINT << httpRequest.toStdString();
 
-        QDomDocument dom = this->getDom(httpRequest);
+        QDomDocument dom = this->createDomFromRequest(httpRequest);
         if (!dom.isNull())
         {
             QList<AlarmPair> alarmPairs = getAlarmPairs(dom);
@@ -239,12 +263,7 @@ void Manager::onReceive(SystemError::ErrorCode code, size_t size)
         }
     }
 
-    m_httpClient->socket()->readSomeAsync(
-        &m_buffer,
-        [this](SystemError::ErrorCode errorCode, size_t size)
-    {
-        this->onReceive(errorCode, size);
-    });
+    readNextNotificationAsync();
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -337,7 +356,7 @@ QSet<QByteArray> Manager::internalNamesToCatch() const
     return names;
 }
 
-QDomDocument Manager::getDom(const QByteArray& request)
+QDomDocument Manager::createDomFromRequest(const QByteArray& request)
 {
     QDomDocument dom;
     static const QByteArray kXmlBeginning =
@@ -417,10 +436,6 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
     NX_URL_PRINT << "DW MTT-camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
-    const  QString kAddressPattern("%1:%2");
-    QString ipPort = kAddressPattern.arg(
-        m_url.host(), QString::number(m_cameraController.longPollingPort()));
-
     makeSubscription();
 
     return nx::sdk::Error::noError;
@@ -441,12 +456,19 @@ nx::sdk::Error Manager::stopFetchingMetadata()
         [&]()
         {
             m_eventsToCatch.clear();
-            if(m_httpClient)
+            if (m_httpClient)
+            {
                 m_httpClient->pleaseStopSync();
+                m_httpClient.reset();
+            }
+            if (m_tcpSocket)
+            {
+                m_tcpSocket->pleaseStopSync();
+                m_tcpSocket.reset();
+            }
             promise.set_value();
         });
     promise.get_future().wait();
-
     return nx::sdk::Error::noError;
 }
 

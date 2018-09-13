@@ -1,11 +1,11 @@
 #include "volume_slider.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <nx/audio/audiodevice.h>
 
 #include <ui/style/helper.h>
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
-
-#include <utils/common/scoped_value_rollback.h>
 
 namespace {
 
@@ -19,7 +19,7 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem* parent):
     m_updating(false)
 {
     /* Supress AudioDevice reset from constructor. */
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
@@ -35,7 +35,7 @@ QnVolumeSlider::QnVolumeSlider(QGraphicsItem* parent):
     connect(nx::audio::AudioDevice::instance(), &nx::audio::AudioDevice::volumeChanged, this,
         [this]
         {
-            QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+            QScopedValueRollback<bool> guard(m_updating, true);
             setSliderPosition(nx::audio::AudioDevice::instance()->volume() * 100);
         });
 }

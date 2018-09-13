@@ -163,7 +163,7 @@ copyBins()
     install -m 755 "$BUILD_DIR/bin/mediaserver" "$STAGE_BIN/mediaserver-bin"
     if [ "$ENABLE_ROOT_TOOL" = "true" ]
     then
-        install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/"
+        install -m 750 "$BUILD_DIR/bin/root_tool" "$STAGE_BIN/root-tool-bin"
     fi
     install -m 755 "$BUILD_DIR/bin/testcamera" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/external.dat" "$STAGE_BIN/" #< TODO: Why "+x" is needed?
@@ -180,14 +180,19 @@ copyStartupScripts()
 {
     echo "Copying upstart and sysv script"
     install -m 755 -d "$STAGE/etc/init"
+
     install -m 644 "init/networkoptix-mediaserver.conf" \
         "$STAGE/etc/init/$CUSTOMIZATION-mediaserver.conf"
+    install -m 644 "init/root-tool.conf" "$STAGE/etc/init/root-tool.conf"
     install -m 755 -d "$STAGE/etc/init.d"
     install -m 755 "init.d/networkoptix-mediaserver" \
         "$STAGE/etc/init.d/$CUSTOMIZATION-mediaserver"
+    install -m 755 "init.d/root-tool" "$STAGE/etc/init.d/root-tool"
     install -m 755 -d "$STAGE/etc/systemd/system"
     install -m 644 "systemd/networkoptix-mediaserver.service" \
         "$STAGE/etc/systemd/system/$CUSTOMIZATION-mediaserver.service"
+    install -m 644 "systemd/root-tool.service" \
+        "$STAGE/etc/systemd/system/root-tool.service"
 }
 
 # [in] STAGE

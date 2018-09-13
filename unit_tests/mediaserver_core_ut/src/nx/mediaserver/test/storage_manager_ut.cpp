@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 
 #include "media_server_module_fixture.h"
-
+#include <media_server/media_server_module.h>
 namespace nx {
 namespace mediaserver {
 namespace test {
@@ -30,34 +30,34 @@ class StorageManager:
 
 TEST_F(StorageManager, deleteRecordsToTime)
 {
+    QnMediaServerModule serverModule;
+
     std::deque<DeviceFileCatalog::Chunk> chunks;
     addChunk(chunks, 5, 10);
     addChunk(chunks, 20, 5);
     addChunk(chunks, 100, 500);
 
     DeviceFileCatalogPtr catalog(new DeviceFileCatalog(
+        &serverModule,
         lit("camera1"),
         QnServer::ChunksCatalog::HiQualityCatalog,
         QnServer::StoragePool::Normal));
     catalog->addChunks(chunks);
 
-    qnNormalStorageMan->deleteRecordsToTime(catalog, 4);
+    serverModule.normalStorageManager()->deleteRecordsToTime(catalog, 4);
     ASSERT_EQ(5, catalog->minTime());
 
-    qnNormalStorageMan->deleteRecordsToTime(catalog, 50);
+    serverModule.normalStorageManager()->deleteRecordsToTime(catalog, 50);
     ASSERT_EQ(100, catalog->minTime());
 
-    qnNormalStorageMan->deleteRecordsToTime(catalog, 100);
+    serverModule.normalStorageManager()->deleteRecordsToTime(catalog, 100);
     ASSERT_EQ(100, catalog->minTime());
 
-    qnNormalStorageMan->deleteRecordsToTime(catalog, 599);
+    serverModule.normalStorageManager()->deleteRecordsToTime(catalog, 599);
     ASSERT_EQ(100, catalog->minTime());
 
-    qnNormalStorageMan->deleteRecordsToTime(catalog, 600);
+    serverModule.normalStorageManager()->deleteRecordsToTime(catalog, 600);
     ASSERT_EQ(AV_NOPTS_VALUE, catalog->minTime());
-
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
 }
 
 } // namespace test

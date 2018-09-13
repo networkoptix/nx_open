@@ -78,11 +78,11 @@ namespace ec2
             while (!m_runningHttpRequests.empty())
             {
                 nx::network::http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
+                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
                 httpClient->pleaseStopSync(checkForLocks);
                 //it is garanteed that no http event handler is running currently and no handler will be called
                 lk.relock();
-                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
             }
         }
 
@@ -173,8 +173,9 @@ namespace ec2
             std::function<void()> handler;
             {
                 QnMutexLocker lk( &m_mutex );
-                auto it = m_runningHttpRequests.find( httpClient );
-                NX_ASSERT( it != m_runningHttpRequests.end() );
+                auto it = m_runningHttpRequests.find(httpClient);
+                if(it == m_runningHttpRequests.end())
+                    return; //< ClientQueryProcessor is about to stop.
                 handler = std::move(it->second);
                 httpClient->pleaseStopSync();
                 m_runningHttpRequests.erase( it );
@@ -274,11 +275,11 @@ namespace ec2
         void addCustomHeaders(const nx::network::http::AsyncHttpClientPtr& httpClient, ApiCommand::Value cmdCode)
         {
             if (cmdCode != ApiCommand::testConnection && cmdCode != ApiCommand::connect)
-            {
-                if (!commonModule()->videowallGuid().isNull())
-                    httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
                 httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
-            }
+
+            if (!commonModule()->videowallGuid().isNull())
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
+
             httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
     };

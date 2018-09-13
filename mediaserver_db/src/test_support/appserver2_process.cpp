@@ -18,6 +18,7 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 #include <nx/vms/cloud_integration/vms_cloud_connection_processor.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/vms/utils/detach_server_processor.h>
 #include <nx/vms/utils/initial_data_loader.h>
 #include <nx/vms/utils/system_merge_processor.h>
 #include <nx/vms/utils/setup_system_processor.h>
@@ -38,7 +39,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/license/util.h>
 #include <network/tcp_connection_priv.h>
 #include <nx1/info.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -101,7 +101,7 @@ void Appserver2Process::setOnStartedEventHandler(
 int Appserver2Process::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
+    auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_onStartedEventHandler)
@@ -119,14 +119,17 @@ int Appserver2Process::exec()
         return 0;
     }
 
+    auto auditManager = std::make_unique<AuditManager>();
     m_commonModule = std::make_unique<QnCommonModule>(false, nx::core::access::Mode::direct);
+    m_commonModule->setAuditManager(auditManager.get());
+
     const auto moduleGuid = settings.moduleGuid();
     m_commonModule->setModuleGUID(
         moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
-    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
+    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>(m_commonModule.get());
 
     updateRuntimeData();
 
@@ -139,7 +142,6 @@ int Appserver2Process::exec()
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
 
-    AuditManager auditManager(m_commonModule.get());
     using namespace nx::vms::network;
 
     std::unique_ptr<ec2::LocalConnectionFactory>
@@ -158,11 +160,11 @@ int Appserver2Process::exec()
             dbUrl, nx::vms::api::ClientInfoData(), &ec2Connection);
         if (errorCode == ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Connected to local EC2"));
             break;
         }
 
-        NX_LOG(lit("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        NX_ERROR(this, lit("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)));
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
@@ -283,6 +285,8 @@ void Appserver2Process::registerHttpHandlers(
     selfInformation.sslAllowed = false;
     selfInformation.port = m_tcpListener->getPort();
     commonModule()->setModuleInformation(selfInformation);
+
+    auto messageBus = ec2ConnectionFactory->messageBus();
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/moduleInformation",
         [](const nx::network::http::Request&, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -434,6 +438,25 @@ void Appserver2Process::registerHttpHandlers(
             return resultCode;
         });
 
+    m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP", "api/detachFromSystem",
+        [this, messageBus](
+            const nx::network::http::Request& request,
+            QnHttpConnectionListener* /*owner*/,
+            QnJsonRestResult* result)
+        {
+            messageBus->commonModule()->setStandAloneMode(true);
+            messageBus->dropConnections();
+
+            auto data = QJson::deserialized<PasswordData>(request.messageBody);
+            nx::vms::utils::DetachServerProcessor detachServerProcessor(
+                m_commonModule.get(),
+                &m_cloudManagerGroup->connectionManager);
+            const auto resultCode = detachServerProcessor.detachServer(result);
+
+            messageBus->commonModule()->setStandAloneMode(false);
+            return resultCode;
+        });
+
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
         nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
@@ -464,6 +487,7 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
     server->setId(commonModule()->moduleGUID());
+
     m_commonModule->resourcePool()->addResource(server);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
@@ -474,6 +498,9 @@ QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     api::MediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
     apiServer.name = server->getName();
+    apiServer.authKey = guidFromArbitraryData(apiServer.id.toString() + "authKey").toString();
+    apiServer.typeId = nx::vms::api::MediaServerData::kResourceTypeId;
+
     ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
@@ -541,24 +568,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     for (const auto &camera : cameraList)
         messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
-    nx::vms::api::MediaServerData serverData;
-    auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
-    if (resTypePtr.isNull())
-        return false;
-    serverData.typeId = resTypePtr->getId();
-    serverData.id = commonModule()->moduleGUID();
-    serverData.authKey = QnUuid::createUuid().toString();
-    serverData.name = lm("server %1").arg(serverData.id);
-    if (resTypePtr.isNull())
-        return false;
-    serverData.typeId = resTypePtr->getId();
-
-    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
-    resultCode = serverManager->saveSync(serverData);
-    if (resultCode != ec2::ErrorCode::ok)
-        return false;
-
-    auto ownServer = commonModule()->resourcePool()->getResourceById(serverData.id);
+    auto ownServer = commonModule()->resourcePool()->getResourceById(commonModule()->moduleGUID());
     if (!ownServer)
         return false;
     ownServer->setStatus(Qn::Online);

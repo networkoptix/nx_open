@@ -1,5 +1,3 @@
-#if defined(USE_OWN_MUTEX)
-
 #if defined(_WIN32)
 #include <Windows.h>
 #elif defined(__linux__)
@@ -16,41 +14,34 @@
 #include <QtCore/QMutexLocker>
 
 #include "mutex.h"
-#include "mutex_impl.h"
 #include "thread_util.h"
+
 #include <nx/utils/log/log.h>
 
-#if defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-static bool kDoAnalyseForDeadlock = true;
-#else
-static bool kDoAnalyseForDeadlock = false;
-#endif
+namespace nx::utils {
 
 //-------------------------------------------------------------------------------------------------
 // class MutexLockKey
 
-MutexLockKey::MutexLockKey():
-    line(0),
-    mutexPtr(nullptr),
-    lockID(0),
-    threadHoldingMutex(0),
-    lockRecursionDepth(0)
+MutexLockKey::MutexLockKey()
 {
 }
 
 MutexLockKey::MutexLockKey(
     const char* _sourceFile,
     int _sourceLine,
-    QnMutex* _mutexPtr,
+    MutexDelegate* _mutexPtr,
     size_t _lockID,
-    std::uintptr_t _threadHoldingMutex)
-    :
+    std::uintptr_t _threadHoldingMutex,
+    bool recursive)
+:
     sourceFile(_sourceFile),
     line(_sourceLine),
     mutexPtr(_mutexPtr),
     lockID(_lockID),
     threadHoldingMutex(_threadHoldingMutex),
-    lockRecursionDepth(0)
+    lockRecursionDepth(0),
+    recursive(recursive)
 {
 }
 
@@ -245,17 +236,14 @@ const ThreadContext* ThreadContextGuard::operator->() const
 //-------------------------------------------------------------------------------------------------
 // class MutexLockAnalyzer
 
-void MutexLockAnalyzer::mutexCreated(QnMutex* const /*mutex*/)
+void MutexLockAnalyzer::mutexCreated(MutexDelegate* const /*mutex*/)
 {
 }
 
-void MutexLockAnalyzer::beforeMutexDestruction(QnMutex* const mutex)
+void MutexLockAnalyzer::beforeMutexDestruction(MutexDelegate* const mutex)
 {
-    if (kDoAnalyseForDeadlock)
-    {
-        QWriteLocker lk(&m_mutex);
-        m_lockDigraph.removeVertice(mutex);
-    }
+    QWriteLocker lk(&m_mutex);
+    m_lockDigraph.removeVertice(mutex);
 }
 
 void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
@@ -272,7 +260,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
     const MutexLockKey& prevLock = threadContext->currentLockPath.front();
     if (prevLock.mutexPtr == mutexLockPosition.mutexPtr)
     {
-        if (mutexLockPosition.mutexPtr->m_impl->recursive)
+        if (mutexLockPosition.recursive)
         {
             ++threadContext->currentLockPath.front().lockRecursionDepth;
             return;     //ignoring recursive lock
@@ -290,8 +278,6 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
     }
 
     threadContext->currentLockPath.push_front(mutexLockPosition);
-    if (!kDoAnalyseForDeadlock)
-        return;
 
     QReadLocker readLock(&m_mutex);
 
@@ -308,7 +294,7 @@ void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
         return;
     }
 
-    std::list<QnMutex*> existingPath;
+    std::list<MutexDelegate*> existingPath;
     std::list<LockGraphEdgeData> edgesTravelled;
     //travelling edges containing any thread different from current
     //    This is needed to avoid reporting deadlock in case of loop in the same thread.
@@ -477,4 +463,4 @@ bool MutexLockAnalyzer::pathConnected(const std::list<LockGraphEdgeData>& edgesT
     return true;
 }
 
-#endif  //USE_OWN_MUTEX
+} // namespace nx::utils

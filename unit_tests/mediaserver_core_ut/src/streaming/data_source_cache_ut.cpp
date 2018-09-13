@@ -31,10 +31,11 @@ public:
     }
 };
 
-class DummyTranscoder:
-    public QnTranscoder
+class DummyTranscoder: public QnTranscoder
 {
 public:
+    DummyTranscoder(): QnTranscoder(nullptr) {}
+
     virtual int setContainer(const QString& /*value*/) override
     {
         return 0;

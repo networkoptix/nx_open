@@ -33,32 +33,32 @@ QnWearableUploadManager::~QnWearableUploadManager()
 {
 }
 
-qint64 QnWearableUploadManager::downloadBytesAvailable() const
+QnWearableStorageStats QnWearableUploadManager::storageStats() const
 {
+    QnWearableStorageStats result;
+
     Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
     QStorageInfo info(downloader->filePath(lit(".")));
 
     QString volumeRoot = info.rootPath();
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByVolume(volumeRoot);
-    qint64 spaceLimit = storage ? storage->getSpaceLimit() : 0;
+    QnStorageResourcePtr storage = serverModule()->normalStorageManager()->getStorageByVolume(volumeRoot);
+    qint64 spaceLimit = storage && storage->isUsedForWriting() ? storage->getSpaceLimit() : 0;
 
-    return std::max(0ll, info.bytesAvailable() - spaceLimit);
-}
+    result.downloaderBytesAvailable = std::max(0ll, info.bytesAvailable() - spaceLimit);
+    result.downloaderBytesFree = info.bytesAvailable();
 
-qint64 QnWearableUploadManager::totalBytesAvailable() const
-{
-    qint64 result = 0;
-
-    for (const QnStorageResourcePtr& storage : qnNormalStorageMan->getUsedWritableStorages())
+    auto storages = serverModule()->normalStorageManager()->getUsedWritableStorages();
+    for (const QnStorageResourcePtr& storage: serverModule()->normalStorageManager()->getUsedWritableStorages())
     {
         qint64 free = storage->getFreeSpace();
         qint64 spaceLimit = storage->getSpaceLimit();
         qint64 available = std::max(0ll, free - spaceLimit);
 
-        result += available;
+        result.totalBytesAvailable += available;
     }
+    result.haveStorages = !storages.empty();
 
     return result;
 }
@@ -76,7 +76,7 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     if (!file->open(QIODevice::ReadOnly))
         return false;
 
-    QnSecurityCamResourcePtr camera = serverModule()->commonModule()->resourcePool()->
+    QnSecurityCamResourcePtr camera = serverModule()->resourcePool()->
         getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;

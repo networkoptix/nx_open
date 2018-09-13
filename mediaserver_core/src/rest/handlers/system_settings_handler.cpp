@@ -35,10 +35,10 @@ void SystemSettingsProcessor::systemNameChanged(
     if (oldValue == newValue)
         return;
 
-    QnAuditRecord auditRecord = qnAuditManager->prepareRecord(m_authSession, Qn::AR_SystemNameChanged);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(m_authSession, Qn::AR_SystemNameChanged);
     QString description = lit("%1 -> %2").arg(oldValue).arg(newValue);
     auditRecord.addParam("description", description.toUtf8());
-    qnAuditManager->addAuditRecord(auditRecord);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
 //-------------------------------------------------------------------------------------------------

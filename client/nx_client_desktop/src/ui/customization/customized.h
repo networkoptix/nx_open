@@ -64,7 +64,7 @@ protected:
 template<class Base>
 class Customized<Base, true>: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(Customized, Base, {});
+    using Base::Base;
 };
 
 

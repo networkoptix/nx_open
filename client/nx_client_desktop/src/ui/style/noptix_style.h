@@ -1,5 +1,4 @@
-#ifndef QN_NOPTIX_STYLE_H
-#define QN_NOPTIX_STYLE_H
+#pragma once
 
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStyleOptionProgressBar>
@@ -11,22 +10,40 @@ class QnNoptixStyleAnimator;
 class QnSkin;
 class QnCustomizer;
 
-class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
-    Q_OBJECT;
+class QnNoptixStyle: public QProxyStyle, public GraphicsStyle
+{
+    Q_OBJECT
 
     typedef QProxyStyle base_type;
 
 public:
-    QnNoptixStyle(QStyle *style = NULL);
-    virtual ~QnNoptixStyle();
+    QnNoptixStyle(QStyle* style = nullptr);
+    virtual ~QnNoptixStyle() override;
 
-    virtual QPixmap generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override;
+    virtual QPixmap generatedIconPixmap(
+        QIcon::Mode iconMode, const QPixmap& pixmap, const QStyleOption* option) const override;
 
-    virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
-    virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
-    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
+    virtual void drawComplexControl(
+        ComplexControl control,
+        const QStyleOptionComplex* option,
+        QPainter* painter,
+        const QWidget* widget = nullptr) const override;
+    virtual void drawControl(
+        ControlElement element,
+        const QStyleOption* option,
+        QPainter* painter,
+        const QWidget* widget = nullptr) const override;
+    virtual void drawPrimitive(
+        PrimitiveElement element,
+        const QStyleOption* option,
+        QPainter* painter,
+        const QWidget* widget = nullptr) const override;
 
-    virtual int styleHint(StyleHint hint, const QStyleOption *option = 0, const QWidget *widget = 0, QStyleHintReturn *returnData = 0) const override;
+    virtual int styleHint(
+        StyleHint hint,
+        const QStyleOption* option = nullptr,
+        const QWidget* widget = nullptr,
+        QStyleHintReturn* returnData = nullptr) const override;
 
     virtual void polish(QApplication *application) override;
     virtual void unpolish(QApplication *application) override;
@@ -48,9 +65,9 @@ private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
     qreal hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const;
     void stopHoverTracking(const QWidget *widget) const;
-    void drawProgressBarGroove(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
-    void drawProgressBarContents(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
-    void drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarGroove(const QStyleOptionProgressBar *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarContents(const QStyleOptionProgressBar *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarLabel(const QStyleOptionProgressBar *pb, QPainter *painter, const QWidget *widget) const;
 
 private:
     QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
@@ -70,6 +87,3 @@ private:
  * last row if there is not enough space for it.
  */
 #define HideLastRowInTreeIfNotEnoughSpace _id("_qn_hideLastRowInTreeIfNotEnoughSpace")
-
-
-#endif // QN_NOPTIX_STYLE_H

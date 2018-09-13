@@ -113,7 +113,7 @@ signals:
     void cryptSha512HashChanged(const QnResourcePtr& user);
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
-	void realmChanged(const QnResourcePtr& user);
+    void realmChanged(const QnResourcePtr& user);
     void sessionExpired(const QnResourcePtr& user);
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;

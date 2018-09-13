@@ -20,13 +20,12 @@
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 
@@ -98,7 +97,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     ui->setupUi(this);
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->treeWidget);
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(ui->treeWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -219,7 +218,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResources() const
 void QnResourceSelectionDialog::setSelectedResources(const QSet<QnUuid>& selected)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        QScopedValueRollback<bool> guard(m_updating, true);
         setSelectedResourcesInternal(selected);
     }
     at_resourceModel_dataChanged();

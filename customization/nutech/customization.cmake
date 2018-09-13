@@ -8,16 +8,14 @@ set(display.product.name "NTN")
 set(product.name.short "dwspectrum")
 set(product.appName "ntnspectrum")
 set(company.name "NuTech National")
-set(uri.protocol "dw-vms")
+set(uri.protocol "ntn-vms")
 set(cloudName "NTN Cloud")
 set(installer.name "ntnspectrum")
 
 # Support section
 set(companyUrl "http://www.nutechnational.com")
 set(productUrl "http://www.nutechnational.com")
-set(supportUrl "")
 set(supportEmail "admin@nutechnational.com")
-set(supportPhone "")
 set(licenseEmail "requests.admin@nutechnational.com")
 # end of Support section
 

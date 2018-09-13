@@ -56,7 +56,7 @@ bool ArchiveDelegateWrapper::hasVideo() const
     return m_delegate->hasVideo();
 }
 
-AVCodecContext* ArchiveDelegateWrapper::setAudioChannel(int num)
+bool ArchiveDelegateWrapper::setAudioChannel(unsigned num)
 {
     return m_delegate->setAudioChannel(num);
 }

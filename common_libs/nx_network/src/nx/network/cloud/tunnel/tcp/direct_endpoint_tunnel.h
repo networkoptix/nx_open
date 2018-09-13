@@ -16,7 +16,7 @@ class NX_NETWORK_API DirectTcpEndpointTunnel:
 public:
     DirectTcpEndpointTunnel(
         aio::AbstractAioThread* aioThread,
-        nx::String connectSessionId,
+        std::string connectSessionId,
         SocketAddress targetEndpoint,
         std::unique_ptr<AbstractStreamSocket> connection);
     virtual ~DirectTcpEndpointTunnel();
@@ -41,7 +41,7 @@ private:
         std::unique_ptr<AbstractStreamSocket> tcpSocket;
     };
 
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     const SocketAddress m_targetEndpoint;
     std::unique_ptr<AbstractStreamSocket> m_controlConnection;
     std::list<ConnectionContext> m_connections;

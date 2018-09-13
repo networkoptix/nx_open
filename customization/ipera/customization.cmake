@@ -18,9 +18,7 @@ set(android.keypass "wLjfL8Yx")
 # Support section
 set(companyUrl "http://www.ipera.ru")
 set(productUrl "http://www.flyviewvms.ru")
-set(supportUrl "")
 set(supportEmail "support@flyvi.ru")
-set(supportPhone "")
 set(licenseEmail "license@flyvi.ru")
 # end of Support section
 
@@ -28,7 +26,6 @@ set(defaultWebPages
     "{\"Home Page\": \"http://flyviewvms.ru\", \"Support\": \"http://flyviewvms.ru/support\"}")
 
 # Update parameters
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.flyviewvms.ru/updates.json")
 set(releaseNotesUrl "http://updates.flyviewvms.ru/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.flyviewvms.ru/updates.json")

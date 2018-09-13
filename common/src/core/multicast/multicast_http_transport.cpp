@@ -455,7 +455,7 @@ void Transport::eraseRequest(const QUuid& id)
 
 void Transport::at_socketReadyRead()
 {
-    std::vector<Guard> callbackGuards;
+    std::vector<nx::utils::Guard> callbackGuards;
 
     QnMutexLocker lock(&m_mutex);
     while (m_recvSocket->hasPendingDatagrams())

@@ -50,8 +50,8 @@ def test_merged_archive(two_merged_mediaservers, camera, sample_media_file):
         two.storage.save_media_sample(camera, st, sample)
     one.api.rebuild_archive()
     two.api.rebuild_archive()
-    assert all_expected_periods == one.api.get_recorded_time_periods(camera)
-    assert all_expected_periods == two.api.get_recorded_time_periods(camera)
+    assert all_expected_periods == one.api.get_recorded_time_periods(camera.id)
+    assert all_expected_periods == two.api.get_recorded_time_periods(camera.id)
     return one, two, expected_periods_one, expected_periods_two
 
 
@@ -61,7 +61,7 @@ def test_separated_archive(two_merged_mediaservers, camera, sample_media_file):
     new_id = uuid.uuid4()
     one.api.set_local_system_id(new_id)
     assert one.api.get_local_system_id() == new_id
-    assert expected_periods_one == one.api.get_recorded_time_periods(camera)
-    assert expected_periods_two == two.api.get_recorded_time_periods(camera)
+    assert expected_periods_one == one.api.get_recorded_time_periods(camera.id)
+    assert expected_periods_two == two.api.get_recorded_time_periods(camera.id)
     assert not one.installation.list_core_dumps()
     assert not two.installation.list_core_dumps()

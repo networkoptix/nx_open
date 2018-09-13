@@ -1,5 +1,4 @@
-#ifndef __TRANSCODER_H
-#define __TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -20,6 +19,7 @@ extern "C"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 
 class CLVideoDecoderOutput;
+namespace nx { namespace metrics { struct Storage; } }
 
 /*!
     \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
@@ -142,7 +142,7 @@ class QnTranscoder: public QObject
     Q_OBJECT
 
 public:
-    QnTranscoder();
+    QnTranscoder(nx::metrics::Storage* metrics);
     virtual ~QnTranscoder();
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
@@ -227,7 +227,8 @@ public:
     static int suggestBitrate(
         AVCodecID codec,
         QSize resolution,
-        Qn::StreamQuality quality);
+        Qn::StreamQuality quality,
+        const char* codecName = nullptr);
 
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 
@@ -266,10 +267,10 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
+    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif  // __TRANSCODER_H

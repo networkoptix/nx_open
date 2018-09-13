@@ -6,31 +6,22 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/root_tool.h>
+#include <nx/mediaserver/root_fs.h>
 
 #include "file_deletor.h"
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 10;
 
-QnFileDeletor* QnFileDeletor_inst = 0;
-
-QnFileDeletor::QnFileDeletor(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+QnFileDeletor::QnFileDeletor(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
-    QnFileDeletor_inst = this;
 }
 
 QnFileDeletor::~QnFileDeletor()
 {
     pleaseStop();
     wait();
-    QnFileDeletor_inst = 0;
-}
-
-QnFileDeletor* QnFileDeletor::instance()
-{
-    return QnFileDeletor_inst;
 }
 
 void QnFileDeletor::run()
@@ -45,11 +36,11 @@ void QnFileDeletor::run()
 
         static const int DELTA = 5; // in range [-5..+5] seconds
         int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
-        if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
+        if (serverModule()->backupStorageManager() && serverModule()->normalStorageManager() && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
             m_storagesTimer.restart();
-            qnNormalStorageMan->clearSpace();
-            qnBackupStorageMan->clearSpace();
+            serverModule()->normalStorageManager()->clearSpace();
+            serverModule()->backupStorageManager()->clearSpace();
         }
         msleep(500);
     }
@@ -68,10 +59,10 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (qnServerModule->rootTool()->removePath(fileName))
+    if (serverModule()->rootFileSystem()->removePath(fileName))
         return true;
 
-    return !qnServerModule->rootTool()->isPathExists(fileName);
+    return !serverModule()->rootFileSystem()->isPathExists(fileName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
@@ -148,7 +139,7 @@ void QnFileDeletor::processPostponedFiles()
     {
         if (std::chrono::steady_clock::now() - start > kMaxProcessPostponedDuration)
         {
-            NX_LOG(lit("[Cleanup] process postponed files duration exceeded. Breaking."), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("[Cleanup] process postponed files duration exceeded. Breaking."));
             for (; itr != m_postponedFiles.end(); ++itr)
                 newList.insert(*itr);
             break;
@@ -163,23 +154,23 @@ void QnFileDeletor::processPostponedFiles()
 
             if (!storage)
             {
-                NX_LOG(lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
+                NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
                         .arg(itr->storageId.toString())
-                        .arg(itr->fileName), cl_logDEBUG2);
+                        .arg(itr->fileName));
             }
             else if (storage->getStatus() == Qn::ResourceStatus::Offline)
             {
-                NX_LOG(lit("[Cleanup] storage %1 is offline. Postponing file %2")
+                NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
                         .arg(storage->getUrl())
-                        .arg(itr->fileName), cl_logDEBUG2);
+                        .arg(itr->fileName));
             }
 
             if (needToPostpone || !internalDeleteFile(itr->fileName))
             {
                 newList.insert(*itr);
-                NX_LOG(lit("[Cleanup] Postponing file %1. Reason: %2")
+                NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
                     .arg(itr->fileName)
-                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"), cl_logDEBUG2);
+                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
             }
         }
     }

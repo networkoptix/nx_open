@@ -51,6 +51,12 @@ void CameraResourceStub::markCameraAsNvr()
     setDeviceType(nx::core::resource::DeviceType::nvr);
 }
 
+void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)
+{
+    m_licenseType = licenseType;
+    emit licenseTypeChanged(toSharedPointer(this));
+}
+
 void CameraResourceStub::markCameraAsVMax()
 {
     m_licenseType = Qn::LC_VMAX;

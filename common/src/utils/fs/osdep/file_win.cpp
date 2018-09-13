@@ -1,7 +1,7 @@
 /***********************************************************************
-*	File: file_win32.cpp
-*	Author: Andrey Kolesnikov
-*	Date: 5 dec 2006
+* File: file_win32.cpp
+* Author: Andrey Kolesnikov
+* Date: 5 dec 2006
 ***********************************************************************/
 
 #ifdef Q_OS_WIN
@@ -13,7 +13,7 @@
 #include <io.h>
 #include <windows.h>
 #include <sys/stat.h>
-
+#include <nx/utils/log/log.h>
 
 QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 {
@@ -31,7 +31,6 @@ QnFile::QnFile(int /*fd*/): m_eof(false)
 {
     NX_ASSERT(false, "Windows is not supported");
 }
-
 
 QnFile::~QnFile()
 {
@@ -87,7 +86,8 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
 
     // Bail out on error.
     if (m_impl == INVALID_HANDLE_VALUE) {
-        qWarning() << qt_error_string();
+        NX_WARNING(this, lm("Failed to open file %1, mode is %2, error is %3")
+            .args(m_fileName, openMode, qt_error_string()));
         return false;
     }
 

@@ -71,7 +71,7 @@ void QnStoredFileDataProvider::at_fileLoaded(const QByteArray& fileData, bool st
         return;
 
     m_provider = mediaFileReader;
-    m_provider->setAudioChannel( 0 );
+    m_provider->setAudioChannel(0);
     m_state = StoredFileDataProviderState::Ready;
     m_cond.wakeOne();
 

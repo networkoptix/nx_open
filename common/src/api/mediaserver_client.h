@@ -83,6 +83,11 @@ public:
         std::function<void(QnJsonRestResult)> completionHandler);
     QnJsonRestResult detachFromCloud(const DetachFromCloudData& request);
 
+    void detachFromSystem(
+        const PasswordData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult detachFromSystem(const PasswordData& request);
+
     void mergeSystems(
         const MergeSystemData& request,
         std::function<void(QnJsonRestResult)> completionHandler);

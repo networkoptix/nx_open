@@ -84,7 +84,7 @@ QnAbstractStorageResource::FileInfoList QnQtFileStorageResource::getFileList(con
 
 qint64 QnQtFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-	return 0; //< not implemented
+    return 0; //< not implemented
 }
 
 Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate()

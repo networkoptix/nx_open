@@ -84,10 +84,10 @@ struct LayoutSettingsDialogState
         /** Path to the selected image (may be path in cache). */
         QString imageSourcePath;
 
-        // Preview image.
+        /** Preview image. */
         QImage preview;
 
-        // Cropped preview image.
+        /** Cropped preview image. */
         QImage croppedPreview;
 
         /** Image is present and image file is available locally. */

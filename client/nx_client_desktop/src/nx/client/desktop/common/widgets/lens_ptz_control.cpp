@@ -139,7 +139,7 @@ void LensPtzControl::updateState()
         }
     }
 
-    Value newValue;
+    Value newValue; //< value from handlers
 
     newValue.rotation = m_current.rotation;
     if (int len2 = QPointF::dotProduct(m_rotationHandler.position, m_rotationHandler.position))
@@ -176,28 +176,31 @@ void LensPtzControl::updateState()
         newValue.vertical = m_ptzHandler.position.y() / limit;
     }
 
-    // Adding values from pressed buttons.
-    newValue.horizontal += m_buttonState.horizontal;
-    newValue.vertical += m_buttonState.vertical;
-    newValue.rotation += m_buttonState.rotation;
+    Value newOutput = newValue; //< value from handlers and external buttons.
 
-    newValue.horizontal = clamp(newValue.horizontal, 1.0f);
-    newValue.vertical = clamp(newValue.vertical, 1.0f);
-    newValue.rotation = clamp(newValue.rotation, 180.0f);
+    // Adding values from pressed buttons.
+    newOutput.horizontal += m_buttonState.horizontal;
+    newOutput.vertical += m_buttonState.vertical;
+    newOutput.rotation += m_buttonState.rotation;
+
+    newOutput.horizontal = clamp(newOutput.horizontal, 1.0f);
+    newOutput.vertical = clamp(newOutput.vertical, 1.0f);
+    newOutput.rotation = clamp(newOutput.rotation, 180.0f);
 
     // Should send signal if we:
     //  - pan/tilt has changed over the threshold.
     //  - pan/tilt became zero, and was not zero before.
     //  - pan/tilt became non-zero and was zero before.
     //  - all the same for rotation.
-    bool changed = changedEnough(m_current.horizontal, newValue.horizontal, kSensitivity)
-        || changedEnough(m_current.vertical, newValue.vertical, kSensitivity)
-        || changedEnough(m_current.rotation, newValue.rotation, kSensitivity*180.0);
+    bool changed = changedEnough(m_output.horizontal, newOutput.horizontal, kSensitivity)
+        || changedEnough(m_output.vertical, newOutput.vertical, kSensitivity)
+        || changedEnough(m_output.rotation, newOutput.rotation, kSensitivity*180.0);
 
     if (changed)
     {
         m_current = newValue;
-        emit valueChanged(m_current);
+        m_output = newOutput;
+        emit valueChanged(m_output);
     }
 
     if (m_needRedraw)
@@ -381,7 +384,7 @@ void LensPtzControl::mouseMoveEvent(QMouseEvent* event)
 
 LensPtzControl::Value LensPtzControl::value() const
 {
-    return m_current;
+    return m_output;
 }
 
 void LensPtzControl::setValue(const Value& value)

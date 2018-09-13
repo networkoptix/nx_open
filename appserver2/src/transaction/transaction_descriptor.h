@@ -164,16 +164,16 @@ struct TransactionDescriptor : TransactionDescriptorBase
     GetTransactionTypeFuncType<ParamType> getTransactionTypeFunc;
 
     template<
-		typename GetHashF,
-		typename CreateTranF,
-		typename TriggerNotificationF,
-		typename CheckSavePermissionFunc,
-		typename CheckReadPermissionFunc,
-		typename FilterBySavePermissionFunc,
-		typename FilterByReadPermissionFunc,
-		typename CheckRemoteAccessFunc,
+        typename GetHashF,
+        typename CreateTranF,
+        typename TriggerNotificationF,
+        typename CheckSavePermissionFunc,
+        typename CheckReadPermissionFunc,
+        typename FilterBySavePermissionFunc,
+        typename FilterByReadPermissionFunc,
+        typename CheckRemoteAccessFunc,
         typename GetTransactionTypeFunc
-	>
+    >
     TransactionDescriptor(ApiCommand::Value value,
         bool isPersistent,
         bool isSystem,

@@ -5,7 +5,7 @@ import pytest
 from contextlib2 import ExitStack
 from netaddr import IPNetwork
 
-from framework.networking import setup_flat_network
+from framework.vms.networks import setup_flat_network
 
 _logger = logging.getLogger(__name__)
 

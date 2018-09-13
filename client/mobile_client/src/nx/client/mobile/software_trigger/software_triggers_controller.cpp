@@ -56,7 +56,7 @@ void SoftwareTriggersController::setResourceId(const QString& id)
 
     if (m_resourceId.isNull())
     {
-        NX_EXPECT(false, "Resource is not camera");
+        NX_ASSERT(false, "Resource is not camera");
     }
 
     cancelTriggerAction();
@@ -77,14 +77,14 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
 {
     if (!m_activeTriggerId.isNull())
     {
-        NX_EXPECT(false, "Can't activate trigger while another in progress");
+        NX_ASSERT(false, "Can't activate trigger while another in progress");
         return false;
     }
 
     const auto rule = m_ruleManager->rule(id);
     if (!rule)
     {
-        NX_EXPECT(false, "Not rule for specified trigger");
+        NX_ASSERT(false, "Not rule for specified trigger");
         return false;
     }
 
@@ -102,8 +102,8 @@ bool SoftwareTriggersController::deactivateTrigger()
     const auto rule = m_ruleManager->rule(m_activeTriggerId);
     if (!rule || !rule->isActionProlonged())
     {
-        NX_EXPECT(rule, "No rule for specified trigger");
-        NX_EXPECT(rule->isActionProlonged(), "Action is not prolonged");
+        NX_ASSERT(rule, "No rule for specified trigger");
+        NX_ASSERT(rule->isActionProlonged(), "Action is not prolonged");
         return false;
     }
 
@@ -128,8 +128,8 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
 {
     if (m_resourceId.isNull() || id.isNull())
     {
-        NX_EXPECT(!m_resourceId.isNull(), "Invalid resource id");
-        NX_EXPECT(!id.isNull(), "Invalid trigger id");
+        NX_ASSERT(!m_resourceId.isNull(), "Invalid resource id");
+        NX_ASSERT(!id.isNull(), "Invalid trigger id");
         return false;
     }
 
@@ -140,7 +140,7 @@ bool SoftwareTriggersController::setTriggerState(QnUuid id, vms::event::EventSta
     const auto rule = m_ruleManager->rule(id);
     if (!rule)
     {
-        NX_EXPECT(rule, "Trigger does not exist");
+        NX_ASSERT(rule, "Trigger does not exist");
         return false;
     }
 

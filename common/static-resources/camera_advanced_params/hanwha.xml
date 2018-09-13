@@ -76,7 +76,7 @@
                         group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;">
+                        aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;specific=true">
                 </param>
                 
                 <!-- NVR only properties -->
@@ -306,7 +306,7 @@
                         group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;">
+                        aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;specific=true">
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/FrameRate"
@@ -990,6 +990,13 @@
             <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
                     dataType="Separator"
                     name="sep"/>
+            <param id="image/ptr/AutoRotate=True"
+                name="Auto Rotate"
+                dataType="Button"
+                writeCmd="control"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%autoRotateButtonSeparator"
+                dataType="Separator"
+                name="sep"/>
             <param id="image/focus/Mode=Reset"
                 name="Initialize Focus"
                 dataType="Button"

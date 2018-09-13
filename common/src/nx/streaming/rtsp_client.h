@@ -59,69 +59,6 @@ public:
     boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
 };
 
-enum class TimePolicy
-{
-    bindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
-    ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
-    forceLocalTime, //< Use local time only.
-    forceCameraTime, //< Use camera NPT time only.
-    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
-};
-
-class QnRtspTimeHelper
-{
-public:
-
-    QnRtspTimeHelper(const QString& resId);
-    ~QnRtspTimeHelper();
-
-    /*!
-        \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
-    */
-    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
-    QString getResID() const { return m_resourceId; }
-
-    void setTimePolicy(TimePolicy policy);
-
-private:
-    double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
-    bool isLocalTimeChanged();
-    bool isCameraTimeChanged(const QnRtspStatistic& statistics, double* outCameraTimeDriftSeconds);
-    void reset();
-private:
-    quint32 m_prevRtpTime = 0;
-    quint32 m_prevCurrentSeconds = 0;
-    QElapsedTimer m_timer;
-    qint64 m_localStartTime;
-    //qint64 m_cameraTimeDrift;
-    boost::optional<double> m_rtcpReportTimeDiff;
-    nx::utils::ElapsedTimer m_rtcpJitterTimer;
-
-    struct CamSyncInfo {
-        CamSyncInfo(): timeDiff(INT_MAX) {}
-        QnMutex mutex;
-        double timeDiff;
-    };
-
-    QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
-    QString m_resourceId;
-
-    static QnMutex m_camClockMutex;
-    static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
-    qint64 m_lastWarnTime;
-    TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
-    QnRtspStatistic m_statistics;
-
-#ifdef DEBUG_TIMINGS
-    void printTime(double jitter);
-    QElapsedTimer m_statsTimer;
-    double m_minJitter;
-    double m_maxJitter;
-    double m_jitterSum;
-    int m_jitPackets;
-#endif
-};
-
 class QnRtspIoDevice
 {
 public:
@@ -165,6 +102,15 @@ public:
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
+
+    static const QByteArray kPlayCommand;
+    static const QByteArray kSetupCommand;
+    static const QByteArray kOptionsCommand;
+    static const QByteArray kDescribeCommand;
+    static const QByteArray kSetParameterCommand;
+    static const QByteArray kGetParameterCommand;
+    static const QByteArray kPauseCommand;
+    static const QByteArray kTeardownCommand;
 
     enum class DateTimeFormat
     {
@@ -265,7 +211,7 @@ public:
     ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
-    CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
+    CameraDiagnostics::Result open(const nx::utils::Url& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -356,7 +302,7 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
-    
+
     QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
 
     void setUsePredefinedTracks(int numOfVideoChannel);

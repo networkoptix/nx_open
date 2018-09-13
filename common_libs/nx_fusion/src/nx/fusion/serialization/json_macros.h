@@ -37,6 +37,7 @@ struct BriefChecker
     template<class U>
     bool operator()(const QList<U>& value) const { return value.empty(); }
 
+    bool operator()(const std::string& value) const { return value.empty(); }
     bool operator()(const QString& value) const { return value.isEmpty(); }
     bool operator()(const QnUuid& value) const { return value.isNull(); }
 };

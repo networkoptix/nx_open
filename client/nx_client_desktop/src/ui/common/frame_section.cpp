@@ -381,7 +381,7 @@ Qt::WindowFrameSection Qn::rotateSection(Qt::WindowFrameSection section, qreal r
     int intRotation = qRound(rotation) % 360; /* we don't need qreal precision */
     if (intRotation < 0)
         intRotation += 360;
-    NX_EXPECT(intRotation >= 0 && intRotation < 360);
+    NX_ASSERT(intRotation >= 0 && intRotation < 360);
 
     int n45 = std::floor((intRotation + 45.0 / 2.0) / 45.0);
 
@@ -396,7 +396,7 @@ Qt::WindowFrameSection Qn::rotateSection(Qt::WindowFrameSection section, qreal r
                                                           << Qt::BottomLeftSection;
 
     int index = sections.indexOf(section);
-    NX_EXPECT(index >= 0);
+    NX_ASSERT(index >= 0);
     index = (index + n45) % sections.size();
     return sections[index];
 }

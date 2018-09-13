@@ -42,7 +42,8 @@ struct JsonRestResponse
     QnJsonRestResult json;
     bool isUndefinedContentLength = false;
 
-    JsonRestResponse(nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
+    JsonRestResponse(
+        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
         QnJsonRestResult json = {}, bool isUndefinedContentLength = false);
 
     template<typename T>
@@ -51,7 +52,8 @@ struct JsonRestResponse
     template<typename T>
     JsonRestResponse(QnJsonRestResult::Error error, const T& value) { json.setError(error, value); }
 
-    JsonRestResponse(nx::network::http::StatusCode::Value status, QnJsonRestResult::Error error);
+    JsonRestResponse(
+        nx::network::http::StatusCode::Value statusCode, QnJsonRestResult::Error error);
 
     RestResponse toRest(bool extraFormatting) const;
 };
@@ -165,6 +167,16 @@ protected:
         }
 
         return true;
+    }
+
+    template<class T>
+    void copyParameter(
+        const QnRequestParams& params,
+        const QString& key,
+        QnJsonRestResult& result,
+        T* value) const
+    {
+        requireParameter(params, key, result, value, /*optional*/ true);
     }
 
     template<class T>

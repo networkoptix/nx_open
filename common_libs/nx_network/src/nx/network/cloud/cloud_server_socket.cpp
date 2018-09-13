@@ -30,7 +30,7 @@ CloudServerSocket::CloudServerSocket(
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    bindToAioThread(getAioThread());
+    bindToAioThreadUnchecked(getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -150,12 +150,10 @@ aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    base_type::bindToAioThread(aioThread);
+    if (getAioThread() == aioThread)
+        return;
 
-    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
-    m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
-    m_mediatorConnection->bindToAioThread(aioThread);
-    m_aggregateAcceptor.bindToAioThread(aioThread);
+    bindToAioThreadUnchecked(aioThread);
 }
 
 void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
@@ -253,6 +251,17 @@ void CloudServerSocket::moveToListeningState()
     m_state = State::listening;
 }
 
+void CloudServerSocket::bindToAioThreadUnchecked(
+    aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
+    m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
+    m_mediatorConnection->bindToAioThread(aioThread);
+    m_aggregateAcceptor.bindToAioThread(aioThread);
+}
+
 void CloudServerSocket::initTunnelPool(int queueLen)
 {
     auto tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
@@ -304,7 +313,7 @@ void CloudServerSocket::onListenRequestCompleted(
     nx::hpm::api::ResultCode resultCode,
     hpm::api::ListenResponse response)
 {
-    const auto registrationHandlerGuard = makeScopeGuard(
+    const auto registrationHandlerGuard = nx::utils::makeScopeGuard(
         [handler = std::move(m_registrationHandler), resultCode]()
         {
             if (handler)
@@ -315,20 +324,20 @@ void CloudServerSocket::onListenRequestCompleted(
     NX_ASSERT(m_state == State::registeringOnMediator);
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
-        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Listen request completed successfully"));
         m_state = State::listening;
         startAcceptingConnections(response);
         return;
     }
 
-    NX_LOGX(lm("Listen request has failed: %1").arg(resultCode), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Listen request has failed: %1").arg(resultCode));
 
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
         // It is not supposed to happen in production, is it?
-        NX_LOGX(lm("Stopped mediator registration retries. Last result code %1")
-            .arg(resultCode), cl_logWARNING);
+        NX_WARNING(this, lm("Stopped mediator registration retries. Last result code %1")
+            .arg(resultCode));
         m_state = State::readyToListen;
         reportResult(SystemError::invalidData); //< TODO: #ak Use better error code.
     }
@@ -382,7 +391,7 @@ void CloudServerSocket::initializeCustomAcceptors(
 
 void CloudServerSocket::retryRegistration()
 {
-    NX_LOGX(lm("Retrying to register on mediator"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Retrying to register on mediator"));
     issueRegistrationRequest();
 }
 
@@ -463,8 +472,8 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     if (socket)
         socket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
 
-    NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
-        .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Returning socket from tunnel pool. Result code %1")
+        .arg(SystemError::toString(sysErrorCode)));
     handler(sysErrorCode, std::move(socket));
 }
 
@@ -531,7 +540,7 @@ void CloudServerSocket::onMediatorConnectionRestored()
             m_aggregateAcceptor.remove(customAcceptor);
         m_customConnectionAcceptors.clear();
 
-        NX_LOGX(lm("Register on mediator after reconnect"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Register on mediator after reconnect"));
         issueRegistrationRequest();
     }
 }

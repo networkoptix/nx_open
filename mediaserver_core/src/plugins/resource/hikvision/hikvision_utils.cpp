@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <QtXml/QDomElement>
 
 #include "hikvision_utils.h"
@@ -44,7 +46,9 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
                 response.noiseReduce = childElement.text() == lit("true");
             else if (nodeName == lit("audioSamplingRate"))
             {
-                response.sampleRateKHz = childElement.text().toInt(&status);
+                /* They forgot to add round to std in arm! So we need a hack here.*/
+                using namespace std;
+                response.sampleRateHz = round(childElement.text().toFloat(&status) * 1000);
                 if (!status)
                     return boost::none;
             }
@@ -60,7 +64,7 @@ boost::optional<ChannelStatusResponse> parseChannelElement(const QDomElement& ch
     return response;
 }
 
-QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
+QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateHz)
 {
     QnAudioFormat result;
     if (codecName == lit("G.711alaw"))
@@ -83,8 +87,12 @@ QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz)
         result.setSampleRate(16000);
         result.setCodec("AAC");
     }
-    if (sampleRateKHz > 0)
-        result.setSampleRate(sampleRateKHz); //< override default value
+    else if (codecName == lit("PCM"))
+    {
+        result.setCodec("AV_CODEC_ID_PCM_U16LE");
+    }
+    if (sampleRateHz > 0)
+        result.setSampleRate(sampleRateHz); //< override default value
 
     return result;
 }
@@ -230,15 +238,40 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
             return false;
 
         if (tag == kVideoCodecTypeTag)
+        {
             success = parseCodecList(options, &outCapabilities->codecs);
+        }
         else if (tag == kVideoResolutionWidthTag)
+        {
             success = parseIntegerList(options, &resolutionWidths);
+        }
         else if (tag == kVideoResolutionHeightTag)
+        {
             success = parseIntegerList(options, &resolutionHeights);
+        }
         else if (tag == kFixedQualityTag)
+        {
             success = parseIntegerList(options, &outCapabilities->quality);
+        }
         else if (tag == kMaxFrameRateTag)
-            success = parseIntegerList(options, &outCapabilities->fps);
+        {
+            auto& fpsList = outCapabilities->fps;
+            success = parseIntegerList(options, &fpsList);
+
+            // ISAPI documentation:
+            // <maxFrameRate> <!—req, xs+:integer, maximum frame rate x100 +[]</maxFrameRate>
+            const auto maxFps = std::max_element(fpsList.begin(), fpsList.end());
+            if (maxFps != fpsList.end() && *maxFps >= 200)
+            {
+                // Threshold is to avoid problems with rear cameras which send raw FPS.
+                for (auto& fps: outCapabilities->fps)
+                    fps /= 100;
+
+                // Cameras often report strange values below 0 FPS...
+                fpsList.erase(std::remove_if(fpsList.begin(), fpsList.end(),
+                    [](int fps) { return fps == 0; }), fpsList.end());
+            }
+        }
         else if (tag == kFixedBitrateTag)
         {
             outCapabilities->bitrateRange.first = propertyElement.attribute("min").toInt(&success);

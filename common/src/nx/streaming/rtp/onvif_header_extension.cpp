@@ -2,9 +2,7 @@
 
 #include <nx/streaming/rtp/rtp.h>
 
-namespace nx {
-namespace streaming {
-namespace rtp {
+namespace nx::streaming::rtp {
 
 static const int kOnvifHeaderExtensionLength = 3; //< in 32 bit units
 static const int kOnvifHeaderExtensionId = 0xabac;
@@ -64,7 +62,7 @@ int OnvifHeaderExtension::write(uint8_t* data, int size) const
         bitstream.putBit(tBit);
         bitstream.putBits(4, 0);
         bitstream.putBits(8, cSeq);
-        bitstream.putBits(8, 0x0000); //< padding
+        bitstream.putBits(16, 0x0000); //< padding
         bitstream.flushBits();
         return bitstream.getBytesCount();
     }
@@ -74,6 +72,4 @@ int OnvifHeaderExtension::write(uint8_t* data, int size) const
     }
 }
 
-} // namespace rtp
-} // namespace streaming
-} // namespace nx
+} // namespace nx::streaming::rtp

@@ -8,20 +8,20 @@
 
 namespace nx::cloud::relay::test {
 
-#define INSTANTIATE_RELAY_METHOD_TESTS_1(ClientSideClass, ServerSideClass, StructName, CaseName) \
+#define DETAIL_INSTANTIATE_RELAY_METHOD_TESTS(ClientSideClass, ServerSideClass, StructName, CaseName) \
     struct StructName \
     { \
         using ClientSideApiClient = api::ClientSideClass; \
         using ServerSideApiClient = api::ServerSideClass; \
     }; \
-     \
+    \
     INSTANTIATE_TYPED_TEST_CASE_P( \
         CaseName, \
         RelayMethodAcceptance, \
         StructName);
 
 #define INSTANTIATE_RELAY_METHOD_TESTS(r, ClientSideClass, ServerSideClass) \
-    INSTANTIATE_RELAY_METHOD_TESTS_1( \
+    DETAIL_INSTANTIATE_RELAY_METHOD_TESTS( \
         ClientSideClass, \
         ServerSideClass, \
         BOOST_PP_CAT(ClientSideClass, ServerSideClass), \

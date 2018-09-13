@@ -25,6 +25,7 @@ public:
     static const QString AUX_DATA_PARAM_NAME;
 
     QnThirdPartyResource(
+        QnMediaServerModule* serverModule,
         const nxcip::CameraInfo& camInfo,
         nxcip::BaseCameraManager* camManager,
         const nxcip_qt::CameraDiscoveryManager& discoveryManager );

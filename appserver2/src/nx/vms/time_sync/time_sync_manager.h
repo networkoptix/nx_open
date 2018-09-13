@@ -58,6 +58,7 @@ class TimeSyncManager: public AbstractTimeSyncManager, public QnCommonModuleAwar
 {
     Q_OBJECT
 public:
+    static const std::chrono::milliseconds kMaxJitterForLocalClock;
 
     static const QString kTimeSyncUrlPath;
 
@@ -107,7 +108,7 @@ private:
     mutable QnMutex m_mutex;
 
     QThread* m_thread = nullptr;
-	QTimer* m_timer = nullptr;
+    QTimer* m_timer = nullptr;
 };
 
 } // namespace time_sync

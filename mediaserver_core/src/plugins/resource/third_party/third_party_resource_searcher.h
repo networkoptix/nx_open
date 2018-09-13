@@ -1,10 +1,4 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
-
-#ifndef THIRD_PARTY_RESOURCE_SEARCHER_H
-#define THIRD_PARTY_RESOURCE_SEARCHER_H
+#pragma once
 
 #ifdef ENABLE_THIRD_PARTY
 
@@ -34,7 +28,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher(QnCommonModule* commonModule);
+    ThirdPartyResourceSearcher(QnMediaServerModule* serverModule);
     /*!
         Releases ref to \a plugin
     */
@@ -81,8 +75,8 @@ private:
     QnThirdPartyResourcePtr createResourceFromCameraInfo(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
         const nxcip::CameraInfo2& cameraInfo );
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 #endif // ENABLE_THIRD_PARTY
-
-#endif  //THIRD_PARTY_RESOURCE_SEARCHER_H

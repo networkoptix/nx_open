@@ -8,7 +8,7 @@
         {
             "id": "nx.hikvision.loitering", 
             "name": {
-                "value": "Loitering detected", 
+                "value": "Loitering detection", 
                 "localization": {}
             }, 
             "internalName": "loitering", 
@@ -20,10 +20,11 @@
         {
             "id": "nx.hikvision.fielddetection", 
             "name": {
-                "value": "Intrusion detected", 
+                "value": "Intrusion detection", 
                 "localization": {}
             }, 
-            "internalName": "fielddetection", 
+            "internalName": "fielddetection,FieldDetect,FiledDetect", 
+            "_comment": "FiledDetect is misspelled FieldDetect - found in DS-2CD2132-I camera",
             "description": "Intrusion %1", 
             "positiveState": "has been detected", 
             "negativeState": "is not detected", 
@@ -32,7 +33,7 @@
         {
             "id": "nx.hikvision.group", 
             "name": {
-                "value": "Group detected", 
+                "value": "Group detection", 
                 "localization": {}
             }, 
             "internalName": "group", 
@@ -44,7 +45,7 @@
         {
             "id": "nx.hikvision.videoloss", 
             "name": {
-                "value": "Video loss detected", 
+                "value": "Video loss detection", 
                 "localization": {}
             }, 
             "internalName": "videoloss", 
@@ -56,7 +57,7 @@
         {
             "id": "nx.hikvision.rapidMove", 
             "name": {
-                "value": "Rapid move detected", 
+                "value": "Rapid move detection", 
                 "localization": {}
             }, 
             "internalName": "rapidMove", 
@@ -68,7 +69,7 @@
         {
             "id": "nx.hikvision.parking", 
             "name": {
-                "value": "Parking detected", 
+                "value": "Parking detection", 
                 "localization": {}
             }, 
             "internalName": "parking", 
@@ -84,7 +85,7 @@
                 "localization": {}
             }, 
             "_": "Following fields belong to private plugin implementation.", 
-            "internalName": "Face", 
+            "internalName": "FaceDetect", 
             "description": "Face %1", 
             "positiveState": "has been detected", 
             "negativeState": "is not detected", 

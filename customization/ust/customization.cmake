@@ -14,8 +14,6 @@ set(cloudName "VMS Cloud")
 set(companyUrl "http://www.ubiquitysmart.com")
 set(productUrl "http://www.ubiquitysmart.com")
 set(supportUrl "http://www.ubiquitysmart.com")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://www.ubiquitysmart.com")
 # end of Support section
 

@@ -108,7 +108,7 @@ bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubjec
 
 void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;
@@ -119,7 +119,7 @@ void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& r
 
 void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;
@@ -131,7 +131,7 @@ void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessS
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;
@@ -175,7 +175,7 @@ void QnBaseResourceAccessProvider::fillProviders(
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     updateAccessToResource(resource);
 
@@ -195,7 +195,7 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
 void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     resource->disconnect(this);
 
@@ -226,7 +226,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const nx::vms::api::UserRoleData& userRole)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     /* We have no certain way to check if user role was already added. */
     handleSubjectAdded(userRole);
@@ -234,7 +234,7 @@ void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
     handleSubjectRemoved(userRole);
 
     if (isUpdating())
@@ -246,14 +246,14 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const nx::vms::api::UserRol
 
 void QnBaseResourceAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     updateAccessBySubject(subject);
 }
 
 void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     if (isUpdating())
         return;
@@ -274,7 +274,7 @@ void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSu
 
 QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubject& subject) const
 {
-    NX_EXPECT(mode() == Mode::cached);
+    NX_ASSERT(mode() == Mode::cached);
 
     QnMutexLocker lk(&m_mutex);
     return m_accessibleResources.value(subject.id());

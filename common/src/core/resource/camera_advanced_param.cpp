@@ -42,7 +42,7 @@ const QString kPtrControl = lit("PtrControl");
 } //< anonymous namespace
 
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const QString &value):
-	id(id), value(value)
+    id(id), value(value)
 {
 }
 
@@ -56,7 +56,6 @@ QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
 {
     appendValueList(list);
 }
-
 
 QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap(
     std::initializer_list<std::pair<QString, QString>> values)
@@ -125,7 +124,7 @@ QSet<QString> QnCameraAdvancedParamValueMap::ids() const
 
 bool QnCameraAdvancedParameter::isValid() const
 {
-	return (dataType != DataType::None)
+    return (dataType != DataType::None)
         && (!id.isEmpty());
 }
 
@@ -201,10 +200,10 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
         << DataType::SliderControl
         << DataType::PtrControl;
 
-	for (auto dataType: allDataTypes)
-		if (dataTypeToString(dataType) == value)
-			return dataType;
-	return DataType::None;
+    for (auto dataType: allDataTypes)
+        if (dataTypeToString(dataType) == value)
+            return dataType;
+    return DataType::None;
 }
 
 bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)

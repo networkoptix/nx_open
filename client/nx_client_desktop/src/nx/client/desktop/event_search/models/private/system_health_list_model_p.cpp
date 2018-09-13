@@ -1,9 +1,11 @@
 #include "system_health_list_model_p.h"
 
 #include <chrono>
+#include <limits>
 
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <health/system_health_helper.h>
 #include <ui/common/notification_levels.h>
@@ -13,9 +15,11 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -98,8 +102,24 @@ QnResourcePtr SystemHealthListModel::Private::resource(int index) const
 QString SystemHealthListModel::Private::text(int index) const
 {
     const auto& item = m_items[index];
-    return QnSystemHealthStringsHelper::messageText(item.message,
-        QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+    switch (item.message)
+    {
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        {
+            // TODO: #vkutin This is bad, remove it after VMS-7724 refactor is done.
+            const auto description = item.serverData->getRuntimeParams().description;
+            if (!description.isEmpty())
+                return description;
+        }
+        [[fallthrough]];
+
+        default:
+            return QnSystemHealthStringsHelper::messageText(item.message,
+                QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+    }
 }
 
 QString SystemHealthListModel::Private::toolTip(int index) const
@@ -133,6 +153,30 @@ int SystemHealthListModel::Private::priority(int index) const
 bool SystemHealthListModel::Private::locked(int index) const
 {
     return QnSystemHealth::isMessageLocked(m_items[index].message);
+}
+
+bool SystemHealthListModel::Private::isCloseable(int index) const
+{
+    return m_items[index].message != QnSystemHealth::DefaultCameraPasswords;
+}
+
+CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
+{
+    if (m_items[index].message != QnSystemHealth::DefaultCameraPasswords)
+        return {};
+
+    auto action = CommandActionPtr(new CommandAction(tr("Set Passwords")));
+    connect(action.data(), &QAction::triggered, this,
+        [this]()
+        {
+            const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
+            const auto parameters = action::Parameters(watcher->camerasWithDefaultPassword())
+                .withArgument(Qn::ForceShowCamerasList, true);
+
+            menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
+        });
+
+    return action;
 }
 
 action::IDType SystemHealthListModel::Private::action(int index) const
@@ -207,13 +251,18 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            auto resourceId = action->getRuntimeParams().eventResourceId;
-            resource = resourcePool()->getResourceById(resourceId);
+            const auto runtimeParameters = action->getRuntimeParams();
+            resource = runtimeParameters.metadata.cameraRefs.empty()
+                ? resourcePool()->getResourceById(runtimeParameters.eventResourceId)
+                : static_cast<QnResourcePtr>(camera_id_helper::findCameraByFlexibleId(resourcePool(),
+                    runtimeParameters.metadata.cameraRefs[0]));
         }
     }
 
     // TODO: #vkutin We may want multiple resource aggregation as one event.
     Item item(message, resource);
+    item.serverData = action;
+
     auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
     if (position != m_items.end() && *position == item)
         return; //< Already exists.
@@ -265,10 +314,23 @@ void SystemHealthListModel::Private::remove(int first, int count)
 
 int SystemHealthListModel::Private::priority(QnSystemHealth::MessageType message)
 {
+    // Custom priorities from higher to lower.
+    enum CustomPriority
+    {
+        kCloudPromoPriority,
+        kDefaultCameraPasswordsPriority,
+    };
+
+    const auto priorityValue =
+        [](CustomPriority custom) { return std::numeric_limits<int>::max() - custom; };
+
     switch (message)
     {
         case QnSystemHealth::CloudPromo:
-            return int(QnNotificationLevel::Value::LevelCount); //< The highest.
+            return priorityValue(kCloudPromoPriority);
+
+        case QnSystemHealth::DefaultCameraPasswords:
+            return priorityValue(kDefaultCameraPasswordsPriority);
 
         default:
             return int(QnNotificationLevel::valueOf(message));

@@ -28,21 +28,21 @@ FrameTypeExtractor::FrameTypeExtractor(const QnConstMediaContextPtr& context):
     {
         const quint8* data = context->getExtradata();
         int size = context->getExtradataSize();
-        if (m_codecId == AV_CODEC_ID_VC1) 
+        if (m_codecId == AV_CODEC_ID_VC1)
         {
             for (int i = 0; i < size - 4; ++i)
             {
-                if (data[i + 0] == 0 && 
-                    data[i + 1] == 0 && 
-                    data[i + 2] == 1 && 
-                    data[i + 3] == VC1_CODE_SEQHDR) 
+                if (data[i + 0] == 0 &&
+                    data[i + 1] == 0 &&
+                    data[i + 2] == 1 &&
+                    data[i + 3] == VC1_CODE_SEQHDR)
                 {
                     decodeWMVSequence(data + i + 4, size - i - 4);
                     break;
                 }
             }
         }
-        else if (m_codecId == AV_CODEC_ID_WMV1 || m_codecId == AV_CODEC_ID_WMV2 || m_codecId == AV_CODEC_ID_WMV3) 
+        else if (m_codecId == AV_CODEC_ID_WMV1 || m_codecId == AV_CODEC_ID_WMV2 || m_codecId == AV_CODEC_ID_WMV3)
         {
             decodeWMVSequence(data, size);
         }
@@ -99,7 +99,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
                 if (slice_type >= 5)
                     slice_type -= 5; //< +5 flag is: all other slices at this picture must be of the same type.
 
-                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE) 
+                if (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE)
                     return P_Frame; //< Fake. It is i-frame, but not IDR, so we can't seek to this time and etc.  // I_Frame;
                 else if (slice_type == SliceUnit::P_TYPE || slice_type == SliceUnit::SP_TYPE)
                     return P_Frame;
@@ -122,7 +122,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpegVideoFrameType(
 {
     enum PictureCodingType { PCT_FORBIDDEN, PCT_I_FRAME, PCT_P_FRAME, PCT_B_FRAME, PCT_D_FRAME };
     const quint8* end = data + size;
-    while (data <= end-4 && data[3] > 0x80) 
+    while (data <= end-4 && data[3] > 0x80)
     {
         data = NALUnit::findNextNAL(data + 4, end);
         if (data == end)
@@ -164,21 +164,21 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getWMVFrameType(
 FrameTypeExtractor::FrameType FrameTypeExtractor::getVCFrameType(
     const quint8* data, int size)
 {
-    if (data[3] == VC1_CODE_FRAME || 
+    if (data[3] == VC1_CODE_FRAME ||
         (data[3] == VC1_USER_CODE_FRAME && m_vcSequence))
     {
         return getWMVFrameType(data + 4, size - 4);
     }
-    else if (data[3] == VC1_CODE_SEQHDR) 
+    else if (data[3] == VC1_CODE_SEQHDR)
     {
         return I_Frame;
 #if 0
         const quint8* next = NALUnit::findNextNAL(data + 3, data + size);
-        if (next < data+size) 
+        if (next < data+size)
         {
             //m_vcSequence->vc1_unescape_buffer(data + 4, next - (data + 4));
             //m_vcSequence->decode_sequence_header();
-            FrameTypeExtractor::FrameType rez = 
+            FrameTypeExtractor::FrameType rez =
                 getWMVFrameType(next, size - (next - data));
             return rez;
         }
@@ -201,7 +201,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpeg4FrameType(
         data -= 3;
         size = end - data;
     }
-    if (size >= 5) 
+    if (size >= 5)
     {
         int frameType = data[4] >> 6;
         if (frameType == PCT_I_FRAME)
@@ -214,7 +214,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpeg4FrameType(
     return UnknownFrameType;
 
 #if 0
-    if (size >= 1) 
+    if (size >= 1)
     {
         int frameType = data[0] >> 6;
         if (frameType == PCT_I_FRAME)
@@ -231,7 +231,8 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpeg4FrameType(
 FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(
     const quint8* data, int dataLen)
 {
-    //quint32 size = ntohl( *((quint32*) data));
+    if (!data)
+        return UnknownFrameType;
     switch (m_codecId)
     {
         case AV_CODEC_ID_H264:

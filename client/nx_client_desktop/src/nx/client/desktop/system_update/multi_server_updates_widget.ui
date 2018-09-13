@@ -58,24 +58,21 @@
        <number>16</number>
       </property>
       <property name="topMargin">
-       <number>14</number>
+       <number>12</number>
       </property>
       <property name="rightMargin">
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>16</number>
+       <number>14</number>
       </property>
       <item>
        <widget class="QStackedWidget" name="titleStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="selectUpdateTypePage">
-         <layout class="QHBoxLayout" name="titleHorizontalLayout">
-          <property name="spacing">
-           <number>2</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -90,6 +87,12 @@
           </property>
           <item>
            <widget class="QPushButton" name="selectUpdateTypeButton">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="focusPolicy">
              <enum>Qt::TabFocus</enum>
             </property>
@@ -108,43 +111,22 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_4">
+           <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>355</width>
               <height>0</height>
              </size>
             </property>
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="refreshButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="mouseTracking">
-             <bool>true</bool>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::TabFocus</enum>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
+           <widget class="QPushButton" name="updateCheckMode">
+            <property name="text">
+             <string>Check for update</string>
             </property>
             <property name="flat">
              <bool>true</bool>
@@ -154,7 +136,7 @@
          </layout>
         </widget>
         <widget class="QWidget" name="updatingPage">
-         <layout class="QHBoxLayout" name="updatingPageHorizontalLayout">
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -175,13 +157,13 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_5">
+           <spacer name="horizontalSpacer_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>476</width>
+              <width>522</width>
               <height>0</height>
              </size>
             </property>
@@ -194,7 +176,7 @@
       <item>
        <widget class="QStackedWidget" name="versionStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="versionPage">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -302,7 +284,7 @@
       <item>
        <widget class="QStackedWidget" name="infoStackedWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="releaseNotesPage">
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -387,9 +369,22 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="getAndInstall">
+           <widget class="QPushButton" name="browseUpdate">
             <property name="text">
-             <string notr="true">Download &amp;&amp; Install</string>
+             <string>Browse</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="downloadAndInstall">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Download &amp;&amp; Install</string>
             </property>
            </widget>
           </item>
@@ -450,6 +445,22 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="advancedUpdateSettings">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Advanced Update Settings</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -560,13 +571,6 @@
          <widget class="QLabel" name="longUpdateWarning">
           <property name="text">
            <string>It looks like the update process is taking more time than usual. Please keep waiting.</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="autoCheckUpdates">
-          <property name="text">
-           <string>Check for updates automatically</string>
           </property>
          </widget>
         </item>

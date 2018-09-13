@@ -62,13 +62,9 @@ void initialize(Manager* manager, Action* root)
     factory(DelayedOpenVideoWallItemAction)
         .flags(NoTarget);
 
-    factory(DelayedDropResourcesAction)
+    factory(ProcessStartupParametersAction)
         .flags(NoTarget)
-        .mode(DesktopMode);
-
-    factory(InstantDropResourcesAction)
-        .flags(NoTarget)
-        .mode(DesktopMode);
+        .mode(DesktopMode | AcsMode);
 
     factory(MoveCameraAction)
         .flags(ResourceTarget | SingleTarget | MultiTarget)
@@ -1171,6 +1167,7 @@ void initialize(Manager* manager, Action* root)
 
     factory()
         .flags(Scene | SingleTarget | MultiTarget)
+        .requiredTargetPermissions(Qn::WritePermission)
         .text(ContextMenu::tr("Rotate to..."));
 
     factory.beginSubMenu();
@@ -1402,6 +1399,14 @@ void initialize(Manager* manager, Action* root)
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));
 
+    factory(CopyRecordingScheduleAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Copy Schedule..."))
+        .requiredGlobalPermission(GlobalPermission::editCameras)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All));
+
     factory(MediaFileSettingsAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1532,6 +1537,7 @@ void initialize(Manager* manager, Action* root)
     factory()
         .flags(Scene | NoTarget)
         .childFactory(new AspectRatioFactory(manager))
+        .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission)
         .text(ContextMenu::tr("Cell Aspect Ratio..."))
         .condition(!ConditionWrapper(new VideoWallReviewModeCondition())
             && ConditionWrapper(new LightModeCondition(Qn::LightModeSingleItem))

@@ -1,0 +1,6 @@
+We want to be the engine that drives the most intelligent video applications on the planet.
+- Make software that is instantly usable.
+- Make software able to discover every networked camera.
+- Make software anyone can install and run on most computers.
+- Make software that is extremely stable and resilient.
+- Make software that is affordable and easy to maintain.

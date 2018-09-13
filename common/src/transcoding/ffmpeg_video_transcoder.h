@@ -1,5 +1,4 @@
-#ifndef __FFMPEG_VIDEO_TRANSCODER_H__
-#define __FFMPEG_VIDEO_TRANSCODER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -7,6 +6,8 @@
 #include <QElapsedTimer>
 
 #include "transcoder.h"
+
+namespace nx { namespace metrics { struct Storage; } }
 
 extern "C"
 {
@@ -16,11 +17,14 @@ extern "C"
 #include "utils/media/frame_info.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 
+
+AVCodecID findVideoEncoder(const QString& codecName);
+
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(AVCodecID codecId);
+    QnFfmpegVideoTranscoder(nx::metrics::Storage* metrics, AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -59,10 +63,10 @@ private:
     bool m_useRealTimeOptimization;
     AVPacket* m_outPacket;
     QnConstMediaContextPtr m_ctxPtr;
+    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif // __FFMPEG_VIDEO_TRANSCODER_H__

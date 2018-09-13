@@ -243,7 +243,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     expectLiveParams(camera, "H264", QSize(1920, 1080), "MJPEG", QSize(800, 600), 192, 15);
     EXPECT_TRUE(camera->getProperty(QString("primaryStreamConfiguration")).isEmpty());
     EXPECT_EQ(QString(
-            R"json({"bitrateKbps":192,"codec":"MJPEG","fps":15,"quality":"6","resolution":{"height":600,"width":800}})json"),
+            R"json({"bitrateKbps":192,"codec":"MJPEG","fps":15,"quality":"undefined","resolution":{"height":600,"width":800}})json"),
         camera->getProperty(QString("secondaryStreamConfiguration")));
 
     // Brocken setProperty().

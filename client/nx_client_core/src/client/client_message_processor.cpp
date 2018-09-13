@@ -66,11 +66,11 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         {
             const auto fullHost = serverId.toSimpleString() + L'.' + info.cloudSystemId;
-            NX_EXPECT(nx::network::SocketGlobals::addressResolver().isCloudHostName(fullHost));
+            NX_ASSERT(nx::network::SocketGlobals::addressResolver().isCloudHostName(fullHost));
             if (host != fullHost)
             {
                 NX_DEBUG(this, lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
-                NX_EXPECT(false, "Correct url must be filled in ecUrl");
+                NX_ASSERT(false, "Correct url must be filled in ecUrl");
                 currentUrl.setHost(fullHost);
                 connection->updateConnectionUrl(currentUrl);
             }
@@ -267,7 +267,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const api::FullInfoData&
     m_status.setState(QnConnectionState::Ready);
     NX_DEBUG(this, lit("Received initial notification while connected to %1")
         .arg(commonModule()->remoteGUID().toString()));
-    NX_EXPECT(commonModule()->currentServer());
+    NX_ASSERT(commonModule()->currentServer());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();

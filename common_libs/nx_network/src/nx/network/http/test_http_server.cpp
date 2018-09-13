@@ -49,7 +49,7 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync(false);
-    NX_LOGX("Stopped", cl_logINFO);
+    NX_INFO(this, "Stopped");
 }
 
 bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
@@ -60,7 +60,7 @@ bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
+    NX_INFO(this, lm("Started on %1").arg(m_httpServer->address()));
     return true;
 }
 

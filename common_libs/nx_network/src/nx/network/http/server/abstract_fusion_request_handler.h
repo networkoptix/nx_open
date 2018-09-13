@@ -66,8 +66,8 @@ public:
         const nx::network::http::Request& request,
         nx::utils::stree::ResourceContainer authInfo ) = 0;
 
-private:
-    virtual void processRequest(
+protected:
+    virtual void processRawHttpRequest(
         nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
         nx::network::http::Request request,
@@ -118,7 +118,7 @@ private:
 };
 
 template<typename HttpMessageDispatcher, typename Func>
-// requires SerializableToJson(typename std::invoke_result<Func>::type)
+// requires SerializableToJson(typename std::invoke_result_t<Func>)
 void registerFusionRequestHandler(
     HttpMessageDispatcher* dispatcher,
     const char* path,

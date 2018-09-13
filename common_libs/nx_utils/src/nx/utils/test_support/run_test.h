@@ -40,6 +40,7 @@ inline int runTest(
     int gtestRunFlags = 0)
 {
     nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
+    nx::utils::enableQtMessageAsserts();
     nx::kit::IniConfig::setOutput(nullptr);
 
     std::vector<const char*> extendedArgs;
@@ -66,7 +67,7 @@ inline int runTest(
     if (extraInit)
         deinitFunctions = extraInit(args);
 
-    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
+    nx::utils::rlimit::setMaxFileDescriptors();
 
     const int result = RUN_ALL_TESTS();
     for (const auto& deinit: deinitFunctions)

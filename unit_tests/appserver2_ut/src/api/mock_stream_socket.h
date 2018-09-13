@@ -200,6 +200,11 @@ public:
         return nullptr;
     }
 
+    virtual void pleaseStopSync(bool checkForLocks = true) override
+    {
+        return;
+    }
+
     virtual void post(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}

@@ -94,8 +94,7 @@ std::string MountHelper::makeCommandString(
 {
     std::ostringstream ss;
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
-        << " -o uid=" << m_delegates.uid() << ",gid=" << m_delegates.gid()
-        << ",credentials=" << credentialFile;
+        << " -o credentials=" << credentialFile;
 
     if (!domain.empty())
         ss << ",domain=" << domain;

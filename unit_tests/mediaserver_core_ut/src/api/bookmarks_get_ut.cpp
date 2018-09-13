@@ -23,10 +23,10 @@ TEST(BookmarksGet, noBookmarks)
     cameraData.physicalId = "test physicalId";
     cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
 
-    NX_LOG("[TEST] Create a camera.", cl_logINFO);
+    NX_INFO(this, "[TEST] Create a camera.");
     NX_TEST_API_POST(&launcher, "/ec2/saveCamera", cameraData);
 
-    NX_LOG("[TEST] Check that there are no bookmarks for the camera.", cl_logINFO);
+    NX_INFO(this, "[TEST] Check that there are no bookmarks for the camera.");
     QnCameraBookmarkList bookmarks;
     NX_TEST_API_GET(&launcher,
         lit("/ec2/bookmarks?cameraId=%1").arg(cameraData.id.toString()), &bookmarks);

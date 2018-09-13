@@ -27,13 +27,14 @@ class QnDesktopCameraDataConsumer: public QnAbstractDataConsumer
 public:
     QnDesktopCameraDataConsumer(QnDesktopCameraConnectionProcessor* owner):
         QnAbstractDataConsumer(50),
-        m_sequence(0),
         m_owner(owner),
         m_needVideoData(false)
     {
-        for (int i = 0; i < 2; ++i) {
-            m_serializers[i].setAdditionFlags(0);
-            m_serializers[i].setLiveMarker(true);
+        for (int i = 0; i < 2; ++i)
+        {
+            m_serializers[i].reset(new QnRtspFfmpegEncoder(owner->commonModule()->metrics()));
+            m_serializers[i]->setAdditionFlags(0);
+            m_serializers[i]->setLiveMarker(true);
         }
     }
 
@@ -63,9 +64,9 @@ protected:
         int streamIndex = media->channelNumber;
         NX_ASSERT(streamIndex <= 1);
 
-        m_serializers[streamIndex].setDataPacket(media);
+        m_serializers[streamIndex]->setDataPacket(media);
         m_owner->sendLock();
-        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex].getNextPacket(sendBuffer))
+        while(!m_needStop && m_owner->isConnected() && m_serializers[streamIndex]->getNextPacket(sendBuffer))
         {
             NX_ASSERT(sendBuffer.size() < 65536 - 4);
             quint8 header[4];
@@ -74,13 +75,6 @@ protected:
             header[2] = sendBuffer.size() >> 8;
             header[3] = (quint8) sendBuffer.size();
             m_owner->sendData((const char*) &header, 4);
-
-            static AVRational r = {1, 1000000};
-            AVRational time_base = {1, (int) m_serializers[streamIndex].getFrequency() };
-            qint64 packetTime = av_rescale_q(packet->timestamp, r, time_base);
-
-            QnRtspEncoder::buildRTPHeader(sendBuffer.data(), m_serializers[streamIndex].getSSRC(), m_serializers[streamIndex].getRtpMarker(),
-                           packetTime, m_serializers[streamIndex].getPayloadtype(), m_sequence++);
             m_owner->sendData(sendBuffer);
             sendBuffer.clear();
         }
@@ -94,8 +88,7 @@ protected:
     }
 
 private:
-    quint32 m_sequence;
-    QnRtspFfmpegEncoder m_serializers[2]; // video + audio
+    std::unique_ptr<QnRtspFfmpegEncoder> m_serializers[2]; // video + audio
     QnDesktopCameraConnectionProcessor* m_owner;
     bool m_needVideoData;
 };
@@ -160,8 +153,6 @@ void QnDesktopCameraConnectionProcessor::processRequest()
         // nothing to do. we restarting timer on any request
     }
     d->response.headers.insert(std::make_pair("cSeq", nx::network::http::getHeaderValue(d->request.headers, "cSeq")));
-    //QnMutexLocker lock( &d->sendMutex );
-    //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }
 
 void QnDesktopCameraConnectionProcessor::disconnectInternal()

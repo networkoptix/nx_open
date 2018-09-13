@@ -29,13 +29,15 @@ public:
      * @param udpSocket If not empty, this socket is passed to udt socket.
      */
     RendezvousConnector(
-        nx::String connectSessionId,
+        std::string connectSessionId,
         SocketAddress remotePeerAddress,
         std::unique_ptr<nx::network::UDPSocket> udpSocket);
+
     RendezvousConnector(
-        nx::String connectSessionId,
+        std::string connectSessionId,
         SocketAddress remotePeerAddress,
         SocketAddress localAddressToBindTo);
+
     virtual ~RendezvousConnector();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -53,14 +55,14 @@ public:
      */
     virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection();
 
-    const nx::String& connectSessionId() const;
+    const std::string& connectSessionId() const;
     const SocketAddress& remoteAddress() const;
 
 protected:
     aio::Timer m_aioThreadBinder;
 
 private:
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     const SocketAddress m_remotePeerAddress;
     std::unique_ptr<nx::network::UDPSocket> m_udpSocket;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;

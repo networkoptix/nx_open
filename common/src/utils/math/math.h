@@ -93,12 +93,12 @@ inline bool qIsPower2(T value) {
  */
 inline unsigned int qPower2Ceil(unsigned int value, int step)
 {
-    NX_EXPECT(qIsPower2(step));
+    NX_ASSERT(qIsPower2(step));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
 inline quint64 qPower2Ceil(quint64 value, int step) {
-    NX_EXPECT(qIsPower2(step));
+    NX_ASSERT(qIsPower2(step));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
@@ -108,7 +108,7 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Floor(unsigned int value, int step) {
-    NX_EXPECT(qIsPower2(step));
+    NX_ASSERT(qIsPower2(step));
     return value & ~(step - 1);
 }
 
@@ -119,8 +119,8 @@ inline unsigned int qPower2Floor(unsigned int value, int step) {
  */
 inline int qPower2Round(int value, int step)
 {
-    NX_EXPECT(value >= 0);
-    NX_EXPECT(qIsPower2(step));
+    NX_ASSERT(value >= 0);
+    NX_ASSERT(qIsPower2(step));
     return qPower2Floor(value + step / 2, step);
 }
 
@@ -159,7 +159,7 @@ inline double qMod(double l, double r) {
 template<class T, class Step>
 T qCeil(T value, Step step)
 {
-    NX_EXPECT(step > 0);
+    NX_ASSERT(step > 0);
     T mod = qMod(value, static_cast<T>(step));
     return QnMathDetail::qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
@@ -172,7 +172,7 @@ T qCeil(T value, Step step)
 template<class T, class Step>
 T qFloor(T value, Step step)
 {
-    NX_EXPECT(step > 0);
+    NX_ASSERT(step > 0);
     return value - qMod(value, static_cast<T>(step));
 }
 
@@ -184,7 +184,7 @@ T qFloor(T value, Step step)
 template<class T, class Step>
 T qRound(T value, Step step)
 {
-    NX_EXPECT(step > 0);
+    NX_ASSERT(step > 0);
     return qFloor(value + static_cast<T>(step) / 2, step);
 }
 

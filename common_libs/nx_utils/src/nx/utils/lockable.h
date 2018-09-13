@@ -1,20 +1,22 @@
 #pragma once
 
+#include <nx/utils/thread/mutex.h>
+
 namespace nx {
 namespace utils {
 
 template <typename Value>
-class Locker
+class ValueLocker
 {
 public:
-    Locker(QnMutex* mutex, Value* value):
+    ValueLocker(QnMutex* mutex, Value* value):
         m_mutex(mutex),
         m_value(value)
     {
         m_mutex->lock();
     }
 
-    Locker(Locker&& other)
+    ValueLocker(ValueLocker&& other)
     {
         m_mutex = other.m_mutex;
         m_value = other.m_value;
@@ -22,19 +24,19 @@ public:
         other.m_value = nullptr;
     }
 
-    Locker(const Locker& other) = delete;
+    ValueLocker(const ValueLocker& other) = delete;
 
-    ~Locker()
+    ~ValueLocker()
     {
         if (m_mutex)
             m_mutex->unlock();
     };
 
-    Locker& operator=(const Locker& other) = delete;
+    ValueLocker& operator=(const ValueLocker& other) = delete;
     inline Value* operator->() { return m_value; }
     inline const Value* operator->() const { return m_value; }
-    inline Locker& operator*() { return *m_value; }
-    inline const Locker& operator*() const { return *m_value; }
+    inline ValueLocker& operator*() { return *m_value; }
+    inline const ValueLocker& operator*() const { return *m_value; }
 
 private:
     mutable QnMutex* m_mutex;
@@ -44,9 +46,9 @@ private:
 template<typename Value>
 struct Lockable
 {
-    Locker<Value> lock()
+    ValueLocker<Value> lock()
     {
-        return Locker<Value>(&m_mutex, &m_value);
+        return ValueLocker<Value>(&m_mutex, &m_value);
     };
 
 private:

@@ -15,6 +15,10 @@ QnAbstractPtzController::~QnAbstractPtzController()
 {
 }
 
+void QnAbstractPtzController::initialize()
+{
+}
+
 QnResourcePtr QnAbstractPtzController::resource() const
 {
     return m_resource;
@@ -34,7 +38,6 @@ bool QnAbstractPtzController::getData(
 {
     data->query = query;
     data->fields = Qn::NoPtzFields;
-    data->capabilities = getCapabilities(options);
 
     if (query.testFlag(Qn::CapabilitiesPtzField))
     {

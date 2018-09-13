@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -64,13 +65,15 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 
     // We need to instantiate core user watcher for two way audio availability watcher.
-    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
+    const auto coreUserWatcher = commonModule()->instance<nx::client::core::UserWatcher>();
+
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
     connect(m_userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
-        [this](const QnUserResourcePtr& user)
+        [this, coreUserWatcher](const QnUserResourcePtr& user)
         {
+            coreUserWatcher->setUser(user);
             if (m_accessController)
                 m_accessController->setUser(user);
             emit userChanged(user);
@@ -230,7 +233,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
-            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to cloud"));
             qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
             break;
         }
@@ -243,7 +246,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
-            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);
             systemUrl.setPassword(auth.password);
@@ -251,7 +254,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             if (systemIsCloud)
             {
                 qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Custom URI: System is cloud, connecting to cloud first"));
             }
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
@@ -270,7 +273,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 bool QnWorkbenchContext::showEulaMessage() const
 {
     const bool acceptedEula =
-        [this]()
+        [this]() -> bool
         {
             const QString eulaHtmlStyle = QString::fromLatin1(R"(
             <style media="screen" type="text/css">
@@ -287,6 +290,24 @@ bool QnWorkbenchContext::showEulaMessage() const
             QFile eula(lit(":/license.html"));
             eula.open(QIODevice::ReadOnly);
             QString eulaText = QString::fromUtf8(eula.readAll());
+
+            // Regexp to dig out a title from html with EULA.
+            QRegExp headerRegExp("<title>(.+)</title>", Qt::CaseInsensitive);
+            headerRegExp.setMinimal(true);
+
+            QString eulaHeader;
+            if (headerRegExp.indexIn(eulaText) != -1)
+            {
+                QString title = headerRegExp.cap(1);
+                eulaHeader = tr("Please review and agree to the %1 in order to proceed").arg(title);
+            }
+            else
+            {
+                // We are here only if some vile monster has chewed our eula file.
+                NX_ASSERT(false);
+                eulaHeader = tr("To use the software you must agree with the end user license agreement");
+            }
+
             eulaText = eulaText.replace(
                 lit("<head>"),
                 lit("<head>%1").arg(eulaHtmlStyle)
@@ -294,7 +315,7 @@ bool QnWorkbenchContext::showEulaMessage() const
 
             QnMessageBox eulaDialog(workbench()->context()->mainWindow());
             eulaDialog.setIcon(QnMessageBoxIcon::Warning);
-            eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+            eulaDialog.setText(eulaHeader);
 
             auto view = new QWebView(&eulaDialog);
             NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
@@ -303,8 +324,8 @@ bool QnWorkbenchContext::showEulaMessage() const
             view->show();
             eulaDialog.addCustomWidget(view);
 
-            eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
-            eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+            eulaDialog.addButton(tr("I Agree"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            eulaDialog.addButton(tr("I Do Not Agree"), QDialogButtonBox::RejectRole);
             return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
         }();
 
@@ -343,12 +364,6 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 QnWorkbenchContext::StartupParametersCode
     QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
-    const bool showEula = qnRuntime->isDesktopMode()
-        && qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
-
-    if (showEula && !showEulaMessage())
-        return forcedExit;
-
     /* Process input files. */
     bool haveInputFiles = false;
     {
@@ -388,23 +403,9 @@ QnWorkbenchContext::StartupParametersCode
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
-    else if (!startupParams.delayedDrop.isEmpty())
-    { /* Drop resources if needed. */
-        NX_ASSERT(startupParams.instantDrop.isEmpty());
 
-        QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(action::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.instantDrop.isEmpty())
-    {
-        QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.layoutName.isEmpty())
-    {
-        const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
-        menu()->trigger(action::DelayedDropResourcesAction, parameters);
-    }
+    menu()->trigger(action::ProcessStartupParametersAction,
+        {Qn::StartupParametersRole, startupParams});
 
     /* Show beta version warning message for the main instance only */
     const bool showBetaWarning = QnAppInfo::beta()

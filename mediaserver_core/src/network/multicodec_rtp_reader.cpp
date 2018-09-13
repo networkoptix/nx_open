@@ -22,6 +22,7 @@
 
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/rtp/onvif_header_extension.h>
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -35,6 +36,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/utils/scope_guard.h>
+#include "nx/network/rtsp/rtsp_types.h"
 
 using namespace nx;
 
@@ -49,9 +51,6 @@ static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
-static const int kOnvifNtpExtensionId = 0xabac;
-static const int kOnvifNtpExtensionAltId = 0xabad;
-static const int kOnvifNtpExtensionWordsNumber = 3;
 
 } // namespace
 
@@ -107,8 +106,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
             Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
         if (ignoreCameraTimeIfBigJitter)
-            m_timeHelper.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
+            m_defaultTimePolicy = nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter;
     }
+    updateTimePolicy();
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -182,12 +182,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         if (elapsed > m_rtpFrameTimeoutMs) {
             reason = vms::api::EventReason::networkNoFrame;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
-            NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
+            NX_WARNING(this, QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()));
         }
         else {
             reason = vms::api::EventReason::networkConnectionClosed;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
-            NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
+            NX_WARNING(this, QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()));
         }
 
         emit networkIssue(getResource(),
@@ -263,7 +263,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     const auto tcpTimeout = m_RtpSession.getTCPTimeout();
     if (m_callbackTimeout.count() > 0)
         m_RtpSession.setTCPTimeout(m_callbackTimeout);
-    const auto scopeGuard = makeScopeGuard([
+    const auto scopeGuard = nx::utils::makeScopeGuard([
         this, tcpTimeout]()
         {
             if (m_callbackTimeout.count() > 0)
@@ -499,10 +499,18 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     return result;
 }
 
-void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const QString & key)
 {
-    if (key == QnMediaResource::rtpTransportKey() && getRtpTransport() != m_RtpSession.getTransport())
+    auto networkResource = res.dynamicCast<QnNetworkResource>();
+    const bool isTransportChanged = key == QnMediaResource::rtpTransportKey()
+        && getRtpTransport() != m_RtpSession.getTransport();
+    const bool isMediaPortChanged = key == QnNetworkResource::mediaPortKey() && networkResource
+        && networkResource->mediaPort() != m_RtpSession.getUrl().port(nx_rtsp::DEFAULT_RTSP_PORT);
+    if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
+
+    if (key == Qn::TRUST_CAMERA_TIME_NAME)
+        updateTimePolicy();
 }
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
@@ -573,9 +581,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotData = false;
 
     const qint64 position = m_positionUsec.exchange(AV_NOPTS_VALUE);
-    const CameraDiagnostics::Result result = m_RtpSession.open(m_currentStreamUrl, position);
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
-        return result;
+    m_openStreamResult = m_RtpSession.open(m_currentStreamUrl, position);
+    if(m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return m_openStreamResult;
 
     if (m_RtpSession.isTcpMode())
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
@@ -628,11 +636,14 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     }
 
     m_rtcpReportTimer.restart();
-    if (!audioExist && !videoExist) {
+    if (!audioExist && !videoExist)
+    {
         m_RtpSession.stop();
-        return CameraDiagnostics::NoMediaTrackResult( m_currentStreamUrl );
+        m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_currentStreamUrl.toString());
+        return m_openStreamResult;
     }
     m_rtpStarted = true;
+    m_openStreamResult = CameraDiagnostics::NoErrorResult();
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -691,7 +702,8 @@ int QnMulticodecRtpReader::getLastResponseCode() const
 void QnMulticodecRtpReader::closeStream()
 {
     m_rtpStarted = false;
-    m_RtpSession.sendTeardown();
+    if (m_RtpSession.isOpened())
+        m_RtpSession.sendTeardown();
     m_RtpSession.stop();
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i) {
         if (m_demuxedData[i])
@@ -702,6 +714,11 @@ void QnMulticodecRtpReader::closeStream()
 bool QnMulticodecRtpReader::isStreamOpened() const
 {
     return m_RtpSession.isOpened();
+}
+
+CameraDiagnostics::Result QnMulticodecRtpReader::lastOpenStreamResult() const
+{
+    return m_openStreamResult;
 }
 
 QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
@@ -741,49 +758,42 @@ void QnMulticodecRtpReader::setUserAgent(const QString& value)
     m_RtpSession.setUserAgent(value);
 }
 
-QString QnMulticodecRtpReader::getCurrentStreamUrl() const
+nx::utils::Url QnMulticodecRtpReader::getCurrentStreamUrl() const
 {
     return m_currentStreamUrl;
 }
 
 void QnMulticodecRtpReader::calcStreamUrl()
 {
-    QString url;
-    auto res = getResource();
-    QnNetworkResourcePtr nres;
-
-    m_currentStreamUrl.clear();
-
-    if (res)
-        nres = res.dynamicCast<QnNetworkResource>();
-    else
-        return;
-
+    auto nres = getResource().dynamicCast<QnNetworkResource>();
     if (!nres)
         return;
 
-    if (m_request.length() > 0)
+    int mediaPort = nres->mediaPort();
+    if (m_request.startsWith(QLatin1String("rtsp://")))
     {
-        if (m_request.startsWith(QLatin1String("rtsp://")))
-        {
-            m_currentStreamUrl = m_request;
-        }
-        else
-        {
-            QTextStream(&m_currentStreamUrl)
-                << "rtsp://"
-                << nres->getHostAddress() << ":"
-                << nres->mediaPort();
-
-            if (!m_request.startsWith(QLatin1Char('/')))
-                m_currentStreamUrl += QLatin1Char('/');
-
-            m_currentStreamUrl += m_request;;
-        }
+        m_currentStreamUrl = m_request;
+        if (mediaPort)
+            m_currentStreamUrl.setPort(mediaPort); //< Override port.
     }
     else
     {
-        QTextStream(&m_currentStreamUrl) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
+        m_currentStreamUrl.clear();
+        m_currentStreamUrl.setScheme("rtsp");
+        m_currentStreamUrl.setHost(nres->getHostAddress());
+        m_currentStreamUrl.setPort(mediaPort ? mediaPort : nx_rtsp::DEFAULT_RTSP_PORT);
+
+        if (!m_request.isEmpty())
+        {
+            auto requestParts = m_request.split('?');
+            QString path = requestParts[0];
+            if (!path.startsWith(L'/'))
+                path.insert(0, L'/');
+            m_currentStreamUrl.setPath(path);
+            if (requestParts.size() > 1)
+                m_currentStreamUrl.setQuery(requestParts[1]);
+        }
+
     }
 }
 
@@ -797,14 +807,19 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
     m_RtpSession.setDateTimeFormat(format);
 }
 
-void QnMulticodecRtpReader::setTrustToCameraTime(bool value)
+void QnMulticodecRtpReader::setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy)
 {
-    m_timeHelper.setTimePolicy(TimePolicy::forceCameraTime);
+    m_defaultTimePolicy = timePolicy;
+    updateTimePolicy();
 }
 
-void QnMulticodecRtpReader::setTimePolicy(TimePolicy timePolicy)
+void QnMulticodecRtpReader::updateTimePolicy()
 {
-    m_timeHelper.setTimePolicy(timePolicy);
+    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
+    if (secResource && secResource->trustCameraTime())
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
+    else
+        m_timeHelper.setTimePolicy(m_defaultTimePolicy);
 }
 
 void QnMulticodecRtpReader::addRequestHeader(
@@ -817,45 +832,6 @@ void QnMulticodecRtpReader::addRequestHeader(
 QnRtspClient& QnMulticodecRtpReader::rtspClient()
 {
     return m_RtpSession;
-}
-
-boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpExtensionTime(
-    quint8* bufferStart,
-    int length) const
-{
-    if (length < RtpHeader::RTP_HEADER_SIZE)
-        return boost::none;
-
-    const auto rtpHeader = (RtpHeader*) bufferStart;
-    if (!rtpHeader->extension)
-        return boost::none;
-
-    if (length < RtpHeader::RTP_HEADER_SIZE + RtpHeaderExtension::kRtpExtensionHeaderLength)
-        return boost::none;
-
-    quint8* ptr = bufferStart + RtpHeader::RTP_HEADER_SIZE;
-    const auto extensionId = htons(*(uint16_t*)ptr);
-
-    if (!isOnvifNtpExtensionId(extensionId))
-        return boost::none;
-
-    const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
-    if (extWords < kOnvifNtpExtensionWordsNumber)
-        return boost::none;
-
-    const quint8* bufferEnd = bufferStart + length;
-    if (ptr + kOnvifNtpExtensionWordsNumber * 4 > bufferEnd)
-        return boost::none;
-
-    ptr += RtpHeaderExtension::kRtpExtensionHeaderLength;
-    const auto seconds = htonl(*(uint32_t*)ptr);
-    const double fractions = htonl(*(uint32_t*)(ptr + 4));
-
-    return std::chrono::microseconds(seconds * std::micro::den)
-        + std::chrono::microseconds(
-            (uint64_t)(fractions / std::numeric_limits<uint32_t>::max()
-            * std::micro::den))
-        - nx::streaming::rtp::kNtpEpochTimeDiff;
 }
 
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
@@ -872,22 +848,13 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
-    const auto extensionNtpTime = parseOnvifNtpExtensionTime(
-        (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
-        rtpPacketSize);
-
-    if (extensionNtpTime.is_initialized())
-        m_lastOnvifNtpExtensionTime = extensionNtpTime;
-
-    rtcpStaticstics.ntpOnvifExtensionTime = m_lastOnvifNtpExtensionTime;
+    nx::streaming::rtp::OnvifHeaderExtension header;
+    if (header.read((quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset, rtpPacketSize))
+        rtcpStaticstics.ntpOnvifExtensionTime = header.ntp;
+    else
+        rtcpStaticstics.ntpOnvifExtensionTime = boost::none;
 
     return rtcpStaticstics;
-}
-
-bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
-{
-    return id == kOnvifNtpExtensionId
-        || id == kOnvifNtpExtensionAltId;
 }
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(

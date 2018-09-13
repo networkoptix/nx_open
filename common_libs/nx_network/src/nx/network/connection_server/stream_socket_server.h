@@ -302,8 +302,8 @@ private:
 
         if (code != SystemError::noError)
         {
-            NX_LOGX(lm("Accept has failed: %1")
-                .arg(SystemError::toString(code)), cl_logWARNING);
+            NX_WARNING(this, lm("Accept has failed: %1")
+                .arg(SystemError::toString(code)));
             return;
         }
 
@@ -316,8 +316,12 @@ private:
         }
 
         auto connection = createConnection(std::move(socket));
-        connection->startReadingConnection(m_connectionInactivityTimeout);
+        auto connectionPtr = connection.get();
         this->saveConnection(std::move(connection));
+        // It is guaranteed that connection is alive here because
+        // connection can be deleted by an event from itself only.
+        // And event can arrive not sooner than connection is started.
+        connectionPtr->startReadingConnection(m_connectionInactivityTimeout);
     }
 };
 

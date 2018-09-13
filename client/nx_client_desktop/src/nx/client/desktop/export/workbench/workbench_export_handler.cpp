@@ -86,13 +86,13 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
 
 static bool informersEnabled()
 {
-    return ini().enableProgressInformers && ini().unifiedEventPanel;
+    return ini().enableProgressInformers;
 }
 
 bool isBinaryExportSupported()
 {
     if (nx::utils::AppInfo::isWindows())
-        return !qnRuntime->isActiveXMode();
+        return !qnRuntime->isAcsMode();
     return false;
 }
 
@@ -507,6 +507,7 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
                 layoutSettings.mode = ExportLayoutSettings::Mode::Export;
                 layoutSettings.period = settings.period;
                 layoutSettings.readOnly = false;
+                layoutSettings.watermark = settings.transcodingSettings.watermark;
 
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
                 // This rotation properly matches either to:
@@ -542,11 +543,12 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
     return std::make_pair(exportId, std::move(tool));
 }
 
-void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog * dialog)
+void WorkbenchExportHandler::setWatermark(nx::client::desktop::ExportSettingsDialog* dialog)
 {
     if (ini().enableWatermark)
     {
         if (globalSettings()->watermarkSettings().useWatermark
+            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
             && context()->user() && !context()->user()->getName().isEmpty())
         {
             dialog->setWatermark({globalSettings()->watermarkSettings(), context()->user()->getName()});

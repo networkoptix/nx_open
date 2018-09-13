@@ -229,7 +229,7 @@ void QnIoModuleGridOverlayContentsPrivate::Layout::setGeometry(const QRectF& rec
 
             for (int i = 0; i < kColumnCount; ++i)
             {
-                NX_EXPECT(m_rowCounts[i] > 0);
+                NX_ASSERT(m_rowCounts[i] > 0);
                 rowHeights[i] = contents.height() / m_rowCounts[i];
             }
 
@@ -289,7 +289,7 @@ void QnIoModuleGridOverlayContentsPrivate::Layout::recalculateLayout()
                     ++m_rowCounts[kRightColumn];
             }
 
-            NX_EXPECT(m_rowCounts[kLeftColumn] + m_rowCounts[kRightColumn] == totalItems);
+            NX_ASSERT(m_rowCounts[kLeftColumn] + m_rowCounts[kRightColumn] == totalItems);
 
             /* Lay out left column: */
             for (int i = 0; i < m_rowCounts[kLeftColumn]; ++i)

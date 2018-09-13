@@ -109,7 +109,7 @@ void LicenseWatcher::startUpdate()
         [this, objectGuard]()
         {
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");
-            const auto scopeGuard = makeScopeGuard([this](){ stopHttpClient(); });
+            const auto scopeGuard = nx::utils::makeScopeGuard([this](){ stopHttpClient(); });
 
             nx::network::http::AsyncClient::State state = m_httpClient->state();
             if (state == nx::network::http::AsyncClient::State::sFailed)

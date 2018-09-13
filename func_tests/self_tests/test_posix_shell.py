@@ -1,16 +1,11 @@
-import time
 import timeit
 
 import pytest
 from pathlib2 import PurePath
 
-from fixtures.ad_hoc_ssh import generate_keys
-from framework.ad_hoc_ssh import ad_hoc_sshd
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_shell import local_shell
-from framework.os_access.ssh_path import make_ssh_path_cls
-
-pytest_plugins = ['fixtures.ad_hoc_ssh']
+from framework.os_access.posix_shell_path import PosixShellPath
 
 
 @pytest.fixture(params=['ssh', 'local'])
@@ -18,17 +13,8 @@ def posix_shell(request):
     if request.param == 'local':
         return local_shell
     if request.param == 'ssh':
-        return request.getfixturevalue('ad_hoc_ssh')
+        return request.getfixturevalue('ssh')
     assert False
-
-
-def test_ad_hoc_ssh(service_ports, node_dir):
-    client_priv, client_pub = generate_keys()
-    host_priv, host_pub = generate_keys()
-    port_range = service_ports[20:25]
-    with ad_hoc_sshd(port_range, node_dir / 'a', client_pub, host_priv) as a:
-        with ad_hoc_sshd(port_range, node_dir / 'b', client_pub, host_priv) as b:
-            time.sleep(1)
 
 
 def test_run_command(posix_shell):
@@ -56,7 +42,7 @@ def test_non_zero_exit_code(posix_shell):
 
 
 def test_create_path(posix_shell):
-    assert isinstance(make_ssh_path_cls(posix_shell)('/tmp'), PurePath)
+    assert isinstance(PosixShellPath.specific_cls(posix_shell)('/tmp'), PurePath)
 
 
 def test_timeout(posix_shell):

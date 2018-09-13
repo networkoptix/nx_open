@@ -100,7 +100,7 @@ void SpecialLayoutPanelWidget::updateButtons()
     for (const auto& actionId: actions)
     {
         const auto action = menu()->action(actionId);
-        NX_EXPECT(action);
+        NX_ASSERT(action);
         if (!action)
             continue;
 

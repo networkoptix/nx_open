@@ -32,14 +32,15 @@
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
-QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64),
-      m_zoneSite(8),
-      m_channelCount(0),
-      m_prevMotionChannel(0),
-      m_dualsensor(false),
-      m_inputPortState(false),
-      m_advancedParametersProvider{this}
+QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
+    m_totalMdZones(64),
+    m_zoneSite(8),
+    m_channelCount(0),
+    m_prevMotionChannel(0),
+    m_dualsensor(false),
+    m_inputPortState(false),
+    m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
 }
@@ -130,7 +131,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     nx::network::http::AsyncHttpClientPtr httpClientCaptured = nx::network::http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
 
-    const nx::network::QnMacAddress cameraMAC = getMAC();
+    const nx::utils::MacAddress cameraMAC = getMAC();
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx::network::http::AsyncHttpClientPtr& httpClient ) mutable
     {
@@ -152,7 +153,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
             return;
         }
         const QByteArray& mac = msgBody.mid( sepIndex+1 );
-        completionHandlerLocal( cameraMAC == nx::network::QnMacAddress(mac) );
+        completionHandlerLocal( cameraMAC == nx::utils::MacAddress(mac) );
     };
     connect( httpClientCaptured.get(), &nx::network::http::AsyncHttpClient::done,
              this, httpReqCompletionHandler,
@@ -418,7 +419,7 @@ QString QnPlAreconVisionResource::generateRequestString(
         !streamParams.contains("image_right") || !streamParams.contains("image_bottom") ||
         (h264 && !streamParams.contains("streamID")))
     {
-        NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
+        NX_ERROR(this, "Error!!! parameter is missing in stream params.");
         //return QnAbstractMediaDataPtr(0);
     }
 
@@ -557,7 +558,8 @@ bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString&
     return false;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString& name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(
+    QnMediaServerModule* serverModule, const QString& name)
 {
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
@@ -568,32 +570,32 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
             if (rt.isNull())
             {
-                NX_LOG( lit("Unsupported AV resource found: %1").arg(name), cl_logERROR);
+                NX_ERROR(typeid(QnPlAreconVisionResource), lit("Unsupported AV resource found: %1").arg(name));
                 return 0;
             }
         }
     }
 
-    return createResourceByTypeId(rt);
+    return createResourceByTypeId(serverModule, rt);
 
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUuid rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMediaServerModule* serverModule, QnUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
+        NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;
     }
 
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType))
-        res = new QnArecontPanoramicResource(resourceType->getName());
+        res = new QnArecontPanoramicResource(serverModule, resourceType->getName());
     else
-        res = new CLArecontSingleSensorResource(resourceType->getName());
+        res = new CLArecontSingleSensorResource(serverModule, resourceType->getName());
 
     res->setTypeId(rt);
 

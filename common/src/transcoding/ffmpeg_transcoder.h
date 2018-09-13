@@ -1,5 +1,4 @@
-#ifndef __FFMPEG_TRANSCODER_H
-#define __FFMPEG_TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -21,7 +20,7 @@ class QnFfmpegTranscoder: public QnTranscoder
 public:
     static const int MTU_SIZE = 1412;
 
-    QnFfmpegTranscoder();
+    QnFfmpegTranscoder(nx::metrics::Storage* metrics);
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
@@ -71,6 +70,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  // __FFMPEG_TRANSCODER_H
-

@@ -21,7 +21,6 @@ WorkbenchSessionTimeoutWatcher::WorkbenchSessionTimeoutWatcher(QnWorkbenchConnec
 
     auto sessionTimeoutTimer = new QTimer(this);
     sessionTimeoutTimer->setInterval(kMsecPerMinute); //< One minute precision is quite enough.
-    sessionTimeoutTimer->setInterval(1000);
     connect(sessionTimeoutTimer, &QTimer::timeout, this,
         [this, owner]
         {

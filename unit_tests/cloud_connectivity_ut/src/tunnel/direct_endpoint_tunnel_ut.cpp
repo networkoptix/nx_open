@@ -40,7 +40,7 @@ public:
     }
 
     std::unique_ptr<DirectTcpEndpointTunnel> makeTunnel(
-        aio::AbstractAioThread* aioThread, String sessionId)
+        aio::AbstractAioThread* aioThread, std::string sessionId)
     {
         auto socket = std::make_unique<TCPSocket>(AF_INET);
         if (!socket->connect(m_testServer->serverAddress(), nx::network::deprecated::kDefaultConnectTimeout) ||
@@ -57,7 +57,7 @@ public:
     {
         m_tunnel = makeTunnel(
             nx::network::SocketGlobals::aioService().getRandomAioThread(),
-            nx::utils::generateRandomName(7));
+            nx::utils::generateRandomName(7).toStdString());
 
         m_tunnel->setControlConnectionClosedHandler(
             [this](SystemError::ErrorCode code) { m_tunnelClosedPromise.set_value(code); });

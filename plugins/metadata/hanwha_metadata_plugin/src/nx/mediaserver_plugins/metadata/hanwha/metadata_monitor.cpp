@@ -6,18 +6,12 @@
 #include "bytestream_filter.h"
 #include <nx/utils/log/log.h>
 
-#if defined(__GNUC__) || defined(__clang__)
-    #define NX_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#elif defined(_MSC_VER)
-    #define NX_PRETTY_FUNCTION __FUNCSIG__
-#else
-    #define NX_PRETTY_FUNCTION __func__
-#endif
-
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
 namespace hanwha {
+
+using namespace std::chrono;
 
 namespace {
 
@@ -25,9 +19,9 @@ static const QString kMonitorUrlTemplate =
     lit("http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
 
 static const int kDefaultHttpPort = 80;
-
-static const std::chrono::minutes kKeepAliveTimeout{2};
-static const std::chrono::seconds kMinReopenInterval{10};
+static const minutes kKeepAliveTimeout(2);
+static const seconds kMinReopenInterval(10);
+static const seconds kResponseTimeout(10);
 
 } // namespace
 
@@ -52,7 +46,6 @@ void MetadataMonitor::startMonitoring()
     m_timer.post(
         [this]()
         {
-            m_monitoringIsInProgress = true;
             initMonitorUnsafe();
         });
 }
@@ -63,16 +56,21 @@ void MetadataMonitor::stopMonitoring()
     m_timer.post(
         [this, &promise]()
         {
-            m_monitoringIsInProgress = false;
-            if (m_httpClient)
-                m_httpClient->pleaseStopSync();
-
-            m_timer.pleaseStopSync();
+            stopMonitorUnsafe();
             promise.set_value();
         });
 
     promise.get_future().wait();
     NX_DEBUG(this, "Stopped");
+}
+
+void MetadataMonitor::stopMonitorUnsafe()
+{
+    m_monitoringIsInProgress = false;
+    if (m_httpClient)
+        m_httpClient->pleaseStopSync();
+
+    m_timer.pleaseStopSync();
 }
 
 void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -98,11 +96,17 @@ void MetadataMonitor::setResourceAccess(const nx::utils::Url& url, const QAuthen
     m_timer.post(
         [this, url, auth]()
         {
-            m_url = buildMonitoringUrl(url);
-            m_auth = auth;
+            const auto monitorUrl = buildMonitoringUrl(url);
+            if (m_url == monitorUrl && m_auth == auth)
+                return; //< Do not recreate connection if nothing is changed.
 
+            m_url = monitorUrl;
+            m_auth = auth;
             if (m_monitoringIsInProgress)
+            {
+                stopMonitorUnsafe();
                 initMonitorUnsafe();
+            }
         });
 }
 
@@ -115,8 +119,9 @@ void MetadataMonitor::setResourceAccess(const nx::utils::Url& url, const QAuthen
 
 void MetadataMonitor::initMonitorUnsafe()
 {
-    if (!m_monitoringIsInProgress)
+    if (m_monitoringIsInProgress)
         return;
+    m_monitoringIsInProgress = true;
 
     NX_DEBUG(this, "Initialization");
     auto httpClient = nx::network::http::AsyncHttpClient::create();
@@ -142,8 +147,8 @@ void MetadataMonitor::initMonitorUnsafe()
     httpClient->setTotalReconnectTries(nx::network::http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES);
     httpClient->setUserName(m_auth.user());
     httpClient->setUserPassword(m_auth.password());
-    httpClient->setMessageBodyReadTimeoutMs(
-        std::chrono::duration_cast<std::chrono::milliseconds>(kKeepAliveTimeout).count());
+    httpClient->setResponseReadTimeoutMs(duration_cast<milliseconds>(kResponseTimeout).count());
+    httpClient->setMessageBodyReadTimeoutMs(duration_cast<milliseconds>(kKeepAliveTimeout).count());
 
     auto handler =
         [this](const EventList& events)
@@ -181,7 +186,14 @@ void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr 
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
         <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
-    m_timer.start(reopenDelay, [this]() { initMonitorUnsafe(); });
+
+    m_timer.start(
+        reopenDelay,
+        [this]()
+        {
+            stopMonitorUnsafe();
+            initMonitorUnsafe();
+        });
 }
 
 } // namespace hanwha

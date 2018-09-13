@@ -23,6 +23,11 @@ static const QString kTypeParam = lit("type");
 
 } // namespace
 
+QnCameraDiagnosticsRestHandler::QnCameraDiagnosticsRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 QStringList QnCameraDiagnosticsRestHandler::cameraIdUrlParams() const
 {
     return kCameraIdParams;
@@ -34,7 +39,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    NX_LOG(lit("QnCameraDiagnosticsRestHandler: received request %1").arg(path), cl_logDEBUG1);
+    NX_DEBUG(this, lit("received request %1").arg(path));
 
     CameraDiagnostics::Step::Value diagnosticsType =
         CameraDiagnostics::Step::fromString(params.value(kTypeParam));
@@ -66,7 +71,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
         }
     }
 
-    QnVideoCameraPtr videoCamera = QnVideoCameraPool::instance()->getVideoCamera(camera);
+    QnVideoCameraPtr videoCamera = videoCameraPool()->getVideoCamera(camera);
     if (!videoCamera)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,

@@ -17,9 +17,7 @@ set(defaultWebPages "{\"Home Page\": \"https://www.rassecurity.com\"}")
 # Support section
 set(companyUrl "https://www.rassecurity.com")
 set(productUrl "https://www.rassecurity.com/nl/producten/camerabewaking/recorders/product/pbx-09-lnx-2tb")
-set(supportUrl "")
 set(supportEmail "ras.support@rassecurity.com")
-set(supportPhone "")
 set(licenseEmail "ras.contact@rassecurity.com")
 
 set(installer.name "probox")

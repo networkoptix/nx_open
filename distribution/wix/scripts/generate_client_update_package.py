@@ -41,6 +41,7 @@ qt_plugins = [
 
 nx_libraries = [
     'nx_vms_utils',
+	'nx_vms_applauncher_api',
     'nx_utils',
     'nx_sql',
     'nx_network',
@@ -49,7 +50,9 @@ nx_libraries = [
     'nx_update',
     'nx_relaying',
     'vms_gateway_core',
-    'udt']
+    'udt',
+    'qtkeychain'
+]
 
 
 def create_client_update_file(config, output_file):
@@ -94,6 +97,7 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, minilauncher_binary_name), minilauncher_binary_name)
         zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
+        zip.write(os.path.join(config['cmake_binary_dir'], 'build_info.txt'), 'build_info.txt')
 
 
 '''

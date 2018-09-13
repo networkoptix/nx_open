@@ -12,7 +12,7 @@
 #include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "common/common_module_aware.h"
-
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace network {
@@ -21,10 +21,10 @@ class UDPSocket;
 }   //nx
 struct QnCameraConflictList;
 
-class QnMServerResourceSearcher: public QnLongRunnable, public QnCommonModuleAware
+class QnMServerResourceSearcher: public QnLongRunnable, public nx::mediaserver::ServerModuleAware
 {
 public:
-    QnMServerResourceSearcher(QnCommonModule* commonModule);
+    QnMServerResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnMServerResourceSearcher();
 
     /** find other servers in current networks. Actually, this function do not instantiate other mServer as resources. Function just check if they are presents */

@@ -11,14 +11,15 @@
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
 #include <nx/vms/event/events/events_fwd.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 //!Monitors mediaserver's status change and sends business event if some server goes offline
-class MediaServerStatusWatcher: public QObject, public QnCommonModuleAware
+class MediaServerStatusWatcher: public QObject, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    MediaServerStatusWatcher(QnCommonModule* commonModule);
+    MediaServerStatusWatcher(QnMediaServerModule* serverModule);
     ~MediaServerStatusWatcher();
 
 public slots:

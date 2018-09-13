@@ -125,7 +125,7 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
-	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
+    QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 
     struct {
         QString username;

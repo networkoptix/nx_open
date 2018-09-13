@@ -32,7 +32,6 @@ abstract DebInstallation {
     # _restore_conf
     + update_mediaserver_conf(new_configuration)
     + identity
-    # _discover_identity()
     + should_reinstall(installer)
 }
 

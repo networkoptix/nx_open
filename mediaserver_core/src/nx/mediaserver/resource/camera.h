@@ -4,8 +4,10 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/dataconsumer/audio_data_transmitter.h>
+#include <media_server/media_server_module.h>
 
 #include "resource_fwd.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
@@ -45,14 +47,16 @@ struct StreamCapabilityKey
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
 using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
 
-class Camera: public QnVirtualCameraResource
+class Camera:
+    public QnVirtualCameraResource,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     using base_type = QnVirtualCameraResource;
 public:
     static const float kMaxEps;
 
-    Camera(QnCommonModule* commonModule = nullptr);
+    Camera(QnMediaServerModule* serverModule);
     virtual ~Camera() override;
 
     /*!
@@ -65,6 +69,7 @@ public:
      * know about or big exposure time.
      */
     int getPrimaryStreamRealFps() const;
+    virtual QString defaultCodec() const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;

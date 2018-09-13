@@ -13,6 +13,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/mutex_delegate_factory.h>
 
 namespace nx {
 namespace utils {
@@ -172,6 +173,8 @@ void Logger::writeLogHeader()
     write(lm("Log file size: %2, backup count: %3, file: %4").args(
         nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
         filePath ? *filePath : QString("-")));
+
+    write(lm("Mutex implementation: %1").args(nx::utils::mutexImplementation()));
 }
 
 void Logger::handleLevelChange(QnMutexLockerBase* lock) const

@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/utils/log/log.h>
+#include <api/server_rest_connection.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -122,31 +123,36 @@ void QnMediaServerStatisticsStorage::update()
         return;
     }
 
-    if (m_updateRequests == 0
-        || m_updateRequests * m_updatePeriod > kRetryTimeoutMs)
+    if (m_updateRequests == 0 || m_updateRequests * m_updatePeriod > kRetryTimeoutMs)
     {
-        m_updateRequestHandle = server->apiConnection()->getStatisticsAsync(
-            this, SLOT(at_statisticsReceived(int, const QnStatisticsReply&, int)));
+        m_updateRequestHandle = server->restConnection()->getStatistics(
+            [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+            {
+                handleStatisticsReply(success, handle, result);
+            },
+            thread());
         m_updateRequests = 0;
         NX_VERBOSE(this, lm("Update requested. Handle: %1.").arg(m_updateRequestHandle));
     }
     ++m_updateRequests;
 }
 
-void QnMediaServerStatisticsStorage::at_statisticsReceived(
-    int status, const QnStatisticsReply& reply, int handle)
+void QnMediaServerStatisticsStorage::handleStatisticsReply(
+    bool success, rest::Handle handle, const QnJsonRestResult& result)
 {
-    NX_VERBOSE(this, lm("Reply received. Handle: %1, Status: %2.").args(handle, status));
+    NX_VERBOSE(this, lm("Reply received. Handle: %1, Status: %2.").args(handle, success));
 
     if (handle != m_updateRequestHandle)
         return;
 
     m_updateRequests = 0;
-    if (status != 0)
+    if (!success)
         return;
 
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     ++m_lastId;
+
+    const auto& reply = result.deserialized<QnStatisticsReply>();
 
     if (reply.updatePeriod > 0 && m_updatePeriod != reply.updatePeriod)
     {

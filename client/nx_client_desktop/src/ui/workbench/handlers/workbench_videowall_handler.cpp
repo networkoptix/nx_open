@@ -693,7 +693,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 {
     if (!videoWall)
     {
-        NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
+        NX_ERROR(this, "Warning: videowall not exists anymore, cannot open videowall item");
         closeInstanceDelayed();
         return;
     }
@@ -1237,7 +1237,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
             ? lit("Warning: videowall %1 is empty, cannot start videowall on this pc")
             : lit("Warning: videowall %1 not exists, cannot start videowall on this pc");
 
-        NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
+        NX_ERROR(this, message.arg(m_videoWallMode.guid.toString()));
 
         setVideoWallAutorunEnabled(m_videoWallMode.guid, false);
         closeInstanceDelayed();
@@ -1247,8 +1247,8 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
-            .arg(m_videoWallMode.guid.toString()), cl_logERROR);
+        NX_ERROR(this, lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(m_videoWallMode.guid.toString()));
 
         closeInstanceDelayed();
         return;
@@ -1490,7 +1490,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
         {
             // Cannot capture the resource directly because real resource pointer may differ if the
             // transaction is received before the request callback.
-            NX_EXPECT(videoWall);
+            NX_ASSERT(videoWall);
             if (success && videoWall)
             {
                 menu()->trigger(action::SelectNewItemAction, videoWall);
@@ -1819,7 +1819,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     const auto videoWall = parameters.resource().dynamicCast<QnVideoWallResource>();
-    NX_EXPECT(videoWall);
+    NX_ASSERT(videoWall);
     if (!videoWall)
         return;
 

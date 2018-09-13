@@ -20,12 +20,12 @@ namespace QnSerializationDetail {
     void check_enum_binary_internal(const T *) {
         static_assert(sizeof(T) <= sizeof(int), "Enums larger than int in size are not supported.");
 
-        check_enum_binary(static_cast<const T *>(NULL));
+        check_enum_binary(static_cast<const T*>(nullptr));
     }
 
     template<class T>
     void check_enum_binary_internal(const QFlags<T> *) {
-        check_enum_binary(static_cast<const T *>(NULL));
+        check_enum_binary(static_cast<const T*>(nullptr));
     }
 
 } // namespace QnSerializationDetail
@@ -34,7 +34,7 @@ namespace QnSerializationDetail {
 namespace QnSerialization {
     template<class T>
     void check_enum_binary() {
-        QnSerializationDetail::check_enum_binary_internal(static_cast<const T *>(NULL));
+        QnSerializationDetail::check_enum_binary_internal(static_cast<const T*>(nullptr));
     }
 
     template<class T>

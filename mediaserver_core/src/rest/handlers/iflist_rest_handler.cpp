@@ -9,5 +9,5 @@ int QnIfListRestHandler::executeGet(
     QnJsonRestResult& result, const QnRestConnectionProcessor* /*processor*/)
 {
     result.setReply(systemNetworkAddressEntryList());
-    return CODE_OK;
+    return nx::network::http::StatusCode::ok;
 }

@@ -155,7 +155,7 @@ private:
     // we can try to search camera using Frequency, Rx and Tx Ids,
     // from camera info.
     // Speed up actually will take place only if we saved this camera
-    // info at the prevous server launches.
+    // info at the previous server launches.
     void makeHint(const nxcip::CameraInfo &info);
 
 private:

@@ -21,7 +21,6 @@
 #include <QFileInfo>
 #include <QByteArray>
 
-#include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/email/email.h>

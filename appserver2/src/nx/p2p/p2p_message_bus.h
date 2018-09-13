@@ -141,7 +141,6 @@ protected:
             return;
         }
 
-
         const vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         const auto context = this->context(connection);
         if (connection->remotePeer().isServer())
@@ -169,7 +168,7 @@ protected:
 
         NX_ASSERT(!(remotePeer == peerId)); //< loop
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
             printTran(connection, tran, Connection::Direction::outgoing);
 
         switch (connection->remotePeer().dataFormat)
@@ -233,12 +232,24 @@ protected:
             if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
                 continue; //< Already processed by remote peer
 
+            if (!connection->shouldTransactionBeSentToPeer(tran))
+            {
+                NX_ASSERT(false,
+                    lm("Transaction '%1' can't be send to peer %2 (%3)")
+                    .arg(toString(tran.command))
+                    .arg(connection->remotePeer().id.toString())
+                    .arg(QnLexical::serialized(connection->remotePeer().peerType)));
+                return; //< This peer doesn't handle transactions of such type.
+            }
+
             if (connection->remotePeer().isClient())
             {
                 if (transportHeader.dstPeers.size() != 1
                     || transportHeader.dstPeers[0] != connection->remotePeer().id)
                 {
-                    NX_ASSERT(0, "Unicast transaction routing error. Transaction skipped.");
+                    NX_ASSERT(0, lm("Unicast transaction routing error. "
+                        "Transaction %1 skipped. remotePeer: %2")
+                        .args(tran.command, connection->remotePeer().id));
                     return;
                 }
                 switch (connection->remotePeer().dataFormat)
@@ -252,8 +263,9 @@ protected:
                             m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
                         break;
                     default:
-                        qWarning() << "Client has requested data in an unsupported format"
-                            << connection->remotePeer().dataFormat;
+                        NX_WARNING(this,
+                            lm("Client has requested data in an unsupported format %1")
+                            .arg(connection->remotePeer().dataFormat));
                         break;
                 }
             }
@@ -267,8 +279,8 @@ protected:
                             m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
                         break;
                     default:
-                        qWarning() << "Server has requested data in an unsupported format"
-                            << connection->remotePeer().dataFormat;
+                        NX_WARNING(this, lm("Server has requested data in an unsupported format %1")
+                            .arg(connection->remotePeer().dataFormat));
                         break;
                     }
             }
@@ -346,7 +358,7 @@ protected:
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran, const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 private:
-	void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
+    void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 
     void doSubscribe(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
 
@@ -406,26 +418,26 @@ public:
         const vms::api::PersistentIdData& to,
         int sequence);
 protected:
-	std::unique_ptr<BidirectionRoutingInfo> m_peers;
-	PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
-	DelayIntervals m_intervals;
-	struct MiscData
-	{
-		MiscData(const MessageBus* owner) : owner(owner) {}
-		void update();
+    std::unique_ptr<BidirectionRoutingInfo> m_peers;
+    PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
+    DelayIntervals m_intervals;
+    struct MiscData
+    {
+        MiscData(const MessageBus* owner) : owner(owner) {}
+        void update();
 
-		int expectedConnections = 0;
-		int maxSubscriptionToResubscribe = 0;
-		int maxDistanceToUseProxy = 0;
-		int newConnectionsAtOnce = 1;
-	private:
-		const MessageBus* owner;
-	} m_miscData;
+        int expectedConnections = 0;
+        int maxSubscriptionToResubscribe = 0;
+        int maxDistanceToUseProxy = 0;
+        int newConnectionsAtOnce = 1;
+    private:
+        const MessageBus* owner;
+    } m_miscData;
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
-	QElapsedTimer m_lastPeerInfoTimer;
-	QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
+    QElapsedTimer m_lastPeerInfoTimer;
+    QMap<vms::api::PersistentIdData, vms::api::RuntimeData> m_lastRuntimeInfo;
 private:
-	QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
+    QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
 
     struct RemoteConnection
     {

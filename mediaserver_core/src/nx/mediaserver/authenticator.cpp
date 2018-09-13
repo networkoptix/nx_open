@@ -16,6 +16,7 @@
 #include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -67,6 +68,27 @@ Authenticator::Authenticator(
     m_userDataProvider(userAuthenticator),
     m_ldap(std::make_unique<LdapManager>(commonModule))
 {
+    const auto settings = commonModule->globalSettings();
+    const auto updateSessionTimeout =
+        [this, settings = commonModule->globalSettings()]()
+        {
+            const auto timeout = settings->sessionTimeoutLimit();
+            if (timeout == std::chrono::minutes::zero())
+                m_sessionKeys.setOptions({kSessionKeyLifeTime, /*prolongLifeOnUse*/ true});
+            else
+                m_sessionKeys.setOptions({timeout, /*prolongLifeOnUse*/ false});
+        };
+
+    connect(
+        settings, &QnGlobalSettings::sessionTimeoutChanged,
+        this, updateSessionTimeout, Qt::DirectConnection);
+
+    updateSessionTimeout();
+}
+
+Authenticator::~Authenticator()
+{
+    commonModule()->globalSettings()->disconnect(this);
 }
 
 QString Authenticator::Result::toString() const
@@ -161,7 +183,8 @@ static void removeLegacyCookie(
 void Authenticator::setAccessCookie(
     const nx::network::http::Request& request,
     nx::network::http::Response* response,
-    Qn::UserAccessData access)
+    Qn::UserAccessData access,
+    bool secure)
 {
     removeLegacyCookie(request, response);
 
@@ -170,7 +193,7 @@ void Authenticator::setAccessCookie(
         return m_sessionKeys.addOrUpdate(sessionKey, access); //< Use existing if possible.
 
     const auto newSessionKey = m_sessionKeys.make(access);
-    response->setCookie(kCookieRuntimeGuid, newSessionKey);
+    response->setCookie(kCookieRuntimeGuid, newSessionKey, "/", secure);
 }
 
 void Authenticator::removeAccessCookie(
@@ -365,7 +388,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
                         &response.headers,
                         nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
                 }
-                bool needRecalcPassword = needUpdateRealm && canUpdateRealm
+                bool needRecalcPassword = (needUpdateRealm && canUpdateRealm)
                      || (userResource->isLdap() && userResource->passwordExpired());
                 if (needRecalcPassword)
                 {
@@ -742,23 +765,19 @@ Qn::AuthResult Authenticator::tryAuthRecord(
     if (!m_nonceProvider->isNonceValid(authorization.digest->params["nonce"]))
         return Qn::Auth_WrongDigest;
 
-    QnResourcePtr res;
-    Qn::AuthResult errCode = Qn::Auth_WrongLogin;
-    std::tie(errCode, res) = m_userDataProvider->authorize(
+    auto [errorCode, resource] = m_userDataProvider->authorize(
         method,
         authorization,
         &response.headers);
-    if (!res)
-        return Qn::Auth_WrongLogin;
 
-    if (auto user = res.dynamicCast<QnUserResource>())
+    if (const auto user = resource.dynamicCast<QnUserResource>())
     {
         if (accessRights)
             *accessRights = Qn::UserAccessData(user->getId());
     }
 
-    saveLoginResult(authorization.digest->userid, clientIp, errCode);
-    return errCode;
+    saveLoginResult(authorization.digest->userid, clientIp, errorCode);
+    return errorCode;
 }
 
 QnUserResourcePtr Authenticator::findUserByName(const QByteArray& nxUserName) const
@@ -811,13 +830,13 @@ void Authenticator::setLockoutOptions(std::optional<LockoutOptions> options)
 }
 
 Authenticator::SessionKeys::SessionKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kSessionKeyLifeTime, /*prolongLifeOnUse*/ true})
 {
 }
 
 Authenticator::PathKeys::PathKeys():
-    nx::network::TemporayKeyKeeper<Qn::UserAccessData>(
+    nx::network::TemporaryKeyKeeper<Qn::UserAccessData>(
         {kPathKeyLifeTime, /*prolongLifeOnUse*/ false})
 {
 }

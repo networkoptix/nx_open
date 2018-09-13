@@ -4,7 +4,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
 #include <utils/common/encoded_credentials.h>
@@ -132,7 +132,7 @@ private:
         const QnEncodedCredentials& credentials,
         bool storePassword,
         bool autoLogin,
-        const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
+        const nx::utils::SharedGuardPtr& completionTracker = nullptr);
 
     void handleStartupTileAction(const QString& systemId, bool initial);
 

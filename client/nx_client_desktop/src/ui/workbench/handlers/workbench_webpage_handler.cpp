@@ -60,7 +60,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
         {
             // Cannot capture the resource directly because real resource pointer may differ if the
             // transaction is received before the request callback.
-            NX_EXPECT(webPage);
+            NX_ASSERT(webPage);
             if (success && webPage)
             {
                 menu()->trigger(action::SelectNewItemAction, webPage);

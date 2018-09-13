@@ -17,7 +17,7 @@ struct EventMetaData
      * Camera list which is associated with the event. EventResourceId may be a POS terminal, but
      * this is a camera list which should be shown with this event.
      */
-    std::vector<QnUuid> cameraRefs;
+    std::vector<QString> cameraRefs;
 
     //! Users that can generate this event.
     std::vector<QnUuid> instigators;

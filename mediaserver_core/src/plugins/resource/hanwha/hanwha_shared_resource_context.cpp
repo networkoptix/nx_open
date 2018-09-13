@@ -157,6 +157,18 @@ void HanwhaSharedResourceContext::cleanupUnsafe()
     }
 }
 
+int HanwhaSharedResourceContext::totalAmountOfSessions(bool isLive) const
+{
+    int result = 0;
+    for (auto itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        bool keyIsLive = itr.key() == HanwhaSessionType::live;
+        if (keyIsLive == isLive)
+            result += itr.value().size();
+    }
+    return result;
+}
+
 SessionContextPtr HanwhaSharedResourceContext::session(
     HanwhaSessionType sessionType,
     const QnUuid& clientId,
@@ -169,19 +181,6 @@ SessionContextPtr HanwhaSharedResourceContext::session(
     cleanupUnsafe();
 
     const bool isLive = sessionType == HanwhaSessionType::live;
-
-    auto totalAmountOfSessions =
-        [this](bool isLive)
-        {
-            int result = 0;
-            for (auto itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-            {
-                bool keyIsLive = itr.key() == HanwhaSessionType::live;
-                if (keyIsLive == isLive)
-                    result += itr.value().size();
-            }
-            return result;
-        };
 
     auto& sessionsByClientId = m_sessions[sessionType];
     const int maxConsumers = isLive ? kDefaultNvrMaxLiveSessions : m_maxArchiveSessions.load();

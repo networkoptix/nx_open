@@ -16,10 +16,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -51,12 +49,12 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     NX_ASSERT(parent);
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    SnappedScrollBar* scrollBar = new SnappedScrollBar(window());
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
-    CheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
-    CheckboxUtils::autoClearTristate(ui->secondStreamDisableCheckBox);
+    check_box_utils::autoClearTristate(ui->checkBoxForceMotionDetection);
+    check_box_utils::autoClearTristate(ui->secondStreamDisableCheckBox);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
@@ -155,7 +153,7 @@ LegacyExpertSettingsWidget::~LegacyExpertSettingsWidget()
 
 void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     boost::optional<bool> isDualStreamingDisabled;
     bool sameIsDualStreamingDisabled = true;
@@ -290,7 +288,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
 
     if (m_hasDualStreaming)
     {
-        CheckboxUtils::setupTristateCheckbox(
+        check_box_utils::setupTristateCheckbox(
             ui->secondStreamDisableCheckBox,
             sameIsDualStreamingDisabled,
             isDualStreamingDisabled ? *isDualStreamingDisabled : false);
@@ -339,7 +337,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
 
     bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->checkBoxForceMotionDetection,
         sameMdPolicies,
         gotForcedMotionStream);
@@ -362,6 +360,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
+    ui->checkBoxDisableNativePtzPresets->setEnabled(supportedNativePtzCount != 0);
     if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
     else if (disabledNativePtzCount != 0)

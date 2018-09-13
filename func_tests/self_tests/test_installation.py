@@ -1,9 +1,12 @@
 import logging
 
 import pytest
+from netaddr import IPNetwork
+from pathlib2 import PurePath
 
-from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.merging import find_any_mediaserver_address, merge_systems
+from framework.installation.installer import Installer
+from framework.installation.make_installation import make_installation
+from framework.merging import merge_systems
 from framework.utils import bool_to_str
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
@@ -11,9 +14,9 @@ pytest_plugins = ['fixtures.unpacked_mediaservers']
 _logger = logging.getLogger(__name__)
 
 
-def test_install(one_vm, mediaserver_installers):
-    installer = installer_by_vm_type(mediaserver_installers, one_vm.type)
-    installation = make_installation(mediaserver_installers, one_vm.type, one_vm.os_access)
+def test_install(one_vm, mediaserver_installer_set):
+    installation = make_installation(one_vm.os_access, mediaserver_installer_set.customization)
+    installer = installation.choose_installer(mediaserver_installer_set.installers)
     installation.install(installer)
     assert installation.is_valid()
 
@@ -56,8 +59,7 @@ system_settings = dict(
 def test_group_install(config, groups):
     with groups.many_allocated_servers(config.SERVER_COUNT, system_settings) as server_list:
         for server in server_list[1:]:
-            remote_address = find_any_mediaserver_address(server)
-            merge_systems(server_list[0], server, remote_address=remote_address)
+            merge_systems(server_list[0], server, accessible_ip_net=IPNetwork('0.0.0.0/0'))
 
 
 def test_lightweight_install(config, groups):
@@ -67,7 +69,7 @@ def test_lightweight_install(config, groups):
                 merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
                 CAMERAS_PER_SERVER=20,
                 ) as lws:
-            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            server.api.merge(lws[0].api, lws.address, lws[0].port, take_remote_settings=True)
 
 
 def test_unpack_core_dump(artifacts_dir, groups):
@@ -93,3 +95,22 @@ def test_lws_core_dump(artifacts_dir, config, groups):
         server_name = lws.name
     # expecting core file itself and it's traceback
     assert len(list(artifacts_dir.joinpath(server_name).glob('core.*'))) == 2
+
+
+@pytest.mark.parametrize(
+    'path',
+    [
+        PurePath('/tmp/nxwitness-server-3.2.0.20805-linux64.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-beta.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-demo.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-linux64-test.deb'),
+        PurePath('/tmp/nxwitness-server-4.0.0.2049-win64-beta-test.exe'),
+        PurePath('/tmp/nxwitness-server-3.2.0.2032-win64-beta-test.exe'),
+        PurePath('/tmp/wave-server-3.2.0.40235-linux86-beta-test.zip'),
+        PurePath('/tmp/dwspectrum-server-3.2.0.40235-linux86-beta-test.zip'),
+        PurePath('/tmp/wave-server-3.2.0.40238-win86-beta-test.msi'),
+        ],
+    ids=lambda path: path.name
+    )
+def test_installer_name_parse(path):
+    Installer(path)

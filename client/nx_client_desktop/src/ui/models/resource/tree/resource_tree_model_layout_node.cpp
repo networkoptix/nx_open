@@ -173,7 +173,7 @@ bool QnResourceTreeModelLayoutNode::itemsLoaded() const
 
 void QnResourceTreeModelLayoutNode::updateLoadedState()
 {
-    NX_EXPECT(m_loadedItems >= 0 && m_loadedItems <= m_items.size());
+    NX_ASSERT(m_loadedItems >= 0 && m_loadedItems <= m_items.size());
     const bool loaded = itemsLoaded();
 
     if (loaded == m_loaded)
@@ -185,6 +185,6 @@ void QnResourceTreeModelLayoutNode::updateLoadedState()
         return;
 
     auto layoutNodeManager = qobject_cast<QnResourceTreeModelLayoutNodeManager*>(manager());
-    NX_EXPECT(layoutNodeManager);
+    NX_ASSERT(layoutNodeManager);
     layoutNodeManager->loadedStateChanged(this, loaded);
 }

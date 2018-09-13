@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <crash_reporter.h>
 
@@ -105,7 +105,7 @@ private:
     void establishConnection(
         ec2::AbstractECConnectionPtr connection);
 
-    void storeConnectionRecord(const nx::utils::Url &url,
+    void storeConnectionRecord(nx::utils::Url url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 

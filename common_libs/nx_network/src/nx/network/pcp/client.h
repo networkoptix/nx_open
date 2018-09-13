@@ -27,10 +27,10 @@ public:
     static Client& instance();
 
     /** Mapps @param port on @param address to the same port on NAT async */
-    Guard mapPort(const SocketAddress& address);
+    nx::utils::Guard mapPort(const SocketAddress& address);
 
     /** Subscribes for port mapping events */
-    Guard subscribe(const std::function<void(Mapping)>& callback);
+    nx::utils::Guard subscribe(const std::function<void(Mapping)>& callback);
 
 private:
     nx::utils::Subscription<Mapping> m_subscription;

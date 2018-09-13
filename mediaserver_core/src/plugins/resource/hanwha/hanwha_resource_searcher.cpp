@@ -36,24 +36,25 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    mediaserver::ServerModuleAware(serverModule),
+    m_sunapiProbePackets(createProbePackets())
+{
+    ini().reload();
+}
+
 HanwhaResult<HanwhaInformation> HanwhaResourceSearcher::cachedDeviceInfo(const QAuthenticator& auth, const nx::utils::Url& url)
 {
     // This is not the same context as for resources, bc we do not have MAC address before hand.
     auto sharedId = lit("hash_%1:%2").arg(url.host()).arg(url.port(80));
-    const auto context = qnServerModule->sharedContextPool()
+    const auto context = serverModule()->sharedContextPool()
         ->sharedContext<HanwhaSharedResourceContext>(sharedId);
 
     context->setResourceAccess(url, auth);
     return context->information();
-}
-
-HanwhaResourceSearcher::HanwhaResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
-    m_sunapiProbePackets(createProbePackets())
-{
-    ini().reload();
 }
 
 std::vector<std::vector<quint8>> HanwhaResourceSearcher::createProbePackets()
@@ -75,7 +76,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
     const QnResourceParams& /*params*/)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-    NX_EXPECT(!resourceType.isNull());
+    NX_ASSERT(!resourceType.isNull());
     if (resourceType.isNull())
     {
         NX_WARNING(this, lm("No resource type for Hanwha camera. Id = %1").arg(resourceTypeId));
@@ -86,7 +87,7 @@ QnResourcePtr HanwhaResourceSearcher::createResource(
         return QnResourcePtr();
 
     QnNetworkResourcePtr result;
-    result = QnVirtualCameraResourcePtr(new HanwhaResource());
+    result = QnVirtualCameraResourcePtr(new HanwhaResource(serverModule()));
     result->setTypeId(resourceTypeId);
     return result;
 }
@@ -108,7 +109,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
         return QList<QnResourcePtr>();
 
     QnResourceList result;
-    HanwhaResourcePtr resource(new HanwhaResource());
+    HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
     utils::Url urlCopy(url);
     urlCopy.setScheme("http");
 
@@ -119,7 +120,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     if (!info || info->macAddress.isEmpty())
         return QList<QnResourcePtr>();
 
-    resource->setMAC(nx::network::QnMacAddress(info->macAddress));
+    resource->setMAC(nx::utils::MacAddress(info->macAddress));
     resource->setModel(info->model);
     resource->setName(info->model);
     resource->setFirmware(info->firmware);
@@ -139,14 +140,14 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
 
 QnResourceList HanwhaResourceSearcher::findResources(void)
 {
-	QnResourceList upnpResults;
+    QnResourceList upnpResults;
 
-	{
-		QnMutexLocker lock(&m_mutex);
-		upnpResults = m_foundUpnpResources;
-		m_foundUpnpResources.clear();
-		m_alreadyFoundMacAddresses.clear();
-	}
+    {
+        QnMutexLocker lock(&m_mutex);
+        upnpResults = m_foundUpnpResources;
+        m_foundUpnpResources.clear();
+        m_alreadyFoundMacAddresses.clear();
+    }
     addResourcesViaSunApi(upnpResults);
     return upnpResults;
 }
@@ -209,7 +210,7 @@ bool HanwhaResourceSearcher::parseSunApiData(const QByteArray& data, SunApiData*
         return false;
 
     static const int kMacAddressOffset = 19;
-    outData->macAddress = nx::network::QnMacAddress(QLatin1String(data.data() + kMacAddressOffset));
+    outData->macAddress = nx::utils::MacAddress(QLatin1String(data.data() + kMacAddressOffset));
     if (outData->macAddress.isNull())
         return false;
 
@@ -264,13 +265,13 @@ bool HanwhaResourceSearcher::readSunApiResponseFromSocket(
         return false;
 
     auto resourceAlreadyFound =
-        [](const QnResourceList* resultResourceList, const nx::network::QnMacAddress& macAddress)
+        [](const QnResourceList* resultResourceList, const nx::utils::MacAddress& macAddress)
         {
             return std::any_of(
                 resultResourceList->cbegin(), resultResourceList->cend(),
                 [&macAddress](const QnResourcePtr& resource)
                 {
-                    return nx::network::QnMacAddress(resource->getUniqueId()) == macAddress;
+                    return nx::utils::MacAddress(resource->getUniqueId()) == macAddress;
                 });
         };
 
@@ -322,9 +323,9 @@ bool HanwhaResourceSearcher::processPacket(
     if (!isHanwhaCamera(devInfo))
         return false;
 
-    nx::network::QnMacAddress cameraMac(devInfo.udn.split(L'-').last());
+    nx::utils::MacAddress cameraMac(devInfo.udn.split(L'-').last());
     if (cameraMac.isNull())
-        cameraMac = nx::network::QnMacAddress(devInfo.serialNumber);
+        cameraMac = nx::utils::MacAddress(devInfo.serialNumber);
     if (cameraMac.isNull())
     {
         NX_WARNING(this, lm("Can't obtain MAC address for hanwha device. udn=%1. serial=%2.")
@@ -334,8 +335,8 @@ bool HanwhaResourceSearcher::processPacket(
 
     QString model(devInfo.modelName);
 
-	{
-		QnMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock(&m_mutex);
 
         // Due to some bugs in UPnP implementation higher priority is given
         // to the native SUNAPI discovery protocol.
@@ -349,7 +350,7 @@ bool HanwhaResourceSearcher::processPacket(
         const bool alreadyFound = m_alreadyFoundMacAddresses.find(cameraMac.toString())
             != m_alreadyFoundMacAddresses.end();
 
-		if (alreadyFound)
+        if (alreadyFound)
             return true;
     }
 
@@ -361,7 +362,7 @@ bool HanwhaResourceSearcher::processPacket(
     m_alreadyFoundMacAddresses.insert(cameraMac.toString());
     m_foundUpnpResources += foundUpnpResources;
 
-	return true;
+    return true;
 }
 
 bool HanwhaResourceSearcher::isEnabled() const
@@ -371,7 +372,7 @@ bool HanwhaResourceSearcher::isEnabled() const
 
 void HanwhaResourceSearcher::createResource(
     const nx::network::upnp::DeviceInfo& devInfo,
-    const nx::network::QnMacAddress& mac,
+    const nx::utils::MacAddress& mac,
     QnResourceList& result)
 {
     auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
@@ -385,7 +386,7 @@ void HanwhaResourceSearcher::createResource(
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
-    HanwhaResourcePtr resource( new HanwhaResource() );
+    HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
 
     resource->setTypeId(rt->getId());
     resource->setVendor(kHanwhaManufacturerName);
@@ -399,7 +400,7 @@ void HanwhaResourceSearcher::createResource(
     resource->setUrl(url.toString(QUrl::RemovePath));
     resource->setMAC(mac);
 
-    auto resPool = commonModule()->resourcePool();
+    auto resPool = serverModule()->resourcePool();
     auto rpRes = resPool->getNetResourceByPhysicalId(
         resource->getUniqueId()).dynamicCast<HanwhaResource>();
 
@@ -431,7 +432,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
         for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
         {
-            HanwhaResourcePtr resource(new HanwhaResource());
+            HanwhaResourcePtr resource(new HanwhaResource(serverModule()));
 
             auto rt = qnResTypePool->getResourceTypeByName(kHanwhaResourceTypeName);
             if (rt.isNull())

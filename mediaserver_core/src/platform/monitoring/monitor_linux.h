@@ -1,5 +1,4 @@
-#ifndef QN_LINUX_MONITOR_H
-#define QN_LINUX_MONITOR_H
+#pragma once
 
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
@@ -9,8 +8,10 @@
 #include <nx/utils/thread/mutex.h>
 
 class QnLinuxMonitorPrivate;
+namespace nx::mediaserver { class RootFileSystem; }
 
-class QnLinuxMonitor: public QnSigarMonitor {
+class QnLinuxMonitor: public QnSigarMonitor
+{
     Q_OBJECT
     typedef QnSigarMonitor base_type;
 
@@ -24,9 +25,9 @@ public:
     virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
 
+    virtual void setServerModule(QnMediaServerModule* serverModule) override;
+
 private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
 };
-
-#endif // QN_LINUX_MONITOR_H

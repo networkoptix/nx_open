@@ -459,7 +459,7 @@
         "palette": {
             "default": {
                 "_": "Scene background color.",
-                "base": "dark4"
+                "base": "dark3"
             }
         }
     },
@@ -472,7 +472,7 @@
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, notifications panel).",
 
-        "colors": ["dark4.setAlpha(217)"],
+        "colors": ["dark3.setAlpha(217)"],
         "frameColor": "dark8",
         "frameWidth": 1.0
     },

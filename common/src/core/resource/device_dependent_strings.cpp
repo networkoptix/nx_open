@@ -60,7 +60,7 @@ QnCameraDeviceType calculateDefaultDeviceType(
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnCameraDeviceStringSet
 
 QnCameraDeviceStringSet::QnCameraDeviceStringSet()
@@ -130,7 +130,7 @@ bool QnCameraDeviceStringSet::isValid() const
         && std::all_of(m_pluralStrings.cbegin(), m_pluralStrings.cend(), stringIsValid);
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnDeviceDependentStrings
 
 QString QnDeviceDependentStrings::getNumericName(

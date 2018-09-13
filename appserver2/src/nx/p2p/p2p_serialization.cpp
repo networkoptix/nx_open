@@ -14,6 +14,7 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/data/peer_data.h>
+#include <nx/vms/api/types/connection_types.h>
 
 namespace {
 
@@ -478,14 +479,29 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 {
     QUrlQuery query(request.requestLine.url.query());
 
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
+    Qn::SerializationFormat dataFormat = Qn::JsonFormat;
     if (query.hasQueryItem(QString::fromLatin1("format")))
         QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("format")), &dataFormat);
 
     auto result = deserializePeerData(request.headers, dataFormat);
     if (result.id.isNull())
-        result.id = QnUuid::createUuid();
+    {
+        if (query.hasQueryItem("guid"))
+            result.id = QnUuid(query.queryItemValue("guid"));
+        if (query.hasQueryItem("runtime-guid"))
+            result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
+    }
 
+    if (result.peerType == nx::vms::api::PeerType::notDefined)
+    {
+        result.peerType = QnLexical::deserialized<vms::api::PeerType>(
+            query.queryItemValue("peerType"),
+            vms::api::PeerType::desktopClient);
+    }
+
+    if (result.id.isNull())
+        result.id = QnUuid::createUuid();
+    result.dataFormat = dataFormat;
     return result;
 }
 

@@ -92,23 +92,23 @@ bool isSignatureMatch(
 
 /** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
-    LicenseTypeInfo(Qn::LC_Trial,           "trial",         1, false),
-    LicenseTypeInfo(Qn::LC_Analog,          "analog",        0, false),
-    LicenseTypeInfo(Qn::LC_Professional,    "digital",       0, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1, false),
-    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0, false),
-    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0, false),
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1, false),
-    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1, false),
-    LicenseTypeInfo(Qn::LC_Start,           "starter",       0, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Free,            "free",          1, /*allowedToShareChannel*/ true),
-    LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        0, false),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1, false),
+    LicenseTypeInfo(Qn::LC_Trial,           "trial",         /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_Analog,          "analog",        /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_Professional,    "digital",                         0, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_IO,              "iomodule",      /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_Start,           "starter",                         0, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Free,            "free",          /*allowedForArm*/ 1, /*allowedToShareChannel*/ true),
+    LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        /*allowedForArm*/ 1, false),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              /*allowedForArm*/ 1, false),
 };
 
 } // namespace
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // LicenseTypeInfo
 
 LicenseTypeInfo::LicenseTypeInfo(
@@ -124,7 +124,7 @@ LicenseTypeInfo::LicenseTypeInfo(
 {
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicense
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
@@ -521,7 +521,7 @@ LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType)
     return ::licenseTypeInfo[licenseType];
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicenseListHelper
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList)
@@ -575,7 +575,7 @@ void QnLicenseListHelper::update(const QnLicenseList& licenseList)
         m_licenseDict[license->key()] = license;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // QnLicensePool
 
 QnLicensePool::QnLicensePool(QObject* parent):

@@ -143,7 +143,7 @@ bool ProxyConnectionProcessor::doProxyData(
 		{
 			if( SystemError::getLastOSErrorCode() == SystemError::interrupted )
 				continue;   //retrying interrupted call
-			NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()));
 			return false;
 		}
 		if( sended == 0 )
@@ -459,11 +459,15 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 			nx::network::http::HttpHeader( "Via", via.toString() ) );
 	}
 
-	auto hostIter = d->request.headers.find("Host");
-	if (hostIter != d->request.headers.end())
-		hostIter->second = nx::network::SocketAddress(
-			dstUrl.host(),
-			dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+    if (!dstUrl.host().isEmpty())
+    {
+        // Destination host may be empty in case of reverse connection.
+        auto hostIter = d->request.headers.find("Host");
+        if (hostIter != d->request.headers.end())
+            hostIter->second = nx::network::SocketAddress(
+                dstUrl.host(),
+                dstUrl.port(nx::network::http::DEFAULT_HTTP_PORT)).toString().toLatin1();
+    }
 
 	//NOTE next hop should accept Authorization header already present
 	//  in request since we use current time as nonce value

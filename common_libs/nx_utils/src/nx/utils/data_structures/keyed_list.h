@@ -135,7 +135,7 @@ private:
     QHash<Key, qint64> m_keyToNumber;
 };
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // KeyedList implementation.
 
 template<typename Key, typename Value>
@@ -221,7 +221,7 @@ int KeyedList<Key, Value>::index_of(const Key& key) const
 
     const auto pos = std::lower_bound(m_items.cbegin(), m_items.cend(), iter.value(),
         [](const Item& left, qint64 rightNumber) { return left.number < rightNumber; });
-    NX_EXPECT(pos != m_items.cend() && pos->number == iter.value());
+    NX_ASSERT(pos != m_items.cend() && pos->number == iter.value());
     return std::distance(m_items.cbegin(), pos);
 }
 
@@ -250,7 +250,7 @@ Value KeyedList<Key, Value>::value(const Key& key, const Value& defaultValue) co
     return index != kInvalidIndex ? (*this)[index] : defaultValue;
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // KeyList implementation.
 
 template<typename Key>
@@ -336,7 +336,7 @@ int KeyList<Key>::index_of(const Key& key) const
 
     const auto pos = std::lower_bound(m_items.cbegin(), m_items.cend(), iter.value(),
         [](const Item& left, qint64 rightNumber) { return left.number < rightNumber; });
-    NX_EXPECT(pos != m_items.cend() && pos->number == iter.value());
+    NX_ASSERT(pos != m_items.cend() && pos->number == iter.value());
     return std::distance(m_items.cbegin(), pos);
 }
 

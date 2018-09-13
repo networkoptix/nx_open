@@ -13,7 +13,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AreaSelectOverlayWidget::Private
 
 class AreaSelectOverlayWidget::Private:
@@ -83,7 +83,7 @@ void AreaSelectOverlayWidget::Private::finishDrag(DragInfo* info)
     emit q->selectedAreaChanged(relativeRect);
 }
 
-// ------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 // AreaSelectOverlayWidget
 
 AreaSelectOverlayWidget::AreaSelectOverlayWidget(QGraphicsWidget* parent):

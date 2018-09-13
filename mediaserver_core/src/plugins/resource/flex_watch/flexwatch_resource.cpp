@@ -4,8 +4,8 @@
 #include "flexwatch_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 
-QnFlexWatchResource::QnFlexWatchResource():
-    QnPlOnvifResource()
+QnFlexWatchResource::QnFlexWatchResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
     // TODO: #Elric set vendor here
     m_tmpH264Conf = new onvifXsd__H264Configuration;
@@ -27,7 +27,9 @@ CameraDiagnostics::Result QnFlexWatchResource::initializeCameraDriver()
 CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
 {
     QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
+    MediaSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
 
     VideoConfigsReq request;
     VideoConfigsResp response;

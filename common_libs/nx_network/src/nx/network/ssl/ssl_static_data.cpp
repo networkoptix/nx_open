@@ -63,18 +63,9 @@ private:
 
         auto& mutex = m_mutexList[type];
         if (mode & CRYPTO_LOCK)
-        {
-            #if defined(USE_OWN_MUTEX)
-                mutex->lock(file, line);
-            #else
-                nx::utils::unused(file, line);
-                mutex->lock();
-            #endif
-        }
+            mutex->lock(file, line);
         else
-        {
             mutex->unlock();
-        }
     }
 
     std::vector<std::unique_ptr<QnMutex>> m_mutexList;
@@ -152,7 +143,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 {
     int disabledVersions = kDisableAllSslVerions;
     const auto versionList = versions.split('|');
-    NX_LOG(lm("Set server SSL versions: %1").container(versionList), cl_logALWAYS);
+    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL versions: %1").container(versionList));
 
     for (const auto& version: versionList)
     {
@@ -185,7 +176,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 
 void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 {
-    NX_LOG(lm("Set server SSL ciphers: %1").arg(ciphers), cl_logALWAYS);
+    NX_ALWAYS(typeid(SslStaticData), lm("Set server SSL ciphers: %1").arg(ciphers));
     s_allowedServerCiphers = ciphers;
     NX_ASSERT(!s_isInitialized, "SSL ciphers does not take effect after first SSL engine usage");
 }

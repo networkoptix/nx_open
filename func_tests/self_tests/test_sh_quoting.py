@@ -3,7 +3,7 @@ from subprocess import check_output
 
 import pytest
 
-from framework.os_access.posix_shell_utils import sh_command_to_script
+from framework.os_access.posix_shell import command_to_script
 
 _logger = logging.getLogger(__name__)
 
@@ -47,9 +47,9 @@ assert not any(_string_begin in string or _string_end in string for string in _t
 @pytest.mark.parametrize('indirection_level', [0, 1, 2], ids='indirection{}'.format)
 def test_basics(strings, indirection_level):
     script = 'for string in {strings}; do echo -n {begin}"$string"{end}; done'.format(
-        strings=sh_command_to_script(strings), begin=_string_begin, end=_string_end)
+        strings=command_to_script(strings), begin=_string_begin, end=_string_end)
     for _ in range(indirection_level):
-        script = sh_command_to_script(['sh', '-c', script])
+        script = command_to_script(['sh', '-c', script])
     _logger.debug('Script:\n%s', script)
     output_with_strings = check_output(script, shell=True)
     assert output_with_strings.startswith(_string_begin) and output_with_strings.endswith(_string_end)

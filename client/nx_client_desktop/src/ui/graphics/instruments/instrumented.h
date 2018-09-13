@@ -14,7 +14,7 @@ class Instrumented;
 
 /**
  * Support class for <tt>Instrumented</tt> template. In most cases there is no
- * need to use this class directly. The only possible use is to 
+ * need to use this class directly. The only possible use is to
  * <tt>dynamic_cast</tt> to it.
  */
 class InstrumentedBase {
@@ -33,7 +33,7 @@ private:
 
 
 /**
- * Base class for items that wish to be automatically registered with their 
+ * Base class for items that wish to be automatically registered with their
  * scene's instrument managers.
  */
 template<class Base, bool baseIsInstrumented = boost::is_base_of<InstrumentedBase, Base>::value>
@@ -57,13 +57,13 @@ protected:
 
 /**
  * Specialization that prevents creation of two instrumented data instances in
- * a single class, even if it was tagged as 'Instrumented' several times 
+ * a single class, even if it was tagged as 'Instrumented' several times
  * (e.g. one of its bases is instrumented).
  */
 template<class Base>
 class Instrumented<Base, true>: public Base {
 public:
-    QN_FORWARD_CONSTRUCTOR(Instrumented, Base, {});
+    using Base::Base;
 };
 
 #endif // QN_INSTRUMENTED_H

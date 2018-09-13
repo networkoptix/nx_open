@@ -532,7 +532,7 @@ void QnResourceTreeWidget::updateNewFilter()
     const auto index = filterEdit->selectedTagIndex();
     if (index >= kTagIndexToAllowedNodeMapping.size())
     {
-        NX_EXPECT(false, "Wrong tag index");
+        NX_ASSERT(false, "Wrong tag index");
         return;
     }
 

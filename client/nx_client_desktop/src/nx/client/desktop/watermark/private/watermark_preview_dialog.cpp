@@ -6,7 +6,7 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <nx/core/watermark/watermark.h>
-#include "../watermark_painter.h"
+#include <nx/core/watermark/watermark_images.h>
 
 namespace nx {
 namespace client {
@@ -19,7 +19,6 @@ const QString kPreviewUsername = "username";
 WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
     ui(new Ui::WatermarkPreviewDialog),
-    m_painter(new WatermarkPainter),
     m_baseImage(new QPixmap(":/skin/system_settings/watermark_preview.png"))
 {
     ui->setupUi(this);
@@ -68,10 +67,10 @@ void WatermarkPreviewDialog::updateDataFromControls()
 void WatermarkPreviewDialog::drawPreview()
 {
     QPixmap image = *m_baseImage;
+    const auto watermark = nx::core::createWatermarkImage(
+        core::Watermark{m_settings, kPreviewUsername}, QSize(1920, 1080));
     QPainter painter(&image);
-
-    m_painter->setWatermark(core::Watermark{m_settings, kPreviewUsername});
-    m_painter->drawWatermark(&painter, image.rect());
+    painter.drawPixmap(image.rect(), watermark, watermark.rect());
     ui->image->setPixmap(image);
 }
 

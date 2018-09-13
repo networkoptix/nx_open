@@ -1,15 +1,14 @@
 #include "icon_combo_box.h"
 
 #include <QtCore/QtMath>
-
 #include <QtGui/QStandardItemModel>
-
 #include <QtWidgets/QListView>
 
 #include <ui/common/indents.h>
-#include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+
+#include <nx/client/desktop/common/delegates/styled_combo_box_delegate.h>
 
 namespace {
 
@@ -21,10 +20,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class IconComboBox::Delegate: public QnStyledComboBoxDelegate
+class IconComboBox::Delegate: public StyledComboBoxDelegate
 {
 public:
-    using QnStyledComboBoxDelegate::QnStyledComboBoxDelegate;
+    using StyledComboBoxDelegate::StyledComboBoxDelegate; //< Forward constructors.
 
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
         const QModelIndex& index) const override

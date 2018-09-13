@@ -1,7 +1,11 @@
+import logging
+import re
 from collections import namedtuple
 from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
+
+_logger = logging.getLogger(__name__)
 
 
 class Version(tuple):  # `tuple` gives `__hash__` and comparisons but requires `__new__`.
@@ -119,7 +123,7 @@ class InstallIdentity(object):
     def from_build_info(cls, build_info):
         return cls(
             Version(build_info['version']),
-            customization = find_customization('customization_name', build_info['customization']),
+            find_customization('customization_name', build_info['customization']),
             )
 
     def __init__(self, version, customization):
@@ -138,29 +142,77 @@ class InstallIdentity(object):
                 self.customization == other.customization)
 
     def __hash__(self):
-        return hash((self.version,self.customization))
+        return hash((self.version, self.customization))
 
 
 class Installer(object):
-    """Information that can be extracted from package name."""
-    _extensions = {'linux64': 'deb', 'win64': 'exe'}
+    ## Installer name regex.
+    # See: https://networkoptix.atlassian.net/wiki/spaces/SD/pages/79462475/Installer+Filenames.
+    _name_re = re.compile(
+        r'''
+            ^ (?P<name> \w+ )
+            - (?P<component> \w+ )
+            - (?P<version> \d+\.\d+\.\d+ (?: \.\d+ )? )
+            - (?P<platform> \w+ )
+            (?: - (?P<beta> beta ) )?
+            (?: - (?P<cloud_group> \w+ ) )?
+            (?P<extension> \.\w+ | \.tar(?: \.gz | \.xz | \.bz2) )
+            $
+        ''',
+        re.VERBOSE)
+
+    ## OS, its variant and architecture is encoded in one part of the name. This is the mapping.
+    _platform_arch = {
+        'linux64': (('linux', 'ubuntu', '14.04'), 'x64'),
+        'linux86': (('linux', 'ubuntu', '14.04'), 'x86'),
+        'win64': (('win', 'none', '7.0'), 'x64'),
+        'win86': (('win', 'none', '7.0'), 'x86'),
+        }
 
     def __init__(self, path):
+        m = self._name_re.match(path.name)
+        if m is None:
+            raise PackageNameParseError("Installer name not understood: {}".format(path.name))
+        _logger.debug("Parsed name: %s", pformat(m.groupdict()))
+        self.extension = m.group('extension')
         try:
-            stem, self.extension = path.name.rsplit('.', 1)
-            installer_name, self.product, version_str, self.platform, self.maturity = stem.split('-', 4)
-        except (TypeError, ValueError):
-            raise PackageNameParseError("Bad format {}".format(path.name))
-        try:
-            platform_extension = self._extensions[self.platform]
-        except KeyError:
-            raise PackageNameParseError("Unknown platform {}".format(self.platform))
-        if platform_extension != self.extension:
-            raise PackageNameParseError("Extension of {} should be {}".format(path.name, platform_extension))
-        self.version = Version(version_str)
-        self.customization = find_customization('installer_name', installer_name)
+            self.customization = find_customization('installer_name', m.group('name'))
+        except UnknownCustomization as e:
+            raise PackageNameParseError("{}: {}".format(e, path.name))
+        self.component = m.group('component')
+        self.version = Version(m.group('version'))
+        platform_tuple, self.arch = self._platform_arch[m.group('platform')]
+        self.platform, self.platform_variant, self.platform_variant_version = platform_tuple
+        self.is_beta = bool(m.group('beta'))
+        self.cloud_group = m.group('cloud_group') or None
         self.identity = InstallIdentity(self.version, self.customization)
         self.path = path
 
     def __repr__(self):
         return 'Installer({!r})'.format(self.path)
+
+
+class InstallerSet(object):
+    def __init__(self, installers_dir):
+        _logger.debug("Search for packages in %s.", installers_dir)
+        self.installers = []
+        for path in installers_dir.glob('*'):
+            try:
+                installer = Installer(path)
+            except PackageNameParseError as e:
+                _logger.debug("File {}: {!s}".format(path, e))
+                continue
+            _logger.info("File {}: {!r}".format(path, installer))
+            self.installers.append(installer)
+        customizations = {installer.customization for installer in self.installers}
+        _logger.debug("Customizations: %r", customizations)
+        try:
+            self.customization, = customizations
+        except ValueError:
+            raise ValueError("Expected one, found: {!r}".format(customizations))
+        versions = {installer.version for installer in self.installers}
+        _logger.debug("Versions: %r", versions)
+        try:
+            self.version, = versions
+        except ValueError:
+            raise ValueError("Expected one, found: {!r}".format(versions))

@@ -245,19 +245,24 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresse
     {
         if (ignored.contains(address))
             continue;
+        NX_ASSERT(!address.toString().isEmpty());
         result.insert(address);
     }
 
-    for (const nx::utils::Url &url : getAdditionalUrls())
+    for (const nx::utils::Url& url : getAdditionalUrls())
     {
         nx::network::SocketAddress address = toAddress(url);
         if (ignored.contains(address))
             continue;
+        NX_ASSERT(!address.toString().isEmpty());
         result.insert(address);
     }
 
     if (auto cloudAddress = getCloudAddress())
+    {
+        NX_ASSERT(!cloudAddress->toString().isEmpty());
         result.insert(std::move(*cloudAddress));
+    }
 
     return result.toList();
 }
@@ -320,10 +325,17 @@ nx::utils::Url QnMediaServerResource::getApiUrl() const
 
 QString QnMediaServerResource::getUrl() const
 {
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
+        .setScheme(isSslAllowed() ? "https" : "http")
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
+}
+
+QString QnMediaServerResource::rtspUrl() const
+{
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
+    nx::network::url::Builder urlBuilder(getUrl());
+    urlBuilder.setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure));
+    return urlBuilder.toString();
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
@@ -374,6 +386,8 @@ nx::network::SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
+    if (m_url.isEmpty())
+        return nx::network::SocketAddress();
     return nx::network::url::getEndpoint(nx::utils::Url(m_url));
 }
 
@@ -609,6 +623,13 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
     return false;
 }
 
+bool QnMediaServerResource::isArmServer(const QnResourcePtr &resource)
+{
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags().testFlag(vms::api::SF_ArmServer));
+    return false;
+}
+
 bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
 {
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
@@ -631,11 +652,11 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
         {
             if (res->hasFlags(Qn::depend_on_parent_status))
             {
-                NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                         .arg(QString::fromLatin1(Q_FUNC_INFO))
                         .arg(res->getId().toString())
                         .arg(res->getName())
-                        .arg(res->getUrl()), cl_logDEBUG2);
+                        .arg(res->getUrl()));
                 emit res->statusChanged(res, Qn::StatusChangeReason::Local);
             }
         }

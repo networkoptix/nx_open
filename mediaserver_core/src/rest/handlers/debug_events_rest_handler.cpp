@@ -12,8 +12,15 @@
 #include <nx/network/http/http_types.h>
 #include <utils/common/synctime.h>
 #include <rest/server/rest_connection_processor.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
 
 using namespace nx;
+
+QnDebugEventsRestHandler::QnDebugEventsRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
 
 int QnDebugEventsRestHandler::executeGet(
     const QString &path,
@@ -57,7 +64,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
             vms::api::EventReason::networkNoFrame,
             param));
 
-        qnEventRuleProcessor->processEvent(networkEvent);
+        serverModule()->eventRuleProcessor()->processEvent(networkEvent);
         return nx::network::http::StatusCode::ok;
     }
     else if (id == "closed")
@@ -71,7 +78,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
             vms::api::EventReason::networkConnectionClosed,
             param));
 
-        qnEventRuleProcessor->processEvent(networkEvent);
+        serverModule()->eventRuleProcessor()->processEvent(networkEvent);
         return nx::network::http::StatusCode::ok;
     }
     else if (id == "packetloss")
@@ -85,7 +92,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(
             vms::api::EventReason::networkRtpPacketLoss,
             param));
 
-        qnEventRuleProcessor->processEvent(networkEvent);
+        serverModule()->eventRuleProcessor()->processEvent(networkEvent);
         return nx::network::http::StatusCode::ok;
     }
 
@@ -107,6 +114,6 @@ int QnDebugEventsRestHandler::testCameraDisconnected(
     vms::event::CameraDisconnectedEventPtr event(new vms::event::CameraDisconnectedEvent(
         camera, qnSyncTime->currentUSecsSinceEpoch()));
 
-    qnEventRuleProcessor->processEvent(event);
+    serverModule()->eventRuleProcessor()->processEvent(event);
     return nx::network::http::StatusCode::ok;
 }

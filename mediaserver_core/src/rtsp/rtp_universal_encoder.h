@@ -1,62 +1,62 @@
 #pragma once
 
-#include "rtsp/rtsp_encoder.h"
+#include "rtsp/abstract_rtsp_encoder.h"
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "utils/common/byte_array.h"
 #include <nx/streaming/rtp/rtcp.h>
 
-
 class QnCommonModule;
 
-class QnUniversalRtpEncoder: public QnRtspEncoder
+class QnUniversalRtpEncoder: public AbstractRtspEncoder
 {
 public:
-    /*
-    * RTP muxer.
-    * param media - source media data
-    * param transcodeToCodec - if codec specified, all media packets are transcoded to specified codec.
-    * param videoSize - transcoded video size
-    */
-    QnUniversalRtpEncoder(
-        QnCommonModule* commonModule,
-        QnConstAbstractMediaDataPtr media,
+    struct Config
+    {
+        bool absoluteRtcpTimestamps = false;
+        bool addOnvifHeaderExtension = false;
+        bool useRealTimeOptimization = false;
+        bool useMultipleSdpPayloadTypes = false;
+    };
+
+public:
+    QnUniversalRtpEncoder(const Config& config, nx::metrics::Storage* metrics);
+
+    bool open(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        MediaQuality requiredQuality,
         AVCodecID transcodeToCodec,
         const QSize& videoSize,
-        const QnLegacyTranscodingSettings& extraTranscodeParams,
-        bool enableAbsoluteRtcpTimestamps
-    );
+        const QnLegacyTranscodingSettings& extraTranscodeParams);
 
-    virtual QByteArray getAdditionSDP() override;
+    virtual QString getSdpMedia(bool isVideo, int trackId) override;
 
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
 
-    virtual quint32 getSSRC() override;
-    virtual bool getRtpMarker() override;
-    virtual quint32 getFrequency() override;
-    virtual quint8 getPayloadtype() override;
-    virtual QString getName() override;
-
-    virtual bool isRtpHeaderExists() const override { return true; }
-    bool isOpened() const;
-    void setUseRealTimeOptimization(bool value);
-    void enableAbsoluteRtcpTimestamps();
-    void enableOnvifExtension() { m_addOnvifHeaderExtension = true; }
-
+private:
+    void buildSdp(
+        QnConstAbstractMediaDataPtr mediaHigh,
+        QnConstAbstractMediaDataPtr mediaLow,
+        bool transcoding,
+        MediaQuality quality);
 
 private:
     QnByteArray m_outputBuffer;
-    bool m_absoluteRtcpTimestamps = false;
-    bool m_addOnvifHeaderExtension = false;
-    int m_outputPos;
-    int packetIndex;
+    QByteArray m_sdp;
+    Config m_config;
+    bool m_isCurrentPacketSecondaryStream = false;
+    bool m_useSecondaryPayloadType = false;
+    MediaQuality m_requiredQuality = MEDIA_Quality_None;
+    int m_outputPos = 0;
+    int m_packetIndex = 0;
     QnFfmpegTranscoder m_transcoder;
-    AVCodecID m_codec;
-    bool m_isVideo;
-    //quint32 m_firstTime;
-    //bool m_isFirstPacket;
-    bool m_isOpened;
+    AVCodecID m_codec = AV_CODEC_ID_NONE;
+    bool m_isVideo = false;
+    int m_payloadType = 0;
     nx::streaming::rtp::RtcpSenderReporter m_rtcpReporter;
 };
+
+using QnUniversalRtpEncoderPtr = std::unique_ptr<QnUniversalRtpEncoder>;

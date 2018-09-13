@@ -117,7 +117,7 @@ namespace ec2
             QString logMessage = lit("Adding User Permissions: %1 -> %2")
                 .arg(QnLexical::serialized(oldPermissions))
                 .arg(QnLexical::serialized(newPermissions));
-            NX_LOG(logMessage, cl_logINFO);
+            NX_INFO(typeid(QSqlDatabase), logMessage);
 
             QSqlQuery query(database);
             query.setForwardOnly(true);
@@ -179,7 +179,7 @@ namespace ec2
                 bool allCamerasAvailable = userCameras == allCameras;
                 QString logMessage = lit("Checking cameras availability: %1 of %2")
                     .arg(userCameras.size()).arg(allCameras.size());
-                NX_LOG(logMessage, cl_logINFO);
+                NX_INFO(typeid(QSqlDatabase), logMessage);
                 bool success = allCamerasAvailable
                     ? addCommonPermissions(database, userId)
                     : addAccessibleCamerasList(database, userId, userCameras);

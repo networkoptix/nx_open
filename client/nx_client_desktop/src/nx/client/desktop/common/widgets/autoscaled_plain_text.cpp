@@ -49,7 +49,7 @@ public:
         if (m_effectiveFontDirty)
             effectiveFont();
 
-        NX_EXPECT(!m_effectiveFontDirty);
+        NX_ASSERT(!m_effectiveFontDirty);
         return m_effectiveFontValid;
     }
 

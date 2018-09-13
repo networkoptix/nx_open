@@ -20,7 +20,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
 #include <ui/models/user_roles_model.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/client/desktop/common/widgets/checkable_header_view.h>
 
 #include <utils/common/ldap.h>
@@ -289,7 +289,7 @@ QnLdapUsers QnLdapUsersDialog::visibleSelectedUsers() const
 
 void QnLdapUsersDialog::setupUsersTable(const QnLdapUsers& filteredUsers)
 {
-    auto scrollBar = new QnSnappedScrollBar(this);
+    auto scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     auto usersModel = new QnLdapUserListModel(this);

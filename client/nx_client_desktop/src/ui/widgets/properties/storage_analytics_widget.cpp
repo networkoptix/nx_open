@@ -38,7 +38,6 @@
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::client::desktop;
@@ -535,7 +534,7 @@ void QnStorageAnalyticsWidget::at_forecastParamsChanged()
     if (m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (!ui->forecastTable->isEnabled())
         return;

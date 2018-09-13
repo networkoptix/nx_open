@@ -15,20 +15,29 @@ angular.module('webadminApp')
                 }
             }
         };
-    }]).directive('enterButton', function() {
+    }]).directive('enterButton', ['$timeout', function($timeout) {
         return {
             restrict: 'A',
             link : function(scope, $element) {
                 var $body = $('body');
 
                 function keyHandler(event){
-                    return false;
+                    if (event.keyCode === 13) {
+                        if ($element.is(':disabled')) {
+                            return false;
+                        }
+                        $element.click();
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
                 }
-
-                $body.bind( 'keyup.enter', keyHandler );
+    
+                $timeout(function () {
+                    $body.bind( 'keyup.enter', keyHandler );
+                },100);
                 scope.$on('$destroy',function(){
                     $body.unbind('keyup.enter');
                 });
             }
         };
-    });
+    }]);

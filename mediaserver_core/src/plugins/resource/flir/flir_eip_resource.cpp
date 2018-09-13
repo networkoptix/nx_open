@@ -18,7 +18,8 @@ const QString kAlarmsCountParamName("alarmsCount");
 
 } //namespace
 
-QnFlirEIPResource::QnFlirEIPResource() :
+QnFlirEIPResource::QnFlirEIPResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_advancedParametersProvider(this),
     m_inputPortMonitored(false),
     m_currentCheckingPortNumber(0),
@@ -47,6 +48,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnFlirEIPResource::getStreamCapab
 
 CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
 {
+    setCameraCapability(Qn::customMediaPortCapability, true);
     m_eipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
     m_outputEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
     m_alarmsEipAsyncClient = std::make_shared<EIPAsyncClient>(getHostAddress());
@@ -455,7 +457,7 @@ bool QnFlirEIPResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedP
 
     if (!result)
     {
-        NX_LOG(lit("Error while parsing xml (flir) %1").arg(templateFilename), cl_logWARNING);
+        NX_WARNING(this, lit("Error while parsing xml (flir) %1").arg(templateFilename));
     }
 
     return result;
