@@ -666,7 +666,7 @@ public:
     {
         NX_CRITICAL(responseHolderCount == 0);
 
-        m_wrapper.beforeMethodInvocation<Request>();
+        m_wrapper.template beforeMethodInvocation<Request>();
         const char* ptr = m_wrapper.m_endpoint;
 
         std::invoke(RequestTraits<Request, Response>::requestFunc,
