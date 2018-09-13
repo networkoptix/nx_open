@@ -24,19 +24,11 @@ def ffprobe_streams(stream_url):
         out = local_shell.run_sh_script(
             # language=Bash
             '''
-                ffprobe -show_format -show_streams -of json "$URL" &
-                pid=$!
-                for i in `seq 1 10`; do
-                    if ps aux | awk '{print $2}' | grep $pid >/dev/null 2>&1; then
-                        sleep 1
-                    else
-                        exit 0
-                    fi
-                done
-                kill -9 $pid
-                exit 1
+                ffprobe -show_format -show_streams -analyzeduration 3M -probesize 2e+07 -of json "$URL"
                 ''',
-            env={'URL': stream_url})
+            env={'URL': stream_url},
+            timeout_sec=10,
+            )
     except (AssertionError, Timeout, NonZeroExitStatus) as error:
         _logger.debug("FFprobe error: %s", str(error))
         return

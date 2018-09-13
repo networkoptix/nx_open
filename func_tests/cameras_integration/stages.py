@@ -3,8 +3,8 @@ This file contains all test stages, implementation rules are simple:
 
 Exception is thrown = Failure, exception stack is returned.
 Success result = Success is returned.
-Failure result = Error is saved, retry will fallow.
-Halt = Next iteration will fallow.
+Failure result = Error is saved, retry will follow.
+Halt = Next iteration will follow.
 Stop iteration = Failure, last error is returned.
 """
 
@@ -68,7 +68,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     checker = Checker()
     # Checking if the camera is recording already
@@ -107,7 +107,7 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                         configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
@@ -117,7 +117,7 @@ def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gener
             while True:
                 streams = ffprobe_streams(stream_url)
                 if not streams:
-                    yield Halt('Audio stream was not discovered by ffprobe.')
+                    yield Halt('Video stream was not discovered by ffprobe.')
                     continue
 
                 yield expect_values(

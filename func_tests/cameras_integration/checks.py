@@ -47,7 +47,6 @@ class Halt(Result):
 
 
 def expect_values(expected, actual, *args, **kwargs):
-        # type: (object, object) -> object
     checker = Checker()
     checker.expect_values(expected, actual, *args, **kwargs)
     return checker.result()
