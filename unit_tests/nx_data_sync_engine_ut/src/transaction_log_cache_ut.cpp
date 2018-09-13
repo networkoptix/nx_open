@@ -139,8 +139,8 @@ private:
     };
 
     VmsTransactionLogCache m_cache;
-    const nx::String m_systemId;
-    const nx::String m_peerId;
+    const std::string m_systemId;
+    const std::string m_peerId;
     const QnUuid m_dbId;
     CacheState m_committedData;
     CacheState m_initialData;
@@ -180,7 +180,10 @@ private:
         TranId tranId,
         CommandHeader transactionHeader)
     {
-        m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);
+        m_cache.insertOrReplaceTransaction(
+            tranId,
+            transactionHeader,
+            (m_peerId + m_systemId).c_str());
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
     }
 

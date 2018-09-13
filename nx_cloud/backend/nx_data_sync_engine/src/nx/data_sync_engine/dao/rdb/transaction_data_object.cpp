@@ -26,7 +26,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
                                      timestamp_hi, timestamp, tran_hash, tran_data)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         )sql");
-    saveTranQuery.addBindValue(QLatin1String(tran.systemId));
+    saveTranQuery.addBindValue(tran.systemId.c_str());
     saveTranQuery.addBindValue(tran.header.peerID.toSimpleString());
     saveTranQuery.addBindValue(tran.header.persistentInfo.dbID.toSimpleString());
     saveTranQuery.addBindValue(tran.header.persistentInfo.sequence);
@@ -49,7 +49,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
 
 nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     quint64 newValue)
 {
     QSqlQuery saveSystemTimestampSequence(*queryContext->connection()->qtSqlConnection());
@@ -57,7 +57,7 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
         R"sql(
         REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
         )sql");
-    saveSystemTimestampSequence.addBindValue(QLatin1String(systemId));
+    saveSystemTimestampSequence.addBindValue(systemId.c_str());
     saveSystemTimestampSequence.addBindValue(newValue);
     if (!saveSystemTimestampSequence.exec())
     {
@@ -71,7 +71,7 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
 
 nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
     std::int64_t minSequence,
@@ -86,7 +86,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
             WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<=?
             ORDER BY sequence
         )sql");
-    fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));
+    fetchTransactionsOfAPeerQuery.addBindValue(systemId.c_str());
     fetchTransactionsOfAPeerQuery.addBindValue(peerId);
     fetchTransactionsOfAPeerQuery.addBindValue(dbInstanceId);
     fetchTransactionsOfAPeerQuery.addBindValue((qint64)minSequence);
