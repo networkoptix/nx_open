@@ -330,9 +330,13 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
 {
-    return isClient
-        ? MessageType::pushTransactionData
-        : (MessageType)buffer.at(kMessageOffset);
+    if (isClient)
+        return MessageType::pushTransactionData;
+
+    auto messageType = buffer.at(kMessageOffset);
+    return messageType < (qint8) MessageType::counter
+        ? (MessageType) messageType
+        : MessageType::unknown;
 }
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
