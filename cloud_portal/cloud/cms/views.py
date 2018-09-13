@@ -309,7 +309,8 @@ def download_file(request, path):
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    file = filldata.read_customized_file(path, settings.CUSTOMIZATION, language_code, version_id, preview)
+    file = filldata.read_customized_file(path, settings.PRIMARY_PRODUCT, settings.CUSTOMIZATION,
+                                         language_code, version_id, preview)
     if file:
         return response_attachment(file, os.path.basename(path), "application")
     raise defaults.page_not_found("File does not exist")

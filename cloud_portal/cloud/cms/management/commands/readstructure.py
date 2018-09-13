@@ -92,7 +92,7 @@ def read_structure_file(filename, product_type, global_strings, skin):
 
 
 def read_structure(product_type):
-    product_type = structure.find_or_add_product_type(type=product_type)
+    product_type = structure.find_or_add_product_type(product_type)
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_type=product_type).\
         values_list("name", flat=True)

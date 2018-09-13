@@ -20,15 +20,14 @@ def find_or_add_product_type(product_type):
     return product_type
 
 
-def find_or_add_product(name, can_preview, type=ProductType.PRODUCT_TYPES.cloud_portal):
+def find_or_add_product(name, can_preview, product_type_name='cloud_portal'):
+    product_type = ProductType.objects.get(type=ProductType.get_type_by_name(product_type_name))
     if Product.objects.filter(name=name).exists():
         product = Product.objects.get(name=name)
         product.can_preview = can_preview
-        product.product_type.type = type
+        product.product_type = product_type
     else:
         product = Product(name=name, can_preview=can_preview)
-        product_type = ProductType(type=type)
-        product_type.save()
         product.product_type = product_type
     product.save()
     return product
@@ -68,7 +67,6 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 def update_from_object(cms_structure):
     for product in cms_structure:
         product_type_name = product['type'] if 'type' in product else ""
-        print product_type_name
         product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
         order = 0
 
