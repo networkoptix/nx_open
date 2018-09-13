@@ -197,7 +197,7 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(Cam
 {
     QnSharedResourcePointer<CameraMock> camera(new CameraMock());
     setup(camera.data());
-    return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
+    return camera->init() ? camera : QnSharedResourcePointer<CameraMock>();
 }
 
 } // namespace test

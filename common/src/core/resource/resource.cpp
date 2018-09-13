@@ -352,7 +352,6 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    NX_EXPECT(commonModule());
     return commonModule()
         ? commonModule()->statusDictionary()->value(getId())
         : Qn::NotDefined;
@@ -394,7 +393,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_EXPECT(commonModule());
     if (!commonModule())
         return;
 
