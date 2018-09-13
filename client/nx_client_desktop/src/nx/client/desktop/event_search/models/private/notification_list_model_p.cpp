@@ -47,13 +47,16 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
     if (!player->open(filePath))
         return {};
 
-    const auto loopConnection = QObject::connect(player.data(), &AudioPlayer::done,
+    const auto restart =
         [filePath, player = player.data()]()
         {
             player->close();
             if (player->open(filePath))
                 player->playAsync();
-        });
+        };
+
+    const auto loopConnection = QObject::connect(player.data(), &AudioPlayer::done,
+        player.data(), restart, Qt::QueuedConnection);
 
     if (!player->playAsync())
         return {};
