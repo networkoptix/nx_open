@@ -188,6 +188,28 @@ TEST(debug, disabledTime)
     NX_TIME_END(testTag);
 }
 
+TEST(debug, toString_string)
+{
+    ASSERT_STREQ("\"abc\"", nx::kit::debug::toString(std::string("abc")));
+}
+
+TEST(debug, toString_ptr)
+{
+    ASSERT_STREQ("null", nx::kit::debug::toString((const void*) nullptr));
+}
+
+TEST(debug, toString_bool)
+{
+    ASSERT_STREQ("true", nx::kit::debug::toString(true));
+    ASSERT_STREQ("false", nx::kit::debug::toString(false));
+}
+
+TEST(debug, toString_number)
+{
+    ASSERT_STREQ("42", nx::kit::debug::toString(42));
+    ASSERT_STREQ("3.14", nx::kit::debug::toString(3.14));
+}
+
 TEST(debug, toString_char)
 {
     ASSERT_STREQ("'C'", nx::kit::debug::toString('C'));
