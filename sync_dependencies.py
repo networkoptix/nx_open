@@ -84,7 +84,8 @@ def determine_package_versions(
     if box == "rpi":
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
-        v["sysroot"] = "jessie"
+        v["sysroot"] = "jessie" 
+        v["ffmpeg"] = "3.4.2"
 
     if box == "edge1":
         v["sysroot"] = "jessie"

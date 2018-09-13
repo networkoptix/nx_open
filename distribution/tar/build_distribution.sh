@@ -105,6 +105,21 @@ copyBuildLibs()
         libvpx
     )
 
+    if [ "$BOX" = "rpi" ]
+    then
+        LIBS_TO_COPY+=(
+            libasound
+            libmmal_core
+            libmmal_util
+            libmmal_vc_client
+            libvchiq_arm
+            libvcos
+            libvcsm
+            libbcm_host
+            libopenh264
+        )
+    fi
+
     if [ "$BOX" != "edge1" ]
     then
         LIBS_TO_COPY+=(
@@ -308,6 +323,7 @@ copyMediaserverPlugins()
         generic_multicast_plugin
         genericrtspplugin
         mjpg_link
+        usb_cam
     )
     PLUGINS+=( # Metadata plugins.
         hikvision_metadata_plugin
