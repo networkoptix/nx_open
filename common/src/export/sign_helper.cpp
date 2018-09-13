@@ -286,7 +286,7 @@ QColor blendColor(QColor color, float opacity, QColor backgroundColor)
 
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
-    nx::utils::ScopeGuard trasformRollback(
+    const auto trasformRollback = nx::utils::makeScopeGuard(
         [&painter, transform = painter.transform()]
         {
             painter.setTransform(transform);

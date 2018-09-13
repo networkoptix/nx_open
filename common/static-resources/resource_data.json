@@ -187,7 +187,9 @@
         },
         {
             "keys": [
-                "ActiveCam|*"
+                "ActiveCam|*",
+                "ACTI|B915", 
+                "*|ACTi-915"
             ],
             "forceONVIF": true
         },

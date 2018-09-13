@@ -285,6 +285,7 @@ void ConnectionBase::startConnection()
     QUrlQuery requestUrlQuery(requestUrl.query());
     for (const auto& param: m_requestQueryParams)
         requestUrlQuery.addQueryItem(param.first, param.second);
+    requestUrlQuery.addQueryItem("format", QnLexical::serialized(localPeer().dataFormat));
     requestUrl.setQuery(requestUrlQuery.toString());
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());

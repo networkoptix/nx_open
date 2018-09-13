@@ -241,6 +241,10 @@ private:
         QnCameraAdvancedParameter* inOutParameter,
         const HanwhaAdavancedParameterInfo& info) const;
 
+    bool addResolutionRanges(
+        QnCameraAdvancedParameter* inOutParameter,
+        const HanwhaAdavancedParameterInfo& info) const;
+
     using CreateDependencyFunc =
         std::function<QnCameraAdvancedParameterDependency(
             const HanwhaCodecLimits& codecLimits,

@@ -175,7 +175,7 @@ void LocalConnectionFactory::registerTransactionListener(
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+            "*", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
