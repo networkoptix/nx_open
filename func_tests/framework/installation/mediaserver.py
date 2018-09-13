@@ -108,7 +108,8 @@ class BaseMediaserver(object):
 class Mediaserver(BaseMediaserver):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation, port=7001):  # type: (str, Installation, int) -> None
+    def __init__(self, name, installation, port=7001):
+        # type: (str, Installation, int) -> None
         super(Mediaserver, self).__init__(name, installation)
         assert port is not None
         self.name = name

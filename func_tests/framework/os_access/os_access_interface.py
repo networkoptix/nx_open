@@ -1,14 +1,18 @@
 import logging
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 
+import six
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
-from typing import Optional
+from typing import Callable, ContextManager, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
+from framework.utils import RunningTime
 
 _DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
 
@@ -23,6 +27,17 @@ class _AllPorts(object):
         if not 1 <= port <= 65535:
             raise KeyError("Port must be an int between {!r} and {!r} but given {!r}".format(1, 65535, port))
         return port
+
+
+@six.add_metaclass(ABCMeta)
+class Time(object):
+    @abstractmethod
+    def get(self):  # type: () -> RunningTime
+        pass
+
+    @abstractmethod
+    def set(self, aware_datetime):  # type: (datetime) -> RunningTime
+        pass
 
 
 class OneWayPortMap(object):
@@ -94,13 +109,13 @@ class OSAccess(object):
 
     def __init__(
             self,
-            alias,
+            alias,  # type: str
             port_map,  # type: ReciprocalPortMap
             networking,  # type: Optional[Networking]
-            time,
+            time,  # type: Time
             traffic_capture,  # type: Optional[TrafficCapture]
-            lock_acquired,
-            path_cls,
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            path_cls,  # type: Type[FileSystemPath]
             ):
         self.alias = alias
         self.port_map = port_map
@@ -111,7 +126,8 @@ class OSAccess(object):
         self.path_cls = path_cls
 
     @abstractmethod
-    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
+    def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        # type: (list, bytes, logging.Logger, int) -> bytes
         """For applications with cross-platform CLI"""
         return b'stdout'
 

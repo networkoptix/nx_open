@@ -1,6 +1,8 @@
 import logging
 
 from framework.method_caching import cached_property
+from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import FileSystemPath
 from framework.os_access.path import copy_file
 from .deb_installation import DebInstallation
 from .upstart_service import UpstartService
@@ -12,6 +14,7 @@ class DpkgInstallation(DebInstallation):
     """Install mediaserver using dpkg, control it as upstart service"""
 
     def __init__(self, os_access, dir):
+        # type: (OSAccess, FileSystemPath) -> None
         dir = os_access.path_cls('/opt', dir)
         super(DpkgInstallation, self).__init__(os_access, dir)
 

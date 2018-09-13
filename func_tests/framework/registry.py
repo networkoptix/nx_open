@@ -1,8 +1,11 @@
 import logging
 from contextlib import contextmanager
 
+from typing import Callable
+
 from framework.os_access.exceptions import AlreadyAcquired
 from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import FileSystemPath
 
 _logger = logging.getLogger(__name__)
 
@@ -19,6 +22,7 @@ class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
     def __init__(self, os_access, locks_dir, make_name, limit):
+        # type: (OSAccess, FileSystemPath, Callable[..., str], int) -> None
         self._os_access = os_access  # type: OSAccess
         self._dir = os_access.path_cls(locks_dir).expanduser()
         self._dir.mkdir(parents=True, exist_ok=True)

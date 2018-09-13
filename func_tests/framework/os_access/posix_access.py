@@ -1,10 +1,12 @@
 import datetime
 import errno
 import logging
+import timeit
 from abc import ABCMeta
 from contextlib import contextmanager
 
 import portalocker
+import pytz
 import tzlocal
 from netaddr import EUI
 from typing import Container
@@ -15,24 +17,54 @@ from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
-from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap
-from framework.os_access.posix_shell import ReadOnlyTime, Time
+from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
+from framework.os_access.posix_shell import Shell
 from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
+from framework.utils import RunningTime
 
 _logger = logging.getLogger(__name__)
 
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
-class _LocalTime(object):
+class _LocalTime(Time):
     def __init__(self):
         self._tz = tzlocal.get_localzone()
 
-    def get(self):
+    def get(self):  # type: () -> RunningTime
         now = datetime.datetime.now(tz=self._tz)
-        return now
+        return RunningTime(now)
+
+    def set(self, aware_datetime):  # type: (datetime) -> RunningTime
+        raise NotImplementedError("Setting time is prohibited on local machine")
+
+
+class _ReadOnlyPosixTime(Time):
+    def __init__(self, shell):  # type: (Shell) -> None
+        self._shell = shell
+
+    def get(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self._shell.command(['date', '+%s']).check_output(timeout_sec=2)
+        timestamp = int(timestamp_output.decode('ascii').rstrip())
+        delay_sec = timeit.default_timer() - started_at
+        timezone_output = self._shell.command(['cat', '/etc/timezone']).check_output(timeout_sec=2)
+        timezone_name = timezone_output.decode('ascii').rstrip()
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def set(self, aware_datetime):
+        raise NotImplementedError("Setting time is prohibited on {!r}".format(self._shell))
+
+
+class _PosixTime(_ReadOnlyPosixTime):
+    def set(self, new_time):
+        started_at = datetime.datetime.now(pytz.utc)
+        self._shell.command(['date', '--set', new_time.isoformat()]).check_output()
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
 
 local_time = _LocalTime()
@@ -70,7 +102,7 @@ class PosixAccess(OSAccess):
         return cls(
             vm_alias,
             port_map,
-            ssh, Time(ssh), traffic_capture, ssh.lock_acquired, Path,
+            ssh, _PosixTime(ssh), traffic_capture, ssh.lock_acquired, path_cls,
             LinuxNetworking(ssh, macs))
 
     @classmethod
@@ -81,7 +113,7 @@ class PosixAccess(OSAccess):
         return cls(
             alias,
             port_map,
-            ssh, ReadOnlyTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
+            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
             None)
 
     def is_accessible(self):
