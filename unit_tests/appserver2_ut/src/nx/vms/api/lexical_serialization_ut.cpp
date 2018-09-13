@@ -17,7 +17,7 @@ TEST(Lexical, enumSerialization)
         QnLexical::serialized(ec2::TransactionType::Regular).toStdString());
 }
 
-TEST(Lexical, enumDerialization)
+TEST(Lexical, enumDeserialization)
 {
     {
         auto value = QnLexical::deserialized<ec2::ApiCommand::Value>("saveUser");
