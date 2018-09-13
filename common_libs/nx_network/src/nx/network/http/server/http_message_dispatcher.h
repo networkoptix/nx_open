@@ -131,7 +131,7 @@ public:
         const QString& path,
         Func func)
     {
-        using Handler = CustomRequestHandler<Func>;
+        using Handler = server::handler::CustomRequestHandler<Func>;
 
         return registerRequestProcessor<Handler>(
             path,
