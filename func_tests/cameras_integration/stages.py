@@ -101,7 +101,7 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                 while True:
                     streams = ffprobe_streams(archive_url)
                     if not streams:
-                        yield Failure('FFprobe returned no valid stream info')
+                        yield Halt('FFprobe returned no valid stream info')
                         continue
                     yield expect_values(
                         configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
@@ -117,6 +117,7 @@ def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gener
             while True:
                 streams = ffprobe_streams(stream_url)
                 if not streams:
+                    yield Halt('Audio stream was not discovered by ffprobe.')
                     continue
 
                 yield expect_values(
@@ -142,6 +143,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                 try:
                     streams = ffprobe_streams(run.media_url)
                     if not streams:
+                        yield Halt('Audio stream was not discovered by ffprobe.')
                         continue
                     audio_stream = streams[1]
                 except IndexError:
