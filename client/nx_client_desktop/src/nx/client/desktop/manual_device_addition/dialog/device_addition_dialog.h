@@ -68,6 +68,7 @@ private:
     void showAdditionFailedDialog(const FakeResourceList& resources);
 
     void handleTabClicked(int index);
+    void updateMessageBar();
 
     using AddingDevicesSet = QSet<QString>;
     void appendAddingDevices(const AddingDevicesSet& value);

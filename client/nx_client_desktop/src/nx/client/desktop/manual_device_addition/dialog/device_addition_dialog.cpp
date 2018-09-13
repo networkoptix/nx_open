@@ -436,7 +436,18 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
 void DeviceAdditionDialog::appendAddingDevices(const AddingDevicesSet& value)
 {
+    const int lastCount = m_addingDevices.size();
     m_addingDevices += value;
+    if (m_addingDevices.size() > lastCount)
+        updateMessageBar();
+}
+
+void DeviceAdditionDialog::updateMessageBar()
+{
+    ui->messageBar->setText(m_addingDevices.isEmpty()
+        ? QString()
+        : tr("%n devices are being added. You can close this dialog or start a new search",
+            nullptr, m_addingDevices.size()));
 }
 
 void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
@@ -444,6 +455,7 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
     if (!m_addingDevices.remove(uniqueId))
         return;
 
+    updateMessageBar();
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
     if (!index.isValid())
         return;
