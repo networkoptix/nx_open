@@ -33,6 +33,14 @@ struct NX_NETWORK_API RequestResult
 
 typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
+struct RequestContext
+{
+    nx::network::http::HttpServerConnection* connection;
+    nx::utils::stree::ResourceContainer authInfo;
+    nx::network::http::Request request;
+    nx::network::http::Response* response;
+};
+
 /**
  * Base class for all HTTP request processors
  * NOTE: Class methods are not thread-safe

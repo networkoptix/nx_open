@@ -5,6 +5,7 @@
 
 #include "get_post_tunnel_processor.h"
 #include "../controller/connect_session_manager.h"
+#include "../settings.h"
 
 namespace nx::cloud::relay::view {
 
@@ -15,6 +16,7 @@ public:
     static const char* kPath;
 
     CreateGetPostServerTunnelHandler(
+        const conf::Settings* settings,
         GetPostServerTunnelProcessor* tunnelProcessor);
 
     virtual void processRequest(
@@ -25,7 +27,8 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
-    GetPostServerTunnelProcessor * m_tunnelProcessor;
+    const conf::Settings* m_settings = nullptr;
+    GetPostServerTunnelProcessor* m_tunnelProcessor = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -48,7 +51,7 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
-    controller::AbstractConnectSessionManager* m_connectSessionManager;
+    controller::AbstractConnectSessionManager* m_connectSessionManager = nullptr;
     GetPostClientTunnelProcessor* m_tunnelProcessor;
     std::string m_sessionId;
     nx::network::http::RequestProcessedHandler m_completionHandler;

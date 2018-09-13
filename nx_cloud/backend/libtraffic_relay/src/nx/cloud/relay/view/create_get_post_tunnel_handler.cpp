@@ -5,8 +5,10 @@ namespace nx::cloud::relay::view {
 const char* CreateGetPostServerTunnelHandler::kPath = api::kServerTunnelPath;
 
 CreateGetPostServerTunnelHandler::CreateGetPostServerTunnelHandler(
+    const conf::Settings* settings,
     GetPostServerTunnelProcessor* tunnelProcessor)
     :
+    m_settings(settings),
     m_tunnelProcessor(tunnelProcessor)
 {
 }
@@ -20,6 +22,13 @@ void CreateGetPostServerTunnelHandler::processRequest(
 {
     if (requestPathParams().empty())
         return completionHandler(nx::network::http::StatusCode::badRequest);
+
+    api::BeginListeningResponse responseData;
+    responseData.preemptiveConnectionCount =
+        m_settings->listeningPeer().recommendedPreemptiveConnectionCount;
+    responseData.keepAliveOptions = m_settings->listeningPeer().tcpKeepAlive;
+
+    serializeToHeaders(&response->headers, responseData);
 
     auto requestResult = m_tunnelProcessor->processOpenTunnelRequest(
         requestPathParams()[0].toStdString(),

@@ -55,10 +55,7 @@ View::View(
     m_settings(settings),
     m_model(model),
     m_controller(controller),
-    m_getPostServerTunnelProcessor(
-        m_settings,
-        &model->listeningPeerPool()),
-    m_getPostClientTunnelProcessor(m_settings),
+    m_getPostServerTunnelProcessor(&model->listeningPeerPool()),
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
@@ -133,6 +130,7 @@ void View::registerApiHandlers()
 
     registerApiHandler<view::CreateGetPostServerTunnelHandler>(
         nx::network::http::Method::get,
+        &m_settings,
         &m_getPostServerTunnelProcessor);
 
     registerApiHandler<view::CreateGetPostClientTunnelHandler>(
@@ -172,7 +170,7 @@ void View::registerApiHandler(
     Arg ... arg)
 {
     registerApiHandler<Handler, Arg...>(
-        Handler::kPath, method, std::move(arg)...);
+        Handler::kPath, method, arg...);
 }
 
 template<typename Handler, typename ... Arg>
