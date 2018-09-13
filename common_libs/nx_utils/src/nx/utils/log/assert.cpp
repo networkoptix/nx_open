@@ -29,7 +29,7 @@ void crashProgram(const log::Message& message)
         // Copy error text to a stack variable so it is present in the mini-dump.
         char textOnStack[256] = {0};
         const auto text = lm("%1").arg(message).toStdString();
-        strncpy(textOnStack, text.c_str(), sizeof(textOnStack) - 1);
+        snprintf(textOnStack, sizeof(textOnStack), "%s", text.c_str());
     #else
         unused(message);
     #endif
