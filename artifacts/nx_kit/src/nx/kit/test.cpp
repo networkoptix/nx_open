@@ -178,11 +178,11 @@ static std::string systemTempDir()
     #if defined(ANDROID) || defined(__ANDROID__)
         return "/sdcard/";
     #elif defined(_WIN32)
-        char buffer[1024]{0};
-        size_t size = 0;
-        if (getenv_s(&size, buffer, "TEMP") != 0 || buffer[0] == '\0')
+        char env[1024]{0};
+        size_t size;
+        if (getenv_s(&size, env, sizeof(env), "TEMP") != 0 || env[0] == '\0')
             return ".\\"; //< Use current dir if the system temp is not available.
-        return std::string(buffer) + kPathSeparator;
+        return std::string(env) + kPathSeparator;
     #else // Assuming Linux or MacOS systems.
         return "/tmp/";
     #endif
