@@ -47,6 +47,7 @@
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <nx/client/desktop/debug_utils/dialogs/credentials_store_dialog.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
@@ -134,6 +135,8 @@ public:
         addButton(lit("Applaucher control"), [this] { (new QnApplauncherControlDialog(this))->show();});
 
         addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
+
+        addButton("Credentials", [this]{ (new CredentialsStoreDialog(this))->show(); });
 
         addButton(lit("Custom Settings Test"), [this]
             { (new CustomSettingsTestDialog(this))->show(); });
