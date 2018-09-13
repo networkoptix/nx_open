@@ -9,7 +9,7 @@ from .context_logger import ContextLogger
 _logger = ContextLogger(__name__, 'wait')
 
 
-DEFAULT_MAX_DELAY_SEC = 2
+DEFAULT_MAX_DELAY_SEC = 5
 
 
 class Wait(object):
