@@ -20,7 +20,7 @@ class Registry(object):
 
     def __init__(self, os_access, locks_dir, make_name, limit):
         self._os_access = os_access  # type: OSAccess
-        self._dir = os_access.Path(locks_dir).expanduser()
+        self._dir = os_access.path_cls(locks_dir).expanduser()
         self._dir.mkdir(parents=True, exist_ok=True)
         self._make_name = make_name
         self._limit = limit

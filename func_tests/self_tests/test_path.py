@@ -32,7 +32,7 @@ def windows_vm(vm_types):
 
 @pytest.fixture()
 def smb_path_cls(windows_vm):
-    return windows_vm.os_access.Path
+    return windows_vm.os_access.path_cls
 
 
 @pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls'])
@@ -262,8 +262,7 @@ def remote_file_path(request, path_type, name):
     if path_type == 'smb':
         vm_fixture_name = 'windows_vm'
     vm = request.getfixturevalue(vm_fixture_name)
-    path_class = vm.os_access.Path
-    tmp_dir = path_class.tmp()
+    tmp_dir = vm.os_access.path_cls.tmp()
     tmp_dir.mkdir(parents=True, exist_ok=True)
     base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)

@@ -67,7 +67,7 @@ class WindowsAccess(OSAccess):
 
     def __init__(self, host_alias, port_map, macs, username, password):
         self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
-        Path = SMBPath.specific_cls(
+        path_cls = SMBPath.specific_cls(
             port_map.remote.address, port_map.remote.tcp(445),
             username, password)
 
@@ -75,9 +75,9 @@ class WindowsAccess(OSAccess):
             host_alias, port_map,
             WindowsNetworking(self.winrm, macs),
             WindowsTime(self.winrm),
-            WindowsTrafficCapture(Path.tmp() / 'NetworkTrafficCapture', self.winrm),
+            WindowsTrafficCapture(path_cls.tmp() / 'NetworkTrafficCapture', self.winrm),
             None,
-            Path,
+            path_cls,
             )
         self._username = username
 

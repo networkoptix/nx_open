@@ -155,7 +155,7 @@ class Storage(object):
 
     @cached_property  # TODO: Use cached_getter.
     def timezone(self):
-        tzname = self.os_access.Path('/etc/timezone').read_text().strip()
+        tzname = self.os_access.path_cls('/etc/timezone').read_text().strip()
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):

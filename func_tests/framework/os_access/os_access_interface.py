@@ -100,7 +100,7 @@ class OSAccess(object):
             time,
             traffic_capture,  # type: Optional[TrafficCapture]
             lock_acquired,
-            Path,
+            path_cls,
             ):
         self.alias = alias
         self.port_map = port_map
@@ -108,7 +108,7 @@ class OSAccess(object):
         self.traffic_capture = traffic_capture
         self.time = time
         self.lock_acquired = lock_acquired
-        self.Path = Path
+        self.path_cls = path_cls
 
     @abstractmethod
     def run_command(self, command, input=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
@@ -136,7 +136,7 @@ class OSAccess(object):
 
     @abstractmethod
     def make_fake_disk(self, name, size_bytes):
-        return self.Path()
+        return self.path_cls()
 
     def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)
@@ -153,8 +153,8 @@ class OSAccess(object):
 
     @abstractmethod
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
-        return self.Path()
+        return self.path_cls()
 
     @abstractmethod
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
-        return self.Path()
+        return self.path_cls()

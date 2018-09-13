@@ -46,12 +46,12 @@ class PosixAccess(OSAccess):
             alias,
             port_map,
             shell, time, traffic_capture, lock_acquired,
-            Path, networking):
+            path_cls, networking):
         super(PosixAccess, self).__init__(
             alias,
             port_map,
             networking, time, traffic_capture, lock_acquired,
-            Path)
+            path_cls)
         self.shell = shell
 
     @staticmethod
@@ -65,8 +65,8 @@ class PosixAccess(OSAccess):
     def to_vm(cls, vm_alias, port_map, macs, ssh_user_name, ssh_private_key):
         # type: (str, ReciprocalPortMap, str, str, Container[EUI]) -> PosixAccess
         ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
-        Path = PosixShellPath.specific_cls(ssh)
-        traffic_capture = SSHTrafficCapture(ssh, Path.tmp() / 'traffic_capture')
+        path_cls = PosixShellPath.specific_cls(ssh)
+        traffic_capture = SSHTrafficCapture(ssh, path_cls.tmp() / 'traffic_capture')
         return cls(
             vm_alias,
             port_map,
@@ -133,7 +133,7 @@ class PosixAccess(OSAccess):
         return output.decode('ascii')
 
     def make_fake_disk(self, name, size_bytes):
-        mount_point = self.Path('/mnt') / name
+        mount_point = self.path_cls('/mnt') / name
         image_path = mount_point.with_suffix('.image')
         self.shell.run_sh_script(
             # language=Bash

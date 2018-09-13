@@ -12,7 +12,7 @@ class DpkgInstallation(DebInstallation):
     """Install mediaserver using dpkg, control it as upstart service"""
 
     def __init__(self, os_access, dir):
-        dir = os_access.Path('/opt', dir)
+        dir = os_access.path_cls('/opt', dir)
         super(DpkgInstallation, self).__init__(os_access, dir)
 
     @cached_property
@@ -25,7 +25,7 @@ class DpkgInstallation(DebInstallation):
         if not self.should_reinstall(installer):
             return
 
-        remote_path = self.os_access.Path.tmp() / installer.path.name
+        remote_path = self.os_access.path_cls.tmp() / installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(installer.path, remote_path)
         self.posix_access.shell.run_sh_script(
