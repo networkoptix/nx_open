@@ -1,4 +1,4 @@
-machines:remote_network
+machines:
 - {alias: first, type: linux}
 - {alias: second, type: linux}
 - {alias: proxy-1, type: linux}
