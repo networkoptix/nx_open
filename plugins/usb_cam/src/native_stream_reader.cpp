@@ -19,7 +19,6 @@ uint64_t kMsecInSec = 1000;
 uint64_t now = 0;
 uint64_t earlier = 0;
 
-
 }
 
 NativeStreamReader::NativeStreamReader(
@@ -36,7 +35,8 @@ NativeStreamReader::NativeStreamReader(
 
 NativeStreamReader::~NativeStreamReader()
 {
-    interrupt();
+    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
+    m_avConsumer->interrupt();
 }
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)

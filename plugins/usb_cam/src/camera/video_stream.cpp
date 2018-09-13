@@ -52,6 +52,7 @@ VideoStream::VideoStream(
     m_initCode(0)
 {
     start();
+    std::cout << "VideoStream()" << std::endl;
 }
 
 VideoStream::~VideoStream()
@@ -59,6 +60,7 @@ VideoStream::~VideoStream()
     stop();
     uninitialize();
     m_timeProvider->releaseRef();
+    std::cout << "~VideoStream" << std::endl;
 }
 
 std::string VideoStream::url() const

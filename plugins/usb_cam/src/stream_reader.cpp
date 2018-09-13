@@ -46,10 +46,6 @@ StreamReader::StreamReader(
 {
 }
 
-StreamReader::~StreamReader()
-{
-}
-
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0 )
@@ -120,7 +116,8 @@ StreamReaderPrivate::StreamReaderPrivate(
 
 StreamReaderPrivate::~StreamReaderPrivate()
 {
-    interrupt();
+    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
+    m_avConsumer->interrupt();
 }
 
 void StreamReaderPrivate::interrupt()

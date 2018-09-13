@@ -70,7 +70,6 @@ private:
     void maybeDrop();
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
-    int framesToDrop();
 };
 
 } // namespace usb_cam

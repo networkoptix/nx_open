@@ -50,8 +50,9 @@ TranscodeStreamReader::TranscodeStreamReader(
 
 TranscodeStreamReader::~TranscodeStreamReader()
 {
-    interrupt();
     uninitialize();
+    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
+    m_videoFrameConsumer->interrupt();
 }
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
@@ -273,6 +274,8 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     }
 }
 
+
+
 bool TranscodeStreamReader::ensureInitialized()
 {   
     bool needInit = m_cameraState == csOff || m_cameraState == csModified;
@@ -447,14 +450,6 @@ void TranscodeStreamReader::calculateTimePerFrame()
 {
     m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec;
 }
-
-int TranscodeStreamReader::framesToDrop()
-{
-    int audioCorrect = m_camera->audioEnabled() ? 1 : 0;
-    int drop = (m_camera->videoStream()->fps() / m_codecParams.fps - 1);// - audioCorrect;
-    return drop < 0 ? 0 : drop;
-}
-
 
 } // namespace usb_cam
 } // namespace nx

@@ -39,8 +39,6 @@ public:
         nxpt::CommonRefManager* const parentRefManager,
         std::unique_ptr<StreamReaderPrivate> streamReader);
 
-    virtual ~StreamReader();
-
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual unsigned int addRef() override;
     virtual unsigned int releaseRef() override;

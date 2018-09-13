@@ -75,6 +75,10 @@ private:
      * assigning nullptr where possible to release decerement the count.
      */
     std::shared_ptr<std::atomic_int> m_packetCount;
+    
+    /**
+     * See /a m_packetCount
+     */
     std::shared_ptr<std::atomic_int> m_frameCount;
 
     TimeStampMapper m_timeStamps;    
