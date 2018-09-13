@@ -342,10 +342,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         {
             result = decodeNextFrame(m_decodedFrame->frame());
             if (result < 0)
-            {
-                m_terminated = result == AVERROR(ENODEV);
                 returnData(result, nullptr);
-            }
 
             result = resample(m_decodedFrame->frame(), m_resampledFrame->frame());
             if(result < 0)
@@ -449,7 +446,13 @@ void AudioStream::AudioStreamPrivate::run()
 
         int result;
         auto packet = getNextData(&result);
-        if (result < 0 || !packet)
+        if (result < 0)
+        {
+            std::cout << "GET NEXT DATA ERROR: " << result << ": " << ffmpeg::utils::errorToString(result) << std::endl;
+            m_terminated = result == AVERROR(ENODEV);
+            continue;
+        }
+        if(!packet)
             continue;
 
         std::lock_guard<std::mutex> lock(m_mutex);

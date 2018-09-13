@@ -61,6 +61,22 @@ VideoStream::~VideoStream()
     m_timeProvider->releaseRef();
 }
 
+std::string VideoStream::url() const
+{
+    return m_url;
+}
+
+float VideoStream::fps() const
+{
+    return m_codecParams.fps;
+}
+
+AVPixelFormat VideoStream::decoderPixelFormat() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
+}
+
 void VideoStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -79,7 +95,7 @@ void VideoStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& cons
 void VideoStream::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    size_t pos = m_frameConsumerManager.addConsumer(consumer);
+    m_frameConsumerManager.addConsumer(consumer);
     updateUnlocked();
     m_wait.notify_all();
 }
@@ -89,6 +105,24 @@ void VideoStream::removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consum
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.removeConsumer(consumer);
     updateUnlocked();
+}
+
+void VideoStream::updateFps()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    updateFpsUnlocked();
+}
+
+void VideoStream::updateBitrate()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    updateBitrateUnlocked();
+}
+
+void VideoStream::updateResolution()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    updateResolutionUnlocked();
 }
 
 std::string VideoStream::ffmpegUrl() const
@@ -132,11 +166,6 @@ void VideoStream::updateFpsUnlocked()
     auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
     if (videoConsumer.expired())
         return;
-
-    int width = 0;
-    int height = 0;
-    float fps = videoConsumer.lock()->fps();
-    videoConsumer.lock()->resolution(&width, &height);
 
     CodecParameters codecParams = closestHardwareConfiguration(videoConsumer);
     setCodecParameters(codecParams);
@@ -218,46 +247,6 @@ void VideoStream::stop()
         m_videoThread.join();
 }
 
-AVPixelFormat VideoStream::decoderPixelFormat() const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
-}
-
-float VideoStream::fps() const
-{
-    return m_codecParams.fps;
-}
-
-int VideoStream::actualTimePerFrame() const
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_inputFormat ? m_inputFormat->actualTimePerFrame() : 0;
-}
-
-void VideoStream::updateFps()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    updateFpsUnlocked();
-}
-
-void VideoStream::updateBitrate()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    updateBitrateUnlocked();
-}
-
-void VideoStream::updateResolution()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    updateResolutionUnlocked();
-}
-
-std::string VideoStream::url() const
-{
-    return m_url;
-}
-
 void VideoStream::run()
 {
     while (!m_terminated)
@@ -287,7 +276,7 @@ void VideoStream::run()
         int result = m_inputFormat->readFrame(packet->packet());
         if (result < 0)
         {
-            m_terminated = result = AVERROR(ENODEV);
+            m_terminated = result == AVERROR(ENODEV);
             continue;
         }
 
@@ -388,6 +377,7 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     if (m_codecParams.width * m_codecParams.height > 0)
         inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
 
+    // note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
         if(auto cam = m_camera.lock())

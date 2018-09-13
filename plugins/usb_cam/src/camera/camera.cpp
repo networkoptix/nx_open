@@ -45,8 +45,8 @@ device::CompressionTypeDescriptorPtr getPriorityDescriptor(
 
 
 const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = {
-    nxcip::AV_CODEC_ID_H264,
     nxcip::AV_CODEC_ID_H263,
+    nxcip::AV_CODEC_ID_H264,
     nxcip::AV_CODEC_ID_MJPEG
 };
 
@@ -62,11 +62,6 @@ Camera::Camera(
     auto codecList = device::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
     m_defaultVideoParams = getDefaultVideoParameters(url(), m_compressionTypeDescriptor);
-
-    std::string video = std::string("VIDEO url: ") + m_info.url;
-    std::string audio = std::string("AUDIO url: ") + m_info.auxiliaryData;
-    std::string both = video + "\n" + audio;
-    std::cout << both << std::endl;
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()

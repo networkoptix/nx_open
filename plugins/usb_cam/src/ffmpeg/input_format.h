@@ -42,17 +42,10 @@ public:
 
     void resolution(int * width, int * height) const;
 
-    int actualTimePerFrame() const;
-
 private:
     AVFormatContext * m_formatContext = nullptr;
     AVInputFormat * m_inputFormat = nullptr;
     std::string m_url;
-    int m_actualTimePerFrame;
-    int64_t m_lastPts;
-
-private:
-    void calculateActualTimePerFrame(AVPacket * packet);
 };
 
 } // namespace ffmpeg

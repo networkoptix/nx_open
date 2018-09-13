@@ -44,7 +44,6 @@ TranscodeStreamReader::TranscodeStreamReader(
     m_lastVideoTimeStamp(0),
     m_videoFrameConsumer(new BufferedVideoFrameConsumer(m_camera->videoStream(), m_codecParams))
 {
-    std::cout << "TranscodeStreamReader" << std::endl;
     calculateTimePerFrame();
 }
 
@@ -53,7 +52,6 @@ TranscodeStreamReader::~TranscodeStreamReader()
 {
     interrupt();
     uninitialize();
-    std::cout << "~TranscodeStreamReader" << std::endl;
 }
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
@@ -87,7 +85,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         << ", " << now - earlier
         << ", " << packet->timeStamp() - m_lastTs
         << ", " << ffmpeg::utils::codecIDToName(packet->codecID());
-    std::cout << ss.str() << std::endl;
+    //std::cout << ss.str() << std::endl;
     earlier = now;
 
     *lpPacket = toNxPacket(packet.get()).release();
@@ -191,6 +189,8 @@ void TranscodeStreamReader::waitForTimeSpan(uint64_t msecDifference)
         if (m_interrupted)
             return;
 
+        auto t = m_camera->millisSinceEpoch();
+
         std::set<uint64_t> allKeys;
         
         auto videoKeys = m_videoFrameConsumer->keys();
@@ -259,9 +259,11 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         {
             if (auto videoPacket = transcodeVideo(videoFrame.get(), outNxError))
                 m_avConsumer->givePacket(videoPacket);
-            else
-                return nullptr;
         }
+
+        // release the reference so that internally m_frameCount will be decremented
+        // see /a VideoStream::m_frameCount
+        videoFrame = nullptr;
 
         auto packet = m_avConsumer->popFront(1);
         if (interrupted())

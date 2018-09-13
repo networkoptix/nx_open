@@ -35,20 +35,18 @@ public:
         const std::weak_ptr<Camera>& camera);
     virtual ~VideoStream();
 
+    std::string url() const;
+    float fps() const;
+    AVPixelFormat decoderPixelFormat() const;
+
     void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
     void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
     void addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
     void removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
 
-    AVPixelFormat decoderPixelFormat() const;
-    float fps() const;
-    int actualTimePerFrame() const;
-
     void updateFps();
     void updateBitrate();
     void updateResolution();
-
-    std::string url() const;
     
 private:
     enum CameraState
@@ -69,6 +67,13 @@ private:
     std::unique_ptr<ffmpeg::Codec> m_decoder;
     bool m_waitForKeyPacket;
 
+    /**
+     * Some cameras crash the plugin if they are uninitialized while there are still packets and 
+     * frame allocated. These variables are given to allocated packets and frames tokeep track of 
+     * the amount of frames and packets still waiting to be consumed. /a uninitialize() blocks until
+     * both reach 0. All pointers to a packet or frame should be kept for as short as possible, 
+     * assigning nullptr where possible to release decerement the count.
+     */
     std::shared_ptr<std::atomic_int> m_packetCount;
     std::shared_ptr<std::atomic_int> m_frameCount;
 

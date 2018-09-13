@@ -24,12 +24,10 @@ TranscodeMediaEncoder::TranscodeMediaEncoder(
         encoderIndex,
         camera)
 {
-    std::cout << "TranscodeMediaEncoder" << std::endl;
 }
 
 TranscodeMediaEncoder::~TranscodeMediaEncoder()
 {
-    std::cout << "~TranscodeMediaEncoder" << std::endl;
 }
 
 int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const

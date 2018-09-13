@@ -111,7 +111,7 @@ StreamReaderPrivate::StreamReaderPrivate(
     m_encoderIndex(encoderIndex),
     m_codecParams(codecParams),
     m_camera(camera),
-    m_avConsumer(new BufferedAudioVideoPacketConsumer(camera->videoStream(), codecParams)),
+    m_avConsumer(new BufferedAudioVideoPacketConsumer(m_camera->videoStream(), m_codecParams)),
     m_consumerAdded(false),
     m_interrupted(false),
     m_lastTs(0)

@@ -32,12 +32,10 @@ NativeStreamReader::NativeStreamReader(
         codecParams,
         camera)
 {
-    std::cout << "NativeStreamReader" << std::endl;
 }
 
 NativeStreamReader::~NativeStreamReader()
 {
-    std::cout << "~NativeStreamReader" << std::endl;
     interrupt();
 }
 
@@ -64,7 +62,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         << ", " << now - earlier
         << ", " << packet->timeStamp() - m_lastTs
         << ", " << ffmpeg::utils::codecIDToName(packet->codecID());
-    std::cout << ss.str() << std::endl;
+    //std::cout << ss.str() << std::endl;
     earlier = now;
 
     *lpPacket = toNxPacket(packet.get()).release();

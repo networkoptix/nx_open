@@ -17,12 +17,10 @@ NativeMediaEncoder::NativeMediaEncoder(
         encoderIndex,
         camera)
 {
-    std::cout << "NativeMediaEncoder" << std::endl;
 }
 
 NativeMediaEncoder::~NativeMediaEncoder()
 {
-    std::cout << "~NativeMediaEncoder" << std::endl;
 }
 
 int NativeMediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
