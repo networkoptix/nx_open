@@ -5,10 +5,11 @@ from textwrap import dedent
 from netaddr import EUI, IPAddress
 from pathlib2 import PurePath
 from six.moves import shlex_quote
+from typing import Mapping, Sequence
 
 from framework.os_access.command import Command, CommandOutcome, DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyAcquired, exit_status_error_cls
-from framework.os_access.path import copy_file_using_read_and_write
+from framework.os_access.path import FileSystemPath, copy_file_using_read_and_write
 
 STREAM_BUFFER_SIZE = 16 * 1024
 _PROHIBITED_ENV_NAMES = {'PATH', 'HOME', 'USER', 'SHELL', 'PWD', 'TERM'}
@@ -147,12 +148,18 @@ class Shell(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
+    def is_working(self):  # type: () -> bool
+        pass
+
+    @abstractmethod
     def command(self, args, cwd=None, env=None, logger=None):
-        return Command()
+        # type: (Sequence[str], FileSystemPath, Mapping[str, str], ...) -> Command
+        pass
 
     @abstractmethod
     def sh_script(self, script, cwd=None, env=None, logger=None, set_eux=True):
-        return Command()
+        # type: (str, FileSystemPath, Mapping[str, str], ..., bool) -> Command
+        pass
 
     @contextmanager
     def lock_acquired(self, path, timeout_sec=10):

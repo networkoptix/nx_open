@@ -9,19 +9,22 @@ import portalocker
 import pytz
 import tzlocal
 from netaddr import EUI
-from typing import Container
+from typing import Container, Optional, Callable, ContextManager, Type
 
 from framework.method_caching import cached_getter
+from framework.networking.interface import Networking
 from framework.networking.linux import LinuxNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
 from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
+from framework.os_access.path import FileSystemPath
 from framework.os_access.posix_shell import Shell
 from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
+from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
 
 _logger = logging.getLogger(__name__)
@@ -75,10 +78,15 @@ class PosixAccess(OSAccess):
 
     def __init__(
             self,
-            alias,
-            port_map,
-            shell, time, traffic_capture, lock_acquired,
-            path_cls, networking):
+            alias,  # type: str
+            port_map,  # type: ReciprocalPortMap
+            shell,  # type: Shell
+            time,  # type: Time
+            traffic_capture,  # type: Optional[TrafficCapture]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            path_cls,  # type: Type[FileSystemPath]
+            networking,  # type: Optional[Networking]
+            ):
         super(PosixAccess, self).__init__(
             alias,
             port_map,
