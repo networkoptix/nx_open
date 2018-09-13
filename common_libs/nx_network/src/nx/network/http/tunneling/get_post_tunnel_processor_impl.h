@@ -2,6 +2,7 @@
 
 #include <nx/network/url/url_parse_helper.h>
 
+#include "abstract_tunnel_authorizer.h"
 #include "get_post_tunnel_processor.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
 
@@ -25,7 +26,7 @@ public:
         server::rest::MessageDispatcher* messageDispatcher);
 
     void setTunnelAuthorizer(
-        typename TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
+        TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
 
 protected:
     virtual void onTunnelCreated(
@@ -34,7 +35,7 @@ protected:
 
 private:
     NewTunnelHandler m_newTunnelHandler;
-    typename TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
+    TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
 
     void processTunnelInitiationRequest(
         RequestContext requestContext,
@@ -79,7 +80,7 @@ void GetPostTunnelProcessorImpl<ApplicationData>::registerRequestHandlers(
 
 template<typename ApplicationData>
 void GetPostTunnelProcessorImpl<ApplicationData>::setTunnelAuthorizer(
-    typename TunnelAuthorizer<ApplicationData>* tunnelAuthorizer)
+    TunnelAuthorizer<ApplicationData>* tunnelAuthorizer)
 {
     m_tunnelAuthorizer = tunnelAuthorizer;
 }
@@ -154,7 +155,7 @@ void GetPostTunnelProcessorImpl<ApplicationData>::openTunnel(
     std::unique_ptr<RequestContext> requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    auto requestResult = processOpenTunnelRequest(
+    auto requestResult = this->processOpenTunnelRequest(
         std::move(applicationData),
         requestContext->request,
         requestContext->response);

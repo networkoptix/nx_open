@@ -26,12 +26,12 @@ public:
         const std::string& basePath,
         server::rest::MessageDispatcher* messageDispatcher,
         TunnelCreatedHandler tunnelCreatedHandler,
-        typename TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
+        TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
 
 private:
     TunnelCreatedHandler m_tunnelCreatedHandler;
-    typename TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
-    typename GetPostTunnelProcessorImpl<ApplicationData> m_getPostTunnelProcessor;
+    TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
+    GetPostTunnelProcessorImpl<ApplicationData> m_getPostTunnelProcessor;
 
     void registerRequestHandlers(
         const std::string& basePath,
