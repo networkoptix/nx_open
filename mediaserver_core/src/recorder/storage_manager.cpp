@@ -2436,7 +2436,7 @@ void QnStorageManager::startAuxTimerTasks()
                  */
                 for (const auto &storage: getClearableStorages())
                 {
-                    if (m_fullDisksIds.contains(storage->getId()))
+                    if (m_fullDisksIds.contains(storage->getId()) && !storage->isSystem())
                         fullStorages << storage;
                 }
                 m_fullDisksIds.clear();
