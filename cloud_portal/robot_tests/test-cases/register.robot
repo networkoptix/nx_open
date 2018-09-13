@@ -61,6 +61,7 @@ should register user with correct credentials
 
 should allow !#$%&'*+-/=?^_`{|}~ in email field
     [documentation]    This is here because testing activation with the '&' freaks out Python's imaplib so we test that our form accepts it.
+    [tags]
     ${email}    Get Random Symbol Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -235,21 +236,18 @@ Cannot register email that is already activated
     Register    mark    hamill    ${email}    ${password}
     Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
 
-Check registration email links
+Check registration email links, colors, cloud name, and user name
     [tags]    C24211
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
-
-
-
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
-    Log   ${email text}
-    Check Email Body    ${email text}    ${email color}    ${TEST FIRST NAME}    ${TEST LAST NAME}
 
-
+    Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
+    Check Email User Names    ${email text}    ${TEST FIRST NAME}    ${TEST LAST NAME}
+    Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
 
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
