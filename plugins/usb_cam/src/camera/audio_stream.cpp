@@ -49,13 +49,11 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_packetCount(std::make_shared<std::atomic_int>()),
     m_bufferMaxSize(3)
 {
-    std::cout << "AudioStreamPrivate" << std::endl;
     start();
 }
 
 AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
 {
-    std::cout << "~AudioStreamPrivate" << std::endl;
     stop();
     uninitialize();
     m_timeProvider->releaseRef();
@@ -449,7 +447,6 @@ void AudioStream::AudioStreamPrivate::run()
         auto packet = getNextData(&result);
         if (result < 0)
         {
-            std::cout << "GET NEXT DATA ERROR: " << result << ": " << ffmpeg::utils::errorToString(result) << std::endl;
             m_terminated = result == AVERROR(ENODEV);
             continue;
         }
