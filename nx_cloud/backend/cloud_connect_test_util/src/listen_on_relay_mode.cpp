@@ -89,25 +89,22 @@ TestHttpServerOnProxy::TestHttpServerOnProxy(
         std::move(acceptor));
     m_httpServer->registerRequestProcessorFunc(
         nx::network::http::kAnyPath,
-        std::bind(&TestHttpServerOnProxy::httpRequestHandler, this,
-            _1, _2, _3, _4, _5));
+        std::bind(&TestHttpServerOnProxy::httpRequestHandler, this, _1, _2));
     m_httpServer->server().start();
 }
 
 void TestHttpServerOnProxy::httpRequestHandler(
-    nx::network::http::HttpServerConnection* const /*connection*/,
-    nx::utils::stree::ResourceContainer /*authInfo*/,
-    nx::network::http::Request request,
-    nx::network::http::Response* const /*response*/,
+    nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
     auto responseMessage = std::make_unique<nx::network::http::BufferSource>(
         "text/plain",
         lm("Hello from %1 %2\r\n")
-        .args(request.requestLine.method, request.requestLine.url.path()).toUtf8());
+        .args(requestContext.request.requestLine.method, 
+            requestContext.request.requestLine.url.path()).toUtf8());
 
-    std::cout << request.requestLine.method.toStdString() << " "
-        << request.requestLine.url.path().toStdString()
+    std::cout << requestContext.request.requestLine.method.toStdString() << " "
+        << requestContext.request.requestLine.url.path().toStdString()
         << std::endl;
 
     completionHandler(nx::network::http::RequestResult(

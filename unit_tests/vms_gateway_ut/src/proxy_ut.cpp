@@ -441,16 +441,13 @@ private:
 
         testHttpServer()->registerRequestProcessorFunc(
             kEmptyResourcePath,
-            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2, _3, _4, _5));
+            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2));
 
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
     void returnEmptyHttpResponse(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         completionHandler(nx::network::http::StatusCode::noContent);
@@ -458,7 +455,8 @@ private:
 
     void fetchResource(const char* path)
     {
-        const nx::utils::Url url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
+        const nx::utils::Url url(lm("http://%1/%2%3")
+            .args(endpoint(), testHttpServer()->serverAddress(), path));
         nx::network::http::HttpClient httpClient;
         httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
         ASSERT_TRUE(httpClient.doGet(url));
