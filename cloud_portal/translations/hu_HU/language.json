@@ -1,5 +1,5 @@
 {
-  "language": "en_US",
+  "language": "hu_HU",
   "language_name": "Magyar",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Speciális felhasználó",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Élőkép megtekintése, keresés archívban, PTZ vezérlés, stb"
     },
     "Administrator": {
       "label": "Adminisztrátor",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Törlés",
     "successDisconnected": "Rendszer sikeresen bontotta %PRODUCT_NAME% kapcsolatát",
     "successDeleted": "{{systemName}} rendszer sikeresen törölve a fiókból",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "A {{systemName}} rendszert egyesítjük az {{systemName}} verzióval",
     "permissionsRemoved": "{{email}} engedélyei vissavonva"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "vágólapra másolva"
     },
     "systemOffline": "A rendszer offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "NINCSENEK KAMERÁK",
     "cameraStates": {
       "offline": "Offline",
       "error": "Hiba",
@@ -304,7 +304,7 @@
     "voiceCommands": {
       "play": "letjátszás",
       "pause": "szünet",
-      "live": "go to live | show me live",
+      "live": "élőbe menni | mutatsd élőben",
       "view": "nézet + [kamera neve]",
       "search": "keresés + [szöveg a keresősávhoz]",
       "clear search": "keresés törlése",

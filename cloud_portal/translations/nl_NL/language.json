@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Gebruiker 'Geavanceerd'",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Kan live video bekijken, bladeren in het archief, camera's configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
       "label": "Administrator",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Verwijder",
     "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Systeem {{systemName}} is samengevoegd met {{systemName}}",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "gekopieerd naar het klembord"
     },
     "systemOffline": "Systeem Offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "GEEN CAMERA'S",
     "cameraStates": {
       "offline": "Offline",
       "error": "Error",
