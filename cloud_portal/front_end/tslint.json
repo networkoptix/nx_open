@@ -1,6 +1,5 @@
 {
     "extends"       : "tslint:latest",
-    // "rulesDirectory": "built/local/tslint/rules",
     "rulesDirectory": [
         "node_modules/tslint-eslint-rules/dist/rules"
     ],
