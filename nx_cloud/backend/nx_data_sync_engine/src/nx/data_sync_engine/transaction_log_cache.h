@@ -47,7 +47,7 @@ public:
     VmsTransactionLogCache();
 
     bool isShouldBeIgnored(
-        const nx::String& systemId,
+        const std::string& systemId,
         const CommandHeader& tran,
         const QByteArray& hash) const;
 

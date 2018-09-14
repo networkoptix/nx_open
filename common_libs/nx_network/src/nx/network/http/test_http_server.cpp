@@ -137,17 +137,16 @@ bool TestHttpServer::registerContentProvider(
     return registerRequestProcessorFunc(
         httpPath,
         [contentProviderFactoryShared](
-            nx::network::http::HttpServerConnection* const /*connection*/,
-            nx::utils::stree::ResourceContainer /*authInfo*/,
-            nx::network::http::Request /*request*/,
-            nx::network::http::Response* const /*response*/,
+            nx::network::http::RequestContext /*requestContext*/,
             nx::network::http::RequestProcessedHandler completionHandler)
         {
             auto msgBody = (*contentProviderFactoryShared)();
             if (msgBody)
             {
                 completionHandler(
-                    nx::network::http::RequestResult(nx::network::http::StatusCode::ok, std::move(msgBody)));
+                    nx::network::http::RequestResult(
+                        nx::network::http::StatusCode::ok,
+                        std::move(msgBody)));
             }
             else
             {

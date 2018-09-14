@@ -1873,7 +1873,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 
 nx::sql::DBResult SystemManager::processEc2SaveUser(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     data_sync_engine::Command<vms::api::UserData> transaction)
 {
     const auto& vmsUser = transaction.params;
@@ -1885,7 +1885,7 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
 
     // Preparing SystemSharing structure.
     data::SystemSharing systemSharing;
-    systemSharing.systemId = systemId.toStdString();
+    systemSharing.systemId = systemId;
     ec2::convert(vmsUser, &systemSharing);
 
     const nx::sql::InnerJoinFilterFields sqlFilter =
@@ -1943,7 +1943,7 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
 
 nx::sql::DBResult SystemManager::processEc2RemoveUser(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     data_sync_engine::Command<nx::vms::api::IdData> transaction)
 {
     const auto& data = transaction.params;
@@ -1952,12 +1952,12 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             .arg(systemId).arg(data.id));
 
     data::SystemSharing systemSharing;
-    systemSharing.systemId = systemId.toStdString();
+    systemSharing.systemId = systemId;
     systemSharing.vmsUserId = data.id.toSimpleString().toStdString();
 
     const auto dbResult = m_systemSharingDao.deleteSharing(
         queryContext,
-        systemId.toStdString(),
+        systemId,
         {nx::sql::SqlFilterFieldEqual("vms_user_id", ":vmsUserId",
             QnSql::serialized_field(systemSharing.vmsUserId))});
     if (dbResult != nx::sql::DBResult::ok)
@@ -1990,7 +1990,7 @@ void SystemManager::removeVmsUserFromCache(
 
 nx::sql::DBResult SystemManager::processSetResourceParam(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> transaction)
 {
     const auto& data = transaction.params;
@@ -2005,7 +2005,7 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
     }
 
     data::SystemAttributesUpdate systemNameUpdate;
-    systemNameUpdate.systemId = systemId.toStdString();
+    systemNameUpdate.systemId = systemId;
     systemNameUpdate.name = data.value.toStdString();
     const auto dbResult = m_systemDao->execSystemNameUpdate(
         queryContext,
@@ -2021,7 +2021,7 @@ nx::sql::DBResult SystemManager::processSetResourceParam(
 
 nx::sql::DBResult SystemManager::processRemoveResourceParam(
     nx::sql::QueryContext* /*queryContext*/,
-    const nx::String& systemId,
+    const std::string& systemId,
     data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data)
 {
     // This can only be removal of already-removed user attribute.

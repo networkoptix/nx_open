@@ -26,7 +26,7 @@ public:
     WebSocketTransactionTransport(
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
-        const nx::String& systemId,
+        const std::string& systemId,
         const QnUuid& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         vms::api::PeerDataEx localPeerData,

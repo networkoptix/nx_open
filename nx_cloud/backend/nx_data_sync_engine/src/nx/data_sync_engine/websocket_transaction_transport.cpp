@@ -14,7 +14,7 @@ constexpr static const int kMaxTransactionsPerIteration = 17;
 WebSocketTransactionTransport::WebSocketTransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
-    const nx::String& systemId,
+    const std::string& systemId,
     const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
     vms::api::PeerDataEx localPeerData,
@@ -83,7 +83,7 @@ void WebSocketTransactionTransport::onGotMessage(
             TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
             cdbTransportHeader.endpoint = remoteSocketAddr();
             cdbTransportHeader.systemId = m_transactionLogReader->systemId();
-            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
+            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
             cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
             m_gotTransactionEventHandler(

@@ -171,7 +171,7 @@ class SpecialCommandProcessor:
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        const nx::String& /*systemId*/,
+        const std::string& /*systemId*/,
         TransactionTransportHeader /*transportHeader*/,
         Command<typename CommandDescriptor::Data> /*data*/,
         TransactionProcessedHandler /*handler*/)> ProcessorFunc;
@@ -211,7 +211,7 @@ public:
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction)>;
+            nx::sql::QueryContext*, std::string /*systemId*/, Ec2Transaction)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
@@ -248,7 +248,7 @@ private:
             std::move(transportHeader),
             std::move(transaction)};
         m_transactionLog->startDbTransaction(
-            systemId,
+            systemId.c_str(),
             [this, transactionContext = std::move(transactionContext)](
                 nx::sql::QueryContext* queryContext) mutable
             {
@@ -274,7 +274,7 @@ private:
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
                 queryContext,
-                transactionContext.transportHeader.systemId,
+                transactionContext.transportHeader.systemId.c_str(),
                 transactionContext.transaction);
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
@@ -297,7 +297,7 @@ private:
 
         dbResultCode = m_processTranFunc(
             queryContext,
-            transactionContext.transportHeader.systemId,
+            transactionContext.transportHeader.systemId.c_str(),
             std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {
