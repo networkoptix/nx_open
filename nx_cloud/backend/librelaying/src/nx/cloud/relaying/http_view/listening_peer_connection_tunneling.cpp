@@ -3,7 +3,7 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_data_types.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 
-namespace nx::cloud::relay::view {
+namespace nx::cloud::relaying {
 
 ListeningPeerConnectionTunnelingServer::ListeningPeerConnectionTunnelingServer(
     relaying::AbstractListeningPeerManager* listeningPeerManager,
@@ -47,7 +47,7 @@ void ListeningPeerConnectionTunnelingServer::authorize(
             std::string());
     }
 
-    api::BeginListeningRequest beginListeningRequest{
+    relay::api::BeginListeningRequest beginListeningRequest{
         requestContext->requestPathParams[0].toStdString()};
 
     m_listeningPeerManager->beginListening(
@@ -73,7 +73,7 @@ void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
     relay::api::BeginListeningResponse response,
     nx::network::http::ConnectionEvents /*connectionEvents*/)
 {
-    if (resultCode != api::ResultCode::ok)
+    if (resultCode != relay::api::ResultCode::ok)
     {
         completionHandler(nx::network::http::StatusCode::forbidden, peerName);
         return;
@@ -92,4 +92,4 @@ void ListeningPeerConnectionTunnelingServer::saveNewTunnel(
         std::move(connection));
 }
 
-} // namespace nx::cloud::relay::view
+} // namespace nx::cloud::relaying

@@ -2,12 +2,12 @@
 
 #include <nx/network/http/tunneling/server.h>
 
-#include <nx/cloud/relaying/listening_peer_pool.h>
-#include <nx/cloud/relaying/listening_peer_manager.h>
+#include "../listening_peer_pool.h"
+#include "../listening_peer_manager.h"
 
-namespace nx::cloud::relay::view {
+namespace nx::cloud::relaying {
 
-class ListeningPeerConnectionTunnelingServer:
+class NX_RELAYING_API ListeningPeerConnectionTunnelingServer:
     public nx::network::http::tunneling::TunnelAuthorizer<std::string>
 {
 public:
@@ -45,4 +45,4 @@ private:
         std::unique_ptr<network::AbstractStreamSocket> connection);
 };
 
-} // namespace nx::cloud::relay::view
+} // namespace nx::cloud::relaying
