@@ -1,7 +1,11 @@
 #include "plugin.h"
 
+#include <map>
+
 #include <QtCore/QString>
+#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
@@ -22,15 +26,30 @@ namespace hanwha {
 namespace {
 
 static const char* const kPluginName = "Hanwha metadata plugin";
-static const QString kSamsungTechwinVendor = lit("samsung");
-static const QString kHanwhaTechwinVendor = lit("hanwha");
+static const QString kSamsungTechwinVendor("samsung");
+static const QString kHanwhaTechwinVendor("hanwha");
 
-static const QString kVideoAnalytics = lit("VideoAnalytics");
-static const QString kAudioAnalytics = lit("AudioAnalytics");
+static const QString kVideoAnalytics("VideoAnalytics");
+static const QString kAudioAnalytics("AudioAnalytics");
+static const QString kQueueEvent("QueueEvent");
+static const std::map<QString, QString> kSpecialEventTypes = {
+    {kVideoAnalytics, kVideoAnalytics},
+    {kAudioAnalytics, kAudioAnalytics},
+    {kQueueEvent, "Queue"}
+};
 
 // TODO: Decide on these unused constants.
-static const std::chrono::milliseconds kAttributesTimeout{4000};
-static const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
+static const std::chrono::milliseconds kAttributesTimeout(4000);
+static const QString kAttributesPath("/stw-cgi/attributes.cgi/cgis");
+
+QString specialEventName(const QString& eventName)
+{
+    const auto itr = kSpecialEventTypes.find(eventName);
+    if (itr == kSpecialEventTypes.cend())
+        return QString();
+
+    return itr->second;
+}
 
 } // namespace
 
@@ -121,25 +140,25 @@ void Plugin::setLocale(const char* /*locale*/)
 }
 
 CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const QString vendor = QString(cameraInfo.vendor).toLower();
+    const QString vendor = QString(cameraInfo->vendor).toLower();
 
     if (!vendor.startsWith(kHanwhaTechwinVendor) && !vendor.startsWith(kSamsungTechwinVendor))
         return nullptr;
 
-    auto sharedRes = sharedResources(cameraInfo);
-    auto sharedResourceGuard = makeScopeGuard(
-        [&sharedRes, &cameraInfo, this]()
+    auto sharedRes = sharedResources(*cameraInfo);
+    auto sharedResourceGuard = nx::utils::makeScopeGuard(
+        [&sharedRes, cameraInfo, this]()
         {
             if (sharedRes->managerCounter == 0)
-                m_sharedResources.remove(QString::fromUtf8(cameraInfo.sharedId));
+                m_sharedResources.remove(QString::fromUtf8(cameraInfo->sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(cameraInfo);
+    auto supportedEvents = fetchSupportedEvents(*cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -147,7 +166,7 @@ CameraManager* Plugin::obtainCameraManager(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new Manager(this);
-    manager->setCameraInfo(cameraInfo);
+    manager->setCameraInfo(*cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
@@ -172,7 +191,7 @@ void Plugin::executeAction(Action* action, Error* outError)
     // Do nothing.
 }
 
-boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
+boost::optional<QList<QString>> Plugin::fetchSupportedEvents(
     const CameraInfo& cameraInfo)
 {
     using namespace nx::mediaserver_core::plugins;
@@ -190,10 +209,10 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
+    return eventTypeIdsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
-boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
+boost::optional<QList<QString>> Plugin::eventTypeIdsFromParameters(
     const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
     const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
     int channel) const
@@ -207,39 +226,36 @@ boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(
     if (!supportedEventsParameter.is_initialized())
         return boost::none;
 
-    QList<QnUuid> result;
+    QSet<QString> result;
 
     const auto& supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName: supportedEvents)
     {
-        auto guid = m_driverManifest.eventTypeByInternalName(eventName);
-        if (!guid.isNull())
-            result.push_back(guid);
+        auto eventTypeId = m_driverManifest.eventTypeIdByName(eventName);
+        if (!eventTypeId.isNull())
+            result.insert(eventTypeId);
 
-        if (eventName == kVideoAnalytics || eventName == kAudioAnalytics)
+        const auto altEventName = specialEventName(eventName);
+        if (!altEventName.isEmpty())
         {
             const auto& responseParameters = eventStatuses.response();
             for (const auto& entry: responseParameters)
             {
                 const auto& fullEventName = entry.first;
-                const bool isAnalyticsEvent = fullEventName.startsWith(
-                    lit("Channel.%1.%2.")
-                        .arg(channel)
-                        .arg(eventName));
+                const bool isMatched = fullEventName.startsWith(
+                    lm("Channel.%1.%2.").args(channel, altEventName));
 
-                if (isAnalyticsEvent)
+                if (isMatched)
                 {
-                    guid = m_driverManifest.eventTypeByInternalName(
-                        eventName + "." + fullEventName.split(L'.').last());
-
-                    if (!guid.isNull())
-                        result.push_back(guid);
+                    eventTypeId = m_driverManifest.eventTypeIdByName(fullEventName);
+                    if (!eventTypeId.isNull())
+                        result.insert(eventTypeId);
                 }
             }
         }
     }
 
-    return result;
+    return QList<QString>::fromSet(result);
 }
 
 const Hanwha::DriverManifest& Plugin::driverManifest() const

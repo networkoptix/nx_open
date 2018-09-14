@@ -1,15 +1,19 @@
-#ifndef ABSTRACT_NAVIGATOR_H
-#define ABSTRACT_NAVIGATOR_H
+#pragma once
 
 #include <QtCore/QtGlobal>
+
+extern "C"
+{
+#include <libavutil/avutil.h>
+}
 
 class QnAbstractNavigator
 {
 public:
-    virtual ~QnAbstractNavigator() {}
+    virtual ~QnAbstractNavigator() = default;
 
     virtual void directJumpToNonKeyFrame(qint64 mksec) = 0;
-    virtual bool jumpTo(qint64 mksec,  qint64 skipTime) = 0;
+    virtual bool jumpTo(qint64 mksec, qint64 skipTime) = 0;
     virtual void setSkipFramesToTime(qint64 skipTime) = 0;
     virtual void previousFrame(qint64 mksec) = 0;
     virtual void nextFrame() = 0;
@@ -22,11 +26,5 @@ public:
 
     virtual bool isEnabled() const { return true; }
 
-    virtual void setSpeed(double value, qint64 currentTimeHint) = 0;
-
-    // playback filter by motion detection mask
-    // delivery motion data to a client
-    //virtual bool setSendMotion(bool value) = 0;
+    virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
 };
-
-#endif // ABSTRACT_NAVIGATOR_H

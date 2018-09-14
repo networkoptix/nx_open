@@ -147,7 +147,7 @@ TEST_F(StunClientServerTest, Connectivity)
     const auto address = startServer();
     server.reset();
     client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
-    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
@@ -318,7 +318,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
-    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([this]() { client->pleaseStopSync(); });
     client->connect(nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(address));
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);

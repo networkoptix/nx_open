@@ -4,39 +4,22 @@
 
 #include <common/common_module_aware.h>
 
-#include "nx/utils/thread/long_runnable.h"
-#include <nx/network/socket.h>
-#include "utils/common/byte_array.h"
-#include "api/model/audit/auth_session.h"
-
+#include <api/model/audit/auth_session.h>
 #include <nx/network/http/http_types.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_delegate.h>
+#include <nx/network/socket.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/common/byte_array.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
-/** This class allows to convert sharedPointer to unique pointer */
-class ShareSocketDelegate: public nx::network::StreamSocketDelegate
-{
-    using base_type = nx::network::StreamSocketDelegate;
-public:
-    ShareSocketDelegate(QSharedPointer<nx::network::AbstractStreamSocket> socket):
-        base_type(socket.data()),
-        m_socket(std::move(socket))
-    {
-    }
-    ~ShareSocketDelegate()
-    {
-
-    }
-private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
-};
-
 class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAware
 {
-    Q_OBJECT;
+    Q_OBJECT
+    using base_type = QnLongRunnable;
 
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
@@ -47,8 +30,10 @@ public:
      */
     static bool doesPathEndWithCameraId() { return false; }
 
-    QnTCPConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnTCPConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
+
+    virtual void stop() override;
 
     /**
      * Check for request or response is completed: finished with /r/n/r/n or contains full content len data
@@ -59,15 +44,13 @@ public:
         const QByteArray& message,
         boost::optional<qint64>* const fullMessageSize = nullptr );
 
-    int getSocketTimeout();
-
     bool sendChunk(const QnByteArray& chunk);
     bool sendChunk(const QByteArray& chunk);
     bool sendChunk(const char* data, int size);
 
-    void execute(QnMutex& mutex);
+    void execute(QnMutexLockerBase& mutex);
     virtual void pleaseStop();
-    QSharedPointer<nx::network::AbstractStreamSocket> socket() const;
+    nx::network::SocketAddress getForeignAddress() const;
     nx::utils::Url getDecodedUrl() const;
 
     bool sendBuffer(const QnByteArray& sendBuffer);
@@ -86,9 +69,9 @@ public:
     bool readSingleRequest();
     virtual void parseRequest();
 
-    bool isSocketTaken() const;
-    QSharedPointer<nx::network::AbstractStreamSocket> takeSocket();
-    void releaseSocket();
+    bool isConnectionSecure() const;
+    std::unique_ptr<nx::network::AbstractStreamSocket> takeSocket();
+    //void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     int notFound(QByteArray& contentType);
@@ -99,6 +82,9 @@ public:
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
+
+    std::pair<nx::String, nx::String> generateErrorResponse(
+        nx::network::http::StatusCode::Value errorCode, const QByteArray& errorDetails = {}) const;
 
     //QnByteArray& getSendBuffer();
     //void bufferData(const char* data, int size);
@@ -113,8 +99,6 @@ protected:
         const QByteArray& contentEncoding = {}, const QByteArray& multipartBoundary = {},
         bool displayDebug = false, bool isUndefinedContentLength = false);
 
-    QString codeToMessage(int code);
-
     void copyClientRequestTo(QnTCPConnectionProcessor& other);
     /*!
         \return Number of bytes read. 0 if connection has been closed. -1 in case of error
@@ -125,17 +109,20 @@ protected:
 
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
     // For inherited classes without TCP server socket only
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-    void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
+    void sendErrorResponse(nx::network::http::StatusCode::Value httpResult);
+    void sendUnauthorizedResponse(
+        nx::network::http::StatusCode::Value httpResult,
+        const QByteArray& messageBody = {}, const QByteArray& details = {});
 
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);

@@ -54,7 +54,7 @@ public:
 
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
     virtual nx::network::AbstractStreamServerSocket* createAndPrepareSocket(
         bool sslNeeded,
         const nx::network::SocketAddress& localAddress) override;
@@ -62,7 +62,7 @@ protected:
 
 private:
     std::unique_ptr<nx::mediaserver::Authenticator> m_authenticator;
-    nx::network::MultipleServerSocket* m_multipleServerSocket;
+    nx::network::MultipleServerSocket* m_multipleServerSocket = nullptr;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;
     bool m_boundToCloud;

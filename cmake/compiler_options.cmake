@@ -14,20 +14,6 @@ if(developerBuild)
     set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 endif()
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
-if(MSVC)
-    # MSVC does not support compiler feature detection macros, so Qt fails to enable constexpr
-    # for some its claasses like QRect, QMargins, etc.
-    if(MSVC_VERSION GREATER 1900)
-        add_definitions(-D__cpp_constexpr=201304)
-    else()
-        add_definitions(-DQ_COMPILER_CONSTEXPR)
-    endif()
-endif()
-
 if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
     # TODO: Use CMake defaults in the next release version (remove the following two lines).
     string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
@@ -86,12 +72,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
-    add_definitions(-DUSE_OWN_MUTEX)
-endif()
-
-if(analyzeMutexLocksForDeadlock)
-    add_definitions(-DUSE_OWN_MUTEX)
-    add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
 endif()
 
 if(WINDOWS)
@@ -163,6 +143,7 @@ if(UNIX)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         add_compile_options(
             -Wno-error=dangling-else
+            -Wno-error=maybe-uninitialized
             -Wno-psabi
         )
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -201,6 +182,9 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
+    set(CMAKE_INSTALL_RPATH @executable_path/../lib)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -107,14 +107,11 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
 
 void extractSpsPps(
     const QnConstCompressedVideoDataPtr& videoData,
-    QSize* const newResolution,
-    std::map<QString, QString>* const customStreamParams)
+    QSize* const newResolution)
 {
     std::vector<std::pair<const quint8*, size_t>> nalUnits = decodeNalUnits(videoData);
 
     //generating profile-level-id and sprop-parameter-sets as in rfc6184
-    QByteArray profileLevelID;
-    QByteArray spropParameterSets;
     bool spsFound = false;
     bool ppsFound = false;
 
@@ -149,14 +146,6 @@ void extractSpsPps(
                     const unsigned int originalFrameCropBottom = cropUnitY * sps.frame_crop_bottom_offset;
                     newResolution->setHeight(newResolution->height() - (originalFrameCropTop + originalFrameCropBottom));
                 }
-
-                if (customStreamParams)
-                {
-                    profileLevelID = QByteArray::fromRawData((const char*)nalu.first + 1, 3).toHex();
-                    spropParameterSets = NALUnit::decodeNAL(
-                        QByteArray::fromRawData((const char*)nalu.first, static_cast<int>(nalu.second))).toBase64() +
-                        "," + spropParameterSets;
-                }
                 break;
 
             case nuPPS:
@@ -164,22 +153,8 @@ void extractSpsPps(
                     continue;
                 else
                     ppsFound = true;
-
-                if (customStreamParams)
-                {
-                    spropParameterSets += NALUnit::decodeNAL(
-                        QByteArray::fromRawData((const char*)nalu.first, static_cast<int>(nalu.second))).toBase64();
-                }
                 break;
         }
-    }
-
-    if (customStreamParams)
-    {
-        if (!profileLevelID.isEmpty())
-            customStreamParams->emplace(Qn::PROFILE_LEVEL_ID_PARAM_NAME, QLatin1String(profileLevelID));
-        if (!spropParameterSets.isEmpty())
-            customStreamParams->emplace(Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets));
     }
 }
 

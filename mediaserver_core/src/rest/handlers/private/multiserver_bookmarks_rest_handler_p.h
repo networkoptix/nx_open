@@ -6,6 +6,8 @@
 #include <rest/helpers/request_context.h>
 #include <rest/server/rest_connection_processor.h>
 
+class QnMediaServerModule;
+
 enum class QnBookmarkOperation
 {
     Get,
@@ -27,14 +29,14 @@ class QnMultiserverBookmarksRestHandlerPrivate
 {
 public:
     static QString urlPath;
-    static QnCameraBookmarkList getBookmarks(QnCommonModule* commonModule, QnGetBookmarksRequestContext& context);
-    static QnCameraBookmarkTagList getBookmarkTags(QnCommonModule* commonModule, QnGetBookmarkTagsRequestContext& context);
+    static QnCameraBookmarkList getBookmarks(QnMediaServerModule* serverModule, QnGetBookmarksRequestContext& context);
+    static QnCameraBookmarkTagList getBookmarkTags(QnMediaServerModule* serverModule, QnGetBookmarkTagsRequestContext& context);
     static bool addBookmark(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         QnUpdateBookmarkRequestContext &context,
         const QnUuid& authorityUser);
-    static bool updateBookmark(QnCommonModule* commonModule, QnUpdateBookmarkRequestContext &context);
-    static bool deleteBookmark(QnCommonModule* commonModule, QnDeleteBookmarkRequestContext &context);
+    static bool updateBookmark(QnMediaServerModule* serverModule, QnUpdateBookmarkRequestContext &context);
+    static bool deleteBookmark(QnMediaServerModule* serverModule, QnDeleteBookmarkRequestContext &context);
 
     static QnBookmarkOperation getOperation(const QString &path);
 };

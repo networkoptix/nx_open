@@ -21,11 +21,12 @@ qt_libraries = [
     'WebChannel',
     'PrintSupport',
     'MultimediaWidgets',
-    'MultimediaQuick_p',
+    'MultimediaQuick',
     'Qml',
     'Quick',
     'QuickWidgets',
-    'LabsTemplates',
+    'QuickTemplates2',
+    'QuickControls2',
     'WebKit',
     'WebKitWidgets']
 

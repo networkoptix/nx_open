@@ -15,13 +15,16 @@
 
 #include <media_server/serverutil.h>
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/utils/detach_server_processor.h>
 #include <utils/common/app_info.h>
 
 QnDetachFromSystemRestHandler::QnDetachFromSystemRestHandler(
+    QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudConnectionManager* const cloudConnectionManager,
     ec2::AbstractTransactionMessageBus* messageBus)
     :
     QnJsonRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudConnectionManager(cloudConnectionManager),
     m_messageBus(messageBus)
 {
@@ -53,53 +56,35 @@ int QnDetachFromSystemRestHandler::execute(
     using namespace nx::cdb;
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    NX_LOGX(lm("Detaching server from system started."), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Detaching server from system started."));
 
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
-        NX_LOGX(lm("Cannot detach server from system while in safe mode."), cl_logWARNING);
+        NX_WARNING(this, lm("Cannot detach server from system while in safe mode."));
         return QnPermissionsHelper::safeModeError(result);
     }
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
     {
-        NX_LOGX(lm("Cannot detach from system. Owner permissions are required."), cl_logWARNING);
+        NX_WARNING(this, lm("Cannot detach from system. Owner permissions are required."));
         return QnPermissionsHelper::notOwnerError(result);
     }
 
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
-        NX_LOGX(lm("Cannot detach from system. Password check failed.")
-            , cl_logDEBUG1);
+        NX_DEBUG(this, lm("Cannot detach from system. Password check failed.")
+            );
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx::network::http::StatusCode::ok;
     }
 
-    dropConnectionsToRemotePeers(m_messageBus);
+    nx::mediaserver::Utils::dropConnectionsToRemotePeers(m_messageBus);
 
-    if (nx::vms::utils::resetSystemToStateNew(owner->commonModule()))
-    {
-        if (!m_cloudConnectionManager->detachSystemFromCloud())
-        {
-            errStr = lm("Cannot detach from cloud. Failed to reset cloud attributes. cloudSystemId %1")
-                .arg(owner->globalSettings()->cloudSystemId());
-        }
-    }
-    else
-    {
-        errStr = lm("Cannot detach from system. Failed to reset system to state new.");
-    }
+    nx::vms::utils::DetachServerProcessor detachServerProcessor(
+        owner->commonModule(),
+        m_cloudConnectionManager);
+    const auto resultCode = detachServerProcessor.detachServer(&result);
 
-    if (errStr.isEmpty())
-    {
-        NX_LOGX(lm("Detaching server from system finished."), cl_logDEBUG1);
-    }
-    else
-    {
-        NX_LOGX(errStr, cl_logWARNING);
-        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-    }
-
-    resumeConnectionsToRemotePeers(m_messageBus);
-    return nx::network::http::StatusCode::ok;
+    nx::mediaserver::Utils::resumeConnectionsToRemotePeers(m_messageBus);
+    return resultCode;
 }

@@ -288,11 +288,11 @@ void Plugin::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     // We should invent more accurate test.
-    if (cameraInfo.logicalId != 0)
-        return new Manager(this, cameraInfo, m_typedManifest);
+    if (cameraInfo->logicalId != 0)
+        return new Manager(this, *cameraInfo, m_typedManifest);
     else
         return nullptr;
 }

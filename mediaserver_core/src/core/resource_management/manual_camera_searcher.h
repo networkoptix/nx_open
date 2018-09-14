@@ -26,6 +26,7 @@ public:
     QnSearchTask(){};
 
     QnSearchTask(
+        QnCommonModule* commonModule,
         const QString& addr,
         int port,
         const QAuthenticator& auth,
@@ -45,6 +46,7 @@ public:
     QString toString();
 
 private:
+    QnCommonModule * m_commonModule = nullptr;
     nx::utils::Url m_url;
     QAuthenticator m_auth;
 
@@ -101,7 +103,6 @@ private:
     QList<QnAbstractNetworkResourceSearcher*> getAllNetworkSearchers() const;
 private:
     mutable QnMutex m_mutex;
-
     QnManualResourceSearchList m_results;
     QnManualResourceSearchStatus::State m_state;
     std::atomic<bool> m_cancelled;

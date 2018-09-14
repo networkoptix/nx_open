@@ -5,8 +5,11 @@
 #include <tuple>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/elapsed_timer_pool.h>
 #include <nx/utils/math/sum_per_period.h>
 #include <nx/utils/thread/mutex.h>
+
+#include "access_blocker_pool.h"
 
 namespace nx {
 namespace network {
@@ -26,15 +29,9 @@ struct UserLockerSettings
 class NX_NETWORK_API UserLocker
 {
 public:
-    enum class AuthResult
-    {
-        success,
-        failure,
-    };
-
     UserLocker(const UserLockerSettings& settings);
 
-    void updateLockoutState(AuthResult authResult);
+    LockUpdateResult updateLockoutState(AuthResult authResult);
     bool isLocked() const;
 
 private:
@@ -45,22 +42,23 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_NETWORK_API UserLockerPool
+using UserAccessBlockerPool = AccessBlockerPool<
+    std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>,
+    UserLocker,
+    UserLockerSettings>;
+
+class UserLockerPool:
+    public UserAccessBlockerPool
 {
+    using base_type = UserAccessBlockerPool;
+
 public:
-    using Key = std::tuple<nx::network::HostAddress /*source*/, std::string /*userName*/>;
-
-    UserLockerPool(const UserLockerSettings& settings);
-
-    void updateLockoutState(const Key& key, UserLocker::AuthResult authResult);
-    bool isLocked(const Key& key) const;
-
-    std::map<Key, UserLocker> userLockers() const;
-
-private:
-    const UserLockerSettings m_settings;
-    mutable QnMutex m_mutex;
-    std::map<Key, UserLocker> m_userLockers;
+    UserLockerPool(const UserLockerSettings& settings):
+        base_type(
+            settings,
+            std::max(settings.checkPeriod, settings.lockPeriod))
+    {
+    }
 };
 
 } // namespace server

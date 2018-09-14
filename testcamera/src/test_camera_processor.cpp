@@ -10,12 +10,12 @@ public:
 };
 
 QnTestCameraProcessor::QnTestCameraProcessor(
-    const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner,
     bool noSecondaryStream,
     int fps)
     :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_noSecondaryStream(noSecondaryStream),
     m_fps(fps)
 {
@@ -74,7 +74,7 @@ void QnTestCameraProcessor::run()
         if (!isSecondary || !m_noSecondaryStream)
         {
             qDebug() << "Start" << (isSecondary ? "secondary" : "primary") << "stream";
-            camera->startStreaming(d->socket.data(), isSecondary, fps);
+            camera->startStreaming(d->socket.get(), isSecondary, fps);
         }
     }
 }

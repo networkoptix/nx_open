@@ -24,6 +24,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/core/utils/operation_manager.h>
@@ -291,10 +292,9 @@ nx::utils::Url QnContext::getWebSocketUrl() const
 bool QnContext::setCloudCredentials(const QString& login, const QString& password)
 {
     // TODO: #GDM do we need store temporary credentials here?
-    qnClientCoreSettings->setCloudLogin(login);
-    qnClientCoreSettings->setCloudPassword(password);
-    const bool result = cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
-    qnClientCoreSettings->save();
+    QnEncodedCredentials credentials(login, password);
+    nx::client::core::secureSettings()->cloudCredentials = credentials;
+    const bool result = cloudStatusWatcher()->setCredentials(credentials);
     return result;
 }
 

@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
-#include <nx/utils/qt_random_device.h>
-#include <nx/utils/cryptographic_random_device.h>
+#include <nx/utils/random_qt_device.h>
+#include <nx/utils/random_cryptographic_device.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
@@ -90,9 +90,9 @@ REGISTER_TYPED_TEST_CASE_P(Random, Numbers);
 
 INSTANTIATE_TYPED_TEST_CASE_P(QtDevice, Random, nx::utils::random::QtDevice);
 INSTANTIATE_TYPED_TEST_CASE_P(
-    CryptographicRandomDevice,
+    CryptographicDevice,
     Random,
-    nx::utils::random::CryptographicRandomDevice);
+    nx::utils::random::CryptographicDevice);
 
 } // namespace test
 } // namespace random

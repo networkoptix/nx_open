@@ -1,39 +1,51 @@
 # Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
+
+# Needed for proper RPATH in MacOS.
+if(POLICY CMP0068)
+    cmake_policy(SET CMP0068 NEW)
+endif()
+
 project(nx_kit_test)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src)
-
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-include(nx_kit.cmake)
+set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
-# Test for ini_config disabled via -DNX_INI_CONFIG_DISABLED.
-add_library(disabled_ini_config_ut SHARED
+add_library(nx_kit ${nxKitLibraryType}
+    src/nx/kit/debug.h
+    src/nx/kit/debug.cpp
+    src/nx/kit/ini_config.h
     src/nx/kit/ini_config.cpp
+    src/nx/kit/test.h
     src/nx/kit/test.cpp
-    unit_tests/ini_config_ut.cpp
-    unit_tests/disabled_ini_config_ut.cpp
-)
-target_compile_definitions(disabled_ini_config_ut
-    PRIVATE NX_INI_CONFIG_DISABLED
-    PRIVATE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_EXPORT_MACRO}
-    INTERFACE DISABLED_INI_CONFIG_UT_API=${NX_KIT_API_IMPORT_MACRO}
-    PRIVATE NX_KIT_API= #< nx_kit sources are statically linked into lib disabled_ini_config_ut.
+    src/ini_config_c.h
+    src/ini_config_c_impl.h
 )
 
-# Executable for all tests.
-add_executable(nx_kit_ut
-    unit_tests/ini_config_ut.cpp
-    unit_tests/debug_ut.cpp
-    unit_tests/ini.cpp
-    unit_tests/ini_config_c_ut.c
-    unit_tests/main.cpp
+target_include_directories(nx_kit PUBLIC src)
+
+set(NX_KIT_API_IMPORT_MACRO "")
+set(NX_KIT_API_EXPORT_MACRO "")
+if(WIN32)
+    if (nxKitLibraryType STREQUAL "SHARED")
+        set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
+        set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    endif()
+else()
+    set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+endif()
+
+target_compile_definitions(nx_kit
+    PRIVATE NX_KIT_API=${NX_KIT_API_EXPORT_MACRO}
+    INTERFACE NX_KIT_API=${NX_KIT_API_IMPORT_MACRO}
 )
-target_link_libraries(nx_kit_ut
-    nx_kit
-    disabled_ini_config_ut
-)
+
+set(nxKitWithTests "YES" CACHE STRING "Whether to build unit tests")
+if(nxKitWithTests)
+    enable_testing()
+    add_subdirectory(unit_tests)
+endif()

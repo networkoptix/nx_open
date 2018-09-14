@@ -58,10 +58,10 @@ def find_or_add_context_by_file(file_path, product_id, has_language):
     return context
 
 
-def find_or_add_context_template(context, language_code):
-    if ContextTemplate.objects.filter(context__id=context.id, language__code=language_code).exists():
-        return ContextTemplate.objects.get(context__id=context.id, language__code=language_code)
-    context_template = ContextTemplate(context=context, language=Language.by_code(language_code))
+def find_or_add_context_template(context, language_code, skin):
+    if ContextTemplate.objects.filter(context__id=context.id, language__code=language_code, skin=skin).exists():
+        return ContextTemplate.objects.get(context__id=context.id, language__code=language_code, skin=skin)
+    context_template = ContextTemplate(context=context, language=Language.by_code(language_code), skin=skin)
     context_template.save()
     return context_template
 
@@ -73,8 +73,8 @@ def read_cms_strings(filename):
         return data, set(re.findall(pattern, data))
 
 
-def read_structure_file(filename, product_id, global_strings):
-    context_name, language_code = context_for_file(filename, 'blue')
+def read_structure_file(filename, product_id, global_strings, skin):
+    context_name, language_code = context_for_file(filename, skin)
 
     # now read file and get records from there.
     data, strings = read_cms_strings(filename)
@@ -86,7 +86,7 @@ def read_structure_file(filename, product_id, global_strings):
     # Here we check if there are any unique strings (which are not global)
     strings = [string for string in strings if string not in global_strings]
     context = find_or_add_context_by_file(context_name, product_id, bool(language_code))
-    context_template = find_or_add_context_template(context, language_code)
+    context_template = find_or_add_context_template(context, language_code, skin)
     context_template.template = data  # update template for this context
     context_template.save()
     for string in strings:
@@ -98,8 +98,10 @@ def read_structure(product_name):
     global_strings = DataStructure.objects.\
         filter(context__is_global=True, context__product_id=product_id).\
         values_list("name", flat=True)
-    for file in iterate_cms_files('blue', False):
-        read_structure_file(file, product_id, global_strings)
+    for skin in settings.SKINS:
+        for file in iterate_cms_files(skin, False):
+            read_structure_file(file, product_id, global_strings, skin)
+
 
 
 def find_or_add_language(language_code):
@@ -109,7 +111,8 @@ def find_or_add_language(language_code):
 
     if language.code == language.name:  # name and code are the same - try to update name
         # try to read language.json for LANGUAGE_NAME
-        language_json_path = os.path.join(SOURCE_DIR.replace("{{skin}}", "blue"), "static", "lang_" + language_code,
+        language_json_path = os.path.join(SOURCE_DIR.replace("{{skin}}", settings.DEFAULT_SKIN),
+                                          "static", "lang_" + language_code,
                                           "language.json")
 
         with codecs.open(language_json_path, 'r', 'utf-8') as file_descriptor:
@@ -133,7 +136,7 @@ class Command(BaseCommand):
            'the database (contexts, datastructure)'
 
     def handle(self, *args, **options):
-        read_languages('blue')
+        read_languages(settings.DEFAULT_SKIN)
         if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
             structure.find_or_add_product('cloud_portal', True)
             default_customization = Customization(name=settings.CUSTOMIZATION,

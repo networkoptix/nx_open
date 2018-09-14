@@ -238,7 +238,7 @@ ResultCode Storage::updateFileInformation(
         updated = true;
     }
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, updated, it, status = it->status]()
         {
             if (updated || status != it->status)
@@ -289,7 +289,7 @@ ResultCode Storage::setChunkSize(const QString& fileName, qint64 chunkSize)
         it->chunkChecksums.resize(chunkCount);
     }
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it]()
         {
             lock.unlock();
@@ -369,7 +369,7 @@ ResultCode Storage::writeFileChunk(
 
     file.close();
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();
@@ -474,7 +474,7 @@ ResultCode Storage::setChunkChecksums(
 
     it->chunkChecksums = chunkChecksums;
 
-    const auto& exitGuard = makeScopeGuard(
+    const auto& exitGuard = nx::utils::makeScopeGuard(
         [this, &lock, it, status = it->status]()
         {
             lock.unlock();
@@ -535,14 +535,24 @@ void Storage::findDownloads()
     if (!m_downloadsDirectory.exists())
         return;
 
-    for (const auto& entry: m_downloadsDirectory.entryInfoList(
-        {lit("*") + kMetadataSuffix}, QDir::Files))
+    findDownloadsImpl(m_downloadsDirectory);
+}
+
+void Storage::findDownloadsImpl(const QDir& dir)
+{
+    for (const auto& entry: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot))
     {
         auto fileName = entry.absoluteFilePath();
-        fileName.truncate(fileName.size() - kMetadataSuffix.size());
-
-        if (QFileInfo(fileName).isFile())
-            loadDownload(fileName);
+        if (entry.isDir())
+        {
+            findDownloadsImpl(QDir(fileName));
+        }
+        else if (fileName.endsWith(kMetadataSuffix))
+        {
+            fileName.truncate(fileName.size() - kMetadataSuffix.size());
+            if (entry.isFile())
+                loadDownload(fileName);
+        }
     }
 }
 
@@ -692,7 +702,8 @@ void Storage::checkDownloadCompleted(FileMetadata& fileInfo)
 
     const auto path = filePath(fileInfo.name);
 
-    if (calculateMd5(path) != fileInfo.md5)
+    const auto md5 = calculateMd5(path);
+    if (md5 != fileInfo.md5)
     {
         fileInfo.status = FileInformation::Status::corrupted;
         return;

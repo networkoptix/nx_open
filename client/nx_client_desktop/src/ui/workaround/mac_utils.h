@@ -13,8 +13,6 @@ void mac_stopFileAccess();
 
 bool mac_isSandboxed();
 
-void mac_setLimits();
-
 void setHidesOnDeactivate(WId windowId, bool value);
 
 #endif // _HDWITNESS_MAC_UTILS_H_

@@ -66,7 +66,7 @@ void Service::setOnAbnormalTerminationDetected(
 
 int Service::exec()
 {
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
+    auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
         [this]()
         {
             if (m_startedEventHandler)
@@ -96,15 +96,20 @@ int Service::exec()
                 m_abnormalTerminationHandler(readStartInfoFile());
         }
         writeStartInfo();
-        auto startInfoFileGuard = makeScopeGuard([this]() { removeStartInfoFile(); });
+        auto startInfoFileGuard = nx::utils::makeScopeGuard([this]() { removeStartInfoFile(); });
 
         return serviceMain(*settings);
     }
     catch (const std::exception& e)
     {
-        NX_LOGX(lm("Error starting. %1").arg(e.what()), cl_logERROR);
+        NX_ERROR(this, lm("Error starting. %1").arg(e.what()));
         return 3;
     }
+}
+
+std::string Service::applicationDisplayName() const
+{
+    return m_applicationDisplayName.toStdString();
 }
 
 int Service::runMainLoop()

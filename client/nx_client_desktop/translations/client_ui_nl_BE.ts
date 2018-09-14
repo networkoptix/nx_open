@@ -896,6 +896,14 @@
     </message>
   </context>
   <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation>Stream Adressen</translation>
+    </message>
+  </context>
+  <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
@@ -1071,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>Op schermindeling</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1188,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Ellipticiteit</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>Op schermindeling</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation>Camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation>Bron camera</translation>
     </message>
   </context>
   <context>
@@ -1336,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>Layoutinstellingen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>Algemene instellingen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>Layout is vergrendeld</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>Achtergrond</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>Beeld verwerken... Een ogenblik geduld.</translation>
     </message>
     <message>
       <location/>
@@ -1364,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>Weergave...</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>Wissen</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>Beeld verwerken... Een ogenblik geduld.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>Beeldverhouding behouden</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>Aanpassen aan de monitor aspect ratio</translation>
+      <source>View...</source>
+      <translation>Weergave...</translation>
     </message>
     <message>
       <location/>
@@ -1394,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>Hoogte:</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>Beeldverhouding behouden</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>Transparantie:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>Hoogte:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>Aanpassen aan de monitor aspect ratio</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation>Geblokkeerd</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation>Breedte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation>Hoogte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>Logische ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Genereer</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Minimal Size</source>
+      <translation>Minimale grootte</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation>Selecteer schermindeling</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation>Gedeelde schermindelingen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>Selecteer een gebruiker in de regel &quot;tot&quot; om zijn lokale schermindeling in deze lijst weer te geven</translation>
     </message>
   </context>
   <context>
@@ -1477,6 +1547,14 @@
       <location/>
       <source>Disable imported users</source>
       <translation>Geïmporteerde gebruikers uitschakelen</translation>
+    </message>
+  </context>
+  <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation>Streams bewerken...</translation>
     </message>
   </context>
   <context>
@@ -1993,29 +2071,6 @@
     </message>
   </context>
   <context>
-    <name>QnFileNameInputWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulier</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>Bestandsnaam:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Select file...</source>
-      <translation>Selecteer bestand...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>Bladeren...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -2188,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>Map:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>Bladeren...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>Bestandsnaam:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>Formaat:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>Opties</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>Waarschuwing: bestand met dezelfde naam bestaat al!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2284,6 +2306,11 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>Plaats de snelkoppeling op het bureaublad.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation>Schakel tijdlijn op de videowall in</translation>
     </message>
   </context>
   <context>
@@ -2961,6 +2988,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>Waarschuwing! Hierdoor worden de kwaliteit en de framerate (FPS) instellingen in het opnameschema irrelevant.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation>Toon watermerk met gebruikersnaam over het videobeeld</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation>Voorbeeld watermerk</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3141,8 +3178,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>Webpagina</translation>
+      <source>This web page is for C2P integration</source>
+      <translation>Deze webpagina is bedoeld voor de C2P-integratie</translation>
     </message>
   </context>
   <context>
@@ -3171,6 +3208,24 @@
       <location/>
       <source>Note: Schedule is based on server time.</source>
       <translation>Opmerking: Schema is gebaseerd op de servertijd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation>Voorbeeld watermerk</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Transparantie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation>Frequentie</translation>
     </message>
   </context>
 </TS>

@@ -12,7 +12,8 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnDesktopCameraResourcePtr& res)
+QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(
+    const QnDesktopCameraResourcePtr& res)
 :
     CLServerPushStreamReader(res)
 {
@@ -50,7 +51,8 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
 
 void QnDesktopCameraStreamReader::closeStream()
 {
-    if (m_socket && QnDesktopCameraResourceSearcher::instance()) {
+    if (m_socket && QnDesktopCameraResourceSearcher::instance())
+    {
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);
         m_socket->send(request.toLatin1());
@@ -145,8 +147,8 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         }
         if (streamIndex >= MEDIA_STREAM_COUNT)
         {
-            NX_LOG(lit("QnDesktopCameraStreamReader: wrong streamIndex from pocket (%1 >= %2), pocket rejected")
-                   .arg(streamIndex).arg(MEDIA_STREAM_COUNT), cl_logERROR);
+            NX_ERROR(this, lit("wrong streamIndex from pocket (%1 >= %2), pocket rejected")
+                   .arg(streamIndex).arg(MEDIA_STREAM_COUNT));
         }
         else
         if (bufferSize == packetSize)

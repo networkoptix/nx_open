@@ -22,11 +22,12 @@ public:
     LoggerSettings() = default;
 
     /**
-     * LOGGER_SETTINGS = param (; param)
+     * LOGGER_SETTINGS = param (";" param)*
      * param = key [= value]
      * value = TEXT
      * param = file | dir | maxBackupCount | maxFileSize | level
-     * level = LogLevel [: messageTagPrefix]
+     * level = LogLevel ["[" messageTagPrefixes "]"]
+     * messageTagPrefixes = messageTagPrefix (", " messageTagPrefix)*
      * file = - | fileName
      *
      * "-" means STDOUT
@@ -52,9 +53,6 @@ public:
     void updateDirectoryIfEmpty(const QString& dataDirectory);
 
     bool operator==(const LoggerSettings& right) const;
-
-private:
-    void loadLevel(const QString& str);
 };
 
 class NX_UTILS_API Settings

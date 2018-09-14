@@ -6,6 +6,7 @@
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <providers/live_stream_provider.h>
+#include <utils/media/av_codec_helper.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -18,6 +19,8 @@
 #include <media_server/media_server_module.h>
 #include <nx/streaming/archive_stream_reader.h>
 
+static const std::set<QString> kSupportedCodecs = {"MJPEG", "H264", "H265"};
+
 namespace nx {
 namespace mediaserver {
 namespace resource {
@@ -25,8 +28,9 @@ namespace resource {
 
 const float Camera::kMaxEps = 0.01f;
 
-Camera::Camera(QnCommonModule* commonModule):
-    QnVirtualCameraResource(commonModule),
+Camera::Camera(QnMediaServerModule* serverModule):
+    QnVirtualCameraResource(serverModule ? serverModule->commonModule() : nullptr),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);
@@ -70,7 +74,7 @@ QnAbstractPtzController* Camera::createPtzController() const
             .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message, cl_logWARNING);
+        NX_WARNING(this, message);
     }
 
     if((capabilities & Ptz::DevicePositioningPtzCapability)
@@ -82,10 +86,15 @@ QnAbstractPtzController* Camera::createPtzController() const
             .arg(getUrl());
 
         qDebug() << message;
-        NX_LOG(message.toLatin1(), cl_logERROR);
+        NX_ERROR(this, message.toLatin1());
     }
 
     return result;
+}
+
+QString Camera::defaultCodec() const
+{
+    return QnAvCodecHelper::codecIdToString(AV_CODEC_ID_H264);
 }
 
 void Camera::setUrl(const QString &urlStr)
@@ -103,6 +112,8 @@ void Camera::setUrl(const QString &urlStr)
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
     QnMutexLocker lock(&m_initMutex);
+    if (!isInitialized())
+        return {};
 
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
@@ -159,6 +170,8 @@ boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
 QSet<QString> Camera::setAdvancedParameters(const QnCameraAdvancedParamValueMap& values)
 {
     QnMutexLocker lock(&m_initMutex);
+    if (!isInitialized())
+        return {};
 
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
@@ -215,6 +228,9 @@ QnAdvancedStreamParams Camera::advancedLiveStreamParams() const
         [&](Qn::StreamIndex streamIndex)
         {
             QnMutexLocker lock(&m_initMutex);
+            if (!isInitialized())
+                return QnLiveStreamParams();
+
             const auto it = m_streamCapabilityAdvancedProviders.find(streamIndex);
             if (it == m_streamCapabilityAdvancedProviders.end())
                 return QnLiveStreamParams();
@@ -442,6 +458,18 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
     };
 
     StreamCapabilityMap result = getStreamCapabilityMapFromDrives(streamIndex);
+    for (auto itr = result.begin(); itr != result.end();)
+    {
+        if (kSupportedCodecs.count(itr.key().codec))
+        {
+            ++itr;
+            continue;
+        }
+
+        NX_DEBUG(this, lm("Remove unsuported stream capability %1").args(itr.key()));
+        itr = result.erase(itr);
+    }
+
     for (auto itr = result.begin(); itr != result.end(); ++itr)
     {
         auto& value = itr.value();
@@ -452,6 +480,7 @@ StreamCapabilityMap Camera::getStreamCapabilityMap(Qn::StreamIndex streamIndex)
         mergeField(value.defaultFps, defaultValue.defaultFps);
         mergeField(value.maxFps, defaultValue.maxFps);
     }
+
     return result;
 }
 
@@ -498,7 +527,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
     Qn::ConnectionRole role)
 {
     const auto camera = resource.dynamicCast<Camera>();
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return nullptr;
 
@@ -523,7 +552,7 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
 
             QnAbstractArchiveDelegate* archiveDelegate = camera->createArchiveDelegate();
             if (!archiveDelegate)
-                archiveDelegate = new QnServerArchiveDelegate(qnServerModule); //< Default value.
+                archiveDelegate = new QnServerArchiveDelegate(camera->serverModule()); //< Default value.
             if (!archiveDelegate)
                 return nullptr;
 

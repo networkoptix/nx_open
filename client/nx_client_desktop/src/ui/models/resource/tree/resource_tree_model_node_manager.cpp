@@ -101,7 +101,7 @@ void QnResourceTreeModelNodeManager::addResourceNode(const QnResourceTreeModelNo
         if (resource->resourcePool())
             primaryNodeAdded(node.data());
         else
-            NX_EXPECT(false);
+            NX_ASSERT(false);
     }
 }
 

@@ -77,9 +77,9 @@ func (testRunner *TestSuiteCollectionRunner) startTestSuites() error {
 func (testRunner *TestSuiteCollectionRunner) waitForCompletion() error {
 	for i := 0; i < len(testRunner.testSuites); i++ {
 		testSuiteReport := <-testRunner.testSuiteResultPipe
-		testRunner.report.suiteReports = append(testRunner.report.suiteReports, testSuiteReport)
+		testRunner.report.SuiteReports = append(testRunner.report.SuiteReports, testSuiteReport)
 		log.Printf("Test suite %s finished with %d failure(s)",
-			testSuiteReport.name, testSuiteReport.failureCount())
+			testSuiteReport.Name, testSuiteReport.failureCount())
 		if testSuiteReport.failureCount() > 0 {
 			// TODO Interrupting other test suites that are still running
 			// break

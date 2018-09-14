@@ -20,7 +20,7 @@ Page
     screenOrientation: (d.minimumHeight > width || d.minimumHeight > height)
         ? Qt.PortraitOrientation : Qt.PrimaryOrientation
 
-    leftButtonIcon: lp("/images/menu.png")
+    leftButtonIcon.source: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
 
     ResourceHelper

@@ -15,7 +15,7 @@ class QnPlVmax480Resource: public nx::mediaserver::resource::Camera
 public:
     static const QString MANUFACTURE;
 
-    QnPlVmax480Resource();
+    QnPlVmax480Resource(QnMediaServerModule* serverModule);
     virtual ~QnPlVmax480Resource();
 
     virtual int getMaxFps() const override;

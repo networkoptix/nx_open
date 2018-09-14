@@ -24,7 +24,7 @@ class QnAdamResource:
 public:
     static const QString kManufacture;
 
-    QnAdamResource();
+    QnAdamResource(QnMediaServerModule* serverModule);
     virtual ~QnAdamResource();
 
     virtual void setIframeDistance(int frames, int timeMs) override;
@@ -60,10 +60,6 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    QnIOPortDataList mergeIOPortData(
-        const QnIOPortDataList& fromDevice,
-        const QnIOPortDataList& saved) const;
-
     void setPortDefaultStates();
 
     Qn::IOPortType portType(const QString& portId) const;

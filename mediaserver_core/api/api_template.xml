@@ -91,7 +91,12 @@
                         </param>
                         <param>
                             <name>speed</name>
-                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1.</description>
+                            <description>Playback speed. Only values in range [1..32] are supported. Default value is 1. The special value 'max' means streaming without delay</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>multiple_payload_types</name>
+                            <description>Generate SDP with two payload types(high and low qualities). Payload type of RTP packets will changed accordingly transmitted stream</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -256,6 +261,28 @@
             </functions>
         </group>
         <group>
+            <groupName>WebSocket API</groupName>
+            <urlPrefix>/ec2</urlPrefix>
+            <groupDescription>
+                This group contains information about an access to the Nx Media Server transaction bus via WebSocket connection endpoint.
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>transactionBus</name>
+                    <description>Allows third-party systems to get an access to the Nx Media Server transaction bus.
+                        Third-part peer should undergo usual (the same as when accessing Server API or System API) authentication process before using WebSocket connection. Transaction format is JSON.
+                        <br/>
+                    Example: wc://10.0.2.1/ec2/transactionBus
+                    </description>
+                    <method></method>
+                    <params/>
+                    <result>
+                        <caption>A ready-to-use WebSocket connection, read-only as for now</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
             <groupName>Authentication</groupName>
             <urlPrefix/>
             <groupDescription>
@@ -366,5 +393,5 @@
                 </function>
             </functions>
         </group>
-    </groups>
+   </groups>
 </apidoc>

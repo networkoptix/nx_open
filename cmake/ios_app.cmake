@@ -70,6 +70,7 @@ function(setup_ios_application target)
         "-framework UIKit"
         "-framework CoreText"
         "-framework CoreGraphics"
+        "-framework ImageIO"
         "-framework MobileCoreServices"
         "-framework Foundation"
         "-framework UIKit"
@@ -80,9 +81,9 @@ function(setup_ios_application target)
         "-framework QuartzCore"
         "-framework AssetsLibrary"
         "-L${QT_DIR}/lib"
-        qtharfbuzzng qtpcre qtfreetype
-        Qt5PlatformSupport
-        Qt5LabsControls Qt5LabsTemplates
+        qtharfbuzz qtpcre2 qtfreetype qtlibpng
+        Qt5FontDatabaseSupport Qt5GraphicsSupport Qt5ClipboardSupport
+        Qt5QuickControls2 Qt5QuickTemplates2
         z
     )
 

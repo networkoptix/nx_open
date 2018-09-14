@@ -196,8 +196,8 @@ public:
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override;
 
     bool reopen();
 

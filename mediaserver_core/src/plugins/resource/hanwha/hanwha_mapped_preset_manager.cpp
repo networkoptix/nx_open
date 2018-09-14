@@ -66,7 +66,7 @@ bool HanwhaMappedPresetManager::removeNativePreset(const QString nativePresetId)
 
 bool HanwhaMappedPresetManager::nativePresets(QnPtzPresetList* outNativePresets) const
 {
-    NX_EXPECT(outNativePresets);
+    NX_ASSERT(outNativePresets);
     if (!outNativePresets)
         return false;
 
@@ -150,7 +150,7 @@ QString HanwhaMappedPresetManager::makePresetId(const QString& number, const QSt
 
 QString HanwhaMappedPresetManager::makeDevicePresetName(const QString& presetNumber) const
 {
-    NX_EXPECT(!presetNumber.isEmpty());
+    NX_ASSERT(!presetNumber.isEmpty());
     if (presetNumber.isEmpty())
         return QString();
 

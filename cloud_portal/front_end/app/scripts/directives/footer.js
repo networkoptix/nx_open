@@ -5,8 +5,7 @@ angular.module('cloudApp')
         return {
             restrict: 'E',
             templateUrl: Config.viewsDir + 'components/footer.html',
-            link: function (scope, element, attrs) {
-
+            link: function (scope) {
             }
         }
     });

@@ -9,7 +9,7 @@ namespace dw_mtt {
 
 bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
 {
-    return lh.typeId == rh.typeId;
+    return lh.id == rh.id;
 }
 
 bool AnalyticsDriverManifest::supportsModel(const QString& model) const noexcept

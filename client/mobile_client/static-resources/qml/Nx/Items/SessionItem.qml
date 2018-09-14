@@ -1,6 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Layouts 1.1
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Models 1.0
@@ -115,7 +115,7 @@ Pane
         y: 2
         z: 1
         anchors.right: parent.right
-        icon: lp("/images/edit.png")
+        icon.source: lp("/images/edit.png")
         visible: !cloudSystem && authenticationDataModel.hasData
         onClicked: d.openSavedSession()
     }

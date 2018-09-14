@@ -37,7 +37,7 @@ public:
     virtual void setLocale(const char* locale) override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo,
+        const nx::sdk::CameraInfo* cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(
@@ -78,10 +78,10 @@ private:
     };
 
 private:
-    boost::optional<QList<QnUuid>> fetchSupportedEvents(
+    boost::optional<QList<QString>> fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
 
-    boost::optional<QList<QnUuid>> eventsFromParameters(
+    boost::optional<QList<QString>> eventTypeIdsFromParameters(
         const nx::mediaserver_core::plugins::HanwhaCgiParameters& parameters,
         const nx::mediaserver_core::plugins::HanwhaResponse& eventStatuses,
         int channel) const;

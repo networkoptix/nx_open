@@ -7,6 +7,8 @@
 
 #include <nx/vms/api/data/peer_data.h>
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace p2p {
 
@@ -17,7 +19,7 @@ class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     ConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
     virtual ~ConnectionProcessor();
@@ -30,6 +32,8 @@ private:
     bool isDisabledPeer(const vms::api::PeerData& remotePeer) const;
     bool isPeerCompatible(const vms::api::PeerDataEx& remotePeer) const;
     Qn::UserAccessData userAccessData(const vms::api::PeerDataEx& remotePeer) const;
+private:
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 } // namespace p2p

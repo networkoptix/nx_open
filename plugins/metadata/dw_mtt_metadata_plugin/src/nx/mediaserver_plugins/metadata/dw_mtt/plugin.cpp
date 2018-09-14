@@ -20,7 +20,9 @@ namespace {
 
 static const char* const kPluginName = "DW MTT metadata plugin";
 static const QString kDwMttVendor("digitalwatchdog");
-// Just for information: DW VCA camera's vendor string is "cap".
+// Just for information:
+// DW VCA camera's vendor string is "cap",
+// DW MTT camera's vendor string is "digitalwatchdog"
 
 QString normalize(const QString& name)
 {
@@ -106,14 +108,14 @@ void Plugin::setLocale(const char* /*locale*/)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     *outError = Error::noError;
-    auto vendor = normalize(QString(cameraInfo.vendor));
-    auto model = normalize(QString(cameraInfo.model));
+    auto vendor = normalize(QString(cameraInfo->vendor));
+    auto model = normalize(QString(cameraInfo->model));
 
     if (vendor.startsWith(kDwMttVendor) && m_typedManifest.supportsModel(model))
-        return new Manager(this, cameraInfo, m_typedManifest);
+        return new Manager(this, *cameraInfo, m_typedManifest);
     else
         return nullptr;
 }
@@ -124,15 +126,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&uuid](const AnalyticsEventType& event)
-        {
-            return event.typeId == uuid;
-        });
+        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
 
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }

@@ -89,7 +89,7 @@ void QnResourceTreeModelLayoutToursNode::removeNode(QnResourceTreeModelNodePtr n
     switch (node->type())
     {
         case NodeType::layoutTour:
-            NX_EXPECT(m_nodes.key(node) == node->uuid());
+            NX_ASSERT(m_nodes.key(node) == node->uuid());
             m_nodes.remove(node->uuid());
             break;
         default:

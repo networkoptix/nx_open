@@ -15,7 +15,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <utils/common/connective.h>
 
@@ -212,7 +212,7 @@ public:
             return QObject::eventFilter(watched, event);
 
         const auto parentWindow = getParentWindow(properWidget);
-        NX_EXPECT(parentWindow);
+        NX_ASSERT(parentWindow);
         const auto geometry = properWidget->geometry();
         const auto globalPos = parentWindow->geometry().topLeft();
         const auto fixedPos = screenRelatedToGlobal(globalPos, parentWindow->screen());
@@ -304,10 +304,10 @@ void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
         return;
 
     const bool started = movie->state() != QMovie::NotRunning;
-    QnRaiiGuardPtr stopGuard;
+    nx::utils::Guard stopGuard;
     if (!started)
     {
-        stopGuard = QnRaiiGuard::createDestructible([movie](){ movie->stop(); });
+        stopGuard = nx::utils::Guard([movie](){ movie->stop(); });
         movie->start();
     }
 

@@ -10,11 +10,11 @@ namespace proxy {
 
 M3uPlaylistConverter::M3uPlaylistConverter(
     const AbstractUrlRewriter& urlRewriter,
-    const SocketAddress& proxyEndpoint,
+    const utils::Url& proxyHostUrl,
     const nx::String& targetHost)
     :
     m_urlRewriter(urlRewriter),
-    m_proxyEndpoint(proxyEndpoint),
+    m_proxyHostUrl(proxyHostUrl),
     m_targetHost(targetHost)
 {
 }
@@ -34,7 +34,7 @@ nx::network::http::BufferType M3uPlaylistConverter::convert(
             continue;
 
         nx::utils::Url url(entry.value);
-        url = m_urlRewriter.originalResourceUrlToProxyUrl(url, m_proxyEndpoint, m_targetHost);
+        url = m_urlRewriter.originalResourceUrlToProxyUrl(url, m_proxyHostUrl, m_targetHost);
         entry.value = url.toString().toUtf8();
     }
 

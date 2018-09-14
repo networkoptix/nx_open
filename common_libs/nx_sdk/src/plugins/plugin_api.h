@@ -62,51 +62,41 @@ namespace nxpl
         virtual unsigned int releaseRef() = 0;
     };
 
-    //!Setting
     struct Setting
     {
-        //!\0-terminated setting name
-        /*!
-            Param groups are separated using /. Example of valid names: param1, group1/param1, group1/param2
-            \warning Settings, defined by plugin, MUST be prefixed with plugin_name/. Plugin name is returned by \a Plugin::name()
-        */
-        char* name;
-        //!\0-terminated setting value
-        char* value;
+        /**
+         * 0-terminated setting name.
+         */
+        const char* name;
 
-        Setting()
-        :
-            name( nullptr ),
-            value( nullptr )
-        {
-        }
+        /** 0-terminated setting value. */
+        const char* value;
+
+        Setting(): name(nullptr), value(nullptr) {}
+        Setting(const char* name, const char* value): name(name), value(value) {}
     };
 
     // {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
     static const NX_GUID IID_Plugin = { { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b } };
 
-    //!Optional interface with general plugin functions (plugin name, plugin settings)
-    /*!
-        Server tries to cast initial pointer received from \a createNXPluginInstance to this type just after plugin load
+    /**
+     * Optional interface with general plugin features (name, settings). Server tries to cast
+     * the initial pointer received from createNXPluginInstance() to this type right after the
+     * plugin is loaded.
     */
-    class Plugin
-    :
-        public nxpl::PluginInterface
+    class Plugin: public nxpl::PluginInterface
     {
     public:
         virtual ~Plugin() {}
 
-        //!Name of plugin
-        /*!
-            This name is used for information purpose only
-        */
+        /** Name of the plugin, used for information purpose only. */
         virtual const char* name() const = 0;
-        //!Used by server to report settings to plugin
-        /*!
-            Called before plugin functionality is used
-            \param settings This memory cannot be relied on after method returns
-            \param count Size of \a settings array
-            \warning Settings, defined by plugin, MUST be prefixed with plugin_name/. Plugin name is returned by \a Plugin::name()
+
+        /**
+         * Used by the server to assign settings to the plugin. Called before other plugin
+         * features are used.
+         * @param settings This memory cannot be accessed after this method returns.
+         * @param count Size of the settings array.
         */
         virtual void setSettings( const nxpl::Setting* settings, int count ) = 0;
     };
@@ -147,10 +137,12 @@ namespace nxpl
 }
 
 // TODO: Move NX_PLUGIN_API definition from here to cmake.
-#ifdef _WIN32
-    #define NX_PLUGIN_API __declspec(dllexport)
-#else
-    #define NX_PLUGIN_API
+#if !defined(NX_PLUGIN_API)
+    #if defined(_WIN32)
+        #define NX_PLUGIN_API __declspec(dllexport)
+    #else
+        #define NX_PLUGIN_API
+    #endif
 #endif
 
 //!Define to mark locale dependent output parameters and return values.

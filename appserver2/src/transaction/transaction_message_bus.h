@@ -44,7 +44,6 @@ public:
     virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
-
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     bool moveConnectionToReadyForStreaming(const QnUuid& connectionGuid);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
@@ -216,10 +215,10 @@ protected:
     virtual void logTransactionState();
 
     virtual void handleIncomingTransaction(
-	    QnTransactionTransport* sender,
-	    Qn::SerializationFormat tranFormat,
-	    QByteArray serializedTran,
-	    const QnTransactionTransportHeader& transportHeader);
+        QnTransactionTransport* sender,
+        Qn::SerializationFormat tranFormat,
+        QByteArray serializedTran,
+        const QnTransactionTransportHeader& transportHeader);
 
     virtual ErrorCode updatePersistentMarker(
         const QnTransaction<nx::vms::api::UpdateSequenceData>& tran);
@@ -281,10 +280,10 @@ protected slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 protected:
-	QnConnectionMap m_connections;
-	std::shared_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
-	bool m_restartPending = false;
-	QVector<QnTransactionTransport*> m_connectingConnections;
+    QnConnectionMap m_connections;
+    std::shared_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+    bool m_restartPending = false;
+    QVector<QnTransactionTransport*> m_connectingConnections;
 
 private:
     struct RemoteUrlConnectInfo

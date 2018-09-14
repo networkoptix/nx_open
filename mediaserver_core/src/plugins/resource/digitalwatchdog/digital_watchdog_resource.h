@@ -24,10 +24,10 @@ class QnDigitalWatchdogResource : public QnPlOnvifResource
     typedef QnPlOnvifResource base_type;
 
 public:
-    QnDigitalWatchdogResource();
+    QnDigitalWatchdogResource(QnMediaServerModule* serverModule);
     ~QnDigitalWatchdogResource();
 
-    CLSimpleHTTPClient httpClient() const;
+    std::unique_ptr<CLSimpleHTTPClient> httpClient() const;
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;

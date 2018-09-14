@@ -87,7 +87,7 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceRemoved(const QnResour
     if (!user)
         return;
 
-    disconnect(user.data(), NULL, this, NULL);
+    user->disconnect(this);
 
     /* Any email is valid for removed user. */
     if (!m_emailValidByUser[user])

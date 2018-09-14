@@ -21,7 +21,7 @@ Plugin::Plugin():
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& /*cameraInfo*/, Error* /*outError*/)
+    const CameraInfo* /*cameraInfo*/, Error* /*outError*/)
 {
     return new CameraManager(this);
 }
@@ -52,19 +52,19 @@ std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": ")json" + nxpt::toStdString(kDriverGuid) + R"json(",
-            "driverName": {
+            "pluginId": "nx.stub",
+            "pluginName": {
                 "value": "Stub Metadata Plugin"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
+                    "id": ")json" + kLineCrossingEventType + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json(",
+                    "id": ")json" + kObjectInTheAreaEventType + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -73,13 +73,13 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + nxpt::toStdString(kCarObjectGuid) + R"json(",
+                    "id": ")json" + kCarObjectType+ R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::toStdString(kHumanFaceObjectGuid) + R"json(",
+                    "id": ")json" + kHumanFaceObjectType+ R"json(",
                     "name": {
                         "value": "Human face"
                     }
@@ -126,7 +126,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + kCarObjectType+ R"json("
                     ],
                     "settings": {
                         "params": [
@@ -152,7 +152,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + kCarObjectType+ R"json("
                     ]
                 }
             ]
@@ -168,8 +168,8 @@ void Plugin::settingsChanged()
 void Plugin::executeAction(
     const std::string& actionId,
     nxpl::NX_GUID objectId,
-    nxpl::NX_GUID cameraId,
-    int64_t timestampUs,
+    nxpl::NX_GUID /*cameraId*/,
+    int64_t /*timestampUs*/,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,

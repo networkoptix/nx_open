@@ -6,6 +6,7 @@ nx_add_server_plugin(dw_mtt_metadata_plugin
         nx_utils
         nx_fusion
         nx_kit
+        common
 )
 
 add_definitions(-DNX_PRINT_TO_LOG)

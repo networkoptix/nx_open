@@ -1,7 +1,7 @@
 /***********************************************************************
-*	File: file.cpp
-*	Author: Andrey Kolesnikov
-*	Date: 13 oct 2006
+* File: file.cpp
+* Author: Andrey Kolesnikov
+* Date: 13 oct 2006
 ***********************************************************************/
 
 #include <qglobal.h>
@@ -70,7 +70,6 @@ QnFile::QnFile(int fd): m_eof(false)
     m_impl = reinterpret_cast<void*>(fd);
 }
 
-
 QnFile::~QnFile()
 {
     if( isOpen() )
@@ -125,23 +124,21 @@ qint64 QnFile::read( char* buffer, qint64 count )
 
 qint64 QnFile::write( const char* buffer, qint64 count )
 {
-    auto printLogMessage = [](const QString& m, QnLogLevel l)
+    auto printLogMessage = [](const QString& m)
     {
-        NX_LOG(lit("QnFile::write failed. %1 Errno: %2")
-                .arg(m)
-                .arg(errno),
-            cl_logERROR);
+        NX_ERROR(typeid(QnFile), lit("Write failed. %1 Errno: %2").arg(m).arg(errno));
     };
+
     if( !isOpen() )
     {
-        printLogMessage(lit("File is not opened."), cl_logERROR);
+        printLogMessage(lit("File is not opened."));
         return -1;
     }
     ssize_t writtenBytes = ::write( (long)m_impl, buffer, count );
     if (writtenBytes == -1)
-        printLogMessage(lit(""), cl_logERROR);
+        printLogMessage(lit(""));
     else if (writtenBytes < count)
-        printLogMessage(lit("Failed to write all bytes."), cl_logERROR);
+        printLogMessage(lit("Failed to write all bytes."));
 
     return writtenBytes;
 }
@@ -166,7 +163,6 @@ bool QnFile::seek( qint64 offset)
 {
     if( !isOpen() )
         return false;
-
 
 #if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
     return lseek( (long)m_impl, offset, SEEK_SET) != -1;

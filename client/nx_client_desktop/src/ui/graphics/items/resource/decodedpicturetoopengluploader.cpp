@@ -168,23 +168,13 @@ public:
         nv12SharedUsed(false),
         functions(new QnGlFunctions(context))
     {
-        QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-        QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-
-        /* Maximal texture size. */
-        int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-        NX_VERBOSE(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
+        initializeOpenGLFunctions();
 
         /* Clamp constant. */
-//        clampConstant = GL_CLAMP;
-//        if (extensions.contains("GL_EXT_texture_edge_clamp") || extensions.contains("GL_SGIS_texture_edge_clamp") || version >= QByteArray("1.2.0"))
-            clampConstant = GL_CLAMP_TO_EDGE;
+        clampConstant = GL_CLAMP_TO_EDGE;
 
         /* Check for non-power of 2 textures. */
-        supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
-
+        supportsNonPower2Textures = hasOpenGLFeature(OpenGLFeature::NPOTTextures);
     }
 
     ~DecodedPictureToOpenGLUploaderPrivate()

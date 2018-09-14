@@ -62,7 +62,7 @@ void CursorHandlerPool::markCursorForDeletion(QnUuid id)
 BasicCursorOperationExecutor::BasicCursorOperationExecutor(
     CursorHandlerPool* cursorContextPool)
     :
-    base_type(QueryType::lookup),
+    base_type(QueryType::lookup, std::string()),
     m_cursorContextPool(cursorContextPool)
 {
 }
@@ -97,6 +97,10 @@ void CursorCreator::reportErrorWithoutExecution(DBResult errorCode)
     m_cursorHandler->reportErrorWithoutExecution(errorCode);
 }
 
+void CursorCreator::setExternalTransaction(Transaction* /*transaction*/)
+{
+}
+
 void CursorCreator::executeCursor(AbstractDbConnection* const connection)
 {
     m_cursorHandler->initialize(connection); //< Throws on failure.
@@ -114,7 +118,13 @@ CleanUpDroppedCursorsExecutor::CleanUpDroppedCursorsExecutor(
 {
 }
 
-void CleanUpDroppedCursorsExecutor::reportErrorWithoutExecution(DBResult /*errorCode*/)
+void CleanUpDroppedCursorsExecutor::reportErrorWithoutExecution(
+    DBResult /*errorCode*/)
+{
+}
+
+void CleanUpDroppedCursorsExecutor::setExternalTransaction(
+    Transaction* /*transaction*/)
 {
 }
 

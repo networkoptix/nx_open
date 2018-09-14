@@ -23,10 +23,10 @@ namespace {
 constexpr int kThumbnailWidth = 192;
 constexpr int kThumbnailHeight = 108;
 constexpr int kLazyUpdateMs = 1000; //< Autoupdate cursor once per sec.
-}
+} // namespace
 
-TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent)
-    : base_type(slider),
+TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphicsItem* tooltipParent):
+    base_type(slider),
     QnWorkbenchContextAware(slider),
     m_slider(slider),
     m_layout(new TimelineCursorLayout()),
@@ -54,10 +54,6 @@ TimelineScreenshotCursor::TimelineScreenshotCursor(QnTimeSlider* slider, QGraphi
 
     m_mark->setParentItem(slider);
     m_mark->setPen(palette().mid().color());
-
-    // We should set color for the mark on the timeline.
-    installEventHandler(this, QEvent::PaletteChange, this,
-        [this](QObject*, QEvent*) { m_mark->setPen(palette().mid().color()); });
 
     hide();
 }
@@ -88,15 +84,32 @@ QVariant TimelineScreenshotCursor::itemChange(GraphicsItemChange change, const Q
     return QGraphicsItem::itemChange(change, value);
 }
 
+void TimelineScreenshotCursor::polishEvent()
+{
+    base_type::polishEvent();
+
+    // We should set color for the mark on the timeline.
+    m_mark->setPen(palette().mid().color());
+}
+
 void TimelineScreenshotCursor::showNow()
 {
+    const auto currentWidget = navigator()->currentWidget();
+    if (!currentWidget)
+        return;
+
+    const auto currentResource = currentWidget->resource();
+    NX_ASSERT(currentResource);
+    if (!currentResource->hasFlags(Qn::media))
+        return;
+
     milliseconds timePoint = m_slider->timeFromPosition(QPointF(m_position, 0), true);
     api::ResourceImageRequest request;
     request.usecSinceEpoch = microseconds(timePoint).count();
     request.size = QSize(kThumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.roundMethod = nx::api::ImageRequest::RoundMethod::iFrameBefore;
-    request.resource = navigator()->currentWidget()->resource();
+    request.resource = currentResource;
 
     // We probably want to initialize image provider first time unconditionally.
     if (!m_imageProvider)
@@ -108,8 +121,8 @@ void TimelineScreenshotCursor::showNow()
     else
         m_imageProvider->setRequestData(request);
 
-    auto resource = navigator()->currentWidget()->resource();
-    bool isLocalFile = resource->hasFlags(Qn::local_video) && !resource->hasFlags(Qn::periods);
+    bool isLocalFile = currentResource->hasFlags(Qn::local_video)
+        && !currentResource->hasFlags(Qn::periods);
     bool imageExists = isLocalFile
         || m_slider->timePeriods(0, Qn::RecordingContent).containTime(timePoint.count());
 
@@ -126,3 +139,4 @@ void TimelineScreenshotCursor::showNow()
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

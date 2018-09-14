@@ -35,8 +35,7 @@ public:
         nx::sdk::metadata::MetadataHandler* handler) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* typeList,
-        int typeListSize) override;
+        const char* const* typeList, int typeListSize) override;
 
     virtual nx::sdk::Error stopFetchingMetadata() override;
 
@@ -51,8 +50,8 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
-    /** @return nullptr if not found */
-    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
+    /** @return Null if not found. */
+    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
 
 private:
     AnalyticsDriverManifest m_typedManifest;

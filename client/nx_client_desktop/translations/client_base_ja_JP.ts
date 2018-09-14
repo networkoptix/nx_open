@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>セルの間隔...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation>スクリーン設定...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,19 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>少なくとも一つのレイアウトを選択してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n レイアウト</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1055,36 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>実行可能 %1 メディアファイル (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>ソースカメラ</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation>一つのデバイスを選択してください</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation>1台のカメラを選択してください</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>少なくとも一つのレイアウトを選択してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n レイアウト</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation>%1 / %2</translation>
     </message>
   </context>
   <context>
@@ -1836,11 +1883,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>最低一つのデバイスを選択してください</translation>
+      <translation>少なくとも一つのデバイスを選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>最低一つのカメラを選択してください</translation>
+      <translation>少なくとも1台のカメラを選択してください</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
@@ -1890,11 +1937,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>最低一つのデバイスを選択してください</translation>
+      <translation>少なくとも一つのデバイスを選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>最低一つのカメラを選択してください</translation>
+      <translation>少なくとも1台のカメラを選択してください</translation>
     </message>
     <message>
       <source>Occurs</source>
@@ -1949,11 +1996,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>最低一つのデバイスを選択してください</translation>
+      <translation>少なくとも一つのデバイスを選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>最低一つのカメラを選択してください</translation>
+      <translation>少なくとも1台のカメラを選択してください</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2208,42 +2255,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>設定がありません</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>セカンダリストリーム</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O モジュール ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>カメラ ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>オーディオ ストリーム</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>プライマリ ストリーム</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL は使用できません　ストリーム開き、もう一度やり直してください</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL は使用できません　ビデオストリーム開き、もう一度やり直してください</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O モジュールにはオーディオ ストリームがありません</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>カメラのセカンダリ ストリームがありません</translation>
     </message>
   </context>
   <context>
@@ -3479,7 +3490,7 @@ to %1</source>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation>1代のカメラを選択</translation>
+      <translation>1台のカメラを選択してください</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
@@ -3576,6 +3587,14 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>イメージが暗すぎます</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation>無効な入力イメージ</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>内部エラー</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
@@ -3585,10 +3604,26 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation>
+        <numerusform>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すれば、アクションは動作します</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>1台のカメラを選択してください</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>選択フォルダー...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3784,45 +3819,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>ファイル選択...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>ピクチャ %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>画像なし</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>画像の読み込み中にエラーが発生しました</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>画像のアップロード時にエラーが発生しました</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>画像を読み取ることができません</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>画像を読み取ることができません</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>セル</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>画像が大きすぎます　最大サイズは %1 MB です</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3906,21 +3902,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>インポートの選択</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>ズーム</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>回転:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>フォーカス</translation>
     </message>
   </context>
   <context>
@@ -4819,6 +4800,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation>回転</translation>
+    </message>
+  </context>
+  <context>
     <name>QnPerformanceTest</name>
     <message>
       <source>%1 can work in configuration mode only</source>
@@ -5063,7 +5051,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>選択フォルダー...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -6311,11 +6299,11 @@ to %1</source>
     </message>
     <message>
       <source>Select at least one device in the Backup Settings to start backup.</source>
-      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1 つのデバイスを選択します</translation>
+      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1 つのデバイスを選択してください</translation>
     </message>
     <message>
       <source>Select at least one camera in the Backup Settings to start backup.</source>
-      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1 つのカメラを選択します</translation>
+      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1台のカメラを選択してください</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
@@ -6758,17 +6746,6 @@ to %1</source>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
       <translation>dd MMMM yyyy h:mm ap</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>選択フォルダー...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>ファイル選択...</translation>
     </message>
   </context>
   <context>
@@ -7794,6 +7771,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation>サーバーストレージに十分なスペースがありません</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8025,6 +8006,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>プライマリ ストリーム</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>セカンダリストリーム</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation>セカンダリストリームなし</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8142,7 +8138,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>選択フォルダー...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
   </context>
   <context>
@@ -8172,6 +8168,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>セル</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>画像なし</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>画像の読み込み中にエラーが発生しました</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>画像のアップロード時にエラーが発生しました</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>ファイル選択...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>ピクチャ %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>画像を読み取ることができません</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>画像が大きすぎます　最大サイズは %1 MB です</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>画像を読み取ることができません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>セル</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation>迅速な識別とアクセスのためにレイアウトに割り当てることのできるカスタム番号</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>一般</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation>背景</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8180,6 +8237,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>カメラではありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>セカンダリストリーム</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O モジュール ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>カメラ ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>オーディオ ストリーム</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>プライマリ ストリーム</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL は使用できません　ストリーム開き、もう一度やり直してください</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL は使用できません　ビデオストリーム開き、もう一度やり直してください</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O モジュールにはオーディオ ストリームがありません</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>カメラのセカンダリ ストリームがありません</translation>
     </message>
   </context>
   <context>
@@ -8645,7 +8741,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>選択フォルダー...</translation>
+      <translation>フォルダー選択...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
@@ -8683,7 +8779,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
-      <translation>選択したアイテムの名前:</translation>
+      <translation>選択したアイテムの新しい名前を入力：</translation>
     </message>
     <message>
       <source>Updating Background...</source>
@@ -8762,8 +8858,12 @@ to %1</source>
       <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>警告！このビルドはテスト目的のみのものです！利用可能な次のパッチまたはリリースバージョンにアップグレードしてください</translation>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation>警告！このビルドはテスト目的のみのものです！</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation>利用可能な次のパッチまたはリリースバージョンにアップグレードしてください。</translation>
     </message>
   </context>
   <context>

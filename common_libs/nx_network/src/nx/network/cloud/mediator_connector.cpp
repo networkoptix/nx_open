@@ -16,7 +16,8 @@ namespace api {
 
 namespace { static network::stun::AbstractAsyncClient::Settings s_stunClientSettings; }
 
-MediatorConnector::MediatorConnector():
+MediatorConnector::MediatorConnector(const std::string& cloudHost):
+    m_cloudHost(cloudHost),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
             s_stunClientSettings.reconnectPolicy))
@@ -166,13 +167,7 @@ void MediatorConnector::stopWhileInAioThread()
 void MediatorConnector::fetchEndpoint()
 {
     if (!m_mediatorUrlFetcher)
-    {
-        m_mediatorUrlFetcher =
-            std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
-        m_mediatorUrlFetcher->bindToAioThread(getAioThread());
-        if (m_cloudModulesXmlUrl)
-            m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
-    }
+        initializeUrlFetcher();
 
     m_mediatorUrlFetcher->get(
         [this](
@@ -205,6 +200,22 @@ void MediatorConnector::fetchEndpoint()
         });
 }
 
+void MediatorConnector::initializeUrlFetcher()
+{
+    m_mediatorUrlFetcher =
+        std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>();
+    m_mediatorUrlFetcher->bindToAioThread(getAioThread());
+    if (m_cloudModulesXmlUrl)
+    {
+        m_mediatorUrlFetcher->setModulesXmlUrl(*m_cloudModulesXmlUrl);
+    }
+    else
+    {
+        m_mediatorUrlFetcher->setModulesXmlUrl(
+            network::AppInfo::defaultCloudModulesXmlUrl(m_cloudHost.c_str()));
+    }
+}
+
 void MediatorConnector::connectToMediatorAsync()
 {
     auto createStunTunnelUrl =
@@ -218,7 +229,6 @@ void MediatorConnector::connectToMediatorAsync()
             if (code == SystemError::noError)
             {
                 m_fetchEndpointRetryTimer->reset();
-                saveMediatorEndpoint();
                 // TODO: ak m_stunClient is expected to invoke "reconnected" handler here.
             }
             else
@@ -231,14 +241,6 @@ void MediatorConnector::connectToMediatorAsync()
             if (!isReady(*m_future))
                 m_promise->set_value(code == SystemError::noError);
         });
-}
-
-void MediatorConnector::saveMediatorEndpoint()
-{
-    QnMutexLocker lock(&m_mutex);
-    // NOTE: Assuming that mediator's UDP and TCP interfaces are available on the same IP.
-    m_mediatorUdpEndpoint->address = m_stunClient->remoteAddress().address;
-    NX_DEBUG(this, lm("Connected to mediator at %1").arg(m_mediatorUrl));
 }
 
 void MediatorConnector::reconnectToMediator()

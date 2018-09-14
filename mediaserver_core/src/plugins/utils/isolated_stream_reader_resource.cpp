@@ -6,8 +6,8 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-IsolatedStreamReaderResource::IsolatedStreamReaderResource(QnCommonModule* commonModule):
-    QnPlOnvifResource(commonModule)
+IsolatedStreamReaderResource::IsolatedStreamReaderResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
 }
 

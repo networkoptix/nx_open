@@ -10,10 +10,10 @@ namespace network {
 
 ReverseConnectionListener::ReverseConnectionListener(
     ReverseConnectionManager* reverseConnectionManager,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_reverseConnectionManager(reverseConnectionManager)
 {
     setObjectName(::toString(this));
@@ -27,8 +27,7 @@ void ReverseConnectionListener::run()
     sendResponse(nx::network::http::StatusCode::ok, QByteArray());
 
     auto guid = nx::network::http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
-    auto socket = std::make_unique<ShareSocketDelegate>(ShareSocketDelegate(takeSocket()));
-    m_reverseConnectionManager->addIncomingTcpConnection(guid, std::move(socket));
+    m_reverseConnectionManager->addIncomingTcpConnection(guid, takeSocket());
 }
 
 } // namespace network

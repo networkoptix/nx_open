@@ -14,12 +14,9 @@ class QAbstractItemModel;
 
 namespace QnNotificationLevel { enum class Value; }
 
-namespace nx {
+namespace nx::vms::event { class StringsHelper; }
 
-namespace vms { namespace event { class StringsHelper; } }
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class EventSearchListModel;
 class MotionSearchListModel;
@@ -91,6 +88,4 @@ private:
     int m_lastTabIndex = 0;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

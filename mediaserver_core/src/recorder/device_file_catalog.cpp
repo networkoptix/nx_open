@@ -96,10 +96,12 @@ void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 }
 
 DeviceFileCatalog::DeviceFileCatalog(
+    QnMediaServerModule* serverModule,
     const QString           &cameraUniqueId,
     QnServer::ChunksCatalog catalog,
-    QnServer::StoragePool   storagePool
-) :
+    QnServer::StoragePool   storagePool)
+    :
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_mutex(QnMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
@@ -353,7 +355,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
             }
             chunk = Chunk(
                 startTimeMs,
-                qnStorageDbPool->getStorageIndex(storage),
+                storageDbPool()->getStorageIndex(storage),
                 fileIndex,
                 endTimeMs - startTimeMs,
                 detectTimeZone(startTimeMs, localFileName)
@@ -380,7 +382,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
     chunk = Chunk(
         startTimeMs,
-        qnStorageDbPool->getStorageIndex(storage),
+        storageDbPool()->getStorageIndex(storage),
         fileIndex,
         durationMs,
         detectTimeZone(startTimeMs, localFileName)
@@ -391,9 +393,9 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)
-        return qnNormalStorageMan;
+        return serverModule()->normalStorageManager();
     else if (m_storagePool == QnServer::StoragePool::Backup)
-        return qnBackupStorageMan;
+        return serverModule()->backupStorageManager();
     else {
         NX_ASSERT(0);
         return nullptr;
@@ -415,9 +417,24 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
     const QString path = toLocalStoragePath(storage, dirName);
     QStringList folders = path.split(getPathSeparator(path)).mid(3);
 
+    static const int kMaxFolderDepth = 4;
+    if (folders.size() > kMaxFolderDepth)
+    {
+        NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+        return QnTimePeriod(); //< Invalid folder structure.
+    }
+
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
-        timestamp = timestamp.arg(folders[i].toInt(), i == 0 ? 4 : 2, 10, QChar('0'));
+    {
+        bool ok = false;
+        timestamp = timestamp.arg(folders[i].toInt(&ok), i == 0 ? 4 : 2, 10, QChar('0'));
+        if (!ok)
+        {
+            NX_WARNING(this, lm("Skip invalid folder %1 for scan media files.").arg(dirName));
+            return QnTimePeriod(); //< Invalid folder structure.
+        }
+    }
     for (int i = folders.size(); i < 4; ++i)
         timestamp = timestamp.arg(i == 3 ? 0 : 1, 2, 10, QChar('0')); // mm and dd from 1, hours from 0
     QDateTime dtStart = QDateTime::fromString(timestamp, Qt::ISODate);
@@ -464,7 +481,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
 //    qDebug() << "folder being scanned: " << folder;
-    NX_LOG(lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder));
     QnAbstractStorageResource::FileInfoList files;
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
@@ -474,7 +491,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
 
         if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
         {
-            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             return; // canceled
         }
 
@@ -502,7 +519,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     {
         if (QnResource::isStopping())
         {
-            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             break;
         }
 
@@ -826,7 +843,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     QTextStream str(&msg);
     str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
     str.flush();
-    NX_LOG(msg, cl_logWARNING);
+    NX_WARNING(this, msg);
     str.flush();
 */
     QnMutexLocker lock( &m_mutex );
@@ -1030,7 +1047,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     if (!file.open(QFile::ReadOnly))
     {
-        NX_LOG(lit("Can't open title file %1").arg(file.fileName()), cl_logERROR);
+        NX_ERROR(this, lit("Can't open title file %1").arg(file.fileName()));
         return false;
     }
 

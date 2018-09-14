@@ -92,6 +92,7 @@ protected:
 
     virtual void cancelIoInAioThread() override;
 
+    void bindToAioThreadUnchecked(aio::AbstractAioThread* aioThread);
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
     void onListenRequestCompleted(

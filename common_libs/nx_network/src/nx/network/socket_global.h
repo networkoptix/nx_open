@@ -27,9 +27,6 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
-    NX_INI_FLAG(1, enableNewSslSocket, "Enable new SSL socket implementation");
-
-    bool isHostDisabled(const HostAddress& address) const;
 };
 
 class NX_NETWORK_API SocketGlobals
@@ -57,6 +54,12 @@ public:
     /** Invokes @param init only once, calls @param deinit in destructor. */
     static void customInit(CustomInit init, CustomDeinit deinit = nullptr);
 
+    void blockHost(const std::string& hostname);
+    void unblockHost(const std::string& hostname);
+    bool isHostBlocked(const HostAddress& address) const;
+
+    static SocketGlobals& instance();
+
     class InitGuard
     {
     public:
@@ -81,6 +84,7 @@ private:
     SocketGlobals(const SocketGlobals&) = delete;
     SocketGlobals& operator=(const SocketGlobals&) = delete;
 
+    void reloadIni();
     void setDebugIniReloadTimer();
 
     void initializeNetworking();

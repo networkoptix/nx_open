@@ -21,7 +21,7 @@ public:
 
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const nx::vms::api::PeerData& remotePeer,
         qint64 remoteSystemIdentityTime,
@@ -36,7 +36,7 @@ public:
     */
     void gotIncomingTransactionsConnectionFromRemotePeer(
         const QnUuid& connectionGuid,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         const nx::vms::api::PeerData &remotePeer,
         qint64 remoteSystemIdentityTime,
         const nx::network::http::Request& request,

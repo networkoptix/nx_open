@@ -164,7 +164,7 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
         {
             connectionContext->localPeersMessage = data;
             connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printPeersMessage();
             connection->sendMessage(data);
         }
@@ -298,6 +298,12 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
         if (peer == localPeer)
             continue;
 
+        if (auto connection = findConnectionById(peer))
+        {
+            if (!connection->remotePeer().isServer())
+                continue;
+        }
+
         //auto subscribedVia = currentSubscription.value(peer);
         while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
             ++currentSubscriptionItr;
@@ -326,15 +332,15 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
             // It could happen if neighbor(or closer) peer just goes offline
             if (std::any_of(viaList.begin(), viaList.end(),
                 [this, &peer, &localPeer](const vms::api::PersistentIdData& via)
-            {
-                if (via == localPeer)
-                    return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
-                auto connection = findConnectionById(via);
-                NX_ASSERT(connection);
-                if (!connection)
-                    return true; //< It shouldn't be.
-                return context(connection)->isRemotePeerSubscribedTo(peer);
-            }))
+                {
+                    if (via == localPeer)
+                        return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
+                    auto connection = findConnectionById(via);
+                    NX_ASSERT(connection);
+                    if (!connection)
+                        return true; //< It shouldn't be.
+                    return context(connection)->isRemotePeerSubscribedTo(peer);
+                }))
             {
                 continue;
             }
@@ -391,6 +397,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const vms::api::PeerDataEx& remotePeer,
     ec2::ConnectionLockGuard connectionLockGuard,
     nx::network::WebSocketPtr webSocket,
+    const QUrlQuery& requestUrlQuery,
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
@@ -399,6 +406,7 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
         remotePeer,
         localPeerEx(),
         std::move(webSocket),
+        requestUrlQuery,
         userAccessData,
         std::make_unique<nx::p2p::ConnectionContext>(),
         std::move(connectionLockGuard)));
@@ -414,11 +422,15 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     if (remotePeer.isClient())
     {
         // Clients use simplified logic. They are started and subscribed to all updates immediately.
+        // Client don't use any p2p protocol related structures. It just gets transactions.
         context(connection)->isLocalStarted = true;
-        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
+        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1, localPeer()));
         sendInitialDataToClient(connection);
     }
     context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;
+
+    lock.unlock();
+    emit newDirectConnectionEstablished(connection.data());
 }
 
 void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
@@ -517,7 +529,7 @@ void ServerMessageBus::resubscribePeers(
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
                 printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
 
             QVector<SubscribeRecord> request;
@@ -582,7 +594,7 @@ bool ServerMessageBus::selectAndSendTransactions(
     context(connection)->sendDataInProgress = !isFinished;
     context(connection)->remoteSubscription = newSubscription;
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
     {
         for (const auto& serializedTran : serializedTransactions)
         {

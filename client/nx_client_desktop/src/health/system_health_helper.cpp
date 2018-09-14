@@ -88,6 +88,9 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
                 .arg(style::Metrics::kStandardPadding);
         }
 
+        case QnSystemHealth::DefaultCameraPasswords:
+            return tr("Some cameras require passwords to be set");
+
         case QnSystemHealth::RemoteArchiveSyncStarted:
             return tr("Remote archive synchronization has been started");
         case QnSystemHealth::RemoteArchiveSyncFinished:
@@ -112,6 +115,9 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
         // disable tooltip for promo
         case QnSystemHealth::CloudPromo:
             return QString();
+
+        case QnSystemHealth::DefaultCameraPasswords:
+            return QString(); //< TODO: #vkutin #gdm Some tooltip would be nice.
 
         case QnSystemHealth::EmailIsEmpty:
             messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by email.");

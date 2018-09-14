@@ -14,6 +14,8 @@
 #include <utils/media/frame_type_extractor.h>
 #include <nx/utils/log/log.h>
 
+using namespace nx::vms::api;
+
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
 // forward instead seek backward
@@ -64,8 +66,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     m_speed(1.0),
     m_prevSpeed(1.0),
     m_pausedStart(false),
-    m_sendMotion(false),
-    m_prevSendMotion(false),
+    m_streamDataFilter(StreamDataFilter::mediaOnly),
+    m_prevStreamDataFilter(StreamDataFilter::mediaOnly),
     m_outOfPlaybackMask(false),
     m_latPacketTime(DATETIME_NOW),
     m_stopCond(false)
@@ -282,6 +284,7 @@ bool QnArchiveStreamReader::init()
 
     if (!opened)
         return false;
+
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     m_jumpMtx.lock();
@@ -400,7 +403,7 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
-    //NX_LOG(lit("QnArchiveStreamReader::getNextData()"), cl_logDEBUG2);
+    //NX_VERBOSE(this, lit("QnArchiveStreamReader::getNextData()"));
 
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
@@ -452,14 +455,12 @@ begin_label:
         }
     }
 
-    bool sendMotion = m_sendMotion;
-    if (sendMotion != m_prevSendMotion) {
-        m_delegate->setSendMotion(sendMotion);
-        m_prevSendMotion = sendMotion;
+    const auto streamDataFilter = m_streamDataFilter;
+    if (streamDataFilter != m_prevStreamDataFilter)
+    {
+        m_delegate->setStreamDataFilter(streamDataFilter);
+        m_prevStreamDataFilter = streamDataFilter;
     }
-
-    // TODO: Set sendAnalytics from appropriate parameter(s).
-    bool sendAnalytics = true;
 
     int channelCount = m_delegate->getVideoLayout()->channelCount();
 
@@ -525,7 +526,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            NX_LOG(s, cl_logALWAYS);
+            NX_ALWAYS(this, s);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
@@ -909,7 +910,19 @@ begin_label:
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
             m_eof = false;
         }
-        if (m_BOF) {
+
+        /**
+         * Consumers, such as CamDisplay, skip data frames if data with MediaFlags_BOF flag has
+         * not been received yet. On the other hand, QnAbstractArchiveStreamReader drops non-key
+         * frames if it hasn't received one. So, without this condition below
+         * (&& m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)) we may end up
+         * with a frame with MediaFlags_BOF flag being dropped because it is not a key frame and
+         * consumer won't never get a BOF frame.
+         * Above is true only for the video packets => '!videoData' condition.
+         */
+        if (m_BOF
+            && (!videoData || m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)))
+        {
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
             m_BOF = false;
         }
@@ -923,21 +936,21 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && (sendMotion || sendAnalytics))
+    if (m_currentData && (streamDataFilter & (StreamDataFilter::motion | StreamDataFilter::objectDetection)))
     {
         const int channel = m_currentData->channelNumber;
 
-        updateMetadataReaders(channel, sendMotion, sendAnalytics);
+        updateMetadataReaders(channel, streamDataFilter);
 
         if (m_motionConnection[channel])
         {
-            auto motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
-            if (motion)
+            auto metadata = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
+            if (metadata)
             {
-                motion->flags = m_currentData->flags;
-                motion->opaque = m_currentData->opaque;
+                metadata->flags = m_currentData->flags;
+                metadata->opaque = m_currentData->opaque;
                 m_afterMotionData = m_currentData;
-                return motion;
+                return metadata;
             }
         }
     }
@@ -946,11 +959,13 @@ begin_label:
     return m_currentData;
 }
 
-void QnArchiveStreamReader::updateMetadataReaders(
-    int channel, bool sendMotion, bool sendAnalytics)
+void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters filter)
 {
     constexpr int kMotionReaderId = 0;
     constexpr int kAnalyticsReaderId = 1;
+
+    const bool sendMotion = filter.testFlag(StreamDataFilter::motion);
+    const bool sendAnalytics = filter.testFlag(StreamDataFilter::objectDetection);
 
     if (!m_motionConnection[channel])
         m_motionConnection[channel] = std::make_shared<MetadataMultiplexer>();
@@ -1010,7 +1025,6 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     {
 
         result = m_delegate->getNextData();
-
         if (result == 0 && !needToStop())
         {
             if (m_cycleMode)
@@ -1039,7 +1053,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     return result;
 }
 
-unsigned int QnArchiveStreamReader::getCurrentAudioChannel() const
+unsigned QnArchiveStreamReader::getCurrentAudioChannel() const
 {
     return m_selectedAudioChannel;
 }
@@ -1052,12 +1066,13 @@ QStringList QnArchiveStreamReader::getAudioTracksInfo() const
     return rez;
 }
 
-bool QnArchiveStreamReader::setAudioChannel(unsigned int num)
+bool QnArchiveStreamReader::setAudioChannel(unsigned num)
 {
-    AVCodecContext* audioContext = m_delegate->setAudioChannel(num);
-    if (audioContext)
-        m_selectedAudioChannel = num;
-    return audioContext != 0;
+    if (!m_delegate->setAudioChannel(num))
+        return false;
+
+    m_selectedAudioChannel = num;
+    return true;
 }
 
 void QnArchiveStreamReader::setSpeedInternal(double value, qint64 currentTimeHint)
@@ -1256,16 +1271,19 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
     m_delegate->beforeSeek(mksec);
 }
 
-bool QnArchiveStreamReader::setSendMotion(bool value)
+bool QnArchiveStreamReader::setStreamDataFilter(StreamDataFilters filter)
 {
-    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
+    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMetadata)
     {
-        m_sendMotion = value;
+        m_streamDataFilter = filter;
         return true;
     }
-    else {
-        return false;
-    }
+    return false;
+}
+
+nx::vms::api::StreamDataFilters QnArchiveStreamReader::streamDataFilter() const
+{
+    return m_streamDataFilter;
 }
 
 bool QnArchiveStreamReader::isOpened() const

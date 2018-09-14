@@ -6,7 +6,7 @@
 angular.module('nxCommon')
     .filter('checkProtocol', function(){
         return function(url){
-            return url.indexOf('//') >= 0 ? url : "//"+url;
+            return url.indexOf('//') >= 0 ? url : "http://"+url;
         };
     })
     .directive('cameraLinks', ['systemAPI', function (systemAPI) {
@@ -33,7 +33,7 @@ angular.module('nxCommon')
                     useCredentials: false,
                     useLogin: 'login',
                     usePassword: 'password'
-                }
+                };
                 scope.L = L;
 
                 scope.streamName = function(stream){

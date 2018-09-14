@@ -86,7 +86,6 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
     m_currentHeight(-1),
     m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
-    m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
     m_forcedMtDecoding(false),
     m_prevTimestamp(AV_NOPTS_VALUE),
@@ -105,8 +104,6 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstComp
 
     openDecoder(data);
 
-    if( m_swDecoderCount )
-        m_swDecoderCount->ref();
 }
 
 QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
@@ -115,9 +112,6 @@ QnFfmpegVideoDecoder::~QnFfmpegVideoDecoder(void)
 
     QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
     m_passedContext = 0;
-
-    if( m_swDecoderCount )
-        m_swDecoderCount->deref();
 }
 
 void QnFfmpegVideoDecoder::flush()
@@ -237,11 +231,11 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-    NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
+    NX_VERBOSE(this, QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"));
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
-	    // try to reopen decoder without passed context
+        // try to reopen decoder without passed context
         if (m_passedContext)
         {
             QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
@@ -266,7 +260,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_passedContext = nullptr;
 
     if (data->context)
-	{
+    {
         m_codec = findCodec(data->context->getCodecId());
         m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
@@ -406,7 +400,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         {
             if (!isImage) {
                 // try to decode in QT for still image
-                NX_LOG(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+                NX_WARNING(this, QLatin1String("decoder not found: m_codec = 0"));
                 return false;
             }
         }
@@ -484,8 +478,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         {
             const quint8* dataEnd = avpkt.data + avpkt.size;
             const quint8* curPtr = avpkt.data;
-			// New version scan whole data to find SPS unit.
-			// It is slower but some cameras do not put SPS the begining of a data.
+            // New version scan whole data to find SPS unit.
+            // It is slower but some cameras do not put SPS the begining of a data.
             while (curPtr < dataEnd - 2)
             {
                 const int nalLen = curPtr[2] == 0x01 ? 3 : 4;
@@ -573,7 +567,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||
             outFrame->format != correctedPixelFormat || outFrame->linesize[0] != copyFromFrame->linesize[0]))
         {
-            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
+            outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, copyFromFrame->linesize[0]);
         }
 
 #if 0

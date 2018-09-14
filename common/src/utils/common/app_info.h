@@ -17,7 +17,6 @@ public:
 
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
-    static Q_INVOKABLE QString organizationNameForSettings();
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
@@ -72,6 +71,7 @@ public:
     static Q_INVOKABLE bool isAndroid();
     static Q_INVOKABLE bool isIos();
     static Q_INVOKABLE bool isMobile();
+    static Q_INVOKABLE bool isWindows();
 
     static Q_INVOKABLE nx::vms::api::SystemInformation currentSystemInformation();
 };

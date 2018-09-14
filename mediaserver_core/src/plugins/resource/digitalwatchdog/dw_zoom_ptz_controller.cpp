@@ -45,20 +45,20 @@ bool QnDwZoomPtzController::continuousMove(
 
     QString value;
 
-    if(qFuzzyIsNull(speedVector.zoom)) 
+    if(qFuzzyIsNull(speedVector.zoom))
     {
         value = lit("stop");
-    } 
-    else if(speedVector.zoom < 0.0) 
+    }
+    else if(speedVector.zoom < 0.0)
     {
         value = lit("zoomOut");
-    } 
-    else if(speedVector.zoom > 0.0) 
+    }
+    else if(speedVector.zoom > 0.0)
     {
         value = lit("zoomIn");
     }
 
-    return m_resource->httpClient().doGET(query.arg(value)) == CL_HTTP_SUCCESS;
+    return m_resource->httpClient()->doGET(query.arg(value)) == CL_HTTP_SUCCESS;
 }
 
 #endif //ENABLE_ONVIF

@@ -14,7 +14,8 @@
 class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnDesktopCameraStreamReader(const QnDesktopCameraResourcePtr& res);
+    QnDesktopCameraStreamReader(
+        const QnDesktopCameraResourcePtr& res);
     virtual ~QnDesktopCameraStreamReader();
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
     void setNeedVideoData(bool value);
@@ -44,7 +45,7 @@ private:
 private:
     static const int MEDIA_STREAM_COUNT = 2;
 
-    TCPSocketPtr m_socket;
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
     quint8 m_recvBuffer[65536];
     QnNxRtpParser m_parsers[MEDIA_STREAM_COUNT];
     QElapsedTimer m_keepaliveTimer;

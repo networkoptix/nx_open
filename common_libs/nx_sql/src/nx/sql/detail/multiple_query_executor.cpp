@@ -3,9 +3,9 @@
 namespace nx::sql::detail {
 
 MultipleQueryExecutor::MultipleQueryExecutor(
-    std::vector<std::unique_ptr<AbstractUpdateExecutor>> queries)
+    std::vector<std::unique_ptr<AbstractExecutor>> queries)
     :
-    base_type(QueryType::modification),
+    base_type(QueryType::modification, /*No aggregation*/ std::string()),
     m_queries(std::move(queries))
 {
 }
@@ -13,6 +13,10 @@ MultipleQueryExecutor::MultipleQueryExecutor(
 void MultipleQueryExecutor::reportErrorWithoutExecution(DBResult errorCode)
 {
     reportQueryFailure(m_queries.begin(), m_queries.end(), errorCode);
+}
+
+void MultipleQueryExecutor::setExternalTransaction(Transaction* /*transaction*/)
+{
 }
 
 DBResult MultipleQueryExecutor::executeQuery(AbstractDbConnection* const connection)

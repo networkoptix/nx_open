@@ -16,7 +16,7 @@ public:
     QnArchiveSyncPlayWrapper(QObject *parent = NULL);
     virtual ~QnArchiveSyncPlayWrapper();
     void addArchiveReader(QnAbstractArchiveStreamReader* reader, QnlTimeSource* cam);
-    
+
     void removeArchiveReader(QnAbstractArchiveStreamReader* reader);
 
     virtual qint64 getCurrentTime() const;
@@ -44,9 +44,6 @@ public:
     virtual bool isEnabled() const;
     virtual qreal getSpeed() const;
 
-    //virtual bool setMotionRegion(const QRegion& region);
-    //virtual bool setSendMotion(bool value);
-    //
     bool isBuffering() const;
 
     virtual void onBufferingFinished(QnlTimeSource* source) override;

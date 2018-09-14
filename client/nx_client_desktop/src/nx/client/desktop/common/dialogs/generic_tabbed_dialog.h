@@ -6,15 +6,11 @@
 
 class QTabWidget;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
- *  Generic class to create multi-paged dialogs.
- *  Each page of the dialog must have its own unique key (enum is recommended). All pages work is done
- *  through these keys.
- *
+ *  Generic class to create multi-paged dialogs. Each page of the dialog must have its own unique
+ *  key (enum is recommended). Page changes interface is implemented through these keys.
  */
 class GenericTabbedDialog: public QnButtonBoxDialog
 {
@@ -22,67 +18,67 @@ class GenericTabbedDialog: public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    explicit GenericTabbedDialog(QWidget *parent = nullptr, Qt::WindowFlags windowFlags = 0);
+    explicit GenericTabbedDialog(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
+
+    static constexpr int kInvalidPage = -1;
 
     /**
-     * @brief currentPage                       Get key of the current page.
+     * Get key of the current page.
      */
     int currentPage() const;
 
     /**
-     * @brief setCurrentPage                    Select current page by key.
-     * \param adjust                            If set to true, nearest available page will be
-     *                                          selected if target page is disabled or hidden.
+     * Select current page by key.
      */
-    void setCurrentPage(int page, bool adjust = false);
+    void setCurrentPage(int key);
 
 protected:
-    struct Page {
-        int key;
-        QString title;
-        bool visible;
-        bool enabled;
-        QWidget* widget;
-
-        Page(): key(-1), visible(true), enabled(true), widget(nullptr) {}
-        bool isValid() const { return visible && enabled; }
-    };
-
     /**
-     * @brief addPage                           Add page, associated with the given key and the following title.
+     * Add page, associated with the given key and the following title. Pages are displayed in the
+     * order of adding.
      */
-    void addPage(int key, QWidget *page, const QString& title);
+    void addPage(int key, QWidget* widget, const QString& title);
 
     /**
-    * @brief isPageVisible                      Check if page is visible by its key.
+    * Check if page is visible by its key.
     */
     bool isPageVisible(int key) const;
 
     /**
-    * @brief setPageVisible                    Show or hide the page by its key.
+    * Show or hide the page by its key.
     */
     void setPageVisible(int key, bool visible);
 
     /**
-     * @brief setPageEnabled                    Enable or disable the page by its key.
+     * Enable or disable the page by its key.
      */
     void setPageEnabled(int key, bool enabled);
 
     virtual void initializeButtonBox() override;
 
-    QList<Page> allPages() const;
-
-protected:
     void setTabWidget(QTabWidget* tabWidget);
 
 private:
+    struct Page
+    {
+        int key = kInvalidPage;
+        QString title;
+        bool visible = true;
+        bool enabled = true;
+        QWidget* widget = nullptr;
+
+        bool isValid() const { return visible && enabled; }
+    };
+    using Pages = QList<Page>;
+
     void initializeTabWidget();
+
+    Pages::iterator findPage(int key);
+    Pages::const_iterator findPage(int key) const;
 
 private:
     QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

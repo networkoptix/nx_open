@@ -1,5 +1,7 @@
 #include "common.h"
 
+#include <QtCore/QRegExp>
+
 #include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha,
@@ -10,50 +12,77 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace hanwha {
 
-QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEventName) const
+namespace {
+
+bool doesMatch(const QString& realEventName, const QString& internalEventName)
 {
-    QnUuid result = m_idByInternalName.value(internalEventName);
+    const auto realEventNameString = realEventName.trimmed();
+    const auto internalEventNameString = internalEventName.trimmed();
+
+    const auto possibleInternalNames = internalEventNameString.split(
+        L',',
+        QString::SplitBehavior::SkipEmptyParts);
+
+    for (const auto& name: possibleInternalNames)
+    {
+        if (realEventNameString.contains(name))
+            return true;
+    }
+
+    const QRegExp pattern(
+        internalEventName,
+        Qt::CaseSensitivity::CaseInsensitive,
+        QRegExp::PatternSyntax::Wildcard);
+
+    if (!pattern.isValid())
+        return false;
+
+    return pattern.exactMatch(realEventName);
+}
+
+} // namespace
+
+QString Hanwha::DriverManifest::eventTypeIdByName(const QString& eventName) const
+{
+    QString result = m_eventTypeIdByInternalName.value(eventName);
     if (!result.isNull())
         return result;
 
-    for (const auto& eventDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: outputEventTypes)
     {
-        const auto& possibleInternalNames = eventDescriptor.internalName.split(L',');
-        for (const auto& name: possibleInternalNames)
+        if (doesMatch(eventName, eventTypeDescriptor.internalName))
         {
-            if (internalEventName.contains(name))
-            {
-                m_idByInternalName.insert(internalEventName, eventDescriptor.typeId);
-                return eventDescriptor.typeId;
-            }
+            m_eventTypeIdByInternalName.insert(eventName, eventTypeDescriptor.id);
+            return eventTypeDescriptor.id;
         }
     }
 
-    return QUuid();
+    return QString();
 }
 
-const Hanwha::EventDescriptor& Hanwha::DriverManifest::eventDescriptorById(const QnUuid& id) const
+const Hanwha::EventTypeDescriptor& Hanwha::DriverManifest::eventTypeDescriptorById(
+    const QString& id) const
 {
-    static const Hanwha::EventDescriptor defaultEventDescriptor{};
+    static const Hanwha::EventTypeDescriptor defaultEventTypeDescriptor{};
 
-    auto itr = m_recordById.find(id);
-    if (itr != m_recordById.end())
-        return itr.value();
-    for (const auto& eventDescriptor: outputEventTypes)
+    auto it = m_eventTypeDescriptorById.find(id);
+    if (it != m_eventTypeDescriptorById.end())
+        return it.value();
+    for (const auto& eventTypeDescriptor: outputEventTypes)
     {
-        if (eventDescriptor.typeId == id)
+        if (eventTypeDescriptor.id == id)
         {
-            itr = m_recordById.insert(id, eventDescriptor);
-            return itr.value();
+            it = m_eventTypeDescriptorById.insert(id, eventTypeDescriptor);
+            return it.value();
         }
     }
 
-    return defaultEventDescriptor;
+    return defaultEventTypeDescriptor;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventDescriptor,
-    (json), EventDescriptor_Fields)
+    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventTypeDescriptor,
+    (json), EventTypeDescriptor_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha::DriverManifest,
     (json), DriverManifest_Fields)
 

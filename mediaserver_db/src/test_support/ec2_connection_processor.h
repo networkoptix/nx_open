@@ -13,7 +13,7 @@ class Ec2ConnectionProcessor:
 {
 public:
     Ec2ConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         nx::vms::auth::AbstractUserDataProvider* userDataProvider,
         nx::vms::auth::AbstractNonceProvider* nonceProvider,
         QnHttpConnectionListener* owner);

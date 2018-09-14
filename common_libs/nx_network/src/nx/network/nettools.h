@@ -5,6 +5,7 @@
 #include <QtNetwork/QNetworkAddressEntry>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/mac_address.h>
 
 namespace nx {
 namespace network {
@@ -51,12 +52,6 @@ inline uint qHash(const QnInterfaceAndAddr& iface, uint seed=0)
         + qHash(iface.netMask, seed^0x17a317a3);
 }
 
-NX_NETWORK_API QString MACToString(const unsigned char *mac);
-
-NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
-NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
-
-
 enum class InterfaceListPolicy
 {
     oneAddressPerInterface, //< Return interface and its first IP address.
@@ -102,8 +97,8 @@ void NX_NETWORK_API setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
 void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 
-QString NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
-QString NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
+utils::MacAddress NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
+utils::MacAddress NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
 
 //QHostAddress NX_NETWORK_API getGatewayOfIf(const QString& netIf);
 

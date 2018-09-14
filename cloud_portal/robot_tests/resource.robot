@@ -10,16 +10,38 @@ Resource          ${variables_file}
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
+${docker}    false
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
+    ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
+
+Regular Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    Open Browser    ${ENV}    ${BROWSER}
+#    Maximize Browser Window
+
+Docker Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
+    Sleep    20
+    Go to    ${url}
+
+Set Chrome Options
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
 
 Check Language
     Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
@@ -95,6 +117,7 @@ Get Email Link
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
@@ -115,18 +138,18 @@ Edit User Permissions In Systems
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
-    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
-    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
-    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label='${permissions}']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),"${EDIT USER BUTTON TEXT}")]/..
+    Wait Until Element Is Visible    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
+    Click Element    //form[@name='shareForm']//select[@ng-model='user.role']//option[@label="${permissions}"]
     Wait Until Element Is Visible    ${EDIT PERMISSIONS SAVE}
     Click Element    ${EDIT PERMISSIONS SAVE}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
 Check User Permissions
     [arguments]    ${user email}    ${permissions}
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
-    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span['${permissions}']
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
+    Element Should Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/span["${permissions}"]
 
 Remove User Permissions
     [arguments]    ${user email}
@@ -153,7 +176,6 @@ Check For Alert Dismissable
     Element Text Should Be    ${ALERT}    ${alert text}
     Click Element    ${ALERT CLOSE}
     Wait Until Page Does Not Contain Element    ${ALERT}
-
 
 Verify In System
     [arguments]    ${system name}

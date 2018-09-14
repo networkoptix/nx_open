@@ -155,14 +155,20 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
-        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
+    connect(ui->securitySettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->securitySettingsWidget,
+        &SecuritySettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning,
+        &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
 {
     ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
+    ui->securitySettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
     if(!qnGlobalSettings->isVideoTrafficEncriptionForced())
         ui->forceVideoEncryptionWarning->hide();
@@ -171,6 +177,7 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
+    ui->securitySettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
     ui->forceVideoEncryptionWarning->hide();
 
@@ -180,10 +187,9 @@ void QnGeneralSystemAdministrationWidget::applyChanges()
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const
 {
-    if (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
-        return true;
-
-    return ui->systemSettingsWidget->hasChanges();
+    return (ui->systemNameLabel->text().trimmed() != qnGlobalSettings->systemName())
+        || ui->systemSettingsWidget->hasChanges()
+        || ui->securitySettingsWidget->hasChanges();
 }
 
 void QnGeneralSystemAdministrationWidget::retranslateUi()

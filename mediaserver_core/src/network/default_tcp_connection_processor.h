@@ -1,14 +1,12 @@
-#ifndef __DEFAULT_TCP_CONNECTION_PROCESSOR
-#define __DEFAULT_TCP_CONNECTION_PROCESSOR
+#pragma once
 
 #include "network/tcp_connection_processor.h"
 
 class QnDefaultTcpConnectionProcessor: virtual public QnTCPConnectionProcessor
 {
 public:
-    QnDefaultTcpConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnDefaultTcpConnectionProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
 protected:
     virtual void run() override;
 };
-
-#endif

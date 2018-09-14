@@ -1,4 +1,4 @@
-.import Qt.labs.controls 1.0 as Controls
+.import QtQuick.Controls 2.4 as Controls
 
 function focusCurrentScreen()
 {

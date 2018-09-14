@@ -24,12 +24,12 @@
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
             <h1>U heeft zich geregistreerd voor %PRODUCT_NAME%</h1>
-            <p>We hebben u een e-mail met activatielink naar {{data.email}} gestuurd. <br>Activeer uw account via deze link.</p>
+            <p>We hebben u een Email met activatielink naar {{data.email}} gestuurd. <br>Activeer uw account via deze link.</p>
         </div>
         <h1 ng-if="!data.email">Activeer uw account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">E-mailadres</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -38,7 +38,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> E-mailadres is verplicht </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Vult u alstublieft een geldige e-mailadres in </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">E-mail is verplicht</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Geef een geldig e-mailadres op</span>
                 </div>
             </div>
             <div class="form-group">
@@ -61,7 +62,7 @@
         <h1>Reset wachtwoord</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">E-mailadres</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -70,8 +71,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mailadres is verplicht</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Vult u alstublieft een geldige e-mailadres in</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">E-mail is verplicht</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Geef een geldig e-mailadres op</span>
                 </div>
             </div>
             <div class="form-group">

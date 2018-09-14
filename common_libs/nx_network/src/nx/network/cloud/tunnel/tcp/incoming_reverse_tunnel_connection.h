@@ -4,6 +4,7 @@
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace network {
@@ -43,7 +44,7 @@ private:
 
     nx::network::http::AsyncClient::Timeouts m_httpTimeouts;
     size_t m_expectedPoolSize = 1;
-    boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    std::optional<KeepAliveOptions> m_keepAliveOptions;
 
     std::unique_ptr<RetryTimer> m_timer;
     std::list<std::unique_ptr<ReverseConnector>> m_connectors;

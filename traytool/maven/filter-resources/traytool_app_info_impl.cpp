@@ -5,7 +5,7 @@
 
 QString QnTraytoolAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${traytool.name}");
 }
 
 QString QnTraytoolAppInfo::clientName()

@@ -26,6 +26,8 @@
 #include <media_server/media_server_module.h>
 #include <core/dataprovider/data_provider_factory.h>
 
+class QnDataProviderFactory;
+
 using nx::api::ImageRequest;
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -49,7 +51,7 @@ public:
 
     virtual void beforeDisconnectFromResource();
 
-    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly);
+    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, bool iFramesOnly);
 
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data);
@@ -199,7 +201,7 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
     return true;
 }
 
-int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, bool iFramesOnly)
 {
     auto addData =
         [&](const QnConstAbstractDataPacketPtr& data)
@@ -210,7 +212,14 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
                 QnCompressedVideoData* newData = video->clone();
                 if (skipTime && video->timestamp <= skipTime)
                     newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
-                newData->opaque = cseq;
+                /**
+                 * data->opaque is used here to designate cseq (Command Sequence Number, see
+                 * QnDataConsumer::setWaitCSeq for details).
+                 * When playing live stream, several frames from the GopKeeper are pushed in the
+                 * stream  before real live frames are played. Since live frames always have
+                 * cseq == 0, we force GopKeeper frames to have the same cseq.
+                 */
+                newData->opaque = 0;
                 dstQueue.push(QnAbstractMediaDataPtr(newData));
             }
             else {
@@ -453,9 +462,11 @@ void QnVideoCameraGopKeeper::clearVideoData()
 
 QnVideoCamera::QnVideoCamera(
     const nx::mediaserver::Settings& settings,
+    QnDataProviderFactory* dataProviderFactory,
     const QnResourcePtr& resource)
     :
     m_settings(settings),
+    m_dataProviderFactory(dataProviderFactory),
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
@@ -551,7 +562,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         QnAbstractStreamDataProvider* dataProvider = NULL;
         if ( primaryLiveStream || (cameraResource && cameraResource->hasDualStreaming()) )
-            dataProvider = qnServerModule->dataProviderFactory()->createDataProvider(m_resource, role);
+            dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
 
         if ( dataProvider )
         {
@@ -640,13 +651,12 @@ int QnVideoCamera::copyLastGop(
     bool primaryLiveStream,
     qint64 skipTime,
     QnDataPacketQueue& dstQueue,
-    int cseq,
     bool iFramesOnly)
 {
     if (primaryLiveStream && m_primaryGopKeeper)
-        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
+        return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
     else if (m_secondaryGopKeeper)
-        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
+        return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, iFramesOnly);
     return 0;
 }
 

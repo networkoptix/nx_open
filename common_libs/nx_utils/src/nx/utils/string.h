@@ -99,20 +99,30 @@ NX_UTILS_API uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
 NX_UTILS_API uint64_t stringToBytes(const QString& str, uint64_t defaultValue);
 NX_UTILS_API uint64_t stringToBytesConst(const char* str);
 
+enum GroupToken
+{
+    doubleQuotes = 1,
+    squareBraces = 2,
+    roundBraces = 4,
+};
+
 NX_UTILS_API std::vector<QnByteArrayConstRef> splitQuotedString(
-    const QnByteArrayConstRef& src, char separator=',');
+    const QnByteArrayConstRef& src,
+    char separator=',',
+    int groupTokens = GroupToken::doubleQuotes);
 
 template<template<typename...> class Dictionary>
 void parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
     char separator,
-    Dictionary<QByteArray, QByteArray>* const params)
+    Dictionary<QByteArray, QByteArray>* const params,
+    int groupTokens = GroupToken::doubleQuotes)
 {
     const std::vector<QnByteArrayConstRef>& paramsList =
-        splitQuotedString(serializedData, separator);
+        splitQuotedString(serializedData, separator, groupTokens);
     for (const QnByteArrayConstRef& token: paramsList)
     {
-        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');
+        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=', groupTokens);
         if (nameAndValue.empty())
             continue;
         QnByteArrayConstRef value = nameAndValue.size() > 1 ? nameAndValue[1] : QnByteArrayConstRef();
@@ -126,13 +136,15 @@ void parseNameValuePairs(
 template<template<typename...> class Dictionary>
 Dictionary<QByteArray, QByteArray> parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
-    char separator = ',')
+    char separator = ',',
+    int groupTokens = GroupToken::doubleQuotes)
 {
     Dictionary<QByteArray, QByteArray> nameValueContainer;
     parseNameValuePairs<Dictionary>(
         serializedData,
         separator,
-        &nameValueContainer);
+        &nameValueContainer,
+        groupTokens);
     return nameValueContainer;
 }
 

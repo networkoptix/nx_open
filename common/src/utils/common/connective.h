@@ -13,8 +13,6 @@
 
 #include <nx/utils/unused.h>
 
-#include "forward.h"
-
 /* Properly defined NULL is required for this class to work, so we just redefine
  * it here. Defining it only in config.h doesn't work for some compilers. */
 #undef NULL
@@ -143,7 +141,7 @@ template<class Base, bool baseIsConnective = boost::is_base_of<ConnectiveBase, B
 class Connective: public Base, public ConnectiveBase
 {
 public:
-    QN_FORWARD_CONSTRUCTOR(Connective, Base, {})
+    using Base::Base;
 
     using ConnectiveBase::connect;
     using ConnectiveBase::disconnect;
@@ -159,5 +157,5 @@ template<class Base>
 class Connective<Base, true>: public Base
 {
 public:
-    QN_FORWARD_CONSTRUCTOR(Connective, Base, {})
+    using Base::Base;
 };

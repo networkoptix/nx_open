@@ -27,29 +27,31 @@
 
 namespace {
 
-nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePtr& camera,
-    const QnUuid& driverId, const QnUuid& eventTypeId)
+static nx::api::Analytics::EventType analyticsEventType(
+    const QnVirtualCameraResourcePtr& camera,
+    const QString& pluginId,
+    const QString& eventTypeId)
 {
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return {};
 
-    if (driverId.isNull())
+    if (pluginId.isNull())
         return {};
 
     auto server = camera->getParentServer();
-    NX_EXPECT(server);
+    NX_ASSERT(server);
     if (!server)
         return {};
 
     const auto drivers = server->analyticsDrivers();
     const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [driverId](const nx::api::AnalyticsDriverManifest& manifest)
+        [pluginId](const nx::api::AnalyticsDriverManifest& manifest)
         {
-            return manifest.driverId == driverId;
+            return manifest.pluginId == pluginId;
         });
 
-    NX_EXPECT(driver != drivers.cend());
+    NX_ASSERT(driver != drivers.cend());
     if (driver == drivers.cend())
         return {};
 
@@ -57,7 +59,7 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::api::Analytics::EventType eventType)
         {
-            return eventType.typeId == eventTypeId;
+            return eventType.id == eventTypeId;
         });
 
     return eventType == types.cend()
@@ -66,8 +68,6 @@ nx::api::Analytics::EventType analyticsEventType(const QnVirtualCameraResourcePt
 }
 
 } // namespace
-
-
 
 namespace nx {
 namespace vms {
@@ -247,9 +247,9 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
         case EventType::analyticsSdkEvent:
             if (!params.caption.isEmpty())
             {
-                return lit("%1 - %2")
-                    .arg(getAnalyticsSdkEventName(params))
-                    .arg(params.caption);
+                const auto eventName = getAnalyticsSdkEventName(params);
+                NX_ASSERT(!eventName.isEmpty());
+                return lit("%1 - %2").arg(eventName).arg(params.caption);
             }
 
             return tr("%1 at %2", "Analytics Event at some camera")
@@ -282,8 +282,8 @@ QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
 QString StringsHelper::getResoureIPFromParams(
     const EventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
-	return result.isNull() ? params.resourceName : result;
+    QString result = QnResourceDisplayInfo(eventSource(params)).host();
+    return result.isNull() ? params.resourceName : result;
 }
 
 QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
@@ -432,16 +432,16 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.date());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
-	quint64 ts = params.eventTimestampUsec;
-	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return datetime::toString(time.time());
+    quint64 ts = params.eventTimestampUsec;
+    QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
+    return datetime::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -709,7 +709,6 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-
 QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
     const auto triggerId = name.trimmed();
@@ -727,16 +726,16 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
-    QnUuid driverId = params.analyticsDriverId();
-    NX_EXPECT(!driverId.isNull());
+    const QString pluginId = params.getAnalyticsPluginId();
+    NX_ASSERT(!pluginId.isEmpty());
 
-    QnUuid eventTypeId = params.analyticsEventId();
-    NX_EXPECT(!eventTypeId.isNull());
+    const QString eventTypeId = params.getAnalyticsEventTypeId();
+    NX_ASSERT(!eventTypeId.isEmpty());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventType = analyticsEventType(camera, driverId, eventTypeId);
+    const auto eventType = analyticsEventType(camera, pluginId, eventTypeId);
     const auto text = eventType.name.text(locale);
 
     return !text.isEmpty()

@@ -9,6 +9,8 @@ namespace ptz {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OverridePart, (json), PtzOverridePart_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Override, (json), PtzOverride_Fields)
 
+const QString Override::kPtzOverrideKey = "ptzOverride";
+
 OverridePart Override::overrideByType(nx::core::ptz::Type ptzType) const
 {
     switch (ptzType)

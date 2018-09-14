@@ -10,6 +10,12 @@ namespace {
 
 using namespace nx::client::core;
 
+static const QSet<int> kSortingRoles = {
+    QnSystemsModel::SystemNameRoleId,
+    QnSystemsModel::SystemIdRoleId,
+    QnSystemsModel::LocalIdRoleId,
+    QnSystemsModel::IsFactorySystemRoleId};
+
 bool getWeightFromData(
     const QnWeightsDataHash& weights,
     const QModelIndex& modelIndex,
@@ -74,6 +80,7 @@ FilterModel::FilterModel(QObject* parent):
     m_systemsModel(new QnSystemsModel())
 {
     setSourceModel(m_systemsModel.data());
+    setTriggeringRoles(kSortingRoles);
 }
 
 QnSystemsModel* FilterModel::systemsModel()
@@ -147,6 +154,8 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
             this, &QnOrderedSystemsModel::forceUpdate);
     }
 
+    setTriggeringRoles(kSortingRoles);
+
     handleWeightsChanged();
 }
 
@@ -155,7 +164,7 @@ QString QnOrderedSystemsModel::minimalVersion() const
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         return model->systemsModel()->minimalVersion();
 
-    NX_EXPECT(false, "Wrong source model!");
+    NX_ASSERT(false, "Wrong source model!");
     return QString();
 }
 
@@ -164,7 +173,7 @@ void QnOrderedSystemsModel::setMinimalVersion(const QString& minimalVersion)
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         model->systemsModel()->setMinimalVersion(minimalVersion);
     else
-        NX_EXPECT(false, "Wrong source model!");
+        NX_ASSERT(false, "Wrong source model!");
 }
 
 void QnOrderedSystemsModel::forceUpdate()
@@ -173,7 +182,7 @@ void QnOrderedSystemsModel::forceUpdate()
     if (auto model = dynamic_cast<FilterModel*>(sourceModel()))
         model->forceUpdate();
     else
-        NX_EXPECT(false, "Wrong source model!");
+        NX_ASSERT(false, "Wrong source model!");
 }
 
 WeightData QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const

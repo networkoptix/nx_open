@@ -33,7 +33,7 @@ QnImageButtonWidget* newActionButton(
     action::IDType actionId,
     int helpTopicId)
 {
-    NX_EXPECT(context);
+    NX_ASSERT(context);
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);
@@ -55,7 +55,7 @@ T* newCustomShowHideButton(
     QnWorkbenchContext* context,
     action::IDType actionId)
 {
-    NX_EXPECT(context);
+    NX_ASSERT(context);
     const auto action = context->menu()->action(actionId);
 
     auto button = new T(parent);
@@ -98,7 +98,7 @@ QnImageButtonWidget* newPinButton(
     action::IDType actionId,
     bool smallIcon)
 {
-    NX_EXPECT(context);
+    NX_ASSERT(context);
     const auto action = context->menu()->action(actionId);
 
     QnImageButtonWidget* button = new QnImageButtonWidget(parent);

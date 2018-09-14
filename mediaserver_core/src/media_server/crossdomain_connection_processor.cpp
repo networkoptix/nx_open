@@ -25,13 +25,11 @@ class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorP
 };
 
 QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
     QnTCPConnectionProcessor(
-        new QnCrossdomainConnectionProcessorPrivate,
-        socket,
-        owner)
+        new QnCrossdomainConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 

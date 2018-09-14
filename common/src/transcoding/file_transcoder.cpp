@@ -18,12 +18,13 @@
 #include <utils/fs/file.h>
 #include <nx/utils/random.h>
 
-FileTranscoder::FileTranscoder()
-:
+FileTranscoder::FileTranscoder(nx::metrics::Storage* metrics):
+    m_transcoder(metrics),
     m_resultCode( 0 ),
     m_state( sInit ),
     m_transcodeDurationLimit( 0 ),
-    m_transcodedDataDuration( 0 )
+    m_transcodedDataDuration( 0 ),
+    m_metrics(metrics)
 {
 }
 
@@ -110,7 +111,7 @@ bool FileTranscoder::setTagValue(
             formatCtx->video_codec_id = formatCtx->streams[i]->codec->codec_id;
     }
 
-    std::unique_ptr<FileTranscoder> transcoder(new FileTranscoder());
+    auto transcoder = std::make_unique<FileTranscoder>();
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||

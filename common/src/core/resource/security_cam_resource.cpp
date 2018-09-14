@@ -6,11 +6,12 @@
 
 #include <nx/fusion/serialization/lexical.h>
 
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "user_resource.h"
-#include "common/common_module.h"
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -47,6 +48,11 @@ bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
 {
     return value == nx::core::resource::DeviceType::unknown;
 };
+
+QString boolToPropertyStr(bool value)
+{
+    return value ? lit("1") : lit("0");
+}
 
 } // namespace
 
@@ -126,6 +132,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     connect(this, &QnResource::resourceChanged, this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::licenseTypeChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::parentIdChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -255,10 +269,8 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         if (ok)
             return reservedSecondStreamFps;
 
-        NX_LOGX(
-            lm("Wrong reserved second stream fps value for camera %1")
-                .arg(getName()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Wrong reserved second stream fps value for camera %1")
+                .arg(getName()));
     }
 
     auto sharingMethod = streamFpsSharingMethod();
@@ -298,6 +310,20 @@ bool QnSecurityCamResource::isInputPortMonitored() const {
     return false;
 }
 
+bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+{
+    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return false;
+
+    if (!m_hasVideo)
+    {
+        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+    }
+    return *m_hasVideo;
+}
+
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
 {
     if (isIOModule())
@@ -324,7 +350,8 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    if (isEdge())
+    // Since 3.2 Edge license type is used by any ARM server.
+    if (QnMediaServerResource::isArmServer(getParentResource()))
         return Qn::LC_Edge;
 
     return Qn::LC_Professional;
@@ -466,6 +493,9 @@ bool QnSecurityCamResource::isAnalog() const
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
+    if (deviceType() == nx::core::resource::DeviceType::encoder)
+        return true;
+
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
@@ -488,11 +518,6 @@ bool QnSecurityCamResource::hasCombinedSensors() const
     return !combinedSensorsDescription().isEmpty();
 }
 
-bool QnSecurityCamResource::isEdge() const
-{
-    return QnMediaServerResource::isEdgeServer(getParentResource());
-}
-
 bool QnSecurityCamResource::isSharingLicenseInGroup() const
 {
     if (getGroupId().isEmpty())
@@ -501,13 +526,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
         return false; //< Don't allow sharing for encoders e.t.c
 
     const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(Qn::kCanShareLicenseGroup), false)
-        return true;
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
-    if (!resType)
-        return false;
-    return resType->hasParam(lit("canShareLicenseGroup"));
+    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -880,13 +899,24 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty( Qn::FIRMWARE_PARAM_NAME );
+    return getProperty(Qn::FIRMWARE_PARAM_NAME);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty( Qn::FIRMWARE_PARAM_NAME, firmware );
+    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
 }
+
+bool QnSecurityCamResource::trustCameraTime() const
+{
+    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
+}
+
+void QnSecurityCamResource::setTrustCameraTime(bool value)
+{
+    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
+}
+
 
 QString QnSecurityCamResource::getVendor() const
 {

@@ -34,7 +34,13 @@ TEST(HanwhaFirmware, comparsion)
     };
 
     for (const auto& entry: kEqualFirmwareOptions)
+    {
         ASSERT_EQ(HanwhaFirmware(entry.first), HanwhaFirmware(entry.second));
+        ASSERT_LE(HanwhaFirmware(entry.first), HanwhaFirmware(entry.second));
+        ASSERT_GE(HanwhaFirmware(entry.first), HanwhaFirmware(entry.second));
+        ASSERT_LE(HanwhaFirmware(entry.second), HanwhaFirmware(entry.first));
+        ASSERT_GE(HanwhaFirmware(entry.second), HanwhaFirmware(entry.first));
+    }
 
     static const std::map<QString, QString> kMoreThanFirmwareOptions = {
         {{"1.12"}, {"0.12_123456"}},
@@ -44,5 +50,8 @@ TEST(HanwhaFirmware, comparsion)
     };
 
     for (const auto& entry: kMoreThanFirmwareOptions)
+    {
         ASSERT_GT(HanwhaFirmware(entry.first), HanwhaFirmware(entry.second));
+        ASSERT_LT(HanwhaFirmware(entry.second), HanwhaFirmware(entry.first));
+    }
 }

@@ -57,7 +57,7 @@ bool ClientBindResponse::parseAttributes(const nx::network::stun::Message& messa
     }
     else
     {
-        tcpConnectionKeepAlive = boost::none;
+        tcpConnectionKeepAlive = std::nullopt;
     }
 
     return true;

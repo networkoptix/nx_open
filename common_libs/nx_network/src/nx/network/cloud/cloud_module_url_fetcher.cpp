@@ -1,5 +1,7 @@
 #include "cloud_module_url_fetcher.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -106,6 +108,9 @@ void CloudModuleUrlFetcher::ScopedOperation::get(
 CloudDbUrlFetcher::CloudDbUrlFetcher():
     CloudModuleUrlFetcher(kCloudDbModuleName)
 {
+    setModulesXmlUrl(
+        AppInfo::defaultCloudModulesXmlUrl(
+            nx::network::SocketGlobals::cloud().cloudHost()));
 }
 
 } // namespace cloud

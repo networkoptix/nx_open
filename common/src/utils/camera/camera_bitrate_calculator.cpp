@@ -108,8 +108,7 @@ float CameraBitrateCalculator::roundMbpsToKbps(float mbps, int decimals)
 float CameraBitrateCalculator::getBitrateForQualityMbps(
     const QnVirtualCameraResourcePtr& camera,
     Qn::StreamQuality quality,
-    int fps,
-    int decimals)
+    int fps)
 {
     const auto resolution = camera->streamInfo().getResolution();
     const auto bitrateKbps = camera->suggestBitrateForQualityKbps(
@@ -117,7 +116,8 @@ float CameraBitrateCalculator::getBitrateForQualityMbps(
         resolution,
         fps,
         Qn::CR_LiveVideo);
-    return roundKbpsToMbps(bitrateKbps, decimals);
+
+    return roundKbpsToMbps(bitrateKbps, kBitrateKbpsPrecisionDecimals);
 }
 
 } // namespace core

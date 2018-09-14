@@ -10,6 +10,10 @@ namespace
     const QString allowedParamChars = lit("^[a-zA-Z0-9_ =\\-\\+\\.]*$");
 }
 
+QnExecScript::QnExecScript(const QString& dataDirectory): m_dataDirectory(dataDirectory)
+{
+}
+
 int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     if (path.contains(lit("..")) || path.contains('\\')) {
@@ -18,7 +22,7 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
     }
 
     QString scriptName = QFileInfo(path).fileName();
-    QString fileName = getDataDirectory() + "/scripts/" + scriptName;
+    QString fileName = m_dataDirectory + "/scripts/" + scriptName;
     if (!QFile::exists(fileName)) {
         result.setError(QnRestResult::InvalidParameter, lit( "Script '%1' is missing at the server").arg(scriptName));
         return nx::network::http::StatusCode::ok;
@@ -48,7 +52,7 @@ void QnExecScript::afterExecute(const QString& path, const QnRequestParamList& p
         return;
 
     QString scriptName = QFileInfo(path).fileName();
-    QString fileName = getDataDirectory() + "/scripts/" + scriptName;
+    QString fileName = m_dataDirectory + "/scripts/" + scriptName;
 
     QStringList args;
     for (const auto& param: params)

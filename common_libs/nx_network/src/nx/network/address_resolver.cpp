@@ -65,7 +65,7 @@ void AddressResolver::resolveAsync(
         return handler(SystemError::noError, std::move(result));
     }
 
-    if (SocketGlobals::ini().isHostDisabled(hostName))
+    if (SocketGlobals::instance().isHostBlocked(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     std::deque<AddressEntry> resolvedAddresses;
@@ -316,8 +316,8 @@ bool AddressResolver::resolveNonBlocking(
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
-    NX_LOGX(lm("dnsResolve. %1. %2")
-        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("dnsResolve. %1. %2")
+        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()));
 
     switch (info->second.dnsState())
     {
@@ -330,7 +330,7 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
-    NX_LOGX(lm("dnsResolve async. %1").arg(std::get<1>(info->first)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("dnsResolve async. %1").arg(std::get<1>(info->first)));
 
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
@@ -339,9 +339,9 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
-            NX_LOGX(lm("dnsResolve async done. %1, %2").args(code, ips.size()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("dnsResolve async done. %1, %2").args(code, ips.size()));
 
-            std::vector<Guard> guards;
+            std::vector<nx::utils::Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
             std::vector<AddressEntry> entries;
@@ -356,7 +356,7 @@ void AddressResolver::dnsResolve(
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("dnsResolve async done. grabndlers.size() = %1").arg(guards.size()));
             if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
@@ -390,7 +390,7 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    const auto unlockedGuard = makeScopeGuard(
+    const auto unlockedGuard = nx::utils::makeScopeGuard(
         [lk, guards = grabHandlers(resolveResult, info)]() mutable
         {
             QnMutexUnlocker ulk(lk);
@@ -401,11 +401,11 @@ void AddressResolver::mediatorResolve(
         return dnsResolve(info, lk, false, ipVersion);
 }
 
-std::vector<Guard> AddressResolver::grabHandlers(
+std::vector<nx::utils::Guard> AddressResolver::grabHandlers(
     SystemError::ErrorCode lastErrorCode,
     HaInfoIterator info)
 {
-    std::vector<Guard> guards;
+    std::vector<nx::utils::Guard> guards;
 
     auto entries = info->second.getAll();
     for (auto req = info->second.pendingRequests.begin();
@@ -424,10 +424,10 @@ std::vector<Guard> AddressResolver::grabHandlers(
             }
 
             it->second.inProgress = true;
-            guards.push_back(Guard(
+            guards.push_back(nx::utils::Guard(
                 [this, it, entries, lastErrorCode, info]()
                 {
-                    Guard guard; //< Shall fire out of mutex scope
+                    nx::utils::Guard guard; //< Shall fire out of mutex scope
                     auto code = entries.empty() ? lastErrorCode : SystemError::noError;
                     it->second.handler(code, std::move(entries));
 

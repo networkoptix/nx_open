@@ -21,9 +21,7 @@ set(defaultWebPages "{\"Home Page\": \"http://www.senturiansolutions.com\"}")
 # Support section
 set(companyUrl "http://www.senturiansolutions.com")
 set(productUrl "http://www.senturiansolutions.com/matrix")
-set(supportUrl "")
 set(supportEmail "info@senturiansolutions.com")
-set(supportPhone "")
 set(licenseEmail "seantham@senturiansolutions.com")
 # end of Support section
 
@@ -47,15 +45,6 @@ set(customization.fullBundleUpgradeCode "{73346e2a-e08d-4ab0-85a4-3cd0807df39f}"
 
 set(deb.customization.company.name "senturian")
 
-#set(paxton.className "SentryMatrix")
-#set(paxton.classId "{4F49B7C4-3BB9-4C9A-B9B4-E0135DEEC3D6}")
-#set(paxton.interfaceId "{71C290F8-2147-4B68-B356-7905E75FA2F3}")
-#set(paxton.eventsId "{661140CE-4E59-409A-8608-3E655C72DED4}")
-#set(paxton.typeLibId "{CC66B6F9-7888-47C6-B54D-6F864E3DB192}")
-#set(paxton.appId "{1CCE1756-FAE7-4461-ACBD-25F330C33654}")
-#set(paxton.upgradeCode "{5BF7EE6E-93EA-4E3E-97CD-757AA5A14F7E}")
-#set(paxton.bundleUpgradeCode "{07BB33DD-91DD-4FC3-A931-1E0D970741C1}")
-
 set(ios.new_bundle_identifier "com.senturian.SentryMobile")
 set(ios.group_identifier "group.com.senturian.SentryMobile")
 set(ios.sign.identity "iPhone Distribution: Senturian Solutions Pte Ltd (2DME8ZLDN5)")
@@ -76,5 +65,5 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
+set(translations en_US zh_CN)
 set(defaultTranslation en_US)
-set(additionalTranslations zh_CN)

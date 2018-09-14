@@ -1,5 +1,4 @@
-#ifndef __VMAX480_TCP_SERVER_H__
-#define __VMAX480_TCP_SERVER_H__
+#pragma once
 
 #ifdef ENABLE_VMAX
 
@@ -14,10 +13,10 @@ class VMaxStreamFetcher;
 class QnVMax480ConnectionProcessor;
 class QnVMax480ConnectionProcessorPrivate;
 
-class QnVMax480Server: public QnTcpListener, public Singleton<QnVMax480Server>
+class QnVMax480Server: public QnTcpListener
 {
 public:
-    QnVMax480Server();
+    QnVMax480Server(QObject* parent = nullptr);
     virtual ~QnVMax480Server();
 
     bool waitForConnection(const QString& tcpID, int timeoutMs);
@@ -27,7 +26,7 @@ public:
 
     VMaxStreamFetcher* bindConnection(const QString& tcpID, QnVMax480ConnectionProcessor* connection);
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
 private:
     QMap<QString, VMaxStreamFetcher*> m_providers;
     QnMutex m_mutexProvider;
@@ -36,7 +35,7 @@ private:
 class QnVMax480ConnectionProcessor: virtual public QnTCPConnectionProcessor
 {
 public:
-    QnVMax480ConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnVMax480ConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnVMax480ConnectionProcessor();
 
     void vMaxConnect(const QString& url, int channel, const QAuthenticator& auth, bool isLive);
@@ -58,4 +57,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_VMAX
-#endif // __VMAX480_TCP_SERVER_H__

@@ -2,13 +2,12 @@ import logging
 import math
 import struct
 import time
-import urllib
-import urlparse
 from datetime import datetime, timedelta
 
 import cv2
 import requests
 from requests.auth import HTTPDigestAuth
+from six.moves.urllib.parse import urlencode, urlparse
 
 from .artifact import ArtifactType
 from .utils import datetime_utc_to_timestamp
@@ -22,19 +21,6 @@ AVI_ARTIFACT_TYPE = ArtifactType(name='video-avi', content_type='video/avi', ext
 WEBM_ARTIFACT_TYPE = ArtifactType(name='video-webm', content_type='video/webm', ext='.webm')
 MKV_ARTIFACT_TYPE = ArtifactType(name='video-mkv', content_type='video/x-matroska', ext='.mkv')
 MPEG_ARTIFCT_TYPE = ArtifactType(name='video-mpeg', content_type='video/mpeg', ext='.mpeg')
-
-
-def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
-    assert server_url.endswith('/'), repr(server_url)
-    if stream_type == 'webm':
-        return WebmMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'rtsp':
-        return RtspMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'hls':
-        return M3uHlsMediaStream(server_url, user, password, camera_mac_addr)
-    if stream_type == 'direct-hls':
-        return DirectHlsMediaStream(server_url, user, password, camera_mac_addr)
-    assert False, 'Unknown stream type: %r; known are: rtsp, webm, hls and direct-hls' % stream_type
 
 
 class Metadata(object):
@@ -52,11 +38,11 @@ class Metadata(object):
             cap.release()
 
     def __init__(self, cap):
-        self.frame_count = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
-        self.width = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-        self.height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-        self.fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
-        self.fourcc = int(cap.get(cv2.cv.CV_CAP_PROP_FOURCC))
+        self.frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.fps = cap.get(cv2.CAP_PROP_FPS)
+        self.fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
 
     def log_properties(self, name):
         _logger.info('media stream %r properties:', name)
@@ -67,16 +53,16 @@ class Metadata(object):
         _logger.info('\tfourcc: %r (%d) ', struct.pack('I', self.fourcc), self.fourcc)
 
 
-class RtspMediaStream(object):
+class Rtsp(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         params = dict(pos=0, speed=RTSP_SPEED)
-        self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
+        self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format(
             user=user,
             password=password,
-            netloc=urlparse.urlparse(server_url).netloc,
+            netloc=urlparse(server_url).netloc,
             camera_mac_addr=camera_mac_addr,
-            params=urllib.urlencode(params),
+            params=urlencode(params),
             )
         self.user = user
         self.password = password
@@ -121,7 +107,7 @@ class RtspMediaStream(object):
             frame_count += 1
             t = time.time()
             if t - log_time >= 5:  # log every 5 seconds
-                msec = from_cap.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
+                msec = from_cap.get(cv2.CAP_PROP_POS_MSEC)
                 _logger.debug(
                     'RTSP stream: loaded %d frames in %.2f seconds, current position: %.2f seconds',
                     frame_count, t - start_time, msec/1000.)
@@ -130,8 +116,9 @@ class RtspMediaStream(object):
 
 
 def load_stream_metadata_from_http(stream_type, url, user, password, params, temp_file_path):
-    _logger.info('%s request: %r, user=%r, password=%r, %s',
-             stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
+    _logger.info(
+        '%s request: %r, user=%r, password=%r, %s',
+        stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
     response = requests.get(url, auth=HTTPDigestAuth(user, password), params=params, stream=True)
     return load_stream_metadata_from_http_response(stream_type, response, temp_file_path)
 
@@ -153,12 +140,13 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
             if t - log_time >= 5:  # log every 5 seconds
                 _logger.debug('%s stream: loaded %d bytes in %d chunks', stream_type.upper(), size, chunk_count)
                 log_time = t
-    _logger.info('%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
-             stream_type.upper(), chunk_count, time.time() - start_time, size, size/1024., size/1024./1024)
+    _logger.info(
+        '%s stream: completed loading %d chunks in %.2f seconds, total size: %dB/%.2fKB/%.2fMB',
+        stream_type.upper(), chunk_count, time.time() - start_time, size, size / 1024., size / 1024. / 1024)
     return Metadata.from_file(temp_file_path)
 
 
-class WebmMediaStream(object):
+class Webm(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.url = '%smedia/%s.webm' % (server_url, camera_mac_addr)
@@ -173,7 +161,7 @@ class WebmMediaStream(object):
         return [metadata]
 
 
-class DirectHlsMediaStream(object):
+class DirectHls(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.url = '%shls/%s.mkv' % (server_url, camera_mac_addr)
@@ -192,7 +180,7 @@ class DirectHlsMediaStream(object):
         return [metadata]
 
 
-class M3uHlsMediaStream(object):
+class M3uHls(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.server_url = server_url
@@ -236,7 +224,7 @@ class M3uHlsMediaMetainfoLoader(object):
             self._process_media_response(response)
 
     def _process_url_response(self, response):
-        paths = [line for line in response.content.splitlines() if line and not line.startswith('#')]
+        paths = [line for line in response.content.decode('ascii').splitlines() if line and not line.startswith('#')]
         for path in paths:
             _logger.debug('HLS: received path %r' % path)
         for path in paths:

@@ -1,30 +1,27 @@
 #include "permissions_helper.h"
 
-#include <media_server/settings.h>
-
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
-//This file is really placed in appserver2/src. Hate this.
-#include <settings.h>
-
 #include <rest/server/fusion_rest_handler.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
+
 #include "core/resource_access/user_access_data.h"
+
+#include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
-bool QnPermissionsHelper::isSafeMode(const QnCommonModule* commonModule)
+bool QnPermissionsHelper::isSafeMode(const QnMediaServerModule* serverModule)
 {
-    return qnServerModule->settings().ecDbReadOnly() || commonModule->isReadOnly();
+    return serverModule->settings().ecDbReadOnly() || serverModule->commonModule()->isReadOnly();
 }
 
 int QnPermissionsHelper::safeModeError(QnRestResult &result)
 {
     auto errorMessage = lit("Can't process rest request because server is running in safe mode.");
-    NX_LOG(errorMessage, cl_logDEBUG1);
+    NX_DEBUG(typeid(QnPermissionsHelper), errorMessage);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
     return nx::network::http::StatusCode::forbidden;
 }
@@ -43,7 +40,7 @@ bool QnPermissionsHelper::hasOwnerPermissions(
 int QnPermissionsHelper::notOwnerError(QnRestResult &result)
 {
     auto errorMessage = lit("Can't process rest request because authenticated user is not a system owner.");
-    NX_LOG(errorMessage, cl_logDEBUG1);
+    NX_DEBUG(typeid(QnPermissionsHelper), errorMessage);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
     return nx::network::http::StatusCode::forbidden;
 }
@@ -59,7 +56,7 @@ int QnPermissionsHelper::safeModeError(QByteArray& result, QByteArray& contentTy
 int QnPermissionsHelper::permissionsError(QnRestResult& result)
 {
     auto errorMessage = lit("Can't process rest request because user has not enough access rights.");
-    NX_LOG(errorMessage, cl_logDEBUG1);
+    NX_DEBUG(typeid(QnPermissionsHelper), errorMessage);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
     return nx::network::http::StatusCode::forbidden;
 }

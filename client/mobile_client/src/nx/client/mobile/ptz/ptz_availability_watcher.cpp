@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <client_core/client_core_module.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/uuid.h>
 #include <nx/client/core/watchers/user_watcher.h>
 
@@ -68,7 +68,7 @@ void PtzAvailabilityWatcher::setResourceId(const QnUuid& uuid)
 
 void PtzAvailabilityWatcher::updateAvailability()
 {
-    const auto nonAvaialbleSetter = QnRaiiGuard::createDestructible(
+    auto nonAvailableSetter = nx::utils::makeScopeGuard(
         [this]() { setAvailable(false); });
 
     if (!m_camera)
@@ -88,7 +88,7 @@ void PtzAvailabilityWatcher::updateAvailability()
         return;
 
     const auto server = m_camera->getParentServer();
-    const bool wrongServerVersion = !server 
+    const bool wrongServerVersion = !server
         || server->getVersion() < nx::utils::SoftwareVersion(2, 6);
     if (wrongServerVersion)
         return;
@@ -96,7 +96,7 @@ void PtzAvailabilityWatcher::updateAvailability()
     if (m_camera->getDewarpingParams().enabled)
         return;
 
-    nonAvaialbleSetter->disableDestructionHandler();
+    nonAvailableSetter.disarm();
     setAvailable(true);
 }
 

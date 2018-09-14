@@ -48,7 +48,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(action(action::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            NX_EXPECT(context()->user());
+            NX_ASSERT(context()->user());
             if (!context()->user())
                 return;
 
@@ -120,7 +120,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         {
             const auto parameters = menu()->currentParameters(sender());
             auto id = parameters.argument<QnUuid>(Qn::UuidRole);
-            NX_EXPECT(!id.isNull());
+            NX_ASSERT(!id.isNull());
 
             const auto tour = layoutTourManager()->tour(id);
             if (!tour.name.isEmpty())
@@ -147,7 +147,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
             if (!toggled)
             {
-                NX_EXPECT(id.isNull());
+                NX_ASSERT(id.isNull());
                 m_tourExecutor->stopCurrentTour();
             }
 
@@ -168,7 +168,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             }
             else
             {
-                NX_EXPECT(toggled);
+                NX_ASSERT(toggled);
                 m_tourExecutor->startTour(layoutTourManager()->tour(id));
                 context()->instance<QnWorkbenchStateManager>()->saveState();
             }
@@ -207,7 +207,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 action(action::ToggleLayoutTourModeAction)->toggle();
 
             // Just for safety
-            NX_EXPECT(m_tourExecutor->runningTour().isNull());
+            NX_ASSERT(m_tourExecutor->runningTour().isNull());
             m_tourExecutor->stopCurrentTour();
         });
 }
@@ -243,7 +243,7 @@ void LayoutToursHandler::submitState(QnWorkbenchState* state)
 
 void LayoutToursHandler::saveTourToServer(const nx::vms::api::LayoutTourData& tour)
 {
-    NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
+    NX_ASSERT(layoutTourManager()->tour(tour.id).isValid());
     auto stateManager = qnClientCoreModule->layoutTourStateManager();
 
     if (const auto connection = commonModule()->ec2Connection())

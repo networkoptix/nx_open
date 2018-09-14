@@ -36,10 +36,10 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner, bool needAuth)
 :
-    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->listener = owner;
@@ -51,18 +51,18 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
     QnUniversalRequestProcessorPrivate* priv,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnUniversalTcpListener* owner,
     bool needAuth)
 :
-    QnTCPConnectionProcessor(priv, socket, owner)
+    QnTCPConnectionProcessor(priv, std::move(socket), owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
     d->needAuth = needAuth;
 }
 
-static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
+static QByteArray m_unauthorizedPageBody;
 static nx::network::http::AuthMethod::Values m_unauthorizedPageForMethods = nx::network::http::AuthMethod::NotDefined;
 
 void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value, nx::network::http::AuthMethod::Values methods)
@@ -96,36 +96,31 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         while ((result = d->listener->authenticator()->tryAllMethods(
             clientIp, d->request, &d->response, isProxy)).code != Qn::Auth_OK)
         {
+            const auto resultReason = toString(result.code).toUtf8();
             lastUnauthorizedData = authSession();
             nx::network::http::insertOrReplaceHeader(
-                &d->response.headers,
-                {Qn::AUTH_RESULT_HEADER_NAME, QnLexical::serialized(result.code).toUtf8()});
+                &d->response.headers, {Qn::AUTH_RESULT_HEADER_NAME, resultReason});
 
-            if( !d->socket->isConnected() )
-                break;   //connection has been closed
+            if (!d->socket->isConnected())
+                break;
 
             nx::network::http::StatusCode::Value httpResult;
             QByteArray msgBody;
             if (isProxy)
             {
-                msgBody = STATIC_PROXY_UNAUTHORIZED_HTML;
                 httpResult = nx::network::http::StatusCode::proxyAuthenticationRequired;
             }
             else if (result.code ==  Qn::Auth_Forbidden)
             {
-                msgBody = STATIC_FORBIDDEN_HTML;
                 httpResult = nx::network::http::StatusCode::forbidden;
             }
             else
             {
+                httpResult = nx::network::http::StatusCode::unauthorized;
                 if (result.usedMethods & m_unauthorizedPageForMethods)
                     msgBody = unauthorizedPageBody();
-                else
-                    msgBody = STATIC_UNAUTHORIZED_HTML;
-                httpResult = nx::network::http::StatusCode::unauthorized;
             }
-            sendUnauthorizedResponse(httpResult, msgBody);
-
+            sendUnauthorizedResponse(httpResult, msgBody, resultReason);
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT) {
                 break;
@@ -151,7 +146,8 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
             if (result.code != Qn::Auth_WrongInternalLogin)
             {
                 lastUnauthorizedData.id = QnUuid::createUuid();
-                qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(
+                auto auditManager = d->owner->commonModule()->auditManager();
+                auditManager->addAuditRecord(auditManager->prepareRecord(
                     lastUnauthorizedData, Qn::AR_UnauthorizedLogin));
             }
             return false;
@@ -237,9 +233,7 @@ void QnUniversalRequestProcessor::run()
 bool QnUniversalRequestProcessor::hasSecurityIssue()
 {
     Q_D(QnUniversalRequestProcessor);
-    const auto secureSocket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(
-        d->socket.data());
-    if (!secureSocket || !secureSocket->isEncryptionEnabled())
+    if (!isConnectionSecure())
     {
         const auto settings = commonModule()->globalSettings();
         const auto protocol = d->request.requestLine.version.protocol.toUpper();
@@ -257,8 +251,7 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
         else if (settings->isTrafficEncriptionForced())
         {
             NX_ASSERT(false, lm("Unable to redirect protocol to secure version: %1").arg(protocol));
-            d->response.messageBody = STATIC_FORBIDDEN_HTML;
-            sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+            sendErrorResponse(nx::network::http::StatusCode::forbidden);
             return true;
         }
     }
@@ -275,8 +268,7 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     if (listener && listener->isProxy(d->request))
     {
         NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
-        d->response.messageBody = STATIC_FORBIDDEN_HTML;
-        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
 
@@ -284,8 +276,7 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
     if (url.scheme() == schemeString)
     {
         NX_ASSERT(false, lm("Unable to insecure connection on sheme: %1").arg(schemeString));
-        d->response.messageBody = STATIC_BAD_REQUEST_HTML;
-        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
 
@@ -295,7 +286,8 @@ bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
         : nx::network::SocketAddress(host));
 
     url.setHost(endpoint.address.toString());
-    url.setPort(endpoint.port);
+    if (endpoint.port > 0)
+        url.setPort(endpoint.port);
     url.setScheme(scheme);
     NX_VERBOSE(this, lm("Redirecting '%1' from '%2' to '%3'").args(
         d->request.requestLine.url, d->socket->getLocalAddress(), url));
@@ -313,7 +305,7 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     QnMutexLocker lock( &d->mutex );
     auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
     if (auto handler = owner->findHandler(d->protocol, d->request))
-        d->processor = handler(d->socket, owner);
+        d->processor = handler(std::move(d->socket), owner);
     else
         return false;
 
@@ -323,13 +315,9 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
-        if (d->processor->isSocketTaken())
-            d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
-        d->processor->execute(d->mutex);
-        if (!d->processor->isSocketTaken())
-            d->processor->releaseSocket();
-        else
-            d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.
+        d->processor->execute(lock);
+        // Get socket back(if still exists) for the next request.
+        d->socket = d->processor->takeSocket();
     }
 
     delete d->processor;

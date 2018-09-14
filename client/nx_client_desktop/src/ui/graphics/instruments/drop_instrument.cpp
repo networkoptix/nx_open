@@ -22,7 +22,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
@@ -245,8 +245,8 @@ bool DropInstrument::delayedTriggerIfPossible(action::IDType id, const action::P
             if (!context)
                 return;
 
-            QnRaiiGuard cursorGuard(
-                []() { QApplication::setOverrideCursor(Qt::WaitCursor); },
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            auto cursorGuard = nx::utils::makeScopeGuard(
                 []() { QApplication::restoreOverrideCursor(); });
 
             context->menu()->triggerIfPossible(id, parameters);

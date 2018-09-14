@@ -15,20 +15,22 @@
 #include <rest/helpers/permissions_helper.h>
 
 QnDetachFromCloudRestHandler::QnDetachFromCloudRestHandler(
+    QnMediaServerModule* serverModule,
     nx::vms::cloud_integration::CloudManagerGroup* cloudManagerGroup)
     :
     QnJsonRestHandler(),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_cloudManagerGroup(cloudManagerGroup)
 {
 }
 
 int QnDetachFromCloudRestHandler::executeGet(
     const QString& /*path*/,
-    const QnRequestParams& params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor* owner)
+    const QnRequestParams& /*params*/,
+    QnJsonRestResult& /*result*/,
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    return execute(std::move(DetachFromCloudData(params)), owner, result);
+    return nx::network::http::StatusCode::forbidden;
 }
 
 int QnDetachFromCloudRestHandler::executePost(
@@ -49,19 +51,19 @@ int QnDetachFromCloudRestHandler::execute(
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    NX_LOGX(lm("Detaching system from cloud. cloudSystemId %1")
-        .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Detaching system from cloud. cloudSystemId %1")
+        .arg(owner->globalSettings()->cloudSystemId()));
 
-    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
     {
-        NX_LOGX(lm("Cannot detach from cloud while in safe mode. cloudSystemId %1")
-            .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Cannot detach from cloud while in safe mode. cloudSystemId %1")
+            .arg(owner->globalSettings()->cloudSystemId()));
         return QnPermissionsHelper::safeModeError(result);
     }
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
     {
-        NX_LOGX(lm("Cannot detach from cloud. Owner permissions are required. cloudSystemId %1")
-            .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Cannot detach from cloud. Owner permissions are required. cloudSystemId %1")
+            .arg(owner->globalSettings()->cloudSystemId()));
         return QnPermissionsHelper::notOwnerError(result);
     }
 

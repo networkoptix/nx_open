@@ -8,6 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "abstract_http_request_handler.h"
+#include "handler/http_server_handler_custom.h"
 #include "http_server_exact_path_matcher.h"
 #include "http_server_connection.h"
 
@@ -124,9 +125,23 @@ public:
             method);
     }
 
+    template<typename Func>
+    bool registerRequestProcessorFunc(
+        const nx::network::http::StringType& method,
+        const std::string& path,
+        Func func)
+    {
+        using Handler = server::handler::CustomRequestHandler<Func>;
+
+        return registerRequestProcessor<Handler>(
+            path.c_str(),
+            [func]() { return std::make_unique<Handler>(std::move(func)); },
+            method);
+    }
+
     void addModRewriteRule(QString oldPrefix, QString newPrefix)
     {
-        NX_LOGX(lm("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix), cl_logDEBUG1);
+        NX_DEBUG(this, lm("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix));
         m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
     }
 
@@ -147,7 +162,7 @@ private:
         if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path()))
         {
             const auto newPath = url->path().replace(it->first, it->second);
-            NX_LOGX(lm("Rewriting url '%1' to '%2'").args(url->path(), newPath), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Rewriting url '%1' to '%2'").args(url->path(), newPath));
             url->setPath(newPath);
         }
     }

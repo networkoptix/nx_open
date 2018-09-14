@@ -6,8 +6,9 @@ angular.module('cloudApp')
     function ($scope, $routeParams, $location, page, cloudApi, account) {
 
         $scope.downloads = Config.downloads;
-        account.requireLogin().then(function(){
 
+        $scope.requireLogin = !Config.publicDownloads;
+        function getDownloads(){
             cloudApi.getDownloads().then(function(data){
                 $scope.downloadsData = data.data;
 
@@ -76,6 +77,11 @@ angular.module('cloudApp')
 
                 $location.path('/download/' + addHash, false);
             };
+        }
 
-        });
+        if ($scope.requireLogin) {
+            account.requireLogin().then(getDownloads);
+        }else{
+            getDownloads();
+        }
     }]);

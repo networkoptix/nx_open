@@ -8,8 +8,10 @@
 
 #include "image_provider.h"
 
-
 namespace nx {
+
+namespace core { struct Watermark; }
+
 namespace client {
 namespace desktop {
 
@@ -34,6 +36,8 @@ public:
     virtual Qn::ThumbnailStatus status() const override;
 
     QnLayoutResourcePtr layout() const;
+
+    void setWatermark(const nx::core::Watermark& watermark);
 
     QColor itemBackgroundColor() const;
     void setItemBackgroundColor(const QColor& value);

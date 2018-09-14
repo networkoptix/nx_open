@@ -78,10 +78,10 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
 }
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_noAuth(false)
 {
 }
@@ -119,12 +119,12 @@ void QnRestConnectionProcessor::run()
             QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
                 return;
             }
             if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
                 return;
             }
         }
@@ -161,7 +161,8 @@ void QnRestConnectionProcessor::run()
     else
     {
         response.statusCode = (nx::network::http::StatusCode::Value)
-            redirectTo(QnTcpListener::defaultPage(), response.content.type);
+            notFound(response.content.type);
+        response.content.body = d->response.messageBody;
     }
 
     QByteArray contentEncoding;
@@ -185,7 +186,7 @@ void QnRestConnectionProcessor::run()
         /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
         response.isUndefinedContentLength);
 
-    if (handler)
+    if (handler && nx::network::http::StatusCode::isSuccessCode(response.statusCode))
         handler->afterExecute(request, response.content.body);
 }
 

@@ -34,7 +34,7 @@ public:
     }
 
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
         return nullptr;
     }
@@ -193,11 +193,9 @@ public:
         const ApiMockData& existingData,
         const ApiMockData& expectedData)
     {
-        NX_LOG(lit("[TEST] ====================================================================="),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
+        NX_INFO(this, lit("[TEST] ====================================================================="));
+        NX_INFO(this, lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
+        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         m_requestJson = requestJson;
         m_existingData = existingData;
@@ -235,11 +233,9 @@ public:
         const ApiMockDataJson& requestJson,
         const ApiMockData& existingData)
     {
-        NX_LOG(lit("[TEST] ====================================================================="),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
+        NX_INFO(this, lit("[TEST] ====================================================================="));
+        NX_INFO(this, lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
+        NX_DEBUG(this, lit("[TEST] JSON: %1").arg(requestJson.json.constData()));
 
         NX_CRITICAL(requestJson.isIncomplete, "[TEST]");
 
@@ -295,7 +291,7 @@ private:
         m_wasHandleUpdateCalled = true;
         NX_CRITICAL(command == kMockApiCommand, "[TEST]");
 
-        NX_LOG(lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()), cl_logINFO);
+        NX_INFO(this, lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()));
 
         if (m_expectedData != data)
         {
@@ -309,8 +305,6 @@ private:
     }
 
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket{new MockStreamSocket()};
-
     std::shared_ptr<MockConnection> m_connection{new MockConnection(
         [this](ApiCommand::Value command, QnUuid input, MockConnection::QueryHandler handler)
         {
@@ -325,7 +319,10 @@ private:
 
     QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
     MockQnHttpConnectionListener listener{&m_commonModule};
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
+    QnRestConnectionProcessor m_restConnectionProcessor
+        {
+            std::make_unique<MockStreamSocket>(), /*owner*/ &listener 
+        };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};

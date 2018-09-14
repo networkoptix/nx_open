@@ -86,6 +86,7 @@ private:
     FileMetadata fileMetadata(const QString& fileName) const;
     ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
+    void findDownloadsImpl(const QDir& dir);
 
     static ResultCode reserveSpace(const QString& fileName, const qint64 size);
     static QString metadataFileName(const QString& fileName);

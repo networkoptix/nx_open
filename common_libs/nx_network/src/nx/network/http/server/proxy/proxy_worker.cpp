@@ -3,6 +3,7 @@
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -16,12 +17,11 @@ std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
 ProxyWorker::ProxyWorker(
     const nx::String& targetHost,
+    const char* originalRequestScheme,
     nx::network::http::Request translatedRequest,
-    AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
     :
     m_targetHost(targetHost),
-    m_responseSender(responseSender),
     m_proxyingId(++m_proxyingIdSequence)
 {
     using namespace std::placeholders;
@@ -43,7 +43,9 @@ ProxyWorker::ProxyWorker(
     m_targetHostPipeline->setOnMessageEnd(
         std::bind(&ProxyWorker::onMessageEnd, this));
 
-    m_proxyHost = nx::network::http::getHeaderValue(translatedRequest.headers, "Host");
+    m_proxyHostUrl = url::Builder()
+        .setScheme(originalRequestScheme)
+        .setEndpoint(nx::network::http::getHeaderValue(translatedRequest.headers, "Host"));
 
     bindToAioThread(m_targetHostPipeline->getAioThread());
 
@@ -56,13 +58,16 @@ void ProxyWorker::setTargetHostConnectionInactivityTimeout(
     m_targetHostPipeline->setInactivityTimeout(timeout);
 }
 
-void ProxyWorker::start()
+void ProxyWorker::start(ProxyCompletionHander handler)
 {
     // Making sure sending & receiving is started atomically.
     post(
-        [this]()
+        [this, handler = std::move(handler)]() mutable
         {
-            nx::network::http::Message requestMsg(nx::network::http::MessageType::request);
+            m_completionHandler = std::move(handler);
+
+            nx::network::http::Message requestMsg(
+                nx::network::http::MessageType::request);
             *requestMsg.request = std::move(m_translatedRequest);
             m_targetHostPipeline->sendMessage(std::move(requestMsg),
                 [this](SystemError::ErrorCode resultCode)
@@ -93,7 +98,8 @@ void ProxyWorker::closeConnection(
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
 
-    m_responseSender->sendResponse(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         nx::network::http::StatusCode::serviceUnavailable,
         boost::none);
 }
@@ -126,7 +132,8 @@ void ProxyWorker::onMessageFromTargetHost(nx::network::http::Message message)
             .args(m_proxyingId, m_targetHost, m_targetHostPipeline->socket()->getForeignAddress()));
 
         // TODO: #ak Use better status code.
-        m_responseSender->sendResponse(
+        nx::utils::swapAndCall(
+            m_completionHandler,
             nx::network::http::StatusCode::serviceUnavailable,
             boost::none);
         return;
@@ -157,9 +164,11 @@ void ProxyWorker::onMessageFromTargetHost(nx::network::http::Message message)
 void ProxyWorker::startMessageBodyStreaming(nx::network::http::Message message)
 {
     auto msgBody = prepareStreamingMessageBody(message);
-    m_responseSender->sendResponse(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         nx::network::http::RequestResult(
-            static_cast<nx::network::http::StatusCode::Value>(message.response->statusLine.statusCode),
+            static_cast<nx::network::http::StatusCode::Value>(
+                message.response->statusLine.statusCode),
             std::move(msgBody)),
         std::move(*message.response));
 }
@@ -192,7 +201,7 @@ bool ProxyWorker::messageBodyNeedsConvertion(const nx::network::http::Response& 
         return false;
 
     m_messageBodyConverter = MessageBodyConverterFactory::instance().create(
-        m_proxyHost,
+        m_proxyHostUrl,
         m_targetHost,
         contentTypeIter->second);
     if (m_messageBodyConverter)
@@ -218,7 +227,8 @@ void ProxyWorker::onMessageEnd()
     }
 
     const auto statusCode = m_responseMessage.response->statusLine.statusCode;
-    m_responseSender->sendResponse(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         nx::network::http::RequestResult(
             static_cast<nx::network::http::StatusCode::Value>(statusCode),
             std::move(msgBody)),

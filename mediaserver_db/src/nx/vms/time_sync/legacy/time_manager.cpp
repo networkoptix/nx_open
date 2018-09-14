@@ -1,10 +1,6 @@
 #include "time_manager.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
-#include <zlib.h>
-#else
-#include <QtZlib/zlib.h>
-#endif
+#include <nx/utils/crc32.h>
 
 namespace nx {
 namespace time_sync {
@@ -19,8 +15,7 @@ void TimePriorityKey::fromUInt64(quint64 val)
 
 quint32 TimePriorityKey::seedFromId(const QnUuid& id)
 {
-    auto serverId = id.toByteArray();
-    return crc32(0, (const Bytef*)serverId.constData(), serverId.size());
+    return nx::utils::crc32(id.toByteArray());
 }
 
 } // namespace legacy

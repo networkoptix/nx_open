@@ -10,6 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/discovery/manager.h>
+#include <nx/client/core/settings/secure_settings.h>
 #include <network/system_helpers.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
@@ -100,7 +101,7 @@ void SessionsMigrationHelper::Private::at_moduleFound(
 
     const auto systemId = helpers::getLocalSystemId(moduleData);
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
-    auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
+    auto authenticationData = nx::client::core::secureSettings()->systemAuthenticationData();
     auto savedSessions = qnSettings->savedSessions();
     bool recentConnectionsChanged = false;
 

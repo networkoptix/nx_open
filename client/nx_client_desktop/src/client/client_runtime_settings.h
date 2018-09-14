@@ -29,13 +29,10 @@ public:
         VIDEO_WALL_WITH_TIMELINE,
 
         /** ActiveX library mode - client is embedded to another window. */
-        ACTIVE_X_MODE,
+        ACS_MODE,
 
         /** Always display full info on cameras. */
         SHOW_FULL_INFO,
-
-        /** Do not notify users if servers have different versions. */
-        IGNORE_VERSION_MISMATCH,
 
         /** Use OpenGL double buffering. */
         GL_DOUBLE_BUFFER,
@@ -72,10 +69,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isVideoWallMode, setVideoWallMode, VIDEO_WALL_MODE, false)
         QN_DECLARE_RW_PROPERTY(bool, videoWallWithTimeline, setVideoWallWithTimeLine,
             VIDEO_WALL_WITH_TIMELINE, true)
-        QN_DECLARE_RW_PROPERTY(bool, isActiveXMode, setActiveXMode, ACTIVE_X_MODE, false)
+        QN_DECLARE_RW_PROPERTY(bool, isAcsMode, setAcsMode, ACS_MODE, false)
         QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
-        QN_DECLARE_RW_PROPERTY(bool, ignoreVersionMismatch, setIgnoreVersionMismatch,
-            IGNORE_VERSION_MISMATCH, false)
         QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
         QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
         QN_DECLARE_RW_PROPERTY(bool, isProfilerMode, setProfilerMode, PROFILER_MODE, false)

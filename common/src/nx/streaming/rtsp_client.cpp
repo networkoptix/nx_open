@@ -24,6 +24,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/system_error.h>
@@ -32,7 +33,6 @@
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
 
-static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
@@ -40,10 +40,6 @@ static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
-static const double kMaxRtcpJitterSeconds = 0.15; //< 150 ms
-static const int TIME_RESYNC_THRESHOLD_S = 10;
-static const double IGNORE_CAMERA_TIME_THRESHOLD_S = 7.0;
-static const double LOCAL_TIME_RESYNC_THRESHOLD_MS = 500;
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
 
 QByteArray QnRtspClient::m_guid;
@@ -55,9 +51,17 @@ const quint8 FFMPEG_CODE = 102;
 QString FFMPEG_STR(lit("FFMPEG"));
 const quint8 METADATA_CODE = 126;
 const QString METADATA_STR(lit("ffmpeg-metadata"));
-const QString DEFAULT_REALM(lit("NetworkOptix"));
 
 } // namespace
+
+const QByteArray QnRtspClient::kPlayCommand("PLAY");
+const QByteArray QnRtspClient::kSetupCommand("SETUP");
+const QByteArray QnRtspClient::kOptionsCommand("OPTIONS");
+const QByteArray QnRtspClient::kDescribeCommand("DESCRIBE");
+const QByteArray QnRtspClient::kSetParameterCommand("SET_PARAMETER");
+const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
+const QByteArray QnRtspClient::kPauseCommand("PAUSE");
+const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
 
 //-------------------------------------------------------------------------------------------------
 // QnRtspIoDevice
@@ -156,7 +160,7 @@ void QnRtspIoDevice::processRtcpData()
             QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
             if (gotValue)
                 m_statistic = stats;
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
@@ -175,7 +179,7 @@ void QnRtspIoDevice::processRtcpData()
 
         if (m_reportTimer.elapsed() > 5000)
         {
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 auto remoteEndpoint = nx::network::SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
@@ -203,298 +207,6 @@ quint32 QnRtspClient::SDPTrackInfo::getSSRC() const
     return ioDevice->getSSRC();
 }
 
-//-------------------------------------------------------------------------------------------------
-// QnRtspTimeHelper
-
-QnMutex QnRtspTimeHelper::m_camClockMutex;
-
-/** map<resID, <CamSyncInfo, refcount>> */
-QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>>
-    QnRtspTimeHelper::m_camClock;
-
-QnRtspTimeHelper::QnRtspTimeHelper(const QString& resourceId):
-    m_localStartTime(0),
-    m_resourceId(resourceId)
-{
-    {
-        QnMutexLocker lock(&m_camClockMutex);
-
-        QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>& val = m_camClock[m_resourceId];
-        if (!val.first)
-            val.first = QSharedPointer<CamSyncInfo>(new CamSyncInfo());
-        m_cameraClockToLocalDiff = val.first;
-
-        // Need refcounter, since QSharedPointer does not provide access to its refcounter.
-        ++val.second;
-    }
-
-    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
-    m_timer.restart();
-    m_lastWarnTime = 0;
-}
-
-QnRtspTimeHelper::~QnRtspTimeHelper()
-{
-    QnMutexLocker lock(&m_camClockMutex);
-
-    QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>>::iterator it =
-        m_camClock.find(m_resourceId);
-    if (it != m_camClock.end())
-    {
-        if (--it.value().second == 0)
-            m_camClock.erase(it);
-    }
-}
-
-void QnRtspTimeHelper::setTimePolicy(TimePolicy policy)
-{
-    m_timePolicy = policy;
-}
-
-double QnRtspTimeHelper::cameraTimeToLocalTime(
-    double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch)
-{
-    QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
-    if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)
-        m_cameraClockToLocalDiff->timeDiff = currentSecondsSinceEpoch - cameraSecondsSinceEpoch;
-    return cameraSecondsSinceEpoch + m_cameraClockToLocalDiff->timeDiff;
-}
-
-void QnRtspTimeHelper::reset()
-{
-    QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
-    m_cameraClockToLocalDiff->timeDiff = INT_MAX;
-}
-
-bool QnRtspTimeHelper::isLocalTimeChanged()
-{
-    qint64 elapsed;
-    int tryCount = 0;
-    qint64 ct;
-    do
-    {
-        elapsed = m_timer.elapsed();
-        ct = qnSyncTime->currentMSecsSinceEpoch();
-    } while (m_timer.elapsed() != elapsed && ++tryCount < 3);
-
-    qint64 expectedLocalTime = elapsed + m_localStartTime;
-    bool timeChanged = qAbs(expectedLocalTime - ct) > LOCAL_TIME_RESYNC_THRESHOLD_MS;
-    if (timeChanged || elapsed > 3600)
-    {
-        m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
-        m_timer.restart();
-    }
-    return timeChanged;
-}
-
-bool QnRtspTimeHelper::isCameraTimeChanged(
-    const QnRtspStatistic& statistics, 
-    double* outCameraTimeDriftSeconds)
-{
-    if (statistics.isEmpty())
-        return false; //< No camera time provided yet.
-
-    double diff = statistics.localTime - statistics.ntpTime;
-    if (!m_rtcpReportTimeDiff.is_initialized())
-        m_rtcpReportTimeDiff = diff;
-    
-    *outCameraTimeDriftSeconds = qAbs(diff - *m_rtcpReportTimeDiff);
-    bool result = false;
-    if (*outCameraTimeDriftSeconds > TIME_RESYNC_THRESHOLD_S)
-    {
-        result = true; //< Quite big delta. Report time change immediately.
-    }
-    else if (*outCameraTimeDriftSeconds > kMaxRtcpJitterSeconds)
-    {
-        if (!m_rtcpJitterTimer.isValid())
-            m_rtcpJitterTimer.restart();  //< Low delta. Start monitoring for a camera time drift.
-        else if (m_rtcpJitterTimer.hasExpired(std::chrono::seconds(TIME_RESYNC_THRESHOLD_S)))
-            result = true;
-    }
-    else
-    {
-        m_rtcpJitterTimer.invalidate(); //< Jitter back to normal.
-    }
-
-    if (result)
-        m_rtcpReportTimeDiff.reset();
-    return result;
-}
-
-#if defined(DEBUG_TIMINGS)
-
-void QnRtspTimeHelper::printTime(double jitter)
-{
-    if (m_statsTimer.elapsed() < 1000)
-    {
-        m_minJitter = qMin(m_minJitter, jitter);
-        m_maxJitter = qMax(m_maxJitter, jitter);
-        m_jitterSum += jitter;
-        m_jitPackets++;
-    }
-    else
-    {
-        if (m_jitPackets > 0)
-        {
-            NX_LOG(lm("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms")
-                .arg(m_resourceId)
-                .arg((int) (/*rounding*/ 0.5 + m_minJitter * 1000))
-                .arg((int) (/*rounding*/ 0.5 + m_maxJitter * 1000))
-                .arg((int) (/*rounding*/ 0.5 + m_jitterSum * 1000 / m_jitPackets)),
-                cl_logINFO);
-        }
-        m_statsTimer.restart();
-        m_minJitter = INT_MAX;
-        m_maxJitter = 0;
-        m_jitterSum = 0;
-        m_jitPackets = 0;
-    }
-}
-
-#endif // defined(DEBUG_TIMINGS)
-
-/** Intended for logging. */
-static QString deltaMs(double scale, double base, double value)
-{
-    const int64_t d = (int64_t) (0.5 + scale * (value - base));
-    if (d >= 0)
-        return lit("+%1 ms").arg(d);
-    else
-        return lit("%1 ms").arg(d);
-}
-
-qint64 QnRtspTimeHelper::getUsecTime(
-    quint32 rtpTime, const QnRtspStatistic& statistics, int frequency, bool recursionAllowed)
-{
-    #define VERBOSE(S) NX_VERBOSE(this, lm("%1() %2").args(__func__, (S)))
-
-    const qint64 currentUs = qnSyncTime->currentUSecsSinceEpoch();
-    const qint64 currentMs = (/*rounding*/ 500 + currentUs) / 1000;
-    if (statistics.isEmpty() || m_timePolicy == TimePolicy::forceLocalTime)
-    {
-        VERBOSE(lm("-> %2 (%3), resourceId: %1")
-            .arg(m_resourceId)
-            .arg(currentUs)
-            .arg(m_timePolicy == TimePolicy::forceLocalTime
-                ? "ignoreCameraTime=true"
-                : "empty statistics"));
-        return currentUs;
-    }
-
-    if (m_timePolicy == TimePolicy::onvifExtension
-        && statistics.ntpOnvifExtensionTime.is_initialized())
-    {
-        VERBOSE(lm("-> %2 (%3), resourceId: %1")
-            .arg(m_resourceId)
-            .arg(currentUs)
-            .arg("got time from Onvif NTP extension"));
-
-        return statistics.ntpOnvifExtensionTime->count();
-    }
-
-    const double currentSeconds = currentMs / 1000.0;
-    const int rtpTimeDiff = rtpTime - statistics.timestamp;
-    const double cameraSeconds = statistics.ntpTime + rtpTimeDiff / (double) frequency;
-
-    const bool gotNewStatistics = !qFuzzyEquals(statistics.ntpTime, m_statistics.ntpTime)
-        || statistics.timestamp != m_statistics.timestamp
-        || m_statistics.isEmpty();
-
-    if (gotNewStatistics)
-    {
-        m_statistics = statistics;
-        QnMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
-        m_cameraClockToLocalDiff->timeDiff = currentSeconds - cameraSeconds;
-    }
-
-    if (m_timePolicy == TimePolicy::forceCameraTime)
-    {
-        VERBOSE(lm("-> %2 (%3), resourceId: %1")
-            .arg(m_resourceId)
-            .arg(currentUs)
-            .arg("ignoreLocalTime=true"));
-
-        return cameraSeconds * 1000000LL;
-    }
-
-    const double resultSeconds = cameraTimeToLocalTime(cameraSeconds, currentSeconds);
-    const double jitterSeconds = qAbs(resultSeconds - currentSeconds);
-    const bool gotInvalidTime = jitterSeconds > TIME_RESYNC_THRESHOLD_S;
-    double cameraTimeDriftSeconds = 0;
-    const bool cameraTimeChanged = isCameraTimeChanged(statistics, &cameraTimeDriftSeconds);
-    const bool localTimeChanged = isLocalTimeChanged();
-
-    VERBOSE(lm("BEGIN: "
-        "timestamp %1, rtpTime %2 (%3), nowMs %4, camera_from_nowMs %5, result_from_nowMs %6")
-        .args(
-            statistics.timestamp,
-            rtpTime,
-            deltaMs(1000 / (double) frequency, m_prevRtpTime, rtpTime),
-            deltaMs(1000, m_prevCurrentSeconds, currentSeconds),
-            deltaMs(1000, currentSeconds, cameraSeconds),
-            deltaMs(1000, currentSeconds, resultSeconds)));
-    m_prevRtpTime = rtpTime;
-    m_prevCurrentSeconds = currentSeconds;
-
-    #if defined(DEBUG_TIMINGS)
-        printTime(jitter);
-    #endif
-
-    if (jitterSeconds > IGNORE_CAMERA_TIME_THRESHOLD_S
-        && m_timePolicy == TimePolicy::ignoreCameraTimeIfBigJitter)
-    {
-        m_timePolicy = TimePolicy::forceLocalTime;
-        NX_DEBUG(this, lm("Jitter exceeds %1 s; camera time will be ignored")
-            .arg(IGNORE_CAMERA_TIME_THRESHOLD_S));
-        VERBOSE(lm("-> %1").arg(currentUs));
-        return currentUs;
-    }
-
-    if ((cameraTimeChanged || localTimeChanged || gotInvalidTime) && recursionAllowed)
-    {
-        const qint64 currentUsecTime = getUsecTimer();
-        if (currentUsecTime - m_lastWarnTime > 2000 * 1000LL)
-        {
-            if (cameraTimeChanged)
-            {
-                NX_DEBUG(this, lm(
-                    "Camera time has been changed or receiving latency %1 > %2 seconds. "
-                    "Resync time for camera %3")
-                    .args(cameraTimeDriftSeconds, kMaxRtcpJitterSeconds, m_resourceId));
-            }
-            else if (localTimeChanged)
-            {
-                NX_DEBUG(this, lm(
-                    "Local time has been changed. Resync time for camera %1")
-                    .arg(m_resourceId));
-            }
-            else
-            {
-                NX_DEBUG(this, lm(
-                    "RTSP time drift reached %1 seconds. Resync time for camera %2")
-                    .args(currentSeconds - resultSeconds, m_resourceId));
-            }
-            m_lastWarnTime = currentUsecTime;
-        }
-
-        reset();
-        VERBOSE("Reset, calling recursively");
-        const qint64 result =
-            getUsecTime(rtpTime, statistics, frequency, /*recursionAllowed*/ false); //< recursion
-        VERBOSE(lm("END -> %1 (after recursion)").arg(result));
-        return result;
-    }
-    else
-    {
-        const qint64 result = (gotInvalidTime ? currentSeconds : resultSeconds) * 1000000LL;
-        VERBOSE(lm("END -> %1 (gotInvalidTime: %2)")
-            .args(result, gotInvalidTime ? "true" : "false"));
-        return result;
-    }
-
-    #undef VERBOSE
-}
-
 static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
 static std::atomic<int> RTPSessionInstanceCounter(0);
@@ -515,7 +227,7 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(CODE_OK),
+    m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
@@ -713,7 +425,7 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
     }
 }
 
-CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTime)
+CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 startTime)
 {
 #ifdef _DUMP_STREAM
     const int fileIndex = ++RTPSessionInstanceCounter;
@@ -729,7 +441,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = CODE_OK;
+    m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
@@ -767,7 +479,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         targetAddress = nx::network::SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
 
     if (!m_tcpSock->connect(targetAddress, std::chrono::milliseconds(TCP_CONNECT_TIMEOUT_MS)))
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), targetAddress.port);
     previousSocketHolder.reset(); //< Reset old socket after taking new one to guarantee new TCP port.
 
     m_tcpSock->setNoDelay(true);
@@ -785,7 +497,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, targetAddress.port);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url.toString(), targetAddress.port);
     }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -809,32 +521,32 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         case CL_HTTP_AUTH_REQUIRED:
         case nx::network::http::StatusCode::proxyAuthenticationRequired:
             stop();
-            return CameraDiagnostics::NotAuthorisedResult( url );
+            return CameraDiagnostics::NotAuthorisedResult(url.toString());
         default:
             stop();
-            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
+            return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url.toString()), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
         stop();
-        return CameraDiagnostics::NoMediaTrackResult( url );
+        return CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     m_sdp = response.mid(sdp_index+4);
     parseSDP();
 
-    if (m_sdpTracks.size()<=0) {
+    if (m_sdpTracks.size() <= 0)
+    {
         stop();
-        result = CameraDiagnostics::NoMediaTrackResult( url );
+        result = CameraDiagnostics::NoMediaTrackResult(url.toString());
     }
 
     if( result )
     {
-        NX_LOG(lit("Sucessfully opened RTSP stream %1")
-                .arg(m_url.toString(QUrl::RemovePassword)),
-            cl_logALWAYS);
+        NX_ALWAYS(this, lit("Sucessfully opened RTSP stream %1")
+                .arg(m_url.toString(QUrl::RemovePassword)));
     }
 
     return result;
@@ -926,11 +638,15 @@ void QnRtspClient::addAuth(QByteArray& request)
 
 void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 {
-
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
+        &headers, nx::network::http::HttpHeader("CSeq", QByteArray::number(m_csec++)));
     nx::network::http::insertOrReplaceHeader(
-        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent ));
+        &headers, nx::network::http::HttpHeader("User-Agent", m_userAgent));
+    nx::network::http::insertOrReplaceHeader(
+        &headers,
+        nx::network::http::HttpHeader(
+            "Host",
+            nx::network::url::getEndpoint(m_url).toString().toUtf8()));
 }
 
 void QnRtspClient::addAdditionalHeaders(
@@ -946,7 +662,7 @@ nx::network::http::Request QnRtspClient::createDescribeRequest()
     m_sdpTracks.clear();
 
     nx::network::http::Request request;
-    request.requestLine.method = "DESCRIBE";
+    request.requestLine.method = kDescribeCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -977,7 +693,7 @@ bool QnRtspClient::sendDescribe()
 bool QnRtspClient::sendOptions()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "OPTIONS";
+    request.requestLine.method = kOptionsCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1140,7 +856,7 @@ bool QnRtspClient::sendSetup()
                 ? nx::utils::Url()
                 : nx::utils::Url(QString::fromLatin1(trackInfo->setupURL));
 
-        request.requestLine.method = "SETUP";
+        request.requestLine.method = kSetupCommand;
         if( setupUrl.isRelative() )
         {
             // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
@@ -1282,7 +998,7 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
     request.messageBody.append(paramValue);
     request.messageBody.append("\r\n");
 
-    request.requestLine.method = "SET_PARAMETER";
+    request.requestLine.method = kSetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1342,13 +1058,13 @@ QByteArray QnRtspClient::getGuid()
 nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qint64 endPos )
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PLAY";
+    request.requestLine.method = kPlayCommand;
     request.requestLine.url = m_contentBase;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
-    addAdditionalHeaders(lit("PLAY"), &request.headers);
+    addAdditionalHeaders(kPlayCommand, &request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Scale", QByteArray::number(m_scale)) );
     if( m_numOfPredefinedChannels )
     {
@@ -1411,7 +1127,7 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
 bool QnRtspClient::sendPause()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "PAUSE";
+    request.requestLine.method = kPauseCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1422,7 +1138,7 @@ bool QnRtspClient::sendPause()
 bool QnRtspClient::sendTeardown()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "TEARDOWN";
+    request.requestLine.method = kTeardownCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1430,95 +1146,16 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-static const int RTCP_SENDER_REPORT = 200;
-static const int RTCP_RECEIVER_REPORT = 201;
-static const int RTCP_SOURCE_DESCRIPTION = 202;
-
 QnRtspStatistic QnRtspClient::parseServerRTCPReport(
     const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
-    static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
-        .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
-
     QnRtspStatistic stats;
     *gotStatistics = false;
-    try {
-        BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
-        reader.skipBits(8); // skip version
-
-        while (reader.getBitsLeft() > 0)
-        {
-            int messageCode = reader.getBits(8);
-            int messageLen = reader.getBits(16);
-            nx::utils::unused(messageLen);
-            if (messageCode == RTCP_SENDER_REPORT)
-            {
-                stats.ssrc = reader.getBits(32);
-                quint32 intTime = reader.getBits(32);
-                quint32 fracTime = reader.getBits(32);
-                stats.ntpTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
-                stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
-                stats.timestamp = reader.getBits(32);
-                stats.receivedPackets = reader.getBits(32);
-                stats.receivedOctets = reader.getBits(32);
-                *gotStatistics = true;
-                break;
-            }
-            else {
-                break;
-            }
-        }
-    } catch(...)
-    {
-
-    }
+    if (!stats.senderReport.read(srcBuffer, srcBufferSize))
+        return stats;
+    stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
+    *gotStatistics = true;
     return stats;
-}
-
-int QnRtspClient::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
-{
-    QByteArray esDescr("netoptix");
-
-    NX_ASSERT(bufferLen >= 20 + esDescr.size());
-
-    quint8* curBuffer = dstBuffer;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
-    *curBuffer++ = RTCP_RECEIVER_REPORT;  // packet type
-    curBuffer += 2; // skip len field;
-
-    quint32* curBuf32 = (quint32*) curBuffer;
-    *curBuf32++ = htonl(SSRC_CONST);
-    /*
-    *curBuf32++ = htonl((quint32) stats->nptTime);
-    quint32 fracTime = (quint32) ((stats->nptTime - (quint32) stats->nptTime) * UINT_MAX); // UINT32_MAX
-    *curBuf32++ = htonl(fracTime);
-    *curBuf32++ = htonl(stats->timestamp);
-    *curBuf32++ = htonl(stats->receivedPackets);
-    *curBuf32++ = htonl(stats->receivedOctets);
-    */
-
-    // correct len field (count of 32 bit words -1)
-    quint16 len = (quint16) (curBuf32 - (quint32*) dstBuffer);
-    * ((quint16*) (dstBuffer + 2)) = htons(len-1);
-
-    // build source description
-    curBuffer = (quint8*) curBuf32;
-    *curBuffer++ = (RtpHeader::RTP_VERSION << 6) + 1;  // source count = 1
-    *curBuffer++ = RTCP_SOURCE_DESCRIPTION;  // packet type
-    *curBuffer++ = 0; // len field = 6 (hi)
-    *curBuffer++ = 4; // len field = 6 (low), (4+1)*4=20 bytes
-    curBuf32 = (quint32*) curBuffer;
-    *curBuf32 = htonl(CSRC_CONST);
-    curBuffer+=4;
-    *curBuffer++ = 1; // ES_TYPE CNAME
-    *curBuffer++ = esDescr.size();
-    memcpy(curBuffer, esDescr.data(), esDescr.size());
-    curBuffer += esDescr.size();
-    while ((curBuffer - dstBuffer)%4 != 0)
-        *curBuffer++ = 0;
-    //return len * sizeof(quint32);
-
-    return curBuffer - dstBuffer;
 }
 
 bool QnRtspClient::sendKeepAliveIfNeeded()
@@ -1540,7 +1177,7 @@ bool QnRtspClient::sendKeepAliveIfNeeded()
 bool QnRtspClient::sendKeepAlive()
 {
     nx::network::http::Request request;
-    request.requestLine.method = "GET_PARAMETER";
+    request.requestLine.method = kGetParameterCommand;
     request.requestLine.url = m_url;
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
@@ -1702,7 +1339,7 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
     QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
     if (gotValue)
     {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.senderReport.ssrc)
             ioDevice->setStatistic(stats);
     }
     return true;
@@ -1721,13 +1358,13 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
             {
                 if( bytesRead == 0 )
                 {
-                    NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
-                        arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
+                    NX_INFO(this, lit("RTSP connection to %1 has been unexpectedly closed").
+                        arg(m_tcpSock->getForeignAddress().toString()));
                 }
                 else if (!m_tcpSock->isClosed())
                 {
-                    NX_LOG( lit("Error reading RTSP response from %1. %2").
-                        arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                    NX_WARNING(this, lit("Error reading RTSP response from %1. %2").
+                        arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()));
                 }
                 return false;	//error occured or connection closed
             }
@@ -1769,8 +1406,8 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
         }
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
-            NX_LOG( lit("RTSP response from %1 has exceeded max response size (%2)").
-                arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN), cl_logINFO );
+            NX_INFO(this, lit("RTSP response from %1 has exceeded max response size (%2)").
+                arg(m_tcpSock->getForeignAddress().toString()).arg(RTSP_BUFFER_LEN));
             return false;
         }
     }

@@ -204,6 +204,13 @@ private:
 class BitStreamWriter: public BitStream
 {
 public:
+    BitStreamWriter() = default;
+
+    BitStreamWriter(quint8* buffer, quint8* end)
+    {
+        setBuffer(buffer, end);
+    }
+
     inline void setBuffer(quint8* buffer, quint8* end)
     {
         BitStream::setBuffer(buffer, end);

@@ -135,7 +135,7 @@ private:
         m_mediaserverEmulator = std::make_unique<nx::network::http::TestHttpServer>();
         m_mediaserverEmulator->registerRequestProcessorFunc(
             "/gateway/{systemId}/api/mergeSystems",
-            std::bind(&VmsGateway::vmsApiRequestStub, this, _1, _2, _3, _4, _5));
+            std::bind(&VmsGateway::vmsApiRequestStub, this, _1, _2));
         ASSERT_TRUE(m_mediaserverEmulator->bindAndListen());
 
         std::string vmsUrl = lm("http://%1/gateway/{systemId}/")
@@ -149,13 +149,10 @@ private:
     }
 
     void vmsApiRequestStub(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_vmsApiRequests.push(std::move(request));
+        m_vmsApiRequests.push(std::move(requestContext.request));
 
         if (m_forcedHttpResponseStatus)
             return completionHandler(*m_forcedHttpResponseStatus);

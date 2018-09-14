@@ -8,7 +8,7 @@
 
 #include <nx/client/core/motion/motion_grid.h>
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <nx/client/desktop/common/utils/checkbox_utils.h>
+#include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/utils/disconnect_helper.h>
 
@@ -23,9 +23,9 @@ WearableCameraMotionWidget::WearableCameraMotionWidget(QWidget* parent):
 {
     ui->setupUi(this);
     m_aligner->addWidget(ui->sensitivityLabel);
-    CheckboxUtils::autoClearTristate(ui->motionDetectionCheckBox);
+    check_box_utils::autoClearTristate(ui->motionDetectionCheckBox);
 
-    ComboBoxUtils::insertMultipleValuesItem(ui->sensitivityComboBox);
+    combo_box_utils::insertMultipleValuesItem(ui->sensitivityComboBox);
 
     for (int i = 1; i < QnMotionRegion::kSensitivityLevelCount; i++)
         ui->sensitivityComboBox->addItem(QString::number(i));
@@ -60,7 +60,7 @@ void WearableCameraMotionWidget::loadState(const CameraSettingsDialogState& stat
     setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
     setReadOnly(ui->sensitivityComboBox, state.readOnly);
 
-    CheckboxUtils::setupTristateCheckbox(ui->motionDetectionCheckBox, state.wearableMotion.enabled);
+    check_box_utils::setupTristateCheckbox(ui->motionDetectionCheckBox, state.wearableMotion.enabled);
 
     ui->sensitivityWidget->setVisible(ui->motionDetectionCheckBox->checkState() == Qt::Checked);
     ui->sensitivityComboBox->setCurrentIndex(state.wearableMotion.sensitivity.valueOr(0));

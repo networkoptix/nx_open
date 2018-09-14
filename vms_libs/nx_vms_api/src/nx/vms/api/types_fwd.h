@@ -25,21 +25,19 @@ enum class UserRole;
 } // namespace vms
 } // namespace nx
 
-#define DECLARE_TYPE(type) \
+#define NX_VMS_API_DECLARE_TYPE(type) \
     QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::type, (metatype)(lexical)(debug), NX_VMS_API)
 
-DECLARE_TYPE(EventReason)
-DECLARE_TYPE(EventState)
-DECLARE_TYPE(ResourceStatus)
-DECLARE_TYPE(RecordingType)
-DECLARE_TYPE(StreamQuality)
-DECLARE_TYPE(FailoverPriority)
-DECLARE_TYPE(IoModuleVisualStyle)
-DECLARE_TYPE(ConnectionType)
-DECLARE_TYPE(RtpTransportType)
-DECLARE_TYPE(MotionStreamType)
-DECLARE_TYPE(PeerType)
-DECLARE_TYPE(BackupType)
-DECLARE_TYPE(UserRole)
-
-#undef DECLARE_TYPE
+NX_VMS_API_DECLARE_TYPE(EventReason)
+NX_VMS_API_DECLARE_TYPE(EventState)
+NX_VMS_API_DECLARE_TYPE(ResourceStatus)
+NX_VMS_API_DECLARE_TYPE(RecordingType)
+NX_VMS_API_DECLARE_TYPE(StreamQuality)
+NX_VMS_API_DECLARE_TYPE(FailoverPriority)
+NX_VMS_API_DECLARE_TYPE(IoModuleVisualStyle)
+NX_VMS_API_DECLARE_TYPE(ConnectionType)
+NX_VMS_API_DECLARE_TYPE(RtpTransportType)
+NX_VMS_API_DECLARE_TYPE(MotionStreamType)
+NX_VMS_API_DECLARE_TYPE(PeerType)
+NX_VMS_API_DECLARE_TYPE(BackupType)
+NX_VMS_API_DECLARE_TYPE(UserRole)

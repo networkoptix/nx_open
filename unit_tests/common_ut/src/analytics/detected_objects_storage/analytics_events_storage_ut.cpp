@@ -649,6 +649,9 @@ protected:
     {
         base_type::SetUp();
 
+        if (HasFatalFailure())
+            return;
+
         generateVariousEvents();
     }
 
@@ -696,7 +699,7 @@ protected:
 
     void addMaxObjectsLimitToFilter()
     {
-        m_filter.maxObjectsToSelect = filterObjects(
+        m_filter.maxObjectsToSelect = (int) filterObjects(
             toDetectedObjects(analyticsDataPackets()), m_filter).size() / 2;
     }
 
@@ -767,7 +770,7 @@ protected:
             for (auto& object: packet->objects)
             {
                 object.objectId = m_specificObjectId;
-                object.objectTypeId = m_specificObjectId;
+                object.objectTypeId = m_specificObjectId.toString();
             }
         }
 
@@ -1284,6 +1287,9 @@ private:
     void SetUp() override
     {
         base_type::SetUp();
+
+        if (HasFatalFailure())
+            return;
 
         m_deviceId = QnUuid::createUuid();
         setAllowedDeviceIds({{ m_deviceId }});

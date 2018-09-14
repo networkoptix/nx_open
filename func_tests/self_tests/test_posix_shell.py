@@ -5,9 +5,7 @@ from pathlib2 import PurePath
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.local_shell import local_shell
-from framework.os_access.ssh_path import make_ssh_path_cls
-
-pytest_plugins = ['fixtures.ad_hoc_ssh']
+from framework.os_access.posix_shell_path import PosixShellPath
 
 
 @pytest.fixture(params=['ssh', 'local'])
@@ -15,7 +13,7 @@ def posix_shell(request):
     if request.param == 'local':
         return local_shell
     if request.param == 'ssh':
-        return request.getfixturevalue('ad_hoc_ssh')
+        return request.getfixturevalue('ssh')
     assert False
 
 
@@ -44,7 +42,7 @@ def test_non_zero_exit_code(posix_shell):
 
 
 def test_create_path(posix_shell):
-    assert isinstance(make_ssh_path_cls(posix_shell)('/tmp'), PurePath)
+    assert isinstance(PosixShellPath.specific_cls(posix_shell)('/tmp'), PurePath)
 
 
 def test_timeout(posix_shell):
@@ -115,11 +113,13 @@ def test_receive_times_out(posix_shell):
     timeout_sec = 2
     command = posix_shell.command(['python', '-c', _wait_for_any_data_script], set_eux=False)
     with command.running() as run:
-        begin = timeit.default_timer()
-        output_line, stderr = run.receive(timeout_sec)
-        end = timeit.default_timer()
-        assert stderr == b''
-        assert output_line == b''
+        while True:
+            begin = timeit.default_timer()
+            output_line, stderr = run.receive(timeout_sec)
+            end = timeit.default_timer()
+            assert output_line == b''
+            if stderr == b'':
+                break
         assert timeout_sec < end - begin < timeout_sec + acceptable_error_sec
         _, _ = run.communicate(input=b' ', timeout_sec=acceptable_error_sec)
     assert run.outcome.is_success
@@ -147,6 +147,11 @@ def test_receive_with_delays(posix_shell):
     acceptable_error_sec = 0.1
     timeout_tolerance_sec = 0.2
     with posix_shell.command(['python', '-c', _delayed_cat, delay_sec], set_eux=False).running() as run:
+        while True:
+            stdout, stderr = run.receive(delay_sec + timeout_tolerance_sec)
+            assert not stdout
+            if not stderr:
+                break
         second_begin = timeit.default_timer()
         input_line = b'test line\n'
         run.send(input_line)

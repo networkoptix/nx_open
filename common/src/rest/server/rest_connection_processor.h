@@ -1,5 +1,4 @@
-#ifndef _REST_CONNECTION_PROCESSOR_H__
-#define _REST_CONNECTION_PROCESSOR_H__
+#pragma once
 
 #include <QtCore/QVariantList>
 
@@ -41,7 +40,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 
 public:
     QnRestConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
@@ -59,5 +58,3 @@ protected:
 private:
     bool m_noAuth;
 };
-
-#endif // _REST_CONNECTION_PROCESSOR_H__

@@ -1,10 +1,6 @@
 set(dmg_file_name ${client_distribution_name}.dmg)
 set(update_file_name ${client_update_distribution_name}.zip)
 
-set(libdir ${CMAKE_BINARY_DIR})
-set(build.configuration)
-set(ClientHelpSourceDir ${help_directory}/bin/help)
-
 set(configured_files_dir ${CMAKE_CURRENT_BINARY_DIR}/configured_files_dir)
 
 nx_configure_directory(
@@ -13,6 +9,12 @@ nx_configure_directory(
     @ONLY
     OUTPUT_FILES_VARIABLE configured_files
 )
+
+nx_configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.conf.in
+    ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
+    @ONLY)
+list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
 
 nx_configure_directory(
     ${CMAKE_CURRENT_SOURCE_DIR}/resources
@@ -31,6 +33,9 @@ nx_configure_directory(
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} "${releaseVersion.full}")
 nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file})
 
+nx_copy(${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 add_custom_target(distribution_dmg_client ALL
     DEPENDS desktop_client applauncher
         ${configured_files} ${copied_files} ${customization_files}
@@ -47,36 +52,36 @@ add_custom_target(distribution_dmg_client ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${configured_files_dir} ${CMAKE_CURRENT_BINARY_DIR}
 
     # Copying some files and directories for maven compatibility.
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/qml
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/imageformats
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/platforms
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/audio
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/mediaservice
+
+    # TODO: Eliminate this copying; adjust python script accordingly.
+
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/qml
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/imageformats
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/platforms
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/audio
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/mediaservice
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/qml ${libdir}/bin/qml
+        ${QT_DIR}/qml ${CMAKE_BINARY_DIR}/bin/qml
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/imageformats ${libdir}/bin/imageformats
+        ${QT_DIR}/plugins/imageformats ${CMAKE_BINARY_DIR}/bin/imageformats
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/platforms ${libdir}/bin/platforms
+        ${QT_DIR}/plugins/platforms ${CMAKE_BINARY_DIR}/bin/platforms
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/audio ${libdir}/bin/audio
+        ${QT_DIR}/plugins/audio ${CMAKE_BINARY_DIR}/bin/audio
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/mediaservice ${libdir}/bin/mediaservice
+        ${QT_DIR}/plugins/mediaservice ${CMAKE_BINARY_DIR}/bin/mediaservice
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/common/maven/bin-resources/resources/qt/etc/qt.conf ${libdir}/bin
-    COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${libdir}/bin
+        ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${CMAKE_BINARY_DIR}/bin
 
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/build_dmg.sh
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh
 
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/qml
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/imageformats
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/platforms
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/audio
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${libdir}/plugins/mediaservice
-    COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/bin/qt.conf
-    COMMAND ${CMAKE_COMMAND} -E remove ${libdir}/bin/${launcher.version.file}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/qml
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/imageformats
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/platforms
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/audio
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/mediaservice
+    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/bin/${launcher.version.file}
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${dmg_file_name} ${distribution_output_dir}

@@ -1,6 +1,3 @@
-set(product.title "${client.name}")
-set(product.display.title "${client.display.name}")
-
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
 else()
@@ -42,6 +39,8 @@ nx_add_target(nx_client_desktop LIBRARY
         Qt5::Core Qt5::Widgets Qt5::Network Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets Qt5::Xml Qt5::Multimedia Qt5::Concurrent
         nx_client_core nx_speech_synthesizer nx_audio vms_gateway_core
+	nx_vms_applauncher_api
+    MACOS_ARG_MAX_WORKAROUND
 )
 
 if(WINDOWS)

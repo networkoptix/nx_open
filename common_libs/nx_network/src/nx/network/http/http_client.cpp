@@ -229,6 +229,11 @@ void HttpClient::setMessageBodyReadTimeout(
     m_messageBodyReadTimeout = messageBodyReadTimeout;
 }
 
+void HttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_maxNumberOfRedirects = maxNumberOfRedirects;
+}
+
 void HttpClient::setUserAgent(const QString& userAgent)
 {
     m_userAgent = userAgent;
@@ -366,6 +371,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setResponseReadTimeout(*m_responseReadTimeout);
         if (m_messageBodyReadTimeout)
             m_asyncHttpClient->setMessageBodyReadTimeout(*m_messageBodyReadTimeout);
+        if (m_maxNumberOfRedirects)
+            m_asyncHttpClient->setMaxNumberOfRedirects(*m_maxNumberOfRedirects);
         if (m_userAgent)
             m_asyncHttpClient->setUserAgent(*m_userAgent);
         if (m_userName)

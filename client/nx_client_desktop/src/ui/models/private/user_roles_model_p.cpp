@@ -245,7 +245,7 @@ bool QnUserRolesModelPrivate::removeUserRole(const UserRoleData& userRole)
 
 RoleDescription QnUserRolesModelPrivate::roleByRow(int row) const
 {
-    NX_EXPECT(row >= 0 && row < count());
+    NX_ASSERT(row >= 0 && row < count());
     if (row < 0)
         return RoleDescription();
 

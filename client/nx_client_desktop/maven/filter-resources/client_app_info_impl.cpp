@@ -7,12 +7,12 @@
 
 QString QnClientAppInfo::applicationName()
 {
-    return QStringLiteral("${product.title}");
+    return QStringLiteral("${client.name}");
 }
 
 QString QnClientAppInfo::applicationDisplayName()
 {
-    return QStringLiteral("${product.display.title}");
+    return QStringLiteral("${client.display.name}");
 }
 
 QString QnClientAppInfo::minilauncherBinaryName()
@@ -71,3 +71,8 @@ int QnClientAppInfo::eulaVersion()
 {
     return ${eulaVersion};
 }
+QString QnClientAppInfo::metaVersion()
+{
+    return QStringLiteral("${metaVersion}");
+}
+

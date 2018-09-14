@@ -21,7 +21,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-using StatusCode = nx::api::Updates2StatusData::StatusCode;
+using StatusCode = nx::update::Status::Code;
 
 class ServerStatusItemDelegate::ServerStatusWidget: public QWidget
 {
@@ -81,6 +81,7 @@ public:
         {
             switch (data->state)
             {
+            /* This state is removed
             case StatusCode::checking:
                 m_left->setHidden(false);
                 m_left->setText(tr("Checking for updates..."));
@@ -88,13 +89,13 @@ public:
                 m_animated = true;
                 m_left->setIcon(m_owner->getCurrentAnimationFrame());
                 m_right->setHidden(true);
-                break;
+                break;*/
             case StatusCode::preparing:
                 m_left->setHidden(true);
                 progressHidden = false;
                 m_progress->setMinimum(0);
                 m_progress->setMaximum(0);
-                m_right->setText(lit(""));
+                m_right->setText("");
                 m_right->setIcon(qnSkin->icon("text_buttons/clear.png"));
                 m_right->setHidden(false);
                 break;
@@ -104,10 +105,11 @@ public:
                 m_progress->setMinimum(0);
                 m_progress->setMaximum(100);
                 m_progress->setValue(data->progress);
-                m_right->setText(lit(""));
+                m_right->setText("");
                 m_right->setIcon(qnSkin->icon("text_buttons/clear.png"));
                 m_right->setHidden(false);
                 break;
+            /* Is missing for some reason
             case StatusCode::installing:
                 m_left->setHidden(false);
                 m_left->setText(tr("Installing updates..."));
@@ -115,7 +117,7 @@ public:
                 m_animated = true;
                 m_left->setIcon(m_owner->getCurrentAnimationFrame());
                 m_right->setHidden(true);
-                break;
+                break;*/
             case StatusCode::readyToInstall:
                 // TODO: We should get proper server version here
                 m_left->setText(tr("Downloaded"));
@@ -135,11 +137,12 @@ public:
 
                 errorStyle = true;
                 break;
+            /* Is missing for some reason
             case StatusCode::notAvailable:
                 m_left->setHidden(false);
                 m_left->setText(tr("Update is not available"));
                 errorStyle = true;
-                break;
+                break;*/
             default:
                 // In fact we should not be here. All the states should be handled accordingly
                 m_left->setHidden(false);

@@ -4,6 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <nx/network/address_resolver.h>
+#include <nx/network/dns_resolver.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/stun/udp_server.h>
@@ -12,6 +15,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/sync_call.h>
@@ -32,12 +36,20 @@ public:
         m_totalMessagesReceived(0)
     {
         addServer();
+
+        m_client = std::make_unique<stun::UdpClient>();
     }
 
     ~UdpClient()
     {
+        if (m_client)
+            m_client->pleaseStopSync();
+
         for (const auto& serverCtx: m_udpServers)
             serverCtx->server->pleaseStopSync();
+
+        for (const auto& hostname: m_blockedHosts)
+            nx::network::SocketGlobals::instance().unblockHost(hostname);
     }
 
     /**
@@ -151,13 +163,60 @@ protected:
         ASSERT_TRUE(m_expectedTransactionIDs.empty());
     }
 
+    void setRequestHandler(std::function<void()> handler)
+    {
+        m_auxiliaryRequestHandler.swap(handler);
+    }
+
+    void whenSendRequestToUnknownHost()
+    {
+        const SocketAddress endpoint(
+            nx::utils::random::generateName(7).toStdString(),
+            12345);
+        nx::network::SocketGlobals::instance()
+            .blockHost(endpoint.address.toStdString());
+        m_blockedHosts.push_back(endpoint.address.toStdString());
+
+        whenSendRequestTo(endpoint);
+    }
+
+    void whenSendRequestTo(const SocketAddress& endpoint)
+    {
+        using namespace std::placeholders;
+
+        nx::network::stun::Message requestMessage(
+            stun::Header(
+                nx::network::stun::MessageClass::request,
+                nx::network::stun::bindingMethod));
+        m_client->sendRequestTo(
+            endpoint,
+            std::move(requestMessage),
+            std::bind(&UdpClient::saveRequestResult, this, _1, _2));
+    }
+    
+    void thenRequestFailed()
+    {
+        ASSERT_NE(SystemError::noError, std::get<0>(m_requestResults.pop()));
+    }
+
+    void deleteClient()
+    {
+        m_client.reset();
+    }
+
 private:
+    using RequestResult = std::tuple<SystemError::ErrorCode, Message>;
+
     std::vector<std::unique_ptr<ServerContext>> m_udpServers;
     size_t m_messagesToIgnore;
     size_t m_totalMessagesReceived;
     std::mutex m_mutex;
     nx::utils::promise<void> m_allResponsesHaveBeenReceived;
     std::set<nx::String> m_expectedTransactionIDs;
+    std::function<void()> m_auxiliaryRequestHandler;
+    std::unique_ptr<stun::UdpClient> m_client;
+    nx::utils::SyncQueue<RequestResult> m_requestResults;
+    std::vector<std::string> m_blockedHosts;
 
     void onMessage(
         std::shared_ptr< AbstractServerConnection > connection,
@@ -179,6 +238,17 @@ private:
                 message.header.transactionId));
         response.newAttribute<stun::attrs::Nonce>(kServerResponseNonce);
         connection->sendMessage(std::move(response), nullptr);
+    }
+
+    void saveRequestResult(
+        SystemError::ErrorCode errorCode,
+        Message response)
+    {
+        if (m_auxiliaryRequestHandler)
+            m_auxiliaryRequestHandler();
+
+        m_requestResults.push(
+            std::make_tuple(errorCode, std::move(response)));
     }
 };
 
@@ -203,7 +273,7 @@ TEST_F(UdpClient, client_test_sync)
         addServer();
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
     {
@@ -234,7 +304,7 @@ TEST_F(UdpClient, multiple_concurrent_async_requests)
     addAdditionalServers(kLocalServersCount-1);
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client](){ client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client](){ client.pleaseStopSync(); });
 
     issueMultipleRequestsToRandomServers(&client, kRequestToSendCount);
     assertAllResponsesHaveBeenReceived();
@@ -253,7 +323,7 @@ TEST_F(UdpClient, client_retransmits_general)
     ignoreNextMessage();
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     nx::network::stun::Message requestMessage(
         stun::Header(
@@ -288,7 +358,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
     ignoreNextMessage(MAX_RETRANSMISSIONS+1);
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
     client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
@@ -318,7 +388,7 @@ TEST_F(UdpClient, client_cancellation)
     const int REQUESTS_TO_SEND = 3;
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.setRetransmissionTimeOut(std::chrono::seconds(100));
     nx::network::stun::Message requestMessage(
@@ -371,7 +441,7 @@ TEST_F(UdpClient, client_response_injection)
     SystemError::ErrorCode responseErrorCode = SystemError::noError;
 
     stun::UdpClient client;
-    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = nx::utils::makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
     client.sendRequestTo(
@@ -433,6 +503,16 @@ TEST_F(UdpClient, client_response_injection)
     ASSERT_NE(nullptr, nonceAttr);
     ASSERT_EQ(kServerResponseNonce, nonceAttr->getString());
 }
+
+TEST_F(UdpClient, client_can_be_removed_within_handler_after_host_resolve_error)
+{
+    setRequestHandler([this]() { deleteClient(); });
+
+    whenSendRequestToUnknownHost();
+    thenRequestFailed();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class UdpClientRedirect:
     public UdpClient

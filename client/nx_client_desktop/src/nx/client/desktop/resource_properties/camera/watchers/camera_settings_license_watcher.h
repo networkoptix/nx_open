@@ -6,11 +6,9 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-class AbstractTextProvider;
+class LicenseUsageProvider;
 class CameraSettingsDialogStore;
 
 class CameraSettingsLicenseWatcher:
@@ -29,13 +27,11 @@ public:
     QnVirtualCameraResourceList cameras() const;
     void setCameras(const QnVirtualCameraResourceList& value);
 
-    AbstractTextProvider* licenseUsageTextProvider() const;
+    LicenseUsageProvider* licenseUsageProvider() const;
 
 private:
     class Private;
     const QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

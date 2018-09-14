@@ -81,9 +81,11 @@ const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
 
 void AsyncSqlQueryExecutor::executeUpdate(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    const std::string& queryAggregationKey)
 {
     scheduleQuery<detail::UpdateWithoutAnyDataExecutor>(
+        queryAggregationKey,
         std::move(dbUpdateFunc),
         std::move(completionHandler));
 }
@@ -93,6 +95,7 @@ void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
     nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
     scheduleQuery<detail::UpdateWithoutAnyDataExecutorNoTran>(
+        std::string(),
         std::move(dbUpdateFunc),
         std::move(completionHandler));
 }
@@ -102,6 +105,7 @@ void AsyncSqlQueryExecutor::executeSelect(
     nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
     scheduleQuery<detail::SelectExecutor>(
+        std::string(),
         std::move(dbSelectFunc),
         std::move(completionHandler));
 }

@@ -36,80 +36,85 @@
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
+#include "media_server_module.h"
 
 using namespace nx::plugins;
 
-QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* commonModule):
+QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModule* serverModule):
     QObject(),
-    QnCommonModuleAware(commonModule)
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
+    auto commonModule = serverModule->commonModule();
+
     //NOTE plugins have higher priority than built-in drivers
-    m_searchers << new ThirdPartyResourceSearcher(commonModule);
+    m_searchers << new ThirdPartyResourceSearcher(serverModule);
 
     m_searchers << new QnPlC2pCameraResourceSearcher(commonModule);
 
 #ifdef ENABLE_DESKTOP_CAMERA
-    m_searchers << new QnDesktopCameraResourceSearcher(commonModule);
+    m_searchers << new QnDesktopCameraResourceSearcher(serverModule);
 
     // TODO: #GDM it this the best place for this class instance? Why not place it directly to the searcher?
-    QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
+    QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(commonModule);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
 #ifdef ENABLE_WEARABLE
-    m_searchers << new QnWearableCameraResourceSearcher(commonModule);
+    m_searchers << new QnWearableCameraResourceSearcher(serverModule);
 #endif
 
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT
-        m_searchers << new QnPlArecontResourceSearcher(commonModule);
+        m_searchers << new QnPlArecontResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_DLINK
-        m_searchers << new QnPlDlinkResourceSearcher(commonModule);
+        m_searchers << new QnPlDlinkResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_TEST_CAMERA
-        m_searchers << new QnTestCameraResourceSearcher(commonModule);
+        m_searchers << new QnTestCameraResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_AXIS
-        m_searchers << new QnPlAxisResourceSearcher(commonModule);
+        m_searchers << new QnPlAxisResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_ACTI
-        m_searchers << new QnActiResourceSearcher(commonModule);
+        m_searchers << new QnActiResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_IQINVISION
-        m_searchers << new QnPlIqResourceSearcher(commonModule);
+        m_searchers << new QnPlIqResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_ISD
-        m_searchers << new QnPlISDResourceSearcher(commonModule);
+        m_searchers << new QnPlISDResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_HANWHA
-        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(commonModule);
+        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(serverModule);
     #endif
 
     #ifdef ENABLE_ADVANTECH
-        m_searchers << new QnAdamResourceSearcher(commonModule);
+        m_searchers << new QnAdamResourceSearcher(serverModule);
     #endif
     #ifdef ENABLE_FLIR
-        m_searchers << new flir::FcResourceSearcher(commonModule);
-        m_searchers << new QnFlirResourceSearcher(commonModule);
+        m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
+
+        m_searchers << new flir::FcResourceSearcher(serverModule);
+        m_searchers << new QnFlirResourceSearcher(serverModule);
         #ifdef ENABLE_ONVIF
-        bool enableSequentialFlirOnvifSearcher = QnCommonModuleAware::commonModule()
+        bool enableSequentialFlirOnvifSearcher = commonModule
             ->globalSettings()
             ->sequentialFlirOnvifSearcherEnabled();
 
         if (enableSequentialFlirOnvifSearcher)
-            m_searchers << new flir::OnvifResourceSearcher(commonModule);
+            m_searchers << new flir::OnvifResourceSearcher(serverModule);
         #endif
     #endif
     #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-        m_searchers << new QnPlVmax480ResourceSearcher(commonModule);
+        m_searchers << new QnPlVmax480ResourceSearcher(serverModule);
     #endif
 
-        m_searchers << new QnArchiveCamResourceSearcher(commonModule);
+        m_searchers << new QnArchiveCamResourceSearcher(serverModule);
 
         //Onvif searcher should be the last:
     #ifdef ENABLE_ONVIF
-        m_searchers << new QnFlexWatchResourceSearcher(commonModule);
-        m_searchers << new OnvifResourceSearcher(commonModule);
+        m_searchers << new QnFlexWatchResourceSearcher(serverModule);
+        m_searchers << new OnvifResourceSearcher(serverModule);
     #endif //ENABLE_ONVIF
 #endif
 

@@ -3,6 +3,7 @@
 #include <QtCore/QCryptographicHash>
 
 #include <nx/vms/api/data/resource_type_data.h>
+#include <nx/utils/literal.h>
 
 namespace ec2 {
 

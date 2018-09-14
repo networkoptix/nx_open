@@ -1,7 +1,7 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
-import Qt.labs.controls 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
@@ -138,10 +138,11 @@ Item
     {
         y: 56 / 2 - height / 2
         padding: 8
+        labelPadding: 0
         width: 56
         height: width
         color: ColorTheme.transparent(ColorTheme.base1, 0.2)
-        icon: lp("/images/previous.png")
+        icon.source: lp("/images/previous.png")
         radius: width / 2
         z: 1
         onClicked: videoNavigation.switchToPreviousCamera()
@@ -152,10 +153,11 @@ Item
         y: 56 / 2 - height / 2
         anchors.right: parent.right
         padding: 8
+        labelPadding: 0
         width: 56
         height: width
         color: ColorTheme.transparent(ColorTheme.base1, 0.2)
-        icon: lp("/images/next.png")
+        icon.source: lp("/images/next.png")
         radius: width / 2
         z: 1
         onClicked: videoNavigation.switchToNextCamera()
@@ -418,7 +420,7 @@ Item
 
                 visible: videoNavigation.canViewArchive
                 anchors.verticalCenter: parent.verticalCenter
-                icon: lp("/images/calendar.png")
+                icon.source: lp("/images/calendar.png")
                 enabled: d.hasArchive
                 onClicked:
                 {
@@ -440,7 +442,7 @@ Item
                 {
                     id: zoomOutButton
 
-                    icon: lp("/images/minus.png")
+                    icon.source: lp("/images/minus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomOut()
                 }
@@ -449,7 +451,7 @@ Item
                 {
                     id: zoomInButton
 
-                    icon: lp("/images/plus.png")
+                    icon.source: lp("/images/plus.png")
                     enabled: d.hasArchive
                     onClicked: timeline.zoomIn()
                 }

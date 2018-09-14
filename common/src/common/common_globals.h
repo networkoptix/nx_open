@@ -51,6 +51,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
         DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
         DualStreamingForLiveOnly            = 0x8000,
+        customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -61,9 +62,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
-
-        RelativeMovePtzCommand,
-        RelativeFocusPtzCommand,
 
         GetDevicePositionPtzCommand,
         GetLogicalPositionPtzCommand,
@@ -90,6 +88,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         RunAuxilaryCommandPtzCommand,
 
         GetDataPtzCommand,
+
+        RelativeMovePtzCommand,
+        RelativeFocusPtzCommand,
 
         InvalidPtzCommand = -1
     };
@@ -330,7 +331,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AR_UserRemove        = 0x10000,
         AR_BEventReset       = 0x20000,
         AR_DatabaseRestore   = 0x40000,
-        AR_CameraInsert      = 0x80000
+        AR_CameraInsert      = 0x80000,
+        AR_UpdateInstall     = 0x100000
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)

@@ -6,8 +6,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include "core/ptz/ptz_preset.h"
@@ -17,6 +15,8 @@
 #include "core/ptz/activity_ptz_controller.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
 #include "ui/workaround/widgets_signals_workaround.h"
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 
 using namespace nx;
 
@@ -43,7 +43,7 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::actionResources))
     {
@@ -69,7 +69,8 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
     fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
 
-    if (QnPtzControllerPtr serverController = qnPtzPool->controller(camera))
+    auto ptzPool = qnClientCoreModule->ptzControllerPool();
+    if (QnPtzControllerPtr serverController = ptzPool->controller(camera))
     {
         serverController.reset(new QnActivityPtzController(commonModule(),
             QnActivityPtzController::Client, serverController));

@@ -19,7 +19,7 @@ class NX_NETWORK_API AvailableEndpointVerificator:
     using base_type = AbstractEndpointVerificator;
 
 public:
-    AvailableEndpointVerificator(const nx::String& connectSessionId);
+    AvailableEndpointVerificator(const std::string& connectSessionId);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -38,7 +38,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     boost::optional<std::chrono::milliseconds> m_timeout;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;

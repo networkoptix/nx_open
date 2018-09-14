@@ -1,12 +1,3 @@
-/**********************************************************
-* 13 feb 2015
-* akolesnikov@networkoptix.com
-***********************************************************/
-
-#ifndef USE_OWN_MUTEX
-#define USE_OWN_MUTEX
-#endif
-
 #include <gtest/gtest.h>
 
 #include <array>
@@ -14,7 +5,6 @@
 
 #include <nx/utils/math/digraph.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
-
 
 namespace
 {
@@ -26,6 +16,9 @@ namespace
         return l;
     }
 }
+
+namespace nx {
+namespace utils {
 
 TEST( Digraph, findAnyPath )
 {
@@ -272,3 +265,6 @@ TEST( Digraph, are_elements_same_in_sorted_ranges )
             r2.begin(), r2.end() ) );
     }
 }
+
+} // namespace utils
+} // namespace nx

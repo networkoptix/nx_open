@@ -69,9 +69,10 @@ def quazip_files_to(source_dir):
     yield os.path.join(source_dir, 'quazip.dll')
 
 
-def icu_files(qt_bin_dir):
-    for file in find_files_by_template(qt_bin_dir, 'icu*.dll'):
-        yield file
+def icu_files(icu_directory):
+    yield os.path.join(icu_directory, 'icudt60.dll')
+    yield os.path.join(icu_directory, 'icuin60.dll')
+    yield os.path.join(icu_directory, 'icuuc60.dll')
 
 
 def qt_files(qt_bin_dir, libs, extension='dll'):

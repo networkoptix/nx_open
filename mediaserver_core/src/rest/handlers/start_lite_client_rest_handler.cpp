@@ -14,19 +14,25 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
 static const char* const kScriptName = "start_lite_client";
 
-static QString scriptFileName()
-{
-    return getDataDirectory() + "/scripts/" + kScriptName;
-}
-
 } // namespace
 
-/*static*/ bool QnStartLiteClientRestHandler::isLiteClientPresent()
+QnStartLiteClientRestHandler::QnStartLiteClientRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
+QString QnStartLiteClientRestHandler::scriptFileName() const
+{ 
+    return serverModule()->settings().dataDir() + "/scripts/" + kScriptName;
+}
+
+bool QnStartLiteClientRestHandler::isLiteClientPresent() const
 {
     return QFile::exists(scriptFileName());
 }
@@ -93,7 +99,7 @@ int QnStartLiteClientRestHandler::executeGet(
     if (startCamerasMode)
         args.append(QStringList{"--auto-login", "enabled"});
 
-    NX_LOG(lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")));
 
     if (!QProcess::startDetached(fileName, args))
     {

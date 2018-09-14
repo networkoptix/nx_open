@@ -121,6 +121,7 @@ BinaryPredicate makePredByGetter(const GetterType &getter, bool isAscending)
 
 bool compareCameraThenStartTimeAsc(const QnCameraBookmark &first, const QnCameraBookmark &second)
 {
+    // Convert to toRfc4122 to make order the same as for the SQL database.
     if (first.cameraId != second.cameraId)
         return first.cameraId.toRfc4122() < second.cameraId.toRfc4122();
     return first.startTimeMs < second.startTimeMs;
@@ -128,6 +129,7 @@ bool compareCameraThenStartTimeAsc(const QnCameraBookmark &first, const QnCamera
 
 bool compareCameraThenStartTimeDesc(const QnCameraBookmark &first, const QnCameraBookmark &second)
 {
+    // Convert to toRfc4122 to make order the same as for the SQL database.
     if (first.cameraId != second.cameraId)
         return first.cameraId.toRfc4122() > second.cameraId.toRfc4122();
     return first.startTimeMs > second.startTimeMs;

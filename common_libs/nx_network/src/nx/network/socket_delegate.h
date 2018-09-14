@@ -297,12 +297,12 @@ public:
         return this->m_target->getConnectionStatistics(info);
     }
 
-    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
+    virtual bool setKeepAlive(std::optional< KeepAliveOptions > info) override
     {
         return this->m_target->setKeepAlive(info);
     }
 
-    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
+    virtual bool getKeepAlive(std::optional< KeepAliveOptions >* result) const override
     {
         return this->m_target->getKeepAlive(result);
     }

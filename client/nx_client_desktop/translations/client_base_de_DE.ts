@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Zellabstand...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation>Bildschirmeinstellungen...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>Layout auswählen...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Ausführbare %1 Mediendatei (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Quell-Kamera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation>Gerät auswählen...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation>Kamera auswählen...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>Layout auswählen...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation>%1 auf %2</translation>
     </message>
   </context>
   <context>
@@ -2230,42 +2279,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Keine Einstellung</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Sekundärer Stream</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O-Modul-ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Kamera-ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Audio-Stream</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Primärer Stream</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL ist nicht verfügbar. Öffnen Sie den Stream und versuchen Sie es erneut.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL ist nicht verfügbar. Öffnen Sie den Videostream und versuchen Sie es erneut.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O-Modul hat keinen Audiostream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Die Kamera hat keinen sekundären Stream</translation>
     </message>
   </context>
   <context>
@@ -3614,12 +3627,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Bild möglicherweise zu dunkel.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation>Ungültiges Eingabebild.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>Interner Fehler.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Verwenden Sie diese Einstellung, um Verzerrungen auszugleichen, wenn die Kamera nicht exakt vertikal oder horizontal montiert ist.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation>
+        <numerusform>Diese Kamera befindet sich derzeit nicht auf einem der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</numerusform>
+        <numerusform>Diese Kamera befindet sich derzeit nicht auf einem der ausgewählten Layouts. Die Aktion funktioniert, wenn die Kamera hinzugefügt wird, bevor die Aktion ausgelöst wird.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Wählen Sie genau eine Kamera</translation>
     </message>
   </context>
   <context>
@@ -3822,45 +3860,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Datei wählen...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Bilder %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Kein Bild</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Fehler beim Laden vom Bild</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Fehler beim Hochladen vom Bild</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Bild kann nicht gelesen werden</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Bild kann nicht geladen werden</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>Zellen</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Bild ist zu groß. Maximale Größe beträgt %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3945,21 +3944,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Auswahl importieren</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Zoom</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Rotation:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Fokus</translation>
     </message>
   </context>
   <context>
@@ -4871,6 +4855,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Passwörter festlegen</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -6831,17 +6822,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Ordner wählen...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Datei wählen...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -7887,6 +7867,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 deckt den Zeitraum ab, für den das Video hochgeladen wird.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation>Nicht genügend Speicherplatz auf dem Serverspeicher</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8137,6 +8121,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primärer Stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Sekundärer Stream</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation>Kein sekundärer Stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8284,6 +8283,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>Zellen</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Kein Bild</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Fehler beim Laden vom Bild</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Fehler beim Hochladen vom Bild</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Datei wählen...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Bilder %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Bild kann nicht gelesen werden</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Bild ist zu groß. Maximale Größe beträgt %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Bild kann nicht geladen werden</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>Zellen</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation>Benutzerdefinierte Nummer, die einem Layout zugeordnet werden kann, um eine schnelle Identifizierung und einen schnellen Zugriff zu ermöglichen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Allgemein</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation>Hintergrund</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8292,6 +8352,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>KEINE KAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Sekundärer Stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O-Modul-ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera-ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Audio-Stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primärer Stream</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL ist nicht verfügbar. Öffnen Sie den Stream und versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL ist nicht verfügbar. Öffnen Sie den Videostream und versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O-Modul hat keinen Audiostream</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Die Kamera hat keinen sekundären Stream</translation>
     </message>
   </context>
   <context>
@@ -8882,8 +8981,12 @@ to %1</source>
       <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Warnung! Diese Version dient nur zu Testzwecken! Bitte aktualisieren Sie auf die nächste verfügbare Patch- oder Release-Version, sobald diese verfügbar ist.</translation>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation>Warnung! Diese Buildversion dient nur zu Testzwecken!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation>Bitte aktualisieren Sie auf die nächste verfügbare Patch- oder Releaseversion, sobald diese verfügbar ist.</translation>
     </message>
   </context>
   <context>

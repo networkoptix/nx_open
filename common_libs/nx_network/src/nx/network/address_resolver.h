@@ -143,7 +143,7 @@ protected:
         bool inProgress;
         NatTraversalSupport natTraversalSupport;
         ResolveHandler handler;
-        Guard guard;
+        nx::utils::Guard guard;
 
         RequestInfo(
             HostAddress address,
@@ -163,7 +163,7 @@ protected:
     void mediatorResolve(
         HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
-    std::vector<Guard> grabHandlers(
+    std::vector<nx::utils::Guard> grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
 
 protected:

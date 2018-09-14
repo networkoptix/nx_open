@@ -33,14 +33,14 @@ public:
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kServerTunnelPath).toQString()),
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
-                _1, _2, _3, _4, _5),
+                _1, _2),
             nx::network::http::Method::get);
 
         httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kClientGetPostTunnelPath).toQString()),
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
-                _1, _2, _3, _4, _5),
+                _1, _2),
             nx::network::http::Method::get);
     }
 
@@ -55,17 +55,17 @@ private:
     }
 
     void openTunnelChannelDown(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
 
-        serializeToHeaders(&response->headers, beginListeningResponse());
+        serializeToHeaders(
+            &requestContext.response->headers,
+            beginListeningResponse());
 
-        network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
+        network::http::RequestResult requestResult(
+            nx::network::http::StatusCode::ok);
         requestResult.connectionEvents.onResponseHasBeenSent =
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openUpTunnel, this, _1);
 

@@ -101,7 +101,10 @@ public:
         nx::utils::ElapsedTimer timer;
         timer.restart();
         while (users2.size() != 2 && timer.elapsed() < kSyncWaitTimeout)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             NX_TEST_API_GET(makeUrl(server2, "/ec2/getUsers"), &users2);
+        }
         ASSERT_EQ(2, users2.size());
     }
 

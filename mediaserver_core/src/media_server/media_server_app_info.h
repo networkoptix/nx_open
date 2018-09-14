@@ -7,4 +7,7 @@ struct QnServerAppInfo
 
     /** Real application name, visible to the user. */
     static QString applicationDisplayName();
+
+    /** Name of the mediaserver service. */
+    static QString serviceName();
 };

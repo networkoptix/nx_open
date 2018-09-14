@@ -47,16 +47,6 @@ void QnResourceListModel::setHasCheckboxes(bool value)
     m_hasCheckboxes = value;
 }
 
-bool QnResourceListModel::userCheckable() const
-{
-    return m_userCheckable;
-}
-
-void QnResourceListModel::setUserCheckable(bool value)
-{
-    m_userCheckable = value;
-}
-
 void QnResourceListModel::setSinglePick(bool value)
 {
     m_singlePick = value;
@@ -194,11 +184,8 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return Qt::NoItemFlags;
 
-    int column = index.column();
-    Qt::ItemFlag userCheckableFlag = m_userCheckable ? Qt::ItemIsUserCheckable : Qt::NoItemFlags;
-
-    if (column == CheckColumn)
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | userCheckableFlag;
+    if (index.column() == CheckColumn)
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
 
     Qt::ItemFlags result = base_type::flags(index);
     if (m_readOnly)
@@ -322,7 +309,7 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
         }
 
         emit dataChanged(index.sibling(index.row(), 0),
-            index.sibling(index.row(), ColumnCount - 1),
+            index.sibling(index.row(), columnCount(index) - 1),
             { Qt::CheckStateRole });
         return true;
     }

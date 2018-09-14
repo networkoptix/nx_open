@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import logging
 import re
 
@@ -55,7 +57,7 @@ class UpstartService(Service):
     def status(self):
         command = ['status', self._service_name]
         output = self._ssh.run_command(command)
-        match = _status_output_re.match(output.strip())
+        match = _status_output_re.match(output.decode('ascii').strip())
         if match is None:
             raise ValueError("Cannot parse output of `{}`:\n{}".format(' '.join(command), output))
         if match.group('job') != self._service_name:
@@ -77,7 +79,7 @@ class LinuxAdHocService(Service):
     Its interface mimic a `service` command.
     """
 
-    START_STOP_TIMEOUT_SEC = 20
+    START_STOP_TIMEOUT_SEC = 60
 
     def __init__(self, ssh, dir):
         self._ssh = ssh
@@ -95,6 +97,13 @@ class LinuxAdHocService(Service):
         # TODO: Make a script.
         if not self._service_script_path.exists():
             return False  # not even installed
-        output = self._ssh.run_command([self._service_script_path, 'is_active'])
-        is_running = output.strip() == 'active'
-        return ServiceStatus(is_running, None)
+        output = self._ssh.run_command([self._service_script_path, 'status']).strip()
+        if output == 'inactive':
+            is_running = False
+            pid = None
+        else:
+            is_running = True
+            mo = re.match(r'active/(\d+)', output)
+            assert mo, 'Invalid output from control script: %r' % output
+            pid = int(mo.group(1))
+        return ServiceStatus(is_running, pid)

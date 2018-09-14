@@ -49,6 +49,9 @@ private:
 private:
     struct Private;
     QScopedPointer<Private> d;
+
+    // Figures out if a watermark is needed and sets it to the dialog.
+    void setWatermark(nx::client::desktop::ExportSettingsDialog* dialog);
 };
 
 } // namespace desktop

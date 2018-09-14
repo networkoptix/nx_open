@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import sys
 import plistlib
+import re
 
 from itertools import chain
 from os.path import join
@@ -13,6 +14,28 @@ from os.path import join
 
 def change_dep_path(binary, xfrom, relative_to):
     subprocess.call(['install_name_tool', '-change', xfrom, '@executable_path/../Frameworks/' + relative_to, binary])
+
+
+def remove_rpath(binary):
+    output = subprocess.check_output(["otool", "-l", binary])
+
+    # Here we parse paths from otool output which looks like this:
+    #     cmd LC_RPATH
+    # cmdsize 40
+    #    path @executable_path/Frameworks (offset 12)
+    #         ^ Path is here.           ^
+
+    rpath_re = re.compile(
+        "cmd LC_RPATH.*?cmdsize .*?path (.+?) \\(offset.*?\\)",
+        re.MULTILINE | re.DOTALL)
+
+    command = ['install_name_tool']
+    for path in rpath_re.findall(output):
+        command += ["-delete_rpath", path]
+
+    command.append(binary)
+
+    subprocess.call(command)
 
 
 def binary_deps(binary):
@@ -41,7 +64,7 @@ def set_permissions(path):
         os.chmod(path, 0644)
 
 
-def prepare(binary, sbindir, tlibdir):
+def prepare(build_dir, binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
 #    if os.path.exists(tbindir):
 #        shutil.rmtree(tbindir)
@@ -60,7 +83,7 @@ def prepare(binary, sbindir, tlibdir):
 
     shutil.copyfile(join(sbindir, '@client.binary.name@'), binary)
     shutil.copyfile(join(sbindir, '@applauncher.binary.name@'), applauncher_binary)
-    shutil.copyfile(join(sbindir, 'qt.conf'), join(tbindir, 'qt.conf'))
+    shutil.copyfile(join(build_dir, 'qt.conf'), join(tbindir, 'qt.conf'))
 
     os.chmod(binary, 0755)
     os.chmod(applauncher_binary, 0755)
@@ -88,6 +111,8 @@ def prepare(binary, sbindir, tlibdir):
                 yield join(root, xfile)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
+    remove_rpath(binary)
+
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
     qframeworks = fnmatch.filter(os.listdir(qlibdir), '*.framework')
 
@@ -154,7 +179,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
                 change_dep_path(binary, full_name, join(folder, name))
 
 
-def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
+def main(build_dir, app_path, bindir, libdir, helpdir, qtdir, qtver):
     qlibdir = join(qtdir, 'lib')
 
     appdir = os.path.basename(app_path)
@@ -162,7 +187,7 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     client_binary = "{app_path}/Contents/MacOS/{app}".format(app_path=app_path, app=app)
     tlibdir = "{app_path}/Contents/Frameworks".format(app_path=app_path)
 
-    for binary in prepare(client_binary, bindir, tlibdir):
+    for binary in prepare(build_dir, client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
     resources_dir = "{app_path}/Contents/Resources".format(app_path=app_path)
@@ -171,5 +196,5 @@ def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
     shutil.copy(join(bindir, 'launcher.version'), resources_dir)
 
 if __name__ == '__main__':
-    _, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
-    main(appdir, bindir, libdir, helpdir, qtdir, qtver)
+    _, build_dir, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
+    main(build_dir, appdir, bindir, libdir, helpdir, qtdir, qtver)

@@ -231,7 +231,7 @@ void QnCameraListModel::at_resource_resourceChanged(const QnResourcePtr &resourc
 
 bool QnCameraListModel::cameraFits(const QnVirtualCameraResourcePtr& camera) const
 {
-    NX_EXPECT(camera);
+    NX_ASSERT(camera);
     if (!camera)
         return false;
 

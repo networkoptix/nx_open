@@ -892,6 +892,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>背景格間距...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation>螢幕設定</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -984,6 +988,19 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation>選擇佈局</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1039,6 +1056,36 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>可執行的 %1 影音檔案 (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>來源攝影機</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation>選擇裝置...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation>選擇攝影機...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>選擇佈局</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation>
+        <numerusform>%n 佈局</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation>在 %2 顯示 %1</translation>
     </message>
   </context>
   <context>
@@ -2209,42 +2256,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>無設定</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>次串流</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O 模組 ID</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>攝影機 ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>聲音串流</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>主串流</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL 無效. 開啟串流再試一次.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL 無效. 開啟影像串流再試一次.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O 模組無聲音串流</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>攝影機沒有次串流</translation>
     </message>
   </context>
   <context>
@@ -3581,12 +3592,36 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>圖像可能太暗.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation>圖片有誤。</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation>內部錯誤.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>如果相機未完全垂直或水平安裝，請使用此設置來補償失真。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation>
+        <numerusform>此攝影機現在不在選定的佈局上。請在觸發警報前加入攝影機，否則警報將無法作用。</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>選擇一支攝影機</translation>
     </message>
   </context>
   <context>
@@ -3789,45 +3824,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>選擇檔案...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>畫面%1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>無圖片</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>載入圖片時出現錯誤</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>上傳圖片時出錯</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>無法讀取圖片</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>無法載入圖片</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>框格</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>圖片過大. 最大大小為 %1 MB</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3911,21 +3907,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>匯入所選</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>縮放</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>旋轉:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>焦距</translation>
     </message>
   </context>
   <context>
@@ -4821,6 +4802,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>設定密碼</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation>旋轉</translation>
     </message>
   </context>
   <context>
@@ -6766,17 +6754,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>伺服器時間...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>選擇檔案...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -7799,6 +7776,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 包含了正在上傳的影像</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8030,6 +8011,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主串流</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>次串流</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation>無次串流</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8177,6 +8173,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>框格</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>無圖片</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>載入圖片時出現錯誤</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>上傳圖片時出錯</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>選擇檔案...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>畫面%1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>無法讀取圖片</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>圖片過大. 最大大小為 %1 MB</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>無法載入圖片</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>框格</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation>請分配自訂編號給佈局，以便快速識別和連結</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>一般</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation>背景</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8185,6 +8242,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>不是攝影機</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>次串流</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 模組 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>攝影機 ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>聲音串流</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>主串流</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL 無效. 開啟串流再試一次.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL 無效. 開啟影像串流再試一次.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O 模組無聲音串流</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>攝影機沒有次串流</translation>
     </message>
   </context>
   <context>
@@ -8767,8 +8863,12 @@ to %1</source>
       <translation>變更 %2 支攝影機中的 %1 支攝影機密碼失敗</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>警告！此版本僅用於測試目的! 請升級到下一版更新程式或正式版</translation>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

@@ -13,6 +13,7 @@
 #include <nx/sdk/metadata/events_metadata_packet.h>
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnAbstractDataReceptor;
 
@@ -22,12 +23,13 @@ namespace metadata {
 
 class MetadataHandler:
     public QObject,
-    public nx::sdk::metadata::MetadataHandler
+    public nx::sdk::metadata::MetadataHandler,
+    public ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    MetadataHandler();
+    MetadataHandler(QnMediaServerModule* serverModule);
     virtual void handleMetadata(
         nx::sdk::Error error,
         nx::sdk::metadata::MetadataPacket* metadata) override;
@@ -45,10 +47,12 @@ signals:
     void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
-    nx::vms::api::EventState lastEventState(const QnUuid& eventId) const;
+    nx::vms::api::EventState lastEventState(const QString& eventTypeId) const;
 
-    void setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState);
-    nx::api::Analytics::EventType eventDescriptor(const QnUuid& eventId) const;
+    void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
+    
+    nx::api::Analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
+
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::EventsMetadataPacket> packet);
 
@@ -62,7 +66,7 @@ private:
 private:
     QnSecurityCamResourcePtr m_resource;
     nx::api::AnalyticsDriverManifest m_manifest;
-    QMap<QnUuid, nx::vms::api::EventState> m_eventStateMap;
+    QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_dataReceptor = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;
 };

@@ -16,26 +16,26 @@ class QnHttpConnectionListener;
 
 template<class T>
 QnTCPConnectionProcessor* handlerInstance(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
-    return new T(socket, owner);
+    return new T(std::move(socket), owner);
 };
 
 template <class T, class ExtraParam>
 QnTCPConnectionProcessor* handlerInstance(
     ExtraParam extraParam,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 {
-    return new T(extraParam, socket, owner);
+    return new T(extraParam, std::move(socket), owner);
 }
 
 class QnHttpConnectionListener: public QnTcpListener
 {
 public:
     typedef std::function<QnTCPConnectionProcessor*(
-        QSharedPointer<nx::network::AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
+        std::unique_ptr<nx::network::AbstractStreamSocket>, QnHttpConnectionListener*)> InstanceFunc;
 
     struct HandlerInfo
     {

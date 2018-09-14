@@ -1,6 +1,5 @@
 #include "onvif_audio_transmitter.h"
-#include <rtsp/rtsp_encoder.h>
-#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/rtp.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -136,7 +135,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
 {
     QByteArray sendBuffer;
     const static int kRtpTcpHeaderSize = 4;
-    sendBuffer.resize(audioData->dataSize() + RtpHeader::RTP_HEADER_SIZE + kRtpTcpHeaderSize);
+    sendBuffer.resize(audioData->dataSize() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize);
     char* rtpHeaderPtr = sendBuffer.data() + kRtpTcpHeaderSize;
 
     AVRational srcTimeBase = { 1, 1000000 };
@@ -145,7 +144,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
         m_firstPts = audioData->timestamp;
     auto timestamp = av_rescale_q(audioData->timestamp - m_firstPts, srcTimeBase, dstTimeBase);
 
-    QnRtspEncoder::buildRTPHeader(
+    nx::streaming::rtp::buildRtpHeader(
         rtpHeaderPtr,
         0, //< ssrc
         audioData->dataSize(),
@@ -158,7 +157,7 @@ bool OnvifAudioTransmitter::sendData(const QnAbstractMediaDataPtr& audioData)
     quint16* lenPtr = (quint16*)(sendBuffer.data() + 2);
     *lenPtr = htons(sendBuffer.size() - kRtpTcpHeaderSize);
     memcpy(
-        sendBuffer.data() + RtpHeader::RTP_HEADER_SIZE + kRtpTcpHeaderSize,
+        sendBuffer.data() + nx::streaming::rtp::RtpHeader::kSize + kRtpTcpHeaderSize,
         audioData->data(),
         audioData->dataSize());
     m_rtspConnection->sendBynaryResponse((const quint8*) sendBuffer.data(), sendBuffer.size());

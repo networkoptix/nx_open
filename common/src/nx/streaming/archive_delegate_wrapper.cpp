@@ -56,7 +56,7 @@ bool ArchiveDelegateWrapper::hasVideo() const
     return m_delegate->hasVideo();
 }
 
-AVCodecContext* ArchiveDelegateWrapper::setAudioChannel(int num)
+bool ArchiveDelegateWrapper::setAudioChannel(unsigned num)
 {
     return m_delegate->setAudioChannel(num);
 }
@@ -106,9 +106,14 @@ QnAbstractMotionArchiveConnectionPtr ArchiveDelegateWrapper::getMotionConnection
     return m_delegate->getMotionConnection(channel);
 }
 
-void ArchiveDelegateWrapper::setSendMotion(bool value)
+void ArchiveDelegateWrapper::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
-    m_delegate->setSendMotion(value);
+    m_delegate->setStreamDataFilter(filter);
+}
+
+nx::vms::api::StreamDataFilters ArchiveDelegateWrapper::streamDataFilter() const
+{
+    return m_delegate->streamDataFilter();
 }
 
 void ArchiveDelegateWrapper::setMotionRegion(const QnMotionRegion& region)

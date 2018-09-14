@@ -23,9 +23,6 @@ public:
         base_type(std::move(args)...)
     {
     }
-
-    virtual void handshakeAsync(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 } // namespace detail
@@ -35,7 +32,8 @@ public:
 enum class EncryptionUse
 {
     always,
-    autoDetectByReceivedData
+    autoDetectByReceivedData,
+    never,
 };
 
 /**

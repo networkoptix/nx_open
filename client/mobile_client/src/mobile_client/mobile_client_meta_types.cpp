@@ -92,8 +92,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
-    qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");
-
     nx::client::mobile::ActionButtonsModel::registerQmlType();
     nx::client::mobile::SoftwareTriggersController::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();

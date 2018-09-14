@@ -1,5 +1,3 @@
-set(product.title "${applauncher.name}")
-
 nx_configure_file(maven/filter-resources/applauncher_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -10,8 +8,9 @@ nx_add_target(applauncher EXECUTABLE SIGNED
         "applauncher.rc"
     PUBLIC_LIBS
         qtsinglecoreapplication
-        nx_kit
         common
+        nx_vms_applauncher_api
+        nx_kit
 )
 
 string(REPLACE ".exe" "" binary_name ${applauncher.binary.name})

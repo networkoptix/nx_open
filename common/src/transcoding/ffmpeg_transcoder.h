@@ -1,5 +1,4 @@
-#ifndef __FFMPEG_TRANSCODER_H
-#define __FFMPEG_TRANSCODER_H
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -21,10 +20,11 @@ class QnFfmpegTranscoder: public QnTranscoder
 public:
     static const int MTU_SIZE = 1412;
 
-    QnFfmpegTranscoder();
+    QnFfmpegTranscoder(nx::metrics::Storage* metrics);
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
+    void setFormatOption(const QString& option, const QString& value);
     bool isCodecSupported(AVCodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;
@@ -38,6 +38,14 @@ public:
     void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
     void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
+
+    struct PacketTimestamp
+    {
+        uint64_t ntpTimestamp = 0;
+        uint32_t rtpTimestamp = 0;
+    };
+    PacketTimestamp getLastPacketTimestamp() { return m_lastPacketTimestamp; }
+
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
     virtual int finalizeInternal(QnByteArray* const result) override;
@@ -56,11 +64,9 @@ private:
 
     QString m_container;
     qint64 m_baseTime;
+    PacketTimestamp m_lastPacketTimestamp;
     bool m_inMiddleOfStream;
     qint64 m_startTimeOffset;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif  // __FFMPEG_TRANSCODER_H
-

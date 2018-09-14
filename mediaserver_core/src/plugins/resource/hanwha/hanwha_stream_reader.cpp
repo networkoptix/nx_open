@@ -28,7 +28,9 @@ static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 
 } // namespace
 
-HanwhaStreamReader::HanwhaStreamReader(const HanwhaResourcePtr& res):
+HanwhaStreamReader::HanwhaStreamReader(
+    const HanwhaResourcePtr& res)
+    :
     QnRtpStreamReader(res),
     m_hanwhaResource(res)
 {
@@ -80,9 +82,9 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     }
 
     if (role == Qn::ConnectionRole::CR_Archive)
-        m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
+        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
-        m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
+        m_rtpReader.setTimePolicy(nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter);
 
     if (!m_rateControlEnabled)
         m_rtpReader.addRequestHeader(lit("PLAY"), nx::network::http::HttpHeader("Rate-Control", "no"));
@@ -251,6 +253,13 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
             << "Time Range:"
             << QDateTime::fromMSecsSinceEpoch(m_startTimeUsec / 1000)
             << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
+    }
+
+    if (ini().forcedRtspPort > 0)
+    {
+        QUrl realUrl(*outUrl);
+        realUrl.setPort(ini().forcedRtspPort);
+        *outUrl = realUrl.toString();
     }
 
     return CameraDiagnostics::NoErrorResult();

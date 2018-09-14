@@ -25,7 +25,7 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     if( caps & nxcip::DtsArchiveReader::reverseGopModeCapability )
         m_flags |= QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if( caps & nxcip::DtsArchiveReader::motionDataCapability )
-        m_flags |= QnAbstractArchiveDelegate::Flag_CanSendMotion;
+        m_flags |= QnAbstractArchiveDelegate::Flag_CanSendMetadata;
 
     m_flags |= QnAbstractArchiveDelegate::Flag_CanOfflineRange;
     m_flags |= QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
@@ -164,9 +164,9 @@ void ThirdPartyArchiveDelegate::setRange( qint64 startTime, qint64 endTime, qint
     m_archiveReader->playRange( ++m_cSeq, startTime, endTime, frameStep );
 }
 
-void ThirdPartyArchiveDelegate::setSendMotion( bool value )
+void ThirdPartyArchiveDelegate::setStreamDataFilter(nx::vms::api::StreamDataFilters filter)
 {
-    m_archiveReader->setMotionDataEnabled( value );
+    m_archiveReader->setMotionDataEnabled(filter.testFlag(nx::vms::api::StreamDataFilter::motion));
 }
 
 #endif // ENABLE_THIRD_PARTY

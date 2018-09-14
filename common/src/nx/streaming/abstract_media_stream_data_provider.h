@@ -10,13 +10,13 @@ class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
 #define MAX_LIVE_FPS 10000000.0
-#define MAX_LOST_FRAME 2
 
 class QnAbstractMediaStreamDataProvider: public QnAbstractStreamDataProvider
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
+
     explicit QnAbstractMediaStreamDataProvider(const QnResourcePtr& res);
     virtual ~QnAbstractMediaStreamDataProvider();
 
@@ -40,7 +40,9 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
     virtual bool hasThread() const { return true; }
-
+    virtual bool reinitResourceOnStreamError() const { return true; }
+signals:
+    void streamEvent(QnAbstractMediaStreamDataProvider* streamReader, CameraDiagnostics::Result result);
 protected:
     virtual void sleepIfNeeded() {}
 
@@ -48,9 +50,6 @@ protected:
     virtual void afterRun();
 
     virtual bool beforeGetData() { return true; }
-
-    // If the function returns false, we do not put the result into the queues.
-    virtual bool afterGetData(const QnAbstractDataPacketPtr& data);
 
     void checkTime(const QnAbstractMediaDataPtr& data);
     void checkAndFixTimeFromCamera(const QnAbstractMediaDataPtr& data);
@@ -60,7 +59,6 @@ protected:
     QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
-    int mFramesLost;
     QnResourcePtr m_mediaResource;
 
 private:

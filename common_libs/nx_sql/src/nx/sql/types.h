@@ -72,7 +72,7 @@ public:
     bool operator==(const ConnectionOptions&) const;
 };
 
-enum class QueryType
+enum class NX_SQL_API QueryType
 {
     lookup,
     modification,

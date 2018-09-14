@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
-set(CMAKE_SUPPRESS_REGENERATION true)
+
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -126,6 +126,7 @@ nx_create_dev_qt_conf()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
+    list(APPEND CMAKE_INSTALL_RPATH ${QT_DIR}/lib)
 endif()
 if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
@@ -158,11 +159,6 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(targetDevice STREQUAL "bpi")
-    set_property(TARGET Qt5::Gui APPEND PROPERTY
-        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
-endif()
-
 if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
@@ -192,6 +188,8 @@ if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
 endif()
+
+list(APPEND CMAKE_MSVCIDE_RUN_PATH ${QT_DIR}/bin)
 
 add_subdirectory(dependencies)
 
@@ -223,10 +221,9 @@ if(withMediaServer)
         add_subdirectory(media_db_util)
     endif()
 
-    # This will be uncommented when all root_tool related tasks are finished.
-    # if(LINUX AND box MATCHES "none|tx1")
-    #     add_subdirectory(root_tool)
-    # endif()
+    if(withRootTool)
+        add_subdirectory(root_tool)
+    endif()
 endif()
 
 #add_subdirectory(_axis_controller)
@@ -241,9 +238,7 @@ if(withTrayTool)
     add_subdirectory(traytool)
 endif()
 
-if(withDesktopClient OR withMobileClient)
-    add_subdirectory(client)
-endif()
+add_subdirectory(client)
 
 if(withNxTool)
     add_subdirectory(nxtool)
@@ -266,8 +261,6 @@ else()
     set(beta_bool "false")
 endif()
 
-nx_save_known_files()
-
 if(withClouds)
     add_custom_target(cloud DEPENDS cloud-backend)
 
@@ -279,3 +272,5 @@ if(withClouds)
         add_subdirectory(nx_cloud_deploy)
     endif()
 endif()
+
+nx_save_known_files()

@@ -14,7 +14,6 @@
 #include <ui/widgets/system_settings/smtp/smtp_test_connection_widget.h>
 
 #include <utils/email/email.h>
-#include <utils/common/scoped_value_rollback.h>
 
 
 namespace {
@@ -70,7 +69,7 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 }
 
 void QnSmtpSettingsWidget::loadDataToUi() {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     finishTesting();
 
@@ -124,7 +123,7 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
     if (m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (toggled) {
         /* Switching from simple to advanced */

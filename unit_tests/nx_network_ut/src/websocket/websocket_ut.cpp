@@ -248,7 +248,7 @@ std::string ConnectedSocketsSupplier::lastError()
 {
     return m_lastError;
 }
-// -------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 class WebSocket:
     public ::testing::Test
@@ -917,16 +917,6 @@ TEST_F(WebSocket_PingPong, Close)
     startAndWaitForDestroyed();
     ASSERT_FALSE(clientWebSocket);
     ASSERT_FALSE(serverWebSocket);
-}
-
-TEST_F(WebSocket, ContinueWorkAfterTimeout)
-{
-    givenServerClientWebSocketsWithDifferentTimeouts();
-    whenServerDoesntAnswerPings();
-    thenClientSocketShouldReceiveTimeoutErrorInReadHandler();
-
-    whenServerStartsAnsweringPings();
-    thenNoNewErrorsShouldHappen();
 }
 
 TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)

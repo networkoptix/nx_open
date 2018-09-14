@@ -8,7 +8,6 @@
 
 #include <business/business_resource_validation.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <utils/common/scoped_value_rollback.h>
 
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/events/abstract_event.h>
@@ -81,7 +80,7 @@ void QnPopupBusinessActionWidget::parametersChanged()
     if (!model() || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
     auto params = model()->actionParams();
     params.needConfirmation = ui->forceAcknoledgementCheckBox->isChecked();
     model()->setActionParams(params);

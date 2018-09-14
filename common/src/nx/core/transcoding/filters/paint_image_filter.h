@@ -2,6 +2,7 @@
 
 #if defined(ENABLE_DATA_PROVIDERS)
 
+#include <QtCore/QPoint>
 #include <transcoding/filters/abstract_image_filter.h>
 
 namespace nx {
@@ -25,8 +26,8 @@ public:
 
     void setImage(
         const QImage& image,
-        const QPoint& offset,
-        Qt::Alignment alignment);
+        const QPoint& offset = QPoint(0, 0),
+        Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignTop);
 
 private:
     const QScopedPointer<detail::ImageToFramePainter> m_painter;

@@ -896,6 +896,14 @@
     </message>
   </context>
   <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation>串流地址</translation>
+    </message>
+  </context>
+  <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
@@ -1071,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>在佈局上</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1188,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>橢圓</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>在佈局上</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation>攝影機</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation>來源攝影機</translation>
     </message>
   </context>
   <context>
@@ -1336,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>佈局設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>一般設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>鎖定佈局</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>背景</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>處理影像…請稍等.</translation>
     </message>
     <message>
       <location/>
@@ -1364,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>顯示…</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>清除</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>處理影像…請稍等.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>維持長寬比</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;變更螢幕長寬比</translation>
+      <source>View...</source>
+      <translation>顯示…</translation>
     </message>
     <message>
       <location/>
@@ -1394,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>&amp;高:</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>維持長寬比</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>&amp;不透明度:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>&amp;高:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>&amp;變更螢幕長寬比</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation>鎖定</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation>宽度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation>高度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>邏輯 ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>產生</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>重置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Minimal Size</source>
+      <translation type="unfinished">Minimal Size</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation>選擇佈局</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation>共享佈局</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>在 &quot;列表中選擇單個用戶, 然後顯示本地佈局到&quot;</translation>
     </message>
   </context>
   <context>
@@ -1477,6 +1547,14 @@
       <location/>
       <source>Disable imported users</source>
       <translation>停用匯入的使用者</translation>
+    </message>
+  </context>
+  <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation>編輯串流......</translation>
     </message>
   </context>
   <context>
@@ -1993,29 +2071,6 @@
     </message>
   </context>
   <context>
-    <name>QnFileNameInputWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
-      <source>Form</source>
-      <translation>表格</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>檔案名稱:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Select file...</source>
-      <translation>選擇檔案...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>瀏覽…</translation>
-    </message>
-  </context>
-  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -2188,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>目錄:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>瀏覽…</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>檔案名稱:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>格式:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>選項</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>警告: 具有相同名稱的檔案已存在!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2284,6 +2306,11 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>在桌面上放置捷徑.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation>在電視牆上啟用時間軸</translation>
     </message>
   </context>
   <context>
@@ -2961,6 +2988,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation>在影像上顯示用戶名的浮水印</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation>浮水印預覽</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3141,8 +3178,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>網頁:</translation>
+      <source>This web page is for C2P integration</source>
+      <translation>此網頁用於C2P整合</translation>
     </message>
   </context>
   <context>
@@ -3171,6 +3208,24 @@
       <location/>
       <source>Note: Schedule is based on server time.</source>
       <translation>備註：排程時間為伺服器時間.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation>浮水印預覽</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>不透明度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation>頻率</translation>
     </message>
   </context>
 </TS>

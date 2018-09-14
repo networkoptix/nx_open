@@ -368,7 +368,7 @@ CHandShake::CHandShake():
         m_piPeerIP[i] = 0;
 }
 
-int CHandShake::serialize(char* buf, int& size)
+int CHandShake::serialize(char* buf, int& size) const
 {
     if (size < m_iContentSize)
         return -1;

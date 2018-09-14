@@ -18,7 +18,7 @@ ${valid email}                 noptixqa+valid@gmail.com
 #Register form errors
 ${FIRST NAME IS REQUIRED}      //span[@ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required" and contains(text(),"${FIRST NAME IS REQUIRED TEXT}")]
 ${LAST NAME IS REQUIRED}       //span[@ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required" and contains(text(),"${LAST NAME IS REQUIRED TEXT}")]
-${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
+${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
 ${EMAIL ALREADY REGISTERED}    //span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and contains(text(),"${EMAIL ALREADY REGISTERED TEXT}")]
 ${EMAIL INVALID}               //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),"${EMAIL INVALID TEXT}")]
 ${PASSWORD IS REQUIRED}        //span[@ng-if="passwordInput.password.$error.required" and contains(text(),"${PASSWORD IS REQUIRED TEXT}")]
@@ -64,6 +64,10 @@ Restart
 
 Test Register Invalid
     [Arguments]    ${first}    ${last}    ${email}    ${pass}    ${checked}
+    # These two lines are because Hebrew has double quotes in its text.
+    # This makes for issues with strings in xpaths.  These lines convert to single quotes if the language is Hebrew
+    Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL INVALID}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email" and contains(text(),'${EMAIL INVALID TEXT}')]
+    Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Register Form Validation    ${first}    ${last}    ${email}    ${pass}    ${checked}
     Run Keyword Unless    "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
@@ -81,7 +85,7 @@ Register Form Validation
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
-    Sleep    .05    #On Ubuntu it was going too fast
+    Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
 
 Check Email Outline

@@ -191,6 +191,25 @@ QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset)
     return QnUuid(result);
 }
 
+namespace nx::utils {
+
+QString changedGuidByteOrder(const QString& guid)
+{
+    if (guid.length() != 36)
+        return guid;
+
+    QString result(guid);
+
+    int replace[] = { 6, 7, 4, 5, 2, 3, 0, 1, 8, 11, 12, 9, 10, 13, 16, 17, 14, 15 };
+    int max = sizeof(replace) / sizeof(replace[0]);
+    for (int i = 0; i < max; i++)
+        result[i] = guid[replace[i]];
+
+    return result;
+}
+
+} // namespace nx::utils
+
 uint qHash(const QnUuid& uuid, uint seed) throw()
 {
     return qHash(uuid.getQUuid(), seed);

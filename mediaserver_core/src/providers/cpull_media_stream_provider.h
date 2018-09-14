@@ -1,11 +1,11 @@
-#ifndef client_pull_stream_reader_h1226
-#define client_pull_stream_reader_h1226
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <utils/common/adaptive_sleep.h>
 #include "live_stream_provider.h"
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 struct QnAbstractMediaData;
 
@@ -14,11 +14,10 @@ class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
     Q_OBJECT;
 
 public:
-    QnClientPullMediaStreamProvider(const QnResourcePtr& dev);
+    QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:
-    bool canChangeStatus() const;
     virtual void beforeRun() override;
     virtual bool isCameraControlRequired() const = 0;
 
@@ -30,5 +29,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // client_pull_stream_reader_h1226

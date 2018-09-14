@@ -52,9 +52,9 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             if (m_httpClient.response()->statusLine.statusCode !=
                     nx::network::http::StatusCode::switchingProtocols)
             {
-                NX_LOG(lm("Unexpected status: (%1) %2")
+                NX_DEBUG(this, lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient.response()->statusLine.statusCode)
-                    .arg(m_httpClient.response()->statusLine.reasonPhrase), cl_logDEBUG1);
+                    .arg(m_httpClient.response()->statusLine.reasonPhrase));
 
                 return handler(SystemError::connectionAbort);
             }
@@ -72,17 +72,17 @@ std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
     if (socket->setSendTimeout(0) && socket->setRecvTimeout(0))
         return socket;
 
-    NX_LOGX(lm("Could not disable timeouts on HTTP socket: %1")
-        .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Could not disable timeouts on HTTP socket: %1")
+        .arg(SystemError::getLastOSErrorText()));
 
     return nullptr;
 }
 
-boost::optional<size_t> ReverseConnector::getPoolSize() const
+std::optional<size_t> ReverseConnector::getPoolSize() const
 {
     const auto value = m_httpClient.response()->headers.find(kNxRcPoolSize);
     if (value == m_httpClient.response()->headers.end())
-        return boost::none;
+        return std::nullopt;
 
     bool isOk;
     auto result = (size_t)QString::fromUtf8(value->second).toInt(&isOk);
@@ -90,14 +90,14 @@ boost::optional<size_t> ReverseConnector::getPoolSize() const
     if (isOk)
         return result;
     else
-        return boost::none;
+        return std::nullopt;
 }
 
-boost::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
+std::optional<KeepAliveOptions> ReverseConnector::getKeepAliveOptions() const
 {
     const auto value = m_httpClient.response()->headers.find(kNxRcKeepAliveOptions);
     if (value == m_httpClient.response()->headers.end())
-        return boost::none;
+        return std::nullopt;
 
     return KeepAliveOptions::fromString(QString::fromUtf8(value->second));
 }

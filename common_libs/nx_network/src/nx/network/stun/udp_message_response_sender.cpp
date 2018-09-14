@@ -56,7 +56,7 @@ void UDPMessageResponseSender::close()
 }
 
 void UDPMessageResponseSender::setInactivityTimeout(
-    boost::optional<std::chrono::milliseconds> /*value*/)
+    std::optional<std::chrono::milliseconds> /*value*/)
 {
     // This class emulates "server connection" on top of UDP for convenience.
     // So, connection-related logic like this one is not appropriate.

@@ -1,49 +1,43 @@
 #include "user_management_widget.h"
 #include "ui_user_management_widget.h"
 
-#include <QtCore/QSortFilterProxyModel>
-
-#include <QtGui/QKeyEvent>
-
 #include <boost/algorithm/cxx11/any_of.hpp>
 
+#include <QtCore/QSortFilterProxyModel>
+#include <QtGui/QKeyEvent>
+
 #include <api/global_settings.h>
-
 #include <client/client_settings.h>
-
 #include <common/common_module.h>
-
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-
-#include <nx/client/desktop/ui/messages/resources_messages.h>
-
 #include <ui/common/palette.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
-#include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/common/message_box.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-
 #include <utils/common/event_processors.h>
 #include <utils/common/ldap.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
+
+#include <nx/client/desktop/common/delegates/switch_item_delegate.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -201,7 +195,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     auto hoverTracker = new ItemViewHoverTracker(ui->usersTable);
 
-    auto switchItemDelegate = new QnSwitchItemDelegate(this);
+    auto switchItemDelegate = new SwitchItemDelegate(this);
     switchItemDelegate->setHideDisabledItems(true);
 
     ui->usersTable->setModel(m_sortModel);
@@ -219,7 +213,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     ui->usersTable->sortByColumn(QnUserListModel::LoginColumn, Qt::AscendingOrder);
 
-    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    SnappedScrollBar *scrollBar = new SnappedScrollBar(this);
     ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnUserManagementWidget::updateLdapState);

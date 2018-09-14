@@ -5,10 +5,12 @@
 #include <QtEndian>
 #include "flir_eip_resource.h"
 
-QnFlirResourceSearcher::QnFlirResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    base_type(commonModule)
+QnFlirResourceSearcher::QnFlirResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    base_type(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
     m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
     m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
@@ -35,7 +37,7 @@ QnResourcePtr QnFlirResourceSearcher::createResource(const QnUuid &resourceTypeI
         return result;
     }
 
-    result.reset(new QnFlirEIPResource());
+    result.reset(new QnFlirEIPResource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create FLIR camera resource. typeID:" << resourceTypeId.toString();
@@ -186,14 +188,14 @@ QList<QnNetworkResourcePtr> QnFlirResourceSearcher::processPacket(
 
 void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QAuthenticator& auth, QList<QnResourcePtr>& result)
 {
-    QnFlirEIPResourcePtr resource(new QnFlirEIPResource());
+    QnFlirEIPResourcePtr resource(new QnFlirEIPResource(m_serverModule));
 
     resource->setName(manufacture() + lit("-") + info.model);
     resource->setModel(info.model);
     resource->setVendor(manufacture());
     resource->setTypeId(m_eipFlirResTypeId);
     resource->setUrl(info.url.toString());
-    resource->setMAC(nx::network::QnMacAddress(info.mac));
+    resource->setMAC(nx::utils::MacAddress(info.mac));
     resource->setDefaultAuth(auth);
     resource->setFirmware(info.firmware);
 

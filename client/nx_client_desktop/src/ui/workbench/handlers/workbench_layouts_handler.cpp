@@ -59,7 +59,6 @@
 #include <nx/utils/counter.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
@@ -254,7 +253,7 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         // TODO: #GDM #VW #LOW refactor common code to common place
-        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+        NX_ASSERT(accessController()->hasPermissions(layout, Qn::SavePermission),
             "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
                 [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)

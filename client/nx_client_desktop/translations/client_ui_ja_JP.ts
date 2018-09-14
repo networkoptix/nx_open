@@ -896,6 +896,14 @@
     </message>
   </context>
   <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
+      <source>Streams Addresses</source>
+      <translation>ストリームアドレス</translation>
+    </message>
+  </context>
+  <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
@@ -1071,6 +1079,14 @@
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>レイアウト</translation>
+    </message>
+  </context>
+  <context>
     <name>ExportLayoutSettingsWidget</name>
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
@@ -1188,6 +1204,24 @@
       <location/>
       <source>Ellipticity</source>
       <translation>楕円率</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
+      <source>On layout</source>
+      <translation>レイアウト</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera</source>
+      <translation>カメラ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source camera</source>
+      <translation>ソースカメラをフルスクリーン表示する</translation>
     </message>
   </context>
   <context>
@@ -1336,26 +1370,11 @@
     </message>
   </context>
   <context>
-    <name>LayoutSettingsDialog</name>
+    <name>LayoutBackgroundSettingsWidget</name>
     <message>
-      <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
-      <source>Layout Settings</source>
-      <translation>レイアウト設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>General Settings</source>
-      <translation>一般設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Layout is Locked</source>
-      <translation>レイアウトのロック</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Background</source>
-      <translation>背景</translation>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
+      <source>Processing Image...Please Wait.</source>
+      <translation>お待ちください.</translation>
     </message>
     <message>
       <location/>
@@ -1364,28 +1383,13 @@
     </message>
     <message>
       <location/>
-      <source>View...</source>
-      <translation>表示...</translation>
-    </message>
-    <message>
-      <location/>
       <source>Clear</source>
       <translation>クリア</translation>
     </message>
     <message>
       <location/>
-      <source>Processing Image...Please Wait.</source>
-      <translation>お待ちください.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep Aspect Ratio</source>
-      <translation>アスペクト比を固定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Crop to monitor aspect ratio</source>
-      <translation>モニターアスペクト比(&amp;C)</translation>
+      <source>View...</source>
+      <translation>表示...</translation>
     </message>
     <message>
       <location/>
@@ -1394,13 +1398,79 @@
     </message>
     <message>
       <location/>
-      <source>Height:</source>
-      <translation>高さ(&amp;H):</translation>
+      <source>Keep Aspect Ratio</source>
+      <translation>アスペクト比を固定</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
       <translation>透過(&amp;O):</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height:</source>
+      <translation>高さ(&amp;H):</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>モニターアスペクト比(&amp;C)</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
+      <source>Locked</source>
+      <translation>ロックされています</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Width</source>
+      <translation>幅</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Height</source>
+      <translation>高さ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>論理ID</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>生成</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>リセット</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Minimal Size</source>
+      <translation type="unfinished">Minimal Size</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
+      <source>Select layout</source>
+      <translation>レイアウトを選択</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Shared layouts</source>
+      <translation>共有レイアウト</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>このリストにローカル レイアウトを表示する単一のユーザーを選択します</translation>
     </message>
   </context>
   <context>
@@ -1477,6 +1547,14 @@
       <location/>
       <source>Disable imported users</source>
       <translation>インポートしたユーザーを無効</translation>
+    </message>
+  </context>
+  <context>
+    <name>LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
+      <source>Edit Streams...</source>
+      <translation>ストリームの編集...</translation>
     </message>
   </context>
   <context>
@@ -1993,29 +2071,6 @@
     </message>
   </context>
   <context>
-    <name>QnFileNameInputWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>ファイル名:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Select file...</source>
-      <translation>ファイル選択...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>参照...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -2188,39 +2243,6 @@
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
-      <source>Folder:</source>
-      <translation>フォルダー:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Browse...</source>
-      <translation>参照...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Filename:</source>
-      <translation>ファイル名:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Format:</source>
-      <translation>フォーマット:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Options</source>
-      <translation>オプション</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning: file with the same name already exists!</source>
-      <translation>警告: 同じ名前のファイルが既に存在します!</translation>
-    </message>
-  </context>
-  <context>
     <name>QnUserManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
@@ -2284,6 +2306,11 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>デスクトップにショートカットを作成.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enable timeline on video wall</source>
+      <translation>ビデオウォールでタイムラインを有効にする</translation>
     </message>
   </context>
   <context>
@@ -2961,6 +2988,16 @@
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
       <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Display watermark with username over video</source>
+      <translation>ユーザー名のウォーターマーク表示</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Watermark Preview</source>
+      <translation>ウォーターマーク表示</translation>
+    </message>
   </context>
   <context>
     <name>TextOverlaySettingsWidget</name>
@@ -3141,8 +3178,8 @@
     <name>WebpageDialog</name>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
-      <source>Web Page</source>
-      <translation>ウェブページ:</translation>
+      <source>This web page is for C2P integration</source>
+      <translation>このWebページはC2Pの統合用です</translation>
     </message>
   </context>
   <context>
@@ -3171,6 +3208,24 @@
       <location/>
       <source>Note: Schedule is based on server time.</source>
       <translation>注: スケジュールはサーバー時間を使用.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
+      <source>Watermark preview</source>
+      <translation>ウォーターマーク表示</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>透過度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frequency</source>
+      <translation>周波数</translation>
     </message>
   </context>
 </TS>

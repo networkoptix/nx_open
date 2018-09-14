@@ -96,6 +96,13 @@ TEST_F(LogMainTest, ExplicitTag)
     expectMessages({
         "* ALWAYS TestTag: Always 7",
         "* INFO TestTag: Info 7"});
+
+    NX_ERROR(kTestTag, "Value %1 = %2", "error_count", 1);
+    NX_WARNING(kTestTag, "Value %1 = %2", "error_count", 2);
+    NX_DEBUG(kTestTag, "Value %1 = %2", "error_count", 3);
+    expectMessages({
+        "* ERROR TestTag: Value error_count = 1",
+        "* WARNING TestTag: Value error_count = 2"});
 }
 
 TEST_F(LogMainTest, This)
@@ -122,6 +129,14 @@ TEST_F(LogMainTest, This)
         "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
         "* INFO nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
+
+    NX_ERROR(this, "Value %1 = %2", "error_count", 1);
+    NX_WARNING(this, "Value %1 = %2", "error_count", 2);
+    NX_DEBUG(this, "Value %1 = %2", "error_count", 3);
+    expectMessages({
+        "* ERROR nx::utils::log::test::*LogMain*(0x*): Value error_count = 1",
+        "* WARNING nx::utils::log::test::*LogMain*(0x*): Value error_count = 2",
+        "* DEBUG nx::utils::log::test::*LogMain*(0x*): Value error_count = 3"});
 }
 
 class LogMainPerformanceTest: public LogMainTest

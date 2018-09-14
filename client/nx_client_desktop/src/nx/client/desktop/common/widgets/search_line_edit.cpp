@@ -59,7 +59,7 @@ SearchLineEdit::~SearchLineEdit()
 {
 }
 
-void SearchLineEdit::initStyleOption(QStyleOptionFrameV2* option) const
+void SearchLineEdit::initStyleOption(QStyleOptionFrame* option) const
 {
     option->initFrom(this);
     option->rect = contentsRect();
@@ -72,7 +72,7 @@ void SearchLineEdit::initStyleOption(QStyleOptionFrameV2* option) const
     if (hasEditFocus())
         option->state |= QStyle::State_HasEditFocus;
 #endif
-    option->features = QStyleOptionFrameV2::None;
+    option->features = QStyleOptionFrame::None;
 }
 
 QSize SearchLineEdit::sizeHint() const

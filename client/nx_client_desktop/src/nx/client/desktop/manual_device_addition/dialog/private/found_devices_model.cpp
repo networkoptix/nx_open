@@ -1,5 +1,7 @@
 #include "found_devices_model.h"
 
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 namespace {
@@ -14,6 +16,13 @@ IdsSet extractIds(const QnManualResourceSearchList& devices)
     return result;
 }
 
+QFont selectionColumnFont()
+{
+    QFont result;
+    result.setPixelSize(13);
+    return result;
+}
+
 } // namespace
 
 namespace nx {
@@ -21,31 +30,51 @@ namespace client {
 namespace desktop {
 
 FoundDevicesModel::FoundDevicesModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
 void FoundDevicesModel::addDevices(const QnManualResourceSearchList& devices)
 {
+    const auto pool = commonModule()->resourcePool();
+
     auto newIds = extractIds(devices);
     const auto currentIds = extractIds(m_devices);
     const auto truncatedIds = newIds.subtract(currentIds);
     if (truncatedIds.size() != devices.size())
-        NX_EXPECT(false, "Devices exist already");
+        NX_ASSERT(false, "Devices exist already");
 
     const int first = rowCount();
     const int last = rowCount() + truncatedIds.size() - 1;
-    const ScopedInsertRows guard(this, QModelIndex(), first, last);
     bool hasNewDevices = false;
-    for (const auto& newDevice: devices)
     {
-        if (truncatedIds.contains(newDevice.uniqueId))
+        const ScopedInsertRows guard(this, QModelIndex(), first, last);
+        for (const auto& device: devices)
         {
-            hasNewDevices = true;
-            m_devices.append(newDevice);
-            m_checked.insert(newDevice.uniqueId, false);
-            m_presentedState.insert(newDevice.uniqueId,
-                newDevice.existsInPool ? alreadyAddedState : notPresentedState);
+            const auto& id = device.uniqueId;
+            if (truncatedIds.contains(id))
+            {
+                hasNewDevices = true;
+                m_devices.append(device);
+                m_checked.insert(id, false);
+                m_presentedState.insert(id,
+                    device.existsInPool ? alreadyAddedState : notPresentedState);
+
+                if (!device.existsInPool)
+                    continue;
+
+                const auto camera = pool->getResourceByUniqueId<QnVirtualCameraResource>(id);
+                if (!camera)
+                    continue;
+
+                const ColumnDifference difference({
+                    {brandColumn, device.vendor.trimmed() != camera->getVendor().trimmed()},
+                    {modelColumn, device.name.trimmed() != camera->getModel().trimmed()},
+                    {addressColumn, device.url.trimmed() != camera->sourceUrl(Qn::CR_LiveVideo).trimmed()}});
+
+                m_fieldsDifference.insert(id, difference);
+            }
         }
     }
 
@@ -74,7 +103,7 @@ void FoundDevicesModel::removeDevices(QStringList ids)
 
         if (it == m_devices.end())
         {
-            NX_EXPECT(false, "Item does not exist");
+            NX_ASSERT(false, "Item does not exist");
             continue;
         }
 
@@ -83,6 +112,7 @@ void FoundDevicesModel::removeDevices(QStringList ids)
         m_checked.remove(id);
         m_presentedState.remove(id);
         m_devices.erase(it);
+        m_fieldsDifference.remove(id);
         someDevicesRemoved = true;
     }
 
@@ -113,7 +143,7 @@ int FoundDevicesModel::rowCount(const QModelIndex &parent) const
     if (!parent.isValid())
         return m_devices.size();
 
-    NX_EXPECT(false, "Wrong parent index");
+    NX_ASSERT(false, "Wrong parent index");
     return 0;
 }
 
@@ -121,7 +151,7 @@ bool FoundDevicesModel::correctIndex(const QModelIndex& index) const
 {
     const bool correct = index.isValid() && index.row() >= 0 && index.row() < rowCount();
     if (!correct)
-        NX_EXPECT(false, "Invalid index");
+        NX_ASSERT(false, "Invalid index");
 
     return correct;
 }
@@ -177,9 +207,36 @@ QVariant FoundDevicesModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(device(index));
         case presentedStateRole:
             return m_presentedState[device(index).uniqueId];
+        case Qt::TextColorRole:
+            return QPalette().color(getColorRole(index));
         default:
             return QVariant();
     }
+}
+
+QPalette::ColorRole FoundDevicesModel::getColorRole(const QModelIndex& index) const
+{
+    static const auto kUsualColor = QPalette::WindowText;
+    static const auto kHighlightedColor = QPalette::Light;
+
+    const auto column = index.column();
+    if (column == presentedStateColumn || column == checkboxColumn)
+        return kUsualColor;
+
+    const auto deviceId = device(index).uniqueId;
+    if (m_presentedState[deviceId] != alreadyAddedState)
+        return kHighlightedColor;
+
+    const auto diffIt = m_fieldsDifference.find(deviceId);
+    if (diffIt == m_fieldsDifference.end())
+        return kUsualColor;
+
+    const auto& difference = diffIt.value();
+    const auto diffValueIt = difference.find(column);
+    if (diffValueIt == difference.end())
+        return kUsualColor;
+
+    return diffValueIt.value() ? kHighlightedColor : kUsualColor;
 }
 
 bool FoundDevicesModel::setData(
@@ -201,7 +258,10 @@ bool FoundDevicesModel::setData(
     {
         const auto uniqueId = device(index).uniqueId;
         m_presentedState[uniqueId] = value.value<PresentedState>();
+
         emit dataChanged(index, index, {presentedStateRole});
+        emit headerDataChanged(Qt::Horizontal,
+            FoundDevicesModel::presentedStateColumn, FoundDevicesModel::presentedStateColumn);
         return true;
     }
 
@@ -213,6 +273,21 @@ QVariant FoundDevicesModel::headerData(
     Qt::Orientation orientation,
     int role) const
 {
+    if (section == Columns::presentedStateColumn)
+    {
+        switch(role)
+        {
+            case Qt::FontRole:
+                return selectionColumnFont();
+            case Qt::TextColorRole:
+                return QPalette().color(QPalette::Light);
+            case Qt::TextAlignmentRole:
+                return Qt::AlignRight;
+            default:
+                break;
+        }
+    }
+
     if (role != Qt::DisplayRole)
         return base_type::headerData(section, orientation, role);
 
@@ -236,14 +311,14 @@ int FoundDevicesModel::columnCount(const QModelIndex& parent) const
     if (!parent.isValid())
         return Columns::count;
 
-    NX_EXPECT(false, "Wrong parent index");
+    NX_ASSERT(false, "Wrong parent index");
     return 0;
 }
 
 int FoundDevicesModel::newDevicesCount() const
 {
-    const auto addedDevicesCount = std::count_if(m_devices.begin(), m_devices.end(),
-        [](const QnManualResourceSearchEntry& entry) { return entry.existsInPool; });
+    const auto addedDevicesCount = std::count_if(m_presentedState.begin(), m_presentedState.end(),
+        [](PresentedState state) { return state == alreadyAddedState; });
 
     return rowCount() - addedDevicesCount;
 }

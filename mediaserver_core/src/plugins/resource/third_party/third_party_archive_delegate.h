@@ -49,7 +49,7 @@ public:
     //!Implementation of QnAbstractArchiveDelegate::setRange
     virtual void setRange( qint64 startTime, qint64 endTime, qint64 frameStep ) override;
     //!Implementation of QnAbstractArchiveDelegate::setSendMotion
-    virtual void setSendMotion( bool value ) override;
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) override;
 
 private:
     QnResourcePtr m_resource;

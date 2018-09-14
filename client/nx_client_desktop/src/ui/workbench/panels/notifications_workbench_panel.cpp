@@ -14,6 +14,7 @@
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
@@ -22,8 +23,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
-#include <ui/graphics/items/notifications/notifications_collection_widget.h>
-#include <ui/graphics/items/notifications/notification_widget.h>
+#include <ui/graphics/items/notifications/notification_tooltip_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -34,8 +34,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
-
-#include <utils/common/scoped_value_rollback.h>
 
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
@@ -135,7 +133,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     :
     base_type(settings, parentWidget, parent),
     backgroundItem(new QnControlBackgroundWidget(Qt::RightEdge, parentWidget)),
-    item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
+    item(new QGraphicsWidget(parentWidget)),
     xAnimator(new VariantAnimator(this)),
 
     m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
@@ -157,12 +155,13 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
         &NotificationsWorkbenchPanel::updateControlsGeometry);
 
     item->setMinimumWidth(kNarrowWidth);
+    item->setVisible(false);
+    createEventPanel(parentWidget);
 
-    if (nx::client::desktop::ini().unifiedEventPanel)
-    {
-        item->setVisible(false);
-        createEventPanel(parentWidget);
-    }
+    // Hide EventPanel widget when the panel is moved out of view.
+    // This is required for correct counting of unread notifications.
+    connect(item, &QGraphicsWidget::xChanged, this,
+        [this]() { m_eventPanel->setHidden(item->x() >= m_parentWidget->rect().right()); });
 
     action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     connect(action(action::PinNotificationsAction), &QAction::toggled, this,
@@ -179,10 +178,10 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
-    item->setBlinker(m_showButton);
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
+    m_opacityProcessor->addTargetItem(m_eventPanelContainer);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -190,6 +189,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
+    m_hidingProcessor->addTargetItem(m_eventPanelContainer);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -212,6 +212,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_eventPanelContainer));
 
     /* Create a shadow: */
     auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, NxUi::kShadowThickness);
@@ -296,6 +297,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         opacityAnimator(item)->setTargetValue(opacity);
         opacityAnimator(backgroundItem)->setTargetValue(opacity);
         opacityAnimator(m_showButton)->setTargetValue(opacity);
+        opacityAnimator(m_eventPanelContainer)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
     }
     else
@@ -303,6 +305,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
         backgroundItem->setOpacity(opacity);
+        m_eventPanelContainer->setOpacity(opacity);
         m_showButton->setOpacity(opacity);
     }
 }
@@ -345,15 +348,12 @@ void NotificationsWorkbenchPanel::setShowButtonIcon()
 void NotificationsWorkbenchPanel::updateControlsGeometry()
 {
     auto parentWidgetRect = m_parentWidget->rect();
-    QRectF headerGeometry = m_parentWidget->mapRectFromItem(item, item->headerGeometry());
-    QRectF backgroundGeometry = m_parentWidget->mapRectFromItem(item, item->visibleGeometry());
 
     QRectF paintGeometry = item->geometry();
     backgroundItem->setGeometry(paintGeometry);
     m_showButton->setPos(QPointF(
         qMin(parentWidgetRect.right(), paintGeometry.left()),
-        (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height()) / 2
-    ));
+        (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height()) / 2));
 
     emit geometryChanged();
 }
@@ -384,36 +384,41 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     m_eventPanel.reset(new EventPanel(context()));
 
     // TODO: #vkutin Get rid of proxying.
-    auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
+    m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
 
-    auto eventPanelResizer = new ResizerWidget(item, eventPanelContainer);
+    auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(eventPanelResizer);
 
     connect(item, &QGraphicsWidget::geometryChanged, this,
-        [this, eventPanelContainer, eventPanelResizer]()
+        [this, eventPanelResizer]()
         {
             // Add 1-pixel shift for notification panel frame.
             const auto newGeometry = item->geometry().adjusted(1, 0, 0, 0);
-            eventPanelContainer->setGeometry(newGeometry);
+            m_eventPanelContainer->setGeometry(newGeometry);
             eventPanelResizer->setGeometry(0, 0, style::Metrics::kStandardPadding,
-                eventPanelContainer->size().height());
+                m_eventPanelContainer->size().height());
         });
 
     // TODO: #vkutin Test which mode is faster.
     //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
-    eventPanelContainer->setWidget(m_eventPanel.data());
-
-    m_hidingProcessor->addTargetItem(eventPanelContainer);
+    m_eventPanelContainer->setWidget(m_eventPanel.data());
 
     auto toolTipInstrument = InstrumentManager::instance(parentWidget->scene())
         ->instrument<ToolTipInstrument>();
 
     if (toolTipInstrument)
-        toolTipInstrument->addIgnoredItem(eventPanelContainer);
+        toolTipInstrument->addIgnoredItem(m_eventPanelContainer);
 
     connect(m_eventPanel.data(), &EventPanel::tileHovered,
         this, &NotificationsWorkbenchPanel::at_eventTileHovered);
+
+    connect(m_eventPanel.data(), &EventPanel::unreadCountChanged, this,
+        [this](int count, QnNotificationLevel::Value level)
+        {
+            m_showButton->setNotificationCount(count);
+            m_showButton->setColor(QnNotificationLevel::notificationColor(level));
+        });
 }
 
 void NotificationsWorkbenchPanel::at_eventTileHovered(
@@ -447,7 +452,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     QPointer<QnNotificationToolTipWidget> toolTip(
         new QnNotificationToolTipWidget(parentWidget));
     toolTip->setOpacity(0.0);
-    toolTip->setEnclosingGeometry(item->toolTipsEnclosingRect());
+    toolTip->setEnclosingGeometry(tooltipsEnclosingRect);
     toolTip->setMaxThumbnailSize(kToolTipMaxThumbnailSize);
     toolTip->setText(text);
     toolTip->setImageProvider(imageProvider);

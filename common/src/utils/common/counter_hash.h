@@ -40,7 +40,7 @@ public:
         if (iter == m_hash.end())
             return false;
 
-        NX_EXPECT(iter.value() > 0);
+        NX_ASSERT(iter.value() > 0);
         const bool wasLast = (--iter.value() <= 0);
         if (wasLast)
             m_hash.erase(iter);

@@ -119,8 +119,8 @@ void QnWorkbenchLayoutSynchronizer::deinitialize() {
 
     m_update = m_submit = false;
 
-    disconnect(m_layout, NULL, this, NULL);
-    disconnect(m_resource, NULL, this, NULL);
+    m_layout->disconnect(this);
+    m_resource->disconnect(this);
 
     qn_synchronizerByLayoutResource()->remove(m_resource.data());
     m_layout->setProperty(layoutSynchronizerPropertyName, QVariant());
@@ -152,7 +152,7 @@ void QnWorkbenchLayoutSynchronizer::update() {
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     m_layout->update(m_resource);
 }
 
@@ -167,14 +167,14 @@ void QnWorkbenchLayoutSynchronizer::submit() {
 
     m_submitPending = false;
     m_pendingItems.clear();
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     m_layout->submit(m_resource);
 }
 
 void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
     m_submitPending = false;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
 
     foreach(const QnUuid &uuid, m_pendingItems) {
         QnWorkbenchItem *item = m_layout->item(uuid);
@@ -212,7 +212,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_nameChanged() {
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     m_layout->setName(m_resource->getName());
 }
 
@@ -233,7 +233,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemAdded(const QnLayoutResource
     if (!resource)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     auto item = new QnWorkbenchItem(resource, itemData, this);
     m_layout->addItem(item);
     if (auto zoomTargetItem = m_layout->item(itemData.zoomTargetUuid))
@@ -244,7 +244,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemRemoved(const QnLayoutResour
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
 
     QnWorkbenchItem *item = m_layout->item(itemData.uuid);
     if(item == NULL) {
@@ -267,7 +267,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_itemChanged(const QnLayoutResour
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
 
     QnWorkbenchItem *item = m_layout->item(itemData.uuid);
     if(item == NULL) {
@@ -291,7 +291,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_cellAspectRatioChanged() {
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     m_layout->setCellAspectRatio(m_resource->cellAspectRatio());
 }
 
@@ -299,7 +299,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged() {
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     m_layout->setCellSpacing(m_resource->cellSpacing());
 }
 
@@ -307,7 +307,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_lockedChanged() {
     if(!m_update)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+    QScopedValueRollback<bool> guard(m_submit, false);
     m_layout->setLocked(m_resource->locked());
 }
 
@@ -323,17 +323,17 @@ void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
     if (!resource)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     m_resource->addItem(item->data());
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    disconnect(item, NULL, this, NULL);
+    item->disconnect(this);
 
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
 
     m_pendingItems.remove(item->uuid());
 
@@ -344,7 +344,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_nameChanged() {
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     m_resource->setName(m_layout->name());
 }
 
@@ -352,7 +352,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_cellAspectRatioChanged() {
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     m_resource->setCellAspectRatio(m_layout->cellAspectRatio());
 }
 
@@ -360,7 +360,7 @@ void QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged() {
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     m_resource->setCellSpacing(m_layout->cellSpacing());
 }
 
@@ -378,7 +378,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_dataChanged(int role) {
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
     m_pendingItems.insert(item->uuid());
     submitPendingItemsLater();
@@ -388,7 +388,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(Qn::ItemFlag flag, bool 
     if(!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
     if(item->hasFlag(flag) != value)
         return; /* Somebody has already changed it back. */

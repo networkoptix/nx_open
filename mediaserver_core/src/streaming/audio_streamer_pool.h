@@ -1,22 +1,22 @@
 #pragma once
 
-#include <nx/utils/singleton.h>
 #include <nx/vms/event/event_fwd.h>
 #include <providers/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
 #include <camera/video_camera.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnAbstractAudioTransmitter;
 namespace nx { namespace mediaserver { namespace resource { class Camera; } }}
 
 class QnAudioStreamerPool:
-    public Singleton<QnAudioStreamerPool>,
-    public QnCommonModuleAware
+    public QObject,
+    public nx::mediaserver::ServerModuleAware
 {
-
+    Q_OBJECT
 public:
-    QnAudioStreamerPool(QnCommonModule* commonModule);
+    QnAudioStreamerPool(QnMediaServerModule* serverModule);
 
     enum class Action
     {

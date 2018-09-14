@@ -32,10 +32,10 @@ public:
 
     nx::analytics::storage::Settings analyticEventsStorage() const;
 
-    static QString defaultROSettingsFilePath();
-    static QString defaultRunTimeSettingsFilePath();
     static QString defaultConfigDirectory();
 
+    static QString defaultConfigFileName;
+    static QString defaultConfigFileNameRunTime;
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );
     void initializeROSettings();
@@ -47,6 +47,6 @@ private:
 private:
     nx::mediaserver::Settings m_settings;
     std::unique_ptr<QSettings> m_rwSettings;
-    std::unique_ptr<QSettings> m_roSettings;
+    std::shared_ptr<QSettings> m_roSettings;
     nx::analytics::storage::Settings m_analyticEventsStorage;
 };

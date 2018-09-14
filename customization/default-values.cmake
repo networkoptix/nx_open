@@ -25,7 +25,6 @@ set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
@@ -46,9 +45,31 @@ set(enable_hanwha false)
 set(dynamic.customization false)
 
 # Localization
-set(additionalTranslations "")
 set(installerLanguage "en_US")
 set(installer.cultures "en-us")
+set(translations
+    en_US
+    en_GB
+    fr_FR
+    cs_CZ
+    de_DE
+    ru_RU
+    es_ES
+    it_IT
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    uk_UA
+    vi_VN
+    th_TH
+)
+set(defaultTranslation en_US)
 
 set(customization.defines "")
 

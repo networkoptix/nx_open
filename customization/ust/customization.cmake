@@ -14,8 +14,6 @@ set(cloudName "VMS Cloud")
 set(companyUrl "http://www.ubiquitysmart.com")
 set(productUrl "http://www.ubiquitysmart.com")
 set(supportUrl "http://www.ubiquitysmart.com")
-set(supportEmail "")
-set(supportPhone "")
 set(licenseEmail "http://www.ubiquitysmart.com")
 # end of Support section
 
@@ -56,25 +54,3 @@ set(freeLicenseKey "0000-0000-0000-0023")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    it_IT
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)

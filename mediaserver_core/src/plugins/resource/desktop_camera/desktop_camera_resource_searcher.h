@@ -6,18 +6,20 @@
 
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 #include <nx/network/deprecated/simple_http_client.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/url.h>
 
+class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
+    public Singleton<QnDesktopCameraResourceSearcher>,
     public QnAbstractNetworkResourceSearcher,
-    public Singleton<QnDesktopCameraResourceSearcher>
+    public nx::mediaserver::ServerModuleAware
 {
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:
-    explicit QnDesktopCameraResourceSearcher(QnCommonModule* commonModule);
+    explicit QnDesktopCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnDesktopCameraResourceSearcher() override;
 
     virtual QnResourcePtr createResource(const QnUuid& resourceTypeId,
@@ -32,14 +34,14 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    void registerCamera(const QSharedPointer<nx::network::AbstractStreamSocket>& connection,
+    void registerCamera(std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         const QString& userName,
         const QString& uniqueId);
 
-    quint32 incCSeq(const TCPSocketPtr& socket);
+    quint32 incCSeq(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
 
-    TCPSocketPtr acquireConnection(const QString& userId);
-    void releaseConnection(const TCPSocketPtr& socket);
+    QSharedPointer<nx::network::AbstractStreamSocket> acquireConnection(const QString& userId);
+    void releaseConnection(const QSharedPointer<nx::network::AbstractStreamSocket>& socket);
 
     virtual bool isVirtualResource() const override { return true; }
 
@@ -49,7 +51,9 @@ public:
 private:
     struct ClientConnectionInfo;
 
-    static QnSecurityCamResourcePtr cameraFromConnection(const ClientConnectionInfo& info);
+    static QnSecurityCamResourcePtr cameraFromConnection(
+        QnMediaServerModule* m_serverModule,
+        const ClientConnectionInfo& info);
     void log(const QByteArray& message, const ClientConnectionInfo& info) const;
 
     void cleanupConnections();

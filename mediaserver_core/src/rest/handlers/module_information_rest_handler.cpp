@@ -32,14 +32,6 @@ bool keepConnectionOpenMode(const P& p) { return p.contains(lit("keepConnectionO
 template<typename P>
 bool updateStreamMode(const P& p) { return p.contains(lit("updateStream")); }
 
-static void clearSockets(std::set<QSharedPointer<nx::network::AbstractStreamSocket>>* sockets)
-{
-    for (const auto& s: *sockets)
-        s->cancelIOSync(nx::network::aio::etNone);
-
-    sockets->clear();
-}
-
 } // namespace
 
 QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
@@ -57,6 +49,14 @@ QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
         });
 
     stopPromise.get_future().wait();
+}
+
+void QnModuleInformationRestHandler::clearSockets(SocketList* sockets)
+{
+    for (const auto& s: *sockets)
+        s.first->cancelIOSync(nx::network::aio::etNone);
+
+    sockets->clear();
 }
 
 JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestRequest& request)
@@ -117,7 +117,8 @@ void QnModuleInformationRestHandler::afterExecute(
         return;
 
     // TODO: Probably owner is supposed to be passed as mutable.
-    auto socket = const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket = const_cast<QnRestConnectionProcessor*>(request.owner)->takeSocket();
+
     socket->bindToAioThread(m_pollable.getAioThread());
     if (!socket->setNonBlockingMode(true)
         || !socket->setRecvTimeout(kConnectionTimeout)
@@ -136,32 +137,34 @@ void QnModuleInformationRestHandler::afterExecute(
         this, &QnModuleInformationRestHandler::changeModuleInformation, Qt::UniqueConnection);
 
     m_pollable.post(
-        [this, socket = std::move(socket), updateStreamMode = updateStreamMode(request.params)]()
+        [this, socket = std::move(socket), updateStreamMode = updateStreamMode(request.params)]() mutable
         {
+            auto socketPtr = socket.get();
+
             if (updateStreamMode)
             {
-                m_socketsToUpdate.insert(socket);
                 NX_VERBOSE(this, lm("Connection %1 asks for update stream, %2 total")
                     .args(socket, m_socketsToKeepOpen.size()));
 
-                sendKeepAliveByTimer(socket);
+                m_socketsToUpdate.emplace(socketPtr, std::move(socket));
+                sendKeepAliveByTimer(socketPtr);
             }
             else
             {
-                m_socketsToKeepOpen.insert(socket);
+                m_socketsToKeepOpen.emplace(socketPtr, std::move(socket));
                 NX_VERBOSE(this, lm("Connection %1 asks to keep connection open, %2 total")
-                    .args(socket, m_socketsToKeepOpen.size()));
+                    .args(socketPtr, m_socketsToKeepOpen.size()));
 
                 auto buffer = std::make_shared<QByteArray>();
                 buffer->reserve(100);
-                socket->readSomeAsync(buffer.get(),
-                    [this, socket, buffer](SystemError::ErrorCode code, size_t size)
+                socketPtr->readSomeAsync(buffer.get(),
+                    [this, socketPtr, buffer](SystemError::ErrorCode code, size_t size)
                     {
-                        socket->cancelIOSync(nx::network::aio::etNone);
-                        m_socketsToKeepOpen.erase(socket);
+                        socketPtr->cancelIOSync(nx::network::aio::etNone);
                         NX_VERBOSE(this, lm("Unexpected event on connection from %1 (size=%2): %3")
-                            .args(socket->getForeignAddress(), size, SystemError::toString(code)));
-                    });
+                            .args(socketPtr->getForeignAddress(), size, SystemError::toString(code)));
+                        m_socketsToKeepOpen.erase(socketPtr);
+                });
             }
         });
 }
@@ -180,7 +183,7 @@ void QnModuleInformationRestHandler::changeModuleInformation()
                 .arg(m_socketsToUpdate.size()));
 
             for (const auto& socket: m_socketsToUpdate)
-                sendModuleImformation(socket);
+                sendModuleImformation(socket.first);
         });
 }
 
@@ -202,7 +205,7 @@ void QnModuleInformationRestHandler::updateModuleImformation()
 }
 
 void QnModuleInformationRestHandler::sendModuleImformation(
-    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
+    nx::network::AbstractStreamSocket* socket)
 {
     if (m_moduleInformatiom.isEmpty())
         updateModuleImformation();
@@ -224,7 +227,7 @@ void QnModuleInformationRestHandler::sendModuleImformation(
 
 
 void QnModuleInformationRestHandler::sendKeepAliveByTimer(
-    const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
+    nx::network::AbstractStreamSocket* socket)
 {
     socket->registerTimer(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe / 2,
         [this, socket]()

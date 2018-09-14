@@ -39,7 +39,7 @@ public:
     virtual const char* capabilitiesManifest(nx::sdk::Error* error) const override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo, nx::sdk::Error* outError) override;
+        const nx::sdk::CameraInfo* cameraInfo, nx::sdk::Error* outError) override;
 
     virtual void executeAction(nx::sdk::metadata::Action*, nx::sdk::Error*) override;
 
@@ -50,7 +50,7 @@ public:
 private:
     std::vector<ObjectClassDescription> loadObjectClasses() const;
     std::vector<std::string> loadLabels(const std::string& labelFilePath) const;
-    std::vector<nxpl::NX_GUID> loadClassGuids(const std::string& guidsFilePath) const;
+    std::vector<std::string> loadClassGuids(const std::string& guidsFilePath) const;
 
     std::string buildManifestObectTypeString(const ObjectClassDescription& description) const;
 

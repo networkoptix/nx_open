@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QMetaType>
+
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 #include <nx/vms/api/data/software_version.h>
@@ -33,7 +35,6 @@ struct QnStartupParameters
     const static QString kAllowMultipleClientInstancesKey;
 
     bool skipMediaFolderScan = false;
-    bool ignoreVersionMismatch = false;
     bool vsyncDisabled = false;
     bool clientUpdateDisabled = false;
     bool softwareYuv = false;
@@ -47,15 +48,20 @@ struct QnStartupParameters
     bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
 
+    /**
+     * Special mode for ACS and similar scenarios: client does not have any UI elements, opens
+     * fixed camera(s) and limits timeline by 5-min window.
+     */
+    bool acsMode = false;
+
     QString devModeKey;
     QString authenticationString;
     QString delayedDrop;
     QString instantDrop;
-    QString layoutName;
+    QString layoutRef;
     QString logLevel;
     QString logFile;
     QString ec2TranLogLevel;
-    QString exceptionFilters; //< TODO: remove in 4.0.
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
@@ -73,3 +79,5 @@ struct QnStartupParameters
 
     QString qmlRoot;
 };
+
+Q_DECLARE_METATYPE(QnStartupParameters)

@@ -1,14 +1,20 @@
-#ifndef QN_RECORDING_STATS_REST_HANDLER_H
-#define QN_RECORDING_STATS_REST_HANDLER_H
+#pragma once
 
 #include "rest/server/json_rest_handler.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 
-class QnRecordingStatsRestHandler: public QnJsonRestHandler
+class QnRecordingStatsRestHandler:
+    public QnJsonRestHandler,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-};
+    QnRecordingStatsRestHandler(QnMediaServerModule* serverModule);
 
-#endif // QN_RECORDING_STATS_REST_HANDLER_H
+    virtual int executeGet(
+        const QString &path, 
+        const QnRequestParams &params, 
+        QnJsonRestResult &result, 
+        const QnRestConnectionProcessor*) override;
+};

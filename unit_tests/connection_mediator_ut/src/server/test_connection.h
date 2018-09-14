@@ -64,12 +64,12 @@ public:
     }
 
     virtual void setInactivityTimeout(
-        boost::optional<std::chrono::milliseconds> value) override
+        std::optional<std::chrono::milliseconds> value) override
     {
         m_inactivityTimeout = value;
     }
 
-    boost::optional<std::chrono::milliseconds> inactivityTimeout() const
+    std::optional<std::chrono::milliseconds> inactivityTimeout() const
     {
         return m_inactivityTimeout;
     }
@@ -86,7 +86,7 @@ public:
 
 private:
     Socket m_socket;
-    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    std::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::utils::MoveOnlyFunc<void()> m_connectionCloseHandler;
 };
 
@@ -107,12 +107,12 @@ public:
     virtual nx::network::SocketAddress getSourceAddress() const override;
 
     virtual void setInactivityTimeout(
-        boost::optional<std::chrono::milliseconds> value) override;
+        std::optional<std::chrono::milliseconds> value) override;
 
-    boost::optional<std::chrono::milliseconds> inactivityTimeout() const;
+    std::optional<std::chrono::milliseconds> inactivityTimeout() const;
 
 private:
-    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    std::optional<std::chrono::milliseconds> m_inactivityTimeout;
 };
 
 } // namespace test

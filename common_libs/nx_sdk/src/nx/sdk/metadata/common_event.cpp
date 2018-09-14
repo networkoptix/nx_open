@@ -19,9 +19,9 @@ void* CommonEvent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-nxpl::NX_GUID CommonEvent::typeId() const
+const char* CommonEvent::typeId() const
 {
-    return m_typeId;
+    return m_typeId.c_str();
 }
 
 float CommonEvent::confidence() const
@@ -49,9 +49,9 @@ bool CommonEvent::isActive() const
     return m_isActive;
 }
 
-void CommonEvent::setTypeId(const nxpl::NX_GUID& typeId)
+void CommonEvent::setTypeId(std::string typeId)
 {
-    m_typeId = typeId;
+    m_typeId = std::move(typeId);
 }
 
 void CommonEvent::setConfidence(float confidence)

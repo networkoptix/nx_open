@@ -22,17 +22,17 @@ class UserWatcher: public Connective<QObject>, public QnConnectionContextAware
 public:
     UserWatcher(QObject* parent = nullptr);
 
+    void setUser(const QnUserResourcePtr& currentUser);
+    const QnUserResourcePtr& user() const;
+
     void setUserName(const QString& name);
     const QString& userName() const;
-
-    const QnUserResourcePtr& user() const;
 
 signals:
     void userChanged(const QnUserResourcePtr& user);
     void userNameChanged();
 
 private:
-    void setCurrentUser(const QnUserResourcePtr& currentUser);
 
 private:
     QString m_userName;

@@ -84,7 +84,7 @@ QTimer* executeDelayedImpl(Callback callback, int delayMs, QThread* targetThread
     if (targetThread)
     {
         // TODO: #sivanov: Investigate why this assertion fails in mediaserver_core_ut.
-        //NX_EXPECT(qnHasEventLoop(targetThread));
+        //NX_ASSERT(qnHasEventLoop(targetThread));
         timer->moveToThread(targetThread);
         functor->moveToThread(targetThread);
     }
@@ -123,8 +123,8 @@ QTimer* executeDelayedParented(Callback callback, QObject* parent)
 
 void executeInThread(QThread* thread, Callback callback)
 {
-    NX_EXPECT(thread);
-    NX_EXPECT(callback);
+    NX_ASSERT(thread);
+    NX_ASSERT(callback);
 
     if (!callback)
         return;

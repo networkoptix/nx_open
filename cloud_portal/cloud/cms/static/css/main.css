@@ -90,6 +90,14 @@ img.preview-image{
     margin-top: -1px !important;
 }
 
+.submit-row a.btn-danger {
+    color: #fff !important;
+}
+
+.submit-row a.btn-default {
+    color: #333 !important;
+}
+
 .module h2{
     background: #35464F;
 }
@@ -100,4 +108,9 @@ img.preview-image{
     max-height: 350px;
     padding: 5px;
     border: 1px solid silver;
+    border-radius: 5px;
+}
+
+.disabled-row{
+    background-color: lightgray;
 }

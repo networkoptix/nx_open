@@ -15,7 +15,7 @@ namespace ApiCommand
     QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
     Value fromString(const QString& val)
-	{
+    {
         auto descriptor = getTransactionDescriptorByName(val);
         return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
     }
@@ -53,7 +53,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, true))
 
-
 QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray& data2)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
@@ -73,5 +72,17 @@ QnUuid QnAbstractTransaction::makeHash(
     return QnUuid::fromRfc4122(hash.result());
 }
 
-
 } // namespace ec2
+
+#define TRANSACTION_ENUM_APPLY(VALUE, NAME, ...) (ec2::ApiCommand::NAME, #NAME)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::ApiCommand, Value,
+    NX_MSVC_EXPAND(TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_ENUM_APPLY))
+)
+#undef TRANSACTION_ENUM_APPLY
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::TransactionType, Value,
+    (ec2::TransactionType::Unknown, "Unknown")
+    (ec2::TransactionType::Regular, "Regular")
+    (ec2::TransactionType::Local, "Local")
+    (ec2::TransactionType::Cloud, "Cloud")
+)

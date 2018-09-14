@@ -53,6 +53,8 @@ public:
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual QString partitionByPath(const QString &path) override;
 
+    virtual void setServerModule(QnMediaServerModule* serverModule) override;
+
 protected:
     virtual void timerEvent(QTimerEvent *event) override;
 

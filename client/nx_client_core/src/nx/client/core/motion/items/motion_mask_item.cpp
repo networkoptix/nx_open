@@ -8,55 +8,76 @@
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QSGTextureProvider>
 #include <QtQuick/QSGGeometryNode>
+#include <QtQuick/private/qquickwindow_p.h>
+
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace client {
 namespace core {
 
-// ------------------------------------------------------------------------------------------------
-// MotionMaskItem::Private
+//-------------------------------------------------------------------------------------------------
 
-class MotionMaskItem::Private: public QSGTextureProvider
+class MotionMaskItemTextureProvider: public QSGTextureProvider
+{
+public:
+    void updateTexture(QSGTexture* texture)
+    {
+        if (m_texture == texture)
+            return;
+
+        m_texture = texture;
+        emit textureChanged();
+    }
+
+    virtual QSGTexture* texture() const override
+    {
+        return m_texture;
+    }
+
+private:
+    QSGTexture* m_texture = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class MotionMaskItem::Private
 {
     MotionMaskItem* const q = nullptr;
 
 public:
-    explicit Private(MotionMaskItem* q): q(q)
+    explicit Private(MotionMaskItem* q):
+        q(q)
     {
     }
 
     void ensureTexture()
     {
-        if (!m_textureDirty)
+        if (!textureDirty)
             return;
 
         if (auto window = q->window())
         {
-            const auto mask = QBitmap::fromData(QSize(MotionGrid::kHeight, MotionGrid::kWidth),
-                reinterpret_cast<const uchar*>(m_mask.data()), QImage::Format_Mono);
+            const auto bitmap = QBitmap::fromData(QSize(MotionGrid::kHeight, MotionGrid::kWidth),
+                reinterpret_cast<const uchar*>(mask.data()), QImage::Format_Mono);
 
             // Rotate90 and mirror are operations optimized by QImage, while transposition
             // - single transformation with QMatrix(0,1,1,0, 0,0) - is not optimized.
-            auto image = mask.toImage().transformed(QMatrix().rotate(-90)).mirrored();
+            auto image = bitmap.toImage().transformed(QMatrix().rotate(-90)).mirrored();
             image.setColorTable({0, 0xFFFFFFFF});
 
-            m_texture.reset(window->createTextureFromImage(image));
-            m_texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
-            m_texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
+            texture.reset(window->createTextureFromImage(image));
+            texture->setHorizontalWrapMode(QSGTexture::ClampToEdge);
+            texture->setVerticalWrapMode(QSGTexture::ClampToEdge);
+            provider->updateTexture(texture.data());
 
-            m_textureDirty = false;
-            emit textureChanged();
+            textureDirty = false;
         }
-    }
-
-    virtual QSGTexture* texture() const override
-    {
-        return m_texture.data();
     }
 
     QByteArray motionMask() const
     {
-        return m_mask;
+        return mask;
     }
 
     void setMotionMask(QByteArray value)
@@ -64,24 +85,24 @@ public:
         if (value.size() != kMotionMaskSizeBytes)
             value.resize(kMotionMaskSizeBytes);
 
-        if (m_mask == value)
+        if (mask == value)
             return;
 
-        m_mask = value;
+        mask = value;
 
-        m_textureDirty = true;
+        textureDirty = true;
         q->update();
         emit q->motionMaskChanged();
     }
 
-private:
-    QByteArray m_mask = QByteArray(kMotionMaskSizeBytes, 0);
-    QScopedPointer<QSGTexture, QScopedPointerDeleteLater> m_texture;
-    bool m_textureDirty = true;
+public:
+    QByteArray mask = QByteArray(kMotionMaskSizeBytes, 0);
+    QScopedPointer<QSGTexture, QScopedPointerDeleteLater> texture;
+    bool textureDirty = true;
+    MotionMaskItemTextureProvider* provider = nullptr;
 };
 
-// ------------------------------------------------------------------------------------------------
-// MotionMaskItem
+//-------------------------------------------------------------------------------------------------
 
 MotionMaskItem::MotionMaskItem(QQuickItem* parent):
     base_type(parent),
@@ -101,7 +122,12 @@ bool MotionMaskItem::isTextureProvider() const
 
 QSGTextureProvider* MotionMaskItem::textureProvider() const
 {
-    return d.data();
+    if (!d->provider)
+    {
+        d->provider = new MotionMaskItemTextureProvider();
+        d->provider->updateTexture(d->texture.data());
+    }
+    return d->provider;
 }
 
 QByteArray MotionMaskItem::motionMask() const
@@ -114,7 +140,8 @@ void MotionMaskItem::setMotionMask(const QByteArray& value)
     d->setMotionMask(value);
 }
 
-QSGNode* MotionMaskItem::updatePaintNode(QSGNode* node, UpdatePaintNodeData* updatePaintNodeData)
+QSGNode* MotionMaskItem::updatePaintNode(
+    QSGNode* node, UpdatePaintNodeData* /*updatePaintNodeData*/)
 {
     auto geometryNode = static_cast<QSGGeometryNode*>(node);
     if (!geometryNode)
@@ -132,14 +159,14 @@ QSGNode* MotionMaskItem::updatePaintNode(QSGNode* node, UpdatePaintNodeData* upd
     d->ensureTexture();
 
     auto material = static_cast<QSGTextureMaterial*>(geometryNode->material());
-    if (material->texture() != d->texture())
+    if (material->texture() != d->texture.data())
     {
-        material->setTexture(d->texture());
+        material->setTexture(d->texture.data());
         geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
-    const auto w = width();
-    const auto h = height();
+    const auto w = (float) width();
+    const auto h = (float) height();
     auto data = geometryNode->geometry()->vertexDataAsTexturedPoint2D();
     data[0].set(0, 0, 0, 0);
     data[1].set(0, h, 0, 1);
@@ -148,6 +175,15 @@ QSGNode* MotionMaskItem::updatePaintNode(QSGNode* node, UpdatePaintNodeData* upd
     geometryNode->markDirty(QSGNode::DirtyGeometry);
 
     return geometryNode;
+}
+
+void MotionMaskItem::releaseResources()
+{
+    if (d->provider)
+    {
+        QQuickWindowQObjectCleanupJob::schedule(window(), d->provider);
+        d->provider = nullptr;
+    }
 }
 
 void MotionMaskItem::registerQmlType()

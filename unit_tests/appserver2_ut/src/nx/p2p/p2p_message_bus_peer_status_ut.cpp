@@ -90,14 +90,8 @@ protected:
         for (const auto& server : m_servers)
         {
             createData(server, 0, 0);
-            const auto connection = server->moduleInstance()->ecConnection();
-            MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
-            auto intervals = bus->delayIntervals();
-            intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
-            intervals.outConnectionsInterval = std::chrono::milliseconds(1);
-            intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
-            bus->setDelayIntervals(intervals);
         }
+        setLowDelayIntervals();
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
         MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();

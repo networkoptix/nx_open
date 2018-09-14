@@ -97,7 +97,8 @@ protected:
         {
             m_queries.push_back(std::make_unique<UpdateWithoutAnyDataExecutor>(
                 [](QueryContext*) { return DBResult::ok; },
-                std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1)));
+                std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1),
+                std::string()));
         }
     }
 
@@ -110,7 +111,8 @@ protected:
             m_queries.begin() + pos,
             std::make_unique<UpdateWithoutAnyDataExecutor>(
                 [](QueryContext*) { return DBResult::ioError; },
-                std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1)));
+                std::bind(&MultipleQueryExecutor::saveQueryResult, this, _1),
+                std::string()));
     }
 
     void whenExecute()
@@ -170,7 +172,7 @@ protected:
     }
 
 private:
-    std::vector<std::unique_ptr<AbstractUpdateExecutor>> m_queries;
+    std::vector<std::unique_ptr<AbstractExecutor>> m_queries;
     std::vector<DBResult> m_queryResults;
     DBResult m_execResult = DBResult::ok;
     int m_queryCount = 0;

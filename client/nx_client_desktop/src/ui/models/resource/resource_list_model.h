@@ -50,9 +50,6 @@ public:
     bool hasCheckboxes() const;
     void setHasCheckboxes(bool value);
 
-    bool userCheckable() const;
-    void setUserCheckable(bool value);
-
     bool hasStatus() const;
     void setHasStatus(bool value);
 
@@ -93,7 +90,6 @@ private:
 private:
     bool m_readOnly = false;
     bool m_hasCheckboxes = false;
-    bool m_userCheckable = true;
     bool m_hasStatus = false;
 
     bool m_singlePick = false;

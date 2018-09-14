@@ -18,6 +18,10 @@
     "version": "1.0",
     "data": [
         {
+            "keys": ["Hanwha|*"],
+            "canShareLicenseGroup": true
+        },
+        {
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
@@ -32,6 +36,12 @@
                 "DWC-MVT4Wi*|ONVIF"
             ],
             "obtainMacFromMulticast": "Never"
+        },
+        {
+            "keys": [
+                "Hanwha|SNP-5300"
+            ],
+            "disableNormalizedSpeed": true
         },
         {
             "keys": [
@@ -177,7 +187,9 @@
         },
         {
             "keys": [
-                "ActiveCam|*"
+                "ActiveCam|*",
+                "ACTI|B915", 
+                "*|ACTi-915"
             ],
             "forceONVIF": true
         },
@@ -558,9 +570,18 @@
                 "Pelco|NET5504",
                 "Pelco|NET5508",
                 "Pelco|NET5516",
-                "Samsung*|SPE-100",
-                "Samsung*|SPE-101",
-                "Samsung*|SPE-1600*",
+                "Samsung|SPE-100",
+                "Samsung|SPE-101",
+                "Samsung|SPE-410",
+                "Samsung|SPE-16*",
+                "Samsung Techwin|SPE-100",
+                "Samsung Techwin|SPE-101",
+                "Samsung Techwin|SPE-410",
+                "Samsung Techwin|SPE-16*",
+                "Hanwha|SPE-100",
+                "Hanwha|SPE-101",
+                "Hanwha|SPE-410",
+                "Hanwha|SPE-16*",
                 "BOSCH|VIDEO JET multi 4000",
                 "DW-CP16|Digital Watchdog*",
                 "*|EXVA-HD-216",
@@ -913,7 +934,9 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*",
+                "DS-6716*|Embedded_Net_DVR", "DS-6716*|Embedded Net DVS",
+                "Embedded_Net_DVR|DS-6716*", "Embedded Net DVS|DS-6716*"
             ],
             "forcedOnvifParams":
             {
@@ -944,21 +967,21 @@
                 "HIKVISION|DS-2CD2655FWD-IZS",
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2CD4A26FWD-IZS",
                 "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
                 "Hikvision|DS-2DE4A220IW-DE",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
                 "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
+                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -968,13 +991,11 @@
                 "HIKVISION|DS-2CD2655FWD-IZS",
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2CD4A26FWD-IZS",
                 "HIKVISION|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD2522FWD*",
@@ -984,7 +1005,9 @@
                 "ONVIF|IP-2CD4B26FWD-IZS",
                 "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
-                "hikvision|DS-2CD2142FWD*"
+                "hikvision|DS-2CD2142FWD*",
+                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"                
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2169,7 +2192,8 @@
             "keys": [
                 "iPIXA|INVDHDW32812IR"
             ],
-            "clearInputsTimeoutSec": 3
+            "clearInputsTimeoutSec": 3,
+            "comment": "considers input state as 0 after specified timeout"
         },
         {
             "keys": [
@@ -2186,8 +2210,16 @@
         },
         {
             "keys": [
+                "AVer|FV3028-RTM"
+            ],
+            "onfivPtzBroken": true,
+            "_comment": "Camera says, that it supports onvif ptz, but it lies. It support proprietary ptz only."
+        },
+        {
+            "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2430,53 +2462,6 @@
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
         },
         {
-            "keys":[
-            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
-            ],
-            "multiresourceVideoChannelMapping": [
-                {
-                    "resourceChannel": 1,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [0]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 2,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [1]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 3,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [2]
-                        }
-                    ]
-                },
-                {
-                    "resourceChannel": 4,
-                    "channelMap": [
-                        {
-                            "originalChannel": 0,
-                            "mappedChannels": [3]
-                        }
-                    ]
-                }
-            ],
-            "doNotConfigureCamera": false,
-            "ignoreMultisensors": true,
-            "shouldAppearAsSingleChannel": true,
-            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
-        },
-        {
             "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
             "onvifManufacturerReplacement": "Hikvision"
         },
@@ -2484,6 +2469,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2510,6 +2496,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2563,6 +2550,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2696,6 +2684,7 @@
             "keys": [
                 "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2824,6 +2813,62 @@
         {
             "keys": ["Hanwha|SNF-8010*"],
             "operationalPtzCapabilities": "NoPtzCapabilities"
+        },
+        {
+            "keys": [
+                "*|PTZIP762X20IR"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1,   -1],
+                        "logical": [-90,   2]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
+                        "logical": [1, 1.35, 1.82 , 2.46 , 3.31 , 4.47 , 6.034 , 8.14, 10.99, 14.9 , 20],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+            "9W-H3-3MH*|*",
+            "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
+            "AXIS|AXIS P3707*",
+            "Axis|AXISP3707*",
+            "AXIS|AXISP3707*",
+            "AXIS|AXIS Q3709*",
+            "Axis|AXISQ3709*",
+            "AXIS|AXISQ3709*",
+            "AXIS|AXIS Q3708*",
+            "Axis|AXISQ3708*",
+            "AXIS|AXISQ3708*",
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
+            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
+            ],
+            "canShareLicenseGroup": true
+        },
+        {
+            "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
+            "bypassFirmware":"1.0.0"
+        },
+        {
+            "keys": [
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+            ],
+            "clearInputsTimeoutSec": 1,
+            "comment": "considers input state as 0 after specified timeout"
         }
     ]
 }

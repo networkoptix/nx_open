@@ -19,17 +19,6 @@ namespace http {
 namespace server {
 namespace proxy {
 
-// TODO: Review this interface.
-class NX_NETWORK_API AbstractResponseSender
-{
-public:
-    virtual ~AbstractResponseSender() = default;
-
-    virtual void sendResponse(
-        nx::network::http::RequestResult requestResult,
-        boost::optional<nx::network::http::Response> response) = 0;
-};
-
 /**
  * Proxies HTTP request and corresponding response.
  */
@@ -40,15 +29,24 @@ class NX_NETWORK_API ProxyWorker:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
+    using ProxyCompletionHander = nx::utils::MoveOnlyFunc<void(
+        nx::network::http::RequestResult requestResult,
+        boost::optional<nx::network::http::Response> response)>;
+
     ProxyWorker(
         const nx::String& targetHost,
+        const char* originalRequestScheme,
         nx::network::http::Request translatedRequest,
-        AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
 
     void setTargetHostConnectionInactivityTimeout(std::chrono::milliseconds timeout);
-    /** MUST be called to start actual activity. */
-    void start();
+    /**
+     * MUST be called to start actual activity.
+     * @param handler Invoked when there is a response from target server.
+     *   Or target server is not responding.
+     *   The response may contain message body of unknown size (e.g., video stream).
+     */
+    void start(ProxyCompletionHander handler);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -60,10 +58,10 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    nx::String m_proxyHost;
+    nx::utils::Url m_proxyHostUrl;
     nx::String m_targetHost;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_targetHostPipeline;
-    AbstractResponseSender* m_responseSender = nullptr;
+    ProxyCompletionHander m_completionHandler;
     std::unique_ptr<AbstractMessageBodyConverter> m_messageBodyConverter;
     nx::Buffer m_messageBodyBuffer;
     nx::network::http::Message m_responseMessage;

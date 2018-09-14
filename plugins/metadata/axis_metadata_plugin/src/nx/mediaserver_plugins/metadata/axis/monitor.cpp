@@ -23,14 +23,15 @@ static const std::string kRuleNamePrefix("NX_RULE_");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& event, bool active)
+nx::sdk::metadata::CommonEvent* createCommonEvent(
+    const AnalyticsEventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(event.eventTypeIdExternal);
-    commonEvent->setDescription(event.name.value.toStdString());
+    commonEvent->setTypeId(eventType.eventTypeIdExternal.toStdString());
+    commonEvent->setDescription(eventType.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(event.topic.toStdString());
+    commonEvent->setAuxilaryData(eventType.topic.toStdString());
     return commonEvent;
 }
 
@@ -79,14 +80,12 @@ void axisHandler::processRequest(
 
     const QString kMessage = "?Message=";
     const int kGuidStringLength = 36; //< Size of guid string.
-    int startIndex = request.toString().indexOf(kMessage);
-    QString uuidString = request.toString().
-        mid(startIndex + kMessage.size(), kGuidStringLength);
-    QnUuid uuid(uuidString);
-
+    const int startIndex = request.toString().indexOf(kMessage);
+    const QString uuid = request.toString().mid(startIndex + kMessage.size(), kGuidStringLength);
+    
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
     const auto it = std::find_if(m_events.begin(), m_events.end(),
-        [&uuid](ElapsedEvent& event) { return event.type.typeId == uuid; });
+        [&uuid](ElapsedEvent& event) { return event.type.id == uuid; });
     if (it != m_events.end())
     {
         m_monitor->sendEventStartedPacket(it->type);
@@ -95,8 +94,7 @@ void axisHandler::processRequest(
     }
     else
     {
-        NX_PRINT << "Received packed with undefined event type. Uuid = "
-            << uuidString.toStdString();
+        NX_PRINT << "Received packed with undefined event type. Uuid = " << uuid.toStdString();
     }
     completionHandler(nx::network::http::StatusCode::ok);
 }
@@ -121,8 +119,8 @@ Monitor::~Monitor()
     stopMonitoring();
 }
 
-void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_GUID* eventTypeList,
-    int eventTypeListSize)
+void Monitor::addRules(const nx::network::SocketAddress& localAddress,
+    const char* const* eventTypeList, int eventTypeListSize)
 {
     removeRules();
 
@@ -137,10 +135,9 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
         const auto it = std::find_if(
             m_manager->events().outputEventTypes.cbegin(),
             m_manager->events().outputEventTypes.cend(),
-            [eventTypeList,i](const AnalyticsEventType& event)
+            [eventTypeList, i](const AnalyticsEventType& event)
             {
-                return memcmp(&event.eventTypeIdExternal, &eventTypeList[i],
-                    sizeof(nxpl::NX_GUID)) == 0;
+                return event.eventTypeIdExternal == eventTypeList[i];
             });
         if (it != m_manager->events().outputEventTypes.cend())
         {
@@ -155,7 +152,7 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress, nxpl::NX_
             std::string actionEventName = it->fullName().toStdString();
             std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
             std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
-            std::string message = std::string(it->typeId.toSimpleString().toLatin1()) +
+            std::string message = std::string(it->id.toLatin1()) +
                 std::string(".") + actionEventName;
 
             int actionId = cameraController.addActiveHttpNotificationAction(
@@ -209,15 +206,15 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
     return nx::network::HostAddress();
 }
 
-nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
-    int eventTypeListSize)
+nx::sdk::Error Monitor::startMonitoring(const char* const* typeList, int typeListSize)
 {
-    for (int i = 0; i < eventTypeListSize; ++i)
+    // Assume that the list contains events only, since this plugin produces no objects.
+    for (int i = 0; i < typeListSize; ++i)
     {
-        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
-        const AnalyticsEventType* eventType = m_manager->eventByUuid(id);
+        const QString id = typeList[i];
+        const AnalyticsEventType* eventType = m_manager->eventTypeById(id);
         if (!eventType)
-            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
+            NX_PRINT << "Unknown event type id = " << id.toStdString();
         else
             m_eventsToCatch.emplace_back(*eventType);
     }
@@ -247,7 +244,7 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
     m_aioTimer.start(kMinTimeBetweenEvents, [this](){ onTimer(); });
 
     localAddress = m_httpServer->server().address();
-    this->addRules(localAddress, eventTypeList, eventTypeListSize);
+    this->addRules(localAddress, typeList, typeListSize);
     return nx::sdk::Error::noError;
 }
 

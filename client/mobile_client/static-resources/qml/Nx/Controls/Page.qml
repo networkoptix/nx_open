@@ -5,7 +5,6 @@ PageBase
 {
     id: page
 
-    property alias title: toolBar.title
     property alias leftButtonIcon: toolBar.leftButtonIcon
     property alias titleControls: toolBar.controls
     property alias warningText: warningPanel.text
@@ -34,7 +33,8 @@ PageBase
             ToolBar
             {
                 id: toolBar
-                leftButtonIcon: lp("/images/arrow_back.png")
+                title: page.title
+                leftButtonIcon.source: lp("/images/arrow_back.png")
                 onLeftButtonClicked: page.leftButtonClicked()
             }
 

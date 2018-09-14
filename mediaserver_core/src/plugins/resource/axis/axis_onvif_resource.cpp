@@ -3,7 +3,8 @@
 
 #include "axis_onvif_resource.h"
 
-QnAxisOnvifResource::QnAxisOnvifResource()
+QnAxisOnvifResource::QnAxisOnvifResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
 }
 

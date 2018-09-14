@@ -19,7 +19,8 @@
 
 const QString QnAdamResource::kManufacture(lit("AdvantechADAM"));
 
-QnAdamResource::QnAdamResource()
+QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     Qn::directConnect(
         this, &QnResource::propertyChanged,
@@ -162,26 +163,6 @@ bool QnAdamResource::isInputPortMonitored() const
     return false;
 }
 
-QnIOPortDataList QnAdamResource::mergeIOPortData(
-    const QnIOPortDataList& deviceIO,
-    const QnIOPortDataList& savedIO) const
-{
-    QnIOPortDataList resultIO = deviceIO;
-    for (auto& result : resultIO)
-    {
-        for(const auto& saved : savedIO)
-        {
-            if (result.id == saved.id)
-            {
-                result = saved;
-                break;
-            }
-        }
-    }
-
-    return resultIO;
-}
-
 void QnAdamResource::setPortDefaultStates()
 {
     if (!m_ioManager)
@@ -204,21 +185,7 @@ void QnAdamResource::setPortDefaultStates()
 QnIOPortDataList QnAdamResource::getRelayOutputList() const
 {
     if (m_ioManager)
-    {
-        auto deviceOutputs = m_ioManager->getOutputPortList();
-        auto savedIO = QJson::deserialized<QnIOPortDataList>(
-            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-
-        QnIOPortDataList savedOutputs;
-
-        for (const auto& ioPort: savedIO)
-        {
-            if (ioPort.portType == Qn::PT_Output)
-                savedOutputs.push_back(ioPort);
-        }
-
-        return mergeIOPortData(deviceOutputs, savedOutputs);
-    }
+        return m_ioManager->getOutputPortList();
 
     return QnIOPortDataList();
 }
@@ -226,21 +193,7 @@ QnIOPortDataList QnAdamResource::getRelayOutputList() const
 QnIOPortDataList QnAdamResource::getInputPortList() const
 {
     if (m_ioManager)
-    {
-        auto deviceInputs = m_ioManager->getInputPortList();
-        auto savedIO = QJson::deserialized<QnIOPortDataList>(
-            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-
-        QnIOPortDataList savedInputs;
-
-        for (const auto& ioPort: savedIO)
-        {
-            if (ioPort.portType == Qn::PT_Input)
-                savedInputs.push_back(ioPort);
-        }
-
-        return mergeIOPortData(deviceInputs, savedInputs);
-    }
+        return m_ioManager->getInputPortList();
 
     return QnIOPortDataList();
 }

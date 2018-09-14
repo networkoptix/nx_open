@@ -21,25 +21,37 @@ QN_DECLARE_METAOBJECT_HEADER(api, EventReason EventState EventType ActionType, )
 enum class EventReason
 {
     none = 0,
-    networkNoFrame,
-    networkConnectionClosed,
-    networkRtpPacketLoss,
-    serverTerminated,
-    serverStarted,
-    storageIoError,
-    storageTooSlow,
-    storageFull,
-    systemStorageFull,
-    licenseRemoved,
-    backupFailedNoBackupStorageError,
-    backupFailedSourceStorageError,
-    backupFailedSourceFileError,
-    backupFailedTargetFileError,
-    backupFailedChunkError,
-    backupEndOfPeriod,
-    backupDone,
-    backupCancelled,
-    networkNoResponseFromDevice
+
+    // Network Issue event
+    networkNoFrame = 1,
+    networkConnectionClosed = 2,
+    networkRtpPacketLoss = 3,
+    networkNoResponseFromDevice = 19,
+
+    // Server Failure event
+    serverTerminated = 4,
+    serverStarted = 5,
+
+    // Storage Failure event
+    storageIoError = 6,
+    storageTooSlow = 7,
+    storageFull = 8,
+    systemStorageFull = 9,
+
+    // License Issue event
+    licenseRemoved = 10,
+
+    // Backup Finished event
+    backupFailedNoBackupStorageError = 11,
+    backupFailedSourceStorageError = 12,
+    backupFailedSourceFileError = 13,
+    backupFailedTargetFileError = 14,
+    backupFailedChunkError = 15,
+    backupEndOfPeriod = 16,
+    backupDone = 17,
+    backupCancelled = 18,
+
+    // last number is 19, see networkNoResponseFromDevice
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 

@@ -200,14 +200,6 @@ void QnUserProfileWidget::applyChanges()
             if (getCredentials(localSystemId, url.userName()).isValid())
                 storeCredentials(localSystemId, QnEncodedCredentials(url));
             qnClientCoreSettings->save();
-
-            auto lastUsed = qnSettings->lastUsedConnection();
-            if (!lastUsed.url.password().isEmpty() && isUrlEqual(lastUsed.url, url))
-            {
-                lastUsed.url = url;
-                qnSettings->setLastUsedConnection(lastUsed);
-                qnSettings->save();
-            }
         }
     }
 

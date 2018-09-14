@@ -30,7 +30,7 @@ protected:
         utils::TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
-        auto tmpSocketGuard = makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
+        auto tmpSocketGuard = nx::utils::makeScopeGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
 
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));
@@ -116,8 +116,8 @@ protected:
             m_connectionAddress,
             [this, count](SystemError::ErrorCode code)
             {
-                NX_LOGX(lm("Connect result: %1")
-                    .arg(SystemError::toString(code)), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("Connect result: %1")
+                    .arg(SystemError::toString(code)));
 
                 m_connectResults.push(code);
                 if (code == SystemError::noError)

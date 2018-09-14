@@ -34,7 +34,7 @@ public:
     virtual void setLocale(const char* locale) override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo,
+        const nx::sdk::CameraInfo* cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(
@@ -42,7 +42,7 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {}
 
-    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
+    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
 
     virtual void executeAction(
         nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;

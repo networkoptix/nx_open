@@ -59,6 +59,7 @@ angular.module('cloudApp')
                 updateActive();
                 account.get().then(function(account){
                     scope.account = account;
+                    scope.downloadsHistory = scope.account.permissions.indexOf(Config.permissions.canViewRelease) > -1;
 
                     $('body').removeClass('loading');
                     $('body').addClass('authorized');

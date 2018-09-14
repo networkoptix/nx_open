@@ -21,7 +21,7 @@ public:
     Connector(
         nx::utils::Url relayUrl,
         AddressEntry targetHostAddress,
-        nx::String connectSessionId);
+        std::string connectSessionId);
     virtual ~Connector() override;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

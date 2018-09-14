@@ -23,6 +23,8 @@
 
 #include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
+#include <nx/metrics/metrics_storage.h>
+
 
 // we need enough size for updates
 #ifdef __arm__
@@ -33,40 +35,45 @@
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
     d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
     d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnCommonModule* commonModule)
 :
     QnCommonModuleAware(commonModule),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
+}
+
+void QnTCPConnectionProcessor::stop()
+{
+    base_type::stop();
 }
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
@@ -246,6 +253,28 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
+std::pair<nx::String, nx::String> QnTCPConnectionProcessor::generateErrorResponse(
+    nx::network::http::StatusCode::Value errorCode, const QByteArray& details) const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    using namespace nx::network::http;
+    const auto accepted = getHeaderValue(d->request.headers, header::kAccept);
+    if (accepted.contains(header::ContentType::kJson.value))
+    {
+        return std::pair<nx::String, nx::String>(
+            header::ContentType::kJson.toString(),
+            lm(R"json({"error": "%1", "errorString": "%2", "details": "%3"})json").args(
+                static_cast<int>(errorCode), errorCode, details).toUtf8());
+    }
+    else
+    {
+        return std::pair<nx::String, nx::String>(
+            header::ContentType::kHtml.toString(),
+            lm(R"http(<HTML><HEAD><TITLE>%1</TITLE></HEAD><BODY><H1>%2 %3</H1></BODY>)http").args(
+                errorCode, static_cast<int>(errorCode), errorCode).toUtf8());
+    }
+}
+
 QByteArray QnTCPConnectionProcessor::createResponse(
     int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding,
     const QByteArray& multipartBoundary, bool displayDebug, bool isUndefinedContentLength)
@@ -290,11 +319,11 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     QByteArray response = !multipartBoundary.isEmpty() ? d->response.toMultipartString(multipartBoundary) : d->response.toString();
 
     if (displayDebug)
-        NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Server response to %1:\n%2").arg(d->socket->getForeignAddress().address.toString()).arg(QString::fromLatin1(response)));
 
-    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
+    NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getForeignAddress().toString()).
-        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
+        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))));
 
     return response;
 }
@@ -331,44 +360,22 @@ bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
     return sendData( result.constData(), result.size() );
 }
 
-QString QnTCPConnectionProcessor::codeToMessage(int code)
-{
-    switch(code)
-    {
-    case CODE_OK:
-        return tr("OK");
-    case CODE_NOT_FOUND:
-        return tr("Not Found");
-    case CODE_NOT_IMPLEMETED:
-        return tr("Not Implemented");
-    case CODE_UNSPOORTED_TRANSPORT:
-        return tr("Unsupported Transport");
-    case CODE_INTERNAL_ERROR:
-        return tr("Internal Server Error");
-    case CODE_INVALID_PARAMETER:
-        return tr("Invalid Parameter");
-    }
-    return QString ();
-}
-
 void QnTCPConnectionProcessor::pleaseStop()
 {
     Q_D(QnTCPConnectionProcessor);
-    if (auto socket = d->socket)
-        socket->shutdown();
+    {
+        QnMutexLocker lock(&d->socketMutex);
+        if (d->socket)
+            d->socket->shutdown();
+    }
     QnLongRunnable::pleaseStop();
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
+nx::network::SocketAddress QnTCPConnectionProcessor::getForeignAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket;
-}
-
-int QnTCPConnectionProcessor::getSocketTimeout()
-{
-    Q_D(QnTCPConnectionProcessor);
-    return d->socketTimeout;
+    QnMutexLocker lock(&d->socketMutex);
+    return d->socket->getForeignAddress();
 }
 
 int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
@@ -402,9 +409,9 @@ bool QnTCPConnectionProcessor::readRequest()
 
             if (messageSize)
             {
-                NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+                NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
                     arg(d->socket->getForeignAddress().toString()).
-                    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+                    arg(QString::fromLatin1(d->clientRequest)));
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
@@ -455,9 +462,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             if (readed <= 0)
             {
                 d->prevSocketError = SystemError::getLastOSErrorCode();
-                NX_LOG( lit("Error reading request from %1: %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )),
-                    cl_logDEBUG1 );
+                NX_DEBUG(this, lit("Error reading request from %1: %2").
+                    arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString( d->prevSocketError )));
                 return false;
             }
             d->interleavedMessageData = QByteArray::fromRawData( (const char*)d->tcpReadBuffer, readed );
@@ -496,9 +502,9 @@ bool QnTCPConnectionProcessor::readSingleRequest()
                 d->owner->applyModToRequest(&d->request);
 
             //TODO #ak logging
-            //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+            //NX_DEBUG(QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
             //    arg(d->socket->getForeignAddress().toString()).
-            //    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
+            //    arg(QString::fromLatin1(d->clientRequest)));
             return true;
         }
     }
@@ -522,12 +528,12 @@ nx::utils::Url QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QnMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutexLockerBase& mutexLocker)
 {
     m_needStop = false;
-    mutex.unlock();
+    mutexLocker.unlock();
     run();
-    mutex.lock();
+    mutexLocker.relock();
 }
 
 nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
@@ -536,43 +542,36 @@ nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
     return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
-bool QnTCPConnectionProcessor::isSocketTaken() const
+bool QnTCPConnectionProcessor::isConnectionSecure() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->isSocketTaken;
+    NX_ASSERT(d->socket);
+    const auto socket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(d->socket.get());
+    return socket && socket->isEncryptionEnabled();
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
 {
     Q_D(QnTCPConnectionProcessor);
-    d->isSocketTaken = true;
-
-    const auto socket = d->socket;
-    d->socket.clear();
-    return socket;
-}
-
-void QnTCPConnectionProcessor::releaseSocket()
-{
-    Q_D(QnTCPConnectionProcessor);
-    d->socket.clear();
+    QnMutexLocker lock(&d->socketMutex);
+    return std::move(d->socket);
 }
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {
+    const auto code = nx::network::http::StatusCode::movedPermanently;
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=utf-8";
-    d->response.messageBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(code);
     d->response.headers.insert(nx::network::http::HttpHeader("Location", page));
-    return CODE_MOVED_PERMANENTLY;
+    return code;
 }
 
 int QnTCPConnectionProcessor::notFound(QByteArray& contentType)
 {
+    const auto code = nx::network::http::StatusCode::notFound;
     Q_D(QnTCPConnectionProcessor);
-    contentType = "text/html; charset=utf-8";
-    d->response.messageBody = "<html><head><title>Not Found</title></head><body><h1>Not Found</h1></html>";
-    return CODE_NOT_FOUND;
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(code);
+    return code;
 }
 
 bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
@@ -640,15 +639,30 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     return result;
 }
 
-void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody)
+void QnTCPConnectionProcessor::sendErrorResponse(nx::network::http::StatusCode::Value httpResult)
+{
+    Q_D(QnTCPConnectionProcessor);
+    nx::String contentType;
+    std::tie(contentType, d->response.messageBody) = generateErrorResponse(httpResult);
+    sendResponse(httpResult, contentType);
+}
+
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(
+    nx::network::http::StatusCode::Value httpResult,
+    const QByteArray& messageBody, const QByteArray& details)
 {
     Q_D(QnTCPConnectionProcessor);
 
+    nx::String contentType = nx::network::http::header::ContentType::kHtml.toString();
     if( d->request.requestLine.method == nx::network::http::Method::get ||
         d->request.requestLine.method == nx::network::http::Method::head )
     {
-        d->response.messageBody = messageBody;
+        if (messageBody.isEmpty())
+            std::tie(contentType, d->response.messageBody) = generateErrorResponse(httpResult, details);
+        else
+            d->response.messageBody = messageBody;
     }
+
     if (nx::network::http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
         d->response.headers.insert(nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
@@ -674,7 +688,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx::network::http::Statu
     }
     sendResponse(
         httpResult,
-        d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
+        d->response.messageBody.isEmpty() ? QByteArray() : contentType,
         contentEncoding );
 }
 

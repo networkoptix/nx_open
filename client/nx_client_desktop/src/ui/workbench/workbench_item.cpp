@@ -33,7 +33,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
     m_uuid(data.uuid),
     m_resource(resource)
 {
-    NX_EXPECT(m_resource && m_resource == resourcePool()->getResourceByDescriptor(data.resource));
+    NX_ASSERT(m_resource);
+    NX_ASSERT_HEAVY_CONDITION(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
@@ -52,7 +53,7 @@ QnWorkbenchItem::~QnWorkbenchItem()
 
 QnLayoutItemData QnWorkbenchItem::data() const
 {
-    NX_EXPECT(m_resource);
+    NX_ASSERT(m_resource);
 
     QnLayoutItemData data;
     data.uuid = m_uuid;
@@ -73,8 +74,9 @@ QnLayoutItemData QnWorkbenchItem::data() const
 
 bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 {
-    NX_EXPECT(data.uuid == uuid());
-    NX_EXPECT(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
+    NX_ASSERT(data.uuid == uuid());
+    NX_ASSERT(m_resource);
+    NX_ASSERT_HEAVY_CONDITION(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     bool result = true;
 
@@ -93,8 +95,9 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 
 void QnWorkbenchItem::submit(QnLayoutItemData &data) const
 {
-    NX_EXPECT(data.uuid == uuid());
-    NX_EXPECT(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
+    NX_ASSERT(data.uuid == uuid());
+    NX_ASSERT(m_resource);
+    NX_ASSERT_HEAVY_CONDITION(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     data.flags = flags();
     data.rotation = rotation();
@@ -418,7 +421,7 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
 
 void QnWorkbenchItem::sortByGeometry(QList<QnWorkbenchItem*>* items)
 {
-    NX_EXPECT(items);
+    NX_ASSERT(items);
     if (!items)
         return;
 

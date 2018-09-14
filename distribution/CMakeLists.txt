@@ -9,3 +9,7 @@ elseif(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
 elseif(box STREQUAL "tx1")
     add_subdirectory(tgz)
 endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()

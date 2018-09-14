@@ -87,7 +87,7 @@ TEST(TcpReverseConnector, General)
             auto buffer = std::make_shared<Buffer>();
             buffer->reserve(100);
             ASSERT_EQ(SystemError::noError, code);
-            ASSERT_EQ(boost::make_optional<size_t>(5), connector->getPoolSize());
+            ASSERT_EQ(std::optional<size_t>(5), connector->getPoolSize());
             ASSERT_EQ(
                 KeepAliveOptions(std::chrono::seconds(1), std::chrono::seconds(2), 3),
                 connector->getKeepAliveOptions());

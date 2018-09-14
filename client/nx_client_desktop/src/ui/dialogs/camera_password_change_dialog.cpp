@@ -56,7 +56,7 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
 
     if (cameras.isEmpty())
     {
-        NX_EXPECT(false, "Cameras list is empty");
+        NX_ASSERT(false, "Cameras list is empty");
         return;
     }
 

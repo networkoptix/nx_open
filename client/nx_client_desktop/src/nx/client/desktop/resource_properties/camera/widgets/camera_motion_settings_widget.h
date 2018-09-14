@@ -37,6 +37,7 @@ public:
 
 private:
     void loadState(const CameraSettingsDialogState& state);
+    void loadAlerts(const CameraSettingsDialogState& state);
     void resetMotionRegions();
 
 private:

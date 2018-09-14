@@ -9,10 +9,12 @@ NX_NETWORK_API extern const char* const kRelayProtocolName;
 
 NX_NETWORK_API extern const char* const kServerIncomingConnectionsPath;
 NX_NETWORK_API extern const char* const kServerTunnelPath;
+NX_NETWORK_API extern const char* const kServerTunnelBasePath;
 
 NX_NETWORK_API extern const char* const kServerClientSessionsPath;
 NX_NETWORK_API extern const char* const kClientSessionConnectionsPath;
 NX_NETWORK_API extern const char* const kClientGetPostTunnelPath;
+NX_NETWORK_API extern const char* const kClientTunnelBasePath;
 NX_NETWORK_API extern const char* const kRelayClientPathPrefix;
 
 NX_NETWORK_API extern const char* const kRelayStatisticsMetricsPath;

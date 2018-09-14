@@ -17,16 +17,16 @@ func (runner *TestSuiteRunner) run() TestSuiteReport {
 	if runner.configuration.maxTimeToWaitForServiceUp > 0 {
 		report = runner.waitForServiceUp()
 		if report.failureCount() > 0 {
-			log.Printf("Test suite %s depedent services never got up", report.name)
+			log.Printf("Test suite %s dependent services never got up", report.Name)
 			return report
 		}
 	}
 
 	testReport := runner.testSuite.run()
-	testReport.testReports = append(report.testReports, testReport.testReports...)
+	testReport.TestReports = append(report.TestReports, testReport.TestReports...)
 
 	log.Printf("%s test suite has completed with %d failure(s)",
-		testReport.name, testReport.failureCount())
+		testReport.Name, testReport.failureCount())
 	return testReport
 }
 

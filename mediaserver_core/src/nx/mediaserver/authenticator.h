@@ -50,6 +50,7 @@ public:
         TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::auth::AbstractNonceProvider* cloudNonceProvider,
         nx::vms::auth::AbstractUserDataProvider* userAuthenticator);
+    virtual ~Authenticator() override;
 
     struct Result
     {
@@ -71,7 +72,8 @@ public:
     void setAccessCookie(
         const nx::network::http::Request& request,
         nx::network::http::Response* response,
-        Qn::UserAccessData access);
+        Qn::UserAccessData access,
+        bool secure);
 
     void removeAccessCookie(
         const nx::network::http::Request& request,
@@ -100,13 +102,17 @@ public:
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    LdapManager* ldapManager() const;
+    AbstractLdapManager* ldapManager() const;
+    void setLdapManager(std::unique_ptr<AbstractLdapManager> ldapManager);
 
     struct LockoutOptions
     {
-        size_t maxLoginFailures = 10;
-        std::chrono::milliseconds accountTime = std::chrono::minutes(5);
-        std::chrono::milliseconds lockoutTime = std::chrono::seconds(30);
+        static constexpr size_t kMaxLoginFailures{5};
+        static constexpr std::chrono::seconds kLockoutTimeout{30};
+
+        size_t maxLoginFailures = kMaxLoginFailures;
+        std::chrono::milliseconds accountTime = kLockoutTimeout * kMaxLoginFailures;
+        std::chrono::milliseconds lockoutTime = kLockoutTimeout;
     };
 
     std::optional<LockoutOptions> getLockoutOptions() const;
@@ -142,7 +148,6 @@ private:
 
     void addAuthHeader(
         nx::network::http::Response& responseHeaders,
-        const QnUserResourcePtr& userRes = {},
         bool isProxy = false,
         bool isDigest = true);
 
@@ -178,12 +183,12 @@ private:
     nx::vms::auth::AbstractNonceProvider* const m_timeBasedNonceProvider;
     nx::vms::auth::AbstractNonceProvider* const m_nonceProvider;
     nx::vms::auth::AbstractUserDataProvider* const m_userDataProvider;
-    const std::unique_ptr<LdapManager> m_ldap;
+    std::unique_ptr<AbstractLdapManager> m_ldap;
 
-    struct SessionKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
+    struct SessionKeys: public nx::network::TemporaryKeyKeeper<Qn::UserAccessData> { SessionKeys(); };
     SessionKeys m_sessionKeys;
 
-    struct PathKeys: public nx::network::TemporayKeyKeeper<Qn::UserAccessData> { PathKeys(); };
+    struct PathKeys: public nx::network::TemporaryKeyKeeper<Qn::UserAccessData> { PathKeys(); };
     SessionKeys m_pathKeys;
 
     mutable QnMutex m_mutex;

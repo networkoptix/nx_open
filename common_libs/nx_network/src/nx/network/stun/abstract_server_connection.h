@@ -35,7 +35,7 @@ public:
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     virtual AbstractCommunicatingSocket* socket() = 0;
     virtual void close() = 0;
-    virtual void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value) = 0;
+    virtual void setInactivityTimeout(std::optional<std::chrono::milliseconds> value) = 0;
 };
 
 } // namespace stun

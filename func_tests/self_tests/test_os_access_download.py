@@ -4,19 +4,8 @@ import pytest
 from flask import Flask, send_file
 from werkzeug.exceptions import NotFound
 
-from framework.os_access.exceptions import AlreadyDownloaded
-from framework.os_access.local_access import local_access
-from framework.serving import WsgiServer, make_base_url_for_remote_machine
-
-
-@pytest.fixture(scope='session', params=['linux', 'windows', 'local'])
-def os_access(request):
-    if request.param == 'local':
-        return local_access
-    else:
-        vm_fixture = request.param + '_vm'
-        vm = request.getfixturevalue(vm_fixture)
-        return vm.os_access
+from framework.os_access.exceptions import AlreadyExists
+from framework.serving import WsgiServer
 
 
 @pytest.fixture()
@@ -30,14 +19,14 @@ def served_file(node_dir):
 
 @pytest.fixture()
 def downloads_dir(os_access):
-    downloads_dir = os_access.Path.tmp() / 'downloads_dir'
+    downloads_dir = os_access.path_cls.tmp() / 'downloads_dir'
     downloads_dir.rmtree(ignore_errors=True)
     downloads_dir.mkdir(parents=True)
     return downloads_dir
 
 
 @pytest.fixture()
-def _http_url(os_access, served_file):
+def _http_url(service_ports, os_access, served_file):
     app = Flask('One file download')
 
     @app.route('/<path:path>')
@@ -46,9 +35,9 @@ def _http_url(os_access, served_file):
             raise NotFound()
         return send_file(str(served_file), as_attachment=True)
 
-    wsgi_server = WsgiServer(app.wsgi_app, range(8081, 8100))
+    wsgi_server = WsgiServer(app.wsgi_app, service_ports[5:10])
     with wsgi_server.serving():
-        base_url = make_base_url_for_remote_machine(os_access, wsgi_server.port)
+        base_url = 'http://{}:{}'.format(os_access.port_map.local.address, wsgi_server.port)
         yield base_url + '/' + served_file.name
 
 
@@ -72,6 +61,6 @@ def url(request):
 def test_download(os_access, url, downloads_dir):
     path = os_access.download(url, downloads_dir)
     assert path.exists() or path.is_symlink()
-    with pytest.raises(AlreadyDownloaded) as excinfo:
+    with pytest.raises(AlreadyExists) as excinfo:
         os_access.download(url, downloads_dir)
     assert excinfo.value.path == path

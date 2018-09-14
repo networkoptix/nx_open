@@ -47,7 +47,7 @@ public:
 private:
     static nx::utils::Url buildMonitoringUrl(const nx::utils::Url& url);
     void initMonitorUnsafe();
-
+    void stopMonitorUnsafe();
 private:
     void at_responseReceived(nx::network::http::AsyncHttpClientPtr httpClient);
     void at_someBytesAvailable(nx::network::http::AsyncHttpClientPtr httpClient);

@@ -98,9 +98,9 @@ public:
 };
 
 QnFileConnectionProcessor::QnFileConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
-:
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 

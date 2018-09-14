@@ -41,13 +41,12 @@ public:
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
 	ServerTransactionMessageBus* messageBus,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnTransactionTcpProcessor);
-    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
@@ -144,13 +143,9 @@ void QnTransactionTcpProcessor::run()
             return;
         }
 
-        //we must pass socket to QnTransactionMessageBus atomically, but QSharedPointer has move operator only,
-        //  but not move initializer. So, have to declare localSocket
-        auto localSocket = std::move(d->socket);
-        d->socket.clear();
         d->messageBus->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
-            std::move(localSocket),
+            std::move(d->socket),
             remotePeer,
             remoteSystemIdentityTime,
             d->request,
@@ -302,8 +297,8 @@ void QnTransactionTcpProcessor::run()
         if (remotePeer.isClient()) {
             auto session = authSession();
             //session.userAgent = toString(remotePeer.peerType);
-            qnAuditManager->at_connectionOpened(session);
-            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
+            commonModule->auditManager()->at_connectionOpened(session);
+            ttFinishCallback = std::bind(&QnAuditManager::at_connectionClosed, commonModule->auditManager(), session);
         }
 
         auto base64EncodingRequiredHeaderIter = d->request.headers.find( Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME );

@@ -17,8 +17,6 @@ set(android.packageName "com.cox.hdsec")
 # Support section
 set(companyUrl "https://www.cox.com")
 set(productUrl "https://www.cox.com/business/home.html")
-set(supportUrl "")
-set(supportEmail "")
 set(supportPhone "+1(844)601-5890")
 set(licenseEmail "https://www.cox.com/business/contact-us/contact-technical-support.html")
 # end of Support section
@@ -60,28 +58,6 @@ set(freeLicenseKey "0000-0000-0000-0006")
 set(windows.skip.sign "true")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-
-# Localization
-set(defaultTranslation en_US)
-set(additionalTranslations
-    en_GB
-    fr_FR
-    de_DE
-    ru_RU
-    es_ES
-    it_IT
-    ja_JP
-    ko_KR
-    tr_TR
-    zh_CN
-    zh_TW
-    he_IL
-    hu_HU
-    nl_NL
-    pl_PL
-    vi_VN
-    th_TH
-)
 
 # Additional Features
 set(vmax "true")

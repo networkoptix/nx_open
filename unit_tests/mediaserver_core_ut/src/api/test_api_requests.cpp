@@ -11,6 +11,8 @@ namespace test {
 
 namespace api_requests_detail {
 
+struct FunctionsTag{};
+
 /**
  * Convert a JSON Object from string to map. If JSON is invalid or non-object, register a test
  * failure and return empty map.
@@ -58,8 +60,9 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient()
 nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
     // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
+    const auto urlStrFix = urlStr.startsWith("/") ? urlStr : ("/" + urlStr);
     return nx::utils::Url(launcher->apiUrl().toString(
-        QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStr);
+        QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStrFix);
 }
 
 void doExecutePost(
@@ -74,16 +77,16 @@ void doExecutePost(
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
-    NX_LOG(lm("[TEST] POST %1").arg(urlStr), cl_logINFO);
-    NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(actualRequest), cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST %1").arg(urlStr));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_REQUEST: %2").arg(actualRequest));
 
     httpClient->doPost(url, "application/json", actualRequest);
 
     const auto response = readResponseBody(httpClient.get());
-    NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(response), cl_logINFO);
-    NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_RESPONSE: %1").arg(response));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
+    ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 }
 
@@ -103,17 +106,43 @@ void doExecuteGet(
 {
     auto httpClient = createHttpClient();
 
-    NX_LOG(lm("[TEST] GET %1").arg(url.path()), cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET %1").arg(url.path()));
 
     ASSERT_TRUE(httpClient->doGet(url));
 
     NX_CRITICAL(outResponse);
     *outResponse = readResponseBody(httpClient.get());
-    NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(*outResponse), cl_logINFO);
-    NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
-        cl_logINFO);
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_RESPONSE: %1").arg(*outResponse));
+    NX_INFO(typeid(FunctionsTag), lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
+}
+
+void executeGet(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    QJsonDocument* responseData,
+    int httpStatus)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus));
+
+    QJsonParseError error;
+    *responseData = QJsonDocument::fromJson(response, &error);
+    ASSERT_EQ(error.error, QJsonParseError::NoError) << error.errorString().toStdString();
+}
+
+void executeGet(
+    const nx::utils::Url& url,
+    QJsonDocument* responseData,
+    int httpStatus)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
+
+    QJsonParseError error;
+    *responseData = QJsonDocument::fromJson(response, &error);
+    ASSERT_EQ(error.error, QJsonParseError::NoError) << error.errorString().toStdString();
 }
 
 } using namespace api_requests_detail;

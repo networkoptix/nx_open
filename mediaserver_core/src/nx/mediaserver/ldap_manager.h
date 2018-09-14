@@ -23,19 +23,26 @@ enum class LdapResult
 
 QString toString(LdapResult ldapResult);
 
-class LdapManager: public QObject, public QnCommonModuleAware
+class AbstractLdapManager
+{
+public:
+    virtual ~AbstractLdapManager() = default;
+    virtual Qn::AuthResult authenticate(const QString& login, const QString& password) = 0;
+    virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) = 0;
+    virtual LdapResult fetchUsers(QnLdapUsers &users) = 0;
+};
+
+class LdapManager: public QObject, public AbstractLdapManager, public QnCommonModuleAware
 {
     Q_OBJECT
-
 public:
-
     LdapManager(QnCommonModule* commonModule);
-    ~LdapManager();
+    virtual ~LdapManager() override;
 
-    LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings);
-    LdapResult fetchUsers(QnLdapUsers &users);
+    virtual LdapResult fetchUsers(QnLdapUsers &users, const QnLdapSettings& settings) override;
+    virtual LdapResult fetchUsers(QnLdapUsers &users) override;
 
-    Qn::AuthResult authenticate(const QString &login, const QString &password);
+    virtual Qn::AuthResult authenticate(const QString& login, const QString& password) override;
 
 private slots:
     void clearCache();

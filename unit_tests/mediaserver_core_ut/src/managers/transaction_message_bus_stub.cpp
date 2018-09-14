@@ -42,6 +42,11 @@ nx::network::http::AuthInfoCache::AuthorizationCacheItem TransactionTransportStu
     return nx::network::http::AuthInfoCache::AuthorizationCacheItem();
 }
 
+std::multimap<QString, QString>  TransactionTransportStub::httpQueryParams() const
+{
+    return {};
+}
+
 //-------------------------------------------------------------------------------------------------
 
 TransactionMessageBusStub::TransactionMessageBusStub(

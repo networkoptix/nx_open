@@ -13,7 +13,7 @@ class ReverseConnectionListener: public QnTCPConnectionProcessor
 public:
     ReverseConnectionListener(
         ReverseConnectionManager* reverseConnectionManager,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket, 
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 protected:
     virtual void run();

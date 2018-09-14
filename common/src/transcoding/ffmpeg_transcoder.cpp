@@ -2,6 +2,11 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+extern "C"
+{
+#include <libavutil/opt.h>
+}
+
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
@@ -61,9 +66,9 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder()
+QnFfmpegTranscoder::QnFfmpegTranscoder(nx::metrics::Storage* metrics)
 :
-    QnTranscoder(),
+    QnTranscoder(metrics),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),
     m_videoBitrate(0),
@@ -72,14 +77,14 @@ QnFfmpegTranscoder::QnFfmpegTranscoder()
     m_inMiddleOfStream(false),
     m_startTimeOffset(0)
 {
-    NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Created new ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1));
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
 {
-    NX_LOG( lit("Destroying ffmpeg transcoder. Total transcoder count %1").
-        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Destroying ffmpeg transcoder. Total transcoder count %1").
+        arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(-1)-1));
     closeFfmpegContext();
 }
 
@@ -120,6 +125,11 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     return 0;
 }
 
+void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& value)
+{
+    av_opt_set(m_formatCtx->priv_data, option.toLatin1().data(), value.toLatin1().data(), 0);
+}
+
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
     if (video && m_videoCodec != AV_CODEC_ID_NONE)
@@ -128,7 +138,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (videoStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_LOG(m_lastErrMessage, cl_logERROR);
+            NX_ERROR(this, m_lastErrMessage);
             return -1;
         }
 
@@ -208,7 +218,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (audioStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            NX_LOG(m_lastErrMessage, cl_logERROR);
+            NX_ERROR(this, m_lastErrMessage);
             return -1;
         }
 
@@ -253,7 +263,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     {
         closeFfmpegContext();
         m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
-        NX_LOG(m_lastErrMessage, cl_logERROR);
+        NX_ERROR(this, m_lastErrMessage);
         return -3;
     }
 
@@ -322,9 +332,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
+                m_lastPacketTimestamp.ntpTimestamp = transcodedData->timestamp;
             }
         }
         else {
+            m_lastPacketTimestamp.ntpTimestamp = media->timestamp;
             // direct stream copy
             packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
             packet.data = const_cast<quint8*>((const quint8*) media->data());
@@ -337,6 +349,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
         if (packet.size > 0)
         {
+            m_lastPacketTimestamp.rtpTimestamp = packet.pts;
             if (av_write_frame(m_formatCtx, &packet) < 0) {
                 qWarning() << QLatin1String("Transcoder error: can't write AV packet");
                 //return -1; // ignore error and continue

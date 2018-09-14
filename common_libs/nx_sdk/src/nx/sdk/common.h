@@ -61,7 +61,7 @@ public:
 enum class Error
 {
     noError,
-    unknownError, //< TODO: #mike: Consider renaming to "otherError".
+    unknownError, //< TODO: Consider renaming to "otherError".
     needMoreBufferSpace,
     typeIsNotSupported,
     networkError,

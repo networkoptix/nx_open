@@ -61,7 +61,7 @@ bool QnAviResource::hasAviMetadata() const
 
 const QnAviArchiveMetadata& QnAviResource::aviMetadata() const
 {
-    NX_EXPECT(m_aviMetadata.is_initialized());
+    NX_ASSERT(m_aviMetadata.is_initialized());
     return m_aviMetadata.get();
 }
 
@@ -87,7 +87,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
         return new QnSingleShotFileStreamreader(resource);
 
     const auto aviResource = resource.dynamicCast<QnAviResource>();
-    NX_EXPECT(aviResource);
+    NX_ASSERT(aviResource);
     if (!aviResource)
         return nullptr;
 
@@ -100,7 +100,16 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
-        return archiveReader->getDPVideoLayout();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_videoLayout)
+            return m_videoLayout;
+        lock.unlock();
+        auto result = archiveReader->getDPVideoLayout();
+        lock.relock();
+        m_videoLayout = result;
+        return result;
+    }
 
     return QnMediaResource::getVideoLayout();
 }

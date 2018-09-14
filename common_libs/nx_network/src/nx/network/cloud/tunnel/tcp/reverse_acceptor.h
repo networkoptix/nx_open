@@ -50,9 +50,9 @@ public:
     String selfHostName() const;
 
     // TODO: make is configurable for each client? can it be usefull?
-    void setPoolSize(boost::optional<size_t> value);
+    void setPoolSize(std::optional<size_t> value);
     void setHttpConnectionInactivityTimeout(std::chrono::milliseconds inactivityTimeout);
-    void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
+    void setKeepAliveOptions(std::optional<KeepAliveOptions> value);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -81,9 +81,9 @@ private:
     ConnectHandler m_connectHandler;
 
     mutable QnMutex m_dataMutex;
-    boost::optional<size_t> m_poolSize;
-    boost::optional<std::chrono::milliseconds> m_httpConnectionInactivityTimeout;
-    boost::optional<KeepAliveOptions> m_keepAliveOptions;
+    std::optional<size_t> m_poolSize;
+    std::optional<std::chrono::milliseconds> m_httpConnectionInactivityTimeout;
+    std::optional<KeepAliveOptions> m_keepAliveOptions;
 
     nx::network::http::MessageDispatcher m_httpMessageDispatcher;
     std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;

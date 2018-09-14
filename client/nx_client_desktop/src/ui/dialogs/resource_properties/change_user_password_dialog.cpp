@@ -13,7 +13,7 @@ using namespace nx::client::desktop;
 
 QnChangeUserPasswordDialog::QnChangeUserPasswordDialog(QWidget* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::manual),
+    QnWorkbenchContextAware(parent, QnWorkbenchContextAware::InitializationMode::lazy),
     ui(new Ui::ChangeUserPasswordDialog())
 {
     ui->setupUi(this);

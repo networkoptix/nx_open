@@ -1,10 +1,12 @@
 #include "license_helpers.h"
 
+#include <chrono>
+
 #include <QtCore/QThread>
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/fusion/serialization_format.h>
-#include <nx/utils/raii_guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <rest/server/json_rest_result.h>
 #include <utils/common/delayed.h>
@@ -71,8 +73,12 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::license::Deacti
 
 namespace {
 
+using namespace std::chrono_literals;
+
 static const auto kDeactivateLicenseUrl =
     nx::utils::Url::fromUserInput(lit("http://licensing.networkoptix.com/nxlicensed/api/v1/deactivate/"));
+
+static constexpr std::chrono::milliseconds kRequestTimeout = 30s;
 
 using namespace nx::client::desktop::license;
 using ErrorCode = Deactivator::ErrorCode;
@@ -126,6 +132,9 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     base_type(parent),
     m_httpClient(nx::network::http::AsyncHttpClient::create())
 {
+    m_httpClient->setSendTimeoutMs(kRequestTimeout.count());
+    m_httpClient->setResponseReadTimeoutMs(kRequestTimeout.count());
+
     const auto finalize =
         [this, handler](Result result, const LicenseErrorHash& errors = LicenseErrorHash())
         {
@@ -251,7 +260,7 @@ QString Deactivator::errorDescription(ErrorCode error)
             return tr("Number of deactivations exceeded limit for this license.");
     }
 
-    NX_EXPECT(false, "We don't expect to be here");
+    NX_ASSERT(false, "We don't expect to be here");
     return QString();
 }
 

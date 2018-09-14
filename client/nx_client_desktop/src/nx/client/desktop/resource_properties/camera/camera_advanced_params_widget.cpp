@@ -217,33 +217,31 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
     }
     else if (parameter.writeCmd == lit("custom_ptr"))
     {
+        // Expecting a value like "horisontal,vertical,rotation".
         QStringList values = value.split(L',');
-        if (values.size() == 3)
-        {
-            nx::core::ptz::Vector speed;
-            // Expecting a value like "horisontal,vertical,rotation".
-            speed.pan = values[0].toFloat(&ok);
-            speed.tilt = values[1].toFloat(&ok);
 
-            // Control provides the angle in range [-180;180],
-            // but we should send values in range [-1.0, 1.0].
-            speed.rotation = values[2].toFloat(&ok) / 180.0;
-            if (speed.rotation > 1.0)
-                speed.rotation = 1.0;
-            if (speed.rotation < -1.0)
-                speed.rotation = -1.0;
+        if (values.size() != 3)
+            return;
 
-            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
-            // TODO: Implement rotation stuff
-            serverConnection->ptzContinuousMoveAsync(
-                m_camera,
-                speed,
-                options,
-                m_ptzSequenceId,
-                m_ptzSequenceNumber,
-                this,
-                slot);
-        }
+        nx::core::ptz::Vector speed;
+
+        speed.pan = values[0].toFloat(&ok);
+        speed.tilt = values[1].toFloat(&ok);
+
+        // Control provides the angle in range [-180; 180],
+        // but we should send values in range [-1.0, 1.0].
+        speed.rotation = qBound<qreal>(values[2].toFloat(&ok) / 180.0, -1.0, 1.0);
+
+        qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
+
+        serverConnection->ptzContinuousMoveAsync(
+            m_camera,
+            speed,
+            options,
+            m_ptzSequenceId,
+            m_ptzSequenceNumber,
+            this,
+            slot);
     }
     else if (parameter.writeCmd == lit("custom_focus"))
     {

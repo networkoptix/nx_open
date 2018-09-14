@@ -331,6 +331,7 @@ QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
     base_type(parent)
 {
     setSourceModel(new HostsModel(this));
+    setTriggeringRoles({UrlRole});
 }
 
 bool QnSystemHostsModel::lessThan(

@@ -3,22 +3,16 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
-namespace {
-
-static const std::chrono::microseconds kDefaultPrebuffering(1);
-
-} // namespace
-
 using namespace std::chrono;
 
 QnServerEdgeStreamRecorder::QnServerEdgeStreamRecorder(
+    QnMediaServerModule* serverModule,
     const QnResourcePtr &dev,
     QnServer::ChunksCatalog catalog,
     QnAbstractMediaStreamDataProvider* mediaProvider)
     :
-    QnServerStreamRecorder(dev, catalog, mediaProvider)
+    QnServerStreamRecorder(serverModule, dev, catalog, mediaProvider)
 {
-    setPrebufferingUsec(duration_cast<microseconds>(kDefaultPrebuffering).count());
     setCanDropPackets(false);
 }
 

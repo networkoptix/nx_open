@@ -38,7 +38,8 @@ core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr&
             kRelativeMoveMapping,
             core_ptz::RelativeContinuousMoveMapping());
     }
-    else if (resourceData.contains(kSimpleRelativeMoveMapping))
+
+    if (resourceData.contains(kSimpleRelativeMoveMapping))
     {
         const auto simpleMapping =
             resourceData.value<core_ptz::SimpleRelativeContinuousMoveMapping>(
@@ -71,7 +72,7 @@ namespace nx {
 namespace mediaserver_core {
 namespace ptz {
 
-ServerPtzControllerPool::ServerPtzControllerPool(QObject *parent):
+ServerPtzControllerPool::ServerPtzControllerPool(QObject* parent):
     base_type(parent)
 {
     NX_DEBUG(this, "Creating server PTZ controller pool");
@@ -186,7 +187,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     wrappingParameters.absoluteMoveMapper = mapper(camera);
     wrappingParameters.relativeMoveMapping = relativeMoveMapping(camera);
     wrappingParameters.areNativePresetsDisabled = disableNativePresets;
-    wrappingParameters.ptzPool = qnPtzPool;
+    wrappingParameters.ptzPool = this;
     wrappingParameters.commonModule = commonModule();
 
     NX_DEBUG(

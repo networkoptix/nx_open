@@ -99,12 +99,12 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
     *outError = Error::noError;
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo->vendor).toLower();
     if (vendor.startsWith(kVcaVendor))
-        return new Manager(this, cameraInfo, m_typedManifest);
+        return new Manager(this, *cameraInfo, m_typedManifest);
     else
         return nullptr;
 }
@@ -115,15 +115,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&uuid](const AnalyticsEventType& event)
-        {
-            return event.typeId == uuid;
-        });
+        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
 
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }

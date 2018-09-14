@@ -19,7 +19,7 @@ class QnRuntimeTransactionLog: public QObject, public QnCommonModuleAware
 public:
 
     QnRuntimeTransactionLog(QnCommonModule* commonModule);
-	    ~QnRuntimeTransactionLog();
+        ~QnRuntimeTransactionLog();
 
     void clearOldRuntimeData(const nx::vms::api::PersistentIdData& key);
     void clearRuntimeData(const QnUuid& id);

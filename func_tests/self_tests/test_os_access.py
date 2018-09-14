@@ -8,7 +8,7 @@ from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def os_access(one_vm):
     return one_vm.os_access
 
@@ -22,10 +22,10 @@ def test_is_accessible(os_access):
 
 
 def test_path(os_access):  # type: (OSAccess) -> None
-    assert issubclass(os_access.Path, FileSystemPath)
-    assert os_access.Path is os_access.Path,  "Same class must be returned each time"
-    assert isinstance(os_access.Path.home(), os_access.Path)
-    assert isinstance(os_access.Path.tmp(), os_access.Path)
+    assert issubclass(os_access.path_cls, FileSystemPath)
+    assert os_access.path_cls is os_access.path_cls, "Same class must be returned each time"
+    assert isinstance(os_access.path_cls.home(), os_access.path_cls)
+    assert isinstance(os_access.path_cls.tmp(), os_access.path_cls)
 
 
 def test_networking(os_access):
@@ -34,5 +34,14 @@ def test_networking(os_access):
 
 
 def test_get_set_time(os_access):
-    os_access.get_time()
-    os_access.set_time(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=100))
+    os_access.time.get()
+    os_access.time.set(datetime.datetime.now(pytz.utc) - datetime.timedelta(days=100))
+
+
+def test_disk_space(os_access):
+    before = os_access.free_disk_space_bytes()
+    should_be = 1000 * 1000 * 1000
+    os_access.consume_disk_space(should_be)
+    assert os_access.free_disk_space_bytes() == pytest.approx(should_be, rel=0.001, abs=1000000)
+    os_access.cleanup_disk_space()
+    assert os_access.free_disk_space_bytes() == pytest.approx(before, rel=0.001, abs=1000000)

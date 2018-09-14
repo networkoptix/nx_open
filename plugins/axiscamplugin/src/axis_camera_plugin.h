@@ -15,7 +15,6 @@
 
 #include <plugins/plugin_api.h>
 
-
 /*! \mainpage
     \par
     This project demonstrates usage of camera integration plugin API to add AXIS camera support to mediaserver. Overrides built-in AXIS camera driver.\n
@@ -25,8 +24,8 @@
     It is Qt 5 project. Compiles to dynamic library. Tested on MS Windows 10 and Ubuntu 16.04.LTS\n
     To build You MUST have Qt 5.0+ installed.\n
     \warning To build plugin using cmake on Ubuntu you need to install qtbase5-dev:\n
-	$sudo apt-get install qtbase5-dev
-	\warning Qt is used here to simplify this sample only! It is not required to use Qt in real production plugin. Provided API uses c++ only (even STL is not required)
+    $sudo apt-get install qtbase5-dev
+    \warning Qt is used here to simplify this sample only! It is not required to use Qt in real production plugin. Provided API uses c++ only (even STL is not required)
 
     To build:
     \code
@@ -48,7 +47,7 @@
     - \a nxcip::CameraRelayIOManager to receive relay input port change state events and change relay output port state
 
     \par Object life-time management:
-    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor) 
+    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor)
         to factory class instance (e.g., \a AxisCameraManager is a factory for \a AxisRelayIOManager, \a AxisMediaEncoder, etc.)
     - all factory classes (except for \a AxisCameraDiscoveryManager) hold pointer to child class object (e.g., \a AxisRelayIOManager is a child for \a AxisCameraManager)
         and delete all children on destruction

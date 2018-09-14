@@ -11,8 +11,8 @@ struct TestData
 {
     TestData() {}
     TestData(
-        const QString& physicalId, 
-        const QString& url, 
+        const QString& physicalId,
+        const QString& url,
         const QString& groupId = QString(),
         bool isManuallyAdded = false)
         :
@@ -32,10 +32,11 @@ struct TestData
 template <std::size_t size>
 bool checkData(const std::array<TestData, size>& data)
 {
+    QnMediaServerModule serverModule;
     QSet<QnNetworkResourcePtr> resList;
     for (const auto& value: data)
     {
-        QnAxisOnvifResourcePtr res(new QnAxisOnvifResource());
+        QnAxisOnvifResourcePtr res(new QnAxisOnvifResource(&serverModule));
         res->setPhysicalId(value.physicalId);
         res->setId(res->physicalIdToId(value.physicalId));
         res->setUrl(value.url);

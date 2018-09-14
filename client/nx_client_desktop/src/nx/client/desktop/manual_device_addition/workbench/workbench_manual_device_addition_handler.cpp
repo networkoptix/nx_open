@@ -30,6 +30,17 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
                 m_deviceAdditionDialog, mainWindowWidget());
 
             m_deviceAdditionDialog->setServer(server);
+            const auto removeOnClose =
+                [this]()
+                {
+                    if (m_deviceAdditionDialog)
+                        m_deviceAdditionDialog->deleteLater();
+                };
+
+            // Prevents dialog controls blinking.
+            connect(m_deviceAdditionDialog, &QDialog::accepted, this, removeOnClose);
+            connect(m_deviceAdditionDialog, &QDialog::rejected, this, removeOnClose);
+            connect(m_deviceAdditionDialog, &QDialog::finished, this, removeOnClose);
         });
 
     connect(action(ui::action::MainMenuAddDeviceManuallyAction), &QAction::triggered, this,
@@ -38,7 +49,7 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
             const auto servers = commonModule()->resourcePool()->getAllServers(Qn::Online);
             if (servers.isEmpty())
             {
-                NX_EXPECT(false, "No online servers for device searching");
+                NX_ASSERT(false, "No online servers for device searching");
                 return;
             }
 

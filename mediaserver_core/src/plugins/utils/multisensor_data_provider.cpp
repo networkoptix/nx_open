@@ -22,7 +22,9 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const QnPlOnvifResourcePtr& res):
+MultisensorDataProvider::MultisensorDataProvider(
+    const QnPlOnvifResourcePtr& res)
+    :
     CLServerPushStreamReader(res),
     m_onvifRes(res)
 {
@@ -138,7 +140,7 @@ QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 cha
     url.setQuery(urlQuery);
 
     QnPlOnvifResourcePtr subChannelResource(
-        new nx::plugins::utils::IsolatedStreamReaderResource(m_resource->commonModule()));
+        new nx::plugins::utils::IsolatedStreamReaderResource(serverModule()));
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());

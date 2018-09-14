@@ -10,6 +10,7 @@
 #include <nx/utils/log/log.h>
 
 #include <utils/db/db_helper.h>
+#include <nx/utils/literal.h>
 
 namespace ec2 {
 namespace database {
@@ -17,11 +18,11 @@ namespace migrations {
 
 namespace {
 
-static const QString kLogPrefix("db::migration::");
+static const QString kLogPrefix("ec2::database::migrations::");
 
 void log(const QString& message)
 {
-    NX_LOG(kLogPrefix + message, cl_logDEBUG1);
+    NX_DEBUG(nx::utils::log::Tag(kLogPrefix), message);
 }
 
 struct LayoutOnVideoWall
@@ -202,7 +203,7 @@ bool reparentVideoWallLayouts(ec2::database::api::QueryContext* context)
         }
     }
 
-    NX_LOG(lit("End of DB migration: reparent videowall layouts"), cl_logDEBUG1);
+    log(lit("End of DB migration: reparent videowall layouts"));
     return true;
 }
 

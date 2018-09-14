@@ -16,6 +16,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <nx/client/core/settings/secure_settings.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -61,7 +62,8 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
     if (!m_loginToCloudDialog)
     {
         m_loginToCloudDialog = new QnLoginToCloudDialog(mainWindowWidget());
-        m_loginToCloudDialog->setLogin(qnClientCoreSettings->cloudLogin());
+        m_loginToCloudDialog->setLogin(
+            nx::client::core::secureSettings()->cloudCredentials().user);
         m_loginToCloudDialog->show();
 
         connect(m_loginToCloudDialog, &QnLoginToCloudDialog::finished, this,
@@ -77,8 +79,8 @@ void QnWorkbenchCloudHandler::at_loginToCloudAction_triggered()
 
 void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
 {
-    qnClientCoreSettings->setCloudPassword(QString());
-    qnClientCoreSettings->save();
+    nx::client::core::secureSettings()->cloudCredentials = QnEncodedCredentials(
+        nx::client::core::secureSettings()->cloudCredentials().user, QString());
     /* Updating login if were logged under temporary credentials. */
     qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));

@@ -30,7 +30,8 @@ namespace
     const QString kFastRequestKey("fast");
 }
 
-QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
+QnStorageSpaceRestHandler::QnStorageSpaceRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {}
 
 int QnStorageSpaceRestHandler::executeGet(
@@ -59,11 +60,11 @@ int QnStorageSpaceRestHandler::executeGet(
     };
 
     enumerate(
-        qnNormalStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnNormalStorageMan->getAllWritableStorages());
+        serverModule()->normalStorageManager()->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->normalStorageManager()->getAllWritableStorages());
     enumerate(
-        qnBackupStorageMan->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : qnBackupStorageMan->getAllWritableStorages());
+        serverModule()->backupStorageManager()->getStorages(),
+        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->backupStorageManager()->getAllWritableStorages());
 
     if (!fastRequest)
     {
@@ -80,7 +81,7 @@ int QnStorageSpaceRestHandler::executeGet(
 QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 {
     QList<QString> result;
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule()->pluginManager();
     NX_ASSERT(pluginManager, "There should be common module.");
     if (!pluginManager)
         return result;
@@ -97,10 +98,10 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
 {
     QList<QString> storagePaths;
-    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
+    for(const QnFileStorageResourcePtr &fileStorage: serverModule()->normalStorageManager()->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
-    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
+    for(const QnFileStorageResourcePtr &fileStorage: serverModule()->backupStorageManager()->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getPath()));
 
     return storagePaths;
@@ -110,11 +111,11 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 {
     QnStorageSpaceDataList result;
 
-    auto partitionEnoughSpace = [](QnPlatformMonitor::PartitionType ptype, qint64 size)
+    auto partitionEnoughSpace = [this](QnPlatformMonitor::PartitionType ptype, qint64 size)
     {
         if (size == QnStorageResource::kUnknownSize)
             return true;
-        return size >= QnFileStorageResource::calcSpaceLimit(ptype);
+        return size >= QnFileStorageResource(serverModule()).calcSpaceLimit(ptype);
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
@@ -153,7 +154,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
         data.url = partition.path + QnAppInfo::mediaFolderName();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = QnFileStorageResource::calcSpaceLimit(partition.type);
+        data.reservedSpace = QnFileStorageResource(serverModule()).calcSpaceLimit(partition.type);
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.storageType = QnLexical::serialized(partition.type);
 
@@ -178,7 +179,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 
             QnStorageResourceList additionalStorages;
             additionalStorages.append(storage);
-            auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
+            auto writableStoragesIfCurrentWasAdded = serverModule()->normalStorageManager()->getAllWritableStorages(
                 &additionalStorages);
 
             bool wouldBeWritableIfAmongstServerStorages =

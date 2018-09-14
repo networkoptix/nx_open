@@ -33,7 +33,7 @@ QTransform sharpTransform(const QTransform& transform, bool* corrected)
 
 void paintSharp(QPainter* painter, std::function<void(QPainter*)> paint)
 {
-    NX_EXPECT(paint);
+    NX_ASSERT(paint);
     if (!paint)
         return;
 

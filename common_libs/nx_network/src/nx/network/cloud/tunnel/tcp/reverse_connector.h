@@ -3,6 +3,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace network {
@@ -40,8 +41,8 @@ public:
     void connect(const SocketAddress& endpoint, ConnectHandler handler);
 
     std::unique_ptr<BufferedStreamSocket> takeSocket();
-    boost::optional<size_t> getPoolSize() const;
-    boost::optional<KeepAliveOptions> getKeepAliveOptions() const;
+    std::optional<size_t> getPoolSize() const;
+    std::optional<KeepAliveOptions> getKeepAliveOptions() const;
 
 private:
     const String m_targetHostName;

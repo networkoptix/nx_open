@@ -38,7 +38,8 @@ public:
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override;
 private:
     QMap<QString, QnTestCamera*> m_cameras;
     int m_cameraNum;

@@ -147,6 +147,41 @@ void CameraMotionSettingsWidget::loadState(const CameraSettingsDialogState& stat
         motionItem->setProperty("cameraResourceId", m_cameraId);
         motionItem->setEnabled(!state.readOnly);
     }
+
+    loadAlerts(state);
+}
+
+void CameraMotionSettingsWidget::loadAlerts(const CameraSettingsDialogState& state)
+{
+    ui->recordingAlertBar->setText(!state.hasMotion() || state.recording.enabled()
+        ? QString()
+        : tr("Motion detection will work only when camera is being viewed. "
+            "Enable recording to make it work all the time."));
+
+    ui->regionsAlertBar->setText(
+        [&state]()
+        {
+            if (!state.motionAlert)
+                return QString();
+
+            using MotionAlert = CameraSettingsDialogState::MotionAlert;
+            switch (*state.motionAlert)
+            {
+                case MotionAlert::motionDetectionTooManyRectangles:
+                    return tr("Maximum number of motion detection rectangles for current camera "
+                        "is reached");
+
+                case MotionAlert::motionDetectionTooManyMaskRectangles:
+                    return tr("Maximum number of ignore motion rectangles for current camera "
+                        "is reached");
+
+                case MotionAlert::motionDetectionTooManySensitivityRectangles:
+                    return tr("Maximum number of detect motion rectangles for current camera "
+                        "is reached");
+            }
+
+            return QString();
+        }());
 }
 
 QVector<QColor> CameraMotionSettingsWidget::sensitivityColors() const

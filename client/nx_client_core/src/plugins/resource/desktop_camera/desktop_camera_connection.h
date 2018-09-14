@@ -34,14 +34,13 @@ protected:
     virtual void run() override;
 private:
     void terminatedSleep(int sleep);
-    QSharedPointer<nx::network::AbstractStreamSocket> takeSocketFromHttpClient(
+    std::unique_ptr<nx::network::AbstractStreamSocket> takeSocketFromHttpClient(
         std::unique_ptr<nx::network::http::HttpClient>& httpClient);
 private:
     QnDesktopResourcePtr m_owner;
     QnMediaServerResourcePtr m_server;
     QnUuid m_userId;
     std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
-    QSharedPointer<nx::network::AbstractStreamSocket> tcpSocket;
     std::unique_ptr<nx::network::http::HttpClient> httpClient;
     QnMutex m_mutex;
 };
@@ -52,7 +51,7 @@ class QnDesktopCameraConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnDesktopCameraConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         void* sslContext,
         QnDesktopResourcePtr desktop);
     virtual ~QnDesktopCameraConnectionProcessor();

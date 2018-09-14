@@ -23,6 +23,11 @@ public:
     virtual ~AbstractAioThread() = default;
 
     /**
+     * Queues functor to be executed from within this aio thread as soon as possible.
+     */
+    virtual void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor) = 0;
+
+    /**
      * Cancels calls scheduled with aio::AIOThread::post and aio::AIOThread::dispatch.
      */
     virtual void cancelPostedCalls(Pollable* const sock) = 0;
@@ -47,6 +52,10 @@ public:
 
     virtual void pleaseStop() override;
 
+    virtual void post(
+        Pollable* const sock,
+        nx::utils::MoveOnlyFunc<void()> functor) override;
+
     virtual void cancelPostedCalls(Pollable* const sock) override;
 
     /**
@@ -70,10 +79,6 @@ public:
      * NOTE: MUST be called with mutex locked.
      */
     void stopMonitoring(Pollable* const sock, aio::EventType eventType);
-    /**
-     * Queues functor to be executed from within this aio thread as soon as possible.
-     */
-    void post(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor);
     /**
      * If called in this aio thread, then calls functor immediately,
      *   otherwise queues functor in same way as aio::AIOThread::post does.

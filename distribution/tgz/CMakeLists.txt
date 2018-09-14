@@ -15,6 +15,8 @@ set(tgz_file ${distribution_output_dir}/tegra.tgz)
 
 set(installer_output_list ${tgz_file})
 
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 
 add_custom_command(

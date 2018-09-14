@@ -118,17 +118,17 @@ void MetadataPlugin::setLocale(const char* locale)
 }
 
 CameraManager* MetadataPlugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
+    const CameraInfo* cameraInfo,
     Error* outError)
 {
     *outError = Error::noError;
 
-    const auto vendor = QString(cameraInfo.vendor).toLower();
+    const auto vendor = QString(cameraInfo->vendor).toLower();
 
     if (!vendor.startsWith(kHikvisionTechwinVendor))
         return nullptr;
 
-    auto supportedEvents = fetchSupportedEvents(cameraInfo);
+    auto supportedEvents = fetchSupportedEvents(*cameraInfo);
     if (!supportedEvents)
         return nullptr;
 
@@ -136,7 +136,7 @@ CameraManager* MetadataPlugin::obtainCameraManager(
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new MetadataManager(this);
-    manager->setCameraInfo(cameraInfo);
+    manager->setCameraInfo(*cameraInfo);
     manager->setDeviceManifest(QJson::serialized(deviceManifest));
     manager->setDriverManifest(driverManifest());
 
@@ -149,31 +149,31 @@ const char* MetadataPlugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-QList<QnUuid> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
+QList<QString> MetadataPlugin::parseSupportedEvents(const QByteArray& data)
 {
-    QList<QnUuid> result;
+    QList<QString> result;
     auto supportedEvents = hikvision::AttributesParser::parseSupportedEventsXml(data);
     if (!supportedEvents)
         return result;
     for (const auto& internalName: *supportedEvents)
     {
-        const QnUuid eventTypeId = m_driverManifest.eventTypeByInternalName(internalName);
+        const QString eventTypeId = m_driverManifest.eventTypeByInternalName(internalName);
         if (!eventTypeId.isNull())
         {
             result << eventTypeId;
-            const auto descriptor = m_driverManifest.eventDescriptorById(eventTypeId);
+            const auto descriptor = m_driverManifest.eventTypeDescriptorById(eventTypeId);
             for (const auto& dependedName: descriptor.dependedEvent.split(','))
             {
-                auto descriptor = m_driverManifest.eventDescriptorByInternalName(dependedName);
-                if (!descriptor.typeId.isNull())
-                    result << descriptor.typeId;
+                auto descriptor = m_driverManifest.eventTypeDescriptorByInternalName(dependedName);
+                if (!descriptor.id.isNull())
+                    result << descriptor.id;
             }
         }
     }
     return result;
 }
 
-boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
+boost::optional<QList<QString>> MetadataPlugin::fetchSupportedEvents(
     const CameraInfo& cameraInfo)
 {
     auto& data = m_cachedDeviceData[cameraInfo.sharedId];
@@ -191,7 +191,7 @@ boost::optional<QList<QnUuid>> MetadataPlugin::fetchSupportedEvents(
     {
         NX_WARNING(this,lm("Can't fetch supported events for device %1. HTTP status code: %2").
             arg(cameraInfo.url).arg(statusCode));
-        return boost::optional<QList<QnUuid>>();
+        return boost::optional<QList<QString>>();
     }
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
         arg(cameraInfo.url).arg(buffer));

@@ -8,13 +8,18 @@
 #include "recorder/storage_manager.h"
 #include "api/model/recording_stats_reply.h"
 
+QnRecordingStatsRestHandler::QnRecordingStatsRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
 int QnRecordingStatsRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
     QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
     qint64 bitrateAnalizePeriodMs = params.value("bitrateAnalizePeriodMs").toLongLong();
 
     // TODO: #akulikov #backup storages. Alter this for two storage managers
-    auto normalStatistics = qnNormalStorageMan->getChunkStatistics(bitrateAnalizePeriodMs);
+    auto normalStatistics = serverModule()->normalStorageManager()->getChunkStatistics(bitrateAnalizePeriodMs);
     result.setReply(normalStatistics);
     return nx::network::http::StatusCode::ok;
 }

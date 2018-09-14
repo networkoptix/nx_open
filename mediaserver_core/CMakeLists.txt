@@ -3,9 +3,6 @@ include(find_java)
 
 find_package(Qt5 COMPONENTS WebSockets)
 
-set(product.title "${mediaserver.name}")
-set(product.display.title "${mediaserver.display.name}")
-
 nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
@@ -49,8 +46,8 @@ add_custom_command(
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/api.xml
         ${CMAKE_CURRENT_BINARY_DIR}/api.json
-    MAIN_DEPENDENCY ${apidoctool_jar}
     DEPENDS
+        ${apidoctool_jar}
         ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
         ${apidoctool_deps_absolute}
     COMMAND
@@ -58,21 +55,9 @@ add_custom_command(
         code-to-xml
         -vms-path ${PROJECT_SOURCE_DIR}
         -template-xml ${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml
-        -output-xml ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
-        -output-json ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
+        -output-xml ${CMAKE_CURRENT_BINARY_DIR}/api.xml
+        -output-json ${CMAKE_CURRENT_BINARY_DIR}/api.json
         ${apidoctool_params}
-    COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
-            ${CMAKE_CURRENT_BINARY_DIR}/api.xml
-    COMMAND
-        ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/api.xml.copy
-    COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-            ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
-            ${CMAKE_CURRENT_BINARY_DIR}/api.json
-    COMMAND
-        ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/api.json.copy
 )
 
 set(private_libs qtservice qtsinglecoreapplication sigar)

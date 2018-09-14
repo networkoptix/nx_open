@@ -27,6 +27,11 @@ QnWinDesktopResource::~QnWinDesktopResource()
     delete m_desktopDataProvider;
 }
 
+bool QnWinDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+{
+    return true;
+}
+
 QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal()
 {
     QnMutexLocker lock( &m_dpMutex );
@@ -108,7 +113,7 @@ QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProvider(
     Qn::ConnectionRole role)
 {
     const auto desktopResource = resource.dynamicCast<QnWinDesktopResource>();
-    NX_EXPECT(desktopResource);
+    NX_ASSERT(desktopResource);
     if (!desktopResource)
         return nullptr;
 

@@ -38,12 +38,6 @@ enum class CredentialsFileNameCall
     notCalled
 };
 
-enum class GidUidCall
-{
-    called,
-    notCalled
-};
-
 enum class UserName
 {
     present_domain,
@@ -59,8 +53,6 @@ enum class Password
 
 static const std::string kValidUrl = "//host/path";
 static const std::string kPath = "path";
-static const uid_t kUid = 42;
-static const uid_t kGid = 43;
 static const std::string kCredentialsFile = "credentials";
 static const std::string kUserName = "username";
 static const std::string kUserNameWithDomain = "username\\DOMAIN";
@@ -84,8 +76,6 @@ class MountHelper: public ::testing::Test
 protected:
     virtual void SetUp() override
     {
-        m_delegates.gid = [this]() { m_gidCalled = true; return kGid; };
-        m_delegates.uid = [this]() { m_uidCalled = true; return kUid; };
         m_delegates.credentialsFileName =
             [this]( const std::string& username, const std::string& password)
                 {
@@ -122,8 +112,8 @@ protected:
                 m_osMountCalledTImes++;
 
                 std::stringstream ss;
-                ss << "mount -t cifs '" << kValidUrl << "' '" << kPath << "' -o uid=" << kUid
-                   << ",gid=" << kGid << ",credentials=" << kCredentialsFile;
+                ss << "mount -t cifs '" << kValidUrl << "' '" << kPath
+                    << "' -o credentials=" << kCredentialsFile;
 
                 auto baseCommand = ss.str();
                 assertEq(true, command.find(baseCommand) != std::string::npos);
@@ -216,8 +206,7 @@ protected:
 
     void expectingCalls(
         int osMountCalledTimesAtLeast,
-        CredentialsFileNameCall credentialsFileNameCallExpectations,
-        GidUidCall gidUidCallExpectations)
+        CredentialsFileNameCall credentialsFileNameCallExpectations)
     {
         ASSERT_GE(m_osMountCalledTImes, osMountCalledTimesAtLeast);
         switch (credentialsFileNameCallExpectations)
@@ -236,18 +225,6 @@ protected:
             ASSERT_FALSE(m_credentialsFileNameCalled);
             break;
         }
-
-        switch (gidUidCallExpectations)
-        {
-        case GidUidCall::called:
-            ASSERT_TRUE(m_gidCalled);
-            ASSERT_TRUE(m_uidCalled);
-            break;
-        case GidUidCall::notCalled:
-            ASSERT_FALSE(m_gidCalled);
-            ASSERT_FALSE(m_uidCalled);
-            break;
-        }
     }
 
 private:
@@ -262,8 +239,6 @@ private:
 
     int m_osMountCalledTImes = 0;
     mutable bool m_credentialsFileNameCalled = false;
-    mutable bool m_gidCalled = false;
-    mutable bool m_uidCalled = false;
 
     template<typename Expected, typename Actual>
     void assertEq(const Expected& expected, const Actual& actual) { ASSERT_EQ(expected, actual); }
@@ -288,8 +263,7 @@ TEST_F(MountHelper, success_noVer_noDomain)
     whenMountCalled(kValidUrl, kUserName);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -302,8 +276,7 @@ TEST_F(MountHelper, fail_invalidMountPath)
     whenMountCalled(kValidUrl, kUserName);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 0,
-        CredentialsFileNameCall::notCalled,
-        GidUidCall::notCalled);
+        CredentialsFileNameCall::notCalled);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 
@@ -316,8 +289,7 @@ TEST_F(MountHelper, fail_invalidUrl)
     whenMountCalled("invalid_url", kUserName);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 0,
-        CredentialsFileNameCall::notCalled,
-        GidUidCall::notCalled);
+        CredentialsFileNameCall::notCalled);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 
@@ -330,8 +302,7 @@ TEST_F(MountHelper, fail_invalidUsername)
     whenMountCalled(kValidUrl, "\\adf");
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 0,
-        CredentialsFileNameCall::notCalled,
-        GidUidCall::notCalled);
+        CredentialsFileNameCall::notCalled);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 
@@ -344,8 +315,7 @@ TEST_F(MountHelper, fail_invalidUsername_2)
     whenMountCalled(kValidUrl, "adf\\");
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 0,
-        CredentialsFileNameCall::notCalled,
-        GidUidCall::notCalled);
+        CredentialsFileNameCall::notCalled);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 
@@ -358,8 +328,7 @@ TEST_F(MountHelper, success_domainProvided_noVer)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -372,8 +341,7 @@ TEST_F(MountHelper, success_domainProvided_ver1)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -386,8 +354,7 @@ TEST_F(MountHelper, success_domainProvided_ver2)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -400,8 +367,7 @@ TEST_F(MountHelper, success_noDomain_ver1)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -414,8 +380,7 @@ TEST_F(MountHelper, success_defaultDomain_noVer)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -428,8 +393,7 @@ TEST_F(MountHelper, success_defaultDomain_ver1)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -442,8 +406,7 @@ TEST_F(MountHelper, success_defaultDomain_ver2)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::ok);
 }
 
@@ -456,8 +419,7 @@ TEST_F(MountHelper, fail_invalidCredentials)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::wrongCredentials);
 }
 
@@ -470,8 +432,7 @@ TEST_F(MountHelper, fail_osMountFail)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 1,
-        CredentialsFileNameCall::called_Ok,
-        GidUidCall::called);
+        CredentialsFileNameCall::called_Ok);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 
@@ -485,8 +446,7 @@ TEST_F(MountHelper, fail_cantCreateCredentialsFile)
     whenMountCalled(kValidUrl, kUserNameWithDomain);
     expectingCalls(
         /*osMountCalledTimesAtLeast*/ 0,
-        CredentialsFileNameCall::called_Fail,
-        GidUidCall::notCalled);
+        CredentialsFileNameCall::called_Fail);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
 

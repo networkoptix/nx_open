@@ -266,13 +266,13 @@ QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& paramete
 
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
     const bool isCurrentTour = id.isNull();
-    NX_EXPECT(!isCurrentTour || workbench()->currentLayout()->isLayoutTourReview());
+    NX_ASSERT(!isCurrentTour || workbench()->currentLayout()->isLayoutTourReview());
 
     if (isCurrentTour)
         id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
 
     const auto tour = layoutTourManager()->tour(id);
-    NX_EXPECT(tour.isValid());
+    NX_ASSERT(tour.isValid());
     if (!tour.isValid())
         return actionGroup->actions();
 
@@ -289,7 +289,7 @@ QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& paramete
             [this, id, manual]
             {
                 auto tour = layoutTourManager()->tour(id);
-                NX_EXPECT(tour.isValid());
+                NX_ASSERT(tour.isValid());
                 if (!tour.isValid())
                     return;
 

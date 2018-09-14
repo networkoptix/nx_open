@@ -12,7 +12,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
@@ -47,7 +47,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->rolesTreeView->setItemDelegate(m_roleListDelegate);
     ui->usersTreeView->setItemDelegate(m_userListDelegate);
 
-    auto indicatorDelegate = new QnCustomizableItemDelegate(this);
+    auto indicatorDelegate = new CustomizableItemDelegate(this);
     indicatorDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
@@ -70,13 +70,11 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    ui->allUsersCheckableLine->setUserCheckable(false); //< Entire row clicks are handled instead.
-
-    ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
+    item_view_utils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
         CheckableLineWidget::CheckColumn);
 
-    ItemViewUtils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
-    ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    item_view_utils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
         [this](TreeView* treeView)
@@ -93,7 +91,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     setupTreeView(ui->rolesTreeView);
     setupTreeView(ui->usersTreeView);
 
-    auto scrollBar = new QnSnappedScrollBar(ui->mainWidget);
+    auto scrollBar = new SnappedScrollBar(ui->mainWidget);
     scrollBar->setUseItemViewPaddingWhenVisible(false);
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());

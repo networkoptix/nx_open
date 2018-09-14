@@ -26,6 +26,9 @@ extern "C" {
 } // extern "C"
 
 namespace nx {
+
+namespace mediaserver { namespace resource { class SharedContextPool; } }
+
 namespace mediaserver_core {
 namespace plugins {
 
@@ -41,7 +44,7 @@ class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
 public:
-    HanwhaResource() = default;
+    HanwhaResource(QnMediaServerModule* serverModule);
     virtual ~HanwhaResource() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
@@ -235,6 +238,10 @@ private:
         const HanwhaAdavancedParameterInfo& info) const;
 
     bool addFrameRateRanges(
+        QnCameraAdvancedParameter* inOutParameter,
+        const HanwhaAdavancedParameterInfo& info) const;
+
+    bool addResolutionRanges(
         QnCameraAdvancedParameter* inOutParameter,
         const HanwhaAdavancedParameterInfo& info) const;
 

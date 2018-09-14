@@ -1163,10 +1163,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Помилка сховища</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Проблема з мережею</translation>
     </message>
@@ -1283,10 +1279,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Рух на %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Помилка сховища %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1589,6 +1581,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 на %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation>Проблема зі зберіганням</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation>Проблема зі зберіганням на %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation>На повний екран</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation>Вийти з повноекранного режиму</translation>
     </message>
   </context>
   <context>

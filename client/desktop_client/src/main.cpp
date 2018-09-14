@@ -42,6 +42,7 @@
 
 #include <common/static_common_module.h>
 
+#include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -54,6 +55,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/rlimit.h>
 
 #include <nx/audio/audiodevice.h>
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -76,6 +78,8 @@
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #include <plugins/io_device/joystick/joystick_manager.h>
+
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -104,6 +108,21 @@ void sendCloudPortalConfirmation(const nx::vms::utils::SystemUri& uri, QObject* 
         manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
 }
 
+Qt::WindowFlags calculateWindowFlags()
+{
+    if (qnRuntime->isAcsMode())
+        return Qt::Window;
+
+    Qt::WindowFlags result = nx::utils::AppInfo::isMacOsX()
+        ? Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
+        : Qt::Window | Qt::CustomizeWindowHint;
+
+    if (qnRuntime->isVideoWallMode())
+        result |= Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint;
+
+    return result;
+}
+
 } // namespace
 
 #ifndef API_TEST_MAIN
@@ -130,7 +149,7 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
     if (startupParams.customUri.isValid())
         sendCloudPortalConfirmation(startupParams.customUri, application);
 
-    /* Running updater after QApplication and NX_LOG are initialized. */
+    /* Running updater after QApplication and logging are initialized. */
     if (qnRuntime->isDesktopMode() && !startupParams.exportedMode)
     {
         /* All functionality is in the constructor. */
@@ -155,16 +174,27 @@ int runApplication(QtSingleApplication* application, const QnStartupParameters& 
         qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
     #endif
 
+    // Dealing with EULA in videowall mode can make people frown.
+    if (!qnRuntime->isVideoWallMode() && qnRuntime->isDesktopMode())
+    {
+        int accepted = qnSettings->acceptedEulaVersion();
+        int current = QnClientAppInfo::eulaVersion();
+        const bool showEula =  accepted < current;
+        if (showEula && !context->showEulaMessage())
+        {
+            // We should exit completely.
+            return 0;
+        }
+    }
+
     /* Create main window. */
-    Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
-        ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
-        : static_cast<Qt::WindowFlags>(0);
 
     // todo: remove it. VMS-5837
     using namespace nx::client::plugins::io_device;
     std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
 
-    QScopedPointer<ui::MainWindow> mainWindow(new ui::MainWindow(context.data(), NULL, flags));
+    QScopedPointer<ui::MainWindow> mainWindow(
+        new ui::MainWindow(context.data(), nullptr, calculateWindowFlags()));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
@@ -261,9 +291,7 @@ int main(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_MAC
-    mac_setLimits();
-#endif
+    nx::utils::rlimit::setMaxFileDescriptors(8000);
 
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(argc, argv));
@@ -272,7 +300,7 @@ int main(int argc, char** argv)
     textToWaveServer->waitForStarted();
 
     // This attribute is needed to embed QQuickWidget into other QWidgets.
-    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+    //QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
     if (startupParams.hiDpiDisabled)

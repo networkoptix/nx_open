@@ -220,6 +220,7 @@ private:
  * NOTE: LeftChannel and RightChannel are allowed to be std::unique_ptr<...>.
  */
 template<typename LeftChannel, typename RightChannel>
+// requires MoveConstructible<LeftChannel> && MoveConstructible<RightChannel>
 std::unique_ptr<AsyncChannelBridgeImpl<LeftChannel, RightChannel>>
     makeAsyncChannelBridge(LeftChannel leftChannel, RightChannel rightChannel)
 {

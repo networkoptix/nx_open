@@ -66,11 +66,12 @@ bool ListenResponse::parseAttributes(const nx::network::stun::Message& message)
 {
     using namespace nx::network::stun::extension;
 
-    tcpConnectionKeepAlive = boost::none;
+    tcpConnectionKeepAlive = std::nullopt;
     nx::String keepAliveOptions;
     if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
     {
-        tcpConnectionKeepAlive = network::KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
+        tcpConnectionKeepAlive =
+            network::KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
         if (!tcpConnectionKeepAlive)
             return false; //< Empty means parsing has failed.
     }

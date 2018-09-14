@@ -95,10 +95,11 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     connect(d->pressAndHoldTimer, &QTimer::timeout, this,
         [this, d]()
         {
-            QQuickMouseEvent event(
+            QQuickMouseEvent mouseEvent;
+            mouseEvent.reset(
                 d->lastPos.x(), d->lastPos.y(),
                 d->lastButton, d->lastButtons, d->lastModifiers, false, true);
-            emit pressAndHold(&event);
+            emit pressAndHold(&mouseEvent);
         });
 }
 
@@ -325,7 +326,8 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
     Q_D(QnQuickTextInput);
     if (!d->dragStarted)
     {
-        QQuickMouseEvent mouseEvent(
+        QQuickMouseEvent mouseEvent;
+        mouseEvent.reset(
             event->pos().x(), event->pos().y(),
             event->button(), event->buttons(), event->modifiers(), true, false);
         emit clicked(&mouseEvent);
@@ -342,7 +344,8 @@ void QnQuickTextInput::mouseDoubleClickEvent(QMouseEvent* event)
     Q_D(QnQuickTextInput);
     d->pressAndHoldTimer->stop();
 
-    QQuickMouseEvent mouseEvent(
+    QQuickMouseEvent mouseEvent;
+    mouseEvent.reset(
         event->pos().x(), event->pos().y(),
         event->button(), event->buttons(), event->modifiers(), true, false);
     emit doubleClicked(&mouseEvent);

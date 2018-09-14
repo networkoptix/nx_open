@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import Qt.labs.templates 1.0
+import QtQuick.Controls 2.4
 import Nx 1.0
 
 ScrollIndicator
@@ -9,7 +9,7 @@ ScrollIndicator
     implicitWidth: Math.max(indicator.implicitWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(indicator.implicitHeight + topPadding + bottomPadding)
 
-    indicator: Rectangle
+    contentItem: Rectangle
     {
         id: indicator
 

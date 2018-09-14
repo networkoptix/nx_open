@@ -1,4 +1,3 @@
-
 #include "iomonitor_tcp_server.h"
 
 #include <QUrlQuery>
@@ -28,8 +27,11 @@ public:
     std::deque<QByteArray> messagesToSend;
 };
 
-QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner)
+QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 
@@ -57,7 +59,7 @@ void QnIOMonitorConnectionProcessor::run()
         QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleId(
             resourcePool(), cameraId);
         if (!camera) {
-            sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
+            sendResponse(nx::network::http::StatusCode::notFound, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
         Qn::directConnect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
@@ -65,11 +67,11 @@ void QnIOMonitorConnectionProcessor::run()
         Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
         if (camera->getParentId() != commonModule()->moduleGUID()) {
-            sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
+            sendResponse(nx::network::http::StatusCode::notFound, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
         else {
-            sendResponse(CODE_OK, "multipart/x-mixed-replace; boundary=ioboundary");
+            sendResponse(nx::network::http::StatusCode::ok, "multipart/x-mixed-replace; boundary=ioboundary");
         }
         camera->inputPortListenerAttached();
         static const int REQUEST_BUFFER_SIZE = 1024;
@@ -79,7 +81,10 @@ void QnIOMonitorConnectionProcessor::run()
         d->socket->setNonBlockingMode(true);
 
         using namespace std::placeholders;
-        d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+        d->socket->readSomeAsync(
+            &d->requestBuffer,
+            std::bind(&QnIOMonitorConnectionProcessor::onSomeBytesReadAsync,
+                      this, d->socket.get(), _1, _2));
 
         addData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
@@ -124,7 +129,7 @@ void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync(
     {
         d->socket->readSomeAsync(
             &d->requestBuffer,
-            std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+            std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.get(), _1, _2 ) );
     }
     d->waitCond.wakeAll();
 }
@@ -149,7 +154,7 @@ void QnIOMonitorConnectionProcessor::sendData()
 
     d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
     d->dataToSend.clear();
-    auto messageToSend = createResponse(CODE_OK, "application/json", QByteArray(), "--ioboundary");
+    auto messageToSend = createResponse(nx::network::http::StatusCode::ok, "application/json", QByteArray(), "--ioboundary");
 
     d->socket->post(
         [this, messageToSend=std::move(messageToSend)]

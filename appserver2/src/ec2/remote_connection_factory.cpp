@@ -18,6 +18,8 @@
 #include "compatibility/old_ec_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/vms/time_sync/client_time_sync_manager.h>
 
@@ -47,17 +49,17 @@ RemoteConnectionFactory::RemoteConnectionFactory(
         m_ubjsonTranSerializer.get()));
 }
 
+RemoteConnectionFactory::~RemoteConnectionFactory()
+{
+}
+
 void RemoteConnectionFactory::shutdown()
 {
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
-	// todo: introduce server and client TimeSynchronizationManager
+    // todo: introduce server and client TimeSynchronizationManager
     pleaseStop();
     join();
-}
-
-RemoteConnectionFactory::~RemoteConnectionFactory()
-{
 }
 
 void RemoteConnectionFactory::pleaseStop()
@@ -85,10 +87,8 @@ int RemoteConnectionFactory::testConnectionAsync(
     query.addQueryItem(lit("format"), QnLexical::serialized(Qn::JsonFormat));
     url.setQuery(query);
 
-    if (url.isEmpty())
-        return testDirectConnection(url, handler);
-    else
-        return testRemoteConnection(url, handler);
+    return url.isEmpty()
+        ? testDirectConnection(url, handler) : testRemoteConnection(url, handler);
 }
 
 // Implementation of AbstractECConnectionFactory::connectAsync
@@ -108,7 +108,7 @@ int RemoteConnectionFactory::connectAsync(
         url.setQuery(query);
     }
 
-	return establishConnectionToRemoteServer(url, handler, clientInfo);
+    return establishConnectionToRemoteServer(url, handler, clientInfo);
 }
 
 void RemoteConnectionFactory::setConfParams(std::map<QString, QVariant> confParams)
@@ -122,15 +122,6 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     const nx::vms::api::ClientInfoData& clientInfo)
 {
     const int reqId = generateRequestID();
-
-#if 0 // TODO: #ak Return existing connection, if any.
-    {
-        QnMutexLocker lk(&m_mutex);
-        auto it = m_urlToConnection.find(addr);
-        if (it != m_urlToConnection.end())
-            AbstractECConnectionPtr connection = it->second.second;
-    }
-#endif // 0
 
     nx::vms::api::ConnectionData loginInfo;
     loginInfo.login = addr.userName();
@@ -146,8 +137,7 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     }
 
     const auto info = QString::fromUtf8(QJson::serialized(clientInfo) );
-    NX_LOG(lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info),
-            cl_logDEBUG1);
+    NX_DEBUG(this, lit("%1 to %2 with %3").arg(Q_FUNC_INFO).arg(addr.toString(QUrl::RemovePassword)).arg(info));
 
     auto func =
         [this, reqId, addr, handler](
@@ -286,9 +276,8 @@ void RemoteConnectionFactory::remoteConnectionFinished(
     const nx::utils::Url& ecUrl,
     impl::ConnectHandlerPtr handler)
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit(
-        "RemoteConnectionFactory::remoteConnectionFinished. errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit("remoteConnectionFinished. errorCode = %1, ecUrl = %2")
+        .arg((int)errorCode).arg(ecUrl.toString(QUrl::RemovePassword)));
 
     // TODO: #ak async ssl is working now, make async request to old ec here
 
@@ -315,14 +304,14 @@ void RemoteConnectionFactory::remoteConnectionFinished(
     {
         const auto fullHost =
             connectionInfo.serverId().toSimpleString() + L'.' + connectionInfo.cloudSystemId;
-        NX_EXPECT(ecUrl.host() == connectionInfo.cloudSystemId
+        NX_ASSERT(ecUrl.host() == connectionInfo.cloudSystemId
             || ecUrl.host() == fullHost, "Unexpected cloud host!");
         connectionInfoCopy.ecUrl.setHost(fullHost);
     }
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit(
-        "RemoteConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
-        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+    NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lit(
+        "remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
+        .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)));
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
         m_peerType,
@@ -411,8 +400,7 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
             if (infoList.size() > 0
                 && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
             {
-                NX_LOG(lit("RemoteConnectionFactory: New client had already been registered with the same params"),
-                    cl_logDEBUG2);
+                NX_VERBOSE(this, lit("New client had already been registered with the same params"));
                 return ErrorCode::ok;
             }
 
@@ -422,13 +410,12 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
                 {
                     if (result == ErrorCode::ok)
                     {
-                        NX_LOG(lit("RemoteConnectionFactory: New client has been registered"),
-                            cl_logINFO);
+                        NX_INFO(this, lit("New client has been registered"));
                     }
                     else
                     {
-                        NX_LOG(lit("RemoteConnectionFactory: New client transaction has failed %1")
-                            .arg(toString(result)), cl_logERROR);
+                        NX_ERROR(this, lit("New client transaction has failed %1")
+                            .arg(toString(result)));
                     }
                 });
         }

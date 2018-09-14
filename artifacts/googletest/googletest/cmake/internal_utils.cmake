@@ -20,7 +20,7 @@ macro(fix_default_compiler_settings_)
   if (MSVC)
     # For MSVC, CMake sets certain flags to defaults we want to override.
     # This replacement code is taken from sample in the CMake Wiki at
-    # http://www.cmake.org/Wiki/CMake_FAQ#Dynamic_Replace.
+    # https://gitlab.kitware.com/cmake/community/wikis/FAQ#dynamic-replace.
     foreach (flag_var
              CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
              CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
@@ -38,6 +38,11 @@ macro(fix_default_compiler_settings_)
       # We prefer more strict warning checking for building Google Test.
       # Replaces /W3 with /W4 in defaults.
       string(REPLACE "/W3" "/W4" ${flag_var} "${${flag_var}}")
+
+      # Prevent D9025 warning for targets that have exception handling
+      # turned off (/EHs-c- flag). Where required, exceptions are explicitly
+      # re-enabled using the cxx_exception_flags variable.
+      string(REPLACE "/EHsc" "" ${flag_var} "${${flag_var}}")
     endforeach()
   endif()
 endmacro()
@@ -62,7 +67,7 @@ macro(config_compiler_and_linker)
   if (MSVC)
     # Newlines inside flags variables break CMake's NMake generator.
     # TODO(vladl@google.com): Add -RTCs and -RTCu to debug builds.
-    set(cxx_base_flags "-GS -W4 -WX -wd4251 -wd4275 -nologo -J -Zi")
+    set(cxx_base_flags "-GS -W4 -wd4251 -wd4275 -nologo -J -Zi")
     if (MSVC_VERSION LESS 1400)  # 1400 is Visual Studio 2005
       # Suppress spurious warnings MSVC 7.1 sometimes issues.
       # Forcing value to bool.
@@ -91,10 +96,13 @@ macro(config_compiler_and_linker)
     set(cxx_base_flags "${cxx_base_flags} -D_UNICODE -DUNICODE -DWIN32 -D_WIN32")
     set(cxx_base_flags "${cxx_base_flags} -DSTRICT -DWIN32_LEAN_AND_MEAN")
     set(cxx_exception_flags "-EHsc -D_HAS_EXCEPTIONS=1")
-    set(cxx_no_exception_flags "-D_HAS_EXCEPTIONS=0")
+    set(cxx_no_exception_flags "-EHs-c- -D_HAS_EXCEPTIONS=0")
     set(cxx_no_rtti_flags "-GR-")
   elseif (CMAKE_COMPILER_IS_GNUCXX)
     set(cxx_base_flags "-Wall -Wshadow -Werror")
+    if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0.0)
+      set(cxx_base_flags "${cxx_base_flags} -Wno-error=dangling-else")
+    endif()
     set(cxx_exception_flags "-fexceptions")
     set(cxx_no_exception_flags "-fno-exceptions")
     # Until version 4.3.2, GCC doesn't define a macro to indicate
@@ -155,6 +163,10 @@ function(cxx_library_with_type name type cxx_flags)
   set_target_properties(${name}
     PROPERTIES
     COMPILE_FLAGS "${cxx_flags}")
+  # Generate debug library name with a postfix.
+  set_target_properties(${name}
+    PROPERTIES
+    DEBUG_POSTFIX "d")
   if (BUILD_SHARED_LIBS OR type STREQUAL "SHARED")
     set_target_properties(${name}
       PROPERTIES
@@ -223,7 +235,7 @@ find_package(PythonInterp)
 # from the given source files with the given compiler flags.
 function(cxx_test_with_flags name cxx_flags libs)
   cxx_executable_with_flags(${name} "${cxx_flags}" "${libs}" ${ARGN})
-  add_test(${name} ${name})
+  add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
 # cxx_test(name libs srcs...)
@@ -250,14 +262,14 @@ function(py_test name)
         add_test(
           NAME ${name}
           COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/${name}.py
-              --build_dir=${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>)
+              --build_dir=${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG> ${ARGN})
       else (CMAKE_CONFIGURATION_TYPES)
 	# Single-configuration build generators like Makefile generators
 	# don't have subdirs below CMAKE_CURRENT_BINARY_DIR.
         add_test(
           NAME ${name}
           COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/${name}.py
-              --build_dir=${CMAKE_CURRENT_BINARY_DIR})
+              --build_dir=${CMAKE_CURRENT_BINARY_DIR} ${ARGN})
       endif (CMAKE_CONFIGURATION_TYPES)
     else (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.1)
       # ${CMAKE_CURRENT_BINARY_DIR} is known at configuration time, so we can
@@ -267,7 +279,7 @@ function(py_test name)
       add_test(
         ${name}
         ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test/${name}.py
-          --build_dir=${CMAKE_CURRENT_BINARY_DIR}/\${CTEST_CONFIGURATION_TYPE})
+          --build_dir=${CMAKE_CURRENT_BINARY_DIR}/\${CTEST_CONFIGURATION_TYPE} ${ARGN})
     endif (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.1)
   endif(PYTHONINTERP_FOUND)
 endfunction()

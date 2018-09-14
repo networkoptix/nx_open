@@ -6,6 +6,8 @@
 #include <QtCore/qjsondocument.h>
 #include <nx/utils/log/log.h>
 
+struct MustacheHelper{};
+
 bool renderTemplateFromFile(
     const QString& filename,
     const QVariantMap& contextMap,
@@ -21,12 +23,12 @@ bool renderTemplateFromFile(
     Mustache::QtVariantContext context(contextMap, &partialLoader);
     *renderedMail = renderer.render(_template, &context);
 
-	QJsonDocument json = QJsonDocument::fromVariant(contextMap);
-	QByteArray jsonData = json.toJson();
+    QJsonDocument json = QJsonDocument::fromVariant(contextMap);
+    QByteArray jsonData = json.toJson();
 
-	NX_LOG(lm("Rendering template %1").arg(filename), cl_logDEBUG2);
-	NX_LOG(lm("Body:\n%1").arg(_template), cl_logDEBUG2);
-	NX_LOG(lm("Context:\n%1").arg(jsonData), cl_logDEBUG2);
+    NX_VERBOSE(typeid(MustacheHelper), lm("Rendering template %1").arg(filename));
+    NX_VERBOSE(typeid(MustacheHelper), lm("Body:\n%1").arg(_template));
+    NX_VERBOSE(typeid(MustacheHelper), lm("Context:\n%1").arg(jsonData));
 
     return true;
 }

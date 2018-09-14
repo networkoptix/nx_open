@@ -13,6 +13,7 @@
 #include <transcoding/filters/time_image_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
+#include <nx/core/transcoding/filters/watermark_filter.h>
 
 #include <transcoding/transcoder.h>
 
@@ -47,7 +48,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     const auto videoLayout = resource->getVideoLayout();
 
     NX_ASSERT(!isReady(), "Double initialization");
-    //NX_EXPECT(isTranscodingRequired(videoLayout));
+    //NX_ASSERT(isTranscodingRequired(videoLayout));
 
     prepareVideoArFilter(srcFrameResolution);
 
@@ -61,6 +62,7 @@ void FilterChain::prepare(const QnMediaResourcePtr& resource,
     prepareRotationFilter();
     prepareDownscaleFilter(srcFrameResolution, resolutionLimit);
     prepareOverlaysFilters();
+    prepareWatermarkFilter();
 
     m_ready = true;
 }
@@ -86,6 +88,7 @@ void FilterChain::prepareForImage(const QnMediaResourcePtr& resource,
     prepareRotationFilter();
     prepareDownscaleFilter(fullImageResolution, resolutionLimit);
     prepareOverlaysFilters();
+    prepareWatermarkFilter();
 
     NX_ASSERT(!isEmpty());
 
@@ -119,6 +122,9 @@ bool FilterChain::isTranscodingRequired() const
         return true;
 
     if (m_settings.rotation != 0)
+        return true;
+
+    if (m_settings.watermark.visible())
         return true;
 
     return !m_settings.overlays.isEmpty();
@@ -262,6 +268,12 @@ void FilterChain::prepareOverlaysFilters()
 
     for (const auto legacyFilter: m_legacyFilters)
         push_back(legacyFilter);
+}
+
+void FilterChain::prepareWatermarkFilter()
+{
+    if (m_settings.watermark.visible())
+        push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
 }
 
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,

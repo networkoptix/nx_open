@@ -48,7 +48,7 @@ public:
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
-    virtual void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value) override;
+    virtual void setInactivityTimeout(std::optional<std::chrono::milliseconds> value) override;
 
     void setDestructHandler(std::function< void() > handler = nullptr);
 

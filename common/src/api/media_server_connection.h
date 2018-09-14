@@ -87,11 +87,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr& camera,
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
 
-    /**
-     * @return Request handle.
-     */
-    int getStatisticsAsync(QObject* target, const char* slot);
-
     int searchCameraAsyncStart(
         const QString& startAddr, const QString& endAddr, const QString& username,
         const QString& password, int port, QObject* target, const char* slot);
@@ -323,8 +318,6 @@ public:
     int getRecordingStatisticsAsync(
         qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
-    int mergeSystemAsync(const nx::utils::Url &url, const QString& getKey, const QString& postKey, bool ownSettings,
-        bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot);
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);

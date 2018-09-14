@@ -1,14 +1,90 @@
-#ifndef onvif_soap_wrapper_h
-#define onvif_soap_wrapper_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
 #include <list>
+#include <map>
+#include <ctime>
 
 #include <QSharedPointer>
 
-#include "onvif_helper.h"
 #include <utils/common/credentials.h>
+#include <plugins/resource/onvif/onvif_helper.h>
+#include <plugins/resource/onvif/onvif_namespace_registrar.h>
+#include <plugins/resource/onvif/soap_helpers.h>
+
+struct SoapTimeouts
+{
+    const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
+    const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
+    const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
+    const int kSoapDefaultAcceptTimeoutSeconds = 5 * 5;
+
+    SoapTimeouts():
+        sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
+        recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
+        connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
+        acceptTimeoutSeconds(kSoapDefaultAcceptTimeoutSeconds)
+    {};
+
+    SoapTimeouts(const QString& serialized):
+        SoapTimeouts()
+    {
+        if (serialized.isEmpty())
+            return;
+
+        const int kTimeoutsCount = 4;
+
+        bool success = false;
+        auto timeouts = serialized.split(';');
+        auto paramsNum = timeouts.size();
+
+        std::vector<std::chrono::seconds*> fieldsToSet =
+        {
+            &sendTimeoutSeconds,
+            &recvTimeoutSeconds,
+            &connectTimeoutSeconds,
+            &acceptTimeoutSeconds
+        };
+
+        if (paramsNum == 1)
+        {
+            auto timeout = timeouts[0].toInt(&success);
+
+            if (!success)
+                return;
+
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+        }
+        else if (paramsNum == 4)
+        {
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+            {
+                auto timeout = timeouts[i].toInt(&success);
+
+                if (!success)
+                    continue;
+
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+            }
+        }
+    }
+
+    QString serialize()
+    {
+        return lit("%1;%2;%3;%4")
+            .arg(sendTimeoutSeconds.count())
+            .arg(recvTimeoutSeconds.count())
+            .arg(connectTimeoutSeconds.count())
+            .arg(acceptTimeoutSeconds.count());
+    };
+
+    std::chrono::seconds sendTimeoutSeconds;
+    std::chrono::seconds recvTimeoutSeconds;
+    std::chrono::seconds connectTimeoutSeconds;
+    std::chrono::seconds acceptTimeoutSeconds;
+};
 
 struct soap;
 class DeviceBindingProxy;
@@ -183,7 +259,6 @@ typedef _onvifMedia__SetVideoEncoderConfigurationResponse SetVideoConfigResp;
 typedef _onvifMedia__SetVideoSourceConfiguration SetVideoSrcConfigReq;
 typedef _onvifMedia__SetVideoSourceConfigurationResponse SetVideoSrcConfigResp;
 
-
 class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
 class _onvifImg__GetOptions;
@@ -266,13 +341,17 @@ class _oasisWsnB2__RenewResponse;
 class _oasisWsnB2__Unsubscribe;
 class _oasisWsnB2__UnsubscribeResponse;
 
-
-
 template <class T>
 class SoapWrapper
 {
 public:
-    SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive);
+    SoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive);
     virtual ~SoapWrapper();
 
     const T* getProxy() const { return m_soapProxy; }
@@ -295,7 +374,7 @@ public:
         RequestType* const request,
         ResponseType* const response )
     {
-        beforeMethodInvocation();
+        beforeMethodInvocation<RequestType>();
         return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
     }
 
@@ -303,7 +382,34 @@ protected:
     T* m_soapProxy;
     char* m_endpoint;
 
-    void beforeMethodInvocation();
+    template<typename Request>
+    void beforeMethodInvocation()
+    {
+        using namespace nx::mediaserver_core::plugins;
+        if (m_invoked)
+        {
+            soap_destroy(m_soapProxy->soap);
+            soap_end(m_soapProxy->soap);
+        }
+        else
+        {
+            m_invoked = true;
+        }
+
+        const auto namespaces = onvif::requestNamespaces<Request>();
+        if (namespaces != nullptr)
+            soap_set_namespaces(m_soapProxy->soap, namespaces);
+
+        if (!m_login.isEmpty())
+        {
+            onvif::soapWsseAddUsernameTokenDigest(
+                m_soapProxy->soap,
+                NULL,
+                m_login.toUtf8().constData(),
+                m_passwd.toUtf8().constData(),
+                time(NULL) + m_timeDrift);
+        }
+    }
 
     int m_timeDrift;
 
@@ -321,7 +427,13 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 {
 public:
     // TODO: #vasilenko UTF unuse std::string
-    DeviceSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    DeviceSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
@@ -360,7 +472,13 @@ private:
 class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
 {
 public:
-    DeviceIOWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false );
+    DeviceIOWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString &login,
+        const QString &passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~DeviceIOWrapper();
 
     int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
@@ -374,7 +492,13 @@ public:
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 {
 public:
-    MediaSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    MediaSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
     virtual ~MediaSoapWrapper();
 
     int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
@@ -421,7 +545,13 @@ typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
 class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 {
 public:
-    PtzSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false);
+    PtzSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString &login,
+        const QString &passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
     virtual ~PtzSoapWrapper();
 
     int doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response);
@@ -446,7 +576,13 @@ typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
 class ImagingSoapWrapper: public SoapWrapper<ImagingBindingProxy>
 {
 public:
-    ImagingSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    ImagingSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
     virtual ~ImagingSoapWrapper();
 
     int getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response);
@@ -465,7 +601,13 @@ typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;
 class NotificationProducerSoapWrapper: public SoapWrapper<NotificationProducerBindingProxy>
 {
 public:
-    NotificationProducerSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false);
+    NotificationProducerSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString &login,
+        const QString &passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
 
     int Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response);
 };
@@ -475,7 +617,13 @@ public:
 class CreatePullPointSoapWrapper: public SoapWrapper<CreatePullPointBindingProxy>
 {
 public:
-    CreatePullPointSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    CreatePullPointSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString& login,
+        const QString& passwd,
+        int timeDrift,
+        bool tcpKeepAlive = false);
 
     int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
 };
@@ -485,7 +633,9 @@ public:
 class PullPointSubscriptionWrapper: public SoapWrapper<PullPointSubscriptionBindingProxy>
 {
 public:
-    PullPointSubscriptionWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false);
+    PullPointSubscriptionWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false);
 
     int pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response );
 };
@@ -495,7 +645,9 @@ public:
 class EventSoapWrapper: public SoapWrapper<EventBindingProxy>
 {
 public:
-    EventSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
+    EventSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
 
     int createPullPointSubscription( _onvifEvents__CreatePullPointSubscription& request, _onvifEvents__CreatePullPointSubscriptionResponse& response );
 };
@@ -505,12 +657,16 @@ public:
 class SubscriptionManagerSoapWrapper: public SoapWrapper<SubscriptionManagerBindingProxy>
 {
 public:
-    SubscriptionManagerSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int _timeDrift, bool tcpKeepAlive = false);
+    SubscriptionManagerSoapWrapper(
+        const SoapTimeouts& timeouts,
+        const std::string& endpoint,
+        const QString &login,
+        const QString &passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false);
 
     int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
     int unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response );
 };
 
 #endif //ENABLE_ONVIF
-
-#endif //onvif_soap_wrapper_h

@@ -9,7 +9,7 @@ namespace network {
 namespace server {
 namespace test {
 
-using AuthResult = server::UserLocker::AuthResult;
+using AuthResult = server::AuthResult;
 
 class UserLocker:
     public ::testing::Test
@@ -57,6 +57,11 @@ protected:
         m_timeShift.applyRelativeShift(m_settings.lockPeriod);
     }
 
+    void whenCheckPeriodPasses()
+    {
+        m_timeShift.applyRelativeShift(m_settings.checkPeriod);
+    }
+
     void whenDoSuccessfulAuthentication()
     {
         m_locker.updateLockoutState(m_userKey, AuthResult::success);
@@ -75,11 +80,11 @@ protected:
     void thenThereIsNoLockoutRecord()
     {
         const auto userLockers = m_locker.userLockers();
-        ASSERT_EQ(userLockers.end(), userLockers.find(m_userKey));
+        ASSERT_TRUE(userLockers.find(m_userKey) == userLockers.end());
     }
 
 private:
-    const UserLockerPool::Key m_userKey;
+    const UserLockerPool::key_type m_userKey;
     server::UserLockerSettings m_settings;
     server::UserLockerPool m_locker;
     nx::utils::test::ScopedTimeShift m_timeShift;
@@ -121,6 +126,16 @@ TEST_F(UserLocker, lockout_context_removed_after_unlocking_user)
     whenDoSuccessfulAuthentication();
 
     thenThereIsNoLockoutRecord();
+}
+
+TEST_F(UserLocker, unused_context_removed_by_timeout)
+{
+    givenLockedUser();
+
+    whenCheckPeriodPasses();
+
+    thenThereIsNoLockoutRecord();
+    thenUserIsNotLocked();
 }
 
 } // namespace test

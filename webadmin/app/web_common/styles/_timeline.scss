@@ -108,6 +108,7 @@ ng-include{
   user-select: none;
   background-color: $additional_light2;
   text-transform: uppercase;
+  z-index: 9;
 
   div{
       .shadows-off{

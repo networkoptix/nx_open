@@ -25,7 +25,7 @@ class OutgoingTunnelConnectionWatcher:
     public ::testing::Test
 {
 public:
-    typedef ScopeGuard<std::function<void()>> InitializationGuard;
+    using InitializationGuard = nx::utils::ScopeGuard<std::function<void()>>;
 
     OutgoingTunnelConnectionWatcher():
         m_tunnelAioThread(nullptr),
@@ -56,7 +56,7 @@ protected:
 
         m_tunnel->start();
 
-        return InitializationGuard(
+        return nx::utils::makeScopeGuard<std::function<void()>>(
             [this]()
             {
                 decltype(m_tunnel) tunnel(m_tunnel.release());

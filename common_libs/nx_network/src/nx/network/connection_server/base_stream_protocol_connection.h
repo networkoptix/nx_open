@@ -36,7 +36,7 @@ template<
     typename Parser,
     typename Serializer
 > class BaseStreamProtocolConnection:
-	public BaseServerConnection<CustomConnection>
+    public BaseServerConnection<CustomConnection>
 {
     using self_type = BaseStreamProtocolConnection<
         CustomConnection,

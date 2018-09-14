@@ -16,14 +16,14 @@ class NX_NETWORK_API M3uPlaylistConverter:
 public:
     M3uPlaylistConverter(
         const AbstractUrlRewriter& urlRewriter,
-        const SocketAddress& proxyEndpoint,
+        const utils::Url& proxyHostUrl,
         const nx::String& targetHost);
 
     virtual nx::network::http::BufferType convert(nx::network::http::BufferType originalBody) override;
 
 private:
     const AbstractUrlRewriter& m_urlRewriter;
-    const SocketAddress m_proxyEndpoint;
+    const utils::Url m_proxyHostUrl;
     const nx::String m_targetHost;
 };
 

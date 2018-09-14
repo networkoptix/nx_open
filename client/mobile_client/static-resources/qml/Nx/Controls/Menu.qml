@@ -1,8 +1,8 @@
 import QtQuick 2.6
-import Qt.labs.templates 1.0 as T
+import QtQuick.Controls 2.4
 import Nx 1.0
 
-T.Menu
+Menu
 {
     id: control
 
@@ -13,9 +13,9 @@ T.Menu
 
     background: Rectangle { color: ColorTheme.contrast3 }
 
+    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
     modal: true
-    // TODO: #dklychkov Enable after switching to Qt 5.7
-    // dim: false
+    dim: false
 
     contentItem: ListView
     {
@@ -39,25 +39,25 @@ T.Menu
 
         implicitWidth:
         {
-            if (T.ApplicationWindow.window)
+            if (ApplicationWindow.window)
             {
                 return Math.max(
                     orientation === Qt.Vertical ? 120 : 0,
                     Math.min(
                         maxItemSize.width,
-                        T.ApplicationWindow.window.width - 56))
+                        ApplicationWindow.window.width - 56))
             }
             return maxItemSize.width
         }
         implicitHeight:
         {
-            if (T.ApplicationWindow.window)
+            if (ApplicationWindow.window)
             {
                 return Math.max(
                     orientation === Qt.Horizontal ? 48 : 0,
                     Math.min(
                         listView.contentItem.childrenRect.height,
-                        T.ApplicationWindow.window.height - 56))
+                        ApplicationWindow.window.height - 56))
             }
             return listView.contentItem.childrenRect.height
         }
@@ -70,8 +70,8 @@ T.Menu
 
         model: control.contentModel
 
-        interactive: T.ApplicationWindow.window
-            && listView.contentHeight > T.ApplicationWindow.window.height
+        interactive: ApplicationWindow.window
+            && listView.contentHeight > ApplicationWindow.window.height
 
         clip: true
         keyNavigationWraps: false

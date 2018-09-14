@@ -25,19 +25,19 @@ nx_libraries = [
     'udt']
 
 
-def generate_testcamera_package(
-    binaries_dir,
-    qt_dir,
-    vcredist_directory,
-    output_file
-):
+def generate_testcamera_package(config, output_file):
+    icu_directory = config['icu_directory']
+    binaries_dir = config['bin_source_dir']
+    qt_directory = config['qt_directory']
+    vcredist_directory = config['vcredist_directory']
+
     with zipfile.ZipFile(output_file, "w", zipfile.ZIP_DEFLATED) as zip:
         e.zip_files_to(zip, e.ffmpeg_files(binaries_dir), binaries_dir)
         e.zip_files_to(zip, e.openssl_files(binaries_dir), binaries_dir)
         e.zip_files_to(zip, e.nx_files(binaries_dir, nx_libraries), binaries_dir)
+        e.zip_files_to(zip, e.icu_files(icu_directory), icu_directory)
 
-        qt_bin_dir = os.path.join(qt_dir, 'bin')
-        e.zip_files_to(zip, e.icu_files(qt_bin_dir), qt_bin_dir)
+        qt_bin_dir = os.path.join(qt_directory, 'bin')
         e.zip_files_to(zip, e.qt_files(qt_bin_dir, qt_libraries), qt_bin_dir)
 
         e.zip_rdep_package_to(zip, vcredist_directory)
@@ -56,11 +56,7 @@ def main():
 
     output_file = os.path.join(
         args.output, config['testcamera_distribution_name']) + '.zip'
-    generate_testcamera_package(
-        binaries_dir=config['bin_source_dir'],
-        qt_dir=config['qt_directory'],
-        vcredist_directory=config['vcredist_directory'],
-        output_file=output_file)
+    generate_testcamera_package(config, output_file)
 
 
 if __name__ == '__main__':

@@ -16,16 +16,20 @@
 #include <core/dataprovider/live_stream_params.h>
 #include <nx/mediaserver/metadata/video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
+#include <nx/mediaserver/server_module_aware.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
-class QnLiveStreamProvider: public QnAbstractMediaStreamDataProvider
+class QnLiveStreamProvider:
+    public QnAbstractMediaStreamDataProvider,
+    public nx::mediaserver::ServerModuleAware
 {
 public:
     class MetadataDataReceptor;
 
-    QnLiveStreamProvider(const QnResourcePtr& res);
+    QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res);
     virtual ~QnLiveStreamProvider();
 
     virtual void setRole(Qn::ConnectionRole role) override;
@@ -54,7 +58,6 @@ public:
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
 
     virtual void updateSoftwareMotion();
-    bool canChangeStatus() const;
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
@@ -73,7 +76,6 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
-
 protected:
     mutable QnMutex m_liveMutex;
 
@@ -86,8 +88,7 @@ private:
 
     void extractMediaStreamParams(
         const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution,
-        std::map<QString, QString>* const customStreamParams = nullptr);
+        QSize* const newResolution);
 
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
 

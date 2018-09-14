@@ -8,6 +8,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/user_resource.h"
 #include "api/app_server_connection.h"
+#include "api/server_rest_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"
@@ -75,31 +76,37 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
 
     TwoStepRequestCtx& ctx = m_twoStepRequests[handle];
 
-    QByteArray getKey = createHttpQueryAuthParam(
+    QString getKey = QString::fromLatin1(createHttpQueryAuthParam(
         ctx.auth.user(),
         ctx.auth.password(),
         nonceReply.realm,
         "GET",
-        nonceReply.nonce.toUtf8());
+        nonceReply.nonce.toUtf8()));
 
-    QByteArray postKey = createHttpQueryAuthParam(
+    QString postKey = QString::fromLatin1(createHttpQueryAuthParam(
         ctx.auth.user(),
         ctx.auth.password(),
         nonceReply.realm,
         "POST",
-        nonceReply.nonce.toUtf8());
+        nonceReply.nonce.toUtf8()));
 
     NX_DEBUG(this, lm("Send merge request to %1").arg(ctx.peerString()));
 
-    ctx.mainRequestHandle = ctx.proxy->apiConnection()->mergeSystemAsync(
-        ctx.url,
-        QString::fromLatin1(getKey),
-        QString::fromLatin1(postKey),
-        ctx.ownSettings,
-        ctx.oneServer,
-        ctx.ignoreIncompatible,
-        this,
-        SLOT(at_mergeSystem_finished(int, nx::vms::api::ModuleInformation, int, QString)));
+    auto callback =
+        [this](bool success, rest::Handle handle, QnJsonRestResult response)
+        {
+            QString error = response.errorString;
+            const auto moduleInfo = response.deserialized<nx::vms::api::ModuleInformation>();
+            at_mergeSystem_finished(success, moduleInfo, handle, error);
+        };
+
+    if (auto connection = ctx.proxy->restConnection())
+    {
+        ctx.mainRequestHandle = connection->mergeSystemAsync(
+            ctx.url, getKey, postKey,
+            ctx.ownSettings, ctx.oneServer, ctx.ignoreIncompatible,
+            callback, this->thread());
+    }
 }
 
 void QnMergeSystemsTool::at_getNonceForPingFinished(
@@ -207,7 +214,7 @@ void QnMergeSystemsTool::at_pingSystem_finished(
 }
 
 void QnMergeSystemsTool::at_mergeSystem_finished(
-    int status,
+    bool success,
     const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
     const QString& errorString)
@@ -231,12 +238,11 @@ void QnMergeSystemsTool::at_mergeSystem_finished(
     NX_DEBUG(this, lm("Merge response from %1: id=%2 error=%3").args(
         peerString, moduleInformation.id, errorString));
 
-    auto errorCode = utils::MergeSystemsStatus::unknownError;
-    if (status == QNetworkReply::ContentOperationNotPermittedError)
-        errorCode = utils::MergeSystemsStatus::forbidden;
-    else if (status == 0)
+    auto errorCode = utils::MergeSystemsStatus::ok;
+    if (!success)
+        errorCode = utils::MergeSystemsStatus::unknownError;
+    if (!errorString.isEmpty())
         errorCode = utils::MergeSystemsStatus::fromString(errorString);
-
     emit mergeFinished(errorCode, moduleInformation, handle);
 }
 

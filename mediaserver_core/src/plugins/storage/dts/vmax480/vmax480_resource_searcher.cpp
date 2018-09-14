@@ -23,10 +23,12 @@ static const QString kUpnpDeviceType("dvrdevice");
 } // namespace
 
 // ====================================================================
-QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule),
-    QnUpnpResourceSearcherAsync(commonModule, kUpnpDeviceType)
+QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnMediaServerModule* serverModule)
+    :
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    QnUpnpResourceSearcherAsync(serverModule->commonModule(), kUpnpDeviceType),
+    m_serverModule(serverModule)
 {
 }
 
@@ -40,7 +42,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
-    nx::network::QnMacAddress mac(devInfo.serialNumber);
+    nx::utils::MacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;
@@ -70,7 +72,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryA
 
     for (int i = 0; i < channles; ++i)
     {
-        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+        QnPlVmax480ResourcePtr resource (new QnPlVmax480Resource(m_serverModule));
 
         resource->setTypeId(rt);
 
@@ -140,7 +142,7 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resource
         return result;
     }
 
-    result = QnVirtualCameraResourcePtr( new QnPlVmax480Resource() );
+    result = QnVirtualCameraResourcePtr(new QnPlVmax480Resource(m_serverModule));
     result->setTypeId(resourceTypeId);
 
     qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
@@ -360,7 +362,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils:
     }
     for (int i = minCh; i < maxCh; ++i)
     {
-        QnPlVmax480ResourcePtr resource ( new QnPlVmax480Resource() );
+        QnPlVmax480ResourcePtr resource (new QnPlVmax480Resource(m_serverModule));
 
         resource->setTypeId(rt);
         if (camNames.value(i+1).isEmpty())

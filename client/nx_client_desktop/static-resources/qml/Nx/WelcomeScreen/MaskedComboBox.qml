@@ -1,55 +1,49 @@
-import QtQuick 2.5;
-import QtQuick.Controls 1.2;
-import Nx.Models 1.0;
+import QtQuick 2.5
+import Nx.Models 1.0
 
 MaskedItem
 {
-    id: control;
+    id: control
 
-    property var model;
-    property string comboBoxTextRole: "display";
-    property string comboBoxValueRole: comboBoxTextRole;
-    property bool isEditableComboBox: false;
-    property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1);
+    property var model
+    property string comboBoxTextRole: "display"
+    property string comboBoxValueRole: comboBoxTextRole
+    property int currentItemIndex: (maskedArea ? maskedArea.currentIndex : -1)
 
     function forceCurrentIndex(index)
     {
         if (maskedArea)
-            maskedArea.currentIndex = index;
+            maskedArea.currentIndex = index
     }
 
     maskedAreaDelegate: NxComboBox
     {
-        id: comboBox;
+        textRole: control.comboBoxTextRole
+        model: control.model
+        width: control.width
+        editable: true
 
-        textRole: control.comboBoxTextRole;
-        model: control.model;
-        width: control.width;
-        editable: control.isEditableComboBox;
-        isEditMode: editable;
-
-        onTextChanged:
+        onDisplayTextChanged:
         {
-            control.displayValue = text;
-
-            if (control.currentItemIndex == -1)
-            {
-                control.value = text;
-                return;
-            }
-
-            control.value = dataAccessor.getData(
-                control.currentItemIndex, control.comboBoxValueRole);
+            control.displayValue = displayText
+            control.value =
+                dataAccessor.getData(currentIndex, control.comboBoxValueRole) || displayText
         }
 
-        KeyNavigation.tab: control.KeyNavigation.tab;
-        KeyNavigation.backtab: control.KeyNavigation.backtab;
-        onAccepted: control.accepted();
-
-        ModelDataAccessor
+        onCountChanged:
         {
-            id: dataAccessor;
-            model: control.model;
+            if (count > 0 && currentIndex === -1)
+                currentIndex = 0
         }
+
+        KeyNavigation.tab: control.KeyNavigation.tab
+        KeyNavigation.backtab: control.KeyNavigation.backtab
+        onAccepted: control.accepted()
+    }
+
+    ModelDataAccessor
+    {
+        id: dataAccessor
+        model: control.model
     }
 }

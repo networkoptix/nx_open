@@ -11,6 +11,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <utils/db/db_helper.h>
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 namespace ec2 {
 namespace db {
@@ -79,8 +81,8 @@ int migrateFromV26(int oldPermissions)
         static_cast<user_permissions::GlobalPermissionsV26>(oldPermissions);
     const auto result = user_permissions::migrateFromV26(v26permissions);
 
-    NX_LOG(lm("Migrating User Permissions: %1 -> %2").args(
-        QnLexical::serialized(v26permissions), QnLexical::serialized(result)), cl_logDEBUG1);
+    NX_DEBUG(typeid(QSqlDatabase), lm("Migrating User Permissions: %1 -> %2").args(
+        QnLexical::serialized(v26permissions), QnLexical::serialized(result)));
 
     return result;
 }
@@ -105,7 +107,7 @@ int fixCustomFlag(int oldPermissionsValue)
     QString logMessage = lit("Fix User Permissions Custom Flag: %1 -> %2")
         .arg(QnLexical::serialized(oldPermissions))
         .arg(result);
-    NX_LOG(logMessage, cl_logINFO);
+    NX_INFO(typeid(QSqlDatabase), logMessage);
 
     return result;
 }

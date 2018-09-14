@@ -17,4 +17,4 @@ def api(one_running_mediaserver):
         ],
     ids=lambda path: path.replace('/', '_'))
 def test_api_request(api, url):
-    api.get(url)
+    api.generic.get(url)

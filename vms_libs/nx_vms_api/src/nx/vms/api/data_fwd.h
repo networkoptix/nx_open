@@ -127,7 +127,7 @@ DECLARE_STRUCT_AND_LIST(KeyValueData)
 DECLARE_STRUCT_AND_LIST(MiscData)
 
 DECLARE_STRUCT_EX(DiscoverPeerData, (ubjson)(json)(xml)(csv_record))
-DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record))
+DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record)(sql_record))
 DECLARE_STRUCT_AND_LIST_EX(DiscoveredServerData, (ubjson)(json)(xml)(csv_record))
 
 DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))

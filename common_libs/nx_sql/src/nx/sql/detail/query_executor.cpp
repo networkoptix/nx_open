@@ -9,11 +9,15 @@ namespace nx::sql::detail {
 //-------------------------------------------------------------------------------------------------
 // BaseExecutor
 
-BaseExecutor::BaseExecutor(QueryType queryType):
+BaseExecutor::BaseExecutor(
+    QueryType queryType,
+    const std::string& queryAggregationKey)
+    :
     m_statisticsCollector(nullptr),
     m_creationTime(nx::utils::monotonicTime()),
     m_queryExecuted(false),
-    m_queryType(queryType)
+    m_queryType(queryType),
+    m_queryAggregationKey(queryAggregationKey)
 {
 }
 
@@ -61,6 +65,11 @@ void BaseExecutor::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handle
     m_onBeforeDestructionHandler = std::move(handler);
 }
 
+std::string BaseExecutor::aggregationKey() const
+{
+    return m_queryAggregationKey;
+}
+
 void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollector)
 {
     m_statisticsCollector = statisticsCollector;
@@ -71,9 +80,12 @@ void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollect
 
 UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    const std::string& queryAggregationKey)
     :
-    base_type(std::move(completionHandler)),
+    base_type(
+        std::move(completionHandler),
+        queryAggregationKey),
     m_dbUpdateFunc(std::move(dbUpdateFunc))
 {
 }
@@ -93,9 +105,12 @@ void UpdateWithoutAnyDataExecutor::reportSuccess()
 
 UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    const std::string& queryAggregationKey)
     :
-    base_type(std::move(completionHandler)),
+    base_type(
+        std::move(completionHandler),
+        queryAggregationKey),
     m_dbUpdateFunc(std::move(dbUpdateFunc))
 {
     setExternalTransaction(nullptr); //< Run without transaction.
@@ -116,9 +131,10 @@ void UpdateWithoutAnyDataExecutorNoTran::reportSuccess()
 
 SelectExecutor::SelectExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+    const std::string& queryAggregationKey)
     :
-    base_type(QueryType::lookup),
+    base_type(QueryType::lookup, queryAggregationKey),
     m_dbSelectFunc(std::move(dbSelectFunc)),
     m_completionHandler(std::move(completionHandler))
 {
@@ -137,6 +153,11 @@ DBResult SelectExecutor::executeQuery(AbstractDbConnection* const connection)
 void SelectExecutor::reportErrorWithoutExecution(DBResult errorCode)
 {
     m_completionHandler(errorCode);
+}
+
+void SelectExecutor::setExternalTransaction(Transaction* /*transaction*/)
+{
+    // Ignoring since SelectExecutor::executeQuery always uses nullptr as a transaction.
 }
 
 } // namespace nx::sql::detail

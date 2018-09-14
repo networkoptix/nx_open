@@ -41,7 +41,7 @@ int FakeResourceListModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid())
     {
-        NX_EXPECT(false, "Wrong parent");
+        NX_ASSERT(false, "Wrong parent");
         return 0;
     }
 

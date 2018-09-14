@@ -55,7 +55,7 @@ void LayoutTourExecutor::startTour(const nx::vms::api::LayoutTourData& tour)
     if (!tour.isValid())
         return;
 
-    NX_EXPECT(m_tour.items.empty());
+    NX_ASSERT(m_tour.items.empty());
     resetTourItems(tour.items);
     if (tour.items.empty())
         return;
@@ -78,7 +78,7 @@ void LayoutTourExecutor::updateTour(const nx::vms::api::LayoutTourData& tour)
     if (tour.id != m_tour.id)
         return;
 
-    NX_EXPECT(tour.isValid());
+    NX_ASSERT(tour.isValid());
 
     // Start/stop timer before items check.
     const bool isTourManual = !isTimerRunning();
@@ -157,7 +157,7 @@ void LayoutTourExecutor::stopCurrentTour()
             stopTimer();
             setHintVisible(false);
             m_tour.currentIndex = 0;
-            NX_EXPECT(!m_tour.id.isNull());
+            NX_ASSERT(!m_tour.id.isNull());
             QnUuid tourId = m_tour.id;
             m_tour.id = QnUuid();
             resetTourItems({});
@@ -190,7 +190,7 @@ void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataLi
             ? existingLayout->clone(&remapHash)
             : QnLayoutResource::createFromResource(existing);
 
-        NX_EXPECT(layout);
+        NX_ASSERT(layout);
         if (!layout)
             continue;
 
@@ -223,7 +223,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
 {
     auto nextIndex = [forward](int current, int size)
         {
-            NX_EXPECT(size > 0);
+            NX_ASSERT(size > 0);
             if (current < 0 || size <= 0)
                 return 0;
 
@@ -260,9 +260,9 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
         }
         case Mode::MultipleLayouts:
         {
-            NX_EXPECT(!m_tour.id.isNull());
+            NX_ASSERT(!m_tour.id.isNull());
             const bool hasItems = !m_tour.items.empty();
-            NX_EXPECT(hasItems);
+            NX_ASSERT(hasItems);
             if (!hasItems)
             {
                 stopCurrentTour();
@@ -329,7 +329,7 @@ void LayoutTourExecutor::restoreWorkbenchState(const QnUuid& tourId)
 
     const bool validState = !workbench()->layouts().empty()
         && workbench()->currentLayout()->resource();
-    NX_EXPECT(validState);
+    NX_ASSERT(validState);
     if (!validState)
         menu()->trigger(action::OpenNewTabAction);
 }
@@ -353,10 +353,10 @@ void LayoutTourExecutor::setHintVisible(bool visible)
 
 void LayoutTourExecutor::startTimer()
 {
-    NX_EXPECT(m_tour.timerId == 0);
+    NX_ASSERT(m_tour.timerId == 0);
     if (m_tour.timerId == 0)
         m_tour.timerId = QObject::startTimer(kTimerPrecisionMs);
-    NX_EXPECT(!m_tour.elapsed.isValid());
+    NX_ASSERT(!m_tour.elapsed.isValid());
     m_tour.elapsed.start();
 }
 
@@ -365,10 +365,10 @@ void LayoutTourExecutor::stopTimer()
     if (!isTimerRunning())
         return;
 
-    NX_EXPECT(m_tour.timerId != 0);
+    NX_ASSERT(m_tour.timerId != 0);
     killTimer(m_tour.timerId);
     m_tour.timerId = 0;
-    NX_EXPECT(m_tour.elapsed.isValid());
+    NX_ASSERT(m_tour.elapsed.isValid());
     m_tour.elapsed.invalidate();
 }
 

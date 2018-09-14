@@ -5,7 +5,6 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
@@ -67,9 +66,9 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
+    return new QnUniversalRequestProcessor(std::move(clientSocket), this, needAuth());
 }
 
 nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
@@ -162,7 +161,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     if (!m_multipleServerSocket)
         return;
 
-    NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
+    NX_INFO(this, lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud));
     if (m_boundToCloud)
     {
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
@@ -249,6 +248,10 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
                 !socket->bind(localAddress) ||
                 !socket->listen())
             {
+                NX_WARNING(
+                    typeid(QnUniversalTcpListener),
+                    lm("Failed to create server socket for address: %1, family: %2")
+                        .args(localAddress, (ipVersion == AF_INET ? "IpV4" : "IpV6")));
                 return false;
             }
 
@@ -257,19 +260,12 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
             return true;
         };
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.ipV4())
-    {
-        if (!addSocket(localAddress, AF_INET))
-            return {};
-    }
+    const bool isAnyHost = localAddress.address.toString() == nx::network::HostAddress::anyHost.toString();
+    if (isAnyHost || (bool) localAddress.address.ipV4())
+        addSocket(localAddress, AF_INET);
 
-    if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
-        || (bool) localAddress.address.isPureIpV6())
-    {
-        if (!addSocket(localAddress, AF_INET6))
-            return {};
-    }
+    if (isAnyHost || (bool) localAddress.address.isPureIpV6())
+        addSocket(localAddress, AF_INET6);
 
     return sockets;
 }

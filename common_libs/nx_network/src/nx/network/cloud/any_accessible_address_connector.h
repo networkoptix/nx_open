@@ -65,22 +65,28 @@ private:
     std::list<std::unique_ptr<CloudAddressConnector>> m_cloudConnectors;
 
     void connectToEntryAsync(const AddressEntry& dnsEntry);
+
     void onTimeout();
 
     bool establishDirectConnection(const SocketAddress& endpoint);
+
     void onDirectConnectDone(
         SystemError::ErrorCode sysErrorCode,
         std::list<std::unique_ptr<AbstractStreamSocket>>::iterator directConnectionIter);
+
     void onConnectDone(
         SystemError::ErrorCode sysErrorCode,
+        AddressType addressType,
         boost::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
+
     void cleanUpAndReportResult(
         SystemError::ErrorCode sysErrorCode,
         boost::optional<TunnelAttributes> cloudTunnelAttributes,
         std::unique_ptr<AbstractStreamSocket> connection);
 
     void establishCloudConnection(const AddressEntry& dnsEntry);
+
     void onCloudConnectDone(
         SystemError::ErrorCode sysErrorCode,
         TunnelAttributes cloudTunnelAttributes,

@@ -21,6 +21,7 @@ QN_DECLARE_METAOBJECT_HEADER(p2p, MessageType, )
 
 enum class MessageType
 {
+    unknown,
     start,
     stop,
     resolvePeerNumberRequest,

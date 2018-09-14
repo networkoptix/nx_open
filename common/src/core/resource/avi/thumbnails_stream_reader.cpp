@@ -71,9 +71,10 @@ void QnThumbnailsStreamReader::run()
     NX_INFO(this, "Started");
     beforeRun();
 
-    m_delegate->open(getResource());
-
-    while(!needToStop())
+    const bool isOpened = m_delegate->open(getResource());
+    if (!isOpened)
+        NX_WARNING(this, lm("Unable to open stream for resource %1").arg(getResource()->getUniqueId()));
+    while(isOpened && !needToStop())
     {
         pauseDelay(); // pause if needed;
         if (needToStop()) // extra check after pause
@@ -92,10 +93,7 @@ void QnThumbnailsStreamReader::run()
         if (data==0 && !m_needStop)
         {
             setNeedKeyData();
-            mFramesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
+            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
             msleep(30);
             continue;
         }

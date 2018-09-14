@@ -45,14 +45,14 @@ void LegacyCameraMotionMaskWidget::init()
 {
     m_motionSensitivity = 0;
 
-    /* Set up scene & view. */
+    // Set up scene & view.
     m_scene.reset(new QnGraphicsScene(this));
     m_view.reset(new QnGraphicsView(m_scene.data(), this));
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
     m_view->setAutoFillBackground(true);
 
-    /* Set up model & control machinery. */
+    // Set up model & control machinery.
     m_context.reset(new QnWorkbenchContext(context()->accessController(), this));
 
     createWorkbenchLayout();
@@ -64,32 +64,39 @@ void LegacyCameraMotionMaskWidget::init()
     display->curtainAnimator()->setCurtainItem(nullptr);
     m_controller.reset(new QnWorkbenchController(display));
 
-    /* Disable unused instruments. */
+    // Disable unused instruments.
     m_controller->setMenuEnabled(false);
 
-    /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
-    SignalingInstrument *resizeSignalingInstrument = new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
+    // We need to listen to viewport resize events to make sure that our widget is always
+    // positioned at viewport's center.
+    SignalingInstrument* resizeSignalingInstrument =
+        new SignalingInstrument(Instrument::Viewport, Instrument::makeSet(QEvent::Resize), this);
     display->instrumentManager()->installInstrument(resizeSignalingInstrument);
-    connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
+    connect(resizeSignalingInstrument, SIGNAL(activated(QWidget*, QEvent*)),
+        this, SLOT(at_viewport_resized()));
 
-    /* Create motion mask selection instrument. */
+    // Create motion mask selection instrument.
     m_motionSelectionInstrument = dynamic_cast<MotionSelectionInstrument*>(
         m_controller->motionSelectionInstrument());
     m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setBrush(qnGlobals->motionMaskRubberBandColor());
     m_motionSelectionInstrument->setPen(qnGlobals->motionMaskRubberBandBorderColor());
-    disconnect(m_motionSelectionInstrument, NULL,                                               m_controller,   NULL); // TODO: #Elric controller flags?
-    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionSelected,   this,           &LegacyCameraMotionMaskWidget::at_motionRegionSelected);
-    connect(m_motionSelectionInstrument,    &MotionSelectionInstrument::motionRegionCleared,    this,           &LegacyCameraMotionMaskWidget::clearMotion);
+    // TODO: #Elric controller flags?
+    disconnect(m_motionSelectionInstrument, nullptr, m_controller, nullptr);
+    connect(m_motionSelectionInstrument, &MotionSelectionInstrument::motionRegionSelected,
+        this, &LegacyCameraMotionMaskWidget::at_motionRegionSelected);
+    connect(m_motionSelectionInstrument, &MotionSelectionInstrument::motionRegionCleared,
+        this, &LegacyCameraMotionMaskWidget::clearMotion);
 
-    /* Create motion region floodfill instrument. */
+    // Create motion region floodfill instrument.
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
-    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),   this,   SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
+    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)),
+        this, SLOT(at_itemClicked(QGraphicsView*, QGraphicsItem*, const ClickInfo&)));
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
-    /* Set up UI. */
-    QVBoxLayout *layout = new QVBoxLayout();
+    // Set up UI.
+    QVBoxLayout* layout = new QVBoxLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(m_view.data());
@@ -176,7 +183,7 @@ void LegacyCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
         m_context->workbench()->setItem(Qn::ZoomedRole, item);
 
         /* Set up the corresponding widget. */
-        m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
+        m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for nullptr
         NX_ASSERT(m_resourceWidget);
 
         if (m_resourceWidget)

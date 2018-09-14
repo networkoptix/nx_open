@@ -4,6 +4,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include "hikvision_request_helper.h"
+
 #include <plugins/resource/hikvision/hikvision_utils.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/network/http/http_client.h>
@@ -18,21 +20,19 @@ class HikvisionResource: public QnPlOnvifResource
 
     using base_type = QnPlOnvifResource;
 public:
-    HikvisionResource();
+    HikvisionResource(QnMediaServerModule* serverModule);
     virtual ~HikvisionResource() override;
+
+    virtual QString defaultCodec() const override;
 
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
     bool findDefaultPtzProfileToken();
 
-    struct ProtocolState
-    {
-        bool supported = false;
-        bool enabled = false;
-    };
-
-    static std::map<QString, ProtocolState> tryToEnableIntegrationProtocols(
-        const nx::utils::Url& url, const QAuthenticator& authenticator);
+    static hikvision::ProtocolStates tryToEnableIntegrationProtocols(
+        const nx::utils::Url& url,
+        const QAuthenticator& authenticator,
+        bool isAdditionalSupportCheckNeeded = false);
 
 protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
@@ -41,6 +41,7 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
     virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
 
@@ -57,7 +58,7 @@ private:
 
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
-    std::map<QString, ProtocolState> m_integrationProtocols;
+    hikvision::ProtocolStates m_integrationProtocols;
     bool m_hevcSupported = false;
 };
 

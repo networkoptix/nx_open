@@ -134,6 +134,18 @@ protected:
         thenClientTunnelSucceeded();
     }
 
+    void whenClientRequestsConnectionUsingUnknownSessionId()
+    {
+        m_clientSideApiClient->openConnectionToTheTargetHost(
+            "unknownSessionId",
+            [this](
+                api::ResultCode resultCode,
+                std::unique_ptr<network::AbstractStreamSocket> connection)
+            {
+                m_clientTunnelResults.push({resultCode, std::move(connection)});
+            });
+    }
+
     void thenOpenTunnelNotificationIsSentThroughServerConnection()
     {
         auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
@@ -163,6 +175,12 @@ protected:
         exchangeSomeData(
             m_prevClientTunnelResult.connection.get(),
             m_prevServerTunnelResult.connection.get());
+    }
+
+    void thenRequestFailedWith(api::ResultCode expectedResultCode)
+    {
+        m_prevClientTunnelResult = m_clientTunnelResults.pop();
+        ASSERT_EQ(expectedResultCode, m_prevClientTunnelResult.resultCode);
     }
 
 private:
@@ -287,9 +305,16 @@ TYPED_TEST_P(RelayMethodAcceptance, client_and_server_can_exchange_data)
     this->thenCanExchangeDataBetweenServerAndClient();
 }
 
+TYPED_TEST_P(RelayMethodAcceptance, unknown_session_id_is_handled_properly)
+{
+    this->whenClientRequestsConnectionUsingUnknownSessionId();
+    this->thenRequestFailedWith(api::ResultCode::notFound);
+}
+
 REGISTER_TYPED_TEST_CASE_P(RelayMethodAcceptance,
     server_can_establish_tunnel,
     client_can_establish_tunnel,
-    client_and_server_can_exchange_data);
+    client_and_server_can_exchange_data,
+    unknown_session_id_is_handled_properly);
 
 } // namespace nx::cloud::relay::test

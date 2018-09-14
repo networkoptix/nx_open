@@ -1,5 +1,4 @@
-#ifndef HTTP_TRANSACTION_RECEIVER_H
-#define HTTP_TRANSACTION_RECEIVER_H
+#pragma once
 
 #include <nx/streaming/abstract_data_consumer.h>
 #include <rest/server/request_handler.h>
@@ -23,7 +22,7 @@ namespace ec2
     public:
         QnHttpTransactionReceiver(
 			ServerTransactionMessageBus* messageBus,
-            QSharedPointer<nx::network::AbstractStreamSocket> socket,
+            std::unique_ptr<nx::network::AbstractStreamSocket> socket,
             QnTcpListener* owner );
         virtual ~QnHttpTransactionReceiver();
 
@@ -34,5 +33,3 @@ namespace ec2
         Q_DECLARE_PRIVATE(QnHttpTransactionReceiver);
     };
 }
-
-#endif  //HTTP_TRANSACTION_RECEIVER_H

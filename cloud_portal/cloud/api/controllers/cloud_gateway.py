@@ -6,12 +6,12 @@ import urlparse
 import logging
 logger = logging.getLogger(__name__)
 
-CLOUD_GATEWAY_URL = settings.CLOUD_CONNECT['gateway']
+CLOUD_GATEWAY_URL = settings.TRAFFIC_RELAY_PROTOCOL + settings.TRAFFIC_RELAY_HOST
 
 
 @validate_mediaserver_response
 def get(system_id, url, email=None, password=None):
-    request = urlparse.urljoin(CLOUD_GATEWAY_URL, system_id+'/')
+    request = CLOUD_GATEWAY_URL.replace('{systemId}', system_id)
     request = urlparse.urljoin(request, url)
     auth = None
     if email:
@@ -23,7 +23,7 @@ def get(system_id, url, email=None, password=None):
 
 @validate_mediaserver_response
 def post(system_id, url, data, email=None, password=None):
-    request = urlparse.urljoin(CLOUD_GATEWAY_URL, system_id+'/')
+    request = CLOUD_GATEWAY_URL.replace('{systemId}', system_id)
     request = urlparse.urljoin(request, url)
     auth = None
     if email:

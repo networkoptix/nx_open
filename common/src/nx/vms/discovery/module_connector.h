@@ -79,7 +79,7 @@ private:
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
-        enum Priority { kDefault, kDns, kLocalHost, kLocalNetwork, kIp, kCloud };
+        enum Priority { kDefault, kDns, kLocalHost, kLocalIpV4, kLocalIpV6, kRemoteIp, kCloud };
         typedef std::map<Priority, std::set<nx::network::SocketAddress>> Endpoints;
 
         Priority hostPriority(const nx::network::HostAddress& host) const;

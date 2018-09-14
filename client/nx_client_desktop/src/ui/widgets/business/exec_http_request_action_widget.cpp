@@ -5,8 +5,6 @@
 
 #include <nx/network/http/http_async_client.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <map>
 
 namespace
@@ -81,7 +79,7 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
     if (!model() || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     const auto params = model()->actionParams();
     QUrl url(params.url);
@@ -121,7 +119,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     if (!model() || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     auto params = model()->actionParams();
 

@@ -74,10 +74,6 @@ static const char* PASSWD10 = "";
 static const char* PASSWD11 = "ikwd";
 static const char* PASSWD_CAMERA = "camera";
 
-//
-// PasswordHelper
-//
-
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
 #ifdef ONVIF_DEBUG

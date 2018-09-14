@@ -1,3 +1,5 @@
+#include <QtCore/QCoreApplication>
+
 #include <nx/sql/test_support/test_with_db_helper.h>
 
 #define USE_GMOCK
@@ -5,6 +7,8 @@
 
 int main(int argc, char** argv)
 {
+    QCoreApplication application(argc, argv);
+
     const auto resultCode = nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)

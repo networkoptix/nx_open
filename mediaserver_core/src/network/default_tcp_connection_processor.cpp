@@ -3,9 +3,9 @@
 #include "network/tcp_listener.h"
 
 QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket, 
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(std::move(socket), owner)
 {
 }
 
@@ -24,5 +24,5 @@ void QnDefaultTcpConnectionProcessor::run()
     d->response.messageBody.append("</body>\n");
     d->response.messageBody.append("</html>\n");
 
-    sendResponse(CODE_NOT_FOUND, "text/html; charset=utf-8");
+    sendResponse(nx::network::http::StatusCode::notFound, "text/html; charset=utf-8");
 }

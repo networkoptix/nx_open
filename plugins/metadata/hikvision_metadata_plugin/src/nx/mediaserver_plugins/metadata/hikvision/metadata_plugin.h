@@ -39,7 +39,7 @@ public:
     virtual void setLocale(const char* locale) override;
 
     virtual nx::sdk::metadata::CameraManager* obtainCameraManager(
-        const nx::sdk::CameraInfo& cameraInfo,
+        const nx::sdk::CameraInfo* cameraInfo,
         nx::sdk::Error* outError) override;
 
     virtual const char* capabilitiesManifest(
@@ -53,9 +53,9 @@ public:
         nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
 
 private:
-    boost::optional<QList<QnUuid>> fetchSupportedEvents(
+    boost::optional<QList<QString>> fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
-    QList<QnUuid> parseSupportedEvents(const QByteArray& data);
+    QList<QString> parseSupportedEvents(const QByteArray& data);
 
 private:
     mutable QnMutex m_mutex;
@@ -66,7 +66,7 @@ private:
     {
         bool hasExpired() const;
 
-        QList<QnUuid> supportedEventTypes;
+        QList<QString> supportedEventTypes;
         nx::utils::ElapsedTimer timeout;
     };
 

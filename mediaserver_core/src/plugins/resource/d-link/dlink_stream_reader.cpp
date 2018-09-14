@@ -120,7 +120,6 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        getResource()->setStatus(Qn::Unauthorized);
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
     }
 
@@ -147,7 +146,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()));
     if (m_profile.codec.contains("264"))
     {
         QString rtspUrl(m_profile.url);
@@ -163,20 +162,21 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         // mpeg4 or jpeg
         m_HttpClient.reset(new CLSimpleHTTPClient(m_dlinkRes->getHostAddress(), 80, 2000, m_dlinkRes->getAuth()));
         const CLHttpStatus status = m_HttpClient->doGET(m_profile.url);
-		if (status == CL_HTTP_SUCCESS)
-		{
-			QUrl httpStreamUrl;
-			httpStreamUrl.setScheme("http");
-			httpStreamUrl.setHost(m_dlinkRes->getHostAddress());
-			httpStreamUrl.setPort(80);
-			httpStreamUrl.setPath(m_profile.url);
-			m_dlinkRes->updateSourceUrl(httpStreamUrl.toString(), getRole());
-			return CameraDiagnostics::NoErrorResult();
-		}
-		else
-		{
-			return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
-		}
+        if (status == CL_HTTP_SUCCESS)
+        {
+            QUrl httpStreamUrl;
+            httpStreamUrl.setScheme("http");
+            httpStreamUrl.setHost(m_dlinkRes->getHostAddress());
+            auto mediaPort = m_dlinkRes->mediaPort();
+            httpStreamUrl.setPort(mediaPort ? mediaPort :80);
+            httpStreamUrl.setPath(m_profile.url);
+            m_dlinkRes->updateSourceUrl(httpStreamUrl.toString(), getRole());
+            return CameraDiagnostics::NoErrorResult();
+        }
+        else
+        {
+            return CameraDiagnostics::RequestFailedResult(m_profile.url, QLatin1String(nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)status)));
+        }
     }
 }
 

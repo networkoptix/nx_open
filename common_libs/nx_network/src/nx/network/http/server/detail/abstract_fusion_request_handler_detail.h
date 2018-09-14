@@ -40,6 +40,8 @@ bool serializeToHeaders(nx::network::http::HttpHeaders* /*where*/, const T& /*wh
 class NX_NETWORK_API BaseFusionRequestHandler:
     public AbstractHttpRequestHandler
 {
+    using base_type = AbstractHttpRequestHandler;
+
 public:
     BaseFusionRequestHandler();
 
@@ -47,6 +49,18 @@ protected:
     RequestProcessedHandler m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
     nx::network::http::Method::ValueType m_requestMethod;
+
+    virtual void processRawHttpRequest(
+        nx::network::http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) = 0;
+
+    virtual void sendRawHttpResponse(RequestResult requestResult)
+    {
+        base_type::sendResponse(std::move(requestResult));
+    }
 
     void requestCompleted(FusionRequestResult result);
 
@@ -119,6 +133,26 @@ protected:
 
 private:
     boost::optional<nx::network::http::ConnectionEvents> m_connectionEvents;
+
+    virtual void processRequest(
+        nx::network::http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer authInfo,
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override
+    {
+        processRawHttpRequest(
+            connection,
+            std::move(authInfo),
+            std::move(request),
+            response,
+            std::move(completionHandler));
+    }
+
+    virtual void sendResponse(RequestResult requestResult) override
+    {
+        sendRawHttpResponse(std::move(requestResult));
+    }
 };
 
 
@@ -208,8 +242,8 @@ template<typename Input, typename Output, typename Descendant>
 class BaseFusionRequestHandlerWithInput:
     public BaseFusionRequestHandlerWithOutput<Output>
 {
-private:
-    virtual void processRequest(
+protected:
+    virtual void processRawHttpRequest(
         nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
         nx::network::http::Request request,

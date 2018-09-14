@@ -10,6 +10,7 @@
 #include <nx/network/test_support/stream_socket_stub.h>
 #include <nx/utils/random.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/test_support/settings_loader.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -133,6 +134,8 @@ public:
     ConnectSessionManager():
         m_peerName(nx::utils::generateRandomName(17).toStdString())
     {
+        nx::utils::to_lower(&m_peerName);
+
         addArg("-listeningPeer/maxPreemptiveConnectionCount", "7");
         addArg("-listeningPeer/recommendedPreemptiveConnectionCount", "4");
         addArg("-listeningPeer/internalTimerPeriod", "1ms");
@@ -650,6 +653,7 @@ public:
     ConnectSessionManagerConnectingByDomainName()
     {
         m_domainName = utils::generateRandomName(11).toStdString();
+        nx::utils::to_lower(&m_domainName);
         setListeningPeerName(m_domainName);
     }
 

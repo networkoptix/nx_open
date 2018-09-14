@@ -1,5 +1,5 @@
 Config.helpLinks.push({
-    url: "http://support.networkoptix.com",
+    url: "support.xstream@xccelo.com",
     title: "Support",
     target: "new" // new|frame
 });
@@ -11,20 +11,14 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "https://itunes.apple.com/eg/app/hd-witness/id648369716?mt=8",
-    title: "iOS Client",
-    target: "new" // new|frame
-});
-
-Config.helpLinks.push({
     urls: [
         {
-            url: "https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8",
+            url: "https://itunes.apple.com/us/app/xstream-mobile/id1398591536?ls=1&mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness",
+            url: "https://play.google.com/store/apps/details?id=com.xccelo.xstream",
             class:'googleplay',
             button: "Android Client"
         }

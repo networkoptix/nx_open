@@ -28,6 +28,7 @@
 
 #include <core/resource_access/resource_access_filter.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -477,11 +478,6 @@ void QnWorkbenchDisplay::deinitSceneView()
         delete gridBackgroundItem();
 }
 
-QGLWidget *QnWorkbenchDisplay::newGlWidget(QWidget *parent, Qt::WindowFlags windowFlags) const
-{
-    return new QGLWidget(parent, nullptr, windowFlags);
-}
-
 QSet<QnWorkbenchItem*> QnWorkbenchDisplay::draggedItems() const
 {
     return m_draggedItems;
@@ -536,8 +532,7 @@ void QnWorkbenchDisplay::initSceneView()
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if (!m_view->property(qn_viewInitializedPropertyName).toBool())
     {
-        QGLWidget *viewport = newGlWidget(m_view);
-
+        auto viewport = new QGLWidget(m_view);
         if (const auto window = viewport->windowHandle())
         {
             connect(window, &QWindow::screenChanged, this,
@@ -1093,8 +1088,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (m_widgets.size() >= maxItems)
     {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
-            .arg(maxItems), cl_logDEBUG1);
+        NX_DEBUG(this, lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
+            .arg(maxItems));
         qnDeleteLater(item);
         return false;
     }
@@ -2432,7 +2427,10 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
         if (eventParams.eventType >= vms::api::EventType::userDefinedEvent)
-            targetResources.unite(resourcePool()->getResourcesByIds(eventParams.metadata.cameraRefs).toSet());
+        {
+            QnResourceList cameras = resourcePool()->getCamerasByFlexibleIds(eventParams.metadata.cameraRefs);
+            targetResources.unite(cameras.toSet());
+        }
     }
 
     for (const QnResourcePtr &resource : targetResources)
@@ -2483,7 +2481,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
 
 bool QnWorkbenchDisplay::canShowLayoutBackground() const
 {
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return false;
 
     if (m_lightMode & Qn::LightModeNoLayoutBackground)
