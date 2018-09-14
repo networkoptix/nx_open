@@ -564,8 +564,12 @@ class MediaserverApi(object):
         logger.info("Merge %s to %s (takeRemoteSettings: %s):", self, remote_api, take_remote_settings)
         master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
         master_system_id = master_api.get_local_system_id()
+        if master_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(master_api))
         logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
         servant_system_id = servant_api.get_local_system_id()
+        if servant_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(servant_api))
         logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)
