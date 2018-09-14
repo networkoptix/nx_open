@@ -74,7 +74,7 @@ QnUuid QnAbstractTransaction::makeHash(
 
 } // namespace ec2
 
-#define TRANSACTION_ENUM_APPLY(VALUE, NAME, ...) (ec2::ApiCommand::##NAME, #NAME)
+#define TRANSACTION_ENUM_APPLY(VALUE, NAME, ...) (ec2::ApiCommand::NAME, #NAME)
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::ApiCommand, Value,
     NX_MSVC_EXPAND(TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_ENUM_APPLY))
 )
