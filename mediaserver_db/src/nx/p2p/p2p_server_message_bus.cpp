@@ -300,7 +300,7 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
 
         if (auto connection = findConnectionById(peer))
         {
-            if (connection->remotePeer().isClient())
+            if (!connection->remotePeer().isServer())
                 continue;
         }
 

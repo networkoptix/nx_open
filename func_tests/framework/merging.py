@@ -41,21 +41,20 @@ def setup_system(allocate_mediaserver, scheme):
 
     # Local is one to which request is sent.
     # Remote's URL is sent included in request to local.
-    for remote_mediaserver_alias, local_mediaserver_aliases in scheme.items():
-        remote_mediaserver = get_mediaserver(remote_mediaserver_alias)
-        for local_mediaserver_alias, merge_parameters in (local_mediaserver_aliases or {}).items():
-            local_mediaserver = get_mediaserver(local_mediaserver_alias)
-            merge_kwargs = {}
-            if merge_parameters is not None:
-                try:
-                    merge_kwargs['take_remote_settings'] = merge_parameters['settings'] == 'remote'
-                except KeyError:
-                    pass
-                try:
-                    remote_network = IPNetwork(merge_parameters['network'])
-                except KeyError:
-                    pass
-                else:
-                    merge_kwargs['accessible_ip_net'] = remote_network
-            merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
+    for merge_parameters in scheme:
+        local_mediaserver = get_mediaserver(merge_parameters['local'])
+        remote_mediaserver = get_mediaserver(merge_parameters['remote'])
+        merge_kwargs = {}
+        if merge_parameters is not None:
+            try:
+                merge_kwargs['take_remote_settings'] = merge_parameters['settings'] == 'remote'
+            except KeyError:
+                pass
+            try:
+                remote_network = IPNetwork(merge_parameters['network'])
+            except KeyError:
+                pass
+            else:
+                merge_kwargs['accessible_ip_net'] = remote_network
+        merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
     return allocated_mediaservers

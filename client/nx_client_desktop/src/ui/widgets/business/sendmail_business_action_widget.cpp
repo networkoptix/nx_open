@@ -9,8 +9,6 @@
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 using namespace nx::client::desktop::ui;
 
 QnSendmailBusinessActionWidget::QnSendmailBusinessActionWidget(QWidget* parent):
@@ -43,7 +41,7 @@ void QnSendmailBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::actionParams))
     {

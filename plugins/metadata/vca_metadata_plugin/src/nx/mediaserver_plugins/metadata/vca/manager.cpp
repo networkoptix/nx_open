@@ -42,15 +42,14 @@ struct EventMessage
 };
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const AnalyticsEventType& event, bool active)
+    const AnalyticsEventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(
-        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
-    commonEvent->setDescription(event.name.value.toStdString());
+    commonEvent->setTypeId(eventType.id.toStdString());
+    commonEvent->setDescription(eventType.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(event.internalName.toStdString());
+    commonEvent->setAuxilaryData(eventType.internalName.toStdString());
     return commonEvent;
 }
 
@@ -60,7 +59,7 @@ nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
     using namespace std::chrono;
 
     auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
-    auto commonEvent = createCommonEvent(event, active);
+    const auto commonEvent = createCommonEvent(event, active);
     packet->addItem(commonEvent);
     packet->setTimestampUsec(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -186,7 +185,7 @@ Manager::Manager(Plugin* plugin,
 
     nx::api::AnalyticsDeviceManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.typeId);
+        typedCameraManifest.supportedEventTypes.push_back(eventType.id);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     static const int kBufferCapacity = 4096;
@@ -437,7 +436,7 @@ nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
     return nx::sdk::Error::noError;
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int typeListSize)
 {
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
@@ -448,8 +447,8 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
 
     for (int i = 0; i < typeListSize; ++i)
     {
-        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]);
-        const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
+        QString id = typeList[i];
+        const AnalyticsEventType* eventType = m_plugin->eventTypeById(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
         else
@@ -457,7 +456,7 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
     }
 
     QByteArray eventNames;
-    for (const auto& event : m_eventsToCatch)
+    for (const auto& event: m_eventsToCatch)
     {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
     }

@@ -201,7 +201,7 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(
 {
     QnSharedResourcePointer<CameraMock> camera(new CameraMock(serverModule()));
     setup(camera.data());
-    return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
+    return camera->init() ? camera : QnSharedResourcePointer<CameraMock>();
 }
 
 void CameraTest::SetUp()

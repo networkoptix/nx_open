@@ -173,7 +173,7 @@ class UnpackedMediaserverFactory(object):
             name=host.name,
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
-            root_dir=host.os_access.Path(host.dir),
+            root_dir=host.os_access.path_cls(host.dir),
             server_bind_address=host.server_bind_address,
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,

@@ -38,7 +38,6 @@
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -376,7 +375,7 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    QScopedValueRollback<bool> guard(m_ignoreClickEvent, true);
     action(action::ToggleTimelineAction)->setChecked(opened);
 
     m_yAnimator->stop();
@@ -595,7 +594,7 @@ void TimelineWorkbenchPanel::updateResizerGeometry()
 
     if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updateResizerGeometryLater, true);
+        QScopedValueRollback<bool> guard(m_updateResizerGeometryLater, true);
 
         m_resizerWidget->setGeometry(resizerGeometry);
 
@@ -609,7 +608,7 @@ void TimelineWorkbenchPanel::updateControlsGeometry()
     if (m_resizing)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_resizing, true);
+    QScopedValueRollback<bool> guard(m_resizing, true);
 
     QRectF geometry = item->geometry();
     auto parentWidgetRect = m_parentWidget->rect();

@@ -26,9 +26,12 @@ loggers:
   framework.vms.vm_type: {level: INFO}
   framework.vms.vm_type.wait: {level: WARNING}
   framework.vms.vm_type.ssh: {level: WARNING}
+  framework.vms.vm_type.winrm: {level: WARNING}
   framework.vms.vm_type.networking.ssh: {level: WARNING}
+  framework.vms.vm_type.networking.winrm: {level: WARNING}
   framework.vms.hypervisor.virtual_box: {level: INFO}
   framework.vms.hypervisor.virtual_box.manage: {level: WARNING}
+  framework.os_access.windows_remoting._cim_query: {level: INFO}
   framework.os_access.traffic_capture: {level: INFO}
   framework.mediaserver_api.setup: {level: INFO}
   framework.mediaserver_api.setup.wait: {level: WARNING}

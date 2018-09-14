@@ -21,7 +21,6 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
@@ -384,7 +383,7 @@ void QnPtzManageDialog::clear()
 
 void QnPtzManageDialog::saveData()
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
+    QScopedValueRollback<bool> guard(m_submitting, true);
 
     if (!m_model->synchronized())
     {

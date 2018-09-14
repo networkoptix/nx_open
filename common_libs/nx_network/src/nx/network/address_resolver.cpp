@@ -65,7 +65,7 @@ void AddressResolver::resolveAsync(
         return handler(SystemError::noError, std::move(result));
     }
 
-    if (SocketGlobals::ini().isHostDisabled(hostName))
+    if (SocketGlobals::instance().isHostBlocked(hostName))
         return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     std::deque<AddressEntry> resolvedAddresses;

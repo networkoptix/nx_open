@@ -42,7 +42,7 @@ namespace api {
 
 uint qHash(const Analytics::EventType& t)
 {
-    return qHash(t.typeId.toByteArray());
+    return qHash(t.id);
 }
 
 } // namespace api
@@ -203,7 +203,7 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
-nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
+std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -212,7 +212,7 @@ nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return nx::plugins::SettingsHolder{};
+            return std::make_shared<nx::plugins::SettingsHolder>();
         };
 
     if (!QFileInfo::exists(filename))
@@ -228,8 +228,8 @@ nx::plugins::SettingsHolder ManagerPool::loadSettingsFromFile(
     if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    const auto settings = nx::plugins::SettingsHolder(settingsJson);
-    if (!settings.isValid())
+    const auto settings = std::make_shared<nx::plugins::SettingsHolder>(settingsJson);
+    if (!settings->isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 
     return settings;
@@ -301,22 +301,22 @@ static QString settingsFilename(
 
 void ManagerPool::setCameraManagerDeclaredSettings(
     CameraManager* manager,
-    const QnSecurityCamResourcePtr& /*camera*/,
+    const QnSecurityCamResourcePtr& camera,
     const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
     const auto settings = loadSettingsFromFile(lit("Plugin Camera Manager"), settingsFilename(
         pluginsIni().metadataPluginCameraManagerSettingsPath,
-        pluginLibName, lit("_camera_manager")));
-    manager->setDeclaredSettings(settings.array(), settings.size());
+        pluginLibName, lit("_camera_manager_for_") + camera->getPhysicalId()));
+    manager->setDeclaredSettings(settings->array(), settings->size());
 }
 
 void ManagerPool::setPluginDeclaredSettings(Plugin* plugin, const QString& pluginLibName)
 {
     // TODO: Stub. Implement storing the settings in the database.
-    auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
+    const auto settings = loadSettingsFromFile(lit("Plugin"), settingsFilename(
         pluginsIni().metadataPluginSettingsPath, pluginLibName));
-    plugin->setDeclaredSettings(settings.array(), settings.size());
+    plugin->setDeclaredSettings(settings->array(), settings->size());
 }
 
 void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -366,7 +366,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
         }
         if (auxiliaryPluginManifest)
         {
-            auxiliaryPluginManifest->driverId = pluginManifest->driverId;
+            auxiliaryPluginManifest->pluginId = pluginManifest->pluginId;
             pluginManifest = mergePluginManifestToServer(*auxiliaryPluginManifest, server);
         }
 
@@ -521,7 +521,7 @@ bool ManagerPool::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
 void ManagerPool::fetchMetadataForResourceUnsafe(
     const QnUuid& resourceId,
     ResourceMetadataContext& context,
-    QSet<QnUuid>& eventTypeIds)
+    const QSet<QString>& eventTypeIds)
 {
     for (auto& data: context.managers())
     {
@@ -535,7 +535,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             if (data.manager->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.driverName.value));
+                    .arg(data.manifest.pluginName.value));
             }
         }
         else
@@ -544,28 +544,35 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             if (data.manager->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.driverName.value));
+                    .arg(data.manifest.pluginName.value));
             }
 
             NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
                 .args(resourceId, eventTypeIds));
 
-            std::vector<nxpl::NX_GUID> eventTypeList;
+            std::vector<std::string> eventTypeList;
+            std::vector<const char*> eventTypePtrs;
             for (const auto& eventTypeId: eventTypeIds)
-                eventTypeList.push_back(nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122()));
-            auto result = data.manager->startFetchingMetadata(
-                !eventTypeList.empty() ? &eventTypeList[0] : nullptr,
-                static_cast<int>(eventTypeList.size()));
+            {
+                eventTypeList.push_back(eventTypeId.toStdString());
+                eventTypePtrs.push_back(eventTypeList.back().c_str());
+            }                
+            const auto result = data.manager->startFetchingMetadata(
+                eventTypePtrs.empty() ? nullptr : &eventTypePtrs.front(),
+                (int) eventTypePtrs.size());
 
             if (result != Error::noError)
-                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1").arg(data.manifest.driverName.value));
+            {
+                NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
+                    .arg(data.manifest.pluginName.value));
+            }
         }
     }
 }
 
-uint qHash(const nx::api::Analytics::EventType& t)// noexcept
+static uint qHash(const nx::api::Analytics::EventType& eventType) // noexcept
 {
-    return qHash(t.typeId.toByteArray());
+    return qHash(eventType.id);
 }
 
 boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifest(
@@ -573,7 +580,6 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
 {
     Error error = Error::noError;
     // TODO: #mike: Consider a dedicated mechanism for localization.
-    // TODO: #mike: Refactor GUIDs to be string-based hierarchical ids (e.g. "nx.eventType.LineCrossing").
 
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
@@ -614,7 +620,7 @@ void ManagerPool::assignPluginManifestToServer(
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
         {
-            return m.driverId == manifest.driverId;
+            return m.pluginId == manifest.pluginId;
         });
 
     if (it == existingManifests.cend())
@@ -635,7 +641,7 @@ nx::api::AnalyticsDriverManifest ManagerPool::mergePluginManifestToServer(
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::api::AnalyticsDriverManifest& m)
         {
-            return m.driverId == manifest.driverId;
+            return m.pluginId == manifest.pluginId;
         });
 
     if (it == existingManifests.cend())
@@ -649,15 +655,6 @@ nx::api::AnalyticsDriverManifest ManagerPool::mergePluginManifestToServer(
             unite(manifest.outputEventTypes.toSet()).toList();
         result = &*it;
     }
-
-#if defined _DEBUG
-    // Sometimes in debug purposes we need do clean existingManifest.outputEventTypes list.
-    if (!manifest.outputEventTypes.empty() &&
-        manifest.outputEventTypes.front().typeId == nx::api::kResetPluginManifestEventId)
-    {
-        it->outputEventTypes.clear();
-    }
-#endif
 
     server->setAnalyticsDrivers(existingManifests);
     server->saveParams();
@@ -731,10 +728,7 @@ ManagerPool::loadManagerManifest(
             driverManifest->outputEventTypes.cbegin(),
             driverManifest->outputEventTypes.cend(),
             std::back_inserter(deviceManifest->supportedEventTypes),
-            [](const nx::api::Analytics::EventType& driverManifestElement)
-            {
-                return driverManifestElement.typeId;
-            });
+            [](const nx::api::Analytics::EventType& eventType) { return eventType.id; });
         return std::make_pair(deviceManifest, driverManifest);
     }
 
@@ -947,8 +941,8 @@ boost::optional<PixelFormat> ManagerPool::pixelFormatFromManifest(
     if (uncompressedFrameCapabilityCount > 1)
     {
         NX_ERROR(this) << lm(
-            "More than one needUncompressedVideoFrames_... capability found in manifest of \"%1\"")
-            .arg(manifest.driverId);
+            "More than one needUncompressedVideoFrames_... capability found"
+            "in manifest of metadata plugin \"%1\"").arg(manifest.pluginId);
     }
     if (uncompressedFrameCapabilityCount != 1)
         return boost::optional<PixelFormat>{};

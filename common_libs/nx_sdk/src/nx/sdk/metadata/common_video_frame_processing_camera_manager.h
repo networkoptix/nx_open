@@ -117,7 +117,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual Error setHandler(MetadataHandler* handler) override;
     virtual Error pushDataPacket(DataPacket* dataPacket) override;
-    virtual Error startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize) override;
+    virtual Error startFetchingMetadata(const char* const* typeList, int typeListSize) override;
     virtual Error stopFetchingMetadata() override;
     virtual const char* capabilitiesManifest(Error* error) override;
     virtual void freeManifest(const char* data) override;

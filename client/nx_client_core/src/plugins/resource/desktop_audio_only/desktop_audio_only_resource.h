@@ -12,6 +12,8 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
             const QnAbstractStreamDataProvider *dataProvider) const override;
 
+    bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
+
     static QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);

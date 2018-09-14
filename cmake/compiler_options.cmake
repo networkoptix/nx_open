@@ -182,6 +182,9 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
+    set(CMAKE_INSTALL_RPATH @executable_path/../lib)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

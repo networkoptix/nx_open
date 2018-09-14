@@ -76,6 +76,7 @@
 
                 <Directory Id="plugins" Name="plugins"/>
                 <Directory Id="plugins_optional" Name="plugins_optional"/>
+                <Directory Id="platforms" Name="platforms"/>
                 <Directory Id="vox" Name="vox"/>
                 <Directory Id="sqldrivers" Name="sqldrivers"/>
 
@@ -125,6 +126,7 @@
             <ComponentGroupRef Id="shared_nx_libraries"/>
             <ComponentGroupRef Id="shared_misc_libraries"/>
             <ComponentGroupRef Id="shared_qt_libraries"/>
+            <ComponentGroupRef Id="shared_qt_platforms"/>
             <ComponentGroupRef Id="shared_icu_libraries"/>
             <ComponentGroupRef Id="server_qt_libraries"/>
             <ComponentGroupRef Id="server_qt_sqldrivers"/>
@@ -133,6 +135,7 @@
             <ComponentGroupRef Id="server_plugins_optional"/>
 
             <ComponentGroupRef Id="vox"/>
+            <ComponentGroupRef Id="traytool"/>
 
             <ComponentRef Id='ServerVersion'/>
             <ComponentGroupRef Id='server_txt_files'/>
@@ -148,13 +151,7 @@
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>
 
-            <ComponentRef Id="traytool.exe"/>
-            <ComponentGroupRef Id="TrayToolLibs"/>
-            <ComponentGroupRef Id="TrayToolQTLibraries"/>
-            <ComponentGroupRef Id="TrayToolOpenSSL"/>
             <ComponentGroupRef Id="ServerVcrt14ComponentGroup"/>
-            <ComponentGroupRef Id="TraytoolPlatforms" />
-            <ComponentGroupRef Id="TraytoolVcrt14ComponentGroup"/>
         </Feature>
 
     </Fragment>

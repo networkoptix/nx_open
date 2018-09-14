@@ -285,6 +285,7 @@ void ConnectionBase::startConnection()
     QUrlQuery requestUrlQuery(requestUrl.query());
     for (const auto& param: m_requestQueryParams)
         requestUrlQuery.addQueryItem(param.first, param.second);
+    requestUrlQuery.addQueryItem("format", QnLexical::serialized(localPeer().dataFormat));
     requestUrl.setQuery(requestUrlQuery.toString());
 
     m_httpClient->bindToAioThread(m_timer.getAioThread());
@@ -331,6 +332,11 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 {
     if (remotePeer().isClient())
         NX_ASSERT(messageType == MessageType::pushTransactionData);
+    if (remotePeer().isCloudServer())
+    {
+        NX_ASSERT(messageType == MessageType::pushTransactionData
+            || messageType == MessageType::subscribeAll);
+    }
 
     nx::Buffer buffer;
     buffer.reserve(data.size() + 1);
@@ -341,9 +347,13 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
 {
-    return isClient
-        ? MessageType::pushTransactionData
-        : (MessageType) buffer.at(kMessageOffset);
+    if (isClient)
+        return MessageType::pushTransactionData;
+
+    auto messageType = buffer.at(kMessageOffset);
+    return messageType < (qint8) MessageType::counter
+        ? (MessageType) messageType
+        : MessageType::unknown;
 }
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
@@ -410,7 +420,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
+        quint8 messageType = (quint8)getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(

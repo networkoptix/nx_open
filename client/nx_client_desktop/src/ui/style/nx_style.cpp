@@ -3157,9 +3157,10 @@ QRect QnNxStyle::subElementRect(
                     rect.setLeft(rect.left() + arrowSize + margin);
                 }
 
+                const auto horizontalAlignment = header->textAlignment & ~Qt::AlignVertical_Mask;
                 rect = option->fontMetrics.boundingRect(
                     rect,
-                    Qt::AlignLeft | Qt::AlignVCenter | Qt::TextShowMnemonic,
+                    horizontalAlignment | Qt::AlignVCenter | Qt::TextShowMnemonic,
                     header->text);
 
                 if (!header->icon.isNull())

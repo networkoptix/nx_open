@@ -1315,10 +1315,8 @@ protected:
         testHttpServer().setAuthenticationEnabled(true);
         testHttpServer().registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this,
-                _1, _2, _3, _4, _5),
+            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this, _1, _2),
             http::Method::get);
-
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
@@ -1361,14 +1359,11 @@ private:
     std::unique_ptr<http::AsyncClient> m_client;
 
     void saveRequestUser(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        auto it = request.headers.find(http::header::Authorization::NAME);
-        if (it != request.headers.end())
+        auto it = requestContext.request.headers.find(http::header::Authorization::NAME);
+        if (it != requestContext.request.headers.end())
         {
             http::header::Authorization authorization;
             ASSERT_TRUE(authorization.parse(it->second));

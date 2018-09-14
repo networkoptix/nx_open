@@ -8,10 +8,10 @@ from pathlib2 import Path
 from pylru import lrudecorator
 
 from defaults import defaults
-from framework.networking import setup_flat_network
 from framework.os_access.posix_access import local_access
 from framework.serialize import load
 from framework.vms.hypervisor.virtual_box import VirtualBox
+from framework.vms.networks import setup_flat_network
 from framework.vms.vm_type import VMType
 
 
@@ -43,7 +43,7 @@ def runner_address(hypervisor):
 
 @pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
-    dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
+    dir = host_os_access.path_cls.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)
     return dir
 
@@ -112,25 +112,25 @@ def two_vm_types(request):
     return request.param
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def linux_vm(vm_types):
     with vm_types['linux'].vm_ready('single-linux') as vm:
         yield vm
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def windows_vm(vm_types):
     with vm_types['windows'].vm_ready('single-windows') as vm:
         yield vm
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def one_vm(request, one_vm_type):
     # TODO: If new VM type is added, create separate fixture for it or use factory here.
     return request.getfixturevalue(one_vm_type + '_vm')
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def two_vms(two_vm_types, hypervisor, vm_types):
     first_vm_type, second_vm_type = two_vm_types
     with vm_types[first_vm_type].vm_ready('first-{}'.format(first_vm_type)) as first_vm:

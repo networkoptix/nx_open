@@ -35,8 +35,6 @@
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <nx/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/client/desktop/event_search/widgets/event_tile.h>
@@ -183,6 +181,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
+    m_opacityProcessor->addTargetItem(m_eventPanelContainer);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -190,6 +189,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     m_hidingProcessor->addTargetItem(item);
     m_hidingProcessor->addTargetItem(m_showButton);
+    m_hidingProcessor->addTargetItem(m_eventPanelContainer);
     m_hidingProcessor->setHoverLeaveDelay(NxUi::kClosePanelTimeoutMs);
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
     connect(m_hidingProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -212,6 +212,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
+    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_eventPanelContainer));
 
     /* Create a shadow: */
     auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, NxUi::kShadowThickness);
@@ -296,6 +297,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         opacityAnimator(item)->setTargetValue(opacity);
         opacityAnimator(backgroundItem)->setTargetValue(opacity);
         opacityAnimator(m_showButton)->setTargetValue(opacity);
+        opacityAnimator(m_eventPanelContainer)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
     }
     else
@@ -303,6 +305,7 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
         m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
         backgroundItem->setOpacity(opacity);
+        m_eventPanelContainer->setOpacity(opacity);
         m_showButton->setOpacity(opacity);
     }
 }
@@ -381,33 +384,31 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
     m_eventPanel.reset(new EventPanel(context()));
 
     // TODO: #vkutin Get rid of proxying.
-    auto eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
+    m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
 
-    auto eventPanelResizer = new ResizerWidget(item, eventPanelContainer);
+    auto eventPanelResizer = new ResizerWidget(item, m_eventPanelContainer);
     auto dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(eventPanelResizer);
 
     connect(item, &QGraphicsWidget::geometryChanged, this,
-        [this, eventPanelContainer, eventPanelResizer]()
+        [this, eventPanelResizer]()
         {
             // Add 1-pixel shift for notification panel frame.
             const auto newGeometry = item->geometry().adjusted(1, 0, 0, 0);
-            eventPanelContainer->setGeometry(newGeometry);
+            m_eventPanelContainer->setGeometry(newGeometry);
             eventPanelResizer->setGeometry(0, 0, style::Metrics::kStandardPadding,
-                eventPanelContainer->size().height());
+                m_eventPanelContainer->size().height());
         });
 
     // TODO: #vkutin Test which mode is faster.
     //eventPanelContainer->setCacheMode(QGraphicsItem::NoCache);
-    eventPanelContainer->setWidget(m_eventPanel.data());
-
-    m_hidingProcessor->addTargetItem(eventPanelContainer);
+    m_eventPanelContainer->setWidget(m_eventPanel.data());
 
     auto toolTipInstrument = InstrumentManager::instance(parentWidget->scene())
         ->instrument<ToolTipInstrument>();
 
     if (toolTipInstrument)
-        toolTipInstrument->addIgnoredItem(eventPanelContainer);
+        toolTipInstrument->addIgnoredItem(m_eventPanelContainer);
 
     connect(m_eventPanel.data(), &EventPanel::tileHovered,
         this, &NotificationsWorkbenchPanel::at_eventTileHovered);

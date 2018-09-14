@@ -7,7 +7,6 @@
 #include <nx/vms/event/events/camera_input_event.h>
 
 #include <nx/client/desktop/common/utils/aligner.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 
@@ -36,7 +35,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventResources))
     {

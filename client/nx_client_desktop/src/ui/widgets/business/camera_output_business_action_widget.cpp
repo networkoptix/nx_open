@@ -13,8 +13,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::CameraOutputBusinessActionWidget)

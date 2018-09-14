@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import sys
 import plistlib
+import re
 
 from itertools import chain
 from os.path import join
@@ -13,6 +14,28 @@ from os.path import join
 
 def change_dep_path(binary, xfrom, relative_to):
     subprocess.call(['install_name_tool', '-change', xfrom, '@executable_path/../Frameworks/' + relative_to, binary])
+
+
+def remove_rpath(binary):
+    output = subprocess.check_output(["otool", "-l", binary])
+
+    # Here we parse paths from otool output which looks like this:
+    #     cmd LC_RPATH
+    # cmdsize 40
+    #    path @executable_path/Frameworks (offset 12)
+    #         ^ Path is here.           ^
+
+    rpath_re = re.compile(
+        "cmd LC_RPATH.*?cmdsize .*?path (.+?) \\(offset.*?\\)",
+        re.MULTILINE | re.DOTALL)
+
+    command = ['install_name_tool']
+    for path in rpath_re.findall(output):
+        command += ["-delete_rpath", path]
+
+    command.append(binary)
+
+    subprocess.call(command)
 
 
 def binary_deps(binary):
@@ -88,6 +111,8 @@ def prepare(build_dir, binary, sbindir, tlibdir):
                 yield join(root, xfile)
 
 def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
+    remove_rpath(binary)
+
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
     qframeworks = fnmatch.filter(os.listdir(qlibdir), '*.framework')
 
