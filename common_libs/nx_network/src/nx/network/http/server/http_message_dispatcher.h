@@ -8,6 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "abstract_http_request_handler.h"
+#include "handler/http_server_handler_custom.h"
 #include "http_server_exact_path_matcher.h"
 #include "http_server_connection.h"
 
@@ -121,6 +122,20 @@ public:
         return registerRequestProcessor<RequestHandlerType>(
             path,
             []() { return std::make_unique<RequestHandlerType>(); },
+            method);
+    }
+
+    template<typename Func>
+    bool registerRequestProcessorFunc(
+        const nx::network::http::StringType& method,
+        const std::string& path,
+        Func func)
+    {
+        using Handler = server::handler::CustomRequestHandler<Func>;
+
+        return registerRequestProcessor<Handler>(
+            path.c_str(),
+            [func]() { return std::make_unique<Handler>(std::move(func)); },
             method);
     }
 

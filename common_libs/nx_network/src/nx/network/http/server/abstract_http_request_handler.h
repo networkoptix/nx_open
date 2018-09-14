@@ -33,6 +33,21 @@ struct NX_NETWORK_API RequestResult
 
 typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
+struct RequestContext
+{
+    nx::network::http::HttpServerConnection* connection;
+    nx::utils::stree::ResourceContainer authInfo;
+    nx::network::http::Request request;
+    nx::network::http::Response* response;
+    /**
+     * Parameters, taken from request path. 
+     * E.g., if handler was registered with path /object_type/{id}/sub_object_type/{id},
+     * and request /object_type/id1/sub_object_type/id2 was received.
+     * Then this vector would be ("id1", "id2").
+     */
+    std::vector<StringType> requestPathParams;
+};
+
 /**
  * Base class for all HTTP request processors
  * NOTE: Class methods are not thread-safe

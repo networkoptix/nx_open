@@ -81,7 +81,7 @@ protected:
 
         m_httpServer.registerRequestProcessorFunc(
             "",
-            std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2, _3, _4, _5));
+            std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2));
 
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
@@ -124,13 +124,10 @@ private:
     std::string m_proxyHost;
 
     void processHttpRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_receivedRequests.push(std::move(request));
+        m_receivedRequests.push(std::move(requestContext.request));
         completionHandler(nx::network::http::StatusCode::ok);
     }
 
@@ -224,25 +221,22 @@ private:
 
         m_httpServer.registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpAsyncClientConnectionUpgrade::processHttpRequest, this, _1, _2, _3, _4, _5));
+            std::bind(&HttpAsyncClientConnectionUpgrade::processHttpRequest, this, _1, _2));
 
         base_type::SetUp();
     }
 
     void processHttpRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_receivedRequests.push(std::move(request));
+        m_receivedRequests.push(std::move(requestContext.request));
 
         if (m_serverSendUpgradeHeaderInResponse)
-            response->headers.emplace("Upgrade", kUpgradeTo);
+            requestContext.response->headers.emplace("Upgrade", kUpgradeTo);
         else
-            response->headers.emplace("Upgrade", nx::network::http::StringType());
-        response->headers.emplace("Connection", "Upgrade");
+            requestContext.response->headers.emplace("Upgrade", nx::network::http::StringType());
+        requestContext.response->headers.emplace("Connection", "Upgrade");
 
         completionHandler(nx::network::http::StatusCode::switchingProtocols);
     }
