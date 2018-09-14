@@ -239,7 +239,7 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
 {
     if (index.column() == ProgressColumn)
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    else if(index.column() == StorageSettingsColumn)
+    if (index.column() == StorageSettingsColumn)
         return Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return base_type::flags(index);
 }
@@ -264,7 +264,7 @@ void ServerUpdatesModel::resetResourses(QnResourcePool* pool)
     beginResetModel();
     for (const auto& item: m_items)
     {
-        if(const auto server = item->server)
+        if (const auto server = item->server)
         {
             disconnect(server.data(), &QnResource::statusChanged,
                 this, &ServerUpdatesModel::at_resourceChanged);
