@@ -2,6 +2,7 @@ project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
+set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
 set(referenceList
@@ -44,8 +45,21 @@ set_target_properties(paxton_plugin PROPERTIES
     VS_DOTNET_REFERENCES "${referenceList}"
     VS_GLOBAL_SignAssembly "true"
     VS_GLOBAL_AssemblyOriginatorKeyFile "${signKey}"
-    OUTPUT_NAME "${paxtonDriverOutputName}"
+    OUTPUT_NAME "${paxtonDriverIntermediateName}"
 )
+
+# Merging references into a single library. Note: OemDvrInterfaces.dll is not to be merged!
+add_custom_command(TARGET paxton_plugin POST_BUILD
+    COMMAND
+        ${ilmerge_directory}/bin/ilmerge.exe
+        /out:"${paxtonDriverOutputName}.dll"
+        "${paxtonDriverIntermediateName}.dll"
+        "${CMAKE_CURRENT_SOURCE_DIR}/References/Newtonsoft.Json.dll"
+        "${CMAKE_CURRENT_SOURCE_DIR}/References/log4net.dll"
+        /target:dll
+        /targetplatform:v4,C:/Windows/Microsoft.NET/Framework64/v4.0.30319
+        /wildcards
+    COMMENT "Merging references...")
 
 target_compile_options(paxton_plugin PRIVATE "/langversion:6")
 
