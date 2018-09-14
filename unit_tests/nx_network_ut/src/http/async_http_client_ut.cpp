@@ -1313,12 +1313,13 @@ protected:
         base_type::SetUp();
 
         testHttpServer().setAuthenticationEnabled(true);
+        /*
         testHttpServer().registerRequestProcessorFunc(
             kTestPath,
             std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this,
                 _1, _2, _3, _4, _5),
             http::Method::get);
-
+        */
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
