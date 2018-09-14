@@ -35,18 +35,6 @@ public:
     void setTunnelAuthorizer(
         TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
 
-    network::http::RequestResult processOpenTunnelRequest(
-        ApplicationData requestData,
-        const network::http::Request& request,
-        network::http::Response* const response);
-
-protected:
-    void onTunnelCreated(
-        ApplicationData requestData,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
-
-    void closeAllTunnels();
-
 private:
     struct TunnelContext
     {
@@ -65,6 +53,17 @@ private:
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override;
+
+    network::http::RequestResult processOpenTunnelRequest(
+        ApplicationData requestData,
+        const network::http::Request& request,
+        network::http::Response* const response);
+
+    void onTunnelCreated(
+        ApplicationData requestData,
+        std::unique_ptr<network::AbstractStreamSocket> connection);
+
+    void closeAllTunnels();
 
     void processTunnelInitiationRequest(
         RequestContext requestContext,
