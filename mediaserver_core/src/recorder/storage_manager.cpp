@@ -2400,7 +2400,6 @@ void QnStorageManager::checkWritableStoragesExist()
 
 void QnStorageManager::startAuxTimerTasks()
 {
-
     if (m_role == QnServer::StoragePool::Normal)
     {
         static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
