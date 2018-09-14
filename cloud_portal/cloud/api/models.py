@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
-from account_backend import AccountManager
 from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
+from api.account_backend import AccountManager
 from cms.models import UserGroupsToCustomizationPermissions
 from cloud.settings import CUSTOMIZATION
 
