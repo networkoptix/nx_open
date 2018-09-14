@@ -31,7 +31,7 @@ private:
             controller::AbstractConnectSessionManager::StartRelayingFunc>;
 
     controller::AbstractConnectSessionManager* m_connectSessionManager = nullptr;
-    std::unique_ptr<TunnelingServer> m_tunnelingServer;
+    TunnelingServer m_tunnelingServer;
 
     void connectToPeerFinished(
         api::ResultCode resultCode,

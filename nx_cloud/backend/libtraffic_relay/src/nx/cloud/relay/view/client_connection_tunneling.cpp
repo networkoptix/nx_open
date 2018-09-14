@@ -7,7 +7,11 @@ namespace nx::cloud::relay::view {
 ClientConnectionTunnelingServer::ClientConnectionTunnelingServer(
     controller::AbstractConnectSessionManager* connectSessionManager)
     :
-    m_connectSessionManager(connectSessionManager)
+    m_connectSessionManager(connectSessionManager),
+    m_tunnelingServer(
+        std::bind(&ClientConnectionTunnelingServer::saveNewTunnel, this,
+            std::placeholders::_1, std::placeholders::_2),
+        this)
 {
 }
 
@@ -15,12 +19,9 @@ void ClientConnectionTunnelingServer::registerHandlers(
     const std::string& basePath,
     network::http::server::rest::MessageDispatcher* messageDispatcher)
 {
-    m_tunnelingServer = std::make_unique<TunnelingServer>(
+    m_tunnelingServer.registerRequestHandlers(
         basePath,
-        messageDispatcher,
-        std::bind(&ClientConnectionTunnelingServer::saveNewTunnel, this,
-            std::placeholders::_1, std::placeholders::_2),
-        this);
+        messageDispatcher);
 }
 
 void ClientConnectionTunnelingServer::authorize(

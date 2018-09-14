@@ -3,8 +3,7 @@
 #include <nx/network/http/tunneling/server.h>
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
-
-#include "../settings.h"
+#include <nx/cloud/relaying/listening_peer_manager.h>
 
 namespace nx::cloud::relay::view {
 
@@ -13,7 +12,7 @@ class ListeningPeerConnectionTunnelingServer:
 {
 public:
     ListeningPeerConnectionTunnelingServer(
-        const conf::Settings& settings,
+        relaying::AbstractListeningPeerManager* listeningPeerManager,
         relaying::AbstractListeningPeerPool* listeningPeerPool);
 
     void registerHandlers(
@@ -29,9 +28,17 @@ private:
     using TunnelingServer = 
         nx::network::http::tunneling::Server<std::string /*listeningPeerName*/>;
 
-    const conf::Settings& m_settings;
+    relaying::AbstractListeningPeerManager* m_listeningPeerManager = nullptr;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool = nullptr;
-    std::unique_ptr<TunnelingServer> m_tunnelingServer;
+    TunnelingServer m_tunnelingServer;
+
+    void onBeginListeningCompletion(
+        CompletionHandler completionHandler,
+        const std::string& peerName,
+        network::http::Response* httpResponse,
+        relay::api::ResultCode resultCode,
+        relay::api::BeginListeningResponse response,
+        nx::network::http::ConnectionEvents connectionEvents);
 
     void saveNewTunnel(
         const std::string& listeningPeerName,
