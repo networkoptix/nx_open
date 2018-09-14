@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -11,6 +12,7 @@
 #include "../http_types.h"
 #include "../server/http_server_connection.h"
 #include "../server/http_stream_socket_server.h"
+#include "../server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http::tunneling {
 
@@ -19,7 +21,19 @@ class GetPostTunnelProcessor:
     public network::http::StreamConnectionHolder
 {
 public:
+    using NewTunnelHandler = nx::utils::MoveOnlyFunc<void(
+        ApplicationData /*requestData*/,
+        std::unique_ptr<network::AbstractStreamSocket> /*connection*/)>;
+
+    GetPostTunnelProcessor(NewTunnelHandler newTunnelHandler);
     virtual ~GetPostTunnelProcessor();
+
+    void registerRequestHandlers(
+        const std::string& basePath,
+        server::rest::MessageDispatcher* messageDispatcher);
+
+    void setTunnelAuthorizer(
+        TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
 
     network::http::RequestResult processOpenTunnelRequest(
         ApplicationData requestData,
@@ -27,9 +41,9 @@ public:
         network::http::Response* const response);
 
 protected:
-    virtual void onTunnelCreated(
+    void onTunnelCreated(
         ApplicationData requestData,
-        std::unique_ptr<network::AbstractStreamSocket> connection) = 0;
+        std::unique_ptr<network::AbstractStreamSocket> connection);
 
     void closeAllTunnels();
 
@@ -45,10 +59,27 @@ private:
 
     mutable QnMutex m_mutex;
     Tunnels m_tunnelsInProgress;
+    NewTunnelHandler m_newTunnelHandler;
+    TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override;
+
+    void processTunnelInitiationRequest(
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void onTunnelAutorizationCompleted(
+        StatusCode::Value authorizationResult,
+        ApplicationData applicationData,
+        std::unique_ptr<RequestContext> requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
+
+    void openTunnel(
+        ApplicationData applicationData,
+        std::unique_ptr<RequestContext> requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler);
 
     void closeConnection(
         const QnMutexLockerBase& lock,
@@ -75,9 +106,117 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<typename ApplicationData>
+GetPostTunnelProcessor<ApplicationData>::GetPostTunnelProcessor(
+    NewTunnelHandler newTunnelHandler)
+    :
+    m_newTunnelHandler(std::move(newTunnelHandler))
+{
+}
+
+template<typename ApplicationData>
 GetPostTunnelProcessor<ApplicationData>::~GetPostTunnelProcessor()
 {
     closeAllTunnels();
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::registerRequestHandlers(
+    const std::string& basePath,
+    server::rest::MessageDispatcher* messageDispatcher)
+{
+    using namespace std::placeholders;
+
+    static constexpr char path[] = "get_post/{sequence}";
+
+    messageDispatcher->registerRequestProcessorFunc(
+        nx::network::http::Method::get,
+        url::joinPath(basePath, path),
+        std::bind(&GetPostTunnelProcessor::processTunnelInitiationRequest, this, _1, _2));
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::setTunnelAuthorizer(
+    TunnelAuthorizer<ApplicationData>* tunnelAuthorizer)
+{
+    m_tunnelAuthorizer = tunnelAuthorizer;
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::onTunnelCreated(
+    ApplicationData requestData,
+    std::unique_ptr<network::AbstractStreamSocket> connection)
+{
+    m_newTunnelHandler(std::move(requestData), std::move(connection));
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::processTunnelInitiationRequest(
+    RequestContext requestContextOriginal,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    using namespace std::placeholders;
+
+    auto requestContext = std::make_unique<RequestContext>(
+        std::move(requestContextOriginal));
+
+    if (m_tunnelAuthorizer)
+    {
+        auto requestContextPtr = requestContext.get();
+
+        m_tunnelAuthorizer->authorize(
+            requestContextPtr,
+            [this, requestContext = std::move(requestContext),
+                completionHandler = std::move(completionHandler)](
+                    StatusCode::Value result,
+                    ApplicationData applicationData) mutable
+            {
+                onTunnelAutorizationCompleted(
+                    result,
+                    std::move(applicationData),
+                    std::move(requestContext),
+                    std::move(completionHandler));
+            });
+    }
+    else
+    {
+        openTunnel(
+            ApplicationData(),
+            std::move(requestContext),
+            std::move(completionHandler));
+    }
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::onTunnelAutorizationCompleted(
+    StatusCode::Value authorizationResult,
+    ApplicationData applicationData,
+    std::unique_ptr<RequestContext> requestContext,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    if (!StatusCode::isSuccessCode(authorizationResult))
+    {
+        nx::utils::swapAndCall(completionHandler, authorizationResult);
+        return;
+    }
+
+    openTunnel(
+        std::move(applicationData),
+        std::move(requestContext),
+        std::move(completionHandler));
+}
+
+template<typename ApplicationData>
+void GetPostTunnelProcessor<ApplicationData>::openTunnel(
+    ApplicationData applicationData,
+    std::unique_ptr<RequestContext> requestContext,
+    nx::network::http::RequestProcessedHandler completionHandler)
+{
+    auto requestResult = this->processOpenTunnelRequest(
+        std::move(applicationData),
+        requestContext->request,
+        requestContext->response);
+
+    nx::utils::swapAndCall(completionHandler, std::move(requestResult));
 }
 
 template<typename ApplicationData>

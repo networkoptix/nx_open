@@ -4,7 +4,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include "get_post_tunnel_processor_impl.h"
+#include "get_post_tunnel_processor.h"
 #include "abstract_tunnel_authorizer.h"
 #include "../http_types.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
@@ -31,7 +31,7 @@ public:
 private:
     TunnelCreatedHandler m_tunnelCreatedHandler;
     TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
-    GetPostTunnelProcessorImpl<ApplicationData> m_getPostTunnelProcessor;
+    GetPostTunnelProcessor<ApplicationData> m_getPostTunnelProcessor;
 
     void registerRequestHandlers(
         const std::string& basePath,
