@@ -52,7 +52,6 @@ VideoStream::VideoStream(
     m_initCode(0)
 {
     start();
-    std::cout << "VideoStream()" << std::endl;
 }
 
 VideoStream::~VideoStream()
@@ -60,7 +59,6 @@ VideoStream::~VideoStream()
     stop();
     uninitialize();
     m_timeProvider->releaseRef();
-    std::cout << "~VideoStream" << std::endl;
 }
 
 std::string VideoStream::url() const
@@ -150,89 +148,6 @@ void VideoStream::waitForConsumers()
         uninitialize();
         m_wait.wait(lock, [&]() { return m_terminated || !consumersEmpty(); });
     }
-}
-
-void VideoStream::updateFpsUnlocked()
-{
-    if (consumersEmpty())
-        return;
-
-    float packetFps = 0;
-    float frameFps = 0;
-    std::weak_ptr<VideoConsumer> packetConsumer;
-    std::weak_ptr<VideoConsumer> frameConsumer;
-
-    packetConsumer = m_packetConsumerManager.largestFps(&packetFps);
-    frameConsumer = m_frameConsumerManager.largestFps(&frameFps);
-
-    auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
-    if (videoConsumer.expired())
-        return;
-
-    CodecParameters codecParams = closestHardwareConfiguration(videoConsumer);
-    setCodecParameters(codecParams);
-}
-
-void VideoStream::updateResolutionUnlocked()
-{
-    if (consumersEmpty())
-        return;
-
-    int packetWidth = 0;
-    int packetHeight = 0;
-    std::weak_ptr<VideoConsumer> packetConsumer;
-    packetConsumer = m_packetConsumerManager.largestResolution(&packetWidth, &packetHeight);
-
-    int frameWidth = 0;
-    int frameHeight = 0;
-    std::weak_ptr<VideoConsumer> frameConsumer;
-    frameConsumer = m_frameConsumerManager.largestResolution(&frameWidth, &frameHeight);
-
-    std::weak_ptr<VideoConsumer> videoConsumer = packetConsumer;
-    if (frameWidth * frameHeight > frameWidth * frameHeight)
-        videoConsumer = frameConsumer.lock() ? frameConsumer : videoConsumer;
-
-    if (!videoConsumer.lock())
-        return;
-
-    CodecParameters codecParams = closestHardwareConfiguration(videoConsumer);
-    setCodecParameters(codecParams);
-}
-
-void VideoStream::updateBitrateUnlocked()
-{
-    if (consumersEmpty())
-        return;
-
-    int packetBitrate = 0;
-    int frameBitrate = 0;
-    std::weak_ptr<VideoConsumer>packetConsumer;
-    std::weak_ptr<VideoConsumer>frameConsumer;
-
-    packetConsumer = m_packetConsumerManager.largestBitrate(&packetBitrate);
-    frameConsumer = m_frameConsumerManager.largestBitrate(&frameBitrate);
-
-    std::weak_ptr<VideoConsumer> videoConsumer = frameBitrate > packetBitrate 
-        ? frameConsumer
-        : packetConsumer;
-        
-
-    if (videoConsumer.expired())
-        return;
-
-    if (m_codecParams.bitrate != videoConsumer.lock()->bitrate())
-    {
-        m_codecParams.bitrate = videoConsumer.lock()->bitrate();
-        m_cameraState = csModified;
-    }
-}
-
-void VideoStream::updateUnlocked()
-{
-    updateFpsUnlocked();
-    updateResolutionUnlocked();
-    updateBitrateUnlocked();
-    NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
 }
 
 void VideoStream::start()
@@ -491,58 +406,191 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
     return result;
 }
 
-CodecParameters VideoStream::closestHardwareConfiguration(
-    const std::weak_ptr<VideoConsumer>& consumer) const
+float VideoStream::largestFps() const
 {
-    if (!consumer.lock()) // should never happen
-        return CodecParameters();
+    float packetFps = 0;
+    float frameFps = 0;
+    std::weak_ptr<VideoConsumer> packetConsumer;
+    std::weak_ptr<VideoConsumer> frameConsumer;
 
-    auto consumerPtr = consumer.lock();
+    packetConsumer = m_packetConsumerManager.largestFps(&packetFps);
+    frameConsumer = m_frameConsumerManager.largestFps(&frameFps);
 
+    auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
+    if (videoConsumer.expired())
+        return -1; //should never happen unless consumersEmpty() returns true
+
+    return videoConsumer.lock()->fps();
+}
+
+void VideoStream::largestResolution(int * outWidth, int * outHeight) const
+{
+    if(consumersEmpty())
+        return;
+
+    int packetWidth = 0;
+    int packetHeight = 0;
+    std::weak_ptr<VideoConsumer> packetConsumer;
+    packetConsumer = m_packetConsumerManager.largestResolution(&packetWidth, &packetHeight);
+
+    int frameWidth = 0;
+    int frameHeight = 0;
+    std::weak_ptr<VideoConsumer> frameConsumer;
+    frameConsumer = m_frameConsumerManager.largestResolution(&frameWidth, &frameHeight);
+
+    std::weak_ptr<VideoConsumer> videoConsumer = packetConsumer;
+    if (frameWidth * frameHeight > frameWidth * frameHeight)
+        videoConsumer = frameConsumer.lock() ? frameConsumer : videoConsumer;
+
+    if (videoConsumer.expired())
+        return;
+
+    videoConsumer.lock()->resolution(outWidth, outHeight);
+}
+
+int VideoStream::largestBitrate() const
+{
+    if (consumersEmpty())
+        return -1;
+
+    int packetBitrate = 0;
+    int frameBitrate = 0;
+    std::weak_ptr<VideoConsumer>packetConsumer;
+    std::weak_ptr<VideoConsumer>frameConsumer;
+
+    packetConsumer = m_packetConsumerManager.largestBitrate(&packetBitrate);
+    frameConsumer = m_frameConsumerManager.largestBitrate(&frameBitrate);
+
+    std::weak_ptr<VideoConsumer> videoConsumer = frameBitrate > packetBitrate 
+        ? frameConsumer
+        : packetConsumer;
+
+    if (videoConsumer.expired())
+        return -1; // should never happen
+
+    return videoConsumer.lock()->bitrate();
+}
+
+void VideoStream::updateFpsUnlocked()
+{
+    if (consumersEmpty())
+        return;
+
+    CodecParameters newParams = m_codecParams;
+    newParams.fps = largestFps();
+
+    CodecParameters codecParams = closestHardwareConfiguration(newParams);
+    setCodecParameters(codecParams);
+}
+
+void VideoStream::updateResolutionUnlocked()
+{
+    if (consumersEmpty())
+        return;
+
+    int width;
+    int height;
+    CodecParameters newParams = m_codecParams;
+    largestResolution(&width, &height);
+    newParams.setResolution(width, height);
+
+    CodecParameters codecParams = closestHardwareConfiguration(newParams);
+    setCodecParameters(codecParams);
+}
+
+void VideoStream::updateBitrateUnlocked()
+{
+    if (consumersEmpty())
+        return;
+
+    int bitrate = largestBitrate();
+
+    if (m_codecParams.bitrate != bitrate)
+    {
+        m_codecParams.bitrate = bitrate;
+        m_cameraState = csModified;
+    }
+}
+
+void VideoStream::updateUnlocked()
+{
+    /**
+     * Could call updateFpsUnlocked() and updateResolutionUnlcoked here, but this way
+     * closestHardwareConfiguration(), which queries hardware, only gets called once.
+     */
+
+    CodecParameters newParams = m_codecParams;
+    newParams.fps = largestFps();
+
+    int width;
+    int height;
+    largestResolution(&width, &height);
+    newParams.setResolution(width, height);
+
+    updateBitrateUnlocked();
+
+    CodecParameters codecParams = closestHardwareConfiguration(newParams);
+    setCodecParameters(codecParams);
+
+    NX_DEBUG(this) << m_url + ":" << "Selected Params:" << m_codecParams.toString();
+}
+
+CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters& params) const
+{
     std::vector<device::ResolutionData>resolutionList;
+
+    //assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
         resolutionList = cam->getResolutionList();
-    //assumes list is in ascending resolution order
-
-    int width = 0;
-    int height = 0;
-    float fps = consumerPtr->fps();
-    consumerPtr->resolution(&width, &height);
 
     // try to find an exact match first
     for (const auto & resolution : resolutionList)
     {
-        if (resolution.width == width && resolution.height == height && resolution.fps == fps)
+        if (resolution.width == params.width 
+            && resolution.height == params.height 
+            && resolution.fps == params.fps)
+        {
             return CodecParameters(
-                m_codecParams.codecID, fps, m_codecParams.bitrate, width, height);
+                m_codecParams.codecID, 
+                params.fps,
+                m_codecParams.bitrate,
+                params.width,
+                params.height);
+        }
     }
 
     // then a match with similar aspect ratio whose resolution and fps are higher than requested
-    float aspectRatio = (float) width / height;
+    float aspectRatio = (float) params.width / params.height;
     for (const auto & resolution : resolutionList)
     {
         if (aspectRatio == resolution.aspectRatio())
         {
-            if (resolution.width * resolution.height >= width * height && resolution.fps >= fps)
+            if (resolution.width * resolution.height >= params.width * params.height 
+                && resolution.fps >= params.fps)
+            {
                 return CodecParameters(
                     m_codecParams.codecID,
                     resolution.fps,
                     m_codecParams.bitrate,
                     resolution.width,
                     resolution.height);
+            }
         }
     }
 
     //any resolution or fps higher than requested
     for (const auto & resolution : resolutionList)
     {
-        if (resolution.width * resolution.height >= width * height && resolution.fps >= fps)
+        if (resolution.width * resolution.height >= params.width * params.height 
+            && resolution.fps >= params.fps)
+        {
             return CodecParameters(
                 m_codecParams.codecID,
                 resolution.fps,
                 m_codecParams.bitrate,
                 resolution.width,
                 resolution.height);
+        }
     }
 
     return m_codecParams;

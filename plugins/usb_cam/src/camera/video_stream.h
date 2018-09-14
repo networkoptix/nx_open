@@ -97,10 +97,6 @@ private:
     std::string ffmpegUrl() const;
     bool consumersEmpty() const;
     void waitForConsumers();
-    void updateFpsUnlocked();
-    void updateResolutionUnlocked();
-    void updateBitrateUnlocked();
-    void updateUnlocked();
     void start();
     void stop();
     void run();
@@ -112,7 +108,15 @@ private:
     int initializeDecoder();
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
-    CodecParameters closestHardwareConfiguration(const std::weak_ptr<VideoConsumer>& consumer) const;
+
+    float largestFps() const;
+    void largestResolution(int * outWidth, int * outHeight) const;
+    int largestBitrate() const;
+    void updateFpsUnlocked();
+    void updateResolutionUnlocked();
+    void updateBitrateUnlocked();
+    void updateUnlocked();
+    CodecParameters closestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
 };
 
