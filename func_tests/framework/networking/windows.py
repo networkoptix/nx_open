@@ -220,3 +220,6 @@ class WindowsNetworking(Networking):
 
     def setup_nat(self, outer_mac):
         raise NotImplementedError("Windows 10 cannot be set up as router out-of-the-box")
+
+    def is_router(self):
+        return False

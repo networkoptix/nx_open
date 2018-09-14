@@ -139,6 +139,9 @@ class LinuxNetworking(Networking):
                 ''',
             env={'OUTER_INTERFACE': self.interfaces[outer_mac]})
 
+    def is_router(self):
+        return self._ssh.command(['sysctl', 'net.ipv4.ip_forward']).run() == b'1'
+
     def can_reach(self, ip, timeout_sec=4):
         try:
             self._ssh.run_command(['ping', '-c', 1, '-W', timeout_sec, ip])

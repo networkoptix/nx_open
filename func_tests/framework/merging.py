@@ -26,24 +26,12 @@ def merge_systems(
     local.api.merge(remote.api, remote_address, remote.port, take_remote_settings=take_remote_settings)
 
 
-def setup_system(allocate_mediaserver, scheme):
-    allocated_mediaservers = {}
-
-    def get_mediaserver(alias):
-        """Get running server with local system set up; save it in allocated_mediaservers."""
-        try:
-            return allocated_mediaservers[alias]
-        except KeyError:
-            allocated_mediaservers[alias] = new_mediaserver = allocate_mediaserver(alias)
-            new_mediaserver.start()
-            new_mediaserver.api.setup_local_system()
-            return new_mediaserver
-
+def setup_system(mediaservers, scheme):
     # Local is one to which request is sent.
     # Remote's URL is sent included in request to local.
     for merge_parameters in scheme:
-        local_mediaserver = get_mediaserver(merge_parameters['local'])
-        remote_mediaserver = get_mediaserver(merge_parameters['remote'])
+        local_mediaserver = mediaservers[merge_parameters['local']]
+        remote_mediaserver = mediaservers[merge_parameters['remote']]
         merge_kwargs = {}
         if merge_parameters is not None:
             try:
@@ -57,4 +45,3 @@ def setup_system(allocate_mediaserver, scheme):
             else:
                 merge_kwargs['accessible_ip_net'] = remote_network
         merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
-    return allocated_mediaservers

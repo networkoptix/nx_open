@@ -41,3 +41,7 @@ class Networking(object):
     @abstractmethod
     def can_reach(self, ip, timeout_sec):
         pass
+
+    @abstractmethod
+    def is_router(self):  # type: () -> bool
+        pass

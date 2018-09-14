@@ -1,6 +1,6 @@
 import pytest
-from contextlib2 import ExitStack
 
+from framework.installation.bulk import many_mediaservers_allocated
 from framework.merging import setup_system
 
 
@@ -13,11 +13,12 @@ def layout_file(request):
     return request.param
 
 
-def test_merge_by_scheme(mediaserver_allocation, network, layout):
-    with ExitStack() as stack:
-        def allocate_mediaserver(alias):
-            vm = network[alias]
-            server = stack.enter_context(mediaserver_allocation(vm))
-            return server
+@pytest.fixture()
+def mediaservers(mediaserver_allocation, network):
+    hosts = [machine for machine in network if not machine.is_router()]
+    with many_mediaservers_allocated(hosts, mediaserver_allocation) as mediaservers:
+        yield mediaservers
 
-        setup_system(allocate_mediaserver, layout['mergers'])
+
+def test_merge_by_scheme(mediaservers, layout):
+    setup_system(mediaservers, layout['mergers'])

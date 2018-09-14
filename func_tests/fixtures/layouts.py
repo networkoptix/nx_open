@@ -1,7 +1,7 @@
 import pytest
-from contextlib2 import ExitStack
 from pathlib2 import Path
 
+from framework.installation.bulk import many_mediaservers_allocated
 from framework.merging import setup_system
 from framework.serialize import load
 from framework.vms.bulk import many_allocated
@@ -26,10 +26,7 @@ def network(hypervisor, vm_types, layout):
 
 @pytest.fixture()
 def system(mediaserver_allocation, network, layout):
-    with ExitStack() as stack:
-        def allocate_mediaserver(alias):
-            vm = network[alias]
-            server = stack.enter_context(mediaserver_allocation(vm))
-            return server
-        used_mediaservers = setup_system(allocate_mediaserver, layout['mergers'])
-        yield used_mediaservers
+    hosts = [machine for machine in network if not machine.is_router()]
+    with many_mediaservers_allocated(hosts, mediaserver_allocation) as mediaservers:
+        setup_system(mediaservers, layout['mergers'])
+        yield mediaservers
