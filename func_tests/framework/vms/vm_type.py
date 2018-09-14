@@ -4,11 +4,11 @@ from functools import partial
 
 from contextlib2 import ExitStack
 
+from framework.context_logger import context_logger
 from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
-from framework.context_logger import context_logger
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
@@ -126,6 +126,7 @@ class VMType(object):
         with self.vm_allocated(alias) as vm:
             with ExitStack() as stack:
                 stack.enter_context(context_logger(_logger, 'framework.networking.linux'))
+                stack.enter_context(context_logger(_logger, 'framework.networking.windows'))
                 stack.enter_context(context_logger(_logger, 'ssh'))
                 stack.enter_context(context_logger(_logger, 'framework.os_access.windows_remoting'))
 

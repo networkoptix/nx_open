@@ -162,8 +162,8 @@ public:
         QPen pen = m_pen;
         pen.setWidthF(penWidth);
 
-        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, pen);
-        QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_brush);
+        QnScopedPainterPenRollback penRollback(painter, pen);
+        QnScopedPainterBrushRollback brushRollback(painter, m_brush);
         painter->drawEllipse(rect);
         painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
     }
@@ -345,7 +345,7 @@ public:
             }
         }
 
-        QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, m_pen);
+        QnScopedPainterPenRollback penRollback(painter, m_pen);
         painter->drawLines(crosshairLines);
     }
 

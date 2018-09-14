@@ -362,11 +362,11 @@ bool ThirdPartyStreamReader::isStreamOpened() const
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
-CameraDiagnostics::Result ThirdPartyStreamReader::openStreamResult() const
+CameraDiagnostics::Result ThirdPartyStreamReader::lastOpenStreamResult() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
     if (!m_liveStreamReader && m_builtinStreamReader)
-        return m_builtinStreamReader->openStreamResult();
+        return m_builtinStreamReader->lastOpenStreamResult();
     return CameraDiagnostics::NoErrorResult();
 }
 

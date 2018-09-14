@@ -60,10 +60,6 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
-    QnIOPortDataList mergeIOPortData(
-        const QnIOPortDataList& fromDevice,
-        const QnIOPortDataList& saved) const;
-
     void setPortDefaultStates();
 
     Qn::IOPortType portType(const QString& portId) const;

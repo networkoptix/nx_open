@@ -22,6 +22,7 @@
 
 #include <nx/streaming/rtp_stream_parser.h>
 #include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/rtp/onvif_header_extension.h>
 #include <nx/network/compat_poll.h>
 #include <nx/utils/log/log.h>
 
@@ -50,9 +51,6 @@ static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
-static const int kOnvifNtpExtensionId = 0xabac;
-static const int kOnvifNtpExtensionAltId = 0xabad;
-static const int kOnvifNtpExtensionWordsNumber = 3;
 
 } // namespace
 
@@ -718,7 +716,7 @@ bool QnMulticodecRtpReader::isStreamOpened() const
     return m_RtpSession.isOpened();
 }
 
-CameraDiagnostics::Result QnMulticodecRtpReader::openStreamResult() const
+CameraDiagnostics::Result QnMulticodecRtpReader::lastOpenStreamResult() const
 {
     return m_openStreamResult;
 }
@@ -836,45 +834,6 @@ QnRtspClient& QnMulticodecRtpReader::rtspClient()
     return m_RtpSession;
 }
 
-boost::optional<std::chrono::microseconds> QnMulticodecRtpReader::parseOnvifNtpExtensionTime(
-    quint8* bufferStart,
-    int length) const
-{
-    if (length < RtpHeader::RTP_HEADER_SIZE)
-        return boost::none;
-
-    const auto rtpHeader = (RtpHeader*) bufferStart;
-    if (!rtpHeader->extension)
-        return boost::none;
-
-    if (length < RtpHeader::RTP_HEADER_SIZE + RtpHeaderExtension::kRtpExtensionHeaderLength)
-        return boost::none;
-
-    quint8* ptr = bufferStart + RtpHeader::RTP_HEADER_SIZE;
-    const auto extensionId = htons(*(uint16_t*)ptr);
-
-    if (!isOnvifNtpExtensionId(extensionId))
-        return boost::none;
-
-    const int extWords = ((int(ptr[2]) << 8) + ptr[3]);
-    if (extWords < kOnvifNtpExtensionWordsNumber)
-        return boost::none;
-
-    const quint8* bufferEnd = bufferStart + length;
-    if (ptr + kOnvifNtpExtensionWordsNumber * 4 > bufferEnd)
-        return boost::none;
-
-    ptr += RtpHeaderExtension::kRtpExtensionHeaderLength;
-    const auto seconds = htonl(*(uint32_t*)ptr);
-    const double fractions = htonl(*(uint32_t*)(ptr + 4));
-
-    return std::chrono::microseconds(seconds * std::micro::den)
-        + std::chrono::microseconds(
-            (uint64_t)(fractions / std::numeric_limits<uint32_t>::max()
-            * std::micro::den))
-        - nx::streaming::rtp::kNtpEpochTimeDiff;
-}
-
 QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
     int rtpBufferOffset,
     int rtpPacketSize,
@@ -889,22 +848,13 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
-    const auto extensionNtpTime = parseOnvifNtpExtensionTime(
-        (quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset,
-        rtpPacketSize);
-
-    if (extensionNtpTime.is_initialized())
-        m_lastOnvifNtpExtensionTime = extensionNtpTime;
-
-    rtcpStaticstics.ntpOnvifExtensionTime = m_lastOnvifNtpExtensionTime;
+    nx::streaming::rtp::OnvifHeaderExtension header;
+    if (header.read((quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset, rtpPacketSize))
+        rtcpStaticstics.ntpOnvifExtensionTime = header.ntp;
+    else
+        rtcpStaticstics.ntpOnvifExtensionTime = boost::none;
 
     return rtcpStaticstics;
-}
-
-bool QnMulticodecRtpReader::isOnvifNtpExtensionId(uint16_t id) const
-{
-    return id == kOnvifNtpExtensionId
-        || id == kOnvifNtpExtensionAltId;
 }
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(

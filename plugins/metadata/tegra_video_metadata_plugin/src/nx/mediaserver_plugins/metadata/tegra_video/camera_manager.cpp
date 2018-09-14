@@ -18,17 +18,6 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace tegra_video {
 
-namespace {
-
-// TODO: #dmishin get rid of this. Pass object type id from TegraVideo.
-static const QnUuid kCarUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
-//kCarObjectType = "visionlabs.objectType.Car"
-//kCarObjectType = "nvidia.metropolis.objectType.Car"
-
-static const QnUuid kHumanUuid("{58AE392F-8516-4B27-AEE1-311139B5A37A}");
-
-} // namespace
-
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
@@ -49,12 +38,12 @@ CameraManager::CameraManager(Plugin* plugin):
     if (strcmp(ini().postprocType, "ped") == 0)
     {
         setTrackerAttributeOptions(kHumanAttributeOptions);
-        m_tracker.setObjectTypeId(kHumanUuid);
+        m_tracker.setObjectTypeId("nx.tegraVideo.human");
     }
     else if (strcmp(ini().postprocType, "car") == 0)
     {
         setTrackerAttributeOptions(kCarAttributeOptions);
-        m_tracker.setObjectTypeId(kCarUuid);
+        m_tracker.setObjectTypeId("nx.tegraVideo.car");
     }
 
     // TODO: Move all the ctor code below to startFetchingMetadata() when it starts being called.

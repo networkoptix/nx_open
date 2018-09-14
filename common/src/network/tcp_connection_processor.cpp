@@ -542,6 +542,14 @@ nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
     return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
+bool QnTCPConnectionProcessor::isConnectionSecure() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    NX_ASSERT(d->socket);
+    const auto socket = dynamic_cast<nx::network::AbstractEncryptedStreamSocket*>(d->socket.get());
+    return socket && socket->isEncryptionEnabled();
+}
+
 std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
 {
     Q_D(QnTCPConnectionProcessor);

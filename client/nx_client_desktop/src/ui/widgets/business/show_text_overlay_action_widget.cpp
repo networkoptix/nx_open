@@ -3,7 +3,6 @@
 
 #include <nx/vms/event/action_parameters.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -88,7 +87,7 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(Fields fields) {
     if (!model() || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventType))
     {
@@ -127,7 +126,7 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
     if (!model() || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     vms::event::ActionParameters params = model()->actionParams();
 

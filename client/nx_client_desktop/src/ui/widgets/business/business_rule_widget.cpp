@@ -35,7 +35,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <client/client_settings.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/utils/mime_data.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
@@ -156,7 +155,7 @@ void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
     }
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        QScopedValueRollback<bool> guard(m_updating, true);
         ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
@@ -171,7 +170,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
     if (!m_model || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields & Field::eventType)
     {

@@ -303,7 +303,7 @@ private:
     /**
      * Storage id --> 'corresponding storage has too much data not managed by VMS' flag map.
      */
-    QMap<QnUuid, bool> m_diskFullMap;
+    QSet<QnUuid> m_fullDisksIds;
 
     QnStorageScanData m_archiveRebuildInfo;
     std::atomic<bool> m_rebuildCancelled;

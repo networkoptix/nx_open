@@ -24,7 +24,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :

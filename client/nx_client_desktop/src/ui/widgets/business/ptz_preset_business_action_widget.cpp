@@ -6,8 +6,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include "core/ptz/ptz_preset.h"
@@ -45,7 +43,7 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::actionResources))
     {

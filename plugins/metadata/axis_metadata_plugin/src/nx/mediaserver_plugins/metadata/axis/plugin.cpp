@@ -149,7 +149,7 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
-        [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });
+        [](const nx::axis::SupportedEventType& eventType) {return AnalyticsEventType(eventType); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".

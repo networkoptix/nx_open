@@ -93,6 +93,7 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 
     /** New event panel. */
+    QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
     QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
     const nx::client::desktop::EventTile* m_lastHoveredTile = nullptr;

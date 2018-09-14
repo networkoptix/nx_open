@@ -372,7 +372,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_ASSERT(commonModule());
     if (!commonModule())
         return;
 

@@ -60,7 +60,7 @@ void Manager::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count
     // There are no Manager settings for this plugin.
 }
 
-Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeListSize*/)
+Error Manager::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
 {
     const auto monitorHandler =
         [this](const EventList& events)
@@ -68,7 +68,7 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
             using namespace std::chrono;
             auto packet = new CommonEventsMetadataPacket();
 
-            for (const auto& hanwhaEvent : events)
+            for (const auto& hanwhaEvent: events)
             {
                 if (hanwhaEvent.channel.is_initialized() && hanwhaEvent.channel != m_channel)
                     return;
@@ -83,7 +83,7 @@ Error Manager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeList
                 NX_VERBOSE(this, lm("Got event: %1 %2 on channel %3").args(
                     hanwhaEvent.caption, hanwhaEvent.description, m_channel));
 
-                event->setTypeId(hanwhaEvent.typeId);
+                event->setTypeId(hanwhaEvent.typeId.toStdString());
                 event->setCaption(hanwhaEvent.caption.toStdString());
                 event->setDescription(hanwhaEvent.caption.toStdString());
                 event->setIsActive(hanwhaEvent.isActive);

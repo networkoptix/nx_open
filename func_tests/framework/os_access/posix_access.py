@@ -1,38 +1,73 @@
 import datetime
 import errno
 import logging
+import timeit
 from abc import ABCMeta
 from contextlib import contextmanager
 
 import portalocker
+import pytz
 import tzlocal
 from netaddr import EUI
-from typing import Container
+from typing import Container, Optional, Callable, ContextManager, Type
 
 from framework.method_caching import cached_getter
+from framework.networking.interface import Networking
 from framework.networking.linux import LinuxNetworking
 from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.local_shell import local_shell
-from framework.os_access.os_access_interface import OSAccess, ReciprocalPortMap, OneWayPortMap
-from framework.os_access.posix_shell import ReadOnlyTime, Time
+from framework.os_access.os_access_interface import OSAccess, OneWayPortMap, ReciprocalPortMap, Time
+from framework.os_access.path import FileSystemPath
+from framework.os_access.posix_shell import Shell
 from framework.os_access.posix_shell_path import PosixShellPath
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
+from framework.os_access.traffic_capture import TrafficCapture
+from framework.utils import RunningTime
 
 _logger = logging.getLogger(__name__)
 
 MAKE_CORE_DUMP_TIMEOUT_SEC = 60 * 5
 
 
-class _LocalTime(object):
+class _LocalTime(Time):
     def __init__(self):
         self._tz = tzlocal.get_localzone()
 
-    def get(self):
+    def get(self):  # type: () -> RunningTime
         now = datetime.datetime.now(tz=self._tz)
-        return now
+        return RunningTime(now)
+
+    def set(self, aware_datetime):  # type: (datetime) -> RunningTime
+        raise NotImplementedError("Setting time is prohibited on local machine")
+
+
+class _ReadOnlyPosixTime(Time):
+    def __init__(self, shell):  # type: (Shell) -> None
+        self._shell = shell
+
+    def get(self):
+        started_at = timeit.default_timer()
+        timestamp_output = self._shell.command(['date', '+%s']).check_output(timeout_sec=2)
+        timestamp = int(timestamp_output.decode('ascii').rstrip())
+        delay_sec = timeit.default_timer() - started_at
+        timezone_output = self._shell.command(['cat', '/etc/timezone']).check_output(timeout_sec=2)
+        timezone_name = timezone_output.decode('ascii').rstrip()
+        timezone = pytz.timezone(timezone_name)
+        local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
+        return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
+
+    def set(self, aware_datetime):
+        raise NotImplementedError("Setting time is prohibited on {!r}".format(self._shell))
+
+
+class _PosixTime(_ReadOnlyPosixTime):
+    def set(self, new_time):
+        started_at = datetime.datetime.now(pytz.utc)
+        self._shell.command(['date', '--set', new_time.isoformat()]).check_output()
+        return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
 
 local_time = _LocalTime()
@@ -43,15 +78,20 @@ class PosixAccess(OSAccess):
 
     def __init__(
             self,
-            alias,
-            port_map,
-            shell, time, traffic_capture, lock_acquired,
-            Path, networking):
+            alias,  # type: str
+            port_map,  # type: ReciprocalPortMap
+            shell,  # type: Shell
+            time,  # type: Time
+            traffic_capture,  # type: Optional[TrafficCapture]
+            lock_acquired,  # type: Optional[Callable[[FileSystemPath, ...], ContextManager[None]]]
+            path_cls,  # type: Type[FileSystemPath]
+            networking,  # type: Optional[Networking]
+            ):
         super(PosixAccess, self).__init__(
             alias,
             port_map,
             networking, time, traffic_capture, lock_acquired,
-            Path)
+            path_cls)
         self.shell = shell
 
     @staticmethod
@@ -65,12 +105,12 @@ class PosixAccess(OSAccess):
     def to_vm(cls, vm_alias, port_map, macs, ssh_user_name, ssh_private_key):
         # type: (str, ReciprocalPortMap, str, str, Container[EUI]) -> PosixAccess
         ssh = cls._make_ssh(port_map, ssh_user_name, ssh_private_key)
-        Path = PosixShellPath.specific_cls(ssh)
-        traffic_capture = SSHTrafficCapture(ssh, Path.tmp() / 'traffic_capture')
+        path_cls = PosixShellPath.specific_cls(ssh)
+        traffic_capture = SSHTrafficCapture(ssh, path_cls.tmp() / 'traffic_capture')
         return cls(
             vm_alias,
             port_map,
-            ssh, Time(ssh), traffic_capture, ssh.lock_acquired, Path,
+            ssh, _PosixTime(ssh), traffic_capture, ssh.lock_acquired, path_cls,
             LinuxNetworking(ssh, macs))
 
     @classmethod
@@ -81,7 +121,7 @@ class PosixAccess(OSAccess):
         return cls(
             alias,
             port_map,
-            ssh, ReadOnlyTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
+            ssh, _ReadOnlyPosixTime(ssh), None, ssh.lock_acquired, PosixShellPath.specific_cls(ssh),
             None)
 
     def is_accessible(self):
@@ -133,7 +173,7 @@ class PosixAccess(OSAccess):
         return output.decode('ascii')
 
     def make_fake_disk(self, name, size_bytes):
-        mount_point = self.Path('/mnt') / name
+        mount_point = self.path_cls('/mnt') / name
         image_path = mount_point.with_suffix('.image')
         self.shell.run_sh_script(
             # language=Bash
@@ -147,6 +187,24 @@ class PosixAccess(OSAccess):
                 ''',
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
+
+    def free_disk_space_bytes(self):
+        command = self.shell.command([
+            'df',
+            '--output=target,avail',  # Only mount point (target) and free (available) space.
+            '--block-size=1',  # By default it's 1024 and all values are in kilobytes.
+            ])
+        output = command.check_output()
+        for line in output.splitlines()[1:]:  # Mind header.
+            mount_point, free_space_raw = line.split()
+            if mount_point == '/':
+                return int(free_space_raw)
+        raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
+
+    def consume_disk_space(self, should_leave_bytes):
+        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        holder_path = self._disk_space_holder()
+        self.shell.command(['fallocate', '-l', to_consume_bytes, holder_path]).check_call()
 
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)

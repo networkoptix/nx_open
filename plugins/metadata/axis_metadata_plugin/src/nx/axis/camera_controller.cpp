@@ -121,7 +121,7 @@ std::string joinTags(const std::vector<const char*>& st, char separator = '/')
 // Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
 // A "topic" member of every found event gets "topicName" value.
 void replanishEventsFromElement(const soap_dom_element* element, const char* topicName,
-    std::vector<const char*>& tagStack, std::vector<nx::axis::SupportedEvent>& events)
+    std::vector<const char*>& tagStack, std::vector<nx::axis::SupportedEventType>& events)
 {
     static const char kStopTag[] = "aev:MessageInstance";
     static const char kNiceName[] = "aev:NiceName";
@@ -156,7 +156,7 @@ void replanishEventsFromElement(const soap_dom_element* element, const char* top
 
 // Finds events in topic "topic" and adds them to vector "events"
 void replanishEventsFromTopic(const soap_dom_element* topic, const char* topicName,
-    std::vector<nx::axis::SupportedEvent>& events)
+    std::vector<nx::axis::SupportedEventType>& events)
 {
     std::vector<const char*> auxiliaryStack;
     const soap_dom_element* child = topic->elts;
@@ -207,7 +207,7 @@ std::vector<Namespace> buildExtentedNamespaceArray(const Namespace* baseNamespac
 
 } // namespace
 
-std::string SupportedEvent::toString() const
+std::string SupportedEventType::toString() const
 {
     std::stringstream output;
     output << (stateful ? 1 : 0) << ' ' << std::setw(64) << std::left << fullName() << description;
@@ -301,7 +301,7 @@ void CameraController::filterSupportedEvents(const std::vector<std::string>& nee
 {
     if (neededTopics.empty())
         return;
-    std::vector<SupportedEvent> events;
+    std::vector<SupportedEventType> events;
     std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
         [&neededTopics](const auto& event)
     {
@@ -315,7 +315,7 @@ void CameraController::removeForbiddenEvents(const std::vector<std::string>& for
 {
     if (forbiddenDescriptions.empty())
         return;
-    std::vector<SupportedEvent> events;
+    std::vector<SupportedEventType> events;
     std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
         [&forbiddenDescriptions](const auto& event)
     {
@@ -343,7 +343,7 @@ bool CameraController::readSupportedEvents()
         m_user.c_str(), m_password.c_str()))
         return false;
 
-    std::vector<SupportedEvent> events;
+    std::vector<SupportedEventType> events;
     for (const soap_dom_element& topic: response.ns2__TopicSet->__any)
     {
         replanishEventsFromTopic(&topic, topic.name, events);

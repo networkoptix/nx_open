@@ -84,12 +84,13 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
             .arg(remotePeer.systemId));
         return false;
     }
-    if (remotePeer.peerType != vms::api::PeerType::mobileClient)
+    if (remotePeer.dataFormat == Qn::UbjsonFormat)
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
             NX_WARNING(this,
-                lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
+                lm("Reject incoming P2P connection using UBJSON "
+                    "from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
                 .arg(nx_ec::EC2_PROTO_VERSION)

@@ -9,6 +9,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/core/resource/device_type.h>
+#include <nx/utils/std/optional.h>
 
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
@@ -317,6 +318,8 @@ public:
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
 
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
      */
@@ -440,6 +443,7 @@ private:
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
+    mutable std::optional<bool> m_hasVideo;
 
 private slots:
     void resetCachedValues();

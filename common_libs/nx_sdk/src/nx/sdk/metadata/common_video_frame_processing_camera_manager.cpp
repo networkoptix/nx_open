@@ -140,7 +140,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
 }
 
 Error CommonVideoFrameProcessingCameraManager::startFetchingMetadata(
-    nxpl::NX_GUID* /*typeList*/, int /*typeListSize*/)
+    const char* const* /*typeList*/, int /*typeListSize*/)
 {
     NX_PRINT << __func__ << "() -> noError";
     return Error::noError;

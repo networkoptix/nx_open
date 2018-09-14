@@ -68,7 +68,7 @@ QString toString(const DetectionMetadataPacket& packet)
             + lit(", w ") + QString::number(object.boundingBox.width())
             + lit(", h ") + QString::number(object.boundingBox.height())
             + lit(", id ") + object.objectId.toString()
-            + lit(", typeId ") + object.objectTypeId.toString()
+            + lit(", typeId ") + object.objectTypeId
             + lit(", labels [");
 
         bool isLabelFirst = true;

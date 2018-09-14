@@ -115,6 +115,22 @@ NX_KIT_API std::ostream*& stream();
     if (!(NX_DEBUG_ENABLE_OUTPUT)) {} else NX_PRINT
 
 //-------------------------------------------------------------------------------------------------
+// Assertions
+
+#define NX_KIT_ASSERT(...) \
+    NX_KIT_DEBUG_DETAIL_MSVC_EXPAND(NX_KIT_DEBUG_DETAIL_GET_3RD_ARG( \
+        __VA_ARGS__, NX_KIT_DEBUG_DETAIL_ASSERT2, NX_KIT_DEBUG_DETAIL_ASSERT1, \
+        /* Helps to generate a reasonable compiler error. */ args_required)(__VA_ARGS__))
+
+/**
+ * If the condition is false, log the failure with NX_PRINT, and in debug build (i.e. NDEBUG is
+ * not defined), crash the process to let a dump/core be generated.
+ *
+ * ATTENTION: Unlike std library assert(), the condition is checked even in Release build to log
+ * the failure.
+ */
+
+//-------------------------------------------------------------------------------------------------
 // Print info
 
 /**
@@ -203,6 +219,30 @@ std::string toString(T value);
 //-------------------------------------------------------------------------------------------------
 // Implementation
 
+/**
+ * Needed as a workaround for an MSVC issue: if __VA_ARGS__ is used as an argument to another
+ * macro, it forms a single macro argument even if contains commas.
+ */
+#define NX_KIT_DEBUG_DETAIL_MSVC_EXPAND(ARG) ARG
+
+/** Needed to make an "overloaded" macro which can accept either one or two args. */
+#define NX_KIT_DEBUG_DETAIL_GET_3RD_ARG(ARG1, ARG2, ARG3, ...) ARG3
+
+#define NX_KIT_DEBUG_DETAIL_ASSERT1(CONDITION) \
+    NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, "")
+
+#define NX_KIT_DEBUG_DETAIL_ASSERT2(CONDITION, MESSAGE) \
+    NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, MESSAGE)
+
+#define NX_KIT_DEBUG_DETAIL_ASSERT(CONDITION, MESSAGE) do \
+{ \
+    if (!(CONDITION)) \
+    { \
+        nx::kit::debug::detail::assertionFailed( \
+            NX_KIT_DEBUG_DETAIL_PRINT_FUNC, #CONDITION, (MESSAGE), __FILE__, __LINE__); \
+    } \
+} while (0)
+
 #define NX_KIT_DEBUG_DETAIL_CONCAT(X, Y) NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y)
 #define NX_KIT_DEBUG_DETAIL_CONCAT2(X, Y) X##Y
 
@@ -219,6 +259,7 @@ NX_KIT_API std::string toString(char c);
 NX_KIT_API std::string toString(const char* s);
 NX_KIT_API std::string toString(char* s);
 NX_KIT_API std::string toString(const void* ptr);
+NX_KIT_API std::string toString(bool b);
 
 #if defined(QT_CORE_LIB)
 
@@ -253,6 +294,10 @@ typedef std::function<void(const char*)> PrintFunc;
 
 /** @param file Supply __FILE__. */
 NX_KIT_API std::string printPrefix(const char* file);
+
+NX_KIT_API void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line);
 
 class NX_KIT_API Timer
 {

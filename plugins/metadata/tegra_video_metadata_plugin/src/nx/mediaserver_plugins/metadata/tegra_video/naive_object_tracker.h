@@ -24,7 +24,7 @@ public:
         const std::vector<TegraVideo::Rect>& rects,
         int64_t ptsUs);
 
-    void setObjectTypeId(const QnUuid& objectTypeId);
+    void setObjectTypeId(const QString& objectTypeId);
 
     void setAttributeOptions(
         const QString& attributeName,
@@ -87,7 +87,7 @@ private:
 
 private:
     std::map<QnUuid, CachedObject> m_cachedObjects;
-    QnUuid m_objectTypeId;
+    QString m_objectTypeId;
     std::map<QString, std::vector<QString>> m_attributeOptions;
 };
 

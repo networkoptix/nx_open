@@ -73,3 +73,16 @@ QnUuid QnAbstractTransaction::makeHash(
 }
 
 } // namespace ec2
+
+#define TRANSACTION_ENUM_APPLY(VALUE, NAME, ...) (ec2::ApiCommand::NAME, #NAME)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::ApiCommand, Value,
+    NX_MSVC_EXPAND(TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_ENUM_APPLY))
+)
+#undef TRANSACTION_ENUM_APPLY
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ec2::TransactionType, Value,
+    (ec2::TransactionType::Unknown, "Unknown")
+    (ec2::TransactionType::Regular, "Regular")
+    (ec2::TransactionType::Local, "Local")
+    (ec2::TransactionType::Cloud, "Cloud")
+)

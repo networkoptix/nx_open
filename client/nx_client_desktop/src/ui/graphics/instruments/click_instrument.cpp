@@ -1,8 +1,9 @@
 #include "click_instrument.h"
+
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 
 #include <QtWidgets/QApplication>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 #include <ui/common/weak_pointer.h>
@@ -31,7 +32,7 @@ struct ClickInstrument::ClickData {
     QPointer<QGraphicsView> view;
 };
 
-ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent): 
+ClickInstrument::ClickInstrument(Qt::MouseButtons buttons, int clickDelayMSec, WatchedType watchedType, QObject *parent):
     DragProcessingInstrument(
         watchedType,
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneMouseDoubleClick),
@@ -57,12 +58,12 @@ ClickInstrument::~ClickInstrument() {
 
 void ClickInstrument::aboutToBeDisabledNotify() {
     killClickTimer();
-    
+
     base_type::aboutToBeDisabledNotify();
 }
 
 void ClickInstrument::timerEvent(QTimerEvent *) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_isClick, true);
+    QScopedValueRollback<bool> guard(m_isClick, true);
     if(m_isDoubleClick) {
         m_isDoubleClick = false;
     } else {
@@ -118,7 +119,7 @@ bool ClickInstrument::mousePressEventInternal(T *object, QGraphicsSceneMouseEven
      * regarding the widget stored in the supplied event. */
     QGraphicsView *view = NULL;
     if(event->widget() != NULL)
-        view = qobject_cast<QGraphicsView *>(event->widget()->parent()); 
+        view = qobject_cast<QGraphicsView *>(event->widget()->parent());
     emitInitialSignal(view, object, event);
 
     dragProcessor()->mousePressEvent(object, event);
@@ -154,7 +155,7 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
 
     if(!m_isClick)
         return false;
-    
+
     /* Object may get deleted in click signal handlers, so we have to be careful. */
     WeakPointer<T> guard(object);
 
@@ -162,7 +163,7 @@ bool ClickInstrument::mouseReleaseEventInternal(T *object, QGraphicsSceneMouseEv
      * regarding the widget stored in the supplied event. */
     QGraphicsView *view = NULL;
     if(event->widget() != NULL)
-        view = qobject_cast<QGraphicsView *>(event->widget()->parent()); 
+        view = qobject_cast<QGraphicsView *>(event->widget()->parent());
     if(m_clickDelayMSec != 0) {
         if(m_isDoubleClick) {
             killClickTimer();

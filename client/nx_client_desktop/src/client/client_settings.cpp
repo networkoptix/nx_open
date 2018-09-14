@@ -7,7 +7,6 @@
 
 #include <utils/common/util.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/variant.h>
 #include <nx/utils/string.h>
 
@@ -257,7 +256,7 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
 }
 
 void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isAcsMode())
         return;
 
     switch(id)
@@ -377,7 +376,7 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
 }
 
 void QnClientSettings::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
+    QScopedValueRollback<bool> guard(m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

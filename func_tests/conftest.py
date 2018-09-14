@@ -22,6 +22,7 @@ pytest_plugins = [
     'fixtures.cloud',
     'fixtures.layouts',
     'fixtures.media',
+    'fixtures.updates',
     'fixtures.backward_compatibility',
     ]
 

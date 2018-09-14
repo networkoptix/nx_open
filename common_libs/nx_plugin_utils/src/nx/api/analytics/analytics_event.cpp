@@ -10,13 +10,19 @@ namespace api {
 
 bool operator==(const Analytics::EventType& lh, const Analytics::EventType& rh)
 {
-    return lh.typeId == rh.typeId;
+    return lh.id == rh.id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     Analytics::EventType,
     (json),
     AnalyticsEventType_Fields,
+    (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    Analytics::ObjectType,
+    (json),
+    AnalyticsObjectType_Fields,
     (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
