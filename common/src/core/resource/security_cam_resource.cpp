@@ -125,11 +125,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedHasVideo(
         [this]()
         {
-            const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
-            if (!cameraResource)
-                return false;
-
-            const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+            const auto data = qnStaticCommon->dataPool()->data(toSharedPointer(this));
             return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
         },
         &m_mutex)
