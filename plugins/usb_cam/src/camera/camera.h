@@ -63,9 +63,7 @@ private:
     device::CompressionTypeDescriptorPtr m_compressionTypeDescriptor;
 
 private:
-    CodecParameters getDefaultVideoParameters(
-        const std::string& url,
-        const device::CompressionTypeDescriptorPtr& descriptor);
+    CodecParameters getDefaultVideoParameters();
 };
 
 } // namespace usb_cams

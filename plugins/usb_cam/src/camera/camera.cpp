@@ -61,7 +61,12 @@ Camera::Camera(
 {
     auto codecList = device::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
-    m_defaultVideoParams = getDefaultVideoParameters(url(), m_compressionTypeDescriptor);
+    
+    // if m_compressionTypeDescriptor is null, there probably is no camera plugged in.
+    if(m_compressionTypeDescriptor)
+        m_defaultVideoParams = getDefaultVideoParameters();
+    else
+        setLastError(AVERROR(ENODEV));
 }
 
 std::shared_ptr<AudioStream> Camera::audioStream()
@@ -163,17 +168,12 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
     return ffmpegCodecList;
 }
 
-CodecParameters Camera::getDefaultVideoParameters(
-    const std::string& url,
-    const device::CompressionTypeDescriptorPtr& descriptor)
+CodecParameters Camera::getDefaultVideoParameters()
 {
-    if (!descriptor)
-        return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
-
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
 
-    auto resolutionList = device::getResolutionList(url.c_str(), descriptor);
+    auto resolutionList = getResolutionList();
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::ResolutionData& a, const device::ResolutionData& b)
     {
@@ -182,7 +182,7 @@ CodecParameters Camera::getDefaultVideoParameters(
 
     if (it != resolutionList.end())
     {
-        int maxBitrate = device::getMaxBitrate(url.c_str(), m_compressionTypeDescriptor);
+        int maxBitrate = device::getMaxBitrate(url().c_str(), m_compressionTypeDescriptor);
         return CodecParameters(
             ffmpegCodecID,
             it->fps,
@@ -190,8 +190,9 @@ CodecParameters Camera::getDefaultVideoParameters(
             it->width,
             it->height);
     }
-    else
-        return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
+    
+    // should never reach here if m_compressionTypeDescriptor is valid
+    return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
 }
 
 } // namespace usb_cam

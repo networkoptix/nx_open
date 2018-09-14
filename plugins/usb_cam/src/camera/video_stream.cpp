@@ -193,6 +193,7 @@ void VideoStream::run()
         int result = m_inputFormat->readFrame(packet->packet());
         if (result < 0)
         {
+            // ENODEV is returned when the device is unplugged
             m_terminated = result == AVERROR(ENODEV);
             continue;
         }

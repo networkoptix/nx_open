@@ -447,7 +447,8 @@ void AudioStream::AudioStreamPrivate::run()
         auto packet = getNextData(&result);
         if (result < 0)
         {
-            m_terminated = result == AVERROR(ENODEV);
+            // EIO is returned when the device is unplugged for audio
+            m_terminated = result == AVERROR(EIO);
             continue;
         }
         if(!packet)

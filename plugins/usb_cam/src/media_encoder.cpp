@@ -27,7 +27,9 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
 {
 }
 
-MediaEncoder::~MediaEncoder() {}
+MediaEncoder::~MediaEncoder()
+{
+}
 
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
