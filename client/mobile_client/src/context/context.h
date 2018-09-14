@@ -111,7 +111,9 @@ public:
     Q_INVOKABLE int deviceStatusBarHeight() const;
 
     Q_INVOKABLE void removeSavedConnection(
-        const QString& localSystemId, const QString& userName = QString());
+        const QString& systemId,
+        const QString& localSystemId,
+        const QString& userName = QString());
 
     Q_INVOKABLE void clearSavedPasswords();
     Q_INVOKABLE void clearLastUsedConnection();
