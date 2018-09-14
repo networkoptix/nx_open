@@ -25,7 +25,7 @@ class GetPostTunnelServer:
     using base_type = BasicCustomTunnelServer<ApplicationData>;
 
 public:
-    GetPostTunnelServer(NewTunnelHandler newTunnelHandler);
+    GetPostTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
     virtual ~GetPostTunnelServer();
 
     void registerRequestHandlers(
@@ -82,7 +82,7 @@ private:
 
 template<typename ApplicationData>
 GetPostTunnelServer<ApplicationData>::GetPostTunnelServer(
-    NewTunnelHandler newTunnelHandler)
+    typename base_type::NewTunnelHandler newTunnelHandler)
     :
     base_type(std::move(newTunnelHandler))
 {
@@ -213,7 +213,7 @@ void GetPostTunnelServer<ApplicationData>::onMessage(
     NX_VERBOSE(this, lm("Successfully opened GET/POST tunnel. Url %1")
         .args(tunnelContext.urlPath));
 
-    reportTunnel(
+    this->reportTunnel(
         std::move(tunnelContext.requestData),
         tunnelContext.connection->takeSocket());
 }

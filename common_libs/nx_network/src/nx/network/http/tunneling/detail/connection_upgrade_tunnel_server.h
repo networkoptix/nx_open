@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include "basic_custom_tunnel_server.h"
 #include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
@@ -17,7 +19,7 @@ class ConnectionUpgradeTunnelServer:
     using base_type = BasicCustomTunnelServer<ApplicationData>;
 
 public:
-    ConnectionUpgradeTunnelServer(NewTunnelHandler newTunnelHandler);
+    ConnectionUpgradeTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
     virtual ~ConnectionUpgradeTunnelServer();
 
     void registerRequestHandlers(
@@ -47,7 +49,7 @@ private:
 
 template<typename ApplicationData>
 ConnectionUpgradeTunnelServer<ApplicationData>::ConnectionUpgradeTunnelServer(
-    NewTunnelHandler newTunnelHandler)
+    typename base_type::NewTunnelHandler newTunnelHandler)
     :
     base_type(std::move(newTunnelHandler))
 {
@@ -126,7 +128,7 @@ network::http::RequestResult
         [this, requestData = std::move(requestData)](
             HttpServerConnection* httpConnection) mutable
         {
-            reportTunnel(
+            this->reportTunnel(
                 std::move(requestData),
                 httpConnection->takeSocket());
         };
