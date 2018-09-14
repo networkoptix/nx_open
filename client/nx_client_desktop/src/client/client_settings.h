@@ -248,8 +248,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
-        QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)
-        QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  600)
+        QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  50)
+        QN_DECLARE_RW_PROPERTY(int,                         maximumLiveBufferMSecs, setMaximumLiveBufferMSecs,  MAXIMUM_LIVE_BUFFER_MSECS,  500)
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
     QN_END_PROPERTY_STORAGE()
 
