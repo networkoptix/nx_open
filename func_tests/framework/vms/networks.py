@@ -68,7 +68,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
     return nodes_ips
 
 
-def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup networks.
+def setup_flat_network(machines, network_ip, hypervisor):
     network_uuid = hypervisor.make_internal_network(str(network_ip))
     iter_ips = network_ip.iter_hosts()
     next(iter_ips)  # First IP is usually reserved for router.
