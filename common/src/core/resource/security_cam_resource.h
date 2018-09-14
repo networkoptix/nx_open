@@ -317,6 +317,8 @@ public:
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
 
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
      */
@@ -440,6 +442,7 @@ private:
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
+    mutable boost::optional<bool> m_hasVideo;
 
 private slots:
     void resetCachedValues();
