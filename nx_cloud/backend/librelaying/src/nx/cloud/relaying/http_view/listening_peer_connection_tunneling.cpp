@@ -84,8 +84,8 @@ void ListeningPeerConnectionTunnelingServer::onBeginListeningCompletion(
 }
 
 void ListeningPeerConnectionTunnelingServer::saveNewTunnel(
-    const std::string& listeningPeerName,
-    std::unique_ptr<network::AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    const std::string& listeningPeerName)
 {
     m_listeningPeerPool->addConnection(
         listeningPeerName,

@@ -75,8 +75,8 @@ void ClientConnectionTunnelingServer::connectToPeerFinished(
 }
 
 void ClientConnectionTunnelingServer::saveNewTunnel(
-    controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
-    std::unique_ptr<network::AbstractStreamSocket> connection)
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc)
 {
     startRelayingFunc(std::move(connection));
 }

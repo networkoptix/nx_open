@@ -12,11 +12,11 @@
 
 namespace nx::network::http::tunneling::detail {
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 class ConnectionUpgradeTunnelServer:
-    public BasicCustomTunnelServer<ApplicationData>
+    public BasicCustomTunnelServer<ApplicationData...>
 {
-    using base_type = BasicCustomTunnelServer<ApplicationData>;
+    using base_type = BasicCustomTunnelServer<ApplicationData...>;
 
 public:
     ConnectionUpgradeTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
@@ -40,28 +40,28 @@ private:
         const RequestContext& requestContext) override;
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        ApplicationData requestData,
         const network::http::Request& request,
-        network::http::Response* response) override;
+        network::http::Response* response,
+        ApplicationData... requestData) override;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename ApplicationData>
-ConnectionUpgradeTunnelServer<ApplicationData>::ConnectionUpgradeTunnelServer(
+template<typename ...ApplicationData>
+ConnectionUpgradeTunnelServer<ApplicationData...>::ConnectionUpgradeTunnelServer(
     typename base_type::NewTunnelHandler newTunnelHandler)
     :
     base_type(std::move(newTunnelHandler))
 {
 }
 
-template<typename ApplicationData>
-ConnectionUpgradeTunnelServer<ApplicationData>::~ConnectionUpgradeTunnelServer()
+template<typename ...ApplicationData>
+ConnectionUpgradeTunnelServer<ApplicationData...>::~ConnectionUpgradeTunnelServer()
 {
 }
 
-template<typename ApplicationData>
-void ConnectionUpgradeTunnelServer<ApplicationData>::registerRequestHandlers(
+template<typename ...ApplicationData>
+void ConnectionUpgradeTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
     server::rest::MessageDispatcher* messageDispatcher)
 {
@@ -75,35 +75,35 @@ void ConnectionUpgradeTunnelServer<ApplicationData>::registerRequestHandlers(
         std::bind(&ConnectionUpgradeTunnelServer::processTunnelInitiationRequest, this, _1, _2));
 }
 
-template<typename ApplicationData>
-void ConnectionUpgradeTunnelServer<ApplicationData>::setProtocolName(
+template<typename ...ApplicationData>
+void ConnectionUpgradeTunnelServer<ApplicationData...>::setProtocolName(
     const std::string& protocolName)
 {
     m_protocolToUpgradeTo = protocolName;
 }
 
-template<typename ApplicationData>
-std::string ConnectionUpgradeTunnelServer<ApplicationData>::protocolName() const
+template<typename ...ApplicationData>
+std::string ConnectionUpgradeTunnelServer<ApplicationData...>::protocolName() const
 {
     return m_protocolToUpgradeTo;
 }
 
-template<typename ApplicationData>
-void ConnectionUpgradeTunnelServer<ApplicationData>::setUpgradeRequestMethod(
+template<typename ...ApplicationData>
+void ConnectionUpgradeTunnelServer<ApplicationData...>::setUpgradeRequestMethod(
     http::Method::ValueType method)
 {
     m_upgradeRequestMethod = method;
 }
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 http::Method::ValueType
-    ConnectionUpgradeTunnelServer<ApplicationData>::upgradeRequestMethod() const
+    ConnectionUpgradeTunnelServer<ApplicationData...>::upgradeRequestMethod() const
 {
     return m_upgradeRequestMethod;
 }
 
-template<typename ApplicationData>
-StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData>::validateOpenTunnelRequest(
+template<typename ...ApplicationData>
+StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpenTunnelRequest(
     const RequestContext& requestContext)
 {
     auto upgradeIter = requestContext.request.headers.find("Upgrade");
@@ -116,21 +116,25 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData>::validateOpenTu
     return nx::network::http::StatusCode::ok;
 }
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 network::http::RequestResult
-    ConnectionUpgradeTunnelServer<ApplicationData>::processOpenTunnelRequest(
-        ApplicationData requestData,
+    ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
         const network::http::Request& /*request*/,
-        network::http::Response* /*response*/)
+        network::http::Response* /*response*/,
+        ApplicationData... requestData)
 {
     RequestResult requestResult(StatusCode::switchingProtocols);
     requestResult.connectionEvents.onResponseHasBeenSent =
-        [this, requestData = std::move(requestData)](
+        [this, requestData = std::make_tuple(std::move(requestData)...)](
             HttpServerConnection* httpConnection) mutable
         {
-            this->reportTunnel(
-                std::move(requestData),
-                httpConnection->takeSocket());
+            auto allArgs = std::tuple_cat(
+                std::make_tuple(this, httpConnection->takeSocket()),
+                std::move(requestData));
+
+            std::apply(
+                &ConnectionUpgradeTunnelServer::reportTunnel,
+                std::move(allArgs));
         };
     
     return requestResult;

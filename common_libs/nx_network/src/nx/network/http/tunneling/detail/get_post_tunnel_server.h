@@ -9,6 +9,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "basic_custom_tunnel_server.h"
+#include "request_paths.h"
 #include "../abstract_tunnel_authorizer.h"
 #include "../../http_types.h"
 #include "../../server/http_server_connection.h"
@@ -35,9 +36,9 @@ public:
 private:
     struct TunnelContext
     {
-        ApplicationData requestData;
         std::string urlPath;
         std::unique_ptr<network::http::AsyncMessagePipeline> connection;
+        ApplicationData requestData;
     };
 
     using Tunnels = std::map<network::http::AsyncMessagePipeline*, TunnelContext>;
@@ -50,9 +51,9 @@ private:
         network::http::AsyncMessagePipeline* /*connection*/) override;
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        ApplicationData requestData,
         const network::http::Request& request,
-        network::http::Response* response) override;
+        network::http::Response* response,
+        ApplicationData requestData) override;
 
     void closeAllTunnels();
 
@@ -66,8 +67,8 @@ private:
 
     void openUpTunnel(
         network::http::HttpServerConnection* connection,
-        ApplicationData requestData,
-        const std::string& requestPath);
+        const std::string& requestPath,
+        ApplicationData requestData);
 
     void onMessage(
         network::http::AsyncMessagePipeline* tunnel,
@@ -101,20 +102,22 @@ void GetPostTunnelServer<ApplicationData>::registerRequestHandlers(
 {
     using namespace std::placeholders;
 
-    static constexpr char path[] = "get_post/{sequence}";
+    const auto path = this->requestPath().empty()
+        ? url::joinPath(basePath, kGetPostTunnelPath)
+        : this->requestPath();
 
     messageDispatcher->registerRequestProcessorFunc(
         nx::network::http::Method::get,
-        !this->requestPath().empty() ? this->requestPath() : url::joinPath(basePath, path),
+        path,
         std::bind(&GetPostTunnelServer::processTunnelInitiationRequest, this, _1, _2));
 }
 
 template<typename ApplicationData>
 network::http::RequestResult
     GetPostTunnelServer<ApplicationData>::processOpenTunnelRequest(
-        ApplicationData requestData,
         const network::http::Request& request,
-        network::http::Response* response)
+        network::http::Response* response,
+        ApplicationData requestData)
 {
     using namespace std::placeholders;
 
@@ -131,10 +134,7 @@ network::http::RequestResult
             requestPath = request.requestLine.url.path().toStdString()](
                 network::http::HttpServerConnection* connection) mutable
         {
-            openUpTunnel(
-                connection,
-                std::move(requestData),
-                requestPath);
+            openUpTunnel(connection, requestPath, std::move(requestData));
         };
 
     return requestResult;
@@ -167,8 +167,8 @@ void GetPostTunnelServer<ApplicationData>::prepareCreateDownTunnelResponse(
 template<typename ApplicationData>
 void GetPostTunnelServer<ApplicationData>::openUpTunnel(
     network::http::HttpServerConnection* connection,
-    ApplicationData requestData,
-    const std::string& requestPath)
+    const std::string& requestPath,
+    ApplicationData requestData)
 {
     using namespace std::placeholders;
 
@@ -181,7 +181,7 @@ void GetPostTunnelServer<ApplicationData>::openUpTunnel(
 
     auto insertionResult = m_tunnelsInProgress.emplace(
         httpPipePtr,
-        TunnelContext{std::move(requestData), requestPath, std::move(httpPipe)});
+        TunnelContext{requestPath, std::move(httpPipe), std::move(requestData)});
 
     insertionResult.first->second.connection->setMessageHandler(
         std::bind(&GetPostTunnelServer::onMessage, this, httpPipePtr, _1));
@@ -214,8 +214,8 @@ void GetPostTunnelServer<ApplicationData>::onMessage(
         .args(tunnelContext.urlPath));
 
     this->reportTunnel(
-        std::move(tunnelContext.requestData),
-        tunnelContext.connection->takeSocket());
+        tunnelContext.connection->takeSocket(),
+        std::move(tunnelContext.requestData));
 }
 
 template<typename ApplicationData>

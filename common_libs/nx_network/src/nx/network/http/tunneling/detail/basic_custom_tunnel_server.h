@@ -5,19 +5,19 @@
 
 namespace nx::network::http::tunneling::detail {
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 class BasicCustomTunnelServer
 {
 public:
     using NewTunnelHandler = nx::utils::MoveOnlyFunc<void(
-        ApplicationData /*requestData*/,
-        std::unique_ptr<network::AbstractStreamSocket> /*connection*/)>;
+        std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
+        ApplicationData... /*requestData*/)>;
 
     BasicCustomTunnelServer(NewTunnelHandler newTunnelHandler);
     virtual ~BasicCustomTunnelServer() = default;
 
     void setTunnelAuthorizer(
-        TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
+        TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer);
 
     void setRequestPath(const std::string& path);
     std::string requestPath() const;
@@ -27,9 +27,9 @@ protected:
         const RequestContext& requestContext);
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        ApplicationData requestData,
         const network::http::Request& request,
-        network::http::Response* const response) = 0;
+        network::http::Response* const response,
+        ApplicationData... requestData) = 0;
 
     /**
      * This should be registered as the handler of the initial "open tunnel" request.
@@ -39,65 +39,65 @@ protected:
         nx::network::http::RequestProcessedHandler completionHandler);
 
     void reportTunnel(
-        ApplicationData applicationData,
-        std::unique_ptr<AbstractStreamSocket> connection);
+        std::unique_ptr<AbstractStreamSocket> connection,
+        ApplicationData... applicationData);
 
 private:
     NewTunnelHandler m_newTunnelHandler;
-    TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
+    TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
     std::string m_path;
 
     void onTunnelAutorizationCompleted(
         StatusCode::Value authorizationResult,
-        ApplicationData applicationData,
         std::unique_ptr<RequestContext> requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler);
+        nx::network::http::RequestProcessedHandler completionHandler,
+        ApplicationData... applicationData);
 
     void openTunnel(
-        ApplicationData applicationData,
         std::unique_ptr<RequestContext> requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler);
+        nx::network::http::RequestProcessedHandler completionHandler,
+        ApplicationData... applicationData);
 };
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename ApplicationData>
-BasicCustomTunnelServer<ApplicationData>::BasicCustomTunnelServer(
+template<typename ...ApplicationData>
+BasicCustomTunnelServer<ApplicationData...>::BasicCustomTunnelServer(
     NewTunnelHandler newTunnelHandler)
     :
     m_newTunnelHandler(std::move(newTunnelHandler))
 {
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::setTunnelAuthorizer(
-    TunnelAuthorizer<ApplicationData>* tunnelAuthorizer)
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::setTunnelAuthorizer(
+    TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer)
 {
     m_tunnelAuthorizer = tunnelAuthorizer;
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::setRequestPath(
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::setRequestPath(
     const std::string& path)
 {
     m_path = path;
 }
 
-template<typename ApplicationData>
-std::string BasicCustomTunnelServer<ApplicationData>::requestPath() const
+template<typename ...ApplicationData>
+std::string BasicCustomTunnelServer<ApplicationData...>::requestPath() const
 {
     return m_path;
 }
 
-template<typename ApplicationData>
-StatusCode::Value BasicCustomTunnelServer<ApplicationData>::validateOpenTunnelRequest(
+template<typename ...ApplicationData>
+StatusCode::Value BasicCustomTunnelServer<ApplicationData...>::validateOpenTunnelRequest(
     const RequestContext& /*requestContext*/)
 {
     return StatusCode::ok;
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::processTunnelInitiationRequest(
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::processTunnelInitiationRequest(
     RequestContext requestContextOriginal,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
@@ -123,40 +123,40 @@ void BasicCustomTunnelServer<ApplicationData>::processTunnelInitiationRequest(
             [this, requestContext = std::move(requestContext),
                 completionHandler = std::move(completionHandler)](
                     StatusCode::Value result,
-                    ApplicationData applicationData) mutable
+                    ApplicationData... applicationData) mutable
             {
                 onTunnelAutorizationCompleted(
                     result,
-                    std::move(applicationData),
                     std::move(requestContext),
-                    std::move(completionHandler));
+                    std::move(completionHandler),
+                    std::move(applicationData)...);
             });
     }
     else
     {
         openTunnel(
-            ApplicationData(),
             std::move(requestContext),
-            std::move(completionHandler));
+            std::move(completionHandler),
+            ApplicationData()...);
     }
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::reportTunnel(
-    ApplicationData applicationData,
-    std::unique_ptr<AbstractStreamSocket> connection)
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::reportTunnel(
+    std::unique_ptr<AbstractStreamSocket> connection,
+    ApplicationData... applicationData)
 {
     m_newTunnelHandler(
-        std::move(applicationData),
-        std::move(connection));
+        std::move(connection),
+        std::move(applicationData)...);
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::onTunnelAutorizationCompleted(
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::onTunnelAutorizationCompleted(
     StatusCode::Value authorizationResult,
-    ApplicationData applicationData,
     std::unique_ptr<RequestContext> requestContext,
-    nx::network::http::RequestProcessedHandler completionHandler)
+    nx::network::http::RequestProcessedHandler completionHandler,
+    ApplicationData... applicationData)
 {
     if (!StatusCode::isSuccessCode(authorizationResult))
     {
@@ -165,21 +165,21 @@ void BasicCustomTunnelServer<ApplicationData>::onTunnelAutorizationCompleted(
     }
 
     openTunnel(
-        std::move(applicationData),
         std::move(requestContext),
-        std::move(completionHandler));
+        std::move(completionHandler),
+        std::move(applicationData)...);
 }
 
-template<typename ApplicationData>
-void BasicCustomTunnelServer<ApplicationData>::openTunnel(
-    ApplicationData applicationData,
+template<typename ...ApplicationData>
+void BasicCustomTunnelServer<ApplicationData...>::openTunnel(
     std::unique_ptr<RequestContext> requestContext,
-    nx::network::http::RequestProcessedHandler completionHandler)
+    nx::network::http::RequestProcessedHandler completionHandler,
+    ApplicationData... applicationData)
 {
     auto requestResult = this->processOpenTunnelRequest(
-        std::move(applicationData),
         requestContext->request,
-        requestContext->response);
+        requestContext->response,
+        std::move(applicationData)...);
 
     nx::utils::swapAndCall(completionHandler, std::move(requestResult));
 }

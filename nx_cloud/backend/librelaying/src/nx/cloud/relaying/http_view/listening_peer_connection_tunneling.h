@@ -41,8 +41,8 @@ private:
         nx::network::http::ConnectionEvents connectionEvents);
 
     void saveNewTunnel(
-        const std::string& listeningPeerName,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        const std::string& listeningPeerName);
 };
 
 } // namespace nx::cloud::relaying

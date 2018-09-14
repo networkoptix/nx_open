@@ -39,8 +39,8 @@ private:
         CompletionHandler completionHandler);
         
     void saveNewTunnel(
-        controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc);
 };
 
 } // namespace nx::cloud::relay::view
