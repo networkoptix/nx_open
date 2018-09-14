@@ -1312,14 +1312,21 @@ protected:
 
         base_type::SetUp();
 
+        auto processorFunc =
+            [this](RequestContext context, RequestProcessedHandler handler)
+            {
+                saveRequestUser(context.connection,
+                        context.authInfo,
+                        context.request,
+                        context.response,
+                        std::move(handler));
+            };
+
         testHttpServer().setAuthenticationEnabled(true);
-        /*
         testHttpServer().registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpClientAsyncAuthorization::saveRequestUser, this,
-                _1, _2, _3, _4, _5),
+            processorFunc,
             http::Method::get);
-        */
         ASSERT_TRUE(testHttpServer().bindAndListen());
     }
 
