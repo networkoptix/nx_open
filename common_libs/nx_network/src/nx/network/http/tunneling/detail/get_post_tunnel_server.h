@@ -18,12 +18,12 @@
 
 namespace nx::network::http::tunneling::detail {
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 class GetPostTunnelServer:
-    public BasicCustomTunnelServer<ApplicationData>,
+    public BasicCustomTunnelServer<ApplicationData...>,
     public network::http::StreamConnectionHolder
 {
-    using base_type = BasicCustomTunnelServer<ApplicationData>;
+    using base_type = BasicCustomTunnelServer<ApplicationData...>;
 
 public:
     GetPostTunnelServer(typename base_type::NewTunnelHandler newTunnelHandler);
@@ -38,7 +38,7 @@ private:
     {
         std::string urlPath;
         std::unique_ptr<network::http::AsyncMessagePipeline> connection;
-        ApplicationData requestData;
+        std::tuple<ApplicationData...> requestData;
     };
 
     using Tunnels = std::map<network::http::AsyncMessagePipeline*, TunnelContext>;
@@ -53,7 +53,7 @@ private:
     virtual network::http::RequestResult processOpenTunnelRequest(
         const network::http::Request& request,
         network::http::Response* response,
-        ApplicationData requestData) override;
+        ApplicationData... requestData) override;
 
     void closeAllTunnels();
 
@@ -68,7 +68,7 @@ private:
     void openUpTunnel(
         network::http::HttpServerConnection* connection,
         const std::string& requestPath,
-        ApplicationData requestData);
+        ApplicationData... requestData);
 
     void onMessage(
         network::http::AsyncMessagePipeline* tunnel,
@@ -81,22 +81,22 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename ApplicationData>
-GetPostTunnelServer<ApplicationData>::GetPostTunnelServer(
+template<typename ...ApplicationData>
+GetPostTunnelServer<ApplicationData...>::GetPostTunnelServer(
     typename base_type::NewTunnelHandler newTunnelHandler)
     :
     base_type(std::move(newTunnelHandler))
 {
 }
 
-template<typename ApplicationData>
-GetPostTunnelServer<ApplicationData>::~GetPostTunnelServer()
+template<typename ...ApplicationData>
+GetPostTunnelServer<ApplicationData...>::~GetPostTunnelServer()
 {
     closeAllTunnels();
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::registerRequestHandlers(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
     server::rest::MessageDispatcher* messageDispatcher)
 {
@@ -112,12 +112,12 @@ void GetPostTunnelServer<ApplicationData>::registerRequestHandlers(
         std::bind(&GetPostTunnelServer::processTunnelInitiationRequest, this, _1, _2));
 }
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 network::http::RequestResult
-    GetPostTunnelServer<ApplicationData>::processOpenTunnelRequest(
+    GetPostTunnelServer<ApplicationData...>::processOpenTunnelRequest(
         const network::http::Request& request,
         network::http::Response* response,
-        ApplicationData requestData)
+        ApplicationData... requestData)
 {
     using namespace std::placeholders;
 
@@ -130,18 +130,22 @@ network::http::RequestResult
     prepareCreateDownTunnelResponse(response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
-        [this, requestData = std::move(requestData),
+        [this, requestData = std::make_tuple(std::move(requestData)...),
             requestPath = request.requestLine.url.path().toStdString()](
                 network::http::HttpServerConnection* connection) mutable
         {
-            openUpTunnel(connection, requestPath, std::move(requestData));
+            auto allArgs = std::tuple_cat(
+                std::make_tuple(this, connection, requestPath),
+                std::move(requestData));
+
+            std::apply(&GetPostTunnelServer::openUpTunnel, std::move(allArgs));
         };
 
     return requestResult;
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::closeAllTunnels()
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::closeAllTunnels()
 {
     Tunnels tunnelsInProgress;
     {
@@ -153,8 +157,8 @@ void GetPostTunnelServer<ApplicationData>::closeAllTunnels()
         tunnelContext.second.connection->pleaseStopSync();
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::prepareCreateDownTunnelResponse(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
     network::http::Response* response)
 {
     response->headers.emplace("Content-Type", "application/octet-stream");
@@ -164,11 +168,11 @@ void GetPostTunnelServer<ApplicationData>::prepareCreateDownTunnelResponse(
     response->headers.emplace("Connection", "close");
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::openUpTunnel(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
     network::http::HttpServerConnection* connection,
     const std::string& requestPath,
-    ApplicationData requestData)
+    ApplicationData... requestData)
 {
     using namespace std::placeholders;
 
@@ -181,15 +185,18 @@ void GetPostTunnelServer<ApplicationData>::openUpTunnel(
 
     auto insertionResult = m_tunnelsInProgress.emplace(
         httpPipePtr,
-        TunnelContext{requestPath, std::move(httpPipe), std::move(requestData)});
+        TunnelContext{
+            requestPath,
+            std::move(httpPipe),
+            std::make_tuple(std::move(requestData)...)});
 
     insertionResult.first->second.connection->setMessageHandler(
         std::bind(&GetPostTunnelServer::onMessage, this, httpPipePtr, _1));
     insertionResult.first->second.connection->startReadingConnection();
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::onMessage(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::onMessage(
     network::http::AsyncMessagePipeline* tunnel,
     network::http::Message message)
 {
@@ -213,13 +220,15 @@ void GetPostTunnelServer<ApplicationData>::onMessage(
     NX_VERBOSE(this, lm("Successfully opened GET/POST tunnel. Url %1")
         .args(tunnelContext.urlPath));
 
-    this->reportTunnel(
-        tunnelContext.connection->takeSocket(),
-        std::move(tunnelContext.requestData));
+    std::apply(
+        &GetPostTunnelServer::reportTunnel,
+        std::tuple_cat(
+            std::make_tuple(this, tunnelContext.connection->takeSocket()),
+            std::move(tunnelContext.requestData)));
 }
 
-template<typename ApplicationData>
-bool GetPostTunnelServer<ApplicationData>::validateOpenUpChannelMessage(
+template<typename ...ApplicationData>
+bool GetPostTunnelServer<ApplicationData...>::validateOpenUpChannelMessage(
     const TunnelContext& tunnelContext,
     const network::http::Message& message)
 {
@@ -233,8 +242,8 @@ bool GetPostTunnelServer<ApplicationData>::validateOpenUpChannelMessage(
     return true;
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::closeConnection(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::closeConnection(
     SystemError::ErrorCode closeReason,
     network::http::AsyncMessagePipeline* connection)
 {
@@ -242,8 +251,8 @@ void GetPostTunnelServer<ApplicationData>::closeConnection(
     closeConnection(lock, closeReason, connection);
 }
 
-template<typename ApplicationData>
-void GetPostTunnelServer<ApplicationData>::closeConnection(
+template<typename ...ApplicationData>
+void GetPostTunnelServer<ApplicationData...>::closeConnection(
     const QnMutexLockerBase& /*lock*/,
     SystemError::ErrorCode /*closeReason*/,
     network::http::AsyncMessagePipeline* connection)

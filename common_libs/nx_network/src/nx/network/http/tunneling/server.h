@@ -55,10 +55,8 @@ Server<ApplicationData...>::Server(
     :
     m_tunnelCreatedHandler(std::move(tunnelCreatedHandler)),
     m_tunnelAuthorizer(tunnelAuthorizer),
-    m_getPostTunnelServer(std::bind(&Server::reportNewTunnel, this, 
-        std::placeholders::_1, std::placeholders::_2)),
-    m_connectionUpgradeServer(std::bind(&Server::reportNewTunnel, this,
-        std::placeholders::_1, std::placeholders::_2))
+    m_getPostTunnelServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
+    m_connectionUpgradeServer([this](auto... args) { reportNewTunnel(std::move(args)...); })
 {
     if (m_tunnelAuthorizer)
     {
