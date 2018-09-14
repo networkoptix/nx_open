@@ -9,6 +9,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/core/resource/device_type.h>
+#include <nx/utils/std/optional.h>
 
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
@@ -442,7 +443,7 @@ private:
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
-    mutable boost::optional<bool> m_hasVideo;
+    mutable std::optional<bool> m_hasVideo;
 
 private slots:
     void resetCachedValues();

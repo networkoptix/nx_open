@@ -316,7 +316,7 @@ bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataPro
     if (!cameraResource)
         return false;
 
-    if (!m_hasVideo.is_initialized())
+    if (!m_hasVideo)
     {
         const auto data = qnStaticCommon->dataPool()->data(cameraResource);
         m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);

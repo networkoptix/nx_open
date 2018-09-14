@@ -10,7 +10,6 @@
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
 #include <common/common_module.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/vms/api/types/motion_types.h>
