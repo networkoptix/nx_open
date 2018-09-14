@@ -105,6 +105,7 @@
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/analytics/object_display_settings.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/client/desktop/system_health/system_internet_access_watcher.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -461,6 +462,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new LayoutTemplateManager());
     commonModule->store(new ObjectDisplaySettings());
+
+    auto internetAccessWatcher = new nx::client::desktop::SystemInternetAccessWatcher(commonModule);
+    commonModule->store(internetAccessWatcher);
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 
