@@ -443,7 +443,7 @@ private:
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
-    mutable CachedValue<bool> m_cachedHasVideo;
+    CachedValue<bool> m_cachedHasVideo;
 
 private slots:
     void resetCachedValues();
