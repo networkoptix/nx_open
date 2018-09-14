@@ -44,6 +44,8 @@ private slots:
     void updateControlBlock();
 
     void at_generateLogicalId();
+
+    void at_preferredPresetTypeChanged(int index);
 private:
     bool areDefaultValues() const;
 

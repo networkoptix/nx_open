@@ -21,7 +21,7 @@ public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnPresetPtzController();
 
-    static bool extends(Ptz::Capabilities capabilities, bool disableNative = false);
+    static bool extends(Ptz::Capabilities capabilities, bool preferSystemPresets = false);
 
     virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 

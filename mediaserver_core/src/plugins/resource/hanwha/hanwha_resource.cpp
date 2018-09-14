@@ -1336,7 +1336,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, QString());
+    setUserPreferredPtzPresetType(nx::core::ptz::PresetType::native);
 
     const auto mainDescriptors = isNvr()
         ? kHanwhaNvrPtzCapabilityDescriptors

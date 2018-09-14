@@ -106,7 +106,7 @@ QnPtzControllerPtr wrapController(
         {
             if (QnPresetPtzController::extends(
                 capabilities(*original),
-                parameters.areNativePresetsDisabled))
+                parameters.preferSystemPresets))
             {
                original->reset(new QnPresetPtzController(*original));
             }

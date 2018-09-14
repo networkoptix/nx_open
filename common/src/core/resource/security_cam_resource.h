@@ -24,6 +24,8 @@
 #include <core/resource/combined_sensors_description.h>
 #include <core/resource/media_stream_capability.h>
 
+#include <core/ptz/ptz_preset.h>
+
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
 
@@ -345,6 +347,16 @@ public:
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
+
+    nx::core::ptz::PresetType preferredPtzPresetType() const;
+
+    nx::core::ptz::PresetType userPreferredPtzPresetType() const;
+    void setUserPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+    nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
+    void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

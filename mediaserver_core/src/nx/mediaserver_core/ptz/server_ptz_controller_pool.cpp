@@ -166,12 +166,12 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr
         return QnPtzControllerPtr();
     }
 
-    bool disableNativePresets = false;
-    if (ptz::capabilities(controller).testFlag(Ptz::NativePresetsPtzCapability))
+    bool preferSystemPresets = false;
+    const auto capabilities = ptz::capabilities(controller);
+    if (capabilities.testFlag(Ptz::NativePresetsPtzCapability)
+        && !capabilities.testFlag(Ptz::NoNxPresetsPtzCapability))
     {
-        disableNativePresets = !resource->getProperty(
-            Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
-
+        preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
             resource, &QnResource::propertyChanged,
             this, &ServerPtzControllerPool::at_cameraPropertyChanged,
@@ -183,7 +183,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr
     wrappingParameters.capabilitiesToRemove = ptz::ini().excludedCapabilities();
     wrappingParameters.absoluteMoveMapper = mapper(camera);
     wrappingParameters.relativeMoveMapping = relativeMoveMapping(camera);
-    wrappingParameters.areNativePresetsDisabled = disableNativePresets;
+    wrappingParameters.preferSystemPresets = preferSystemPresets;
     wrappingParameters.ptzPool = qnPtzPool;
     wrappingParameters.commonModule = commonModule();
 
@@ -212,7 +212,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr
 void ServerPtzControllerPool::at_cameraPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    if (key == Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME)
+    if (key == Qn::kUserPreferredPtzPresetType || key == Qn::kDefaultPreferredPtzPresetType)
     {
         // Camera reinitialization is required.
         NX_DEBUG(

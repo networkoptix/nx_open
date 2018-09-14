@@ -22,7 +22,7 @@ struct ControllerWrappingParameters
     QnPtzMapperPtr absoluteMoveMapper;
     nx::core::ptz::RelativeContinuousMoveMapping relativeMoveMapping;
 
-    bool areNativePresetsDisabled = false;
+    bool preferSystemPresets = false;
 
     QnPtzControllerPool* ptzPool = nullptr;
     QnCommonModule* commonModule = nullptr;
@@ -36,7 +36,7 @@ struct ControllerWrappingParameters
             .args(
                 capabilitiesToAdd,
                 capabilitiesToRemove,
-                areNativePresetsDisabled).toQString();
+                preferSystemPresets).toQString();
     };
 };
 

@@ -89,7 +89,7 @@ namespace Qn
     static const QString kConfigurationalPtzCapabilities = lit("configurationalPtzCapabilities");
     static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
     static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
-    static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
+
     static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
@@ -98,6 +98,9 @@ namespace Qn
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
     static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
+
+    static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
+    static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
 
     // Mediaserver common info
     static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");

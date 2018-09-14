@@ -1,6 +1,7 @@
 #include "expert_settings_widget.h"
 #include "ui_expert_settings_widget.h"
 
+#include <QtCore/QtGlobal>
 #include <QtWidgets/QListView>
 
 #include <ui/style/skin.h>
@@ -31,11 +32,25 @@ using namespace nx::client::desktop::ui;
 namespace {
 
 // Native ptz presets can be disabled if they are supported and nx presets are supported too.
-bool canDisableNativePresets(const QnVirtualCameraResourcePtr& camera)
+bool canSwitchPresetTypes(const QnVirtualCameraResourcePtr& camera)
 {
     const auto caps = camera->getPtzCapabilities();
     return caps.testFlag(Ptz::NativePresetsPtzCapability)
         && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
+}
+
+static const int kAutoPresetsIndex = 0;
+static const int kSystemPresetsIndex = 1;
+static const int kNativePresetsIndex = 2;
+
+nx::core::ptz::PresetType presetTypeByIndex(int index)
+{
+    switch (index)
+    {
+        case kSystemPresetsIndex: return nx::core::ptz::PresetType::system;
+        case kNativePresetsIndex: return nx::core::ptz::PresetType::native;
+        default: return nx::core::ptz::PresetType::automatic;
+    }
 }
 
 } // namespace
@@ -82,7 +97,14 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->bitratePerGopCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
-    connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(at_preferredPresetTypeChanged(int)));
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &QnCameraExpertSettingsWidget::at_dataChanged);
@@ -174,8 +196,9 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int forcedMotionStreamIndex = -1;
     bool allCamerasSupportForceMotion = true;
 
-    int supportedNativePtzCount = 0;
-    int disabledNativePtzCount = 0;
+    int supportBothPresetTypeCount = 0;
+    int preferSystemPresetsCount = 0;
+    int preferNativePresetsCount = 0;
 
     int camCnt = 0;
     for (const auto& camera: cameras)
@@ -260,11 +283,16 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             }
         }
 
-        if (canDisableNativePresets(camera))
+        if (canSwitchPresetTypes(camera))
         {
-            ++supportedNativePtzCount;
-            if (!camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
-                ++disabledNativePtzCount;
+            ++supportBothPresetTypeCount;
+            const auto preferredPtzPresetType = camera->preferredPtzPresetType();
+
+            if (preferredPtzPresetType == nx::core::ptz::PresetType::system)
+                ++preferSystemPresetsCount;
+
+            if (preferredPtzPresetType == nx::core::ptz::PresetType::native)
+                ++preferNativePresetsCount;
         }
 
         camCnt++;
@@ -345,14 +373,22 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
-    ui->checkBoxDisableNativePtzPresets->setEnabled(supportedNativePtzCount != 0);
-    if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
-    else if (disabledNativePtzCount != 0)
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::PartiallyChecked);
-    else
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    const bool canSwitchPresetTypeOnCameras = supportBothPresetTypeCount != 0;
+    ui->groupBoxPtzControl->setEnabled(canSwitchPresetTypeOnCameras);
+    ui->preferredPtzPresetTypeWidget->setEnabled(canSwitchPresetTypeOnCameras);
+    ui->preferredPtzPresetTypeComboBox->setEnabled(canSwitchPresetTypeOnCameras);
+
+    if (canSwitchPresetTypeOnCameras)
+    {
+        if (preferSystemPresetsCount == supportBothPresetTypeCount)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kSystemPresetsIndex);
+        else if (preferNativePresetsCount == supportBothPresetTypeCount)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kNativePresetsIndex);
+        else if (preferSystemPresetsCount == 0 && preferNativePresetsCount == 0)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kAutoPresetsIndex);
+        else
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(-1);
+    }
 
     const bool canSetupVideoStream = std::all_of(cameras.cbegin(), cameras.cend(),
         [](const QnVirtualCameraResourcePtr& camera)
@@ -379,7 +415,7 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
     bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
-    auto disableNativePtz = ui->checkBoxDisableNativePtzPresets->checkState();
+    auto preferredPtzPresetTypeIndex = ui->preferredPtzPresetTypeComboBox->currentIndex();
 
     for (const auto& camera: cameras)
     {
@@ -429,11 +465,9 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
             }
         }
 
-        if (disableNativePtz != Qt::PartiallyChecked && canDisableNativePresets(camera))
+        if (preferredPtzPresetTypeIndex != -1 && canSwitchPresetTypes(camera))
         {
-            camera->setProperty(
-                Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-                (disableNativePtz == Qt::Checked) ? lit("true") : QString());
+            camera->setUserPreferredPtzPresetType(presetTypeByIndex(preferredPtzPresetTypeIndex));
         }
 
         if (ui->logicalIdGroupBox->isEnabled())
@@ -527,6 +561,11 @@ void QnCameraExpertSettingsWidget::at_dataChanged()
         emit dataChanged();
 }
 
+void QnCameraExpertSettingsWidget::at_preferredPresetTypeChanged(int index)
+{
+    ui->presetTypeLimitationsLabel->setVisible(index == kSystemPresetsIndex);
+}
+
 bool QnCameraExpertSettingsWidget::areDefaultValues() const
 {
     if (ui->bitratePerGopCheckBox->isEnabled() && ui->bitratePerGopCheckBox->isChecked())
@@ -537,7 +576,7 @@ bool QnCameraExpertSettingsWidget::areDefaultValues() const
         && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
         && ui->comboBoxTransport->currentIndex() == 0
         && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked
-        && ui->checkBoxDisableNativePtzPresets->checkState() == Qt::Unchecked
+        && ui->preferredPtzPresetTypeComboBox->currentIndex() == kAutoPresetsIndex
         && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked;
 }
 
@@ -551,7 +590,7 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->comboBoxTransport->setCurrentIndex(0);
     ui->checkBoxForceMotionDetection->setCheckState(Qt::Unchecked);
     ui->comboBoxForcedMotionStream->setCurrentIndex(0);
-    ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kAutoPresetsIndex);
     ui->logicalIdSpinBox->setValue(0);
 }
 

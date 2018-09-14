@@ -1680,6 +1680,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
+    if (updateName.endsWith("/99_20180914_rename_preferred_preset_type.sql"))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }

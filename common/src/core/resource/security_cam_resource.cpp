@@ -1485,6 +1485,39 @@ Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
     return role == Qn::CR_SecondaryLiveVideo ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
 }
 
+nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
+{
+    auto userPreference = userPreferredPtzPresetType();
+    if (userPreference != nx::core::ptz::PresetType::automatic)
+        return userPreference;
+
+    return defaultPreferredPtzPresetType();
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kUserPreferredPtzPresetType),
+        nx::core::ptz::PresetType::automatic);
+}
+
+void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kDefaultPreferredPtzPresetType),
+        nx::core::ptz::PresetType::automatic);
+}
+
+void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)

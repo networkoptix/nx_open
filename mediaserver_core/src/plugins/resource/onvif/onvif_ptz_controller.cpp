@@ -98,9 +98,9 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     QnResourceData data = qnStaticCommon->dataPool()->data(resource);
     m_stopBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
     m_speedBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzSpeedBroken"), false);
-    bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
-    bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
-    bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
+    bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"), false);
+    bool focusEnabled = data.value<bool>(lit("onvifPtzFocusEnabled"), false);
+    bool nativePresetsAreEnabled = data.value<bool>(lit("onvifPtzPresetsEnabled"), false);
 
     const int digitsAfterDecimalPoint  = data.value<int>(lit("onvifPtzDigitsAfterDecimalPoint"), 10);
     sprintf( m_floatFormat, "%%.%df", digitsAfterDecimalPoint );
@@ -119,8 +119,11 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         m_capabilities &= ~(Ptz::AbsolutePtzCapabilities | Ptz::DevicePositioningPtzCapability);
     if(focusEnabled)
         m_capabilities |= initContinuousFocus();
-    if(presetsEnabled && !m_resource->getPtzUrl().isEmpty())
+    if(nativePresetsAreEnabled && !m_resource->getPtzUrl().isEmpty())
         m_capabilities |= (Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability);
+
+    m_resource->setDefaultPreferredPtzPresetType(
+        nativePresetsAreEnabled ? ptz::PresetType::native : ptz::PresetType::system);
 
     // TODO: #PTZ #Elric actually implement flip!
 }
@@ -225,6 +228,10 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     }
 
     Ptz::Capabilities result = configCapabilities & nodeCapabilities;
+
+    if (nodeResponse.PTZNode->MaximumNumberOfPresets > 0)
+        result |= (Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability);
+
     if(result & Ptz::AbsolutePtzCapabilities) {
         result |= Ptz::DevicePositioningPtzCapability;
 
