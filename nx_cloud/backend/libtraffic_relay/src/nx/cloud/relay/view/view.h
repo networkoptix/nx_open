@@ -58,7 +58,6 @@ private:
     std::vector<network::SocketAddress> m_httpsEndpoint;
 
     void registerApiHandlers();
-    void registerCompatibilityHandlers();
 
     template<typename Handler, typename ... Arg>
     void registerApiHandler(
