@@ -571,18 +571,6 @@ void QnFlirEIPResource::initializeIO()
     setIOPorts(portList);
 }
 
-QnIOPortDataList QnFlirEIPResource::getRelayOutputList() const
-{
-    QnMutexLocker lock(&m_ioMutex);
-    return m_outputPorts;
-}
-
-QnIOPortDataList QnFlirEIPResource::getInputPortList() const
-{
-    QnMutexLocker lock(&m_ioMutex);
-    return m_inputPorts;
-}
-
 void QnFlirEIPResource::stopInputPortMonitoringAsync()
 {
     QnMutexLocker lock(&m_ioMutex);

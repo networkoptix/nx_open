@@ -54,10 +54,6 @@ public:
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids) override;
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values) override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-
-    virtual QnIOPortDataList getInputPortList() const override;
-
     virtual bool setRelayOutputState(
         const QString& outputId,
         bool activate,

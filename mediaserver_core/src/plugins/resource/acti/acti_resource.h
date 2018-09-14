@@ -66,19 +66,12 @@ public:
 
     bool isAudioSupported() const;
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
-    /*!
-        Actual request is performed asynchronously. This method only posts task to the queue
-    */
+    /** Actual request is performed asynchronously. This method only posts task to the queue*/
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
-    //!Implementation of TimerEventHandler::onTimer
+
     virtual void onTimer( const quint64& timerID );
 
     static CLHttpStatus makeActiRequest(

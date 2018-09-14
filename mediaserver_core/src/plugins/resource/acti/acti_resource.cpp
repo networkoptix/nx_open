@@ -976,32 +976,6 @@ QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
     return new QnActiPtzController(toSharedPointer(this));
 }
 
-QnIOPortDataList QnActiResource::getRelayOutputList() const
-{
-    QnIOPortDataList outputIDStrList;
-    for( int i = 1; i <= m_outputCount; ++i ) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Output;
-        value.id = QString::number(i);
-        value.outputName = tr("Output %1").arg(i);
-        outputIDStrList.push_back(value);
-    }
-    return outputIDStrList;
-}
-
-QnIOPortDataList QnActiResource::getInputPortList() const
-{
-    QnIOPortDataList inputIDStrList;
-    for( int i = 1; i <= m_inputCount; ++i ) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Input;
-        value.id = QString::number(i);
-        value.inputName = tr("Input %1").arg(i);
-        inputIDStrList.push_back(value);
-    }
-    return inputIDStrList;
-}
-
 static const int MIN_DIO_PORT_NUMBER = 1;
 static const int MAX_DIO_PORT_NUMBER = 2;
 
@@ -1072,9 +1046,24 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     if( m_outputCount > 0 )
         setCameraCapability(Qn::RelayOutputCapability, true);
 
-    auto ports = getInputPortList();
-    for (auto item: getRelayOutputList())
-        ports.push_back(item);
+    QnIOPortDataList ports;
+    for( int i = 1; i <= m_outputCount; ++i )
+    {
+        QnIOPortData value;
+        value.portType = Qn::PT_Output;
+        value.id = QString::number(i);
+        value.outputName = tr("Output %1").arg(i);
+        ports.push_back(value);
+    }
+
+    for( int i = 1; i <= m_inputCount; ++i )
+    {
+        QnIOPortData value;
+        value.portType = Qn::PT_Input;
+        value.id = QString::number(i);
+        value.inputName = tr("Input %1").arg(i);
+        ports.push_back(value);
+    }
     setIOPorts(ports);
 }
 

@@ -25,6 +25,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
@@ -297,24 +298,8 @@ bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
 
 void QnSecurityCamResource::initializationDone()
 {
-    //m_initMutex is locked down the stack
     QnNetworkResource::initializationDone();
-    if( m_inputPortListenerCount.load() > 0 )
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
     resetCachedValues();
-}
-
-bool QnSecurityCamResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
-{
-    return false;
-}
-
-void QnSecurityCamResource::stopInputPortMonitoringAsync()
-{
-}
-
-bool QnSecurityCamResource::isInputPortMonitored() const {
-    return false;
 }
 
 bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
@@ -586,74 +571,24 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-QnIOPortDataList QnSecurityCamResource::getRelayOutputList() const {
-    QnIOPortDataList result;
-    QnIOPortDataList ports = getIOPorts();
-    for (const auto& port: ports)
-    {
-        if (port.portType == Qn::PT_Output)
-            result.push_back(port);
-    }
-    return result;
-}
-
-QnIOPortDataList QnSecurityCamResource::getInputPortList() const
-{
-    QnIOPortDataList result;
-    QnIOPortDataList ports = getIOPorts();
-    for (const auto& port: ports)
-    {
-        if (port.portType == Qn::PT_Input)
-            result.push_back(port);
-    }
-    return result;
-}
-
 void QnSecurityCamResource::setIOPorts(const QnIOPortDataList& ports)
 {
     setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
 }
 
-QnIOPortDataList QnSecurityCamResource::getIOPorts() const
+QnIOPortDataList QnSecurityCamResource::getIOPorts(Qn::IOPortType type) const
 {
-    return QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-}
+    auto ports = QJson::deserialized<QnIOPortDataList>(
+        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 
-bool QnSecurityCamResource::setRelayOutputState(const QString& /*ouputID*/, bool /*activate*/, unsigned int /*autoResetTimeout*/)
-{
-    return false;
-}
+    if (type != Qn::PT_Unknown)
+        nx::utils::remove_if(ports, [&](auto p) { return p.portType != type; });
 
-void QnSecurityCamResource::inputPortListenerAttached()
-{
-    QnMutexLocker lk( &m_initMutex );
-
-    //if camera is not initialized yet, delayed input monitoring will start on initialization completion
-    const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
-    if( isInitialized() && (inputPortListenerCount == 0) )
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
-    //if resource is not initialized, input port monitoring will start just after init() completion
-}
-
-void QnSecurityCamResource::inputPortListenerDetached()
-{
-    QnMutexLocker lk( &m_initMutex );
-
-    if( m_inputPortListenerCount.load() <= 0 )
-        return;
-
-    int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
-    if( result == 1 )
-        stopInputPortMonitoringAsync();
-    else if( result <= 0 )
-        m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
+    return ports;
 }
 
 void QnSecurityCamResource::at_initializedChanged()
 {
-    if( !isInitialized() )  //e.g., camera has been moved to a different server
-        stopInputPortMonitoringAsync();  //stopping input monitoring
-
     emit licenseTypeChanged(toSharedPointer());
 }
 

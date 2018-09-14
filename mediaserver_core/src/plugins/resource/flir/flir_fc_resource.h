@@ -38,9 +38,6 @@ public:
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    virtual QnIOPortDataList getInputPortList() const override;
-
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,

@@ -802,7 +802,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
             ->InputConnectors;
     }
 
-    auto allPorts = getRelayOutputList();
+    auto allPorts = generateOutputPorts();
     const auto inputPorts = generateInputPorts(inputCount);
 
     m_inputPortCount = inputPorts.size();
@@ -1510,8 +1510,7 @@ static QString getRelayOutpuToken(const QnPlOnvifResource::RelayOutputInfo& rela
     return QString::fromStdString(relayInfo.token);
 }
 
-// !Implementation of QnSecurityCamResource::getRelayOutputList
-QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
+QnIOPortDataList QnPlOnvifResource::generateOutputPorts() const
 {
     QStringList idList;
     std::transform(
@@ -1529,12 +1528,6 @@ QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
         result.push_back(value);
     }
     return result;
-}
-
-QnIOPortDataList QnPlOnvifResource::getInputPortList() const
-{
-    //TODO/IMPL
-    return QnIOPortDataList();
 }
 
 bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilitiesResponse)

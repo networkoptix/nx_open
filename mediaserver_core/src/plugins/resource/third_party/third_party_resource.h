@@ -44,11 +44,7 @@ public:
     virtual void setIframeDistance( int frames, int timems ) override;
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
 
-    //!Implementation of QnSecurityCamResource::getInputPortList
-    virtual QnIOPortDataList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
     //!Implementation of QnSecurityCamResource::createArchiveDataProvider

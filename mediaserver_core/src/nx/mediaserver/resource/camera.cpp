@@ -35,6 +35,24 @@ Camera::Camera(QnMediaServerModule* serverModule):
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
+
+    connect(this, &QnResource::initializedChanged,
+        [this]()
+        {
+            //QnMutexLocker lk( &m_initMutex );
+            fixInputPortMonitoring();
+        });
+
+    const auto updateIoCache =
+        [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
+        {
+            NX_DEBUG(this, "Port %1 is changed to %2 (%3)", id, value, timestamp);
+            QnMutexLocker lk(&m_ioPortStatesMutex);
+            m_ioPortStatesCache[id] = QnIOStateData(id, value, timestamp);
+        };
+
+    connect(this, &Camera::cameraInput, updateIoCache);
+    connect(this, &Camera::cameraOutput, updateIoCache);
 }
 
 Camera::~Camera()
@@ -372,6 +390,18 @@ CameraDiagnostics::Result Camera::initInternal()
     return initializeAdvancedParametersProviders();
 }
 
+void Camera::initializationDone()
+{
+    base_type::initializationDone();
+
+    QnMutexLocker lk(&m_initMutex);
+    if (m_inputPortListenerCount > 0 && !m_inputPortListeningInProgress)
+    {
+        startInputPortMonitoringAsync(std::function<void(bool)>());
+        m_inputPortListeningInProgress = true;
+    }
+}
+
 nx::media::CameraTraits Camera::mediaTraits() const
 {
     return m_mediaTraits;
@@ -380,6 +410,20 @@ nx::media::CameraTraits Camera::mediaTraits() const
 QnAbstractPtzController* Camera::createPtzControllerInternal() const
 {
     return nullptr;
+}
+
+bool Camera::startInputPortMonitoringAsync(std::function<void(bool)>&& /*completionHandler*/)
+{
+    return false;
+}
+
+void Camera::stopInputPortMonitoringAsync()
+{
+}
+
+bool Camera::isInputPortMonitored() const
+{
+    return false;
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
@@ -566,6 +610,66 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
             break;
     }
     return nullptr;
+}
+
+void Camera::inputPortListenerAttached()
+{
+    QnMutexLocker lk(&m_initMutex);
+    ++m_inputPortListenerCount;
+    fixInputPortMonitoring();
+}
+
+void Camera::inputPortListenerDetached()
+{
+    QnMutexLocker lk(&m_initMutex);
+    if (m_inputPortListenerCount == 0)
+    {
+        NX_ASSERT(false, "Detached input port listener without attach");
+    }
+    else
+    {
+        --m_inputPortListenerCount;
+        fixInputPortMonitoring();
+    }
+}
+
+QnIOStateDataList Camera::ioStates() const
+{
+    QnMutexLocker lock(&m_mutex);
+    QnIOStateDataList states;
+    for (const auto& [id, state]: m_ioPortStatesCache)
+        states.push_back(state);
+    return states;
+}
+
+bool Camera::setRelayOutputState(
+    const QString& /*portId*/,
+    bool /*value*/,
+    unsigned int /*autoResetTimeoutMs*/)
+{
+    return false;
+}
+
+void Camera::fixInputPortMonitoring()
+{
+    if (isInitialized() && m_inputPortListenerCount)
+    {
+        if (!m_inputPortListeningInProgress)
+        {
+            NX_DEBUG(this, "Start input port monitoring");
+            startInputPortMonitoringAsync(nullptr);
+            m_inputPortListeningInProgress = true;
+        }
+    }
+    else
+    {
+        if (m_inputPortListeningInProgress)
+        {
+            NX_DEBUG(this, "Stop input port monitoring");
+            stopInputPortMonitoringAsync();
+            m_inputPortListeningInProgress = false;
+        }
+    }
 }
 
 } // namespace resource

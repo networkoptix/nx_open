@@ -172,6 +172,14 @@ bool contains_if(const Container& container, UnaryPredicate p)
     return contains_if(container.begin(), container.end(), p);
 }
 
+template<typename Container, typename UnaryPredicate>
+void remove_if(Container& container, UnaryPredicate p)
+{
+    container.erase(
+        std::remove_if(container.begin(), container.end(), p),
+        container.end());
+}
+
 template<typename StringType>
 // requires String<StringType>
 void to_lower(StringType* str)

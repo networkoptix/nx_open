@@ -202,45 +202,6 @@ void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
     //TODO/IMPL
 }
 
-//!Implementation of QnSecurityCamResource::getRelayOutputList
-QnIOPortDataList QnThirdPartyResource::getRelayOutputList() const
-{
-    QnIOPortDataList result;
-
-    QStringList ids;
-    if( !m_relayIOManager.get() )
-        return result;
-
-    m_relayIOManager->getRelayOutputList( &ids );
-
-    for (const auto& data: ids) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Output;
-        value.id = data;
-        value.outputName = tr("Otput %1").arg(data);
-        result.push_back(value);
-    }
-    return result;
-}
-
-QnIOPortDataList QnThirdPartyResource::getInputPortList() const
-{
-    QnIOPortDataList result;
-    if( !m_relayIOManager.get() )
-        return result;
-
-    QStringList ids;
-    m_relayIOManager->getInputPortList( &ids );
-    for (const auto& data: ids) {
-        QnIOPortData value;
-        value.portType = Qn::PT_Input;
-        value.id = data;
-        value.inputName = tr("Input %1").arg(data);
-        result.push_back(value);
-    }
-    return result;
-}
-
 bool QnThirdPartyResource::setRelayOutputState(
     const QString& outputID,
     bool activate,

@@ -146,8 +146,36 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 
+    void inputPortListenerAttached();
+    void inputPortListenerDetached();
+
+    /** Override to support output ports. */
+    virtual bool setRelayOutputState(
+        const QString& portId,
+        bool value,
+        unsigned int autoResetTimeoutMs = 0);
+
+    /** Override for IO modules. */
+    virtual QnIOStateDataList ioStates() const;
+
+signals:
+    /** Emit on camera or IO module input change. */
+    void cameraInput(
+        const QnResourcePtr& resource,
+        const QString& portId,
+        bool value,
+        qint64 timestamp);
+
+    /** Emit on IO modules only. */
+    void cameraOutput(
+        const QnResourcePtr& resource,
+        const QString& portId,
+        bool value,
+        qint64 timestamp);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+    virtual void initializationDone() override;
 
     /** Is called during initInternal(). */
     virtual CameraDiagnostics::Result initializeCameraDriver() = 0;
@@ -169,10 +197,19 @@ protected:
     virtual nx::media::CameraTraits mediaTraits() const;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
+
+    /** Override to support input port monitoring. */
+    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler);
+    virtual void stopInputPortMonitoringAsync();
+    virtual bool isInputPortMonitored() const;
+
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
+    void fixInputPortMonitoring();
+
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
+
 private:
     using StreamCapabilityAdvancedParameterProviders
         = std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
@@ -185,6 +222,11 @@ private:
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
     CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
     nx::media::CameraTraits m_mediaTraits;
+
+    std::atomic<size_t> m_inputPortListenerCount = 0;
+    bool m_inputPortListeningInProgress = false;
+    QnMutex m_ioPortStatesMutex;
+    std::map<QString, QnIOStateData> m_ioPortStatesCache;
 };
 
 } // namespace resource

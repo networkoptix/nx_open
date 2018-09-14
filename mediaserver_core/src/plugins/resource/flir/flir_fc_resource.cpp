@@ -106,8 +106,8 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     }
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
-    QnIOPortDataList allPorts = getInputPortList();
-    QnIOPortDataList outputPorts = getRelayOutputList();
+    QnIOPortDataList allPorts = m_ioManager->getInputPortList();
+    QnIOPortDataList outputPorts = m_ioManager->getOutputPortList();
 
     if (!allPorts.empty())
         caps |= Qn::RelayInputCapability;
@@ -183,22 +183,6 @@ void FcResource::stopInputPortMonitoringAsync()
         return;
 
     m_ioManager->stopIOMonitoring();
-}
-
-QnIOPortDataList FcResource::getRelayOutputList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getOutputPortList();
-
-    return QnIOPortDataList();
-}
-
-QnIOPortDataList FcResource::getInputPortList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getInputPortList();
-
-    return QnIOPortDataList();
 }
 
 QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()

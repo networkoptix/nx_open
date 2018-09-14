@@ -14,6 +14,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <network/tcp_listener.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/mediaserver/resource/camera.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -56,23 +57,36 @@ void QnIOMonitorConnectionProcessor::run()
         parseRequest();
         const QString cameraId = QUrlQuery(getDecodedUrl().query())
             .queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
-        QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleId(
-            resourcePool(), cameraId);
-        if (!camera) {
-            sendResponse(nx::network::http::StatusCode::notFound, "multipart/x-mixed-replace; boundary=ioboundary");
-            return;
-        }
-        Qn::directConnect(camera.data(), &QnSecurityCamResource::initializedChanged, this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
-        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
-        Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
-        if (camera->getParentId() != commonModule()->moduleGUID()) {
-            sendResponse(nx::network::http::StatusCode::notFound, "multipart/x-mixed-replace; boundary=ioboundary");
+        const auto camera = nx::camera_id_helper::findCameraByFlexibleId(
+            resourcePool(), cameraId).dynamicCast<nx::mediaserver::resource::Camera>();
+        if (!camera)
+        {
+            sendResponse(nx::network::http::StatusCode::notFound,
+                "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
-        else {
-            sendResponse(nx::network::http::StatusCode::ok, "multipart/x-mixed-replace; boundary=ioboundary");
+
+        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::initializedChanged,
+            this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
+        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::cameraInput,
+            this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
+        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::cameraOutput,
+            this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
+
+        if (camera->getParentId() != commonModule()->moduleGUID())
+        {
+            sendResponse(nx::network::http::StatusCode::notFound,
+                "multipart/x-mixed-replace; boundary=ioboundary");
+            return;
         }
+        else
+        {
+            sendResponse(
+                nx::network::http::StatusCode::ok,
+                "multipart/x-mixed-replace; boundary=ioboundary");
+        }
+
         camera->inputPortListenerAttached();
         static const int REQUEST_BUFFER_SIZE = 1024;
         static const int KEEPALIVE_INTERVAL = 1000 * 5;
@@ -108,8 +122,9 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr& reso
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->waitMutex);
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (camera && camera->isInitialized()) {
+    const auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
+    if (camera && camera->isInitialized())
+    {
         addData(camera->ioStates());
         d->waitCond.wakeAll();
     }

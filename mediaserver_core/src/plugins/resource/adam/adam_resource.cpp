@@ -77,16 +77,16 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
-    QnIOPortDataList allPorts = getInputPortList();
-    QnIOPortDataList outputPorts = getRelayOutputList();
-    allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
+    auto ports = m_ioManager->getInputPortList();
+    auto outputs = m_ioManager->getOutputPortList();
+    ports.insert(ports.begin(), ports.begin(), ports.end());
 
     m_portTypes.clear();
-    for (const auto& port: allPorts)
+    for (const auto& port: ports)
         m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
-    setIOPorts(allPorts);
+    setIOPorts(ports);
     setCameraCapabilities(caps);
 
     setFlags(flags() | Qn::io_module);
@@ -180,22 +180,6 @@ void QnAdamResource::setPortDefaultStates()
             port.id,
             nx_io_managment::fromDefaultPortState(portDefaultState));
     }
-}
-
-QnIOPortDataList QnAdamResource::getRelayOutputList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getOutputPortList();
-
-    return QnIOPortDataList();
-}
-
-QnIOPortDataList QnAdamResource::getInputPortList() const
-{
-    if (m_ioManager)
-        return m_ioManager->getInputPortList();
-
-    return QnIOPortDataList();
 }
 
 QnIOStateDataList QnAdamResource::ioStates() const

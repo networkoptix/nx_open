@@ -682,30 +682,6 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     return success ? values.ids() : QSet<QString>();
 }
 
-QnIOPortDataList HanwhaResource::getRelayOutputList() const
-{
-    QnIOPortDataList result;
-    for (const auto& entry: m_ioPortTypeById)
-    {
-        if (entry.portType == Qn::PT_Output)
-            result.push_back(entry);
-    }
-
-    return result;
-}
-
-QnIOPortDataList HanwhaResource::getInputPortList() const
-{
-    QnIOPortDataList result;
-    for (const auto& entry : m_ioPortTypeById)
-    {
-        if (entry.portType == Qn::PT_Input)
-            result.push_back(entry);
-    }
-
-    return result;
-}
-
 bool HanwhaResource::setRelayOutputState(
     const QString& outputId,
     bool activate,

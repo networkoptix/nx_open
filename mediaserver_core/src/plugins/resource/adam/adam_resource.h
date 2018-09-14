@@ -31,10 +31,6 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-
-    virtual QnIOPortDataList getInputPortList() const override;
-
     virtual QnIOStateDataList ioStates() const override;
 
     virtual bool setRelayOutputState(

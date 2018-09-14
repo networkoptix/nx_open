@@ -554,7 +554,7 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
         NX_WARNING(this, lit("Received BA_CameraOutput with no resource reference. Ignoring..."));
         return false;
     }
-    QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(resource.data());
+    const auto securityCam = dynamic_cast<nx::mediaserver::resource::Camera*>(resource.data());
     if (!securityCam)
     {
         NX_WARNING(this, lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").

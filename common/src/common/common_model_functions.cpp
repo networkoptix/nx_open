@@ -18,6 +18,8 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType,
 (Qn::PT_Unknown,  "Unknown")
@@ -97,6 +99,16 @@ QString toString(MediaStreamEvent value)
         default:
             return lit("Unknown error");
     }
+}
+
+QString toString(ResourceStatus status)
+{
+    return QnLexical::serialized(status);
+}
+
+QString toString(StatusChangeReason reason)
+{
+    return QnLexical::serialized(reason);
 }
 
 } // namespace Qn

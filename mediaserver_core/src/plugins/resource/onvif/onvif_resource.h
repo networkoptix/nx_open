@@ -190,11 +190,6 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; }
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue
     */
@@ -382,6 +377,8 @@ protected:
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
 private:
+    QnIOPortDataList generateOutputPorts() const;
+
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
