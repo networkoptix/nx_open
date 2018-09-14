@@ -64,7 +64,7 @@ class WinRM(object):
         return self._shell().start(command_str_list, logger=_logger.getChild('cmd'))
 
     def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
-        return self.command(command).check_output(input, timeout_sec=timeout_sec)
+        return self.command(command).run(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables, logger=_logger.getChild('cmd'))

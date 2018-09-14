@@ -83,7 +83,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         if not self.parts[0].startswith('~'):
             return self
         if self.parts[0] == '~':
-            user_name = self._shell.command(['whoami']).check_output().rstrip('\n')
+            user_name = self._shell.command(['whoami']).run().rstrip('\n')
         else:
             user_name = self.parts[0][1:]
         output = self._shell.run_command(['getent', 'passwd', user_name])
