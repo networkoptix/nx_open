@@ -121,6 +121,17 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
                 getProperty(Qn::kDeviceType),
                 nx::core::resource::DeviceType::unknown);
         },
+        &m_mutex),
+    m_cachedHasVideo(
+        [this]()
+        {
+            const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+            if (!cameraResource)
+                return false;
+
+            const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+            return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+        },
         &m_mutex)
 {
     addFlags(Qn::live_cam);
@@ -312,16 +323,7 @@ bool QnSecurityCamResource::isInputPortMonitored() const {
 
 bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
-    if (!cameraResource)
-        return false;
-
-    if (!m_hasVideo)
-    {
-        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
-        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
-    }
-    return *m_hasVideo;
+    return m_cachedHasVideo.get();
 }
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
