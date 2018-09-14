@@ -10,6 +10,7 @@ extern "C" {
 }
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 Codec::~Codec()
@@ -255,4 +256,5 @@ void Codec::flush() const
 }
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

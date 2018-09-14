@@ -5,6 +5,7 @@ extern "C" {
 }
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 Options::~Options()
@@ -34,4 +35,5 @@ int Options::count() const
 }
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

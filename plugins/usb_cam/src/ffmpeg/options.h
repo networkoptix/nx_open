@@ -6,6 +6,7 @@ struct AVDictionary;
 struct AVDictionaryEntry;
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 class Options
@@ -23,4 +24,5 @@ protected:
 
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

@@ -7,6 +7,7 @@ extern "C" {
 }
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 class Codec : public Options
@@ -66,4 +67,5 @@ private:
 };
 
 } //namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

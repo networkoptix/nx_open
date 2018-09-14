@@ -3,6 +3,7 @@
 #include <string>
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 InputFormat::InputFormat():
@@ -129,4 +130,5 @@ void InputFormat::resolution(int * width, int * height) const
 }
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

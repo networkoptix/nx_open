@@ -12,6 +12,7 @@ extern "C" {
 #include "packet.h"
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 class InputFormat : public Options
@@ -49,4 +50,5 @@ private:
 };
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

@@ -6,6 +6,7 @@ extern "C"{
 } // extern "C"
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 Frame::Frame(const std::shared_ptr<std::atomic_int>& frameCount):
@@ -80,4 +81,5 @@ int Frame::getBuffer(AVSampleFormat format, int nbSamples, uint64_t channelLayou
 }
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

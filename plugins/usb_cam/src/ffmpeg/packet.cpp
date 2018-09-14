@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg {
 
 namespace {
@@ -175,4 +176,5 @@ void Packet::parseNalUnits() const
 #endif
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx

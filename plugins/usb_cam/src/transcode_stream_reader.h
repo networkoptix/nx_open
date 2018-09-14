@@ -8,8 +8,8 @@
 #include "camera/buffered_stream_consumer.h"
 #include "camera/timestamp_mapper.h"
 
-namespace nx { namespace ffmpeg { class Codec; } }
-namespace nx { namespace ffmpeg { class Frame; } }
+namespace nx { namespace usb_cam { namespace ffmpeg { class Codec; } } }
+namespace nx { namespace usb_cam { namespace ffmpeg { class Frame; } } }
 
 namespace nx {
 namespace usb_cam {
@@ -47,7 +47,7 @@ private:
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
     std::vector<std::shared_ptr<ffmpeg::Packet>> m_videoPackets;
     
-    std::unique_ptr<nx::ffmpeg::Codec> m_encoder;
+    std::unique_ptr<ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
     TimeStampMapper m_timeStamps;

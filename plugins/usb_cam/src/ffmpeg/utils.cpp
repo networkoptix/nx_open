@@ -5,6 +5,7 @@
 #include <camera/camera_plugin.h>
 
 namespace nx {
+namespace usb_cam {
 namespace ffmpeg{
 namespace utils{
 
@@ -320,4 +321,5 @@ int suggestSampleRate(AVCodec * codec)
 
 } // namespace utils
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namesapce nx

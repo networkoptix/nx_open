@@ -10,6 +10,7 @@ extern"C"{
 }
 
 namespace nx{
+namespace usb_cam {
 namespace ffmpeg {
 
 class Frame
@@ -38,4 +39,5 @@ private:
 };
 
 } // namespace ffmpeg
+} // namespace usb_cam
 } // namespace nx
