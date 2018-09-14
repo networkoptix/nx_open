@@ -137,8 +137,8 @@ private:
 
         const ApiPersistentIdData remotePeer(connection->remotePeer());
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
-        auto remoteAccess = descriptor->
-            checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
+        auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
+            commonModule(), connection.staticCast<Connection>()->userAccessData(), tran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
             NX_VERBOSE(
@@ -148,7 +148,6 @@ private:
                 .arg(remotePeer.id.toString()));
             return;
         }
-
 
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         const auto context = this->context(connection);
@@ -169,9 +168,15 @@ private:
         {
             return;
         }
+        else if (connection->remotePeer().peerType == Qn::PT_CloudServer)
+        {
+            if (!descriptor->isPersistent || context->sendDataInProgress)
+                return;
+        }
+
         NX_ASSERT(!(remotePeer == peerId)); //< loop
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, this))
             printTran(connection, tran, Connection::Direction::outgoing);
 
         switch (connection->remotePeer().dataFormat)
@@ -181,7 +186,12 @@ private:
                 m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
             break;
         case Qn::UbjsonFormat:
-            if (descriptor->isPersistent)
+            if (connection->remotePeer().isClient())
+            {
+                connection->sendMessage(
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+            }
+            else if (descriptor->isPersistent)
             {
                 connection->sendMessage(MessageType::pushTransactionData,
                     m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
@@ -230,29 +240,57 @@ private:
             if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
                 continue; //< Already processed by remote peer
 
-            switch (connection->remotePeer().dataFormat)
+            if (!connection->shouldTransactionBeSentToPeer(tran))
             {
-            case Qn::JsonFormat:
-                if (transportHeader.dstPeers.size() == 1
-                    && transportHeader.dstPeers[0] == connection->remotePeer().id)
+                NX_ASSERT(false,
+                    lm("Transaction '%1' can't be send to peer %2 (%3)")
+                    .arg(toString(tran.command))
+                    .arg(connection->remotePeer().id.toString())
+                    .arg(QnLexical::serialized(connection->remotePeer().peerType)));
+                return; //< This peer doesn't handle transactions of such type.
+            }
+
+            if (connection->remotePeer().isClient())
+            {
+                if (transportHeader.dstPeers.size() != 1
+                    || transportHeader.dstPeers[0] != connection->remotePeer().id)
                 {
+                    NX_ASSERT(0, lm("Unicast transaction routing error. "
+                        "Transaction %1 skipped. remotePeer: %2")
+                        .args(tran.command, connection->remotePeer().id));
+                    return;
+                }
+                switch (connection->remotePeer().dataFormat)
+                {
+                case Qn::JsonFormat:
                     connection->sendMessage(
                         m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                    break;
+                case Qn::UbjsonFormat:
+                    connection->sendMessage(
+                        m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+                    break;
+                default:
+                    NX_WARNING(this,
+                        lm("Client has requested data in an unsupported format %1")
+                        .arg(connection->remotePeer().dataFormat));
+                    break;
                 }
-                else
+            }
+            else
+            {
+                switch (connection->remotePeer().dataFormat)
                 {
-                    NX_ASSERT(0, "Unicast transaction routing error. Transaction skipped.");
+                case Qn::UbjsonFormat:
+                    transportHeader.via.insert(localPeer().id);
+                    connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
+                        m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
+                    break;
+                default:
+                    NX_WARNING(this, lm("Server has requested data in an unsupported format %1")
+                        .arg(connection->remotePeer().dataFormat));
+                    break;
                 }
-                break;
-            case Qn::UbjsonFormat:
-                transportHeader.via.insert(localPeer().id);
-                connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
-                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format"
-                    << connection->remotePeer().dataFormat;
-                break;
             }
         }
     }
