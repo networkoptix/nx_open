@@ -10,6 +10,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <ui/style/skin.h>
+#include <ui/style/helper.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/common/palette.h>
@@ -68,7 +69,8 @@ SearchEdit::SearchEdit(QWidget* parent):
     connect(m_lineEdit, &QLineEdit::textChanged, this, &SearchEdit::textChanged);
 
     const auto marginsLayout = new QVBoxLayout();
-    marginsLayout->setContentsMargins(8, 0, 8, 0);
+    marginsLayout->setContentsMargins(style::Metrics::kStandardPadding, 0,
+        style::Metrics::kStandardPadding, 0);
     marginsLayout->addWidget(m_tagButton);
     marginsLayout->setAlignment(m_tagButton, Qt::AlignLeft | Qt::AlignVCenter);
 
