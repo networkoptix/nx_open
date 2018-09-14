@@ -9,6 +9,7 @@
 #include "../audio_discovery_manager.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 #include <string>
@@ -69,6 +70,7 @@ private:
 };
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif

@@ -8,6 +8,7 @@
 #include "device_data.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 
@@ -58,4 +59,5 @@ int getMaxBitrate(
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx

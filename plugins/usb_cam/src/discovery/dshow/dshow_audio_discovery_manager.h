@@ -6,6 +6,7 @@
 #include "device/device_data.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
  
 class DShowAudioDiscoveryManager : public AudioDiscoveryManagerPrivate{
@@ -14,6 +15,7 @@ public:
 };
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif

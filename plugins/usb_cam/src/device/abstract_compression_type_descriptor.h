@@ -3,6 +3,7 @@
 #include <memory>
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 class AbstractCompressionTypeDescriptor
@@ -14,4 +15,5 @@ public:
 typedef std::shared_ptr<AbstractCompressionTypeDescriptor> CompressionTypeDescriptorPtr;
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx

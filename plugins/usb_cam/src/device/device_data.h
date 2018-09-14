@@ -8,6 +8,7 @@
 #include "abstract_compression_type_descriptor.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 struct ResolutionData
@@ -65,4 +66,5 @@ struct DeviceData
 };
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx

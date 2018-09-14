@@ -13,6 +13,7 @@
 #include "camera/camera_plugin_types.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 namespace impl {
 
@@ -119,6 +120,7 @@ std::vector<AudioDeviceDescriptor> getAudioDeviceList();
 
 } // namespace impl
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif

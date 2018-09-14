@@ -6,7 +6,8 @@
 
 #include "device/dshow/dshow_utils.h"
 
-namespace nx{
+namespace nx {
+namespace usb_cam {
 namespace device {
 
 void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
@@ -69,6 +70,7 @@ void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, i
 }
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif //_WIN32

@@ -8,6 +8,7 @@
 #include <alsa/asoundlib.h>
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 namespace {
@@ -145,6 +146,7 @@ AlsaAudioDiscoveryManager::getDevices() const
 }
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif

@@ -8,7 +8,9 @@
 #include "utils.h"
 
 namespace nx {
+namespace usb_cam {
 namespace device {
+
 std::string getDeviceName(const char * devicePath)
 {
     return impl::getDeviceName(devicePath);
@@ -54,4 +56,5 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 }
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx

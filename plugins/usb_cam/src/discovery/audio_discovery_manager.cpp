@@ -8,6 +8,7 @@
 
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 /////////////////////////////////// AudioDiscoveryManagerPrivate ///////////////////////////////////
@@ -39,4 +40,5 @@ void AudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int ca
 }
 
 } // namespace device
+} // namespace usb_cam
 } // namespace nx

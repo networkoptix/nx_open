@@ -3,6 +3,7 @@
 #include <camera/camera_plugin.h>
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 
 class AudioDiscoveryManagerPrivate
@@ -23,5 +24,6 @@ private:
     AudioDiscoveryManagerPrivate * m_discovery;
 };
 
-} // device
-} // usb_cam
+} // namespace device
+} // namespace usb_cam
+} // namespace nx

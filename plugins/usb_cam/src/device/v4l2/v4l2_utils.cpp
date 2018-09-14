@@ -17,6 +17,7 @@
 #include <nx/utils/app_info.h>
 
 namespace nx {
+namespace usb_cam {
 namespace device {
 namespace impl {
 
@@ -371,6 +372,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 
 } // namespace impl
 } // namespace device
+} // namespace usb_cam
 } // namespace nx
 
 #endif
