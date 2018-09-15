@@ -135,7 +135,6 @@ void CameraManager::setCredentials( const char* username, const char* password )
 int CameraManager::setAudioEnabled( int audioEnabled )
 {
     m_audioEnabled = audioEnabled;
-    std::cout << "SETTING AUDIO ENABLED: " << m_audioEnabled << std::endl;
     if (m_camera)
         m_camera->setAudioEnabled(m_audioEnabled);
     return nxcip::NX_NO_ERROR;
