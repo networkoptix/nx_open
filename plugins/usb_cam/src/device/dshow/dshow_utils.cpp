@@ -499,7 +499,7 @@ HRESULT getBitrateList(IMoniker *pMoniker,
         {
             auto viHeader = reinterpret_cast<VIDEOINFOHEADER*>(mediaType->pbFormat);
 
-            if (viHeader->bmiHeader.biCompression == targetHeader->bmiCompression)
+            if (viHeader->bmiHeader.biCompression == targetHeader->biCompression)
             {
                 int bitrate = (int) viHeader->dwBitRate;
                 if (std::find(bitrateList.begin(), bitrateList.end(), bitrate) == bitrateList.end())
