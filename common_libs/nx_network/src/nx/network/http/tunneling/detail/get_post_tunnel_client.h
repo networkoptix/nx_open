@@ -54,6 +54,8 @@ private:
     void cleanupFailedTunnel();
     void reportFailure(OpenTunnelResult result);
 
+    bool resetConnectionAttributes();
+
     void reportSuccess();
 };
 

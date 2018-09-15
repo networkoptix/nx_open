@@ -108,7 +108,20 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     std::size_t /*bytesTransferred*/)
 {
     if (systemErrorCode != SystemError::noError)
-        return reportFailure({systemErrorCode, StatusCode::serviceUnavailable, nullptr});
+    {
+        return reportFailure({
+            systemErrorCode,
+            StatusCode::serviceUnavailable,
+            nullptr});
+    }
+
+    if (!resetConnectionAttributes())
+    {
+        return reportFailure({
+            SystemError::getLastOSErrorCode(),
+            StatusCode::serviceUnavailable,
+            nullptr});
+    }
 
     reportSuccess();
 }
@@ -133,6 +146,12 @@ void GetPostTunnelClient::reportFailure(OpenTunnelResult result)
         nx::utils::swapAndCall(m_clientFeedbackFunction, false);
 
     nx::utils::swapAndCall(m_completionHandler, std::move(result));
+}
+
+bool GetPostTunnelClient::resetConnectionAttributes()
+{
+    return m_connection->setRecvTimeout(kNoTimeout)
+        && m_connection->setSendTimeout(kNoTimeout);
 }
 
 void GetPostTunnelClient::reportSuccess()
