@@ -108,7 +108,7 @@ void GetPostTunnelClient::handleOpenUpTunnelResult(
     std::size_t /*bytesTransferred*/)
 {
     if (systemErrorCode != SystemError::noError)
-        return reportFailure({systemErrorCode});
+        return reportFailure({systemErrorCode, StatusCode::serviceUnavailable, nullptr});
 
     reportSuccess();
 }
