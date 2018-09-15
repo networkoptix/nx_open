@@ -60,7 +60,7 @@ public:
         return cf::make_ready_future(true);
     }
 
-    virtual void setNodeId(const std::string& /*nodeId*/) {}
+    virtual void setNodeId(const std::string& /*nodeId*/) override {}
 };
 
 class TrafficRelayStub:

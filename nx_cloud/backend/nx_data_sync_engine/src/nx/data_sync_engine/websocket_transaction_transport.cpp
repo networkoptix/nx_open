@@ -32,6 +32,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         transactionLog,
         systemId,
         remotePeerData.dataFormat)),
+    m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
     bindToAioThread(this->webSocket()->getAioThread());
@@ -106,8 +107,9 @@ void WebSocketTransactionTransport::onGotMessage(
             break;
         }
         default:
-            NX_ERROR(this, lm("P2P message type '%1' is not allowed for cloud connect!")
-                .arg(toString(messageType)));
+            NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
+                "System id %2, source endpoint %3")
+                .args(toString(messageType), m_systemId, remoteSocketAddr()));
             setState(State::Error);
             break;
     }
