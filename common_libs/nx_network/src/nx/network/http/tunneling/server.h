@@ -1,85 +1,101 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 
 #include <nx/utils/move_only_func.h>
 
-#include "get_post_tunnel_processor.h"
 #include "abstract_tunnel_authorizer.h"
+#include "detail/connection_upgrade_tunnel_server.h"
+#include "detail/get_post_tunnel_server.h"
 #include "../http_types.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
 
 namespace nx::network::http::tunneling {
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 class Server
 {
 public:
     using TunnelCreatedHandler = nx::utils::MoveOnlyFunc<void(
-        ApplicationData /*applicationData*/,
-        std::unique_ptr<network::AbstractStreamSocket> /*connection*/)>;
+        std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
+        ApplicationData... /*applicationData*/)>;
 
     /**
      * @param tunnelAuthorizer If null, then any tunnel is considered authorized.
      */
     Server(
-        const std::string& basePath,
-        server::rest::MessageDispatcher* messageDispatcher,
         TunnelCreatedHandler tunnelCreatedHandler,
-        TunnelAuthorizer<ApplicationData>* tunnelAuthorizer);
-
-private:
-    TunnelCreatedHandler m_tunnelCreatedHandler;
-    TunnelAuthorizer<ApplicationData>* m_tunnelAuthorizer = nullptr;
-    GetPostTunnelProcessor<ApplicationData> m_getPostTunnelProcessor;
+        TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer);
 
     void registerRequestHandlers(
         const std::string& basePath,
         server::rest::MessageDispatcher* messageDispatcher);
 
+    detail::GetPostTunnelServer<ApplicationData...>& getPostTunnelServer();
+    detail::ConnectionUpgradeTunnelServer<ApplicationData...>& connectionUpgradeServer();
+
+private:
+    TunnelCreatedHandler m_tunnelCreatedHandler;
+    TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
+    detail::GetPostTunnelServer<ApplicationData...> m_getPostTunnelServer;
+    detail::ConnectionUpgradeTunnelServer<ApplicationData...> m_connectionUpgradeServer;
+
     void reportNewTunnel(
-        ApplicationData /*applicationData*/,
-        std::unique_ptr<network::AbstractStreamSocket> /*connection*/);
+        std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
+        ApplicationData... /*applicationData*/);
 };
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename ApplicationData>
-Server<ApplicationData>::Server(
-    const std::string& basePath,
-    server::rest::MessageDispatcher* messageDispatcher,
+template<typename ...ApplicationData>
+Server<ApplicationData...>::Server(
     TunnelCreatedHandler tunnelCreatedHandler,
-    TunnelAuthorizer<ApplicationData>* tunnelAuthorizer)
+    TunnelAuthorizer<ApplicationData...>* tunnelAuthorizer)
     :
     m_tunnelCreatedHandler(std::move(tunnelCreatedHandler)),
     m_tunnelAuthorizer(tunnelAuthorizer),
-    m_getPostTunnelProcessor(std::bind(&Server::reportNewTunnel, this, 
-        std::placeholders::_1, std::placeholders::_2))
+    m_getPostTunnelServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
+    m_connectionUpgradeServer([this](auto... args) { reportNewTunnel(std::move(args)...); })
 {
-    registerRequestHandlers(basePath, messageDispatcher);
-
     if (m_tunnelAuthorizer)
-        m_getPostTunnelProcessor.setTunnelAuthorizer(m_tunnelAuthorizer);
+    {
+        m_getPostTunnelServer.setTunnelAuthorizer(m_tunnelAuthorizer);
+        m_connectionUpgradeServer.setTunnelAuthorizer(m_tunnelAuthorizer);
+    }
 }
 
-template<typename ApplicationData>
-void Server<ApplicationData>::registerRequestHandlers(
+template<typename ...ApplicationData>
+void Server<ApplicationData...>::registerRequestHandlers(
     const std::string& basePath,
     server::rest::MessageDispatcher* messageDispatcher)
 {
-    m_getPostTunnelProcessor.registerRequestHandlers(
-        basePath,
-        messageDispatcher);
+    m_getPostTunnelServer.registerRequestHandlers(basePath, messageDispatcher);
+    m_connectionUpgradeServer.registerRequestHandlers(basePath, messageDispatcher);
 }
 
-template<typename ApplicationData>
-void Server<ApplicationData>::reportNewTunnel(
-    ApplicationData applicationData,
-    std::unique_ptr<network::AbstractStreamSocket> connection)
+template<typename ...ApplicationData>
+detail::GetPostTunnelServer<ApplicationData...>& 
+    Server<ApplicationData...>::getPostTunnelServer()
+{
+    return m_getPostTunnelServer;
+}
+
+template<typename ...ApplicationData>
+detail::ConnectionUpgradeTunnelServer<ApplicationData...>& 
+    Server<ApplicationData...>::connectionUpgradeServer()
+{
+    return m_connectionUpgradeServer;
+}
+
+template<typename ...ApplicationData>
+void Server<ApplicationData...>::reportNewTunnel(
+    std::unique_ptr<network::AbstractStreamSocket> connection,
+    ApplicationData... applicationData)
 {
     m_tunnelCreatedHandler(
-        std::move(applicationData),
-        std::move(connection));
+        std::move(connection),
+        std::move(applicationData)...);
 }
 
 } // namespace nx::network::http::tunneling

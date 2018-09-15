@@ -8,10 +8,10 @@
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/tunneling/server.h>
+#include <nx/cloud/relaying/http_view/listening_peer_connection_tunneling.h>
 
 #include "authentication_manager.h"
 #include "client_connection_tunneling.h"
-#include "listening_peer_connection_tunneling.h"
 
 namespace nx {
 namespace cloud {
@@ -48,7 +48,7 @@ private:
     const conf::Settings& m_settings;
     Model* m_model;
     Controller* m_controller;
-    view::ListeningPeerConnectionTunnelingServer m_listeningPeerConnectionTunnelingServer;
+    relaying::ListeningPeerConnectionTunnelingServer m_listeningPeerConnectionTunnelingServer;
     view::ClientConnectionTunnelingServer m_clientConnectionTunnelingServer;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
@@ -58,7 +58,6 @@ private:
     std::vector<network::SocketAddress> m_httpsEndpoint;
 
     void registerApiHandlers();
-    void registerCompatibilityHandlers();
 
     template<typename Handler, typename ... Args>
     void registerApiHandler(
