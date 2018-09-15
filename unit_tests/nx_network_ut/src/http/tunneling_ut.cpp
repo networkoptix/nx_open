@@ -114,6 +114,9 @@ private:
 
     void enableTunnelMethods(int tunnelMethodMask)
     {
+        if (tunnelMethodMask & TunnelMethod::all)
+            return; //< By default, the factory is initialized with all methods.
+
         m_localFactory.clear();
 
         if (tunnelMethodMask & TunnelMethod::getPost)
@@ -150,9 +153,17 @@ TEST_P(HttpTunneling, error_is_reported)
     thenTunnelIsNotEstablished();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 INSTANTIATE_TEST_CASE_P(
-    EveryMethodIsEnabled,
+    EveryMethod,
     HttpTunneling,
     ::testing::Values(TunnelMethod::all));
+
+
+INSTANTIATE_TEST_CASE_P(
+    GetPostWithLargeMessageBody,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::getPost));
 
 } // namespace nx::network::http::tunneling::test
