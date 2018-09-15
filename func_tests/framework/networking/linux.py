@@ -64,7 +64,8 @@ class LinuxNetworking(Networking):
                 ''',
             env={'AVAILABLE_INTERFACES': '\n'.join(self.interfaces.values())})
 
-    def setup_ip(self, mac, ip, prefix_length):
+    def setup_network(self, mac, ip):
+        # type: (EUI, IPNetwork) -> None
         interface = self.interfaces[mac]
         self._ssh.run_sh_script(
             # language=Bash
@@ -72,8 +73,8 @@ class LinuxNetworking(Networking):
                 ip addr replace ${ADDRESS}/${PREFIX_LENGTH} dev ${INTERFACE}
                 ip link set dev ${INTERFACE} up
                 ''',
-            env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
-        _logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh, ip, prefix_length, interface, mac)
+            env={'INTERFACE': interface, 'ADDRESS': ip.ip, 'PREFIX_LENGTH': ip.prefixlen})
+        _logger.info("Machine %r has IP %s on %s (%s).", self._ssh, ip, interface, mac)
 
     def list_ips(self):
         output = self._ssh.run_sh_script('ip address show scope global | grep -w inet')

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from netaddr import IPNetwork
+from netaddr import EUI, IPNetwork
 
 
 class Networking(object):
@@ -15,12 +15,9 @@ class Networking(object):
         pass
 
     @abstractmethod
-    def setup_ip(self, mac, ip, prefix_length):
+    def setup_network(self, mac, ip):
+        # type: (EUI, IPNetwork) -> None
         pass
-
-    def setup_network(self, mac, network):
-        ip_network = IPNetwork(network)
-        self.setup_ip(mac, ip_network.ip, ip_network.prefixlen)
 
     @abstractmethod
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
