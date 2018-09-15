@@ -80,8 +80,9 @@ protected:
     {
         thenClientTunnelSucceeded();
 
-        ASSERT_NE(nullptr, m_serverTunnels.pop());
-        // TODO: Exchange some data between client & server connections.
+        thenServerTunnelSucceded();
+
+        exchangeSomeData();
     }
 
     void thenClientTunnelSucceeded()
@@ -91,6 +92,12 @@ protected:
         ASSERT_EQ(SystemError::noError, m_prevClientTunnelResult.sysError);
         ASSERT_TRUE(StatusCode::isSuccessCode(m_prevClientTunnelResult.httpStatus));
         ASSERT_NE(nullptr, m_prevClientTunnelResult.connection);
+    }
+
+    void thenServerTunnelSucceded()
+    {
+        m_prevServerTunnelConnection = m_serverTunnels.pop();
+        ASSERT_NE(nullptr, m_prevServerTunnelConnection);
     }
 
     void thenTunnelIsNotEstablished()
@@ -111,6 +118,7 @@ private:
     nx::utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverTunnels;
     OpenTunnelResult m_prevClientTunnelResult;
     nx::utils::Url m_baseUrl;
+    std::unique_ptr<AbstractStreamSocket> m_prevServerTunnelConnection;
 
     void enableTunnelMethods(int tunnelMethodMask)
     {
@@ -121,9 +129,6 @@ private:
 
         if (tunnelMethodMask & TunnelMethod::getPost)
             m_localFactory.registerClientType<detail::GetPostTunnelClient>();
-
-        //if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
-        //    m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
     }
 
     void saveClientTunnel(OpenTunnelResult result)
@@ -134,6 +139,33 @@ private:
     void saveServerTunnel(std::unique_ptr<AbstractStreamSocket> connection)
     {
         m_serverTunnels.push(std::move(connection));
+    }
+
+    void exchangeSomeData()
+    {
+        ASSERT_TRUE(m_prevServerTunnelConnection->setNonBlockingMode(false));
+        ASSERT_TRUE(m_prevClientTunnelResult.connection->setNonBlockingMode(false));
+
+        assertDataCanBeTransferred(
+            m_prevServerTunnelConnection.get(),
+            m_prevClientTunnelResult.connection.get());
+
+        assertDataCanBeTransferred(
+            m_prevClientTunnelResult.connection.get(),
+            m_prevServerTunnelConnection.get());
+    }
+
+    void assertDataCanBeTransferred(
+        AbstractStreamSocket* from,
+        AbstractStreamSocket* to)
+    {
+        constexpr char buf[] = "Hello, world!";
+        ASSERT_EQ(sizeof(buf), from->send(buf, sizeof(buf)));
+
+        char readBuf[sizeof(buf)];
+        ASSERT_EQ(sizeof(readBuf), to->recv(readBuf, sizeof(readBuf)));
+
+        ASSERT_EQ(0, memcmp(buf, readBuf, sizeof(readBuf)));
     }
 };
 
