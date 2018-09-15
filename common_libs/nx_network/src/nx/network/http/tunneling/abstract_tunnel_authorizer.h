@@ -8,7 +8,7 @@
 
 namespace nx::network::http::tunneling {
 
-template<typename ApplicationData>
+template<typename ...ApplicationData>
 class TunnelAuthorizer
 {
 public:
@@ -17,7 +17,7 @@ public:
      */
     using CompletionHandler = nx::utils::MoveOnlyFunc<void(
         StatusCode::Value /*statusCode*/,
-        ApplicationData /*applicationData*/)>;
+        ApplicationData... /*applicationData*/)>;
 
     virtual ~TunnelAuthorizer() = default;
 

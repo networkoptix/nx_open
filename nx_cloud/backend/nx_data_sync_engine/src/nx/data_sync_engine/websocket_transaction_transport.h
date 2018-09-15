@@ -73,6 +73,7 @@ private:
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
     vms::api::TranState m_remoteSubscription; //< remote -> local subscription
+    const std::string m_systemId;
     QnUuid m_connectionGuid;
 };
 
