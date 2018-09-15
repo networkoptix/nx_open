@@ -6,6 +6,7 @@
 #include <nx/network/url/url_parse_helper.h>
 
 #include "basic_custom_tunnel_server.h"
+#include "request_paths.h"
 #include "../abstract_tunnel_authorizer.h"
 #include "../../server/http_server_connection.h"
 #include "../../server/rest/http_server_rest_message_dispatcher.h"
@@ -33,8 +34,8 @@ public:
     http::Method::ValueType upgradeRequestMethod() const;
 
 private:
-    std::string m_protocolToUpgradeTo = "NxProprietary";
-    http::Method::ValueType m_upgradeRequestMethod = http::Method::get;
+    std::string m_protocolToUpgradeTo = kConnectionUpgradeTunnelProtocol;
+    http::Method::ValueType m_upgradeRequestMethod = kConnectionUpgradeTunnelMethod;
 
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext) override;
@@ -67,11 +68,14 @@ void ConnectionUpgradeTunnelServer<ApplicationData...>::registerRequestHandlers(
 {
     using namespace std::placeholders;
 
-    static constexpr char path[] = "upgrade_connection";
+    const auto path = 
+        this->requestPath().empty()
+        ? url::joinPath(basePath, kConnectionUpgradeTunnelPath)
+        : this->requestPath();
 
     messageDispatcher->registerRequestProcessorFunc(
         m_upgradeRequestMethod,
-        !this->requestPath().empty() ? this->requestPath() : url::joinPath(basePath, path),
+        path,
         std::bind(&ConnectionUpgradeTunnelServer::processTunnelInitiationRequest, this, _1, _2));
 }
 
