@@ -203,7 +203,7 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
-std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
+std::unique_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -212,7 +212,7 @@ std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFrom
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return std::make_shared<nx::plugins::SettingsHolder>();
+            return std::make_unique<const nx::plugins::SettingsHolder>();
         };
 
     if (!QFileInfo::exists(filename))
@@ -228,7 +228,7 @@ std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFrom
     if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    const auto settings = std::make_shared<nx::plugins::SettingsHolder>(settingsJson);
+    auto settings = std::make_unique<const nx::plugins::SettingsHolder>(settingsJson);
     if (!settings->isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 

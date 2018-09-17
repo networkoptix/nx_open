@@ -87,7 +87,7 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    std::shared_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
+    std::unique_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
     void saveManifestToFile(
