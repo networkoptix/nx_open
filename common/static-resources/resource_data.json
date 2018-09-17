@@ -2760,7 +2760,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*"
+                "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*", "UNIVIEW|IPC6252SR*"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2771,8 +2771,8 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.1666667, 1],
-                        "logical": [-15, 90]
+                        "device":  [1, -0.1666667],
+                        "logical": [-90, 15]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
