@@ -198,3 +198,9 @@ inline nx::core::ptz::Vector qBound(
         qBound<float>(limits.minFov, position.zoom, limits.maxFov));
 }
 
+nx::core::ptz::Vector linearCombine(
+    qreal a,
+    const nx::core::ptz::Vector& x,
+    qreal b,
+    const nx::core::ptz::Vector& y);
+
