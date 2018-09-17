@@ -9,6 +9,7 @@ from typing import Callable, ContextManager, Optional, Type
 
 from framework.networking.interface import Networking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
@@ -166,7 +167,10 @@ class OSAccess(object):
         pass
 
     def cleanup_disk_space(self):
-        self._disk_space_holder().unlink()
+        try:
+            self._disk_space_holder().unlink()
+        except DoesNotExist:
+            pass
 
     def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)
