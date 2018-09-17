@@ -29,7 +29,8 @@ void ConnectHandler::processRequest(
     static_cast<void>(authInfo);
     static_cast<void>(response);
 
-    network::SocketAddress targetAddress(request.requestLine.url.path());
+    // TODO: check correctness of requestLine.... Here?
+    network::SocketAddress targetAddress(request.requestLine.url.host(), request.requestLine.url.port());
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(targetAddress.address.toString()))
     {
@@ -111,8 +112,7 @@ void ConnectHandler::connect(const network::SocketAddress& address)
 
 void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
 {
-    NX_DEBUG(this, lm("Socket %1 returned error %2")
-        .arg(socket).arg(SystemError::toString(error)));
+    NX_WARNING(this, "Socket %1 returned error: %2", socket, SystemError::toString(error));
 
     const auto handler = std::move(m_completionHandler);
     handler(nx::network::http::StatusCode::serviceUnavailable);
