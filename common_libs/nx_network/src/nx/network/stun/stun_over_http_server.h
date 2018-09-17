@@ -34,6 +34,7 @@ public:
         using namespace std::placeholders;
         using CreateStunOverHttpConnectionHandler = nx::network::http::server::handler::CreateTunnelHandler;
 
+        // TODO: #ak Remove it after end of 3.2 support.
         httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
             stunOverHttpPath.c_str(),
             [this]()
