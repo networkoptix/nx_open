@@ -122,15 +122,13 @@ void QueryExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
             ++m_numberOfFailedRequestsInARow;
             if (isDbErrorRecoverable(result))
             {
-                NX_LOGX(lm("DB query failed with result code %1. Db text %2")
-                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastErrorText()),
-                    cl_logDEBUG1);
+                NX_DEBUG(this, lm("DB query failed with result code %1. Db text %2")
+                    .args(result, m_dbConnectionHolder.dbConnection()->lastErrorText()));
             }
             else
             {
-                NX_LOGX(lm("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastErrorText()),
-                    cl_logWARNING);
+                NX_WARNING(this, lm("Dropping DB connection due to unrecoverable error %1. Db text %2")
+                    .args(result, m_dbConnectionHolder.dbConnection()->lastErrorText()));
                 closeConnection();
                 break;
             }
@@ -138,8 +136,10 @@ void QueryExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
             if (m_numberOfFailedRequestsInARow >=
                 connectionOptions().maxErrorsInARowBeforeClosingConnection)
             {
-                NX_LOGX(lm("Dropping DB connection due to %1 errors in a row. Db text %2")
-                    .arg(result), cl_logWARNING);
+                NX_WARNING(this, lm("Dropping DB connection due to %1 errors in a row. "
+                    "Last error %2. Db text %3")
+                    .args(m_numberOfFailedRequestsInARow, result,
+                        m_dbConnectionHolder.dbConnection()->lastErrorText()));
                 closeConnection();
                 break;
             }
