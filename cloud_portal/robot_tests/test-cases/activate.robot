@@ -8,7 +8,7 @@ Suite Teardown    Close All Browsers
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
-
+${symbol password}    pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
 *** Keywords ***
 Restart
     Register Keyword To Run On Failure    NONE
@@ -32,7 +32,7 @@ Register and Activate
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate user with cyrillic First and Last names and correct credentials
+allows register, activate, login with user with cyrillic First and Last names and correct credentials
     [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -41,7 +41,7 @@ allows activate user with cyrillic First and Last names and correct credentials
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate user with smiley First and Last names and correct credentials
+allows register, activate, login with user with smiley First and Last names and correct credentials
     [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -50,7 +50,7 @@ allows activate user with smiley First and Last names and correct credentials
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate user with glyph First and Last names and correct credentials
+allows register, activate, login with user with glyph First and Last names and correct credentials
     [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -59,7 +59,7 @@ allows activate user with glyph First and Last names and correct credentials
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
+allows register, activate, login with `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     [tags]    C41863
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -68,7 +68,7 @@ allows activate `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate +!#$%'*-/=?^_`{|}~ in email field
+allows register, activate, login with +!#$%'*-/=?^_`{|}~ in email field
 #ampersand was removed from this test because imaplib could not handle it
     ${email}    Get Random Symbol Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -77,7 +77,7 @@ allows activate +!#$%'*-/=?^_`{|}~ in email field
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate with leading space in email
+allows register, activate, login with with leading space in email
     [tags]    C41557    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -86,13 +86,22 @@ allows activate with leading space in email
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
-allows activate with trailing space in email
+allows register, activate, login with with trailing space in email
     [tags]    C41557    C41864
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}${SPACE}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} password
+    [tags]    C41861
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${symbol password}
+    Activate    ${email}
+    Log In    ${email}    ${symbol password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
 should show error if same link is used twice
