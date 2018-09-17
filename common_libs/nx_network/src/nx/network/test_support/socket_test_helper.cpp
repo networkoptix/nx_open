@@ -347,8 +347,6 @@ void TestConnection::sendAllAsync( std::function<void()> handler )
         return reportFinish( SystemError::noError );
     }
 
-    // FIXME: check if it is required somewhere
-//    prepareConsequentDataToSend(&m_outData);
     m_socket->sendAsync(
         m_outData,
         [this, handler = std::move(handler)](
