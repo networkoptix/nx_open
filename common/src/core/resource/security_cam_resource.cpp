@@ -582,7 +582,7 @@ bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, boo
         if (needMerge)
         {
             if (const auto savedPort = nx::utils::find_if(savedPorts,
-                [&](const auto& savedPort) { return savedPort.id == newPort.id; }))
+                [&](const auto& port) { return port.id == newPort.id; }))
             {
                 newPort = *savedPort;
                 wasDataMerged = true;
