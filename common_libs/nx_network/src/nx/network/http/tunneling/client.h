@@ -40,7 +40,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    std::unique_ptr<detail::BasicTunnelClient> m_actualClient;
+    std::unique_ptr<detail::BaseTunnelClient> m_actualClient;
 };
 
 } // namespace nx::network::http::tunneling

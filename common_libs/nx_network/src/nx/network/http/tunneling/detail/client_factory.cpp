@@ -31,7 +31,7 @@ ClientFactory& ClientFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<BasicTunnelClient> ClientFactory::defaultFactoryFunction(
+std::unique_ptr<BaseTunnelClient> ClientFactory::defaultFactoryFunction(
     const utils::Url& baseUrl)
 {
     using namespace std::placeholders;

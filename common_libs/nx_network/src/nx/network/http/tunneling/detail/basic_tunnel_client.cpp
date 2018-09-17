@@ -2,7 +2,7 @@
 
 namespace nx::network::http::tunneling::detail {
 
-BasicTunnelClient::BasicTunnelClient(
+BaseTunnelClient::BaseTunnelClient(
     const nx::utils::Url& baseTunnelUrl,
     ClientFeedbackFunction clientFeedbackFunction)
     :
@@ -11,7 +11,7 @@ BasicTunnelClient::BasicTunnelClient(
 {
 }
 
-void BasicTunnelClient::bindToAioThread(
+void BaseTunnelClient::bindToAioThread(
     aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -22,13 +22,13 @@ void BasicTunnelClient::bindToAioThread(
         m_connection->bindToAioThread(aioThread);
 }
 
-void BasicTunnelClient::stopWhileInAioThread()
+void BaseTunnelClient::stopWhileInAioThread()
 {
     m_httpClient.reset();
     m_connection.reset();
 }
 
-void BasicTunnelClient::cleanupFailedTunnel()
+void BaseTunnelClient::cleanupFailedTunnel()
 {
     OpenTunnelResult result;
     result.sysError = m_httpClient->lastSysErrorCode();
@@ -42,7 +42,7 @@ void BasicTunnelClient::cleanupFailedTunnel()
     reportFailure(std::move(result));
 }
 
-void BasicTunnelClient::reportFailure(OpenTunnelResult result)
+void BaseTunnelClient::reportFailure(OpenTunnelResult result)
 {
     if (m_clientFeedbackFunction)
         nx::utils::swapAndCall(m_clientFeedbackFunction, false);
@@ -50,13 +50,13 @@ void BasicTunnelClient::reportFailure(OpenTunnelResult result)
     nx::utils::swapAndCall(m_completionHandler, std::move(result));
 }
 
-bool BasicTunnelClient::resetConnectionAttributes()
+bool BaseTunnelClient::resetConnectionAttributes()
 {
     return m_connection->setRecvTimeout(kNoTimeout)
         && m_connection->setSendTimeout(kNoTimeout);
 }
 
-void BasicTunnelClient::reportSuccess()
+void BaseTunnelClient::reportSuccess()
 {
     nx::utils::swapAndCall(
         m_completionHandler,

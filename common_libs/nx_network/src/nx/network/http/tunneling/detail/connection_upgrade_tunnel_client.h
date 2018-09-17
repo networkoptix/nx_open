@@ -6,9 +6,9 @@
 namespace nx::network::http::tunneling::detail {
 
 class NX_NETWORK_API ConnectionUpgradeTunnelClient:
-    public BasicTunnelClient
+    public BaseTunnelClient
 {
-    using base_type = BasicTunnelClient;
+    using base_type = BaseTunnelClient;
 
 public:
     ConnectionUpgradeTunnelClient(

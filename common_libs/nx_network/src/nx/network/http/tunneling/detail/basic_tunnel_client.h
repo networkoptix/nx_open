@@ -21,16 +21,16 @@ using ClientFeedbackFunction = nx::utils::MoveOnlyFunc<void(bool /*success*/)>;
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_NETWORK_API BasicTunnelClient:
+class NX_NETWORK_API BaseTunnelClient:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
 
 public:
-    BasicTunnelClient(
+    BaseTunnelClient(
         const nx::utils::Url& baseTunnelUrl,
         ClientFeedbackFunction clientFeedbackFunction);
-    virtual ~BasicTunnelClient() = default;
+    virtual ~BaseTunnelClient() = default;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

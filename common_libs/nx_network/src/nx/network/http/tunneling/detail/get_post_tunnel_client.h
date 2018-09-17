@@ -10,9 +10,9 @@
 namespace nx::network::http::tunneling::detail {
 
 class NX_NETWORK_API GetPostTunnelClient:
-    public BasicTunnelClient
+    public BaseTunnelClient
 {
-    using base_type = BasicTunnelClient;
+    using base_type = BaseTunnelClient;
 
 public:
     GetPostTunnelClient(
