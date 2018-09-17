@@ -1,6 +1,6 @@
 #pragma once
 
-#include "basic_tunnel_client.h"
+#include "base_tunnel_client.h"
 #include "../../http_async_client.h"
 
 namespace nx::network::http::tunneling::detail {

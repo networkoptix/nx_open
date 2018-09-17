@@ -2,7 +2,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 
-#include "basic_tunnel_client.h"
+#include "base_tunnel_client.h"
 #include "request_paths.h"
 #include "../../http_async_client.h"
 #include "../../http_types.h"

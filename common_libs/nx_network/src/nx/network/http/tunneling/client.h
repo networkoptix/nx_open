@@ -6,7 +6,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
-#include "detail/basic_tunnel_client.h"
+#include "detail/base_tunnel_client.h"
 #include "../http_types.h"
 
 namespace nx::network::http::tunneling {
