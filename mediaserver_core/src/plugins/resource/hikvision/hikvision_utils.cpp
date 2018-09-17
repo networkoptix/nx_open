@@ -249,20 +249,7 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
         {
             auto& fpsList = outCapabilities->fps;
             success = parseIntegerList(options, &fpsList);
-
-            // ISAPI documentation:
-            // <maxFrameRate> <!—req, xs+:integer, maximum frame rate x100 +[]</maxFrameRate>
-            const auto maxFps = std::max_element(fpsList.begin(), fpsList.end());
-            if (maxFps != fpsList.end() && *maxFps >= 200)
-            {
-                // Threshold is to avoid problems with rear cameras which send raw FPS.
-                for (auto& fps: outCapabilities->fps)
-                    fps /= 100;
-
-                // Cameras often report strange values below 0 FPS...
-                fpsList.erase(std::remove_if(fpsList.begin(), fpsList.end(),
-                    [](int fps) { return fps == 0; }), fpsList.end());
-            }
+            std::sort(fpsList.begin(), fpsList.end(), std::greater<int>());
         }
         else if (tag == kFixedBitrateTag)
         {
@@ -505,6 +492,15 @@ bool responseIsOk(const boost::optional<CommonResponse>& response)
 {
     return response
         && response->statusCode == kStatusCodeOk;
+}
+
+int ChannelCapabilities::realMaxFps() const
+{
+    if (fps.empty())
+        return 0;
+
+    const auto maxFps = fps.at(0);
+    return maxFps > kFpsThreshold ? maxFps / 100 : maxFps;
 }
 
 } // namespace hikvision

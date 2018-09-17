@@ -49,6 +49,8 @@ static const QString kCapabilitiesRequestPathTemplate =
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
 static const QString kChannelStreamingPathForNvrTemplate = lit("/ISAPI/Streaming/channels/%1");
 
+static const int kFpsThreshold = 200;
+
 static const std::array<QString, 6> kVideoChannelProperties = {
     kVideoCodecTypeTag,
     kVideoResolutionWidthTag,
@@ -69,9 +71,15 @@ struct ChannelCapabilities
 {
     std::set<AVCodecID> codecs;
     std::vector<QSize> resolutions;
+
+    // Cameras usually return framerate values multiplied by 100.
+    // Some models return "normal" (not multiplied) values.
+    // This vector is sorted in descending order, so the first element is the maximum framerate.
     std::vector<int> fps;
     std::vector<int> quality;
     std::pair<int, int> bitrateRange;
+
+    int realMaxFps() const;
 };
 
 // Intentionally use struct here just in case we need
