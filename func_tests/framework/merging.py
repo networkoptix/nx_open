@@ -1,9 +1,14 @@
 import logging
 
 from netaddr import IPNetwork
+from typing import Mapping
+from typing import Sequence
 
 from framework.installation.mediaserver import Mediaserver
+from framework.mediaserver_api import DEFAULT_TAKE_REMOTE_SETTINGS
 from .context_logger import context_logger
+
+DEFAULT_ACCESSIBLE_IP_NET = IPNetwork('10.254.0.0/16')
 
 _logger = logging.getLogger(__name__)
 _merge_logger = logging.getLogger('framework.mediaserver_api.merge')
@@ -14,8 +19,8 @@ _merge_logger = logging.getLogger('framework.mediaserver_api.merge')
 def merge_systems(
         local,  # type: Mediaserver  # Request will be sent to this.
         remote,  # type: Mediaserver
-        take_remote_settings=False,
-        accessible_ip_net=IPNetwork('10.254.0.0/16'),
+        take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
+        accessible_ip_net=DEFAULT_ACCESSIBLE_IP_NET,
         ):
     remote_interfaces = remote.api.interfaces()
     try:
@@ -27,21 +32,13 @@ def merge_systems(
 
 
 def setup_system(mediaservers, scheme):
-    # Local is one to which request is sent.
-    # Remote's URL is sent included in request to local.
-    for merge_parameters in scheme:
-        local_mediaserver = mediaservers[merge_parameters['local']]
-        remote_mediaserver = mediaservers[merge_parameters['remote']]
-        merge_kwargs = {}
-        if merge_parameters is not None:
-            try:
-                merge_kwargs['take_remote_settings'] = merge_parameters['settings'] == 'remote'
-            except KeyError:
-                pass
-            try:
-                remote_network = IPNetwork(merge_parameters['network'])
-            except KeyError:
-                pass
-            else:
-                merge_kwargs['accessible_ip_net'] = remote_network
-        merge_systems(local_mediaserver, remote_mediaserver, **merge_kwargs)
+    # type: (Mapping[str, Mediaserver], Sequence[Mapping[str, ...]]) -> None
+    """Request is sent to "local". It's asked to merge with "remote" and provided base URL of
+    API of "remote".
+    """
+    for merger in scheme:
+        merge_systems(
+            mediaservers[merger['local']],
+            mediaservers[merger['remote']],
+            take_remote_settings=merger.get('take_remote_settings', DEFAULT_TAKE_REMOTE_SETTINGS),
+            accessible_ip_net=IPNetwork(merger.get('network', DEFAULT_ACCESSIBLE_IP_NET)))

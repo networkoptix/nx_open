@@ -27,6 +27,7 @@ DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
+DEFAULT_TAKE_REMOTE_SETTINGS = False
 
 
 class MediaserverApiRequestError(Exception):
@@ -556,7 +557,7 @@ class MediaserverApi(object):
             remote_api,  # type: MediaserverApi
             remote_address,  # type: IPAddress
             remote_port,
-            take_remote_settings=False,
+            take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
