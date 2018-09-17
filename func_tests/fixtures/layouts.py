@@ -26,7 +26,10 @@ def network(hypervisor, vm_types, layout):
 
 @pytest.fixture()
 def system(mediaserver_allocation, network, layout):
-    hosts = [machine for machine in network if not machine.is_router()]
+    hosts = {
+        alias: machine
+        for alias, machine in network.items()
+        if not machine.os_access.networking.is_router()}
     with many_mediaservers_allocated(hosts, mediaserver_allocation) as mediaservers:
         setup_system(mediaservers, layout['mergers'])
         yield mediaservers
