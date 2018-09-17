@@ -6,7 +6,6 @@ Measure system synchronization time.
 import datetime
 from collections import namedtuple
 from contextlib import contextmanager
-from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
@@ -21,7 +20,7 @@ from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
-from framework.utils import GrowingSleep
+from framework.utils import GrowingSleep, with_traceback
 from memory_usage_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
@@ -80,17 +79,6 @@ def get_server_admin(server):
     admins = [(server, u) for u in server.api.generic.get('ec2/getUsers') if u['isAdmin']]
     assert admins
     return admins[0]
-
-
-def with_traceback(fn):
-    @wraps(fn)  # critical for VMFactory.map to work
-    def wrapper(*args, **kw):
-        try:
-            return fn(*args, **kw)
-        except Exception:
-            _logger.exception('Exception in %r:', fn)
-            raise
-    return wrapper
 
 
 @with_traceback
