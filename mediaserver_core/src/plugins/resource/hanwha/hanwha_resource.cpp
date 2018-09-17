@@ -1237,7 +1237,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAlarmInputs.is_initialized() && *maxAlarmInputs > 0)
     {
-        setCameraCapability(Qn::RelayInputCapability, true);
         for (auto i = 1; i <= maxAlarmInputs.get(); ++i)
         {
             QnIOPortData inputPortData;
@@ -1259,7 +1258,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAlarmOutputs.is_initialized() && *maxAlarmOutputs > 0)
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
         for (auto i = 1; i <= maxAlarmOutputs.get(); ++i)
         {
             QnIOPortData outputPortData;
@@ -1276,7 +1274,6 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     if (maxAuxDevices.is_initialized() && *maxAuxDevices > 0)
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
         for (auto i = 1; i <= maxAuxDevices.get(); ++i)
         {
             QnIOPortData outputPortData;
@@ -1291,7 +1288,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     // TODO: #dmishin get alarm outputs via bypass if possible?
 
-    setIoPortDescriptions(ioPorts);
+    setIoPortDescriptions(std::move(ioPorts), /*needMerge*/ true);
     return CameraDiagnostics::NoErrorResult();
 }
 

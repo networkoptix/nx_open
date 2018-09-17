@@ -226,9 +226,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
         zone_size = 1;
 
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
     saveParams();

@@ -124,7 +124,7 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 
     //if no input, exiting
-    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+    if( !hasCameraCapabilities(Qn::InputPortCapability) )
         return result;
 
     QAuthenticator auth = getAuth();

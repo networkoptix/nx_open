@@ -266,8 +266,18 @@ public:
      */
     virtual bool isReadyToDetach() const {return true;}
 
-    //!Set list of IO ports
-    void setIoPortDescriptions(const QnIOPortDataList& ports);
+    /**
+     * @param ports Ports data to save into resource property.
+     * @param needMerge If true, overrides new ports dscription with saved state, because it might
+     *      be edited by client. TODO: This should be fixed by using different properties!
+     * @return true Merge has happend, false otherwise.
+     */
+    bool setIoPortDescriptions(QnIOPortDataList ports, bool needMerge);
+
+    /**
+     * @param type Filters ports by type, does not filter if Qn::PT_Unknown.
+     */
+    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     virtual bool setProperty(
         const QString &key,
@@ -278,8 +288,6 @@ public:
         const QString &key,
         const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
-
-    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 

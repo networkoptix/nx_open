@@ -733,11 +733,11 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     fetchRelayOutputs(&relayOutputs);
     if (!relayOutputs.empty())
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
         // TODO #ak it's not clear yet how to get input port list for sure
         // (on DW cam getDigitalInputs returns nothing),
         // but all cameras I've seen have either both input & output or none.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
 
         //resetting all ports states to inactive
         for (auto i = 0; i < relayOutputs.size(); ++i)
@@ -809,12 +809,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     const auto outputPortCount = allPorts.size();
 
     allPorts.insert(allPorts.cend(), inputPorts.cbegin(), inputPorts.cend());
-    setIoPortDescriptions(std::move(allPorts));
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
 
     m_portNamePrefixToIgnore = resourceData.value<QString>("portNamePrefixToIgnore", QString());
-    setCameraCapability(Qn::RelayInputCapability, m_inputPortCount > 0);
-    setCameraCapability(Qn::RelayOutputCapability, outputPortCount > 0);
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1544,7 +1541,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
         < (int) MAX_IO_PORTS_PER_DEVICE)
     {
         // Camera has input port.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     }
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));

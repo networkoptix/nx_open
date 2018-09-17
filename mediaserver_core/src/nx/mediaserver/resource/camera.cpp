@@ -645,7 +645,7 @@ void Camera::fixInputPortMonitoring()
 {
     if (isInitialized() && m_inputPortListenerCount)
     {
-        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::RelayInputCapability))
+        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::InputPortCapability))
         {
             NX_DEBUG(this, "Start input port monitoring");
             startInputPortStatesMonitoring();

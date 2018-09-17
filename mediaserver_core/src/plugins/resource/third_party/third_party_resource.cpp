@@ -497,9 +497,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     }
 
     if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
-        setCameraCapability( Qn::RelayInputCapability, true );
+        setCameraCapability( Qn::InputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
-        setCameraCapability( Qn::RelayOutputCapability, true );
+        setCameraCapability( Qn::OutputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
         setCameraCapability( Qn::ShareIpCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
@@ -716,8 +716,8 @@ bool QnThirdPartyResource::initializeIOPorts()
     {
         NX_WARNING(this, lit("Failed to get pointer to nxcip::CameraRelayIOManager interface for third-party camera %1:%2 (url %3)").
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)));
-        setCameraCapability( Qn::RelayInputCapability, false );
-        setCameraCapability( Qn::RelayOutputCapability, false );
+        setCameraCapability( Qn::InputPortCapability, false );
+        setCameraCapability( Qn::OutputPortCapability, false );
         return false;
     }
 

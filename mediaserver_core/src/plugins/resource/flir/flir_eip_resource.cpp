@@ -58,10 +58,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     if (!client->registerSession())
         return CameraDiagnostics::CannotEstablishConnectionResult(kDefaultEipPort);
 
-    setCameraCapabilities(
-        Qn::PrimaryStreamSoftMotionCapability |
-        Qn::RelayInputCapability |
-        Qn::RelayOutputCapability );
+    setCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability);
 
     initializeIO();
 
@@ -566,7 +563,7 @@ void QnFlirEIPResource::initializeIO()
     for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
-    setIoPortDescriptions(portList);
+    setIoPortDescriptions(std::move(portList), /*needMerge*/ true);
 }
 
 void QnFlirEIPResource::stopInputPortStatesMonitoring()

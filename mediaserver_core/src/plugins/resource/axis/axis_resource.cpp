@@ -1236,7 +1236,7 @@ void QnPlAxisResource::readPortIdLIst()
         m_ioPortIdList << portId;
 }
 
-bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
+bool QnPlAxisResource::initializeIOPorts(CLSimpleHTTPClient* const http)
 {
     readPortIdLIst();
 
@@ -1244,29 +1244,16 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     if (!readPortSettings(http, cameraPorts))
         return ioPortErrorOccured();
 
-    QnIOPortDataList savedPorts = ioPortDescriptions();
-    if (savedPorts.empty() && !cameraPorts.empty()) {
-        QnMutexLocker lock(&m_mutex);
+    if (setIoPortDescriptions(cameraPorts, /*needMerge*/ true))
+    {
+        m_ioPorts = ioPortDescriptions();
+        if (!savePortSettings(m_ioPorts, cameraPorts))
+            return ioPortErrorOccured();
+    }
+    else
+    {
         m_ioPorts = cameraPorts;
     }
-    else {
-        auto mergedData = mergeIOSettings(cameraPorts, savedPorts);
-        if (!savePortSettings(mergedData, cameraPorts))
-            return ioPortErrorOccured();
-        QnMutexLocker lock(&m_mutex);
-        m_ioPorts = mergedData;
-    }
-    if (m_ioPorts != savedPorts)
-        setIoPortDescriptions(m_ioPorts);
-
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
-    for (const auto& port: m_ioPorts) {
-        if (port.supportedPortTypes & Qn::PT_Input)
-            caps |= Qn::RelayInputCapability;
-        if (port.supportedPortTypes & Qn::PT_Output)
-            caps |= Qn::RelayOutputCapability;
-    }
-    setCameraCapabilities(getCameraCapabilities() | caps);
     return true;
 
     //TODO/IMPL periodically update port names in case some one changes it via camera's webpage

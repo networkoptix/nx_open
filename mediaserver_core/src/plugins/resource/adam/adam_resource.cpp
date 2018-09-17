@@ -70,11 +70,6 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
             lit("couldn't get valid response from device"));
     }
 
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
-
-    caps |= Qn::RelayInputCapability;
-    caps |= Qn::RelayOutputCapability;
-
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
     auto ports = m_ioManager->getInputPortList();
@@ -86,8 +81,7 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
         m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
-    setIoPortDescriptions(ports);
-    setCameraCapabilities(caps);
+    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
     setProperty(Qn::VIDEO_DISABLED_PARAM_NAME, 1);
@@ -237,9 +231,9 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
-        auto ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        auto ports = ioPortDescriptions();
         setPortDefaultStates();
-        setIoPortDescriptions(ports);
+        setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
         saveParams();
     }
 }

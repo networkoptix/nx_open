@@ -1024,14 +1024,10 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     auto it = systemInfo.find( "di" );
     if( it != systemInfo.end() )
         m_inputCount = it.value().toInt();
-    if( m_inputCount > 0 )
-        setCameraCapability(Qn::RelayInputCapability, true);
 
     it = systemInfo.find( "do" );
     if( it != systemInfo.end() )
         m_outputCount = it.value().toInt();
-    if( m_outputCount > 0 )
-        setCameraCapability(Qn::RelayOutputCapability, true);
 
     QnIOPortDataList ports;
     for( int i = 1; i <= m_outputCount; ++i )
@@ -1051,7 +1047,7 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
         value.inputName = tr("Input %1").arg(i);
         ports.push_back(value);
     }
-    setIoPortDescriptions(ports);
+    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 }
 
 /*

@@ -82,7 +82,7 @@ void LegacyIoPortSettingsWidget::submitToResource(const QnVirtualCameraResourceP
     /* Second, change ports: */
     auto portList = m_model->modelData();
     if (!portList.empty()) //< can happen if it's just discovered unauthorized I/O module
-        camera->setIoPortDescriptions(portList);
+        camera->setIoPortDescriptions(portList, /*needMerge*/ false);
 }
 
 } // namespace nx::client::desktop

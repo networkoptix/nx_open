@@ -105,23 +105,12 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
         m_ioManager->moveToThread(IoExecutor::instance()->getThread());
     }
 
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
     QnIOPortDataList allPorts = m_ioManager->getInputPortList();
     QnIOPortDataList outputPorts = m_ioManager->getOutputPortList();
-
-    if (!allPorts.empty())
-        caps |= Qn::RelayInputCapability;
-
-    if (!outputPorts.empty())
-        caps |= Qn::RelayOutputCapability;
-
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
-    setIoPortDescriptions(allPorts);
-    setCameraCapabilities(caps);
-
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
     saveParams();
-
     return CameraDiagnostics::NoErrorResult();
 }
 

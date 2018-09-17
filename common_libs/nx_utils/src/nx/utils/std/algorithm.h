@@ -180,6 +180,20 @@ void remove_if(Container& container, UnaryPredicate p)
         container.end());
 }
 
+template<typename Container, typename UnaryPredicate>
+const typename Container::value_type* find_if(const Container& container, UnaryPredicate p)
+{
+    const auto it = std::find_if(container.begin(), container.end(), p);
+    return it == container.end() ? (typename Container::value_type*) nullptr : &(*it);
+}
+
+template<typename Container, typename UnaryPredicate>
+typename Container::value_type* find_if(Container& container, UnaryPredicate p)
+{
+    const auto it = std::find_if(container.begin(), container.end(), p);
+    return it == container.end() ? nullptr : *it;
+}
+
 template<typename StringType>
 // requires String<StringType>
 void to_lower(StringType* str)

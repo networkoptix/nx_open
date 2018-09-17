@@ -571,9 +571,33 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-void QnSecurityCamResource::setIoPortDescriptions(const QnIOPortDataList& ports)
+bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, bool needMerge)
 {
-    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
+    const auto savedPorts = ioPortDescriptions();
+    bool wasDataMerged = false;
+    bool hasInputs = false;
+    bool hasOutputs = false;
+    for (auto& newPort: newPorts)
+    {
+        if (needMerge)
+        {
+            if (const auto savedPort = nx::utils::find_if(savedPorts,
+                [&](const auto& savedPort) { return savedPort.id == newPort.id; }))
+            {
+                newPort = *savedPort;
+                wasDataMerged = true;
+            }
+        }
+
+        const auto supportedTypes = newPort.supportedPortTypes | newPort.portType;
+        hasInputs |= supportedTypes & Qn::PT_Input;
+        hasOutputs |= supportedTypes & Qn::PT_Output;
+    }
+
+    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(newPorts)));
+    setCameraCapability(Qn::InputPortCapability, hasInputs);
+    setCameraCapability(Qn::OutputPortCapability, hasOutputs);
+    return wasDataMerged;
 }
 
 QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
