@@ -1504,6 +1504,7 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
     calculateAutoFocusSupport(&ptzTraits);
     return ptzTraits;
 }
+
 QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
 {
     QnPtzAuxilaryTraitList ptzTraits;
