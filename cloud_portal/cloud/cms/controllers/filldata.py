@@ -42,29 +42,34 @@ def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
-            if dict_key == key:
-                adict[dict_key] = value  # replace in value
+            itm_type = type(adict[dict_key])
+            if itm_type not in [str, unicode, dict, list]:
+                continue
 
-            elif type(adict[dict_key]) is dict:  #
+            if itm_type is list:
+                for item in adict[dict_key]:
+                    if type(item) in [str, unicode]:
+                        idx = adict[dict_key].index(item)
+                        adict[dict_key][idx] = item.replace(key, value)
+                    elif item in [dict, list]:
+                        replace_in(item, key, value)
+
+            elif itm_type is dict:
                 replace_in(adict[dict_key], key, value)
 
-    # check if the file is language JSON
-    json_content = {}
-    if ".json" in context.file_path:  # check if it ends with
-        try:
-            json_content = json.loads(content)
-        except:  # check for specific err
-            pass
+            elif key in adict[dict_key]:
+                adict[dict_key] = adict[dict_key].replace(key, value)
 
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
             content_value = datastructure.find_actual_value(customization, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-                if not json_content:
-                    content = content.replace(datastructure.name, content_value)
+                if type(content) == dict:
+                    # Process language JSON file
+                    replace_in(content, datastructure.name, content_value)
                 else:
-                    replace_in(json_content, datastructure.name, content_value)
+                    content = content.replace(datastructure.name, content_value)
 
             elif content_value or datastructure.optional:
                 if context.is_global and not force_global_files:
@@ -92,9 +97,6 @@ def process_context_structure(customization, context, content,
                 datastructure.name, customization.name))
             logger.error(traceback.format_exc())
 
-    if json_content:
-        content = json.dumps(json_content)
-
     return content
 
 
@@ -108,14 +110,27 @@ def process_context(context, language_code, customization, preview, version_id, 
     language = Language.by_code(language_code, customization.default_language)
     skin = customization.read_global_value('%SKIN%')
     context_template_text = context.template_for_language(language, customization.default_language, skin)
+
+    # check if the file is language JSON
+    if context.file_path.endswith(".json") and isinstance(context_template_text, unicode):
+        try:
+            context_template_text = json.loads(context_template_text)
+        except ValueError:
+            print("Failed to decode file -> " + context.file_path)
+
     if not context_template_text:
         context_template_text = ''
+
     content = process_context_structure(customization, context, context_template_text, language,
                                         version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
             content = process_context_structure(
                 customization, global_context, content, None, version_id, preview, False)
+
+    # If json -> dump it to string
+    if type(content) == dict:
+        content = json.dumps(content)
 
     return content
 
