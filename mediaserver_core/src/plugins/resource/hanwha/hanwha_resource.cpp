@@ -1529,6 +1529,7 @@ QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
 
     return ptzTraits;
 }
+
 void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
 {
     const auto parameter = cgiParameters().parameter(lit("image/focus/control/Mode"));
