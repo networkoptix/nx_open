@@ -26,12 +26,11 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
     m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
 
     connect(
-        &m_stat[0], &QnMediaStreamStatistics::connectionLost,
-        this, [this] { emit streamError(this, ErrorCode::streamIssue); }, Qt::DirectConnection);
-
-    connect(
-        &m_stat[0], &QnMediaStreamStatistics::connectionBackToNormal,
-        this, [this] { emit streamError(this, ErrorCode::noError); }, Qt::DirectConnection);
+        &m_stat[0], &QnMediaStreamStatistics::streamEvent,
+        this, [this](CameraDiagnostics::Result result)
+        {
+            emit streamEvent(this, result);
+        }, Qt::DirectConnection);
 }
 
 QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()

@@ -1371,8 +1371,6 @@ APPLY(10201, getSystemMergeHistory, nx::vms::api::SystemMergeHistoryRecordList, 
         {
             NotDefined = 0,
             TRANSACTION_DESCRIPTOR_LIST(TRANSACTION_ENUM_APPLY)
-            testLdapSettings = 11001,
-            maxTransactionValue         = 65535
         };
 #undef TRANSACTION_ENUM_APPLY
 
@@ -1621,6 +1619,6 @@ QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
     int generateRequestID();
 } /* namespace ec2*/
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value)(ec2::TransactionType::Value), (metatype)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value)(ec2::TransactionType::Value), (lexical))
 
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

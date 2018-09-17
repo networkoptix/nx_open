@@ -327,9 +327,8 @@ static const QString kFramePriorityProperty = lit("PriorityType");
 static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
-//Taken from Hanwha metadata plugin manifest.json
-static const QnUuid kHanwhaInputPortEventId =
-    QnUuid(lit("{1BAB8A57-5F19-4E3A-B73B-3641058D46B8}"));
+// Taken from Hanwha metadata plugin manifest.json.
+static const QString kHanwhaInputPortEventId = "nx.hanwha.inputPort";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -756,7 +755,7 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
         return false;
 
     const auto parameters = analyticsEvent->getRuntimeParams();
-    if (parameters.analyticsEventId() != kHanwhaInputPortEventId)
+    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventId)
         return false;
 
     emit cameraInput(
@@ -1986,7 +1985,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
         return CameraDiagnostics::NoErrorResult();
 
     if (totalProfileNumber)
-        *totalProfileNumber = profiles.size();
+        *totalProfileNumber = (int) profiles.size();
 
     static const auto kAppName = QnAppInfo::productNameLong();
     if (outPrimaryProfile)
@@ -2848,6 +2847,9 @@ bool HanwhaResource::addSpecificRanges(
     if (parameterName == kHanwhaFrameRateProperty)
         return addFrameRateRanges(inOutParameter, *info);
 
+    if (parameterName == kHanwhaResolutionProperty)
+        return addResolutionRanges(inOutParameter, *info);
+
     return true;
 }
 
@@ -2897,6 +2899,48 @@ bool HanwhaResource::addFrameRateRanges(
         };
 
     return addDependencies(inOutParameter, info, createDependencyFunc);
+}
+
+bool HanwhaResource::addResolutionRanges(
+    QnCameraAdvancedParameter* inOutParameter,
+    const HanwhaAdavancedParameterInfo & info) const
+{
+    const auto codecs = m_codecInfo.codecs(getChannel());
+    const auto streamPrefix =
+        info.profileDependency() == Qn::ConnectionRole::CR_LiveVideo
+            ? "PRIMARY%"
+            : "SECONDARY%";
+
+    for (const auto& codec: codecs)
+    {
+        const auto codecString = toHanwhaString(codec);
+        QnCameraAdvancedParameterCondition codecCondition;
+        codecCondition.type = QnCameraAdvancedParameterCondition::ConditionType::equal;
+        codecCondition.paramId = lit("%1media/videoprofile/EncodingType")
+            .arg(streamPrefix);
+        codecCondition.value = codecString;
+
+        const auto resolutions = m_codecInfo.resolutions(getChannel(), codec, "General");
+        QString resolutionRangeString;
+        for (const auto& resolution: resolutions)
+        {
+            resolutionRangeString +=
+                QString("%1x%2").arg(resolution.width()).arg(resolution.height()) + ",";
+        }
+
+        if (!resolutionRangeString.isEmpty())
+            resolutionRangeString = resolutionRangeString.left(resolutionRangeString.size() - 1);
+
+        QnCameraAdvancedParameterDependency dependency;
+        dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
+        dependency.range = resolutionRangeString;
+        dependency.conditions.push_back(codecCondition);
+        dependency.autoFillId();
+
+        inOutParameter->dependencies.push_back(dependency);
+    }
+
+    return true;
 }
 
 bool HanwhaResource::addDependencies(

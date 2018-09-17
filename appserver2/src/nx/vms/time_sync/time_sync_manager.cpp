@@ -23,6 +23,7 @@ namespace vms {
 namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
+const std::chrono::milliseconds TimeSyncManager::kMaxJitterForLocalClock(250);
 
 TimeSyncManager::TimeSyncManager(
     QnCommonModule* commonModule)
@@ -92,7 +93,6 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
 void TimeSyncManager::loadTimeFromLocalClock()
 {
     auto newValue = m_systemClock->millisSinceEpoch();
-    static const std::chrono::milliseconds kMaxJitterForLocalClock(250);
 
     if (setSyncTime(newValue, kMaxJitterForLocalClock))
     {

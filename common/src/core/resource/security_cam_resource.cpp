@@ -6,11 +6,12 @@
 
 #include <nx/fusion/serialization/lexical.h>
 
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "user_resource.h"
-#include "common/common_module.h"
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -307,6 +308,20 @@ void QnSecurityCamResource::stopInputPortMonitoringAsync()
 
 bool QnSecurityCamResource::isInputPortMonitored() const {
     return false;
+}
+
+bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+{
+    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return false;
+
+    if (!m_hasVideo)
+    {
+        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+    }
+    return *m_hasVideo;
 }
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
@@ -894,7 +909,7 @@ void QnSecurityCamResource::setFirmware(const QString &firmware)
 
 bool QnSecurityCamResource::trustCameraTime() const
 {
-    return getProperty(Qn::TRUST_CAMERA_TIME_NAME).toInt() > 0;
+    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
 }
 
 void QnSecurityCamResource::setTrustCameraTime(bool value)

@@ -8,7 +8,7 @@ OutgoingTransactionDispatcher::OutgoingTransactionDispatcher()
 }
 
 void OutgoingTransactionDispatcher::dispatchTransaction(
-    const nx::String& systemId,
+    const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     m_onNewTransactionSubscription.notify(

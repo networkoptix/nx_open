@@ -65,7 +65,7 @@ public:
 
     /** Implementation of QnAbstractMediaStreamProvider::isStreamOpened. */
     virtual bool isStreamOpened() const override;
-    virtual CameraDiagnostics::Result openStreamResult() const override;
+    virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
     int getLastResponseCode() const;
@@ -141,12 +141,6 @@ private:
 
     void calcStreamUrl();
 
-    boost::optional<std::chrono::microseconds> parseOnvifNtpExtensionTime(
-        quint8* bufferStart,
-        int length) const;
-
-    bool isOnvifNtpExtensionId(uint16_t id) const;
-
     QnRtspStatistic rtspStatistics(
         int rtpBufferOffset,
         int rtpPacketSize,
@@ -185,7 +179,6 @@ private:
     int m_maxRtpRetryCount{0};
     int m_rtpFrameTimeoutMs{0};
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
-    boost::optional<std::chrono::microseconds> m_lastOnvifNtpExtensionTime{0};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
     nx::streaming::rtp::TimePolicy m_defaultTimePolicy {nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime};

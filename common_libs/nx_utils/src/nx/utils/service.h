@@ -46,6 +46,8 @@ public:
 
     int exec();
 
+    std::string applicationDisplayName() const;
+
 protected:
     virtual std::unique_ptr<AbstractServiceSettings> createSettings() = 0;
     /**

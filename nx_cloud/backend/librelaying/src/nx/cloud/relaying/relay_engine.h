@@ -4,6 +4,7 @@
 
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 
+#include "http_view/listening_peer_connection_tunneling.h"
 #include "listening_peer_manager.h"
 #include "listening_peer_pool.h"
 #include "settings.h"
@@ -24,6 +25,7 @@ public:
 private:
     ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<AbstractListeningPeerManager> m_listeningPeerManager;
+    ListeningPeerConnectionTunnelingServer m_tunnelingServer;
 
     void registerApiHandlers(
         nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher);

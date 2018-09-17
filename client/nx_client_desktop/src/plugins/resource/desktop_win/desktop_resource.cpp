@@ -27,6 +27,11 @@ QnWinDesktopResource::~QnWinDesktopResource()
     delete m_desktopDataProvider;
 }
 
+bool QnWinDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+{
+    return true;
+}
+
 QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal()
 {
     QnMutexLocker lock( &m_dpMutex );

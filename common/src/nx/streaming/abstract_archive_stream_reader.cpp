@@ -127,7 +127,7 @@ void QnAbstractArchiveStreamReader::run()
                 m_noDataHandler();
 
             setNeedKeyData();
-            m_stat[0].onEvent(CL_STREAM_ISSUE);
+            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
 
             QnSleep::msleep(30);
             continue;

@@ -48,7 +48,7 @@ class NX_UTILS_API Settings
 {
 public:
     Settings() = default;
-    bool attach(const std::shared_ptr<QSettings>& settings);
+    void attach(const std::shared_ptr<QSettings>& settings);
 
     QJsonObject buildDocumentation() const;
 
@@ -176,6 +176,18 @@ private:
     std::map<QString, BaseOption*> m_options;
     std::shared_ptr<QSettings> m_qtSettings;
 };
+
+
+// Override string loader to workaround StringList parsing when input string contains comma
+template<>
+inline bool Settings::Option<QString>::fromQVariant(const QVariant& value, QString* result)
+{
+    if (!value.isValid())
+        return false;
+
+    *result = value.toString();
+    return true;
+}
 
 template<>
 inline bool Settings::Option<std::chrono::milliseconds>::fromQVariant(

@@ -16,6 +16,11 @@ bool QnDesktopAudioOnlyResource::isRendererSlow() const
     return false;
 }
 
+bool QnDesktopAudioOnlyResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+{
+    return false;
+}
+
 QnConstResourceAudioLayoutPtr QnDesktopAudioOnlyResource::getAudioLayout(const QnAbstractStreamDataProvider *dataProvider) const
 {
     Q_UNUSED(dataProvider);

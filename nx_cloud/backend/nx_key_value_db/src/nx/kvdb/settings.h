@@ -7,7 +7,7 @@ namespace nx::kvdb {
 class NX_KEY_VALUE_DB_API Settings
 {
 public:
-    nx::data_sync_engine::Settings dataSyncEngineSettings;
+    nx::data_sync_engine::SynchronizationSettings dataSyncEngineSettings;
 
     void load(const QnSettings& settings);
 };

@@ -121,9 +121,9 @@ public:
         {
             connect(
                 mediaProvider,
-                &QnAbstractMediaStreamDataProvider::streamError,
+                &QnAbstractMediaStreamDataProvider::streamEvent,
                 serverModule()->cameraErrorProcessor(),
-                &nx::mediaserver::camera::ErrorProcessor::onStreamReaderError,
+                &nx::mediaserver::camera::ErrorProcessor::onStreamReaderEvent,
                 Qt::DirectConnection);
         }
         return result;

@@ -33,7 +33,7 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const nx::api::AnalyticsDeviceManifest& deviceManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const std::vector<QnUuid>& eventTypes)
+    const std::vector<QString>& eventTypes)
     :
     m_manifest(manifest),
     m_deviceManifest(deviceManifest),
@@ -90,13 +90,14 @@ void HikvisionMetadataMonitor::clearHandlers()
 
 nx::utils::Url HikvisionMetadataMonitor::buildMonitoringUrl(
     const nx::utils::Url& resourceUrl,
-    const std::vector<QnUuid>& eventTypes) const
+    const std::vector<QString>& eventTypes) const
 {
-    int channel = std::max(1, QUrlQuery(resourceUrl.query()).queryItemValue("channel").toInt());
+    const int channel =
+        std::max(1, QUrlQuery(resourceUrl.query()).queryItemValue("channel").toInt());
     QString eventListIds;
-    for (const auto& eventTypeId : eventTypes)
+    for (const auto& eventTypeId: eventTypes)
     {
-        auto name = m_manifest.eventDescriptorById(eventTypeId).internalName;
+        const auto name = m_manifest.eventTypeDescriptorById(eventTypeId).internalName;
         eventListIds += lit("/%1-%2").arg(name).arg(channel).toLower();
     }
 
@@ -119,8 +120,8 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
     std::array<const char*, 3> lprEventTypes = { "BlackList", "WhiteList", "otherlist" };
     for (const auto& eventName: lprEventTypes)
     {
-        auto lprEventDescriptor = m_manifest.eventDescriptorByInternalName(eventName);
-        if (m_deviceManifest.supportedEventTypes.contains(lprEventDescriptor.typeId))
+        auto lprEventTypeDescriptor = m_manifest.eventTypeDescriptorByInternalName(eventName);
+        if (m_deviceManifest.supportedEventTypes.contains(lprEventTypeDescriptor.id))
         {
             initLprMonitor();
             break;
@@ -252,7 +253,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
     auto getEventKey =
         [](const HikvisionEvent& event)
         {
-            QString result = event.typeId.toString();
+            QString result = event.typeId;
             if (event.region)
                 result += QString::number(*event.region) + lit("_");
             if (event.channel)
@@ -260,11 +261,11 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
             return result;
         };
 
-    auto eventDescriptor = m_manifest.eventDescriptorById(hikvisionEvent.typeId);
+    auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
     using namespace nx::sdk::metadata;
-    if (eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    if (eventTypeDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
     {
-        QString key = getEventKey(hikvisionEvent);
+        const QString key = getEventKey(hikvisionEvent);
         if (hikvisionEvent.isActive)
             m_startedEvents[key] = StartedEvent(hikvisionEvent);
         else
@@ -279,7 +280,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
         NX_VERBOSE(this, lm("Got event %1, isActive=%2").args(e.caption, e.isActive));
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto handler: m_handlers)
+    for (const auto& handler: m_handlers)
         handler(result);
 
     return true;

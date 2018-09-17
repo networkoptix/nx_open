@@ -161,7 +161,8 @@ void QnRestConnectionProcessor::run()
     else
     {
         response.statusCode = (nx::network::http::StatusCode::Value)
-            redirectTo(QnTcpListener::defaultPage(), response.content.type);
+            notFound(response.content.type);
+        response.content.body = d->response.messageBody;
     }
 
     QByteArray contentEncoding;
@@ -185,7 +186,7 @@ void QnRestConnectionProcessor::run()
         /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
         response.isUndefinedContentLength);
 
-    if (handler)
+    if (handler && nx::network::http::StatusCode::isSuccessCode(response.statusCode))
         handler->afterExecute(request, response.content.body);
 }
 

@@ -15,8 +15,6 @@
 
 #include <ui/workbench/workbench.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
@@ -191,8 +189,8 @@ bool Manager::triggerIfPossible(IDType id, const Parameters& parameters)
     if (action->checkCondition(action->scope(), parameters) != EnabledAction)
         return false;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
-    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
+    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
     action->trigger();
     return true;
 }
@@ -204,8 +202,8 @@ void Manager::triggerForced(IDType id, const Parameters& parameters)
     if (!action)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[nullptr], parameters);
-    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    QScopedValueRollback<Parameters> currentParameters(m_parametersByMenu[nullptr], parameters);
+    QScopedValueRollback<Action*> shortcut(m_shortcutAction, action);
     action->trigger();
 }
 

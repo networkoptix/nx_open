@@ -31,18 +31,15 @@ public:
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kServerIncomingConnectionsPath).toQString()),
             std::bind(&RelayApiClientOverHttpUpgradeTypeSet::beginListeningHandler, this,
-                _1, _2, _3, _4, _5));
+                _1, _2));
     }
 
 private:
     void beginListeningHandler(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        serializeToHeaders(&response->headers, beginListeningResponse());
+        serializeToHeaders(&requestContext.response->headers, beginListeningResponse());
 
         network::http::RequestResult requestResult(
             nx::network::http::StatusCode::switchingProtocols);

@@ -63,6 +63,7 @@ struct EventParameters
     /** Used for ReasonedEvent business events as reason code. */
     EventReason reasonCode;
 
+    // TODO: Refactor: inputPortId should not be used for analytics event id.
     /** Used for Input events only. Identifies the input port. */
     QString inputPortId;
 
@@ -80,6 +81,7 @@ struct EventParameters
     QString description;
 
     /**
+     * TODO: Fix the comment - metadata is more than a camera list.
      * Camera list which is associated with the event. EventResourceId may be a POS terminal, but
      * this is a camera list which should be shown with this event.
      */
@@ -91,11 +93,13 @@ struct EventParameters
      */
     bool omitDbLogging = false;
 
-    // TODO: #GDM #vkutin #rvasilenko think about implementing something like std::variant here.
-    QnUuid analyticsEventId() const;
-    void setAnalyticsEventId(const QnUuid& id);
-    QnUuid analyticsDriverId() const;
-    void setAnalyticsDriverId(const QnUuid& id);
+    QString analyticsPluginId;
+
+    // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
+    QString getAnalyticsEventTypeId() const;
+    void setAnalyticsEventTypeId(const QString& id);
+    QString getAnalyticsPluginId() const;
+    void setAnalyticsPluginId(const QString& id);
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
@@ -103,7 +107,7 @@ struct EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);

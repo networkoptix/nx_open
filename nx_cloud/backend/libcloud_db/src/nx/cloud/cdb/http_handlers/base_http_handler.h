@@ -14,7 +14,7 @@
 #include "../access_control/authorization_manager.h"
 #include "../access_control/auth_types.h"
 #include "../access_control/security_manager.h"
-#include "../access_control/transport_security_manager.h"
+#include "../access_control/access_blocker.h"
 #include "../managers/managers_types.h"
 #include "../stree/cdb_ns.h"
 #include "../stree/http_request_attr_reader.h"
@@ -43,53 +43,7 @@ public:
     {
     }
 
-    virtual ~BasicHttpRequestHandler()
-    {
-        if (m_responseTimer)
-            m_responseTimer->pleaseStopSync();
-    }
-
 protected:
-    virtual void processRawHttpRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer authInfo,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
-        nx::network::http::RequestProcessedHandler completionHandler) override
-    {
-        m_connectionAioThread = connection->getAioThread();
-
-        m_securityActions = m_securityManager.transportSecurityManager().analyze(
-            *connection, request);
-
-        base_type::processRawHttpRequest(
-            connection,
-            std::move(authInfo),
-            std::move(request),
-            response,
-            std::move(completionHandler));
-    }
-
-    virtual void sendRawHttpResponse(
-        nx::network::http::RequestResult requestResult) override
-    {
-        if (m_securityActions.responseDelay)
-        {
-            m_responseTimer = std::make_unique<nx::network::aio::Timer>();
-            m_responseTimer->bindToAioThread(m_connectionAioThread);
-            m_responseTimer->start(
-                *m_securityActions.responseDelay,
-                [this, requestResult = std::move(requestResult)]() mutable
-                {
-                    m_responseTimer.reset();
-                    base_type::sendRawHttpResponse(std::move(requestResult));
-                });
-            return;
-        }
-
-        base_type::sendRawHttpResponse(std::move(requestResult));
-    }
-
     bool authorize(
         nx::network::http::HttpServerConnection* const connection,
         const nx::network::http::Request& request,
@@ -139,9 +93,6 @@ private:
     const EntityType m_entityType;
     const DataActionType m_actionType;
     const SecurityManager& m_securityManager;
-    nx::network::aio::AbstractAioThread* m_connectionAioThread = nullptr;
-    std::unique_ptr<nx::network::aio::Timer> m_responseTimer;
-    SecurityActions m_securityActions;
 };
 
 } // namespace detail

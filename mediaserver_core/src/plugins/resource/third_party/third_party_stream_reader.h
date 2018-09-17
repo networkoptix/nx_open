@@ -42,7 +42,7 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 
     void setNeedCorrectTime(bool value);
-    virtual CameraDiagnostics::Result openStreamResult() const override;
+    virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;

@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include <plugins/plugin_api.h>
-
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
@@ -14,17 +12,17 @@ struct ObjectClassDescription
     ObjectClassDescription(
         const std::string& name,
         const std::string& description,
-        const nxpl::NX_GUID& guid)
+        const std::string& typeId)
         :
         name(name),
         description(description),
-        guid(guid)
+        typeId(typeId)
     {
     }
 
     std::string name;
     std::string description;
-    nxpl::NX_GUID guid;
+    std::string typeId;
 };
 
 } // namespace deepstream

@@ -1,6 +1,5 @@
 #include "workbench_synchronizer.h"
 #include <cassert>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 
 #include <core/resource/user_resource.h>
@@ -46,7 +45,7 @@ void QnWorkbenchSynchronizer::submit()
     if (!m_submit)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+    QScopedValueRollback<bool> guard(m_update, false);
 
     /* Layout may have been closed, but it doesn't mean that we should remove it.
      *

@@ -26,7 +26,7 @@ public:
     using TransactionSequence = decltype(CommandHeader::PersistentInfo::sequence);
 
     OutgoingTransactionSorter(
-        const nx::String& systemId,
+        const std::string& systemId,
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
@@ -60,7 +60,7 @@ private:
         TransactionSequence maxSequence = 0;
     };
 
-    const nx::String m_systemId;
+    const std::string m_systemId;
     VmsTransactionLogCache* m_vmsTransactionLogCache;
     AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     std::map<VmsTransactionLogCache::TranId, TranContext> m_transactions;

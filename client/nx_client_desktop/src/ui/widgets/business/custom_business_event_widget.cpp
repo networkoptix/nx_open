@@ -9,7 +9,6 @@
 #include <core/resource/media_server_resource.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <utils/common/scoped_value_rollback.h>
 
 namespace {
 
@@ -62,7 +61,7 @@ void QnCustomBusinessEventWidget::at_model_dataChanged(Fields fields)
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventResources))
     {

@@ -32,7 +32,7 @@ public:
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
-    virtual CameraDiagnostics::Result openStreamResult() const override;
+    virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 private:
     void at_audioEnabledChanged(const QnResourcePtr& res);
 

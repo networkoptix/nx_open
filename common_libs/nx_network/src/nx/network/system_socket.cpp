@@ -1806,7 +1806,15 @@ void UDPSocket::sendToAsync(
             SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
         {
             if (code != SystemError::noError)
-                return handler(code, SocketAddress(), 0);
+            {
+                // Making sure that handler is never invoked within sendToAsync thread.
+                post(
+                    [handler = std::move(handler), code]()
+                    {
+                        handler(code, SocketAddress(), 0);
+                    });
+                return;
+            }
 
             auto addressIter = std::find_if(
                 ips.begin(), ips.end(),

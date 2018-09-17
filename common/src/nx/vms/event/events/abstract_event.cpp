@@ -133,10 +133,10 @@ bool hasToggleState(
         return true;
     case EventType::analyticsSdkEvent:
     {
-        if (runtimeParams.analyticsEventId().isNull())
+        if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
         AnalyticsHelper helper(commonModule);
-        auto descriptor = helper.eventDescriptor(runtimeParams.analyticsEventId());
+        auto descriptor = helper.eventTypeDescriptor(runtimeParams.getAnalyticsEventTypeId());
         return descriptor.flags.testFlag(nx::api::Analytics::stateDependent);
     }
     default:

@@ -9,7 +9,7 @@ from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.exceptions import AlreadyExists, CannotDownload, exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
@@ -19,7 +19,7 @@ from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
 
 
-class WindowsTime(object):
+class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
@@ -67,7 +67,7 @@ class WindowsAccess(OSAccess):
 
     def __init__(self, host_alias, port_map, macs, username, password):
         self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
-        Path = SMBPath.specific_cls(
+        path_cls = SMBPath.specific_cls(
             port_map.remote.address, port_map.remote.tcp(445),
             username, password)
 
@@ -75,9 +75,9 @@ class WindowsAccess(OSAccess):
             host_alias, port_map,
             WindowsNetworking(self.winrm, macs),
             WindowsTime(self.winrm),
-            WindowsTrafficCapture(Path.tmp() / 'NetworkTrafficCapture', self.winrm),
+            WindowsTrafficCapture(path_cls.tmp() / 'NetworkTrafficCapture', self.winrm),
             None,
-            Path,
+            path_cls,
             )
         self._username = username
 
@@ -148,6 +148,17 @@ class WindowsAccess(OSAccess):
 
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
+
+    def free_disk_space_bytes(self):
+        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
+        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
+        return int(disk_c['FreeSpace'])
+
+    def consume_disk_space(self, should_leave_bytes):
+        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        holder_path = self._disk_space_holder()
+        args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
+        self.winrm.command(args).check_call()
 
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)

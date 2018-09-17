@@ -3,14 +3,7 @@
 #include <QtCore/QDateTime>
 
 #include <nx/utils/thread/mutex.h>
-
-// TODO: #Elric #enum
-enum QnMediaStreamStatisticsEvent
-{
-    CL_STAT_DATA,
-    CL_STREAM_ISSUE,
-    CL_STAT_END //< Must not be used in onEvent.
-};
+#include <utils/camera/camera_diagnostics.h>
 
 class QnMediaStreamStatistics: public QObject
 {
@@ -20,13 +13,6 @@ class QnMediaStreamStatistics: public QObject
     static const int CL_STATISTICS_UPDATE_PERIOD_MS = 700;
     static const int CL_STATS_NUM = (CL_STATISTICS_WINDOW_MS / CL_STATISTICS_UPDATE_PERIOD_MS + 1);
 
-    struct EventStat
-    {
-        EventStat() = default;
-
-        unsigned long amount = 0;
-    };
-
     struct StatHelper
     {
         StatHelper() = default;
@@ -35,8 +21,7 @@ class QnMediaStreamStatistics: public QObject
         unsigned long frames = 0;
     };
 signals:
-    void connectionLost();
-    void connectionBackToNormal();
+    void streamEvent(CameraDiagnostics::Result event);
 public:
     QnMediaStreamStatistics();
 
@@ -53,17 +38,10 @@ public:
     float getavFrameRate() const;// returns average framerate
     unsigned long totalSecs() const; // how long statistics is assembled in seconds
 
-    void onBadSensor();
-    bool badSensor() const;
-
     bool isConnectionLost() const;
 
-    void onEvent(QnMediaStreamStatisticsEvent event);
-    unsigned long totalEvents(QnMediaStreamStatisticsEvent event) const;
-    float eventsPerHour(QnMediaStreamStatisticsEvent event) const;
-
-private:
-    void setConnectionLost(bool value);
+    void onEvent(CameraDiagnostics::Result event);
+    void updateStatisticsUnsafe(CameraDiagnostics::Result event);
 private:
     mutable QnMutex m_mutex;
 
@@ -72,10 +50,7 @@ private:
     unsigned long m_keyFrames;
     unsigned long long m_dataTotal;
 
-    bool m_badsensor;
-    std::atomic<bool> m_connectionLost{false};
-
-    EventStat m_events[CL_STAT_END];
+    std::atomic_int m_numberOfErrors = 0;
 
     StatHelper m_stat[CL_STATS_NUM];
     int m_current_stat;

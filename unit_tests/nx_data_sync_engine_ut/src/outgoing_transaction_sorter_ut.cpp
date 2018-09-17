@@ -19,7 +19,7 @@ class TestOutgoingTransactionSorter:
 {
 public:
     TestOutgoingTransactionSorter(
-        const nx::String& systemId,
+        const std::string& systemId,
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
     :
@@ -122,7 +122,7 @@ class OutgoingTransactionSorter:
 public:
     OutgoingTransactionSorter():
         m_transactionSorter(
-            QnUuid::createUuid().toSimpleByteArray(),
+            QnUuid::createUuid().toSimpleByteArray().toStdString(),
             &m_transactionCache,
             &m_testOutgoingTransactionDispatcher),
         m_prevSequence(0),
