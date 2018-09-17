@@ -168,7 +168,10 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         return True
 
     @_retrying_on_status(_STATUS_SHARING_VIOLATION)  # Let OS and processes time unlock files.
-    @_reraising_on_operation_failure({_STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile})
+    @_reraising_on_operation_failure({
+        _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        })
     def unlink(self):
         if '*' in str(self):
             raise ValueError("{!r} contains '*', but files can be deleted only by one")
