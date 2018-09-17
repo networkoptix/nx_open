@@ -13,16 +13,12 @@
 #include <utils/fs/file.h>
 
 namespace {
-
-    /* Maximum nov-file entries. */
-    const quint32 kMaxEntries = 1024;
-
     /* Max future nov-file version that should be opened by the current client version. */
-    const quint32 kMaxVersion = 1024;
+    const qint32 kMaxVersion = 1024;
 
     /* Protocol for items on the exported layouts. */
     static const QString kLayoutProtocol(lit("layout://"));
-}
+} // namespace
 
 using namespace nx::core::layout;
 
@@ -110,7 +106,6 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonM
 {
     QnMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
-    //m_novFileLen = 0;
     m_allStorages.insert(this);
 
     m_capabilities |= cap::ListFile;
@@ -252,32 +247,34 @@ QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonM
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
+    const auto info = identifyFile(getUrl());
+    if (!info.isValid)
+    {
+        qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
+        return false;
+    }
+
     QFile file(getUrl());
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
     file.seek(m_novFileOffset);
-    file.read((char*) &m_index, sizeof(m_index));
+    file.read((char*)&m_index, sizeof(m_index));
 
-    if (m_index.magic == kIndexCryptedMagic)
+    if (info.isCrypted)
     {
         m_crypted = true;
         file.read((char*) &m_cryptoInfo, sizeof(m_cryptoInfo));
     }
-    else if (m_index.magic != kIndexMagic)
+    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles = 1024, but StreamIndex has only 256 entries.
     {
-        qWarning() << "Invalid nov index detected! Disk write error or antivirus activity. Ignoring.";
-        m_index = StreamIndex();
-        return false;
-    }
-
-    if (m_index.entryCount > kMaxEntries) {
         qWarning() << "Corrupted nov file. Ignoring.";
         m_index = StreamIndex();
         return false;
     }
 
-    if (m_index.version > kMaxVersion) {
+    if (info.version > kMaxVersion)
+    {
         qWarning() << "Unsupported file from the future version. Ignoring.";
         m_index = StreamIndex();
         return false;
@@ -307,7 +304,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::addStream(const
     else
         fileSize = sizeof(m_index);
 
-    if (m_index.entryCount >= (quint32) kMaxEntries)
+    if (m_index.entryCount >= (quint32) kMaxStreams)
         return Stream();
 
 #ifdef _DEBUG
