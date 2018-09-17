@@ -1498,11 +1498,20 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
 QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
 {
     QnPtzAuxilaryTraitList ptzTraits;
+    if (deviceType() == HanwhaDeviceType::nwc) //< Camera device type.
+        ptzTraits = calculateCameraOnlyTraits();
+
+    calculateAutoFocusSupport(&ptzTraits);
+    return ptzTraits;
+}
+QnPtzAuxilaryTraitList HanwhaResource::calculateCameraOnlyTraits() const
+{
+    QnPtzAuxilaryTraitList ptzTraits;
     for (const auto& item: kHanwhaPtzTraitDescriptors)
     {
         const auto trait = QnPtzAuxilaryTrait(item.first);
         const auto& descriptor = item.second;
-        const auto& parameter = cgiParameters().parameter(descriptor.parameterName);
+        const auto& parameter = m_cgiParameters.parameter(descriptor.parameterName);
 
         if (parameter == boost::none)
             continue;
@@ -1517,7 +1526,6 @@ QnPtzAuxilaryTraitList HanwhaResource::calculatePtzTraits() const
         }
     }
 
-    calculateAutoFocusSupport(&ptzTraits);
     return ptzTraits;
 }
 void HanwhaResource::calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const
