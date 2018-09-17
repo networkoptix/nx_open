@@ -180,7 +180,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int secondaryRecorderDisabled = -1;
     bool samePrimaryRec = true;
     bool sameBitratePerGOP = true;
-    bool enableBitratePerGop = true;
     bool sameSecRec = true;
 
     bool sameRtpTransport = true;
@@ -245,10 +244,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         else if (primaryRecorderDisabled != primaryRecDisabled)
             samePrimaryRec = false;
 
-        Qn::BitratePerGopType bpgType = camera->bitratePerGopType();
-        if (bpgType == Qn::BPG_Predefined)
-            enableBitratePerGop = false;
-        int bitratePerGop = bpgType == Qn::BPG_None ? 0 : 1;
+        int bitratePerGop = camera->useBitratePerGop() ? 1 : 0;
         if (bitratePerGopPresent == -1)
             bitratePerGopPresent = bitratePerGop;
         else if (bitratePerGopPresent != bitratePerGop)
@@ -317,8 +313,6 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->bitratePerGopCheckBox->setChecked(bitratePerGopPresent);
     else
         ui->bitratePerGopCheckBox->setCheckState(Qt::PartiallyChecked);
-
-    ui->bitratePerGopCheckBox->setEnabled(enableBitratePerGop);
 
     ui->checkBoxSecondaryRecorder->setEnabled(m_hasDualStreaming);
     if (m_hasDualStreaming)

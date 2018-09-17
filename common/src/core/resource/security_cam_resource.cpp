@@ -1402,18 +1402,19 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedDeviceType.reset();
 }
 
-Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
+bool QnSecurityCamResource::useBitratePerGop() const
 {
+    auto result = getProperty(Qn::FORCE_BITRATE_PER_GOP);
+    if (!result.isEmpty())
+        return result.toInt() > 0;
+
     if (qnStaticCommon)
     {
         QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
         if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return Qn::BPG_Predefined;
-
-        if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
-            return Qn::BPG_User;
+            return true;
     }
-    return Qn::BPG_None;
+    return false;
 }
 
 bool QnSecurityCamResource::isIOModule() const
@@ -1569,7 +1570,7 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
 
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 
-    if (bitratePerGopType() != Qn::BPG_None)
+    if (useBitratePerGop())
         result = result * (30.0 / (qreal)fps);
 
     if (streamCapability.maxBitrateKbps > 0)

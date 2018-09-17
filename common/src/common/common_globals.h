@@ -301,13 +301,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         GotFromRemotePeer
     };
 
-    enum BitratePerGopType {
-        BPG_None,
-        BPG_Predefined,
-        BPG_User
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
-
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
         SF_None = 0x000,
@@ -928,7 +921,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::StreamQuality)(Qn::StatisticsDeviceType)
     (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
     (Qn::PanicMode)(Qn::RecordingType)
-    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::ConnectionRole)(Qn::ResourceStatus)
     (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)

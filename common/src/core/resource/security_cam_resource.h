@@ -302,7 +302,7 @@ public:
     //!Returns list of IO ports's states
     virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
 
-    virtual Qn::BitratePerGopType bitratePerGopType() const;
+    virtual bool useBitratePerGop() const;
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
