@@ -69,9 +69,9 @@ void QnIOMonitorConnectionProcessor::run()
 
         Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::initializedChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraInitDone);
-        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::cameraInput,
+        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::inputPortStateChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
-        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::cameraOutput,
+        Qn::directConnect(camera.data(), &nx::mediaserver::resource::Camera::outputPortStateChanged,
             this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
         if (camera->getParentId() != commonModule()->moduleGUID())
@@ -100,7 +100,7 @@ void QnIOMonitorConnectionProcessor::run()
             std::bind(&QnIOMonitorConnectionProcessor::onSomeBytesReadAsync,
                       this, d->socket.get(), _1, _2));
 
-        addData(camera->ioStates());
+        addData(camera->ioPortStates());
         QnMutexLocker lock(&d->waitMutex);
         while (!needToStop()
                && d->socket->isConnected()
@@ -125,7 +125,7 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr& reso
     const auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>();
     if (camera && camera->isInitialized())
     {
-        addData(camera->ioStates());
+        addData(camera->ioPortStates());
         d->waitCond.wakeAll();
     }
 }

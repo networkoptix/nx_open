@@ -571,12 +571,12 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-void QnSecurityCamResource::setIOPorts(const QnIOPortDataList& ports)
+void QnSecurityCamResource::setIoPortDescriptions(const QnIOPortDataList& ports)
 {
     setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
 }
 
-QnIOPortDataList QnSecurityCamResource::getIOPorts(Qn::IOPortType type) const
+QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
 {
     auto ports = QJson::deserialized<QnIOPortDataList>(
         getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());

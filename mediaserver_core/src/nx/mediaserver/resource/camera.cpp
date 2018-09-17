@@ -39,7 +39,7 @@ Camera::Camera(QnMediaServerModule* serverModule):
     connect(this, &QnResource::initializedChanged,
         [this]()
         {
-            //QnMutexLocker lk( &m_initMutex );
+            // m_initMutex is locked down the stack.
             fixInputPortMonitoring();
         });
 
@@ -51,8 +51,8 @@ Camera::Camera(QnMediaServerModule* serverModule):
             m_ioPortStatesCache[id] = QnIOStateData(id, value, timestamp);
         };
 
-    connect(this, &Camera::cameraInput, updateIoCache);
-    connect(this, &Camera::cameraOutput, updateIoCache);
+    connect(this, &Camera::inputPortStateChanged, updateIoCache);
+    connect(this, &Camera::outputPortStateChanged, updateIoCache);
 }
 
 Camera::~Camera()
@@ -394,12 +394,9 @@ void Camera::initializationDone()
 {
     base_type::initializationDone();
 
+    // TODO: Find out is it's ever required, monitoring resource state change should be enough!
     QnMutexLocker lk(&m_initMutex);
-    if (m_inputPortListenerCount > 0 && !m_inputPortListeningInProgress)
-    {
-        startInputPortMonitoringAsync(std::function<void(bool)>());
-        m_inputPortListeningInProgress = true;
-    }
+    fixInputPortMonitoring();
 }
 
 nx::media::CameraTraits Camera::mediaTraits() const
@@ -412,18 +409,12 @@ QnAbstractPtzController* Camera::createPtzControllerInternal() const
     return nullptr;
 }
 
-bool Camera::startInputPortMonitoringAsync(std::function<void(bool)>&& /*completionHandler*/)
-{
-    return false;
-}
-
-void Camera::stopInputPortMonitoringAsync()
+void Camera::startInputPortStatesMonitoring()
 {
 }
 
-bool Camera::isInputPortMonitored() const
+void Camera::stopInputPortStatesMonitoring()
 {
-    return false;
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
@@ -633,7 +624,7 @@ void Camera::inputPortListenerDetached()
     }
 }
 
-QnIOStateDataList Camera::ioStates() const
+QnIOStateDataList Camera::ioPortStates() const
 {
     QnMutexLocker lock(&m_mutex);
     QnIOStateDataList states;
@@ -642,7 +633,7 @@ QnIOStateDataList Camera::ioStates() const
     return states;
 }
 
-bool Camera::setRelayOutputState(
+bool Camera::setOutputPortState(
     const QString& /*portId*/,
     bool /*value*/,
     unsigned int /*autoResetTimeoutMs*/)
@@ -654,10 +645,10 @@ void Camera::fixInputPortMonitoring()
 {
     if (isInitialized() && m_inputPortListenerCount)
     {
-        if (!m_inputPortListeningInProgress)
+        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::RelayInputCapability))
         {
             NX_DEBUG(this, "Start input port monitoring");
-            startInputPortMonitoringAsync(nullptr);
+            startInputPortStatesMonitoring();
             m_inputPortListeningInProgress = true;
         }
     }
@@ -666,7 +657,7 @@ void Camera::fixInputPortMonitoring()
         if (m_inputPortListeningInProgress)
         {
             NX_DEBUG(this, "Stop input port monitoring");
-            stopInputPortMonitoringAsync();
+            stopInputPortStatesMonitoring();
             m_inputPortListeningInProgress = false;
         }
     }

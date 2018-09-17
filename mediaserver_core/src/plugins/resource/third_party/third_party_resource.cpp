@@ -60,7 +60,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
         m_cameraManager3 = nullptr;
     }
 
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 }
 
 QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal() const
@@ -202,7 +202,7 @@ void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
     //TODO/IMPL
 }
 
-bool QnThirdPartyResource::setRelayOutputState(
+bool QnThirdPartyResource::setOutputPortState(
     const QString& outputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -359,7 +359,7 @@ void QnThirdPartyResource::inputPortStateChanged(
     int newState,
     unsigned long int /*timestamp*/ )
 {
-    emit cameraInput(
+    emit nx::mediaserver::resource::Camera::inputPortStateChanged(
         toSharedPointer(),
         QString::fromUtf8(inputPortID),
         newState != 0,
@@ -690,27 +690,22 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnThirdPartyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnThirdPartyResource::startInputPortStatesMonitoring()
 {
-    if( !m_relayIOManager.get() )
-        return false;
-    m_relayIOManager->registerEventHandler( this );
-    return m_relayIOManager->startInputPortMonitoring() == nxcip::NX_NO_ERROR;
-}
-
-void QnThirdPartyResource::stopInputPortMonitoringAsync()
-{
-    if( m_relayIOManager.get() )
+    if (m_relayIOManager.get())
     {
-        m_relayIOManager->stopInputPortMonitoring();
-        m_relayIOManager->unregisterEventHandler( this );
+        m_relayIOManager->registerEventHandler(this);
+        m_relayIOManager->startInputPortMonitoring();
     }
 }
 
-bool QnThirdPartyResource::isInputPortMonitored() const
+void QnThirdPartyResource::stopInputPortStatesMonitoring()
 {
-    //TODO/IMPL
-    return false;
+    if (m_relayIOManager.get())
+    {
+        m_relayIOManager->stopInputPortMonitoring();
+        m_relayIOManager->unregisterEventHandler(this);
+    }
 }
 
 bool QnThirdPartyResource::initializeIOPorts()

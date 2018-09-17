@@ -331,7 +331,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
             const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();
             if (!ioPortDataList.empty()) //< Can happen if it's just discovered unauthorized module.
-                camera->setIOPorts(ioPortDataList);
+                camera->setIoPortDescriptions(ioPortDataList);
         }
     }
 

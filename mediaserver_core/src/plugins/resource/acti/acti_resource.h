@@ -67,7 +67,7 @@ public:
     bool isAudioSupported() const;
 
     /** Actual request is performed asynchronously. This method only posts task to the queue*/
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -103,12 +103,8 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
-    virtual void stopInputPortMonitoringAsync() override;
-    //!Implementation of QnSecurityCamResource::isInputPortMonitored
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     struct CameraAdvancedParamQueryInfo

@@ -265,7 +265,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
             inputNumber = tokens[1];
     }
 
-    emit cameraInput(
+    emit inputPortStateChanged(
         toSharedPointer(),
         inputNumber,
         isActivated,
@@ -712,16 +712,10 @@ bool QnActiResource::SetupAudioInput()
     }
 }
 
-bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnActiResource::startInputPortStatesMonitoring()
 {
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     if( actiEventPort == 0 )
-        return false;   //no http listener is present
+        return;   //no http listener is present
 
     //considering, that we have excusive access to the camera, so rewriting existing event setup
 
@@ -746,7 +740,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
     QString localInterfaceAddress;  //determining address of local interface, used to connect to camera
     QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr, responseStatusCode, false, &localInterfaceAddress);
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     static const int EVENT_HTTP_SERVER_NUMBER = 1;
     static const int MAX_CONNECTION_TIME_SEC = 7;
@@ -767,7 +761,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
@@ -790,7 +784,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         setupURLCommandRequestStr,
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
         //registering events (one event per input port)
             //GET /cgi-bin/cmd/encoder?EVENT_CONFIG HTTP/1.1\r\n
@@ -814,14 +808,12 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
         registerEventRequestStr,
         responseStatusCode );
     if( responseStatusCode != CL_HTTP_SUCCESS )
-        return false;
+        return;
 
     m_inputMonitored = true;
-
-    return true;
 }
 
-void QnActiResource::stopInputPortMonitoringAsync()
+void QnActiResource::stopInputPortStatesMonitoring()
 {
     if( actiEventPort == 0 )
         return;   //no http listener is present
@@ -849,11 +841,6 @@ void QnActiResource::stopInputPortMonitoringAsync()
         },
         Qt::DirectConnection );
     httpClient->doGet( url );
-}
-
-bool QnActiResource::isInputPortMonitored() const
-{
-    return m_inputMonitored;
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
@@ -979,7 +966,7 @@ QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
 static const int MIN_DIO_PORT_NUMBER = 1;
 static const int MAX_DIO_PORT_NUMBER = 2;
 
-bool QnActiResource::setRelayOutputState(
+bool QnActiResource::setOutputPortState(
     const QString& ouputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -1064,7 +1051,7 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
         value.inputName = tr("Input %1").arg(i);
         ports.push_back(value);
     }
-    setIOPorts(ports);
+    setIoPortDescriptions(ports);
 }
 
 /*

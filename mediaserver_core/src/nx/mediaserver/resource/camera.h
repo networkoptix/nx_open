@@ -150,24 +150,24 @@ public:
     void inputPortListenerDetached();
 
     /** Override to support output ports. */
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& portId,
         bool value,
         unsigned int autoResetTimeoutMs = 0);
 
     /** Override for IO modules. */
-    virtual QnIOStateDataList ioStates() const;
+    virtual QnIOStateDataList ioPortStates() const;
 
 signals:
     /** Emit on camera or IO module input change. */
-    void cameraInput(
+    void inputPortStateChanged(
         const QnResourcePtr& resource,
         const QString& portId,
         bool value,
         qint64 timestamp);
 
     /** Emit on IO modules only. */
-    void cameraOutput(
+    void outputPortStateChanged(
         const QnResourcePtr& resource,
         const QString& portId,
         bool value,
@@ -199,9 +199,8 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
 
     /** Override to support input port monitoring. */
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler);
-    virtual void stopInputPortMonitoringAsync();
-    virtual bool isInputPortMonitored() const;
+    virtual void startInputPortStatesMonitoring();
+    virtual void stopInputPortStatesMonitoring();
 
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();

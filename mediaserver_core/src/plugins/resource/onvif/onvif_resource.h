@@ -193,7 +193,7 @@ public:
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue
     */
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -406,10 +406,8 @@ protected:
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    virtual bool startInputPortMonitoringAsync(
-        std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
@@ -589,7 +587,7 @@ private:
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    void setRelayOutputStateNonSafe(
+    void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,
         bool active,

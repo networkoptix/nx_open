@@ -30,7 +30,7 @@ FcResource::FcResource(QnMediaServerModule* serverModule)
 
 FcResource::~FcResource()
 {
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 
     if (m_ioManager)
     {
@@ -117,7 +117,7 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
 
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
-    setIOPorts(allPorts);
+    setIoPortDescriptions(allPorts);
     setCameraCapabilities(caps);
 
     saveParams();
@@ -125,13 +125,13 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+void FcResource::startInputPortStatesMonitoring()
 {
     if (!m_ioManager)
-        return false;
+        return;
 
     if (m_ioManager->isMonitoringInProgress())
-        return false;
+        return;
 
     m_ioManager->setInputPortStateChangeCallback(
         [this](QString portId, nx_io_managment::IOPortState portState)
@@ -140,7 +140,7 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
             m_callbackIsInProgress = true;
 
             lock.unlock();
-            emit cameraInput(
+            emit inputPortStateChanged(
                 toSharedPointer(this),
                 portId,
                 nx_io_managment::isActiveIOPortState(portState),
@@ -171,10 +171,9 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
         });
 
     m_ioManager->startIOMonitoring();
-    return true;
 }
 
-void FcResource::stopInputPortMonitoringAsync()
+void FcResource::stopInputPortStatesMonitoring()
 {
     if (!m_ioManager)
         return;
@@ -258,7 +257,7 @@ bool FcResource::tryToEnableNexusServer(nx::network::http::HttpClient& httpClien
     return true;
 }
 
-bool FcResource::setRelayOutputState(
+bool FcResource::setOutputPortState(
     const QString& outputId,
     bool isActive,
     unsigned int autoResetTimeoutMs)

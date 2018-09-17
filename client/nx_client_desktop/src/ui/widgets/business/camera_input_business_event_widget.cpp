@@ -44,7 +44,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(Fields fields) {
 
         auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->eventResources());
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            QnIOPortDataList cameraInputs = camera->getIOPorts(Qn::PT_Input);
+            QnIOPortDataList cameraInputs = camera->ioPortDescriptions(Qn::PT_Input);
             if (!inited) {
                 inputPorts = cameraInputs;
                 inited = true;

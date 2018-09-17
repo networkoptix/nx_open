@@ -31,9 +31,9 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual QnIOStateDataList ioStates() const override;
+    virtual QnIOStateDataList ioPortStates() const override;
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& outputID,
         bool isActive,
         unsigned int autoResetTimeoutMS ) override;
@@ -48,12 +48,8 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override { return nullptr; }
 
-    virtual bool startInputPortMonitoringAsync(
-            std::function<void(bool)>&& completionHandler ) override;
-
-    virtual void stopInputPortMonitoringAsync() override;
-
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     void setPortDefaultStates();

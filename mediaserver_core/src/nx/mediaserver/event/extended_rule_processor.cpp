@@ -565,7 +565,7 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = action->getToggleState() != vms::api::EventState::inactive;
 
-    return securityCam->setRelayOutputState(
+    return securityCam->setOutputPortState(
                 relayOutputId,
                 on,
                 autoResetTimeout);

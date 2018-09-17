@@ -682,7 +682,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     return success ? values.ids() : QSet<QString>();
 }
 
-bool HanwhaResource::setRelayOutputState(
+bool HanwhaResource::setOutputPortState(
     const QString& outputId,
     bool activate,
     unsigned int autoResetTimeoutMs)
@@ -690,7 +690,7 @@ bool HanwhaResource::setRelayOutputState(
     auto resetHandler =
         [state = !activate, outputId, this]()
         {
-            setRelayOutputStateInternal(outputId, state);
+            setOutputPortStateInternal(outputId, state);
         };
 
     if (autoResetTimeoutMs > 0)
@@ -701,24 +701,17 @@ bool HanwhaResource::setRelayOutputState(
             std::chrono::milliseconds(autoResetTimeoutMs));
     }
 
-    return setRelayOutputStateInternal(outputId, activate);
+    return setOutputPortStateInternal(outputId, activate);
 }
 
-bool HanwhaResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& completionHandler)
+void HanwhaResource::startInputPortStatesMonitoring()
 {
     m_areInputPortsMonitored = true;
-    return true;
 }
 
-void HanwhaResource::stopInputPortMonitoringAsync()
+void HanwhaResource::stopInputPortStatesMonitoring()
 {
     m_areInputPortsMonitored = false;
-}
-
-bool HanwhaResource::isInputPortMonitored() const
-{
-    return m_areInputPortsMonitored;
 }
 
 bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
@@ -734,7 +727,7 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventId)
         return false;
 
-    emit cameraInput(
+    emit inputPortStateChanged(
         toSharedPointer(this),
         analyticsEvent->auxiliaryData(),
         analyticsEvent->getToggleState() == nx::vms::api::EventState::active,
@@ -1298,7 +1291,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
 
     // TODO: #dmishin get alarm outputs via bypass if possible?
 
-    setIOPorts(ioPorts);
+    setIoPortDescriptions(ioPorts);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -3480,7 +3473,7 @@ HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id)
     return result;
 }
 
-bool HanwhaResource::setRelayOutputStateInternal(const QString& outputId, bool activate)
+bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
     const auto info = portInfoFromId(outputId);
     const auto state = activate ? lit("On") : lit("Off");

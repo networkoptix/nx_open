@@ -35,10 +35,10 @@ public:
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS) override;

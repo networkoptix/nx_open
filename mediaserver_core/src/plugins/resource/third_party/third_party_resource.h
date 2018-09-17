@@ -45,8 +45,8 @@ public:
     //!Implementation of QnSecurityCamResource::createLiveDataProvider
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
-    virtual bool setRelayOutputState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
+    //!Implementation of QnSecurityCamResource::setOutputPortState
+    virtual bool setOutputPortState( const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS ) override;
     //!Implementation of QnSecurityCamResource::createArchiveDataProvider
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     //!Implementation of QnSecurityCamResource::createArchiveDelegate
@@ -87,9 +87,10 @@ protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
+
     virtual void setMotionMaskPhysical( int channel );
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;

@@ -267,7 +267,7 @@ public:
     virtual bool isReadyToDetach() const {return true;}
 
     //!Set list of IO ports
-    void setIOPorts(const QnIOPortDataList& ports);
+    void setIoPortDescriptions(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
         const QString &key,
@@ -279,7 +279,7 @@ public:
         const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    QnIOPortDataList getIOPorts(Qn::IOPortType type = Qn::PT_Unknown) const;
+    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 

@@ -210,14 +210,13 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnPlAxisResource::startInputPortStatesMonitoring()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_ioStates.clear();
+        m_ioPortStates.clear();
     }
     m_timer.post([this]() { startInputPortMonitoring(); });
-    return true;
 }
 
 void QnPlAxisResource::startInputPortMonitoring()
@@ -249,7 +248,7 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     QString requestQuery = lit("monitor=");
 
     QString portList;
-    for (const auto& port: getIOPorts())
+    for (const auto& port: ioPortDescriptions())
     {
         if (port.portType == ioMonitor.portType)
         {
@@ -283,7 +282,7 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     return true;
 }
 
-void QnPlAxisResource::stopInputPortMonitoringAsync()
+void QnPlAxisResource::stopInputPortStatesMonitoring()
 {
     m_timer.post(
         [this]()
@@ -301,16 +300,11 @@ void QnPlAxisResource::stopInputPortMonitoringSync()
     m_timer.cancelSync();
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
-    for (const auto& state : ioStates())
+    for (const auto& state: ioPortStates())
     {
         if (state.isActive)
             updateIOState(state.id, false /*inactive*/, timeMs, true /*override*/);
     }
-}
-
-bool QnPlAxisResource::isInputPortMonitored() const
-{
-    return m_inputIoMonitor.httpClient != nullptr;
 }
 
 void QnPlAxisResource::clear()
@@ -789,8 +783,8 @@ int QnPlAxisResource::getChannelNumAxis() const
     return result;
 }
 
-//!Implementation of QnSecurityCamResource::setRelayOutputState
-bool QnPlAxisResource::setRelayOutputState(
+//!Implementation of QnSecurityCamResource::setOutputPortState
+bool QnPlAxisResource::setOutputPortState(
     const QString& outputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -1250,7 +1244,7 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     if (!readPortSettings(http, cameraPorts))
         return ioPortErrorOccured();
 
-    QnIOPortDataList savedPorts = getIOPorts();
+    QnIOPortDataList savedPorts = ioPortDescriptions();
     if (savedPorts.empty() && !cameraPorts.empty()) {
         QnMutexLocker lock(&m_mutex);
         m_ioPorts = cameraPorts;
@@ -1263,7 +1257,7 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         m_ioPorts = mergedData;
     }
     if (m_ioPorts != savedPorts)
-        setIOPorts(m_ioPorts);
+        setIoPortDescriptions(m_ioPorts);
 
     Qn::CameraCapabilities caps = Qn::NoCapabilities;
     for (const auto& port: m_ioPorts) {
@@ -1284,7 +1278,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
     QnMutexLocker lock(&m_mutex);
     QnIOStateData newValue(portId, isActive, timestampMs);
     bool found = false;
-    for (auto& ioState: m_ioStates) {
+    for (auto& ioState: m_ioPortStates) {
         if (ioState.id == portId)
         {
             if (overrideIfExist && ioState != newValue)
@@ -1298,7 +1292,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
 
     if (!found)
     {
-        m_ioStates.push_back(newValue);
+        m_ioPortStates.push_back(newValue);
         if (!isActive)
             return;
     }
@@ -1308,7 +1302,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
         if (port.id == portId) {
             if (port.portType == Qn::PT_Input) {
                 lock.unlock();
-                emit cameraInput(
+                emit inputPortStateChanged(
                     toSharedPointer(),
                     portId,
                     isActive,
@@ -1316,7 +1310,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
             }
             else if (port.portType == Qn::PT_Output) {
                 lock.unlock();
-                emit cameraOutput(
+                emit outputPortStateChanged(
                     toSharedPointer(),
                     portId,
                     isActive,
@@ -1327,10 +1321,10 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
     }
 }
 
-QnIOStateDataList QnPlAxisResource::ioStates() const
+QnIOStateDataList QnPlAxisResource::ioPortStates() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ioStates;
+    return m_ioPortStates;
 }
 
 void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBufferRefType& notification )
@@ -1419,7 +1413,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     QString requestQuery = lit("checkactive=");
 
     QString portList;
-    for (const auto& port: getIOPorts()) {
+    for (const auto& port: ioPortDescriptions()) {
         if (port.portType != Qn::PT_Disabled) {
             if (!portList.isEmpty())
                 portList += lit(",");
@@ -1466,7 +1460,7 @@ void QnPlAxisResource::updateIOSettings()
             QnMutexLocker lock(&m_mutex);
             m_ioPorts = newValue;
         }
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
+        startInputPortStatesMonitoring();
     }
     else
         setStatus(Qn::Offline); // reinit

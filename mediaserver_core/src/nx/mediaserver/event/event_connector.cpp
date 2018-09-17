@@ -42,7 +42,7 @@ void EventConnector::onNewResource(const QnResourcePtr& resource)
         connect(camera.data(), &QnSecurityCamResource::networkIssue,
             this, &EventConnector::at_networkIssue);
 
-        connect(camera.data(), &nx::mediaserver::resource::Camera::cameraInput,
+        connect(camera.data(), &nx::mediaserver::resource::Camera::inputPortStateChanged,
             this, &EventConnector::at_cameraInput);
 
         // TODO: Remove these signals from camera and other places as theay are deprecated and

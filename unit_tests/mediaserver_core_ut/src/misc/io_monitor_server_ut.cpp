@@ -169,7 +169,7 @@ TEST(IoServerMonitorTest, main)
 
     for (const auto& data: testData)
     {
-        emit camera->cameraInput(
+        emit camera->inputPortStateChanged(
             camera->toSharedPointer(),
             data.id,
             data.isActive,
