@@ -88,7 +88,7 @@ HRESULT getResolutionList(IMoniker *pMoniker,
 
 HRESULT getBitrateList(IMoniker *pMoniker,
     std::vector<int>* outBitrateList,
-    nxcip::CompressionType targetCodec);
+    const device::CompressionTypeDescriptorPtr& targetCodec);
 
 std::string toStdString(BSTR str);
 std::string getDeviceName(IMoniker *pMoniker);
