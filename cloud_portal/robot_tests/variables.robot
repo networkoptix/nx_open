@@ -81,7 +81,7 @@ ${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-m
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
-${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY_POLICY_URL}']
+${PRIVACY POLICY LINK}                //form[@name= 'registerForm']//a[@href='${PRIVACY POLICY URL}']
 ${RESEND ACTIVATION LINK BUTTON}      //form[@name= 'loginForm']//a[contains(text(), "${RESEND ACTIVATION LINK BUTTON TEXT}")]
 ${REGISTER EYE ICON OPEN}             ${REGISTER FORM}${EYE ICON OPEN}
 ${REGISTER EYE ICON CLOSED}           ${REGISTER FORM}${EYE ICON CLOSED}

@@ -144,7 +144,7 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${url}/content/privacy
+    Location Should Be    ${PRIVACY POLICY URL}
     Select Window    @{tabs}[0]
 
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
@@ -170,7 +170,7 @@ should open Privacy Policy in a new page
     Sleep    2    #This is specifically for Firefox
     ${windows}    Get Window Handles
     Select Window    @{windows}[2]
-    Location Should Be    ${PRIVACY_POLICY_URL}
+    Location Should Be    ${PRIVACY POLICY URL}
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}
@@ -253,7 +253,7 @@ Check registration email links, colors, cloud name, and user name
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
     ${links}    Get Links From Email    ${email}
-    @{expected links}    Set Variable    ${SUPPORT_URL}    ${WEBSITE_URL}    ${ENV}    ${ENV}/activate
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/activate
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
     Delete Email    ${email}
