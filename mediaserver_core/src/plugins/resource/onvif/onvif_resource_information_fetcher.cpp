@@ -159,20 +159,18 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
     if (NameHelper::instance().isManufacturerSupported(manufacturer) &&
         NameHelper::instance().isSupported(normilizedModel))
     {
-        NX_LOG(lit("Discovery----:  ignore ONVIF camera %1 (%2-%3) because it supported by native driver").
+        NX_DEBUG(typeid(OnvifResourceInformationFetcher), lit("ignore ONVIF camera %1 (%2-%3) because it supported by native driver").
             arg(host).
             arg(manufacturer).
-            arg(model),
-            cl_logDEBUG1);
+            arg(model));
         return true;
     }
     if (ignoreCamera(manufacturer, normilizedModel))
     {
-        NX_LOG(lit("Discovery----:  ignore ONVIF camera %1 (%2-%3) because it is in the special blocking list").
+        NX_DEBUG(typeid(OnvifResourceInformationFetcher), lit("ignore ONVIF camera %1 (%2-%3) because it is in the special blocking list").
             arg(host).
             arg(manufacturer).
-            arg(model),
-            cl_logDEBUG1);
+            arg(model));
         return true;
     }
     return false;

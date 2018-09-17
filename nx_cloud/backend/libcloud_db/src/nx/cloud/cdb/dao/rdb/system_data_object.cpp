@@ -41,9 +41,8 @@ nx::sql::DBResult SystemDataObject::insert(
     insertSystemQuery.bindValue(":expirationTimeUtc", system.expirationTimeUtc);
     if (!insertSystemQuery.exec())
     {
-        NX_LOG(lm("Could not insert system %1 (%2) into DB. %3")
-            .arg(system.name).arg(system.id).arg(insertSystemQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not insert system %1 (%2) into DB. %3")
+            .arg(system.name).arg(system.id).arg(insertSystemQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -64,9 +63,8 @@ nx::sql::DBResult SystemDataObject::selectSystemSequence(
     selectSystemSequence.bindValue(0, QnSql::serialized_field(systemId));
     if (!selectSystemSequence.exec() || !selectSystemSequence.next())
     {
-        NX_LOG(lm("Error selecting sequence of system %1. %2")
-            .arg(systemId).arg(selectSystemSequence.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error selecting sequence of system %1. %2")
+            .arg(systemId).arg(selectSystemSequence.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
     *sequence = selectSystemSequence.value(0).toULongLong();
@@ -99,9 +97,8 @@ nx::sql::DBResult SystemDataObject::markSystemForDeletion(
         QnSql::serialized_field(systemId));
     if (!markSystemAsRemoved.exec())
     {
-        NX_LOG(lm("Error marking system %1 as deleted. %2")
-            .arg(systemId).arg(markSystemAsRemoved.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error marking system %1 as deleted. %2")
+            .arg(systemId).arg(markSystemAsRemoved.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -117,9 +114,8 @@ nx::sql::DBResult SystemDataObject::deleteSystem(
     QnSql::bind(systemId, &removeSystem);
     if (!removeSystem.exec())
     {
-        NX_LOG(lm("Could not delete system %1. %2")
-            .arg(systemId).arg(removeSystem.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not delete system %1. %2")
+            .arg(systemId).arg(removeSystem.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -139,9 +135,9 @@ nx::sql::DBResult SystemDataObject::execSystemNameUpdate(
     updateSystemNameQuery.bindValue(":systemId", QnSql::serialized_field(data.systemId));
     if (!updateSystemNameQuery.exec())
     {
-        NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
+        NX_WARNING(this, lm("Failed to update system %1 name in DB to %2. %3")
             .arg(data.systemId).arg(data.name.get())
-            .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
+            .arg(updateSystemNameQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -163,9 +159,8 @@ nx::sql::DBResult SystemDataObject::execSystemOpaqueUpdate(
     updateSystemOpaqueQuery.bindValue(":systemId", QnSql::serialized_field(data.systemId));
     if (!updateSystemOpaqueQuery.exec())
     {
-        NX_LOGX(lm("Error updating system %1. %2")
-            .arg(data.systemId).arg(updateSystemOpaqueQuery.lastError().text()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Error updating system %1. %2")
+            .arg(data.systemId).arg(updateSystemOpaqueQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -232,9 +227,8 @@ nx::sql::DBResult SystemDataObject::fetchSystems(
     nx::sql::bindFields(&readSystemsQuery, filterFields);
     if (!readSystemsQuery.exec())
     {
-        NX_LOG(lit("Failed to read system list with filter \"%1\" from DB. %2")
-            .arg(filterStr).arg(readSystemsQuery.lastError().text()),
-            cl_logWARNING);
+        NX_WARNING(this, lit("Failed to read system list with filter \"%1\" from DB. %2")
+            .arg(filterStr).arg(readSystemsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -283,8 +277,8 @@ nx::sql::DBResult SystemDataObject::deleteExpiredSystems(
         (int)nx::utils::timeSinceEpoch().count());
     if (!dropExpiredSystems.exec())
     {
-        NX_LOGX(lit("Error deleting expired systems from DB. %1").
-            arg(dropExpiredSystems.lastError().text()), cl_logWARNING);
+        NX_WARNING(this, lit("Error deleting expired systems from DB. %1").
+            arg(dropExpiredSystems.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

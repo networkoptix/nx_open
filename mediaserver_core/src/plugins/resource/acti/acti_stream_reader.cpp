@@ -144,19 +144,15 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
 
     QString streamUrl = m_actiRes->getRtspUrl(ch);
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
         .arg(streamUrl)
         .arg(m_resource->getUrl())
-        .arg(getRole()),
-        cl_logINFO);
+        .arg(getRole()));
 
     m_multiCodec.setRequest(streamUrl);
 	m_actiRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     m_multiCodec.setRtpTransport(desiredTransport);
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized)
-        m_resource->setStatus(Qn::Unauthorized);
-
     return result;
 }
 

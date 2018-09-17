@@ -108,6 +108,12 @@ private:
     qint64 m_lastSeekTime = AV_NOPTS_VALUE;
     qint64 m_firstDts = 0; //< DTS of the very first video packet
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
+    /**
+     * Designates if a key frame has been found for a channel, that is, if
+     * m_keyFrameFound[0] == true, than we have already found a key frame for the channel 0,
+     * otherwise, we haven't.
+     */
+    std::vector<bool> m_keyFrameFound;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

@@ -372,7 +372,7 @@ nx::sql::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
 }
 
 void EventsStorage::addObjectTypeIdToFilter(
-    const std::vector<QnUuid>& objectTypeIds,
+    const std::vector<QString>& objectTypeIds,
     nx::sql::InnerJoinFilterFields* sqlFilter)
 {
     // TODO: #ak Add support for every objectTypeId specified.
@@ -480,7 +480,7 @@ void EventsStorage::loadObject(
 {
     object->objectId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery->value(lit("object_id")));
-    object->objectTypeId = QnSql::deserialized_field<QnUuid>(
+    object->objectTypeId = QnSql::deserialized_field<QString>(
         selectEventsQuery->value(lit("object_type_id")));
     QJson::deserialize(
         selectEventsQuery->value(lit("attributes")).toString(),

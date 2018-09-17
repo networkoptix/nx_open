@@ -206,7 +206,7 @@ void Manager::initializeConnector()
                 m_modules.erase(it);
                 lock.unlock();
 
-                NX_LOGX(lm("Lost module %1").args(id), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Lost module %1").args(id));
                 emit lost(id);
 
                 if (!cloudHost.isEmpty())

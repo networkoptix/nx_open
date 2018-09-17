@@ -1,5 +1,7 @@
 #include "socket_global.h"
 
+#include <map>
+
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/aio_service.h"
@@ -57,6 +59,8 @@ struct SocketGlobalsImpl
 {
     int m_initializationFlags = 0;
     Ini m_ini;
+    /** map<string representation, regexp> */
+    std::map<std::string, QRegExp> m_disabledHostPatterns;
 
     /**
      * Regular networking services. (AddressResolver should be split to cloud and non-cloud).
@@ -81,34 +85,6 @@ Ini::Ini():
     reload();
 }
 
-bool Ini::isHostDisabled(const HostAddress& host) const
-{
-    if (s_initState != InitState::done)
-        return false;
-
-    // Here 'static const' is an optimization as reload is called only on start.
-    static const auto disabledHostPatterns =
-        [this]()
-        {
-            std::list<QRegExp> regExps;
-            for (const auto& s: QString::fromUtf8(disableHosts).split(QChar(',')))
-            {
-                if (!s.isEmpty())
-                    regExps.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
-            }
-
-            return regExps;
-        }();
-
-    for (const auto& p: disabledHostPatterns)
-    {
-        if (p.exactMatch(host.toString()))
-            return true;
-    }
-
-    return false;
-}
-
 //-------------------------------------------------------------------------------------------------
 // SocketGlobals
 
@@ -124,6 +100,8 @@ SocketGlobals::SocketGlobals(int initializationFlags):
     m_impl->m_initializationFlags = initializationFlags;
     if (m_impl->m_initializationFlags & InitializationFlags::disableUdt)
         m_impl->m_pollSetFactory.disableUdt();
+
+    reloadIni();
 }
 
 SocketGlobals::~SocketGlobals()
@@ -248,13 +226,63 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
         init();
 }
 
+void SocketGlobals::blockHost(const std::string& regexpString)
+{
+    QnMutexLocker lock(&m_impl->m_mutex);
+
+    m_impl->m_disabledHostPatterns.emplace(
+        regexpString,
+        QRegExp(regexpString.c_str(), Qt::CaseInsensitive, QRegExp::Wildcard));
+}
+
+void SocketGlobals::unblockHost(const std::string& regexpString)
+{
+    QnMutexLocker lock(&m_impl->m_mutex);
+
+    m_impl->m_disabledHostPatterns.erase(regexpString);
+}
+
+bool SocketGlobals::isHostBlocked(const HostAddress& host) const
+{
+    // TODO: #ak Following check is not appropriate here.
+    if (s_initState != InitState::done)
+        return false;
+
+    for (const auto& p: m_impl->m_disabledHostPatterns)
+    {
+        if (p.second.exactMatch(host.toString()))
+            return true;
+    }
+
+    return false;
+}
+
+SocketGlobals& SocketGlobals::instance()
+{
+    return *s_instance;
+}
+
+void SocketGlobals::reloadIni()
+{
+    m_impl->m_ini.reload();
+
+    const auto disabledHosts = QString::fromUtf8(m_impl->m_ini.disableHosts).split(',');
+    for (const auto& regexpString: disabledHosts)
+    {
+        if (regexpString.isEmpty())
+            continue;
+
+        blockHost(regexpString.toStdString());
+    }
+}
+
 void SocketGlobals::setDebugIniReloadTimer()
 {
     m_impl->m_debugIniReloadTimer->start(
         kDebugIniReloadInterval,
         [this]()
         {
-            m_impl->m_ini.reload();
+            reloadIni();
             setDebugIniReloadTimer();
         });
 }

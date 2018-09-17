@@ -2,24 +2,16 @@
 
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
 //-------------------------------------------------------------------------------------------------
 // class RetryPolicy
-
-constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
-constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
-constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
 const RetryPolicy RetryPolicy::kNoRetries(
     0, kDefaultInitialDelay, kDefaultDelayMultiplier, kDefaultMaxDelay);
 
 RetryPolicy::RetryPolicy():
-    maxRetryCount(kDefaultMaxRetryCount),
-    initialDelay(kDefaultInitialDelay),
-    delayMultiplier(kDefaultDelayMultiplier),
-    maxDelay(kDefaultMaxDelay)
+    maxRetryCount(kDefaultMaxRetryCount)
 {
 }
 
@@ -29,30 +21,25 @@ RetryPolicy::RetryPolicy(
     unsigned int delayMultiplier,
     std::chrono::milliseconds maxDelay)
 :
-    maxRetryCount(maxRetryCount),
-    initialDelay(initialDelay),
-    delayMultiplier(delayMultiplier),
-    maxDelay(maxDelay)
+    base_type(initialDelay, delayMultiplier, maxDelay),
+    maxRetryCount(maxRetryCount)
 {
 }
 
 bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 {
-    return maxRetryCount == rhs.maxRetryCount
-        && initialDelay == rhs.initialDelay
-        && delayMultiplier == rhs.delayMultiplier
-        && maxDelay == rhs.maxDelay;
+    return static_cast<const ProgressiveDelayPolicy&>(*this) == rhs
+        && maxRetryCount == rhs.maxRetryCount;
 }
-
 
 //-------------------------------------------------------------------------------------------------
 // class RetryTimer
 
 RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
+    m_delayCalculator(policy),
     m_timer(std::make_unique<aio::Timer>(aioThread)),
-    m_retryPolicy(policy),
-    m_triesMade(0)
+    m_retryPolicy(policy)
 {
     bindToAioThread(getAioThread());
     reset();
@@ -74,25 +61,9 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     if (retriesLeft() == 0)
         return false;
 
-    if ((m_triesMade > 0) &&
-        (m_retryPolicy.delayMultiplier > 0) &&
-        (m_currentDelay < m_effectiveMaxDelay))
-    {
-        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier;
-        if (newDelay == std::chrono::milliseconds::zero())
-            newDelay = std::chrono::milliseconds(1);
-        if (newDelay < m_currentDelay)
-        {
-            //overflow
-            newDelay = std::chrono::milliseconds::max();
-        }
-        m_currentDelay = newDelay;
-        if (m_currentDelay > m_effectiveMaxDelay)
-            m_currentDelay = m_effectiveMaxDelay;
-    }
-
-    ++m_triesMade;
-    m_timer->start(m_currentDelay, std::move(doAnotherTryFunc));
+    m_timer->start(
+        m_delayCalculator.calculateNewDelay(),
+        std::move(doAnotherTryFunc));
     return true;
 }
 
@@ -101,7 +72,7 @@ unsigned int RetryTimer::retriesLeft() const
     if (m_retryPolicy.maxRetryCount == RetryPolicy::kInfiniteRetries)
         return RetryPolicy::kInfiniteRetries;
 
-    return m_retryPolicy.maxRetryCount - m_triesMade;
+    return m_retryPolicy.maxRetryCount - m_delayCalculator.triesMade();
 }
 
 boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
@@ -111,17 +82,13 @@ boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
 
 std::chrono::milliseconds RetryTimer::currentDelay() const
 {
-    return m_currentDelay;
+    //return m_currentDelay;
+    return m_delayCalculator.currentDelay();
 }
 
 void RetryTimer::reset()
 {
-    m_currentDelay = m_retryPolicy.initialDelay;
-    m_effectiveMaxDelay =
-        m_retryPolicy.maxDelay == RetryPolicy::kNoMaxDelay
-        ? std::chrono::milliseconds::max()
-        : m_retryPolicy.maxDelay;
-    m_triesMade = 0;
+    m_delayCalculator.reset();
 }
 
 void RetryTimer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -145,5 +112,4 @@ void RetryTimer::stopWhileInAioThread()
     m_timer.reset();
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::network

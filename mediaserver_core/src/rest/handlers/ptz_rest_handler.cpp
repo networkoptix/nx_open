@@ -185,6 +185,15 @@ QStringList QnPtzRestHandler::cameraIdUrlParams() const
     return kCameraIdParams;
 }
 
+int QnPtzRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
+{
+    return executePost(path, params, {}, result, owner);
+}
+
 int QnPtzRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
@@ -192,7 +201,7 @@ int QnPtzRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    NX_LOG(lit("QnPtzRestHandler: received request %1 %2").arg(path).arg(toString(params)), cl_logDEBUG1);
+    NX_DEBUG(this, lit("received request %1 %2").arg(path).arg(toString(params)));
 
     QString sequenceId;
     int sequenceNumber = -1;

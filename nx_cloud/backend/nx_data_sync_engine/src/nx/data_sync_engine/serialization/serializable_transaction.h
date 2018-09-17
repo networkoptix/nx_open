@@ -1,7 +1,5 @@
 #pragma once
 
-#include <transaction/transaction.h>
-
 #include "../command.h"
 #include "transaction_serializer.h"
 

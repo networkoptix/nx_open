@@ -100,7 +100,16 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
-        return archiveReader->getDPVideoLayout();
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_videoLayout)
+            return m_videoLayout;
+        lock.unlock();
+        auto result = archiveReader->getDPVideoLayout();
+        lock.relock();
+        m_videoLayout = result;
+        return result;
+    }
 
     return QnMediaResource::getVideoLayout();
 }

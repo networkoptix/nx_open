@@ -481,7 +481,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
 //    qDebug() << "folder being scanned: " << folder;
-    NX_LOG(lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder));
     QnAbstractStorageResource::FileInfoList files;
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
@@ -491,7 +491,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
 
         if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
         {
-            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             return; // canceled
         }
 
@@ -519,7 +519,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     {
         if (QnResource::isStopping())
         {
-            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             break;
         }
 
@@ -843,7 +843,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     QTextStream str(&msg);
     str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
     str.flush();
-    NX_LOG(msg, cl_logWARNING);
+    NX_WARNING(this, msg);
     str.flush();
 */
     QnMutexLocker lock( &m_mutex );
@@ -1047,7 +1047,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     if (!file.open(QFile::ReadOnly))
     {
-        NX_LOG(lit("Can't open title file %1").arg(file.fileName()), cl_logERROR);
+        NX_ERROR(this, lit("Can't open title file %1").arg(file.fileName()));
         return false;
     }
 

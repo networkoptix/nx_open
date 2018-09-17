@@ -48,7 +48,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS) override;
@@ -85,8 +85,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     virtual bool isRTSPSupported() const;
 

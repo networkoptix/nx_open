@@ -653,7 +653,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         if (avPkt.pts < avPkt.dts)
         {
             avPkt.pts = avPkt.dts;
-            NX_LOG(QLatin1String("Timestamp error: PTS < DTS. Fixed."), cl_logWARNING);
+            NX_WARNING(this, QLatin1String("Timestamp error: PTS < DTS. Fixed."));
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
@@ -683,7 +683,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         if (ret < 0)
         {
-            NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
+            NX_WARNING(this, QLatin1String("AV packet write error"));
         }
         else
         {
@@ -721,7 +721,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             StreamRecorderError::containerNotFound,
             QnStorageResourcePtr()
         );
-        NX_LOG(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
+        NX_ERROR(this, lit("No %1 container in FFMPEG library.").arg(m_container));
         return false;
     }
 
@@ -759,8 +759,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 StreamRecorderError::fileCreate,
                 context.storage
             );
-            NX_LOG(lit("Can't create output file '%1' for video recording.")
-                .arg(context.fileName), cl_logERROR);
+            NX_ERROR(this, lit("Can't create output file '%1' for video recording.")
+                .arg(context.fileName));
 
             msleep(500); // avoid createFile flood
             return false;
@@ -835,7 +835,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                         StreamRecorderError::videoStreamAllocation,
                         context.storage
                     );
-                    NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
+                    NX_ERROR(this, lit("Can't allocate output stream for recording."));
                     return false;
                 }
 
@@ -931,7 +931,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     StreamRecorderError::audioStreamAllocation,
                     context.storage
                 );
-                NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
+                NX_ERROR(this, lit("Can't allocate output audio stream."));
                 return false;
             }
 
@@ -944,7 +944,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     StreamRecorderError::invalidAudioCodec,
                     context.storage
                 );
-                NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
+                NX_ERROR(this, lit("Invalid audio codec information."));
                 return false;
             }
 
@@ -994,7 +994,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             avformat_close_input(&context.formatCtx);
             m_lastError = StreamRecorderErrorStruct(StreamRecorderError::fileCreate,
                 context.storage);
-            NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
+            NX_ERROR(this, lit("Can't create output file '%1'.").arg(url));
             m_recordingFinished = true;
             msleep(500); // avoid createFile flood
             return false;
@@ -1010,8 +1010,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 StreamRecorderError::incompatibleCodec,
                 context.storage
             );
-            NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
-                arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)), cl_logERROR);
+            NX_ERROR(this, lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
+                arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)));
             return false;
         }
 

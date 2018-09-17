@@ -1,16 +1,17 @@
 #include "event_connector.h"
 
-#include <core/resource/resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <media_server/media_server_module.h>
+#include <media_server/serverutil.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
 #include <nx/mediaserver/event/rule_processor.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/system_health_action.h>
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/events.h>
-#include <media_server/serverutil.h>
-#include <media_server/media_server_module.h>
-#include <nx/mediaserver/event/extended_rule_processor.h>
 
 //#define REDUCE_NET_ISSUE_HACK
 
@@ -36,12 +37,12 @@ EventConnector::~EventConnector()
 
 void EventConnector::onNewResource(const QnResourcePtr& resource)
 {
-    if (auto camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource))
+    if (const auto camera = resource.dynamicCast<nx::mediaserver::resource::Camera>())
     {
         connect(camera.data(), &QnSecurityCamResource::networkIssue,
             this, &EventConnector::at_networkIssue);
 
-        connect(camera.data(), &QnSecurityCamResource::cameraInput,
+        connect(camera.data(), &nx::mediaserver::resource::Camera::inputPortStateChanged,
             this, &EventConnector::at_cameraInput);
 
         // TODO: Remove these signals from camera and other places as theay are deprecated and
@@ -539,8 +540,8 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
             vms::event::AnalyticsSdkEventPtr event(new vms::event::AnalyticsSdkEvent(
                 resource->toSharedPointer(),
-                params.analyticsDriverId(),
-                params.analyticsEventId(),
+                params.getAnalyticsPluginId(),
+                params.getAnalyticsEventTypeId(),
                 eventState,
                 params.caption,
                 params.description,

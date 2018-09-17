@@ -37,7 +37,7 @@ protected:
         ASSERT_TRUE(server->listen(10));;
 
         const auto serverAddress = server->getLocalAddress();
-        NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Server address: %1").arg(serverAddress.toString()));
 
         client = std::make_unique<TCPSocket>(AF_INET);
         ASSERT_TRUE(client->setSendTimeout(500));

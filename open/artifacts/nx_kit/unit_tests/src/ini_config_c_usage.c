@@ -30,8 +30,7 @@ int testIniConfigCUsage()
 
     // Test: iniFilePath() == iniFilesDir() + iniFile().
     char iniFilePath[1000] = "";
-    strncat(iniFilePath, nx_ini_iniFilesDir(), sizeof(iniFilePath) - 1);
-    strncat(iniFilePath, nx_ini_iniFile(), sizeof(iniFilePath) - 1);
+    snprintf(iniFilePath, sizeof(iniFilePath), "%s%s", nx_ini_iniFilesDir(), nx_ini_iniFile());
     ASSERT_TRUE(strcmp(iniFilePath, nx_ini_iniFilePath()) == 0);
 
     return 0;

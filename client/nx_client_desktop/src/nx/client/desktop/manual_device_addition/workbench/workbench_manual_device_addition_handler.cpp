@@ -30,6 +30,17 @@ WorkbenchManualDeviceAdditionHandler::WorkbenchManualDeviceAdditionHandler(QObje
                 m_deviceAdditionDialog, mainWindowWidget());
 
             m_deviceAdditionDialog->setServer(server);
+            const auto removeOnClose =
+                [this]()
+                {
+                    if (m_deviceAdditionDialog)
+                        m_deviceAdditionDialog->deleteLater();
+                };
+
+            // Prevents dialog controls blinking.
+            connect(m_deviceAdditionDialog, &QDialog::accepted, this, removeOnClose);
+            connect(m_deviceAdditionDialog, &QDialog::rejected, this, removeOnClose);
+            connect(m_deviceAdditionDialog, &QDialog::finished, this, removeOnClose);
         });
 
     connect(action(ui::action::MainMenuAddDeviceManuallyAction), &QAction::triggered, this,

@@ -85,7 +85,7 @@ private:
 
     utils::PendingOperation* createUpdateWorkbenchFilterOperation();
 
-    void executePluginAction(const QnUuid& driverId,
+    void executePluginAction(const QString& pluginId,
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 

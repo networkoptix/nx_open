@@ -9,6 +9,7 @@
 #include <utils/common/app_info.h>
 
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/app_info.h>
 
@@ -32,11 +33,15 @@ const bool kDefaultNotificationEnabled = true;
 
 //-------------------------------------------------------------------------------------------------
 // Account manager settings
-const QLatin1String kAccountActivationCodeExpirationTimeout("accountManager/accountActivationCodeExpirationTimeout");
-const std::chrono::seconds kDefaultAccountActivationCodeExpirationTimeout = std::chrono::hours(3*24);
+const QLatin1String kAccountActivationCodeExpirationTimeout(
+    "accountManager/accountActivationCodeExpirationTimeout");
+const std::chrono::seconds kDefaultAccountActivationCodeExpirationTimeout =
+    std::chrono::hours(3*24);
 
-const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeout");
-const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
+const QLatin1String kPasswordResetCodeExpirationTimeout(
+    "accountManager/passwordResetCodeExpirationTimeout");
+const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout =
+    std::chrono::hours(24);
 
 //-------------------------------------------------------------------------------------------------
 // System manager settings
@@ -261,7 +266,7 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
-const data_sync_engine::Settings& Settings::p2pDb() const
+const data_sync_engine::SynchronizationSettings& Settings::p2pDb() const
 {
     return m_p2pDb;
 }
@@ -284,6 +289,11 @@ const Http& Settings::http() const
 const VmsGateway& Settings::vmsGateway() const
 {
     return m_vmsGateway;
+}
+
+const LoginEnumerationProtectionSettings& Settings::loginEnumerationProtectionSettings() const
+{
+    return m_loginEnumerationProtectionSettings;
 }
 
 void Settings::setDbConnectionOptions(

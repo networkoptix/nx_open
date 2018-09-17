@@ -13,6 +13,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
+
+#include <utils/common/app_info.h>
 #include <utils/update/update_utils.h>
 #include <update/task/check_update_peer_task.h>
 #include <update/low_free_space_warning.h>
@@ -20,12 +22,14 @@
 #include <client/client_settings.h>
 #include <client/desktop_client_message_processor.h>
 
-#include <utils/common/app_info.h>
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
-
+#include <nx/client/desktop/utils/upload_manager.h>
 #include <api/server_rest_connection.h>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 namespace {
 
@@ -41,19 +45,170 @@ nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     return minimalVersion;
 }
 
-} // anonymous namespace
+const QString kPackageIndexFile = "packages.json";
+const QString kTempDataDir = "update_temp";
+const int kReadBufferSizeBytes = 1024 * 1024;
+
+} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+using UpdateCheckResult = ServerUpdateTool::UpdateCheckResult;
+
 ServerUpdateTool::ServerUpdateTool(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_outputDir(QDir::temp().absoluteFilePath("nx_updates/"))
 {
+    QString path = m_outputDir.path();
+    qDebug() << "Will output temp files to " << path;
+
+    m_outputDir.removeRecursively();
+    if (!m_outputDir.exists())
+        m_outputDir.mkpath(".");
+
+    /*
+    /temp/nx_updates/rand_file
+    m_peerManagerFactory.reset(new nx::vms::common::p2p::downloader::PeerManagerFactory(commonModule()));
+    m_downloader.reset(new Downloader(QDir("downloads"), commonModule(), m_peerManagerFactory.get()));
+    connect(m_downloader.get(), &Downloader::fileStatusChanged,
+            this, &MultiServerUpdatesWidget::at_downloaderStatusChanged);
+            */
+
+    // Keeping this initializations here because I do not want to track
+    // declaration order from the header.
+    m_uploadManager.reset(new UploadManager());
 }
 
 ServerUpdateTool::~ServerUpdateTool()
 {
+}
+
+/*
+void MultiServerUpdatesWidget::at_downloaderStatusChanged(const FileInformation& fileInformation)
+{
+    // TODO: Some sort of an error here
+    qDebug() << "MultiServerUpdatesWidget::at_downloaderStatusChanged("<< fileInformation.name
+             << ") - status changed to " << fileInformation.status;
+}
+*/
+
+std::future<UpdateCheckResult> ServerUpdateTool::checkLatestUpdate()
+{
+    QString updateUrl = qnSettings->updateFeedUrl();
+    return std::async(std::launch::async,
+        [updateUrl]()
+        {
+            UpdateCheckResult result;
+            result.info = nx::update::updateInformation(updateUrl, nx::update::kLatestVersion, &result.error);
+            return result;
+        });
+}
+
+std::future<UpdateCheckResult> ServerUpdateTool::checkSpecificChangeset(QString build, QString password)
+{
+    QString updateUrl = qnSettings->updateFeedUrl();
+
+    return std::async(std::launch::async,
+        [updateUrl, build]()
+        {
+            UpdateCheckResult result;
+            result.info = nx::update::updateInformation(updateUrl, build, &result.error);
+            return result;
+        });
+}
+
+std::future<ServerUpdateTool::UpdateCheckResult> ServerUpdateTool::checkUpdateFromFile(QString file)
+{
+    qDebug() << "ServerUpdateTool::checkUpdateFromFile(" << file << ")";
+
+    m_offlineUpdaterState = OfflineUpdateState::Unpack;
+    m_extractor = std::make_shared<QnZipExtractor>(file, m_outputDir.path());
+    m_offlineUpdateCheckResult = std::promise<UpdateCheckResult>();
+    m_extractor->start();
+    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ServerUpdateTool::at_extractFilesFinished);
+
+    // TODO: exit if there is already some work issued
+    return m_offlineUpdateCheckResult.get_future();
+}
+
+ServerUpdateTool::UpdateCheckResult ServerUpdateTool::readUpdateManifest(QString path)
+{
+    qDebug() << "ServerUpdateTool::readUpdateManifest(" << path << ")";
+    // TODO: Should be able to find update manifest in the subdirectory.
+    UpdateCheckResult result;
+    result.error = nx::update::InformationError::jsonError;
+    result.mode = CheckMode::File;
+
+    QFile file(path);
+
+    if (!file.open(QFile::ReadOnly))
+        return result;
+
+    QByteArray buf(kReadBufferSizeBytes, 0);
+
+    qint64 read = file.read(buf.data(), kReadBufferSizeBytes);
+    if (read == -1)
+        return result;
+
+    buf.truncate(read);
+    if (!QJson::deserialize(buf, &result.info))
+        return result;
+
+    result.error = nx::update::InformationError::noError;
+
+    return result;
+}
+
+// NOTE: We are probably not in the UI thread.
+void ServerUpdateTool::at_extractFilesFinished(int code)
+{
+    // TODO: Add some thread safety here
+    NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::Unpack);
+    if (code != QnZipExtractor::Ok)
+    {
+        qDebug() << "ServerUpdateTool::at_extractFilesFinished() err=" << QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+        m_offlineUpdaterState = OfflineUpdateState::Initial;
+        UpdateCheckResult result = {CheckMode::File, {}, nx::update::InformationError::missingPackageError};
+        m_offlineUpdateCheckResult.set_value(result);
+        return;
+    }
+    qDebug() << "ServerUpdateTool::at_extractFilesFinished() status = Ready";
+
+    QString manifestPath = m_outputDir.filePath(kPackageIndexFile);
+    UpdateCheckResult result = readUpdateManifest(manifestPath);
+
+    m_filesToUpload.clear();
+    int missing = 0;
+    auto version = nx::utils::SoftwareVersion(result.info.version);
+    m_uploadDestination = QString("updates") + QString("/%1/").arg(result.info.version);
+
+    for (auto& package: result.info.packages)
+    {
+        QFileInfo file(m_outputDir.filePath(package.file));
+        if (file.exists())
+            m_filesToUpload.push_back(package.file);
+        else
+            missing++;
+
+        package.url = "";
+        package.file = m_uploadDestination + file.fileName();
+    }
+
+    if (!m_filesToUpload.empty())
+    {
+        result.error = nx::update::InformationError::noError;
+        m_offlineUpdaterState = OfflineUpdateState::Ready;
+    }
+    else
+    {
+        // Haven't found files for update
+        m_offlineUpdaterState = OfflineUpdateState::Initial;
+        result.error = nx::update::InformationError::missingPackageError;
+    }
+
+    m_offlineUpdateCheckResult.set_value(result);
 }
 
 void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
@@ -71,8 +226,174 @@ void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
         this, &ServerUpdateTool::at_resourceAdded);
     m_onRemovedResource = connect(pool, &QnResourcePool::resourceRemoved,
         this, &ServerUpdateTool::at_resourceRemoved);
+    // TODO: Should replace it by connecting to each resource
     m_onUpdatedResource = connect(pool, &QnResourcePool::resourceChanged,
         this, &ServerUpdateTool::at_resourceChanged);
+}
+
+QnMediaServerResourceList ServerUpdateTool::getServersForUpload()
+{
+    QnMediaServerResourceList result;
+    for (auto server: m_activeServers)
+        result.push_back(server.second);
+    return result;
+}
+
+ServerUpdateTool::OfflineUpdateState ServerUpdateTool::getUploaderState() const
+{
+    return m_offlineUpdaterState;
+}
+
+void ServerUpdateTool::at_uploadWorkerState(QnUuid serverId, const UploadState& state)
+{
+    if (!m_uploadState.count(state.id))
+    {
+        qDebug() << "ServerUpdateTool::at_uploadWorkerState() no upload state with id=" << state.id;
+        return;
+    }
+
+    auto server = m_activeServers[serverId];
+    switch(state.status)
+    {
+        case UploadState::Done:
+            qDebug() << "ServerUpdateTool::at_uploadWorkerState() uploaded file="
+                     << state.destination << "server:" << serverId;
+            m_activeUploads.erase(state.id);
+            m_completedUploads.insert(state.id);
+            if (m_activeUploads.empty() && !m_completedUploads.empty())
+            {
+                m_offlineUpdaterState =OfflineUpdateState::Done;
+                m_offlineUpdateStateChanged = true;
+            }
+
+            break;
+        case UploadState::Uploading:
+            qDebug() << "ServerUpdateTool::at_uploadWorkerState() uploading file="
+                     << state.destination << "bytes"
+                     << state.uploaded << "of" << state.size
+                     << "server:" << serverId;
+            break;
+        case UploadState::Error:
+            qDebug() << "ServerUpdateTool::at_uploadWorkerState() error with file="
+                     << state.destination
+                     << "error:" << state.errorMessage
+                     << "server:" << serverId;
+            m_activeUploads.erase(state.id);
+            m_completedUploads.insert(state.id);
+            if (m_activeUploads.empty() && !m_completedUploads.empty())
+            {
+                m_offlineUpdaterState =OfflineUpdateState::Done;
+                m_offlineUpdateStateChanged = true;
+            }
+            break;
+        default:
+            break;
+    }
+
+    m_uploadState[state.id] = state;
+    m_offlineUpdateStateChanged = true;
+}
+
+void ServerUpdateTool::startUpload(QString changeset)
+{
+    qDebug() << "ServerUpdateTool::startUpload()";
+    NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::Ready);
+    QnMediaServerResourceList recipients = getServersForUpload();
+
+    QStringList files = m_filesToUpload;
+
+    for (auto id: m_activeUploads)
+        m_uploadManager->cancelUpload(id);
+
+    m_activeUploads.clear();
+    m_completedUploads.clear();
+    m_uploadState.clear();
+    for(auto server: recipients)
+    {
+        QnUuid serverId = server->getId();
+        for (auto path: m_filesToUpload)
+        {
+            auto callback = [this, serverId](const UploadState& state)
+            {
+                at_uploadWorkerState(serverId, state);
+            };
+
+            UploadState config;
+            config.source = m_outputDir.filePath(path);
+            config.destination = m_uploadDestination + path;
+            // Updates should land to updates/publication_key/file_name
+            config.ttl = -1; //< This should mean 'infinite time'
+            auto id = m_uploadManager->addUpload(server, config, this, callback);
+
+            if (!id.isEmpty())
+            {
+                m_uploadState[id] = config;
+                m_activeUploads.insert(id);
+            }
+            else
+            {
+                qDebug() << "ServerUpdateTool::uploadNext - failed to start uploading file="
+                         << path
+                         << "reason="
+                         << config.errorMessage;
+            }
+        }
+    }
+
+    m_offlineUpdaterState = OfflineUpdateState::Push;
+}
+
+void ServerUpdateTool::stopUpload()
+{
+    NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::Push);
+    // TODO: Implement it
+    for (auto record: m_uploadState)
+    {
+        m_uploadManager->cancelUpload(record.first);
+    }
+
+    m_activeUploads.clear();
+    m_completedUploads.clear();
+    m_uploadState.clear();
+    qDebug() << "ServerUpdateTool::stopUpload()";
+    m_offlineUpdaterState = OfflineUpdateState::Ready;
+}
+
+ServerUpdateTool::ProgressInfo ServerUpdateTool::calcUploadProgress()
+{
+    ProgressInfo result;
+
+    for(const auto record: m_uploadState)
+    {
+        result.max += 100;
+        qint64 progress = 0;
+        switch (record.second.status)
+        {
+            case UploadState::Uploading:
+                progress = 100*record.second.uploaded / record.second.size;
+                break;
+            case UploadState::Done:
+                progress = 100;
+                break;
+            default:
+                progress = 0;
+                break;
+        }
+        result.current += progress;
+    }
+    return result;
+}
+
+ServerUpdateTool::ProgressInfo ServerUpdateTool::calcRemoteDownloadProgress()
+{
+    ProgressInfo result;
+    return result;
+}
+
+ServerUpdateTool::ProgressInfo ServerUpdateTool::calcInstallProgress()
+{
+    ProgressInfo result;
+    return result;
 }
 
 void ServerUpdateTool::at_resourceAdded(const QnResourcePtr& resource)
@@ -166,6 +487,11 @@ bool ServerUpdateTool::hasRemoteChanges() const
     return result;
 }
 
+bool ServerUpdateTool::hasOfflineUpdateChanges() const
+{
+    return m_offlineUpdateStateChanged;
+}
+
 using UpdateStatusAll = rest::RestResultWithData<std::vector<nx::update::Status>>;
 
 bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
@@ -175,7 +501,6 @@ bool ServerUpdateTool::getServersStatusChanges(RemoteStatus& status)
     status = std::move(m_remoteUpdateStatus);
     return true;
 }
-
 
 void ServerUpdateTool::requestStopAction(QSet<QnUuid> targets)
 {
@@ -190,6 +515,7 @@ void ServerUpdateTool::requestStartUpdate(const nx::update::Information& info)
     if (auto connection = getServerConnection(commonModule()->currentServer()))
     {
         connection->updateActionStart(info);
+        m_updateManifest = info;
     }
 }
 

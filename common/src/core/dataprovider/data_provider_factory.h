@@ -15,7 +15,7 @@ public:
     explicit QnDataProviderFactory(QObject* parent = nullptr);
     virtual ~QnDataProviderFactory() override;
 
-    QnAbstractStreamDataProvider* createDataProvider(
+    virtual QnAbstractStreamDataProvider* createDataProvider(
         const QnResourcePtr& resource,
         Qn::ConnectionRole role = Qn::CR_Default);
 

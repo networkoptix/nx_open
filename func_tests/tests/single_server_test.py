@@ -14,7 +14,7 @@ from framework.http_api import HttpError, REST_API_TIMEOUT_SEC
 from framework.mediaserver_api import TimePeriod
 from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import log_list
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -203,8 +203,8 @@ def test_auth_with_time_changed(mediaserver_allocation, one_vm):
         assert timeless_server.api.is_primary_time_server()
         url = timeless_server.api.generic.http.url('ec2/testConnection')
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
-        wait_for_true(
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc)),
             "time on {} is close to now".format(timeless_server))
 
@@ -216,8 +216,8 @@ def test_auth_with_time_changed(mediaserver_allocation, one_vm):
         response = requests.get(url, headers={'Authorization': authorization_header_value})
         response.raise_for_status()
 
-        timeless_server.os_access.set_time(datetime.now(pytz.utc) + shift)
-        wait_for_true(
+        timeless_server.os_access.time.set(datetime.now(pytz.utc) + shift)
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(datetime.now(pytz.utc) + shift),
             "time on {} is close to now + {}".format(timeless_server, shift))
 
@@ -233,12 +233,12 @@ def test_uptime_is_monotonic(mediaserver_allocation, one_vm):
         timeless_guid = timeless_server.api.get_server_id()
         timeless_server.api.generic.post('ec2/forcePrimaryTimeServer', dict(id=timeless_guid))
         assert timeless_server.api.is_primary_time_server()
-        timeless_server.os_access.set_time(datetime.now(pytz.utc))
+        timeless_server.os_access.time.set(datetime.now(pytz.utc))
         first_uptime = timeless_server.api.generic.get('api/statistics')['uptimeMs']
         if not isinstance(first_uptime, (int, float)):
             _logger.warning("Type of uptimeMs is %s but expected to be numeric.", type(first_uptime).__name__)
-        new_time = timeless_server.os_access.set_time(datetime.now(pytz.utc) - timedelta(minutes=1))
-        wait_for_true(
+        new_time = timeless_server.os_access.time.set(datetime.now(pytz.utc) - timedelta(minutes=1))
+        wait_for_truthy(
             lambda: timeless_server.api.get_time().is_close_to(new_time),
             "time on {} is close to {}".format(timeless_server, new_time))
         second_uptime = timeless_server.api.generic.get('api/statistics')['uptimeMs']
@@ -273,7 +273,7 @@ def test_non_existent_api_endpoints(one_running_mediaserver, path):
 
 
 def test_https_verification(one_running_mediaserver, ca):
-    url = one_running_mediaserver.api.generic.http.url('/api/ping', secure=True)
+    url = one_running_mediaserver.api.generic.http.secure_url('/api/ping')
     assert url.startswith('https://')
     with warnings.catch_warnings(record=True) as warning_list:
         response = requests.get(url, verify=str(ca.cert_path))

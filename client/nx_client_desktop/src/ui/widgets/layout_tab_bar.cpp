@@ -19,7 +19,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -122,7 +121,7 @@ void QnLayoutTabBar::submitCurrentLayout()
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+        QScopedValueRollback<bool> guard(m_update, false);
         workbench()->setCurrentLayout(currentIndex() == -1 ? NULL : m_layouts[currentIndex()]);
     }
 
@@ -335,7 +334,7 @@ void QnLayoutTabBar::at_workbench_layoutsChanged()
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+        QScopedValueRollback<bool> guard(m_submit, false);
 
         for (int i = 0; i < layouts.size(); i++)
         {
@@ -376,7 +375,7 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged()
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
+        QScopedValueRollback<bool> guard(m_submit, false);
         setCurrentIndex(newCurrentIndex);
     }
 
@@ -391,7 +390,7 @@ void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &
 void QnLayoutTabBar::tabInserted(int index)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+        QScopedValueRollback<bool> guard(m_update, false);
 
         QString name;
         if (m_layouts.size() != count())
@@ -433,7 +432,7 @@ void QnLayoutTabBar::tabInserted(int index)
 void QnLayoutTabBar::tabRemoved(int index)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+        QScopedValueRollback<bool> guard(m_update, false);
 
         QnWorkbenchLayout *layout = m_layouts[index];
         disconnect(layout, NULL, this, NULL);
@@ -452,7 +451,7 @@ void QnLayoutTabBar::tabRemoved(int index)
 void QnLayoutTabBar::at_tabMoved(int from, int to)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_update, false);
+        QScopedValueRollback<bool> guard(m_update, false);
 
         QnWorkbenchLayout *layout = m_layouts[from];
         m_layouts.move(from, to);

@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Aangepast",
-      "description": "Gebruik de %PRODUCT_NAME% client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -128,7 +128,7 @@
     "unknownError": "Er is een onverwachte fout opgetreden",
     "accountAlreadyActivated": "Deze account is al geactiveerd",
     "emailNotFound": "Dit account bestaat niet.",
-    "EmailAlreadyExists": "Dit e-mailadres is al geregistreerd",
+    "EmailAlreadyExists": "Dit Email is al geregistreerd",
     "oldPasswordMistmatch": "Dit wachtwoord is onjuist.",
     "passwordMismatch": "Wachtwoord onjuist",
     "cantEditYourself": "Het wijzigen van eigen machtigingen is niet toegestaan",
@@ -259,7 +259,7 @@
     "setNewPasswordLabel": "Nieuw wachtwoord"
   },
   "regActions": {
-    "passwordLabel": "Password",
+    "passwordLabel": "Wachtwoord",
     "createAccount": "Account aanmaken"
   },
   "header": {

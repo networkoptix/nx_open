@@ -29,8 +29,7 @@ public:
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
-        nxpl::NX_GUID* eventTypeList,
-        int eventTypeListSize) override;
+        const char* const* typeList, int typeListSize) override;
 
     virtual nx::sdk::Error setHandler(
         nx::sdk::metadata::MetadataHandler* handler) override;

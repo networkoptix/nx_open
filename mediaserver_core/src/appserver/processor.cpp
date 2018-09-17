@@ -183,7 +183,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
         ->saveSync(apiCameraData.id, properties);
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_LOG(QString::fromLatin1("Can't add camera's properties to database. DB error code %1").arg(ec2::toString(errorCode)), cl_logWARNING);
+        NX_WARNING(typeid(QnAppserverResourceProcessor), QString::fromLatin1("Can't add camera's properties to database. DB error code %1").arg(ec2::toString(errorCode)));
         return errorCode;
     }
 
@@ -191,7 +191,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
         ->getCameraManager(Qn::kSystemAccess)
         ->addCameraSync(apiCameraData);
     if (errorCode != ec2::ErrorCode::ok)
-        NX_LOG(QString::fromLatin1("Can't add camera to database. DB error code %1").arg(ec2::toString(errorCode)), cl_logWARNING);
+        NX_WARNING(typeid(QnAppserverResourceProcessor), QString::fromLatin1("Can't add camera to database. DB error code %1").arg(ec2::toString(errorCode)));
 
     return errorCode;
 }
@@ -236,7 +236,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         errCode =  ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)), cl_logWARNING );
+            NX_WARNING (this, QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)));
             return;
         }
         QSet<QByteArray> modifiedFields;

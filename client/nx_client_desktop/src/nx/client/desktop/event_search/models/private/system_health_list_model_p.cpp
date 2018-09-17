@@ -102,8 +102,24 @@ QnResourcePtr SystemHealthListModel::Private::resource(int index) const
 QString SystemHealthListModel::Private::text(int index) const
 {
     const auto& item = m_items[index];
-    return QnSystemHealthStringsHelper::messageText(item.message,
-        QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+    switch (item.message)
+    {
+        case QnSystemHealth::RemoteArchiveSyncStarted:
+        case QnSystemHealth::RemoteArchiveSyncFinished:
+        case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::RemoteArchiveSyncError:
+        {
+            // TODO: #vkutin This is bad, remove it after VMS-7724 refactor is done.
+            const auto description = item.serverData->getRuntimeParams().description;
+            if (!description.isEmpty())
+                return description;
+        }
+        [[fallthrough]];
+
+        default:
+            return QnSystemHealthStringsHelper::messageText(item.message,
+                QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+    }
 }
 
 QString SystemHealthListModel::Private::toolTip(int index) const
@@ -235,13 +251,18 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
         action = params.value<vms::event::AbstractActionPtr>();
         if (action)
         {
-            auto resourceId = action->getRuntimeParams().eventResourceId;
-            resource = resourcePool()->getResourceById(resourceId);
+            const auto runtimeParameters = action->getRuntimeParams();
+            resource = runtimeParameters.metadata.cameraRefs.empty()
+                ? resourcePool()->getResourceById(runtimeParameters.eventResourceId)
+                : static_cast<QnResourcePtr>(camera_id_helper::findCameraByFlexibleId(resourcePool(),
+                    runtimeParameters.metadata.cameraRefs[0]));
         }
     }
 
     // TODO: #vkutin We may want multiple resource aggregation as one event.
     Item item(message, resource);
+    item.serverData = action;
+
     auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
     if (position != m_items.end() && *position == item)
         return; //< Already exists.

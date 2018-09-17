@@ -2,9 +2,9 @@
 Idea for this is to have same code used by self_tests and usual tests
 and to have less code in tests."""
 
+import logging
 from collections import namedtuple
 from contextlib import contextmanager
-import logging
 
 from pathlib2 import Path
 
@@ -12,7 +12,7 @@ from framework.installation.lightweight_mediaserver import LwMultiServer
 from framework.installation.mediaserver import Mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.os_access.exceptions import CoreDumpError
-from framework.os_access.ssh_access import PhysicalSshAccess
+from framework.os_access.posix_access import PosixAccess
 from framework.utils import flatten_list
 
 _logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def host_from_config(host_config):
     host_name = host_config['name']
     return Host(
         name=host_name,
-        os_access=PhysicalSshAccess(
+        os_access=PosixAccess.to_physical_machine(
             host_name,
             host_config['address'],
             host_config['username'],
@@ -173,7 +173,7 @@ class UnpackedMediaserverFactory(object):
             name=host.name,
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
-            root_dir=host.os_access.Path(host.dir),
+            root_dir=host.os_access.path_cls(host.dir),
             server_bind_address=host.server_bind_address,
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,

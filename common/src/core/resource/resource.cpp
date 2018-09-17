@@ -354,11 +354,11 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
-        NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+        NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                 .arg(QString::fromLatin1(Q_FUNC_INFO))
                 .arg(sharedThis->getId().toString())
                 .arg(sharedThis->getName())
-                .arg(sharedThis->getUrl()), cl_logDEBUG2);
+                .arg(sharedThis->getUrl()));
 
         emit statusChanged(sharedThis, reason);
     }
@@ -372,7 +372,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_ASSERT(commonModule());
     if (!commonModule())
         return;
 
@@ -380,6 +379,8 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
+
+    NX_DEBUG(this, "Status changed to %1: %2", newStatus, reason);
     commonModule()->statusDictionary()->setValue(id, newStatus);
     doStatusChanged(oldStatus, newStatus, reason);
 }

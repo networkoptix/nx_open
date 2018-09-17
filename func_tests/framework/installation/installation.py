@@ -80,7 +80,7 @@ class Installation(object):
     def list_log_files(self):
         logs_dir = self._var.joinpath('log')
         if logs_dir.exists():
-            return logs_dir.glob('log_file*.log')
+            return logs_dir.glob('*')
         else:
             return []
 

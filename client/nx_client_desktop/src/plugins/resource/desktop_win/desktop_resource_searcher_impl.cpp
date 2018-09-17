@@ -26,7 +26,7 @@ QnDesktopResourceSearcherImpl::~QnDesktopResourceSearcherImpl()
 }
 
 QnResourceList QnDesktopResourceSearcherImpl::findResources() {
-    if (qnRuntime->isVideoWallMode() || qnRuntime->isActiveXMode())
+    if (qnRuntime->isVideoWallMode() || qnRuntime->isAcsMode())
         return QnResourceList();
 
     QnResourceList result;

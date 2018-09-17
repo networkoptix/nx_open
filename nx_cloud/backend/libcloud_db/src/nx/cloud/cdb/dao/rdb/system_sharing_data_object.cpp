@@ -26,11 +26,10 @@ nx::sql::DBResult SystemSharingDataObject::insertOrReplaceSharing(
     QnSql::bind(sharing, &replaceSharingQuery);
     if (!replaceSharingQuery.exec())
     {
-        NX_LOG(lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
+        NX_DEBUG(this, lm("Failed to update/remove sharing. system %1, account %2, access role %3. %4")
             .arg(sharing.systemId).arg(sharing.accountEmail)
             .arg(QnLexical::serialized(sharing.accessRole))
-            .arg(replaceSharingQuery.lastError().text()),
-            cl_logDEBUG1);
+            .arg(replaceSharingQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -75,9 +74,8 @@ nx::sql::DBResult SystemSharingDataObject::fetchSharing(
     if (dbResult != nx::sql::DBResult::ok &&
         dbResult != nx::sql::DBResult::notFound)
     {
-        NX_LOGX(lm("Error fetching sharing of system %1 to account %2")
-            .arg(systemId).arg(accountEmail),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Error fetching sharing of system %1 to account %2")
+            .arg(systemId).arg(accountEmail));
     }
 
     return dbResult;
@@ -144,11 +142,8 @@ nx::sql::DBResult SystemSharingDataObject::deleteSharing(
     nx::sql::bindFields(&removeSharingQuery, filterFields);
     if (!removeSharingQuery.exec())
     {
-        NX_LOGX(
-            QnLog::EC2_TRAN_LOG,
-            lm("Failed to remove sharing. system %1, filter \"%2\". %3")
-            .arg(systemId).arg(filterStr).arg(removeSharingQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Failed to remove sharing. system %1, filter \"%2\". %3")
+            .arg(systemId).arg(filterStr).arg(removeSharingQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
     return nx::sql::DBResult::ok;
@@ -174,10 +169,9 @@ nx::sql::DBResult SystemSharingDataObject::calculateUsageFrequencyForANewSystem(
     if (!calculateUsageFrequencyForTheNewSystem.exec() ||
         !calculateUsageFrequencyForTheNewSystem.next())
     {
-        NX_LOGX(lm("Failed to fetch usage_frequency for the new system %1 of account %2. %3")
+        NX_DEBUG(this, lm("Failed to fetch usage_frequency for the new system %1 of account %2. %3")
             .arg(systemId).arg(accountId)
-            .arg(calculateUsageFrequencyForTheNewSystem.lastError().text()),
-            cl_logDEBUG1);
+            .arg(calculateUsageFrequencyForTheNewSystem.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -210,9 +204,9 @@ nx::sql::DBResult SystemSharingDataObject::updateUserLoginStatistics(
         ":system_id", QnSql::serialized_field(systemId));
     if (!updateUsageStatisticsQuery.exec())
     {
-        NX_LOGX(lm("Error executing request to update system %1 usage by %2 in db. %3")
+        NX_WARNING(this, lm("Error executing request to update system %1 usage by %2 in db. %3")
             .arg(systemId).arg(accountId)
-            .arg(updateUsageStatisticsQuery.lastError().text()), cl_logWARNING);
+            .arg(updateUsageStatisticsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -252,9 +246,8 @@ nx::sql::DBResult SystemSharingDataObject::fetchUserSharings(
     nx::sql::bindFields(&selectSharingQuery, filterFields);
     if (!selectSharingQuery.exec())
     {
-        NX_LOGX(lm("Error executing request to select sharings with filter \"%1\". %2")
-            .arg(filterStr).arg(selectSharingQuery.lastError().text()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Error executing request to select sharings with filter \"%1\". %2")
+            .arg(filterStr).arg(selectSharingQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
     QnSql::fetch_many(selectSharingQuery, sharings);

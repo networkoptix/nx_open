@@ -4,7 +4,7 @@ Initial task https://networkoptix.atlassian.net/browse/UT-42.
 """
 import pytest
 
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 SECOND_CLOUD_USER = 'vfedorov@networkoptix.com'
 SECOND_CLOUD_PASSWORD = '123qweasd'
@@ -39,5 +39,5 @@ def test_mediaserver_cloud_protocol_synchronization(one_mediaserver, cloud_accou
     assert second_cloud_users[0]['isCloud']
 
     one_mediaserver.api.generic.http.set_credentials(SECOND_CLOUD_USER, SECOND_CLOUD_PASSWORD)
-    wait_for_true(one_mediaserver.api.credentials_work)
+    wait_for_truthy(one_mediaserver.api.credentials_work)
     assert not one_mediaserver.installation.list_core_dumps()

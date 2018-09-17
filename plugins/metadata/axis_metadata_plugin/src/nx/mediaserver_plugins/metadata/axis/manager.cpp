@@ -29,8 +29,8 @@ Manager::Manager(
     m_auth.setPassword(cameraInfo.password);
 
     nx::api::AnalyticsDeviceManifest deviceManifest;
-    for (const auto& event: typedManifest.outputEventTypes)
-        deviceManifest.supportedEventTypes.push_back(event.typeId);
+    for (const auto& eventType: typedManifest.outputEventTypes)
+        deviceManifest.supportedEventTypes.push_back(eventType.id);
     NX_PRINT << "Axis metadata manager created";
 }
 
@@ -66,7 +66,7 @@ void Manager::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count
     // There are no Manager settings for this plugin.
 }
 
-nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeListSize)
+nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int typeListSize)
 {
     m_monitor = new Monitor(this, m_url, m_auth, m_handler);
     return m_monitor->startMonitoring(typeList, typeListSize);
@@ -97,12 +97,12 @@ void Manager::freeManifest(const char* data)
     // released in Manager's destructor.
 }
 
-const AnalyticsEventType* Manager::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Manager::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&uuid](const AnalyticsEventType& event) { return event.typeId == uuid; });
+        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
 
     if (it == m_typedManifest.outputEventTypes.cend())
         return nullptr;

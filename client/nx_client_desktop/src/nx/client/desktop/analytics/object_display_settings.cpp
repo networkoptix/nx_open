@@ -43,18 +43,18 @@ bool systemAttribute(const QString& name)
 class ObjectDisplaySettings::Private
 {
 public:
-    QHash<QnUuid, ObjectDisplaySettingsItem> settingsByTypeId;
+    QHash<QString, ObjectDisplaySettingsItem> settingsByObjectTypeId;
 
     void loadSettings()
     {
-        settingsByTypeId = QJson::deserialized<decltype(settingsByTypeId)>(
+        settingsByObjectTypeId = QJson::deserialized<decltype(settingsByObjectTypeId)>(
             qnSettings->detectedObjectDisplaySettings().toUtf8());
     }
 
     void saveSettings()
     {
         qnSettings->setDetectedObjectDisplaySettings(
-            QString::fromUtf8(QJson::serialized(settingsByTypeId)));
+            QString::fromUtf8(QJson::serialized(settingsByObjectTypeId)));
     }
 };
 
@@ -68,9 +68,9 @@ ObjectDisplaySettings::~ObjectDisplaySettings()
 {
 }
 
-QColor ObjectDisplaySettings::objectColor(const QnUuid& objectTypeId)
+QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 {
-    auto& settings = d->settingsByTypeId[objectTypeId];
+    auto& settings = d->settingsByObjectTypeId[objectTypeId];
     if (!settings.color.isValid())
     {
         settings.color = utils::random::choice(colorTheme()->groupColors("detectedObject"));
@@ -87,7 +87,7 @@ QColor ObjectDisplaySettings::objectColor(const common::metadata::DetectedObject
 std::vector<common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
     const common::metadata::DetectedObject& object) const
 {
-    const auto& settings = d->settingsByTypeId.value(object.objectTypeId);
+    const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
 
     std::vector<common::metadata::Attribute> result;
 
@@ -106,7 +106,7 @@ std::vector<common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
 std::vector<common::metadata::Attribute> ObjectDisplaySettings::visibleAttributes(
     const common::metadata::DetectedObject& object) const
 {
-    const auto& settings = d->settingsByTypeId.value(object.objectTypeId);
+    const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
 
     std::vector<common::metadata::Attribute> result;
 

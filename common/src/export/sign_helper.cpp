@@ -11,9 +11,10 @@
 
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
-#include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
 #include "utils/media/ffmpeg_helper.h"
+
+#include <nx/utils/scope_guard.h>
 
 extern "C" {
 #include <libswscale/swscale.h>
@@ -285,7 +286,8 @@ QColor blendColor(QColor color, float opacity, QColor backgroundColor)
 
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
-    QnScopedPainterTransformRollback rollback(&painter);
+    // We should restore this transform at the exit.
+    const auto initialTransform = painter.transform();
 
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
@@ -353,6 +355,8 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
                 painter.drawPixmap(x*SQUARE_SIZE, y*SQUARE_SIZE, m_roundRectPixmap);
         }
     }
+
+    painter.setTransform(initialTransform);
 }
 
 void QnSignHelper::draw(QImage& img, bool drawText)

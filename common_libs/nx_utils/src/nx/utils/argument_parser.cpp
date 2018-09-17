@@ -65,7 +65,7 @@ void ArgumentParser::parse(int argc, const char* argv[])
         }
     }
 
-    NX_LOGX(lm("Parsed: %1").container(m_args), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Parsed: %1").container(m_args));
 }
 
 bool ArgumentParser::read(const QString& name, QString* const value) const

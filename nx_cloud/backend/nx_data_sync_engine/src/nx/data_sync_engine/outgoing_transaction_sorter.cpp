@@ -11,7 +11,7 @@ namespace nx {
 namespace data_sync_engine {
 
 OutgoingTransactionSorter::OutgoingTransactionSorter(
-    const nx::String& systemId,
+    const std::string& systemId,
     VmsTransactionLogCache* vmsTransactionLogCache,
     AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
 :

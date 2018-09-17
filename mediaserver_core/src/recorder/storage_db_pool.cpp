@@ -20,9 +20,9 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
     {
         if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
         {
-            NX_LOG(lit("%1 Storage %2 is not writable. Can't create storage DB file.")
+            NX_WARNING(this, lit("%1 Storage %2 is not writable. Can't create storage DB file.")
                     .arg(Q_FUNC_INFO)
-                    .arg(storage->getUrl()), cl_logWARNING);
+                    .arg(storage->getUrl()));
             return sdb;
         }
         QString simplifiedGUID = moduleGUID().toSimpleString();
@@ -36,9 +36,9 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
             m_chunksDB[storage->getUrl()] = sdb;
         }
         else {
-            NX_LOG(lit("%1 Storage DB file %2 open failed.")
+            NX_WARNING(this, lit("%1 Storage DB file %2 open failed.")
                     .arg(Q_FUNC_INFO)
-                    .arg(fileName), cl_logWARNING);
+                    .arg(fileName));
             return QnStorageDbPtr();
         }
     }

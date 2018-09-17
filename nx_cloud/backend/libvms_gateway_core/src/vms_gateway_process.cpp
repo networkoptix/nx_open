@@ -101,7 +101,7 @@ int VmsGatewayProcess::serviceMain(
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
         {
-            NX_LOG("No HTTP address to listen", cl_logALWAYS);
+            NX_ALWAYS(this, "No HTTP address to listen");
             return 1;
         }
 
@@ -164,20 +164,20 @@ int VmsGatewayProcess::serviceMain(
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-        NX_LOG(lm("%1 has been started on %2")
+        NX_ALWAYS(this, lm("%1 has been started on %2")
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
-            .container(m_httpEndpoints), cl_logALWAYS);
+            .container(m_httpEndpoints));
 
         const auto result = runMainLoop();
 
-        NX_LOG(lm("%1 has been stopped")
-            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
+        NX_ALWAYS(this, lm("%1 has been stopped")
+            .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()));
 
         return result;
     }
     catch (const std::exception& e)
     {
-        NX_LOG(lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS);
+        NX_ALWAYS(this, lit("Failed to start application. %1").arg(e.what()));
         return 3;
     }
 }
@@ -233,8 +233,8 @@ void VmsGatewayProcess::publicAddressFetched(
     const conf::Settings& settings,
     const QString& publicAddress)
 {
-    NX_LOGX(lm("Retrieved public address %1. This address will be used for cloud connect")
-        .arg(publicAddress), cl_logINFO);
+    NX_INFO(this, lm("Retrieved public address %1. This address will be used for cloud connect")
+        .arg(publicAddress));
 
     nx::network::SocketGlobals::cloud().settings()
         .replaceOriginatingHostAddress(publicAddress);

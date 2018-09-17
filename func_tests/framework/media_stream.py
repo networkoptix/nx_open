@@ -2,20 +2,12 @@ import logging
 import math
 import struct
 import time
-try:
-    from urllib import urlencode
-    # noinspection PyCompatibility
-    from urlparse import urlparse
-except ImportError:
-    # noinspection PyCompatibility
-    from urllib.parse import urlparse
-    # noinspection PyCompatibility
-    from urllib.parse import urlencode
 from datetime import datetime, timedelta
 
 import cv2
 import requests
 from requests.auth import HTTPDigestAuth
+from six.moves.urllib.parse import urlencode, urlparse
 
 from .artifact import ArtifactType
 from .utils import datetime_utc_to_timestamp
@@ -61,7 +53,7 @@ class Metadata(object):
         _logger.info('\tfourcc: %r (%d) ', struct.pack('I', self.fourcc), self.fourcc)
 
 
-class RtspMediaStream(object):
+class Rtsp(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         params = dict(pos=0, speed=RTSP_SPEED)
@@ -154,7 +146,7 @@ def load_stream_metadata_from_http_response(stream_type, response, temp_file_pat
     return Metadata.from_file(temp_file_path)
 
 
-class WebmMediaStream(object):
+class Webm(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.url = '%smedia/%s.webm' % (server_url, camera_mac_addr)
@@ -169,7 +161,7 @@ class WebmMediaStream(object):
         return [metadata]
 
 
-class DirectHlsMediaStream(object):
+class DirectHls(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.url = '%shls/%s.mkv' % (server_url, camera_mac_addr)
@@ -188,7 +180,7 @@ class DirectHlsMediaStream(object):
         return [metadata]
 
 
-class M3uHlsMediaStream(object):
+class M3uHls(object):
 
     def __init__(self, server_url, user, password, camera_mac_addr):
         self.server_url = server_url

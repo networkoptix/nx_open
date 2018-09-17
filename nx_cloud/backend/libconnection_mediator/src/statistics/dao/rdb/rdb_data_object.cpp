@@ -29,16 +29,16 @@ nx::sql::DBResult DataObject::save(
     if (!saveRecordQuery.prepare(queryText))
     {
         NX_ASSERT(false);
-        NX_LOGX(lm("Failed to prepare connect session statistics query. %1")
-            .arg(saveRecordQuery.lastError().text()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to prepare connect session statistics query. %1")
+            .arg(saveRecordQuery.lastError().text()));
         return nx::sql::DBResult::statementError;
     }
 
     QnSql::bind(stats, &saveRecordQuery);
     if (!saveRecordQuery.exec())
     {
-        NX_LOGX(lm("Failed to save connect session statistics to DB. %1")
-            .arg(saveRecordQuery.lastError().text()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to save connect session statistics to DB. %1")
+            .arg(saveRecordQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -67,15 +67,15 @@ nx::sql::DBResult DataObject::readAllRecords(
     if (!fetchAllRecordsQuery.prepare(queryText))
     {
         NX_ASSERT(false);
-        NX_LOGX(lm("Failed to prepare fetch connect session statistics query. %1")
-            .arg(fetchAllRecordsQuery.lastError().text()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to prepare fetch connect session statistics query. %1")
+            .arg(fetchAllRecordsQuery.lastError().text()));
         return nx::sql::DBResult::statementError;
     }
 
     if (!fetchAllRecordsQuery.exec())
     {
-        NX_LOGX(lm("Failed to fetch connect session statistics from DB. %1")
-            .arg(fetchAllRecordsQuery.lastError().text()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to fetch connect session statistics from DB. %1")
+            .arg(fetchAllRecordsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

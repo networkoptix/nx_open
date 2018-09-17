@@ -19,7 +19,7 @@ import pytest
 from framework.merging import merge_systems
 from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str
-from framework.waiting import WaitTimeout, wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    copy_file(backup_db_path, server.os_access.Path(server_db_path))
+    copy_file(backup_db_path, server.os_access.path_cls(server_db_path))
 
 
 def check_camera(server, camera_guid):
@@ -94,7 +94,7 @@ def check_camera_absence_on_server(server, camera_guid):
 
 def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
     try:
-        wait_for_true(
+        wait_for_truthy(
             lambda: one.api.generic.get('ec2/getFullInfo') == two.api.generic.get('ec2/getFullInfo'),
             "Servers have the same ec2/getFullInfo {}".format(stage))
     finally:
@@ -124,7 +124,7 @@ def test_backup_restore(artifact_factory, one, two, camera):
     # 90 seconds is empiric value (30 isn't enough to restart after restore database)
     with one.api.waiting_for_restart(timeout_sec=90), two.api.waiting_for_restart(timeout_sec=90):
         one.api.generic.post('ec2/restoreDatabase', dict(data=backup['data']))
-    wait_for_true(
+    wait_for_truthy(
         lambda: check_camera_absence_on_server(one, camera_guid),
         "Server ONE camera disappearance")
     full_info_after_backup_restore = wait_for_full_info_be_the_same(

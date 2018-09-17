@@ -1,5 +1,3 @@
-import pytest
-
 from framework.installation.dpkg_installation import DpkgInstallation
 from framework.installation.installation import OsNotSupported
 from framework.installation.windows_installation import WindowsInstallation

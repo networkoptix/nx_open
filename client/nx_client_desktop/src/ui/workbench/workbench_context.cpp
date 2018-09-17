@@ -233,7 +233,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
-            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to cloud"));
             qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
             break;
         }
@@ -246,7 +246,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
-            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);
             systemUrl.setPassword(auth.password);
@@ -254,7 +254,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             if (systemIsCloud)
             {
                 qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
-                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Custom URI: System is cloud, connecting to cloud first"));
             }
 
             auto parameters = action::Parameters().withArgument(Qn::UrlRole, systemUrl);
@@ -403,23 +403,9 @@ QnWorkbenchContext::StartupParametersCode
                                  .withArgument(Qn::VideoWallGuidRole, startupParams.videoWallGuid)
                                  .withArgument(Qn::VideoWallItemGuidRole, startupParams.videoWallItemGuid));
     }
-    else if (!startupParams.delayedDrop.isEmpty())
-    { /* Drop resources if needed. */
-        NX_ASSERT(startupParams.instantDrop.isEmpty());
 
-        QByteArray data = QByteArray::fromBase64(startupParams.delayedDrop.toLatin1());
-        menu()->trigger(action::DelayedDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.instantDrop.isEmpty())
-    {
-        QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
-        menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
-    }
-    else if (!startupParams.layoutName.isEmpty())
-    {
-        const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
-        menu()->trigger(action::DelayedDropResourcesAction, parameters);
-    }
+    menu()->trigger(action::ProcessStartupParametersAction,
+        {Qn::StartupParametersRole, startupParams});
 
     /* Show beta version warning message for the main instance only */
     const bool showBetaWarning = QnAppInfo::beta()

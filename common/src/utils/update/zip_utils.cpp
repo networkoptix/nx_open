@@ -6,10 +6,11 @@
 #include <quazip/quazipfile.h>
 
 namespace {
-    const int readBufferSize = 1024 * 16;
-    const int maxSymlinkLength = readBufferSize;
+    const int kReadBufferSizeBytes = 1024 * 16;
+    const int maxSymlinkLength = kReadBufferSizeBytes;
 
-    bool isSymlink(const QuaZipFileInfo64 &info) {
+    bool isSymlink(const QuaZipFileInfo64 &info)
+    {
         /* According to zip format specifications the higher 4 bits contain file type. Symlink is 0xA. */
         return (info.externalAttr >> 28) == 0xA;
     }
@@ -29,44 +30,77 @@ QnZipExtractor::QnZipExtractor(QIODevice *ioDevice, const QDir &targetDir) :
 {
 }
 
-QnZipExtractor::~QnZipExtractor() {
+QnZipExtractor::~QnZipExtractor()
+{
     stop();
 }
 
-QString QnZipExtractor::errorToString(QnZipExtractor::Error error) {
-    switch (error) {
-    case BrokenZip:
-        return lit("Zip file is brocken.");
-    case WrongDir:
-        return lit("Could not find target dir.");
-    case CantOpenFile:
-        return lit("Could not open file for writing.");
-    case NoFreeSpace:
-        return lit("There is no free space on the disk.");
-    case OtherError:
-        return lit("Unknown error.");
-    case Stopped:
-        return lit("Extraction was canceled.");
-    default:
-        return QString();
+/*
+QnZipExtractor::Error QnZipExtractor::extract(const QString &fileName, const QDir &targetDir)
+{
+    if (isRunning())
+        return Error::Busy;
+
+    m_lastError = Ok;
+    m_dir = targetDir;
+    m_zip.reset(new QuaZip(fileName));
+    return Ok;
+}
+
+QnZipExtractor::Error QnZipExtractor::extract(QIODevice *ioDevice, const QDir &targetDir)
+{
+    if (isRunning())
+        return Error::Busy;
+
+    m_lastError = Ok;
+    m_dir = targetDir;
+    m_zip.reset(new QuaZip(ioDevice));
+    return Ok;
+}
+*/
+
+QString QnZipExtractor::errorToString(QnZipExtractor::Error error)
+{
+    switch (error)
+    {
+        case Error::BrokenZip:
+            return "Zip file is brocken.";
+        case Error::WrongDir:
+            return "Could not find target dir.";
+        case Error::CantOpenFile:
+            return "Could not open file for writing.";
+        case Error::NoFreeSpace:
+            return "There is no free space on the disk.";
+        case Error::OtherError:
+            return "Unknown error.";
+        case Error::Stopped:
+            return "Extraction was canceled.";
+        case Error::Busy:
+            return "Extractor is busy.";
+        default:
+            return QString();
     }
 }
 
-QnZipExtractor::Error QnZipExtractor::error() const {
+QnZipExtractor::Error QnZipExtractor::error() const
+{
     return m_lastError;
 }
 
-QDir QnZipExtractor::dir() const {
+QDir QnZipExtractor::dir() const
+{
     return m_dir;
 }
 
-void QnZipExtractor::run() {
+void QnZipExtractor::run()
+{
     Error error = extractZip();
     m_lastError = error;
     emit finished(error);
 }
 
-QnZipExtractor::Error QnZipExtractor::extractZip() {
+QnZipExtractor::Error QnZipExtractor::extractZip()
+{
     if (!m_dir.exists())
         return WrongDir;
 
@@ -75,8 +109,9 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
 
     QList<QPair<QString, QString>> symlinks;
 
-    QuaZipFile file(m_zip);
-    for (bool more = m_zip->goToFirstFile(); more && !m_needStop; more = m_zip->goToNextFile()) {
+    QuaZipFile file(m_zip.get());
+    for (bool more = m_zip->goToFirstFile(); more && !m_needStop; more = m_zip->goToNextFile())
+    {
         QuaZipFileInfo64 info;
         m_zip->getCurrentFileInfo(&info);
 
@@ -87,7 +122,8 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
             return OtherError;
 
 
-        if (isSymlink(info)) {
+        if (isSymlink(info))
+        {
             if (!file.open(QuaZipFile::ReadOnly))
                 return BrokenZip;
 
@@ -101,7 +137,8 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
             continue;
         }
 
-        if (!info.name.endsWith(lit("/"))) {
+        if (!info.name.endsWith("/"))
+        {
             QFile destFile(m_dir.absoluteFilePath(info.name));
             if (!destFile.open(QFile::WriteOnly))
                 return CantOpenFile;
@@ -109,10 +146,12 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
             if (!file.open(QuaZipFile::ReadOnly))
                 return BrokenZip;
 
-            QByteArray buf(readBufferSize, 0);
-            while (file.bytesAvailable() && !m_needStop) {
-                qint64 read = file.read(buf.data(), readBufferSize);
-                if (read != destFile.write(buf.data(), read)) {
+            QByteArray buf(kReadBufferSizeBytes, 0);
+            while (file.bytesAvailable() && !m_needStop)
+            {
+                qint64 read = file.read(buf.data(), kReadBufferSizeBytes);
+                if (read != destFile.write(buf.data(), read))
+                {
                     file.close();
                     return NoFreeSpace;
                 }
@@ -121,11 +160,14 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
             destFile.setPermissions(info.getPermissions());
             destFile.close();
             file.close();
-
         }
+
+        if (m_needStop)
+            return Stopped;
     }
 
-    for (const QPair<QString, QString> &symlink: symlinks) {
+    for (const QPair<QString, QString> &symlink: symlinks)
+    {
         QString link = m_dir.absoluteFilePath(symlink.first);
         QString target = symlink.second;
         if (!QFile::link(target, link))
@@ -140,7 +182,8 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
     return m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip;
 }
 
-QStringList QnZipExtractor::fileList() {
+QStringList QnZipExtractor::fileList()
+{
     if (!m_zip->open(QuaZip::mdUnzip))
         return QStringList();
 

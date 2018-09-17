@@ -4,39 +4,27 @@
 #include <limits>
 #include <memory>
 
+#include <nx/utils/progressive_delay_calculator.h>
+
 #include "aio/basic_pollable.h"
 #include "aio/timer.h"
 
-namespace nx {
-namespace network {
+namespace nx::network {
 
-class NX_NETWORK_API RetryPolicy
+class NX_NETWORK_API RetryPolicy:
+    public nx::utils::ProgressiveDelayPolicy
 {
+    using base_type = nx::utils::ProgressiveDelayPolicy;
+
 public:
     constexpr static const unsigned int kInfiniteRetries =
         std::numeric_limits<unsigned int>::max();
-    constexpr static const std::chrono::milliseconds kNoMaxDelay =
-        std::chrono::milliseconds::zero();
 
     constexpr static const unsigned int kDefaultMaxRetryCount = 7;
-    constexpr static const std::chrono::milliseconds kDefaultInitialDelay =
-        std::chrono::milliseconds(500);
-    constexpr static const unsigned int kDefaultDelayMultiplier = 2;
-    constexpr static const std::chrono::milliseconds kDefaultMaxDelay =
-        std::chrono::minutes(1);
 
     const static RetryPolicy kNoRetries;
 
     unsigned int maxRetryCount;
-    std::chrono::milliseconds initialDelay;
-    /**
-     * Value of 0 means no multiplier (actually, same as 1).
-     */
-    unsigned int delayMultiplier;
-    /**
-     * std::chrono::milliseconds::zero is treated as no limit.
-     */
-    std::chrono::milliseconds maxDelay;
 
     RetryPolicy();
     RetryPolicy(
@@ -85,12 +73,9 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    nx::utils::ProgressiveDelayCalculator m_delayCalculator;
     std::unique_ptr<aio::Timer> m_timer;
     const RetryPolicy m_retryPolicy;
-    std::chrono::milliseconds m_currentDelay;
-    std::chrono::milliseconds m_effectiveMaxDelay;
-    unsigned int m_triesMade;
 };
 
-}   //network
-}   //nx
+} // namespace nx::network

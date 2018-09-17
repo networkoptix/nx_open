@@ -8,21 +8,26 @@
 
 class QuaZip;
 
-class QnZipExtractor : public QnLongRunnable {
+class QnZipExtractor : public QnLongRunnable
+{
     Q_OBJECT
 public:
-    enum Error {
+    enum Error
+    {
         Ok,
         BrokenZip,
         WrongDir,
         CantOpenFile,
         NoFreeSpace,
         OtherError,
-        Stopped
+        Stopped,
+        Busy,       //< Extractor is already busy extracting some file.
     };
 
     QnZipExtractor(const QString &fileName, const QDir &targetDir);
     QnZipExtractor(QIODevice *ioDevice, const QDir &targetDir);
+
+    QnZipExtractor();
     ~QnZipExtractor();
 
     static QString errorToString(Error error);
@@ -41,7 +46,8 @@ protected:
 
 private:
     QDir m_dir;
-    QuaZip *m_zip;
+    QScopedPointer<QuaZip> m_zip;
+    nx::utils::Mutex m_mutex;
     Error m_lastError;
 };
 

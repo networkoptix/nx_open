@@ -1,14 +1,14 @@
-import logging
 from pprint import pformat
 
-from netaddr import EUI, IPNetwork, mac_eui48
+from netaddr import EUI, IPAddress, IPNetwork, mac_eui48
 from winrm.exceptions import WinRMError
 
+from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.windows_remoting import WinRM
 
-_logger = logging.getLogger(__name__)
+_logger = ContextLogger(__name__, 'networking')
 
 
 class PingError(Exception):
@@ -17,6 +17,7 @@ class PingError(Exception):
         self.ip = ip
 
 
+@context_logger(_logger, 'framework.os_access.windows_remoting')
 class WindowsNetworking(Networking):
     _firewall_rule_name = 'NX-TestStandNetwork'
     _firewall_rule_display_name = 'NX Test Stand Network'
@@ -128,20 +129,21 @@ class WindowsNetworking(Networking):
         profile = query.get()
         return int(profile[u'DefaultOutboundAction']) == 0
 
-    def setup_ip(self, mac, ip, prefix_length):
+    def setup_network(self, mac, ip):
+        # type: (EUI, IPNetwork) -> None
         all_configurations = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', {}).enumerate()
         requested_configuration, = [
             configuration for configuration in all_configurations
             if configuration[u'MACAddress'] != {u'@xsi:nil': u'true'} and EUI(configuration[u'MACAddress']) == mac]
         invoke_selectors = {u'Index': requested_configuration[u'Index']}
         invoke_query = self._winrm.wmi_query(u'Win32_NetworkAdapterConfiguration', invoke_selectors)
-        subnet_mask = IPNetwork('{}/{}'.format(ip, prefix_length)).netmask
-        invoke_arguments = {u'IPAddress': [str(ip)], u'SubnetMask': [str(subnet_mask)]}
+        invoke_arguments = {u'IPAddress': [str(ip.ip)], u'SubnetMask': [str(ip.netmask)]}
         invoke_result = invoke_query.invoke_method(u'EnableStatic', invoke_arguments)
         if invoke_result[u'ReturnValue'] != u'0':
             raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
 
     def list_ips(self):
+        # -PolicyStore:PersistentStore filters out first NATed address
         result = self._winrm.run_powershell_script(
             # language=PowerShell
             '''
@@ -149,7 +151,7 @@ class WindowsNetworking(Networking):
                     select InterfaceAlias,IPAddress
                     ''',
             {})
-        return result
+        return [IPAddress(d['IPAddress']) for d in result]
 
     def remove_ips(self):
         self._winrm.run_powershell_script(
@@ -218,3 +220,6 @@ class WindowsNetworking(Networking):
 
     def setup_nat(self, outer_mac):
         raise NotImplementedError("Windows 10 cannot be set up as router out-of-the-box")
+
+    def is_router(self):
+        return False

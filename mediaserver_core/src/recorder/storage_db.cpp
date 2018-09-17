@@ -45,14 +45,14 @@ public:
     void handleError(nx::media_db::Error error) override
     {
         if (error != nx::media_db::Error::NoError)
-            NX_LOG(lit("%1 temporary DB file error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
+            NX_WARNING(this, lit("%1 temporary DB file error: %2").arg(Q_FUNC_INFO).arg((int)error));
         m_error = error;
     }
 
     void handleRecordWrite(nx::media_db::Error error) override
     {
         if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
-            NX_LOG(lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
+            NX_WARNING(this, lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error));
 
         if (++m_recordCount % 1000 == 0)
             NX_VERBOSE(this, lm("[vacuum] %1 records written").args(m_recordCount));
@@ -125,7 +125,7 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
             {
                 if (triesSoFar == kMaxTries)
                 {
-                    NX_LOG(lit("[media_db] Unable to generate unique hash for camera id %1").arg(cameraUniqueId), cl_logWARNING);
+                    NX_WARNING(this, lit("[media_db] Unable to generate unique hash for camera id %1").arg(cameraUniqueId));
                     return -1;
                 }
                 cameraId = nx::utils::random::number<uint16_t>();
@@ -135,7 +135,7 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
 
             NX_ASSERT(existHashIdIt == m_uuidToHash.right.end());
             if (existHashIdIt != m_uuidToHash.right.end())
-                NX_LOG(lit("%1 Bad camera hash").arg(Q_FUNC_INFO), cl_logWARNING);
+                NX_WARNING(this, lit("%1 Bad camera hash").arg(Q_FUNC_INFO));
 
             m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
             cameraOp.setCameraId(cameraId);
@@ -155,7 +155,7 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     int cameraId = getCameraIdHash(cameraUniqueId);
     if (cameraId == -1)
     {
-        NX_LOG(lit("[media_db, delete] camera id hash is not generated. Unable to delete"), cl_logWARNING);
+        NX_WARNING(this, lit("[media_db, delete] camera id hash is not generated. Unable to delete"));
         return false;
     }
     mediaFileOp.setCameraId(cameraId);
@@ -170,7 +170,7 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
         if (m_lastWriteError != nx::media_db::Error::NoError &&
             m_lastWriteError != nx::media_db::Error::Eof)
         {
-            NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
+            NX_WARNING(this, lit("%1 DB write error").arg(Q_FUNC_INFO));
             return false;
         }
     }
@@ -194,9 +194,7 @@ void QnStorageDb::startVacuumAsync(Callback callback)
     }
     catch (const std::exception& e)
     {
-        NX_LOG(
-            lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())),
-            cl_logERROR);
+        NX_ERROR(this, lit("Failed to join vacuum thread: %1").arg(QString::fromStdString(e.what())));
     }
 
     try
@@ -211,9 +209,7 @@ void QnStorageDb::startVacuumAsync(Callback callback)
     }
     catch (const std::exception& e)
     {
-        NX_LOG(
-            lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())),
-            cl_logERROR);
+        NX_ERROR(this, lit("Failed to start vacuum thread: %1").arg(QString::fromStdString(e.what())));
         m_vacuumThread = nx::utils::thread();
     }
 }
@@ -236,11 +232,11 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
                 {
                     if (result)
                     {
-                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 successfull"), cl_logDEBUG1);
+                        NX_DEBUG(typeid(QnStorageDb), lit("Sheduled vacuum media DB on storage %1 successfull"));
                     }
                     else
                     {
-                        NX_LOG(lit("Sheduled vacuum media DB on storage %1 failed"), cl_logWARNING);
+                        NX_WARNING(typeid(QnStorageDb), lit("Sheduled vacuum media DB on storage %1 failed"));
                     }
                 });
         }
@@ -250,7 +246,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     int cameraId = getCameraIdHash(cameraUniqueId);
     if (cameraId == -1)
     {
-        NX_LOG(lit("[media_db, add] camera id hash is not generated. Unable to add record"), cl_logWARNING);
+        NX_WARNING(this, lit("[media_db, add] camera id hash is not generated. Unable to add record"));
         return false;
     }
     mediaFileOp.setCameraId(cameraId);
@@ -269,7 +265,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
         if (m_lastWriteError != nx::media_db::Error::NoError &&
             m_lastWriteError != nx::media_db::Error::Eof)
         {
-            NX_LOG(lit("%1 DB write error").arg(Q_FUNC_INFO), cl_logWARNING);
+            NX_WARNING(this, lit("%1 DB write error").arg(Q_FUNC_INFO));
             return false;
         }
     }
@@ -303,7 +299,7 @@ bool QnStorageDb::resetIoDevice()
     m_dbHelper.setDevice(nullptr);
     if (!m_ioDevice)
     {
-        NX_LOG(lit("%1 DB file open failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 DB file open failed").arg(Q_FUNC_INFO));
         return false;
     }
     m_dbHelper.setDevice(m_ioDevice.get());
@@ -387,7 +383,7 @@ bool QnStorageDb::startDbFile()
 
     if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
     {
-        NX_LOG(lit("%1 write DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 write DB header failed").arg(Q_FUNC_INFO));
         return false;
     }
     m_dbVersion = kDbVersion;
@@ -398,21 +394,21 @@ bool QnStorageDb::startDbFile()
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
-    NX_LOG(lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
+    NX_INFO(this, lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
             .arg(m_storage->getUrl())
-            .arg(m_dbFileName), cl_logINFO);
+            .arg(m_dbFileName));
 
     if (!vacuum(&result))
     {
-        NX_LOG(lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
+        NX_WARNING(this, lit("[StorageDb] loading chunks from DB failed. storage: %1, file: %2")
                 .arg(m_storage->getUrl())
-                .arg(m_dbFileName), cl_logWARNING);
+                .arg(m_dbFileName));
         return result;
     }
 
-    NX_LOG(lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
+    NX_INFO(this, lit("[StorageDb] finished loading chunks from DB. storage: %1, file: %2")
             .arg(m_storage->getUrl())
-            .arg(m_dbFileName), cl_logINFO);
+            .arg(m_dbFileName));
 
     return result;
 }
@@ -438,7 +434,7 @@ bool QnStorageDb::parseDbContent(QByteArray fileContent)
     auto err = m_dbHelper.readFileHeader(&m_dbVersion);
     if (err != nx::media_db::Error::NoError)
     {
-        NX_LOG(lit("%1 read DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 read DB header failed").arg(Q_FUNC_INFO));
         return false;
     }
 
@@ -488,7 +484,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     }
     else
     {
-        NX_LOG(lit("%1 DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 DB remove file error").arg(Q_FUNC_INFO));
     }
 
     startDbFile();
@@ -497,7 +493,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
 
 bool QnStorageDb::vacuumInternal()
 {
-    NX_LOG("QnStorageDb::vacuumInternal begin", cl_logDEBUG1);
+    NX_DEBUG(this, "QnStorageDb::vacuumInternal begin");
 
     QByteArray writeBuf;
     QBuffer writeDevice(&writeBuf);
@@ -511,7 +507,7 @@ bool QnStorageDb::vacuumInternal()
     nx::media_db::Error error = tmpDbHelper.writeFileHeader(m_dbVersion);
     if (error == nx::media_db::Error::WriteError)
     {
-        NX_LOG(lit("%1 temporary DB file write header error").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 temporary DB file write header error").arg(Q_FUNC_INFO));
         return false;
     }
 
@@ -540,7 +536,7 @@ bool QnStorageDb::vacuumInternal()
                 NX_ASSERT(cameraIdIt != m_readUuidToHash.left.end());
                 if (cameraIdIt == m_readUuidToHash.left.end())
                 {
-                    NX_LOG(lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first), cl_logDEBUG1);
+                    NX_DEBUG(this, lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first));
                     continue;
                 }
 
@@ -573,7 +569,7 @@ bool QnStorageDb::vacuumInternal()
     NX_ASSERT(dbVersion == m_dbVersion);
     if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
     {
-        NX_LOG(lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO));
         return false;
     }
 
@@ -581,11 +577,11 @@ bool QnStorageDb::vacuumInternal()
     NX_ASSERT(isDataConsistent);
     if (!isDataConsistent)
     {
-        NX_LOG(lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO));
         return false;
     }
 
-    NX_LOG("QnStorageDb::vacuumInternal completed successfully", cl_logDEBUG1);
+    NX_DEBUG(this, "QnStorageDb::vacuumInternal completed successfully");
 
     if (!resetIoDevice())
         return false;
@@ -667,7 +663,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     NX_ASSERT(cameraUuidIt != m_readUuidToHash.right.end());
     if (cameraUuidIt == m_readUuidToHash.right.end())
     {
-        NX_LOG(lit("%1 Got media file with unknown camera ID. Skipping.").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 Got media file with unknown camera ID. Skipping.").arg(Q_FUNC_INFO));
         return;
     }
 
@@ -715,7 +711,7 @@ void QnStorageDb::handleMediaFileOp(const nx::media_db::MediaFileOperation &medi
     }
     default:
         NX_ASSERT(false);
-        NX_LOG(lit("%1 Unknown record type.").arg(Q_FUNC_INFO), cl_logWARNING);
+        NX_WARNING(this, lit("%1 Unknown record type.").arg(Q_FUNC_INFO));
         break;
     }
 }
@@ -727,11 +723,10 @@ void QnStorageDb::handleError(nx::media_db::Error error)
     {
         if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
         {
-            NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
+            NX_WARNING(this, lit("%1 DB read error %2. Read errors count = %3")
                        .arg(Q_FUNC_INFO)
                        .arg((int)error)
-                       .arg(m_readErrorCount),
-                   cl_logWARNING);
+                       .arg(m_readErrorCount));
             ++m_readErrorCount;
         }
     }
@@ -742,6 +737,6 @@ void QnStorageDb::handleRecordWrite(nx::media_db::Error error)
 {
     QnMutexLocker lk(&m_errorMutex);
     if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
-        NX_LOG(lit("%1 DB write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
+        NX_WARNING(this, lit("%1 DB write error: %2").arg(Q_FUNC_INFO).arg((int)error));
     m_lastWriteError = error;
 }

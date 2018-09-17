@@ -5,6 +5,8 @@
 #include <nx/cloud/cdb/managers/managers_types.h>
 #include <nx/data_sync_engine/synchronization_engine.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 namespace nx {
 namespace cdb {
 
@@ -103,10 +105,8 @@ void MaintenanceManager::onTransactionLogRead(
 {
     api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG,
-        lm("system %1. Read %2 transactions. Result code %3")
-            .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)),
-        cl_logDEBUG1);
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("system %1. Read %2 transactions. Result code %3")
+            .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)));
 
     NX_ASSERT(resultCode != api::ResultCode::partialContent);
     if (resultCode != api::ResultCode::ok)

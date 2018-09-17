@@ -30,7 +30,6 @@ client_distribution_name = '${client_distribution_name}'
 server_distribution_name = '${server_distribution_name}'
 bundle_distribution_name = '${bundle_distribution_name}'
 servertool_distribution_name = '${servertool_distribution_name}'
-paxton_distribution_name = '${paxton_distribution_name}'
 
 def print_command(command):
     print '>> {0}'.format(subprocess.list2cmdline(command))

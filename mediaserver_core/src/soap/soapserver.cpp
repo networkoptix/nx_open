@@ -50,7 +50,7 @@ bool QnSoapServer::bind()
     {
         std::ostringstream ss;
         soap_stream_fault(m_service.soap, ss);
-        NX_LOG(lit("Error binding soap server to local port. %1").arg(QString::fromStdString(ss.str())), cl_logWARNING);
+        NX_WARNING(this, lit("Error binding soap server to local port. %1").arg(QString::fromStdString(ss.str())));
         return false;
     }
 
@@ -58,7 +58,7 @@ bool QnSoapServer::bind()
     const unsigned int addr_len = sizeof(addr);
     if (getsockname(m_service.soap->master, (sockaddr *)&addr, (socklen_t *)&addr_len) < 0)
     {
-        NX_LOG(lit("Error reading soap server port %1").arg(SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_WARNING(this, lit("Error reading soap server port %1").arg(SystemError::getLastOSErrorText()));
         soap_destroy(m_service.soap);
         soap_end(m_service.soap);
         soap_done(m_service.soap);
@@ -67,7 +67,7 @@ bool QnSoapServer::bind()
     m_port = ntohs(addr.sin_port);
     m_initialized = true;
 
-    NX_LOG(lit("Successfully bound soap server to local port %1").arg(m_port), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Successfully bound soap server to local port %1").arg(m_port));
     return true;
 }
 
@@ -113,7 +113,7 @@ void QnSoapServer::run()
                 break;
             //std::ostringstream ss;
             //soap_stream_fault( m_service.soap, ss );
-            //NX_LOG( lit("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            //NX_DEBUG(this, lit("Error accepting soap connection. %1").arg(QString::fromStdString(ss.str())));
             msleep( ERROR_SKIP_TIMEOUT_MS );
             continue;
         }
@@ -153,7 +153,7 @@ void QnSoapServer::run()
                 break;
             std::ostringstream ss;
             soap_stream_fault( m_service.soap, ss );
-            NX_LOG( lit("Error serving soap request %1").arg(QString::fromStdString(ss.str())), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("Error serving soap request %1").arg(QString::fromStdString(ss.str())));
         }
         soap_destroy( m_service.soap );
         soap_end( m_service.soap );

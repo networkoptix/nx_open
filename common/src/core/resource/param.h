@@ -33,6 +33,7 @@ namespace Qn
         Empty string means no motion is allowed
     */
     static const QString SUPPORTED_MOTION_PARAM_NAME = lit("supportedMotion");
+    static const QString TRUST_CAMERA_TIME_NAME = "trustCameraTime";
     static const QString CAMERA_CREDENTIALS_PARAM_NAME = lit("credentials");
     static const QString CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME = lit("defaultCredentials");
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");

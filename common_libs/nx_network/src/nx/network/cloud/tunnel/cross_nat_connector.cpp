@@ -86,6 +86,8 @@ void CrossNatConnector::connect(
                 NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
                     .arg(hostName));
 
+                m_remotePeerFullName = hostName;
+
                 return handler(
                     SystemError::noError,
                     std::make_unique<tcp::OutgoingReverseTunnelConnection>(
@@ -151,9 +153,8 @@ void CrossNatConnector::issueConnectRequestToMediator(
         !m_mediatorUdpClient->socket()->bind(SocketAddress::anyAddress))
     {
         const auto errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
-            .arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("cross-nat %1. Failed to bind to mediator udp client to local port. %2")
+            .arg(m_connectSessionId).arg(SystemError::getLastOSErrorText()));
         post(
             [handler = move(handler), errorCode]() mutable
             {
@@ -165,10 +166,9 @@ void CrossNatConnector::issueConnectRequestToMediator(
 
     m_localAddress = m_mediatorUdpClient->socket()->getLocalAddress();
 
-    NX_LOGX(lm("cross-nat %1. connecting to %2 with timeout %3, from local port %4")
+    NX_VERBOSE(this, lm("cross-nat %1. connecting to %2 with timeout %3, from local port %4")
         .arg(m_connectSessionId).arg(m_targetPeerAddress.host.toString())
-        .arg(timeout).arg(m_mediatorUdpClient->socket()->getLocalAddress().port),
-        cl_logDEBUG2);
+        .arg(timeout).arg(m_mediatorUdpClient->socket()->getLocalAddress().port));
 
     if (timeout > std::chrono::milliseconds::zero())
     {
@@ -197,9 +197,8 @@ void CrossNatConnector::onConnectResponse(
     using namespace std::placeholders;
 
     s_mediatorResponseCounter.addResult(resultCode);
-    NX_LOGX(lm("cross-nat %1. Received %2 response from mediator")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Received %2 response from mediator")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)));
 
     if (m_done)
         return;
@@ -254,10 +253,9 @@ void CrossNatConnector::onConnectorFinished(
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
-    NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
+    NX_VERBOSE(this, lm("cross-nat %1. Connector has finished with result: %2, %3")
         .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
-        .arg(SystemError::toString(sysErrorCode)),
-        cl_logDEBUG2);
+        .arg(SystemError::toString(sysErrorCode)));
 
     m_cloudConnectorExecutor.reset();
 
@@ -274,9 +272,8 @@ void CrossNatConnector::onConnectorFinished(
 
 void CrossNatConnector::onTimeout()
 {
-    NX_LOGX(lm("cross-nat %1 timed out. Result code %2")
-        .args(m_connectSessionId, QnLexical::serialized(m_connectResultReport.resultCode)),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("cross-nat %1 timed out. Result code %2")
+        .args(m_connectSessionId, QnLexical::serialized(m_connectResultReport.resultCode)));
 
     m_done = true;
 
@@ -296,10 +293,9 @@ void CrossNatConnector::holePunchingDone(
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("cross-nat %1. result: %2, system result code: %3")
+    NX_VERBOSE(this, lm("cross-nat %1. result: %2, system result code: %3")
         .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
-        .arg(SystemError::toString(sysErrorCode)),
-        cl_logDEBUG2);
+        .arg(SystemError::toString(sysErrorCode)));
 
     // We are in aio thread.
     m_timer->cancelSync();
@@ -334,9 +330,8 @@ void CrossNatConnector::connectSessionReportSent(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("cross-nat %1. Failed to send report to mediator. %2")
-            .arg(m_connectSessionId).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("cross-nat %1. Failed to send report to mediator. %2")
+            .arg(m_connectSessionId).arg(SystemError::toString(errorCode)));
     }
 
     // Ignoring send report result code.
@@ -348,10 +343,9 @@ void CrossNatConnector::connectSessionReportSent(
             ? hpm::api::toSystemErrorCode(m_connectResultReport.resultCode)
             : m_connectResultReport.sysErrorCode;
     }
-    NX_LOGX(lm("cross-nat %1. report send result code: %2. Invoking handler with result: %3")
+    NX_VERBOSE(this, lm("cross-nat %1. report send result code: %2. Invoking handler with result: %3")
         .arg(m_connectSessionId).arg(SystemError::toString(errorCode))
-        .arg(SystemError::toString(sysErrorCodeToReport)),
-        cl_logDEBUG2);
+        .arg(SystemError::toString(sysErrorCodeToReport)));
 
     if (m_connection)
     {

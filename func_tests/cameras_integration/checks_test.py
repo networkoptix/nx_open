@@ -56,6 +56,14 @@ def test_results(result, report):
         None),
     ({'path.id=a': {'v': 7}}, {'path': [{'id': 'a', 'v': 6}]},
         ["'camera.path[id=a].v' is 6, expected 7"]),
+    ({'id=x.y': {'v': 7}}, [{'id': 'x.z', 'v': 5}, {'id': 'x.y', 'v': 7}],
+        None),
+    ({'id=x.y': {'v': 7}}, [{'id': 'x.z', 'v': 5}, {'id': 'x.y', 'v': 6}],
+        ["'camera[id=x.y].v' is 6, expected 7"]),
+    ({'!id=x.y': {'v': 7}}, {'id=x.y': {'v': 7}},
+        None),
+    ({'!id=x.y': {'v': 8}}, {'id=x.y': {'v': 7}},
+     ["'camera.<id=x.y>.v' is 7, expected 8"]),
 ])
 def test_expect_values_success(expected, actual, errors):
     result = expect_values(expected, actual)
@@ -63,4 +71,4 @@ def test_expect_values_success(expected, actual, errors):
         assert isinstance(result, Failure)
         assert set(errors) == set(result.errors)
     else:
-        assert isinstance(result, Success)
+        assert isinstance(result, Success), result.errors

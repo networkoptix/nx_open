@@ -337,13 +337,13 @@ void QnConnectionManagerPrivate::resume()
 
 bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 {
-    NX_LOG(lm("doConnect() BEGIN: url: %1").arg(url.toString()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("doConnect() BEGIN: url: %1").arg(url.toString()));
     if (!url.isValid() || url.host().isEmpty())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
-        NX_LOG(lm("doConnect() END: Invalid URL"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("doConnect() END: Invalid URL"));
         return false;
     }
 
@@ -374,7 +374,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 
             if (connectionHandle != result->handle())
             {
-                NX_LOG(lm("doConnect() Invalid handle"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("doConnect() Invalid handle"));
                 return;
             }
 
@@ -409,7 +409,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                 else
                     emit q->connectionFailed(status, infoParameter);
 
-                NX_LOG(lm("doConnect() END: Bad status"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("doConnect() END: Bad status"));
                 return;
             }
 
@@ -469,7 +469,7 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
             emit q->connectionVersionChanged();
         });
 
-    NX_LOG(lm("doConnect() END"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("doConnect() END"));
     return true;
 }
 

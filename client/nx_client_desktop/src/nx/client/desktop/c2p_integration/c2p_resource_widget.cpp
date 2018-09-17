@@ -60,6 +60,8 @@ C2pResourceWidget::C2pResourceWidget(
         });
 
     NxUi::setupWebViewStyle(m_webView, NxUi::WebViewStyle::c2p);
+
+    m_webView->page()->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
 }
 
 void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec)

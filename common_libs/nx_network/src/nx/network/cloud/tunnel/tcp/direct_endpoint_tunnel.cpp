@@ -47,8 +47,7 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
 
 void DirectTcpEndpointTunnel::start()
 {
-    NX_LOGX(lm("Start %1 control connection").arg(m_controlConnection ? "with" : "without"),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Start %1 control connection").arg(m_controlConnection ? "with" : "without"));
 
     if (!m_controlConnection)
         return;
@@ -62,12 +61,12 @@ void DirectTcpEndpointTunnel::start()
         {
             if (code == SystemError::noError && bytesRead == 0)
             {
-                NX_LOGX(lm("Control connection has been closed by remote peer"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Control connection has been closed by remote peer"));
             }
             else
             {
-                NX_LOGX(lm("Unexpected read event on control connection (size=%1): %2").args(
-                    bytesRead, SystemError::toString(code)), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Unexpected read event on control connection (size=%1): %2").args(
+                    bytesRead, SystemError::toString(code)));
             }
 
             m_controlConnection.reset();

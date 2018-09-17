@@ -26,7 +26,6 @@
 #include <ui/help/help_topics.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 
@@ -219,7 +218,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResources() const
 void QnResourceSelectionDialog::setSelectedResources(const QSet<QnUuid>& selected)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        QScopedValueRollback<bool> guard(m_updating, true);
         setSelectedResourcesInternal(selected);
     }
     at_resourceModel_dataChanged();

@@ -23,6 +23,7 @@ class AccountManager;
 class AuthenticationProvider;
 class AuthorizationInfo;
 class CloudModuleUrlProvider;
+class SecurityManager;
 class Controller;
 class EventManager;
 class MaintenanceManager;
@@ -58,7 +59,7 @@ private:
     HttpServer m_multiAddressHttpServer;
 
     void registerApiHandlers(
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager,
         AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,

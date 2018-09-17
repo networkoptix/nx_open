@@ -37,6 +37,7 @@ struct UpdateItem
     bool legacyUpdateUsed = false;
     bool offline = false;
     bool skipped = false;
+    bool storeUpdates = true;
     // Row in the table
     int row = -1;
 };
@@ -59,10 +60,11 @@ public:
         VersionColumn,
         ProgressColumn,
         StatusColumn,
+        StorageSettingsColumn,
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent = 0);
+    explicit ServerUpdatesModel(QObject* parent = nullptr);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);

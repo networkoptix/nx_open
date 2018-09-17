@@ -9,6 +9,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/core/resource/device_type.h>
+#include <nx/utils/std/optional.h>
 
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
@@ -126,9 +127,6 @@ public:
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
 
-    virtual QnIOPortDataList getRelayOutputList() const;
-    virtual QnIOPortDataList getInputPortList() const;
-
     // TODO: move this flags inside CameraMediaCapability struct
     Qn::CameraCapabilities getCameraCapabilities() const;
     bool hasCameraCapabilities(Qn::CameraCapabilities capabilities) const;
@@ -137,14 +135,6 @@ public:
 
     nx::media::CameraMediaCapability cameraMediaCapability() const;
     void setCameraMediaCapability(const nx::media::CameraMediaCapability& value);
-
-    /*!
-        Change output with id \a ouputID state to \a activate
-        \param ouputID If empty, implementation MUST select any output port
-        \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
-        \return true in case of success. false, if nothing has been done
-    */
-    virtual bool setRelayOutputState(const QString& ouputID, bool activate, unsigned int autoResetTimeoutMS = 0);
 
     bool isRecordingEventAttached() const;
 
@@ -195,6 +185,9 @@ public:
 
     QString getFirmware() const;
     void setFirmware(const QString &firmware);
+
+    bool trustCameraTime() const;
+    void setTrustCameraTime(bool value);
 
     QString getVendor() const;
     void setVendor(const QString &value);
@@ -274,7 +267,7 @@ public:
     virtual bool isReadyToDetach() const {return true;}
 
     //!Set list of IO ports
-    void setIOPorts(const QnIOPortDataList& ports);
+    void setIoPortDescriptions(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
         const QString &key,
@@ -286,11 +279,7 @@ public:
         const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    //!Returns list if IO ports
-    QnIOPortDataList getIOPorts() const;
-
-    //!Returns list of IO ports's states
-    virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
+    QnIOPortDataList ioPortDescriptions(Qn::IOPortType type = Qn::PT_Unknown) const;
 
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 
@@ -314,6 +303,8 @@ public:
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
     virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
 
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
      */
@@ -334,9 +325,6 @@ public:
 
     static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
 public slots:
-    virtual void inputPortListenerAttached();
-    virtual void inputPortListenerDetached();
-
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
 
@@ -355,25 +343,6 @@ signals:
     void audioEnabledChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
-
-    //!Emitted on camera input port state has been changed
-    /*!
-        \param resource Smart pointer to \a this
-        \param inputPortID
-        \param value true if input is connected, false otherwise
-        \param timestamp MSecs since epoch, UTC
-    */
-    void cameraInput(
-        const QnResourcePtr& resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp );
-
-    void cameraOutput(
-        const QnResourcePtr& resource,
-        const QString& inputPortID,
-        bool value,
-        qint64 timestamp );
 
     void analyticsEventStart(
         const QnResourcePtr& resource,
@@ -398,25 +367,10 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
     virtual void setMotionMaskPhysical(int /*channel*/) {}
-    //!MUST be overridden for camera with input port. Default implementation does nothing
-    /*!
-        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
-        \return true, if async request has been started successfully
-        \note \a completionHandler is not called yet (support will emerge in 2.4)
-    */
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler );
-    //!MUST be overridden for camera with input port. Default implementation does nothing
-    /*!
-        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
-        \note This method has no right to fail
-    */
-    virtual void stopInputPortMonitoringAsync();
-    virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
 
 private:
-    QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
@@ -437,6 +391,7 @@ private:
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
+    CachedValue<bool> m_cachedHasVideo;
 
 private slots:
     void resetCachedValues();

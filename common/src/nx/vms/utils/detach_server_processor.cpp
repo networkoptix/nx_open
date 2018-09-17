@@ -38,11 +38,11 @@ nx::network::http::StatusCode::Value DetachServerProcessor::detachServer(
 
     if (errStr.isEmpty())
     {
-        NX_LOGX(lm("Detaching server from system finished."), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Detaching server from system finished."));
     }
     else
     {
-        NX_LOGX(errStr, cl_logWARNING);
+        NX_WARNING(this, errStr);
         result->setError(QnJsonRestResult::CantProcessRequest, errStr);
     }
 

@@ -206,7 +206,7 @@ angular.module('webadminApp')
             var promises = [];
             for(var logger in $scope.loggers){
                 if($scope.oldLoggers[logger] !== $scope.loggers[logger]){
-                    promises.push(mediaserver.logLevel(null, logger, $scope.loggers[logger]));
+                    promises.push(mediaserver.logLevel("", logger, $scope.loggers[logger]));
                 }
             }
             

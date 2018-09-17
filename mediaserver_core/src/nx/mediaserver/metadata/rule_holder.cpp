@@ -161,12 +161,12 @@ bool RuleHolder::needToWatchRule(const event::RulePtr& rule) const
     return isAnalyticsRule && !rule->isDisabled();
 }
 
-QnUuid RuleHolder::analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule) const
+QString RuleHolder::analyticsEventTypeIdFromRule(const nx::vms::event::RulePtr& rule) const
 {
     if (rule->eventType() == nx::vms::api::EventType::analyticsSdkEvent)
-        return rule->eventParams().analyticsEventId();
+        return rule->eventParams().getAnalyticsEventTypeId();
 
-    return guidByEventType(rule->eventType());
+    return eventTypeIdByEventType(rule->eventType());
 }
 
 RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
@@ -184,7 +184,7 @@ RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
         if (!rule)
             continue;
 
-        const auto eventId = analyticsEventIdFromRule(rule);
+        const auto eventId = analyticsEventTypeIdFromRule(rule);
         const auto resourceIds = rule->eventResources();
 
         for (const auto& resourceId: resourceIds)
@@ -197,7 +197,7 @@ RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
         if (!rule)
             continue;
 
-        const auto eventId = analyticsEventIdFromRule(rule);
+        const auto eventId = analyticsEventTypeIdFromRule(rule);
         if (eventId.isNull())
             continue;
 

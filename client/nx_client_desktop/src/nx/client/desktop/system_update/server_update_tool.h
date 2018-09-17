@@ -8,28 +8,39 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/update/common_update_manager.h>
+#include <nx/update/update_check.h>
 #include <nx/update/update_information.h>
+
 #include <update/updates_common.h>
 #include <update/update_process.h>
 
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/system_information.h>
-#include <utils/common/connective.h>
 
+#include <utils/common/connective.h>
 #include <api/server_rest_connection.h>
+#include <utils/update/zip_utils.h>
+#include <nx/client/desktop/utils/upload_state.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class UploadManager;
+//using Downloader = vms::common::p2p::downloader::Downloader;
+//using FileInformation = vms::common::p2p::downloader::FileInformation;
+
 // A tool to interact with remote server state.
 // Wraps up /api/update2 part of REST protocol.
-// Note: do not add here anything, not related to remote server state.
-class ServerUpdateTool: public Connective<QObject>, public QnConnectionContextAware
+// Note: this class should survive some time until its internal threads are dead.
+class ServerUpdateTool:
+        public Connective<QObject>,
+        public QnConnectionContextAware,
+        public std::enable_shared_from_this<ServerUpdateTool>
 {
     Q_OBJECT
-
     using base_type = Connective<QObject>;
+
 public:
     ServerUpdateTool(QObject* parent = nullptr);
     ~ServerUpdateTool();
@@ -45,6 +56,8 @@ public:
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
 
+    bool hasOfflineUpdateChanges() const;
+
     // Try to get status changes from the server
     // Should be non-blocking and fast.
     // Check if we've got update for all the servers
@@ -57,22 +70,87 @@ public:
     // Sends GET https://localhost:7001/ec2/updateInformation and stores response in m_statusRequest
     void requestRemoteUpdateState();
 
+    enum class OfflineUpdateState
+    {
+        Initial,
+        Unpack,     //< Unpacking all the packages and checking the contents.
+        Ready,      //< Ready to push packages to the servers.
+        Push,       //< Pushing to the servers.
+        Done        //< All update contents are pushed to the servers. They can start the update.
+    };
+
+    enum class CheckMode
+    {
+        Internet,
+        File,
+        Mediaservers,
+    };
+
+    struct UpdateCheckResult
+    {
+        CheckMode mode = CheckMode::Internet;
+        nx::update::Information info;
+        nx::update::InformationError error = nx::update::InformationError::noError;
+    };
+
+    std::future<UpdateCheckResult> checkLatestUpdate();
+    std::future<UpdateCheckResult> checkSpecificChangeset(QString build, QString password);
+    std::future<UpdateCheckResult> checkUpdateFromFile(QString file);
+
+    // Start uploading local update packages to the server(s).
+    // TODO: There can be some status
+    // @param changeset
+    void startUpload(QString changeset);
+    void stopUpload();
+
+    struct ProgressInfo
+    {
+        int current = 0;
+        int max = 0;
+    };
+
+    // Calculates a progress for uploading files to the server.
+    ProgressInfo calcUploadProgress();
+    // Calculates a progress for remote downloading.
+    ProgressInfo calcRemoteDownloadProgress();
+    // Calculates a progress for remote downloading.
+    ProgressInfo calcInstallProgress();
+
+    OfflineUpdateState getUploaderState() const;
 private:
-    // Handlers for resource updates
+    // Handlers for resource updates.
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_resourceChanged(const QnResourcePtr& resource);
 
-    // We pass this callback to all our REST queries at /api/updates2
     void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
-    // Handler for status update from a single server
+    // Handler for status update from a single server.
     void at_updateStatusResponse(bool success, rest::Handle handle, const nx::update::Status& response);
+
+    // Note: should keep long name for UploadState to make Qt moc catch this signal properly.
+    void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
 
     // Werapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
     rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server);
 
+    void stopOfflineUpdate();
+
+    // Called by QnZipExtractor when the offline update package is unpacked.
+    void at_extractFilesFinished(int code);
+
+    static UpdateCheckResult readUpdateManifest(QString path);
+    QnMediaServerResourceList getServersForUpload();
+
 private:
+
+    OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::Initial;
+    bool m_offlineUpdateStateChanged = false;
+
+    QString m_offlineUpdateFile;
+    std::promise<UpdateCheckResult> m_offlineUpdateCheckResult;
+
+    std::shared_ptr<QnZipExtractor> m_extractor;
 
     // Container for remote state
     // We keep temporary state updates here. Client will pull this data periodically
@@ -85,6 +163,22 @@ private:
 
     // Explicit connections to resource pool events
     QMetaObject::Connection m_onAddedResource, m_onRemovedResource, m_onUpdatedResource;
+
+    // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
+    std::unique_ptr<UploadManager> m_uploadManager;
+    QStringList m_filesToUpload;
+
+    std::set<QString> m_activeUploads;
+    std::set<QString> m_completedUploads;
+    std::map<QString, nx::client::desktop::UploadState> m_uploadState;
+
+    // Current update manifest.
+    nx::update::Information m_updateManifest;
+
+    QString m_uploadDestination;
+
+    QDir m_outputDir;
+    QString m_changeset;
 };
 
 } // namespace desktop

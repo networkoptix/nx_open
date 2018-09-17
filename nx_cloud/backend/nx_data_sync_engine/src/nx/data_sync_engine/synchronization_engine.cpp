@@ -8,13 +8,17 @@ namespace nx {
 namespace data_sync_engine {
 
 SyncronizationEngine::SyncronizationEngine(
+    const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
     const QnUuid& moduleGuid,
-    const Settings& settings,
+    const SynchronizationSettings& settings,
+    const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
+    m_supportedProtocolRange(supportedProtocolRange),
     m_structureUpdater(dbManager),
     m_transactionLog(
         moduleGuid,
+        m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(
@@ -23,9 +27,19 @@ SyncronizationEngine::SyncronizationEngine(
     m_connectionManager(
         moduleGuid,
         settings,
-        &m_transactionLog,
+        m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
+    m_httpTransportAcceptor(
+        moduleGuid,
+        m_supportedProtocolRange,
+        &m_transactionLog,
+        &m_connectionManager),
+    m_webSocketAcceptor(
+        moduleGuid,
+        m_supportedProtocolRange,
+        &m_transactionLog,
+        &m_connectionManager),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -104,9 +118,9 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
     subscription.removeSubscription(m_systemDeletedSubscriptionId);
 }
 
-const char* const kEstablishEc2TransactionConnectionPath = "/events/ConnectingStage1";
-const char* const kEstablishEc2P2pTransactionConnectionPath = "/messageBus";
-const char* const kPushEc2TransactionPath = "/forward_events/{sequence}";
+static constexpr char kEstablishEc2TransactionConnectionPath[] = "/events/ConnectingStage1";
+static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/messageBus";
+static constexpr char kPushEc2TransactionPath[] = "/forward_events/{sequence}";
 
 void SyncronizationEngine::registerHttpApi(
     const std::string& pathPrefix,
@@ -114,21 +128,21 @@ void SyncronizationEngine::registerHttpApi(
 {
     registerHttpHandler(
         nx::network::url::joinPath(pathPrefix, kEstablishEc2TransactionConnectionPath),
-        &ConnectionManager::createTransactionConnection,
-        &m_connectionManager,
+        &transport::HttpTransportAcceptor::createConnection,
+        &m_httpTransportAcceptor,
+        dispatcher);
+
+    registerHttpHandler(
+        nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
+        &transport::HttpTransportAcceptor::pushTransaction,
+        &m_httpTransportAcceptor,
         dispatcher);
 
     registerHttpHandler(
         nx::network::http::Method::get,
         nx::network::url::joinPath(pathPrefix, kEstablishEc2P2pTransactionConnectionPath),
-        &ConnectionManager::createWebsocketTransactionConnection,
-        &m_connectionManager,
-        dispatcher);
-
-    registerHttpHandler(
-        nx::network::url::joinPath(pathPrefix, kPushEc2TransactionPath),
-        &ConnectionManager::pushTransaction,
-        &m_connectionManager,
+        &transport::WebSocketTransportAcceptor::createConnection,
+        &m_webSocketAcceptor,
         dispatcher);
 }
 

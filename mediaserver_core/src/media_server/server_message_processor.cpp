@@ -187,9 +187,9 @@ void QnServerMessageProcessor::onResourceStatusChanged(
     else if (resource->getParentId() == commonModule()->moduleGUID() &&
         resource.dynamicCast<QnStorageResource>())
     {
-        NX_LOG(lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
+        NX_VERBOSE(this, lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
             .arg(QString::fromLatin1(Q_FUNC_INFO))
-            .arg(resource->getId().toString()), cl_logDEBUG2);
+            .arg(resource->getId().toString()));
 
         // Rewrite resource status to DB and send to the foreign peer
         if (resource->getStatus() != status)

@@ -68,6 +68,7 @@ private:
 
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType::Count;
         QnResourcePtr resource;
+        vms::event::AbstractActionPtr serverData;
     };
 
 private:

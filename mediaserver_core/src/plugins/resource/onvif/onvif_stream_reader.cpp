@@ -112,8 +112,6 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     m_onvifRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
 
     result = m_multiCodec.openStream();
-    if (m_multiCodec.getLastResponseCode() == nx::network::http::StatusCode::unauthorized && canChangeStatus())
-        m_resource->setStatus(Qn::Unauthorized);
     return result;
 }
 
@@ -144,14 +142,14 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
                 m_onvifRes->getPhysicalId(), m_streamUrl));
 
             *streamUrl = m_streamUrl;
-            return m_onvifRes->customStreamConfiguration(getRole());
+            return m_onvifRes->customStreamConfiguration(getRole(), params);
         }
     }
 
     m_onvifRes->beforeConfigureStream(getRole());
     CameraDiagnostics::Result result = updateCameraAndFetchStreamUrl(
         getRole() == Qn::CR_LiveVideo, streamUrl, isCameraControlRequired, params);
-    m_onvifRes->customStreamConfiguration(getRole());
+    m_onvifRes->customStreamConfiguration(getRole(), params);
     m_onvifRes->afterConfigureStream(getRole());
 
     if (result.errorCode == CameraDiagnostics::ErrorCode::noError)
@@ -231,11 +229,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    NX_LOG(lit("got stream URL %1 for camera %2 for role %3")
+    NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3")
         .arg(*streamUrl)
         .arg(m_resource->getUrl())
-        .arg(getRole()),
-        cl_logINFO);
+        .arg(getRole()));
 
     return result;
 }
@@ -428,8 +425,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
                 << ". URL: " << soapWrapper.getEndpointUrl()
                 << ", uniqueId: " << m_onvifRes->getUniqueId();
         #endif
-        if (soapWrapper.isNotAuthenticated() && canChangeStatus()) {
-            m_onvifRes->setStatus(Qn::Unauthorized);
+        if (soapWrapper.isNotAuthenticated())
+        {
             return CameraDiagnostics::NotAuthorisedResult( soapWrapper.getEndpointUrl() );
         }
         return CameraDiagnostics::RequestFailedResult(

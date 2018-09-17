@@ -60,9 +60,8 @@ void ConnectorExecutor::start(CompletionHandler handler)
             if (m_connectors.empty())
                 return reportNoSuitableConnectMethod();
 
-            NX_LOGX(lm("cross-nat %1. Starting %2 connector(s)")
-                .arg(m_connectSessionId).arg(m_connectors.size()),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lm("cross-nat %1. Starting %2 connector(s)")
+                .arg(m_connectSessionId).arg(m_connectors.size()));
 
             auto connectorWithMinDelayIter = std::min_element(
                 m_connectors.begin(), m_connectors.end(),
@@ -132,10 +131,9 @@ void ConnectorExecutor::onConnectorFinished(
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
-    NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
+    NX_VERBOSE(this, lm("cross-nat %1. Connector has finished with result: %2, %3")
         .arg(m_connectSessionId).arg(api::toString(resultCode))
-        .arg(SystemError::toString(sysErrorCode)),
-        cl_logDEBUG2);
+        .arg(SystemError::toString(sysErrorCode)));
 
     auto connector = std::move(*connectorIter);
     m_connectors.erase(connectorIter);

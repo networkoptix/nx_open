@@ -71,8 +71,8 @@ namespace ec2
             !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOG( lit("Failed to set timeout for HTTP connection from %1. %2").
-                arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(osErrorCode)), cl_logWARNING );
+            NX_WARNING(this, lit("Failed to set timeout for HTTP connection from %1. %2").
+                arg(d->socket->getForeignAddress().toString()).arg(SystemError::toString(osErrorCode)));
             return;
         }
 
@@ -89,9 +89,8 @@ namespace ec2
             {
                 if( d->prevSocketError == SystemError::timedOut )
                 {
-                    NX_LOG( lit("QnHttpTransactionReceiver. Keep-alive timeout on transaction connection %1 from peer %2").
-                        arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()),
-                        cl_logDEBUG1 );
+                    NX_DEBUG(this, lit("Keep-alive timeout on transaction connection %1 from peer %2").
+                        arg(connectionGuid.toString()).arg(d->socket->getForeignAddress().toString()));
                 }
                 break;
             }
@@ -128,8 +127,8 @@ namespace ec2
                     d->request,
                     d->requestBody ) )
             {
-                NX_LOG( lit("QnHttpTransactionReceiver. Received transaction from %1 for unknown connection %2").
-                    arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()), cl_logWARNING );
+                NX_WARNING(this, lit("Received transaction from %1 for unknown connection %2").
+                    arg(d->socket->getForeignAddress().toString()).arg(connectionGuid.toString()));
                 sendResponse( nx::network::http::StatusCode::notFound, nx::network::http::StringType() );
                 break;
             }

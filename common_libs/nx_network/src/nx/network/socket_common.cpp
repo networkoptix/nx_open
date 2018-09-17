@@ -326,10 +326,7 @@ IpV6WithScope HostAddress::ipV6from(const QString& ip)
         scopeId = ip.mid(scopeIdDelimIndex + 1).toULong(&ok);
 
         if (!ok)
-        {
-            NX_VERBOSE(typeid(HostAddress), lm("Invalid ipv6 address string %1").arg(ip));
             return result;
-        }
     }
 
     struct in6_addr addr6;
@@ -342,7 +339,6 @@ IpV6WithScope HostAddress::ipV6from(const QString& ip)
         return result;
     }
 
-    NX_VERBOSE(typeid(HostAddress), lm("Invalid ipv6 address string %1").arg(ip));
     return result;
 }
 

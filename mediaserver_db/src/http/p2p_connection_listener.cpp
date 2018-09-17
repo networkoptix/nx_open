@@ -84,17 +84,17 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
             .arg(remotePeer.systemId));
         return false;
     }
-    if (remotePeer.peerType != vms::api::PeerType::mobileClient)
+    if (remotePeer.dataFormat == Qn::UbjsonFormat)
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
-            NX_LOG(this,
-                lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
+            NX_WARNING(this,
+                lm("Reject incoming P2P connection using UBJSON "
+                    "from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
                 .arg(nx_ec::EC2_PROTO_VERSION)
-                .arg(remotePeer.protoVersion),
-                cl_logWARNING);
+                .arg(remotePeer.protoVersion));
             return false;
         }
     }
@@ -102,13 +102,12 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
     {
         if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeer.cloudHost)
         {
-            NX_LOG(this,
+            NX_WARNING(this,
                 lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
                     "Local peer host: %2, remote peer host: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
                 .arg(nx::network::SocketGlobals::cloud().cloudHost())
-                .arg(remotePeer.cloudHost),
-                cl_logWARNING);
+                .arg(remotePeer.cloudHost));
             return false;
         }
     }
@@ -221,7 +220,7 @@ void ConnectionProcessor::run()
     auto error = websocket::validateRequest(d->request, &d->response);
     if (error != websocket::Error::noError)
     {
-        NX_LOG(lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error), cl_logERROR);
+        NX_ERROR(this, lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error));
         d->socket->close();
         return;
     }
@@ -244,13 +243,15 @@ void ConnectionProcessor::run()
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(d->socket)));
-    webSocket->setAliveTimeout(keepAliveTimeout);
+    if (keepAliveTimeout > std::chrono::milliseconds::zero())
+        webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();
 
     messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
+        QUrlQuery(d->request.requestLine.url.query()),
         userAccessData(remotePeer),
         onConnectionClosedCallback);
 }

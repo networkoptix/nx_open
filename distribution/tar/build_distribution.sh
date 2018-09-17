@@ -188,8 +188,8 @@ copyBuildLibs()
 
 # [in] LITE_CLIENT
 # [in] STAGE_LIB
-# [in] ALT_LIB_INSTALL_DIR
-# [in] ALT_LIB_INSTALL_PATH
+# [in] ALT_LIB_INSTALL_DIR Absolute path for alternative lib directory in the stage.
+# [in] ALT_LIB_INSTALL_PATH Alternative lib path relative to the device root.
 copyQtLibs()
 {
     echo ""

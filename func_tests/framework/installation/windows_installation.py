@@ -18,9 +18,9 @@ class WindowsInstallation(Installation):
     def __init__(self, os_access, customization):  # type: (WindowsAccess, Customization) -> None
         if not isinstance(os_access, WindowsAccess):
             raise OsNotSupported(self.__class__, os_access)
-        program_files_dir = os_access.Path(os_access.env_vars()['ProgramFiles'])
-        system_profile_dir = os_access.Path(os_access.system_profile_dir())
-        user_profile_dir = os_access.Path(os_access.env_vars()[u'UserProfile'])
+        program_files_dir = os_access.path_cls(os_access.env_vars()['ProgramFiles'])
+        system_profile_dir = os_access.path_cls(os_access.system_profile_dir())
+        user_profile_dir = os_access.path_cls(os_access.env_vars()[u'UserProfile'])
         self._system_local_app_data = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
             os_access=os_access,
@@ -50,7 +50,7 @@ class WindowsInstallation(Installation):
         return WindowsService(self.windows_access.winrm, service_name)
 
     def _upload_installer(self, installer):
-        remote_path = self.os_access.Path.tmp() / installer.path.name
+        remote_path = self.os_access.path_cls.tmp() / installer.path.name
         if not remote_path.exists():
             remote_path.parent.mkdir(parents=True, exist_ok=True)
             copy_file(installer.path, remote_path)
@@ -66,7 +66,11 @@ class WindowsInstallation(Installation):
     def install(self, installer):
         remote_installer_path = self._upload_installer(installer)
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
+        commands = {
+            '.msi': ['MsiExec', '/i', remote_installer_path, '/passive', '/log', remote_log_path],
+            '.exe': [remote_installer_path, '/passive', '/log', remote_log_path],
+            }
+        self.windows_access.winrm.run_command(commands[installer.extension])
         self._backup_configuration()
 
     def parse_core_dump(self, path):

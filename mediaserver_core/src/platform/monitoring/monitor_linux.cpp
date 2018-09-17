@@ -360,7 +360,7 @@ protected:
             QDir sysClassNet( QLatin1String("/sys/class/net/") );
             if( !sysClassNet.exists() )
             {
-                NX_LOG( QString::fromLatin1("No /sys/class/net/. Cannot read network statistics"), cl_logWARNING );
+                NX_WARNING (this, QString::fromLatin1("No /sys/class/net/. Cannot read network statistics"));
                 return;
             }
 

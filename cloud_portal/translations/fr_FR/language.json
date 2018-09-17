@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Personnalisé",
-      "description": "Utiliser l'application client %PRODUCT_NAME% pour configurer des autorisations personnalisées"
+      "description": "Utiliser l'application client %VMS_NAME% pour configurer des autorisations personnalisées"
     },
     "cloudAdmin": {
       "label": "Administrateur",
@@ -122,7 +122,7 @@
     "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
     "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
     "accountNotActivated": "Ce compte n’est pas encore activé. <a href=\"/activate\"> Envoyer à nouveau le lien d’activation</a>",
-    "accountBlocked": "Ce compte est bloqué",
+    "accountBlocked": "Ce compte est bloqué. Veuillez réessayer dans quelques minutes.",
     "notFound": "Introuvable",
     "alreadyExists": "Ce compte existe déjà",
     "unknownError": "Erreur inattendue survenue",

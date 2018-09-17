@@ -179,8 +179,8 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
     if (m_frameStyle == Qt::CustomDashLine)
         pen.setDashPattern(m_dashPattern);
 
-    QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, pen);
-    QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, windowBrush());
+    QnScopedPainterPenRollback penRollback(painter, pen);
+    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
 
     qreal d = m_frameWidth / 2.0;
     QRectF frameRect = rect.adjusted(d, d, -d, -d);
@@ -240,7 +240,7 @@ void FramedBase::paintFrame(QPainter* painter, const QRectF& rect)
 
         case Qn::CustomFrame:
         {
-            QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(painter);
+            QnScopedPainterTransformRollback transformRollback(painter);
 
             painter->translate(frameRect.topLeft());
 

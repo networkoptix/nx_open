@@ -58,7 +58,6 @@ public:
     virtual void onGotAudioFrame(const QnCompressedAudioDataPtr& audioData);
 
     virtual void updateSoftwareMotion();
-    bool canChangeStatus() const;
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
@@ -77,7 +76,6 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
-
 protected:
     mutable QnMutex m_liveMutex;
 

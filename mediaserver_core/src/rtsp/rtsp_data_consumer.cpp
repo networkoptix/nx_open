@@ -119,6 +119,12 @@ void QnRtspDataConsumer::setLastSendTime(qint64 time)
 {
     m_lastMediaTime = m_lastSendTime = time;
 }
+
+/**
+ * CSeq is a "Command sequence number". It is used to choose which packets to give out. Packets
+ * with the other CSeq (usually a small number of packets left from the previous command) will be
+ * ignored.
+ */
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
 {
     QnMutexLocker lock( &m_mutex );
@@ -428,7 +434,7 @@ bool QnRtspDataConsumer::needData(const QnAbstractDataPacketPtr& data) const
         case QnAbstractMediaData::GENERIC_METADATA:
             return m_streamDataFilter.testFlag(StreamDataFilter::objectDetection);
         default:
-            NX_ASSERT(0, "Unexpected data type");
+            NX_ASSERT(false, "Unexpected data type");
             return true;
     }
 }
@@ -493,10 +499,36 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
         if (isLive)
         {
-            if (!needSecondaryStream(m_liveQuality) && isSecondaryProvider)
-                return true; // data for other live quality stream
-            else if (needSecondaryStream(m_liveQuality) && !isSecondaryProvider)
-                return true; // data for other live quality stream
+            if (media->channelNumber >= 0 && media->channelNumber < CL_MAX_CHANNELS)
+            {
+                m_lastLiveFrameTime[media->channelNumber][isSecondaryProvider ? 1 : 0] =
+                    qnSyncTime->currentUSecsSinceEpoch();
+            }
+
+            MediaQuality currentQuality = m_currentQuality[media->channelNumber];
+            MediaQuality prefferredQuality = preferredLiveStreamQuality(media->channelNumber);
+
+            // Switching quality only if the current frame is a key frame.
+            if (prefferredQuality != m_currentQuality[media->channelNumber] && isKeyFrame)
+                m_currentQuality[media->channelNumber] = prefferredQuality;
+
+            const bool isCurrentQualityLow =
+                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_Low;
+            const bool isCurrentQualityHigh =
+                m_currentQuality[media->channelNumber] == MediaQuality::MEDIA_Quality_High;
+
+            const bool isMediaFrameQualityAppropriate =
+                (isCurrentQualityLow && isSecondaryProvider)
+                || (isCurrentQualityHigh && !isSecondaryProvider);
+
+            if (!isMediaFrameQualityAppropriate)
+                return true; //< Skip this frame.
+
+            // Live stream has just been started. Let's wait for the first key frame before switch.
+            if (!m_isLive && !isKeyFrame)
+                return true;
+
+            m_isLive = true;
 
             if (isVideo)
             {
@@ -510,6 +542,10 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                     return true; // wait for I frame for this channel
                 }
             }
+        }
+        else
+        {
+            m_isLive = false;
         }
     }
 
@@ -647,6 +683,40 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
+/**
+ * Determines preferred stream quality for the live stream. Result depends on the stream quality,
+ * desired by the user and on the corresponding camera stream state. If, for example, user-desired
+ * quality is Hi, but the primary stream reader is idle we return LowQuality as a result.
+ */
+MediaQuality QnRtspDataConsumer::preferredLiveStreamQuality(int channelNumber) const
+{
+    const auto kMaxTimeFromPreviousFrameUs = 1 * 1000 * 1000;
+    auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
+    const bool isPrimaryStreamReaderOpened =
+        m_lastLiveFrameTime[channelNumber][0] > nowUs - kMaxTimeFromPreviousFrameUs;
+
+    const bool isSecondaryStreamReaderOpened =
+        m_lastLiveFrameTime[channelNumber][1] > nowUs - kMaxTimeFromPreviousFrameUs;
+
+    MediaQuality prefferredQuality = MEDIA_Quality_None;
+    if (!needSecondaryStream(m_liveQuality))
+    {
+        if (isPrimaryStreamReaderOpened)
+            prefferredQuality = MediaQuality::MEDIA_Quality_High;
+        else
+            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
+    }
+    else
+    {
+        if (isSecondaryStreamReaderOpened)
+            prefferredQuality = MediaQuality::MEDIA_Quality_Low;
+        else
+            prefferredQuality = MediaQuality::MEDIA_Quality_High;
+    }
+
+    return prefferredQuality;
+}
+
 void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
 {
     int bytesRead = 0;
@@ -682,14 +752,13 @@ int QnRtspDataConsumer::copyLastGopFromCamera(
     QnVideoCameraPtr camera,
     bool usePrimaryStream,
     qint64 skipTime,
-    quint32 cseq,
     bool iFramesOnly)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
     int copySize = 0;
     if (camera) // && !res->hasFlags(Qn::no_last_gop))
-        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq, iFramesOnly);
+        copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, iFramesOnly);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
     m_fastChannelZappingSize = copySize;
 

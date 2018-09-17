@@ -54,7 +54,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock2)
         {
             QnMutexLocker lock1(&m1);
             QnMutexLocker lock2(&m2);
-            NX_LOG(lm("Thread 1"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Thread 1"));
         });
 
 
@@ -64,7 +64,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock2)
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             QnMutexLocker lock2(&m2);
             QnMutexLocker lock1(&m1);
-            NX_LOG(lm("Thread 2"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Thread 2"));
         });
 
     t1.join();
@@ -82,7 +82,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
         {
             QnMutexLocker lock1(&m1);
             QnMutexLocker lock2(&m2);
-            NX_LOG(lm("Thread 1"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Thread 1"));
         });
 
 
@@ -92,7 +92,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             QnMutexLocker lock2(&m2);
             QnMutexLocker lock3(&m3);
-            NX_LOG(lm("Thread 2"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Thread 2"));
         });
 
     utils::thread t3(
@@ -101,7 +101,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
             QnMutexLocker lock3(&m3);
             QnMutexLocker lock1(&m1);
-            NX_LOG(lm("Thread 3"), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Thread 3"));
         });
 
     t1.join();

@@ -145,7 +145,7 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
                 continue;
 
             addEvent(hikvisionEvent);
-            const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
+            const auto descriptor = manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
         }
     }
     return result;
@@ -160,7 +160,7 @@ HikvisionEvent AttributesParser::parsePlateData(
     QString eventType;
     int laneNumber = 0;
     QString direction;
-    QnUuid typeId;
+    QString eventTypeId;
     QDateTime dateTime;
     QString picName;
 
@@ -194,8 +194,8 @@ HikvisionEvent AttributesParser::parsePlateData(
         else if (name == "matchingresult")
         {
             const auto internalName = normalizeInternalName(reader.readElementText());
-            typeId = manifest.eventTypeByInternalName(internalName);
-            if (typeId.isNull())
+            eventTypeId = manifest.eventTypeByInternalName(internalName);
+            if (eventTypeId.isNull())
                 NX_WARNING(typeid(AttributesParser), lm("Unknown analytics event name %1").arg(internalName));
         }
         else
@@ -206,12 +206,12 @@ HikvisionEvent AttributesParser::parsePlateData(
 
     using namespace nx::sdk::metadata;
     HikvisionEvent hikvisionEvent;
-    if (!typeId.isNull())
+    if (!eventTypeId.isNull())
     {
         hikvisionEvent.caption = lm("Plate No. %1 (%2)").args(plateNumber, country);
         hikvisionEvent.description = lm("%1, Lane No. %2, Direction: %3")
             .args(hikvisionEvent.caption, laneNumber, direction);
-        hikvisionEvent.typeId = typeId;
+        hikvisionEvent.typeId = eventTypeId;
         hikvisionEvent.dateTime = dateTime;
         hikvisionEvent.picName = picName;
         hikvisionEvent.isActive = true;

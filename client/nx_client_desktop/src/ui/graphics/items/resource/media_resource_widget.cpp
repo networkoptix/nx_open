@@ -3158,8 +3158,8 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
 
             if (!success)
             {
-                NX_LOG(tr("Failed to invoke trigger %1 (%2)")
-                    .arg(id).arg(result.errorString), cl_logERROR);
+                NX_ERROR(this, tr("Failed to invoke trigger %1 (%2)")
+                    .arg(id).arg(result.errorString));
             }
 
             if (resultHandler)

@@ -2,14 +2,14 @@ import logging
 from abc import ABCMeta
 from io import StringIO
 
-from framework.ini_config import IniConfig
-from framework.installation.installation import Installation, OsNotSupported
-from framework.os_access.posix_access import PosixAccess
-from framework.os_access.posix_shell import PosixShell
-
 # Backport provided by package `configparser` from PyPI.
 # noinspection PyUnresolvedReferences,PyCompatibility
 from configparser import ConfigParser
+
+from framework.ini_config import IniConfig
+from framework.installation.installation import Installation, OsNotSupported
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.posix_shell import Shell
 
 _logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class DebInstallation(Installation):
             core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
             )
-        self._posix_shell = os_access.shell  # type: PosixShell
+        self._posix_shell = os_access.shell  # type: Shell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
         self.posix_access = os_access  # type: PosixAccess
@@ -89,7 +89,7 @@ class DebInstallation(Installation):
             return True
 
     def ini_config(self, name):
-        return IniConfig(self.os_access.Path('/etc/nx_ini/{}.ini'.format(name)))
+        return IniConfig(self.os_access.path_cls('/etc/nx_ini/{}.ini'.format(name)))
 
     def _find_library(self, name):
         return self.dir / 'lib' / ('lib' + name + '.so')

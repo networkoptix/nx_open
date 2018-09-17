@@ -40,7 +40,7 @@ public:
             if (requestHelper.post(lit("GetVideoStreamConfig")))
                 m_videoConfig = requestHelper.readRawBody();
             else
-                m_videoConfig = boost::none;
+                m_videoConfig = std::nullopt;
 
             m_cacheExpiration = std::chrono::steady_clock::now() + kCproApiCacheTimeout;
         }
@@ -160,7 +160,7 @@ private:
 
 private:
     QnDigitalWatchdogResource* m_resource;
-    boost::optional<QByteArray> m_videoConfig;
+    std::optional<QByteArray> m_videoConfig;
     std::chrono::steady_clock::time_point m_cacheExpiration;
 };
 
@@ -354,6 +354,9 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
 {
     QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
     if (useOnvifAdvancedParameterProviders())
+        return result;
+
+    if (!m_cameraProxy)
         return result;
 
     for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())

@@ -110,7 +110,7 @@ typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
 struct ReaderErrorInfo
 {
     QString message;
-    QnLogLevel severity;
+    utils::log::Level severity;
 };
 
 class ReaderHandler

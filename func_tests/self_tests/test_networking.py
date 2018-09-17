@@ -1,12 +1,13 @@
 import pytest
+from netaddr import IPNetwork
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def networking(one_vm):
     return one_vm.os_access.networking
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def macs(one_vm):
     return one_vm.hardware.macs
 
@@ -33,8 +34,10 @@ def test_internet_access(networking):
     assert not networking.can_reach('8.8.8.8', timeout_sec=4)
 
 
-@pytest.mark.parametrize('one_vm', ['windows'], indirect=True)
 def test_firewall_rule(networking):
+    if not hasattr(networking, 'remove_firewall_rule'):
+        pytest.skip("{}: no support for firewall rule removal".format(networking))
+
     networking.remove_firewall_rule()
     assert not networking.firewall_rule_exists()
     networking.create_firewall_rule()
@@ -47,17 +50,19 @@ def test_firewall_rule(networking):
     assert not networking.firewall_rule_exists()
 
 
-@pytest.mark.parametrize('one_vm', ['windows'], indirect=True)
 def test_ip_addresses(networking, macs):
+    if not hasattr(networking, 'remove_ips'):
+        pytest.skip("{}: no support for IP settings removal".format(networking))
+
     networking.remove_ips()
     assert not networking.list_ips()
 
     macs_iter = iter(macs.values())
     random_mac_1 = next(macs_iter)
-    networking.setup_ip(random_mac_1, '10.254.252.2', 28)
+    networking.setup_network(random_mac_1, IPNetwork('10.254.252.2/28'))
     assert len(networking.list_ips()) == 1
     random_mac_2 = next(macs_iter)
-    networking.setup_ip(random_mac_2, '10.254.252.18', 28)
+    networking.setup_network(random_mac_2, IPNetwork('10.254.252.18/28'))
     assert len(networking.list_ips()) == 2
 
     networking.remove_ips()
@@ -66,8 +71,10 @@ def test_ip_addresses(networking, macs):
     assert not networking.list_ips()
 
 
-@pytest.mark.parametrize('one_vm', ['windows'], indirect=True)
 def test_routes(networking, macs):
+    if not hasattr(networking, 'remove_routes'):
+        pytest.skip("{}: no support for routes removal".format(networking))
+
     networking.remove_routes()
     assert not networking.list_routes()
 

@@ -179,7 +179,8 @@
             "type": "image",
             "meta": {
               "format": "png",
-              "height": 64
+              "height_le":72,
+              "height_ge":64
             }
           },
           {
@@ -220,7 +221,7 @@
             "type": "image",
             "meta": {
               "format": "png",
-              "height_ge": 240
+              "height_ge": 220
             }
           },
           ["Subtitle", "%SUBTITLE%","Welcome!",

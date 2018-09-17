@@ -187,7 +187,9 @@
         },
         {
             "keys": [
-                "ActiveCam|*"
+                "ActiveCam|*",
+                "ACTI|B915", 
+                "*|ACTi-915"
             ],
             "forceONVIF": true
         },
@@ -2190,7 +2192,8 @@
             "keys": [
                 "iPIXA|INVDHDW32812IR"
             ],
-            "clearInputsTimeoutSec": 3
+            "clearInputsTimeoutSec": 3,
+            "comment": "considers input state as 0 after specified timeout"
         },
         {
             "keys": [
@@ -2216,6 +2219,7 @@
             "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2465,6 +2469,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2491,6 +2496,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2544,6 +2550,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2677,6 +2684,7 @@
             "keys": [
                 "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2834,7 +2842,8 @@
         },
         {
             "keys": [
-            "VIVOTEK|MA8391*",
+            "9W-H3-3MH*|*",
+            "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
             "AXIS|AXIS P3707*",
             "Axis|AXISP3707*",
             "AXIS|AXISP3707*",
@@ -2845,13 +2854,21 @@
             "Axis|AXISQ3708*",
             "AXIS|AXISQ3708*",
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
-            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*"
+            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
             ],
             "canShareLicenseGroup": true
         },
         {
             "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
             "bypassFirmware":"1.0.0"
+        },
+        {
+            "keys": [
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+            ],
+            "clearInputsTimeoutSec": 1,
+            "comment": "considers input state as 0 after specified timeout"
         }
     ]
 }

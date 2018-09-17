@@ -16,8 +16,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_resource.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 #include <nx/client/desktop/common/utils/check_box_utils.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -155,7 +153,7 @@ LegacyExpertSettingsWidget::~LegacyExpertSettingsWidget()
 
 void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResourceList &cameras)
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     boost::optional<bool> isDualStreamingDisabled;
     bool sameIsDualStreamingDisabled = true;
@@ -362,6 +360,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
+    ui->checkBoxDisableNativePtzPresets->setEnabled(supportedNativePtzCount != 0);
     if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
     else if (disabledNativePtzCount != 0)

@@ -282,8 +282,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionAckRequest(
 
     if (m_state > State::waitingServerPeerUDPAddress)
     {
-        NX_LOGX(lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
-            .arg(m_connectionID).arg(toString(m_state)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
+            .arg(m_connectionID).arg(toString(m_state)));
         completionHandler(api::ResultCode::ok);
         return;
     }
@@ -426,9 +426,8 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse connectResponse)
 {
-    NX_LOGX(lm("Connection %1. Sending connect response (%2) while in state %3")
-        .arg(m_connectionID).arg(QnLexical::serialized(resultCode)).arg(toString(m_state)),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Connection %1. Sending connect response (%2) while in state %3")
+        .arg(m_connectionID).arg(QnLexical::serialized(resultCode)).arg(toString(m_state)));
 
     NX_CRITICAL(m_connectResponseSender);
     decltype(m_connectResponseSender) connectResponseSender;
@@ -462,8 +461,8 @@ void UDPHolePunchingConnectionInitiationFsm::processConnectionResultRequest(
 {
     if (m_state < State::waitingConnectionResult)
     {
-        NX_LOGX(lm("Connection %1. Received ConnectionResultRequest while in state %2")
-            .arg(m_connectionID).arg(toString(m_state)), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Connection %1. Received ConnectionResultRequest while in state %2")
+            .arg(m_connectionID).arg(toString(m_state)));
     }
 
     m_sessionStatisticsInfo.resultCode = request.resultCode;

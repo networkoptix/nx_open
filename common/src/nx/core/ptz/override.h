@@ -32,6 +32,8 @@ QN_FUSION_DECLARE_FUNCTIONS(OverridePart, (json))
 
 struct Override
 {
+    static const QString kPtzOverrideKey;
+
     // This struct exists only because enums are not supported as map keys by fusion.
     OverridePart operational;
     OverridePart configurational;

@@ -87,10 +87,13 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     return result;
 }
 
-CameraDiagnostics::Result VivotekResource::customStreamConfiguration(Qn::ConnectionRole role)
+CameraDiagnostics::Result VivotekResource::customStreamConfiguration(
+    Qn::ConnectionRole role,
+    const QnLiveStreamParams& params)
 {
     bool success = true;
-    if (streamSupportsHevc(role))
+    const bool isHevcCodec = params.codec.compare(kHevcCodecString, Qt::CaseInsensitive) == 0;
+    if (isHevcCodec && streamSupportsHevc(role))
         success = setHevcForStream(role);
 
     if (!success)
@@ -269,6 +272,31 @@ bool VivotekResource::setVivotekParameter(
         return false;
 
     return true;
+}
+
+nx::mediaserver::resource::StreamCapabilityMap VivotekResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
+{
+    QnMutexLocker lock(&m_mutex);
+    using namespace nx::mediaserver::resource;
+
+    auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    QSet<QPair<int,int>> resolutions;
+    for (const auto key: onvifResult.keys())
+        resolutions.insert(QPair<int, int>(key.resolution.width(), key.resolution.height()));
+
+    nx::mediaserver::resource::StreamCapabilityMap result = onvifResult;
+    if (m_hasHevcSupport && m_hasHevcSupport.get())
+    {
+        for (const auto& resolution: resolutions)
+        {
+            StreamCapabilityKey key;
+            key.codec = kHevcCodecString.toUpper();
+            key.resolution = QSize(resolution.first, resolution.second);
+            result.insert(key, nx::media::CameraStreamCapability());
+        }
+    }
+    return result;
 }
 
 } // namespace plugins

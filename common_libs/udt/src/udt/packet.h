@@ -223,7 +223,7 @@ class CHandShake
 public:
     CHandShake();
 
-    int serialize(char* buf, int& size);
+    int serialize(char* buf, int& size) const;
     int deserialize(const char* buf, int size);
 
 public:

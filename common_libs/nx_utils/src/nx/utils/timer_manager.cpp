@@ -140,8 +140,7 @@ TimerId StandaloneTimerManager::addTimer(
         timerId,
         TaskContext(std::move(func)),
         delay);
-    NX_LOGX(lm("Added timer %1, delay %2").arg(timerId).arg(delay),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Added timer %1, delay %2").arg(timerId).arg(delay));
     return timerId;
 }
 
@@ -166,9 +165,8 @@ TimerId StandaloneTimerManager::addNonStopTimer(
         timerId,
         TaskContext(std::move(func), repeatPeriod),
         firstShotDelay);
-    NX_LOGX(lm("Added non stop timer %1, repeat period %2, first shot delay %3")
-        .arg(timerId).arg(repeatPeriod).arg(firstShotDelay),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Added non stop timer %1, repeat period %2, first shot delay %3")
+        .arg(timerId).arg(repeatPeriod).arg(firstShotDelay));
     return timerId;
 }
 
@@ -176,9 +174,8 @@ bool StandaloneTimerManager::modifyTimerDelay(
     TimerId timerId,
     std::chrono::milliseconds newDelay)
 {
-    NX_LOGX(lm("Modifying timer %1, new delay %2 ms")
-        .arg(timerId).arg(newDelay.count()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Modifying timer %1, new delay %2 ms")
+        .arg(timerId).arg(newDelay.count()));
 
     QnMutexLocker lk(&m_mutex);
     if (m_runningTaskID == timerId)
@@ -198,9 +195,8 @@ bool StandaloneTimerManager::modifyTimerDelay(
     m_taskToTime.erase(taskIter);
     m_timeToTask.erase(handlerIter);
 
-    NX_LOGX(lm("Modifyed timer %1, new delay %2 ms")
-        .arg(timerId).arg(newDelay.count()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Modifyed timer %1, new delay %2 ms")
+        .arg(timerId).arg(newDelay.count()));
 
     addTaskNonSafe(
         lk,
@@ -220,7 +216,7 @@ void StandaloneTimerManager::deleteTimer(const TimerId& timerId)
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_LOGX(lm("Deleting timer %1").arg(timerId), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Deleting timer %1").arg(timerId));
 
     deleteTaskNonSafe(lk, timerId);
 }
@@ -236,7 +232,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerId)
 
     if (QThread::currentThread() != this)
     {
-        NX_LOGX(lm("Waiting for timer %1 to complete").arg(timerId), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Waiting for timer %1 to complete").arg(timerId));
 
         while (m_runningTaskID == timerId)
             m_cond.wait(lk.mutex());      //waiting for timer handler execution finish
@@ -259,7 +255,7 @@ void StandaloneTimerManager::run()
 {
     QnMutexLocker lk(&m_mutex);
 
-    NX_LOG(lm("StandaloneTimerManager started"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("started"));
 
     while (!m_terminated)
     {
@@ -288,9 +284,9 @@ void StandaloneTimerManager::run()
                     // Using unlocker to ensure exception-safety.
                     QnMutexUnlocker unlocker(&lk);
 
-                    NX_LOGX(lm("Executing task %1").arg(timerId), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Executing task %1").arg(timerId));
                     taskContext.func(timerId);
-                    NX_LOGX(lm("Done task %1").arg(timerId), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Done task %1").arg(timerId));
                 }
 
                 if (m_taskToTime.find(timerId) != m_taskToTime.cend())
@@ -329,9 +325,8 @@ void StandaloneTimerManager::run()
         }
         catch (exception& e)
         {
-            NX_LOG(lm("StandaloneTimerManager. Error. Exception in %1:%2. %3")
-                .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())),
-                cl_logERROR);
+            NX_ERROR(this, lm("Error. Exception in %1:%2. %3")
+                .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())));
             timeToWait = kErrorSkipTimeout;
             m_runningTaskID = 0;
         }
@@ -345,7 +340,7 @@ void StandaloneTimerManager::run()
             m_cond.wait(lk.mutex());
     }
 
-    NX_LOG(lm("StandaloneTimerManager stopped"), cl_logDEBUG1);
+    NX_DEBUG(this, lm("stopped"));
 }
 
 void StandaloneTimerManager::addTaskNonSafe(

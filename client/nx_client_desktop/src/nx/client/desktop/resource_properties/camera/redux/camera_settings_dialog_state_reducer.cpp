@@ -382,6 +382,9 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
+    if (state.expert.trustCameraTime())
+        return false;
+
     return state.expert.rtpTransportType.hasValue()
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
@@ -586,7 +589,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
                     firstCamera->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {}));
 
-            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
+            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->ioPortDescriptions());
         }
 
         state.singleCameraSettings.logicalId.setBase(firstCamera->logicalId());
@@ -676,6 +679,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return QnLexical::deserialized<vms::api::RtpTransportType>(
                 camera->getProperty(QnMediaResource::rtpTransportKey()),
                 vms::api::RtpTransportType::automatic);
+        });
+
+    fetchFromCameras<bool>(state.expert.trustCameraTime, cameras,
+        [](const Camera& camera)
+        {
+            return camera->trustCameraTime();
         });
 
     fetchFromCameras<vms::api::MotionStreamType>(state.expert.motionStreamType, cameras,
@@ -1173,7 +1182,7 @@ State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool
         return state;
 
     const int customMediaPortValue = value ? state.expert.customMediaPortDisplayValue : 0;
-    state.expert.customMediaPort.setUser(value);
+    state.expert.customMediaPort.setUser(customMediaPortValue);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;
@@ -1187,6 +1196,14 @@ State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int valu
 
     state.expert.customMediaPort.setUser(value);
     state.expert.customMediaPortDisplayValue = value;
+    state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.hasChanges = true;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setTrustCameraTime(State state, bool value)
+{
+    state.expert.trustCameraTime.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
     return state;

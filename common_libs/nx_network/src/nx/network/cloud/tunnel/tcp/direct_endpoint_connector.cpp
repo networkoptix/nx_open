@@ -130,8 +130,8 @@ void DirectEndpointConnector::launchVerificators(
 
     for (const SocketAddress& endpoint: endpoints)
     {
-        NX_LOGX(lm("cross-nat %1. Verifying host %2")
-            .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("cross-nat %1. Verifying host %2")
+            .arg(m_connectSessionId).arg(endpoint));
 
         m_verificators.push_back(
             EndpointVerificatorFactory::instance().create(m_connectSessionId));
@@ -192,8 +192,8 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
-    NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
-        .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Reporting successful connection to %2")
+        .arg(m_connectSessionId).arg(endpoint));
 
     m_verificators.clear();
 

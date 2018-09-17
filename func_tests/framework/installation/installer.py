@@ -4,7 +4,6 @@ from collections import namedtuple
 from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
-from typing import Callable
 
 _logger = logging.getLogger(__name__)
 
@@ -195,6 +194,7 @@ class Installer(object):
 
 class InstallerSet(object):
     def __init__(self, installers_dir):
+        _logger.debug("Search for packages in %s.", installers_dir)
         self.installers = []
         for path in installers_dir.glob('*'):
             try:
@@ -205,11 +205,13 @@ class InstallerSet(object):
             _logger.info("File {}: {!r}".format(path, installer))
             self.installers.append(installer)
         customizations = {installer.customization for installer in self.installers}
+        _logger.debug("Customizations: %r", customizations)
         try:
             self.customization, = customizations
         except ValueError:
             raise ValueError("Expected one, found: {!r}".format(customizations))
         versions = {installer.version for installer in self.installers}
+        _logger.debug("Versions: %r", versions)
         try:
             self.version, = versions
         except ValueError:

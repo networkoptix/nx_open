@@ -234,6 +234,13 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(0ms, result[0].startTimeMs);
     ASSERT_EQ(1000ms, result[1].startTimeMs);
+
+    result.clear();
+    filter.orderBy.order = Qt::DescendingOrder;
+    serverDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(0ms, result[1].startTimeMs);
+    ASSERT_EQ(1000ms, result[0].startTimeMs);
 }
 
 TEST_F(BookmarksDatabaseTest, tagSearchTest)
@@ -283,6 +290,11 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
 
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(0, result.size());
+
+    result.clear();
+    filter.text = "btag";
+    mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(3, result.size());
 }
 } // namespace test
 } // namespace bookmarks
