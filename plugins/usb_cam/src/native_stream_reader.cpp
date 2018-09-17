@@ -16,9 +16,6 @@ namespace {
 
 uint64_t kMsecInSec = 1000;
 
-uint64_t now = 0;
-uint64_t earlier = 0;
-
 }
 
 NativeStreamReader::NativeStreamReader(
@@ -55,15 +52,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if(!packet)
         return nxcip::NX_OTHER_ERROR;
-
-    now = m_camera->millisSinceEpoch();
-    std::stringstream ss;
-    ss << packet->timeStamp()
-        << ", " << now - earlier
-        << ", " << packet->timeStamp() - m_lastTs
-        << ", " << ffmpeg::utils::codecIDToName(packet->codecID());
-    //std::cout << ss.str() << std::endl;
-    earlier = now;
 
     *lpPacket = toNxPacket(packet.get()).release();
 

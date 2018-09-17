@@ -24,9 +24,6 @@ namespace {
 int constexpr kRetryLimit = 10;
 int constexpr kMsecInSec = 1000;
 
-uint64_t earlier = 0;
-uint64_t lastTs = 0;
-
 }
 
 TranscodeStreamReader::TranscodeStreamReader(
@@ -79,15 +76,6 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     if(!packet)
         return nxcip::NX_OTHER_ERROR;
-
-    auto now = m_camera->millisSinceEpoch();
-    std::stringstream ss;
-    ss << packet->timeStamp()
-        << ", " << now - earlier
-        << ", " << packet->timeStamp() - m_lastTs
-        << ", " << ffmpeg::utils::codecIDToName(packet->codecID());
-    //std::cout << ss.str() << std::endl;
-    earlier = now;
 
     *lpPacket = toNxPacket(packet.get()).release();
 
@@ -296,7 +284,6 @@ void TranscodeStreamReader::ensureConsumerAdded()
 {
     if (!m_consumerAdded)
     {
-        std::cout << "ENSURE CONSUMER ADDED" << std::endl;
         StreamReaderPrivate::ensureConsumerAdded();
         m_camera->videoStream()->addFrameConsumer(m_videoFrameConsumer);
     }
