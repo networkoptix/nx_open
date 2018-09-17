@@ -16,6 +16,8 @@ using OpenTunnelCompletionHandler = detail::OpenTunnelCompletionHandler;
 
 /**
  * Establishes connection to nx::network::http::tunneling::Server listening same request path.
+ * For description of tunneling methods supported see nx::network::http::tunneling::Server.
+ * The client can try to use different tunneling methods to find the one that works.
  */
 class NX_NETWORK_API Client:
     public aio::BasicPollable
