@@ -39,12 +39,20 @@ class NX_NETWORK_API WebSocket :
     };
 
 public:
-
+    /**
+     * If ROLE is undefined, payload won't be masked (unmasked). FRAME_TYPE may be only BINARY or
+     * TEXT, all other values are ignored and internal frame type is set to BINARY.
+     */
     WebSocket(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         SendMode sendMode = SendMode::singleMessage,
         ReceiveMode receiveMode = ReceiveMode::message,
-        Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
+        Role role = Role::undefined,
+        FrameType frameType= FrameType::binary);
+
+    WebSocket(
+        std::unique_ptr<AbstractStreamSocket> streamSocket,
+        FrameType frameType);
 
     ~WebSocket();
 
@@ -131,6 +139,7 @@ private:
     std::chrono::milliseconds m_aliveTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     SystemError::ErrorCode m_lastError;
+    FrameType m_frameType;
 };
 
 } // namespace websocket

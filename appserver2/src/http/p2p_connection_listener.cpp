@@ -308,7 +308,13 @@ void ConnectionProcessor::run()
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
+
+    WebSocketPtr webSocket(new websocket::WebSocket(
+        std::move(socket),
+        remotePeer.dataFormat == Qn::JsonFormat
+            ? websocket::FrameType::text
+            : websocket::FrameType::binary));
+
     if (keepAliveTimeout > std::chrono::milliseconds::zero())
         webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();
