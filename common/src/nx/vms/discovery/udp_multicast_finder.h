@@ -50,7 +50,7 @@ private:
     void createReceiver();
     void removeObsoleteSenders();
     void addNewSenders();
-    void updateInterfacesInner();
+    void updateInterfacesInAioThread();
 
 private:
     nx::network::SocketAddress m_multicastEndpoint;

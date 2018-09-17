@@ -299,7 +299,7 @@ QSet<QString> getLocalIpV4AddressList()
 
 // TODO: should write unit test
 // NOTE: contains redundant conversion: QHostAddress -> QString -> HostAddress
-std::set<HostAddress> getLocalHostAddressList()
+std::set<HostAddress> getLocalIpV4HostAddressList()
 {
     std::set<HostAddress> localIpList;
     for (const auto& ip: nx::network::getLocalIpV4AddressList())

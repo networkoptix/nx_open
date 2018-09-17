@@ -82,7 +82,7 @@ void UdpMulticastFinder::createReceiver()
 
 void UdpMulticastFinder::removeObsoleteSenders()
 {
-    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalHostAddressList();
+    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalIpV4HostAddressList();
 
     for (auto it = m_senders.begin(); it != m_senders.end(); )
     {
@@ -101,7 +101,7 @@ void UdpMulticastFinder::removeObsoleteSenders()
 
 void UdpMulticastFinder::addNewSenders()
 {
-    for (const auto& ip: nx::network::getLocalHostAddressList())
+    for (const auto& ip: nx::network::getLocalIpV4HostAddressList())
     {
         const auto insert = m_senders.emplace(ip, std::unique_ptr<network::UDPSocket>());
         if (insert.second)
@@ -122,9 +122,9 @@ void UdpMulticastFinder::addNewSenders()
     }
 }
 
-void UdpMulticastFinder::updateInterfacesInner()
+void UdpMulticastFinder::updateInterfacesInAioThread()
 {
-    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalHostAddressList();
+    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalIpV4HostAddressList();
     if (!m_receiver)
         createReceiver();
 
@@ -133,13 +133,13 @@ void UdpMulticastFinder::updateInterfacesInner()
     addNewSenders();
 
     NX_VERBOSE(this, lm("Schedule update interfaces in %1").arg(m_updateInterfacesInterval));
-    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfacesInner(); });
+    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfacesInAioThread(); });
 }
 
 void UdpMulticastFinder::updateInterfaces()
 {
-    // Make sure everything is called inside binded thread
-    m_updateTimer.post([this]() { updateInterfacesInner(); });
+    // Make sure everything is called inside bound thread.
+    m_updateTimer.dispatch([this]() { updateInterfacesInAioThread(); });
 }
 
 void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
@@ -258,7 +258,6 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
             }
     });
 }
-
 
 } // namespace discovery
 } // namespace vms
