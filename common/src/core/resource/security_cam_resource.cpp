@@ -1519,6 +1519,29 @@ void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::Pres
     setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
+bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilites() const
+{
+    return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
+}
+
+void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
+{
+    setProperty(
+        Qn::kUserIsAllowedToOverridePtzCapabilities,
+        QnLexical::serialized(allowed));
+}
+
+Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const
+{
+    return QnLexical::deserialized<Ptz::Capabilities>(
+        getProperty(Qn::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
+}
+
+void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
+{
+    setProperty(Qn::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
+}
+
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
 {
     if (streamParams.bitrateKbps > 0)

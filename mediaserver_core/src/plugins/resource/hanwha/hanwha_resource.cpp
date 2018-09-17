@@ -970,15 +970,6 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
-    const auto operationalCapabilities = ptzCapabilities(core::ptz::Type::operational);
-    const auto configurationalCapabilities = ptzCapabilities(core::ptz::Type::configurational);
-
-    const bool hasSomePtzCapabilities =
-        (operationalCapabilities | configurationalCapabilities) != Ptz::NoPtzCapabilities;
-
-    if (!hasSomePtzCapabilities)
-        return nullptr;
-
     auto controller = new HanwhaPtzController(toSharedPointer(this));
     controller->setPtzCapabilities(m_ptzCapabilities);
     controller->setPtzLimits(m_ptzLimits);
@@ -999,6 +990,13 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
+
+    if (isAnalogEncoder())
+    {
+        // We can't reliably determine if there's PTZ caps for analogous cameras
+        // connected to Hanwha encoder, so we allow a user to enable it on the 'expert' tab
+        setIsUserAllowedToModifyPtzCapabilities(true);
+    }
 
     if (!info.firmware.isEmpty())
         setFirmware(info.firmware);
@@ -1382,6 +1380,14 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 
     NX_DEBUG(this, lm("%1: Supported PTZ capabilities: %2")
         .args(getPhysicalId(), ptzCapabilityBits(capabilities)));
+
+    if (isAnalogEncoder())
+    {
+        // Encoder PTZ capabilities are being overriden from 'Expert' tab
+        // and are empty by default.
+        m_ptzCapabilities[core::ptz::Type::operational] = Ptz::NoPtzCapabilities;
+        m_ptzCapabilities[core::ptz::Type::configurational] = Ptz::NoPtzCapabilities;
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }

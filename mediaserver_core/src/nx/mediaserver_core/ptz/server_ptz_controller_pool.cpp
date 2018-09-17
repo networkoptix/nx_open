@@ -169,7 +169,8 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr
     bool preferSystemPresets = false;
     const auto capabilities = ptz::capabilities(controller);
     if (capabilities.testFlag(Ptz::NativePresetsPtzCapability)
-        && !capabilities.testFlag(Ptz::NoNxPresetsPtzCapability))
+        && !capabilities.testFlag(Ptz::NoNxPresetsPtzCapability)
+        || camera->isUserAllowedToModifyPtzCapabilites())
     {
         preferSystemPresets = camera->preferredPtzPresetType() == nx::core::ptz::PresetType::system;
         connect(
@@ -212,7 +213,12 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(const QnResourcePtr
 void ServerPtzControllerPool::at_cameraPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
-    if (key == Qn::kUserPreferredPtzPresetType || key == Qn::kDefaultPreferredPtzPresetType)
+    const bool isPtzKey = key == Qn::kUserPreferredPtzPresetType
+        || key == Qn::kDefaultPreferredPtzPresetType
+        || key == Qn::kPtzCapabilitiesAddedByUser
+        || key == Qn::kUserIsAllowedToOverridePtzCapabilities;
+
+    if (isPtzKey)
     {
         // Camera reinitialization is required.
         NX_DEBUG(

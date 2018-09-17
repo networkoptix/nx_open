@@ -85,6 +85,12 @@ QnPtzControllerPtr wrapController(
     const ControllerWrappingParameters& parameters)
 {
     const std::vector<ControllerWrapper> wrappers = {
+        [](QnPtzControllerPtr* original)
+        {
+            if (QnWorkaroundPtzController::extends(capabilities(*original)))
+                original->reset(new QnWorkaroundPtzController(*original));
+        },
+
         [&parameters](QnPtzControllerPtr* original)
         {
             if (!parameters.absoluteMoveMapper
@@ -145,12 +151,6 @@ QnPtzControllerPtr wrapController(
                     *original,
                     parameters.ptzPool->executorThread()));
             }
-        },
-
-        [](QnPtzControllerPtr* original)
-        {
-            if (QnWorkaroundPtzController::extends(capabilities(*original)))
-                original->reset(new QnWorkaroundPtzController(*original));
         },
 
         [&parameters](QnPtzControllerPtr* original)

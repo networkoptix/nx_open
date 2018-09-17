@@ -102,6 +102,11 @@ namespace Qn
     static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
     static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
 
+    static const QString kUserIsAllowedToOverridePtzCapabilities(
+        "userIsAllowedToOverridePtzCapabilities");
+
+    static const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
+
     // Mediaserver common info
     static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
 

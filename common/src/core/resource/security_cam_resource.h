@@ -356,6 +356,13 @@ public:
     nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
     void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
 
+    bool isUserAllowedToModifyPtzCapabilites() const;
+
+    void setIsUserAllowedToModifyPtzCapabilities(bool allowed);
+
+    Ptz::Capabilities ptzCapabilitiesAddedByUser() const;
+
+    void setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities);
 
 public slots:
     virtual void inputPortListenerAttached();

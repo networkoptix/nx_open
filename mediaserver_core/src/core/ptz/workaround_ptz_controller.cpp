@@ -39,6 +39,9 @@ core_ptz::Override loadOverride(const QnVirtualCameraResourcePtr& camera)
             *capabilities = capabilitiesOverride;
     }
 
+    const auto userAddedPtzCapabilities = camera->ptzCapabilitiesAddedByUser();
+    ptzOverride.operational.capabilitiesToAdd |= userAddedPtzCapabilities;
+
     return ptzOverride;
 }
 

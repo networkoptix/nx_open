@@ -106,6 +106,14 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
         ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
         this, SLOT(at_preferredPresetTypeChanged(int)));
 
+    connect(
+        ui->forcedPanTiltCheckBox, SIGNAL(toggled(bool)),
+        this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->forcedZoomCheckBox, SIGNAL(toggled(bool)),
+        this, SLOT(at_dataChanged()));
+
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &QnCameraExpertSettingsWidget::at_dataChanged);
 
@@ -142,6 +150,8 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
+
+    // TODO: Help topic for PTZ stuff.
 
     ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, it will receive and use camera stream as-is."));
     setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
@@ -198,6 +208,10 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int supportBothPresetTypeCount = 0;
     int preferSystemPresetsCount = 0;
     int preferNativePresetsCount = 0;
+
+    int modifiablePtzCapabilitiesCount = 0;
+    int addedPanTiltCount = 0;
+    int addedZoomCount = 0;
 
     int camCnt = 0;
     for (const auto& camera: cameras)
@@ -291,6 +305,16 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
                 ++preferNativePresetsCount;
         }
 
+        if (camera->isUserAllowedToModifyPtzCapabilites())
+            ++modifiablePtzCapabilitiesCount;
+
+        const auto capabilitiesAddedByUser = camera->ptzCapabilitiesAddedByUser();
+        if (capabilitiesAddedByUser & Ptz::ContinuousPanTiltCapabilities)
+            ++addedPanTiltCount;
+
+        if (capabilitiesAddedByUser & Ptz::ContinuousZoomCapability)
+            ++addedZoomCount;
+
         camCnt++;
     }
 
@@ -368,7 +392,12 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     const bool canSwitchPresetTypeOnCameras = supportBothPresetTypeCount != 0;
-    ui->groupBoxPtzControl->setEnabled(canSwitchPresetTypeOnCameras);
+    const bool canModifyPtzCapabilities = modifiablePtzCapabilitiesCount != 0;
+
+    ui->groupBoxPtzControl->setEnabled(canSwitchPresetTypeOnCameras || canModifyPtzCapabilities);
+    ui->groupBoxPtzControl->setVisible(canSwitchPresetTypeOnCameras || canModifyPtzCapabilities);
+
+    ui->preferredPtzPresetTypeWidget->setVisible(canSwitchPresetTypeOnCameras);
     ui->preferredPtzPresetTypeWidget->setEnabled(canSwitchPresetTypeOnCameras);
     ui->preferredPtzPresetTypeComboBox->setEnabled(canSwitchPresetTypeOnCameras);
 
@@ -383,6 +412,21 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         else
             ui->preferredPtzPresetTypeComboBox->setCurrentIndex(-1);
     }
+
+    ui->forcedPtzWidget->setVisible(canModifyPtzCapabilities);
+    ui->forcedPtzWidget->setEnabled(canModifyPtzCapabilities);
+    ui->forcedPanTiltCheckBox->setEnabled(canModifyPtzCapabilities);
+    ui->forcedZoomCheckBox->setEnabled(canModifyPtzCapabilities);
+
+    CheckboxUtils::setupTristateCheckbox(
+        ui->forcedPanTiltCheckBox,
+        cameras.size() == addedPanTiltCount || addedPanTiltCount == 0,
+        cameras.size() == addedPanTiltCount);
+
+    CheckboxUtils::setupTristateCheckbox(
+        ui->forcedZoomCheckBox,
+        cameras.size() == addedZoomCount || addedZoomCount == 0,
+        cameras.size() == addedZoomCount);
 
     const bool canSetupVideoStream = std::all_of(cameras.cbegin(), cameras.cend(),
         [](const QnVirtualCameraResourcePtr& camera)
@@ -409,7 +453,6 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
     bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
-    auto preferredPtzPresetTypeIndex = ui->preferredPtzPresetTypeComboBox->currentIndex();
 
     for (const auto& camera: cameras)
     {
@@ -459,9 +502,26 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
             }
         }
 
+        const auto preferredPtzPresetTypeIndex = ui->preferredPtzPresetTypeComboBox->currentIndex();
         if (preferredPtzPresetTypeIndex != -1 && canSwitchPresetTypes(camera))
         {
             camera->setUserPreferredPtzPresetType(presetTypeByIndex(preferredPtzPresetTypeIndex));
+        }
+
+        if (camera->isUserAllowedToModifyPtzCapabilites())
+        {
+            auto userAddedPtzCapabilities = camera->ptzCapabilitiesAddedByUser();
+            if (ui->forcedPanTiltCheckBox->checkState() == Qt::Checked)
+                userAddedPtzCapabilities |= Ptz::ContinuousPanTiltCapabilities;
+            else if (ui->forcedPanTiltCheckBox->checkState() == Qt::Unchecked)
+                userAddedPtzCapabilities &= ~Ptz::ContinuousPanTiltCapabilities;
+
+            if (ui->forcedZoomCheckBox->checkState() == Qt::Checked)
+                userAddedPtzCapabilities |= Ptz::ContinuousZoomCapability;
+            else if (ui->forcedZoomCheckBox->checkState() == Qt::Unchecked)
+                userAddedPtzCapabilities &= ~Ptz::ContinuousZoomCapability;
+
+            camera->setPtzCapabilitiesAddedByUser(userAddedPtzCapabilities);
         }
 
         if (ui->logicalIdGroupBox->isEnabled())
@@ -571,7 +631,9 @@ bool QnCameraExpertSettingsWidget::areDefaultValues() const
         && ui->comboBoxTransport->currentIndex() == 0
         && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked
         && ui->preferredPtzPresetTypeComboBox->currentIndex() == kAutoPresetsIndex
-        && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked;
+        && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked
+        && ui->forcedZoomCheckBox->checkState() == Qt::Unchecked
+        && ui->forcedPanTiltCheckBox->checkState() == Qt::Unchecked;
 }
 
 void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
@@ -586,6 +648,8 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->comboBoxForcedMotionStream->setCurrentIndex(0);
     ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kAutoPresetsIndex);
     ui->logicalIdSpinBox->setValue(0);
+    ui->forcedZoomCheckBox->setCheckState(Qt::Unchecked);
+    ui->forcedPanTiltCheckBox->setCheckState(Qt::Unchecked);
 }
 
 void QnCameraExpertSettingsWidget::updateControlBlock()
