@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -19,7 +19,8 @@ namespace utils {
 class CryptedFileStream : public QIODevice
 {
 public:
-    class Key;
+    constexpr static size_t kKeySize = 32; //< Key size in bytes.
+    using Key = std::array<unsigned char, kKeySize>;
 
     CryptedFileStream(const QString& fileName, const QString& password = QString());
     virtual ~CryptedFileStream();
@@ -28,6 +29,10 @@ public:
 
     void setPassword(const QString& password);
 
+    // Static function for passsword checking.
+    static Key getPasswordHash(const QString& password);
+    static bool checkPassword(const QString& password, Key hash);
+
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;
 
@@ -35,16 +40,6 @@ public:
     virtual qint64 pos() const override;
     virtual qint64 size() const override;
     virtual qint64 grossSize() const;
-
-    constexpr static size_t kKeySize = 32; //< Key size in bytes.
-
-    class Key : public std::vector<unsigned char>
-    {
-    public:
-        Key() { resize(kKeySize); }
-        Key(std::initializer_list<unsigned char> l): std::vector<unsigned char>(l) { NX_ASSERT(l.size() == kKeySize); }
-        explicit Key(const unsigned char * data): std::vector<unsigned char>(data, data + kKeySize) {};
-    };
 
 protected:
     constexpr static int kCryptoStreamVersion = 1;
@@ -67,14 +62,14 @@ protected:
         qint64 version = kCryptoStreamVersion;
         qint64 minReadVersion = kCryptoStreamVersion; //< Minimal reader version to access the stream.
         qint64 dataSize = 0;
-        unsigned char salt[kKeySize] = {};
-        unsigned char keyHash[kKeySize] = {};
+        Key salt = {};
+        Key keyHash = {};
     } m_header;
 #pragma pack(pop)
 
     QString m_fileName;
-    Key m_passwordKey; //< Hash of adapted password
-    Key m_key;
+    Key m_passwordKey = {}; //< Hash of adapted password
+    Key m_key = {};
 
     struct Position
     {
@@ -94,7 +89,7 @@ protected:
     char m_currentCryptedBlock[kCryptoBlockSize];
     void* m_context; //< Using void* because EVP_CIPHER_CTX is a OpenSSL typedef.
     void* m_mdContext; //< Using void* because EVP_MD_CTX is a OpenSSL typedef.
-    Key m_IV;
+    Key m_IV = {};
     bool m_blockDirty = false; //< Data in decrypted block was not flushed.
 
     QFile m_file;

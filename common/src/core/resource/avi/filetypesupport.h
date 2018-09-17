@@ -6,7 +6,6 @@
 class FileTypeSupport
 {
 public:
-    static const quint64 NOV_EXE_MAGIC = 0x73a0b934820d4055ull;
 
     static bool isFileSupported(const QString &filename);
 

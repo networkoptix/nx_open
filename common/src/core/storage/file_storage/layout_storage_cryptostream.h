@@ -1,9 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <QtCore/QFile>
 
-#include <nx/utils/thread/mutex.h>
 #include <utils/crypt/crypted_file_stream.h>
 
 #include "layout_storage_stream.h"

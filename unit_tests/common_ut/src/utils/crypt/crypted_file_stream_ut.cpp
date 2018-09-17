@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 #include <utils/crypt/crypted_file_stream.h>
 
-const int bufferSize = 9000;
+static const int bufferSize = 9000;
 static char buffer[bufferSize];
 
-const char* dummyName = "DeleteMe.bin";
+static const char* dummyName = "DeleteMe.bin";
 
-const char* thePassword = "helloworld";
+static const char* thePassword = "helloworld";
 
-void writeTestFile(const char* name)
+static void writeTestFile(const char* name)
 {
     nx::utils::CryptedFileStream stream(name, thePassword);
     ASSERT_TRUE(stream.open(QIODevice::WriteOnly));

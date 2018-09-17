@@ -6,6 +6,8 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
+#include <nx/core/layout/layout_file_info.h>
+
 #include "utils/common/util.h"
 
 static const char* VIDEO_FILETYPES[] = {
@@ -46,23 +48,7 @@ bool FileTypeSupport::isImageFileExt(const QString &filename)
 
 bool FileTypeSupport::isLayoutFileExt(const QString &filename)
 {
-    if (filename.toLower().endsWith(lit(".nov")))
-        return true;
-
-    if (filename.toLower().endsWith(lit(".exe")))
-    {
-        QFile f(filename);
-        if (f.open(QIODevice::ReadOnly))
-        {
-            //qint64 pos = f.size() - sizeof(qint64)*3;
-            f.seek(f.size() - sizeof(qint64));
-            quint64 magic;
-            f.read((char*) &magic, sizeof(qint64));
-            if (magic == NOV_EXE_MAGIC)
-                return true;
-        }
-    }
-    return false;
+    return nx::core::layout::identifyFile(filename).isValid;
 }
 
 bool FileTypeSupport::isFileSupported(const QString &filename)

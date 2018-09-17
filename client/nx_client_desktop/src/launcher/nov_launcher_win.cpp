@@ -78,8 +78,8 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
 {
     static const QStringList kNameFilters{lit("*.exe"), lit("*.dll"), lit("*.conf")};
     static const QStringList kExtraDirs{
-        lit("vox"), 
-        lit("fonts"), 
+        lit("vox"),
+        lit("fonts"),
         lit("qml"),
         lit("help")};
 
@@ -148,7 +148,7 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
     qint64 novPos = dstFile.pos();
     if (novFileName.isEmpty())
     {
-        QnLayoutFileStorageResource::QnLayoutFileIndex idex;
+        nx::core::layout::StreamIndex idex;
         dstFile.write((const char*)&idex, sizeof(idex)); // nov file start
     }
     else

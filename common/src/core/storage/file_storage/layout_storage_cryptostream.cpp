@@ -22,15 +22,12 @@ bool QnLayoutCryptoStream::open(QIODevice::OpenMode openMode)
     // TODO: Add error-checking.
     QnMutexLocker lock(&m_mutex);
     close();
-    bool emptyStream = false;
     if (openMode & QIODevice::WriteOnly)
     {
         if (!m_storageResource.findStream(m_streamName).valid())
         {
             if (!m_storageResource.addStream(m_streamName).valid())
                 return false;
-
-            emptyStream = true;
         }
     }
 

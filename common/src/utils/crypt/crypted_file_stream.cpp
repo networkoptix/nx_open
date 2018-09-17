@@ -46,7 +46,7 @@ Key adaptPassword(const char* password)
 Key xorKeys(const Key& key1, const Key& key2)
 {
     Key key;
-    for (int i = 0; i < kKeySize; i++)
+    for (size_t i = 0; i < kKeySize; i++)
         key[i] = key1[i] ^ key2[i];
     return key;
 }
@@ -69,6 +69,7 @@ Key getKeyHash(const Key& key)
     Key hash;
     unsigned int len;
     result = EVP_DigestFinal_ex(mdctx, hash.data(), &len);
+    NX_ASSERT(result);
     NX_ASSERT(len == kKeySize);
 
     EVP_MD_CTX_destroy(mdctx);
@@ -84,7 +85,7 @@ Key getRandomSalt()
     generator.seed(time(nullptr));
 
     Key key;
-    for (int i = 0; i < kKeySize; i++)
+    for (size_t i = 0; i < kKeySize; i++)
         key[i] = distribution(generator);
 
     return key;
@@ -97,9 +98,9 @@ namespace utils {
 
 CryptedFileStream::CryptedFileStream(const QString& fileName, const QString& password):
     m_fileName(fileName),
+    m_IV(IV),
     m_file(fileName),
-    m_mutex(QnMutex::Recursive),
-    m_IV(IV)
+    m_mutex(QnMutex::Recursive)
 {
     m_context = EVP_CIPHER_CTX_new();
     NX_ASSERT(m_context);
@@ -129,7 +130,17 @@ void CryptedFileStream::setEnclosure(qint64 position, qint64 size)
 
 void CryptedFileStream::setPassword(const QString& password)
 {
-    m_passwordKey = adaptPassword(password.toUtf8().constData()); //< Convert to utf8 and adapt to Key.
+    m_passwordKey = adaptPassword(password.toUtf8()); //< Convert to utf8 and adapt to Key.
+}
+
+Key CryptedFileStream::getPasswordHash(const QString& password)
+{
+    return getKeyHash(adaptPassword(password.toUtf8()));
+}
+
+bool CryptedFileStream::checkPassword(const QString& password, Key hash)
+{
+    return getPasswordHash(password) == hash;
 }
 
 bool CryptedFileStream::open(QIODevice::OpenMode openMode)
@@ -297,7 +308,6 @@ void CryptedFileStream::resetState()
     m_position = Position();
     m_header = Header();
     memset(m_currentPlainBlock, 0, kCryptoBlockSize);
-    memset(m_header.salt, 0, kKeySize);
     m_openMode = NotOpen;
 }
 
@@ -361,11 +371,9 @@ void CryptedFileStream::createHeader()
 {
     m_header = Header();
 
-    Key salt = getRandomSalt();
-    std::copy_n(salt.begin(), kKeySize, m_header.salt);
-    m_key = xorKeys(m_passwordKey, salt);
-    Key keyHash = getKeyHash(m_key);
-    std::copy_n(keyHash.begin(), kKeySize, m_header.keyHash);
+    m_header.salt = getRandomSalt();
+    m_key = xorKeys(m_passwordKey, m_header.salt);
+    m_header.keyHash = getKeyHash(m_key);
 
     writeHeader();
 }
@@ -382,9 +390,9 @@ bool CryptedFileStream::readHeader()
     if (m_header.minReadVersion > kCryptoStreamVersion) //< The file is too new.
         return false;
 
-    m_key = xorKeys(m_passwordKey, Key(m_header.salt));
+    m_key = xorKeys(m_passwordKey, m_header.salt);
 
-    return getKeyHash(m_key) == Key(m_header.keyHash);
+    return getKeyHash(m_key) == m_header.keyHash;
 }
 
 void CryptedFileStream::writeHeader()
