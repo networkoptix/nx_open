@@ -8,6 +8,7 @@
 #include <nx/utils/std/algorithm.h>
 
 #include "get_post_tunnel_client.h"
+#include "connection_upgrade_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
 
@@ -16,6 +17,7 @@ ClientFactory::ClientFactory():
         std::placeholders::_1))
 {
     registerClientType<GetPostTunnelClient>();
+    registerClientType<ConnectionUpgradeTunnelClient>();
 }
 
 void ClientFactory::clear()
@@ -29,7 +31,7 @@ ClientFactory& ClientFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<BasicTunnelClient> ClientFactory::defaultFactoryFunction(
+std::unique_ptr<BaseTunnelClient> ClientFactory::defaultFactoryFunction(
     const utils::Url& baseUrl)
 {
     using namespace std::placeholders;

@@ -8,12 +8,12 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
-#include "basic_tunnel_client.h"
+#include "base_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
 
 using ClientFactoryFunction =
-    std::unique_ptr<BasicTunnelClient>(const nx::utils::Url& baseUrl);
+    std::unique_ptr<BaseTunnelClient>(const nx::utils::Url& baseUrl);
 
 /**
  * Always instantiates client type with the highest priority.
@@ -47,7 +47,7 @@ public:
 
 private:
     using InternalFactoryFunction = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<BasicTunnelClient>(const nx::utils::Url&, ClientFeedbackFunction)>;
+        std::unique_ptr<BaseTunnelClient>(const nx::utils::Url&, ClientFeedbackFunction)>;
 
     struct ClientTypeContext
     {
@@ -59,7 +59,7 @@ private:
     QnMutex m_mutex;
     int m_prevUsedTypeId = 0;
 
-    std::unique_ptr<BasicTunnelClient> defaultFactoryFunction(
+    std::unique_ptr<BaseTunnelClient> defaultFactoryFunction(
         const nx::utils::Url& baseUrl);
 
     void processClientFeedback(int typeId, bool success);

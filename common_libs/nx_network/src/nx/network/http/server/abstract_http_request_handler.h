@@ -35,10 +35,10 @@ typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
 struct RequestContext
 {
-    nx::network::http::HttpServerConnection* connection;
+    nx::network::http::HttpServerConnection* connection = nullptr;
     nx::utils::stree::ResourceContainer authInfo;
     nx::network::http::Request request;
-    nx::network::http::Response* response;
+    nx::network::http::Response* response = nullptr;
     /**
      * Parameters, taken from request path. 
      * E.g., if handler was registered with path /object_type/{id}/sub_object_type/{id},

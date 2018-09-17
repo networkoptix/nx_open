@@ -135,7 +135,7 @@ public:
 
         return registerRequestProcessor<Handler>(
             path.c_str(),
-            [func]() { return std::make_unique<Handler>(std::move(func)); },
+            [func = std::move(func)]() { return std::make_unique<Handler>(func); },
             method);
     }
 
