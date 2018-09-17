@@ -18,6 +18,7 @@ import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
+from framework.message_bus import MessageBus
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep, with_traceback
@@ -41,6 +42,8 @@ def config(test_config):
         USERS_PER_SERVER=1,
         PROPERTIES_PER_CAMERA=5,
         MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
+        MESSAGE_BUS_TIMEOUT=datetime.timedelta(seconds=10),
+        MESSAGE_BUS_SERVER_COUNT=5,
         HOST_LIST=None,  # use vm servers by default
         )
 
@@ -227,6 +230,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
                 'Wait for method %r results are merged: done, merge duration: %s',
                 api_method, utils.datetime_utc_now() - api_call_start_time)
             return
+        _logger.info('Method %r is still different for %d servers.', api_method, len(env.all_server_list))
         if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
             _logger.info(
                 'Servers %s and %s still has unmatched results for method %r:',
@@ -239,25 +243,27 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
         growing_delay.sleep()
 
 
+def wait_until_no_transactions_from_servers(server_list, timeout):
+    _logger.info('Wait for message bus for %s:', server_list)
+    with MessageBus(server_list).running() as bus:
+        bus.wait_until_no_transactions(timeout.total_seconds())
+    _logger.info('No more transactions from %s:', server_list)
+
+
 _merge_logger = _logger.getChild('merge')
+
 
 @context_logger(_merge_logger, 'framework.waiting')
 @context_logger(_merge_logger, 'framework.http_api')
 @context_logger(_merge_logger, 'framework.mediaserver_api')
-def wait_for_data_merged(artifact_factory, merge_timeout, env):
-    _logger.info('Wait for all data are merged:')
-    api_methods_to_check = [
-        # 'getMediaServersEx',  # The only method to debug/check if servers are actually able to merge.
-        'ec2/getUsers',
-        'ec2/getStorages',
-        'ec2/getLayouts',
-        'ec2/getCamerasEx',
-        'ec2/getFullInfo',
-        'ec2/getTransactionLog',
-        ]
-    for api_method in api_methods_to_check:
-        wait_for_method_matched(artifact_factory, merge_timeout, env, api_method)
-    _logger.info('Wait for all data are merged: done.')
+def wait_for_servers_synced(artifact_factory, config, env):
+    wait_until_no_transactions_from_servers(env.real_server_list[:1], config.MESSAGE_BUS_TIMEOUT)
+    real_server_count = len(env.real_server_list)
+    if real_server_count > config.MESSAGE_BUS_SERVER_COUNT:
+        server_list = [env.real_server_list[i]
+                           for i in range(1, real_server_count, real_server_count/config.MESSAGE_BUS_SERVER_COUNT)]
+        wait_until_no_transactions_from_servers(server_list, config.MESSAGE_BUS_TIMEOUT)
+    wait_for_method_matched(artifact_factory, config.MERGE_TIMEOUT, env, api_method='ec2/getTransactionLog')
 
 
 def collect_additional_metrics(metrics_saver, os_access_set, lws):
@@ -373,7 +379,7 @@ def test_scalability(artifact_factory, metrics_saver, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        wait_for_data_merged(artifact_factory, config.MERGE_TIMEOUT, env)
+        wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
