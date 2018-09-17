@@ -1,6 +1,9 @@
 import logging
+import time
 from abc import ABCMeta, abstractmethod
+from contextlib import contextmanager
 from datetime import datetime
+from threading import Thread
 
 import six
 from netaddr import IPAddress
@@ -13,7 +16,7 @@ from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
-from framework.utils import RunningTime
+from framework.utils import RunningTime, with_traceback
 
 _DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
 
@@ -163,7 +166,7 @@ class OSAccess(object):
         pass
 
     @abstractmethod
-    def consume_disk_space(self, should_leave_bytes):  # type: (int) -> None
+    def _hold_disk_space(self, to_consume_bytes):  # type: (int) -> None
         pass
 
     def cleanup_disk_space(self):
@@ -171,6 +174,35 @@ class OSAccess(object):
             self._disk_space_holder().unlink()
         except DoesNotExist:
             pass
+
+    def _limit_free_disk_space(self, should_leave_bytes):
+        delta_bytes = self.free_disk_space_bytes() - should_leave_bytes
+        if delta_bytes > 0:
+            try:
+                current_size = self._disk_space_holder().size()
+            except DoesNotExist:
+                current_size = 0
+            total_bytes = delta_bytes + current_size
+            self._hold_disk_space(total_bytes)
+
+    @contextmanager
+    def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
+        self._limit_free_disk_space(should_leave_bytes)
+        should_work = [True]
+
+        def target():
+            while should_work[0]:
+                self._limit_free_disk_space(should_leave_bytes)
+                time.sleep(interval_sec)
+
+        thread = Thread(target=with_traceback(target))
+        thread.start()
+        try:
+            yield
+        finally:
+            should_work[0] = False
+            thread.join(interval_sec + 1)
+            self.cleanup_disk_space()
 
     def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)

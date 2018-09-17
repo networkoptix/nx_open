@@ -154,8 +154,7 @@ class WindowsAccess(OSAccess):
         disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
         return int(disk_c['FreeSpace'])
 
-    def consume_disk_space(self, should_leave_bytes):
-        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+    def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
         args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
         self.winrm.command(args).run()

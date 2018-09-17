@@ -146,6 +146,7 @@ class VMType(object):
                 # Networking reset is quite lengthy operation.
                 # TODO: Consider unplug and reset only before network setup.
                 vm.os_access.networking.reset()
+                vm.os_access.cleanup_disk_space()
                 yield vm
 
     def cleanup(self):
