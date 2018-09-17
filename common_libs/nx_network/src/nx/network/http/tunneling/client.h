@@ -6,7 +6,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
-#include "detail/basic_tunnel_client.h"
+#include "detail/base_tunnel_client.h"
 #include "../http_types.h"
 
 namespace nx::network::http::tunneling {
@@ -16,6 +16,8 @@ using OpenTunnelCompletionHandler = detail::OpenTunnelCompletionHandler;
 
 /**
  * Establishes connection to nx::network::http::tunneling::Server listening same request path.
+ * For description of tunneling methods supported see nx::network::http::tunneling::Server.
+ * The client can try to use different tunneling methods to find the one that works.
  */
 class NX_NETWORK_API Client:
     public aio::BasicPollable
@@ -38,7 +40,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    std::unique_ptr<detail::BasicTunnelClient> m_actualClient;
+    std::unique_ptr<detail::BaseTunnelClient> m_actualClient;
 };
 
 } // namespace nx::network::http::tunneling
