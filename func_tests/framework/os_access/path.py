@@ -75,6 +75,10 @@ class FileSystemPath(PurePath):
     def write_text(self, data, encoding, errors):
         return 0
 
+    @abstractmethod
+    def size(self):
+        return 0
+
     def copy_to(self, destination):
         copy_file_using_read_and_write(self, destination)
 

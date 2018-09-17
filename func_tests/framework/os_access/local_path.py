@@ -1,5 +1,6 @@
 import errno
 import os
+import stat
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
 from shutil import rmtree
@@ -96,6 +97,13 @@ class LocalPath(PosixPath, FileSystemPath):
         with self.open('rb') as f:
             f.seek(offset)
             return f.read(max_length)
+
+    @_reraising_existing_file_errors
+    def size(self):
+        path_stat = self.stat()  # type: os.stat_result
+        if not stat.S_ISREG(path_stat.st_mode):
+            raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
+        return path_stat.st_size
 
     def copy_to(self, destination):
         destination.copy_from(self)

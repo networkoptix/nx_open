@@ -7,6 +7,7 @@ from io import BytesIO
 from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
 from smb.SMBConnection import SMBConnection
+from smb.base import SharedFile
 from smb.smb_structs import OperationFailure
 
 from framework.method_caching import cached_getter
@@ -301,3 +302,11 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         bytes_written = self.write_bytes(data)
         assert bytes_written == len(data)
         return len(text)
+
+    @_reraising_on_operation_failure({_STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist})
+    def size(self):
+        attributes = self._smb_connection_pool.connection().getAttributes(
+            self._service_name, self._relative_path)  # type: SharedFile
+        if attributes.isDirectory:
+            raise exceptions.NotAFile("Attributes of the {}: {}".format(self, attributes))
+        return attributes.file_size
