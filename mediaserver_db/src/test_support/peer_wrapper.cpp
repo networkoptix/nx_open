@@ -50,6 +50,9 @@ PeerWrapper::PeerWrapper(const QString& dataDir):
 {
     m_ownerCredentials.username = "admin";
     m_ownerCredentials.authToken = nx::network::http::PasswordAuthToken("admin");
+
+    const auto moduleGuid = QnUuid::createUuid().toSimpleString().toStdString();
+    m_process.addArg("-moduleGuid", moduleGuid.c_str());
 }
 
 void PeerWrapper::addSetting(const std::string& name, const std::string& value)
