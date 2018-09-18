@@ -461,8 +461,8 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         NX_VERBOSE(this) << lm("Analyzing motion; needUncompressedFrame: %1")
             .arg(needUncompressedFrame);
-        if (motionEstimation.analyzeFrame(compressedFrame),
-            needUncompressedFrame ? &uncompressedFrame : nullptr)
+        if (motionEstimation.analyzeFrame(compressedFrame,
+            needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
             updateStreamResolution(channel, motionEstimation.videoResolution());
         }
@@ -480,7 +480,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (videoDataReceptor)
     {
-        NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
+        NX_VERBOSE(this, "Pushing frame (%2) to receptor, timestamp: %1",
+            compressedFrame->timestamp,
+            uncompressedFrame ? "compressed and uncompressed" : "compressed");
         videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 

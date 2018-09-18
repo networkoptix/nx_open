@@ -176,15 +176,8 @@ private:
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame);
 
-    void warnOnce(bool* warningIssued, const QString& message);
-
     boost::optional<PixelFormat> pixelFormatFromManifest(
         const nx::api::AnalyticsDriverManifest& manifest);
-
-    static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
-
-    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToUncompressedVideoFrame(
-        const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat);
 
 private:
     ResourceMetadataContextMap m_contexts;

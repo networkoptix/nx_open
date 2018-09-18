@@ -37,6 +37,8 @@
 #include "generic_uncompressed_video_frame.h"
 #include "wrapping_compressed_video_packet.h"
 
+#include "frame_converter.h"
+
 namespace nx {
 namespace api {
 
@@ -803,19 +805,6 @@ bool ManagerPool::cameraInfoFromResource(
     return true;
 }
 
-void ManagerPool::warnOnce(bool* warningIssued, const QString& message)
-{
-    if (!*warningIssued)
-    {
-        *warningIssued = true;
-        NX_WARNING(this) << message;
-    }
-    else
-    {
-        NX_VERBOSE(this) << message;
-    }
-}
-
 void ManagerPool::putVideoFrame(
     const QnUuid& id,
     const QnConstCompressedVideoDataPtr& compressedFrame,
@@ -831,8 +820,11 @@ void ManagerPool::putVideoFrame(
     else
         m_visualMetadataDebugger->push(compressedFrame);
 
-    std::map<PixelFormat, nxpt::ScopedRef<UncompressedVideoFrame>> rgbFrames;
-    nxpt::ScopedRef<Yuv420UncompressedVideoFrame> yuv420Frame; //< Will be created on first need.
+    FrameConverter frameConverter(
+        [&]() { return compressedFrame; },
+        [&]() { return uncompressedFrame; },
+        &m_compressedFrameWarningIssued,
+        &m_uncompressedFrameWarningIssued);
 
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
@@ -842,59 +834,10 @@ void ManagerPool::putVideoFrame(
         if (!manager)
             continue;
 
-        DataPacket* dataPacket = nullptr;
-
-        const auto pixelFormat = pixelFormatFromManifest(managerData.manifest);
-        if (!pixelFormat)
-        {
-            if (compressedFrame)
-            {
-                dataPacket = new WrappingCompressedVideoPacket(compressedFrame);
-            }
-            else
-            {
-                warnOnce(&m_compressedFrameWarningIssued,
-                    lm("Compressed frame requested but not received."));
-            }
-        }
-        else
-        {
-            if (uncompressedFrame)
-            {
-                if (pixelFormat.get() == PixelFormat::yuv420)
-                {
-                    if (yuv420Frame.get() == nullptr)
-                        yuv420Frame.reset(new Yuv420UncompressedVideoFrame(uncompressedFrame));
-                    yuv420Frame->addRef();
-                    dataPacket = yuv420Frame.get();
-                }
-                else
-                {
-                    auto it = rgbFrames.find(pixelFormat.get());
-                    if (it == rgbFrames.cend())
-                    {
-                        auto insertResult = rgbFrames.insert(std::make_pair(pixelFormat.get(),
-                            nxpt::ScopedRef<UncompressedVideoFrame>(
-                                videoDecoderOutputToUncompressedVideoFrame(
-                                    uncompressedFrame, pixelFormat.get()))));
-                        NX_ASSERT(insertResult.second);
-                        it = insertResult.first;
-                    }
-                    it->second->addRef();
-                    dataPacket = it->second.get();
-                }
-            }
-            else
-            {
-                warnOnce(&m_uncompressedFrameWarningIssued,
-                    lm("Uncompressed frame requested but not received."));
-            }
-        }
-
-        if (dataPacket)
+        if (DataPacket* const dataPacket = frameConverter.getDataPacket(
+            pixelFormatFromManifest(managerData.manifest)))
         {
             manager->pushDataPacket(dataPacket);
-            dataPacket->releaseRef();
         }
         else
         {
@@ -996,55 +939,6 @@ void ManagerPool::registerDataReceptor(
 
     auto& context = m_contexts[id];
     context.setMetadataDataReceptor(dataReceptor);
-}
-
-/**
- * Converts rgb-like pixel formats. Asserts that pixelFormat is a supported RGB-based format.
- */
-/*static*/ AVPixelFormat ManagerPool::rgbToAVPixelFormat(PixelFormat pixelFormat)
-{
-    switch (pixelFormat)
-    {
-        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
-        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
-        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
-        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
-        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
-        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
-
-        default:
-            NX_ASSERT(false, lm(
-                "Unsupported nx::sdk::metadata::UncompressedVideoFrame::PixelFormat \"%1\" = %2")
-                .args(pixelFormatToStdString(pixelFormat), (int) pixelFormat));
-            return AV_PIX_FMT_NONE;
-    }
-}
-
-/*static*/ UncompressedVideoFrame* ManagerPool::videoDecoderOutputToUncompressedVideoFrame(
-    const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat)
-{
-    // TODO: Consider supporting other decoded video frame formats.
-    const auto expectedFormat = AV_PIX_FMT_YUV420P;
-    if (frame->format != expectedFormat)
-    {
-        NX_ERROR(typeid(VideoDataReceptor)) << lm(
-            "Decoded frame has AVPixelFormat %1 instead of %2; ignoring")
-            .args(frame->format, expectedFormat);
-        return nullptr;
-    }
-
-    if (pixelFormat == PixelFormat::yuv420)
-        return new Yuv420UncompressedVideoFrame(frame);
-
-    const AVPixelFormat avPixelFormat = rgbToAVPixelFormat(pixelFormat);
-
-    std::vector<std::vector<char>> data(1);
-    std::vector<int> lineSize(1);
-    data[0] = frame->toRgb(&lineSize[0], avPixelFormat);
-
-    return new GenericUncompressedVideoFrame(
-        frame->pkt_dts, frame->width, frame->height, pixelFormat,
-        std::move(data), std::move(lineSize));
 }
 
 } // namespace metadata
