@@ -21,6 +21,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cms', '0035_auto_20180821_0209'),
+        ('notifications', '0009_cloudnotification_customizations')
     ]
 
     operations = [
