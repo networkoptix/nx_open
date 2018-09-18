@@ -45,7 +45,10 @@ export class MergeModalContent {
     }
 
     setTargetSystem(system) {
-    };
+        this.targetSystem = system;
+        return this.systemService(system.id, this.user.email).update().then((system) => {
+            this.systemMergeable = this.checkMergeAbility(system);
+        });
     }
 
     addStatus(system) {
