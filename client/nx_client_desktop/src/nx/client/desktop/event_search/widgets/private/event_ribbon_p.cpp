@@ -259,6 +259,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
+    tile->setResourceList(index.data(Qn::ResourceListRole).value<QnResourceList>());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 

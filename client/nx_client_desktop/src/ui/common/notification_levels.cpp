@@ -82,6 +82,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncProgress:
+        case QnSystemHealth::UsersEmailIsEmpty:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
@@ -94,7 +95,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::NoLicenses:
         case QnSystemHealth::SmtpIsNotSet:
-        case QnSystemHealth::UsersEmailIsEmpty:
         case QnSystemHealth::SystemIsReadOnly:
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::RemoteArchiveSyncError:

@@ -4,6 +4,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/customization/customized.h>
 
 #include <nx/client/desktop/common/utils/command_action.h>
@@ -95,6 +96,8 @@ public:
 
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
+
+    void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
 
     enum class Mode
     {

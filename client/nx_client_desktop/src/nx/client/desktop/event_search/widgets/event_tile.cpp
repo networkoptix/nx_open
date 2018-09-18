@@ -7,6 +7,7 @@
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
+#include <core/resource/resource.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -16,6 +17,7 @@
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/close_button.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/utils/log/log_message.h>
 
 namespace nx {
 namespace client {
@@ -28,16 +30,24 @@ static constexpr auto kRoundingRadius = 2;
 static constexpr int kTitleFontPixelSize = 13;
 static constexpr int kTimestampFontPixelSize = 11;
 static constexpr int kDescriptionFontPixelSize = 11;
+static constexpr int kResourceListFontPixelSize = 11;
+static constexpr int kAndMoreFontPixelSize = 11; //< "...and n more"
 static constexpr int kFooterFontPixelSize = 11;
 
 static constexpr int kTitleFontWeight = QFont::Medium;
 static constexpr int kTimestampFontWeight = QFont::Normal;
 static constexpr int kDescriptionFontWeight = QFont::Normal;
+static constexpr int kResourceListFontWeight = QFont::Medium;
+static constexpr int kAndMoreFontWeight = QFont::Normal; //< "...and n more"
 static constexpr int kFooterFontWeight = QFont::Normal;
+
+static constexpr int kAndMoreTopMargin = 4; //< Above "...and n more"
 
 static constexpr int kProgressBarResolution = 1000;
 
 static constexpr int kSeparatorHeight = 6;
+
+static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
 
 } // namespace
 
@@ -62,9 +72,10 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setHidden(true);
     ui->timestampLabel->setHidden(true);
     ui->actionHolder->setHidden(true);
+    ui->footerLabel->setHidden(true);
+    ui->resourceListLabel->setHidden(true);
     ui->narrowHolder->setHidden(true);
     ui->wideHolder->setHidden(true);
-    ui->footerLabel->setHidden(true);
 
     ui->previewWidget->setAutoScaleDown(false);
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
@@ -73,6 +84,7 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->setForegroundRole(QPalette::Light);
     ui->timestampLabel->setForegroundRole(QPalette::WindowText);
     ui->descriptionLabel->setForegroundRole(QPalette::Light);
+    ui->resourceListLabel->setForegroundRole(QPalette::Light);
     ui->footerLabel->setForegroundRole(QPalette::Light);
 
     QFont font;
@@ -92,6 +104,12 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+
+    font.setWeight(kResourceListFontWeight);
+    font.setPixelSize(kResourceListFontPixelSize);
+    ui->resourceListLabel->setFont(font);
+    ui->resourceListLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->resourceListLabel->setOpenExternalLinks(false);
 
     font.setWeight(kFooterFontWeight);
     font.setPixelSize(kFooterFontPixelSize);
@@ -203,6 +221,40 @@ void EventTile::setDescription(const QString& value)
 {
     ui->descriptionLabel->setText(value);
     ui->descriptionLabel->setHidden(value.isEmpty());
+}
+
+void EventTile::setResourceList(const QnResourceList& list)
+{
+    if (list.empty())
+    {
+        ui->resourceListLabel->hide();
+        ui->resourceListLabel->setText({});
+    }
+    else
+    {
+        QStringList items;
+        for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
+            items.push_back(list[i]->getName());
+
+        QString text = lm("<b>%1</b>").arg(items.join("<br>"));
+
+        const int numExtra = list.size() - kMaximumResourceListSize;
+        if (numExtra > 0)
+        {
+            static constexpr int kQssFontWeightMultiplier = 8;
+
+            text += lm("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
+                .args(
+                    palette().color(QPalette::WindowText).name(),
+                    kAndMoreFontPixelSize,
+                    kAndMoreFontWeight * kQssFontWeightMultiplier,
+                    kAndMoreTopMargin,
+                    tr("...and %n more", "", numExtra));
+        }
+
+        ui->resourceListLabel->setText(text);
+        ui->resourceListLabel->show();
+    }
 }
 
 QString EventTile::footerText() const

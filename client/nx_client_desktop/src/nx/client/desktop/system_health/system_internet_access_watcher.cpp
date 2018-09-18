@@ -20,14 +20,14 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(QObject* parent):
     connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this,
         [this]()
         {
-            m_initialResourcesReceived = true;
+            m_processRuntimeUpdates = true;
             updateState();
         });
 
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
         [this]()
         {
-            m_initialResourcesReceived = false;
+            m_processRuntimeUpdates = false;
             setHasInternetAccess(false);
         });
 
@@ -43,7 +43,7 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(QObject* parent):
     const auto handleServerAddedOrRemoved =
         [this](const QnResourcePtr& resource)
         {
-            if (m_initialResourcesReceived && resource->hasFlags(Qn::server))
+            if (m_processRuntimeUpdates && resource->hasFlags(Qn::server))
                 updateState();
         };
 
@@ -54,6 +54,8 @@ SystemInternetAccessWatcher::SystemInternetAccessWatcher(QObject* parent):
         this, handleServerAddedOrRemoved);
 
     updateState();
+
+    m_processRuntimeUpdates = !commonModule()->remoteGUID().isNull();
 }
 
 SystemInternetAccessWatcher::~SystemInternetAccessWatcher()

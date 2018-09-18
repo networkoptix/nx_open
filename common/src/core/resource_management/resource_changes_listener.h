@@ -22,7 +22,7 @@ public:
 
         /* Call slot if resource was added or removed. */
         auto updateIfNeeded = [receiver, slot](const QnResourcePtr &resource) {
-            if (resource.dynamicCast<ResourceClassPtr>())
+            if (resource.dynamicCast<ResourceClass>())
                 (receiver->*slot)();
         };
 
@@ -53,7 +53,7 @@ public:
 
         /* Call slot if resource was added or removed. */
         auto updateIfNeeded = [slot](const QnResourcePtr &resource) {
-            if (resource.dynamicCast<ResourceClassPtr>())
+            if (resource.dynamicCast<ResourceClass>())
                 slot();
         };
 
@@ -75,4 +75,38 @@ public:
     }
 
 
+    template<class ResourceClass, class ResourceSignalClass>
+    void connectToResources(const ResourceSignalClass& signal,
+        std::function<void(const QnSharedResourcePointer<ResourceClass>& resource)> handler)
+    {
+        using ResourceClassPtr = QnSharedResourcePointer<ResourceClass>;
+
+        // Call handler if resource was added or removed.
+        const auto updateIfNeeded =
+            [handler](const QnResourcePtr& resource)
+            {
+                if (const auto target = resource.dynamicCast<ResourceClass>())
+                    handler(target);
+            };
+
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this, updateIfNeeded);
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this, updateIfNeeded);
+
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+            [this, signal, handler](const QnResourcePtr& resource)
+            {
+                if (const auto& target = resource.dynamicCast<ResourceClass>())
+                    connect(target, signal, this, [target, handler]() { handler(target); });
+            });
+
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+            [this, signal](const QnResourcePtr &resource)
+            {
+                if (const auto& target = resource.dynamicCast<ResourceClass>())
+                    disconnect(target, signal, this, nullptr);
+            });
+
+        for (const auto& target: resourcePool()->getResources<ResourceClass>())
+            connect(target, signal, this, [target, handler]() { handler(target); });
+    }
 };
