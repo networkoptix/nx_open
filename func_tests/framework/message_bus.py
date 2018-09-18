@@ -9,6 +9,7 @@ import logging
 import pprint
 from contextlib import contextmanager
 
+from contextlib2 import ExitStack
 import websocket
 
 from .context_logger import ContextAdapter
@@ -50,11 +51,14 @@ class _MessageBusThread(object):
     def join(self):
         self._thread.join()
         self._logger.info('Thread joined')
+        if self._ws:
+            self._ws.close()
 
     def _create_connection(self):
         credentials = '%s:%s' % (self._user, self._password)
         authorization = 'Basic ' + base64.b64encode(credentials.encode())
         headers = dict(Authorization=authorization)
+        _logger.debug('Create websocket connection: %s', self._url)
         return websocket.create_connection(self._url, header=headers, timeout=0.5)
 
     @with_traceback
@@ -91,8 +95,15 @@ class MessageBus(object):
 
     def _start(self):
         _logger.debug('Starting message buses.')
-        for bus in self._bus_list:
-            bus.start()
+        stack = ExitStack()
+        try:
+            for bus in self._bus_list:
+                bus.start()
+                stack.callback(bus.join)
+        except:
+            self._stop_flag.append(None)
+            stack.close()
+            raise
 
     def _stop(self):
         _logger.debug('Stopping message buses:')
