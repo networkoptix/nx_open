@@ -172,6 +172,7 @@ class SMBPath(FileSystemPath, PureWindowsPath):
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
         _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
         })
     def unlink(self):
         if '*' in str(self):
@@ -303,7 +304,10 @@ class SMBPath(FileSystemPath, PureWindowsPath):
         assert bytes_written == len(data)
         return len(text)
 
-    @_reraising_on_operation_failure({_STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist})
+    @_reraising_on_operation_failure({
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
     def size(self):
         attributes = self._smb_connection_pool.connection().getAttributes(
             self._service_name, self._relative_path)  # type: SharedFile
