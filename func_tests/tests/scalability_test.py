@@ -227,7 +227,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
         first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
             _logger.info(
-                'Wait for method %r results are merged: done, merge duration: %s',
+                'Wait for method %r results are merged: done, method merge duration: %s',
                 api_method, utils.datetime_utc_now() - api_call_start_time)
             return
         _logger.info('Method %r is still different for %d servers.', api_method, len(env.all_server_list))
