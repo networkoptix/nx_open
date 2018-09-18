@@ -9,7 +9,6 @@ from contextlib import closing
 from datetime import datetime, timedelta
 
 import pytz
-import six
 from pylru import lrudecorator
 from pytz import utc
 
