@@ -38,8 +38,8 @@ def test_update_installed(one_running_mediaserver, update_info, updates_set):
 
 def test_update_low_space(one_running_mediaserver, update_info, updates_set):
     one_mediaserver_api = one_running_mediaserver.api
-    one_mediaserver_api.start_update(update_info)
     with one_running_mediaserver.os_access.free_disk_space_limited(20 * 1024 * 1024):
+        one_mediaserver_api.start_update(update_info)
         wait_for_equal(one_mediaserver_api.get_update_status, 'downloading', path=(0, 'code'))
         ensure_persistence(
             lambda: one_mediaserver_api.get_update_status()[0]['code'] == 'downloading',
