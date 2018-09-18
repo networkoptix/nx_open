@@ -297,8 +297,8 @@ QSet<QString> getLocalIpV4AddressList()
     return result;
 }
 
-// TODO: should write unit test
-// NOTE: contains redundant conversion: QHostAddress -> QString -> HostAddress
+// TODO: Unit tests should be written here.
+// NOTE: Contains redundant conversion: QHostAddress -> QString -> HostAddress.
 std::set<HostAddress> getLocalIpV4HostAddressList()
 {
     std::set<HostAddress> localIpList;

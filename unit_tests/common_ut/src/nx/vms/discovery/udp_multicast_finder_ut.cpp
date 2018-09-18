@@ -16,7 +16,7 @@ namespace vms {
 namespace discovery {
 namespace test {
 
-// NOTE: used as multicast endpoint to avoid collisions with other tests ran in parallel
+// NOTE: Used as multicast endpoint to avoid collisions with other tests ran in parallel.
 const nx::network::SocketAddress kMulticastEndpoint("239.255.11.11:0");
 
 class DiscoveryUdpMulticastFinder: public testing::Test
