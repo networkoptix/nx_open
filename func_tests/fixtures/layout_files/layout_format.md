@@ -131,12 +131,12 @@ Merging scheme is not tree-like as networks scheme. It has fixed number of level
 mergers:
 - local: first # HTTP request goes to this server.
   remote: second  # Root URL of this server is sent in HTTP request.
-  settings: remote  # Optional.
+  take_remote_settings: true  # Optional.
   network: 10.254.1.0/24  # Optional. Required if there are many interfaces on `remote`.
 - local: first
   remote: third
 - local: first
   remote: fourth
-  settings: remote
+  take_remote_settings: true
 ```
 

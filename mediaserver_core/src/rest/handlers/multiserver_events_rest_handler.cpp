@@ -93,7 +93,9 @@ private:
 
                 if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
                 {
-                    remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
+                    auto reply = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), &success);
+                    NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
+                    remoteData = reply.deserialized<vms::event::ActionDataList>(&success);
                     NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
                 }
 

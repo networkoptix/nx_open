@@ -492,11 +492,16 @@ int Helper::makeFileError(const QString& fileName)
 
 int Helper::makeDownloaderError(ResultCode errorCode)
 {
-    return makeError(
-        nx::network::http::StatusCode::internalServerError,
-        QnRestResult::CantProcessRequest,
-        lit("DistributedFileDownloader returned error: %1").arg(
-            QnLexical::serialized(errorCode)));
+    QnJsonRestResult restResult;
+    QString errorMessage = lit("DistributedFileDownloader returned error: %1").arg(
+        QnLexical::serialized(errorCode));
+    restResult.setError(QnRestResult::CantProcessRequest, errorMessage);
+    restResult.setReply(errorCode);
+
+    QnFusionRestHandlerDetail::serialize(restResult, result, resultContentType, Qn::JsonFormat, false);
+    // It will look like:
+    // {"error":"3","errorString":"DistributedFileDownloader returned error: fileAlreadyExists","reply":"fileAlreadyExists"}
+    return nx::network::http::StatusCode::internalServerError;
 }
 
 ResultCode Helper::addFile(

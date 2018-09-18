@@ -376,21 +376,19 @@ Handle ServerConnection::addFileUpload(
     qint64 chunkSize,
     const QByteArray& md5,
     qint64 ttl,
-    PostCallback callback,
+    AddUploadCallback callback,
     QThread* targetThread)
 {
-    return executePost(
-        lit("/api/downloads/%1").arg(fileName),
-        QnRequestParamList{
-            { lit("size"), QString::number(size) },
-            { lit("chunkSize"), QString::number(chunkSize) },
-            { lit("md5"), QString::fromUtf8(md5) },
-            { lit("ttl"), QString::number(ttl) },
-            { lit("upload"), lit("true") } },
-        QByteArray(),
-        QByteArray(),
-        callback,
-        targetThread);
+    QnRequestParamList params
+    {
+        { lit("size"), QString::number(size) },
+        { lit("chunkSize"), QString::number(chunkSize) },
+        { lit("md5"), QString::fromUtf8(md5) },
+        { lit("ttl"), QString::number(ttl) },
+        { lit("upload"), lit("true") }
+    };
+    QString path = lit("/api/downloads/%1").arg(fileName);
+    return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
 Handle ServerConnection::validateFileInformation(

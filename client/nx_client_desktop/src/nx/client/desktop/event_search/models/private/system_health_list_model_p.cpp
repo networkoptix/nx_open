@@ -11,15 +11,16 @@
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
 
@@ -72,11 +73,27 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     q(q),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-    const auto handler = context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler, &QnWorkbenchNotificationsHandler::cleared, this, &Private::clear);
-    connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventAdded,
+    // Handle system health state.
+
+    const auto systemHealthState = context()->instance<SystemHealthState>();
+    for (int i = 0; i < QnSystemHealth::MessageType::Count; ++i)
+    {
+        toggleSystemHealthEvent(QnSystemHealth::MessageType(i),
+            systemHealthState->value(QnSystemHealth::MessageType(i)));
+    }
+
+    connect(systemHealthState, &SystemHealthState::changed,
+        this, &Private::toggleSystemHealthEvent);
+
+    // Handle system health notifications.
+
+    const auto notificationHandler = context()->instance<QnWorkbenchNotificationsHandler>();
+    connect(notificationHandler, &QnWorkbenchNotificationsHandler::cleared, this, &Private::clear);
+
+    connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventAdded,
         this, &Private::addSystemHealthEvent);
-    connect(handler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
+
+    connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
         this, &Private::removeSystemHealthEvent);
 }
 
@@ -169,9 +186,10 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
     connect(action.data(), &QAction::triggered, this,
         [this]()
         {
-            const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
-            const auto parameters = action::Parameters(watcher->camerasWithDefaultPassword())
-                .withArgument(Qn::ForceShowCamerasList, true);
+            const auto state = context()->instance<SystemHealthState>();
+            const auto parameters = action::Parameters(
+                state->data(QnSystemHealth::MessageType::DefaultCameraPasswords))
+                    .withArgument(Qn::ForceShowCamerasList, true);
 
             menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
         });
@@ -204,6 +222,9 @@ action::IDType SystemHealthListModel::Private::action(int index) const
         case QnSystemHealth::ArchiveRebuildCanceled:
             return action::ServerSettingsAction;
 
+         case QnSystemHealth::NoInternetForTimeSync:
+            return action::SystemAdministrationAction;
+
         case QnSystemHealth::CloudPromo:
             return action::PreferencesCloudTabAction;
 
@@ -225,6 +246,12 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
             return action::Parameters(m_items[index].resource)
                 .withArgument(Qn::FocusElementRole, lit("email"))
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+
+        case QnSystemHealth::NoInternetForTimeSync:
+            return action::Parameters()
+                .withArgument(Qn::FocusElementRole, lit("syncWithInternet"))
+                .withArgument(Qn::FocusTabRole,
+                    int(QnSystemAdministrationDialog::TimeServerSelection));
 
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::ArchiveRebuildFinished:
@@ -295,6 +322,16 @@ void SystemHealthListModel::Private::removeSystemHealthEvent(
         if (count > 0)
             q->removeRows(std::distance(m_items.cbegin(), range.first), count);
     }
+}
+
+void SystemHealthListModel::Private::toggleSystemHealthEvent(
+    QnSystemHealth::MessageType message, bool isOn)
+{
+    // TODO: #vkutin FIXME: Support params (resource?)
+    if (isOn)
+        addSystemHealthEvent(message, {});
+    else
+        removeSystemHealthEvent(message, {});
 }
 
 void SystemHealthListModel::Private::clear()

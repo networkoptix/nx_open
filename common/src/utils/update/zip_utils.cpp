@@ -6,8 +6,8 @@
 #include <quazip/quazipfile.h>
 
 namespace {
-    const int readBufferSize = 1024 * 16;
-    const int maxSymlinkLength = readBufferSize;
+    const int kReadBufferSizeBytes = 1024 * 16;
+    const int maxSymlinkLength = kReadBufferSizeBytes;
 
     bool isSymlink(const QuaZipFileInfo64 &info)
     {
@@ -96,7 +96,6 @@ void QnZipExtractor::run()
 {
     Error error = extractZip();
     m_lastError = error;
-    m_result.set_value(m_lastError);
     emit finished(error);
 }
 
@@ -147,10 +146,10 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
             if (!file.open(QuaZipFile::ReadOnly))
                 return BrokenZip;
 
-            QByteArray buf(readBufferSize, 0);
+            QByteArray buf(kReadBufferSizeBytes, 0);
             while (file.bytesAvailable() && !m_needStop)
             {
-                qint64 read = file.read(buf.data(), readBufferSize);
+                qint64 read = file.read(buf.data(), kReadBufferSizeBytes);
                 if (read != destFile.write(buf.data(), read))
                 {
                     file.close();
@@ -181,11 +180,6 @@ QnZipExtractor::Error QnZipExtractor::extractZip()
     m_zip->close();
 
     return m_zip->getZipError() == UNZ_OK ? Ok : BrokenZip;
-}
-
-std::shared_future<int> QnZipExtractor::getFuture()
-{
-    return m_result.get_future();
 }
 
 QStringList QnZipExtractor::fileList()

@@ -2,8 +2,11 @@ from pylru import lrudecorator
 
 
 def _error_message_from_stderr(stderr):
-    """Simple heuristic to get short message from STDERR"""
-    for line in reversed(stderr.decode('ascii').splitlines()):
+    """Simple heuristic to get short message from STDERR: take last line that doesn't begin with
+    plus `+` (command trace). `stderr` decoded as UTF-8 because shell sometimes shows quotation
+    mark (`b'\xe2\x80\x98'`).
+    """
+    for line in reversed(stderr.decode('utf-8').splitlines()):
         if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
             return line
     return 'stderr empty'
@@ -12,7 +15,7 @@ def _error_message_from_stderr(stderr):
 class NonZeroExitStatus(Exception):
     def __init__(self, exit_status, stdout, stderr):
         super(NonZeroExitStatus, self).__init__(
-            "{}".format(_error_message_from_stderr(stderr)))
+            u"{}".format(_error_message_from_stderr(stderr)))
         self.exit_status = exit_status
         self.stdout = stdout
         self.stderr = stderr

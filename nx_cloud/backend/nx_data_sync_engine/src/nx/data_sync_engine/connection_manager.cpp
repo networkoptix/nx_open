@@ -189,7 +189,8 @@ void ConnectionManager::closeConnectionsToSystem(
     const std::string& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Closing all connections to system %1").args(systemId));
+    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
+        lm("Closing all connections to system %1").args(systemId));
 
     auto allConnectionsRemovedGuard =
         nx::utils::makeSharedGuard(std::move(completionHandler));

@@ -119,7 +119,7 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
 }
 
 static constexpr char kEstablishEc2TransactionConnectionPath[] = "/events/ConnectingStage1";
-static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/messageBus";
+static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/transactionBus";
 static constexpr char kPushEc2TransactionPath[] = "/forward_events/{sequence}";
 
 void SyncronizationEngine::registerHttpApi(

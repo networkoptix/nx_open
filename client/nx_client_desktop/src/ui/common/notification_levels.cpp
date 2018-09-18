@@ -99,6 +99,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::DefaultCameraPasswords:
+        case QnSystemHealth::NoInternetForTimeSync:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QUdpSocket>
 #include <QtNetwork/QNetworkAddressEntry>
@@ -127,6 +129,7 @@ int NX_NETWORK_API getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 QString NX_NETWORK_API getMacFromPrimaryIF();
 
 QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
+std::set<HostAddress> NX_NETWORK_API getLocalIpV4HostAddressList();
 
 } // namespace network
 } // namespace nx

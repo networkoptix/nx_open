@@ -11,11 +11,6 @@ CameraMock::CameraMock(QnMediaServerModule* serverModule): Camera(serverModule)
 {
 }
 
-CameraDiagnostics::Result CameraMock::initialize()
-{
-    return initInternal();
-}
-
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)
 {
     const auto it = m_apiAadvancedParameters.find(id);
@@ -200,7 +195,11 @@ QnSharedResourcePointer<CameraMock> CameraTest::newCamera(
     std::function<void(CameraMock*)> setup) const
 {
     QnSharedResourcePointer<CameraMock> camera(new CameraMock(serverModule()));
-    setup(camera.data());
+    camera->setId(QnUuid::createUuid());
+
+    if (setup)
+        setup(camera.data());
+
     return camera->init() ? camera : QnSharedResourcePointer<CameraMock>();
 }
 

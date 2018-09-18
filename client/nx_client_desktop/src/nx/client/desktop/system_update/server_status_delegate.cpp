@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QPainter>
 
+#include <nx/utils/log/assert.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
@@ -38,16 +39,8 @@ public:
         m_progress = new QProgressBar(this);
         m_progress->setTextVisible(false);
         layout->addWidget(m_progress);
-        m_right = new QPushButton(this);
-        m_right->setFlat(true);
-        layout->addWidget(m_right);
-        layout->setAlignment(m_right, Qt::AlignRight);
-
         setLayout(layout);
         setMinimumWidth(200);
-
-        connect(m_right, &QPushButton::clicked,
-            this, &ServerStatusWidget::at_clicked);
 
         connect(owner->m_updateAnimation.data(), &QMovie::frameChanged,
             this, &ServerStatusWidget::at_changeAnimationFrame);
@@ -65,39 +58,22 @@ public:
             m_left->setText(tr("Skipped"));
             m_left->setIcon(qnSkin->icon("text_buttons/skipped_disabled.png"));
             m_left->setHidden(false);
-            m_right->setHidden(true);
         }
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
             m_left->setIcon(qnSkin->icon("text_buttons/skipped_disabled.png"));
             m_left->setHidden(false);
-
-            m_right->setText(tr("Download"));
-            m_right->setIcon(qnSkin->icon("text_buttons/download.png"));
-            m_right->setHidden(false);
         }
         else
         {
             switch (data->state)
             {
-            /* This state is removed
-            case StatusCode::checking:
-                m_left->setHidden(false);
-                m_left->setText(tr("Checking for updates..."));
-                //m_left->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-                m_animated = true;
-                m_left->setIcon(m_owner->getCurrentAnimationFrame());
-                m_right->setHidden(true);
-                break;*/
             case StatusCode::preparing:
                 m_left->setHidden(true);
                 progressHidden = false;
                 m_progress->setMinimum(0);
                 m_progress->setMaximum(0);
-                m_right->setText("");
-                m_right->setIcon(qnSkin->icon("text_buttons/clear.png"));
-                m_right->setHidden(false);
                 break;
             case StatusCode::downloading:
                 m_left->setHidden(true);
@@ -105,25 +81,12 @@ public:
                 m_progress->setMinimum(0);
                 m_progress->setMaximum(100);
                 m_progress->setValue(data->progress);
-                m_right->setText("");
-                m_right->setIcon(qnSkin->icon("text_buttons/clear.png"));
-                m_right->setHidden(false);
-                break;
-            /* Is missing for some reason
-            case StatusCode::installing:
-                m_left->setHidden(false);
-                m_left->setText(tr("Installing updates..."));
-                //m_left->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-                m_animated = true;
-                m_left->setIcon(m_owner->getCurrentAnimationFrame());
-                m_right->setHidden(true);
-                break;*/
+                break;            
             case StatusCode::readyToInstall:
                 // TODO: We should get proper server version here
                 m_left->setText(tr("Downloaded"));
                 m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
                 m_left->setHidden(false);
-                m_right->setHidden(true);
                 break;
 
             case StatusCode::error:
@@ -131,18 +94,16 @@ public:
                 m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
                 m_left->setHidden(false);
 
-                m_right->setText(tr("Try again"));
-                m_right->setIcon(qnSkin->icon("text_buttons/refresh.png"));
-                m_right->setHidden(false);
-
                 errorStyle = true;
                 break;
-            /* Is missing for some reason
-            case StatusCode::notAvailable:
-                m_left->setHidden(false);
-                m_left->setText(tr("Update is not available"));
-                errorStyle = true;
-                break;*/
+            case StatusCode::idle:
+                break;
+            case StatusCode::offline:
+
+                break;
+            case StatusCode::installing:
+                break;
+
             default:
                 // In fact we should not be here. All the states should be handled accordingly
                 m_left->setHidden(false);
@@ -183,7 +144,6 @@ protected:
 private:
     QPushButton* m_left;
     QProgressBar* m_progress;
-    QPushButton* m_right;
 
     bool m_animated = false;
 

@@ -190,13 +190,15 @@ public:
      * @param md5 MD5 hash of the file, as text (32-character hex string).
      * @param ttl TTL for the upload, in milliseconds. Pass 0 for infinity.
      */
+    typedef Result<QnJsonRestResult>::type AddUploadCallback;
+
     Handle addFileUpload(
         const QString& fileName,
         qint64 size,
         qint64 chunkSize,
         const QByteArray& md5,
         qint64 ttl,
-        PostCallback callback,
+        AddUploadCallback callback,
         QThread* targetThread = nullptr);
 
     Handle validateFileInformation(
