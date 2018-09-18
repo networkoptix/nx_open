@@ -1,7 +1,6 @@
 from contextlib2 import ExitStack, contextmanager
 from typing import Mapping, Sequence
 
-from framework.utils import parse_size
 from framework.vms.vm_type import VMType, VM
 
 
@@ -15,7 +14,7 @@ def many_allocated(machine_types, machine_configurations):
             machine = stack.enter_context(machine_type.vm_ready(conf['alias']))  # type: VM
             machines[conf['alias']] = machine
             try:
-                free_space_bytes = conf['free_disk_space']
+                free_space_bytes = int(conf['free_disk_space_mb'] * 1024 * 1024)
             except KeyError:
                 pass
             else:

@@ -165,16 +165,3 @@ def with_traceback(fn):
             _logger.exception('Exception in %r:', fn)
             raise
     return wrapper
-
-
-def parse_size(value):
-    try:
-        return int(value)
-    except ValueError:
-        unit = value[-1].upper()
-        multipliers = {'K': 1024, 'M': 1024 * 1024, 'G': 1024 * 1024 * 1024}
-        try:
-            multiplier = multipliers[unit]
-        except KeyError:
-            raise ValueError('Unknown unit {}'.format(unit))
-        return int(float(value[:-1]) * multiplier)  # `float` allows support for '5.5M' or '0.1G'.
