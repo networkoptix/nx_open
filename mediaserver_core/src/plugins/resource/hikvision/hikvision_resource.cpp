@@ -120,7 +120,7 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
                     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
-                    if (!channelCapabilities.fps.empty())
+                    if (!channelCapabilities.fpsInDeviceUnits.empty())
                         setMaxFps(channelCapabilities.realMaxFps());
                 }
                 if (!channelCapabilities.resolutions.empty())

@@ -247,7 +247,7 @@ bool parseVideoElement(const QDomElement& videoElement, ChannelCapabilities* out
         }
         else if (tag == kMaxFrameRateTag)
         {
-            auto& fpsList = outCapabilities->fps;
+            auto& fpsList = outCapabilities->fpsInDeviceUnits;
             success = parseIntegerList(options, &fpsList);
             std::sort(fpsList.begin(), fpsList.end(), std::greater<int>());
         }
@@ -496,10 +496,10 @@ bool responseIsOk(const boost::optional<CommonResponse>& response)
 
 int ChannelCapabilities::realMaxFps() const
 {
-    if (fps.empty())
+    if (fpsInDeviceUnits.empty())
         return 0;
 
-    const auto maxFps = fps.at(0);
+    const auto maxFps = fpsInDeviceUnits.at(0);
     return maxFps > kFpsThreshold ? maxFps / 100 : maxFps;
 }
 

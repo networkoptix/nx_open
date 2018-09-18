@@ -75,7 +75,7 @@ struct ChannelCapabilities
     // Cameras usually return framerate values multiplied by 100.
     // Some models return "normal" (not multiplied) values.
     // This vector is sorted in descending order, so the first element is the maximum framerate.
-    std::vector<int> fps;
+    std::vector<int> fpsInDeviceUnits;
     std::vector<int> quality;
     std::pair<int, int> bitrateRange;
 

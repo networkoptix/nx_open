@@ -168,15 +168,15 @@ int HikvisionHevcStreamReader::chooseFps(
     const ChannelCapabilities& channelCapabilities, float fps) const
 {
     int choosenFps = 0;
-    if (channelCapabilities.fps.empty())
+    if (channelCapabilities.fpsInDeviceUnits.empty())
         return choosenFps;
 
     auto divider = 1.0;
-    if (channelCapabilities.fps.at(0) > kFpsThreshold)
+    if (channelCapabilities.fpsInDeviceUnits.at(0) > kFpsThreshold)
         divider = 100.0;
 
     auto minDifference = std::numeric_limits<double>::max();
-    for (const auto& hikvisionFramerate: channelCapabilities.fps)
+    for (const auto& hikvisionFramerate: channelCapabilities.fpsInDeviceUnits)
     {
         auto difference = std::abs(hikvisionFramerate / divider - fps);
 
