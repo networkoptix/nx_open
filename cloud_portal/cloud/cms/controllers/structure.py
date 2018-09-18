@@ -20,15 +20,14 @@ def find_or_add_product_type(product_type):
     return product_type
 
 
-def find_or_add_product(name, can_preview, product_type_name='cloud_portal'):
-    product_type = ProductType.objects.get(type=ProductType.get_type_by_name(product_type_name))
-    if Product.objects.filter(name=name).exists():
-        product = Product.objects.get(name=name)
+def find_or_add_product(name, customization, can_preview, product_type_name='cloud_portal'):
+    product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
+    if Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).exists():
+        product = Product.objects.get(name=name, customizations__in=[customization], product_type=product_type)
         product.can_preview = can_preview
-        product.product_type = product_type
     else:
         product = Product(name=name, can_preview=can_preview)
-        product.product_type = product_type
+    product.product_type = product_type
     product.save()
     return product
 

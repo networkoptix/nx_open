@@ -51,7 +51,7 @@ def get_context_and_language(request, context_id, language_code, customization):
 
 
 # This builds the custom 'edit page' form
-def initialize_form(context, customization, language, user):
+def initialize_form(product, context, customization, language, user):
     form_initialization = {'language': language.code}
 
     if context:
@@ -61,7 +61,7 @@ def initialize_form(context, customization, language, user):
         initial=form_initialization)
 
     if context:
-        form.add_fields(context, customization, language, user)
+        form.add_fields(product, context, customization, language, user)
 
     return form
 
@@ -100,8 +100,9 @@ def advanced_touched_without_permission(request_data, customization, data_struct
 
 
 # Handles when users save, create previews, or create reviews
-def context_editor_action(request, context_id, language_code):
+def context_editor_action(request, product, context_id, language_code):
     context, customization, language = get_info_for_context_editor(request, context_id, language_code)
+
     request_data = request.POST
     request_files = request.FILES
 
@@ -118,7 +119,7 @@ def context_editor_action(request, context_id, language_code):
         if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
             current_lang = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors = save_unrevisioned_records(context, customization,
+        upload_errors = save_unrevisioned_records(product, context, customization,
                                                   current_lang, context.datastructure_set.all(),
                                                   request_data, request_files, request.user)
 
@@ -128,9 +129,9 @@ def context_editor_action(request, context_id, language_code):
         if 'SendReview' in request_data:
             if upload_errors:
                 warning_no_error_msg = "Cannot have any errors when sending for review."
-                messages.warning(request, "{} - {}".format(context.product.name, warning_no_error_msg))
+                messages.warning(request, "{} - {}".format(product.name, warning_no_error_msg))
             else:
-                send_version_for_review(customization, context.product, request.user)
+                send_version_for_review(customization, product, request.user)
                 saved_msg += " A new version has been created."
 
         if upload_errors:
@@ -140,7 +141,7 @@ def context_editor_action(request, context_id, language_code):
             preview_link = generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
-    form = initialize_form(context, customization, language, request.user)
+    form = initialize_form(product, context, customization, language, request.user)
 
     return context, customization, language, form, preview_link
 
@@ -149,17 +150,18 @@ def context_editor_action(request, context_id, language_code):
 @require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
 def page_editor(request, context_id=None, language_code=None):
+    product = get_cloud_portal_product()
     if request.method == "GET":
         # Broken into two functions so that they can be reused in the context_editor_action function
         context, customization, language = get_info_for_context_editor(request, context_id, language_code)
-        form = initialize_form(context, customization, language, request.user)
+        form = initialize_form(product, context, customization, language, request.user)
         preview_link = ""
 
     else:
         if not request.user.has_perm('cms.edit_content'):
             raise PermissionDenied
 
-        context, customization, language, form, preview_link = context_editor_action(request, context_id, language_code)
+        context, customization, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
 
         if 'SendReview' in request.POST and preview_link:
             return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
@@ -175,7 +177,7 @@ def page_editor(request, context_id=None, language_code=None):
                    'site_url': mysite.site_url,
                    'site_header': admin.site.site_header,
                    'site_title': admin.site.site_title,
-                   'title': 'Edit %s for %s' % (context.name, context.product.name)})
+                   'title': 'Edit %s for %s' % (context.name, product.name)})
 
 
 @require_http_methods(["POST"])
@@ -185,14 +187,16 @@ def version_action(request, version_id=None):
     if not ContentVersion.objects.filter(id=version_id).exists():
         defaults.bad_request("Version does not exist")
 
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    product = get_cloud_portal_product()
+
     if "Preview" in request.POST:
-        generate_preview(version_id=version_id, send_to_review=True)
+        generate_preview(product, customization, version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
-        customization = Customization.objects.get(name=settings.CUSTOMIZATION)
         publishing_errors = publish_latest_version(customization, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
@@ -202,7 +206,8 @@ def version_action(request, version_id=None):
     elif "Force Update" in request.POST:
         if not request.user.has_perm('cms.force_update'):
             raise PermissionDenied
-        filldata.init_skin(settings.CUSTOMIZATION)
+
+        filldata.init_skin(settings.CUSTOMIZATION, product)
         messages.success(request, "Version {} was force updated ".format(version_id))
 
     else:
@@ -219,7 +224,7 @@ def version(request, version_id=None):
     contexts = get_records_for_version(version)
     #else happens when the user makes a revision without any changes
     if contexts.values():
-        product = contexts.values()[0][0].data_structure.context.product
+        product = get_cloud_portal_product()
         context = None
         if 'preview' in request.GET:
             if len(contexts) == 1:
@@ -306,11 +311,13 @@ def product_settings(request, product_id):
 
 @require_http_methods(["GET"])
 def download_file(request, path):
+    product = get_cloud_portal_product()
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    file = filldata.read_customized_file(path, settings.PRIMARY_PRODUCT, settings.CUSTOMIZATION,
-                                         language_code, version_id, preview)
+    file = filldata.read_customized_file(path, product, customization, language_code, version_id, preview)
     if file:
         return response_attachment(file, os.path.basename(path), "application")
     raise defaults.page_not_found("File does not exist")
@@ -320,7 +327,8 @@ def download_file(request, path):
 def download_package(request, product_name, customization_name=None):
     if not customization_name:
         customization_name = settings.CUSTOMIZATION
+    customization = Customization.objects.get(name=customization_name)
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    zipped_data = filldata.get_zip_package(customization_name, product_name, preview, version_id)
+    zipped_data = filldata.get_zip_package(customization, product_name, preview, version_id)
     return response_attachment(zipped_data, product_name+".zip", "application/zip")

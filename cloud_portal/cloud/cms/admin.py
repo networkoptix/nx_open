@@ -48,12 +48,12 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('context_actions', 'product', 'name', 'description',
-                    'url', 'translatable', 'is_global')
+    list_display = ('context_actions', 'name', 'description',
+                    'url', 'translatable', 'is_global', 'product_type')
 
-    list_display_links = ('name', )
-    list_filter = ('product',)
-    search_fields = ('name', 'description', 'url', 'product__name')
+    list_display_links = ('name',)
+    list_filter = ('product_type',)
+    search_fields = ('name', 'description', 'url')
 
     def changelist_view(self, request, extra_context=None):
         if not request.user.is_superuser:

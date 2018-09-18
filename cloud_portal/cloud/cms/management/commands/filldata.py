@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...controllers import filldata, structure
+from ...controllers import filldata, modify_db
 from ...models import Customization
 from cloud import settings
 
@@ -9,7 +9,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('customization', nargs='?', default=settings.CUSTOMIZATION)
-        parser.add_argument('product', nargs='?', default=settings.PRIMARY_PRODUCT)
 
     def handle(self, *args, **options):
         if 'customization' not in options:
@@ -18,15 +17,12 @@ class Command(BaseCommand):
                 'Initiated static content for ' + settings.CUSTOMIZATION))
         elif options['customization'] == 'all':
             for custom in Customization.objects.all():
-                product_name = 'cloud_portal_{}'.format(custom.name)
-                structure.find_or_add_product(product_name, True)
+                product_name = modify_db.get_cloud_portal_product(custom.name)
                 filldata.init_skin(custom.name, product_name)
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + custom.name))
         else:
-            product = structure.find_or_add_product(options['product'], True)
-            product.customizations = [Customization.objects.get(name=options['customization'])]
-            product.save()
-            filldata.init_skin(options['customization'], options['product'])
+            product_name = modify_db.get_cloud_portal_product(options['customization'])
+            filldata.init_skin(options['customization'], product_name)
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + options['customization']))
 

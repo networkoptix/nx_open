@@ -27,7 +27,8 @@ def check_update_cache(customization, version_id):
 
 def cloud_portal_customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
-    product = Product.objects.get(name=settings.PRIMARY_PRODUCT, product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+    product = Product.objects.get(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal,
+                                     customizations__name__in=[customization_name])
 
     if data and 'version_id' in data and not force:
         force = check_update_cache(customization_name, data['version_id'])[0]
@@ -108,7 +109,7 @@ class ProductType(models.Model):
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):
-        return "{} - {}".format(ProductType.PRODUCT_TYPES[self.type], self.product_set.all()[0])
+        return ProductType.PRODUCT_TYPES[self.type]
 
     @staticmethod
     def get_type_by_name(name):
@@ -122,7 +123,7 @@ class ProductType(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     can_preview = models.BooleanField(default=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -149,7 +150,7 @@ class Product(models.Model):
         if not data_structure:
             return None
 
-        return data_structure.find_actual_value(version_id=self.version_id())
+        return data_structure.find_actual_value(product=self, version_id=self.version_id())
 
     def save(self, *args, **kwargs):
         need_update = False
@@ -173,7 +174,7 @@ class Context(models.Model):
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
-
+    # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
     product = models.ForeignKey(Product, null=True)
     product_type = models.ForeignKey(ProductType, null=True)
     name = models.CharField(max_length=1024)
@@ -266,7 +267,7 @@ class DataStructure(models.Model):
                 return index
         return 0
 
-    def find_actual_value(self, customization=None, language=None, version_id=None):
+    def find_actual_value(self, product=None, customization=None, language=None, version_id=None):
         content_value = ""
         content_record = None
 
@@ -299,6 +300,8 @@ class DataStructure(models.Model):
             content_record = DataRecord.objects \
                 .filter(language_id=customization.default_language.id,
                         data_structure_id=self.id)
+        if product:
+            content_record = content_record.filter(product=product)
 
         if content_record and content_record.exists():
             if not version_id:
@@ -379,6 +382,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
+    product = models.ForeignKey(Product)
     language = models.ForeignKey(Language, null=True, blank=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)

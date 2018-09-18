@@ -13,6 +13,10 @@ from api.models import Account
 from ..models import *
 
 
+def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
+    return Product.objects.get(customizations__name__in=[customization],
+                               product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+
 def accept_latest_draft(customization, version_id, user):
     unaccepted_version = ContentVersion.objects.filter(id=version_id, accepted_date=None, customization=customization)
     if not unaccepted_version.exists():
@@ -38,7 +42,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
              customization.name)
 
 
-def save_unrevisioned_records(context, customization, language, data_structures,
+def save_unrevisioned_records(product, context, customization, language, data_structures,
                               request_data, request_files, user, version_id=None):
     upload_errors = []
     for data_structure in data_structures:
@@ -48,7 +52,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             ds_language = None
 
         new_record_value = ""
-        latest_value = data_structure.find_actual_value(customization, language=ds_language)
+        latest_value = data_structure.find_actual_value(product, customization=customization, language=ds_language)
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
         # TODO: Refactor image/file logic - CLOUD-1524
@@ -120,14 +124,15 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
-        record = DataRecord(data_structure=data_structure,
+        record = DataRecord(product=product,
+                            data_structure=data_structure,
                             language=ds_language,
                             customization=customization,
                             value=new_record_value,
                             created_by=user)
         record.save()
-    fill_content(customization_name=customization.name,
-                 product_name=context.product.name,
+
+    fill_content(product, customization,
                  preview=True,
                  incremental=True,
                  version_id=version_id,
@@ -163,7 +168,7 @@ def update_records_to_version(contexts, customization, version):
 
 
 def strip_version_from_records(version, product):
-    records_to_strip = DataRecord.objects.filter(version=version, data_structure__context__product=product)
+    records_to_strip = DataRecord.objects.filter(version=version, version__product=product)
     for record in records_to_strip:
         record.version = None
         record.save()
@@ -181,8 +186,8 @@ def generate_preview_link(context=None):
     return context.url + "?preview" if context else "/content/about?preview"
 
 
-def generate_preview(context=None, version_id=None, send_to_review=False):
-    fill_content(customization_name=settings.CUSTOMIZATION,
+def generate_preview(product, customization, context=None, version_id=None, send_to_review=False):
+    fill_content(product, customization,
                  preview=True,
                  incremental=True,
                  changed_context=context,
@@ -195,7 +200,7 @@ def publish_latest_version(customization, version_id, user):
     publish_errors = accept_latest_draft(customization, version_id, user)
     if not publish_errors:
         product = Product.objects.get(contentversion__id=version_id)
-        fill_content(customization_name=customization.name, product_name=product.name, preview=False, incremental=True)
+        fill_content(product, customization, preview=False, incremental=True)
     return publish_errors
 
 
@@ -207,11 +212,10 @@ def send_version_for_review(customization, product, user):
         strip_version_from_records(old_version, product)
         old_version.delete()
 
-    version = ContentVersion(customization=customization,
-                             product=product, created_by=user)
+    version = ContentVersion(customization=customization, product=product, created_by=user)
     version.save()
 
-    update_records_to_version(Context.objects.filter(product=product), customization, version)
+    update_records_to_version(Context.objects.filter(product_type=product.product_type), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
 

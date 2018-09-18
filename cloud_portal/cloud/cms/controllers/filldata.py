@@ -38,11 +38,11 @@ def target_file(file_name, customization, language_code, preview):
     return target_file_name
 
 
-def process_context_structure(customization, context, content,
+def process_context_structure(product, customization, context, content,
                               language, version_id, preview, force_global_files):
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
-            content_value = datastructure.find_actual_value(customization, language, version_id)
+            content_value = datastructure.find_actual_value(product, customization, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                 content = content.replace(datastructure.name, content_value)
@@ -81,25 +81,24 @@ def save_content(filename, content):
         file.write(content)
 
 
-def process_context(skin, context, language_code, customization, preview, version_id, global_contexts):
+def process_context(product, context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
+    skin = product.read_global_value('%SKIN%')
     context_template_text = context.template_for_language(language, customization.default_language, skin)
     if not context_template_text:
         context_template_text = ''
-    content = process_context_structure(customization, context, context_template_text, language,
+    content = process_context_structure(product, customization, context, context_template_text, language,
                                         version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
-            content = process_context_structure(
-                customization, global_context, content, None, version_id, preview, False)
+            content = process_context_structure(product, customization, global_context, content,
+                                                None, version_id, preview, False)
 
     return content
 
 
-def read_customized_file(filename, product_name, customization_name, language_code=None, version_id=None, preview=False):
+def read_customized_file(filename, product, customization, language_code=None, version_id=None, preview=False):
     # 1. try to find context for this file
-    product = Product.objects.get(name=product_name)
-    customization = Customization.objects.get(name=customization_name)
 
     clean_name = filename.replace(language_code, "{{language}}") if language_code else filename
     context = Context.objects.filter(file_path=clean_name, product_type=product.product_type)
@@ -107,7 +106,7 @@ def read_customized_file(filename, product_name, customization_name, language_co
         # success -> return process_context
         context = context.first()
         global_contexts = Context.objects.filter(is_global=True, product__type=product.product_type)
-        return process_context(context, language_code, customization, preview, version_id, global_contexts)
+        return process_context(product, context, language_code, customization, preview, version_id, global_contexts)
 
     # 2. try to find datastructure for this file
     # TODO: name is not unique
@@ -136,9 +135,10 @@ def read_customized_file(filename, product_name, customization_name, language_co
         return None  # nothing helps
 
 
-def save_context(skin, context, context_path, language_code, customization, preview, version_id, global_contexts):
-    content = process_context(skin, context, language_code, customization, preview, version_id, global_contexts)
+def save_context(product, context, context_path, language_code, customization, preview, version_id, global_contexts):
+    content = process_context(product, context, language_code, customization, preview, version_id, global_contexts)
     language = Language.by_code(language_code, customization.default_language)
+    skin = product.read_global_value('%SKIN%')
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
         # print "save file: " + target_file_name
@@ -152,20 +152,21 @@ def generate_languages_json(customization, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(customization_name, product=settings.PRIMARY_PRODUCT):
+def init_skin(customization_name, product):
     # 1. read skin for this customization
-    skin = Product.objects.get(name=product).read_global_value('%SKIN%')
+    skin = product.read_global_value('%SKIN%')
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
     distutils.dir_util.copy_tree(from_dir, target_dir)
     distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
     # 3. run fill_content
-    fill_content(customization_name, product, preview=False, incremental=False)
-    fill_content(customization_name, product, preview=True, incremental=False)
+    customization = Customization.objects.get(name=customization_name)
+    fill_content(product, customization, preview=False, incremental=False)
+    fill_content(product, customization, preview=True, incremental=False)
 
 
-def fill_content(customization_name=settings.CUSTOMIZATION, product_name=settings.PRIMARY_PRODUCT,
+def fill_content(product, customization,
                  preview=True,
                  version_id=None,
                  incremental=False,
@@ -178,11 +179,8 @@ def fill_content(customization_name=settings.CUSTOMIZATION, product_name=setting
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    product = Product.objects.get(name=product_name)
     if not product.can_preview:
         return
-
-    customization = Customization.objects.get(name=customization_name)
 
     if preview:  # Here we decide, if we need to change preview state
         # if incremental was false initially - we keep it as false
@@ -231,13 +229,13 @@ def fill_content(customization_name=settings.CUSTOMIZATION, product_name=setting
         # get their datastructures
         # detect their contexts
 
-        changed_records = DataRecord.objects.filter(version_id=version_id, content_version__product=product)
+        changed_records = DataRecord.objects.filter(version_id=version_id, product=product)
         # in case version_id is none - we need to filter by customization as well
         if not version_id:  # if version_id is None - check if records are actually latest
             changed_records_ids = [DataRecord.objects.
                                    filter(language_id=record.language_id,
                                           data_structure_id=record.data_structure_id,
-                                          content_version__product=product).
+                                          product=product).
                                    latest('created_date').id for record in changed_records]
             changed_records = changed_records.filter(id__in=changed_records_ids)
 
@@ -254,12 +252,12 @@ def fill_content(customization_name=settings.CUSTOMIZATION, product_name=setting
             incremental = False
         else:
             changed_contexts = [changed_context]
-            changed_records = DataRecord.objects.filter(version_id=version_id, content_version__product=product)
+            changed_records = DataRecord.objects.filter(version_id=version_id, product=product)
             if not version_id:
                 changed_records_ids = [DataRecord.objects.
                                            filter(language_id=record.language_id,
                                                   data_structure_id=record.data_structure_id,
-                                                  content_version__product=product).
+                                                  product=product).
                                            latest('created_date').id for record in changed_records]
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
@@ -267,7 +265,6 @@ def fill_content(customization_name=settings.CUSTOMIZATION, product_name=setting
         changed_contexts = Context.objects.filter(product_type=product.product_type).all()
         changed_languages = customization.languages_list
 
-    skin = product.read_global_value('%SKIN%')
     for context in changed_contexts:
         # now we need to check what languages were changes
         # if the default language is changed - we update all languages (lazy way)
@@ -283,17 +280,17 @@ def fill_content(customization_name=settings.CUSTOMIZATION, product_name=setting
         # update affected languages
         if context.translatable:
             for language_code in changed_languages:
-                save_context(skin, context, context.file_path, language_code, customization, preview, version_id, global_contexts)
+                save_context(product, context, context.file_path, language_code, customization, preview, version_id, global_contexts)
         else:
-            save_context(skin, context, context.file_path, None, customization, preview, version_id, global_contexts)
+            save_context(product, context, context.file_path, None, customization, preview, version_id, global_contexts)
 
     generate_languages_json(customization, preview)
 
 
-def zip_context(zip_file, skin, context, customization, language_code, preview, version_id, global_contexts, add_root):
+def zip_context(zip_file, skin, product, context, customization, language_code, preview, version_id, global_contexts, add_root):
     language = Language.by_code(language_code, customization.default_language)
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
-        data = process_context(context, language_code, customization, preview, version_id, global_contexts)
+        data = process_context(product, context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
         if add_root:
             name = os.path.join(customization.name, name)
@@ -301,9 +298,8 @@ def zip_context(zip_file, skin, context, customization, language_code, preview, 
     file_structures = context.datastructure_set.filter(type__in=(DataStructure.DATA_TYPES.image,
                                                                  DataStructure.DATA_TYPES.file))
     for file_structure in file_structures:
-        data = file_structure.find_actual_value(customization,
-                                                Language.by_code(language_code),
-                                                version_id)
+        data = file_structure.find_actual_value(product, customization,
+                                                Language.by_code(language_code), version_id)
         data = base64.b64decode(data)
         name = file_structure.name.replace("{{language}}", language_code) if language_code else file_structure.name
         if add_root:
@@ -311,15 +307,14 @@ def zip_context(zip_file, skin, context, customization, language_code, preview, 
         zip_file.writestr(name, data)
 
 
-def get_zip_package(customization_name, product_name,
+def get_zip_package(customization, product_name,
                     preview=True,
                     version_id=None,
                     add_root=True):
     zip_data = StringIO()
     zip_file = zipfile.ZipFile(zip_data, "a", zipfile.ZIP_DEFLATED, False)
 
-    product = Product.objects.get(name=product_name)
-    customization = Customization.objects.get(name=customization_name)
+    product = Product.objects.get(name=product_name, customization__in=[customization])
     global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
     languages = customization.languages_list
 
@@ -328,10 +323,10 @@ def get_zip_package(customization_name, product_name,
     for context in product.context_set.all():
         if context.translatable:
             for language_code in languages:
-                zip_context(zip_file, skin, context, customization, language_code,
+                zip_context(zip_file, skin, product, context, customization, language_code,
                             preview, version_id, global_contexts, add_root)
         else:
-            zip_context(zip_file, skin, context, customization, None,
+            zip_context(zip_file, skin, product, context, customization, None,
                         preview, version_id, global_contexts, add_root)
 
     # Mark the files as having been created on Windows so that

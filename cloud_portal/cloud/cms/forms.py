@@ -47,7 +47,7 @@ class CustomContextForm(forms.Form):
         super(CustomContextForm, self)
         self.fields.pop('language')
 
-    def add_fields(self, context, customization, language, user):
+    def add_fields(self, product, context, customization, language, user):
         data_structures = context.datastructure_set.order_by('order').all()
 
         if len(data_structures) < 1:
@@ -73,7 +73,7 @@ class CustomContextForm(forms.Form):
                     ds_description += "<br>This record is the same for every language."
                 ds_language = None
 
-            record_value = data_structure.find_actual_value(customization, ds_language)
+            record_value = data_structure.find_actual_value(product=product, customization=customization, language=ds_language)
 
             widget_type = forms.TextInput(attrs={'size': 80, 'placeholder': data_structure.default})
 
