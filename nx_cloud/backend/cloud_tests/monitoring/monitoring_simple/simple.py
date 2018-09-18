@@ -17,7 +17,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 MEDIASERVER_VERSION = '3.1.0.17256'
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
+CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20100'
 RETRY_TIMEOUT = 5  # seconds
 
 log = logging.getLogger('simple_cloud_test')
@@ -150,8 +150,6 @@ class CloudSession(object):
         self.email = 'noptixqa-owner@hdw.mx'
         self.password = 'qweasd123'
         self.user_email = 'vasily@hdw.mx'
-
-        self.auth = HTTPDigestAuth(self.email, self.password)
 
         self.vms_user_id = None
         self.system_id = None
@@ -303,7 +301,8 @@ class CloudSession(object):
 
     @testmethod()
     def test_cloud_db_get_system_id(self):
-        r = requests.get(self._url('/cdb/system/get'), auth=self.auth).json()
+        auth = HTTPDigestAuth(self.email, self.password)
+        r = requests.get(self._url('/cdb/system/get'), auth=auth).json()
 
         assert 'systems' in r, 'Invalid response from cloud_db. No systems'
         assert len(r['systems']) == 1, 'Invalid response from cloud_db. Number of systems != 1'
@@ -323,12 +322,14 @@ class CloudSession(object):
         container = client.containers.run(image, command, detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
-        out = container.logs(stdout=True, stderr=True)
+        stdout = container.logs(stdout=True, stderr=False)
+        stderr = container.logs(stdout=False, stderr=True)
 
-        log.info('Output:\n{}'.format(out.decode('utf-8')))
+        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in out, 'Received invalid output from cloud connect (command: {})'.format(
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (command: {})'.format(
             command)
         assert status['StatusCode'] == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
@@ -366,7 +367,7 @@ class CloudSession(object):
             return
 
         ms_url = 'http://{}:7001/ec2/getUsers'.format(mediaserver_ip)
-        r = requests.get(ms_url, auth=self.auth)
+        r = requests.get(ms_url, auth=HTTPDigestAuth(self.email, self.password))
 
         assert r.status_code == 200, 'ERROR: Status code is {}'.format(r.status_code)
 
@@ -418,20 +419,6 @@ class CloudSession(object):
     @testmethod(tries=3, debug_skip=True)
     def share_system(self):
         request_data = {
-            "systemId": self.system_id,
-            "accountEmail": self.user_email,
-            "accessRole": "liveViewer"
-        }
-
-        r = requests.post('{}/cdb/system/share'.format(self.base_url),
-                          json=request_data, auth=self.auth)
-
-        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
-        data = r.json()
-        log.info('Share response: {}'.format(data))
-
-    def share_system_via_vms(self):
-        request_data = {
             "email": self.user_email,
             "name": self.user_email,
             "userRoleId": "{00000000-0000-0000-0000-000000000000}",
@@ -476,6 +463,15 @@ class CloudSession(object):
 
         r = requests.post('{}/cdb/system/share'.format(self.base_url),
                           json=request_data, auth=self.auth)
+
+        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
+        data = r.json()
+        log.info('Remove response: {}'.format(data))
+
+    def remove_user_via_vms(self):
+        request_data = {'id': self.vms_user_id}
+        requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
+                      json=request_data, auth=self.auth)
 
     @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
