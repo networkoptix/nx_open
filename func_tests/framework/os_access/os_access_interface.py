@@ -187,6 +187,19 @@ class OSAccess(object):
 
     @contextmanager
     def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
+        """Try to maintain limited free disk space while in this context.
+
+        One-time allocation (reservation) of disk space is not enough. OS or other software
+        (Mediaserver) may free disk space by deletion of temporary files or archiving other files,
+        especially as reaction on low free disk space, limiting of which is the point of this
+        function. That's why disk space is reallocated one time per second in case some space is
+        freed by OS or software. Hence the thread.
+
+        Disk space is never given back while in this context as it makes the main point of
+        free space limiting useless. Disk space is limited to make impossible for tested software
+        create large file but, if disk space were given back, it would be possible to write file
+        chunk by chunk.
+        """
         self._limit_free_disk_space(should_leave_bytes)
         should_work = [True]
 
