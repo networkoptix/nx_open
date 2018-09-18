@@ -64,6 +64,11 @@ bool PeerWrapper::startAndWaitUntilStarted()
     return m_process.startAndWaitUntilStarted();
 }
 
+void PeerWrapper::stop()
+{
+    m_process.stop();
+}
+
 bool PeerWrapper::configureAsLocalSystem()
 {
     auto mediaServerClient = prepareMediaServerClient();
@@ -193,8 +198,8 @@ nx::utils::test::ModuleLauncher<Appserver2Process>& PeerWrapper::process()
     return m_process;
 }
 
-bool PeerWrapper::areAllPeersHaveSameTransactionLog(
-    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+bool PeerWrapper::allPeersHaveSameTransactionLog(
+    std::vector<const PeerWrapper*> peers)
 {
     std::vector<::ec2::ApiTransactionDataList> transactionLogs;
     for (const auto& server: peers)
@@ -230,7 +235,19 @@ bool PeerWrapper::areAllPeersHaveSameTransactionLog(
     return allLogsAreEqual;
 }
 
-bool PeerWrapper::arePeersInterconnected(
+bool PeerWrapper::allPeersHaveSameTransactionLog(
+    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    std::vector<const PeerWrapper*> peerPtrs;
+    std::transform(
+        peers.begin(), peers.end(),
+        std::back_inserter(peerPtrs),
+        [](const std::unique_ptr<PeerWrapper>& peer) { return peer.get(); });
+
+    return allPeersHaveSameTransactionLog(peerPtrs);
+}
+
+bool PeerWrapper::peersInterconnected(
     const std::vector<std::unique_ptr<PeerWrapper>>& peers)
 {
     // For now just checking that each peer is connected to every other.
