@@ -470,9 +470,9 @@ class CloudSession(object):
                       auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
 
+        data = r.json()
         user = next(filter(lambda x: x['email'] == self.user_email, data), None)
         assert user is not None, 'No users returned'
-
 
     @testmethod(debug_skip=True)
     def remove_user(self):
