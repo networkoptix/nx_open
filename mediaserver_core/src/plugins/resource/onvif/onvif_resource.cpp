@@ -3503,8 +3503,22 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
         char* buf = (char*)malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
         memToFreeOnResponseDone.push_back(buf);
         strcpy(buf, onvifNotificationSubscriptionReferenceUtf8.constData());
-        soapWrapper->getProxy()->soap->header->wsa__To = buf;
+        header->wsa__To = buf;
     }
+
+    // Very few devices need wsa__Action and kReplyTo to be filled, but sometimes they do.
+    wsa__EndpointReferenceType* replyTo =
+        (wsa__EndpointReferenceType*)malloc(sizeof(wsa__EndpointReferenceType));
+    memToFreeOnResponseDone.push_back(replyTo);
+    memset(replyTo, 0, sizeof(*replyTo));
+    static const char* kReplyTo = "http://www.w3.org/2005/08/addressing/anonymous";
+    replyTo->Address = const_cast<char*>(kReplyTo);
+    header->wsa__ReplyTo = replyTo;
+
+    static const char* kAction =
+        "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/PullMessagesRequest";
+    header->wsa__Action = const_cast<char*>(kAction);
+
     _onvifEvents__PullMessagesResponse response;
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
