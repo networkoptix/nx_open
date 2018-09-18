@@ -112,7 +112,7 @@
         },
         {
             "eventTypeId": "12c841a0-33a4-429e-84de-810a43738d35",
-            "eventName": { "value": "Video face detection [exclusive]", "localization": {} },
+            "eventName": { "value": "Video Face Detection [exclusive]", "localization": {} },
             "flags": "stateDependent",
             "internalName": "VFD",
             "alarmName": "vfdAlarm",
