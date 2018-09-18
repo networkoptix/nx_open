@@ -26,17 +26,17 @@ export class MergeModalContent {
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
                 @Inject('account') private account: any,
-                @Inject('system') private _system: any,
+                @Inject('system') private systemService: any,
                 @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
 
     }
 
-    //Add system can merge where added to systems form api call
+    // Add system can merge where added to systems form api call
     checkMergeAbility(system) {
         if (system.stateOfHealth === 'offline') {
-            return 'offline'
+            return 'offline';
         }
         if (!system.canMerge) {
             return 'cannotMerge';
@@ -46,13 +46,13 @@ export class MergeModalContent {
 
     setTargetSystem(system) {
         this.targetSystem = system;
-        return this._system(system.id, this.user.email).update().then((system) => {
+        return this.systemService(system.id, this.user.email).update().then((system) => {
             this.systemMergeable = this.checkMergeAbility(system);
         });
-    };
+    }
 
     addStatus(system) {
-        let status = "";
+        let status = '';
 
         if (system.stateOfHealth === 'offline') {
             status = ' (offline)';
@@ -63,15 +63,15 @@ export class MergeModalContent {
         }
 
         return system.name + status;
-    };
+    }
 
     makeSelectorList(systems) {
         this.systemsSelect = [];
-        systems.forEach( (element) => {
+        systems.forEach(element => {
             this.systemsSelect.push({
                 name: this.addStatus(element),
                 id: element.id
-            })
+            });
         });
     }
 
@@ -86,15 +86,15 @@ export class MergeModalContent {
                 this.showMergeForm = this.system.canMerge && this.systems.length > 0;
                 this.makeSelectorList(this.systems);
                 this.targetSystem = this.systemsSelect[0];
-                return this._system(this.targetSystem.id, user.email).update();
-            }).then((system)=>{
+                return this.systemService(this.targetSystem.id, user.email).update();
+            }).then(system => {
                 this.systemMergeable = this.checkMergeAbility(system);
             });
 
         this.merging = this.process.init(() => {
             let masterSystemId = null;
             let slaveSystemId = null;
-            if (this.masterId == this.system.id) {
+            if (this.masterId === this.system.id) {
                 masterSystemId = this.system.id;
                 slaveSystemId = this.targetSystem.id;
             }
@@ -102,15 +102,15 @@ export class MergeModalContent {
                 masterSystemId = this.targetSystem.id;
                 slaveSystemId = this.system.id;
             }
-            //return this.cloudApi.systems(); //In for testing purposes with merging things
+            // return this.cloudApi.systems(); //In for testing purposes with merging things
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             successMessage: this.language.system.mergeSystemSuccess
         }).then(() => {
             this.systemsProvider.forceUpdateSystems();
             this.activeModal.close({
-                "anotherSystemId": this.targetSystem.id,
-                "role": this.masterId == this.system.id ?
+                anotherSystemId: this.targetSystem.id,
+                role: this.masterId === this.system.id ?
                     this.configService.systemStatuses.master :
                     this.configService.systemStatuses.slave
             });
@@ -125,7 +125,7 @@ export class MergeModalContent {
     styleUrls: []
 })
 
-export class NxModalMergeComponent implements OnInit {
+export class NxModalMergeComponent {
     modalRef: NgbModalRef;
 
     constructor(@Inject('languageService') private language: any,
@@ -147,8 +147,5 @@ export class NxModalMergeComponent implements OnInit {
 
     close() {
         this.modalRef.close({});
-    }
-
-    ngOnInit() {
     }
 }

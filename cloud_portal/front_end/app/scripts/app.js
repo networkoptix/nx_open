@@ -331,10 +331,8 @@ window.L = {};
                             })
                             .when('/download', {
                                 template: '<download-component></download-component>'
-                                // template: ''
                             })
                             .when('/download/:platform', {
-                                // template: '',
                                 template: '<download-component [route-param-platform]="platform"></download-component>',
                                 controller: [ '$scope', 'getPlatform', function ($scope, getPlatform) {
                                     $scope.platform = getPlatform;

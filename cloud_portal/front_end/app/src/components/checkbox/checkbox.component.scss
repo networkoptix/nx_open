@@ -8,18 +8,19 @@ nx-checkbox {
         }
     }
 
-    & + div.input-error {
+    & + label + div.input-error {
         display : none;
     }
 
     &.ng-invalid:not(.ng-untouched) {
-        & + div.input-error {
+        & + label + div.input-error {
             display : block;
         }
     }
 
     .nx-checkbox {
         display : flex;
+        float : left;
 
         input[type="checkbox"] {
             position : absolute;
@@ -32,20 +33,12 @@ nx-checkbox {
             svg polyline.box {
                 stroke : $dark1;
             }
-
-            & ~ .text {
-                color : $dark1;
-            }
         }
 
         input:active ~ .check {
             svg polygon.box,
             svg polyline.box {
                 stroke : $dark9 !important;
-            }
-
-            & ~ .text {
-                color : $dark9 !important;
             }
         }
 
@@ -73,18 +66,11 @@ nx-checkbox {
     }
 }
 
-.text {
-    font-family : $font-family-regular;
-    cursor      : pointer;
-    user-select : none;
-    color       : $dark9;
-}
-
-.check {
+.tick {
     cursor                      : pointer;
     position                    : relative;
-    margin                      : -2px 0 0 0;
-    width                       : 20px;
+    margin                      : -1px 0 0 0;
+    width                       : 24px;
     height                      : 20px;
     -webkit-tap-highlight-color : transparent;
 

@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Sisteme erişim sağlanılamadı</h1>
-        <p>Bu bağlantı bozuk,<br>
+        <h3>Bu bağlantı bozuk,<br>
             Sistemin %PRODUCT_NAME% den bağlantısı kesilmiş olabilir<br>
             Sisteme erişim engennemiş olabilir,<br>
-            Yada farklı bir hesap ile sisteme girilmiş olabilir</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Kullanılabilir Sistem Listesi</a>
+            Yada farklı bir hesap ile sisteme girilmiş olabilir
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Kullanılabilir Sistem Listesi</a>
         </p>
     </div>
 

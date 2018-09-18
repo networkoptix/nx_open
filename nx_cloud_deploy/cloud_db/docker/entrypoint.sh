@@ -2,11 +2,11 @@
 
 mkdir -p /tmp/core
 
-export STUN_PORT=${STUN_PORT:-3345}
-export HTTP_PORT=${HTTP_PORT:-3355}
+MEDIATOR_STUN_PORT=${MEDIATOR_STUN_PORT:-3345}
+MEDIATOR_HTTP_PORT=${MEDIATOR_HTTP_PORT:-3355}
 
-export INSTANCE_IP=$CONNECTION_MEDIATOR_PUBLIC_IP
-[ -n "$INSTANCE_IP" ] || INSTANCE_IP=$(LD_LIBRARY_PATH= wget -q -O- networkoptix.com/myip)
+[ -n "$MEDIATOR_HOST" ] || MEDIATOR_HOST="$CONNECTION_MEDIATOR_PUBLIC_IP"
+[ -n "$MEDIATOR_HOST" ] || MEDIATOR_HOST=$(LD_LIBRARY_PATH= wget -q -O- networkoptix.com/myip)
 
 tmp=$(tempfile)
 envsubst < /opt/networkoptix/cloud_db/etc/cloud_db.conf > $tmp

@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "עברית",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "צופה מתקדם",
-      "description": "יכול לצפות בוידאו חי, לצפות בארכיון, להגדיר מצלמות, לשלוט PTZ וכו '"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "מנהל",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "מחיקה",
     "successDisconnected": "המערכת מנותקת בהצלחה מ- %PRODUCT_NAME%",
     "successDeleted": "המערכת {{systemName}} נמחקה בהצלחה מהחשבון שלך",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "ההרשאות הוסרו מ- {{email}}"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "כל המערכות",
     "systems": "מערכות"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "תזרים ראשי",
+      "lowStream": "תזרים משני",
+      "transcoding": "המרה",
+      "unknown": "לא ידוע",
+      "copyToClipboard": "העתק ללוח",
+      "copyDefaultText": "העתק",
+      "copyActiveText": "הועתק ללוח"
+    },
+    "systemOffline": "השרת אינו זמין",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "לא מקוון",
+      "error": "שגיאה",
+      "unauthorized": "נדרש אימות",
+      "noData": "אין נתונים",
+      "iosVideoTooLarge": "iOS אינה תומכת בוידאו גדול מ fullHD (2MP: 1920 x 1080).",
+      "flashRequired": "אנא התקן <a href='https://get.adobe.com/flashplayer/' target='_blank'> את Adobe Flash</a> להפעלת וידאו משרתים מבוססי Arm.",
+      "flashOrWebmRequired": "יש <a href='https://get.adobe.com/flashplayer/' target='_blank'> להתקין Adobe Flash</a> או <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM codec</a> עבור הצגת וידאו ב- Internet Explorer.",
+      "noArmSupport": "דפדפן או התקן זה אינו תומך בהפעלת וידאו משרתים מבוססי ARM.",
+      "noFormat": "דפדפן זה אינו תומך בשחזור וידאו ממצלמה זו.",
+      "ieNoWebm": "התקן את <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> עבור Internet Explorer.",
+      "ieWin10": "השתמש ב- Microsoft Edge או בדפדפן Google Chrome.",
+      "ubuntuNX": "דפדפן זה אינו תומך בווידאו משרתים מבוססי ARM. בבקשה, השתמש בדפדפן Chromium במקום זאת."
+    },
+    "searchCamPlaceholder": "חיפוש",
+    "resolution": {
+      "auto": "אוטומטי",
+      "high": "גבוה",
+      "low": "נמוך"
+    },
+    "chromeCastWarning": "Chromecast הוא משאב אינטנסיבי ועשוי לגרום לבעיות בשרת שלך.",
+    "voiceCommands": {
+      "play": "נגן",
+      "pause": "השהה",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "נקה את החיפוש",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "הרחב את כל השרתים",
+      "collapse all servers": "כווץ את כל השרתים",
+      "stop listening": "עצור האזנה",
+      "help": "help | show commands"
+    }
   }
 }

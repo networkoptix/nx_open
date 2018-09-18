@@ -13,6 +13,7 @@ ${url}    ${ENV}
 ${existing email}              ${EMAIL VIEWER}
 ${no upper password}           adrhartjad
 ${7char password}              asdfghj
+${symbol password}             pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
 ${common password}             qweasd123
 ${weak password}               asqwerdf
 ${fair password}               qweasd1234
@@ -73,6 +74,8 @@ Trailing Space Password                   mark        hamill      ${valid email}
     [tags]    C41860
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
     [tags]    C41556
+Symbol Password                           mark        hamill      ${valid email}            ${symbol password}          True
+    [tags]    C41861
 Invalid First Name                        ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
 Empty First Name                          ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41556
@@ -98,7 +101,7 @@ Test Register Invalid
     Run Keyword If    "${LANGUAGE}"=="he_IL"    Set Suite Variable    ${EMAIL IS REQUIRED}    //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
     Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Register Form Validation    ${first}    ${last}    ${email}    ${pass}    ${checked}
-    Run Keyword Unless    "${pass}"=="${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}"    Check Password Outline    ${pass}
+    Run Keyword Unless    '''${pass}'''=='''${BASE PASSWORD}''' or '''${pass}'''=='''${symbol password}'''    Check Password Outline    ${pass}
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
@@ -112,7 +115,7 @@ Register Form Validation
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    "${password}"!="${EMPTY}"     Check Password Badge    ${password}
+    Run Keyword If    '''${password}'''!='''${EMPTY}'''     Check Password Badge    ${password}
     Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
@@ -120,12 +123,12 @@ Register Form Validation
 Check Password Badge
     [arguments]    ${pass}
     Wait Until Element Is Visible    ${PASSWORD BADGE}
-    Run Keyword If    "${pass}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT BADGE}
-    ...    ELSE IF    "${pass}"=="${no upper password}" or "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
-    ...    ELSE IF    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
-    ...    ELSE IF    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
-    ...    ELSE IF    "${pass}"=="${fair password}"    Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
-    ...    ELSE IF    "${pass}"=="${BASE PASSWORD}"    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
+    Run Keyword If    '''${pass}'''=='''${7char password}'''    Element Should Be Visible    ${PASSWORD TOO SHORT BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${no upper password}''' or '''${pass}'''=='''${weak password}'''    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${common password}'''    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${CYRILLIC TEXT}''' or '''${pass}'''=='''${SMILEY TEXT}''' or '''${pass}'''=='''${GLYPH TEXT}''' or '''${pass}'''=='''${TM TEXT}''' or '''${pass}'''=='''${SPACE}${BASE PASSWORD}''' or '''${pass}'''=='''${BASE PASSWORD}${SPACE}'''    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${fair password}''' or '''${pass}'''=='''${symbol password}'''   Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${BASE PASSWORD}'''    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
 
 Check Email Outline
     [Arguments]    ${email}
@@ -137,11 +140,11 @@ Check Email Outline
 Check Password Outline
     [Arguments]    ${pass}
     Wait Until Element Is Visible    ${REGISTER PASSWORD INPUT}/../input[contains(@class,'ng-invalid')]
-    Run Keyword If    "${pass}"=="${EMPTY}" or "${pass}"=="${SPACE}"    Element Should Be Visible    ${PASSWORD IS REQUIRED}
-    Run Keyword If    "${pass}"=="${7char password}"    Element Should Be Visible    ${PASSWORD TOO SHORT}
-    Run Keyword If    "${pass}"=="${CYRILLIC TEXT}" or "${pass}"=="${SMILEY TEXT}" or "${pass}"=="${GLYPH TEXT}" or "${pass}"=="${TM TEXT}" or "${pass}"=="${SPACE}${BASE PASSWORD}" or "${pass}"=="${BASE PASSWORD}${SPACE}"    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
-    Run Keyword If    "${pass}"=="${common password}"    Element Should Be Visible    ${PASSWORD TOO COMMON}
-    Run Keyword If    "${pass}"=="${weak password}"    Element Should Be Visible    ${PASSWORD IS WEAK}
+    Run Keyword If    '''${pass}'''=='''${EMPTY}''' or '''${pass}'''=='''${SPACE}'''    Element Should Be Visible    ${PASSWORD IS REQUIRED}
+    Run Keyword If    '''${pass}'''=='''${7char password}'''    Element Should Be Visible    ${PASSWORD TOO SHORT}
+    Run Keyword If    '''${pass}'''=='''${CYRILLIC TEXT}''' or '''${pass}'''=='''${SMILEY TEXT}''' or '''${pass}'''=='''${GLYPH TEXT}''' or '''${pass}'''=='''${TM TEXT}''' or '''${pass}'''=='''${SPACE}${BASE PASSWORD}''' or '''${pass}'''=='''${BASE PASSWORD}${SPACE}'''    Element Should Be Visible    ${PASSWORD SPECIAL CHARS}
+    Run Keyword If    '''${pass}'''=='''${common password}'''    Element Should Be Visible    ${PASSWORD TOO COMMON}
+    Run Keyword If    '''${pass}'''=='''${weak password}'''    Element Should Be Visible    ${PASSWORD IS WEAK}
 
 Check First Name Outline
     [Arguments]    ${first}

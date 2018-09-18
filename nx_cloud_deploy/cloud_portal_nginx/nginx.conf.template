@@ -22,6 +22,14 @@ http {
     # don't send the nginx version number in error pages and Server header
     server_tokens off;
 
+    # Expires map
+    map ${DOLLAR}sent_http_content_type ${DOLLAR}expires {
+        default                    off;
+        text/html                  epoch;
+        text/css                   epoch;
+        application/javascript     epoch;
+    }
+
     upstream app_server {
         # For a TCP configuration:
         server $PORTAL_HOST:5000 fail_timeout=0;
@@ -29,6 +37,8 @@ http {
 
     server {
         listen 80 default;
+
+        expires ${DOLLAR}expires;
 
         client_max_body_size 4G;
         server_name _;

@@ -8,7 +8,7 @@ Suite Teardown    Close All Browsers
 *** Variables ***
 ${password}    ${BASE PASSWORD}
 ${url}         ${ENV}
-
+${symbol password}    pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}
 *** Keywords ***
 Restart
     Register Keyword To Run On Failure    NONE
@@ -30,6 +30,78 @@ Register and Activate
     Register    'mark'    'hamill'    ${email}    ${password}
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with user with cyrillic First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with user with smiley First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with user with glyph First and Last names and correct credentials
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
+    [tags]    C41863
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with +!#$%'*-/=?^_`{|}~ in email field
+#ampersand was removed from this test because imaplib could not handle it
+    ${email}    Get Random Symbol Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with with leading space in email
+    [tags]    C41557    C41864
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${SPACE}${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with with trailing space in email
+    [tags]    C41557    C41864
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}${SPACE}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
+allows register, activate, login with pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} password
+    [tags]    C41861
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${symbol password}
+    Activate    ${email}
+    Log In    ${email}    ${symbol password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
 should show error if same link is used twice
@@ -100,15 +172,17 @@ should allow activation, if user is registered by link /register/?from=mobile
 link works and suggests to log out user, if he was logged in, buttons operate correctly
     [tags]    email    C41564
     ${email1}    Get Random Email    ${BASE EMAIL}
+    # This sleep is so that the emails don't get the same timestamp
+    Sleep    .01
     ${email2}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email1}    ${password}
+   ${link1}    Get Email Link    ${email1}    activate
     Go To    ${url}/register
     Register    mark    hamill    ${email2}    ${password}
+    ${link2}    Get Email Link    ${email2}    activate
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
-    ${link1}    Get Email Link    ${email1}    activate
-    ${link2}    Get Email Link    ${email2}    activate
     Go To    ${link1}
     Wait Until Page Contains Element    ${ACTIVATION SUCCESS}
     Wait Until Element Is Visible    ${LOGGED IN CONTINUE BUTTON}

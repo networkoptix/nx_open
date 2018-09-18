@@ -12,7 +12,7 @@ ${url}    ${ENV}
 ${password}    ${BASE PASSWORD}
 ${no upper password}           adrhartjad
 ${7char password}              asdfghj
-${common password}             yyyyyyyy
+${common password}             qweasd123
 ${weak password}               asqwerdf
 
 ${FORM WITH ERROR}             //form[@name='restorePasswordWithCode']//input[@type='password' and contains(@class,'ng-invalid')]

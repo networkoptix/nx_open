@@ -7,10 +7,10 @@
             .factory('authorizationCheckService', AuthorizationCheckService);
 
         AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64',
-            'cloudApi', 'configService', 'nxDialogsService', 'languageService', '$location'];
+            'cloudApi', 'configService', 'NxDialogsService', 'languageService', '$location'];
 
         function AuthorizationCheckService($rootScope, $q, $localStorage, $base64,
-                                           cloudApi, configService, nxDialogsService, languageService, $location) {
+                                           cloudApi, configService, NxDialogsService, languageService, $location) {
 
             const CONFIG = configService.config;
 
@@ -113,7 +113,7 @@
 
             function requireLogin() {
                 return get().catch(() => {
-                    return nxDialogsService.login(true);
+                    return NxDialogsService.login(true);
                 });
             }
 
@@ -134,7 +134,7 @@
             function logoutAuthorised() {
                 get().then(() => {
                     // logoutAuthorisedLogoutButton
-                    nxDialogsService
+                    NxDialogsService
                         .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle,
                             languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary',
                             languageService.lang.dialogs.logoutAuthorisedLogoutButton

@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Tiếng Việt",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Trình xem nâng cao",
-      "description": "Có thể xem video trực tiếp, duyệt các kho lưu trữ, cấu hình máy ảnh, điều khiển PTZ vv"
+      "description": "Can view live video, browse the archive, control PTZ etc"
     },
     "Administrator": {
       "label": "Giám sát viên",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Xóa bỏ",
     "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
+    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Tất cả Hệ thống",
     "systems": "Hệ thống"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Luồng tốc độ cao",
+      "lowStream": "Luồng tốc độ thấp",
+      "transcoding": "Đang chuyển mã",
+      "unknown": "Không xác định",
+      "copyToClipboard": "chép vào bảng nháp",
+      "copyDefaultText": "sao chép",
+      "copyActiveText": "sao chép vào clipboard"
+    },
+    "systemOffline": "Hệ thống offline",
+    "systemHasNoCameras": "NO CAMERAS",
+    "cameraStates": {
+      "offline": "Ẩn",
+      "error": "Lỗi",
+      "unauthorized": "Yêu cầu xác thực",
+      "noData": "Không có dữ liệu",
+      "iosVideoTooLarge": "ios không hỗ trợ video lớn hơn fullHD (2MP: 1920x1080).",
+      "flashRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> để phát video.",
+      "flashOrWebmRequired": "Vui lòng <a href='https://get.adobe.com/flashplayer/' target='_blank'>cài đặt Adobe Flash</a> hoặc<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> để phát video trong Internet Explorer.",
+      "noArmSupport": "Trình duyệt hoặc thiết bị này không hỗ trợ xem video từ máy chủ trên nền ARM.",
+      "noFormat": "Trình duyệt này không hỗ trợ phát lại video từ camera này.",
+      "ieNoWebm": "Hãy cài đặt <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> cho Internet Explorer.",
+      "ieWin10": "Vui lòng, sử dụng Microsoft Edge hoặc trình duyệt Google Chrome.",
+      "ubuntuNX": "Trình duyệt này không hỗ trợ video từ máy chủ dựa trên ARM. Vui lòng sử dụng trình duyệt Chromium để thay thế."
+    },
+    "searchCamPlaceholder": "Tìm kiếm",
+    "resolution": {
+      "auto": "tự động",
+      "high": "cao (H)",
+      "low": "thấp (L)"
+    },
+    "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
+    "voiceCommands": {
+      "play": "broadcast",
+      "pause": "giờ nghĩ giảo lao",
+      "live": "go to live | show me live",
+      "view": "view + [camera name]",
+      "search": "find + [text for searchbar]",
+      "clear search": "xóa tìm kiếm",
+      "expand server": "expand server + [server name]",
+      "collapse server": "collapse server + [server name]",
+      "expand all servers": "mở rộng tất cả các máy chủ",
+      "collapse all servers": "tất cả máy chủ mất ổn định",
+      "stop listening": "dừng nghe",
+      "help": "help | show commands"
+    }
   }
 }

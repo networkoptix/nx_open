@@ -1,20 +1,19 @@
 
-<div class="card card-default" ng-if="system.isMine">
+<div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
-        <h2>Ihr System</h2>
-        <p></p>
+        <h2 class="mb-3">Ihr System</h2>
         <p>
             <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Mit einem anderen System zusammenführen</button>
         </p>
-        <hr></hr>
+        <hr />
         <button class="btn btn-default" ng-click="disconnect()">Von
-            <span class="product-name">%PRODUCT_NAME%</span> trennen</button>
+            <span class="product-name">&nbsp;%PRODUCT_NAME%</span> trennen</button>
     </div>
 </div>
-<div class="card card-default" ng-if="!system.isMine">
+<div class="card card-condensed" ng-if="!system.isMine">
     <div class="card-body">
         <h2>Besitzer</h2>
         <h3 class="user-name">{{system.info.ownerFullName}}</h3>
@@ -34,19 +33,19 @@
 <div class="card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
-        <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+            wird mit diesem System zusammengeführt</div>
+        <hr />
+        <div class="merge-info-text">Abhängig von der Größe der Datenbank kann dies mehrere Stunden dauern</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
+        <div>Dieses System wird zusammengeführt mit
             <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr></hr>
+        <hr />
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>Abhängig von der Größe der Datenbank kann dies mehrere Stunden dauern.</p>
+            <p>Bis die Zusammenführung abgeschlossen ist, können Sie sich bei diesem System anmelden und Videos ansehen, aber keine Einstellungen ändern.</p>
+            <p>Wenn die Zusammenführung abgeschlossen ist, sind alle Benutzer und Kameras dieses Systems
+                im System <span class="merge-system-name">{{mergeTargetSystem.name}}</span> verfügbar. System, und dieses System wird gelöscht.</p>
         </div>
     </div>
 </div>

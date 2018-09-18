@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Polski",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Zaawansowany użytkownik",
-      "description": "Podgląd wideo na żywo, przeglądanie archiwum, konfigurowanie kamer, sterowanie PTZ itp."
+      "description": "Może wyświetlać wideo na żywo, przeglądać archiwum, sterować PTZ itp."
     },
     "Administrator": {
       "label": "Administrator",
@@ -122,7 +123,7 @@
     "wrongCodeRestore": "Kod potwierdzenia został już użyty lub jest nieprawidłowy",
     "forbidden": "Nie masz uprawnień do wykonania tej operacji",
     "accountNotActivated": "To konto nie jest jeszcze aktywne. <a href=\"/activate\">Wyślij ponownie link aktywacyjny</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Konto jest tymczasowo zablokowane. Prosimy spróbować ponownie za kilka minut.",
     "notFound": "Nie znaleziono",
     "alreadyExists": "To konto już istnieje",
     "unknownError": "Wystąpił nieoczekiwany błąd",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Usuń",
     "successDisconnected": "System został pomyślnie odłączony od %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} został pomyślnie usunięty z Twojego konta",
+    "successMerge": "System {{systemName}} został złączony z {{systemName}}",
     "permissionsRemoved": "Uprawnienia zostały usunięte z {{email}}"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Wszystkie systemy",
     "systems": "Systemy"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Wysoki strumień",
+      "lowStream": "Niski strumień",
+      "transcoding": "Transkodowanie",
+      "unknown": "Nieznany",
+      "copyToClipboard": "kopiuj do schowka",
+      "copyDefaultText": "kopiuj",
+      "copyActiveText": "skopiowano do schowka"
+    },
+    "systemOffline": "Serwer jest odłączony",
+    "systemHasNoCameras": "BRAK KAMER",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Błąd",
+      "unauthorized": "Wymagane uwierzytelnienie",
+      "noData": "Brak danych",
+      "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
+      "flashRequired": "Aby odtwarzać filmy wideo, proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a>.",
+      "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
+      "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
+      "noFormat": "Ta przeglądarka nie obsługuje odtwarzania wideo z tej kamery.",
+      "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
+      "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
+      "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium."
+    },
+    "searchCamPlaceholder": "Szukaj",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Wysoki",
+      "low": "Niski"
+    },
+    "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
+    "voiceCommands": {
+      "play": "odtwarzaj",
+      "pause": "pauza",
+      "live": "podgląd na żywo | pokaż na żywo",
+      "view": "pokaż + [nazwa kamery]",
+      "search": "szukaj + [tekst paska wyszukiwania]",
+      "clear search": "wyczyść wyszukiwanie",
+      "expand server": "rozwiń serwer + [nazwa serwera]",
+      "collapse server": "zwiń serwer + [nazwa serwera]",
+      "expand all servers": "rozwiń wszystkie serwery",
+      "collapse all servers": "zwiń wszystkie serwery",
+      "stop listening": "przestań słuchać",
+      "help": "pomoc | pokaż polecenia"
+    }
   }
 }

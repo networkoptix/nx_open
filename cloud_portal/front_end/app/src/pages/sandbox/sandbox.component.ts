@@ -1,29 +1,31 @@
-import { Component, OnInit, OnDestroy, Inject, ViewChild } from '@angular/core';
-import { NgForm }                                          from '@angular/forms';
+import { Component, ViewChild } from "@angular/core";
+import { NgForm }               from "@angular/forms";
 
 @Component({
-    selector: 'sandbox-component',
-    templateUrl: 'sandbox.component.html',
-    styleUrls: ['sandbox.component.scss']
+    selector   : "sandbox-component",
+    templateUrl: "sandbox.component.html",
+    styleUrls  : [ "sandbox.component.scss" ]
 })
 
-export class NxSandboxComponent implements OnInit, OnDestroy {
+export class NxSandboxComponent {
     click: any;
     blah: string;
     group: string;
     agree: boolean;
     show: boolean;
+    show5: boolean;
     edit: boolean;
 
     submitted = false;
 
-    @ViewChild('testForm') public testForm: NgForm;
+    @ViewChild("testForm") public testForm: NgForm;
 
     private setupDefaults() {
 
         this.show = false;
-        this.blah = 'blah1';
-        this.group = 'Tsanko';
+        this.show5 = false;
+        this.blah = "blah1";
+        this.group = "Tsanko";
         this.agree = false;
         this.edit = false;
 
@@ -34,28 +36,23 @@ export class NxSandboxComponent implements OnInit, OnDestroy {
     }
 
     private touchForm(form) {
-        for (let ctrl in form.form.controls) {
-            form.form.get(ctrl).markAsTouched();
+        for (const ctrl in form.form.controls) {
+            if (form.form.controls.hasOwnProperty(ctrl)) {
+                form.form.get(ctrl).markAsTouched();
+            }
         }
-    }
-
-    ngOnInit(): void {
-    }
-
-    ngOnDestroy() {
-
     }
 
     onSubmit() {
         if (this.testForm && !this.testForm.valid) {
-            //Set the form touched
+            // Set the form touched
             this.touchForm(this.testForm);
 
             return false;
         }
 
         this.submitted = true;
-        window.alert('SUBMIT!');
+        window.alert("SUBMIT!");
     }
 }
 

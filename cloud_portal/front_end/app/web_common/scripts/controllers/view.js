@@ -361,14 +361,22 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $scope.selectFormat = function(format){
+            $scope.showSettings = false;
             $scope.activeFormat = format;
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
+        };
+
+        $scope.toggleVoice = function () {
+            $scope.showSettings = false;
+            $scope.voiceControls.showCommands = !$scope.voiceControls.showCommands;
         };
 
         $scope.selectResolution = function(resolution){
             /*if(resolution === 'auto' || resolution === 'Auto' || resolution === 'AUTO'){
                 resolution = '320p'; //TODO: detect better resolution here
             }*/
+
+            $scope.showSettings = false;
 
             if($scope.activeResolution === resolution){
                 return;
@@ -379,6 +387,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.enableFullScreen = screenfull.enabled;
         $scope.fullScreen = function(){
+            $scope.showSettings = false;
             if (screenfull.enabled) {
                 screenfull.request($('.fullscreen-area').get(0));
             }
@@ -401,10 +410,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         }
 
         $scope.closeFullscreen = function(){
+            $scope.showSettings = false;
             screenfull.exit();
         };
 
         $scope.showCamerasPanel = function(){
+            $scope.showSettings = false;
             $scope.showCameraPanel=true;
         };
 

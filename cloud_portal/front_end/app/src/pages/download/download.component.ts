@@ -48,10 +48,10 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.installers = [{}];
 
         this.platformMatch = {
-            'unix': 'Linux',
-            'linux': 'Linux',
-            'mac': 'MacOS',
-            'windows': 'Windows'
+            unix: 'Linux',
+            linux: 'Linux',
+            mac: 'MacOS',
+            windows: 'Windows'
         };
     }
 
@@ -116,18 +116,18 @@ export class DownloadComponent implements OnInit, OnDestroy {
     private getDownloads () {
         this.userAuthorized = true;
         // TODO: Commented until we ged rid of AJS
-        //this.routeData = this.route.snapshot.data;
+        // this.routeData = this.route.snapshot.data;
 
         this.sub = this.route.params.subscribe(params => {
             // TODO: Commented until we ged rid of AJS
-            //this.platform = params['platform'];
+            // this.platform = params['platform'];
             this.platform = this.routeParamPlatform || this.detectOS();
 
             // TODO: Commented until we ged rid of AJS
-            //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+            // this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
             this.activeOs = this.platform || this.platformMatch[this.platform];
 
-            for (let mobile in this.downloads.mobile) {
+            for (const mobile in this.downloads.mobile) {
                 if (this.downloads.mobile[mobile].os === this.activeOs) {
                     if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
                         this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;

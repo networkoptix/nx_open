@@ -1,4 +1,4 @@
-Xin chào,
+Hello {{message.userFullName}},
 
   Vui lòng truy cập nút bên dưới để xác nhận địa chỉ Email của bạn và kích hoạt tài khoản.
 

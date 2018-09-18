@@ -5,25 +5,38 @@
         <div class="col-12 col-md-4 border-right">
             <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
 
-                <nx-checkbox
-                        name="show" id="show1"
-                        [(ngModel)]="show"
-                        checked>Remember me
-                </nx-checkbox>
+                <div class="form-group">
+                    <nx-checkbox
+                            name="show"
+                            compId="show1"
+                            [(ngModel)]="show5"
+                            checked>Remember me
+                    </nx-checkbox>
 
-                <nx-checkbox
-                        name="show" id="show"
-                        [(ngModel)]="show"
-                        [checked]="true"
-                        disabled>Remember me (disabled)
-                </nx-checkbox>
+                    <label for="show1">Remember me</label>
+                </div>
 
                 <div class="form-group">
                     <nx-checkbox
-                            name="fldAgree" id="fldAgree" #spyAgree
-                            [(ngModel)]="agree"
-                            required>I agree to T&C (required)
+                            name="show"
+                            compId="show"
+                            [(ngModel)]="show"
+                            [checked]="true"
+                            disabled>
                     </nx-checkbox>
+
+                    <label for="show">Remember me (disabled)</label>
+                </div>
+
+                <div class="form-group">
+                    <nx-checkbox
+                            name="fldAgree"
+                            compId="fldAgree" #spyAgree
+                            [(ngModel)]="agree"
+                            required>
+                    </nx-checkbox>
+
+                    <label for="fldAgree">I agree to T&C (required)</label>
                     <!--component: {{spyAgree | json}}-->
                     <div class="help-block input-error input-error--required">Required</div>
                 </div>
@@ -84,6 +97,8 @@
             </form>
 
             <br/>
+            value: {{show5}}
+            <br/>
             value: {{show}}
             <br />
             <!--value (required): {{agree}}-->
@@ -109,7 +124,8 @@
                     </div>
                     <div>
                         <nx-checkbox
-                                name="show2" id="show2"
+                                name="show2"
+                                compId="show2"
                                 [(ngModel)]="show"
                                 [checked]="true">
                         </nx-checkbox>
@@ -117,11 +133,16 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-6 border-right"></div>
+                    <div class="col-6 border-right">
+                        <label for="fldEdit">
+                            <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                        </label>
+                    </div>
                     <div>
                         <nx-checkbox
-                                name="fldEdit" id="fldEdit"
-                                [(ngModel)]="edit"><span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                                name="fldEdit"
+                                compId="fldEdit"
+                                [(ngModel)]="edit">
                         </nx-checkbox>
                     </div>
                 </div>
@@ -141,11 +162,12 @@
                 <table border="1" cellpadding="10">
                     <tr>
                         <td>
-                            <label for="show2" style="margin: 0">This is a separate label:</label>
+                            <label for="show3">This is a separate label:</label>
                         </td>
                         <td>
                             <nx-checkbox
-                                    name="show2" id="show3"
+                                    name="show3"
+                                    compId="show3"
                                     [(ngModel)]="show"
                                     [checked]="true">
                             </nx-checkbox>
@@ -154,10 +176,14 @@
                     <tr>
                         <td colspan="2">
                             <nx-checkbox
-                                    name="fldEdit" id="fldEdit3"
-                                    [(ngModel)]="edit"><span class="glyphicon glyphicon-pencil "
-                                                             title="Used for writing"></span>
+                                    name="fldEdit"
+                                    compId="fldEdit3"
+                                    [(ngModel)]="edit">
                             </nx-checkbox>
+
+                            <label for="fldEdit3">
+                                <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
+                            </label>
                         </td>
                     </tr>
                 </table>

@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import *
 from django.contrib.auth.models import Group
-from .forms import *
+from api.forms import *
+from api.models import *
 # Register your models here.
 from cloud import settings
 from cms.admin import CMSAdmin

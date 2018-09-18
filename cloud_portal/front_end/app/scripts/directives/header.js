@@ -6,10 +6,10 @@
         .module('cloudApp')
         .directive('nxHeader', NxHeader);
 
-    NxHeader.$inject = [ 'nxDialogsService', 'cloudApi', 'account', '$location', '$route',
+    NxHeader.$inject = [ 'NxDialogsService', 'cloudApi', 'account', '$location', '$route',
         'systemsProvider', 'configService' ];
 
-    function NxHeader(nxDialogsService, cloudApi, account, $location, $route,
+    function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
                       systemsProvider, configService) {
 
         const CONFIG = configService.config;
@@ -26,7 +26,7 @@
                 }
 
                 scope.login = function () {
-                    nxDialogsService.login(false);
+                    NxDialogsService.login(false);
                 };
                 scope.logout = function () {
                     account.logout();

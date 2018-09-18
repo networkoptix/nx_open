@@ -1,12 +1,13 @@
 <div class="container auth-visible" process-loading="gettingSystem">
     <div ng-if="systemNoAccess" class="text-center">
         <h1>Fehler beim Zugriff auf das System</h1>
-        <p>Dieser Link ist kaputt,<br>
+        <h3>Dieser Link ist kaputt,<br>
             System könnte von %PRODUCT_NAME% getrennt werden,<br>
             Zugriff auf dieses System könnte widerrufen werden, <br>
-            oder Sie könnten in einem anderen Account angemeldet sein</p>
-        <p>
-            <a href="/systems" class="btn btn-default">Verfügbare Systemliste</a>
+            oder Sie könnten in einem anderen Account angemeldet sein
+        </h3>
+        <p class="mt-4 d-flex justify-content-center">
+            <a href="/systems" class="btn btn-primary">Verfügbare Systemliste</a>
         </p>
     </div>
 

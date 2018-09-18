@@ -72,7 +72,7 @@
                                                 <li class="video-settings-divider buffer"
                                                     ng-if="betaMode || debugMode"></li>
                                                 <li class="video-settings-button" ng-if="betaMode || debugMode"
-                                                    ng-click="voiceControls.showCommands=!voiceControls.showCommands">
+                                                    ng-click="toggleVoice()">
                                                         <span>
                                                             <span ng-class="{'voice-active': voiceControls.enabled}"
                                                                   class="glyphicon glyphicon-bullhorn"></span>

@@ -1,4 +1,5 @@
 {
+  "language": "en_US",
   "language_name": "Deutsch",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
@@ -61,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Erweiterter Betrachter",
-      "description": "Kann Livevideos ansehen, das Archiv durchsuchen, Kameras konfigurieren, PTZ steuern, etc"
+      "description": "Kann Livevideo ansehen, das Archiv durchsuchen, PTZ steuern usw"
     },
     "Administrator": {
       "label": "Administrator",
@@ -176,6 +177,7 @@
     "confirmUnshareAction": "Löschen",
     "successDisconnected": "Das System wurde erfoglreich von %PRODUCT_NAME% getrennt",
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
+    "successMerge": "System {{systemName}}} wurde mit {{systemName}}} zusammengeführt",
     "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
   },
   "account": {
@@ -265,5 +267,53 @@
   "header": {
     "allSystems": "Alle Systeme",
     "systems": "Systeme"
+  },
+  "common": {
+    "cameraLinks": {
+      "highStream": "Hoher Stream",
+      "lowStream": "Niedriger Stream",
+      "transcoding": "Umkodierung",
+      "unknown": "Unbekannt",
+      "copyToClipboard": "in zwischenablage kopieren",
+      "copyDefaultText": "kopieren",
+      "copyActiveText": "in die zwischenablage kopiert"
+    },
+    "systemOffline": "System offline",
+    "systemHasNoCameras": "KEINE KAMERAS",
+    "cameraStates": {
+      "offline": "Offline",
+      "error": "Fehler",
+      "unauthorized": "Authentifizierung erforderlich",
+      "noData": "Keine Daten",
+      "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
+      "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos abzuspielen.",
+      "flashOrWebmRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a> oder<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM Codec</a>, um Videos im Internet Explorer abzuspielen.",
+      "noArmSupport": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.",
+      "noFormat": "Dieser Browser unterstützt keine Videowiedergabe von dieser Kamera.",
+      "ieNoWebm": "Installieren Sie bitte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM Codec</a> für den Internet Explorer.",
+      "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
+      "ubuntuNX": "Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Bitte, verwenden Sie den Browser Chromium."
+    },
+    "searchCamPlaceholder": "Suche",
+    "resolution": {
+      "auto": "Auto",
+      "high": "Hoch",
+      "low": "Niedrig"
+    },
+    "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
+    "voiceCommands": {
+      "play": "Abspielen",
+      "pause": "Pause",
+      "live": "live gehen | live anzeigen",
+      "view": "ansicht + [kameraname]",
+      "search": "finden + [text für suchleiste]",
+      "clear search": "suche zurücksetzen",
+      "expand server": "server erweitern + [Servername]",
+      "collapse server": "server zusammenklappen + [Servername]",
+      "expand all servers": "alle Server erweitern",
+      "collapse all servers": "alle server zusammenklappen",
+      "stop listening": "abhören stoppen",
+      "help": "hilfe | befehle anzeigen"
+    }
   }
 }

@@ -14,7 +14,8 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Check Log In
-    Log In    ${EMAIL UNREGISTERED}    ${password}
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Log In    ${random email}    ${password}
     Wait Until Element Is Visible    ${ACCOUNT NOT FOUND}
     Log In    ${email}    ${password}    None
     Validate Log In

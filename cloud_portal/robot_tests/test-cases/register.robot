@@ -59,52 +59,12 @@ should register user with correct credentials
     Register    mark    hamill    ${email}    ${password}
     Validate Register Success
 
-should register user with cyrillic First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should register user with smiley First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${SMILEY TEXT}    ${SMILEY TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should register user with glyph First and Last names and correct credentials
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${GLYPH TEXT}    ${GLYPH TEXT}    ${email}    ${password}
-    Validate Register Success
-
-should allow `~!@#$%^&*()_:\";\'{}[]+<>?,./ in First and Last name fields
-    [tags]    C41863
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    ${SYMBOL TEXT}    ${SYMBOL TEXT}    ${email}    ${password}
-    Validate Register Success
-
 should allow !#$%&'*+-/=?^_`{|}~ in email field
-    ${email}    Get Random Symbol Email
+    [documentation]    This is here because testing activation with the '&' freaks out Python's imaplib so we test that our form accepts it.
+    [tags]
+    ${email}    Get Random Symbol Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
-    Validate Register Success
-
-allows register with leading space in email
-    [tags]    C41557
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${SPACE}${email}    ${password}
-    Validate Register Success
-
-allows register with trailing space in email
-    [tags]    C41557
-    ${email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${email}${SPACE}    ${password}
     Validate Register Success
 
 with valid inputs no errors are displayed
@@ -184,7 +144,7 @@ should respond to Tab key
     Press Key    ${PRIVACY POLICY LINK}    ${ENTER}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${url}/content/privacy
+    Location Should Be    ${PRIVACY POLICY URL}
     Select Window    @{tabs}[0]
 
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
@@ -208,7 +168,9 @@ should open Privacy Policy in a new page
     Wait Until Element Is Visible    ${PRIVACY POLICY LINK}
     Click Link    ${PRIVACY POLICY LINK}
     Sleep    2    #This is specifically for Firefox
-    Location Should Be    ${url}/content/privacy
+    ${windows}    Get Window Handles
+    Select Window    @{windows}[2]
+    Location Should Be    ${PRIVACY POLICY URL}
 
 should suggest user to log out, if he was logged in and goes to registration link
     Log In    ${EMAIL VIEWER}    ${password}
@@ -274,7 +236,7 @@ Cannot register email that is already activated
     Register    mark    hamill    ${email}    ${password}
     Wait Until Element Is Visible    //form[@name="registerForm"]//span[@ng-if="registerForm.registerEmail.$error.alreadyExists" and text()="${EMAIL ALREADY REGISTERED TEXT}"]
 
-Check registration email links
+Check registration email links, colors, cloud name, and user name
     [tags]    C24211
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -282,13 +244,16 @@ Check registration email links
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
-    Log   ${email text}
+
+    Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
+    Check Email User Names    ${email text}    ${TEST FIRST NAME}    ${TEST LAST NAME}
+    Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
+
     Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
     ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    %PRODUCT_NAME%    Nx Cloud
     ${links}    Get Links From Email    ${email}
-    log    ${links}
-    @{expected links}    Set Variable    ${SUPPORT_URL}    ${WEBSITE_URL}    ${ENV}    ${ENV}/activate
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/activate
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
     Delete Email    ${email}
