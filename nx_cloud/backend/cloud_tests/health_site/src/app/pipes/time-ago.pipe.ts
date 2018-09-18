@@ -8,20 +8,22 @@ export class TimeAgoPipe implements PipeTransform {
 
     transform(value: any, args?: any): any {
         // Calculate item's age
-        let t1 = new Date(value).getTime();
-        let t2 = new Date(args).getTime();
-        let age: any = (t2 - t1) / 1000;
+        const t1: any = new Date(value);
+        const t2: any = new Date(args);
+        const age: any = Math.round((t2.getTime() - t1.getTime()) / 1000);
+
+        let result: any = 'more than a day';
 
         if (age < 10) {
-            age = 'few seconds ago';
+            result = 'few seconds ago';
         }  else if (age < 60) {
-            age = Math.ceil(age) + ' seconds ago';
+            result = Math.floor(age) + ' seconds ago';
         } else if (age < 3600) {
-            age = Math.ceil(age / 60) + ' minutes ago';
+            result = Math.floor(age / 60) + ' minutes ago';
         } else if (age < 86400) {
-            age = Math.ceil((age / 60) / 24) + ' hours ago';
+            result = Math.floor((age / 60) / 60) + ' hours ago';
         }
 
-        return '(' + age + ')';
+        return '(' + result + ')';
     }
 }
