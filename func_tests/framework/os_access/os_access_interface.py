@@ -175,7 +175,7 @@ class OSAccess(object):
         except DoesNotExist:
             pass
 
-    def _limit_free_disk_space(self, should_leave_bytes):
+    def _limit_free_disk_space(self, should_leave_bytes):  # type: (int) -> ...
         delta_bytes = self.free_disk_space_bytes() - should_leave_bytes
         if delta_bytes > 0:
             try:
@@ -187,6 +187,7 @@ class OSAccess(object):
 
     @contextmanager
     def free_disk_space_limited(self, should_leave_bytes, interval_sec=1):
+        # type: (int, float) -> ContextManager[...]
         """Try to maintain limited free disk space while in this context.
 
         One-time allocation (reservation) of disk space is not enough. OS or other software
