@@ -2318,7 +2318,7 @@ void MediaServerProcess::registerRestHandlers(
      *     for all requested cameras. Start time and duration are in milliseconds since epoch.
      *     Duration of -1 means the last chunk is being recorded now.
      */
-    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler(serverModule(), "ec2/recordedTimePeriods")); //< new version
+    reg(QnMultiserverChunksRestHandler::kUrlPath, new QnMultiserverChunksRestHandler(serverModule())); //< new version
 
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler(serverModule()));
 
