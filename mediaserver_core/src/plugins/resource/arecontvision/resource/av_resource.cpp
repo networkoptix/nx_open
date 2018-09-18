@@ -38,12 +38,18 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
       m_zoneSite(8),
       m_channelCount(0),
-      m_prevMotionChannel(0),
+      m_currentMotionChannel(0),
       m_dualsensor(false),
       m_inputPortState(false),
       m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
+}
+
+QnPlAreconVisionResource::~QnPlAreconVisionResource()
+{
+    if (m_metadataClientBusy)
+        m_metadataClient.pleaseStopSync();
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -368,40 +374,100 @@ bool QnPlAreconVisionResource::isH264() const
 
 QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
 {
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QString mdresult;
-    if (m_channelCount == 1)
-    {
-        if (!getApiParameter(QLatin1String("mdresult"), mdresult))
-            return QnMetaDataV1Ptr(0);
-    }
-    else
-    {
-        if (!getParamPhysical2(m_prevMotionChannel+1, QLatin1String("mdresult"), mdresult))
-            return QnMetaDataV1Ptr(0);
-        motion->channelNumber = m_prevMotionChannel;
-        ++m_prevMotionChannel;
-        if (m_prevMotionChannel == m_channelCount)
-            m_prevMotionChannel = 0;
-    }
+    if (!m_metadataClientBusy)
+        getCameraMetadataAsync();
 
-    if (mdresult == lit("no motion"))
+    std::lock_guard<std::mutex> lock(m_metadataMutex);
+    if (m_metadataQueue.empty())
+        return nullptr;
+
+    QnMetaDataV1Ptr result = m_metadataQueue.front();
+    m_metadataQueue.pop();
+    return result;
+}
+
+void QnPlAreconVisionResource::getCameraMetadataAsync()
+{
+    QString path = "/get";
+    int channel = 0;
+    if (m_channelCount > 1)
+    {
+        channel = m_currentMotionChannel;
+        m_currentMotionChannel = (m_currentMotionChannel + 1) % m_channelCount;
+        path += QString::number(channel + 1);
+    }
+    QAuthenticator auth = getAuth();
+    QUrl url;
+    url.setScheme("http");
+    url.setHost(getHostAddress());
+    url.setPort(80);
+    url.setPath(path);
+    url.setQuery("mdresult");
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
+
+    m_metadataClientBusy = true;
+    m_metadataClient.doGet(url,
+        [this, channel]()
+        {
+            m_metadataClientBusy = false;
+            if (m_metadataClient.state() == nx_http::AsyncClient::sFailed)
+            {
+                NX_WARNING(this, lm("Failed to get motion meta data, error: %1").arg(
+                    SystemError::toString(m_metadataClient.lastSysErrorCode())));
+                return;
+            }
+
+            if (!m_metadataClient.response())
+            {
+                NX_WARNING(this, lm("Failed to get motion meta data, invalid response"));
+                return;
+            }
+
+            const int statusCode = m_metadataClient.response()->statusLine.statusCode;
+            if (statusCode != nx_http::StatusCode::ok)
+            {
+                NX_WARNING(this, lm("Failed to get motion meta data. Http error code %1")
+                    .arg(statusCode));
+                return;
+            }
+            QString result = QString::fromLatin1(m_metadataClient.fetchMessageBodyBuffer());
+            auto motion = parseMotionMetadata(channel, result);
+            if (motion)
+            {
+                std::lock_guard<std::mutex> lock(m_metadataMutex);
+                m_metadataQueue.push(std::move(motion));
+            }
+        }
+    );
+}
+
+QnMetaDataV1Ptr QnPlAreconVisionResource::parseMotionMetadata(int channel, const QString& response)
+{
+    int index = response.indexOf('=');
+    if (index == -1)
+    {
+        NX_WARNING(this, lm("Failed to get motion meta data. Invalid response format %1")
+            .arg(response));
+        return nullptr;
+    }
+    QString motionStr = response.mid(index + 1);
+    QnMetaDataV1Ptr motion(new QnMetaDataV1());
+    motion->channelNumber = channel;
+    if (motionStr == lit("no motion"))
         return motion; // no motion detected
 
-
     int zones = totalMdZones() == 1024 ? 32 : 8;
-
-    QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
+    QStringList md = motionStr.split(L' ', QString::SkipEmptyParts);
     if (md.size() < zones*zones)
-        return QnMetaDataV1Ptr(0);
+        return nullptr;
 
     int pixelZoneSize = getZoneSite() * 32;
     if (pixelZoneSize == 0)
-        return QnMetaDataV1Ptr(0);
+        return nullptr;
 
     QVariant maxSensorWidth = getProperty(lit("MaxSensorWidth"));
     QVariant maxSensorHight = getProperty(lit("MaxSensorHeight"));
-
     QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
     QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
 
@@ -411,19 +477,13 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
         {
             int index = y*zones + x;
             QString m = md.at(index);
-
-
             if (m == lit("00") || m == lit("0"))
                 continue;
 
             QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
-
             motion->mapMotion(imageRect, currZoneRect);
-
         }
     }
-
-    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
     motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return motion;
 }
@@ -547,6 +607,7 @@ QString QnPlAreconVisionResource::generateRequestString(
 // ===============================================================================================================================
 bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value) {
     QUrl devUrl(getUrl());
+
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     QString request = lit("get?") + id;
@@ -798,34 +859,6 @@ std::vector<QnPlAreconVisionResource::AdvancedParametersProvider*>
     QnPlAreconVisionResource::advancedParametersProviders()
 {
     return {&m_advancedParametersProvider};
-}
-
-bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)
-{
-    m_mutex.lock();
-    m_mutex.unlock();
-    QUrl devUrl(getUrl());
-
-    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
-    QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
-
-    CLHttpStatus status = connection.doGET(request);
-    if (status == CL_HTTP_AUTH_REQUIRED)
-        setStatus(Qn::Unauthorized);
-
-    if (status != CL_HTTP_SUCCESS)
-        return false;
-
-
-    QByteArray response;
-    connection.readAll(response);
-    int index = response.indexOf('=');
-    if (index==-1)
-        return false;
-
-    val = QLatin1String(response.mid(index+1));
-
-    return true;
 }
 
 #endif

@@ -8,6 +8,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/network/http/http_async_client.h>
 
 class QDomElement;
 
@@ -21,6 +22,7 @@ public:
     static const QString MANUFACTURE;
 
     QnPlAreconVisionResource();
+    ~QnPlAreconVisionResource();
 
     CLHttpStatus getRegister(int page, int num, int& val);
     CLHttpStatus setRegister(int page, int num, int val);
@@ -60,6 +62,7 @@ public:
     int getZoneSite() const;
 
     QnMetaDataV1Ptr getCameraMetadata();
+
     QString generateRequestString(
         const QHash<QByteArray, QVariant>& streamParam,
         bool h264,
@@ -106,16 +109,25 @@ protected:
     QString m_description;
 
 private:
+    void getCameraMetadataAsync();
+    QnMetaDataV1Ptr parseMotionMetadata(int channel, const QString& response);
+
+private:
     int m_totalMdZones;
     int m_zoneSite;
     int m_channelCount;
-    int m_prevMotionChannel;
+    int m_currentMotionChannel;
     bool m_dualsensor;
     bool m_inputPortState;
     nx_http::AsyncHttpClientPtr m_relayInputClient;
+
     AvParametersProvider m_advancedParametersProvider;
 
-    bool getParamPhysical2(int channel, const QString& name, QString &val);
+    std::mutex m_metadataMutex;
+    std::queue<QnMetaDataV1Ptr> m_metadataQueue;
+    nx_http::AsyncClient m_metadataClient;
+    std::atomic<bool> m_metadataClientBusy = false;
+
     void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
 };
 
