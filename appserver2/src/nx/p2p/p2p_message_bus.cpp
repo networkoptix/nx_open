@@ -23,7 +23,8 @@
 namespace nx {
 namespace p2p {
 
-const QString MessageBus::kUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kDeprecatedUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kUrlPath(lit("/ec2/transactionBus"));
 const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;

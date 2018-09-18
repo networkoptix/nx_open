@@ -16,7 +16,7 @@ namespace dao {
 
 struct TransactionData
 {
-    const nx::String& systemId;
+    const std::string& systemId;
     const CommandHeader& header;
     const QByteArray& hash;
     const QByteArray& ubjsonSerializedTransaction;
@@ -45,13 +45,13 @@ public:
 
     virtual nx::sql::DBResult updateTimestampHiForSystem(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         quint64 newValue) = 0;
 
     // TODO: #ak Too many arguments in following method.
     virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         const QString& peerId,
         const QString& dbInstanceId,
         std::int64_t minSequence,

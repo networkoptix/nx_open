@@ -7,7 +7,6 @@ namespace nx {
 namespace system_commands {
 namespace domain_socket {
 
-int acceptConnection(const char* path);
 int readFd(int fd);
 bool readInt64(int fd, int64_t* value);
 

@@ -10,6 +10,11 @@
 #include <nx/streaming/video_data_packet.h>
 #include <core/resource/camera_resource.h>
 
+namespace {
+
+    static const int kErrorDelayTimeoutMs = 100;
+
+} // namespace
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev)
     :
@@ -59,10 +64,8 @@ void QnClientPullMediaStreamProvider::run()
         if (data == nullptr)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(CL_STREAM_ISSUE);
-            if (!needToStop())
-                QnSleep::msleep(30);
-
+            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
+            QnSleep::msleep(kErrorDelayTimeoutMs);
             continue;
         }
 

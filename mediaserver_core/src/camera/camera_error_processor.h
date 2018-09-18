@@ -15,12 +15,12 @@ class ErrorProcessor: public QObject
 public:
     ErrorProcessor(QnMediaServerModule* serverModule);
 public slots:
-    void onStreamReaderError(
+    void onStreamReaderEvent(
         QnAbstractMediaStreamDataProvider* streamReader,
-        QnAbstractMediaStreamDataProvider::ErrorCode code);
+        CameraDiagnostics::Result error);
     void processNoError(QnAbstractMediaStreamDataProvider* streamReader);
 private:
-    void processStreamIssueError(QnAbstractMediaStreamDataProvider* streamReader);
+    void processStreamError(QnAbstractMediaStreamDataProvider* streamReader, CameraDiagnostics::Result error);
 };
 
 } // namespace nx::mediaserver::camera

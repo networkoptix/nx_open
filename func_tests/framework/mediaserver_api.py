@@ -27,6 +27,7 @@ DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
+DEFAULT_TAKE_REMOTE_SETTINGS = False
 
 
 class MediaserverApiRequestError(Exception):
@@ -489,7 +490,6 @@ class MediaserverApi(object):
         attributes.update(kwargs)
         self.generic.post('ec2/saveCameraUserAttributes', attributes)
 
-
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
@@ -544,6 +544,9 @@ class MediaserverApi(object):
     def system_mediaserver_ids(self):
         return set(self.system_mediaservers_status().keys())
 
+    def system_mediaservers_all_online(self):
+        return all(status == 'Online' for status in self.system_mediaservers_status().values())
+
     _merge_logger = _logger.getChild('merge')
 
     @context_logger(_setup_logger, 'framework.waiting')
@@ -554,7 +557,7 @@ class MediaserverApi(object):
             remote_api,  # type: MediaserverApi
             remote_address,  # type: IPAddress
             remote_port,
-            take_remote_settings=False,
+            take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -562,8 +565,12 @@ class MediaserverApi(object):
         logger.info("Merge %s to %s (takeRemoteSettings: %s):", self, remote_api, take_remote_settings)
         master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
         master_system_id = master_api.get_local_system_id()
+        if master_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(master_api))
         logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
         servant_system_id = servant_api.get_local_system_id()
+        if servant_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(servant_api))
         logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)
@@ -586,11 +593,10 @@ class MediaserverApi(object):
             raise ExplicitMergeError(self, remote_api, e.error, e.error_string)
         servant_api.generic.http.set_credentials(master_api.generic.http.user, master_api.generic.http.password)
         wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
-        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=10)
+        wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
         all_ids = master_ids | servant_ids
-        all_online = {id: 'Online' for id in all_ids}
         wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
-        wait_for_equal(master_api.system_mediaservers_status, all_online, timeout_sec=30)
+        wait_for_truthy(master_api.system_mediaservers_all_online, timeout_sec=30)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):

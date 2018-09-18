@@ -34,6 +34,7 @@ template<typename Reason>
 void assertFailure(
     bool isCritical, const char* file, int line, const char* condition, const Reason& message)
 {
+    // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
     #if defined(ANDROID) || defined(__ANDROID__)
         const auto out = lm("ASSERTION FAILED: %1:%2 (%3) %4\nAndroid backtrace:\n%5")
             .arg(file).arg(line).arg(condition).arg(message).arg(buildBacktrace());

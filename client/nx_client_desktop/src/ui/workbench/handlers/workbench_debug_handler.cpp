@@ -47,6 +47,7 @@
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <nx/client/desktop/debug_utils/dialogs/credentials_store_dialog.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
@@ -134,6 +135,8 @@ public:
         addButton(lit("Applaucher control"), [this] { (new QnApplauncherControlDialog(this))->show();});
 
         addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
+
+        addButton("Credentials", [this]{ (new CredentialsStoreDialog(this))->show(); });
 
         addButton(lit("Custom Settings Test"), [this]
             { (new CustomSettingsTestDialog(this))->show(); });
@@ -235,15 +238,15 @@ public:
                 for (int i = 0; i < 5; ++i)
                 {
                     nx::api::AnalyticsDriverManifest manifest;
-                    manifest.driverId = QnUuid::createUuid();
-                    manifest.driverName.value = lit("Driver %1").arg(i);
-                    manifest.driverName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
+                    manifest.pluginId = lit("nx.generatedDriver.%1").arg(i);
+                    manifest.pluginName.value = lit("Plugin %1").arg(i);
+                    manifest.pluginName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
                         nx::api::Analytics::EventType eventType;
-                        eventType.typeId = QnUuid::createUuid();
+                        eventType.id = "";
                         eventType.name.value = lit("Event %1").arg(j);
-                        eventType.name.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
+                        eventType.name.localization[lit("ru_RU")] = lit("Russian %1").arg(j);
                         manifest.outputEventTypes.push_back(eventType);
                     }
 
@@ -264,7 +267,7 @@ public:
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
                         const auto randomDriver = nx::utils::random::choice(drivers);
-                        if (randomDriver.driverId.isNull()) //< dummy driver
+                        if (randomDriver.pluginId.isEmpty()) //< dummy driver
                         {
                             camera->setAnalyticsSupportedEvents({});
                         }
@@ -276,7 +279,7 @@ public:
                                 std::back_inserter(supported),
                                 [](const nx::api::Analytics::EventType& eventType)
                                 {
-                                    return eventType.typeId;
+                                    return eventType.id;
                                 });
                             camera->setAnalyticsSupportedEvents(supported);
                         }

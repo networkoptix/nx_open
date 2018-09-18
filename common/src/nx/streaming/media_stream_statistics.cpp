@@ -18,10 +18,7 @@ void QnMediaStreamStatistics::resetStatistics()
     m_startTime = QDateTime::currentDateTime();
     m_frames = 0;
     m_dataTotal = 0;
-    m_badsensor = false;
-
-    for (int i = 0; i < CL_STAT_END; ++i)
-        m_events[i].amount = 0;
+    m_numberOfErrors = 0;
 
     for (int i = 0; i < CL_STATS_NUM; ++i)
     {
@@ -37,8 +34,6 @@ void QnMediaStreamStatistics::resetStatistics()
     m_runing = true;
 
     m_first_ondata_call = true;
-
-    setConnectionLost(false);
 }
 
 void QnMediaStreamStatistics::stop()
@@ -60,8 +55,8 @@ void QnMediaStreamStatistics::onData(unsigned int datalen, bool isKeyFrame)
         if (isKeyFrame)
             ++m_keyFrames;
 
-        m_dataTotal+=datalen;
-        setConnectionLost(false);
+        m_dataTotal += datalen;
+        updateStatisticsUnsafe(CameraDiagnostics::NoErrorResult());
     }
 
     if (m_first_ondata_call)
@@ -139,55 +134,36 @@ float QnMediaStreamStatistics::getAverageGopSize() const
     return static_cast<float>( m_frames ) / static_cast<float>( m_keyFrames );
 }
 
-void QnMediaStreamStatistics::onBadSensor()
-{
-    if (!m_runing) return;
-    m_badsensor = true;
-}
-bool QnMediaStreamStatistics::badSensor() const
-{
-    return m_badsensor;
-}
-
-void QnMediaStreamStatistics::onEvent(QnMediaStreamStatisticsEvent event)
+void QnMediaStreamStatistics::onEvent(CameraDiagnostics::Result event)
 {
     if (!m_runing)
         return;
 
     onData(0, /*isKeyFrame*/ false);
 
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
+    updateStatisticsUnsafe(event);
+}
 
-    m_events[event].amount++;
-
-    if (event == CL_STAT_DATA)
+void QnMediaStreamStatistics::updateStatisticsUnsafe(CameraDiagnostics::Result event)
+{
+    if (event.errorCode == CameraDiagnostics::ErrorCode::noError)
     {
-        setConnectionLost(false);
-        return;
+        if (m_numberOfErrors > 0)
+            emit streamEvent(event); //< Report no error.
+        m_numberOfErrors = 0;
     }
-
-    // Error event processing
-    if (m_events[event].amount  % kMaxErrorsToReportIssue == 0)
-        setConnectionLost(true);
+    else
+    {
+        ++m_numberOfErrors;
+        if (m_numberOfErrors % kMaxErrorsToReportIssue == 0)
+            emit streamEvent(event);
+    }
 }
 
-unsigned long QnMediaStreamStatistics::totalEvents(QnMediaStreamStatisticsEvent event) const
+bool QnMediaStreamStatistics::isConnectionLost() const
 {
-    QnMutexLocker locker( &m_mutex );
-    return m_events[event].amount;
-}
-
-float QnMediaStreamStatistics::eventsPerHour(QnMediaStreamStatisticsEvent event) const
-{
-    QnMutexLocker locker( &m_mutex );
-    QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
-
-    unsigned long seconds = m_startTime.secsTo(current);
-    if (seconds==0)
-        seconds = 1; // // to avoid devision by zero
-
-    float hours = seconds/3600.0;
-    return m_events[event].amount/hours;
+    return m_numberOfErrors >= kMaxErrorsToReportIssue;
 }
 
 float QnMediaStreamStatistics::getavBitrate() const
@@ -222,20 +198,6 @@ unsigned long QnMediaStreamStatistics::totalSecs() const
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
     return m_startTime.secsTo(current);
 
-}
-
-void QnMediaStreamStatistics::setConnectionLost(bool value)
-{
-    if (value)
-        emit connectionLost(); //< Send signal periodically.
-    else if (m_connectionLost)
-        emit connectionBackToNormal(); //< Send signal once.
-    m_connectionLost = value;
-}
-
-bool QnMediaStreamStatistics::isConnectionLost() const
-{
-    return m_connectionLost;
 }
 
 qint64 QnMediaStreamStatistics::getTotalData() const

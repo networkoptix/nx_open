@@ -36,7 +36,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
+    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
  
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
     virtual void executeAction(

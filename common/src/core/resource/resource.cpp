@@ -372,7 +372,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (hasFlags(Qn::removed))
         return;
 
-    NX_ASSERT(commonModule());
     if (!commonModule())
         return;
 
@@ -380,6 +379,8 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
+
+    NX_DEBUG(this, "Status changed to %1: %2", newStatus, reason);
     commonModule()->statusDictionary()->setValue(id, newStatus);
     doStatusChanged(oldStatus, newStatus, reason);
 }

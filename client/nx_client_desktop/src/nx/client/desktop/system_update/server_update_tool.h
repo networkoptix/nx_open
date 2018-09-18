@@ -56,6 +56,8 @@ public:
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
 
+    bool hasOfflineUpdateChanges() const;
+
     // Try to get status changes from the server
     // Should be non-blocking and fast.
     // Check if we've got update for all the servers
@@ -73,7 +75,7 @@ public:
         Initial,
         Unpack,     //< Unpacking all the packages and checking the contents.
         Ready,      //< Ready to push packages to the servers.
-        Push,       //< Pushing to the servers
+        Push,       //< Pushing to the servers.
         Done        //< All update contents are pushed to the servers. They can start the update.
     };
 
@@ -91,59 +93,60 @@ public:
         nx::update::InformationError error = nx::update::InformationError::noError;
     };
 
-    static UpdateCheckResult checkUpdateFromInternet(QString updateUrl);
-    static UpdateCheckResult checkSpecificBuildFromInternet(QString updateUrl, int build);
-
+    std::future<UpdateCheckResult> checkLatestUpdate();
+    std::future<UpdateCheckResult> checkSpecificChangeset(QString build, QString password);
     std::future<UpdateCheckResult> checkUpdateFromFile(QString file);
 
     // Start uploading local update packages to the server(s).
     // TODO: There can be some status
-    void startUpload();
+    // @param changeset
+    void startUpload(QString changeset);
     void stopUpload();
 
+    struct ProgressInfo
+    {
+        int current = 0;
+        int max = 0;
+    };
+
+    // Calculates a progress for uploading files to the server.
+    ProgressInfo calcUploadProgress();
+    // Calculates a progress for remote downloading.
+    ProgressInfo calcRemoteDownloadProgress();
+    // Calculates a progress for remote downloading.
+    ProgressInfo calcInstallProgress();
+
+    OfflineUpdateState getUploaderState() const;
 private:
     // Handlers for resource updates.
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_resourceChanged(const QnResourcePtr& resource);
 
-    // We pass this callback to all our REST queries at /api/updates2
     void at_updateStatusResponse(bool success, rest::Handle handle, const std::vector<nx::update::Status>& response);
-    // Handler for status update from a single server
+    // Handler for status update from a single server.
     void at_updateStatusResponse(bool success, rest::Handle handle, const nx::update::Status& response);
 
-    void at_uploadStateChanged(QnUuid serverId, const UploadState& state);
+    // Note: should keep long name for UploadState to make Qt moc catch this signal properly.
+    void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
 
     // Werapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
     rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server);
 
-    OfflineUpdateState getOfflineUpdateState() const;
     void stopOfflineUpdate();
 
     // Called by QnZipExtractor when the offline update package is unpacked.
     void at_extractFilesFinished(int code);
 
     static UpdateCheckResult readUpdateManifest(QString path);
-
     QnMediaServerResourceList getServersForUpload();
 
-    struct UploadSet
-    {
-        // List of the files to be uploaded.
-        QStringList files;
-        // Remaining files to be uploaded.
-        QStringList remaining;
-        // Maps upload id to filename
-        std::map<QString, QString> active;
-    };
-
-    void uploadNext(QnMediaServerResourcePtr server, UploadSet& state);
-
 private:
-    OfflineUpdateState iterateOfflineUpdater();
 
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::Initial;
+    bool m_offlineUpdateStateChanged = false;
+
     QString m_offlineUpdateFile;
     std::promise<UpdateCheckResult> m_offlineUpdateCheckResult;
 
@@ -165,9 +168,17 @@ private:
     std::unique_ptr<UploadManager> m_uploadManager;
     QStringList m_filesToUpload;
 
-    std::map<QnUuid, UploadSet> m_uploadState;
+    std::set<QString> m_activeUploads;
+    std::set<QString> m_completedUploads;
+    std::map<QString, nx::client::desktop::UploadState> m_uploadState;
 
-    QTemporaryDir m_outputDir;
+    // Current update manifest.
+    nx::update::Information m_updateManifest;
+
+    QString m_uploadDestination;
+
+    QDir m_outputDir;
+    QString m_changeset;
 };
 
 } // namespace desktop

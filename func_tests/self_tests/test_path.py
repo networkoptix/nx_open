@@ -32,7 +32,7 @@ def windows_vm(vm_types):
 
 @pytest.fixture()
 def smb_path_cls(windows_vm):
-    return windows_vm.os_access.Path
+    return windows_vm.os_access.path_cls
 
 
 @pytest.fixture(params=['local_path_cls', 'ssh_path_cls', 'smb_path_cls'])
@@ -222,6 +222,23 @@ def test_read_from_non_existent(remote_test_dir):
         _ = non_existent_file.read_bytes()
 
 
+def test_size(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.write_bytes(b'X' * 100500)
+    assert path.size() == 100500
+
+
+def test_size_of_nonexistent(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    pytest.raises(DoesNotExist, path.size)
+
+
+def test_size_of_a_dir(remote_test_dir):
+    path = remote_test_dir / 'to_measure_size.dat'
+    path.mkdir()
+    pytest.raises(NotAFile, path.size)
+
+
 def test_glob_on_file(existing_remote_file):
     with pytest.raises(NotADir):
         _ = list(existing_remote_file.glob('*'))
@@ -262,8 +279,7 @@ def remote_file_path(request, path_type, name):
     if path_type == 'smb':
         vm_fixture_name = 'windows_vm'
     vm = request.getfixturevalue(vm_fixture_name)
-    path_class = vm.os_access.Path
-    tmp_dir = path_class.tmp()
+    tmp_dir = vm.os_access.path_cls.tmp()
     tmp_dir.mkdir(parents=True, exist_ok=True)
     base_remote_dir = tmp_dir.joinpath(__name__ + '-remote')
     return base_remote_dir.joinpath(request.node.name + '-' + name)

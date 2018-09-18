@@ -11,7 +11,7 @@ def pytest_addoption(parser):
         help='Dummy smb:// url pointing to existing file.')
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def winrm(windows_vm):
     return windows_vm.os_access.winrm
 
@@ -21,12 +21,12 @@ def winrm_shell(winrm):
     return winrm._shell()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def ssh(linux_vm):
     return linux_vm.os_access.shell
 
 
-@pytest.fixture(scope='session', params=['linux', 'windows', 'local'])
+@pytest.fixture(params=['linux', 'windows', 'local'])
 def os_access(request):
     if request.param == 'local':
         return local_access
@@ -41,6 +41,6 @@ def os_access_temp_dir(os_access, node_dir):
     if os_access is local_access:
         return node_dir
     else:
-        dir = os_access.Path.tmp()
+        dir = os_access.path_cls.tmp()
         dir.mkdir(parents=True, exist_ok=True)
         return dir

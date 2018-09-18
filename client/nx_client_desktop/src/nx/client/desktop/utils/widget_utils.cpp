@@ -24,6 +24,18 @@ void WidgetUtils::removeLayout(QLayout* layout)
             removeLayout(childLayout);
         delete item;
     }
+    delete layout;
+}
+
+void WidgetUtils::setFlag(QWidget* widget, Qt::WindowFlags flags, bool value)
+{
+    auto initialFlags = widget->windowFlags();
+    if (value)
+        initialFlags |= flags;
+    else
+        initialFlags &= ~flags;
+
+    widget->setWindowFlags(initialFlags);
 }
 
 const QWidget* WidgetUtils::graphicsProxiedWidget(const QWidget* widget)

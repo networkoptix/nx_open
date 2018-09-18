@@ -85,8 +85,6 @@ CdbLauncher::CdbLauncher(QString tmpDir):
     addArg("-db/maxConnections");
     addArg(QByteArray::number(dbConnectionOptionsToUse.maxConnectionCount).constData());
 
-    addArg("--accountManager/loginExistenceConcealDelay=1ms");
-
     EMailManagerFactory::setFactory(
         [](const conf::Settings& /*settings*/){
             return std::make_unique<EmailManagerStub>(nullptr);

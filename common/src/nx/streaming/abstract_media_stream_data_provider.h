@@ -17,12 +17,6 @@ class QnAbstractMediaStreamDataProvider: public QnAbstractStreamDataProvider
 
 public:
 
-    enum class ErrorCode
-    {
-        noError,
-        streamIssue
-    };
-
     explicit QnAbstractMediaStreamDataProvider(const QnResourcePtr& res);
     virtual ~QnAbstractMediaStreamDataProvider();
 
@@ -48,7 +42,7 @@ public:
     virtual bool hasThread() const { return true; }
     virtual bool reinitResourceOnStreamError() const { return true; }
 signals:
-    void streamError(QnAbstractMediaStreamDataProvider* streamReader, ErrorCode ecode);
+    void streamEvent(QnAbstractMediaStreamDataProvider* streamReader, CameraDiagnostics::Result result);
 protected:
     virtual void sleepIfNeeded() {}
 

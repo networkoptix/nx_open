@@ -23,7 +23,7 @@ public:
 
     TransactionLogReader(
         TransactionLog* const transactionLog,
-        nx::String systemId,
+        const std::string& systemId,
         Qn::SerializationFormat dataFormat);
     ~TransactionLogReader();
 
@@ -37,11 +37,11 @@ public:
 
     // TODO: #ak following method MUST be asynchronous
     vms::api::TranState getCurrentState() const;
-    nx::String systemId() const;
+    std::string systemId() const;
 
 private:
     TransactionLog* const m_transactionLog;
-    const nx::String m_systemId;
+    const std::string m_systemId;
     const Qn::SerializationFormat m_dataFormat;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     bool m_terminated;

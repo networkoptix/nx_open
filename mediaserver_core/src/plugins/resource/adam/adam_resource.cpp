@@ -30,7 +30,7 @@ QnAdamResource::QnAdamResource(QnMediaServerModule* serverModule):
 QnAdamResource::~QnAdamResource()
 {
     directDisconnectAll();
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
     if (m_ioManager)
         m_ioManager->terminate();
 }
@@ -70,24 +70,18 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
             lit("couldn't get valid response from device"));
     }
 
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
-
-    caps |= Qn::RelayInputCapability;
-    caps |= Qn::RelayOutputCapability;
-
     m_ioManager.reset(new QnAdamModbusIOManager(this));
 
-    QnIOPortDataList allPorts = getInputPortList();
-    QnIOPortDataList outputPorts = getRelayOutputList();
-    allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
+    auto ports = m_ioManager->getInputPortList();
+    auto outputs = m_ioManager->getOutputPortList();
+    ports.insert(ports.begin(), ports.begin(), ports.end());
 
     m_portTypes.clear();
-    for (const auto& port: allPorts)
+    for (const auto& port: ports)
         m_portTypes[port.id] = port.portType;
 
     setPortDefaultStates();
-    setIOPorts(allPorts);
-    setCameraCapabilities(caps);
+    setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
 
     setFlags(flags() | Qn::io_module);
     setProperty(Qn::VIDEO_DISABLED_PARAM_NAME, 1);
@@ -98,10 +92,10 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+void QnAdamResource::startInputPortStatesMonitoring()
 {
     if (!m_ioManager)
-        return false;
+        return;
 
     auto callback = [this](QString portId, nx_io_managment::IOPortState inputState)
     {
@@ -115,7 +109,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
         if (ioPortType == Qn::PT_Input)
         {
-            emit cameraInput(
+            emit inputPortStateChanged(
                 toSharedPointer(),
                 portId,
                 isActive != isDefaultPortStateActive,
@@ -123,7 +117,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         }
         else if (ioPortType == Qn::PT_Output)
         {
-            emit cameraOutput(
+            emit outputPortStateChanged(
                 toSharedPointer(),
                 portId,
                 isActive != isDefaultPortStateActive,
@@ -146,41 +140,13 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
     m_ioManager->setInputPortStateChangeCallback(callback);
     m_ioManager->setNetworkIssueCallback(networkIssueHandler);
 
-    return m_ioManager->startIOMonitoring();
+    m_ioManager->startIOMonitoring();
 }
 
-void QnAdamResource::stopInputPortMonitoringAsync()
+void QnAdamResource::stopInputPortStatesMonitoring()
 {
     if (m_ioManager)
         m_ioManager->stopIOMonitoring();
-}
-
-bool QnAdamResource::isInputPortMonitored() const
-{
-    if (m_ioManager)
-        return m_ioManager->isMonitoringInProgress();
-
-    return false;
-}
-
-QnIOPortDataList QnAdamResource::mergeIOPortData(
-    const QnIOPortDataList& deviceIO,
-    const QnIOPortDataList& savedIO) const
-{
-    QnIOPortDataList resultIO = deviceIO;
-    for (auto& result : resultIO)
-    {
-        for(const auto& saved : savedIO)
-        {
-            if (result.id == saved.id)
-            {
-                result = saved;
-                break;
-            }
-        }
-    }
-
-    return resultIO;
 }
 
 void QnAdamResource::setPortDefaultStates()
@@ -202,51 +168,7 @@ void QnAdamResource::setPortDefaultStates()
     }
 }
 
-QnIOPortDataList QnAdamResource::getRelayOutputList() const
-{
-    if (m_ioManager)
-    {
-        auto deviceOutputs = m_ioManager->getOutputPortList();
-        auto savedIO = QJson::deserialized<QnIOPortDataList>(
-            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-
-        QnIOPortDataList savedOutputs;
-
-        for (const auto& ioPort: savedIO)
-        {
-            if (ioPort.portType == Qn::PT_Output)
-                savedOutputs.push_back(ioPort);
-        }
-
-        return mergeIOPortData(deviceOutputs, savedOutputs);
-    }
-
-    return QnIOPortDataList();
-}
-
-QnIOPortDataList QnAdamResource::getInputPortList() const
-{
-    if (m_ioManager)
-    {
-        auto deviceInputs = m_ioManager->getInputPortList();
-        auto savedIO = QJson::deserialized<QnIOPortDataList>(
-            getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-
-        QnIOPortDataList savedInputs;
-
-        for (const auto& ioPort: savedIO)
-        {
-            if (ioPort.portType == Qn::PT_Input)
-                savedInputs.push_back(ioPort);
-        }
-
-        return mergeIOPortData(deviceInputs, savedInputs);
-    }
-
-    return QnIOPortDataList();
-}
-
-QnIOStateDataList QnAdamResource::ioStates() const
+QnIOStateDataList QnAdamResource::ioPortStates() const
 {
     if (m_ioManager)
         return m_ioManager->getPortStates();
@@ -254,7 +176,7 @@ QnIOStateDataList QnAdamResource::ioStates() const
     return QnIOStateDataList();
 }
 
-bool QnAdamResource::setRelayOutputState(
+bool QnAdamResource::setOutputPortState(
     const QString& outputId,
     bool isActive,
     unsigned int autoResetTimeoutMs )
@@ -309,9 +231,9 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString&
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
-        auto ports = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
+        auto ports = ioPortDescriptions();
         setPortDefaultStates();
-        setIOPorts(ports);
+        setIoPortDescriptions(std::move(ports), /*needMerge*/ true);
         saveParams();
     }
 }

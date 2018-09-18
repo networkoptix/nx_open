@@ -458,7 +458,7 @@ vms::api::PeerDataEx deserializePeerData(
         {
             nx::vms::api::PeerDataEx result;
             result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-            result.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
+            result.protoVersion = nx_ec::EC2_PROTO_VERSION;
             return result;
         };
 
@@ -479,7 +479,7 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
 {
     QUrlQuery query(request.requestLine.url.query());
 
-    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
+    Qn::SerializationFormat dataFormat = Qn::JsonFormat;
     if (query.hasQueryItem(QString::fromLatin1("format")))
         QnLexical::deserialize(query.queryItemValue(QString::fromLatin1("format")), &dataFormat);
 
@@ -492,17 +492,16 @@ vms::api::PeerDataEx deserializePeerData(const network::http::Request& request)
             result.instanceId = QnUuid(query.queryItemValue("runtime-guid"));
     }
 
-    if (result.peerType == nx::vms::api::PeerType::notDefined &&
-        query.hasQueryItem("peerType"))
+    if (result.peerType == nx::vms::api::PeerType::notDefined)
     {
         result.peerType = QnLexical::deserialized<vms::api::PeerType>(
             query.queryItemValue("peerType"),
-            vms::api::PeerType::notDefined);
+            vms::api::PeerType::desktopClient);
     }
 
     if (result.id.isNull())
         result.id = QnUuid::createUuid();
-
+    result.dataFormat = dataFormat;
     return result;
 }
 

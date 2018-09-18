@@ -10,8 +10,6 @@
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
 #include <common/common_module.h>
-#include <common/static_common_module.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 
 #include <nx/vms/api/types/motion_types.h>
@@ -99,20 +97,6 @@ static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResour
 QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     return audioLayout;
-}
-
-bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
-{
-    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
-    if (!cameraResource)
-        return false;
-
-    if (!m_hasVideo.is_initialized())
-    {
-        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
-        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
-    }
-    return *m_hasVideo;
 }
 
 void QnMediaResource::initMediaResource()

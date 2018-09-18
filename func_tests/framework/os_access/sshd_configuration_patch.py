@@ -1,5 +1,11 @@
+from typing import Mapping
+
+from framework.os_access.os_access_interface import OSAccess
+
+
 def _patch_sshd_config(root_os_access, new_settings, config_path='/etc/ssh/sshd_config'):
-    config_path = root_os_access.Path(config_path)
+    # type: (OSAccess, Mapping[str, str], str) -> None
+    config_path = root_os_access.path_cls(config_path)
     current_lines = config_path.read_text(encoding='ascii').splitlines()  # Preserve new line at the end!
     updated_lines = list()
     presented_keys = set()

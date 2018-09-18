@@ -101,13 +101,14 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
     if (!isStreamOpened())
     {
-        QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
+        if (!needToStop())
+            QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage.
 
         closeStream(); // to release resources
 
         setNeedKeyData();
         if (isInitialized)
-            m_stat[0].onEvent(CL_STREAM_ISSUE);
+            m_stat[0].onEvent(m_openStreamResult);
     }
 
     return m_openStreamResult;
@@ -157,10 +158,9 @@ void CLServerPushStreamReader::run()
         if (data == nullptr)
         {
             setNeedKeyData();
-            m_stat[0].onEvent(CL_STREAM_ISSUE);
-
-            if (m_stat[0].isConnectionLost())
-                QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage
+            m_openStreamResult = CameraDiagnostics::BadMediaStreamResult();
+            m_stat[0].onEvent(m_openStreamResult);
+            QnSleep::msleep(kErrorDelayTimeoutMs); //< To avoid large CPU usage
             continue;
         }
 
@@ -215,8 +215,6 @@ void CLServerPushStreamReader::run()
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
-        //qDebug() << "fps = " << m_stat[0].getFrameRate();
-
         // check queue sizes
         if (dataCanBeAccepted())
             putData(std::move(data));
@@ -265,7 +263,7 @@ void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& res)
 
 }
 
-CameraDiagnostics::Result CLServerPushStreamReader::openStreamResult() const
+CameraDiagnostics::Result CLServerPushStreamReader::lastOpenStreamResult() const
 {
     return m_openStreamResult;
 }

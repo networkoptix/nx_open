@@ -28,7 +28,7 @@ public:
     TransactionDataObjectInMemory():
         m_peerGuid(QnUuid::createUuid()),
         m_peerDbId(QnUuid::createUuid()),
-        m_systemId(QnUuid::createUuid().toSimpleByteArray()),
+        m_systemId(QnUuid::createUuid().toSimpleByteArray().toStdString()),
         m_peerSequence(0),
         m_transactionDataObject(kMaxSupportedProtocolVersion),
         m_lastAddedTransaction(m_peerGuid),
@@ -98,7 +98,7 @@ protected:
 private:
     const QnUuid m_peerGuid;
     const QnUuid m_peerDbId;
-    const nx::String m_systemId;
+    const std::string m_systemId;
     std::int64_t m_peerSequence;
     data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
     nx::vms::api::UserData m_transactionData;
@@ -111,7 +111,7 @@ private:
         const auto sharing =
             cdb::test::BusinessDataGenerator::generateRandomSharing(
                 cdb::test::BusinessDataGenerator::generateRandomAccount(),
-                m_systemId.toStdString());
+                m_systemId);
         ec2::convert(sharing, &m_transactionData);
     }
 

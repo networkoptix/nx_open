@@ -183,7 +183,8 @@ static void removeLegacyCookie(
 void Authenticator::setAccessCookie(
     const nx::network::http::Request& request,
     nx::network::http::Response* response,
-    Qn::UserAccessData access)
+    Qn::UserAccessData access,
+    bool secure)
 {
     removeLegacyCookie(request, response);
 
@@ -192,7 +193,7 @@ void Authenticator::setAccessCookie(
         return m_sessionKeys.addOrUpdate(sessionKey, access); //< Use existing if possible.
 
     const auto newSessionKey = m_sessionKeys.make(access);
-    response->setCookie(kCookieRuntimeGuid, newSessionKey);
+    response->setCookie(kCookieRuntimeGuid, newSessionKey, "/", secure);
 }
 
 void Authenticator::removeAccessCookie(

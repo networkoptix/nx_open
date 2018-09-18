@@ -1,18 +1,18 @@
-#ifndef IP_LINE_EDIT_H
-#define IP_LINE_EDIT_H
-
+#pragma once
 #include <QtWidgets/QLineEdit>
 
-class QnIpLineEdit: public QLineEdit{
+class QnIpLineEdit: public QLineEdit
+{
     Q_OBJECT
 typedef QLineEdit base_type;
 
 public:
     explicit QnIpLineEdit(QWidget* parent=0);
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    virtual QSize sizeHint() const override;
+    virtual QSize minimumSizeHint() const override;
+
 protected:
-    virtual void keyPressEvent(QKeyEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void focusOutEvent(QFocusEvent* event) override;
 };
 
-#endif // IP_LINE_EDIT_H

@@ -21,7 +21,6 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/api/analytics/driver_manifest.h>
-#include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/analytics_helper.h>
 
 #include <utils/email/email.h>
@@ -127,7 +126,7 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
 
 bool QnCameraInputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return (camera->getCameraCapabilities() & Qn::RelayInputCapability);
+    return (camera->getCameraCapabilities() & Qn::InputPortCapability);
 }
 
 QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool detailed)
@@ -143,7 +142,7 @@ QString QnCameraInputPolicy::getText(const QnResourceList &resources, const bool
 
 bool QnCameraOutputPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera)
 {
-    return camera->getCameraCapabilities() & Qn::RelayOutputCapability;
+    return camera->getCameraCapabilities() & Qn::OutputPortCapability;
 }
 
 QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const bool detailed)

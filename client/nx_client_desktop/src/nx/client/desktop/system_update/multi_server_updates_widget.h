@@ -79,13 +79,11 @@ protected:
 
     void at_startUpdateAction();
     bool at_cancelCurrentAction();
-
-    //void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
-
-    void setModeLocalFile();
-    void setModeSpecificBuild();
-    void setModeLatestAvailable();
     void hideStatusColumns(bool value);
+
+    void clearUpdateInfo();
+    void pickLocalFile();
+    void pickSpecificBuild();
 
 private:
     // UI Mode for picking the source of update.
@@ -139,19 +137,15 @@ private:
 
     static bool restartClient(const nx::utils::SoftwareVersion& version);
 
-    struct ProgressInfo
-    {
-        int current = 0;
-        int max = 0;
-    };
-
-    ProgressInfo calculateActionProgress() const;
+    ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
     bool processRemoteChanges(bool force = false);
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
     void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
     void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
+
+    bool processUploaderChanges(bool force = false);
 
     // Advances UI FSM towards selected state.
     void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});

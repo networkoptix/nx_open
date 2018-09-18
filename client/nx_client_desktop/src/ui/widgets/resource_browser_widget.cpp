@@ -1065,7 +1065,7 @@ QnResourceSearchQuery QnResourceBrowserWidget::query() const
 
 void QnResourceBrowserWidget::setQuery(const QnResourceSearchQuery& query)
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
+    QScopedValueRollback<bool> guard(m_ignoreFilterChanges, true);
 
     ui->filterLineEdit->lineEdit()->setText(query.text);
 

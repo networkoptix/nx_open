@@ -64,7 +64,7 @@ public:
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent = 0);
+    explicit ServerUpdatesModel(QObject* parent = nullptr);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);

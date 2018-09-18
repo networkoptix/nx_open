@@ -5,6 +5,10 @@
 #include <api/runtime_info_manager.h>
 #include <transaction/abstract_transaction_message_bus.h>
 #include <transaction/abstract_transaction_transport.h>
+#include <common/common_module.h>
+#include <transaction/message_bus_adapter.h>
+
+using namespace nx::vms;
 
 namespace ec2 {
 
@@ -41,6 +45,12 @@ void ClientRegistrar::onNewConnectionEstablished(
     loadQueryParams(&peerRuntimeInfo, transport->httpQueryParams());
 
     m_runtimeInfoManager->updateRemoteItem(peerRuntimeInfo);
+
+    auto commonModule = m_messageBus->commonModule();
+    ec2::QnTransaction<api::RuntimeData> tran(
+        ec2::ApiCommand::runtimeInfoChanged, commonModule->moduleGUID());
+    tran.params = peerRuntimeInfo.data;
+    commonModule->ec2Connection()->messageBus()->sendTransaction(tran);
 }
 
 void ClientRegistrar::loadQueryParams(

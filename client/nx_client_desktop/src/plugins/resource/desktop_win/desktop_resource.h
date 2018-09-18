@@ -25,6 +25,8 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 
+    bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
+
 private:
     QnAbstractStreamDataProvider* createDataProviderInternal();
 

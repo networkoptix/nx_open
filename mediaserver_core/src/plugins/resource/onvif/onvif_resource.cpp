@@ -351,7 +351,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
             if (!outputTask.active)
             {
                 //returning port to inactive state
-                setRelayOutputStateNonSafe(
+                setOutputPortStateNonSafe(
                     0,
                     outputTask.outputID,
                     outputTask.active,
@@ -362,7 +362,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         }
     }
 
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
@@ -733,15 +733,15 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     fetchRelayOutputs(&relayOutputs);
     if (!relayOutputs.empty())
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
         // TODO #ak it's not clear yet how to get input port list for sure
         // (on DW cam getDigitalInputs returns nothing),
         // but all cameras I've seen have either both input & output or none.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
 
         //resetting all ports states to inactive
         for (auto i = 0; i < relayOutputs.size(); ++i)
-            setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
+            setOutputPortStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
     }
 
     if (m_appStopping)
@@ -802,19 +802,16 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
             ->InputConnectors;
     }
 
-    auto allPorts = getRelayOutputList();
+    auto allPorts = generateOutputPorts();
     const auto inputPorts = generateInputPorts(inputCount);
 
     m_inputPortCount = inputPorts.size();
     const auto outputPortCount = allPorts.size();
 
     allPorts.insert(allPorts.cend(), inputPorts.cbegin(), inputPorts.cend());
-    setIOPorts(std::move(allPorts));
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
 
     m_portNamePrefixToIgnore = resourceData.value<QString>("portNamePrefixToIgnore", QString());
-    setCameraCapability(Qn::RelayInputCapability, m_inputPortCount > 0);
-    setCameraCapability(Qn::RelayOutputCapability, outputPortCount > 0);
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1243,7 +1240,7 @@ void QnPlOnvifResource::onRelayInputStateChange(const QString& name, const Relay
     }
 
     NX_DEBUG(this, lm("Input port '%1' = %2").args(portId, state.value));
-    emit cameraInput(
+    emit inputPortStateChanged(
         toSharedPointer(),
         portId,
         state.value,
@@ -1510,8 +1507,7 @@ static QString getRelayOutpuToken(const QnPlOnvifResource::RelayOutputInfo& rela
     return QString::fromStdString(relayInfo.token);
 }
 
-// !Implementation of QnSecurityCamResource::getRelayOutputList
-QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
+QnIOPortDataList QnPlOnvifResource::generateOutputPorts() const
 {
     QStringList idList;
     std::transform(
@@ -1531,12 +1527,6 @@ QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
     return result;
 }
 
-QnIOPortDataList QnPlOnvifResource::getInputPortList() const
-{
-    //TODO/IMPL
-    return QnIOPortDataList();
-}
-
 bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilitiesResponse)
 {
     if (m_deviceIOUrl.empty())
@@ -1551,7 +1541,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
         < (int) MAX_IO_PORTS_PER_DEVICE)
     {
         // Camera has input port.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     }
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
@@ -1606,8 +1596,8 @@ bool QnPlOnvifResource::fetchPtzInfo()
     return true;
 }
 
-//!Implementation of QnSecurityCamResource::setRelayOutputState
-bool QnPlOnvifResource::setRelayOutputState(
+//!Implementation of QnSecurityCamResource::setOutputPortState
+bool QnPlOnvifResource::setOutputPortState(
     const QString& outputID,
     bool active,
     unsigned int autoResetTimeoutMS)
@@ -1616,7 +1606,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
     using namespace std::placeholders;
     const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, active,
+        std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, active,
             autoResetTimeoutMS),
         std::chrono::milliseconds::zero());
     m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, active, autoResetTimeoutMS);
@@ -3135,17 +3125,10 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
     return result.take();
 }
 
-bool QnPlOnvifResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& /*completionHandler*/)
+void QnPlOnvifResource::startInputPortStatesMonitoring()
 {
-    if (hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability))
-    {
-        return false;
-    }
-
     if (!m_eventCapabilities.get())
-        return false;
+        return;
 
     {
         QnMutexLocker lk(&m_ioPortMutex);
@@ -3155,7 +3138,6 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync(
 
     const auto result = subscribeToCameraNotifications();
     NX_DEBUG(this, lit("Port monitoring has started: %1").arg(result));
-    return result;
 }
 
 void QnPlOnvifResource::scheduleRetrySubscriptionTimer()
@@ -3194,7 +3176,7 @@ bool QnPlOnvifResource::subscribeToCameraNotifications()
         return false;
 }
 
-void QnPlOnvifResource::stopInputPortMonitoringAsync()
+void QnPlOnvifResource::stopInputPortStatesMonitoring()
 {
     //TODO #ak this method MUST become asynchronous
     quint64 nextPullMessagesTimerIDBak = 0;
@@ -3481,12 +3463,6 @@ void QnPlOnvifResource::removePullPointSubscription()
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult));
         return;
     }
-}
-
-bool QnPlOnvifResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk(&m_ioPortMutex);
-    return m_inputMonitored;
 }
 
 template<class _NumericInt>
@@ -3810,7 +3786,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     return m_videoLayout;
 }
 
-void QnPlOnvifResource::setRelayOutputStateNonSafe(
+void QnPlOnvifResource::setOutputPortStateNonSafe(
     quint64 timerID,
     const QString& outputID,
     bool active,
@@ -3899,7 +3875,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         //adding task to reset port state
         using namespace std::placeholders;
         const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, !active, 0),
+            std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, !active, 0),
             std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }

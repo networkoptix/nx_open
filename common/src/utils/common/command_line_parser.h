@@ -16,7 +16,7 @@ class QTextStream;
 struct QnCommandLineDefaultImpliedValue {};
 Q_DECLARE_METATYPE(QnCommandLineDefaultImpliedValue);
 
-namespace detail {
+namespace command_line_parser_detail {
     inline QVariant defaultImpliedValue() {
         return QVariant(qMetaTypeId<QnCommandLineDefaultImpliedValue>(), static_cast<const void *>(NULL));
     }
@@ -25,20 +25,20 @@ namespace detail {
 class QnCommandLineParameter {
 public:
     template<class T>
-    QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue()) {
         init<T>(target, longName, shortName, description, impliedValue);
     }
 
     template<class T>
-    QnCommandLineParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    QnCommandLineParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue()) {
         init<T>(target, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
     }
 
-    QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue()) {
         init(NULL, type, longName, shortName, description, impliedValue);
     }
 
-    QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue()) {
         init(NULL, type, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
     }
 
@@ -95,17 +95,17 @@ public:
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
-    void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
-    void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
+    void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue());
+    void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue());
 
     template<class T>
-    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue())
     {
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }
 
     template<class T>
-    void addParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    void addParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = command_line_parser_detail::defaultImpliedValue())
     {
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }

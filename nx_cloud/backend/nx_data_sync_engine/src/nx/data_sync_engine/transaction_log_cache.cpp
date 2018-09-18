@@ -15,7 +15,7 @@ VmsTransactionLogCache::VmsTransactionLogCache():
 }
 
 bool VmsTransactionLogCache::isShouldBeIgnored(
-    const nx::String& systemId,
+    const std::string& systemId,
     const CommandHeader& tran,
     const QByteArray& hash) const
 {

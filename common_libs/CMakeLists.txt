@@ -15,7 +15,6 @@ endif()
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_audio)
     add_subdirectory(nx_media)
-    add_subdirectory(nx_vms_utils)
 endif()
 
 if((withMediaServer OR withDesktopClient) AND NOT targetDevice STREQUAL edge1)

@@ -1,4 +1,5 @@
 import calendar
+from functools import wraps
 import itertools
 import logging
 import socket
@@ -8,6 +9,7 @@ from contextlib import closing
 from datetime import datetime, timedelta
 
 import pytz
+import six
 from pylru import lrudecorator
 from pytz import utc
 
@@ -153,3 +155,27 @@ def get_internet_time(address='time.rfc868server.com', port=37):
     remote_as_posix_timestamp = remote_as_rfc868_timestamp - posix_to_rfc868_diff.total_seconds()
     remote_as_datetime = datetime.fromtimestamp(remote_as_posix_timestamp, utc)
     return RunningTime(remote_as_datetime, request_duration)
+
+
+def with_traceback(fn):
+    @wraps(fn)  # critical for VMFactory.map to work
+    def wrapper(*args, **kw):
+        try:
+            return fn(*args, **kw)
+        except Exception:
+            _logger.exception('Exception in %r:', fn)
+            raise
+    return wrapper
+
+
+def parse_size(value):
+    try:
+        return int(value)
+    except ValueError:
+        unit = value[-1].upper()
+        multipliers = {'K': 1024, 'M': 1024 * 1024, 'G': 1024 * 1024 * 1024}
+        try:
+            multiplier = multipliers[unit]
+        except KeyError:
+            raise ValueError('Unknown unit {}'.format(unit))
+        return int(float(value[:-1]) * multiplier)  # `float` allows support for '5.5M' or '0.1G'.

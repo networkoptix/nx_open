@@ -63,6 +63,10 @@ class HttpClient(object):
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]).encode())
         return key.decode('ascii')
 
+    @property
+    def base_url(self):
+        return self._base_url
+
     def url(self, path):
         # noinspection PyProtectedMember
         return self._base_url._replace(auth=None, path='/' + path.lstrip('/')).url
@@ -98,18 +102,18 @@ class HttpApi(object):
     def request(self, method, path, timeout=None, **kwargs):
         return {}
 
-    def get(self, path, params=None, **kwargs):
+    def get(self, path, params=None, timeout=None, **kwargs):
         params_str = pformat(params, indent=4)
         if '\n' in params_str or len(params_str) > 60:
             params_str = '\n' + params_str
-        _logger.debug('GET %s, params: %s', self.http.url(path), params_str)
+        _logger.debug('GET %s, params: %s, timeout: %s sec', self.http.url(path), params_str, timeout)
         assert 'data' not in kwargs
         assert 'json' not in kwargs
-        return self.request('GET', path, params=params, **kwargs)
+        return self.request('GET', path, params=params, timeout=timeout, **kwargs)
 
-    def post(self, path, data, **kwargs):
+    def post(self, path, data, timeout=None, **kwargs):
         data_str = json.dumps(data)
         if len(data_str) > 60:
             data_str = '\n' + json.dumps(data, indent=4)
-        _logger.debug('POST %s, payload: %s', self.http.url(path), data_str)
-        return self.request('POST', path, json=data, **kwargs)
+        _logger.debug('POST %s, payload: %s, timeout: %s sec', self.http.url(path), data_str, timeout)
+        return self.request('POST', path, json=data, timeout=timeout, **kwargs)

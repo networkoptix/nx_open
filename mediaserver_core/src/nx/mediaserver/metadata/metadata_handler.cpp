@@ -31,11 +31,11 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::api::Analytics::EventType MetadataHandler::eventDescriptor(const QnUuid& eventId) const
+nx::api::Analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
 {
     for (const auto& descriptor: m_manifest.outputEventTypes)
     {
-        if (descriptor.typeId == eventId)
+        if (descriptor.id == eventTypeId)
             return descriptor;
     }
     return nx::api::Analytics::EventType();
@@ -121,7 +121,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
-        object.objectTypeId = fromPluginGuidToQnUuid(item->typeId());
+        object.objectTypeId = item->typeId();
         object.objectId = fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
@@ -159,11 +159,10 @@ void MetadataHandler::handleMetadataEvent(
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
-    const auto eventTypeId =
-        nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->typeId());
+    const auto eventTypeId = eventData->typeId();
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-    auto descriptor = eventDescriptor(eventTypeId);
+    auto descriptor = eventTypeDescriptor(eventTypeId);
     if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
@@ -184,7 +183,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_manifest.driverId,
+        m_manifest.pluginId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -227,17 +226,18 @@ void MetadataHandler::setVisualDebugger(
     m_visualDebugger = visualDebugger;
 }
 
-nx::vms::api::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
+nx::vms::api::EventState MetadataHandler::lastEventState(const QString& eventTypeId) const
 {
-    if (m_eventStateMap.contains(eventId))
-        return m_eventStateMap[eventId];
+    if (m_eventStateMap.contains(eventTypeId))
+        return m_eventStateMap[eventTypeId];
 
     return nx::vms::api::EventState::inactive;
 }
 
-void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState)
+void MetadataHandler::setLastEventState(
+    const QString& eventTypeId, nx::vms::api::EventState eventState)
 {
-    m_eventStateMap[eventId] = eventState;
+    m_eventStateMap[eventTypeId] = eventState;
 }
 
 } // namespace metadata

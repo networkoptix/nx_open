@@ -17,9 +17,9 @@ class RuleHolder: public QnCommonModuleAware
 {
     using RuleId = QnUuid;
     using ResourceId = QnUuid;
-    using EventTypeId = QnUuid;
+    using EventTypeId = QString;
     using AffectedResources = QSet<QnUuid>;
-    using EventIds = QSet<QnUuid>;
+    using EventIds = QSet<QString>;
     using RuleIds = QSet<QnUuid>;
     using ResourceEvents = QMap<ResourceId, EventIds>;
 
@@ -42,7 +42,7 @@ private:
     bool isAnyResourceRule(const nx::vms::event::RulePtr& rule) const;
     bool isRuleBeingWatched(const QnUuid& ruleId) const;
     bool needToWatchRule(const nx::vms::event::RulePtr& ruleId) const;
-    QnUuid analyticsEventIdFromRule(const nx::vms::event::RulePtr& rule) const;
+    QString analyticsEventTypeIdFromRule(const nx::vms::event::RulePtr& rule) const;
     ResourceEvents calculateWatchedEvents() const;
     AffectedResources handleChanges();
 

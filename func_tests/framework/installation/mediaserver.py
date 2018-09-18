@@ -108,7 +108,8 @@ class BaseMediaserver(object):
 class Mediaserver(BaseMediaserver):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation, port=7001):  # type: (str, Installation, int) -> None
+    def __init__(self, name, installation, port=7001):
+        # type: (str, Installation, int) -> None
         super(Mediaserver, self).__init__(name, installation)
         assert port is not None
         self.name = name
@@ -155,7 +156,7 @@ class Storage(object):
 
     @cached_property  # TODO: Use cached_getter.
     def timezone(self):
-        tzname = self.os_access.Path('/etc/timezone').read_text().strip()
+        tzname = self.os_access.path_cls('/etc/timezone').read_text().strip()
         return pytz.timezone(tzname)
 
     def save_media_sample(self, camera, start_time, sample):

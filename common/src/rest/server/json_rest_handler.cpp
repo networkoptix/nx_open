@@ -85,7 +85,7 @@ JsonRestResponse QnJsonRestHandler::executePut(const JsonRestRequest& request, c
     return response;
 }
 
-int wrongMethod(
+static int setWrongMethodError(
     const QString& path, QnJsonRestResult* result, const QnRestConnectionProcessor* owner)
 {
     result->setError(
@@ -99,28 +99,28 @@ int QnJsonRestHandler::executeGet(
     const QString& path, const QnRequestParams& /*params*/, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    return wrongMethod(path, &result, owner);
+    return setWrongMethodError(path, &result, owner);
 }
 
 int QnJsonRestHandler::executeDelete(
     const QString& path, const QnRequestParams& /*params*/, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    return wrongMethod(path, &result, owner);
+    return setWrongMethodError(path, &result, owner);
 }
 
 int QnJsonRestHandler::executePost(
     const QString& path, const QnRequestParams& /*params*/, const QByteArray& /*body*/,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    return wrongMethod(path, &result, owner);
+    return setWrongMethodError(path, &result, owner);
 }
 
 int QnJsonRestHandler::executePut(
     const QString& path, const QnRequestParams& /*params*/, const QByteArray& /*body*/,
     QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    return wrongMethod(path, &result, owner);
+    return setWrongMethodError(path, &result, owner);
 }
 
 RestResponse QnJsonRestHandler::executeGet(const RestRequest& request)

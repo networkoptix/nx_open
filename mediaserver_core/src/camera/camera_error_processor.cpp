@@ -20,19 +20,17 @@ ErrorProcessor::ErrorProcessor(QnMediaServerModule* serverModule)
 /**
  * General sink for various stream errors signals. Dispatched further according to the error CODE.
  */
-void ErrorProcessor::onStreamReaderError(
+void ErrorProcessor::onStreamReaderEvent(
     QnAbstractMediaStreamDataProvider* streamReader,
-    QnAbstractMediaStreamDataProvider::ErrorCode code)
+    CameraDiagnostics::Result error)
 {
-    switch (code)
+    switch (error.errorCode)
     {
-        case QnAbstractMediaStreamDataProvider::ErrorCode::streamIssue:
-            processStreamIssueError(streamReader);
-            break;
-        case QnAbstractMediaStreamDataProvider::ErrorCode::noError:
+        case CameraDiagnostics::ErrorCode::noError:
             processNoError(streamReader);
             break;
         default:
+            processStreamError(streamReader, error);
             break;
     }
 }
@@ -57,7 +55,9 @@ void ErrorProcessor::processNoError(QnAbstractMediaStreamDataProvider* streamRea
  *     No frames last few seconds from other streams -> set owner's status to OFFLINE
  *     Otherwise -> keep working
  */
-void ErrorProcessor::processStreamIssueError(QnAbstractMediaStreamDataProvider* streamReader)
+void ErrorProcessor::processStreamError(
+    QnAbstractMediaStreamDataProvider* streamReader,
+    CameraDiagnostics::Result error)
 {
     auto ownerResource = streamReader->getResource().dynamicCast<resource::Camera>();
     NX_ASSERT(ownerResource);
@@ -74,8 +74,7 @@ void ErrorProcessor::processStreamIssueError(QnAbstractMediaStreamDataProvider* 
 
     auto mediaStreamProvider = dynamic_cast<QnAbstractMediaStreamProvider*>(streamReader);
 
-    if (mediaStreamProvider
-        && mediaStreamProvider->openStreamResult().errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
+    if (error.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
     {
         ownerResource->setStatus(Qn::Unauthorized);
         return;

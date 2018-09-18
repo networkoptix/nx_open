@@ -96,6 +96,13 @@ QSize QnIpLineEdit::minimumSizeHint() const{
                                       expandedTo(QApplication::globalStrut()), this));
 }
 
+void QnIpLineEdit::focusOutEvent(QFocusEvent *event)
+{
+    auto fixedString = text();
+    validator()->fixup(fixedString);
+    setText(fixedString);
+}
+
 void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
     if (event->key() >= QLatin1Char('0') && event->key() <= QLatin1Char('9')){
         base_type::keyPressEvent(event);

@@ -1858,9 +1858,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::db::cleanupClientInfoList(m_sdb);
 
     if (updateName.endsWith(lit("/99_20170928_update_business_rules_guids.sql")))
-    {
         return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
-    }
 
     if (updateName.endsWith(lit("/99_20170926_refactor_user_access_rights.sql")))
     {
@@ -1895,6 +1893,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             removeBusinessRule(rule->id());
         return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
     }
+
+    if (updateName.endsWith(lit("/99_20180904_analytics_guid_to_string.sql")))
+        return resyncIfNeeded(ResyncRules);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

@@ -6,13 +6,14 @@ from contextlib import closing, contextmanager
 from io import StringIO
 
 import paramiko
+from typing import Mapping, Sequence
 
 from framework import context_logger
 from framework.method_caching import cached_getter
 from framework.os_access import posix_shell
 from framework.os_access.command import Command, Run
 from framework.os_access.local_path import LocalPath
-from framework.os_access.path import copy_file_using_read_and_write
+from framework.os_access.path import FileSystemPath, copy_file_using_read_and_write
 from framework.os_access.posix_shell_path import PosixShellPath
 
 _logger = context_logger.ContextLogger('ssh')
@@ -50,7 +51,8 @@ class _SSHCommandOutcome(posix_shell.Outcome):
 class _SSHRun(Run):
     __metaclass__ = ABCMeta
 
-    def __init__(self, channel, logger):  # type: (paramiko.Channel) -> None
+    def __init__(self, channel, logger):
+        # type: (paramiko.Channel, ...) -> None
         super(_SSHRun, self).__init__()
         self._channel = channel
         self._logger = logger
@@ -165,7 +167,8 @@ class _StraightforwardSSHRun(_SSHRun):
 class _SSHCommand(Command):
     __metaclass__ = ABCMeta
 
-    def __init__(self, ssh_client, script, logger, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
+    def __init__(self, ssh_client, script, logger, terminal=False):
+        # type: (paramiko.SSHClient, str, ..., bool) -> None
         self._ssh_client = ssh_client
         self._script = script
         self._logger = logger
@@ -194,6 +197,7 @@ class SSH(posix_shell.Shell):
             ]))
 
     def command(self, args, cwd=None, env=None, logger=None, set_eux=True):
+        # type: (Sequence[str], FileSystemPath, Mapping[str, str], ..., bool) -> Command
         script = posix_shell.command_to_script(args)
         return self.sh_script(script, cwd=cwd, env=env, logger=logger, set_eux=set_eux)
 

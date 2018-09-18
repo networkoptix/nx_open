@@ -2500,14 +2500,14 @@ void MediaServerProcess::registerRestHandlers(
      *     %param actions List of JSON objects, each describing a set of actions from a particular
      *         metadata plugin.
      *     %param actions[].actionIds List of action ids (strings).
-     *     %param actions[].driverId Id of a metadata plugin which offers the actions.
+     *     %param actions[].pluginId Id of a metadata plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
      * Execute analytics action from the particular metadata plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param driverId Id of a metadata plugin which offers the action.
+     * %param pluginId Id of a metadata plugin which offers the action.
      * %param actionId Id of an action to execute.
      * %param objectId Id of a metadata object to which the action is applied.
      * %param cameraId Id of a camera from which the action was triggered.
@@ -3629,6 +3629,8 @@ void MediaServerProcess::connectStorageSignals(QnStorageManager* storage)
 {
     connect(storage, &QnStorageManager::noStoragesAvailable, this,
         &MediaServerProcess::at_storageManager_noStoragesAvailable);
+    connect(storage, &QnStorageManager::storagesAvailable, this,
+        &MediaServerProcess::at_storageManager_storagesAvailable);
     connect(storage, &QnStorageManager::storageFailure, this,
         &MediaServerProcess::at_storageManager_storageFailure);
     connect(storage, &QnStorageManager::rebuildFinished, this,
