@@ -115,7 +115,7 @@ private:
 
 std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommonModule;
 
-TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
+TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
 {
     givenTwoServerCloudSystem();
     stopServer(1);
