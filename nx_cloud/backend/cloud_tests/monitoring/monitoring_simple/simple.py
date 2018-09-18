@@ -466,6 +466,14 @@ class CloudSession(object):
         assert user is not None, 'No users returned'
         self.vms_user_id = user['vmsUserId']
 
+        r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
+                      auth=self.auth)
+        assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
+
+        user = next(filter(lambda x: x['email'] == self.user_email, data), None)
+        assert user is not None, 'No users returned'
+
+
     @testmethod(debug_skip=True)
     def remove_user(self):
         request_data = {
@@ -477,7 +485,7 @@ class CloudSession(object):
         r = requests.post('{}/cdb/system/share'.format(self.base_url),
                           json=request_data, auth=self.auth)
 
-        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
+        assert r.status_code == 200, "Failed to remove user via cdb. Code: {}".format(r.status_code)
         data = r.json()
         log.info('Remove response: {}'.format(data))
 
@@ -496,7 +504,16 @@ class CloudSession(object):
         data = r.json()
         assert data[0]['systemId'] == self.system_id, 'Wrong System ID'
 
-        assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
+        assert next(filter(lambda x: x['accountEmail'] == self.user_email, data),
+                    None) is None, 'User still exists in cdb'
+
+        r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
+                      auth=self.auth)
+        assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
+
+        data = r.json()
+        assert next(filter(lambda x: x['email'] == self.user_email, data),
+                    None) is None, 'User still exists in vms'
 
 
 @contextmanager
