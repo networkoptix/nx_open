@@ -58,7 +58,6 @@ allows to log in with existing credentials and to log out
     Validate Log Out
 
 redirects to systems after log In
-    [tags]    not-ready
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -184,12 +183,12 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}/..
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}/..
-    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
-    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
+    Set Focus To Element    ${REMEMBER ME CHECKBOX}/../input
+    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
+    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}/../input
 
 handles two tabs, updates second tab state if logout is done on first
     Go To    ${url}/register
