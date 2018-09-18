@@ -1,4 +1,5 @@
 # Specification is at https://networkoptix.atlassian.net/wiki/display/SD/Auto-test+for+cloud+portal+backend
+from contextlib import contextmanager
 from io import StringIO
 import time
 import sys
@@ -12,11 +13,34 @@ import requests
 import boto3
 import docker
 from requests.auth import HTTPDigestAuth
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
+MEDIASERVER_VERSION = '3.1.0.17256'
 CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20100'
-RETRY_TIMEOUT = 5                                   # seconds
+RETRY_TIMEOUT = 5  # seconds
 
 log = logging.getLogger('simple_cloud_test')
+
+
+def requests_retry_session(
+        retries=3,
+        backoff_factor=0.3,
+        status_forcelist=(404, 500, 502, 504),
+        session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 def setup_logging():
@@ -57,7 +81,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                     time.sleep(delay)
 
                 for n_try in range(1, tries + 1):
-                    log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
+                    log.info(
+                        'Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
                     try:
                         f(self)
                         break
@@ -291,7 +316,6 @@ class CloudSession(object):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
             CLOUD_CONNECT_TEST_UTIL_VERSION)
 
-
         log.info('Running image: {} command: {}'.format(image, command))
 
         client = docker.client.from_env()
@@ -432,7 +456,7 @@ class CloudSession(object):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
-                  json=request_data, auth=auth)
+                      json=request_data, auth=auth)
 
     @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
@@ -447,6 +471,57 @@ class CloudSession(object):
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
 
 
+@contextmanager
+def mediaserver():
+    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(MEDIASERVER_VERSION)
+
+    client = docker.client.from_env()
+
+    log.info('Running mediaserver')
+    container = client.containers.run(image, ports={7001: 7001}, detach=True)
+
+    try:
+        mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
+
+        for i in range(12):
+            try:
+                log.info('Testing mediaserver connection...')
+                r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
+                assert r.status_code == 200, 'Status code != 200: {}'.format(r.status_code)
+                response_data = r.json()
+                system_id = response_data['reply']['cloudSystemId']
+                if system_id:
+                    break
+
+                time.sleep(RETRY_TIMEOUT)
+            except ConnectionError as e:
+                assert False, "Couldn't connect to local mediaserver directly: {}".format(e)
+
+        assert system_id, 'Couldn\'t get System ID'
+        log.info('System ID: {}'.format(system_id))
+
+        try:
+            log.info('Waiting for connection through proxy...')
+
+            r = requests_retry_session().get('https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
+            assert r.status_code == 200, "Status != 200: {}".format(r.status_code)
+            assert system_id == r.json()['reply']['cloudSystemId'], "Wrong system id"
+        except ConnectionError as e:
+            assert False, "Couldn't connect to local mediaserver through proxy: {}".format(e)
+
+        yield
+    finally:
+        log.info('Stopping mediaserver')
+        status = container.stop()
+        log.info('Mediaserver exited with exit status {}'.format(status))
+        # stdout = container.logs(stdout=True, stderr=False)
+        # stderr = container.logs(stdout=False, stderr=True)
+        #
+        # log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        # log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        container.remove()
+
+
 def main():
     setup_logging()
 
@@ -457,9 +532,10 @@ def main():
     if len(sys.argv) == 3:
         debug = sys.argv[2] == "debug"
 
-    session = CloudSession(host, debug)
-    status = session.run_tests()
-    session.close()
+    with mediaserver():
+        session = CloudSession(host, debug)
+        status = session.run_tests()
+        session.close()
 
     return status
 
