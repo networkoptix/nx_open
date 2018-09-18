@@ -576,6 +576,7 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
         !m_serverSocket->listen() ||
         !m_serverSocket->setNonBlockingMode(true))
     {
+        NX_ERROR(this, "Error starting server: %1", SystemError::getLastOSErrorText());
         m_serverSocket.reset();
         return false;
     }

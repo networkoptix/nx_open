@@ -14,6 +14,7 @@ namespace gateway {
 
 static const int kDefaultBufferSize = 16 * 1024;
 
+// TODO: check what happens with connectHandler when it will close connection in stream()
 ConnectHandler::ConnectHandler(const conf::Settings& settings):
     m_settings(settings)
 {
@@ -37,7 +38,6 @@ void ConnectHandler::processRequest(
         // No cloud address means direct IP
         if (!m_settings.cloudConnect().allowIpTarget)
             return completionHandler(nx::network::http::StatusCode::forbidden);
-
         if (targetAddress.port == 0)
             targetAddress.port = m_settings.http().proxyTargetPort;
     }
@@ -71,7 +71,7 @@ void ConnectHandler::closeConnection(
 void ConnectHandler::connect(const network::SocketAddress& address)
 {
     NX_DEBUG(this, lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
-        .arg(m_connectionSocket).arg(m_targetSocket));
+        .arg(m_connection->socket()).arg(m_targetSocket));
 
     m_targetSocket->connectAsync(
         address,
@@ -122,10 +122,17 @@ void ConnectHandler::stream(Socket* source, Socket* target, Buffer* buffer)
 {
     source->readSomeAsync(
         buffer,
-        [=](SystemError::ErrorCode result, size_t)
+        [=](SystemError::ErrorCode result, size_t size)
         {
             if (result != SystemError::noError)
                 return socketError(source, result);
+
+            if (size == 0)
+            {
+                closeConnection(SystemError::noError, nullptr);
+                return;
+            }
+
 
             target->sendAsync(
                 *buffer,

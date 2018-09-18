@@ -67,18 +67,44 @@ private:
 };
 
 
+// FIXME: Should fix waitForConnected and waitForReadyRead functions
+//        "This function may fail randomly on Windows. Consider using the event loop and the
+//        connected() signal if your software will run on Windows."
+// See: http://doc.qt.io/qt-5/qabstractsocket.html#waitForConnected.
+
+TEST_F(VmsGatewayConnectTest, connectionClose)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+
+    // Client closes connection.
+    auto clientSocket = connectProxySocket();
+    ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
+        << "Connect failed: " << clientSocket->errorString().toStdString();
+
+    clientSocket->close();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // TODO: remove sleep
+    ASSERT_EQ(server.statistics().onlineConnections, 0);
+
+    clientSocket.reset();
+
+    // Server closes connection.
+    clientSocket = connectProxySocket();
+    ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
+        << "Connect failed: " << clientSocket->errorString().toStdString();
+
+    server.pleaseStopSync();
+    ASSERT_FALSE(clientSocket->waitForReadyRead(kTimeoutMsec));
+    ASSERT_EQ(clientSocket->error(), QAbstractSocket::RemoteHostClosedError);
+}
+
 TEST_F(VmsGatewayConnectTest, IpSpecified)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
     const auto clientSocket = connectProxySocket();
 
-    // FIXME: "This function may fail randomly on Windows. Consider using the event loop and the
-    //         connected() signal if your software will run on Windows."
-    // see: http://doc.qt.io/qt-5/qabstractsocket.html#waitForConnected
     ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
         << "Connect failed: " << clientSocket->errorString().toStdString();
 
-//    QByteArray writeData("1234567");
     QByteArray writeData(utils::random::generate(
         network::test::TestConnection::kReadBufferSize));
     ASSERT_EQ(clientSocket->write(writeData), writeData.size());
@@ -92,7 +118,7 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
     ASSERT_TRUE(writeData.startsWith(readData));
 }
 
-TEST_F(VmsGatewayConnectTest, DISABLED_ConnectNotSupported)
+TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));
     const auto socket = connectProxySocket();
@@ -100,7 +126,7 @@ TEST_F(VmsGatewayConnectTest, DISABLED_ConnectNotSupported)
     server.pleaseStopSync();
 }
 
-TEST_F(VmsGatewayConnectTest, DISABLED_IpForbidden)
+TEST_F(VmsGatewayConnectTest, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, true));
     const auto socket = connectProxySocket();
