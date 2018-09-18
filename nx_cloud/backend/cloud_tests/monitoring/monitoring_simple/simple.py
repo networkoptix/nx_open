@@ -331,7 +331,7 @@ class CloudSession(object):
 
         assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (command: {})'.format(
             command)
-        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
+        assert status['StatusCode'] == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
     def test_cloud_connect_base(self, extra_args=''):
         command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
@@ -419,6 +419,21 @@ class CloudSession(object):
     @testmethod(tries=3, debug_skip=True)
     def share_system(self):
         request_data = {
+            "systemId": self.system_id,
+            "accountEmail": self.user_email,
+            "accessRole": "liveViewer"
+        }
+
+        auth = HTTPDigestAuth(self.email, self.password)
+        r = requests.post('{}/cdb/system/share'.format(self.base_url),
+                          json=request_data, auth=auth)
+
+        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
+        data = r.json()
+        log.info('Share response: {}'.format(data))
+
+    def share_system_via_vms(self):
+        request_data = {
             "email": self.user_email,
             "name": self.user_email,
             "userRoleId": "{00000000-0000-0000-0000-000000000000}",
@@ -435,6 +450,8 @@ class CloudSession(object):
                       request_data, headers=headers)
 
         data = r.json()
+        log.info('Share response: {}'.format(data))
+
         assert 'id' in data, 'No ID'
 
     @testmethod(delay=30, metric='view_and_settings_failure', tries=3, debug_skip=True)
@@ -453,6 +470,21 @@ class CloudSession(object):
 
     @testmethod(debug_skip=True)
     def remove_user(self):
+        request_data = {
+            "systemId": self.system_id,
+            "accountEmail": self.user_email,
+            "accessRole": "none"
+        }
+
+        auth = HTTPDigestAuth(self.email, self.password)
+        r = requests.post('{}/cdb/system/share'.format(self.base_url),
+                          json=request_data, auth=auth)
+
+        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
+        data = r.json()
+        log.info('Remove response: {}'.format(data))
+
+    def remove_user_via_vms(self):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
@@ -503,7 +535,8 @@ def mediaserver():
         try:
             log.info('Waiting for connection through proxy...')
 
-            r = requests_retry_session().get('https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
+            r = requests_retry_session().get(
+                'https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
             assert r.status_code == 200, "Status != 200: {}".format(r.status_code)
             assert system_id == r.json()['reply']['cloudSystemId'], "Wrong system id"
         except ConnectionError as e:
