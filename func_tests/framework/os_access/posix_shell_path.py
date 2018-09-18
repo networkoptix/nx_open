@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractproperty
 from functools import wraps
 
+import parse
 from pathlib2 import PurePosixPath
 
 from framework.os_access import exceptions
@@ -83,7 +84,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         if not self.parts[0].startswith('~'):
             return self
         if self.parts[0] == '~':
-            user_name = self._shell.command(['whoami']).check_output().rstrip('\n')
+            user_name = self._shell.command(['whoami']).run().rstrip('\n')
         else:
             user_name = self.parts[0][1:]
         output = self._shell.run_command(['getent', 'passwd', user_name])
@@ -198,6 +199,19 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         bytes_written = self.write_bytes(data)
         assert bytes_written == len(data)
         return len(text)
+
+    def size(self):
+        command = self._shell.command(['stat', '--printf=%s\\n%F', self])
+        try:
+            output = command.run()
+        except exceptions.exit_status_error_cls(1) as e:
+            if b'No such file or directory' not in e.stderr:
+                raise
+            raise exceptions.DoesNotExist("{} fails with {}".format(command, e.stderr))
+        size, file_type = parse.parse(u'{:d}\n{}', output.decode('ascii'))
+        if file_type != u'regular file':
+            raise exceptions.NotAFile("{} reports {}".format(command, output))
+        return size
 
     def copy_to(self, destination):
         self._shell.copy_posix_file_to(self, destination)

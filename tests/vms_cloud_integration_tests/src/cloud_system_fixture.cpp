@@ -32,7 +32,7 @@ nx::cdb::AccountWithPassword Cloud::registerCloudAccount()
 }
 
 bool Cloud::connectToCloud(
-    ::ec2::test::PeerWrapper& peerWrapper,
+    VmsPeer& peerWrapper,
     const nx::cdb::AccountWithPassword& ownerAccount)
 {
     const auto system = m_cdb.addRandomSystemToAccount(ownerAccount);
@@ -95,7 +95,7 @@ bool Cloud::isSystemOnline(
 
 //-------------------------------------------------------------------------------------------------
 
-VmsSystem::VmsSystem(std::vector<std::unique_ptr<::ec2::test::PeerWrapper>> servers):
+VmsSystem::VmsSystem(std::vector<std::unique_ptr<VmsPeer>> servers):
     m_servers(std::move(servers))
 {
 }
@@ -109,7 +109,7 @@ void VmsSystem::waitUntilAllServersAreInterconnected()
 {
     for (;;)
     {
-        if (::ec2::test::PeerWrapper::arePeersInterconnected(m_servers))
+        if (VmsPeer::peersInterconnected(m_servers))
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -119,19 +119,19 @@ void VmsSystem::waitUntilAllServersSynchronizedData()
 {
     for (;;)
     {
-        if (::ec2::test::PeerWrapper::areAllPeersHaveSameTransactionLog(m_servers))
+        if (VmsPeer::allPeersHaveSameTransactionLog(m_servers))
             break;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
-const ::ec2::test::PeerWrapper& VmsSystem::peer(int index) const
+const VmsPeer& VmsSystem::peer(int index) const
 {
     return *m_servers[index];
 }
 
-::ec2::test::PeerWrapper& VmsSystem::peer(int index)
+VmsPeer& VmsSystem::peer(int index)
 {
     return *m_servers[index];
 }
@@ -144,7 +144,7 @@ std::unique_ptr<VmsSystem> VmsSystem::detachServer(int index)
     auto detachedServer = std::move(m_servers[index]);
     m_servers.erase(m_servers.begin() + index);
 
-    std::vector<std::unique_ptr<::ec2::test::PeerWrapper>> newSystemServers;
+    std::vector<std::unique_ptr<VmsPeer>> newSystemServers;
     newSystemServers.push_back(std::move(detachedServer));
 
     return std::make_unique<VmsSystem>(std::move(newSystemServers));
@@ -210,10 +210,11 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 }
 
 void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
-    VmsSystem* vmsSystem,
+    const VmsPeer& vmsPeer,
+    const std::string& cloudSystemId,
     const nx::cdb::AccountWithPassword& account)
 {
-    auto mediaServerClient = vmsSystem->peer(0).mediaServerClient();
+    auto mediaServerClient = vmsPeer.mediaServerClient();
 
     for (;;)
     {
@@ -234,7 +235,7 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
         m_cloud.cdb().getTransactionLog(
             account.email,
             account.password,
-            vmsSystem->cloudSystemId(),
+            cloudSystemId,
             &cloudTransactionLog);
 
         if (vmsTransactionLog == cloudTransactionLog)
@@ -242,6 +243,16 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+}
+
+void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
+    VmsSystem* vmsSystem,
+    const nx::cdb::AccountWithPassword& account)
+{
+    waitUntilVmsTransactionLogMatchesCloudOne(
+        vmsSystem->peer(0),
+        vmsSystem->cloudSystemId(),
+        account);
 }
 
 } // namespace test

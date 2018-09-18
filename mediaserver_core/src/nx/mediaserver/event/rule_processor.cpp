@@ -9,27 +9,28 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
-#include <core/resource/resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <database/server_db.h>
-#include <utils/common/synctime.h>
-#include <utils/common/app_info.h>
-#include <nx/vms/api/data/event_rule_data.h>
+#include <media_server/media_server_module.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/event/action_factory.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/camera_output_action.h>
+#include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/actions/send_mail_action.h>
-#include <nx/vms/event/actions/camera_output_action.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/aio/aio_service.h>
-#include <media_server/media_server_module.h>
+#include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -712,7 +713,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto camResource = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camResource = resource.dynamicCast<nx::mediaserver::resource::Camera>();
     if (!camResource)
         return;
 
@@ -723,7 +724,8 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
+            auto resList = resourcePool()->getResourcesByIds<nx::mediaserver::resource::Camera>(
+                rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
@@ -800,12 +802,22 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                businessRule->eventResources());
-            if (resList.isEmpty())
-                resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
+            auto camerasToMonitor = resourcePool()
+                ->getResourcesByIds<nx::mediaserver::resource::Camera>(
+                    businessRule->eventResources());
 
-            for (const auto& camera: resList)
+            if (camerasToMonitor.isEmpty())
+            {
+                for (const auto camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    if (auto c = camera.dynamicCast<nx::mediaserver::resource::Camera>())
+                        camerasToMonitor.push_back(std::move(c));
+                    else
+                        NX_ASSERT(false, lm("Not a server camera in pool: %1").args(camera));
+                }
+            }
+
+            for (const auto& camera: camerasToMonitor)
             {
                 if (isRuleAdded)
                     camera->inputPortListenerAttached();
@@ -819,8 +831,9 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::api::ActionType::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<nx::mediaserver::resource::Camera>(
                 businessRule->actionResources());
+
             for (const auto& camera: resList)
             {
                 if (isRuleAdded)

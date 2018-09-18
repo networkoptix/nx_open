@@ -11,6 +11,7 @@
 namespace test {
 
 class VmsSystem;
+using VmsPeer = ::ec2::test::PeerWrapper;
 
 class Cloud
 {
@@ -22,7 +23,7 @@ public:
     nx::cdb::AccountWithPassword registerCloudAccount();
 
     bool connectToCloud(
-        ::ec2::test::PeerWrapper& peerWrapper,
+        VmsPeer& peerWrapper,
         const nx::cdb::AccountWithPassword& ownerAccount);
 
     nx::cdb::CdbLauncher& cdb();
@@ -47,15 +48,15 @@ private:
 class VmsSystem
 {
 public:
-    VmsSystem(std::vector<std::unique_ptr<::ec2::test::PeerWrapper>> servers);
+    VmsSystem(std::vector<std::unique_ptr<VmsPeer>> servers);
 
     int peerCount() const;
 
     void waitUntilAllServersAreInterconnected();
     void waitUntilAllServersSynchronizedData();
 
-    const ::ec2::test::PeerWrapper& peer(int index) const;
-    ::ec2::test::PeerWrapper& peer(int index);
+    const VmsPeer& peer(int index) const;
+    VmsPeer& peer(int index);
 
     std::unique_ptr<VmsSystem> detachServer(int index);
 
@@ -68,7 +69,7 @@ public:
     std::string cloudSystemId() const;
 
 private:
-    std::vector<std::unique_ptr<::ec2::test::PeerWrapper>> m_servers;
+    std::vector<std::unique_ptr<VmsPeer>> m_servers;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -81,6 +82,11 @@ public:
     Cloud& cloud();
 
     std::unique_ptr<VmsSystem> createVmsSystem(int serverCount);
+
+    void waitUntilVmsTransactionLogMatchesCloudOne(
+        const VmsPeer& vmsPeer,
+        const std::string& cloudSystemId,
+        const nx::cdb::AccountWithPassword& account);
 
     void waitUntilVmsTransactionLogMatchesCloudOne(
         VmsSystem* vmsSystem,

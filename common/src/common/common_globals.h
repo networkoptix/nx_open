@@ -23,6 +23,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
+    ResourceStatus StatusChangeReason
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
@@ -39,8 +40,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum CameraCapability {
         NoCapabilities                      = 0x000,
         PrimaryStreamSoftMotionCapability   = 0x004,
-        RelayInputCapability                = 0x008,
-        RelayOutputCapability               = 0x010,
+        InputPortCapability                 = 0x008,
+        OutputPortCapability                = 0x010,
         ShareIpCapability                   = 0x020,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
@@ -276,6 +277,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyStatus
     };
 
+    QString toString(ResourceStatus status);
+
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
     {
@@ -291,6 +294,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Local,
         GotFromRemotePeer
     };
+
+    QString toString(StatusChangeReason reason);
 
     enum BitratePerGopType {
         BPG_None,
@@ -737,9 +742,7 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 using nx::vms::api::GlobalPermission;
 using nx::vms::api::GlobalPermissions;
 
-Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 Q_DECLARE_METATYPE(Qn::ResourceFlags)
-Q_DECLARE_METATYPE(Qn::ResourceStatus)
 
 // TODO: #Elric #enum
 
@@ -753,6 +756,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::StatisticsDeviceType)
     (Qn::StorageInitResult)
     (Qn::PanicMode)
+    (Qn::ResourceStatus)(Qn::StatusChangeReason)
     (Qn::ConnectionRole)(Qn::BitratePerGopType)
     (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)

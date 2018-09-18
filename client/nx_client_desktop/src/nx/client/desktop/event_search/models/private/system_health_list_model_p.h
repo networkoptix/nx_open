@@ -50,6 +50,7 @@ public:
 private:
     void addSystemHealthEvent(QnSystemHealth::MessageType message, const QVariant& params);
     void removeSystemHealthEvent(QnSystemHealth::MessageType message, const QVariant& params);
+    void toggleSystemHealthEvent(QnSystemHealth::MessageType message, bool isOn);
     void clear();
 
     static int priority(QnSystemHealth::MessageType message);

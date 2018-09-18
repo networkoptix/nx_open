@@ -33,6 +33,7 @@
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include <utils/common/event_processors.h>
+#include <nx/client/desktop/utils/widget_utils.h>
 
 #include <nx/utils/app_info.h>
 
@@ -45,17 +46,6 @@
 using namespace nx::client::desktop;
 
 namespace {
-
-void setFlag(QWidget* widget, int flag, bool value)
-{
-    auto flags = widget->windowFlags();
-    if (value)
-        flags |= Qt::BypassGraphicsProxyWidget;
-    else
-        flags & ~Qt::BypassGraphicsProxyWidget;
-
-    widget->setWindowFlags(flags);
-}
 
 // Must correlate with QnResourceTreeWidget::filterTags() method.
 static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
@@ -139,7 +129,7 @@ private:
 
 
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
         qreal leftOrder = nodeOrder(left);
         qreal rightOrder = nodeOrder(right);
@@ -394,7 +384,7 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
     const auto widgets = QList<QWidget*>(
         {ui->resourcesTreeView, ui->oldFilterLineEdit, ui->newFilterLineEdit});
     for (const auto widget: widgets)
-        setFlag(widget, Qn::BypassGraphicsProxy, setBypassFlag);
+        WidgetUtils::setFlag(widget, Qt::BypassGraphicsProxyWidget, setBypassFlag);
 }
 
 Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()

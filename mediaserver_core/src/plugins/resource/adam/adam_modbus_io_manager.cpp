@@ -72,7 +72,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     bool shouldNotStartMonitoring =
         securityResource->hasFlags(Qn::foreigner)
-        || !securityResource->hasCameraCapabilities(Qn::RelayInputCapability);
+        || !securityResource->hasCameraCapabilities(Qn::InputPortCapability);
 
     if (shouldNotStartMonitoring)
         return false;

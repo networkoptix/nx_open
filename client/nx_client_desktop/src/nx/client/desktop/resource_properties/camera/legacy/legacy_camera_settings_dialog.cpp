@@ -26,7 +26,7 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include "camera_settings_widget.h"
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
+#include <nx/client/desktop/system_health/default_password_cameras_watcher.h>
 
 using namespace nx::client::desktop;
 namespace {
@@ -164,7 +164,7 @@ void LegacyCameraSettingsDialog::handleChangeDefaultPasswordRequest()
 void LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged()
 {
     const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-    const auto cameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+    const auto cameras = defaultPasswordWatcher->camerasWithDefaultPassword()
         .intersect(m_settingsWidget->cameras().toSet());
 
     m_defaultPasswordAlert->setCameras(cameras);
@@ -418,7 +418,7 @@ void LegacyCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &
 void LegacyCameraSettingsDialog::setupDefaultPasswordListener()
 {
     const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraSetChanged, this,
         &LegacyCameraSettingsDialog::handleCamerasWithDefaultPasswordChanged);
     handleCamerasWithDefaultPasswordChanged();
 }

@@ -63,6 +63,10 @@ class HttpClient(object):
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]).encode())
         return key.decode('ascii')
 
+    @property
+    def base_url(self):
+        return self._base_url
+
     def url(self, path):
         # noinspection PyProtectedMember
         return self._base_url._replace(auth=None, path='/' + path.lstrip('/')).url

@@ -5,6 +5,8 @@
 
 #include <common/common_module.h>
 
+#include <client/client_app_info.h>
+#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/client_runtime_settings.h>
@@ -43,9 +45,8 @@
 #include <watchers/cloud_status_watcher.h>
 
 #include <nx/utils/log/log.h>
-#include <client/client_module.h>
 #include <nx/client/core/watchers/user_watcher.h>
-#include <client/client_app_info.h>
+#include <nx/client/desktop/system_health/system_health_state.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -110,6 +111,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
         statisticsManager, &QnStatisticsManager::resetStatistics);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
         statisticsManager, &QnStatisticsManager::sendStatistics);
+
+    instance<nx::client::desktop::SystemHealthState>();
 
     initWorkarounds();
 }

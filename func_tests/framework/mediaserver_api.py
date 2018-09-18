@@ -27,6 +27,7 @@ DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
+DEFAULT_TAKE_REMOTE_SETTINGS = False
 
 
 class MediaserverApiRequestError(Exception):
@@ -556,7 +557,7 @@ class MediaserverApi(object):
             remote_api,  # type: MediaserverApi
             remote_address,  # type: IPAddress
             remote_port,
-            take_remote_settings=False,
+            take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -564,8 +565,12 @@ class MediaserverApi(object):
         logger.info("Merge %s to %s (takeRemoteSettings: %s):", self, remote_api, take_remote_settings)
         master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
         master_system_id = master_api.get_local_system_id()
+        if master_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(master_api))
         logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
         servant_system_id = servant_api.get_local_system_id()
+        if servant_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(servant_api))
         logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)

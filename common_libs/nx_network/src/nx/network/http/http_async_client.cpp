@@ -1183,7 +1183,14 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 
-    m_contentLocationUrl = nx::utils::Url(QLatin1String(locationIter->second));
+    nx::utils::Url newUrl(locationIter->second);
+    if (newUrl.host().isEmpty())
+    {
+        newUrl.setHost(m_contentLocationUrl.host());
+        newUrl.setPort(m_contentLocationUrl.port());
+        newUrl.setScheme(m_contentLocationUrl.scheme());
+    }
+    m_contentLocationUrl = newUrl;
 
     const auto method = m_request.requestLine.method;
     composeRequest(method);

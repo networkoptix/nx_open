@@ -34,9 +34,9 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& capabilitiesResponse) override;
 
     virtual CameraDiagnostics::Result updateResourceCapabilities() override;
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     nx::network::http::AsyncHttpClientPtr m_inputMonitorHttpClient;

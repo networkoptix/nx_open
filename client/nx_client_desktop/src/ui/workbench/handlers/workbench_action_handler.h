@@ -192,6 +192,8 @@ protected slots:
 
     void at_openNewScene_triggered();
 
+    void at_systemAdministrationAction_triggered();
+
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
     void showMultipleCamerasErrorMessage(

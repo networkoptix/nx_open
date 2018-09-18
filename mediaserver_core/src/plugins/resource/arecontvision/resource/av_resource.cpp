@@ -226,9 +226,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
         zone_size = 1;
 
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
     saveParams();
@@ -267,7 +267,7 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-bool QnPlAreconVisionResource::setRelayOutputState(
+bool QnPlAreconVisionResource::setOutputPortState(
     const QString& /*ouputID*/,
     bool activate,
     unsigned int autoResetTimeoutMS)
@@ -645,8 +645,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
-bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& completionHandler)
+void QnPlAreconVisionResource::startInputPortStatesMonitoring()
 {
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -662,20 +661,13 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
 
     m_relayInputClient = nx::network::http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx::network::http::AsyncHttpClient::done,
-            this,
-            [this, completionHandler](nx::network::http::AsyncHttpClientPtr client) {
-                if (completionHandler)
-                    completionHandler(
-                        client->response() &&
-                        client->response()->statusLine.statusCode == nx::network::http::StatusCode::ok);
-                inputPortStateRequestDone(std::move(client));
-            },
+            this, [this](auto client) { inputPortStateRequestDone(std::move(client)); },
             Qt::DirectConnection);
+
     m_relayInputClient->doGet(url);
-    return true;
 }
 
-void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
+void QnPlAreconVisionResource::stopInputPortStatesMonitoring()
 {
     m_relayInputClient.reset();
 }
@@ -701,7 +693,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(
     if (m_inputPortState != portEnabled)
     {
         m_inputPortState = portEnabled;
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             lit("1"),
             m_inputPortState,

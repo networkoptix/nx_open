@@ -4,9 +4,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct DefaultPasswordCamerasWatcher::Private
 {
@@ -32,31 +30,12 @@ struct DefaultPasswordCamerasWatcher::Private
         }
 
         if (changed)
-        {
-            emit q->cameraListChanged();
-            updateNotificationVisible();
-        }
-    }
-
-    void updateNotificationVisible()
-    {
-        setNotificationVisible(!camerasWithDefaultPassword.empty());
-    }
-
-    void setNotificationVisible(bool value)
-    {
-        if (notificationIsVisible == value)
-            return;
-
-        notificationIsVisible = value;
-        emit q->notificationIsVisibleChanged();
+            emit q->cameraSetChanged();
     }
 
     DefaultPasswordCamerasWatcher* const q;
-    bool notificationIsVisible = false;
-    QSet<QnVirtualCameraResourcePtr> camerasWithDefaultPassword;
+    QnVirtualCameraResourceSet camerasWithDefaultPassword;
 };
-
 
 DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
     base_type(parent),
@@ -65,6 +44,7 @@ DefaultPasswordCamerasWatcher::DefaultPasswordCamerasWatcher(QObject* parent):
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &DefaultPasswordCamerasWatcher::handleResourceAdded);
+
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &DefaultPasswordCamerasWatcher::handleResourceRemoved);
 
@@ -76,14 +56,9 @@ DefaultPasswordCamerasWatcher::~DefaultPasswordCamerasWatcher()
 {
 }
 
-bool DefaultPasswordCamerasWatcher::notificationIsVisible() const
+QnVirtualCameraResourceSet DefaultPasswordCamerasWatcher::camerasWithDefaultPassword() const
 {
-    return d->notificationIsVisible;
-}
-
-QnVirtualCameraResourceList DefaultPasswordCamerasWatcher::camerasWithDefaultPassword() const
-{
-    return d->camerasWithDefaultPassword.values();
+    return d->camerasWithDefaultPassword;
 }
 
 void DefaultPasswordCamerasWatcher::handleResourceAdded(const QnResourcePtr& resource)
@@ -111,11 +86,8 @@ void DefaultPasswordCamerasWatcher::handleResourceRemoved(const QnResourcePtr& r
         return;
 
     camera->disconnect(this);
-    if (d->camerasWithDefaultPassword.remove(camera))
-        d->updateNotificationVisible();
+    d->camerasWithDefaultPassword.remove(camera);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
 

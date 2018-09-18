@@ -447,13 +447,15 @@ private:
         }
         catch (const std::exception& e)
         {
-            NX_WARNING(this, lm("User exception caught while processing socket I/O event %1. %2")
-                .args(eventType, e.what()));
+            NX_WARNING(typeid(decltype(*this)),
+                lm("User exception caught while processing socket I/O event %1. %2")
+                    .args(eventType, e.what()));
         }
         catch (...)
         {
-            NX_WARNING(this, lm("Unknown user exception caught while processing socket I/O event %1")
-                .args(eventType));
+            NX_WARNING(typeid(decltype(*this)),
+                lm("Unknown user exception caught while processing socket I/O event %1")
+                    .args(eventType));
         }
     }
 

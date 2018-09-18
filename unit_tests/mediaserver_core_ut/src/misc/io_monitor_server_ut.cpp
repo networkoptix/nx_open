@@ -156,7 +156,9 @@ TEST(IoServerMonitorTest, main)
             allDataProcessed.set_value();
         });
 
-    auto camera = launcher.commonModule()->resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
+    auto camera = launcher.commonModule()->resourcePool()
+        ->getResourceByUniqueId<nx::mediaserver::resource::Camera>(kTestCamPhysicalId);
+
     ASSERT_TRUE(camera);
     launcher.commonModule()->statusDictionary()->setValue(camera->getId(), Qn::Online);
     httpClient->doGet(url);
@@ -167,7 +169,7 @@ TEST(IoServerMonitorTest, main)
 
     for (const auto& data: testData)
     {
-        emit camera->cameraInput(
+        emit camera->inputPortStateChanged(
             camera->toSharedPointer(),
             data.id,
             data.isActive,

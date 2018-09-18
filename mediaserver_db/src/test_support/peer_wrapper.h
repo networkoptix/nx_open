@@ -47,6 +47,8 @@ public:
 
     bool startAndWaitUntilStarted();
 
+    void stop();
+
     bool configureAsLocalSystem();
 
     bool saveCloudSystemCredentials(
@@ -74,10 +76,13 @@ public:
 
     nx::utils::test::ModuleLauncher<Appserver2Process>& process();
 
-    static bool areAllPeersHaveSameTransactionLog(
+    static bool allPeersHaveSameTransactionLog(
+        std::vector<const PeerWrapper*> peers);
+
+    static bool allPeersHaveSameTransactionLog(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
 
-    static bool arePeersInterconnected(
+    static bool peersInterconnected(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
 
 private:
