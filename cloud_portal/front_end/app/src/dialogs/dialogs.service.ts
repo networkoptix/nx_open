@@ -10,7 +10,7 @@ import { NxModalRenameComponent }     from './../dialogs/rename/rename.component
 import { NxModalMergeComponent }      from './../dialogs/merge/merge.component';
 
 @Injectable()
-export class nxDialogsService {
+export class NxDialogsService {
 
     constructor(@Inject('ngToast') private toast: any,
                 private loginModal: NxModalLoginComponent,
@@ -40,7 +40,7 @@ export class nxDialogsService {
     }
 
     confirm(message, title, actionLabel, actionType?, cancelLabel?) {
-        //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
+        // title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
         return this.genericModal.openConfirm(message, title, actionLabel, actionType, cancelLabel);
     }
 

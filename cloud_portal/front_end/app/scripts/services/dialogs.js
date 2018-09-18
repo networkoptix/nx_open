@@ -2,8 +2,8 @@
     'use strict';
     angular
         .module('cloudApp.services')
-        .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'configService', 'nxDialogsService', 'languageService',
-        function ($http, NgbModal, $q, $location, configService, nxDialogsService, languageService) {
+        .factory('dialogs', ['$http', 'NgbModal', '$q', '$location', 'configService', 'NxDialogsService', 'languageService',
+        function ($http, NgbModal, $q, $location, configService, NxDialogsService, languageService) {
             const CONFIG = configService.config;
             let lang = languageService.lang;
             function openDialog(settings) {
@@ -72,7 +72,7 @@
             }
             return {
                 notify: function (message, type, hold) {
-                    return nxDialogsService.notify(message, type, hold);
+                    return NxDialogsService.notify(message, type, hold);
                     // type = type || 'info';
                     //
                     // return ngToast.create({
@@ -84,11 +84,11 @@
                     // });
                 },
                 dismissNotifications: function () {
-                    return nxDialogsService.dismiss();
+                    return NxDialogsService.dismiss();
                     // return ngToast.dismiss();
                 },
                 alert: function (message, title) {
-                    return nxDialogsService.openAlert(message, title);
+                    return NxDialogsService.openAlert(message, title);
                     // return openDialog({
                     //     title      : title,
                     //     content    : message,
@@ -98,8 +98,8 @@
                     // }).result;
                 },
                 confirm: function (message, title, actionLabel, actionType, cancelLabel) {
-                    //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
-                    return nxDialogsService.confirm(message, title, actionLabel, actionType, cancelLabel);
+                    // title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
+                    return NxDialogsService.confirm(message, title, actionLabel, actionType, cancelLabel);
                     // return openDialog({
                     //     title      : title,
                     //     content    : message,
@@ -112,7 +112,7 @@
                     // }).result;
                 },
                 login: function (keepPage) {
-                    return nxDialogsService.login(keepPage);
+                    return NxDialogsService.login(keepPage);
                     // return openDialog({
                     //     title: L.dialogs.loginTitle,
                     //     template: CONFIG.viewsDir + 'dialogs/login.html',
@@ -125,7 +125,7 @@
                     //     }}).result;
                 },
                 share: function (system, user) {
-                    return nxDialogsService.share(system, user);
+                    return NxDialogsService.share(system, user);
                     // var url = 'share';
                     // var title = L.sharing.shareTitle;
                     // if (user) {
@@ -145,7 +145,7 @@
                     // }).result;
                 },
                 disconnect: function (systemId) {
-                    return nxDialogsService.disconnect(systemId);
+                    return NxDialogsService.disconnect(systemId);
                     // var title = lang.system.confirmDisconnectTitle;
                     //
                     // return openDialog({
@@ -159,7 +159,7 @@
                     // }).result;
                 },
                 rename: function (systemId, systemName) {
-                    return nxDialogsService.rename(systemId, systemName);
+                    return NxDialogsService.rename(systemId, systemName);
                     // var title = lang.system.confirmRenameTitle;
                     //
                     // return openDialog({
@@ -174,7 +174,7 @@
                     // }).result;
                 },
                 merge: function (system) {
-                    return nxDialogsService.merge(system);
+                    return NxDialogsService.merge(system);
                     // var title = lang.system.mergeSystemTitle;
                     //
                     // return openDialog({

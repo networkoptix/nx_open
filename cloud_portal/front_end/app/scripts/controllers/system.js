@@ -165,11 +165,13 @@ angular.module('cloudApp')
             };
 
             $scope.mergeSystems = function () {
-                dialogs.merge($scope.system).then(function (mergeInfo) {
-                    if(mergeInfo) {
-                        setMergeStatus(mergeInfo);
-                    }
-                });
+                return dialogs
+                    .merge($scope.system)
+                    .then(function (mergeInfo) {
+                        if (mergeInfo) {
+                           setMergeStatus(mergeInfo);
+                        }
+                    });
             };
 
             $scope.share = function () {

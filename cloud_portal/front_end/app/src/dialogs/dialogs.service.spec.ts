@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { nxDialogsService } from './dialogs.service';
+import { NxDialogsService } from './dialogs.service';
 
-describe('nxDialogsService', () => {
+describe('NxDialogsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [nxDialogsService]
+      providers: [NxDialogsService]
     });
   });
 
-  it('should be created', inject([nxDialogsService], (service: nxDialogsService) => {
+  it('should be created', inject([NxDialogsService], (service: NxDialogsService) => {
     expect(service).toBeTruthy();
   }));
 });
