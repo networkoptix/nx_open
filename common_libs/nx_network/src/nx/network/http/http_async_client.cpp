@@ -335,9 +335,16 @@ void AsyncClient::doConnect(
 
 void AsyncClient::doRequest(
     nx::network::http::Method::ValueType method,
-    const nx::utils::Url& url)
+    const nx::utils::Url& urlOriginal)
 {
-    NX_ASSERT(!url.host().isEmpty());
+    nx::utils::Url url = urlOriginal;
+    if (url.host().isEmpty() && m_socket != nullptr)
+    {
+        url.setHost(m_socket->getForeignAddress().address.toString());
+        url.setPort(m_socket->getForeignAddress().port);
+    }
+
+    NX_ASSERT(!url.host().isEmpty() || m_socket != nullptr);
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
