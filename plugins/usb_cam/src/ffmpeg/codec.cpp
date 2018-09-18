@@ -199,12 +199,17 @@ void Codec::resolution(int * outWidth, int * outHeight) const
     *outHeight = m_codecContext->height;
 }
 
-AVCodecContext * Codec::codecContext() const
+const AVCodecContext * Codec::codecContext() const
 {
     return m_codecContext;
 }
 
-AVCodec * Codec::codec() const
+AVCodecContext * Codec::codecContext()
+{
+    return m_codecContext;
+}
+
+const AVCodec * Codec::codec() const
 {
     return m_codec;
 }

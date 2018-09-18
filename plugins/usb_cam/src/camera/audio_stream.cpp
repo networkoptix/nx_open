@@ -449,8 +449,17 @@ void AudioStream::AudioStreamPrivate::run()
         {
             // EIO is returned when the device is unplugged for audio
             m_terminated = result == AVERROR(EIO);
+            if(m_terminated)
+            {
+                if(auto cam = m_camera.lock())
+                    cam->setLastError(result);
+            }
             continue;
         }
+        /**
+         *  If the encoder is aac, some packets are buffered and copied before delivering.
+         *  In that case, this packet is nullptr.
+         */
         if(!packet)
             continue;
 

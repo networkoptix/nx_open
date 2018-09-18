@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <deque>
 #include <thread>
 #include <atomic>
 #include <map>
@@ -92,6 +93,8 @@ private:
     bool m_terminated;
     int m_retries;
     int m_initCode;
+
+    std::deque<std::shared_ptr<ffmpeg::Packet>> m_packetBuffer;
 
 private:
     std::string ffmpegUrl() const;

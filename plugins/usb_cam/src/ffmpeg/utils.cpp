@@ -263,7 +263,7 @@ void toFraction(float number, int * outNumerator, int * outDenominator)
     *outDenominator = den;
 }
 
-uint64_t suggestChannelLayout(AVCodec *codec)
+uint64_t suggestChannelLayout(const AVCodec *codec)
 {
     if (!codec->channel_layouts)
         return AV_CH_LAYOUT_STEREO;
@@ -282,7 +282,7 @@ uint64_t suggestChannelLayout(AVCodec *codec)
     return bestLayout;
 }
 
-AVSampleFormat suggestSampleFormat(AVCodec * codec)
+AVSampleFormat suggestSampleFormat(const AVCodec * codec)
 {
     static const std::vector<AVSampleFormat> priorityList = 
     {
@@ -308,7 +308,7 @@ AVSampleFormat suggestSampleFormat(AVCodec * codec)
     return AV_SAMPLE_FMT_NONE;
 }
 
-int suggestSampleRate(AVCodec * codec)
+int suggestSampleRate(const AVCodec * codec)
 {
     if (!codec->supported_samplerates)
         return 44100;

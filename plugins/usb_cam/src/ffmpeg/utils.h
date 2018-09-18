@@ -35,9 +35,9 @@ nxcip::AudioFormat::SampleType toNxSampleType(
 
 void toFraction(float number, int *outNumerator, int * outDenominator);
 
-uint64_t suggestChannelLayout(AVCodec* codec);
-AVSampleFormat suggestSampleFormat(AVCodec * codec);
-int suggestSampleRate(AVCodec * codec);
+uint64_t suggestChannelLayout(const AVCodec* codec);
+AVSampleFormat suggestSampleFormat(const AVCodec * codec);
+int suggestSampleRate(const AVCodec * codec);
 
 } // namespace utils
 } // namespace ffmpeg

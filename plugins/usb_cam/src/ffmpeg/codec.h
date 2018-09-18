@@ -47,8 +47,9 @@ public:
 
     void resolution(int * outWidth, int * outHeight) const;
 
-    AVCodecContext * codecContext() const;
-    AVCodec * codec() const;
+    const AVCodecContext * codecContext() const;
+    AVCodecContext * codecContext();
+    const AVCodec * codec() const;
     AVCodecID codecID() const;
 
     // video

@@ -195,6 +195,11 @@ void VideoStream::run()
         {
             // ENODEV is returned when the device is unplugged
             m_terminated = result == AVERROR(ENODEV);
+            if(m_terminated)
+            {
+                if(auto cam = m_camera.lock())
+                    cam->setLastError(result);
+            }
             continue;
         }
 
@@ -249,6 +254,7 @@ int VideoStream::initialize()
 
 void VideoStream::uninitialize()
 {
+    m_packetBuffer.clear();
     m_packetConsumerManager.consumerFlush();
     m_frameConsumerManager.consumerFlush();
 
@@ -388,7 +394,6 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     uint64_t nxTimeStamp;
     if (!m_timeStamps.getNxTimeStamp(frame->pts(), &nxTimeStamp, true/*eraseEntry*/))
     {
-        //std::cout << "missing timestamp during video decode" << std::endl;
         if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true))
             nxTimeStamp = m_timeProvider->millisSinceEpoch();
     }

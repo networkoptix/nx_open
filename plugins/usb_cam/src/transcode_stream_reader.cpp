@@ -374,6 +374,9 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     encoder->setPixelFormat(ffmpeg::utils::suggestPixelFormat(encoder->codec()));
     
     AVCodecContext* context = encoder->codecContext();
+
+    context->mb_decision = FF_MB_DECISION_BITS;
+
     /* don't use global header. the rpi cam doesn't stream properly with global. */
     context->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
 

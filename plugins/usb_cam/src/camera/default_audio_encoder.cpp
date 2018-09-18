@@ -12,7 +12,6 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     auto encoder = std::make_unique<ffmpeg::Codec>();
 
     int result = encoder->initializeEncoder(AV_CODEC_ID_AAC);
-    //int result = encoder->initializeEncoder(AV_CODEC_ID_PCM_S16LE);
     if (result < 0)
     {
         *outFfmpegError = result;
@@ -20,7 +19,7 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
     }
 
     AVCodecContext * context = encoder->codecContext();
-    AVCodec * codec = encoder->codec();
+    const AVCodec * codec = encoder->codec();
 
     context->sample_fmt = ffmpeg::utils::suggestSampleFormat(codec);
     if (context->sample_fmt == AV_SAMPLE_FMT_NONE)
