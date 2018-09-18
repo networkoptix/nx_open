@@ -3506,7 +3506,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
         header->wsa__To = buf;
     }
 
-    // Very few devices need wsa__Action and wsa_ReplyTo to be filled, but sometimes they do.
+    // Very few devices need wsa__Action and wsa__ReplyTo to be filled, but sometimes they do.
     wsa__EndpointReferenceType* replyTo =
         (wsa__EndpointReferenceType*)malloc(sizeof(wsa__EndpointReferenceType));
     memToFreeOnResponseDone.push_back(replyTo);
