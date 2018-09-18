@@ -701,17 +701,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
 CameraDiagnostics::Result QnPlOnvifResource::initializePtz(
     const CapabilitiesResp& onvifCapabilities)
 {
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    static const QString kOperationalPtzCapabilities("operationalPtzCapabilities");
-    Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
-    if (resourceData.value<Ptz::Capabilities>(kOperationalPtzCapabilities, &capabilities)
-        && (capabilities == Ptz::NoPtzCapabilities))
-    {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("Fetch Onvif PTZ configurations."),
-            lit("According to resource_data.json camera does not support Onvif PTZ."));
-    }
-
     const bool result = fetchPtzInfo();
     if (!result)
     {
