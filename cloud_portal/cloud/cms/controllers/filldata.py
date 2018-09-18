@@ -40,6 +40,8 @@ def target_file(file_name, customization, language_code, preview):
 
 def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
+    logger.info("process_context_structure: " + context.name)
+
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
             itm_type = type(adict[dict_key])
@@ -313,6 +315,7 @@ def fill_content(customization_name='default', product_name='cloud_portal',
         changed_languages = customization.languages_list
 
     for context in changed_contexts:
+        logger.info("Process context: " + context.name + " file:" + context.file_path)
         # now we need to check what languages were changes
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
