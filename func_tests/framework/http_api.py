@@ -1,5 +1,5 @@
 import base64
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 import hashlib
 import json
 from abc import ABCMeta, abstractmethod
@@ -85,10 +85,8 @@ class HttpClient(object):
         headers = dict(Authorization=authorization)
         _logger.debug('Create websocket connection: %s', url)
         ws = websocket.create_connection(url, header=headers, timeout=timeout_sec)
-        try:
+        with closing(ws):
             yield ws
-        finally:
-            ws.close()
 
     def request(self, method, path, timeout=None, **kwargs):
         # noinspection PyProtectedMember

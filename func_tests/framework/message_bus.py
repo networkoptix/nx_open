@@ -73,7 +73,7 @@ def _bus_thread_running(server_alias, ws, queue, stop_flag):
         yield
     finally:
         logger.info('Stopping:')
-        stop_flag.add(None)  # single thread exiting will stop all of them, it's ok
+        stop_flag.add(None)
         thread.join()
         logger.info('Stopping: done; thead is joined.')
 
@@ -81,6 +81,8 @@ def _bus_thread_running(server_alias, ws, queue, stop_flag):
 @contextmanager
 def message_bus_running(mediaserver_iter):
     queue = queue_module.Queue()
+    # Stop flag is shared between threads for faster shutdown:
+    # after first thread's yield returned all other will start exiting too.
     stop_flag = set()
     with ExitStack() as stack:
         _logger.debug('Starting message bus threads.')
