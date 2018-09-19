@@ -9,15 +9,14 @@ namespace {
 
 } // namespace
 
-nx::core::layout::FileInfo nx::core::layout::identifyFile(const QString& fileName)
+nx::core::layout::FileInfo nx::core::layout::identifyFile(const QString& fileName,  bool allowTemp)
 {
     FileInfo info;
 
     try
     {
         QString extension = QFileInfo(fileName).suffix().toLower();
-
-        if (extension != "nov" &&  extension != "exe")
+        if (extension != "nov" && extension != "exe" && !(allowTemp && fileName.endsWith(".exe.tmp")))
             throw std::exception();
 
         QFile file(fileName);
@@ -32,11 +31,13 @@ nx::core::layout::FileInfo nx::core::layout::identifyFile(const QString& fileNam
         {
             file.seek(file.size() - 2 * sizeof(qint64));
             quint64 magic;
-            file.read((char*)&info.offset, sizeof(qint64));
+            quint64 offset;
+            file.read((char*)&offset, sizeof(qint64));
             file.read((char*)&magic, sizeof(qint64));
             if (magic != kFileMagic)
                 throw std::exception();
 
+            info.offset = offset;
             file.seek(info.offset);
         }
 

@@ -24,15 +24,12 @@ bool QnLayoutCryptoStream::open(QIODevice::OpenMode openMode)
     close();
     if (openMode & QIODevice::WriteOnly)
     {
-        if (!m_storageResource.findStream(m_streamName).valid())
-        {
-            if (!m_storageResource.addStream(m_streamName).valid())
-                return false;
-        }
+        if (!m_storageResource.findOrAddStream(m_streamName))
+            return false;
     }
 
     QnLayoutFileStorageResource::Stream enclosure  = m_storageResource.findStream(m_streamName);
-    if (!enclosure.valid())
+    if (!enclosure)
         return false;
 
     setEnclosure(enclosure.position, enclosure.size); //< Setting crypto stream boundaries.

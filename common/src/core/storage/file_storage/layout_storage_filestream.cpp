@@ -58,18 +58,16 @@ bool QnLayoutPlainStream::open(QIODevice::OpenMode openMode)
     m_openMode = openMode;
     if (openMode & QIODevice::WriteOnly)
     {
-        if (!m_storageResource.findStream(m_fileName).valid())
-        {
-            if (!m_storageResource.addStream(m_fileName).valid())
-                return false;
-        }
+        if (!m_storageResource.findOrAddStream(m_fileName))
+            return false;
+
         openMode |= QIODevice::ReadOnly;
     }
     m_file.setFileName(m_storageResource.getUrl());
     if (!m_file.open(openMode))
         return false;
     auto stream = m_storageResource.findStream(m_fileName);
-    if (!stream.valid())
+    if (!stream)
         return false;
     m_fileOffset = stream.position;
     m_fileSize = stream.size;

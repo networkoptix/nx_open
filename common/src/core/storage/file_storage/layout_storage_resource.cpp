@@ -27,6 +27,7 @@ QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
+    qDebug() << "QnLayoutFileStorageResource::open" << getUrl() << url;
     if (getUrl().isEmpty())
     {
         QString layoutUrl = url;
@@ -53,12 +54,16 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     }
 #endif
 
+    // Can only open valid file for reading.
+    if (!(openMode & QIODevice::WriteOnly) && !m_info.isValid)
+        return nullptr;
+
     QIODevice* rez = new QnLayoutPlainStream(*this, url);
 //    QIODevice* rez = new QnLayoutCryptoStream(*this, url, "helloworld");
     if (!rez->open(openMode))
     {
         delete rez;
-        return 0;
+        return nullptr;
     }
     return rez;
 }
@@ -101,15 +106,11 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_fileSync(QnMutex::Recursive),
-    m_capabilities(0)
+    m_fileSync(QnMutex::Recursive)
 {
+    qDebug() << "QnLayoutFileStorageResource::QnLayoutFileStorageResource" << getUrl();
     QnMutexLocker lock(&m_storageSync);
-    m_novFileOffset = 0;
     m_allStorages.insert(this);
-
-    m_capabilities |= cap::ListFile;
-    m_capabilities |= cap::ReadFile;
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
@@ -187,7 +188,7 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
 
 int QnLayoutFileStorageResource::getCapabilities() const
 {
-    return m_capabilities;
+    return ListFile | ReadFile;
 }
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
@@ -245,10 +246,29 @@ QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonM
     return new QnLayoutFileStorageResource(commonModule);
 }
 
+bool QnLayoutFileStorageResource::isCrypted() const
+{
+    return m_info.isCrypted;
+}
+
+void QnLayoutFileStorageResource::usePasswordForExport(const QString& password)
+{
+    // TODO
+}
+
+bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
+{
+    if (!m_info.isCrypted)
+        return false;
+    return true;
+    // TODO
+//    if (checkPassword()
+}
+
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
-    const auto info = identifyFile(getUrl());
-    if (!info.isValid)
+    m_info = identifyFile(getUrl(), true);
+    if (!m_info.isValid)
     {
         qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
         return false;
@@ -258,22 +278,19 @@ bool QnLayoutFileStorageResource::readIndexHeader()
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
-    file.seek(m_novFileOffset);
+    file.seek(m_info.offset);
     file.read((char*)&m_index, sizeof(m_index));
 
-    if (info.isCrypted)
-    {
-        m_crypted = true;
+    if (m_info.isCrypted)
         file.read((char*) &m_cryptoInfo, sizeof(m_cryptoInfo));
-    }
-    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles = 1024, but StreamIndex has only 256 entries.
+    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles == 1024, but StreamIndex has only 256 entries.
     {
         qWarning() << "Corrupted nov file. Ignoring.";
         m_index = StreamIndex();
         return false;
     }
 
-    if (info.version > kMaxVersion)
+    if (m_info.version > kMaxVersion)
     {
         qWarning() << "Unsupported file from the future version. Ignoring.";
         m_index = StreamIndex();
@@ -283,41 +300,65 @@ bool QnLayoutFileStorageResource::readIndexHeader()
     return true;
 }
 
+bool QnLayoutFileStorageResource::createNewFile()
+{
+    QFile file(getUrl());
+    if (!file.open(QIODevice::WriteOnly))
+        return false;
+
+    file.write((const char*)&m_index, sizeof(m_index));
+
+    if (m_info.isCrypted)
+        file.write((const char*)&m_cryptoInfo, sizeof(CryptoInfo));
+
+    if (file.error() != QFile::NoError)
+        return false;
+
+    m_info.isValid = true;
+    return true;
+}
+
 int QnLayoutFileStorageResource::getPostfixSize() const
 {
-    return m_novFileOffset == 0 ? 0 : sizeof(qint64)*2;
+    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
+}
+
+QString QnLayoutFileStorageResource::stripName(const QString& fileName)
+{
+    return fileName.mid(fileName.lastIndexOf(L'?') + 1);
 }
 
 // This function may create a new .nov file.
-QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::addStream(const QString& srcFileName)
+QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream(const QString& name)
 {
     QnMutexLocker lock( &m_fileSync );
 
-    QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
+    QString fileName = stripName(name);
 
-    QFile file(getUrl());
-    qint64 fileSize = file.size() -  getPostfixSize();
+    const auto stream = findStream(name);
+    if (stream)
+        return stream;
 
-    // If we are writing to .exe file, index is already written by QnNovLauncher::createLaunchingFile.
-    if (fileSize > 0)
-        readIndexHeader();
-    else
-        fileSize = sizeof(m_index);
+    // At this point m_info and m_index are read in findStream if existed.
+    // It is the same for exe, because index is already written by QnNovLauncher::createLaunchingFile.
 
-    if (m_index.entryCount >= (quint32) kMaxStreams)
+    if (m_index.entryCount >= kMaxStreams)
         return Stream();
 
-#ifdef _DEBUG
-    NX_ASSERT(!findStream(srcFileName).valid(), Q_FUNC_INFO, "Duplicate file name");
-#endif
+    if (!m_info.isValid) //< Could not access the file or it is empty.
+        if (!createNewFile())
+            return Stream();
+
+    QFile file(getUrl());
+    const qint64 fileSize = file.size() -  getPostfixSize();
 
     m_index.entries[m_index.entryCount++] =
-        StreamIndexEntry{fileSize - m_novFileOffset, qt4Hash(fileName)};
+        StreamIndexEntry{fileSize - m_info.offset, qt4Hash(fileName)};
 
     if (!file.open(QIODevice::ReadWrite))
         return Stream();
     // Write new or updated index.
-    file.seek(m_novFileOffset);
+    file.seek(m_info.offset);
     file.write((const char*) &m_index, sizeof(m_index));
     file.seek(fileSize);
 
@@ -327,40 +368,42 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::addStream(const
     file.write(utf8FileName);
 
     // Add ending magic string.
-    if (m_novFileOffset > 0)
+    if (m_info.offset > 0)
         addBinaryPostfix(file);
+
     return Stream{fileSize + utf8FileName.size() + 1, 0};
 }
 
-// This function may try to readIndexHeader if it is empty.
-QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(const QString& fileName)
+// This function assumes index is already read by setUrl() (maybe called from open() ).
+QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(const QString& name)
 {
     QnMutexLocker lock(&m_fileSync);
 
     if (m_index.entryCount == 0)
-        readIndexHeader();
+        return Stream();
 
     QFile file(getUrl());
     if (!file.open(QIODevice::ReadOnly))
         return Stream();
 
+    const QString fileName = stripName(name);
     quint32 hash = qt4Hash(fileName);
     QByteArray utf8FileName = fileName.toUtf8();
     for (uint i = 0; i < m_index.entryCount; ++i)
     {
         if (m_index.entries[i].fileNameCrc == hash)
         {
-            file.seek(m_index.entries[i].offset + m_novFileOffset);
+            file.seek(m_index.entries[i].offset + m_info.offset);
             char tmpBuffer[1024]; // buffer size is max file len
             int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
             QByteArray actualFileName(tmpBuffer, qMin(readBytes, utf8FileName.length()));
             if (utf8FileName == actualFileName)
             {
                 Stream stream;
-                stream.position = m_index.entries[i].offset + m_novFileOffset
+                stream.position = m_index.entries[i].offset + m_info.offset
                     + fileName.toUtf8().length() + 1;
                 if (i < m_index.entryCount-1)
-                    stream.size = m_index.entries[i + 1].offset + m_novFileOffset - stream.position;
+                    stream.size = m_index.entries[i + 1].offset + m_info.offset - stream.position;
                 else
                 {
                     qint64 endPos = file.size() - getPostfixSize();
@@ -375,7 +418,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
 
 void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 {
-    if (m_novFileOffset > 0)
+    if (m_info.offset > 0)
     {
         QFile file(getUrl());
         file.open(QIODevice::Append);
@@ -386,36 +429,18 @@ void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
+    qDebug() << "QnLayoutFileStorageResource::setUrl" << value;
     NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
 
     setId(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
-    if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))
-    {
-        // find nov file inside binary
-        QFile f(value);
-        if (f.open(QIODevice::ReadOnly))
-        {
-            qint64 postfixPos = f.size() - sizeof(quint64) * 2;
-            f.seek(postfixPos); // go to nov index and magic
-            qint64 novOffset;
-            quint64 magic;
-            f.read((char*) &novOffset, sizeof(qint64));
-            f.read((char*) &magic, sizeof(qint64));
-            if (magic == nx::core::layout::kFileMagic)
-            {
-                m_novFileOffset = novOffset;
-            }
-        }
-    }
-    else {
-        m_novFileOffset = 0;
-    }
+
+    readIndexHeader();
 }
 
 void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
 {
-    file.write((char*) &m_novFileOffset, sizeof(qint64));
+    file.write((char*) &m_info.offset, sizeof(qint64));
 
     const quint64 magic = nx::core::layout::kFileMagic;
     file.write((char*) &magic, sizeof(qint64));
@@ -428,6 +453,7 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr
     QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
     if (!chunkData)
         return QnTimePeriodList();
+
     QnTimePeriodList chunks;
     QByteArray chunkDataArray(chunkData->readAll());
     chunks.decode(chunkDataArray);
@@ -468,8 +494,8 @@ void QnLayoutFileStorageResource::dumpStructure()
     for(quint32 i = 0; i < m_index.entryCount - 1; i++)
     {
         char tmpBuffer[1024]; // buffer size is max file len
-        file.seek(m_index.entries[i].offset + m_novFileOffset);
-        int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
+        file.seek(m_index.entries[i].offset + m_info.offset);
+        const int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
         QByteArray actualFileName(tmpBuffer, readBytes);
         qDebug() << "Entry" << i << QString(actualFileName)
             << "size:" << hex <<m_index.entries[i + 1].offset - m_index.entries[i].offset

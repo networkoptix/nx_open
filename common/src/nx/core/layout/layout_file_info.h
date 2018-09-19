@@ -53,7 +53,8 @@ struct FileInfo
     qint64 offset = 0;
 };
 
-FileInfo identifyFile(const QString& fileName);
+// Reads basic info for layout file. Allows .exe.tmp extension if allowTemp is set.
+FileInfo identifyFile(const QString& fileName, bool allowTemp = false);
 
 bool checkPassword(const QString& password, const FileInfo& fileInfo);
 

@@ -148,11 +148,13 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstNa
     qint64 novPos = dstFile.pos();
     if (novFileName.isEmpty())
     {
+        // Create new index for new file.
         nx::core::layout::StreamIndex idex;
         dstFile.write((const char*)&idex, sizeof(idex)); // nov file start
     }
     else
     {
+        // Append existing nov file to exe.
         if (!appendFile(dstFile, novFileName))
             return ErrorCode::WriteMediaError;
     }

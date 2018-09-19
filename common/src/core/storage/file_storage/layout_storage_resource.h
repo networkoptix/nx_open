@@ -25,6 +25,7 @@ class QnLayoutFileStorageResource: public QnStorageResource
     using StreamIndexEntry = nx::core::layout::StreamIndexEntry;
     using StreamIndex = nx::core::layout::StreamIndex;
     using CryptoInfo = nx::core::layout::CryptoInfo;
+
 public:
     enum StorageFlags {
         ReadOnly        = 0x1,
@@ -36,7 +37,14 @@ public:
 
     static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
+    // Whether the file is crypted or intended to be crypted.
+    bool isCrypted() const;
+    // Set new password if we intend to create a new layout file. Please call before `open`.
+    void usePasswordForExport(const QString& password);
+    // Set password for reading existing layout file.
+    bool usePasswordToOpen(const QString& password);
+
+    virtual QIODevice* open(const QString& url, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
@@ -65,12 +73,12 @@ public:
         qint64 position = 0;
         qint64 size = 0;
 
-        bool valid() const { return position > 0; }
+        operator bool () const { return position > 0; }
     };
-    // Adds new stream to the layout storage.
-    Stream addStream(const QString& srcFileName);
+    // Opens or adds new stream to the layout storage.
+    Stream findOrAddStream(const QString& name);
     // Searches for a stream with the given name.
-    Stream findStream(const QString& fileName);
+    Stream findStream(const QString& name);
     // Called from a output stream when it is closed.
     void finalizeWrittenStream(qint64 pos);
     void registerFile(QnLayoutStreamSupport* file);
@@ -78,15 +86,14 @@ public:
 
     void dumpStructure();
 
-public:
-
-
 private:
     bool readIndexHeader();
+    bool createNewFile();
     void addBinaryPostfix(QFile& file);
     void closeOpenedFiles();
     void restoreOpenedFiles();
     int getPostfixSize() const;
+    static QString stripName(const QString& fileName); //< Returns part after '?'.
 
 private:
     StreamIndex m_index;
@@ -95,13 +102,10 @@ private:
     QnMutex m_fileSync;
     static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
-    qint64 m_novFileOffset;
 
-    bool m_crypted = false;
+    nx::core::layout::FileInfo m_info;
+
     CryptoInfo m_cryptoInfo;
-
-    int m_capabilities;
-    //qint64 m_novFileLen;
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
