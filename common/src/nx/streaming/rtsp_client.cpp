@@ -516,9 +516,9 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     updateResponseStatus(response);
     switch( m_responseCode )
     {
-        case CL_HTTP_SUCCESS:
+        case nx::network::rtsp::StatusCode::ok:
             break;
-        case CL_HTTP_AUTH_REQUIRED:
+        case nx::network::rtsp::StatusCode::unauthorized:
         case nx::network::rtsp::StatusCode::proxyAuthenticationRequired:
             stop();
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
