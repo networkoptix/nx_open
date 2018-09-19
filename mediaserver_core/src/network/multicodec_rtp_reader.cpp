@@ -505,7 +505,8 @@ void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const 
     const bool isTransportChanged = key == QnMediaResource::rtpTransportKey()
         && getRtpTransport() != m_RtpSession.getTransport();
     const bool isMediaPortChanged = key == QnNetworkResource::mediaPortKey() && networkResource
-        && networkResource->mediaPort() != m_RtpSession.getUrl().port(nx_rtsp::DEFAULT_RTSP_PORT);
+        && networkResource->mediaPort() != m_RtpSession.getUrl()
+            .port(nx::network::rtsp::DEFAULT_RTSP_PORT);
     if (isTransportChanged || isMediaPortChanged)
         pleaseStop();
 
@@ -694,7 +695,7 @@ void QnMulticodecRtpReader::createTrackParsers()
     }
 }
 
-int QnMulticodecRtpReader::getLastResponseCode() const
+nx::network::rtsp::StatusCode QnMulticodecRtpReader::getLastResponseCode() const
 {
     return m_RtpSession.getLastResponseCode();
 }
@@ -781,7 +782,7 @@ void QnMulticodecRtpReader::calcStreamUrl()
         m_currentStreamUrl.clear();
         m_currentStreamUrl.setScheme("rtsp");
         m_currentStreamUrl.setHost(nres->getHostAddress());
-        m_currentStreamUrl.setPort(mediaPort ? mediaPort : nx_rtsp::DEFAULT_RTSP_PORT);
+        m_currentStreamUrl.setPort(mediaPort ? mediaPort : nx::network::rtsp::DEFAULT_RTSP_PORT);
 
         if (!m_request.isEmpty())
         {

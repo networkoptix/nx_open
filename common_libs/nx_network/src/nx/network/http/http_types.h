@@ -176,7 +176,8 @@ enum Value
     proxyAuthenticationRequired = 407,
     unsupportedMediaType = 415,
     rangeNotSatisfiable = 416,
-    invalidParameter = 451,
+    unprocessableEntity = 422,
+    unavailableForLegalReasons = 451,
 
     internalServerError = 500,
     notImplemented = 501,

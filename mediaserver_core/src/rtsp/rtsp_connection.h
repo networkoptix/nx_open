@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "nx/streaming/media_data_packet.h"
 #include "rtsp/abstract_rtsp_encoder.h"
+#include <nx/network/rtsp/rtsp_types.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -113,21 +114,23 @@ private:
     void checkQuality();
     void processRequest();
     void parseRequest();
-    void initResponse(int code = 200, const QString& message = "OK");
+    void initResponse(
+        nx::network::rtsp::StatusCode code = nx::network::rtsp::StatusCode::ok,
+        const QString& message = "OK");
     void generateSessionId();
-    void sendResponse(int code, const QByteArray& contentType);
+    void sendResponse(nx::network::rtsp::StatusCode code, const QByteArray& contentType);
     PlaybackMode getStreamingMode() const;
 
     int numOfVideoChannels();
-    int composeDescribe();
-    int composeSetup();
-    int composePlay();
-    int composePause();
+    nx::network::rtsp::StatusCode composeDescribe();
+    nx::network::rtsp::StatusCode composeSetup();
+    nx::network::rtsp::StatusCode composePlay();
+    nx::network::rtsp::StatusCode composePause();
     int extractTrackId(const QString& path);
-    int composeTeardown();
+    nx::network::rtsp::StatusCode composeTeardown();
     void processRangeHeader();
-    int composeSetParameter();
-    int composeGetParameter();
+    nx::network::rtsp::StatusCode composeSetParameter();
+    nx::network::rtsp::StatusCode composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();

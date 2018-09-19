@@ -34,7 +34,7 @@ int QnEventLogRestHandler::executeGet(
         result.append("<root>\n");
         result.append(errStr);
         result.append("</root>\n");
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 }
 

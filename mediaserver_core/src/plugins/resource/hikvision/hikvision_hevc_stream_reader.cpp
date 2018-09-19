@@ -85,7 +85,7 @@ nx::utils::Url HikvisionHevcStreamReader::buildHikvisionStreamUrl(
     const hikvision::ChannelProperties& properties) const
 {
     auto url = properties.httpUrl;
-    url.setScheme(QString::fromUtf8(nx_rtsp::kUrlSchemeName));
+    url.setScheme(QString::fromUtf8(nx::network::rtsp::kUrlSchemeName));
     url.setPort(properties.rtspPort);
     url.setQuery(QString());
     return url;

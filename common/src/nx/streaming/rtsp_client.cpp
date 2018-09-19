@@ -227,7 +227,7 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(nx::network::http::StatusCode::ok),
+    m_responseCode(nx::network::rtsp::StatusCode::ok),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
@@ -256,7 +256,7 @@ QnRtspClient::~QnRtspClient()
     delete[] m_additionalReadBuffer;
 }
 
-int QnRtspClient::getLastResponseCode() const
+nx::network::rtsp::StatusCode QnRtspClient::getLastResponseCode() const
 {
     return m_responseCode;
 }
@@ -379,7 +379,7 @@ void QnRtspClient::parseSDP()
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
 {
-    //TODO use nx_rtsp::parseRangeHeader
+    //TODO use nx::network::rtsp::parseRangeHeader
 
     QStringList rangeType = rangeStr.trimmed().split(QLatin1Char('='));
     if (rangeType.size() < 2)
@@ -420,7 +420,7 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
     {
         nx::network::http::StatusLine statusLine;
         statusLine.parse( nx::network::http::ConstBufferRefType(response, 0, firstLineEnd) );
-        m_responseCode = statusLine.statusCode;
+        m_responseCode = static_cast<nx::network::rtsp::StatusCode>(statusLine.statusCode);
         m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
     }
 }
@@ -441,7 +441,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = nx::network::http::StatusCode::ok;
+    m_responseCode = nx::network::rtsp::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
@@ -455,9 +455,9 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
     bool isSslRequired = false;
     const auto urlScheme = m_url.scheme().toLower().toUtf8();
-    if (urlScheme == nx_rtsp::kUrlSchemeName)
+    if (urlScheme == nx::network::rtsp::kUrlSchemeName)
         isSslRequired = false;
-    else if (urlScheme == nx_rtsp::kSecureUrlSchemeName)
+    else if (urlScheme == nx::network::rtsp::kSecureUrlSchemeName)
         isSslRequired = true;
     else
         return CameraDiagnostics::UnsupportedProtocolResult(m_url.toString(), m_url.scheme());
@@ -519,7 +519,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         case CL_HTTP_SUCCESS:
             break;
         case CL_HTTP_AUTH_REQUIRED:
-        case nx::network::http::StatusCode::proxyAuthenticationRequired:
+        case nx::network::rtsp::StatusCode::proxyAuthenticationRequired:
             stop();
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
         default:
@@ -664,7 +664,7 @@ nx::network::http::Request QnRtspClient::createDescribeRequest()
     nx::network::http::Request request;
     request.requestLine.method = kDescribeCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Accept", "application/sdp" ) );
     if( m_openedTime != AV_NOPTS_VALUE )
@@ -695,7 +695,7 @@ bool QnRtspClient::sendOptions()
     nx::network::http::Request request;
     request.requestLine.method = kOptionsCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     return sendRequestInternal(std::move(request));
 }
@@ -870,7 +870,7 @@ bool QnRtspClient::sendSetup()
             request.requestLine.url = setupUrl;//QString::fromLatin1(trackInfo->setupURL);
         }
 
-        request.requestLine.version = nx_rtsp::rtsp_1_0;
+        request.requestLine.version = nx::network::rtsp::rtsp_1_0;
         addCommonHeaders(request.headers);
 
         {   //generating transport header
@@ -1000,7 +1000,7 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
 
     request.requestLine.method = kSetParameterCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx::network::http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
@@ -1060,7 +1060,7 @@ nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qin
     nx::network::http::Request request;
     request.requestLine.method = kPlayCommand;
     request.requestLine.url = m_contentBase;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
@@ -1129,7 +1129,7 @@ bool QnRtspClient::sendPause()
     nx::network::http::Request request;
     request.requestLine.method = kPauseCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
@@ -1140,7 +1140,7 @@ bool QnRtspClient::sendTeardown()
     nx::network::http::Request request;
     request.requestLine.method = kTeardownCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
@@ -1179,7 +1179,7 @@ bool QnRtspClient::sendKeepAlive()
     nx::network::http::Request request;
     request.requestLine.method = kGetParameterCommand;
     request.requestLine.url = m_url;
-    request.requestLine.version = nx_rtsp::rtsp_1_0;
+    request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     return sendRequestInternal(std::move(request));
@@ -1730,7 +1730,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 
 bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responseBuf )
 {
-    int prevStatusCode = nx::network::http::StatusCode::ok;
+    auto prevStatusCode = nx::network::rtsp::StatusCode::ok;
     addAuth( &request );
     addAdditionAttrs( &request );
 
@@ -1755,25 +1755,25 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
             return false;
         }
 
-        nx_rtsp::RtspResponse response;
+        nx::network::rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
         {
             NX_VERBOSE(this, lm("Failed to parse response"));
             return false;
         }
 
-        m_responseCode = response.statusLine.statusCode;
-        switch( response.statusLine.statusCode )
+        m_responseCode = static_cast<nx::network::rtsp::StatusCode>(response.statusLine.statusCode);
+        switch (m_responseCode)
         {
-            case nx::network::http::StatusCode::unauthorized:
-            case nx::network::http::StatusCode::proxyAuthenticationRequired:
-                if( prevStatusCode == response.statusLine.statusCode )
+            case nx::network::rtsp::StatusCode::unauthorized:
+            case nx::network::rtsp::StatusCode::proxyAuthenticationRequired:
+                if( prevStatusCode == m_responseCode )
                 {
                     NX_VERBOSE(this, lm("Already tried authentication and have been rejected"));
                     return false;
                 }
 
-                prevStatusCode = response.statusLine.statusCode;
+                prevStatusCode = m_responseCode;
                 break;
 
             default:
@@ -1792,7 +1792,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
         }
     }
 
-    NX_VERBOSE(this, lm("Response after last retry: %1").arg(prevStatusCode));
+    NX_VERBOSE(this, lm("Response after last retry: %1").arg(static_cast<int>(prevStatusCode)));
     return false;
 }
 

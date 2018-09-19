@@ -68,7 +68,7 @@ public:
     virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
-    int getLastResponseCode() const;
+    nx::network::rtsp::StatusCode getLastResponseCode() const;
 
     /** Implementation of QnAbstractMediaStreamProvider::getAudioLayout. */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const override;

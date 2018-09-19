@@ -392,7 +392,7 @@ bool parseTransportElement(
     auto rtspPortNumberElement = transportElement.firstChildElement(kRtspPortNumberTag);
     if (rtspPortNumberElement.isNull())
     {
-        outChannelProperties->rtspPort = nx_rtsp::DEFAULT_RTSP_PORT;
+        outChannelProperties->rtspPort = nx::network::rtsp::DEFAULT_RTSP_PORT;
         return true;
     }
 
