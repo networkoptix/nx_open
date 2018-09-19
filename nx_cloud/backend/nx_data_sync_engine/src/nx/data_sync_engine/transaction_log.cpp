@@ -14,7 +14,8 @@ namespace data_sync_engine {
 const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
     std::nullopt,
     std::nullopt,
-    std::numeric_limits<int>::max() };
+    std::numeric_limits<int>::max(),
+    {}};
 
 QString toString(const CommandHeader& tran)
 {

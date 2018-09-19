@@ -425,7 +425,8 @@ void TransactionTransport::onTransactionsReadFromLog(
             ReadCommandsFilter{
                 m_remotePeerTranState,
                 m_tranStateToSynchronizeTo,
-                kMaxTransactionsPerIteration},
+                kMaxTransactionsPerIteration,
+                {}},
             std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
         return;
     }
