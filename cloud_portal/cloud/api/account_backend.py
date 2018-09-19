@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from cloud import settings
 
 import models
-from api.views.account import get_ip
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
 
@@ -115,6 +114,8 @@ class AccountManager(db.models.Manager):
         return self._create_user(email, password, **extra_fields)
 
 
+def get_ip(request):
+    return request.META.get('HTTP_X_FORWARDED_FOR')
 
 
 @receiver(user_logged_in)

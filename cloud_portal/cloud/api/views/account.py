@@ -7,7 +7,7 @@ import base64
 from django.utils import timezone
 
 from api.controllers.cloud_api import Account
-from api.account_backend import AccountBackend
+from api.account_backend import AccountBackend, get_ip
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params
 from api.views.account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
@@ -18,10 +18,6 @@ from api import models
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-def get_ip(request):
-    return request.META.get('HTTP_X_FORWARDED_FOR')
 
 
 @api_view(['POST'])
