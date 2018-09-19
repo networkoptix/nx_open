@@ -1,5 +1,4 @@
-import time
-from threading import Thread
+from threading import Event, Thread
 
 from framework.utils import with_traceback
 
@@ -19,14 +18,11 @@ class ThreadedCall(object):
 
     @classmethod
     def periodic(cls, iteration_call, sleep_between_sec=0, terminate_timeout_sec=10):
-        should_continue = [True]
-
-        def terminate():
-            should_continue[0] = False
+        stop_event = Event()
 
         def call():
-            while should_continue[0]:
+            while not stop_event.is_set():
                 iteration_call()
-                time.sleep(sleep_between_sec)
+                stop_event.wait(sleep_between_sec)
 
-        return cls(call, terminate, timeout_sec=terminate_timeout_sec)
+        return cls(call, stop_event.set, timeout_sec=terminate_timeout_sec)
