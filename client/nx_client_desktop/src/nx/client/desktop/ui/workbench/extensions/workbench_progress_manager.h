@@ -1,7 +1,5 @@
 #pragma once
 
-#include <limits>
-
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QObject>
@@ -39,7 +37,7 @@ public:
     qreal progress(const QnUuid& activityId) const;
     void setProgress(const QnUuid& activityId, qreal value);
 
-    static constexpr qreal kIndefiniteProgressValue = std::numeric_limits<qreal>::max();
+    static constexpr qreal kIndefiniteProgressValue = -1;
 
     bool isCancellable(const QnUuid& activityId) const;
     void setCancellable(const QnUuid& activityId, bool value);
