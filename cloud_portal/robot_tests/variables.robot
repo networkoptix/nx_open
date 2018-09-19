@@ -26,7 +26,7 @@ ${TM TEXT}                            qweasdzxc123®™
 ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
 ${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
-${LOG IN BUTTON}                      //form[@name='loginForm']//button[text()= 'Log In']
+${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button[text()= 'Log In']
 ${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']

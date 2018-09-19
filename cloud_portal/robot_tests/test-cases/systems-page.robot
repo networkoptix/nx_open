@@ -84,7 +84,10 @@ should update owner name in systems list, if it's changed
     Log In    ${EMAIL OWNER}    ${password}    None
     Validate Log In
     Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}
+    #Sleep added here because the account page was populating the first/lastname fields again after Selenium changed it.
+    Sleep    1
     Wait Until Textfield Contains    ${ACCOUNT EMAIL}    ${EMAIL OWNER}
+    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    newFirstName
     Clear Element Text    ${ACCOUNT LAST NAME}
