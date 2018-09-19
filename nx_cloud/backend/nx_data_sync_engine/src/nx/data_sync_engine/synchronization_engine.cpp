@@ -15,6 +15,7 @@ SyncronizationEngine::SyncronizationEngine(
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
     m_supportedProtocolRange(supportedProtocolRange),
+    m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
     m_transactionLog(
         moduleGuid,
@@ -34,12 +35,14 @@ SyncronizationEngine::SyncronizationEngine(
         moduleGuid,
         m_supportedProtocolRange,
         &m_transactionLog,
-        &m_connectionManager),
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_webSocketAcceptor(
         moduleGuid,
         m_supportedProtocolRange,
         &m_transactionLog,
-        &m_connectionManager),
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -100,6 +103,12 @@ const ConnectionManager& SyncronizationEngine::connectionManager() const
 const statistics::Provider& SyncronizationEngine::statisticsProvider() const
 {
     return m_statisticsProvider;
+}
+
+void SyncronizationEngine::setOutgoingCommandFilter(
+    const OutgoingCommandFilterConfiguration& configuration)
+{
+    m_outgoingCommandFilter.configure(configuration);
 }
 
 void SyncronizationEngine::subscribeToSystemDeletedNotification(

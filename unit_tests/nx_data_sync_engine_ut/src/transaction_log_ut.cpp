@@ -344,9 +344,7 @@ private:
 
         transactionLog()->readTransactions(
             m_systemId.c_str(),
-            boost::none,
-            boost::none,
-            std::numeric_limits<int>::max(),
+            ReadCommandsFilter::kEmptyFilter,
             completionHandler);
 
         return transactionsReadPromise.get_future().get();

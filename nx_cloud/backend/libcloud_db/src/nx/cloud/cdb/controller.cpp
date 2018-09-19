@@ -235,6 +235,11 @@ void Controller::initializeSecurity()
 
 void Controller::initializeDataSynchronizationEngine()
 {
+    nx::data_sync_engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
+    outgoingCommandFilter.sendOnlyOwnCommands = true;
+
+    m_ec2SyncronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
+
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 

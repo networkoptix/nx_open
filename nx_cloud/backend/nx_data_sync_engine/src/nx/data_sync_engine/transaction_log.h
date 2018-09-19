@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/sql/async_sql_query_executor.h>
@@ -30,6 +31,17 @@ namespace db { class AsyncSqlQueryExecutor; } // namespace db
 namespace data_sync_engine {
 
 class AbstractOutgoingTransactionDispatcher;
+
+struct NX_DATA_SYNC_ENGINE_API ReadCommandsFilter
+{
+    std::optional<vms::api::TranState> from;
+    std::optional<vms::api::TranState> to;
+    int maxTransactionsToReturn = 0;
+    /** List of command source peers. If empty, then command source is not restricted. */
+    std::vector<QnUuid> sources;
+
+    static const ReadCommandsFilter kEmptyFilter;
+};
 
 QString toString(const CommandHeader& tran);
 
@@ -156,7 +168,6 @@ public:
                 .arg(systemId).arg(CommandDescriptor::name)
                 .arg(transaction).arg(transactionHash));
 
-
         // Serializing transaction.
         auto serializedTransaction = QnUbjson::serialized(transaction);
 
@@ -225,9 +236,7 @@ public:
      */
     void readTransactions(
         const std::string& systemId,
-        boost::optional<vms::api::TranState> from,
-        boost::optional<vms::api::TranState> to,
-        int maxTransactionsToReturn,
+        ReadCommandsFilter filter,
         TransactionsReadHandler completionHandler);
 
     void clearTransactionLogCacheForSystem(const std::string& systemId);
@@ -294,9 +303,7 @@ private:
     nx::sql::DBResult fetchTransactions(
         nx::sql::QueryContext* connection,
         const std::string& systemId,
-        const vms::api::TranState& from,
-        const vms::api::TranState& to,
-        int maxTransactionsToReturn,
+        const ReadCommandsFilter& filter,
         TransactionReadResult* const outputData);
 
     bool isShouldBeIgnored(
