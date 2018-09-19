@@ -14,7 +14,7 @@ namespace api {
 /**
 * Description of the analytics driver, which can generate different events.
 */
-struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifestBase
+struct NX_PLUGIN_UTILS_API AnalyticsDriverManifestBase
 {
     Q_GADGET
     Q_ENUMS(Capability)
@@ -49,7 +49,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 #define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)\
     (supportedCodecs)(supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
-struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifest: AnalyticsDriverManifestBase
+struct NX_PLUGIN_UTILS_API AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
    QList<Analytics::EventType> outputEventTypes;
    QList<Analytics::Group> groups;

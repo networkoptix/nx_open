@@ -9,7 +9,7 @@ namespace nx {
 namespace sdk {
 namespace metadata {
 
-class /*NX_SDK_API*/ CommonEvent: public nxpt::CommonRefCounter<Event>
+class NX_SDK_API CommonEvent: public nxpt::CommonRefCounter<Event>
 {
 public:
     virtual ~CommonEvent();
