@@ -60,10 +60,6 @@
         ],
         "interface-over-type-literal"     : true,
         "jsdoc-format"                    : true,
-        "linebreak-style"                 : [
-            true,
-            "CRLF"
-        ],
         "next-line"                       : [
             true,
             "check-catch",
