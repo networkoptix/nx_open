@@ -123,7 +123,7 @@ std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommo
 
 TEST_F(
     VmsCloudDataSynchronization,
-    DISABLED_another_mediaserver_synchronizes_data_to_cloud)
+    another_mediaserver_synchronizes_data_to_cloud)
 {
     givenTwoServerCloudSystem();
     stopServer(1);
@@ -133,7 +133,7 @@ TEST_F(
     waitForDataSynchronized(cloud(), server(0));
 }
 
-TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
+TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
 {
     givenTwoServerCloudSystem();
     stopServer(1);
