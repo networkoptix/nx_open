@@ -21,12 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_ip(request):
-    x_forward_ip = request.META.get('HTTP_X_FORWARDED_FOR')
-    user = request.session['email'] if 'email' in request.session else ""
-    if not user:
-        user = request.data['email'] if 'email' in request.data else ""
-    logger.info('Account request for: {}, IP: {}'.format(user, x_forward_ip))
-    return x_forward_ip
+    return request.META.get('HTTP_X_FORWARDED_FOR')
 
 
 @api_view(['POST'])
@@ -54,7 +49,6 @@ def register(request):
 @handle_exceptions
 def login(request):
     user = None
-    request.session['IP'] = get_ip(request)
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']

@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from cloud import settings
 
 import models
+from api.views import get_ip
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
 
@@ -34,7 +35,7 @@ class AccountBackend(ModelBackend):
     @staticmethod
     def authenticate(request=None, username=None, password=None):
         try:
-            ip = request.session.pop('IP', "")
+            ip = get_ip(request)
             user = Account.get(username, password, ip)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if request and exception.error_code == ErrorCodes.account_blocked:
