@@ -18,7 +18,7 @@ import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
-from framework.message_bus import MessageBus
+from framework.message_bus import message_bus_running
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep, with_traceback
@@ -245,7 +245,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
 
 def wait_until_no_transactions_from_servers(server_list, timeout):
     _logger.info('Wait for message bus for %s:', server_list)
-    with MessageBus(server_list).running() as bus:
+    with message_bus_running(server_list) as bus:
         bus.wait_until_no_transactions(timeout.total_seconds())
     _logger.info('No more transactions from %s:', server_list)
 
