@@ -30,19 +30,19 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 };
 #define AxisAnalyticsEventType_Fields AnalyticsEventType_Fields(topic)(name)
 
-/*
- * How do Axis Driver chooses what EventTypes to process, i.e. how does it form the list of events?
- * The final list is a union of two lists. The 1-st is *outputEventTypes* white list.
- * The 2-nd is based on camera supported events. It is constructed in 3 steps:
- *  a) plugin asks camera about all supported events;
- *  b) they are filtered with allowedTopics filter (only events with allowed topics remain);
- *  c) event with descriptions form forbiddenDescriptions list are excised.
- */
+/**
+  * The algorithm of building of the valid event type list:
+  * The final list is a union of two lists. The 1st is outputEventTypes white list.
+  * The 2nd is based on camera supported events. It is constructed in 3 steps:
+  *  a) plugin asks the camera about all supported events;
+  *  b) they are filtered with allowedTopics filter (only events with the allowed topics remain);
+  *  c) event with descriptions form forbiddenDescriptions list are excised.
+  */
 struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 {
-    QStringList allowedTopics; // topic filter
-    QStringList forbiddenDescriptions; // black list
-    QList<AnalyticsEventType> outputEventTypes; // white list
+    QStringList allowedTopics; //< topic filter
+    QStringList forbiddenDescriptions; //< black list
+    QList<AnalyticsEventType> outputEventTypes; //< white list
 };
 #define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(allowedTopics)(forbiddenDescriptions)(outputEventTypes)
 

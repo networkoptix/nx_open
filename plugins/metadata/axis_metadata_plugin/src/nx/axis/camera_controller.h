@@ -249,16 +249,16 @@ public:
     void removeForbiddenEvents(const std::vector<std::string>& forbiddenDescriptions);
 
     // The methods which names begin with "add" or "remove" do not modify corresponding inner
-    // vectors. To update a vector call appropriate read method.
+    // vectors. To update a vector, call the appropriate read method.
 
     /** @return Id of the added action. */
     int addActiveAction(const ActiveAction& action);
 
     /**
-     *NOTE: This high-level function gets out of low-level style of the class, but it's often
-     * needed, so it is left here.
-     */
-    /** @return Id of the added action. */
+      * NOTE: This high-level function gets out of low-level style of the class, but it's often
+      * needed, so it is left here.
+      * @return Id of the added action.
+      */
     int addActiveHttpNotificationAction(
         const char* name,
         const char* message,
@@ -281,7 +281,7 @@ public:
     bool removeActiveRule(int ruleId);
 
     // Auxiliary functions. Helpful to clean camera memory after work.
-    // Waring: they do not empty corresponding vectors.
+    // Waring: they do not empty the corresponding vectors.
     int removeAllActiveActions(const char* namePrefix = nullptr);
     int removeAllActiveRecipients(const char* namePrefix = nullptr);
     int removeAllActiveRules(const char* namePrefix = nullptr);
