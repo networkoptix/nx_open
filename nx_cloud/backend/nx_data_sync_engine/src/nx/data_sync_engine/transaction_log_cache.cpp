@@ -169,9 +169,8 @@ const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
 vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
-    vms::api::Timestamp timestamp;
-    timestamp.sequence = timestampSequence(lock, tranId);
-    timestamp.ticks = m_timestampCalculator.calculateNextTimeStamp().ticks;
+    vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
+    timestamp.sequence = std::max(timestamp.sequence, timestampSequence(lock, tranId));
     return timestamp;
 }
 
