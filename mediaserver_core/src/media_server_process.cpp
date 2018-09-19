@@ -294,7 +294,6 @@
 
 #include "ini.h"
 
-
 using namespace nx;
 
 // This constant is used while checking for compatibility.
@@ -315,7 +314,6 @@ class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-
 
 namespace {
 const QString YES = lit("yes");
@@ -440,7 +438,6 @@ QString defaultLocalAddress(const QHostAddress& target)
         if (result.length()>0)
             return result;
     }
-
 
     {
         // if nothing else works use first enabled hostaddr
@@ -582,7 +579,6 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     }
     return result;
 }
-
 
 QnStorageResourceList createStorages(
     QnCommonModule* commonModule,
@@ -1178,7 +1174,6 @@ void MediaServerProcess::stopAsync()
     QTimer::singleShot(0, this, SLOT(stopSync()));
 }
 
-
 int MediaServerProcess::getTcpPort() const
 {
     return m_universalTcpListener ? m_universalTcpListener->getPort() : 0;
@@ -1258,7 +1253,6 @@ void MediaServerProcess::updateAddressesList()
 
     ec2::ApiMediaServerData prevValue;
     fromResourceToApi(m_mediaServer, prevValue);
-
 
     QList<SocketAddress> serverAddresses;
 
@@ -1356,7 +1350,6 @@ void MediaServerProcess::loadResourcesFromEc(
                 return;
         } while (ec2Connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
-
         // read resource status
         ec2::ApiResourceStatusDataList statusList;
         while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
@@ -1380,7 +1373,6 @@ void MediaServerProcess::loadResourcesFromEc(
         messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
 
     }
-
 
     {
         // read camera list
@@ -2411,7 +2403,6 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/downloads/", new QnDownloadsRestHandler());
 
-
     /**%apidoc[proprietary] GET /api/settime
      * Set current time on the server machine. Can be called only if server flags include
      * "SF_timeCtrl" (server flags can be obtained via /ec2/getMediaServersEx in "flags"
@@ -2515,10 +2506,10 @@ void MediaServerProcess::registerRestHandlers(
      * Merge two Systems. <br/> The System that joins another System is called the current System,
      * the joinable System is called the target System. The <b>URL</b> parameter sets the
      * target Server which should be joined with the current System. Other servers, that are
-     * merged with the target Server will be joined if parameter <b>mergeOneServer</b> is set
-     * to false. <br/> The method uses digest authentication. Two hashes should be previouly
+     * merged with the target Server, will be joined if parameter <b>mergeOneServer</b> is set
+     * to false. <br/> The method uses digest authentication. Two hashes should be previously
      * calculated: <b>getKey</b> and <b>postKey</b>. Both are mandatory. The calculation
-     * algorithm is described in <b>Calculating authentication hash</b> section (in the bootom
+     * algorithm is described in <b>Calculating authentication hash</b> section (in the bottom
      * of the page). While calculating hashes, username and password of the target Server are
      * needed. Digest authentication needs realm and nonce, both can be obtained with <code>GET
      * /api/getNonce call</code> call. The lifetime of a nonce is about a few minutes.
@@ -2540,11 +2531,11 @@ void MediaServerProcess::registerRestHandlers(
      *         will be disjoined from another system (if it was joined).
      *     %value false The current system will merge with target server and all servers which are
      *         merged with the target server.
-     * %param[opt]:boolean ignoreIncompatible Whether to ignore different version of merged server
+     * %param[opt]:boolean ignoreIncompatible Whether to ignore different versions of merged server
      *     protocols. Default value is false.
      *     %value true Merge will start anyway.
      *     %value false If the target server protocol version differs from the current server
-     *         protocol version merge aborts.
+     *         protocol, version merge aborts.
      * %return:object JSON with error code and error string. Error string could be empty in case
      *     of successful ping, "FAIL" if the specified system is unreachable or there is no system,
      *     "UNAUTHORIZED" if the authentication credentials are invalid, "INCOMPATIBLE" if the
@@ -3861,13 +3852,11 @@ void MediaServerProcess::run()
             } while (appserverHost.toIPv4Address() == 0);
         }
 
-
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
         cloudManagerGroup.connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
-
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
@@ -4084,7 +4073,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
 
-
     commonModule()->resourceDiscoveryManager()->setReady(true);
     const bool isDiscoveryDisabled =
         qnServerModule->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
@@ -4092,7 +4080,6 @@ void MediaServerProcess::run()
         commonModule()->resourceDiscoveryManager()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
-
 
     connect(
         commonModule()->resourceDiscoveryManager(),
@@ -4523,7 +4510,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 #ifdef __linux__
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
-
 
 #ifndef EDGE_SERVER
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
