@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from cloud import settings
 
 import models
-from api.views import get_ip
+from api.views.account import get_ip
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, APIException, APILogicException, ErrorCodes, APINotAuthorisedException
 
