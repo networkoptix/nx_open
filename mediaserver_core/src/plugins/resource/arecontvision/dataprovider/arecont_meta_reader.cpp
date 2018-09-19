@@ -3,8 +3,23 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
+struct MdParsingInfo
+{
+    MdParsingInfo(QnPlAreconVisionResource* resource)
+    {
+        maxSensorWidth = resource->getProperty(lit("MaxSensorWidth")).toInt();
+        maxSensorHight = resource->getProperty(lit("MaxSensorHeight")).toInt();
+        totalMdZones = resource->totalMdZones();
+        zoneSize = resource->getZoneSite();
+    }
+    int totalMdZones;
+    int zoneSize;
+    int maxSensorWidth;
+    int maxSensorHight;
+};
+
 static QnMetaDataV1Ptr parseMotionMetadata(
-    int channel, const QString& response, const ArecontMetaReader::MdParsingInfo& info)
+    int channel, const QString& response, const MdParsingInfo& info)
 {
     int index = response.indexOf('=');
     if (index == -1)
@@ -45,8 +60,11 @@ static QnMetaDataV1Ptr parseMotionMetadata(
     return motion;
 }
 
-ArecontMetaReader::ArecontMetaReader(int channelCount):
-    m_channelCount(channelCount)
+ArecontMetaReader::ArecontMetaReader(
+        int channelCount, std::chrono::milliseconds minRepeatInterval, int minFrameInterval):
+    m_channelCount(channelCount),
+    m_minRepeatInterval(minRepeatInterval),
+    m_minFrameInterval(minFrameInterval)
 {
 }
 
@@ -67,21 +85,36 @@ QnMetaDataV1Ptr ArecontMetaReader::getData()
     return std::move(m_metaData);
 }
 
-void ArecontMetaReader::asyncRequest(
-    const QString& host, const QAuthenticator& auth, const MdParsingInfo& info)
+void ArecontMetaReader::requestIfReady(QnPlAreconVisionResource* resource)
+{
+    bool repeatIntervalExceeded = m_framesSinceLastMetaData > 0 &&
+        (!m_lastMetaRequest.isValid() || m_lastMetaRequest.elapsed() > m_minRepeatInterval);
+    bool frameIntervalExceeded = m_framesSinceLastMetaData > m_minFrameInterval;
+
+    if (!m_metaDataClientBusy && (repeatIntervalExceeded || frameIntervalExceeded))
+    {
+        m_framesSinceLastMetaData = 0;
+        m_lastMetaRequest.restart();
+        asyncRequest(resource);
+    }
+}
+
+void ArecontMetaReader::asyncRequest(QnPlAreconVisionResource* resource)
 {
     QString path = "/get";
     if (m_channelCount > 1)
         path += QString::number(m_currentChannel + 1);
+    auto auth = resource->getAuth();
     QUrl url = nx::network::url::Builder()
         .setScheme("http")
-        .setHost(host)
+        .setHost(resource->getHostAddress())
         .setPort(80)
         .setPath(path)
         .setQuery("mdresult")
         .setUserName(auth.user())
         .setPassword(auth.password());
 
+    MdParsingInfo info(resource);
     m_metaDataClientBusy = true;
     m_metaDataClient.doGet(url,
         [this, info]()

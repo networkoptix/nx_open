@@ -1,29 +1,28 @@
 #pragma once
 
+#include <chrono>
 #include <nx/network/http/http_async_client.h>
 #include <nx/streaming/media_data_packet.h>
+#include <nx/utils/elapsed_timer.h>
 
+#include "../resource/av_resource.h"
+
+
+struct MdParsingInfo;
 class ArecontMetaReader
 {
 public:
-    struct MdParsingInfo
-    {
-        int totalMdZones;
-        int zoneSize;
-        int maxSensorWidth;
-        int maxSensorHight;
-    };
-
-public:
-    ArecontMetaReader(int channelCount);
+    ArecontMetaReader(
+        int channelCount, std::chrono::milliseconds minRepeatInterval, int minFrameInterval);
     ~ArecontMetaReader();
 
-    void asyncRequest(const QString& host, const QAuthenticator& auth, const MdParsingInfo& info);
-    bool busy() { return m_metaDataClientBusy; }
+    void requestIfReady(QnPlAreconVisionResource* resource);
     bool hasData();
     QnMetaDataV1Ptr getData();
+    void onNewFrame() { ++m_framesSinceLastMetaData; }
 
 private:
+    void asyncRequest(QnPlAreconVisionResource* resource);
     void onMetaData(const MdParsingInfo& info);
 
 private:
@@ -33,4 +32,9 @@ private:
     const int m_channelCount;
     int m_currentChannel = 0;
     QnMetaDataV1Ptr m_metaData;
+
+    const std::chrono::milliseconds m_minRepeatInterval;
+    const int m_minFrameInterval;
+    nx::utils::ElapsedTimer m_lastMetaRequest;
+    int m_framesSinceLastMetaData = 0;
 };

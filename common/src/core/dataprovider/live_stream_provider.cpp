@@ -341,7 +341,7 @@ bool QnLiveStreamProvider::needMetaData()
     }
     else if (needHardwareMotion())
     {
-        bool result = m_framesSinceLastMetaData > 10
+        bool result = m_framesSinceLastMetaData > kMetaFrameInterval
             || (m_framesSinceLastMetaData > 0
                 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 

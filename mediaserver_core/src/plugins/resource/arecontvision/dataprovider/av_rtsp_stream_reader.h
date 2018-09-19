@@ -45,10 +45,7 @@ private:
 
 private:
     QnMulticodecRtpReader m_rtpStreamParser;
-
     std::unique_ptr<ArecontMetaReader> m_metaReader;
-    QElapsedTimer m_lastMetaRequest;
-    int m_framesSinceLastMetaData = 0;
 };
 
 #endif // ENABLE_ARECONT

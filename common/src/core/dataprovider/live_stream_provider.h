@@ -23,7 +23,8 @@
 #include <analytics/common/video_metadata_plugin.h>
 #include <core/dataprovider/live_stream_params.h>
 
-static const int  META_DATA_DURATION_MS = 300;
+static const int kMetaFrameInterval = 10;
+static const int META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 

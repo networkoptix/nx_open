@@ -19,8 +19,10 @@ QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res):
     auto mediaRes = res.dynamicCast<QnMediaResource>();
     if (mediaRes)
     {
-        m_metaReader =
-            std::make_unique<ArecontMetaReader>(mediaRes->getVideoLayout(0)->channelCount());
+        m_metaReader = std::make_unique<ArecontMetaReader>(
+            mediaRes->getVideoLayout(0)->channelCount(),
+            std::chrono::milliseconds(META_DATA_DURATION_MS),
+            kMetaFrameInterval);
     }
 }
 
@@ -135,25 +137,10 @@ bool QnArecontRtspStreamReader::needMetaData()
     if (m_metaReader->hasData())
         return true;
 
-    bool repeatIntervalExceeded =
-        !m_lastMetaRequest.isValid() || m_lastMetaRequest.elapsed() > META_DATA_DURATION_MS;
-    bool needMetaData =
-        m_framesSinceLastMetaData > 10 || (m_framesSinceLastMetaData > 0 && repeatIntervalExceeded);
-
-    if (!m_metaReader->busy() && needMetaData)
-    {
-        m_framesSinceLastMetaData = 0;
-        m_lastMetaRequest.restart();
-        auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
-        if (!resource)
-            return false;
-        ArecontMetaReader::MdParsingInfo info;
-        info.maxSensorWidth = resource->getProperty(lit("MaxSensorWidth")).toInt();
-        info.maxSensorHight = resource->getProperty(lit("MaxSensorHeight")).toInt();
-        info.totalMdZones = resource->totalMdZones();
-        info.zoneSize = resource->getZoneSite();
-        m_metaReader->asyncRequest(resource->getHostAddress(), resource->getAuth(), info);
-    }
+    auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+    if (!resource)
+        return false;
+    m_metaReader->requestIfReady(resource.data());
     return false;
 }
 
@@ -179,7 +166,7 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
             break;
         }
     }
-    ++m_framesSinceLastMetaData;
+    m_metaReader->onNewFrame();
     return rez;
 }
 
