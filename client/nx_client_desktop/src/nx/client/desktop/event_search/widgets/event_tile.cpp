@@ -50,17 +50,89 @@ static constexpr int kMaximumResourceListSize = 3; //< Before "...and n more"
 
 } // namespace
 
+// ------------------------------------------------------------------------------------------------
+// EventTile::Private
+
+struct EventTile::Private
+{
+    EventTile* const q;
+    CloseButton* const closeButton;
+    bool closeable = false;
+    CommandActionPtr action; //< Button action.
+    QnElidedLabel* const progressLabel;
+    QTimer* autoCloseTimer = nullptr;
+    qreal progressValue = 0.0;
+    bool isRead = false;
+    bool footerEnabled = true;
+    Style style = Style::standard;
+
+    Private(EventTile* q):
+        q(q),
+        closeButton(new CloseButton(q)),
+        progressLabel(new QnElidedLabel(q))
+    {
+    }
+
+    void handleHoverChanged(bool hovered)
+    {
+        const auto showCloseButton = hovered & closeable;
+        q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
+        closeButton->setVisible(showCloseButton);
+        updateBackgroundRole(hovered);
+
+        if (showCloseButton)
+            closeButton->raise();
+
+        if (autoCloseTimer)
+        {
+            if (hovered)
+                autoCloseTimer->stop();
+            else
+                autoCloseTimer->start();
+        }
+    }
+
+    void updateBackgroundRole(bool hovered)
+    {
+        q->setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
+    }
+
+    void updatePalette()
+    {
+        auto pal = q->palette();
+        const auto base = pal.color(QPalette::Base);
+        const auto lighter = colorTheme()->lighter(base, 1);
+
+        switch (style)
+        {
+            case Style::standard:
+                pal.setColor(QPalette::Window, base);
+                pal.setColor(QPalette::Midlight, lighter);
+                break;
+
+            case Style::informer:
+                pal.setColor(QPalette::Window, lighter);
+                pal.setColor(QPalette::Midlight, colorTheme()->lighter(lighter, 1));
+                break;
+        }
+
+        q->setPalette(pal);
+    }
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventTile
+
 EventTile::EventTile(QWidget* parent):
     base_type(parent, Qt::FramelessWindowHint),
-    ui(new Ui::EventTile()),
-    m_closeButton(new CloseButton(this)),
-    m_progressLabel(new QnElidedLabel(this))
+    d(new Private(this)),
+    ui(new Ui::EventTile())
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
-    m_closeButton->setHidden(true);
-    auto anchor = new WidgetAnchor(m_closeButton);
+    d->closeButton->setHidden(true);
+    auto anchor = new WidgetAnchor(d->closeButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
     anchor->setMargins({0, 6, 2, 0}); //< Fine-tuned in correspondence with UI-file.
 
@@ -133,16 +205,16 @@ EventTile::EventTile(QWidget* parent):
     QFont progressLabelFont;
     progressLabelFont.setWeight(QFont::DemiBold);
 
-    m_progressLabel->setParent(ui->progressBar);
-    m_progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
-    m_progressLabel->setFont(progressLabelFont);
-    m_progressLabel->setForegroundRole(QPalette::Highlight);
+    d->progressLabel->setParent(ui->progressBar);
+    d->progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    d->progressLabel->setFont(progressLabelFont);
+    d->progressLabel->setForegroundRole(QPalette::Highlight);
 
     static constexpr int kProgressLabelShift = 8;
-    auto progressLabelAnchor = new WidgetAnchor(m_progressLabel);
+    auto progressLabelAnchor = new WidgetAnchor(d->progressLabel);
     progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
 
-    connect(m_closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
+    connect(d->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
     const auto activateLink =
         [this](const QString& link)
@@ -179,16 +251,16 @@ EventTile::~EventTile()
 
 bool EventTile::closeable() const
 {
-    return m_closeable;
+    return d->closeable;
 }
 
 void EventTile::setCloseable(bool value)
 {
-    if (m_closeable == value)
+    if (d->closeable == value)
         return;
 
-    m_closeable = value;
-    handleHoverChanged(m_closeable && underMouse());
+    d->closeable = value;
+    d->handleHoverChanged(d->closeable && underMouse());
 }
 
 QString EventTile::title() const
@@ -269,7 +341,7 @@ QString EventTile::footerText() const
 void EventTile::setFooterText(const QString& value)
 {
     ui->footerLabel->setText(value);
-    ui->footerLabel->setHidden(!m_footerEnabled || value.isEmpty());
+    ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
 QString EventTile::timestamp() const
@@ -280,7 +352,7 @@ QString EventTile::timestamp() const
 void EventTile::setTimestamp(const QString& value)
 {
     ui->timestampLabel->setText(value);
-    ui->timestampLabel->setHidden(value.isEmpty() || !m_closeButton->isHidden());
+    ui->timestampLabel->setHidden(value.isEmpty() || !d->closeButton->isHidden());
 }
 
 QPixmap EventTile::icon() const
@@ -324,14 +396,14 @@ void EventTile::setPreviewCropRect(const QRectF& relativeRect)
 
 CommandActionPtr EventTile::action() const
 {
-    return m_action;
+    return d->action;
 }
 
 void EventTile::setAction(const CommandActionPtr& value)
 {
-    m_action = value;
-    ui->actionButton->setAction(m_action.data());
-    ui->actionHolder->setHidden(m_action.isNull());
+    d->action = value;
+    ui->actionButton->setAction(d->action.data());
+    ui->actionHolder->setHidden(d->action.isNull());
 }
 
 void EventTile::paintEvent(QPaintEvent* /*event*/)
@@ -356,7 +428,7 @@ bool EventTile::event(QEvent* event)
     if (event->type() == QEvent::Polish)
     {
         const auto result = base_type::event(event);
-        updatePalette();
+        d->updatePalette();
         return result;
     }
 
@@ -364,12 +436,12 @@ bool EventTile::event(QEvent* event)
     {
         case QEvent::Enter:
         case QEvent::HoverEnter:
-            handleHoverChanged(true);
+            d->handleHoverChanged(true);
             break;
 
         case QEvent::Leave:
         case QEvent::HoverLeave:
-            handleHoverChanged(false);
+            d->handleHoverChanged(false);
             break;
 
         case QEvent::MouseButtonPress:
@@ -389,54 +461,30 @@ bool EventTile::event(QEvent* event)
     return base_type::event(event);
 }
 
-void EventTile::handleHoverChanged(bool hovered)
-{
-    const auto showCloseButton = hovered & m_closeable;
-    ui->timestampLabel->setHidden(showCloseButton || ui->timestampLabel->text().isEmpty());
-    m_closeButton->setVisible(showCloseButton);
-    updateBackgroundRole(hovered);
-
-    if (showCloseButton)
-        m_closeButton->raise();
-
-    if (m_autoCloseTimer)
-    {
-        if (hovered)
-            m_autoCloseTimer->stop();
-        else
-            m_autoCloseTimer->start();
-    }
-}
-
-void EventTile::updateBackgroundRole(bool hovered)
-{
-    setBackgroundRole(hovered ? QPalette::Midlight : QPalette::Window);
-}
-
 bool EventTile::hasAutoClose() const
 {
-    return closeable() && m_autoCloseTimer;
+    return closeable() && d->autoCloseTimer;
 }
 
 int EventTile::autoCloseTimeMs() const
 {
-    return hasAutoClose() ? m_autoCloseTimer->interval() : -1;
+    return hasAutoClose() ? d->autoCloseTimer->interval() : -1;
 }
 
 int EventTile::autoCloseRemainingMs() const
 {
-    return hasAutoClose() ? m_autoCloseTimer->remainingTime() : -1;
+    return hasAutoClose() ? d->autoCloseTimer->remainingTime() : -1;
 }
 
 void EventTile::setAutoCloseTimeMs(int value)
 {
     if (value <= 0)
     {
-        if (!m_autoCloseTimer)
+        if (!d->autoCloseTimer)
             return;
 
-        m_autoCloseTimer->deleteLater();
-        m_autoCloseTimer = nullptr;
+        d->autoCloseTimer->deleteLater();
+        d->autoCloseTimer = nullptr;
         return;
     }
 
@@ -447,23 +495,23 @@ void EventTile::setAutoCloseTimeMs(int value)
                 emit closeRequested();
         };
 
-    if (m_autoCloseTimer)
+    if (d->autoCloseTimer)
     {
-        if (!m_isRead)
-            m_autoCloseTimer->stop();
+        if (!d->isRead)
+            d->autoCloseTimer->stop();
 
-        m_autoCloseTimer->setInterval(value);
+        d->autoCloseTimer->setInterval(value);
     }
     else
     {
-        m_autoCloseTimer = new QTimer(this);
-        m_autoCloseTimer->setSingleShot(true);
-        m_autoCloseTimer->setInterval(value);
+        d->autoCloseTimer = new QTimer(this);
+        d->autoCloseTimer->setSingleShot(true);
+        d->autoCloseTimer->setInterval(value);
 
-        connect(m_autoCloseTimer, &QTimer::timeout, this, autoClose);
+        connect(d->autoCloseTimer, &QTimer::timeout, this, autoClose);
 
-        if (m_isRead)
-            m_autoCloseTimer->start();
+        if (d->isRead)
+            d->autoCloseTimer->start();
     }
 }
 
@@ -489,17 +537,17 @@ void EventTile::setProgressBarVisible(bool value)
 
 qreal EventTile::progressValue() const
 {
-    return m_progressValue;
+    return d->progressValue;
 }
 
 void EventTile::setProgressValue(qreal value)
 {
-    if (qFuzzyIsNull(m_progressValue - value))
+    if (qFuzzyIsNull(d->progressValue - value))
         return;
 
-    m_progressValue = value;
+    d->progressValue = value;
 
-    if (m_progressValue != WorkbenchProgressManager::kIndefiniteProgressValue)
+    if (d->progressValue != WorkbenchProgressManager::kIndefiniteProgressValue)
     {
         // Finite progress.
         ui->progressBar->setRange(0, kProgressBarResolution);
@@ -515,25 +563,25 @@ void EventTile::setProgressValue(qreal value)
 
 QString EventTile::progressTitle() const
 {
-    return m_progressLabel->text();
+    return d->progressLabel->text();
 }
 
 void EventTile::setProgressTitle(const QString& value)
 {
-    m_progressLabel->setText(value);
+    d->progressLabel->setText(value);
 }
 
 bool EventTile::isRead() const
 {
-    return m_isRead;
+    return d->isRead;
 }
 
 void EventTile::setRead(bool value)
 {
-    m_isRead = value;
+    d->isRead = value;
 
-    if (m_isRead && m_autoCloseTimer)
-        m_autoCloseTimer->start();
+    if (d->isRead && d->autoCloseTimer)
+        d->autoCloseTimer->start();
 }
 
 bool EventTile::previewEnabled() const
@@ -549,13 +597,13 @@ void EventTile::setPreviewEnabled(bool value)
 
 bool EventTile::footerEnabled() const
 {
-    return m_footerEnabled;
+    return d->footerEnabled;
 }
 
 void EventTile::setFooterEnabled(bool value)
 {
-    m_footerEnabled = value;
-    ui->footerLabel->setHidden(!m_footerEnabled || ui->footerLabel->text().isEmpty());
+    d->footerEnabled = value;
+    ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
 }
 
 EventTile::Mode EventTile::mode() const
@@ -606,38 +654,16 @@ void EventTile::setMode(Mode value)
 
 EventTile::Style EventTile::visualStyle() const
 {
-    return m_style;
+    return d->style;
 }
 
 void EventTile::setVisualStyle(Style value)
 {
-    if (m_style == value)
+    if (d->style == value)
         return;
 
-    m_style = value;
-    updatePalette();
-}
-
-void EventTile::updatePalette()
-{
-    auto pal = palette();
-    const auto base = pal.color(QPalette::Base);
-    const auto lighter = colorTheme()->lighter(base, 1);
-
-    switch (m_style)
-    {
-        case Style::standard:
-            pal.setColor(QPalette::Window, base);
-            pal.setColor(QPalette::Midlight, lighter);
-            break;
-
-        case Style::informer:
-            pal.setColor(QPalette::Window, lighter);
-            pal.setColor(QPalette::Midlight, colorTheme()->lighter(lighter, 1));
-            break;
-    }
-
-    setPalette(pal);
+    d->style = value;
+    d->updatePalette();
 }
 
 } // namespace nx::client::desktop

@@ -129,21 +129,9 @@ protected:
     virtual bool event(QEvent* event) override;
 
 private:
-    void handleHoverChanged(bool hovered);
-    void updateBackgroundRole(bool hovered);
-    void updatePalette();
-
-private:
-    QScopedPointer<Ui::EventTile> ui;
-    CloseButton* const m_closeButton = nullptr;
-    bool m_closeable = false;
-    CommandActionPtr m_action; //< Button action.
-    QnElidedLabel* const m_progressLabel = nullptr;
-    QTimer* m_autoCloseTimer = nullptr;
-    qreal m_progressValue = 0.0;
-    bool m_isRead = false;
-    bool m_footerEnabled = true;
-    Style m_style = Style::standard;
+    struct Private;
+    const QScopedPointer<Private> d;
+    const QScopedPointer<Ui::EventTile> ui;
 };
 
 } // namespace nx::client::desktop
