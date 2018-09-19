@@ -191,19 +191,20 @@ def generate_languages_json(customization, preview):
     save_content(target_file_name, json.dumps(languages_json, ensure_ascii=False))
 
 
-def init_skin(customization_name, product):
+def init_skin(product, customization_name):
     # 1. read skin for this customization
     skin = product.read_global_value('%SKIN%')
+    customization = Customization.objects.get(name=customization_name)
     logger.info("Init " + skin + " skin for " + customization_name)
+
     # 2. copy directory
     from_dir = SOURCE_DIR.replace("{{skin}}", skin)
     target_dir = TARGET_DIR.replace("{{customization}}", customization_name)
     distutils.dir_util.copy_tree(from_dir, target_dir)
     distutils.dir_util.copy_tree(from_dir, os.path.join(target_dir, 'preview'))
 
-    logger.info("Fill content for " + customization_name)
     # 3. run fill_content
-    customization = Customization.objects.get(name=customization_name)
+    logger.info("Fill content for " + customization_name)
     fill_content(product, customization, preview=False, incremental=False)
     logger.info("Fill preview for " + customization_name)
     fill_content(product, customization, preview=True, incremental=False)
@@ -265,7 +266,7 @@ def fill_content(product, customization,
         else:
             version_id = 0
             incremental = False  # no version - do full update using default values
-        cloud_portal_customization_cache(customization, force=True)
+        cloud_portal_customization_cache(customization.name, force=True)
 
     if incremental and not changed_context:
         # filter records changed in this version
@@ -273,7 +274,7 @@ def fill_content(product, customization,
         # detect their contexts
 
         changed_records = DataRecord.objects.filter(version_id=version_id, product=product)
-        # in case version_id is none - we need to filter by customization as well
+        # in case version_id is none - we need to filter by product as well
         if not version_id:  # if version_id is None - check if records are actually latest
             changed_records_ids = [DataRecord.objects.
                                    filter(language_id=record.language_id,
@@ -285,23 +286,25 @@ def fill_content(product, customization,
         changed_context_ids = list(changed_records.values_list('data_structure__context_id', flat=True).distinct())
         changed_contexts = Context.objects.filter(id__in=changed_context_ids)
 
-        changed_global_contexts = changed_contexts.filter(is_global = True)
+        changed_global_contexts = changed_contexts.filter(is_global=True)
         if changed_global_contexts.exists():  # global context was changed - force full rebuild
             incremental = False
         changed_contexts = changed_contexts.all()
 
-    if changed_context:  # if we want to update only fixed content
+    if changed_context:  # if we want to update only fixed context
         if changed_context.is_global:
             incremental = False
         else:
             changed_contexts = [changed_context]
-            changed_records = DataRecord.objects.filter(version_id=version_id, product=product)
+            changed_records = DataRecord.objects.filter(data_structure__context=changed_context,
+                                                        version_id=version_id,
+                                                        product=product)
             if not version_id:
                 changed_records_ids = [DataRecord.objects.
-                                           filter(language_id=record.language_id,
-                                                  data_structure_id=record.data_structure_id,
-                                                  product=product).
-                                           latest('created_date').id for record in changed_records]
+                                       filter(language_id=record.language_id,
+                                              data_structure_id=record.data_structure.id,
+                                              product=product).
+                                       latest('created_date').id for record in changed_records]
                 changed_records = changed_records.filter(id__in=changed_records_ids)
 
     if not incremental:  # If not incremental - iterate all contexts and all languages
@@ -331,8 +334,10 @@ def fill_content(product, customization,
     generate_languages_json(customization, preview)
 
 
-def zip_context(zip_file, skin, product, context, customization, language_code, preview, version_id, global_contexts, add_root):
+def zip_context(zip_file, product, context, customization, language_code,
+                preview, version_id, global_contexts, add_root):
     language = Language.by_code(language_code, customization.default_language)
+    skin = product.read_global_value('%SKIN%')
     if context.template_for_language(language, customization.default_language, skin):  # if we have template - save context to file
         data = process_context(product, context, language_code, customization, preview, version_id, global_contexts)
         name = context.file_path.replace("{{language}}", language_code) if language_code else context.file_path
@@ -351,7 +356,7 @@ def zip_context(zip_file, skin, product, context, customization, language_code, 
         zip_file.writestr(name, data)
 
 
-def get_zip_package(customization, product,
+def get_zip_package(product, customization,
                     preview=True,
                     version_id=None,
                     add_root=True):
@@ -361,14 +366,13 @@ def get_zip_package(customization, product,
     global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
     languages = customization.languages_list
 
-    skin = product.read_global_value('%SKIN%')
     for context in product.product_type.context_set.all():
         if context.translatable:
             for language_code in languages:
-                zip_context(zip_file, skin, product, context, customization, language_code,
+                zip_context(zip_file, product, context, customization, language_code,
                             preview, version_id, global_contexts, add_root)
         else:
-            zip_context(zip_file, skin, product, context, customization, None,
+            zip_context(zip_file, product, context, customization, None,
                         preview, version_id, global_contexts, add_root)
 
     # Mark the files as having been created on Windows so that

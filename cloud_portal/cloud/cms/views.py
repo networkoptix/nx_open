@@ -103,7 +103,6 @@ def context_editor_action(request, product, context_id, language_code):
     request_data = request.POST
     request_files = request.FILES
 
-    upload_errors = []
     preview_link = ""
     saved_msg = "Changes have been saved."
 
@@ -128,7 +127,7 @@ def context_editor_action(request, product, context_id, language_code):
                 warning_no_error_msg = "Cannot have any errors when sending for review."
                 messages.warning(request, "{} - {}".format(product.name, warning_no_error_msg))
             else:
-                modify_db.send_version_for_review(customization, product, request.user)
+                modify_db.send_version_for_review(product, customization, request.user)
                 saved_msg += " A new version has been created."
 
         if upload_errors:
@@ -194,7 +193,7 @@ def version_action(request, version_id=None):
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
-        publishing_errors = modify_db.publish_latest_version(customization, version_id, request.user)
+        publishing_errors = modify_db.publish_latest_version(product, customization, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
@@ -204,7 +203,7 @@ def version_action(request, version_id=None):
         if not request.user.has_perm('cms.force_update'):
             raise PermissionDenied
 
-        filldata.init_skin(settings.CUSTOMIZATION, product)
+        filldata.init_skin(product, customization.name)
         messages.success(request, "Version {} was force updated ".format(version_id))
 
     else:
@@ -330,5 +329,5 @@ def download_package(request, product_id, customization_name=None):
 
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    zipped_data = filldata.get_zip_package(customization, product, preview, version_id)
+    zipped_data = filldata.get_zip_package(product, customization, preview, version_id)
     return response_attachment(zipped_data, product.name + ".zip", "application/zip")

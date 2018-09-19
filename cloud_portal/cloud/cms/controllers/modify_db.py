@@ -3,7 +3,6 @@ from datetime import datetime
 from notifications.api import send
 from django.contrib.auth.models import Permission
 from django.db.models import Q
-from django.conf import settings
 
 from PIL import Image
 import base64, re, uuid
@@ -13,8 +12,9 @@ from api.models import Account
 from ..models import *
 
 
-def accept_latest_draft(customization, version_id, user):
-    unaccepted_version = ContentVersion.objects.filter(id=version_id, accepted_date=None, customization=customization)
+def accept_latest_draft(product, customization, version_id, user):
+    unaccepted_version = ContentVersion.objects.filter(product=product, customization=customization,
+                                                       id=version_id, accepted_date=None)
     if not unaccepted_version.exists():
         return " is currently publishing or has already been published"
     unaccepted_version = unaccepted_version.latest('created_date')
@@ -24,7 +24,7 @@ def accept_latest_draft(customization, version_id, user):
     return None
 
 
-def notify_version_ready(customization, version_id, product_name, exclude_user):
+def notify_version_ready(product_name, customization, version_id, exclude_user):
     perm = Permission.objects.get(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
@@ -144,12 +144,11 @@ def update_latest_record_version(records, new_version):
         record.save()
 
 
-def update_records_to_version(contexts, customization, version):
+def update_records_to_version(product, contexts, customization, version):
     languages = Language.objects.all()
     for context in contexts:
         for data_structure in context.datastructure_set.all():
-            all_records = data_structure.datarecord_set.filter(
-                customization=customization)
+            all_records = data_structure.datarecord_set.filter(product=product, customization=customization)
 
             if data_structure.translatable:
                 for language in languages:
@@ -164,15 +163,15 @@ def update_records_to_version(contexts, customization, version):
 
 
 def strip_version_from_records(version, product):
-    records_to_strip = DataRecord.objects.filter(version=version, version__product=product)
+    records_to_strip = DataRecord.objects.filter(version=version, product=product)
     for record in records_to_strip:
         record.version = None
         record.save()
 
 
-def remove_unused_records(customization):
-    nullify_records = DataRecord.objects.filter(
-        customization_id=customization.id, version_id=None)
+# Currently unused
+def remove_unused_records(product):
+    nullify_records = DataRecord.objects.filter(product=product, version_id=None)
     if nullify_records.exists():
         for record in nullify_records:
             record.delete()
@@ -192,15 +191,14 @@ def generate_preview(product, customization, context=None, version_id=None, send
     return generate_preview_link(context)
 
 
-def publish_latest_version(customization, version_id, user):
-    publish_errors = accept_latest_draft(customization, version_id, user)
+def publish_latest_version(product, customization, version_id, user):
+    publish_errors = accept_latest_draft(product, customization, version_id, user)
     if not publish_errors:
-        product = Product.objects.get(contentversion__id=version_id)
         fill_content(product, customization, preview=False, incremental=True)
     return publish_errors
 
 
-def send_version_for_review(customization, product, user):
+def send_version_for_review(product, customization, user):
     old_versions = ContentVersion.objects.filter(product=product, customization=customization, accepted_date=None)
 
     if old_versions.exists():
@@ -211,9 +209,9 @@ def send_version_for_review(customization, product, user):
     version = ContentVersion(customization=customization, product=product, created_by=user)
     version.save()
 
-    update_records_to_version(Context.objects.filter(product_type=product.product_type), customization, version)
+    update_records_to_version(product, Context.objects.filter(product_type=product.product_type), customization, version)
 
-    notify_version_ready(customization, version.id, product.name, user)
+    notify_version_ready(product.name, customization, version.id, user)
 
 
 def get_records_for_version(version):
