@@ -36,6 +36,12 @@ protected:
 
     void waitForDataSynchronized(const VmsPeer& one, const VmsPeer& two)
     {
+        while (!ec2::test::PeerWrapper::peersInterconnected(
+            std::vector<const VmsPeer*>{&two, &one}))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
         while (!ec2::test::PeerWrapper::allPeersHaveSameTransactionLog(
             std::vector<const VmsPeer*>{&one, &two}))
         {
@@ -139,8 +145,14 @@ TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
 
     startServer(1);
     waitForDataSynchronized(cloud(), server(1));
+    addRandomNonCloudDataToServer(1);
 
     startServer(0);
+
+    // For some reasons peers won't connect without a butt kick.
+    server(0).process().moduleInstance()->connectTo(
+        server(1).process().moduleInstance().get());
+
     waitForDataSynchronized(server(0), server(1));
 }
 
