@@ -8,7 +8,7 @@ import tzlocal.windows_tz
 from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import AlreadyExists, CannotDownload, exit_status_error_cls
+from framework.os_access.exceptions import AlreadyExists, CannotDownload, DoesNotExist, exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -156,6 +156,10 @@ class WindowsAccess(OSAccess):
 
     def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
+        try:
+            self._disk_space_holder().unlink()
+        except DoesNotExist:
+            pass
         args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
         self.winrm.command(args).run()
 
