@@ -41,13 +41,8 @@ struct SupportedRule
 
 struct Heartbeat
 {
-    std::chrono::seconds interval;
-    bool isEnabled;
-    Heartbeat(): interval(1), isEnabled(false) {}
-    Heartbeat(std::chrono::seconds interval, bool isEnabled):
-        interval(interval), isEnabled(isEnabled)
-    {
-    }
+    std::chrono::seconds interval = std::chrono::seconds(1);
+    bool isEnabled = false;
 };
 
 class CameraControllerImpl;

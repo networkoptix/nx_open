@@ -26,7 +26,6 @@ namespace vca {
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
  * last time.
- * @note ElapsedEvent is non-copyable and non-movable.
  */
 struct ElapsedEvent
 {

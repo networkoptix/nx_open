@@ -6,7 +6,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/kit/debug.h>
 
-
 /**@file
  * This unit is based on the "IPN HTTP API Manual" that explains how to use HTTP-based API of IPN
  * series.
@@ -497,7 +496,11 @@ bool CameraController::setHeartbeat(Heartbeat heartbeat) const
     static const std::chrono::seconds kMaxInterval(300);
 
     if (heartbeat.interval > kMaxInterval || heartbeat.interval < kMinInterval)
+    {
+        NX_PRINT << "Trying to set inappropriate heartbeat interval: "
+            << heartbeat.interval.count() << " seconds";
         return false;
+    }
 
     const QString yesno = heartbeat.isEnabled ? "yes" : "no";
     const QString interval = QString::number(heartbeat.interval.count());

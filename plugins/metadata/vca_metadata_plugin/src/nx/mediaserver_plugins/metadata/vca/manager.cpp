@@ -160,7 +160,7 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
-        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true)))
+        nx::vca::Heartbeat{ kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true }))
     {
         NX_PRINT << "Failed to set VCA-camera heartbeat";
         return nx::sdk::Error::networkError;
