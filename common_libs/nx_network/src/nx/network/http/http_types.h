@@ -158,22 +158,33 @@ enum Value
     switchingProtocols = 101,
 
     ok = 200,
+    created = 201,
     noContent = 204,
     partialContent = 206,
     lastSuccessCode = 299,
     multipleChoices = 300,
     movedPermanently = 301,
+    movedTemporarily = 302,
     found = 302,
     seeOther = 303,
     notModified = 304,
+    useProxy = 305,
 
     badRequest = 400,
     unauthorized = 401,
+    paymentRequired = 402,
     forbidden = 403,
     notFound = 404,
     notAllowed = 405,
     notAcceptable = 406,
     proxyAuthenticationRequired = 407,
+    requestTimeOut = 408,
+    conflict = 409,
+    gone = 410,
+    lengthRequired = 411,
+    preconditionFailed = 412,
+    requestEntityTooLarge = 413,
+    requestUriToLarge = 414,
     unsupportedMediaType = 415,
     rangeNotSatisfiable = 416,
     unprocessableEntity = 422,
@@ -182,7 +193,8 @@ enum Value
     internalServerError = 500,
     notImplemented = 501,
     badGateway = 502,
-    serviceUnavailable = 503
+    serviceUnavailable = 503,
+    gatewayTimeOut = 504,
 };
 
 NX_NETWORK_API StringType toString(Value);

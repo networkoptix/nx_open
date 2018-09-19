@@ -227,7 +227,7 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_responseCode(nx::network::rtsp::StatusCode::ok),
+    m_responseCode(nx::network::http::StatusCode::ok),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
     m_TimeOut(0),
@@ -256,7 +256,7 @@ QnRtspClient::~QnRtspClient()
     delete[] m_additionalReadBuffer;
 }
 
-nx::network::rtsp::StatusCode QnRtspClient::getLastResponseCode() const
+nx::network::rtsp::StatusCodeValue QnRtspClient::getLastResponseCode() const
 {
     return m_responseCode;
 }
@@ -420,7 +420,7 @@ void QnRtspClient::updateResponseStatus(const QByteArray& response)
     {
         nx::network::http::StatusLine statusLine;
         statusLine.parse( nx::network::http::ConstBufferRefType(response, 0, firstLineEnd) );
-        m_responseCode = static_cast<nx::network::rtsp::StatusCode>(statusLine.statusCode);
+        m_responseCode = statusLine.statusCode;
         m_reasonPhrase = QLatin1String(statusLine.reasonPhrase);
     }
 }
@@ -441,7 +441,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
         m_openedTime = startTime;
 
     m_SessionId.clear();
-    m_responseCode = nx::network::rtsp::StatusCode::ok;
+    m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
@@ -516,10 +516,10 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     updateResponseStatus(response);
     switch( m_responseCode )
     {
-        case nx::network::rtsp::StatusCode::ok:
+        case nx::network::http::StatusCode::ok:
             break;
-        case nx::network::rtsp::StatusCode::unauthorized:
-        case nx::network::rtsp::StatusCode::proxyAuthenticationRequired:
+        case nx::network::http::StatusCode::unauthorized:
+        case nx::network::http::StatusCode::proxyAuthenticationRequired:
             stop();
             return CameraDiagnostics::NotAuthorisedResult(url.toString());
         default:
@@ -1730,7 +1730,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 
 bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responseBuf )
 {
-    auto prevStatusCode = nx::network::rtsp::StatusCode::ok;
+    nx::network::rtsp::StatusCodeValue prevStatusCode = nx::network::http::StatusCode::ok;
     addAuth( &request );
     addAdditionAttrs( &request );
 
@@ -1762,11 +1762,11 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
             return false;
         }
 
-        m_responseCode = static_cast<nx::network::rtsp::StatusCode>(response.statusLine.statusCode);
+        m_responseCode = response.statusLine.statusCode;
         switch (m_responseCode)
         {
-            case nx::network::rtsp::StatusCode::unauthorized:
-            case nx::network::rtsp::StatusCode::proxyAuthenticationRequired:
+            case nx::network::http::StatusCode::unauthorized:
+            case nx::network::http::StatusCode::proxyAuthenticationRequired:
                 if( prevStatusCode == m_responseCode )
                 {
                     NX_VERBOSE(this, lm("Already tried authentication and have been rejected"));

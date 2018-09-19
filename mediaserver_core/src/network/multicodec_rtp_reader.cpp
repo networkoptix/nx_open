@@ -695,7 +695,7 @@ void QnMulticodecRtpReader::createTrackParsers()
     }
 }
 
-nx::network::rtsp::StatusCode QnMulticodecRtpReader::getLastResponseCode() const
+nx::network::rtsp::StatusCodeValue QnMulticodecRtpReader::getLastResponseCode() const
 {
     return m_RtpSession.getLastResponseCode();
 }

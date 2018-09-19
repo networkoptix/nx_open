@@ -115,22 +115,22 @@ private:
     void processRequest();
     void parseRequest();
     void initResponse(
-        nx::network::rtsp::StatusCode code = nx::network::rtsp::StatusCode::ok,
+        nx::network::rtsp::StatusCodeValue code = nx::network::http::StatusCode::ok,
         const QString& message = "OK");
     void generateSessionId();
-    void sendResponse(nx::network::rtsp::StatusCode code, const QByteArray& contentType);
+    void sendResponse(nx::network::rtsp::StatusCodeValue code, const QByteArray& contentType);
     PlaybackMode getStreamingMode() const;
 
     int numOfVideoChannels();
-    nx::network::rtsp::StatusCode composeDescribe();
-    nx::network::rtsp::StatusCode composeSetup();
-    nx::network::rtsp::StatusCode composePlay();
-    nx::network::rtsp::StatusCode composePause();
+    nx::network::rtsp::StatusCodeValue composeDescribe();
+    nx::network::rtsp::StatusCodeValue composeSetup();
+    nx::network::rtsp::StatusCodeValue composePlay();
+    nx::network::rtsp::StatusCodeValue composePause();
     int extractTrackId(const QString& path);
-    nx::network::rtsp::StatusCode composeTeardown();
+    nx::network::rtsp::StatusCodeValue composeTeardown();
     void processRangeHeader();
-    nx::network::rtsp::StatusCode composeSetParameter();
-    nx::network::rtsp::StatusCode composeGetParameter();
+    nx::network::rtsp::StatusCodeValue composeSetParameter();
+    nx::network::rtsp::StatusCodeValue composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();

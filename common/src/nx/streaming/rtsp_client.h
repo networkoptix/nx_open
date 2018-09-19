@@ -281,7 +281,7 @@ public:
     QList<QByteArray> getSdpByType(TrackType trackType) const;
     int getTrackCount(TrackType trackType) const;
 
-    nx::network::rtsp::StatusCode getLastResponseCode() const;
+    nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
     bool isAudioEnabled() const;
@@ -378,7 +378,7 @@ private:
     qint64 m_endTime;
     float m_scale;
     std::chrono::milliseconds m_tcpTimeout;
-    nx::network::rtsp::StatusCode m_responseCode;
+    nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     unsigned int m_TimeOut;

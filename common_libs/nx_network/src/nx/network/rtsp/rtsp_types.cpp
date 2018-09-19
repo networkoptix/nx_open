@@ -6,35 +6,11 @@ namespace nx {
 namespace network {
 namespace rtsp {
 
-QString toString(StatusCode statusCode)
+QString toString(int statusCode)
 {
     switch (statusCode)
     {
-        case StatusCode::continue_: return "Continue";
-        case StatusCode::ok: return "OK";
-        case StatusCode::created: return "Created";
         case StatusCode::lowOnStorageSpace: return "Low on storage space";
-        case StatusCode::multipleChoices: return "Multiple choices";
-        case StatusCode::movedPermanently: return "Moved permanently";
-        case StatusCode::movedTemporarily: return "Moved temporarily";
-        case StatusCode::seeOther: return "See other";
-        case StatusCode::notModified: return "Not modified";
-        case StatusCode::useProxy: return "Use proxy";
-        case StatusCode::badRequest: return "Bad request";
-        case StatusCode::unauthorized: return "Unauthorized";
-        case StatusCode::paymentRequired: return "Payment required";
-        case StatusCode::forbidden: return "Forbidden";
-        case StatusCode::notFound: return "Not found";
-        case StatusCode::methodNotAllowed: return "Method not allowed";
-        case StatusCode::notAcceptable: return "Not acceptable";
-        case StatusCode::proxyAuthenticationRequired: return "Proxy authentication required";
-        case StatusCode::requestTimeOut: return "Request time-out";
-        case StatusCode::gone: return "Gone";
-        case StatusCode::lengthRequired: return "Length required";
-        case StatusCode::preconditionFailed: return "Precondition failed";
-        case StatusCode::requestEntityTooLarge: return "Request entity too large";
-        case StatusCode::requestUriToLarge: return "Request URI too large";
-        case StatusCode::unsupportedMediaType: return "Unsupported media type";
         case StatusCode::parameterNotUnderstood: return "Parameter not understood";
         case StatusCode::conferenceNotFound: return "Conference not found";
         case StatusCode::notEnoughBandwidth: return "Not enough bandwidth";
@@ -48,14 +24,9 @@ QString toString(StatusCode statusCode)
         case StatusCode::unsupportedTransport: return "Unsupported transport";
         case StatusCode::destinationUnreachable: return "Destination unreachable";
         case StatusCode::keyManagementFailure: return "Key management failure";
-        case StatusCode::internalServerError: return "Internal server error";
-        case StatusCode::notImplemented: return "Not implemented";
-        case StatusCode::badGateway: return "Bad gateway";
-        case StatusCode::serviceUnavailable: return "Service unavailable";
-        case StatusCode::gatewayTimeOut: return "Gateway time-out";
         case StatusCode::rtspVersionNotSupported: return "RTSP version not supported";
         case StatusCode::optionNotSupported: return "Option not supported";
-        default: return QString("Unknown status code: %1").arg(static_cast<int>(statusCode));
+        default: return nx::network::http::StatusCode::toString(statusCode);
     }
 }
 
