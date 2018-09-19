@@ -4,9 +4,8 @@
 #include <map>
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <nx/network/buffer.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "command.h"
@@ -39,7 +38,7 @@ public:
         /** map<transaction hash, peer which updated transaction> */
         std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
         vms::api::TranState transactionState;
-        boost::optional<std::uint64_t> timestampSequence;
+        std::optional<std::uint64_t> timestampSequence;
     };
 
     static const TranId InvalidTranId = -1;

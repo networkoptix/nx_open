@@ -120,6 +120,10 @@ void VmsTransactionLogCache::commit(TranId tranId)
         m_committedData.timestampSequence = std::max(
             m_committedData.timestampSequence,
             tranContext.data.timestampSequence);
+
+        m_timestampCalculator.shiftTimestampIfNeeded(Timestamp(
+            *m_committedData.timestampSequence,
+            m_timestampCalculator.calculateNextTimeStamp().ticks));
     }
 }
 
@@ -170,7 +174,9 @@ vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId 
 {
     QnMutexLocker lock(&m_mutex);
     vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
-    timestamp.sequence = std::max<decltype(timestamp.sequence)>(timestamp.sequence, timestampSequence(lock, tranId));
+    timestamp.sequence = std::max<decltype(timestamp.sequence)>(
+        timestamp.sequence,
+        timestampSequence(lock, tranId)); //< Increased timestamp sequence can still be not commited.
     return timestamp;
 }
 
