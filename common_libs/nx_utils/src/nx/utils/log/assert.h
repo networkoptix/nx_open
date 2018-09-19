@@ -80,30 +80,35 @@ private:
 
 } // namespace nx::utils
 
-#ifdef NX_CHECK_MEASURE_TIME
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) do \
-    { \
-        auto begin = std::chrono::steady_clock::now(); \
-        bool isOk = static_cast<bool>(condition); \
-        auto time = std::chrono::steady_clock::now() - begin; \
-        \
-        static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
-        info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
-        \
-        if (!isOk) \
-            ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
-    } while (0)
+#if defined(NX_CHECK_MEASURE_TIME)
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) \
+        [&]() \
+        { \
+            auto begin = std::chrono::steady_clock::now(); \
+            bool isOk = static_cast<bool>(condition); \
+            auto time = std::chrono::steady_clock::now() - begin; \
+            \
+            static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
+            info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
+            \
+            if (!isOk) \
+                ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
+            return isOk;
+        }()
 #else
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) do \
-    { \
-        if (!(CONDITION)) \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) \
+        [&]() \
+        { \
+            if (CONDITION) \
+                return true; \
             ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
-    } while (0)
+            return false; \
+        }()
 #endif
 
 /**
  * Debug and Release: Cause segfault in case of failure.
- * Usage: Urecoverable situations when later crash or deadlock is evenadable.
+ * Usage: Unrecoverable situations when later crash or deadlock is inevitable.
  */
 #define NX_CRITICAL(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG( \
