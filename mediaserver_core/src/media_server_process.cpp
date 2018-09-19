@@ -274,6 +274,7 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/mediaserver/event/event_connector.h>
+#include <nx/media/decoder_registrar.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2804,6 +2805,12 @@ nx::vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 
     if (!(serverFlags & (nx::vms::api::SF_ArmServer | nx::vms::api::SF_Edge)))
         serverFlags |= nx::vms::api::SF_SupportsTranscoding;
+
+    QMap<int, QSize> maxFfmpegResolutions;
+    nx::media::DecoderRegistrar::registerDecoders(
+        /*maxFfmpegResolutions*/ QMap<int, QSize>(),
+        /*isTranscodingEnabled*/ serverFlags.hasFlag(nx::vms::api::SF_SupportsTranscoding));
+
 
     const QString appserverHostString = serverModule()->settings().appserverHost();
     bool isLocal = Utils::isLocalAppServer(appserverHostString);
