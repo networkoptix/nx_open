@@ -12,13 +12,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <health/system_health_helper.h>
 #include <ui/common/notification_levels.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
-#include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/dialogs/system_administration_dialog.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+// TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
