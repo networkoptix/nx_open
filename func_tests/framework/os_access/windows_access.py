@@ -7,8 +7,8 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
+from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import AlreadyExists, CannotDownload, DoesNotExist, exit_status_error_cls
 from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -119,7 +119,7 @@ class WindowsAccess(OSAccess):
         expected_exit_status = 0xFFFFFFFE  # ProcDump always exit with this.
         try:
             self.winrm.run_command(['procdump', '-accepteula', pid])  # Full dumps (`-ma`) are too big for pysmb.
-        except exit_status_error_cls(expected_exit_status):
+        except exceptions.exit_status_error_cls(expected_exit_status):
             pass
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
@@ -158,7 +158,7 @@ class WindowsAccess(OSAccess):
         holder_path = self._disk_space_holder()
         try:
             self._disk_space_holder().unlink()
-        except DoesNotExist:
+        except exceptions.DoesNotExist:
             pass
         args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
         self.winrm.command(args).run()
@@ -167,7 +167,7 @@ class WindowsAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyExists(
+            raise exceptions.AlreadyExists(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
@@ -175,7 +175,7 @@ class WindowsAccess(OSAccess):
         try:
             self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url -TimeoutSec $timeoutSec', variables)
         except PowershellError as e:
-            raise CannotDownload(str(e))
+            raise exceptions.CannotDownload(str(e))
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
