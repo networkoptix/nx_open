@@ -416,7 +416,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $scope.showCamerasPanel = function(){
             $scope.showSettings = false;
-            $scope.showCameraPanel=true;
+            $scope.showCameraPanel = true;
         };
 
         document.addEventListener('MSFullscreenChange',function(){ // IE only
@@ -462,6 +462,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             if(serverOffset){
                 timeManager.setOffset(serverOffset);
             }
+
             $scope.showCameraPanel = !$scope.activeCamera;
         });
 
@@ -535,11 +536,11 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         //wait for the page to load then update
         $timeout(updateHeights);
-        
+
         $header.click(function() {
             //350ms delay is to give the navbar enough time to collapse
             $timeout(updateHeights,350);
-        }); 
+        });
 
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",$timeout(updateHeights,200));

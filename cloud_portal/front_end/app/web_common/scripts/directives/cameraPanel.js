@@ -42,7 +42,7 @@
                     // If none - open first server and select first camera
                     // else select last opened server and last selected camera
                     if (Object.keys(scope.storage.serverStates).length === 0) {
-                        if (Object.keys(scope.cameras).length !== 0 && scope.mediaServers !== undefined) {
+                        if (Object.keys(scope.cameras).length !== 0 && scope.mediaServers !== null) {
                             scope.selectCamera(scope.cameras[ scope.mediaServers[ 0 ].id ][ 0 ]);
 
                             scope.toggleInfo = false;
@@ -57,12 +57,12 @@
                                     if (scope.cameras[ server ][ idx ].id === scope.storage.cameraId) {
                                         scope.selectCamera(scope.cameras[ server ][ idx ]);
                                         selected = true;
-                                        return;
+                                        break;
                                     }
                                 }
 
                                 if (selected) {
-                                    return;
+                                    break;
                                 }
                             }
                         }
@@ -87,8 +87,12 @@
                     scope.storage.infoStatus = scope.toggleInfo;
                 };
 
-                scope.selectCamera = function (activeCamera) {
+                scope.showCamera = function (camera) {
                     scope.showCameraPanel = false;
+                    scope.selectCamera(camera);
+                };
+
+                scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
                         return;
                     }
