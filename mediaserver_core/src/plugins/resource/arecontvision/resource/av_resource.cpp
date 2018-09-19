@@ -37,19 +37,11 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
       m_zoneSite(8),
-      m_channelCount(0),
-      m_currentMotionChannel(0),
       m_dualsensor(false),
       m_inputPortState(false),
       m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
-}
-
-QnPlAreconVisionResource::~QnPlAreconVisionResource()
-{
-    if (m_metadataClientBusy)
-        m_metadataClient.pleaseStopSync();
 }
 
 bool QnPlAreconVisionResource::isPanoramic() const
@@ -278,8 +270,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     setApiParameter(lit("mdzonesize"), QString::number(zone_size));
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
-
-    m_channelCount = getVideoLayout(0)->channelCount();
     m_dualsensor = isDualSensor();
 
     return CameraDiagnostics::NoErrorResult();
@@ -370,122 +360,6 @@ int QnPlAreconVisionResource::totalMdZones() const
 bool QnPlAreconVisionResource::isH264() const
 {
     return getProperty(lit("Codec")) == lit("H.264");
-}
-
-QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
-{
-    if (!m_metadataClientBusy)
-        getCameraMetadataAsync();
-
-    std::lock_guard<std::mutex> lock(m_metadataMutex);
-    if (m_metadataQueue.empty())
-        return nullptr;
-
-    QnMetaDataV1Ptr result = m_metadataQueue.front();
-    m_metadataQueue.pop();
-    return result;
-}
-
-void QnPlAreconVisionResource::getCameraMetadataAsync()
-{
-    QString path = "/get";
-    int channel = 0;
-    if (m_channelCount > 1)
-    {
-        channel = m_currentMotionChannel;
-        m_currentMotionChannel = (m_currentMotionChannel + 1) % m_channelCount;
-        path += QString::number(channel + 1);
-    }
-    QAuthenticator auth = getAuth();
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(getHostAddress());
-    url.setPort(80);
-    url.setPath(path);
-    url.setQuery("mdresult");
-    url.setUserName(auth.user());
-    url.setPassword(auth.password());
-
-    m_metadataClientBusy = true;
-    m_metadataClient.doGet(url,
-        [this, channel]()
-        {
-            m_metadataClientBusy = false;
-            if (m_metadataClient.state() == nx_http::AsyncClient::sFailed)
-            {
-                NX_WARNING(this, lm("Failed to get motion meta data, error: %1").arg(
-                    SystemError::toString(m_metadataClient.lastSysErrorCode())));
-                return;
-            }
-
-            if (!m_metadataClient.response())
-            {
-                NX_WARNING(this, lm("Failed to get motion meta data, invalid response"));
-                return;
-            }
-
-            const int statusCode = m_metadataClient.response()->statusLine.statusCode;
-            if (statusCode != nx_http::StatusCode::ok)
-            {
-                NX_WARNING(this, lm("Failed to get motion meta data. Http error code %1")
-                    .arg(statusCode));
-                return;
-            }
-            QString result = QString::fromLatin1(m_metadataClient.fetchMessageBodyBuffer());
-            auto motion = parseMotionMetadata(channel, result);
-            if (motion)
-            {
-                std::lock_guard<std::mutex> lock(m_metadataMutex);
-                m_metadataQueue.push(std::move(motion));
-            }
-        }
-    );
-}
-
-QnMetaDataV1Ptr QnPlAreconVisionResource::parseMotionMetadata(int channel, const QString& response)
-{
-    int index = response.indexOf('=');
-    if (index == -1)
-    {
-        NX_WARNING(this, lm("Failed to get motion meta data. Invalid response format %1")
-            .arg(response));
-        return nullptr;
-    }
-    QString motionStr = response.mid(index + 1);
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    motion->channelNumber = channel;
-    if (motionStr == lit("no motion"))
-        return motion; // no motion detected
-
-    int zones = totalMdZones() == 1024 ? 32 : 8;
-    QStringList md = motionStr.split(L' ', QString::SkipEmptyParts);
-    if (md.size() < zones*zones)
-        return nullptr;
-
-    int pixelZoneSize = getZoneSite() * 32;
-    if (pixelZoneSize == 0)
-        return nullptr;
-
-    QVariant maxSensorWidth = getProperty(lit("MaxSensorWidth"));
-    QVariant maxSensorHight = getProperty(lit("MaxSensorHeight"));
-    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
-    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
-
-    for (int x = 0; x < zones; ++x)
-    {
-        for (int y = 0; y < zones; ++y)
-        {
-            int index = y*zones + x;
-            QString m = md.at(index);
-            if (m == lit("00") || m == lit("0"))
-                continue;
-
-            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
-            motion->mapMotion(imageRect, currZoneRect);
-        }
-    }
-    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
-    return motion;
 }
 
 QString QnPlAreconVisionResource::generateRequestString(

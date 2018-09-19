@@ -59,7 +59,7 @@ public:
     void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
 
-    bool needMetaData();
+    virtual bool needMetaData();
 
     void onStreamReopen();
 
@@ -90,6 +90,7 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
+    bool needHardwareMotion();
 
 protected:
     mutable QnMutex m_livemutex;

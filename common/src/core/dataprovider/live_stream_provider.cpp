@@ -298,15 +298,18 @@ bool QnLiveStreamProvider::isMaxFps() const
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
+bool QnLiveStreamProvider::needHardwareMotion()
+{
+    return getRole() == Qn::CR_LiveVideo
+        && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MT_MotionWindow);
+}
+
 bool QnLiveStreamProvider::needMetaData()
 {
     // I assume this function is called once per video frame
     if (!m_metadataQueue.empty())
         return true;
-
-    bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MT_MotionWindow);
 
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid)
     {
@@ -336,7 +339,7 @@ bool QnLiveStreamProvider::needMetaData()
 #endif
         return false;
     }
-    else if (needHardwareMotion)
+    else if (needHardwareMotion())
     {
         bool result = m_framesSinceLastMetaData > 10
             || (m_framesSinceLastMetaData > 0

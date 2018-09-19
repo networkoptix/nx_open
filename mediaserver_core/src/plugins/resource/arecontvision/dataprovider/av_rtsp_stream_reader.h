@@ -13,8 +13,8 @@
 #include "core/resource/resource_media_layout.h"
 
 #include "basic_av_stream_reader.h"
+#include "arecont_meta_reader.h"
 #include "../resource/av_resource.h"
-
 
 class QnArecontRtspStreamReader
 :
@@ -38,10 +38,17 @@ protected:
     virtual void pleaseStop() override;
     virtual void pleaseReopenStream() override;
     virtual void beforeRun() override;
+
+private:
+    virtual bool needMetaData() override;
+    virtual QnMetaDataV1Ptr getCameraMetadata() override;
+
 private:
     QnMulticodecRtpReader m_rtpStreamParser;
 
-    virtual QnMetaDataV1Ptr getCameraMetadata() override;
+    std::unique_ptr<ArecontMetaReader> m_metaReader;
+    QElapsedTimer m_lastMetaRequest;
+    int m_framesSinceLastMetaData = 0;
 };
 
 #endif // ENABLE_ARECONT

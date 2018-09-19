@@ -57,6 +57,8 @@ AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourceP
 
     m_model = avRes->getModel();
     m_tftp_client = 0;
+    auto mediaRes = res.dynamicCast<QnMediaResource>();
+    m_metaReader = std::make_unique<ArecontMetaReader>(avRes->getVideoLayout(0)->channelCount());
 }
 
 AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
@@ -70,6 +72,38 @@ CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamCon
     QnMutexLocker lk(&m_mutex);
     return m_prevDataReadResult;
 }
+
+// Override needMetaData due to we have async method of meta data obtaining in hardware case
+bool AVClientPullSSTFTPStreamreader::needMetaData()
+{
+    if (!QnPlAVClinetPullStreamReader::needHardwareMotion())
+        return QnPlAVClinetPullStreamReader::needMetaData();
+
+    if (m_metaReader->hasData())
+        return true;
+
+    bool repeatIntervalExceeded =
+        !m_lastMetaRequest.isValid() || m_lastMetaRequest.elapsed() > META_DATA_DURATION_MS;
+    bool needMeteData =
+        m_framesSinceLastMetaData > 10 || (m_framesSinceLastMetaData > 0 && repeatIntervalExceeded);
+
+    if (!m_metaReader->busy() && needMeteData)
+    {
+        m_framesSinceLastMetaData = 0;
+        m_lastMetaRequest.restart();
+        auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+        if (!resource)
+            return false;
+        ArecontMetaReader::MdParsingInfo info;
+        info.maxSensorWidth = resource->getProperty(lit("MaxSensorWidth")).toInt();
+        info.maxSensorHight = resource->getProperty(lit("MaxSensorHeight")).toInt();
+        info.totalMdZones = resource->totalMdZones();
+        info.zoneSize = resource->getZoneSite();
+        m_metaReader->asyncRequest(resource->getHostAddress(), resource->getAuth(), info);
+    }
+    return false;
+}
+
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
@@ -326,13 +360,13 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     videoData->channelNumber = 0;
 
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
+    ++m_framesSinceLastMetaData;
     return videoData;
-
 }
 
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
-    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    auto motion = m_metaReader->getData();
     if (!motion)
         return motion;
     filterMotionByMask(motion);

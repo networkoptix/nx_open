@@ -12,11 +12,16 @@
 #include <plugins/resource/arecontvision/resource/av_panoramic.h>
 
 
-QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)
-:
+QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res):
     parent_type(res),
     m_rtpStreamParser(res)
 {
+    auto mediaRes = res.dynamicCast<QnMediaResource>();
+    if (mediaRes)
+    {
+        m_metaReader =
+            std::make_unique<ArecontMetaReader>(mediaRes->getVideoLayout(0)->channelCount());
+    }
 }
 
 QnArecontRtspStreamReader::~QnArecontRtspStreamReader()
@@ -86,7 +91,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     const QString url = lit("rtsp://%1:%2/%3").arg(res->getHostAddress()).arg(nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
-	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
+    res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 
@@ -102,7 +107,7 @@ bool QnArecontRtspStreamReader::isStreamOpened() const
 
 QnMetaDataV1Ptr QnArecontRtspStreamReader::getCameraMetadata()
 {
-    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    auto motion = m_metaReader->getData();
     if (!motion)
         return motion;
     filterMotionByMask(motion);
@@ -119,6 +124,37 @@ void QnArecontRtspStreamReader::pleaseReopenStream()
 {
     parent_type::pleaseReopenStream();
     CLServerPushStreamReader::pleaseReopenStream();
+}
+
+// Override needMetaData due to we have async method of meta data obtaining in hardware case
+bool QnArecontRtspStreamReader::needMetaData()
+{
+    if (!parent_type::needHardwareMotion())
+        return parent_type::needMetaData();
+
+    if (m_metaReader->hasData())
+        return true;
+
+    bool repeatIntervalExceeded =
+        !m_lastMetaRequest.isValid() || m_lastMetaRequest.elapsed() > META_DATA_DURATION_MS;
+    bool needMetaData =
+        m_framesSinceLastMetaData > 10 || (m_framesSinceLastMetaData > 0 && repeatIntervalExceeded);
+
+    if (!m_metaReader->busy() && needMetaData)
+    {
+        m_framesSinceLastMetaData = 0;
+        m_lastMetaRequest.restart();
+        auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+        if (!resource)
+            return false;
+        ArecontMetaReader::MdParsingInfo info;
+        info.maxSensorWidth = resource->getProperty(lit("MaxSensorWidth")).toInt();
+        info.maxSensorHight = resource->getProperty(lit("MaxSensorHeight")).toInt();
+        info.totalMdZones = resource->totalMdZones();
+        info.zoneSize = resource->getZoneSite();
+        m_metaReader->asyncRequest(resource->getHostAddress(), resource->getAuth(), info);
+    }
+    return false;
 }
 
 QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
@@ -143,7 +179,7 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
             break;
         }
     }
-
+    ++m_framesSinceLastMetaData;
     return rez;
 }
 
