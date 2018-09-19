@@ -43,7 +43,7 @@ ${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//butt
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
 ${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
-${RELEASE HISTORY BUTTON}             //a[contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
+${RELEASE HISTORY BUTTON}             //a[@href="/downloads/history" and contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
 ${SYSTEMS DROPDOWN}                   //header//li[contains(@class, 'collapse-second')]//button[@id='systemsDropdown']
 ${ALL SYSTEMS}                        //header//li[contains(@class, 'collapse-second')]//a[@href='/systems']
 

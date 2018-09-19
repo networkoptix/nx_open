@@ -69,7 +69,9 @@ History link is in the downloads page for user with access and takes you to /dow
     Validate Log In
     Wait Until Element Is Visible    ${DOWNLOAD LINK}
     Click Link    ${DOWNLOAD LINK}
-    Wait Until Element Is Visible    ${RELEASE HISTORY BUTTON}
+    Wait Until Elements Are Visible    ${DOWNLOADS HEADER}    ${WINDOWS TAB}
+    Click Link    ${WINDOWS TAB}
+    Wait Until Elements Are Visible    ${DOWNLOAD WINDOWS VMS LINK}    ${RELEASE HISTORY BUTTON}
     Click Link    ${RELEASE HISTORY BUTTON}
     Location Should Be    ${url}/downloads/history
 
