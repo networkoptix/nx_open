@@ -170,7 +170,7 @@ vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId 
 {
     QnMutexLocker lock(&m_mutex);
     vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
-    timestamp.sequence = std::max(timestamp.sequence, timestampSequence(lock, tranId));
+    timestamp.sequence = std::max<decltype(timestamp.sequence)>(timestamp.sequence, timestampSequence(lock, tranId));
     return timestamp;
 }
 
