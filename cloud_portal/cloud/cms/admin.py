@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
-from .models import *
+from .forms import *
 from cloud import settings
 
 
@@ -33,8 +33,10 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name', 'product_type')
+    list_display = ('context_actions', 'name', 'product_type', 'customizations_list')
     list_display_links = ('name',)
+    list_filter = ('product_type', )
+    form = ProductForm
 
     def context_actions(self, obj):
         return format_html('<a class="btn btn-sm" href="{}">settings</a>',
@@ -42,6 +44,10 @@ class ProductAdmin(CMSAdmin):
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
+
+    def customizations_list(self, obj):
+        return ", ".join(obj.customizations.values_list('name', flat=True))
+    context_actions.short_description = 'Customizations'
 
 
 admin.site.register(Product, ProductAdmin)
@@ -89,7 +95,7 @@ admin.site.register(ContextTemplate, ContextTemplateAdmin)
 
 class DataStructureAdmin(CMSAdmin):
     list_display = ('context', 'label', 'name', 'description', 'translatable', 'type')
-    list_filter = ('context', 'translatable')
+    list_filter = ('context', 'translatable', 'context__product_type')
     search_fields = ('context__name', 'name', 'description', 'type')
 
 
@@ -113,7 +119,7 @@ admin.site.register(Customization, CustomizationAdmin)
 class DataRecordAdmin(CMSAdmin):
     list_display = ('customization', 'language', 'context',
                     'data_structure', 'short_description', 'version')
-    list_filter = ('data_structure__context', 'data_structure', 'customization', 'language')
+    list_filter = ('product', 'customization', 'language', 'data_structure__context', 'data_structure')
     search_fields = ('data_structure__context__name', 'data_structure__name', 'customization__name',
                      'data_structure__description', 'value', 'language__code')
     readonly_fields = ('created_by',)

@@ -10,8 +10,11 @@ from util.config import get_config
 from django.contrib.auth.models import Group
 from django.template.defaultfilters import truncatechars
 
-# TODO: For product type update
-# Change context.product to context.product_type maybe
+
+def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
+    return Product.objects.get(customizations__name__in=[customization],
+                               product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+
 
 def update_global_cache(customization, version_id):
     global_cache = caches['global']
@@ -27,8 +30,7 @@ def check_update_cache(customization, version_id):
 
 def cloud_portal_customization_cache(customization_name, value=None, force=False):
     data = cache.get(customization_name)
-    product = Product.objects.get(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal,
-                                     customizations__name__in=[customization_name])
+    product = get_cloud_portal_product(customization_name)
 
     if data and 'version_id' in data and not force:
         force = check_update_cache(customization_name, data['version_id'])[0]
@@ -105,7 +107,7 @@ class ProductType(models.Model):
                             (1, "vms", "Vms"),
                             (2, "plugin", "Plugin"),
                             (3, "integration", "Integration"))
-
+    one_customization = models.BooleanField(default=False)
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):
@@ -113,6 +115,8 @@ class ProductType(models.Model):
 
     @staticmethod
     def get_type_by_name(name):
+        if name == "":
+            return ProductType.PRODUCT_TYPES.cloud_portal
         if name[0].islower():
             return getattr(ProductType.PRODUCT_TYPES, name, ProductType.PRODUCT_TYPES.cloud_portal)
 
@@ -128,10 +132,12 @@ class Product(models.Model):
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s')
-    customizations = models.ManyToManyField(Customization)
+    customizations = models.ManyToManyField(Customization, default=None, blank=True)
     product_type = models.ForeignKey(ProductType, default=None, null=True)
 
     def __str__(self):
+        if self.product_type == ProductType.PRODUCT_TYPES.cloud_portal:
+            return "{} - {}".format(self.name, self.customizations.first())
         return self.name
 
     def version_id(self):
@@ -159,11 +165,11 @@ class Product(models.Model):
         else:
             orig = Product.objects.get(pk=self.pk)
             if self.customizations.exists():
-                need_update = self.customizations.filter()[0].preview_status == orig.customizations.filter()[0].preview_status
+                need_update = self.customizations.first().preview_status == orig.customizations.first().preview_status
 
         super(Product, self).save(*args, **kwargs)
-        if need_update and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal and self.customizations.exists():
-            cloud_portal_customization_cache(self.customizations.filter()[0], force=True)  # invalidate cache
+        if need_update and self.product_type == ProductType.PRODUCT_TYPES.cloud_portal and len(self.customizations.all()) == 1:
+            cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
 
 

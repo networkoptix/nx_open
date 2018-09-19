@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('cms', '0035_auto_20180821_0209'),
+        ('cms', '0036_convert_to_utf8mb4'),
     ]
 
     def create_new_cloudportals_for_each_customization(apps, schema_editor):
@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
             name='ProductType',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('one_customization', models.BooleanField(default=False)),
                 ('type', models.IntegerField(choices=[(0, 'Cloud Portal'), (1, 'Vms'), (2, 'Plugin'), (3, 'Integration')], default=0)),
             ],
         ),

@@ -132,3 +132,20 @@ class ProductSettingsForm(forms.Form):
             ('update_content', 'Upload customized content files for customizations')
         )
     )
+
+class ProductForm (forms.ModelForm):
+    class Meta:
+        model = Product
+        exclude = []
+
+    def __init__(self, *args, **kwargs):
+        # Do the normal form initialisation.
+        super(ProductForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
+        cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
+        if self.instance.product_type and self.instance.product_type.type == cloud_portal:
+            cloud_customization = self.instance.customizations.first()
+            used_customizations = [product.customizations.first().name
+                                   for product in Product.objects.filter(product_type__type=cloud_portal)
+                                   if product.customizations.exists() and product.customizations.first() != cloud_customization]
+            self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
+            self.initial['customizations'] = self.instance.customizations.all()

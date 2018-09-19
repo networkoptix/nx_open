@@ -10,13 +10,10 @@ from django.contrib import admin
 from django.http.response import HttpResponse, HttpResponseBadRequest, Http404
 
 import os
-from cloud import settings
 import json
-from .controllers import structure, generate_structure
-
-from .controllers.modify_db import *
-from .forms import *
-from .controllers import filldata
+from cloud import settings
+from cms.controllers import filldata, generate_structure, modify_db, structure
+from cms.forms import *
 
 from django.contrib.admin import AdminSite
 
@@ -119,9 +116,9 @@ def context_editor_action(request, product, context_id, language_code):
         if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
             current_lang = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors = save_unrevisioned_records(product, context, customization,
-                                                  current_lang, context.datastructure_set.all(),
-                                                  request_data, request_files, request.user)
+        upload_errors = modify_db.save_unrevisioned_records(product, context, customization,
+                                                            current_lang, context.datastructure_set.all(),
+                                                            request_data, request_files, request.user)
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
@@ -131,14 +128,14 @@ def context_editor_action(request, product, context_id, language_code):
                 warning_no_error_msg = "Cannot have any errors when sending for review."
                 messages.warning(request, "{} - {}".format(product.name, warning_no_error_msg))
             else:
-                send_version_for_review(customization, product, request.user)
+                modify_db.send_version_for_review(customization, product, request.user)
                 saved_msg += " A new version has been created."
 
         if upload_errors:
             add_upload_error_messages(request, upload_errors)
         else:
             messages.success(request, saved_msg)
-            preview_link = generate_preview_link(context)
+            preview_link = modify_db.generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(product, context, customization, language, request.user)
@@ -191,13 +188,13 @@ def version_action(request, version_id=None):
     product = get_cloud_portal_product()
 
     if "Preview" in request.POST:
-        generate_preview(product, customization, version_id=version_id, send_to_review=True)
+        modify_db.generate_preview(product, customization, version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
-        publishing_errors = publish_latest_version(customization, version_id, request.user)
+        publishing_errors = modify_db.publish_latest_version(customization, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
@@ -221,7 +218,7 @@ def version_action(request, version_id=None):
 def version(request, version_id=None):
     preview_link = ""
     version = ContentVersion.objects.get(id=version_id)
-    contexts = get_records_for_version(version)
+    contexts = modify_db.get_records_for_version(version)
     #else happens when the user makes a revision without any changes
     if contexts.values():
         product = get_cloud_portal_product()
@@ -229,7 +226,7 @@ def version(request, version_id=None):
         if 'preview' in request.GET:
             if len(contexts) == 1:
                 context = Context.objects.get(name=contexts.keys()[0])
-            preview_link = generate_preview_link(context)
+            preview_link = modify_db.generate_preview_link(context)
     else:
         product = {'can_preview': False, 'name': ""}
     return render(request, 'review_records.html', {'version': version,
@@ -324,11 +321,14 @@ def download_file(request, path):
 
 
 @require_http_methods(["GET"])
-def download_package(request, product_name, customization_name=None):
+def download_package(request, product_id, customization_name=None):
+    product = Product.objects.get(id=product_id)
     if not customization_name:
-        customization_name = settings.CUSTOMIZATION
-    customization = Customization.objects.get(name=customization_name)
+        customization = product.customizations.first()
+    else:
+        customization = Customization.objects.get(name=customization_name)
+
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    zipped_data = filldata.get_zip_package(customization, product_name, preview, version_id)
-    return response_attachment(zipped_data, product_name+".zip", "application/zip")
+    zipped_data = filldata.get_zip_package(customization, product, preview, version_id)
+    return response_attachment(zipped_data, product.name + ".zip", "application/zip")

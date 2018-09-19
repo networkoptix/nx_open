@@ -144,7 +144,7 @@ def read_customized_file(filename, product, customization, language_code=None, v
     if context.exists():
         # success -> return process_context
         context = context.first()
-        global_contexts = Context.objects.filter(is_global=True, product__type=product.product_type)
+        global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
         return process_context(product, context, language_code, customization, preview, version_id, global_contexts)
 
     # 2. try to find datastructure for this file
@@ -351,20 +351,18 @@ def zip_context(zip_file, skin, product, context, customization, language_code, 
         zip_file.writestr(name, data)
 
 
-def get_zip_package(customization, product_name,
+def get_zip_package(customization, product,
                     preview=True,
                     version_id=None,
                     add_root=True):
     zip_data = StringIO()
     zip_file = zipfile.ZipFile(zip_data, "a", zipfile.ZIP_DEFLATED, False)
 
-    product = Product.objects.get(name=product_name, customization__in=[customization])
     global_contexts = Context.objects.filter(is_global=True, product_type=product.product_type)
     languages = customization.languages_list
 
     skin = product.read_global_value('%SKIN%')
-
-    for context in product.context_set.all():
+    for context in product.product_type.context_set.all():
         if context.translatable:
             for language_code in languages:
                 zip_context(zip_file, skin, product, context, customization, language_code,

@@ -13,10 +13,6 @@ from api.models import Account
 from ..models import *
 
 
-def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
-    return Product.objects.get(customizations__name__in=[customization],
-                               product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
-
 def accept_latest_draft(customization, version_id, user):
     unaccepted_version = ContentVersion.objects.filter(id=version_id, accepted_date=None, customization=customization)
     if not unaccepted_version.exists():

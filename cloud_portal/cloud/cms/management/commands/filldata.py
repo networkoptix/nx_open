@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from ...controllers import filldata, modify_db
-from ...models import Customization
+from ...controllers import filldata
+from ...models import Customization, get_cloud_portal_product
 from cloud import settings
 
 
@@ -17,11 +17,11 @@ class Command(BaseCommand):
                 'Initiated static content for ' + settings.CUSTOMIZATION))
         elif options['customization'] == 'all':
             for custom in Customization.objects.all():
-                product_name = modify_db.get_cloud_portal_product(custom.name)
+                product_name = get_cloud_portal_product(custom.name)
                 filldata.init_skin(custom.name, product_name)
                 self.stdout.write(self.style.SUCCESS('Initiated static content for ' + custom.name))
         else:
-            product_name = modify_db.get_cloud_portal_product(options['customization'])
+            product_name = get_cloud_portal_product(options['customization'])
             filldata.init_skin(options['customization'], product_name)
             self.stdout.write(self.style.SUCCESS(
                 'Initiated static content for ' + options['customization']))
