@@ -76,7 +76,7 @@ protected:
         nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.typeId = kUserResourceTypeGuid;
-        userData.name = "local user";
+        userData.name = "local user " + nx::utils::generateRandomName(7);
         userData.isEnabled = true;
         userData.realm = "VMS";
 
@@ -114,6 +114,18 @@ private:
 };
 
 std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommonModule;
+
+TEST_F(
+    VmsCloudDataSynchronization,
+    DISABLED_another_mediaserver_synchronizes_data_to_cloud)
+{
+    givenTwoServerCloudSystem();
+    stopServer(1);
+
+    addRandomNonCloudDataToServer(0);
+    addCloudUserOnServer(0);
+    waitForDataSynchronized(cloud(), server(0));
+}
 
 TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
 {
