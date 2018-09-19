@@ -307,6 +307,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="progressDescriptionLabel">
+        <property name="text">
+         <string notr="true">&lt;Textual description of operation with progress&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

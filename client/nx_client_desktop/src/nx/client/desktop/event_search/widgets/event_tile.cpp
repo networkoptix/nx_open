@@ -17,11 +17,10 @@
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/close_button.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <nx/utils/log/log_message.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 namespace {
 
@@ -69,13 +68,14 @@ EventTile::EventTile(QWidget* parent):
     sizePolicy.setRetainSizeWhenHidden(true);
     ui->timestampLabel->setSizePolicy(sizePolicy);
 
-    ui->descriptionLabel->setHidden(true);
-    ui->timestampLabel->setHidden(true);
-    ui->actionHolder->setHidden(true);
-    ui->footerLabel->setHidden(true);
-    ui->resourceListLabel->setHidden(true);
-    ui->narrowHolder->setHidden(true);
-    ui->wideHolder->setHidden(true);
+    ui->descriptionLabel->hide();
+    ui->timestampLabel->hide();
+    ui->actionHolder->hide();
+    ui->footerLabel->hide();
+    ui->resourceListLabel->hide();
+    ui->progressDescriptionLabel->hide();
+    ui->narrowHolder->hide();
+    ui->wideHolder->hide();
 
     ui->previewWidget->setAutoScaleDown(false);
     ui->previewWidget->setCropMode(AsyncImageWidget::CropMode::notHovered);
@@ -104,6 +104,9 @@ EventTile::EventTile(QWidget* parent):
     ui->descriptionLabel->setFont(font);
     ui->descriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->descriptionLabel->setOpenExternalLinks(false);
+    ui->progressDescriptionLabel->setFont(font);
+    ui->progressDescriptionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->progressDescriptionLabel->setOpenExternalLinks(false);
 
     font.setWeight(kResourceListFontWeight);
     font.setPixelSize(kResourceListFontPixelSize);
@@ -130,7 +133,6 @@ EventTile::EventTile(QWidget* parent):
     QFont progressLabelFont;
     progressLabelFont.setWeight(QFont::DemiBold);
 
-    ui->progressBar->setRange(0, kProgressBarResolution);
     m_progressLabel->setParent(ui->progressBar);
     m_progressLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     m_progressLabel->setFont(progressLabelFont);
@@ -221,6 +223,8 @@ void EventTile::setDescription(const QString& value)
 {
     ui->descriptionLabel->setText(value);
     ui->descriptionLabel->setHidden(value.isEmpty());
+    ui->progressDescriptionLabel->setText(value);
+    ui->progressDescriptionLabel->setHidden(value.isEmpty());
 }
 
 void EventTile::setResourceList(const QnResourceList& list)
@@ -490,8 +494,23 @@ qreal EventTile::progressValue() const
 
 void EventTile::setProgressValue(qreal value)
 {
+    if (qFuzzyIsNull(m_progressValue - value))
+        return;
+
     m_progressValue = value;
-    ui->progressBar->setValue(int(value * kProgressBarResolution));
+
+    if (m_progressValue != WorkbenchProgressManager::kIndefiniteProgressValue)
+    {
+        // Finite progress.
+        ui->progressBar->setRange(0, kProgressBarResolution);
+        ui->progressBar->setValue(int(value * kProgressBarResolution));
+    }
+    else
+    {
+        // Ininite progress.
+        ui->progressBar->setRange(0, 0);
+        ui->progressBar->setValue(0);
+    }
 }
 
 QString EventTile::progressTitle() const
@@ -621,6 +640,4 @@ void EventTile::updatePalette()
     setPalette(pal);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -17,9 +17,7 @@ class QnElidedLabel;
 
 namespace Ui { class EventTile; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class ImageProvider;
 class CloseButton;
@@ -148,6 +146,4 @@ private:
     Style m_style = Style::standard;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
