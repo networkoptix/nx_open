@@ -167,7 +167,7 @@ RuleTuple extractParameter(const QByteArray& line)
 
 void filterOutUnnamedRules(std::map<int, SupportedRule>& rules)
 {
-    for (auto it = rules.begin(); it != rules.end(); )
+    for (auto it = rules.begin(); it != rules.end();)
     {
         if (it->second.name.isEmpty())
             rules.erase(it++);
