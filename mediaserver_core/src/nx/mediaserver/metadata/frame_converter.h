@@ -22,6 +22,15 @@ namespace metadata {
 class FrameConverter
 {
 public:
+    FrameConverter(
+        nx::utils::MoveOnlyFunc<QnConstCompressedVideoDataPtr()> getCompressedFrame,
+        nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> getUncompressedFrame)
+        :
+        m_getCompressedFrame(std::move(getCompressedFrame)),
+        m_getUncompressedFrame(std::move(getUncompressedFrame))
+    {
+    }
+
     /**
      * @param pixelFormat If omitted, compressed frame request is assumed.
      * @return Null if the frame is not available.
@@ -29,36 +38,12 @@ public:
     nx::sdk::metadata::DataPacket* getDataPacket(
         boost::optional<nx::sdk::metadata::UncompressedVideoFrame::PixelFormat> pixelFormat);
 
-    /**
-     * @param compressedFrameWarningIssued Points to a flag used to issue a warning about missing
-     *     compressed frame only once. 
-     * @param uncompressedFrameWarningIssued Points to a flag used to issue a warning about missing
-     *     uncompressed frame only once.
-     */
-    FrameConverter(
-        nx::utils::MoveOnlyFunc<QnConstCompressedVideoDataPtr()> getCompressedFrame,
-        nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> getUncompressedFrame,
-        bool* compressedFrameWarningIssued,
-        bool* uncompressedFrameWarningIssued)
-        :
-        m_getCompressedFrame(std::move(getCompressedFrame)),
-        m_getUncompressedFrame(std::move(getUncompressedFrame)),
-        m_compressedFrameWarningIssued(compressedFrameWarningIssued),
-        m_uncompressedFrameWarningIssued(uncompressedFrameWarningIssued)
-    {
-    }
-
-private:
-    void warnOnce(bool* warningIssued, const QString& message);
-
 private:
     nx::utils::MoveOnlyFunc<QnConstCompressedVideoDataPtr()> m_getCompressedFrame;
     nx::utils::MoveOnlyFunc<CLConstVideoDecoderOutputPtr()> m_getUncompressedFrame;
-    bool* m_compressedFrameWarningIssued;
-    bool* m_uncompressedFrameWarningIssued;
-
+    
     std::map<nx::sdk::metadata::UncompressedVideoFrame::PixelFormat,
-        nxpt::ScopedRef<nx::sdk::metadata::UncompressedVideoFrame>> m_rgbFrames;
+        nxpt::ScopedRef<nx::sdk::metadata::UncompressedVideoFrame>> m_uncompressedFrames;
 
     nxpt::ScopedRef<nx::sdk::metadata::WrappingCompressedVideoPacket> m_compressedFrame;
 };

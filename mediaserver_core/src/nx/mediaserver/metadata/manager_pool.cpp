@@ -581,7 +581,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     Plugin* plugin)
 {
     Error error = Error::noError;
-    // TODO: #mike: Consider a dedicated mechanism for localization.
+    // TODO: #mshevchenko: Consider a dedicated mechanism for localization.
 
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
@@ -805,14 +805,26 @@ bool ManagerPool::cameraInfoFromResource(
     return true;
 }
 
+void ManagerPool::issueMissingUncompressedFrameWarningOnce()
+{
+    auto logLevel = nx::utils::log::Level::verbose;
+    if (!m_uncompressedFrameWarningIssued)
+    {
+        m_uncompressedFrameWarningIssued = true;
+        logLevel = nx::utils::log::Level::warning;
+    }
+    NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
+}
+
 void ManagerPool::putVideoFrame(
     const QnUuid& id,
     const QnConstCompressedVideoDataPtr& compressedFrame,
     const CLConstVideoDecoderOutputPtr& uncompressedFrame)
 {
-    NX_VERBOSE(this) << lm("putVideoFrame(\"%1\", %2, %3)").args(
-        id,
-        compressedFrame ? "compressedFrame" : "/*compressedFrame*/ nullptr",
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
+    NX_VERBOSE(this, "putVideoFrame(\"%1\", compressedFrame, %2)", id,
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     if (uncompressedFrame)
@@ -822,9 +834,12 @@ void ManagerPool::putVideoFrame(
 
     FrameConverter frameConverter(
         [&]() { return compressedFrame; },
-        [&]() { return uncompressedFrame; },
-        &m_compressedFrameWarningIssued,
-        &m_uncompressedFrameWarningIssued);
+        [&, this]()
+        {
+            if (!uncompressedFrame)
+                issueMissingUncompressedFrameWarningOnce();
+            return uncompressedFrame;
+        });
 
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
@@ -841,14 +856,13 @@ void ManagerPool::putVideoFrame(
             }
             else
             {
-                NX_WARNING(this,
-                    "Video packet for camera %1 for metadata plugin %2 has been skipped: queue overflow.",
-                    id, managerData->manifest().pluginName.value);
+                NX_INFO(this, "Skipped video frame for %1 from camera %2: queue overflow.",
+                    managerData->manifest().pluginName.value, id);
             }
         }
         else
         {
-            NX_VERBOSE(this, "Video frame not sent to CameraManager.");
+            NX_VERBOSE(this, "Video frame not sent to CameraManager: see the log above.");
         }
     }
 }
@@ -928,6 +942,8 @@ QWeakPointer<VideoDataReceptor> ManagerPool::createVideoDataReceptor(const QnUui
             const QnConstCompressedVideoDataPtr& compressedFrame,
             const CLConstVideoDecoderOutputPtr& uncompressedFrame)
         {
+            if (!NX_ASSERT(compressedFrame))
+                return;
             putVideoFrame(id, compressedFrame, uncompressedFrame);
         },
         needsCompressedFrames,

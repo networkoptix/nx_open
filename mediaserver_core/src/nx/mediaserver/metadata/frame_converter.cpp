@@ -27,9 +27,8 @@ static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat)
         case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
 
         default:
-            NX_ASSERT(false, lm(
-                "Unsupported nx::sdk::metadata::UncompressedVideoFrame::PixelFormat \"%1\" = %2")
-                .args(pixelFormatToStdString(pixelFormat), (int) pixelFormat));
+            NX_ASSERT(false, lm("Unsupported PixelFormat \"%1\" = %2").args(
+                pixelFormatToStdString(pixelFormat), (int) pixelFormat));
             return AV_PIX_FMT_NONE;
     }
 }
@@ -42,9 +41,9 @@ static UncompressedVideoFrame* createUncompressedVideoFrameFromVideoDecoderOutpu
     const auto expectedFormat = AV_PIX_FMT_YUV420P;
     if (frame->format != expectedFormat)
     {
-        NX_ERROR(typeid(FrameConverter)) << lm(
-            "Decoded frame has AVPixelFormat %1 instead of %2; ignoring")
-            .args(frame->format, expectedFormat);
+        NX_ERROR(typeid(FrameConverter),
+            "Ignoring decoded frame: AVPixelFormat is %1 instead of %2.",
+            frame->format, expectedFormat);
         return nullptr;
     }
 
@@ -75,18 +74,15 @@ DataPacket* FrameConverter::getDataPacket(boost::optional<PixelFormat> pixelForm
             }
             return m_compressedFrame.get();
         }
-
-        warnOnce(m_compressedFrameWarningIssued,
-            lm("Compressed frame requested but not received."));
         return nullptr;
     }
 
     if (const auto uncompressedFrame = m_getUncompressedFrame())
     {
-        auto it = m_rgbFrames.find(pixelFormat.get());
-        if (it == m_rgbFrames.cend())
+        auto it = m_uncompressedFrames.find(pixelFormat.get());
+        if (it == m_uncompressedFrames.cend())
         {
-            auto insertResult = m_rgbFrames.emplace(
+            auto insertResult = m_uncompressedFrames.emplace(
                 pixelFormat.get(),
                 nxpt::ScopedRef<UncompressedVideoFrame>(
                     createUncompressedVideoFrameFromVideoDecoderOutput(
@@ -96,23 +92,7 @@ DataPacket* FrameConverter::getDataPacket(boost::optional<PixelFormat> pixelForm
         }
         return it->second.get();
     }
-
-    warnOnce(m_uncompressedFrameWarningIssued,
-        lm("Uncompressed frame requested but not received."));
     return nullptr;
-}
-
-void FrameConverter::warnOnce(bool* warningIssued, const QString& message)
-{
-    if (!*warningIssued)
-    {
-        *warningIssued = true;
-        NX_WARNING(this) << message;
-    }
-    else
-    {
-        NX_VERBOSE(this) << message;
-    }
 }
 
 } // namespace metadata

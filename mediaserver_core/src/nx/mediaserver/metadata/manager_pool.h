@@ -179,10 +179,11 @@ private:
     boost::optional<PixelFormat> pixelFormatFromManifest(
         const nx::api::AnalyticsDriverManifest& manifest);
 
+    void issueMissingUncompressedFrameWarningOnce();
+
 private:
     ResourceMetadataContextMap m_contexts;
     QnMutex m_contextMutex;
-    bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
     QThread* m_thread;

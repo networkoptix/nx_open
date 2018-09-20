@@ -413,6 +413,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
     const QnLiveStreamParams& currentLiveParams,
     bool isCameraControlRequired)
 {
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
     m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
