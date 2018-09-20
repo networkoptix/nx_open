@@ -14,6 +14,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 namespace test {
 
@@ -22,9 +23,18 @@ static const QnUuid kUserResourceTypeGuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7
 } // namespace
 
 class CloudMerge:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
+    CloudMerge():
+        nx::utils::test::TestWithTemporaryDirectory(
+            "vms_cloud_integration.cloudMerge",
+            QString()),
+        m_systemMergeFixture(testDataDir().toStdString() + "/merge_test.data")
+    {
+    }
+
     static void SetUpTestCase()
     {
         s_staticCommonModule =

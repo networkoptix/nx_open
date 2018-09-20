@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include "cloud_system_fixture.h"
 
@@ -8,9 +9,18 @@ namespace test {
 
 class VmsCloudDataSynchronization:
     public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory,
     public CloudSystemFixture
 {
 public:
+    VmsCloudDataSynchronization():
+        nx::utils::test::TestWithTemporaryDirectory(
+            "vms_cloud_intergration.dataSynch",
+            QString()),
+        CloudSystemFixture(testDataDir().toStdString())
+    {
+    }
+
     static void SetUpTestCase()
     {
         s_staticCommonModule =
