@@ -64,7 +64,7 @@ def process_context_structure(product, customization, context, content,
 
     for datastructure in context.datastructure_set.order_by('order').all():
         try:
-            content_value = datastructure.find_actual_value(product, customization, language, version_id)
+            content_value = datastructure.find_actual_value(product, language, version_id)
             # replace marker with value
             if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                 if type(content) == dict:
@@ -153,9 +153,7 @@ def read_customized_file(filename, product, customization, language_code=None, v
     if data_structure.exists():
         # success -> return actual value
         data_structure = data_structure.first()
-        value = data_structure.find_actual_value(customization,
-                                                 Language.by_code(language_code),
-                                                 version_id)
+        value = data_structure.find_actual_value(product, Language.by_code(language_code), version_id)
         return base64.b64decode(value)
 
     # fail - try to read file from drive
@@ -347,8 +345,7 @@ def zip_context(zip_file, product, context, customization, language_code,
     file_structures = context.datastructure_set.filter(type__in=(DataStructure.DATA_TYPES.image,
                                                                  DataStructure.DATA_TYPES.file))
     for file_structure in file_structures:
-        data = file_structure.find_actual_value(product, customization,
-                                                Language.by_code(language_code), version_id)
+        data = file_structure.find_actual_value(product, Language.by_code(language_code), version_id)
         data = base64.b64decode(data)
         name = file_structure.name.replace("{{language}}", language_code) if language_code else file_structure.name
         if add_root:

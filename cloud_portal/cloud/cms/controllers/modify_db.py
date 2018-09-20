@@ -48,7 +48,7 @@ def save_unrevisioned_records(product, context, customization, language, data_st
             ds_language = None
 
         new_record_value = ""
-        latest_value = data_structure.find_actual_value(product, customization=customization, language=ds_language)
+        latest_value = data_structure.find_actual_value(product, ds_language)
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
         # TODO: Refactor image/file logic - CLOUD-1524

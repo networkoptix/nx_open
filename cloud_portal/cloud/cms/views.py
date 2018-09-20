@@ -280,7 +280,7 @@ def product_settings(request, product_id):
                 for error in log_messages:
                     messages.error(request, "Error with {} problem with {}".format(error['file'], error['extension']))
                 return response_attachment(content, 'structure.json', 'application/json')
-            log_messages = structure.process_zip(file, request.user, update_structure, update_content)
+            log_messages = structure.process_zip(file, request.user, product, update_structure, update_content)
             for item in log_messages:
                 log_type = {
                     'info': messages.INFO,

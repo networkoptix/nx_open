@@ -145,7 +145,7 @@ def read_structure_json(filename):
         update_from_object(cms_structure)
 
 
-def process_zip(file_descriptor, user, update_structure, update_content):
+def process_zip(file_descriptor, user, product, update_structure, update_content):
     log_messages = []
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
@@ -261,7 +261,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
                     # if there is a value - compare it with latest draft
                     value = result.group(1)
-                    current_value = structure.find_actual_value(customization)
+                    current_value = structure.find_actual_value(product)
                     if value == current_value:
                         log_messages.append(('warning', 'value %s not changed %s for data structure %s' %
                                              (value, name, structure.name)))
@@ -303,7 +303,7 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
         if update_content:
             # get latest value
-            latest_value = structure.find_actual_value(customization)
+            latest_value = structure.find_actual_value(product)
             # check if file was changed
             if latest_value == data64:
                 continue

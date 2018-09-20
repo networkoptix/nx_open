@@ -73,7 +73,7 @@ class CustomContextForm(forms.Form):
                     ds_description += "<br>This record is the same for every language."
                 ds_language = None
 
-            record_value = data_structure.find_actual_value(product=product, customization=customization, language=ds_language)
+            record_value = data_structure.find_actual_value(product, ds_language)
 
             widget_type = forms.TextInput(attrs={'size': 80, 'placeholder': data_structure.default})
 

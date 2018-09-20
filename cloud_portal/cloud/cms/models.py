@@ -274,41 +274,17 @@ class DataStructure(models.Model):
                 return index
         return 0
 
-    def find_actual_value(self, product=None, customization=None, language=None, version_id=None):
+    def find_actual_value(self, product=None, language=None, version_id=None):
         content_value = ""
-        content_record = None
-
-        # try to get by customization
-        if customization and language:
-            content_record = DataRecord.objects \
-                .filter(customization_id=customization.id,
-                        language_id=language.id,
-                        data_structure_id=self.id)
-
-        if not content_record and customization:
-            content_record = DataRecord.objects \
-                .filter(customization_id=customization.id,
-                        data_structure_id=self.id)
+        if not product:
+            return self.default
+        content_record = DataRecord.objects.filter(product=product, data_structure=self)
 
         # try to get translated content
-        if not content_record and language and self.translatable:
-            content_record = DataRecord.objects \
-                .filter(language_id=language.id,
-                        data_structure_id=self.id)
-
-        # if not - get record without language
-        if not content_record or not content_record.exists():
-            content_record = DataRecord.objects \
-                .filter(language_id=None,
-                        data_structure_id=self.id)
-
-        # if not - get default language
-        if customization and (not content_record or not content_record.exists()):
-            content_record = DataRecord.objects \
-                .filter(language_id=customization.default_language.id,
-                        data_structure_id=self.id)
-        if product:
-            content_record = content_record.filter(product=product)
+        if language and self.translatable:
+            content_record = content_record.filter(language=language)
+        else:
+            content_record = content_record.filter(language=product.customizations.first().default_language)
 
         if content_record and content_record.exists():
             if not version_id:
