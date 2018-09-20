@@ -22,7 +22,7 @@ from framework.message_bus import message_bus_running
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep, with_traceback
-from memory_usage_metrics import load_host_memory_usage
+from system_load_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
