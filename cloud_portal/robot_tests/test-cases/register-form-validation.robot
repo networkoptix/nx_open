@@ -52,21 +52,21 @@ Empty Email                               mark        hamill      ${EMPTY}      
     [tags]    C41556
 Registered Email                          mark        hamill      ${existing email}         ${BASE PASSWORD}            True
     [tags]    C41860
-Short Password                            mark        hamill      ${valid email}            ${7char password}           True
+Short Password asdfghj                    mark        hamill      ${valid email}            ${7char password}           True
     [tags]    C41860
-No Uppercase Password                     mark        hamill      ${valid email}            ${no upper password}        True
+No Uppercase Password adrhartjad          mark        hamill      ${valid email}            ${no upper password}        True
     [tags]    C41860
-Common Password                           mark        hamill      ${valid email}            ${common password}          True
+Common Password qweasd123                 mark        hamill      ${valid email}            ${common password}          True
     [tags]    C41860
-Weak Password                             mark        hamill      ${valid email}            ${weak password}            True
+Weak Password asqwerdf                    mark        hamill      ${valid email}            ${weak password}            True
     [tags]    C41860
-Cyrillic Password                         mark        hamill      ${valid email}            ${CYRILLIC TEXT}            True
+Cyrillic Password Кенгшщзх                mark        hamill      ${valid email}            ${CYRILLIC TEXT}            True
     [tags]    C41860
-Smiley Password                           mark        hamill      ${valid email}            ${SMILEY TEXT}              True
+Smiley Password ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★      mark        hamill      ${valid email}            ${SMILEY TEXT}              True
     [tags]    C41860
-Glyph Password                            mark        hamill      ${valid email}            ${GLYPH TEXT}               True
+Glyph Password 您都可以享受源源不絕的好禮及優惠    mark        hamill      ${valid email}            ${GLYPH TEXT}               True
     [tags]    C41860
-TM Password                               mark        hamill      ${valid email}            ${TM TEXT}                  True
+TM Password qweasdzxc123®™       mark        hamill      ${valid email}            ${TM TEXT}                  True
     [tags]    C41860
 Leading Space Password                    mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
     [tags]    C41860
@@ -74,7 +74,7 @@ Trailing Space Password                   mark        hamill      ${valid email}
     [tags]    C41860
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
     [tags]    C41556
-Symbol Password                           mark        hamill      ${valid email}            ${symbol password}          True
+Symbol Password pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}    mark        hamill      ${valid email}            ${symbol password}          True
     [tags]    C41861
 Invalid First Name                        ${SPACE}    hamill      ${valid email}            ${BASE PASSWORD}            True
 Empty First Name                          ${EMPTY}    hamill      ${valid email}            ${BASE PASSWORD}            True
