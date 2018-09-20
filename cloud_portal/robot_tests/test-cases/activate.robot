@@ -104,6 +104,15 @@ allows register, activate, login with pass!@#$%^&*()_-+=;:'"`~,./\|?[]{} passwor
     Log In    ${email}    ${symbol password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
 
+allows register, activate, login with qweasd 123
+    [tags]    C41862
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${BASE PASSWORD}
+    Activate    ${email}
+    Log In    ${email}    ${BASE PASSWORD}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+
 should show error if same link is used twice
     [tags]    email    C41566
     ${email}    Get Random Email    ${BASE EMAIL}

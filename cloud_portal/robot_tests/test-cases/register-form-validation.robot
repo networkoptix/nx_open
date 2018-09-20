@@ -72,6 +72,8 @@ Leading Space Password                    mark        hamill      ${valid email}
     [tags]    C41860
 Trailing Space Password                   mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}    True
     [tags]    C41860
+Middle Space Password qweasd 123          mark        hamill      ${valid email}            ${BASE PASSWORD}            True
+    [tags]    C41862
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
     [tags]    C41556
 Symbol Password pass!@#$%^&*()_-+=;:'"`~,./\|?[]{}    mark        hamill      ${valid email}            ${symbol password}          True
