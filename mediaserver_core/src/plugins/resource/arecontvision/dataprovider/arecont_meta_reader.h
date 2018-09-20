@@ -7,7 +7,6 @@
 
 #include "../resource/av_resource.h"
 
-
 struct MdParsingInfo;
 class ArecontMetaReader
 {

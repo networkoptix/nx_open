@@ -5,13 +5,6 @@
 
 struct MdParsingInfo
 {
-    MdParsingInfo(QnPlAreconVisionResource* resource)
-    {
-        maxSensorWidth = resource->getProperty(lit("MaxSensorWidth")).toInt();
-        maxSensorHight = resource->getProperty(lit("MaxSensorHeight")).toInt();
-        totalMdZones = resource->totalMdZones();
-        zoneSize = resource->getZoneSite();
-    }
     int totalMdZones;
     int zoneSize;
     int maxSensorWidth;
@@ -76,7 +69,7 @@ ArecontMetaReader::~ArecontMetaReader()
 bool ArecontMetaReader::hasData()
 {
     QnMutexLocker lock(&m_metaDataMutex);
-    return static_cast<bool>(m_metaData);
+    return m_metaData != nullptr;
 }
 
 QnMetaDataV1Ptr ArecontMetaReader::getData()
@@ -114,7 +107,12 @@ void ArecontMetaReader::asyncRequest(QnPlAreconVisionResource* resource)
         .setUserName(auth.user())
         .setPassword(auth.password());
 
-    MdParsingInfo info(resource);
+    MdParsingInfo info {
+        resource->totalMdZones(),
+        resource->getZoneSite(),
+        resource->getProperty(lit("MaxSensorWidth")).toInt(),
+        resource->getProperty(lit("MaxSensorHeight")).toInt()
+    };
     m_metaDataClientBusy = true;
     m_metaDataClient.doGet(url,
         [this, info]()
