@@ -1,5 +1,6 @@
 #include "test_setup.h"
 
+#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/random.h>
 
@@ -11,7 +12,7 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-const int kTimeoutMsec = 100;
+const constexpr int kTimeoutMsec = 100;
 
 class VmsGatewayConnectTest:
     public BasicComponentTest
@@ -54,7 +55,7 @@ public:
 
         // FIXME: "Network proxy is not used if the address used in connectToHost(), bind() or
         //       listen() is equivalent to QHostAddress::LocalHost or QHostAddress::LocalHostIPv6"
-        //       (but Qt on linux has another opinion about this... according to dumps).
+        //       (but Qt on linux has another opinion about this and works well...).
         // see: http://doc.qt.io/qt-5/qnetworkproxy.html
         socket->connectToHost(addr.address.toString(), addr.port);
         return socket;
@@ -76,13 +77,20 @@ TEST_F(VmsGatewayConnectTest, connectionClose)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
 
+    utils::TestSyncQueue<bool> waitQueue{std::chrono::milliseconds(kTimeoutMsec)};
+    server.setOnFinishedConnectionHandler(
+        [&waitQueue](network::test::TestConnection*)
+        {
+            waitQueue.push(true);
+        });
+
     // Client closes connection.
     auto clientSocket = connectProxySocket();
     ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
         << "Connect failed: " << clientSocket->errorString().toStdString();
 
     clientSocket->close();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // TODO: remove sleep
+    waitQueue.pop();
     ASSERT_EQ(server.statistics().onlineConnections, 0);
 
     clientSocket.reset();

@@ -564,6 +564,12 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
+void RandomDataTcpServer::setOnFinishedConnectionHandler(
+    nx::utils::MoveOnlyFunc<void (TestConnection *)> handler)
+{
+    m_finishedConnectionHandler = std::move(handler);
+}
+
 bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
 {
     using namespace std::placeholders;
@@ -650,6 +656,9 @@ void RandomDataTcpServer::onNewConnection(
 void RandomDataTcpServer::onConnectionDone(
     TestConnection* connection )
 {
+    if (m_finishedConnectionHandler)
+        m_finishedConnectionHandler(connection);
+
     QnMutexLocker lk(&m_mutex);
     auto it = std::find_if(
         m_aliveConnections.begin(),

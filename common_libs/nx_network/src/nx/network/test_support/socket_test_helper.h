@@ -177,6 +177,7 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    void setOnFinishedConnectionHandler(nx::utils::MoveOnlyFunc<void(TestConnection*)> handler);
     void setLocalAddress(SocketAddress addr);
     bool start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
@@ -189,6 +190,7 @@ private:
     const size_t m_trafficLimit;
     const TestTransmissionMode m_transmissionMode;
     mutable QnMutex m_mutex;
+    nx::utils::MoveOnlyFunc<void(TestConnection*)> m_finishedConnectionHandler;
     std::list<std::shared_ptr<TestConnection>> m_aliveConnections;
     SocketAddress m_localAddress;
     size_t m_totalConnectionsAccepted;
