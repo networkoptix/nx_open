@@ -88,7 +88,6 @@ MessageBus::MessageBus(
             m_timer->start(500);
         });
     connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
-    connect(commonModule, &QnCommonModule::systemIdentityTimeChanged, this, [this]() { stop(); });
 }
 
 MessageBus::~MessageBus()
