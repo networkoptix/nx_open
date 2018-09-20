@@ -50,6 +50,10 @@ http {
         error_page 503 /static/503.html;
         error_page 502 /static/503.html;
 
+        if (${DOLLAR}http_x_forwarded_proto != "https") {
+            return 301 https://${DOLLAR}host${DOLLAR}request_uri;
+        }
+
         location @proxy_to_app {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
             proxy_set_header Host ${DOLLAR}http_host;
@@ -71,18 +75,6 @@ http {
 
             proxy_pass   http://app_server;
         }
-
-        location ~ ^/(|index.html)$ {
-            index static/index.html;
-
-            if (${DOLLAR}http_x_forwarded_proto != "https") {
-                return 301 https://${DOLLAR}host${DOLLAR}request_uri;
-            }
-
-            # checks for static file, if not found proxy to app
-            try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app;
-        }
-
 
         location / {
             index static/index.html;
