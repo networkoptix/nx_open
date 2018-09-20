@@ -184,7 +184,7 @@ protected:
         const auto transactionHash = 
             nx::cdb::ec2::command::SaveUser::hash(transaction.params);
         auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser::Data>>(
+            UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>>(
                 std::move(transaction),
                 protocolVersionRange().currentVersion());
 
@@ -260,7 +260,8 @@ protected:
             <nx::cdb::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
+                data_sync_engine::SerializableTransaction<nx::cdb::ec2::command::SaveUser>(
+                    std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
@@ -399,7 +400,7 @@ private:
             <nx::cdb::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
+                data_sync_engine::UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>(
                     std::move(transaction),
                     nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)

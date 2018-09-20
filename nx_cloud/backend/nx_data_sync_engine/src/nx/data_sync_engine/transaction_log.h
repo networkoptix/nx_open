@@ -66,7 +66,6 @@ public:
         nx::sql::DBResult(
             nx::sql::QueryContext* /*queryContext*/,
             const std::string& /*systemId*/,
-            const nx::Buffer& /*transactionHash*/,
             const nx::data_sync_engine::EditableSerializableTransaction& /*transaction*/)>;
 
     /**
@@ -106,7 +105,7 @@ public:
     nx::sql::DBResult checkIfNeededAndSaveToLog(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableTransaction<typename CommandDescriptor::Data>& transaction)
+        const SerializableTransaction<CommandDescriptor>& transaction)
     {
         const auto transactionHash = CommandDescriptor::hash(transaction.get().params);
 
@@ -156,7 +155,7 @@ public:
 
         const auto transactionHash = CommandDescriptor::hash(transaction.params);
         auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
+            UbjsonSerializedTransaction<CommandDescriptor>>(
                 std::move(transaction),
                 m_supportedProtocolRange.currentVersion());
 
@@ -301,7 +300,7 @@ private:
     nx::sql::DBResult invokeExternalProcessor(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableTransaction<typename CommandDescriptor::Data>& transaction)
+        const SerializableTransaction<CommandDescriptor>& transaction)
     {
         if (!m_onTransactionReceivedHandler)
             return nx::sql::DBResult::ok;
@@ -309,7 +308,6 @@ private:
         return m_onTransactionReceivedHandler(
             queryContext,
             systemId,
-            CommandDescriptor::hash(transaction.get().params),
             transaction);
     }
 

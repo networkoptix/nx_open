@@ -493,7 +493,7 @@ void TransactionTransport::sendTransaction(
         {
             auto serializedTransaction = QnUbjson::serialized(transaction);
             transactionSerializer =
-                std::make_unique<UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
+                std::make_unique<UbjsonSerializedTransaction<CommandDescriptor>>(
                     std::move(transaction),
                     std::move(serializedTransaction),
                     m_protocolVersionRange.currentVersion());

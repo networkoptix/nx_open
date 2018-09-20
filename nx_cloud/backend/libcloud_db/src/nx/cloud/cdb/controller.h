@@ -103,7 +103,6 @@ private:
     nx::sql::DBResult copyExternalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const nx::Buffer& transactionHash,
         const nx::data_sync_engine::EditableSerializableTransaction& transaction);
 
     void initializeSecurity();

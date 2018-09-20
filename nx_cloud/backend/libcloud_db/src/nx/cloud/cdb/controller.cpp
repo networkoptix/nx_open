@@ -259,13 +259,12 @@ void Controller::initializeDataSynchronizationEngine()
     // Copying every remote transaction as our own to avoid
     // broken synchronization between mediaservers.
     m_ec2SyncronizationEngine.transactionLog().setOnTransactionReceived(
-        std::bind(&Controller::copyExternalTransaction, this, _1, _2, _3, _4));
+        std::bind(&Controller::copyExternalTransaction, this, _1, _2, _3));
 }
 
 nx::sql::DBResult Controller::copyExternalTransaction(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const nx::Buffer& transactionHash,
     const nx::data_sync_engine::EditableSerializableTransaction& transaction)
 {
     if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
@@ -282,7 +281,7 @@ nx::sql::DBResult Controller::copyExternalTransaction(
     return m_ec2SyncronizationEngine.transactionLog().saveLocalTransaction(
         queryContext,
         systemId,
-        transactionHash,
+        ownTransaction->hash(),
         std::move(ownTransaction));
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../command.h"
 #include "transaction_serializer.h"
+#include "../command.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -21,16 +21,17 @@ class NX_DATA_SYNC_ENGINE_API EditableSerializableTransaction:
 public:
     virtual std::unique_ptr<EditableSerializableTransaction> clone() const = 0;
     virtual void setHeader(CommandHeader header) = 0;
+    virtual nx::Buffer hash() const = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename TransactionDataType>
+template<typename CommandDescriptor>
 class SerializableTransaction:
     public EditableSerializableTransaction
 {
 public:
-    SerializableTransaction(Command<TransactionDataType> transaction):
+    SerializableTransaction(Command<typename CommandDescriptor::Data> transaction):
         m_transaction(std::move(transaction))
     {
     }
@@ -78,7 +79,7 @@ public:
 
     virtual std::unique_ptr<EditableSerializableTransaction> clone() const override
     {
-        return std::make_unique<SerializableTransaction<TransactionDataType>>(
+        return std::make_unique<SerializableTransaction<CommandDescriptor>>(
             m_transaction);
     }
 
@@ -87,18 +88,23 @@ public:
         m_transaction.setHeader(std::move(header));
     }
 
-    const Command<TransactionDataType>& get() const
+    virtual nx::Buffer hash() const override
+    {
+        return CommandDescriptor::hash(m_transaction.params);
+    }
+
+    const Command<typename CommandDescriptor::Data>& get() const
     {
         return m_transaction;
     }
 
-    Command<TransactionDataType> take()
+    Command<typename CommandDescriptor::Data> take()
     {
         return std::move(m_transaction);
     }
 
 private:
-    Command<TransactionDataType> m_transaction;
+    Command<typename CommandDescriptor::Data> m_transaction;
 };
 
 } // namespace data_sync_engine
