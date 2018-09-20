@@ -1310,7 +1310,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     m_processedPackets++;
 
-    m_hasVideo = m_resource->hasVideo(data->dataProvider);
+    m_hasVideo = m_resource->hasVideo(media->dataProvider);
 
     if (media->dataType == QnAbstractMediaData::VIDEO ||
         media->dataType == QnAbstractMediaData::AUDIO)

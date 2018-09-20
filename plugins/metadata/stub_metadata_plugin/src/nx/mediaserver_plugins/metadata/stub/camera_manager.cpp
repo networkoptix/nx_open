@@ -296,9 +296,11 @@ bool CameraManager::checkFrame(const UncompressedVideoFrame* frame) const
 
     for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
-        const int bytesPerPlane =
-            (frame->height() / pixelFormatDescriptor->chromaHeightFactor) * frame->lineSize(plane)
-            * (plane == 0 ? 1 : (pixelFormatDescriptor->lumaBitsPerPixel / 8));
+        const int bytesPerPlane = (plane == 0)
+            ? (frame->height() * frame->lineSize(plane))
+            : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
+                * frame->lineSize(plane));
+
         if (frame->dataSize(plane) != bytesPerPlane)
         {
             NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "

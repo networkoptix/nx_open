@@ -36,6 +36,8 @@
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
 #include "wrapping_compressed_video_packet.h"
+#include "data_packet_adapter.h"
+#include "frame_converter.h"
 
 namespace nx {
 namespace api {
@@ -203,7 +205,7 @@ ManagerPool::PluginList ManagerPool::availablePlugins() const
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
-std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
+std::unique_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFromFile(
     const QString& fileDescription, const QString& filename)
 {
     using nx::utils::log::Level;
@@ -212,7 +214,7 @@ std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFrom
         {
             NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
                 .args(fileDescription, message, filename);
-            return std::make_shared<nx::plugins::SettingsHolder>();
+            return std::make_unique<const nx::plugins::SettingsHolder>();
         };
 
     if (!QFileInfo::exists(filename))
@@ -228,7 +230,7 @@ std::shared_ptr<const nx::plugins::SettingsHolder> ManagerPool::loadSettingsFrom
     if (settingsJson.isEmpty())
         return log(Level::error, lit("Unable to read from file"));
 
-    const auto settings = std::make_shared<nx::plugins::SettingsHolder>(settingsJson);
+    auto settings = std::make_unique<const nx::plugins::SettingsHolder>(settingsJson);
     if (!settings->isValid())
         return log(Level::error, lit("Invalid JSON in file"));
 
@@ -525,26 +527,26 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 {
     for (auto& data: context.managers())
     {
-        if (eventTypeIds.empty() && !data.isStreamConsumer)
+        if (eventTypeIds.empty() && !data->isStreamConsumer())
         {
             NX_DEBUG(
                 this,
                 lm("Event list is empty, stopping metadata fetching for resource %1.")
                     .arg(resourceId));
 
-            if (data.manager->stopFetchingMetadata() != Error::noError)
+            if (data->manager()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
         }
         else
         {
             NX_DEBUG(this, lm("Statopping metadata fetching for resource %1").args(resourceId));
-            if (data.manager->stopFetchingMetadata() != Error::noError)
+            if (data->manager()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
 
             NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
@@ -556,15 +558,15 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             {
                 eventTypeList.push_back(eventTypeId.toStdString());
                 eventTypePtrs.push_back(eventTypeList.back().c_str());
-            }                
-            const auto result = data.manager->startFetchingMetadata(
+            }
+            const auto result = data->manager()->startFetchingMetadata(
                 eventTypePtrs.empty() ? nullptr : &eventTypePtrs.front(),
                 (int) eventTypePtrs.size());
 
             if (result != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
         }
     }
@@ -579,7 +581,7 @@ boost::optional<nx::api::AnalyticsDriverManifest> ManagerPool::loadPluginManifes
     Plugin* plugin)
 {
     Error error = Error::noError;
-    // TODO: #mike: Consider a dedicated mechanism for localization.
+    // TODO: #mshevchenko: Consider a dedicated mechanism for localization.
 
     const char* const manifestStr = plugin->capabilitiesManifest(&error);
     if (error != Error::noError)
@@ -803,17 +805,15 @@ bool ManagerPool::cameraInfoFromResource(
     return true;
 }
 
-void ManagerPool::warnOnce(bool* warningIssued, const QString& message)
+void ManagerPool::issueMissingUncompressedFrameWarningOnce()
 {
-    if (!*warningIssued)
+    auto logLevel = nx::utils::log::Level::verbose;
+    if (!m_uncompressedFrameWarningIssued)
     {
-        *warningIssued = true;
-        NX_WARNING(this) << message;
+        m_uncompressedFrameWarningIssued = true;
+        logLevel = nx::utils::log::Level::warning;
     }
-    else
-    {
-        NX_VERBOSE(this) << message;
-    }
+    NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
 }
 
 void ManagerPool::putVideoFrame(
@@ -821,9 +821,10 @@ void ManagerPool::putVideoFrame(
     const QnConstCompressedVideoDataPtr& compressedFrame,
     const CLConstVideoDecoderOutputPtr& uncompressedFrame)
 {
-    NX_VERBOSE(this) << lm("putVideoFrame(\"%1\", %2, %3)").args(
-        id,
-        compressedFrame ? "compressedFrame" : "/*compressedFrame*/ nullptr",
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
+    NX_VERBOSE(this, "putVideoFrame(\"%1\", compressedFrame, %2)", id,
         uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
 
     if (uncompressedFrame)
@@ -831,74 +832,37 @@ void ManagerPool::putVideoFrame(
     else
         m_visualMetadataDebugger->push(compressedFrame);
 
-    std::map<PixelFormat, nxpt::ScopedRef<UncompressedVideoFrame>> rgbFrames;
-    nxpt::ScopedRef<Yuv420UncompressedVideoFrame> yuv420Frame; //< Will be created on first need.
+    FrameConverter frameConverter(
+        [&]() { return compressedFrame; },
+        [&, this]()
+        {
+            if (!uncompressedFrame)
+                issueMissingUncompressedFrameWarningOnce();
+            return uncompressedFrame;
+        });
 
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
     {
-        nxpt::ScopedRef<ConsumingCameraManager> manager(
-            managerData.manager->queryInterface(IID_ConsumingCameraManager));
-        if (!manager)
+        if (!managerData->isStreamConsumer())
             continue;
 
-        DataPacket* dataPacket = nullptr;
-
-        const auto pixelFormat = pixelFormatFromManifest(managerData.manifest);
-        if (!pixelFormat)
+        if (DataPacket* const dataPacket = frameConverter.getDataPacket(
+            pixelFormatFromManifest(managerData->manifest())))
         {
-            if (compressedFrame)
+            if (managerData->canAcceptData())
             {
-                dataPacket = new WrappingCompressedVideoPacket(compressedFrame);
+                managerData->putData(std::make_shared<DataPacketAdapter>(dataPacket));
             }
             else
             {
-                warnOnce(&m_compressedFrameWarningIssued,
-                    lm("Compressed frame requested but not received."));
+                NX_INFO(this, "Skipped video frame for %1 from camera %2: queue overflow.",
+                    managerData->manifest().pluginName.value, id);
             }
         }
         else
         {
-            if (uncompressedFrame)
-            {
-                if (pixelFormat.get() == PixelFormat::yuv420)
-                {
-                    if (yuv420Frame.get() == nullptr)
-                        yuv420Frame.reset(new Yuv420UncompressedVideoFrame(uncompressedFrame));
-                    yuv420Frame->addRef();
-                    dataPacket = yuv420Frame.get();
-                }
-                else
-                {
-                    auto it = rgbFrames.find(pixelFormat.get());
-                    if (it == rgbFrames.cend())
-                    {
-                        auto insertResult = rgbFrames.insert(std::make_pair(pixelFormat.get(),
-                            nxpt::ScopedRef<UncompressedVideoFrame>(
-                                videoDecoderOutputToUncompressedVideoFrame(
-                                    uncompressedFrame, pixelFormat.get()))));
-                        NX_ASSERT(insertResult.second);
-                        it = insertResult.first;
-                    }
-                    it->second->addRef();
-                    dataPacket = it->second.get();
-                }
-            }
-            else
-            {
-                warnOnce(&m_uncompressedFrameWarningIssued,
-                    lm("Uncompressed frame requested but not received."));
-            }
-        }
-
-        if (dataPacket)
-        {
-            manager->pushDataPacket(dataPacket);
-            dataPacket->releaseRef();
-        }
-        else
-        {
-            NX_VERBOSE(this) << lm("Video frame not sent to CameraManager.");
+            NX_VERBOSE(this, "Video frame not sent to CameraManager: see the log above.");
         }
     }
 }
@@ -961,12 +925,12 @@ QWeakPointer<VideoDataReceptor> ManagerPool::createVideoDataReceptor(const QnUui
     for (auto& managerData: m_contexts[id].managers())
     {
         nxpt::ScopedRef<ConsumingCameraManager> manager(
-            managerData.manager->queryInterface(IID_ConsumingCameraManager));
+            managerData->manager()->queryInterface(IID_ConsumingCameraManager));
         if (!manager)
             continue;
 
         boost::optional<PixelFormat> pixelFormat =
-            pixelFormatFromManifest(managerData.manifest);
+            pixelFormatFromManifest(managerData->manifest());
         if (!pixelFormat)
             needsCompressedFrames = true;
         else
@@ -978,6 +942,8 @@ QWeakPointer<VideoDataReceptor> ManagerPool::createVideoDataReceptor(const QnUui
             const QnConstCompressedVideoDataPtr& compressedFrame,
             const CLConstVideoDecoderOutputPtr& uncompressedFrame)
         {
+            if (!NX_ASSERT(compressedFrame))
+                return;
             putVideoFrame(id, compressedFrame, uncompressedFrame);
         },
         needsCompressedFrames,
@@ -996,55 +962,6 @@ void ManagerPool::registerDataReceptor(
 
     auto& context = m_contexts[id];
     context.setMetadataDataReceptor(dataReceptor);
-}
-
-/**
- * Converts rgb-like pixel formats. Asserts that pixelFormat is a supported RGB-based format.
- */
-/*static*/ AVPixelFormat ManagerPool::rgbToAVPixelFormat(PixelFormat pixelFormat)
-{
-    switch (pixelFormat)
-    {
-        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
-        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
-        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
-        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
-        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
-        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
-
-        default:
-            NX_ASSERT(false, lm(
-                "Unsupported nx::sdk::metadata::UncompressedVideoFrame::PixelFormat \"%1\" = %2")
-                .args(pixelFormatToStdString(pixelFormat), (int) pixelFormat));
-            return AV_PIX_FMT_NONE;
-    }
-}
-
-/*static*/ UncompressedVideoFrame* ManagerPool::videoDecoderOutputToUncompressedVideoFrame(
-    const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat)
-{
-    // TODO: Consider supporting other decoded video frame formats.
-    const auto expectedFormat = AV_PIX_FMT_YUV420P;
-    if (frame->format != expectedFormat)
-    {
-        NX_ERROR(typeid(VideoDataReceptor)) << lm(
-            "Decoded frame has AVPixelFormat %1 instead of %2; ignoring")
-            .args(frame->format, expectedFormat);
-        return nullptr;
-    }
-
-    if (pixelFormat == PixelFormat::yuv420)
-        return new Yuv420UncompressedVideoFrame(frame);
-
-    const AVPixelFormat avPixelFormat = rgbToAVPixelFormat(pixelFormat);
-
-    std::vector<std::vector<char>> data(1);
-    std::vector<int> lineSize(1);
-    data[0] = frame->toRgb(&lineSize[0], avPixelFormat);
-
-    return new GenericUncompressedVideoFrame(
-        frame->pkt_dts, frame->width, frame->height, pixelFormat,
-        std::move(data), std::move(lineSize));
 }
 
 } // namespace metadata
