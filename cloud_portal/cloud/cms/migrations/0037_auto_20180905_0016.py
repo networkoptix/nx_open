@@ -107,6 +107,20 @@ class Migration(migrations.Migration):
             name='product',
             field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='cms.Product'),
         ),
+        migrations.RemoveField(
+            model_name='customization',
+            name='preview_status',
+        ),
+        migrations.AddField(
+            model_name='product',
+            name='preview_status',
+            field=models.IntegerField(choices=[(0, 'draft'), (1, 'review')], default=0),
+        ),
+        migrations.AlterField(
+            model_name='product',
+            name='customizations',
+            field=models.ManyToManyField(blank=True, default=None, to='cms.Customization'),
+        ),
         migrations.RunPython(move_contexts_to_producttype),
         migrations.RunPython(create_new_cloudportals_for_each_customization),
         migrations.RunPython(move_revisions_to_new_cloud_portals)

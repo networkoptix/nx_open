@@ -85,8 +85,6 @@ class Customization(models.Model):
     languages = models.ManyToManyField(Language)
     filter_horizontal = ('languages',)
 
-    PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
-    preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
     public_release_history = models.BooleanField(default=False)
     public_downloads = models.BooleanField(default=True)
 
@@ -96,10 +94,6 @@ class Customization(models.Model):
     @property
     def languages_list(self):
         return self.languages.values_list('code', flat=True)
-
-    def change_preview_status(self, new_status):
-        self.preview_status = new_status
-        self.save()
 
 
 class ProductType(models.Model):
@@ -135,6 +129,9 @@ class Product(models.Model):
     customizations = models.ManyToManyField(Customization, default=None, blank=True)
     product_type = models.ForeignKey(ProductType, default=None, null=True)
 
+    PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
+    preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
+
     def __str__(self):
         if self.product_type == ProductType.PRODUCT_TYPES.cloud_portal:
             return "{} - {}".format(self.name, self.customizations.first())
@@ -165,12 +162,16 @@ class Product(models.Model):
         else:
             orig = Product.objects.get(pk=self.pk)
             if self.customizations.exists():
-                need_update = self.customizations.first().preview_status == orig.customizations.first().preview_status
+                need_update = self.preview_status == orig.preview_status
 
         super(Product, self).save(*args, **kwargs)
         if need_update and self.product_type == ProductType.PRODUCT_TYPES.cloud_portal and len(self.customizations.all()) == 1:
             cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
+
+    def change_preview_status(self, new_status):
+        self.preview_status = new_status
+        self.save()
 
 
 class Context(models.Model):
@@ -388,7 +389,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, default=None, null=True)
     language = models.ForeignKey(Language, null=True, blank=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)

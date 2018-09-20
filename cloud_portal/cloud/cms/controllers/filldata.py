@@ -229,22 +229,22 @@ def fill_content(product, customization,
     if preview:  # Here we decide, if we need to change preview state
         # if incremental was false initially - we keep it as false
         if version_id:
-            if customization.preview_status != Customization.PREVIEW_STATUS.review:
+            if product.preview_status != Product.PREVIEW_STATUS.review:
                 # When previewing awaiting version and state is draft
                 # if we are just sending version to review - do incremental update
                 if not send_to_review:
                     incremental = False  # otherwise - do full update and change state to review
-                customization.change_preview_status(Customization.PREVIEW_STATUS.review)
+                product.change_preview_status(Product.PREVIEW_STATUS.review)
             else:
                 if incremental:
                     return  # When previewing awaiting version and state is review - do nothing
                 pass
         else:  # draft
-            if customization.preview_status == Customization.PREVIEW_STATUS.review:
+            if product.preview_status == Product.PREVIEW_STATUS.review:
                 # When saving draft and state is review - do incremental update
                 # applying all drafted changes and change state to draft
                 # incremental = True
-                customization.change_preview_status(Customization.PREVIEW_STATUS.draft)
+                product.change_preview_status(Product.PREVIEW_STATUS.draft)
                 changed_context = None  # remove changed context so that we do full incremental update
             else:
                 # When saving draft for context and state is draft - do incremental update only for changed context
