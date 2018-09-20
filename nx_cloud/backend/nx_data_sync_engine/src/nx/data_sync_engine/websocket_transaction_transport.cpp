@@ -39,7 +39,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
 
     m_commonTransactionHeader.systemId = systemId;
     m_commonTransactionHeader.endpoint = remoteSocketAddr();
-    m_commonTransactionHeader.connectionId = connectionId.toSimpleByteArray();
+    m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
     m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
