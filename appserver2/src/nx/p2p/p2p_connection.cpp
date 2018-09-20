@@ -114,7 +114,11 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
-                httpClient->setUserAuthToken(nx::network::http::Ha1AuthToken(adminUser->getDigest()));
+            {
+                httpClient->setUserCredentials(nx::network::http::Credentials(
+                    adminUser->getName(),
+                    nx::network::http::Ha1AuthToken(adminUser->getDigest())));
+            }
         }
         else
         {

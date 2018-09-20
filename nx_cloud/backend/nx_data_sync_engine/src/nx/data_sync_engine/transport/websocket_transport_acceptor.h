@@ -11,6 +11,7 @@ namespace nx::data_sync_engine {
 
 class ConnectionManager;
 class ProtocolVersionRange;
+class OutgoingCommandFilter;
 class TransactionLog;
 
 } // namespace nx::data_sync_engine
@@ -24,7 +25,8 @@ public:
         const QnUuid& moduleGuid,
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* transactionLog,
-        ConnectionManager* connectionManager);
+        ConnectionManager* connectionManager,
+        const OutgoingCommandFilter& outgoingCommandFilter);
 
     void createConnection(
         nx::network::http::HttpServerConnection* connection,
@@ -37,6 +39,7 @@ private:
     const ProtocolVersionRange& m_protocolVersionRange;
     TransactionLog* m_transactionLog;
     ConnectionManager* m_connectionManager;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;
 
     void addWebSocketTransactionTransport(

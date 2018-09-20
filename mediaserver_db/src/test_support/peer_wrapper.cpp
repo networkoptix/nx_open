@@ -50,6 +50,9 @@ PeerWrapper::PeerWrapper(const QString& dataDir):
 {
     m_ownerCredentials.username = "admin";
     m_ownerCredentials.authToken = nx::network::http::PasswordAuthToken("admin");
+
+    const auto moduleGuid = QnUuid::createUuid().toSimpleString().toStdString();
+    m_process.addArg("-moduleGuid", moduleGuid.c_str());
 }
 
 void PeerWrapper::addSetting(const std::string& name, const std::string& value)
@@ -248,7 +251,7 @@ bool PeerWrapper::allPeersHaveSameTransactionLog(
 }
 
 bool PeerWrapper::peersInterconnected(
-    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+    std::vector<const PeerWrapper*> peers)
 {
     // For now just checking that each peer is connected to every other.
 
@@ -275,6 +278,18 @@ bool PeerWrapper::peersInterconnected(
     }
 
     return true;
+}
+
+bool PeerWrapper::peersInterconnected(
+    const std::vector<std::unique_ptr<PeerWrapper>>& peers)
+{
+    std::vector<const PeerWrapper*> peerPtrs;
+    std::transform(
+        peers.begin(), peers.end(),
+        std::back_inserter(peerPtrs),
+        [](const std::unique_ptr<PeerWrapper>& peer) { return peer.get(); });
+
+    return peersInterconnected(peerPtrs);
 }
 
 std::unique_ptr<MediaServerClientEx> PeerWrapper::prepareMediaServerClient() const

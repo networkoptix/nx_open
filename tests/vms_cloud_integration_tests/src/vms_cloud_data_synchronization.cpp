@@ -36,6 +36,12 @@ protected:
 
     void waitForDataSynchronized(const VmsPeer& one, const VmsPeer& two)
     {
+        while (!ec2::test::PeerWrapper::peersInterconnected(
+            std::vector<const VmsPeer*>{&two, &one}))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+
         while (!ec2::test::PeerWrapper::allPeersHaveSameTransactionLog(
             std::vector<const VmsPeer*>{&one, &two}))
         {
@@ -76,7 +82,7 @@ protected:
         nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.typeId = kUserResourceTypeGuid;
-        userData.name = "local user";
+        userData.name = "local user " + nx::utils::generateRandomName(7);
         userData.isEnabled = true;
         userData.realm = "VMS";
 
@@ -115,7 +121,19 @@ private:
 
 std::unique_ptr<QnStaticCommonModule> VmsCloudDataSynchronization::s_staticCommonModule;
 
-TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
+TEST_F(
+    VmsCloudDataSynchronization,
+    another_mediaserver_synchronizes_data_to_cloud)
+{
+    givenTwoServerCloudSystem();
+    stopServer(1);
+
+    addRandomNonCloudDataToServer(0);
+    addCloudUserOnServer(0);
+    waitForDataSynchronized(cloud(), server(0));
+}
+
+TEST_F(VmsCloudDataSynchronization, using_cloud_does_not_trim_data)
 {
     givenTwoServerCloudSystem();
     stopServer(1);
@@ -127,8 +145,14 @@ TEST_F(VmsCloudDataSynchronization, DISABLED_using_cloud_does_not_trim_data)
 
     startServer(1);
     waitForDataSynchronized(cloud(), server(1));
+    addRandomNonCloudDataToServer(1);
 
     startServer(0);
+
+    // For some reasons peers won't connect without a butt kick.
+    server(0).process().moduleInstance()->connectTo(
+        server(1).process().moduleInstance().get());
+
     waitForDataSynchronized(server(0), server(1));
 }
 

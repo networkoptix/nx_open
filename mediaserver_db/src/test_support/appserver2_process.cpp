@@ -581,9 +581,8 @@ void Appserver2Process::connectTo(const Appserver2Process* dstServer)
     const auto addr = dstServer->endpoint();
     auto peerId = dstServer->commonModule()->moduleGUID();
 
-    nx::utils::Url url = lit("http://%1:%2/ec2/messageBus").arg(addr.address.toString()).arg(addr.port);
-    ecConnection()->messageBus()->
-        addOutgoingConnectionToPeer(peerId, url);
+    nx::utils::Url url = lit("http://%1:%2/").arg(addr.address.toString()).arg(addr.port);
+    ecConnection()->messageBus()-> addOutgoingConnectionToPeer(peerId, url);
 }
 
 // ----------------------------- Appserver2Launcher ----------------------------------------------

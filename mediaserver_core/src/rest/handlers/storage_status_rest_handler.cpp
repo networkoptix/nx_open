@@ -81,11 +81,11 @@ int QnStorageStatusRestHandler::executeGet(
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     auto storage = getOrCreateStorage(storageUrl);
     if (!storage)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     result.setReply(createReply(storage));
     return nx::network::http::StatusCode::ok;

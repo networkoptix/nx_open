@@ -3,12 +3,19 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
 #include "outgoing_transaction_dispatcher.h"
 
 namespace nx {
 namespace data_sync_engine {
+
+const ReadCommandsFilter ReadCommandsFilter::kEmptyFilter = {
+    std::nullopt,
+    std::nullopt,
+    std::numeric_limits<int>::max(),
+    {}};
 
 QString toString(const CommandHeader& tran)
 {
@@ -81,23 +88,21 @@ vms::api::TranState TransactionLog::getTransactionState(const std::string& syste
 
 void TransactionLog::readTransactions(
     const std::string& systemId,
-    boost::optional<vms::api::TranState> from,
-    boost::optional<vms::api::TranState> to,
-    int maxTransactionsToReturn,
+    ReadCommandsFilter filter,
     TransactionsReadHandler completionHandler)
 {
     using namespace std::placeholders;
 
-    if (!from)
-        from = vms::api::TranState{};
+    if (!filter.from)
+        filter.from = vms::api::TranState{};
 
-    if (!to)
+    if (!filter.to)
     {
         vms::api::PersistentIdData maxTranStateKey;
         maxTranStateKey.id = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
         vms::api::TranState maxTranState;
         maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
-        to = std::move(maxTranState);
+        filter.to = std::move(maxTranState);
     }
 
     auto outputData = std::make_unique<TransactionReadResult>();
@@ -105,7 +110,7 @@ void TransactionLog::readTransactions(
     m_dbManager->executeSelect(
         std::bind(
             &TransactionLog::fetchTransactions, this,
-            _1, systemId, std::move(*from), std::move(*to), maxTransactionsToReturn, outputDataPtr),
+            _1, systemId, filter, outputDataPtr),
         [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
             nx::sql::DBResult dbResult)
         {
@@ -118,13 +123,12 @@ void TransactionLog::readTransactions(
         });
 }
 
-void TransactionLog::clearTransactionLogCacheForSystem(
-    const std::string& systemId)
+void TransactionLog::markSystemForDeletion(const std::string& systemId)
 {
-    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
+    NX_VERBOSE(this, lm("Marking system %1 for deletion").arg(systemId));
 
     QnMutexLocker lock(&m_mutex);
-    m_systemIdToTransactionLog.erase(systemId);
+    m_systemsMarkedForDeletion.push_back(systemId);
 }
 
 vms::api::Timestamp TransactionLog::generateTransactionTimestamp(
@@ -230,9 +234,7 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
 nx::sql::DBResult TransactionLog::fetchTransactions(
     nx::sql::QueryContext* queryContext,
     const std::string& systemId,
-    const vms::api::TranState& from,
-    const vms::api::TranState& to,
-    int /*maxTransactionsToReturn*/,
+    const ReadCommandsFilter& filter,
     TransactionReadResult* const outputData)
 {
     // TODO: Taking into account maxTransactionsToReturn
@@ -253,13 +255,16 @@ nx::sql::DBResult TransactionLog::fetchTransactions(
          it != currentState.values.end();
          ++it)
     {
+        if (!filter.sources.empty() && !nx::utils::contains(filter.sources, it.key().id))
+            continue;
+
         const auto dbResult = m_transactionDataObject->fetchTransactionsOfAPeerQuery(
             queryContext,
             systemId,
             it.key().id.toSimpleString(),
             it.key().persistentId.toSimpleString(),
-            from.values.value(it.key()),
-            to.values.value(it.key(), std::numeric_limits<qint32>::max()),
+            filter.from->values.value(it.key()),
+            filter.to->values.value(it.key(), std::numeric_limits<qint32>::max()),
             &outputData->transactions);
         if (dbResult != nx::sql::DBResult::ok)
             return dbResult;
@@ -357,6 +362,9 @@ void TransactionLog::onDbTransactionCompleted(
 
     vmsTransactionLogData->outgoingTransactionsSorter.commit(
         currentDbTranContext.cacheTranId);
+
+    QnMutexLocker lock(&m_mutex);
+    removeSystemsMarkedForDeletion(lock);
 }
 
 TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
@@ -426,6 +434,40 @@ void TransactionLog::updateTimestampHiInCache(
     QnMutexLocker lock(&m_mutex);
     getTransactionLogContext(lock, systemId)->cache.updateTimestampSequence(
         getDbTransactionContext(lock, queryContext, systemId).cacheTranId, newValue);
+}
+
+void TransactionLog::removeSystemsMarkedForDeletion(
+    const QnMutexLockerBase& lock)
+{
+    for (auto it = m_systemsMarkedForDeletion.begin();
+        it != m_systemsMarkedForDeletion.end();
+        )
+    {
+        if (clearTransactionLogCacheForSystem(lock, *it))
+            it = m_systemsMarkedForDeletion.erase(it);
+        else
+            ++it;
+    }
+}
+
+bool TransactionLog::clearTransactionLogCacheForSystem(
+    const QnMutexLockerBase& /*lock*/,
+    const std::string& systemId)
+{
+    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
+
+    auto systemLogIter = m_systemIdToTransactionLog.find(systemId);
+    if (systemLogIter == m_systemIdToTransactionLog.end())
+        return true;
+
+    if (systemLogIter->second->cache.activeTransactionCount() == 0)
+    {
+        m_systemIdToTransactionLog.erase(systemLogIter);
+        return true;
+    }
+
+    // There are active transactions. Will wait for them to finish.
+    return false;
 }
 
 ResultCode TransactionLog::dbResultToApiResult(

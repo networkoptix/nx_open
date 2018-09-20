@@ -18,13 +18,13 @@ import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
-from framework.message_bus import MessageBus
+from framework.message_bus import message_bus_running
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep, with_traceback
-from memory_usage_metrics import load_host_memory_usage
+from system_load_metrics import load_host_memory_usage
 
-pytest_plugins = ['fixtures.unpacked_mediaservers']
+pytest_plugins = ['system_load_metrics', 'fixtures.unpacked_mediaservers']
 
 _logger = ContextLogger(__name__)
 
@@ -245,7 +245,7 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
 
 def wait_until_no_transactions_from_servers(server_list, timeout):
     _logger.info('Wait for message bus for %s:', server_list)
-    with MessageBus(server_list).running() as bus:
+    with message_bus_running(server_list) as bus:
         bus.wait_until_no_transactions(timeout.total_seconds())
     _logger.info('No more transactions from %s:', server_list)
 
@@ -375,11 +375,12 @@ def perform_post_checks(env):
     _logger.info('Perform test post checks: done.')
 
 
-def test_scalability(artifact_factory, metrics_saver, config, env):
+def test_scalability(artifact_factory, metrics_saver, load_averge_collector, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        wait_for_servers_synced(artifact_factory, config, env)
+        with load_averge_collector():
+            wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)

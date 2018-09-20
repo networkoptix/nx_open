@@ -1929,6 +1929,19 @@ nx::sql::DBResult SystemManager::processEc2SaveUser(
             updateSharingInCache(std::move(systemSharing));
         });
 
+    // Copying transaction.
+    dbResult = m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog
+        <ec2::command::SaveUser>(
+            queryContext,
+            systemId,
+            transaction.params);
+    if (dbResult != nx::sql::DBResult::ok)
+    {
+        NX_DEBUG(this, lm("Failed to copy transaction \"saveUser\". System id %1, account %2. %3")
+            .args(systemId, systemSharing.accountEmail, dbResult));
+        return dbResult;
+    }
+
     // Generating "save full name" transaction.
     nx::vms::api::ResourceParamWithRefData fullNameData;
     fullNameData.resourceId = vmsUser.id;

@@ -4,6 +4,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/subscription.h>
 
+#include "outgoing_command_filter.h"
 #include "serialization/serializable_transaction.h"
 #include "serialization/transaction_serializer.h"
 #include "transaction_transport_header.h"
@@ -32,7 +33,8 @@ public:
         const std::string&,
         std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
 
-    OutgoingTransactionDispatcher();
+    OutgoingTransactionDispatcher(
+        const OutgoingCommandFilter& filter);
 
     virtual void dispatchTransaction(
         const std::string& systemId,
@@ -42,6 +44,7 @@ public:
 
 private:
     OnNewTransactionSubscription m_onNewTransactionSubscription;
+    const OutgoingCommandFilter& m_filter;
 };
 
 } // namespace data_sync_engine

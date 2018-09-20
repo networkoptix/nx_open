@@ -25,7 +25,6 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
-
 const float Camera::kMaxEps = 0.01f;
 
 Camera::Camera(QnMediaServerModule* serverModule):
@@ -292,7 +291,7 @@ QSize Camera::getNearestResolution(
 
     int bestIndex = -1;
     double bestMatchCoeff =
-        maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
+        (maxResolutionArea > kMaxEps) ? (maxResolutionArea / requestSquare) : INT_MAX;
 
     for (int i = 0; i < resolutionList.size(); ++i)
     {

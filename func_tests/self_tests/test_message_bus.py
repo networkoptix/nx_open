@@ -1,10 +1,6 @@
-import logging
-
-from framework.message_bus import MessageBus
-
-_logger = logging.getLogger(__name__)
+from framework.message_bus import message_bus_running
 
 
 def test_message_bus(two_merged_mediaservers):
-    with MessageBus(two_merged_mediaservers).running() as bus:
+    with message_bus_running(two_merged_mediaservers) as bus:
         bus.wait_until_no_transactions(timeout_sec=1)

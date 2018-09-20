@@ -35,6 +35,8 @@ public:
         ec2::ApiTransactionDataList* result);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class PeerWrapper
 {
 public:
@@ -81,6 +83,9 @@ public:
 
     static bool allPeersHaveSameTransactionLog(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);
+
+    static bool peersInterconnected(
+        std::vector<const PeerWrapper*> peers);
 
     static bool peersInterconnected(
         const std::vector<std::unique_ptr<PeerWrapper>>& peers);

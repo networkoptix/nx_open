@@ -12,6 +12,7 @@
 #include "http/sync_connection_request_handler.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
+#include "outgoing_command_filter.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
 #include "transport/http_transport_acceptor.h"
@@ -51,6 +52,9 @@ public:
 
     const statistics::Provider& statisticsProvider() const;
 
+    void setOutgoingCommandFilter(
+        const OutgoingCommandFilterConfiguration& configuration);
+
     void subscribeToSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);
     void unsubscribeFromSystemDeletedNotification(
@@ -61,6 +65,7 @@ public:
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
+    OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     dao::rdb::StructureUpdater m_structureUpdater;

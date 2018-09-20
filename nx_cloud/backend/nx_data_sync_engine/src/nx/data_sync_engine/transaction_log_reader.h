@@ -11,6 +11,8 @@
 namespace nx {
 namespace data_sync_engine {
 
+class OutgoingCommandFilter;
+
 /**
  * Asynchronously reads transactions of specified system from log.
  * Returns data in specified format.
@@ -24,15 +26,14 @@ public:
     TransactionLogReader(
         TransactionLog* const transactionLog,
         const std::string& systemId,
-        Qn::SerializationFormat dataFormat);
+        Qn::SerializationFormat dataFormat,
+        const OutgoingCommandFilter& outgoingCommandFilter);
     ~TransactionLogReader();
 
     virtual void stopWhileInAioThread() override;
 
     void readTransactions(
-        boost::optional<vms::api::TranState> from,
-        boost::optional<vms::api::TranState> to,
-        int maxTransactionsToReturn,
+        const ReadCommandsFilter& commandFilter,
         TransactionsReadHandler completionHandler);
 
     // TODO: #ak following method MUST be asynchronous
@@ -43,6 +44,7 @@ private:
     TransactionLog* const m_transactionLog;
     const std::string m_systemId;
     const Qn::SerializationFormat m_dataFormat;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     bool m_terminated;
     QnMutex m_mutex;

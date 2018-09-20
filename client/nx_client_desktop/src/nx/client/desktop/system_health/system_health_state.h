@@ -19,12 +19,13 @@ public:
     virtual ~SystemHealthState() override;
 
     using SystemHealthIndex = QnSystemHealth::MessageType;
-    bool value(SystemHealthIndex index) const;
+    bool state(SystemHealthIndex index) const;
 
     QVariant data(SystemHealthIndex index) const;
 
 signals:
-    void changed(SystemHealthIndex index, bool value, QPrivateSignal);
+    void stateChanged(SystemHealthIndex index, bool state, QPrivateSignal);
+    void dataChanged(SystemHealthIndex index, QPrivateSignal);
 
 private:
     class Private;

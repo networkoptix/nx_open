@@ -104,7 +104,7 @@ bool ProxyConnectionProcessor::isProxyForCamera(
 bool ProxyConnectionProcessor::isProtocol(const QString& protocol) const
 {
 	return nx::network::http::isUrlSheme(protocol)
-		|| nx_rtsp::isUrlSheme(protocol);
+		|| nx::network::rtsp::isUrlSheme(protocol);
 }
 
 int ProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
