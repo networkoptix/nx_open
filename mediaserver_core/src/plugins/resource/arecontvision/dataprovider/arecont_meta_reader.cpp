@@ -5,10 +5,10 @@
 
 struct MdParsingInfo
 {
-    int totalMdZones;
-    int zoneSize;
-    int maxSensorWidth;
-    int maxSensorHight;
+    int totalMdZones = 0;
+    int zoneSize = 0;
+    int maxSensorWidth = 0;
+    int maxSensorHight = 0;
 };
 
 static QnMetaDataV1Ptr parseMotionMetadata(
