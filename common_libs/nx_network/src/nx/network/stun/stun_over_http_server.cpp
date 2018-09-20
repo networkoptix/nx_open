@@ -11,7 +11,7 @@ StunOverHttpServer::StunOverHttpServer(
     :
     m_dispatcher(stunMessageDispatcher),
     m_httpTunnelingServer(
-        std::bind(&StunOverHttpServer::createStunConnection, this, std::placeholders::_1),
+        [this](auto connection) { createStunConnection(std::move(connection)); },
         nullptr)
 {
 }
