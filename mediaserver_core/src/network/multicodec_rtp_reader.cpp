@@ -848,7 +848,7 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
     if (!ioDevice)
         return QnRtspStatistic();
 
-    auto rtcpStaticstics = ioDevice->getStatistic();
+    auto rtcpStatistics = ioDevice->getStatistic();
     uint8_t* data = (uint8_t*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset;
     if (rtpPacketSize < nx::streaming::rtp::RtpHeader::kSize)
     {
@@ -857,12 +857,12 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
     }
 
-    auto header = (nx::streaming::rtp::RtpHeader*)(data);
+    const auto header = (nx::streaming::rtp::RtpHeader*) data;
     if (!header->extension)
-        return rtcpStaticstics;
+        return rtcpStatistics;
 
-    const auto ccrsSizeInBytes = header->CSRCCount * 4;
-    const auto bytesTillExtension = nx::streaming::rtp::RtpHeader::kSize + ccrsSizeInBytes;
+    const auto csrsSizeInBytes = header->CSRCCount * 4;
+    const auto bytesTillExtension = nx::streaming::rtp::RtpHeader::kSize + csrsSizeInBytes;
     if (rtpPacketSize < bytesTillExtension)
     {
         NX_WARNING(this, "RTP packet size is less than expected, resetting statistics");
@@ -876,11 +876,11 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
 
     if (onvifExtension.read(data, rtpPacketSize))
     {
-        rtcpStaticstics.ntpOnvifExtensionTime = onvifExtension.ntp;
-        ioDevice->setStatistic(rtcpStaticstics);
+        rtcpStatistics.ntpOnvifExtensionTime = onvifExtension.ntp;
+        ioDevice->setStatistic(rtcpStatistics);
     }
 
-    return rtcpStaticstics;
+    return rtcpStatistics;
 }
 
 void QnMulticodecRtpReader::setOnSocketReadTimeoutCallback(
