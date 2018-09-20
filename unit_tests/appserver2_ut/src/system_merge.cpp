@@ -9,6 +9,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <api/mediaserver_client.h>
@@ -22,8 +23,16 @@ namespace test {
 
 class SystemMerge:
     public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory,
     public SystemMergeFixture
 {
+public:
+    SystemMerge():
+        nx::utils::test::TestWithTemporaryDirectory("vms_cloud_integration.SystemMerge", QString()),
+        SystemMergeFixture(testDataDir().toStdString())
+    {
+    }
+
 protected:
     void givenTwoSingleServerSystems()
     {
