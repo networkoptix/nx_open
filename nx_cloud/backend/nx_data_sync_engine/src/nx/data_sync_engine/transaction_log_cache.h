@@ -76,6 +76,8 @@ public:
     vms::api::TranState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;
 
+    int activeTransactionCount() const;
+
 private:
     struct TranContext
     {

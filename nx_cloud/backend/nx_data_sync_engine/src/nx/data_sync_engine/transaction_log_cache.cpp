@@ -212,6 +212,12 @@ std::uint64_t VmsTransactionLogCache::committedTimestampSequence() const
     return *m_committedData.timestampSequence;
 }
 
+int VmsTransactionLogCache::activeTransactionCount() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return (int) m_tranIdToContext.size();
+}
+
 std::uint64_t VmsTransactionLogCache::timestampSequence(
     const QnMutexLockerBase& lock, TranId tranId) const
 {

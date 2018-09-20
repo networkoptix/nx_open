@@ -199,7 +199,7 @@ void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
         systemId.c_str(),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
         {
-            m_transactionLog.clearTransactionLogCacheForSystem(systemId.c_str());
+            m_transactionLog.markSystemForDeletion(systemId.c_str());
         });
 }
 

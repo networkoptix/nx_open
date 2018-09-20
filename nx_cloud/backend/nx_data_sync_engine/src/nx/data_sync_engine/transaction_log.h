@@ -239,7 +239,7 @@ public:
         ReadCommandsFilter filter,
         TransactionsReadHandler completionHandler);
 
-    void clearTransactionLogCacheForSystem(const std::string& systemId);
+    void markSystemForDeletion(const std::string& systemId);
 
     vms::api::Timestamp generateTransactionTimestamp(const std::string& systemId);
 
@@ -293,6 +293,7 @@ private:
     std::map<std::string, std::unique_ptr<TransactionLogContext>> m_systemIdToTransactionLog;
     std::atomic<std::uint64_t> m_transactionSequence;
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
+    std::list<std::string> m_systemsMarkedForDeletion;
 
     /** Fills transaction state cache. */
     nx::sql::DBResult fillCache();
@@ -351,6 +352,12 @@ private:
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         quint64 newValue);
+
+    bool clearTransactionLogCacheForSystem(
+        const QnMutexLockerBase& lock,
+        const std::string& systemId);
+
+    void removeSystemsMarkedForDeletion(const QnMutexLockerBase& /*lock*/);
 
     static ResultCode dbResultToApiResult(nx::sql::DBResult dbResult);
 };

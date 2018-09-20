@@ -123,13 +123,12 @@ void TransactionLog::readTransactions(
         });
 }
 
-void TransactionLog::clearTransactionLogCacheForSystem(
-    const std::string& systemId)
+void TransactionLog::markSystemForDeletion(const std::string& systemId)
 {
-    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
+    NX_VERBOSE(this, lm("Marking system %1 for deletion").arg(systemId));
 
     QnMutexLocker lock(&m_mutex);
-    m_systemIdToTransactionLog.erase(systemId);
+    m_systemsMarkedForDeletion.push_back(systemId);
 }
 
 vms::api::Timestamp TransactionLog::generateTransactionTimestamp(
@@ -363,6 +362,9 @@ void TransactionLog::onDbTransactionCompleted(
 
     vmsTransactionLogData->outgoingTransactionsSorter.commit(
         currentDbTranContext.cacheTranId);
+
+    QnMutexLocker lock(&m_mutex);
+    removeSystemsMarkedForDeletion(lock);
 }
 
 TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
@@ -432,6 +434,40 @@ void TransactionLog::updateTimestampHiInCache(
     QnMutexLocker lock(&m_mutex);
     getTransactionLogContext(lock, systemId)->cache.updateTimestampSequence(
         getDbTransactionContext(lock, queryContext, systemId).cacheTranId, newValue);
+}
+
+void TransactionLog::removeSystemsMarkedForDeletion(
+    const QnMutexLockerBase& lock)
+{
+    for (auto it = m_systemsMarkedForDeletion.begin();
+        it != m_systemsMarkedForDeletion.end();
+        )
+    {
+        if (clearTransactionLogCacheForSystem(lock, *it))
+            it = m_systemsMarkedForDeletion.erase(it);
+        else
+            ++it;
+    }
+}
+
+bool TransactionLog::clearTransactionLogCacheForSystem(
+    const QnMutexLockerBase& /*lock*/,
+    const std::string& systemId)
+{
+    NX_VERBOSE(this, lm("Cleaning transaction log for system %1").arg(systemId));
+
+    auto systemLogIter = m_systemIdToTransactionLog.find(systemId);
+    if (systemLogIter == m_systemIdToTransactionLog.end())
+        return true;
+
+    if (systemLogIter->second->cache.activeTransactionCount() == 0)
+    {
+        m_systemIdToTransactionLog.erase(systemLogIter);
+        return true;
+    }
+
+    // There are active transactions. Will wait for them to finish.
+    return false;
 }
 
 ResultCode TransactionLog::dbResultToApiResult(
