@@ -160,7 +160,7 @@ void TransactionTransport::sendTransaction(
     post(
         [this,
             serializedTransaction = std::move(serializedTransaction),
-            transactionHeader = transactionSerializer->transactionHeader()]()
+            transactionHeader = transactionSerializer->header()]()
         {
             // TODO: #ak checking transaction to send queue size
             //if (isReadyToSend(transaction.command) && queue size is too large)

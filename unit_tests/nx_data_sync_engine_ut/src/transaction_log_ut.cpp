@@ -37,6 +37,9 @@ class TransactionLog:
 public:
     TransactionLog(dao::DataObjectType dataObjectType):
         BasePersistentDataTest(DbInitializationType::delayed),
+        m_protocolVersionRange(
+            nx::cdb::kMinSupportedProtocolVersion,
+            nx::cdb::kMaxSupportedProtocolVersion),
         m_peerId(QnUuid::createUuid())
     {
         dbConnectionOptions().maxConnectionCount = 100;
@@ -96,8 +99,14 @@ protected:
         initializeTransactionLog();
     }
 
+    const ProtocolVersionRange& protocolVersionRange() const
+    {
+        return m_protocolVersionRange;
+    }
+
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
+    ProtocolVersionRange m_protocolVersionRange;
     std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
     data_sync_engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
@@ -106,9 +115,7 @@ private:
     {
         m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
             m_peerId,
-            ProtocolVersionRange(
-                nx::cdb::kMinSupportedProtocolVersion,
-                nx::cdb::kMaxSupportedProtocolVersion),
+            m_protocolVersionRange,
             &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
@@ -173,10 +180,19 @@ protected:
             m_transactionData);
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
-        transactionLog()->saveLocalTransaction<nx::cdb::ec2::command::SaveUser>(
+
+        const auto transactionHash = 
+            nx::cdb::ec2::command::SaveUser::hash(transaction.params);
+        auto transactionSerializer = std::make_unique<
+            UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser::Data>>(
+                std::move(transaction),
+                protocolVersionRange().currentVersion());
+
+        transactionLog()->saveLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
-            std::move(transaction));
+            transactionHash,
+            std::move(transactionSerializer));
     }
 
     void assertIfTransactionIsNotPresent()

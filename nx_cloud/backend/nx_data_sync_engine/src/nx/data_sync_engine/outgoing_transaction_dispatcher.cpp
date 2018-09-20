@@ -16,7 +16,7 @@ void OutgoingTransactionDispatcher::dispatchTransaction(
     const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
-    if (!m_filter.satisfies(transactionSerializer->transactionHeader()))
+    if (!m_filter.satisfies(transactionSerializer->header()))
         return;
 
     m_onNewTransactionSubscription.notify(

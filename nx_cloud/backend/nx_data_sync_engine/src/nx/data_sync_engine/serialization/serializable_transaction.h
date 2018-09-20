@@ -6,16 +6,28 @@
 namespace nx {
 namespace data_sync_engine {
 
-class SerializableAbstractTransaction:
+class NX_DATA_SYNC_ENGINE_API SerializableAbstractTransaction:
     public TransactionSerializer
 {
 public:
-    virtual const CommandHeader& transactionHeader() const = 0;
+    virtual const CommandHeader& header() const = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_DATA_SYNC_ENGINE_API EditableSerializableTransaction:
+    public SerializableAbstractTransaction
+{
+public:
+    virtual std::unique_ptr<EditableSerializableTransaction> clone() const = 0;
+    virtual void setHeader(CommandHeader header) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 template<typename TransactionDataType>
 class SerializableTransaction:
-    public SerializableAbstractTransaction
+    public EditableSerializableTransaction
 {
 public:
     SerializableTransaction(Command<TransactionDataType> transaction):
@@ -59,9 +71,20 @@ public:
         }
     }
 
-    virtual const CommandHeader& transactionHeader() const override
+    virtual const CommandHeader& header() const override
     {
         return m_transaction;
+    }
+
+    virtual std::unique_ptr<EditableSerializableTransaction> clone() const override
+    {
+        return std::make_unique<SerializableTransaction<TransactionDataType>>(
+            m_transaction);
+    }
+
+    virtual void setHeader(CommandHeader header) override
+    {
+        m_transaction.setHeader(std::move(header));
     }
 
     const Command<TransactionDataType>& get() const

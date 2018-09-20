@@ -235,6 +235,8 @@ void Controller::initializeSecurity()
 
 void Controller::initializeDataSynchronizationEngine()
 {
+    using namespace std::placeholders;
+
     nx::data_sync_engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
     outgoingCommandFilter.sendOnlyOwnCommands = true;
 
@@ -253,6 +255,35 @@ void Controller::initializeDataSynchronizationEngine()
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
             });
+
+    // Copying every remote transaction as our own to avoid
+    // broken synchronization between mediaservers.
+    m_ec2SyncronizationEngine.transactionLog().setOnTransactionReceived(
+        std::bind(&Controller::copyExternalTransaction, this, _1, _2, _3, _4));
+}
+
+nx::sql::DBResult Controller::copyExternalTransaction(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    const nx::Buffer& transactionHash,
+    const nx::data_sync_engine::EditableSerializableTransaction& transaction)
+{
+    if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
+        return nx::sql::DBResult::ok;
+
+    // Copying transaction.
+    auto ownTransaction = transaction.clone();
+    ownTransaction->setHeader(
+        m_ec2SyncronizationEngine.transactionLog().prepareLocalTransactionHeader(
+            queryContext,
+            systemId,
+            ownTransaction->header().command));
+
+    return m_ec2SyncronizationEngine.transactionLog().saveLocalTransaction(
+        queryContext,
+        systemId,
+        transactionHash,
+        std::move(ownTransaction));
 }
 
 } // namespace cdb

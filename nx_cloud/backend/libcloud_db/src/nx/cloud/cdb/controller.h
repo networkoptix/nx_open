@@ -5,6 +5,7 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
+#include <nx/data_sync_engine/serialization/serializable_transaction.h>
 #include <nx/data_sync_engine/synchronization_engine.h>
 
 #include "access_control/authentication_manager.h"
@@ -98,6 +99,13 @@ private:
     void generateUserAuthRecords(nx::sql::QueryContext* queryContext);
 
     void initializeDataSynchronizationEngine();
+    
+    nx::sql::DBResult copyExternalTransaction(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const nx::Buffer& transactionHash,
+        const nx::data_sync_engine::EditableSerializableTransaction& transaction);
+
     void initializeSecurity();
 };
 

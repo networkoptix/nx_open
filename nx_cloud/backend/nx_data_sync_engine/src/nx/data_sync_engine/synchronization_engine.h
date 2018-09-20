@@ -32,7 +32,7 @@ public:
      */
     SyncronizationEngine(
         const std::string& applicationId,
-        const QnUuid& moduleGuid,
+        const QnUuid& peerId,
         const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
@@ -60,11 +60,14 @@ public:
     void unsubscribeFromSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);
 
+    QnUuid peerId() const;
+
     void registerHttpApi(
         const std::string& pathPrefix,
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
+    QnUuid m_peerId;
     OutgoingCommandFilter m_outgoingCommandFilter;
     const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
