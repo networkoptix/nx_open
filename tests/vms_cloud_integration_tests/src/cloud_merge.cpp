@@ -434,7 +434,7 @@ TEST_F(CloudMerge, cloud_systems_with_the_same_owner_can_be_merged)
     thenMergeFullyCompleted();
 }
 
-TEST_F(CloudMerge, DISABLED_merging_cloud_systems_through_cloud_db)
+TEST_F(CloudMerge, merging_cloud_systems_through_cloud_db)
 {
     givenTwoCloudSystemsWithTheSameOwner();
     addRandomCloudUserToEachSystem();
