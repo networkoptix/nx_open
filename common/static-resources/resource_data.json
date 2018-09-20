@@ -466,7 +466,6 @@
             "keys": [
                 "DW|*"
             ],
-            "bitratePerGOP": true,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
