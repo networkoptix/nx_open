@@ -1792,7 +1792,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx::network::http::Request&& r
         }
     }
 
-    NX_VERBOSE(this, lm("Response after last retry: %1").arg(static_cast<int>(prevStatusCode)));
+    NX_VERBOSE(this, lm("Response after last retry: %1").arg(prevStatusCode));
     return false;
 }
 
