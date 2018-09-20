@@ -849,12 +849,14 @@ QnRtspStatistic QnMulticodecRtpReader::rtspStatistics(
         return QnRtspStatistic();
 
     auto rtcpStaticstics = ioDevice->getStatistic();
+    uint8_t* data = (uint8_t*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset;
+    data += nx::streaming::rtp::RtpHeader::kSize;
+    rtpPacketSize -= nx::streaming::rtp::RtpHeader::kSize;
     nx::streaming::rtp::OnvifHeaderExtension header;
-    if (header.read((quint8*)m_demuxedData[rtpChannel]->data() + rtpBufferOffset, rtpPacketSize))
+    if (header.read(data, rtpPacketSize))
         rtcpStaticstics.ntpOnvifExtensionTime = header.ntp;
     else
         rtcpStaticstics.ntpOnvifExtensionTime = boost::none;
-
     return rtcpStaticstics;
 }
 
