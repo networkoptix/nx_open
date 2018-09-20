@@ -214,6 +214,9 @@ EventTile::EventTile(QWidget* parent):
     auto progressLabelAnchor = new WidgetAnchor(d->progressLabel);
     progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
 
+    ui->progressBar->setRange(0, kProgressBarResolution);
+    ui->progressBar->setValue(0);
+
     connect(d->closeButton, &QPushButton::clicked, this, &EventTile::closeRequested);
 
     const auto activateLink =

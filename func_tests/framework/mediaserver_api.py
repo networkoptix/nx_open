@@ -596,7 +596,6 @@ class MediaserverApi(object):
         wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
         all_ids = master_ids | servant_ids
         wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
-        wait_for_truthy(master_api.system_mediaservers_all_online, timeout_sec=30)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):

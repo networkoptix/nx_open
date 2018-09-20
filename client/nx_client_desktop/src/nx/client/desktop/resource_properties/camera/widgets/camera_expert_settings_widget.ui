@@ -74,8 +74,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>979</width>
-        <height>768</height>
+        <width>1290</width>
+        <height>724</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -344,7 +344,7 @@
                <item>
                 <widget class="QLabel" name="labelTransport">
                  <property name="text">
-                  <string>RTP transport:</string>
+                  <string>RTP transport</string>
                  </property>
                 </widget>
                </item>
