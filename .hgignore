@@ -31,5 +31,9 @@ cloud_portal/front_end/app/images/{favicon.ico,logo.png,logo_small.png,promo/clo
 cloud_portal/front_end/app/styles/custom
 cloud_portal/robot_tests/{geckodriver.log,venv}
 
+nx_cloud/backend/cloud_tests/monitoring/env
+nx_cloud/backend/cloud_tests/monitoring/dist
+nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
+
 webadmin/static
 CMakeLists.txt.user

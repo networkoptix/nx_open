@@ -39,6 +39,12 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
 {
     bindToAioThread(this->webSocket()->getAioThread());
 
+    m_commonTransactionHeader.systemId = systemId;
+    m_commonTransactionHeader.endpoint = remoteSocketAddr();
+    m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
+    m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
+    m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
+
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
 
