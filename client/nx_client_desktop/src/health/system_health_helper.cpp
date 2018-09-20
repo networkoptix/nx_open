@@ -38,6 +38,8 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Remote archive synchronization");
         case QnSystemHealth::ArchiveIntegrityFailed:
             return tr("Archive integrity problem detected");
+        case QnSystemHealth::NoInternetForTimeSync:
+            return tr("No internet access for time synchronization");
         default:
             break;
     }
