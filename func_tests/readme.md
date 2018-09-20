@@ -103,6 +103,12 @@ Locally it looks this way:
 
 Only 5 last runs are saved.
 
+## Defaults in `pytest.ini`
+
+To save a lot of keystrokes, add `work_dir`, `mediaserver_installers_dir` and some other parameters
+to `pytest.ini`. Create and commit you own section. Name of section is `defaults.` plus username or
+hostname or can be set in `PYTEST_DEFAULTS_SECTION` environment variable.
+
 ## Publish to JunkShop (Optional)
 
 It's possible to publish local test result to JunkShop.
