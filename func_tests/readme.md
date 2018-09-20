@@ -54,6 +54,14 @@ Let framework setup VM with mediaserver. Download installers to `~/Downloads` an
 pytest --mediaserver-installers-dir=$HOME/Downloads tests/test_example.py::test_online
 ```
 
+To test Linux only:
+```{.sh}
+pytest --mediaserver-installers-dir=$HOME/Downloads -k 'not windows' tests/test_example.py::test_online
+```
+
+More on `-k` keywords:
+https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name.
+
 ## Artifacts
 
 Use local directory and save artifacts, which are just files stored in specific folder:
