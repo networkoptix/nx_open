@@ -971,7 +971,8 @@
                 "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
                 "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "ONVIF|NC328-VBZ"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
