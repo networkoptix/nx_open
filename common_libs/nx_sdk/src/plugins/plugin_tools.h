@@ -67,6 +67,9 @@ public:
 
     /** @return Protected pointer, without releasing it. */
     T* get() { return m_ptr; }
+	
+    /** @return Protected pointer, without releasing it. */
+    const T* get() const { return m_ptr; }
 
     T* operator->() { return m_ptr; }
     const T* operator->() const { return m_ptr; }

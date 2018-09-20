@@ -36,7 +36,7 @@
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
 #include "wrapping_compressed_video_packet.h"
-
+#include "data_packet_adapter.h"
 #include "frame_converter.h"
 
 namespace nx {
@@ -527,26 +527,26 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
 {
     for (auto& data: context.managers())
     {
-        if (eventTypeIds.empty() && !data.isStreamConsumer)
+        if (eventTypeIds.empty() && !data->isStreamConsumer())
         {
             NX_DEBUG(
                 this,
                 lm("Event list is empty, stopping metadata fetching for resource %1.")
                     .arg(resourceId));
 
-            if (data.manager->stopFetchingMetadata() != Error::noError)
+            if (data->manager()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
         }
         else
         {
             NX_DEBUG(this, lm("Statopping metadata fetching for resource %1").args(resourceId));
-            if (data.manager->stopFetchingMetadata() != Error::noError)
+            if (data->manager()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
 
             NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
@@ -558,15 +558,15 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
             {
                 eventTypeList.push_back(eventTypeId.toStdString());
                 eventTypePtrs.push_back(eventTypeList.back().c_str());
-            }                
-            const auto result = data.manager->startFetchingMetadata(
+            }
+            const auto result = data->manager()->startFetchingMetadata(
                 eventTypePtrs.empty() ? nullptr : &eventTypePtrs.front(),
                 (int) eventTypePtrs.size());
 
             if (result != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
-                    .arg(data.manifest.pluginName.value));
+                    .arg(data->manifest().pluginName.value));
             }
         }
     }
@@ -829,19 +829,26 @@ void ManagerPool::putVideoFrame(
     QnMutexLocker lock(&m_contextMutex);
     for (auto& managerData: m_contexts[id].managers())
     {
-        nxpt::ScopedRef<ConsumingCameraManager> manager(
-            managerData.manager->queryInterface(IID_ConsumingCameraManager));
-        if (!manager)
+        if (!managerData->isStreamConsumer())
             continue;
 
         if (DataPacket* const dataPacket = frameConverter.getDataPacket(
-            pixelFormatFromManifest(managerData.manifest)))
+            pixelFormatFromManifest(managerData->manifest())))
         {
-            manager->pushDataPacket(dataPacket);
+            if (managerData->canAcceptData())
+            {
+                managerData->putData(std::make_shared<DataPacketAdapter>(dataPacket));
+            }
+            else
+            {
+                NX_WARNING(this,
+                    "Video packet for camera %1 for metadata plugin %2 has been skipped: queue overflow.",
+                    id, managerData->manifest().pluginName.value);
+            }
         }
         else
         {
-            NX_VERBOSE(this) << lm("Video frame not sent to CameraManager.");
+            NX_VERBOSE(this, "Video frame not sent to CameraManager.");
         }
     }
 }
@@ -904,12 +911,12 @@ QWeakPointer<VideoDataReceptor> ManagerPool::createVideoDataReceptor(const QnUui
     for (auto& managerData: m_contexts[id].managers())
     {
         nxpt::ScopedRef<ConsumingCameraManager> manager(
-            managerData.manager->queryInterface(IID_ConsumingCameraManager));
+            managerData->manager()->queryInterface(IID_ConsumingCameraManager));
         if (!manager)
             continue;
 
         boost::optional<PixelFormat> pixelFormat =
-            pixelFormatFromManifest(managerData.manifest);
+            pixelFormatFromManifest(managerData->manifest());
         if (!pixelFormat)
             needsCompressedFrames = true;
         else
