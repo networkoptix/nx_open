@@ -132,7 +132,7 @@ void Monitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTy
 
             // actionEventName - is a human readable event name, a part of a message that camera
             // will send us. The other part of a message is event guid. actionEventName is slightly
-            // formatted to be cognizable in http URL query.
+            // formatted to be recognizable in http URL query.
             std::string actionEventName = it->fullName().toStdString();
             std::replace(actionEventName.begin(), actionEventName.end(), '/', '.');
             std::replace(actionEventName.begin(), actionEventName.end(), ':', '_');
@@ -143,13 +143,13 @@ void Monitor::addRules(const SocketAddress& localAddress, nxpl::NX_GUID* eventTy
                 actionName.c_str(),
                 message.c_str(),
                 fullPath.c_str());
-            if(actionId)
+            if (actionId)
                 NX_PRINT << "Action addition succeeded, actionId = " << actionId;
             else
                 NX_PRINT << "Action addition failed";
 
             NX_PRINT << "Try to add rule " << it->fullName().toStdString();
-            //event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
+            // event.fullname is something like "tns1:VideoSource/tnsaxis:DayNightVision"
             std::string ruleName = kRuleNamePrefix + std::to_string(globalCounter);
             nx::axis::ActiveRule rule(
                 ruleName.c_str(),
@@ -184,8 +184,8 @@ HostAddress Monitor::getLocalIp(const SocketAddress& cameraAddress)
     {
         return s.getLocalAddress().address;
     }
-    NX_WARNING(this, "Network connection to camera is broken.\n"
-        "Can't detect local IP address for TCP server.\n"
+    NX_WARNING(this, "Network connection to camera is broken. "
+        "Can't detect local IP address for TCP server. "
         "Event monitoring can not be started.");
     return HostAddress();
 }
@@ -285,7 +285,7 @@ void Monitor::onTimer()
     m_aioTimer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
-} // axis
+} // namespace axis
 } // namespace metadata
 } // namespace mediaserver_plugins
 } // namespace nx

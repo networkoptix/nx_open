@@ -11,9 +11,7 @@
 namespace nx {
 namespace api {
 
-/**
-* Description of the analytics driver, which can generate different events.
-*/
+/** Description of the analytics driver, which can generate different events. */
 struct NX_PLUGIN_UTILS_API AnalyticsDriverManifestBase
 {
     Q_GADGET

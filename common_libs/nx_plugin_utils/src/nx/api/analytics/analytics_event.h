@@ -22,9 +22,7 @@ public:
     };
     Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 
-    /**
-     * Description of the analytics event.
-     */
+    /** Description of the analytics event. */
     struct EventType
     {
         QnUuid eventTypeId;
@@ -34,9 +32,7 @@ public:
         bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
     };
 
-    /**
-     * Description of the analytics event groups.
-     */
+    /** Description of the analytics event groups. */
     struct Group
     {
         QnUuid id;

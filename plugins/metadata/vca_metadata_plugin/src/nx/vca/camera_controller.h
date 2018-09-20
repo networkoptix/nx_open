@@ -48,18 +48,18 @@ struct Heartbeat
 class CameraControllerImpl;
 
 /**
-  * Class to work with VCA-camera settings.
-  *
-  * Methods which names start with "read" obtain appropriate information from camera and save it
-  * into class private members. Further information may be accessed with corresponding methods.
-  *
-  * All read methods are synchronous and may last quite long (depending on the request and camera
-  * performance). Default read timeout is set to 10 seconds, longer requests will fail.
-  * Read-timeout may be enlarged with setReadTimeout method. Timeout also may be reduces though
-  * it is not recommended.
-  *
-  * All read methods return boolean value (true - in case of successful reading).
-  */
+ * Class to work with VCA-camera settings.
+ *
+ * Methods which names start with "read" obtain appropriate information from camera and save it
+ * into class private members. Further information may be accessed with corresponding methods.
+ *
+ * All read methods are synchronous and may last quite long (depending on the request and camera
+ * performance). Default read timeout is set to 10 seconds, longer requests will fail.
+ * Read-timeout may be enlarged with setReadTimeout method. Timeout also may be reduces though
+ * it is not recommended.
+ *
+ * All read methods return boolean value (true - in case of successful reading).
+ */
 class CameraController
 {
 public:
@@ -83,18 +83,18 @@ public:
     int16_t tcpServerPort() const noexcept { return m_tcpServerPort; }
 
     /**
-      * readSupportedRules & readSupportedRules2 do the same thing - they read all necessary
-      * information about rules on the camera and save it into the internal rule table of the
-      * CameraController object.
-      * This rule table may be accessed with suppotedRules() method.
-      * readSupportedRules reads data at once, readSupportedRules2 reads data in chunks.
-      */
+     * readSupportedRules & readSupportedRules2 do the same thing - they read all necessary
+     * information about rules on the camera and save it into the internal rule table of the
+     * CameraController object.
+     * This rule table may be accessed with suppotedRules() method.
+     * readSupportedRules reads data at once, readSupportedRules2 reads data in chunks.
+     */
     bool readSupportedRules();
     bool readSupportedRules2();
 
     /**
-      * Read information about supported rules enable/disable state and update current rule table.
-      */
+     * Read information about supported rules enable/disable state and update current rule table.
+     */
     bool readSupportedRulesState();
 
     /** Read information about supported rules names and update current rule table. */
@@ -106,8 +106,8 @@ public:
     bool setHeartbeat(Heartbeat heartbeat) const;
 
     /** Read the number of tcp port through which the camera server sends notifications when events
-      * occur. To obtain port number, use tcpServerPort() after readTcpServerPort().
-      */
+     * occur. To obtain port number, use tcpServerPort() after readTcpServerPort().
+     */
     bool readTcpServerPort();
 
     bool readTcpServerEnabled(int eventProfileIndex);

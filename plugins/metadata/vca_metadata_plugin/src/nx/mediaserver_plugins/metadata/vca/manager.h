@@ -85,7 +85,6 @@ private:
     QByteArray m_buffer;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 
-    //nx::network::TCPSocket* m_tcpSocket = nullptr;
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;
     nx::network::aio::Timer m_reconnectTimer;

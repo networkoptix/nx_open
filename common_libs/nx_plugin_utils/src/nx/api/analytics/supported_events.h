@@ -7,9 +7,7 @@
 namespace nx {
 namespace api {
 
-/**
- * Subset of events, applicable to the given camera.
- */
+/** Subset of events, applicable to the given camera. */
 using AnalyticsSupportedEvents = QList<QnUuid>;
 
 /**
