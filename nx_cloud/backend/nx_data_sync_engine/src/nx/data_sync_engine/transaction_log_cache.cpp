@@ -125,6 +125,8 @@ void VmsTransactionLogCache::commit(TranId tranId)
             *m_committedData.timestampSequence,
             m_timestampCalculator.calculateNextTimeStamp().ticks));
     }
+
+    m_tranIdToContext.erase(tranId);
 }
 
 void VmsTransactionLogCache::rollback(TranId tranId)
