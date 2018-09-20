@@ -82,7 +82,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::ArchiveRebuildCanceled:
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncProgress:
-        case QnSystemHealth::UsersEmailIsEmpty:
             return QnNotificationLevel::Value::CommonNotification;
 
         // Green notifications.
@@ -100,6 +99,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
         case QnSystemHealth::RemoteArchiveSyncError:
         case QnSystemHealth::DefaultCameraPasswords:
         case QnSystemHealth::NoInternetForTimeSync:
+        case QnSystemHealth::UsersEmailIsEmpty:
             return QnNotificationLevel::Value::ImportantNotification;
 
         // Red notifications.
