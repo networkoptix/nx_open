@@ -16,6 +16,7 @@ ${bad password}                 adrhartjad
 
 *** Test Cases ***            EMAIL                         PASS
 Empty Email and Password      ${EMPTY}                      ${EMPTY}
+    [tags]    C24212
 Empty Email                   ${EMPTY}                      ${good password}
 Empty Password                ${good email}                 ${EMPTY}
 Invalid Email 1               noptixqagmail.com             ${good password}

@@ -51,7 +51,7 @@ can be closed by clicking on the X
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
-    [tags]    C24212
+    [tags]    C24212    C24213
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
