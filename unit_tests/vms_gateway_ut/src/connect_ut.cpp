@@ -126,6 +126,52 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
     ASSERT_TRUE(writeData.startsWith(readData));
 }
 
+// Tests correct handling of CONNECT request when client sends data right after request without
+// waiting of response.
+TEST_F(VmsGatewayConnectTest, httpPipelining)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+
+    const QByteArray connectRequest(QString(
+        "CONNECT %1 HTTP/1.1\r\n"
+        "Host: localhost\r\n\r\n"
+        ).arg(server.addressBeingListened().toString()).toStdString().c_str());
+    const QByteArray dataAfterRequest("Some data not related to http\n");
+    const QByteArray connectResponse("HTTP/1.1 200 Connection estabilished\r\n\r\n");
+
+    server.setConnectionsReadBufferSize(dataAfterRequest.size());
+
+    nx::network::TCPSocket clientSocket;
+    clientSocket.setRecvTimeout(kTimeoutMsec);
+    ASSERT_TRUE(clientSocket.connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
+        << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
+
+
+    // Send CONNECT request and other data right after it
+    ASSERT_EQ(clientSocket.send(connectRequest, connectRequest.size()), connectRequest.size());
+    ASSERT_EQ(clientSocket.send(
+        dataAfterRequest, dataAfterRequest.size()), dataAfterRequest.size());
+
+    QByteArray responseReceiveBuffer;
+    responseReceiveBuffer.resize(connectResponse.size());
+    QByteArray dataAfterRequestReceiveBuffer;
+    dataAfterRequestReceiveBuffer.resize(dataAfterRequest.size());
+
+    // Receive connect response.
+    ASSERT_EQ(clientSocket.recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
+        responseReceiveBuffer.size());
+    ASSERT_EQ(connectResponse, responseReceiveBuffer);
+
+    // Receive data after connect response.
+    ASSERT_EQ(clientSocket.recv(dataAfterRequestReceiveBuffer.data(),
+        dataAfterRequestReceiveBuffer.size(), 0), dataAfterRequestReceiveBuffer.size());
+    ASSERT_EQ(dataAfterRequest, dataAfterRequestReceiveBuffer);
+
+    // Graceful shutdown.
+    clientSocket.shutdown();
+    server.pleaseStopSync();
+}
+
 TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));

@@ -183,6 +183,11 @@ bool TestConnection::isTaskComplete() const
     return false;
 }
 
+void TestConnection::setReadBufferSize(size_t newSize)
+{
+    m_readBufferSize = newSize;
+}
+
 void TestConnection::setOnFinishedEventHandler(
     nx::utils::MoveOnlyFunc<void(int, TestConnection*, SystemError::ErrorCode)> handler)
 {
@@ -213,8 +218,8 @@ TestConnection::TestConnection(
     m_curStreamPos(0),
     m_lastSequenceReceived(0)
 {
-    m_readBuffer.reserve(kReadBufferSize);
-    m_outData = nx::utils::random::generate(kReadBufferSize);
+    m_readBuffer.reserve(m_readBufferSize);
+    m_outData = nx::utils::random::generate(m_readBufferSize);
 
     ++TestConnection_count;
 }
@@ -276,7 +281,7 @@ void TestConnection::startEchoIO()
                 {
                     // start all over again
                     m_readBuffer.resize(0);
-                    m_readBuffer.reserve(kReadBufferSize);
+                    m_readBuffer.reserve(m_readBufferSize);
                     startEchoIO();
                 });
         });
@@ -332,7 +337,7 @@ void TestConnection::readAllAsync( std::function<void()> handler )
                 return reportFinish( code );
 
             m_totalBytesReceived += bytes;
-            if (static_cast<size_t>(m_readBuffer.size()) >= kReadBufferSize)
+            if (static_cast<size_t>(m_readBuffer.size()) >= m_readBufferSize)
                 handler();
             else
                 return readAllAsync(std::move(handler));
@@ -385,7 +390,7 @@ void TestConnection::onDataReceived(
 
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
-    m_readBuffer.reserve( kReadBufferSize );
+    m_readBuffer.reserve( m_readBufferSize );
 
     if (m_limitType == TestTrafficLimitType::incoming &&
         m_totalBytesReceived >= m_trafficLimit)
@@ -564,6 +569,11 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
+void RandomDataTcpServer::setConnectionsReadBufferSize(size_t newSize)
+{
+    m_connectionsReadBufferSize = newSize;
+}
+
 void RandomDataTcpServer::setOnFinishedConnectionHandler(
     nx::utils::MoveOnlyFunc<void (TestConnection *)> handler)
 {
@@ -639,6 +649,7 @@ void RandomDataTcpServer::onNewConnection(
             m_limitType,
             m_trafficLimit,
             m_transmissionMode);
+        testConnection->setReadBufferSize(m_connectionsReadBufferSize);
         testConnection->setOnFinishedEventHandler(
             std::bind(&RandomDataTcpServer::onConnectionDone, this, _2));
         NX_DEBUG(this, lm("Accepted connection %1. local address %2")
