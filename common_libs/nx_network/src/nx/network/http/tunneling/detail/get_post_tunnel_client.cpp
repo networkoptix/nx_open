@@ -15,6 +15,11 @@ GetPostTunnelClient::GetPostTunnelClient(
 {
 }
 
+void GetPostTunnelClient::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_timeout = timeout;
+}
+
 void GetPostTunnelClient::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {
@@ -37,6 +42,12 @@ const Response& GetPostTunnelClient::response() const
 void GetPostTunnelClient::openDownChannel()
 {
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    if (m_timeout)
+    {
+        m_httpClient->setResponseReadTimeout(*m_timeout);
+        m_httpClient->setMessageBodyReadTimeout(*m_timeout);
+    }
+
     m_httpClient->bindToAioThread(getAioThread());
     m_httpClient->setOnResponseReceived(
         std::bind(&GetPostTunnelClient::onDownChannelOpened, this));
