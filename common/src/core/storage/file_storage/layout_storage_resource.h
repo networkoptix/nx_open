@@ -88,8 +88,8 @@ public:
 
 private:
     bool readIndexHeader();
-    bool createNewFile();
-    void addBinaryPostfix(QFile& file);
+    bool writeIndexHeader();
+    void writeFileTail(QFile& file);
     void closeOpenedFiles();
     void restoreOpenedFiles();
     int getPostfixSize() const;
@@ -97,6 +97,9 @@ private:
 
 private:
     StreamIndex m_index;
+    CryptoInfo m_cryptoInfo;
+    QString m_password;
+
     QSet<QnLayoutStreamSupport*> m_openedFiles;
     QSet<QnLayoutStreamSupport*> m_cachedOpenedFiles;
     QnMutex m_fileSync;
@@ -104,8 +107,6 @@ private:
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
 
     nx::core::layout::FileInfo m_info;
-
-    CryptoInfo m_cryptoInfo;
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;

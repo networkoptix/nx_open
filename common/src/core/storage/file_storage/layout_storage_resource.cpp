@@ -30,16 +30,8 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     qDebug() << "QnLayoutFileStorageResource::open" << getUrl() << url;
     if (getUrl().isEmpty())
     {
-        QString layoutUrl = url;
         NX_ASSERT(url.startsWith(kLayoutProtocol));
-        if (layoutUrl.startsWith(kLayoutProtocol))
-            layoutUrl = layoutUrl.mid(kLayoutProtocol.length());
-
-        int postfixPos = layoutUrl.indexOf(L'?');
-        if (postfixPos == -1)
-            setUrl(layoutUrl);
-        else
-            setUrl(layoutUrl.left(postfixPos));
+        setUrl(url.left(url.indexOf(L'?')).remove(kLayoutProtocol));
     }
 
 #ifdef _DEBUG
@@ -253,16 +245,21 @@ bool QnLayoutFileStorageResource::isCrypted() const
 
 void QnLayoutFileStorageResource::usePasswordForExport(const QString& password)
 {
-    // TODO
+    NX_ASSERT(!password.isEmpty());
+    NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
+    m_info.isCrypted = true;
+    m_index.magic = kIndexCryptedMagic;
+    m_password = password;
 }
 
 bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
 {
-    if (!m_info.isCrypted)
-        return false;
-    return true;
-    // TODO
-//    if (checkPassword()
+    if (m_info.isCrypted && checkPassword(password, m_info))
+    {
+        m_password = password;
+        return true;
+    }
+    return false;
 }
 
 bool QnLayoutFileStorageResource::readIndexHeader()
@@ -300,19 +297,23 @@ bool QnLayoutFileStorageResource::readIndexHeader()
     return true;
 }
 
-bool QnLayoutFileStorageResource::createNewFile()
+bool QnLayoutFileStorageResource::writeIndexHeader()
 {
     QFile file(getUrl());
-    if (!file.open(QIODevice::WriteOnly))
+    // This function _appends_ header if we write to exe file.
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return false;
 
-    file.write((const char*)&m_index, sizeof(m_index));
+    m_info.offset = file.pos();
 
+    file.write((const char*)&m_index, sizeof(m_index));
     if (m_info.isCrypted)
         file.write((const char*)&m_cryptoInfo, sizeof(CryptoInfo));
 
     if (file.error() != QFile::NoError)
         return false;
+
+    writeFileTail(file);
 
     m_info.isValid = true;
     return true;
@@ -326,52 +327,6 @@ int QnLayoutFileStorageResource::getPostfixSize() const
 QString QnLayoutFileStorageResource::stripName(const QString& fileName)
 {
     return fileName.mid(fileName.lastIndexOf(L'?') + 1);
-}
-
-// This function may create a new .nov file.
-QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream(const QString& name)
-{
-    QnMutexLocker lock( &m_fileSync );
-
-    QString fileName = stripName(name);
-
-    const auto stream = findStream(name);
-    if (stream)
-        return stream;
-
-    // At this point m_info and m_index are read in findStream if existed.
-    // It is the same for exe, because index is already written by QnNovLauncher::createLaunchingFile.
-
-    if (m_index.entryCount >= kMaxStreams)
-        return Stream();
-
-    if (!m_info.isValid) //< Could not access the file or it is empty.
-        if (!createNewFile())
-            return Stream();
-
-    QFile file(getUrl());
-    const qint64 fileSize = file.size() -  getPostfixSize();
-
-    m_index.entries[m_index.entryCount++] =
-        StreamIndexEntry{fileSize - m_info.offset, qt4Hash(fileName)};
-
-    if (!file.open(QIODevice::ReadWrite))
-        return Stream();
-    // Write new or updated index.
-    file.seek(m_info.offset);
-    file.write((const char*) &m_index, sizeof(m_index));
-    file.seek(fileSize);
-
-    // Write new stream name.
-    QByteArray utf8FileName = fileName.toUtf8();
-    utf8FileName.append('\0');
-    file.write(utf8FileName);
-
-    // Add ending magic string.
-    if (m_info.offset > 0)
-        addBinaryPostfix(file);
-
-    return Stream{fileSize + utf8FileName.size() + 1, 0};
 }
 
 // This function assumes index is already read by setUrl() (maybe called from open() ).
@@ -416,6 +371,51 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
     return Stream();
 }
 
+// This function may create a new .nov file.
+QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream(const QString& name)
+{
+    QnMutexLocker lock( &m_fileSync );
+
+    QString fileName = stripName(name);
+
+    const auto stream = findStream(name);
+    if (stream)
+        return stream;
+
+    // At this point m_info and m_index are read in findStream if existed.
+    // Exe: the file is not valid (m_info.isValid) at this point. Will write a new index a few lines later.
+
+    if (m_index.entryCount >= kMaxStreams)
+        return Stream();
+
+    if (!m_info.isValid) //< Could not access the file or it is empty.
+        if (!writeIndexHeader())
+            return Stream();
+
+    QFile file(getUrl());
+    const qint64 fileSize = file.size() -  getPostfixSize();
+
+    m_index.entries[m_index.entryCount++] =
+        StreamIndexEntry{fileSize - m_info.offset, qt4Hash(fileName)};
+
+    if (!file.open(QIODevice::ReadWrite))
+        return Stream();
+    // Write new or updated index.
+    file.seek(m_info.offset);
+    file.write((const char*) &m_index, sizeof(m_index));
+    file.seek(fileSize);
+
+    // Write new stream name.
+    QByteArray utf8FileName = fileName.toUtf8();
+    utf8FileName.append('\0');
+    file.write(utf8FileName);
+
+    // Add ending magic string.
+    writeFileTail(file);
+
+    return Stream{fileSize + utf8FileName.size() + 1, 0};
+}
+
 void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 {
     if (m_info.offset > 0)
@@ -423,7 +423,7 @@ void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
         QFile file(getUrl());
         file.open(QIODevice::Append);
         file.seek(pos);
-        addBinaryPostfix(file);
+        writeFileTail(file);
     }
 }
 
@@ -438,12 +438,14 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
     readIndexHeader();
 }
 
-void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
+void QnLayoutFileStorageResource::writeFileTail(QFile& file)
 {
-    file.write((char*) &m_info.offset, sizeof(qint64));
-
-    const quint64 magic = nx::core::layout::kFileMagic;
-    file.write((char*) &magic, sizeof(qint64));
+    if (m_info.offset > 0)
+    {
+        file.write((char*)&m_info.offset, sizeof(qint64));
+        const quint64 magic = nx::core::layout::kFileMagic;
+        file.write((char*)&magic, sizeof(qint64));
+    }
 }
 
 QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr &resource)
@@ -481,9 +483,6 @@ QString QnLayoutFileStorageResource::getPath() const
 // The one who requests to remove this function will become a permanent maintainer of this class.
 void QnLayoutFileStorageResource::dumpStructure()
 {
-    if (!getUrl().contains(".exe"))
-        return;
-
     qDebug() << "Logging" << getUrl();
     QFile file(getUrl());
     file.open(QIODevice::ReadOnly);
