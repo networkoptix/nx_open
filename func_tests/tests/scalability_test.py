@@ -24,7 +24,7 @@ from framework.context_logger import ContextLogger, context_logger
 from framework.utils import GrowingSleep, with_traceback
 from system_load_metrics import load_host_memory_usage
 
-pytest_plugins = ['fixtures.unpacked_mediaservers']
+pytest_plugins = ['system_load_metrics', 'fixtures.unpacked_mediaservers']
 
 _logger = ContextLogger(__name__)
 
@@ -375,11 +375,12 @@ def perform_post_checks(env):
     _logger.info('Perform test post checks: done.')
 
 
-def test_scalability(artifact_factory, metrics_saver, config, env):
+def test_scalability(artifact_factory, metrics_saver, load_averge_collector, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        wait_for_servers_synced(artifact_factory, config, env)
+        with load_averge_collector():
+            wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
