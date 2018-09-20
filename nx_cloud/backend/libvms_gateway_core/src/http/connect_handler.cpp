@@ -30,8 +30,8 @@ void ConnectHandler::processRequest(
     static_cast<void>(authInfo);
     static_cast<void>(response);
 
-    // TODO: check correctness of requestLine.... Here?
-    network::SocketAddress targetAddress(request.requestLine.url.host(), request.requestLine.url.port());
+    network::SocketAddress targetAddress(request.requestLine.url.host(),
+        request.requestLine.url.port());
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(targetAddress.address.toString()))
     {
@@ -73,6 +73,11 @@ void ConnectHandler::connect(const network::SocketAddress& address)
     NX_DEBUG(this, lm("Connecting to '%1', socket[%2] -> socket[%3]").arg(address)
         .arg(m_connection->socket()).arg(m_targetSocket));
 
+    // NOTE: Socket is taken before connect because otherwise some data received from client after
+    // CONNECT request can be parsed by HTTP connection parser and do not get here
+    m_connectionSocket = m_connection->takeSocket();
+    m_connectionSocket->cancelIOSync(network::aio::etNone);
+
     m_targetSocket->connectAsync(
         address,
         [this](SystemError::ErrorCode result)
@@ -83,15 +88,9 @@ void ConnectHandler::connect(const network::SocketAddress& address)
             if (result != SystemError::noError)
                 return socketError(m_targetSocket.get(), result);
 
-            // TODO: #mux Find a way to steal socket after sending an automatic response
             m_request.requestLine.version.serialize(&m_connectionBuffer);
             m_connectionBuffer.append(Buffer(" 200 Connection estabilished\r\n\r\n"));
 
-            // TODO: #mux Currently there is a problem as m_connection may have some data
-            //  in it's buffer (client does not has to wait for CONNECT response before
-            //  sending data through)
-            m_connectionSocket = m_connection->takeSocket();
-            m_connectionSocket->cancelIOSync(network::aio::etNone);
             m_connectionSocket->sendAsync(
                 m_connectionBuffer,
                 [this](SystemError::ErrorCode result, size_t)
@@ -110,6 +109,8 @@ void ConnectHandler::connect(const network::SocketAddress& address)
         });
 }
 
+// TODO: what will happen, when it is called after stealing of socket? It can't send any answer
+// TODO: check how did it work before me...
 void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
 {
     NX_WARNING(this, "Socket %1 returned error: %2", socket, SystemError::toString(error));

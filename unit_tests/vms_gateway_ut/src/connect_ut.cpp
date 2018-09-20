@@ -12,7 +12,7 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-const constexpr int kTimeoutMsec = 100;
+const constexpr int kTimeoutMsec = 10;
 
 class VmsGatewayConnectTest:
     public BasicComponentTest
@@ -147,10 +147,10 @@ TEST_F(VmsGatewayConnectTest, httpPipelining)
         << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
 
-    // Send CONNECT request and other data right after it
-    ASSERT_EQ(clientSocket.send(connectRequest, connectRequest.size()), connectRequest.size());
-    ASSERT_EQ(clientSocket.send(
-        dataAfterRequest, dataAfterRequest.size()), dataAfterRequest.size());
+    // Send CONNECT request and other data right after it.
+    ASSERT_EQ(clientSocket.send(connectRequest + dataAfterRequest,
+        connectRequest.size() + dataAfterRequest.size()),
+        connectRequest.size() + dataAfterRequest.size());
 
     QByteArray responseReceiveBuffer;
     responseReceiveBuffer.resize(connectResponse.size());

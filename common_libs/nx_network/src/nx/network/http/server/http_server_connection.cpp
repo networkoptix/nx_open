@@ -127,7 +127,7 @@ void HttpServerConnection::authenticate(nx::network::http::Message requestMessag
                 return;
             }
 
-            strongThis->post(
+            strongThis->dispatch(
                 [this,
                     authenticationResult = std::move(authenticationResult),
                     requestMessage = std::move(requestMessage)]() mutable
