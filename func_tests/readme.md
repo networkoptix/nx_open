@@ -49,9 +49,9 @@ import `fixtures.local_mediaservers` plugin. Run it on you local mediaserver fir
 pytest -p fixtures.local_mediaservers tests/test_example.py::test_online
 ```
 
-Let framework setup VM with mediaserver:
+Let framework setup VM with mediaserver. Download installers to `~/Downloads` and run:
 ```{.sh}
-pytest tests/test_example.py::test_online
+pytest --mediaserver-installers-dir=$HOME/Downloads tests/test_example.py::test_online
 ```
 
 ## Artifacts
