@@ -11,6 +11,7 @@
 #include <recording/time_period_list.h>
 #include <utils/common/util.h>
 #include <utils/fs/file.h>
+#include <core/resource/avi/filetypesupport.h>
 
 namespace {
     /* Max future nov-file version that should be opened by the current client version. */
@@ -25,9 +26,65 @@ using namespace nx::core::layout;
 QnMutex QnLayoutFileStorageResource::m_storageSync;
 QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
+QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
+    m_fileSync(QnMutex::Recursive)
+{
+    qDebug() << "QnLayoutFileStorageResource::QnLayoutFileStorageResource" << getUrl();
+    QnMutexLocker lock(&m_storageSync);
+    m_allStorages.insert(this);
+}
+
+QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
+{
+    QnMutexLocker lock( &m_storageSync );
+    m_allStorages.remove(this);
+}
+
+QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
+{
+    return new QnLayoutFileStorageResource(commonModule);
+}
+
+bool QnLayoutFileStorageResource::isCrypted() const
+{
+    return m_info.isCrypted;
+}
+
+void QnLayoutFileStorageResource::usePasswordForExport(const QString& password)
+{
+    NX_ASSERT(!password.isEmpty());
+    NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
+    m_info.isCrypted = true;
+    m_index.magic = kIndexCryptedMagic;
+    m_password = password;
+}
+
+bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
+{
+    if (m_info.isCrypted && checkPassword(password, m_info))
+    {
+        m_password = password;
+        return true;
+    }
+    return false;
+}
+
+void QnLayoutFileStorageResource::setUrl(const QString& value)
+{
+    qDebug() << "QnLayoutFileStorageResource::setUrl" << value;
+    NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
+
+    setId(QnUuid::createUuid());
+    QnStorageResource::setUrl(value);
+
+    readIndexHeader();
+}
+
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     qDebug() << "QnLayoutFileStorageResource::open" << getUrl() << url;
+    // Set Url if it does not exist yet.
     if (getUrl().isEmpty())
     {
         NX_ASSERT(url.startsWith(kLayoutProtocol));
@@ -50,65 +107,65 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     if (!(openMode & QIODevice::WriteOnly) && !m_info.isValid)
         return nullptr;
 
-    QIODevice* rez = new QnLayoutPlainStream(*this, url);
-//    QIODevice* rez = new QnLayoutCryptoStream(*this, url, "helloworld");
-    if (!rez->open(openMode))
+    const auto fileName = stripName(url);
+
+    QIODevice* stream = nullptr;
+    if (isCrypted() && (FileTypeSupport::isMovieFileExt(fileName)
+        || FileTypeSupport::isImageFileExt(fileName)))
     {
-        delete rez;
+        if (m_password.isEmpty())
+            return nullptr;
+        stream = new QnLayoutCryptoStream(*this, url, m_password);
+    }
+    else
+        stream = new QnLayoutPlainStream(*this, url);
+
+    if (!stream->open(openMode))
+    {
+        delete stream;
         return nullptr;
     }
-    return rez;
+    return stream;
 }
 
-void QnLayoutFileStorageResource::registerFile(QnLayoutStreamSupport* file)
+int QnLayoutFileStorageResource::getCapabilities() const
 {
-    QnMutexLocker lock( &m_fileSync );
-    m_openedFiles.insert(file);
+    return ListFile | ReadFile;
 }
 
-void QnLayoutFileStorageResource::unregisterFile(QnLayoutStreamSupport* file)
+Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 {
-    QnMutexLocker lock( &m_fileSync );
-    m_openedFiles.remove(file);
-}
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
+        + QString::number(nx::utils::random::number<uint>());
 
-void QnLayoutFileStorageResource::closeOpenedFiles()
-{
-    QnMutexLocker lock( &m_fileSync );
-    m_cachedOpenedFiles = m_openedFiles; // m_openedFiles will be cleared in storeStateAndClose().
-    for (auto file : m_cachedOpenedFiles)
-    {
-        file->lockFile();
-        file->storeStateAndClose();
-        file->unlockFile();
+    QDir dir(tmpDir);
+    if (dir.exists()) {
+        dir.remove(tmpDir);
+        return Qn::StorageInit_Ok;
     }
-    m_index.entryCount = 0;
-}
-
-void QnLayoutFileStorageResource::restoreOpenedFiles()
-{
-    QnMutexLocker lock( &m_fileSync );
-    for (auto file : m_cachedOpenedFiles)
-    {
-        file->lockFile();
-        file->restoreState();
-        file->unlockFile();
+    else {
+        if (dir.mkpath(tmpDir))
+        {
+            dir.rmdir(tmpDir);
+            return Qn::StorageInit_Ok;
+        }
+        else
+            return Qn::StorageInit_WrongPath;
     }
+
+    return Qn::StorageInit_WrongPath;
 }
 
-QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_fileSync(QnMutex::Recursive)
+QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 {
-    qDebug() << "QnLayoutFileStorageResource::QnLayoutFileStorageResource" << getUrl();
-    QnMutexLocker lock(&m_storageSync);
-    m_allStorages.insert(this);
+    QDir dir;
+    dir.cd(dirName);
+    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
 }
 
-QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
+qint64 QnLayoutFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-    QnMutexLocker lock( &m_storageSync );
-    m_allStorages.remove(this);
+    return 0; //< not implemented
 }
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
@@ -116,9 +173,39 @@ bool QnLayoutFileStorageResource::removeFile(const QString& url)
     return QFile::remove(url);
 }
 
+bool QnLayoutFileStorageResource::removeDir(const QString& url)
+{
+    QDir dir(url);
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    for(const QFileInfo& fi: list)
+        removeFile(fi.absoluteFilePath());
+    return true;
+}
+
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
     return switchToFile(oldName, newName, true);
+}
+
+bool QnLayoutFileStorageResource::isFileExists(const QString& url)
+{
+    return QFile::exists(url);
+}
+
+bool QnLayoutFileStorageResource::isDirExists(const QString& url)
+{
+    QDir d(url);
+    return d.exists(url);
+}
+
+qint64 QnLayoutFileStorageResource::getFreeSpace()
+{
+    return getDiskFreeSpace(getUrl());
+}
+
+qint64 QnLayoutFileStorageResource::getTotalSpace() const
+{
+    return getDiskTotalSpace(getUrl());
 }
 
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
@@ -163,170 +250,36 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     return rez;
 }
 
-bool QnLayoutFileStorageResource::removeDir(const QString& url)
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr &resource)
 {
-    QDir dir(url);
-    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    for(const QFileInfo& fi: list)
-        removeFile(fi.absoluteFilePath());
-    return true;
+    QString url = resource->getUrl();
+    url = url.mid(url.lastIndexOf(L'?')+1);
+    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
+    if (!chunkData)
+        return QnTimePeriodList();
+
+    QnTimePeriodList chunks;
+    QByteArray chunkDataArray(chunkData->readAll());
+    chunks.decode(chunkDataArray);
+    delete chunkData;
+
+    return chunks;
 }
 
-bool QnLayoutFileStorageResource::isDirExists(const QString& url)
+QString QnLayoutFileStorageResource::itemUniqueId(const QString& layoutUrl,
+    const QString& itemUniqueId)
 {
-    QDir d(url);
-    return d.exists(url);
+    static const QChar kDelimiter = L'?';
+
+    QString itemIdInternal = itemUniqueId.mid(itemUniqueId.lastIndexOf(kDelimiter) + 1);
+    QString layoutUrlInternal = layoutUrl;
+    NX_ASSERT(!layoutUrlInternal.startsWith(kLayoutProtocol));
+    return kLayoutProtocol + layoutUrlInternal + kDelimiter + itemIdInternal;
 }
 
-int QnLayoutFileStorageResource::getCapabilities() const
+QString QnLayoutFileStorageResource::getPath() const
 {
-    return ListFile | ReadFile;
-}
-
-bool QnLayoutFileStorageResource::isFileExists(const QString& url)
-{
-    return QFile::exists(url);
-}
-
-qint64 QnLayoutFileStorageResource::getFreeSpace()
-{
-    return getDiskFreeSpace(getUrl());
-}
-
-qint64 QnLayoutFileStorageResource::getTotalSpace() const
-{
-    return getDiskTotalSpace(getUrl());
-}
-
-QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
-{
-    QDir dir;
-    dir.cd(dirName);
-    return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
-}
-
-qint64 QnLayoutFileStorageResource::getFileSize(const QString& /*url*/) const
-{
-    return 0; //< not implemented
-}
-
-Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
-{
-    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
-        + QString::number(nx::utils::random::number<uint>());
-
-    QDir dir(tmpDir);
-    if (dir.exists()) {
-        dir.remove(tmpDir);
-        return Qn::StorageInit_Ok;
-    }
-    else {
-        if (dir.mkpath(tmpDir))
-        {
-            dir.rmdir(tmpDir);
-            return Qn::StorageInit_Ok;
-        }
-        else
-            return Qn::StorageInit_WrongPath;
-    }
-
-    return Qn::StorageInit_WrongPath;
-}
-
-QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
-{
-    return new QnLayoutFileStorageResource(commonModule);
-}
-
-bool QnLayoutFileStorageResource::isCrypted() const
-{
-    return m_info.isCrypted;
-}
-
-void QnLayoutFileStorageResource::usePasswordForExport(const QString& password)
-{
-    NX_ASSERT(!password.isEmpty());
-    NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
-    m_info.isCrypted = true;
-    m_index.magic = kIndexCryptedMagic;
-    m_password = password;
-}
-
-bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
-{
-    if (m_info.isCrypted && checkPassword(password, m_info))
-    {
-        m_password = password;
-        return true;
-    }
-    return false;
-}
-
-bool QnLayoutFileStorageResource::readIndexHeader()
-{
-    m_info = identifyFile(getUrl(), true);
-    if (!m_info.isValid)
-    {
-        qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
-        return false;
-    }
-
-    QFile file(getUrl());
-    if (!file.open(QIODevice::ReadOnly))
-        return false;
-
-    file.seek(m_info.offset);
-    file.read((char*)&m_index, sizeof(m_index));
-
-    if (m_info.isCrypted)
-        file.read((char*) &m_cryptoInfo, sizeof(m_cryptoInfo));
-    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles == 1024, but StreamIndex has only 256 entries.
-    {
-        qWarning() << "Corrupted nov file. Ignoring.";
-        m_index = StreamIndex();
-        return false;
-    }
-
-    if (m_info.version > kMaxVersion)
-    {
-        qWarning() << "Unsupported file from the future version. Ignoring.";
-        m_index = StreamIndex();
-        return false;
-    }
-
-    return true;
-}
-
-bool QnLayoutFileStorageResource::writeIndexHeader()
-{
-    QFile file(getUrl());
-    // This function _appends_ header if we write to exe file.
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
-        return false;
-
-    m_info.offset = file.pos();
-
-    file.write((const char*)&m_index, sizeof(m_index));
-    if (m_info.isCrypted)
-        file.write((const char*)&m_cryptoInfo, sizeof(CryptoInfo));
-
-    if (file.error() != QFile::NoError)
-        return false;
-
-    writeFileTail(file);
-
-    m_info.isValid = true;
-    return true;
-}
-
-int QnLayoutFileStorageResource::getPostfixSize() const
-{
-    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
-}
-
-QString QnLayoutFileStorageResource::stripName(const QString& fileName)
-{
-    return fileName.mid(fileName.lastIndexOf(L'?') + 1);
+    return getUrl();
 }
 
 // This function assumes index is already read by setUrl() (maybe called from open() ).
@@ -427,15 +380,73 @@ void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
     }
 }
 
-void QnLayoutFileStorageResource::setUrl(const QString& value)
+void QnLayoutFileStorageResource::registerFile(QnLayoutStreamSupport* file)
 {
-    qDebug() << "QnLayoutFileStorageResource::setUrl" << value;
-    NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
+    QnMutexLocker lock( &m_fileSync );
+    m_openedFiles.insert(file);
+}
 
-    setId(QnUuid::createUuid());
-    QnStorageResource::setUrl(value);
+void QnLayoutFileStorageResource::unregisterFile(QnLayoutStreamSupport* file)
+{
+    QnMutexLocker lock( &m_fileSync );
+    m_openedFiles.remove(file);
+}
 
-    readIndexHeader();
+bool QnLayoutFileStorageResource::readIndexHeader()
+{
+    m_info = identifyFile(getUrl(), true);
+    if (!m_info.isValid)
+    {
+        qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
+        return false;
+    }
+
+    QFile file(getUrl());
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    file.seek(m_info.offset);
+    file.read((char*)&m_index, sizeof(m_index));
+
+    if (m_info.isCrypted)
+        file.read((char*) &m_cryptoInfo, sizeof(m_cryptoInfo));
+    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles == 1024, but StreamIndex has only 256 entries.
+    {
+        qWarning() << "Corrupted nov file. Ignoring.";
+        m_index = StreamIndex();
+        return false;
+    }
+
+    if (m_info.version > kMaxVersion)
+    {
+        qWarning() << "Unsupported file from the future version. Ignoring.";
+        m_index = StreamIndex();
+        return false;
+    }
+
+    return true;
+}
+
+bool QnLayoutFileStorageResource::writeIndexHeader()
+{
+    QFile file(getUrl());
+    // This function _appends_ header if we write to exe file.
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
+        return false;
+
+    m_info.offset = file.pos();
+
+    file.write((const char*)&m_index, sizeof(m_index));
+    if (m_info.isCrypted)
+        file.write((const char*)&m_cryptoInfo, sizeof(CryptoInfo));
+
+    if (file.error() != QFile::NoError)
+        return false;
+
+    writeFileTail(file);
+
+    m_info.isValid = true;
+    return true;
 }
 
 void QnLayoutFileStorageResource::writeFileTail(QFile& file)
@@ -448,36 +459,38 @@ void QnLayoutFileStorageResource::writeFileTail(QFile& file)
     }
 }
 
-QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr &resource)
+void QnLayoutFileStorageResource::closeOpenedFiles()
 {
-    QString url = resource->getUrl();
-    url = url.mid(url.lastIndexOf(L'?')+1);
-    QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
-    if (!chunkData)
-        return QnTimePeriodList();
-
-    QnTimePeriodList chunks;
-    QByteArray chunkDataArray(chunkData->readAll());
-    chunks.decode(chunkDataArray);
-    delete chunkData;
-
-    return chunks;
+    QnMutexLocker lock( &m_fileSync );
+    m_cachedOpenedFiles = m_openedFiles; // m_openedFiles will be cleared in storeStateAndClose().
+    for (auto file : m_cachedOpenedFiles)
+    {
+        file->lockFile();
+        file->storeStateAndClose();
+        file->unlockFile();
+    }
+    m_index.entryCount = 0;
 }
 
-QString QnLayoutFileStorageResource::itemUniqueId(const QString& layoutUrl,
-    const QString& itemUniqueId)
+void QnLayoutFileStorageResource::restoreOpenedFiles()
 {
-    static const QChar kDelimiter = L'?';
-
-    QString itemIdInternal = itemUniqueId.mid(itemUniqueId.lastIndexOf(kDelimiter) + 1);
-    QString layoutUrlInternal = layoutUrl;
-    NX_ASSERT(!layoutUrlInternal.startsWith(kLayoutProtocol));
-    return kLayoutProtocol + layoutUrlInternal + kDelimiter + itemIdInternal;
+    QnMutexLocker lock( &m_fileSync );
+    for (auto file : m_cachedOpenedFiles)
+    {
+        file->lockFile();
+        file->restoreState();
+        file->unlockFile();
+    }
 }
 
-QString QnLayoutFileStorageResource::getPath() const
+int QnLayoutFileStorageResource::getPostfixSize() const
 {
-    return getUrl();
+    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
+}
+
+QString QnLayoutFileStorageResource::stripName(const QString& fileName)
+{
+    return fileName.mid(fileName.lastIndexOf(L'?') + 1);
 }
 
 // The one who requests to remove this function will become a permanent maintainer of this class.

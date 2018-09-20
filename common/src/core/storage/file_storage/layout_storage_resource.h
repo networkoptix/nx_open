@@ -44,6 +44,8 @@ public:
     // Set password for reading existing layout file.
     bool usePasswordToOpen(const QString& password);
 
+    virtual void setUrl(const QString& value) override;
+
     virtual QIODevice* open(const QString& url, QIODevice::OpenMode openMode) override;
 
     virtual int getCapabilities() const override;
@@ -57,7 +59,6 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() const override;
-    virtual void setUrl(const QString& value) override;
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
@@ -75,10 +76,10 @@ public:
 
         operator bool () const { return position > 0; }
     };
-    // Opens or adds new stream to the layout storage.
-    Stream findOrAddStream(const QString& name);
     // Searches for a stream with the given name.
     Stream findStream(const QString& name);
+    // Opens or adds new stream to the layout storage.
+    Stream findOrAddStream(const QString& name);
     // Called from a output stream when it is closed.
     void finalizeWrittenStream(qint64 pos);
     void registerFile(QnLayoutStreamSupport* file);
