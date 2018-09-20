@@ -537,10 +537,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
         singleProperties.name.setBase(firstCamera->getName());
         singleProperties.id = firstCamera->getId().toSimpleString();
         singleProperties.firmware = firstCamera->getFirmware();
-        singleProperties.macAddress = firstCamera->getMAC().toString();
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
         singleProperties.hasVideo = firstCamera->hasVideo();
+
+        const auto macAddress = firstCamera->getMAC();
+        singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();
 
         if (firstCamera->getDefaultMotionType() == Qn::MotionType::MT_HardwareGrid)
         {
