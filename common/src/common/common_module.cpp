@@ -353,7 +353,6 @@ void QnCommonModule::updateModuleInformationUnsafe()
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
 {
-    emit beforeSystemIdentityTimeChanged();
     m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }
