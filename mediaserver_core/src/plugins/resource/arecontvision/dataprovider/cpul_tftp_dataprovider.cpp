@@ -61,7 +61,7 @@ AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourceP
     m_metaReader = std::make_unique<ArecontMetaReader>(
         mediaRes->getVideoLayout(0)->channelCount(),
         std::chrono::milliseconds(META_DATA_DURATION_MS),
-        kMetaFrameInterval);
+        META_FRAME_INTERVAL);
 }
 
 AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
@@ -86,8 +86,7 @@ bool AVClientPullSSTFTPStreamreader::needMetaData()
         return true;
 
     auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
-    if (!resource)
-        return false;
+    NX_ASSERT(resource);
     m_metaReader->requestIfReady(resource.data());
     return false;
 }

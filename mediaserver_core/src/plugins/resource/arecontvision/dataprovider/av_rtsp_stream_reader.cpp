@@ -16,13 +16,12 @@ QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res):
     parent_type(res),
     m_rtpStreamParser(res)
 {
-    auto mediaRes = res.dynamicCast<QnMediaResource>();
-    if (mediaRes)
+    if (const auto mediaRes = res.dynamicCast<QnMediaResource>())
     {
         m_metaReader = std::make_unique<ArecontMetaReader>(
             mediaRes->getVideoLayout(0)->channelCount(),
             std::chrono::milliseconds(META_DATA_DURATION_MS),
-            kMetaFrameInterval);
+            META_FRAME_INTERVAL);
     }
 }
 
@@ -138,8 +137,7 @@ bool QnArecontRtspStreamReader::needMetaData()
         return true;
 
     auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
-    if (!resource)
-        return false;
+    NX_ASSERT(resource);
     m_metaReader->requestIfReady(resource.data());
     return false;
 }

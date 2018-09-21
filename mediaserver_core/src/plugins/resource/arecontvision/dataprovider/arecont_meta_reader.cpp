@@ -3,16 +3,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
-struct MdParsingInfo
-{
-    int totalMdZones = 0;
-    int zoneSize = 0;
-    int maxSensorWidth = 0;
-    int maxSensorHight = 0;
-};
-
-static QnMetaDataV1Ptr parseMotionMetadata(
-    int channel, const QString& response, const MdParsingInfo& info)
+QnMetaDataV1Ptr ArecontMetaReader::parseMotionMetadata(
+    int channel, const QString& response, const ParsingInfo& info)
 {
     int index = response.indexOf('=');
     if (index == -1)
@@ -24,9 +16,9 @@ static QnMetaDataV1Ptr parseMotionMetadata(
     if (motionStr == lit("no motion"))
         return motion; // no motion detected
 
-    int zones = info.totalMdZones == 1024 ? 32 : 8;
+    int zoneCount = info.totalMdZones == 1024 ? 32 : 8;
     QStringList md = motionStr.split(L' ', QString::SkipEmptyParts);
-    if (md.size() < zones*zones)
+    if (md.size() < zoneCount * zoneCount)
         return nullptr;
 
     int pixelZoneSize = info.zoneSize * 32;
@@ -36,11 +28,11 @@ static QnMetaDataV1Ptr parseMotionMetadata(
     QRect imageRect(0, 0, info.maxSensorWidth, info.maxSensorHight);
     QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
 
-    for (int x = 0; x < zones; ++x)
+    for (int x = 0; x < zoneCount; ++x)
     {
-        for (int y = 0; y < zones; ++y)
+        for (int y = 0; y < zoneCount; ++y)
         {
-            int index = y*zones + x;
+            int index = y * zoneCount + x;
             QString m = md.at(index);
             if (m == lit("00") || m == lit("0"))
                 continue;
@@ -49,6 +41,7 @@ static QnMetaDataV1Ptr parseMotionMetadata(
             motion->mapMotion(imageRect, currZoneRect);
         }
     }
+    // TODO #lbusygin change to some reasonable value
     motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return motion;
 }
@@ -88,11 +81,11 @@ void ArecontMetaReader::requestIfReady(QnPlAreconVisionResource* resource)
     {
         m_framesSinceLastMetaData = 0;
         m_lastMetaRequest.restart();
-        asyncRequest(resource);
+        requestAsync(resource);
     }
 }
 
-void ArecontMetaReader::asyncRequest(QnPlAreconVisionResource* resource)
+void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
 {
     QString path = "/get";
     if (m_channelCount > 1)
@@ -107,7 +100,7 @@ void ArecontMetaReader::asyncRequest(QnPlAreconVisionResource* resource)
         .setUserName(auth.user())
         .setPassword(auth.password());
 
-    MdParsingInfo info {
+    ParsingInfo info {
         resource->totalMdZones(),
         resource->getZoneSite(),
         resource->getProperty(lit("MaxSensorWidth")).toInt(),
@@ -125,7 +118,7 @@ void ArecontMetaReader::asyncRequest(QnPlAreconVisionResource* resource)
     );
 }
 
-void ArecontMetaReader::onMetaData(const MdParsingInfo& info)
+void ArecontMetaReader::onMetaData(const ParsingInfo& info)
 {
     if (m_metaDataClient.state() == nx_http::AsyncClient::sFailed)
     {

@@ -7,7 +7,6 @@
 
 #include "../resource/av_resource.h"
 
-struct MdParsingInfo;
 class ArecontMetaReader
 {
 public:
@@ -21,19 +20,28 @@ public:
     void onNewFrame() { ++m_framesSinceLastMetaData; }
 
 private:
-    void asyncRequest(QnPlAreconVisionResource* resource);
-    void onMetaData(const MdParsingInfo& info);
+    struct ParsingInfo
+    {
+        int totalMdZones = 0;
+        int zoneSize = 0;
+        int maxSensorWidth = 0;
+        int maxSensorHight = 0;
+    };
+    void requestAsync(QnPlAreconVisionResource* resource);
+    void onMetaData(const ParsingInfo& info);
+    static QnMetaDataV1Ptr parseMotionMetadata(
+        int channel, const QString& response, const ParsingInfo& info);
 
 private:
     nx_http::AsyncClient m_metaDataClient;
     QnMutex m_metaDataMutex;
     std::atomic<bool> m_metaDataClientBusy = false;
-    const int m_channelCount;
+    const int m_channelCount = 0;
     int m_currentChannel = 0;
     QnMetaDataV1Ptr m_metaData;
 
     const std::chrono::milliseconds m_minRepeatInterval;
-    const int m_minFrameInterval;
+    const int m_minFrameInterval = 0;
     nx::utils::ElapsedTimer m_lastMetaRequest;
-    int m_framesSinceLastMetaData = 0;
+    std::atomic<int> m_framesSinceLastMetaData = 0;
 };
