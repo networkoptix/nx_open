@@ -16,6 +16,14 @@ def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
                                product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
 
 
+def get_product_by_context(context_id):
+    return Product.objects.get(product_type__context__id=context_id)
+
+
+def get_product_by_revision(version_id):
+    return Product.objects.get(contentversion__in=[version_id])
+
+
 def update_global_cache(customization, version_id):
     global_cache = caches['global']
     global_cache.set(customization, version_id)

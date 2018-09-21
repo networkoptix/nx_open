@@ -138,7 +138,7 @@ def context_editor_action(request, product, context_id, language_code):
 @require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
 def page_editor(request, context_id=None, language_code=None):
-    product = get_cloud_portal_product()
+    product = get_product_by_context(context_id)
     if request.method == "GET":
         context, language = get_context_and_language(request, context_id, language_code, product.default_language)
         form = initialize_form(product, context, language, request.user)
@@ -174,7 +174,7 @@ def version_action(request, version_id=None):
     if not ContentVersion.objects.filter(id=version_id).exists():
         defaults.bad_request("Version does not exist")
 
-    product = get_cloud_portal_product()
+    product = get_product_by_revision(version_id)
 
     if "Preview" in request.POST:
         modify_db.generate_preview(product, version_id=version_id, send_to_review=True)
@@ -210,7 +210,7 @@ def version(request, version_id=None):
     contexts = modify_db.get_records_for_version(version_model)
     #else happens when the user makes a revision without any changes
     if contexts.values():
-        product = get_cloud_portal_product()
+        product = version_model.product
         context = None
         if 'preview' in request.GET:
             if len(contexts) == 1:

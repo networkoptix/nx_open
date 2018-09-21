@@ -1,9 +1,27 @@
 from __future__ import unicode_literals
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
 from django.urls import reverse
 from django.utils.html import format_html
 from .forms import *
 from cloud import settings
+
+
+class ProductFilter(SimpleListFilter):
+    title = 'Product'
+    parameter_name = 'product'
+
+    def lookups(self, request, model_admin):
+        products = Product.objects.all()
+        if True or not request.user.is_superuser:
+            products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
+            return [(p.id, p.name) for p in products]
+        return[(p.id, p.__str__()) for p in products]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(product=self.value())
+        return queryset
 
 
 class CMSAdmin(admin.ModelAdmin):
@@ -32,6 +50,13 @@ class CMSAdmin(admin.ModelAdmin):
         return qs
 
 
+class ProductTypeAdmin(CMSAdmin):
+    list_display = ('type', 'one_customization',)
+
+
+admin.site.register(ProductType, ProductTypeAdmin)
+
+
 class ProductAdmin(CMSAdmin):
     list_display = ('context_actions', 'name', 'product_type', 'customizations_list')
     list_display_links = ('name',)
@@ -55,10 +80,9 @@ admin.site.register(Product, ProductAdmin)
 
 class ContextAdmin(CMSAdmin):
     list_display = ('context_actions', 'name', 'description',
-                    'url', 'translatable', 'is_global', 'product_type')
+                    'url', 'translatable', 'is_global')
 
     list_display_links = ('name',)
-    list_filter = ('product_type',)
     search_fields = ('name', 'description', 'url')
 
     def changelist_view(self, request, extra_context=None):
@@ -72,6 +96,7 @@ class ContextAdmin(CMSAdmin):
 
     def get_queryset(self, request):  # show only users for cloud_portal product type
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         if not request.user.is_superuser:
             qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
         return qs
@@ -133,7 +158,7 @@ class ContentVersionAdmin(CMSAdmin):
                     'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = ('product',)
+    list_filter = ('product__product_type', ProductFilter,)
     search_fields = ('accepted_by__email', 'created_by__email')
     readonly_fields = ('created_by', 'accepted_by',)
 
@@ -148,7 +173,8 @@ class ContentVersionAdmin(CMSAdmin):
 
     def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(product=get_cloud_portal_product())
+        if True or not request.user.is_superuser:
+            qs = qs.filter(product__customizations__name__in=[settings.CUSTOMIZATION])
         return qs
 
     content_version_actions.short_description = "Admin Options"

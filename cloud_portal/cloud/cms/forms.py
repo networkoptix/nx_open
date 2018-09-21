@@ -133,14 +133,15 @@ class ProductSettingsForm(forms.Form):
         )
     )
 
-class ProductForm (forms.ModelForm):
+
+class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = []
 
     def __init__(self, *args, **kwargs):
         # Do the normal form initialisation.
-        super(ProductForm, self).__init__(*args, **kwargs)  # 'send_cloud_notification'
+        super(ProductForm, self).__init__(*args, **kwargs)
         cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
         if self.instance.product_type and self.instance.product_type.type == cloud_portal:
             cloud_customization = self.instance.customizations.first()
@@ -149,3 +150,10 @@ class ProductForm (forms.ModelForm):
                                    if product.customizations.exists() and product.customizations.first() != cloud_customization]
             self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
             self.initial['customizations'] = self.instance.customizations.all()
+
+    def clean_customizations(self):
+        data = self.cleaned_data['customizations']
+        cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
+        if self.instance.product_type and self.instance.product_type.type == cloud_portal and len(data) > 1:
+            raise ValueError('Too many customizations selected')
+        return data
