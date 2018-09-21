@@ -782,7 +782,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
 )
 
