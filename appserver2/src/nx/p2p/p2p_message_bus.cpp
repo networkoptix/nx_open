@@ -98,8 +98,10 @@ MessageBus::~MessageBus()
 void MessageBus::dropConnections()
 {
     QnMutexLocker lock(&m_mutex);
-    m_connections.clear();
-    m_outgoingConnections.clear();
+    for (const auto& connection: m_connections)
+        connection->setState(Connection::State::Error);
+    for (const auto& connection: m_outgoingConnections)
+        connection->setState(Connection::State::Error);
     m_remoteUrls.clear();
     if (m_peers)
     {

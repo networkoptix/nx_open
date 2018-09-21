@@ -29,7 +29,7 @@ public:
         const QUrlQuery& requestUrlQuery,
         const Qn::UserAccessData& userAccessData,
         std::function<void()> onConnectionClosedCallback);
-
+    bool isRestartPending() const;
 protected:
     virtual void doPeriodicTasks() override;
     virtual void stop() override;
@@ -105,6 +105,7 @@ private:
     ec2::detail::QnDbManager* m_db;
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
+    std::atomic<bool> m_restartPending{false};
 };
 
 } // namespace p2p

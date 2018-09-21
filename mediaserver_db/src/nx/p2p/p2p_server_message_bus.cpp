@@ -98,6 +98,15 @@ ServerMessageBus::ServerMessageBus(
     base_type(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer)
 {
     m_dbCommitTimer.restart();
+
+    connect(commonModule, &QnCommonModule::beforeSystemIdentityTimeChanged,
+        this,
+        [this]()
+        {
+            m_restartPending = true;
+            dropConnections();
+        },
+        Qt::DirectConnection);
 }
 
 void ServerMessageBus::setDatabase(ec2::detail::QnDbManager* db)
@@ -189,6 +198,8 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 void ServerMessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_restartPending)
+        return;
 
     m_miscData.update();
 
@@ -770,6 +781,11 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
         connection,
         payload,
         GotTransactionFuction());
+}
+
+bool ServerMessageBus::isRestartPending() const
+{
+    return m_restartPending;
 }
 
 } // namespace p2p

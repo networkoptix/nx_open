@@ -277,6 +277,7 @@ signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
+    void beforeSystemIdentityTimeChanged();
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
     void standAloneModeChanged(bool value);
