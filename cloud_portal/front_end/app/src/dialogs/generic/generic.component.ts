@@ -1,7 +1,7 @@
-import {Component, Inject, OnInit, Input, ViewEncapsulation} from '@angular/core';
-import {Location} from '@angular/common';
-import {NgbModal, NgbActiveModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {EmailValidator} from '@angular/forms';
+import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Location } from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator } from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-generic-content',
