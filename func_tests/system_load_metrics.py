@@ -2,6 +2,14 @@
 """
 
 from collections import namedtuple
+from contextlib import contextmanager
+import logging
+
+import pytest
+
+from framework.threaded import ThreadedCall
+
+_logger = logging.getLogger(__name__)
 
 
 LIGHTWEIGHT_SERVER_BINARY_NAME = 'appserver2_ut'
@@ -80,3 +88,31 @@ def load_host_memory_usage(os_access):
         mediaserver=ps_memory.mediaserver,
         lws=ps_memory.lws,
         )
+
+
+
+@pytest.fixture
+def load_averge_collector(metrics_saver):
+
+    @contextmanager
+    def collector():
+        average_1min = []  # collected load average with 1 min interval for last 1 min each
+
+        def read_load_average():
+            with open('/proc/loadavg') as f:
+                # file contents looks like this:
+                # 53.29 66.66 43.77 1/1300 27563
+                # first number is load average for last minute - what we want
+                line = f.readline().rstrip()
+                average = float(line.split()[0])
+                _logger.debug('Load average for last minute: %f (full /proc/loadavg line: %r)', average, line)
+                average_1min.append(average)
+
+        with ThreadedCall.periodic(read_load_average, sleep_between_sec=60):
+            yield
+
+        if average_1min:
+            load_average = sum(average_1min) / len(average_1min)
+            metrics_saver.save('cpu_load_average', load_average)
+
+    return collector

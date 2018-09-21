@@ -137,7 +137,7 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 
     //if no input, exiting
-    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+    if( !hasCameraCapabilities(Qn::InputPortCapability) )
         return result;
 
     QAuthenticator auth = getAuth();
@@ -158,16 +158,9 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnPlSonyResource::startInputPortStatesMonitoring()
 {
     QnMutexLocker lk( &m_inputPortMutex );
-
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     if( m_inputMonitorHttpClient )
     {
         m_inputMonitorHttpClient->pleaseStopSync();
@@ -201,10 +194,9 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
     m_inputMonitorHttpClient->doGet( requestUrl );
-    return true;
 }
 
-void QnPlSonyResource::stopInputPortMonitoringAsync()
+void QnPlSonyResource::stopInputPortStatesMonitoring()
 {
     nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
@@ -216,17 +208,11 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
         inputMonitorHttpClient->pleaseStopSync();
 }
 
-bool QnPlSonyResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk( &m_inputPortMutex );
-    return m_inputMonitorHttpClient.get() != NULL;
-}
-
 void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoringAsync() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortStatesMonitoring() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
@@ -282,7 +268,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
             continue;
         prevPortState = currentPortState;
 
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             QString::number(inputPortIndex),
             currentPortState,

@@ -40,6 +40,7 @@ enum MessageType
     ArchiveIntegrityFailed = 18,
 
     DefaultCameraPasswords = 19, //< Generated on the client side.
+    NoInternetForTimeSync = 20, //< Generated on the client side.
 
     // IMPORTANT!!!
     // Enum order change is forbidden as leads to stored settings failure and protocol change.

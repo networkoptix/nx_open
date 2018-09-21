@@ -37,7 +37,7 @@ public:
         m_pool = new ptz::ServerPtzControllerPool(m_serverModule->commonModule());
         m_camera.reset(new test::CameraMock(m_serverModule.get()));
         m_camera->setCommonModule(m_serverModule->commonModule());
-        m_camera->initialize();
+        m_camera->initInternal();
     }
 
 public:

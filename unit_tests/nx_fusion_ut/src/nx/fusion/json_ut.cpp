@@ -266,6 +266,34 @@ TEST_F(QnJsonTextFixture, serializeStructListBrief)
     ASSERT_EQ(data, QJson::deserialized<std::vector<BriefMockData>>(jsonStr));
 }
 
+TEST_F(QnJsonTextFixture, serializeStdMapStringToStructBrief)
+{
+    std::map<QString, BriefMockData> data;
+    data["a"] = {{}, kHelloWorld};
+    data["b"] = {kTestId, {}};
+    data["c"] = {};
+    const QByteArray jsonStr = QString(R"json({"a":{"str":"%1"},"b":{"id":"%2"},"c":{}})json")
+        .arg(kHelloWorld)
+        .arg(kTestId.toString())
+        .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<decltype(data)>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, serializeStdMapIntToStructBrief)
+{
+    std::map<int, BriefMockData> data;
+    data[1] = {{}, kHelloWorld};
+    data[2] = {kTestId, {}};
+    const QByteArray jsonStr = QString(
+        R"json([{"key":1,"value":{"str":"%1"}},{"key":2,"value":{"id":"%2"}}])json")
+            .arg(kHelloWorld)
+            .arg(kTestId.toString())
+            .toUtf8();
+    ASSERT_EQ(jsonStr, QJson::serialized(data));
+    ASSERT_EQ(data, QJson::deserialized<decltype(data)>(jsonStr));
+}
+
 TEST_F(QnJsonTextFixture, serializeVectorBrief)
 {
     BriefMockDataWithVector data;

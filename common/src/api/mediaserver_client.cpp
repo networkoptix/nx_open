@@ -315,7 +315,8 @@ void MediaServerClient::ec2AnalyticsLookupDetectedObjects(
         QUrlQuery query;
         for (const auto& param: queryParams)
             query.addQueryItem(param.first, param.second);
-        requestPath += lit("?") + query.toString();
+        // We create request path here. Not an URL. So, no need to encode it.
+        requestPath += lit("?") + query.toString(QUrl::FullyDecoded);
     }
 
     performAsyncEc2Call(

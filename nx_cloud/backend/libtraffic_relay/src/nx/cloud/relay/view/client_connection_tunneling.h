@@ -31,16 +31,16 @@ private:
             controller::AbstractConnectSessionManager::StartRelayingFunc>;
 
     controller::AbstractConnectSessionManager* m_connectSessionManager = nullptr;
-    std::unique_ptr<TunnelingServer> m_tunnelingServer;
+    TunnelingServer m_tunnelingServer;
 
-    void connectToPeerFinished(
+    void onConnectToPeerFinished(
         api::ResultCode resultCode,
         controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
         CompletionHandler completionHandler);
         
     void saveNewTunnel(
-        controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
-        std::unique_ptr<network::AbstractStreamSocket> connection);
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc);
 };
 
 } // namespace nx::cloud::relay::view

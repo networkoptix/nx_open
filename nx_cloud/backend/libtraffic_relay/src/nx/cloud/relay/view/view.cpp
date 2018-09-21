@@ -55,7 +55,7 @@ View::View(
     m_model(model),
     m_controller(controller),
     m_listeningPeerConnectionTunnelingServer(
-        m_settings,
+        &controller->listeningPeerManager(),
         &model->listeningPeerPool()),
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList)
@@ -118,10 +118,6 @@ const View::MultiHttpServer& View::httpServer() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<relaying::BeginListeningHandler>(
-        nx::network::http::Method::post,
-        &m_controller->listeningPeerManager());
-
     registerApiHandler<view::CreateClientSessionHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
@@ -147,21 +143,6 @@ void View::registerApiHandlers()
         registerApiHandler<view::OptionsRequestHandler>(
             nx::network::http::Method::options);
     }
-
-    // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
-    // Keep until 3.2 release just in case.
-    registerCompatibilityHandlers();
-}
-
-void View::registerCompatibilityHandlers()
-{
-    registerApiHandler<relaying::BeginListeningHandler>(
-        nx::network::http::Method::options,
-        &m_controller->listeningPeerManager());
-
-    registerApiHandler<view::ConnectToListeningPeerWithHttpUpgradeHandler>(
-        nx::network::http::Method::options,
-        &m_controller->connectSessionManager());
 }
 
 template<typename Handler, typename ... Args>

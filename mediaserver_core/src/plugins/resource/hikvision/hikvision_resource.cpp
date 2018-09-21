@@ -104,9 +104,11 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 
 QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 {
+    /*
     const auto& resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.value<bool>(lit("useOnvifPtz"), false))
         return QnPlOnvifResource::createPtzControllerInternal();
+    */
 
     const auto isapi = m_integrationProtocols.find(Protocol::isapi);
     if (isapi != m_integrationProtocols.end() && isapi->second.enabled)

@@ -2400,7 +2400,6 @@ void QnStorageManager::checkWritableStoragesExist()
 
 void QnStorageManager::startAuxTimerTasks()
 {
-
     if (m_role == QnServer::StoragePool::Normal)
     {
         static const std::chrono::seconds kCheckStoragesAvailableInterval(30);
@@ -3014,4 +3013,54 @@ const std::array<QnServer::StoragePool, 2> QnStorageManager::getPools() {
 QnScheduleSync* QnStorageManager::scheduleSync() const
 {
     return m_scheduleSync.get();
+}
+
+Qn::StorageStatuses QnStorageManager::storageStatus(const QnStorageResourcePtr& storage)
+{
+    auto serverModule = dynamic_cast<QnMediaServerModule*>(storage->commonModule());
+    if (!serverModule)
+        return Qn::StorageStatus::unknown;
+
+    Qn::StorageStatuses result =
+        serverModule->normalStorageManager()->storageStatusInternal(storage);
+    if (result.testFlag(Qn::notUsed))
+        result = serverModule->backupStorageManager()->storageStatusInternal(storage);
+
+    return result;
+}
+
+Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResourcePtr& storage)
+{
+    QnStorageResourceList allStorages;
+    QnStorageScanData storageScanData;
+    {
+        QnMutexLocker lock(&m_mutexStorages);
+        std::transform(m_storageRoots.cbegin(), m_storageRoots.cend(),
+            std::back_inserter(allStorages), [](const auto& storage){ return storage; });
+        storageScanData = m_archiveRebuildInfo;
+    }
+
+    Qn::StorageStatuses result;
+    if (!allStorages.contains(storage))
+    {
+        result = Qn::StorageStatus::notUsed;
+        return result;
+    }
+
+    if (storage->getStatus() == Qn::Offline)
+        return result | Qn::StorageStatus::beingChecked;
+
+    if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
+        result | Qn::StorageStatus::beingRebuilded;
+
+    auto writableStorages = getAllWritableStorages();
+    if (!writableStorages.contains(storage))
+    {
+        if (storage->isSystem())
+            result |= Qn::StorageStatus::systemTooSmall;
+        else
+            result |= Qn::StorageStatus::tooSmall;
+    }
+
+    return result;
 }

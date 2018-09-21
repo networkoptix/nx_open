@@ -187,7 +187,7 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
 
     updateOverlayStyle();
 
-    setPorts(module->getIOPorts());
+    setPorts(module->ioPortDescriptions());
     timer->start();
 }
 
@@ -217,7 +217,7 @@ void QnIoModuleOverlayWidgetPrivate::updateContents()
      * It is called when colors or user input enabled state is changed
      * This normally should not happen often when I/O module overlay is open */
     if (module)
-        setPorts(module->getIOPorts());
+        setPorts(module->ioPortDescriptions());
 }
 
 void QnIoModuleOverlayWidgetPrivate::openConnection()
@@ -239,7 +239,7 @@ void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePt
 
     if (key == Qn::IO_SETTINGS_PARAM_NAME)
     {
-        setPorts(module->getIOPorts());
+        setPorts(module->ioPortDescriptions());
     }
     else if (key == Qn::IO_OVERLAY_STYLE_PARAM_NAME)
     {

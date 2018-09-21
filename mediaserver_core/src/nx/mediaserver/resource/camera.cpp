@@ -25,7 +25,6 @@ namespace nx {
 namespace mediaserver {
 namespace resource {
 
-
 const float Camera::kMaxEps = 0.01f;
 
 Camera::Camera(QnMediaServerModule* serverModule):
@@ -35,6 +34,24 @@ Camera::Camera(QnMediaServerModule* serverModule):
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
+
+    connect(this, &QnResource::initializedChanged,
+        [this]()
+        {
+            // m_initMutex is locked down the stack.
+            fixInputPortMonitoring();
+        });
+
+    const auto updateIoCache =
+        [this](const QnResourcePtr&, const QString& id, bool value, qint64 timestamp)
+        {
+            NX_DEBUG(this, "Port %1 is changed to %2 (%3)", id, value, timestamp);
+            QnMutexLocker lk(&m_ioPortStatesMutex);
+            m_ioPortStatesCache[id] = QnIOStateData(id, value, timestamp);
+        };
+
+    connect(this, &Camera::inputPortStateChanged, updateIoCache);
+    connect(this, &Camera::outputPortStateChanged, updateIoCache);
 }
 
 Camera::~Camera()
@@ -274,7 +291,7 @@ QSize Camera::getNearestResolution(
 
     int bestIndex = -1;
     double bestMatchCoeff =
-        maxResolutionArea > kMaxEps ? (maxResolutionArea / requestSquare) : INT_MAX;
+        (maxResolutionArea > kMaxEps) ? (maxResolutionArea / requestSquare) : INT_MAX;
 
     for (int i = 0; i < resolutionList.size(); ++i)
     {
@@ -372,6 +389,15 @@ CameraDiagnostics::Result Camera::initInternal()
     return initializeAdvancedParametersProviders();
 }
 
+void Camera::initializationDone()
+{
+    base_type::initializationDone();
+
+    // TODO: Find out is it's ever required, monitoring resource state change should be enough!
+    QnMutexLocker lk(&m_initMutex);
+    fixInputPortMonitoring();
+}
+
 nx::media::CameraTraits Camera::mediaTraits() const
 {
     return m_mediaTraits;
@@ -380,6 +406,14 @@ nx::media::CameraTraits Camera::mediaTraits() const
 QnAbstractPtzController* Camera::createPtzControllerInternal() const
 {
     return nullptr;
+}
+
+void Camera::startInputPortStatesMonitoring()
+{
+}
+
+void Camera::stopInputPortStatesMonitoring()
+{
 }
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
@@ -566,6 +600,66 @@ QnAbstractStreamDataProvider* Camera::createDataProvider(
             break;
     }
     return nullptr;
+}
+
+void Camera::inputPortListenerAttached()
+{
+    QnMutexLocker lk(&m_initMutex);
+    ++m_inputPortListenerCount;
+    fixInputPortMonitoring();
+}
+
+void Camera::inputPortListenerDetached()
+{
+    QnMutexLocker lk(&m_initMutex);
+    if (m_inputPortListenerCount == 0)
+    {
+        NX_ASSERT(false, "Detached input port listener without attach");
+    }
+    else
+    {
+        --m_inputPortListenerCount;
+        fixInputPortMonitoring();
+    }
+}
+
+QnIOStateDataList Camera::ioPortStates() const
+{
+    QnMutexLocker lock(&m_mutex);
+    QnIOStateDataList states;
+    for (const auto& [id, state]: m_ioPortStatesCache)
+        states.push_back(state);
+    return states;
+}
+
+bool Camera::setOutputPortState(
+    const QString& /*portId*/,
+    bool /*value*/,
+    unsigned int /*autoResetTimeoutMs*/)
+{
+    return false;
+}
+
+void Camera::fixInputPortMonitoring()
+{
+    if (isInitialized() && m_inputPortListenerCount)
+    {
+        if (!m_inputPortListeningInProgress && hasCameraCapabilities(Qn::InputPortCapability))
+        {
+            NX_DEBUG(this, "Start input port monitoring");
+            startInputPortStatesMonitoring();
+            m_inputPortListeningInProgress = true;
+        }
+    }
+    else
+    {
+        if (m_inputPortListeningInProgress)
+        {
+            NX_DEBUG(this, "Stop input port monitoring");
+            stopInputPortStatesMonitoring();
+            m_inputPortListeningInProgress = false;
+        }
+    }
 }
 
 } // namespace resource

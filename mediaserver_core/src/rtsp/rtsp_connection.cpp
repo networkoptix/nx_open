@@ -435,13 +435,15 @@ QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
     return QHostAddress(d->socket->getForeignAddress().toString());
 }
 
-void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
+void QnRtspConnectionProcessor::initResponse(
+    nx::network::rtsp::StatusCodeValue code,
+    const QString& message)
 {
     Q_D(QnRtspConnectionProcessor);
 
     d->response = nx::network::http::Response();
     d->response.statusLine.version = d->request.requestLine.version;
-    d->response.statusLine.statusCode = code;
+    d->response.statusLine.statusCode = static_cast<int>(code);
     d->response.statusLine.reasonPhrase = message.toUtf8();
     d->response.headers.insert(nx::network::http::HttpHeader("CSeq", nx::network::http::getHeaderValue(d->request.headers, "CSeq")));
     QString transport = nx::network::http::getHeaderValue(d->request.headers, "Transport");
@@ -464,14 +466,15 @@ void QnRtspConnectionProcessor::generateSessionId()
 }
 
 
-void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType)
+void QnRtspConnectionProcessor::sendResponse(
+    nx::network::rtsp::StatusCodeValue statusCode,
+    const QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
 
     d->response.statusLine.version = d->request.requestLine.version;
-    d->response.statusLine.statusCode = httpStatusCode;
-    d->response.statusLine.reasonPhrase =
-        nx::network::http::StatusCode::toString((nx::network::http::StatusCode::Value)httpStatusCode);
+    d->response.statusLine.statusCode = statusCode;
+    d->response.statusLine.reasonPhrase = nx::network::rtsp::toString(statusCode).toUtf8();
 
     nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
@@ -733,7 +736,7 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
     return QnConstMediaContextPtr(); //< Not found.
 }
 
-int QnRtspConnectionProcessor::composeDescribe()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
@@ -850,7 +853,7 @@ bool QnRtspConnectionProcessor::isSecondaryLiveDPSupported() const
     return d->liveDpLow && !d->liveDpLow->isPaused();
 }
 
-int QnRtspConnectionProcessor::composeSetup()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetup()
 {
     Q_D(QnRtspConnectionProcessor);
     if (!d->mediaRes)
@@ -917,7 +920,7 @@ int QnRtspConnectionProcessor::composeSetup()
     return nx::network::http::StatusCode::ok;
 }
 
-int QnRtspConnectionProcessor::composePause()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePause()
 {
     //Q_D(QnRtspConnectionProcessor);
     //if (!d->dataProvider)
@@ -953,7 +956,7 @@ void QnRtspConnectionProcessor::processRangeHeader()
     Q_D(QnRtspConnectionProcessor);
     const auto rangeStr = nx::network::http::getHeaderValue(d->request.headers, "Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (!nx_rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
+    if (!nx::network::rtsp::parseRangeHeader(rangeStr, &d->startTime, &d->endTime))
         d->startTime = DATETIME_NOW;
 }
 
@@ -1207,7 +1210,7 @@ StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders() const
     return filter;
 }
 
-int QnRtspConnectionProcessor::composePlay()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 {
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
@@ -1407,7 +1410,7 @@ int QnRtspConnectionProcessor::composePlay()
     return nx::network::http::StatusCode::ok;
 }
 
-int QnRtspConnectionProcessor::composeTeardown()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeTeardown()
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -1422,7 +1425,7 @@ int QnRtspConnectionProcessor::composeTeardown()
     return nx::network::http::StatusCode::ok;
 }
 
-int QnRtspConnectionProcessor::composeSetParameter()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
 
@@ -1437,7 +1440,8 @@ int QnRtspConnectionProcessor::composeSetParameter()
         QByteArray normParam = parameter.trimmed().toLower();
         QList<QByteArray> vals = parameter.split(':');
         if (vals.size() < 2)
-            return nx::network::http::StatusCode::invalidParameter;
+            return nx::network::http::StatusCode::badRequest;
+
         if (normParam.startsWith("x-media-quality"))
         {
             QString q = vals[1].trimmed();
@@ -1490,10 +1494,10 @@ int QnRtspConnectionProcessor::composeSetParameter()
         }
     }
 
-    return nx::network::http::StatusCode::invalidParameter;
+    return nx::network::http::StatusCode::badRequest;
 }
 
-int QnRtspConnectionProcessor::composeGetParameter()
+nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeGetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
     QList<QByteArray> parameters = d->requestBody.split('\n');
@@ -1509,7 +1513,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
         }
         else {
             qWarning() << Q_FUNC_INFO << __LINE__ << "Unsupported RTSP parameter " << parameter.trimmed();
-            return nx::network::http::StatusCode::invalidParameter;
+            return nx::network::rtsp::StatusCode::parameterNotUnderstood;
         }
     }
 

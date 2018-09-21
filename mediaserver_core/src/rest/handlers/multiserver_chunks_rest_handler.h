@@ -11,13 +11,14 @@
 
 typedef QnMultiserverRequestContext<QnChunksRequestData> QnChunksRequestContext;
 
-class QnMultiserverChunksRestHandler: 
+class QnMultiserverChunksRestHandler:
     public QnFusionRestHandler,
     public nx::mediaserver::ServerModuleAware
 {
 public:
-    QnMultiserverChunksRestHandler(
-        QnMediaServerModule* serverModule, const QString& path = QString());
+    static const QString kUrlPath;
+
+    QnMultiserverChunksRestHandler(QnMediaServerModule* serverModule);
 
     virtual int executeGet(
         const QString& path, const QnRequestParamList& params, QByteArray& result,

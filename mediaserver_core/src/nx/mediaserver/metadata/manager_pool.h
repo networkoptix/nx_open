@@ -87,7 +87,7 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    std::shared_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
+    std::unique_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
     void saveManifestToFile(
@@ -176,20 +176,14 @@ private:
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame);
 
-    void warnOnce(bool* warningIssued, const QString& message);
-
     boost::optional<PixelFormat> pixelFormatFromManifest(
         const nx::api::AnalyticsDriverManifest& manifest);
 
-    static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
-
-    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToUncompressedVideoFrame(
-        const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat);
+    void issueMissingUncompressedFrameWarningOnce();
 
 private:
     ResourceMetadataContextMap m_contexts;
     QnMutex m_contextMutex;
-    bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
     QThread* m_thread;

@@ -17,11 +17,13 @@ WebSocketTransportAcceptor::WebSocketTransportAcceptor(
     const QnUuid& moduleGuid,
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* transactionLog,
-    ConnectionManager* connectionManager)
+    ConnectionManager* connectionManager,
+    const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_protocolVersionRange(protocolVersionRange),
     m_transactionLog(transactionLog),
     m_connectionManager(connectionManager),
+    m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
         moduleGuid,
         QnUuid::createUuid(),
@@ -107,6 +109,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
         m_protocolVersionRange,
         m_transactionLog,
         systemId.c_str(),
+        m_outgoingCommandFilter,
         connectionId,
         std::move(webSocket),
         localPeerInfo,

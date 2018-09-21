@@ -21,6 +21,7 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include "resource_metadata_context.h"
 #include <plugins/plugin_tools.h>
+#include <nx/streaming/abstract_data_consumer.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -32,18 +33,34 @@ class VideoDataReceptor;
 using ManagerPtr = nxpt::ScopedRef<nx::sdk::metadata::CameraManager>;
 using HandlerPtr = std::unique_ptr<nx::sdk::metadata::MetadataHandler>;
 
-struct ManagerContext final
+class ManagerContext final: public QnAbstractDataConsumer
 {
-    HandlerPtr handler;
-    ManagerPtr manager;
-    bool isStreamConsumer = false;
-    nx::api::AnalyticsDriverManifest manifest;
-    ManagerContext() = default;
-    ManagerContext(ManagerContext&& other) = default;
+    using base_type = QnAbstractDataConsumer;
+public:
+    ManagerContext(
+        int queueSize,
+        HandlerPtr handler,
+        ManagerPtr manager,
+        const nx::api::AnalyticsDriverManifest& manifest);
     ~ManagerContext();
+
+    bool isStreamConsumer() const;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
+
+    nx::sdk::metadata::CameraManager* manager() { return m_manager.get(); }
+    const nx::sdk::metadata::CameraManager* manager() const { return m_manager.get(); }
+
+    nx::sdk::metadata::MetadataHandler* handler() const { return m_handler.get(); }
+    const nx::api::AnalyticsDriverManifest& manifest() const { return m_manifest; }
+
+private:
+    HandlerPtr m_handler;
+    ManagerPtr m_manager;
+    nx::api::AnalyticsDriverManifest m_manifest;
 };
 
-using ManagerList = std::vector<ManagerContext>;
+using ManagerList = std::vector<std::unique_ptr<ManagerContext>>;
 
 /**
  * Private class for internal use inside ManagerPool only

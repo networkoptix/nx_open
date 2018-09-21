@@ -10,6 +10,7 @@
 #include <api/server_rest_connection.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/vms/common/p2p/downloader/file_information.h>
+#include <nx/vms/common/p2p/downloader/result_code.h>
 
 #include "server_request_storage.h"
 
@@ -33,25 +34,30 @@ struct UploadWorker::Private
     UploadState upload;
     QnMediaServerResourcePtr server;
     QSharedPointer<QFile> file;
-    qint64 ttl = 0;
     QByteArray md5;
     int chunkSize = 1024 * 1024;
     int currentChunk = 0;
     int totalChunks = 0;
+    std::mutex mutex;
 
     QFuture<QByteArray> md5Future;
     QFutureWatcher<QByteArray> md5FutureWatcher;
     ServerRequestStorage requests;
 };
 
-UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, const QString& path, qint64 ttl, QObject* parent):
+UploadWorker::UploadWorker(const QnMediaServerResourcePtr& server, UploadState& config, QObject* parent):
     QObject(parent),
     d(new Private(server))
 {
     NX_ASSERT(server);
 
-    d->file.reset(new QFile(path));
-    d->ttl = ttl;
+    d->upload = config;
+    d->upload.uuid = server->getId();
+    d->upload.source = config.source;
+    d->upload.destination = config.destination;
+    d->upload.ttl = config.ttl;
+
+    d->file.reset(new QFile(config.source));
 
     connect(&d->md5FutureWatcher, &QFutureWatcherBase::finished,
         this, &UploadWorker::handleMd5Calculated);
@@ -70,6 +76,9 @@ void UploadWorker::start()
     QFileInfo info(d->file->fileName());
     if (!info.suffix().isEmpty())
         d->upload.id += lit(".") + info.suffix();
+
+    if (d->upload.destination.isEmpty())
+        d->upload.destination = d->upload.id;
 
     if (!d->file->open(QIODevice::ReadOnly))
     {
@@ -160,32 +169,74 @@ void UploadWorker::handleMd5Calculated()
     emitProgress();
 
     auto callback = guarded(this,
-        [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
+        [this](bool success, rest::Handle handle, const QnJsonRestResult & result)
         {
-            d->requests.releaseHandle(handle);
-            handleFileUploadCreated(success);
+            {
+                std::scoped_lock<std::mutex> lock(d->mutex);
+                d->requests.releaseHandle(handle);
+            }
+            RemoteResult code = RemoteResult::ok;
+            if (!success)
+            {
+                if (result.reply.isNull())
+                    code = RemoteResult::ioError;
+                else
+                    code = result.deserialized<RemoteResult>();
+            }
+
+            QMetaObject::invokeMethod(this, [this, success, code, error=result.errorString]()
+                {
+                    handleFileUploadCreated(success, code, error);
+                });
+            //handleFileUploadCreated(success, code, result.errorString);
         });
 
-    d->requests.storeHandle(d->connection()->addFileUpload(
-        d->upload.id,
+    auto handle = d->connection()->addFileUpload(
+        d->upload.destination,
         d->upload.size,
         d->chunkSize,
         d->md5.toHex(),
-        d->ttl,
-        callback,
-        thread()));
+        d->upload.ttl,
+        callback);
+    // We have a race condition around this handle.
+    d->requests.storeHandle(handle);
 }
 
-void UploadWorker::handleFileUploadCreated(bool success)
+void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QString error)
 {
     if (!success)
     {
-        handleError(tr("Could not create upload on the server side"));
-        return;
+        switch (code)
+        {
+            case RemoteResult::ok:
+                // Should not be here. success should be true
+                NX_ASSERT(false);
+                d->upload.status = UploadState::Uploading;
+                handleUpload();
+                break;
+            case RemoteResult::fileAlreadyExists:
+            case RemoteResult::fileAlreadyDownloaded:
+                d->upload.status = UploadState::Done;
+                emitProgress();
+                break;
+            case RemoteResult::ioError:
+            case RemoteResult::fileDoesNotExist:
+            case RemoteResult::invalidChecksum:
+            case RemoteResult::invalidFileSize:
+            case RemoteResult::invalidChunkIndex:
+            case RemoteResult::invalidChunkSize:
+            case RemoteResult::noFreeSpace:
+                d->upload.status = UploadState::Error;
+                d->upload.errorMessage = error;
+                handleError(tr("Could not create upload on the server side: %1").arg(error));
+                break;
+        }
     }
-
-    d->upload.status = UploadState::Uploading;
-    handleUpload();
+    else
+    {
+        d->upload.status = UploadState::Uploading;
+        handleUpload();
+    }
 }
 
 void UploadWorker::handleUpload()
@@ -209,12 +260,15 @@ void UploadWorker::handleUpload()
     auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const rest::ServerConnection::EmptyResponseType&)
         {
-            d->requests.releaseHandle(handle);
+            {
+                std::scoped_lock<std::mutex> lock(d->mutex);
+                d->requests.releaseHandle(handle);
+            }
             handleChunkUploaded(success);
         });
 
     d->requests.storeHandle(d->connection()->uploadFileChunk(
-        d->upload.id,
+        d->upload.destination,
         d->currentChunk,
         bytes,
         callback,
@@ -243,8 +297,10 @@ void UploadWorker::handleAllUploaded()
     auto callback = guarded(this,
         [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            d->requests.releaseHandle(handle);
-
+            {
+                std::scoped_lock<std::mutex> lock(d->mutex);
+                d->requests.releaseHandle(handle);
+            }
             using namespace nx::vms::common::p2p::downloader;
             FileInformation info = result.deserialized<FileInformation>();
             const bool fileStatusOk = info.status == FileInformation::Status::downloaded;
@@ -252,9 +308,8 @@ void UploadWorker::handleAllUploaded()
         });
 
     d->requests.storeHandle(d->connection()->fileDownloadStatus(
-        d->upload.id,
-        callback,
-        thread()));
+        d->upload.destination,
+        callback, thread()));
 }
 
 void UploadWorker::handleCheckFinished(bool success, bool ok)

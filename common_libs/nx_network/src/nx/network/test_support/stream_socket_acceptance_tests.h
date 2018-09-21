@@ -182,7 +182,7 @@ protected:
         typename SocketTypeSet::ClientSocket* connectionPtr,
         SystemError::ErrorCode errorCode)
     {
-        ASSERT_TRUE(errorCode == SystemError::noError);
+        ASSERT_EQ(SystemError::noError, errorCode);
 
         QnMutexLocker lk(&m_mutex);
 

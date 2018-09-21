@@ -31,7 +31,7 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 {
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, bool /*activate*/,
+bool QnDesktopCameraResource::setOutputPortState(const QString& /*outputID*/, bool /*activate*/,
     unsigned int /*autoResetTimeoutMS*/)
 {
     return false;

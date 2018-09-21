@@ -26,6 +26,7 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     reply.status = storage->initOrUpdate();
     reply.storage.url  = storage->getUrl();
     reply.storage = QnStorageSpaceData(storage, false);
+    reply.storage.storageStatus = QnStorageManager::storageStatus(storage);
 
     QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (fileStorage)
@@ -81,11 +82,11 @@ int QnStorageStatusRestHandler::executeGet(
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     auto storage = getOrCreateStorage(storageUrl);
     if (!storage)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     result.setReply(createReply(storage));
     return nx::network::http::StatusCode::ok;

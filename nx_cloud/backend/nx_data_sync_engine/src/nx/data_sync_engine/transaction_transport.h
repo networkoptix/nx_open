@@ -50,6 +50,7 @@ public:
         nx::network::aio::AbstractAioThread* aioThread,
         std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
         TransactionLog* const transactionLog,
+        const OutgoingCommandFilter& outgoingCommandFilter,
         const ConnectionRequestAttributes& connectionRequestAttributes,
         const std::string& systemId,
         const vms::api::PeerData& localPeer,

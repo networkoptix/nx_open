@@ -15,6 +15,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
     const std::string& systemId,
+    const OutgoingCommandFilter& filter,
     const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
     vms::api::PeerDataEx localPeerData,
@@ -31,10 +32,18 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
-        remotePeerData.dataFormat)),
+        remotePeerData.dataFormat,
+        filter)),
+    m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
     bindToAioThread(this->webSocket()->getAioThread());
+
+    m_commonTransactionHeader.systemId = systemId;
+    m_commonTransactionHeader.endpoint = remoteSocketAddr();
+    m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
+    m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
+    m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
@@ -106,8 +115,9 @@ void WebSocketTransactionTransport::onGotMessage(
             break;
         }
         default:
-            NX_ERROR(this, lm("P2P message type '%1' is not allowed for cloud connect!")
-                .arg(toString(messageType)));
+            NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
+                "System id %2, source endpoint %3")
+                .args(toString(messageType), m_systemId, remoteSocketAddr()));
             setState(State::Error);
             break;
     }
@@ -117,10 +127,13 @@ void WebSocketTransactionTransport::readTransactions()
 {
     using namespace std::placeholders;
     m_tranLogRequestInProgress = true;
+    
+    ReadCommandsFilter filter;
+    filter.from = m_remoteSubscription;
+    filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
+
     m_transactionLogReader->readTransactions(
-        m_remoteSubscription,
-        boost::optional<vms::api::TranState>(), //< toState. Unlimited
-        kMaxTransactionsPerIteration,
+        filter,
         std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
 

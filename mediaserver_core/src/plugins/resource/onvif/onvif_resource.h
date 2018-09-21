@@ -207,15 +207,10 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; }
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue
     */
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -430,6 +425,8 @@ protected:
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
 private:
+    QnIOPortDataList generateOutputPorts() const;
+
     CameraDiagnostics::Result ReadVideoEncoderOptionsForToken(
         const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds);
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions();
@@ -462,10 +459,8 @@ protected:
 
     VideoEncoderConfigOptionsList m_videoEncoderConfigOptionsList;
 
-    virtual bool startInputPortMonitoringAsync(
-        std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
@@ -620,7 +615,7 @@ private:
     bool fetchPtzInfo();
     bool setRelayOutputInfo( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    void setRelayOutputStateNonSafe(
+    void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,
         bool active,

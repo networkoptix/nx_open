@@ -11,7 +11,6 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <utils/common/html.h>
 #include <utils/license_usage_helper.h>
@@ -35,6 +34,7 @@
 #include "widgets/io_module_settings_widget.h"
 
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
 namespace nx::client::desktop {
@@ -144,7 +144,7 @@ struct CameraSettingsDialog::Private
     void handleCamerasWithDefaultPasswordChanged()
     {
         const auto defaultPasswordWatcher = q->context()->instance<DefaultPasswordCamerasWatcher>();
-        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword().toSet()
+        const auto troublesomeCameras = defaultPasswordWatcher->camerasWithDefaultPassword()
             .intersect(cameras.toSet());
 
         if (!troublesomeCameras.empty())
@@ -270,7 +270,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
         [this]() { d->handleAction(ui::action::ChangeDefaultCameraPasswordAction); });
 
     const auto defaultPasswordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraListChanged, this,
+    connect(defaultPasswordWatcher, &DefaultPasswordCamerasWatcher::cameraSetChanged, this,
         [this]() { d->handleCamerasWithDefaultPasswordChanged(); });
 
     // Make sure we will not handle stateChanged, triggered when creating watchers.

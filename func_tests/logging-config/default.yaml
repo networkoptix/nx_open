@@ -36,6 +36,7 @@ loggers:
   framework.mediaserver_api.setup: {level: INFO}
   framework.mediaserver_api.setup.wait: {level: WARNING}
   framework.mediaserver_api.merge: {level: INFO}
+  framework.message_bus.thread: {level: WARNING}
   framework.installation.deb_installation: {level: INFO}
   framework.installation.mediaserver.examination: {level: INFO}
   framework.installation.mediaserver.wait: {level: INFO}
