@@ -51,9 +51,10 @@ PeerWrapper& SystemMergeFixture::peer(int index)
     return *m_servers[index];
 }
 
-void SystemMergeFixture::mergeSystems()
+QnRestResult::Error SystemMergeFixture::mergeSystems()
 {
     m_prevResult = m_servers.back()->mergeTo(*m_servers.front());
+    return m_prevResult;
 }
 
 void SystemMergeFixture::waitUntilAllServersAreInterconnected()

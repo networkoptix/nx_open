@@ -207,7 +207,8 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 
     if (serverCount > 1)
     {
-        systemMergeFixture.mergeSystems();
+        if (systemMergeFixture.mergeSystems() != QnRestResult::NoError)
+            return nullptr;
         systemMergeFixture.waitUntilAllServersSynchronizedData();
     }
 
