@@ -26,6 +26,7 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     reply.status = storage->initOrUpdate();
     reply.storage.url  = storage->getUrl();
     reply.storage = QnStorageSpaceData(storage, false);
+    reply.storage.storageStatus = QnStorageManager::storageStatus(storage);
 
     QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (fileStorage)
