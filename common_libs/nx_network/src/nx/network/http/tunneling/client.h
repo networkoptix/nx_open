@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 
 #include <nx/network/aio/basic_pollable.h>
@@ -32,6 +33,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    void setTimeout(std::chrono::milliseconds timeout);
     void openTunnel(OpenTunnelCompletionHandler completionHandler);
 
     const Response& response() const;

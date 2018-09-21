@@ -15,6 +15,11 @@ ConnectionUpgradeTunnelClient::ConnectionUpgradeTunnelClient(
 {
 }
 
+void ConnectionUpgradeTunnelClient::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_timeout = timeout;
+}
+
 void ConnectionUpgradeTunnelClient::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {
@@ -25,6 +30,11 @@ void ConnectionUpgradeTunnelClient::openTunnel(
     m_completionHandler = std::move(completionHandler);
 
     m_httpClient = std::make_unique<AsyncClient>();
+    if (m_timeout)
+    {
+        m_httpClient->setMessageBodyReadTimeout(*m_timeout);
+        m_httpClient->setResponseReadTimeout(*m_timeout);
+    }
     m_httpClient->bindToAioThread(getAioThread());
     // TODO: HTTP method should be configurable.
     m_httpClient->doUpgrade(

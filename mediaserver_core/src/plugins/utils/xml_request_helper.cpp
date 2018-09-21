@@ -109,21 +109,46 @@ std::optional<bool> XmlRequestHelper::Result::boolean(const QString& name) const
     if (!value)
         return std::nullopt;
 
-    const auto lowwerValue = value->toLower();
-    if (lowwerValue == lit("true") || lowwerValue == lit("on") || lowwerValue == lit("1"))
+    const auto lowerValue = value->toLower();
+    if (lowerValue == lit("true") || lowerValue == lit("on") || lowerValue == lit("1"))
         return true;
 
-    if (lowwerValue == lit("false") || lowwerValue == lit("off") || lowwerValue == lit("0"))
+    if (lowerValue == lit("false") || lowerValue == lit("off") || lowerValue == lit("0"))
         return false;
 
     NX_VERBOSE(m_parent, "Value of <%1> from %3is not an boolean: %2", name, path(), *value);
     return std::nullopt;
 }
 
+std::optional<QString> XmlRequestHelper::Result::attribute(const QString& name) const
+{
+    if (!m_element.hasAttribute(name))
+        return std::nullopt;
+
+    return m_element.attribute(name);
+}
+
+QString XmlRequestHelper::Result::stringOrEmpty(const QString& name) const
+{
+    const auto value = string(name);
+    return value ? *value : QString();
+}
+
+int XmlRequestHelper::Result::integerOrZero(const QString& name) const
+{
+    const auto value = integer(name);
+    return value ? *value : 0;
+}
+
 bool XmlRequestHelper::Result::booleanOrFalse(const QString& name) const
 {
     const auto value = boolean(name);
     return value ? *value : false;
+}
+
+QString XmlRequestHelper::Result::attributeOrEmpty(const QString& name) const
+{
+    return m_element.attribute(name);
 }
 
 std::optional<XmlRequestHelper::Result> XmlRequestHelper::get(const QString& path)
@@ -201,7 +226,8 @@ std::optional<XmlRequestHelper::Result> XmlRequestHelper::readBody()
         return std::nullopt;
     }
 
-    return Result(this, document.documentElement(), {document.nodeName()});
+    const auto element = document.documentElement();
+    return Result(this, element, {element.tagName()});
 }
 
 QString XmlRequestHelper::idForToStringFromPtr() const

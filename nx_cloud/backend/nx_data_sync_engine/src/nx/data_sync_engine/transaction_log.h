@@ -55,11 +55,18 @@ QString toString(const CommandHeader& tran);
 class NX_DATA_SYNC_ENGINE_API TransactionLog
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void()> NewTransactionHandler;
-    typedef nx::utils::MoveOnlyFunc<void(
+    using NewTransactionHandler = nx::utils::MoveOnlyFunc<void()>;
+
+    using TransactionsReadHandler = nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
         std::vector<dao::TransactionLogRecord> /*serializedTransactions*/,
-        vms::api::TranState /*readedUpTo*/)> TransactionsReadHandler;
+        vms::api::TranState /*readedUpTo*/)>;
+
+    using OnTransactionReceivedHandler = nx::utils::MoveOnlyFunc<
+        nx::sql::DBResult(
+            nx::sql::QueryContext* /*queryContext*/,
+            const std::string& /*systemId*/,
+            const nx::data_sync_engine::EditableSerializableTransaction& /*transaction*/)>;
 
     /**
      * Fills internal cache.
@@ -96,15 +103,15 @@ public:
      */
     template<typename CommandDescriptor>
     nx::sql::DBResult checkIfNeededAndSaveToLog(
-        nx::sql::QueryContext* connection,
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const SerializableTransaction<typename CommandDescriptor::Data>& transaction)
+        const SerializableTransaction<CommandDescriptor>& transaction)
     {
         const auto transactionHash = CommandDescriptor::hash(transaction.get().params);
 
         // Checking whether transaction should be saved or not.
         if (isShouldBeIgnored(
-                connection,
+                queryContext,
                 systemId,
                 transaction.get(),
                 transactionHash))
@@ -115,17 +122,23 @@ public:
                     .arg(systemId).arg(CommandDescriptor::name).arg(transaction.get())
                     .arg(CommandDescriptor::hash(transaction.get().params)));
 
-
             // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
             return nx::sql::DBResult::cancelled;
         }
 
-        return saveToDb(
-            connection,
+        const auto resultCode = saveToDb(
+            queryContext,
             systemId,
             transaction.get(),
             transactionHash,
             transaction.serialize(Qn::UbjsonFormat, m_supportedProtocolRange.currentVersion()));
+        if (resultCode != nx::sql::DBResult::ok)
+            return resultCode;
+
+        return invokeExternalProcessor<CommandDescriptor>(
+            queryContext,
+            systemId,
+            transaction);
     }
 
     template<typename CommandDescriptor>
@@ -134,66 +147,42 @@ public:
         const std::string& systemId,
         typename CommandDescriptor::Data transactionData)
     {
-        return saveLocalTransaction<CommandDescriptor>(
+        auto transaction = prepareLocalTransaction(
             queryContext,
             systemId,
-            prepareLocalTransaction(
-                queryContext,
-                systemId,
-                CommandDescriptor::code,
-                std::move(transactionData)));
+            CommandDescriptor::code,
+            std::move(transactionData));
+
+        const auto transactionHash = CommandDescriptor::hash(transaction.params);
+        auto transactionSerializer = std::make_unique<
+            UbjsonSerializedTransaction<CommandDescriptor>>(
+                std::move(transaction),
+                m_supportedProtocolRange.currentVersion());
+
+        return saveLocalTransaction(
+            queryContext,
+            systemId,
+            transactionHash,
+            std::move(transactionSerializer));
     }
 
     /**
      * This method should be used when generating new transactions.
      */
-    template<typename CommandDescriptor>
     nx::sql::DBResult saveLocalTransaction(
         nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        Command<typename CommandDescriptor::Data> transaction)
+        const nx::Buffer& transactionHash,
+        std::unique_ptr<SerializableAbstractTransaction> transactionSerializer);
+
+    template<typename TransactionSerializerType>
+    nx::sql::DBResult saveLocalTransaction(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        std::unique_ptr<TransactionSerializerType> transactionSerializer)
     {
-        TransactionLogContext* vmsTransactionLogData = nullptr;
-
-        QnMutexLocker lock(&m_mutex);
-        DbTransactionContext& dbTranContext =
-            getDbTransactionContext(lock, queryContext, systemId);
-        vmsTransactionLogData = getTransactionLogContext(lock, systemId);
-        lock.unlock();
-
-        const auto transactionHash = CommandDescriptor::hash(transaction.params);
-        NX_DEBUG(
-            QnLog::EC2_TRAN_LOG.join(this),
-            lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
-                .arg(systemId).arg(CommandDescriptor::name)
-                .arg(transaction).arg(transactionHash));
-
-        // Serializing transaction.
-        auto serializedTransaction = QnUbjson::serialized(transaction);
-
-        // Saving transaction to the log.
-        const auto result = saveToDb(
-            queryContext,
-            systemId,
-            transaction,
-            transactionHash,
-            serializedTransaction);
-        if (result != nx::sql::DBResult::ok)
-            return result;
-
-        auto transactionSerializer = std::make_unique<
-            UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
-                std::move(transaction),
-                std::move(serializedTransaction),
-                m_supportedProtocolRange.currentVersion());
-
-        // Saving transactions, generated under current DB transaction,
-        //  so that we can send "new transaction" notifications after commit.
-        vmsTransactionLogData->outgoingTransactionsSorter.addTransaction(
-            dbTranContext.cacheTranId,
-            std::move(transactionSerializer));
-
-        return nx::sql::DBResult::ok;
+        const auto hash = transactionSerializer->hash();
+        return saveLocalTransaction(queryContext, systemId, hash, std::move(transactionSerializer));
     }
 
     template<typename TransactionDataType>
@@ -203,24 +192,18 @@ public:
         int commandCode,
         TransactionDataType transactionData)
     {
-        int transactionSequence = 0;
-        vms::api::Timestamp transactionTimestamp;
-        std::tie(transactionSequence, transactionTimestamp) =
-            generateNewTransactionAttributes(queryContext, systemId);
-
-        // Generating transaction.
-        Command<TransactionDataType> transaction(m_peerId);
-        // Filling transaction header.
-        transaction.command = static_cast<::ec2::ApiCommand::Value>(commandCode);
-        transaction.peerID = m_peerId;
-        transaction.transactionType = ::ec2::TransactionType::Cloud;
-        transaction.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);
-        transaction.persistentInfo.sequence = transactionSequence;
-        transaction.persistentInfo.timestamp = transactionTimestamp;
+        Command<TransactionDataType> transaction;
+        transaction.setHeader(
+            prepareLocalTransactionHeader(queryContext, systemId, commandCode));
         transaction.params = std::move(transactionData);
 
         return transaction;
     }
+
+    CommandHeader prepareLocalTransactionHeader(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        int commandCode);
 
     vms::api::TranState getTransactionState(const std::string& systemId) const;
 
@@ -246,6 +229,8 @@ public:
     void shiftLocalTransactionSequence(
         const std::string& systemId,
         int delta);
+
+    void setOnTransactionReceived(OnTransactionReceivedHandler handler);
 
 private:
     struct DbTransactionContext
@@ -294,6 +279,7 @@ private:
     std::atomic<std::uint64_t> m_transactionSequence;
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
     std::list<std::string> m_systemsMarkedForDeletion;
+    OnTransactionReceivedHandler m_onTransactionReceivedHandler;
 
     /** Fills transaction state cache. */
     nx::sql::DBResult fillCache();
@@ -319,6 +305,21 @@ private:
         const CommandHeader& transaction,
         const QByteArray& transactionHash,
         const QByteArray& ubjsonData);
+
+    template<typename CommandDescriptor>
+    nx::sql::DBResult invokeExternalProcessor(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const SerializableTransaction<CommandDescriptor>& transaction)
+    {
+        if (!m_onTransactionReceivedHandler)
+            return nx::sql::DBResult::ok;
+
+        return m_onTransactionReceivedHandler(
+            queryContext,
+            systemId,
+            transaction);
+    }
 
     int generateNewTransactionSequence(
         const QnMutexLockerBase& lock,

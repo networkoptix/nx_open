@@ -72,6 +72,7 @@ protected:
     void whenRequestTunnel()
     {
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient->setTimeout(nx::network::kNoTimeout);
 
         m_tunnelingClient->openTunnel(
             std::bind(&HttpTunneling::saveClientTunnel, this, std::placeholders::_1));

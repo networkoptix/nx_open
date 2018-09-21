@@ -92,6 +92,9 @@ public:
     Vector restricted(const QnPtzLimits& limits, LimitsType restrictionType) const;
 
     static Vector rangeVector(const QnPtzLimits& limits, LimitsType limitsType);
+
+    QString toString() const;
+    Vector scaleSpeed(const QnPtzLimits& limits) const;
 };
 
 Vector operator*(const Vector& ptzVector, double scalar);

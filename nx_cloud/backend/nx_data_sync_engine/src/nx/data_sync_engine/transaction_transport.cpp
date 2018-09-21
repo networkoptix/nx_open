@@ -160,7 +160,7 @@ void TransactionTransport::sendTransaction(
     post(
         [this,
             serializedTransaction = std::move(serializedTransaction),
-            transactionHeader = transactionSerializer->transactionHeader()]()
+            transactionHeader = transactionSerializer->header()]()
         {
             // TODO: #ak checking transaction to send queue size
             //if (isReadyToSend(transaction.command) && queue size is too large)
@@ -493,7 +493,7 @@ void TransactionTransport::sendTransaction(
         {
             auto serializedTransaction = QnUbjson::serialized(transaction);
             transactionSerializer =
-                std::make_unique<UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
+                std::make_unique<UbjsonSerializedTransaction<CommandDescriptor>>(
                     std::move(transaction),
                     std::move(serializedTransaction),
                     m_protocolVersionRange.currentVersion());

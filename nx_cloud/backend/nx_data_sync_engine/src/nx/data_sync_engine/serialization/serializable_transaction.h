@@ -1,24 +1,37 @@
 #pragma once
 
-#include "../command.h"
 #include "transaction_serializer.h"
+#include "../command.h"
 
 namespace nx {
 namespace data_sync_engine {
 
-class SerializableAbstractTransaction:
+class NX_DATA_SYNC_ENGINE_API SerializableAbstractTransaction:
     public TransactionSerializer
 {
 public:
-    virtual const CommandHeader& transactionHeader() const = 0;
+    virtual const CommandHeader& header() const = 0;
 };
 
-template<typename TransactionDataType>
-class SerializableTransaction:
+//-------------------------------------------------------------------------------------------------
+
+class NX_DATA_SYNC_ENGINE_API EditableSerializableTransaction:
     public SerializableAbstractTransaction
 {
 public:
-    SerializableTransaction(Command<TransactionDataType> transaction):
+    virtual std::unique_ptr<EditableSerializableTransaction> clone() const = 0;
+    virtual void setHeader(CommandHeader header) = 0;
+    virtual nx::Buffer hash() const = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename CommandDescriptor>
+class SerializableTransaction:
+    public EditableSerializableTransaction
+{
+public:
+    SerializableTransaction(Command<typename CommandDescriptor::Data> transaction):
         m_transaction(std::move(transaction))
     {
     }
@@ -59,23 +72,39 @@ public:
         }
     }
 
-    virtual const CommandHeader& transactionHeader() const override
+    virtual const CommandHeader& header() const override
     {
         return m_transaction;
     }
 
-    const Command<TransactionDataType>& get() const
+    virtual std::unique_ptr<EditableSerializableTransaction> clone() const override
+    {
+        return std::make_unique<SerializableTransaction<CommandDescriptor>>(
+            m_transaction);
+    }
+
+    virtual void setHeader(CommandHeader header) override
+    {
+        m_transaction.setHeader(std::move(header));
+    }
+
+    virtual nx::Buffer hash() const override
+    {
+        return CommandDescriptor::hash(m_transaction.params);
+    }
+
+    const Command<typename CommandDescriptor::Data>& get() const
     {
         return m_transaction;
     }
 
-    Command<TransactionDataType> take()
+    Command<typename CommandDescriptor::Data> take()
     {
         return std::move(m_transaction);
     }
 
 private:
-    Command<TransactionDataType> m_transaction;
+    Command<typename CommandDescriptor::Data> m_transaction;
 };
 
 } // namespace data_sync_engine

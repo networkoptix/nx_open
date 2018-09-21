@@ -77,7 +77,72 @@ nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
     return nx::sql::DBResult::ok;
 }
 
-vms::api::TranState TransactionLog::getTransactionState(const std::string& systemId) const
+nx::sql::DBResult TransactionLog::saveLocalTransaction(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    const nx::Buffer& transactionHash,
+    std::unique_ptr<SerializableAbstractTransaction> transactionSerializer)
+{
+    TransactionLogContext* vmsTransactionLogData = nullptr;
+
+    QnMutexLocker lock(&m_mutex);
+    DbTransactionContext& dbTranContext =
+        getDbTransactionContext(lock, queryContext, systemId);
+    vmsTransactionLogData = getTransactionLogContext(lock, systemId);
+    lock.unlock();
+
+    NX_DEBUG(
+        QnLog::EC2_TRAN_LOG.join(this),
+        lm("systemId %1. Generated new transaction %2 (%3, hash %4)")
+            .args(systemId, transactionSerializer->header(), transactionHash));
+
+    // Saving transaction to the log.
+    const auto result = saveToDb(
+        queryContext,
+        systemId,
+        transactionSerializer->header(),
+        transactionHash,
+        transactionSerializer->serialize(
+            Qn::SerializationFormat::UbjsonFormat,
+            m_supportedProtocolRange.currentVersion()));
+    if (result != nx::sql::DBResult::ok)
+        return result;
+
+    // Saving transactions, generated under current DB transaction,
+    //  so that we can send "new transaction" notifications after commit.
+    vmsTransactionLogData->outgoingTransactionsSorter.addTransaction(
+        dbTranContext.cacheTranId,
+        std::move(transactionSerializer));
+
+    return nx::sql::DBResult::ok;
+}
+
+CommandHeader TransactionLog::prepareLocalTransactionHeader(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    int commandCode)
+{
+    CommandHeader header;
+
+    int transactionSequence = 0;
+    vms::api::Timestamp transactionTimestamp;
+    std::tie(transactionSequence, transactionTimestamp) =
+        generateNewTransactionAttributes(queryContext, systemId);
+
+    // Generating transaction.
+    // Filling transaction header.
+    header.command = static_cast<::ec2::ApiCommand::Value>(commandCode);
+    header.peerID = m_peerId;
+    header.transactionType = ::ec2::TransactionType::Cloud;
+    header.persistentInfo.dbID = QnUuid::fromArbitraryData(systemId);
+    header.persistentInfo.sequence = transactionSequence;
+    header.persistentInfo.timestamp = transactionTimestamp;
+
+    return header;
+}
+
+vms::api::TranState TransactionLog::getTransactionState(
+    const std::string& systemId) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_systemIdToTransactionLog.find(systemId);
@@ -150,6 +215,12 @@ void TransactionLog::shiftLocalTransactionSequence(
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
         vms::api::PersistentIdData(m_peerId, QnUuid::fromArbitraryData(systemId)),
         delta);
+}
+
+void TransactionLog::setOnTransactionReceived(
+    OnTransactionReceivedHandler handler)
+{
+    m_onTransactionReceivedHandler = std::move(handler);
 }
 
 nx::sql::DBResult TransactionLog::fillCache()

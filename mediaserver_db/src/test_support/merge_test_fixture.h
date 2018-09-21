@@ -25,7 +25,7 @@ public:
     const PeerWrapper& peer(int index) const;
     PeerWrapper& peer(int index);
 
-    void mergeSystems();
+    QnRestResult::Error mergeSystems();
 
     void waitUntilAllServersAreInterconnected();
     void waitUntilAllServersSynchronizedData();

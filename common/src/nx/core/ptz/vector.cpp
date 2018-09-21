@@ -289,6 +289,29 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
         limits.maxFocusSpeed - limits.minFocusSpeed);
 }
 
+QString Vector::toString() const
+{
+    return lm("ptz(%1, %2, %3, r=%4, f=%5").args(pan, tilt, zoom, rotation, focus);
+}
+
+// Scale from [-1, 1] to [min, max] range.
+double scaleSpeedComponent(double value, qreal min, qreal max)
+{
+    const auto absolute = (value + 1) / 2;
+    return absolute * (max - min) + min;
+}
+
+Vector Vector::scaleSpeed(const QnPtzLimits& limits) const
+{
+    Vector result;
+    result.pan = scaleSpeedComponent(pan, limits.minPanSpeed, limits.maxPanSpeed);
+    result.tilt = scaleSpeedComponent(tilt, limits.minTiltSpeed, limits.maxTiltSpeed);
+    result.rotation = scaleSpeedComponent(rotation, limits.minRotationSpeed, limits.maxRotationSpeed);
+    result.zoom = scaleSpeedComponent(zoom, limits.minZoomSpeed, limits.maxZoomSpeed);
+    result.focus = scaleSpeedComponent(focus, limits.minFocusSpeed, limits.maxFocusSpeed);
+    return result;
+}
+
 Vector operator*(const Vector& ptzVector, double scalar)
 {
     return Vector(
