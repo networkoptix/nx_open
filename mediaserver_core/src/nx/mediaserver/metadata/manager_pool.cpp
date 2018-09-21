@@ -534,6 +534,7 @@ void ManagerPool::fetchMetadataForResourceUnsafe(
                 lm("Event list is empty, stopping metadata fetching for resource %1.")
                     .arg(resourceId));
 
+            data->stop(); //< Stop thread to guarantee there is no 2 simultaneously calls.
             if (data->manager()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from plugin %1")
