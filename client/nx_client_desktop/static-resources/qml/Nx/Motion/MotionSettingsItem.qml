@@ -42,6 +42,23 @@ Rectangle
 
         item: video
 
+        customAspectRatio:
+        {
+            var aspectRatio = helper ? helper.customAspectRatio : 0.0
+            if (aspectRatio === 0.0)
+            {
+                if (player)
+                    aspectRatio = player.aspectRatio
+                else
+                    aspectRatio = sourceSize.width / sourceSize.height
+            }
+
+            var layoutSize = helper ? helper.layoutSize : Qt.size(1, 1)
+            aspectRatio *= layoutSize.width / layoutSize.height
+
+            return aspectRatio
+        }
+
         MultiVideoOutput
         {
             id: video
