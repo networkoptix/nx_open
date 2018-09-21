@@ -498,7 +498,8 @@ bool CameraController::setHeartbeat(Heartbeat heartbeat) const
     if (heartbeat.interval > kMaxInterval || heartbeat.interval < kMinInterval)
     {
         NX_PRINT << "Trying to set inappropriate heartbeat interval: "
-            << heartbeat.interval.count() << " seconds";
+            << heartbeat.interval.count() << " seconds. The value should fall within ["
+            << kMinInterval.count() << ", " << kMaxInterval.count() << "]";
         return false;
     }
 
