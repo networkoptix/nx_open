@@ -24,6 +24,17 @@
 
 namespace {
 
+/**
+ * We have to use double empersand to preserve it in the menu item.
+ * Since we use same string as the button and menu item text simultaneously we need to fix
+ * it for the button (for example) to get rid of double ampersand.
+ */
+QString fixAmpersand(QString value)
+{
+    value.replace(lit("&&"), lit("&"));
+    return value;
+}
+
 QPalette modifiedPalette(QPalette palette, const QColor& backgroundColor = Qt::transparent)
 {
     palette.setBrush(QPalette::Base, QBrush(backgroundColor));
@@ -344,7 +355,7 @@ void SearchEdit::updateTagButton()
 {
     if (d->selectedTagIndex != -1)
     {
-        d->tagButton->setText(m_tags.at(d->selectedTagIndex));
+        d->tagButton->setText(fixAmpersand(m_tags.at(d->selectedTagIndex)));
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
