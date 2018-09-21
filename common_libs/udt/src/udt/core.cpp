@@ -52,6 +52,7 @@ Yunhong Gu, last updated 02/28/2012
 #include <wspiapi.h>
 #endif
 #endif
+#include <atomic>
 #include <cmath>
 #include <sstream>
 #include "queue.h"
@@ -89,8 +90,6 @@ static const int CTRL_MSG_DROP = 7;             //111 - Msg drop request
 static const int CTRL_ACK_SPECIAL_ERROR = 8;    //1000 - acknowledge the peer side a special error
 static const int CTRL_RESERVED = 32767;         //0x7FFF - Resevered for future use
 
-
-
                                                 // Mimimum recv flight flag size is 32 packets
 constexpr const int kMinRecvWindowSize = 32;
 constexpr const int kDefaultRecvWindowSize = 25600;
@@ -107,7 +106,6 @@ constexpr const int kDefaultSendBufferSize =
 kDefaultRecvWindowSize < 8192
     ? kDefaultRecvWindowSize
     : 8192;
-
 
 CUDT::CUDT()
 {
@@ -577,13 +575,13 @@ void CUDT::open()
     // structures for queue
     if (NULL == m_pSNode)
         m_pSNode = new CSNode;
-    m_pSNode->m_pUDT = this;
+    m_pSNode->m_pUDT = shared_from_this();
     m_pSNode->m_llTimeStamp = 1;
     m_pSNode->m_iHeapLoc = -1;
 
     if (NULL == m_pRNode)
         m_pRNode = new CRNode;
-    m_pRNode->m_pUDT = this;
+    m_pRNode->m_pUDT = shared_from_this();
     m_pRNode->m_llTimeStamp = 1;
     m_pRNode->m_pPrev = m_pRNode->m_pNext = NULL;
     m_pRNode->m_bOnList = false;
@@ -669,7 +667,7 @@ void CUDT::connect(const sockaddr* serv_addr)
     if (m_bRendezvous)
         ttl *= 10;
     ttl += CTimer::getTime();
-    m_pRcvQueue->registerConnector(m_SocketID, this, m_iIPversion, serv_addr, ttl);
+    m_pRcvQueue->registerConnector(m_SocketID, shared_from_this(), m_iIPversion, serv_addr, ttl);
 
     // This is my current configurations
     m_ConnReq.m_iVersion = m_iVersion;
@@ -883,7 +881,7 @@ POST_CONNECT:
 
     // register this socket for receiving data packets
     m_pRNode->m_bOnList = true;
-    m_pRcvQueue->setNewEntry(this);
+    m_pRcvQueue->setNewEntry(shared_from_this());
 
     // acknowledge the management module.
     s_UDTUnited.connect_complete(m_SocketID);
@@ -983,7 +981,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
 
     // register this socket for receiving data packets
     m_pRNode->m_bOnList = true;
-    m_pRcvQueue->setNewEntry(this);
+    m_pRcvQueue->setNewEntry(shared_from_this());
 
     //send the response to the peer, see listen() for more discussions about this
     CPacket response;
@@ -1186,7 +1184,7 @@ int CUDT::send(const char* data, int len)
     m_pSndBuffer->addBuffer(data, size);
 
     // insert this socket to snd list if it is not on the list yet
-    m_pSndQueue->m_pSndUList->update(this, false);
+    m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1366,7 +1364,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     m_pSndBuffer->addBuffer(data, len, msttl, inorder);
 
     // insert this socket to the snd list if it is not on the list yet
-    m_pSndQueue->m_pSndUList->update(this, false);
+    m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1552,7 +1550,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
         }
 
         // insert this socket to snd list if it is not on the list yet
-        m_pSndQueue->m_pSndUList->update(this, false);
+        m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
     }
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -2100,7 +2098,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
 
             // insert this socket to snd list if it is not on the list yet
-            m_pSndQueue->m_pSndUList->update(this, false);
+            m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
 
             // Update RTT
             //m_iRTT = *((int32_t *)ctrlpkt.m_pcData + 1);
@@ -2216,7 +2214,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             // the lost packet (retransmission) should be sent out immediately
-            m_pSndQueue->m_pSndUList->update(this);
+            m_pSndQueue->m_pSndUList->update(shared_from_this());
 
             ++m_iRecvNAK;
             ++m_iRecvNAKTotal;
@@ -2579,7 +2577,7 @@ void CUDT::checkTimers(bool forceAck)
             m_bShutdown = false;
 
             // update snd U list to remove this socket
-            m_pSndQueue->m_pSndUList->update(this);
+            m_pSndQueue->m_pSndUList->update(shared_from_this());
 
             releaseSynch();
 
@@ -2606,7 +2604,7 @@ void CUDT::checkTimers(bool forceAck)
             CCUpdate();
 
             // immediately restart transmission
-            m_pSndQueue->m_pSndUList->update(this);
+            m_pSndQueue->m_pSndUList->update(shared_from_this());
         }
         else
         {

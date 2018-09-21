@@ -20,7 +20,6 @@ func_tests/.cache
 func_tests/.rnd
 func_tests/report.html
 func_tests/doc/html
-func_tests/tests/test_example.py
 
 *.orig
 .vscode

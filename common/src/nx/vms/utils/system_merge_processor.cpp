@@ -57,6 +57,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::merge(
     MergeSystemData data,
     QnJsonRestResult* result)
 {
+    NX_DEBUG(this, "Merge. %1", QJson::serialized(data));
+
     m_authSession = authSession;
 
     if (data.mergeOneServer)
@@ -73,6 +75,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::merge(
     auto statusCode = fetchModuleInformation(url, data.getKey, &m_remoteModuleInformation);
     if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
     {
+        NX_DEBUG(this, lm("Failed to read remote module information. %1")
+            .args(nx::network::http::StatusCode::toString(statusCode)));
+
         if (statusCode == nx::network::http::StatusCode::unauthorized)
             setMergeError(result, MergeStatus::unauthorized);
         else
@@ -84,14 +89,26 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::merge(
 
     statusCode = checkWhetherMergeIsPossible(data, result);
     if (statusCode != nx::network::http::StatusCode::ok)
+    {
+        NX_DEBUG(this, lm("Systems cannot be merged"));
         return statusCode;
+    }
 
     statusCode = mergeSystems(accessRights, data, result);
     if (statusCode != nx::network::http::StatusCode::ok)
+    {
+        NX_DEBUG(this, lm("Failed to merge systems. %1")
+            .args(nx::network::http::StatusCode::toString(statusCode)));
         return statusCode;
+    }
 
     if (!addMergeHistoryRecord(data))
+    {
+        NX_DEBUG(this, "Failed to add merge history data");
         return nx::network::http::StatusCode::internalServerError;
+    }
+
+    NX_DEBUG(this, "Merge succeeded");
 
     return nx::network::http::StatusCode::ok;
 }
@@ -271,6 +288,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
 {
     if (m_dbBackupEnabled)
     {
+        NX_DEBUG(this, "Backing up the database");
+
         if (!nx::vms::utils::backupDatabase(
                 m_dataDirectory,
                 m_commonModule->ec2Connection()))
@@ -284,6 +303,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
 
     if (data.takeRemoteSettings)
     {
+        NX_DEBUG(this, "Applying remote peer settings");
+
         if (!applyRemoteSettings(
                 data.url,
                 m_remoteModuleInformation.localSystemId,
@@ -299,6 +320,8 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
     }
     else
     {
+        NX_DEBUG(this, "Applying local settings to a remote peer");
+
         if (!applyCurrentSettings(
                 data.url,
                 data.postKey,
@@ -632,7 +655,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
         {
             auto status = getClientResponse(client);
             NX_DEBUG(this, lm("Error requesting url %1: %2")
-                .args(url, nx::network::http::StatusCode::toString(status)));
+                .args(requestUrl, nx::network::http::StatusCode::toString(status)));
             return status == nx::network::http::StatusCode::undefined
                 ? nx::network::http::StatusCode::serviceUnavailable
                 : status;

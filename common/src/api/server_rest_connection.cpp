@@ -767,6 +767,12 @@ Handle ServerConnection::updateActionStart(const nx::update::Information& info, 
     return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
 }
 
+Handle ServerConnection::getUpdateInfo(Result<nx::update::Information>::type&& callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/ec2/updateInformation", params, callback, targetThread);
+}
+
 Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)
 {
     auto internalCallback = [callback=std::move(callback)](bool success, rest::Handle handle, EmptyResponseType response)

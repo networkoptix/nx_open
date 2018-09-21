@@ -273,10 +273,13 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     return false;
 }
 
-bool QnWorkbenchContext::showEulaMessage() const
+bool QnWorkbenchContext::showEulaMessage(QString eulaPath) const
 {
+    if (eulaPath.isEmpty())
+        eulaPath = lit(":/license.html");
+
     const bool acceptedEula =
-        [this]() -> bool
+        [this, eulaPath]() -> bool
         {
             const QString eulaHtmlStyle = QString::fromLatin1(R"(
             <style media="screen" type="text/css">
@@ -290,8 +293,12 @@ bool QnWorkbenchContext::showEulaMessage() const
             }
             </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
 
-            QFile eula(lit(":/license.html"));
-            eula.open(QIODevice::ReadOnly);
+            QFile eula(eulaPath);
+            if (!eula.open(QIODevice::ReadOnly))
+            {
+                NX_ERROR(this) << "Failed to open eula file" << eulaPath;
+                return true;
+            }
             QString eulaText = QString::fromUtf8(eula.readAll());
 
             // Regexp to dig out a title from html with EULA.

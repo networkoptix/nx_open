@@ -723,6 +723,20 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
+    enum StorageStatus
+    {
+        unknown = 0,
+        notUsed = 1 << 1,
+        tooSmall = 1 << 2,
+        systemTooSmall = 1 << 3,
+        removable = 1 << 4,
+        beingChecked = 1 << 5,
+        beingRebuilded = 1 << 6
+    };
+    Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageStatus)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -768,7 +782,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
 )
 
