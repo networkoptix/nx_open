@@ -149,8 +149,6 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
     log_messages = []
     zip_file = ZipFile(file_descriptor)
     # zip_file.printdir()
-    root = ""
-    block_update_content = False
 
     if update_structure:
         name = next((name for name in zip_file.namelist() if name.endswith('structure.json')), None)
@@ -170,42 +168,18 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                 log_messages.append(('info', 'Ignored: %s' % name))
             continue
 
-        if name.endswith('/'):
-            if name.count('/') == 1:  # top level directories are customizations
-                root = name
-                # If we are updating content we need to check and set customization
-                if update_content:
-                    customization_name = name.replace('/', '')
-                    customization = Customization.objects.filter(name=customization_name)
-
-                    if not customization.exists():
-                        block_update_content = True
-                        log_messages.append(
-                            ('error', 'Ignored %s (customization "%s" not found)' % (name, customization_name)))
-                        continue
-
-                    block_update_content = False
-                    customization = customization.first()
-            continue  # not a file - ignore it
-
-        # if the top level directory is not a valid customization skip over all of it
-        if block_update_content:
-            continue
-
-        short_name = name.replace(root, '')
-
-        if short_name.startswith('help/'):  # Ignore help
-            if short_name == 'help/':
+        if name.startswith('help/'):  # Ignore help
+            if name == 'help/':
                 log_messages.append(('info', 'Ignored: %s (help directory is ignored)' % name))
             continue
 
         # try to find relevant context
-        context = Context.objects.filter(file_path=short_name)
+        context = Context.objects.filter(file_path=name)
         if context.exists():
             try:
                 file_content = zip_file.read(name).decode("utf-8")
             except UnicodeDecodeError:
-                log_messages.append(('error', 'Ignored: %s (file is not UTF-encoded)' % name))
+                log_messages.append(('error', 'Ignored:  %s (file is not UTF-encoded)' % name))
                 continue
 
             context = context.first()
@@ -240,7 +214,7 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
                                          None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %
-                                             (short_name, structure.name)))
+                                             (name, structure.name)))
                         continue
 
                     replace_str = '(.*?)' if structure.type != structure.DATA_TYPES.html else '([.\s\S]*)'
@@ -277,9 +251,9 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             continue
 
         # try to find relevant data structure and update its default (maybe)
-        structure = DataStructure.objects.filter(name=short_name)
+        structure = DataStructure.objects.filter(name=name)
         if not structure.exists():
-            log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, short_name)))
+            log_messages.append(('warning', 'Ignored: %s (data structure %s does not exist)' % (name, name)))
             continue
         structure = structure.first()
 

@@ -31,7 +31,7 @@ def is_advanced(data_structure_name, context):
 
 
 @register.simple_tag
-def has_value(data_structure_name, context, customization, language):
+def has_value(data_structure_name, product, context, language):
     query = DataStructure.objects.filter(context=context, name=data_structure_name)
 
     if query.exists():
@@ -42,12 +42,7 @@ def has_value(data_structure_name, context, customization, language):
     if not data_structure.translatable:
         language = None
 
-    data_records = DataRecord.objects.filter(data_structure=data_structure,
-                                             customization=customization,
-                                             language=language)
-    if not data_records.exists():
-        return False
-    record_value = data_records.latest('id').value
+    record_value = data_structure.find_actual_value(product, language)
     return record_value != "" and data_structure.default != record_value
 
 

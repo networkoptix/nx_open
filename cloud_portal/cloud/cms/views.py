@@ -24,7 +24,7 @@ mysite = MyAdminSite()
 
 
 # Used to get the context and language models
-def get_context_and_language(request, context_id, language_code, customization):
+def get_context_and_language(request, context_id, language_code, default_language):
     context = Context.objects.get(id=context_id) if context_id else None
     language = Language.by_code(language_code)
 
@@ -41,14 +41,14 @@ def get_context_and_language(request, context_id, language_code, customization):
         if 'admin_language' in request.session:
             language = Language.by_code(request.session['admin_language'])
         else:
-            language = customization.default_language
+            language = default_language
 
     request.session['admin_language'] = language.code
     return context, language
 
 
 # This builds the custom 'edit page' form
-def initialize_form(product, context, customization, language, user):
+def initialize_form(product, context, language, user):
     form_initialization = {'language': language.code}
 
     if context:
@@ -58,17 +58,9 @@ def initialize_form(product, context, customization, language, user):
         initial=form_initialization)
 
     if context:
-        form.add_fields(product, context, customization, language, user)
+        form.add_fields(product, context, language, user)
 
     return form
-
-
-# This is used to get the context, customization and language from request information
-def get_info_for_context_editor(request, context_id, language_code):
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
-    context, language = get_context_and_language(request, context_id, language_code, customization)
-
-    return context, customization, language
 
 
 # If there are any errors they will be added to the django messages that show up in the response
@@ -79,11 +71,11 @@ def add_upload_error_messages(request, errors):
 
 
 # Used to make sure users without advanced permission don't modify advanced DataStructures
-def advanced_touched_without_permission(request_data, customization, data_structures):
+def advanced_touched_without_permission(request_data, data_structures, product):
     for ds_name in request_data:
         data_structure = data_structures.filter(name=ds_name)
         if data_structure.exists() and data_structure[0].advanced:
-            data_record = data_structure[0].datarecord_set.filter(customization=customization)
+            data_record = data_structure[0].datarecord_set.filter(product=product)
 
             if data_record.exists():
                 db_record_value = data_record.latest('created_date').value
@@ -98,7 +90,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
 
 # Handles when users save, create previews, or create reviews
 def context_editor_action(request, product, context_id, language_code):
-    context, customization, language = get_info_for_context_editor(request, context_id, language_code)
+    context, language = get_context_and_language(request, context_id, language_code, product.default_language)
 
     request_data = request.POST
     request_files = request.FILES
@@ -107,7 +99,7 @@ def context_editor_action(request, product, context_id, language_code):
     saved_msg = "Changes have been saved."
 
     if not (request.user.is_superuser or request.user.has_perm('cms.edit_advanced'))\
-            and advanced_touched_without_permission(request_data, customization, context.datastructure_set.all()):
+            and advanced_touched_without_permission(request_data, context.datastructure_set.all(), product):
         raise PermissionDenied
 
     if any(action in request_data for action in ['languageChanged', 'Preview', 'SaveDraft', 'SendReview']):
@@ -137,9 +129,9 @@ def context_editor_action(request, product, context_id, language_code):
             preview_link = modify_db.generate_preview_link(context)
 
     # The form is made here so that all of the changes to fields are sent with the new form
-    form = initialize_form(product, context, customization, language, request.user)
+    form = initialize_form(product, context, language, request.user)
 
-    return context, customization, language, form, preview_link
+    return context, language, form, preview_link
 
 
 # Create your views here.
@@ -148,16 +140,15 @@ def context_editor_action(request, product, context_id, language_code):
 def page_editor(request, context_id=None, language_code=None):
     product = get_cloud_portal_product()
     if request.method == "GET":
-        # Broken into two functions so that they can be reused in the context_editor_action function
-        context, customization, language = get_info_for_context_editor(request, context_id, language_code)
-        form = initialize_form(product, context, customization, language, request.user)
+        context, language = get_context_and_language(request, context_id, language_code, product.default_language)
+        form = initialize_form(product, context, language, request.user)
         preview_link = ""
 
     else:
         if not request.user.has_perm('cms.edit_content'):
             raise PermissionDenied
 
-        context, customization, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
+        context, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
 
         if 'SendReview' in request.POST and preview_link:
             return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
@@ -165,7 +156,7 @@ def page_editor(request, context_id=None, language_code=None):
     return render(request, 'context_editor.html',
                   {'context': context,
                    'form': form,
-                   'customization': customization,
+                   'product': product,
                    'language': language,
                    'preview_link': preview_link,
                    'user': request.user,
@@ -183,7 +174,6 @@ def version_action(request, version_id=None):
     if not ContentVersion.objects.filter(id=version_id).exists():
         defaults.bad_request("Version does not exist")
 
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     product = get_cloud_portal_product()
 
     if "Preview" in request.POST:
@@ -203,7 +193,7 @@ def version_action(request, version_id=None):
         if not request.user.has_perm('cms.force_update'):
             raise PermissionDenied
 
-        filldata.init_skin(product, customization.name)
+        filldata.init_skin(product)
         messages.success(request, "Version {} was force updated ".format(version_id))
 
     else:
@@ -216,8 +206,8 @@ def version_action(request, version_id=None):
 @permission_required('cms.change_contentversion')
 def version(request, version_id=None):
     preview_link = ""
-    version = ContentVersion.objects.get(id=version_id)
-    contexts = modify_db.get_records_for_version(version)
+    version_model = ContentVersion.objects.get(id=version_id)
+    contexts = modify_db.get_records_for_version(version_model)
     #else happens when the user makes a revision without any changes
     if contexts.values():
         product = get_cloud_portal_product()
@@ -228,7 +218,7 @@ def version(request, version_id=None):
             preview_link = modify_db.generate_preview_link(context)
     else:
         product = {'can_preview': False, 'name': ""}
-    return render(request, 'review_records.html', {'version': version,
+    return render(request, 'review_records.html', {'version': version_model,
                                                    'contexts': contexts,
                                                    'product': product,
                                                    'preview_link': preview_link,

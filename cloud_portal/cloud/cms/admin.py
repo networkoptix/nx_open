@@ -70,11 +70,10 @@ class ContextAdmin(CMSAdmin):
         return format_html('<a class="btn btn-sm" href="{}">edit content</a>',
                            reverse('page_editor', args=[obj.id]))
 
-    def get_queryset(self, request):  # show only users for current customization
+    def get_queryset(self, request):  # show only users for cloud_portal product type
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         if not request.user.is_superuser:
             qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
-        # additional filter - display only revisions from current customization
         return qs
 
     context_actions.short_description = 'Admin Options'
@@ -147,10 +146,9 @@ class ContentVersionAdmin(CMSAdmin):
         return format_html('<a class="btn btn-sm" href="{}">review</a>',
                            reverse('version', args=[obj.id]))
 
-    def get_queryset(self, request):  # show only users for current customization
+    def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(customization__name=settings.CUSTOMIZATION)
-        # additional filter - display only revisions from current customization
+        qs = qs.filter(product=get_cloud_portal_product())
         return qs
 
     content_version_actions.short_description = "Admin Options"

@@ -376,7 +376,7 @@ class ContentVersion(models.Model):
 
     @property
     def state(self):
-        if self.accepted_by == None:
+        if not self.accepted_by:
             return 'in review'
 
         version_id = self.product.version_id()

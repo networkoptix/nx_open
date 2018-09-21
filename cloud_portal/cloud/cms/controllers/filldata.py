@@ -40,7 +40,7 @@ def target_file(file_name, save_location, language_code, preview):
 
 def process_context_structure(product, context, content, language,
                               version_id, preview, force_global_files):
-    logger.info("process_context_structure: " + context.name)
+    #logger.info("process_context_structure: " + context.name)
 
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
@@ -321,7 +321,7 @@ def fill_content(product,
     default_language_code = product.default_language.code
     languages_list = product.languages_list
     for context in changed_contexts:
-        logger.info("Process context: " + context.name + " file:" + context.file_path)
+        #logger.info("Process context: " + context.name + " file:" + context.file_path)
         # now we need to check what languages were changes
         # if the default language is changed - we update all languages (lazy way)
         # otherwise - update only affected languages
