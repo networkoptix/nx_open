@@ -48,6 +48,7 @@ Leading Space Email                       ${SPACE}myemail@gmail.com
 Trailing Space Email                      myemail@gmail.com${SPACE}
     [tags]    C41875
 Unregistered Email                        ${EMAIL UNREGISTERED}
+    [tags]    C41870
 Empty Email                               ${EMPTY}
     [tags]    C26260
 
