@@ -175,6 +175,16 @@ public:
         const nx::Buffer& transactionHash,
         std::unique_ptr<SerializableAbstractTransaction> transactionSerializer);
 
+    template<typename TransactionSerializerType>
+    nx::sql::DBResult saveLocalTransaction(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        std::unique_ptr<TransactionSerializerType> transactionSerializer)
+    {
+        const auto hash = transactionSerializer->hash();
+        return saveLocalTransaction(queryContext, systemId, hash, std::move(transactionSerializer));
+    }
+
     template<typename TransactionDataType>
     Command<TransactionDataType> prepareLocalTransaction(
         nx::sql::QueryContext* queryContext,

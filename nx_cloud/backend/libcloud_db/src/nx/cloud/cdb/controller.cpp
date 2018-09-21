@@ -281,7 +281,6 @@ nx::sql::DBResult Controller::copyExternalTransaction(
     return m_ec2SyncronizationEngine.transactionLog().saveLocalTransaction(
         queryContext,
         systemId,
-        ownTransaction->hash(),
         std::move(ownTransaction));
 }
 
