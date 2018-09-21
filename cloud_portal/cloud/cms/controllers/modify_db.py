@@ -12,9 +12,8 @@ from api.models import Account
 from ..models import *
 
 
-def accept_latest_draft(product, customization, version_id, user):
-    unaccepted_version = ContentVersion.objects.filter(product=product, customization=customization,
-                                                       id=version_id, accepted_date=None)
+def accept_latest_draft(product, version_id, user):
+    unaccepted_version = ContentVersion.objects.filter(product=product, id=version_id, accepted_date=None)
     if not unaccepted_version.exists():
         return " is currently publishing or has already been published"
     unaccepted_version = unaccepted_version.latest('created_date')
@@ -24,21 +23,22 @@ def accept_latest_draft(product, customization, version_id, user):
     return None
 
 
-def notify_version_ready(product_name, customization, version_id, exclude_user):
+def notify_version_ready(product_name, version_id, exclude_user):
     perm = Permission.objects.get(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
-        filter(customization=customization, subscribe=True).\
+        filter(subscribe=True).\
         exclude(pk=exclude_user.pk).\
         distinct()
 
     for user in users:
         send(user.email, "review_version",
              {'id': version_id, 'product': product_name},
-             customization.name)
+             user.customization)
 
 
-def save_unrevisioned_records(product, context, customization, language, data_structures,
+# TODO: remove customization
+def save_unrevisioned_records(product, context, language, data_structures,
                               request_data, request_files, user, version_id=None):
     upload_errors = []
     for data_structure in data_structures:
@@ -123,12 +123,11 @@ def save_unrevisioned_records(product, context, customization, language, data_st
         record = DataRecord(product=product,
                             data_structure=data_structure,
                             language=ds_language,
-                            customization=customization,
                             value=new_record_value,
                             created_by=user)
         record.save()
 
-    fill_content(product, customization,
+    fill_content(product,
                  preview=True,
                  incremental=True,
                  version_id=version_id,
@@ -144,11 +143,11 @@ def update_latest_record_version(records, new_version):
         record.save()
 
 
-def update_records_to_version(product, contexts, customization, version):
+def update_records_to_version(product, contexts, version):
     languages = Language.objects.all()
     for context in contexts:
         for data_structure in context.datastructure_set.all():
-            all_records = data_structure.datarecord_set.filter(product=product, customization=customization)
+            all_records = data_structure.datarecord_set.filter(product=product)
 
             if data_structure.translatable:
                 for language in languages:
@@ -181,8 +180,8 @@ def generate_preview_link(context=None):
     return context.url + "?preview" if context else "/content/about?preview"
 
 
-def generate_preview(product, customization, context=None, version_id=None, send_to_review=False):
-    fill_content(product, customization,
+def generate_preview(product, context=None, version_id=None, send_to_review=False):
+    fill_content(product,
                  preview=True,
                  incremental=True,
                  changed_context=context,
@@ -191,27 +190,27 @@ def generate_preview(product, customization, context=None, version_id=None, send
     return generate_preview_link(context)
 
 
-def publish_latest_version(product, customization, version_id, user):
-    publish_errors = accept_latest_draft(product, customization, version_id, user)
+def publish_latest_version(product, version_id, user):
+    publish_errors = accept_latest_draft(product, version_id, user)
     if not publish_errors:
-        fill_content(product, customization, preview=False, incremental=True)
+        fill_content(product, preview=False, incremental=True)
     return publish_errors
 
 
-def send_version_for_review(product, customization, user):
-    old_versions = ContentVersion.objects.filter(product=product, customization=customization, accepted_date=None)
+def send_version_for_review(product, user):
+    old_versions = ContentVersion.objects.filter(product=product, accepted_date=None)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
         strip_version_from_records(old_version, product)
         old_version.delete()
 
-    version = ContentVersion(customization=customization, product=product, created_by=user)
+    version = ContentVersion(product=product, created_by=user)
     version.save()
 
-    update_records_to_version(product, Context.objects.filter(product_type=product.product_type), customization, version)
+    update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 
-    notify_version_ready(product.name, customization, version.id, user)
+    notify_version_ready(product.name, version.id, user)
 
 
 def get_records_for_version(version):

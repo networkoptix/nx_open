@@ -117,6 +117,16 @@ class Migration(migrations.Migration):
             field=models.IntegerField(choices=[(0, 'draft'), (1, 'review')], default=0),
         ),
         migrations.AlterField(
+            model_name='contentversion',
+            name='customization',
+            field=models.ForeignKey(default=None, null=True, to='cms.Customization'),
+        ),
+        migrations.AlterField(
+            model_name='datarecord',
+            name='customization',
+            field=models.ForeignKey(default=None, null=True, to='cms.Customization'),
+        ),
+        migrations.AlterField(
             model_name='product',
             name='customizations',
             field=models.ManyToManyField(blank=True, default=None, to='cms.Customization'),

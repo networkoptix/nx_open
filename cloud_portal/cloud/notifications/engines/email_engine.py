@@ -111,6 +111,6 @@ def read_file(customization_name, filename, language_code=""):
     if translated_name not in files_cache:
         files_cache[translated_name] = filldata.read_customized_file(filename,
                                                                      get_cloud_portal_product(customization_name),
-                                                                     customization_name, language_code)
+                                                                     language_code)
         email_cache(customization_name, 'files', files_cache)
     return files_cache[translated_name]

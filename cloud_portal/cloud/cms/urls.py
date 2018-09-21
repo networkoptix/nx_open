@@ -8,7 +8,6 @@ urlpatterns = [
     url(r'download/(?P<path>.*)$', download_file, name="download_file"),
 
     url(r'package/(?P<product_id>.*$)', download_package, name="download_package"),
-    url(r'package/(?P<product_id>.*?)/(?P<customization_name>.*)$', download_package, name="download_package"),
 
     url(r'product_settings/(?P<product_id>.+?)/', product_settings, name="product_settings"),
 

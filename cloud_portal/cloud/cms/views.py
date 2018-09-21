@@ -115,7 +115,7 @@ def context_editor_action(request, product, context_id, language_code):
         if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
             current_lang = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors = modify_db.save_unrevisioned_records(product, context, customization,
+        upload_errors = modify_db.save_unrevisioned_records(product, context,
                                                             current_lang, context.datastructure_set.all(),
                                                             request_data, request_files, request.user)
 
@@ -127,7 +127,7 @@ def context_editor_action(request, product, context_id, language_code):
                 warning_no_error_msg = "Cannot have any errors when sending for review."
                 messages.warning(request, "{} - {}".format(product.name, warning_no_error_msg))
             else:
-                modify_db.send_version_for_review(product, customization, request.user)
+                modify_db.send_version_for_review(product, request.user)
                 saved_msg += " A new version has been created."
 
         if upload_errors:
@@ -187,13 +187,13 @@ def version_action(request, version_id=None):
     product = get_cloud_portal_product()
 
     if "Preview" in request.POST:
-        modify_db.generate_preview(product, customization, version_id=version_id, send_to_review=True)
+        modify_db.generate_preview(product, version_id=version_id, send_to_review=True)
         preview_flag = "?preview"
 
     elif "Publish" in request.POST:
         if not request.user.has_perm('cms.publish_version'):
             raise PermissionDenied
-        publishing_errors = modify_db.publish_latest_version(product, customization, version_id, request.user)
+        publishing_errors = modify_db.publish_latest_version(product, version_id, request.user)
         if publishing_errors:
             messages.error(request, "Version {} {}".format(version_id, publishing_errors))
         else:
@@ -308,26 +308,21 @@ def product_settings(request, product_id):
 @require_http_methods(["GET"])
 def download_file(request, path):
     product = get_cloud_portal_product()
-    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
 
     language_code = request.GET['lang'] if 'lang' in request.GET else None
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    file = filldata.read_customized_file(path, product, customization, language_code, version_id, preview)
+    file = filldata.read_customized_file(path, product, language_code, version_id, preview)
     if file:
         return response_attachment(file, os.path.basename(path), "application")
     raise defaults.page_not_found("File does not exist")
 
 
 @require_http_methods(["GET"])
-def download_package(request, product_id, customization_name=None):
+def download_package(request, product_id):
     product = Product.objects.get(id=product_id)
-    if not customization_name:
-        customization = product.customizations.first()
-    else:
-        customization = Customization.objects.get(name=customization_name)
 
     version_id = request.GET['version_id'] if 'version_id' in request.GET else None
     preview = 'draft' in request.GET
-    zipped_data = filldata.get_zip_package(product, customization, preview, version_id)
+    zipped_data = filldata.get_zip_package(product, preview, version_id)
     return response_attachment(zipped_data, product.name + ".zip", "application/zip")

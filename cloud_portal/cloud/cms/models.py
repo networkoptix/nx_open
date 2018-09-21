@@ -133,13 +133,35 @@ class Product(models.Model):
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
 
     def __str__(self):
-        if self.product_type == ProductType.PRODUCT_TYPES.cloud_portal:
+        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
             return "{} - {}".format(self.name, self.customizations.first())
         return self.name
 
-    def version_id(self):
-        versions = ContentVersion.objects.filter(product=self)
-        return versions.latest('accepted_date').id if versions.exists() else 0
+    @property
+    def default_language(self):
+        if len(self.customizations.all()) == 1:
+            return self.customizations.first().default_language
+
+        return Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+
+    @property
+    def languages_list(self):
+        if self.customizations.exists():
+            lang_list = []
+            for customization in self.customizations.all():
+                lang_list.extend(customization.languages_list)
+            return list(set(lang_list))
+        return Customization.objects.get(name=settings.CUSTOMIZATION).languages_list
+
+    @property
+    def product_root(self):
+        if self.product_type and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+            return self.customizations.first().name
+        return ""
+
+    def change_preview_status(self, new_status):
+        self.preview_status = new_status
+        self.save()
 
     def read_global_value(self, record_name):
         global_contexts = self.product_type.context_set.filter(is_global=True)
@@ -165,13 +187,14 @@ class Product(models.Model):
                 need_update = self.preview_status == orig.preview_status
 
         super(Product, self).save(*args, **kwargs)
-        if need_update and self.product_type == ProductType.PRODUCT_TYPES.cloud_portal and len(self.customizations.all()) == 1:
+        if need_update and self.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal\
+                and len(self.customizations.all()) == 1:
             cloud_portal_customization_cache(self.customizations.first().name, force=True)  # invalidate cache
             # TODO: need to update all static right here
 
-    def change_preview_status(self, new_status):
-        self.preview_status = new_status
-        self.save()
+    def version_id(self):
+        versions = ContentVersion.objects.filter(product=self)
+        return versions.latest('accepted_date').id if versions.exists() else 0
 
 
 class Context(models.Model):
@@ -333,7 +356,8 @@ class ContentVersion(models.Model):
             ("force_update", "Can forcibly update content"),
         )
 
-    customization = models.ForeignKey(Customization)
+    # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
+    customization = models.ForeignKey(Customization, default=None, null=True)
     product = models.ForeignKey(Product, default=1)
     name = models.CharField(max_length=1024)
 
@@ -367,7 +391,8 @@ class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
     product = models.ForeignKey(Product, default=None, null=True)
     language = models.ForeignKey(Language, null=True, blank=True)
-    customization = models.ForeignKey(Customization)
+    # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
+    customization = models.ForeignKey(Customization, default=None, null=True)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
     created_date = models.DateTimeField(auto_now_add=True)

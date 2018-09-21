@@ -269,7 +269,6 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
 
                     # save if needed
                     record = DataRecord(data_structure=structure,
-                                        customization=customization,
                                         value=value,
                                         created_by=user)
                     record.save()
@@ -311,7 +310,6 @@ def process_zip(file_descriptor, user, product, update_structure, update_content
             # add new dataRecrod
             record = DataRecord(
                 data_structure=structure,
-                customization=customization,
                 value=data64,
                 created_by=user
             )
