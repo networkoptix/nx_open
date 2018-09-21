@@ -20,7 +20,8 @@ nx-checkbox {
 
     .nx-checkbox {
         display : flex;
-        float : left;
+        float   : left;
+        margin   : 0;
 
         input[type="checkbox"] {
             position : absolute;

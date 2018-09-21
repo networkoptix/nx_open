@@ -1,4 +1,4 @@
-<div class="container" >
+<div class="container">
     <h1>SANDBOX</h1>
 
     <div class="row">
@@ -43,51 +43,62 @@
 
                 <br/>
 
-                <nx-radio
-                        name="blah" id="blah1"
-                        value="blah1"
-                        [(ngModel)]="blah">blah1
-                </nx-radio>
-                <nx-radio
-                        name="blah" id="blah2"
-                        value="blah2"
-                        [(ngModel)]="blah">blah2
-                </nx-radio>
-                <nx-radio
-                        name="blah" id="blah3"
-                        value="blah3"
-                        [(ngModel)]="blah">blah3
-                </nx-radio>
+                <div class="form-group">
+                    <nx-radio
+                            name="blah" compId="blah1"
+                            value="blah1"
+                            [(ngModel)]="blah">
+                    </nx-radio>
+                    <label for="blah1">blah1</label>
+                    <br/>
+                    <nx-radio
+                            name="blah" compId="blah2"
+                            value="blah2"
+                            [(ngModel)]="blah">blah2
+                    </nx-radio>
+                    <label for="blah2">blah2</label>
+                    <br/>
+                    <nx-radio
+                            name="blah" compId="blah3"
+                            value="blah3"
+                            [(ngModel)]="blah">blah3
+                    </nx-radio>
+                    <label for="blah3">blah3</label>
+                </div>
 
-                <br/>
+                <div class="form-group">
+                    <nx-radio
+                            name="group2" compId="group1"
+                            value="Tsanko"
+                            [(ngModel)]="group">Tsanko
+                    </nx-radio>
+                    <label for="group1">Tsanko</label>
+                    <br/>
+                    <nx-radio
+                            name="group2" compId="group2"
+                            value="Evgeny"
+                            [(ngModel)]="group">Evgeny
+                    </nx-radio>
+                    <label for="group2">Evgeny</label>
+                </div>
 
-                <nx-radio
-                        name="group2" id="group1"
-                        value="Tsanko"
-                        [(ngModel)]="group">Tsanko
-                </nx-radio>
-
-                <nx-radio
-                        name="group2" id="group2"
-                        value="Evgeny"
-                        [(ngModel)]="group">Evgeny
-                </nx-radio>
-
-                <br/>
-
-                <nx-radio
-                        name="group2" id="group3"
-                        value="Tsanko"
-                        [(ngModel)]="group"
-                        disabled>Tsanko
-                </nx-radio>
-
-                <nx-radio
-                        name="group2" id="group4"
-                        value="Evgeny"
-                        [(ngModel)]="group"
-                        disabled>Evgeny
-                </nx-radio>
+                <div class="form-group">
+                    <nx-radio
+                            name="group2" compId="group3"
+                            value="Tsanko"
+                            [(ngModel)]="group"
+                            disabled>Tsanko
+                    </nx-radio>
+                    <label for="group3">Tsanko</label>
+                    <br/>
+                    <nx-radio
+                            name="group2" compId="group4"
+                            value="Evgeny"
+                            [(ngModel)]="group"
+                            disabled>Evgeny
+                    </nx-radio>
+                    <label for="group4">Evgeny</label>
+                </div>
 
                 <br/>
                 <br/>
@@ -100,7 +111,7 @@
             value: {{show5}}
             <br/>
             value: {{show}}
-            <br />
+            <br/>
             <!--value (required): {{agree}}-->
             <!--<br/>-->
             <!--value (blah): {{blah}}-->
@@ -184,6 +195,41 @@
                             <label for="fldEdit3">
                                 <span class="glyphicon glyphicon-pencil " title="Used for writing"></span>
                             </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label for="blah11">blah1</label>
+                        </td>
+                        <td>
+                            <nx-radio
+                                    name="blah" compId="blah11"
+                                    value="blah1"
+                                    [(ngModel)]="blah">
+                            </nx-radio>
+                        </td>
+
+
+                        <td>
+                            <label for="blah21">blah2</label>
+                        </td>
+                        <td>
+                            <nx-radio
+                                    name="blah" compId="blah21"
+                                    value="blah2"
+                                    [(ngModel)]="blah">blah2
+                            </nx-radio>
+                        </td>
+
+                        <td>
+                            <label for="blah31">blah3</label>
+                        </td>
+                        <td>
+                            <nx-radio
+                                    name="blah" compId="blah31"
+                                    value="blah3"
+                                    [(ngModel)]="blah">blah3
+                            </nx-radio>
                         </td>
                     </tr>
                 </table>

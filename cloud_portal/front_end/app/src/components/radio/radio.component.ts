@@ -30,7 +30,7 @@ import {
     encapsulation: ViewEncapsulation.None
 })
 export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator {
-    @Input() id: string;
+    @Input() compId: string;
     @Input() name: string;
     @Input() label: string;
     @Input() value: string;
@@ -40,10 +40,10 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
     private state: string;
     private _value: any;    // ngModel representation
     private _rbxStates = {
-        'false': 'unchecked',
-        'true': 'checked',
-        'disabled': 'disabled',
-        'or-else': 'tristate'
+        rbFalse: 'unchecked',
+        rbTrue: 'checked',
+        rbDisabled: 'disabled',
+        rbOrElse: 'tristate'
     };
 
     // the method set in registerOnChange to emit changes back to the form
@@ -56,7 +56,7 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
     }
 
     ngOnInit() {
-        this.state = this._rbxStates['false']; // 'unchecked'
+        this.state = this._rbxStates.rbFalse; // 'unchecked'
     }
 
     /**
@@ -64,10 +64,10 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
      */
     writeValue(value: any) {
         if ((value && this.value === value)) {
-            this.state = this._rbxStates['true']; // 'checked'
+            this.state = this._rbxStates.rbTrue; // 'checked'
         } else {
             // clear other radio buttons
-            this.state = this._rbxStates['false']; // 'unchecked'
+            this.state = this._rbxStates.rbFalse; // 'unchecked'
         }
     }
 
@@ -83,17 +83,16 @@ export class NxRadioComponent implements OnInit, ControlValueAccessor, Validator
      * Set the function to be called
      * when the control receives a touch event.
      */
-    registerOnTouched(fn: () => void): void {
-    }
+    registerOnTouched(fn: () => void): void {}
 
     changeState() {
         if (this.disabled !== undefined) {
-            return
+            return;
         }
 
         // only one change is possible false -> true
         // on ndModel change if will reset to false
-        this.state = this._rbxStates['true'];
+        this.state = this._rbxStates.rbTrue;
 
         // Propagate component's value attribute (model)
         this.propagateChange(this.value);
