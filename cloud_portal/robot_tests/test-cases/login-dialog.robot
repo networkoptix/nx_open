@@ -103,16 +103,18 @@ passes email from email input to Restore password page, even without clicking 'L
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 shows non-activated user message when not activated at login; Resend activation button sends email
-    [tags]    email
+    [tags]    email    C41865
     Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
-    Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
+    Register    'mark'    'hamill'    ${random email}    ${password}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
     Click Link    ${RESEND ACTIVATION LINK BUTTON}
-    Validate Register Email Received    ${random email}
+    Activate    ${random email}
+    Log In    ${random email}    ${password}
+    Validate Log In
 
 displays password masked
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
