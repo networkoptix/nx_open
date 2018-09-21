@@ -53,13 +53,16 @@ ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
 #Forgot Password
+${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
 ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@type='email']
 ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
-${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
+${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@id='newPassword']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1
 ${RESET SUCCESS MESSAGE}              //h1[contains(text(), "${RESET SUCCESS MESSAGE TEXT}")]
 ${RESET SUCCESS LOG IN LINK}          //div[@ng-if='change.success || changeSuccess']//a[@href='/login']
+${RESET EYE ICON OPEN}                ${RESET PASSWORD FORM}${EYE ICON OPEN}
+${RESET EYE ICON CLOSED}              ${RESET PASSWORD FORM}${EYE ICON CLOSED}
 
 #Change Password
 ${CHANGE PASSWORD FORM}               //form[@name='passwordForm']

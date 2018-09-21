@@ -35,6 +35,7 @@ Invalid New Password 8        ${TM TEXT}
 Invalid New Password 9        ${SPACE}${BASE PASSWORD}
 Invalid New Password 10       ${BASE PASSWORD}${SPACE}
 Empty New Password            ${EMPTY}
+    [tags]    C26260
 
 *** Keywords ***
 Restart

@@ -24,6 +24,7 @@ Invalid Email 7         noptixqa@-gmail.com
 Invalid Email 8         ${SPACE}
 Invalid Email 9         ${EMAIL UNREGISTERED}
 Empty Email             ${EMPTY}
+    [tags]    C26260
 
 *** Keywords ***
 Restart

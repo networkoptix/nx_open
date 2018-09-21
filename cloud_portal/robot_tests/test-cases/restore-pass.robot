@@ -24,15 +24,8 @@ Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***
-should demand that email field is not empty
-    Go To    ${url}/restore_password
-    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-    Click Button    ${RESET PASSWORD BUTTON}
-    ${class}    Get Element Attribute    ${RESTORE PASSWORD EMAIL INPUT}/../..    class
-    Should Contain    ${class}    has-error
-
 restores password
-    [tags]    email
+    [tags]    email    C26260
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -54,7 +47,7 @@ should not allow to access /restore_password/sent /restore_password/success by d
     Wait Until Element Is Visible    ${JUMBOTRON}
 
 should be able to set new password (which is same as old), redirect
-    [tags]    email
+    [tags]    email    C26260
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -72,7 +65,7 @@ should be able to set new password (which is same as old), redirect
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
 
 should set new password, login with new password
-    [tags]    email
+    [tags]    email    C26260
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -89,8 +82,35 @@ should set new password, login with new password
     Click Button    ${SAVE PASSWORD}
     Wait Until Elements Are Visible    ${RESET SUCCESS MESSAGE}    ${RESET SUCCESS LOG IN LINK}
     Click Link    ${RESET SUCCESS LOG IN LINK}
+    Log In    ${email}    ${password}    None
+    Wait Until Element Is Visible    ${WRONG PASSWORD MESSAGE}
     Log In    ${email}    ${ALT PASSWORD}    None
     Validate Log In
+
+displays password masked, shows password and changes eye icon when clicked
+    [tags]    C26260
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    ${link}    Get Email Link    ${email}    activate
+    Go To    ${link}[1]
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    ${link}    Get Email Link    ${email}    restore_password
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    ${input type}    Get Element Attribute    ${RESET PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
+    Click Element    ${RESET EYE ICON OPEN}
+    Wait Until Element Is Visible    ${RESET EYE ICON CLOSED}
+    ${input type}    Get Element Attribute    ${RESET PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'text'
+    Click Element    ${RESET EYE ICON CLOSED}
+    Wait Until Element Is Visible    ${RESET EYE ICON OPEN}
+    ${input type}    Get Element Attribute    ${RESET PASSWORD INPUT}    type
+    Should Be Equal    '${input type}'    'password'
 
 should not allow to use one restore link twice
     [tags]    email
@@ -177,4 +197,30 @@ should handle click I forgot my password link at restore password page
     Click Link    ${FORGOT PASSWORD}
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
 
-#CLOUD-1747
+
+Check restore password email links, colors, cloud name
+    [tags]    C26260
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${random email}    ${password}
+    ${link}    Get Email Link    ${random email}    activate
+    Go To    ${link}[1]
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
+    ${email text}    Get Email Body    ${email}
+
+    Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
+    Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
+
+    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    ${links}    Get Links From Email    ${email}
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/restore_password
+    : FOR    ${link}  IN  @{links}
+    \    check in list    ${expected links}    ${link}
+    Delete Email    ${email}
+    Close Mailbox
