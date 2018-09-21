@@ -563,11 +563,16 @@ void QnResourceTreeWidget::initializeFilter()
             {
                 case Qt::Key_Enter:
                 case Qt::Key_Return:
-                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                {
+                    const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
+                        ? Qt::MetaModifier
+                        : Qt::ControlModifier;
+                    if (keyEvent->modifiers().testFlag(ctrlModifier))
                         emit filterCtrlEnterPressed();
                     else
                         emit filterEnterPressed();
                     break;
+                }
                 default:
                     break;
             }

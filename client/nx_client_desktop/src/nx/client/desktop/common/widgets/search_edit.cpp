@@ -19,6 +19,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
 
 namespace {
@@ -413,10 +414,12 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
-    d->lineEdit->event(event);
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
-        if (event->modifiers().testFlag(Qt::ControlModifier))
+        const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
+            ? Qt::MetaModifier
+            : Qt::ControlModifier;
+        if (event->modifiers().testFlag(ctrlModifier))
             emit ctrlEnterPressed();
         else
             emit enterPressed();
