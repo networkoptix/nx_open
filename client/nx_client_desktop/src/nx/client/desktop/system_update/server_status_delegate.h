@@ -23,6 +23,8 @@ public:
     ~ServerStatusItemDelegate();
 
     QPixmap getCurrentAnimationFrame() const;
+    void setStatusVisible(bool value);
+
 signals:
     // Event is emitted when we click 'retry' or 'cancel'
     void updateItemCommand(std::shared_ptr<UpdateItem> item) const;
@@ -35,6 +37,7 @@ protected:
 
 private:
     QScopedPointer<QMovie> m_updateAnimation;
+    bool m_statusVisible = false;
 };
 
 } // namespace desktop

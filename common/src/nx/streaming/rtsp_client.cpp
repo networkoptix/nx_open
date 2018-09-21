@@ -444,6 +444,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
     m_responseCode = nx::network::http::StatusCode::ok;
     m_url = url;
     m_contentBase = m_url.toString();
+    NX_ASSERT(!m_contentBase.isEmpty());
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
     m_rtspAuthCtx.clear();
@@ -506,11 +507,18 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::utils::Url& url, qint64 s
 
     tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
     if (!tmp.isEmpty())
+    {
         m_contentBase = tmp;
+    }
 
-    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
-    if (!tmp.isEmpty())
-        m_contentBase = tmp;
+    else
+    {
+		tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
+		if (!tmp.isEmpty())
+		{
+			m_contentBase = tmp;
+		}
+    }
 
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
     updateResponseStatus(response);
@@ -1080,7 +1088,11 @@ nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qin
 
 bool QnRtspClient::sendPlayInternal(qint64 startPos, qint64 endPos)
 {
-    return sendRequestInternal(createPlayRequest( startPos, endPos ));
+    auto request = createPlayRequest( startPos, endPos );
+    NX_ASSERT(request.requestLine.url.isValid());
+    if (!request.requestLine.url.isValid())
+        return false;
+    return sendRequestInternal(std::move(request));
 }
 
 bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)

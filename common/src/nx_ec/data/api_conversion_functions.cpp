@@ -1050,6 +1050,9 @@ QList<nx::network::SocketAddress> moduleInformationEndpoints(
     QList<nx::network::SocketAddress> endpoints;
     for (auto address: data.remoteAddresses)
     {
+        //NX_ASSERT(!address.isEmpty());
+        if (address.isEmpty())
+            continue;
         const bool isIpV6 = address.count(':') > 1;
         if (isIpV6 && !address.startsWith('['))
             address = '[' + address + ']';
