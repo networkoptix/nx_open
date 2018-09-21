@@ -42,7 +42,7 @@
                     // If none - open first server and select first camera
                     // else select last opened server and last selected camera
                     if (Object.keys(scope.storage.serverStates).length === 0) {
-                        if (Object.keys(scope.cameras).length !== 0 && scope.mediaServers !== null) {
+                        if (Object.keys(scope.cameras).length !== 0 && !!scope.mediaServers) {
                             scope.selectCamera(scope.cameras[ scope.mediaServers[ 0 ].id ][ 0 ]);
 
                             scope.toggleInfo = false;
