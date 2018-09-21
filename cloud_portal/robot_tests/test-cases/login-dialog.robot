@@ -91,6 +91,7 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
+    [tags]    C41872
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
