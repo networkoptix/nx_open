@@ -406,7 +406,7 @@ QStringList QnResourceBrowserWidget::filterTags()
         tr("All types"),
         QString(), // splitter
         tr("Servers"),
-        tr("Cameras & Devices"),
+        tr("Cameras && Devices"),
         tr("Layouts"),
         tr("Layout Tours"),
         tr("Video Walls"),
