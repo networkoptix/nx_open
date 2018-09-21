@@ -497,11 +497,13 @@ void QnVideoCamera::beforeStop()
 
     if (m_primaryReader) {
         m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
         m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
     }
 }

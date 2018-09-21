@@ -69,47 +69,43 @@ public:
         {
             switch (data->state)
             {
-            case StatusCode::preparing:
-                m_left->setHidden(true);
-                progressHidden = false;
-                m_progress->setMinimum(0);
-                m_progress->setMaximum(0);
-                break;
-            case StatusCode::downloading:
-                m_left->setHidden(true);
-                progressHidden = false;
-                m_progress->setMinimum(0);
-                m_progress->setMaximum(100);
-                m_progress->setValue(data->progress);
-                break;            
-            case StatusCode::readyToInstall:
-                // TODO: We should get proper server version here
-                m_left->setText(tr("Downloaded"));
-                m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
-                m_left->setHidden(false);
-                break;
-
-            case StatusCode::error:
-                m_left->setText(data->statusMessage);
-                m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
-                m_left->setHidden(false);
-
-                errorStyle = true;
-                break;
-            case StatusCode::idle:
-                break;
-            case StatusCode::offline:
-
-                break;
-            case StatusCode::installing:
-                break;
-
-            default:
-                // In fact we should not be here. All the states should be handled accordingly
-                m_left->setHidden(false);
-                m_left->setText(lit("Unhandled state: ") + data->statusMessage);
-                errorStyle = true;
-                break;
+                case StatusCode::preparing:
+                    m_left->setHidden(true);
+                    progressHidden = false;
+                    m_progress->setMinimum(0);
+                    m_progress->setMaximum(0);
+                    break;
+                case StatusCode::downloading:
+                    m_left->setHidden(true);
+                    progressHidden = false;
+                    m_progress->setMinimum(0);
+                    m_progress->setMaximum(100);
+                    m_progress->setValue(data->progress);
+                    break;
+                case StatusCode::readyToInstall:
+                    // TODO: We should get proper server version here
+                    m_left->setText(tr("Downloaded"));
+                    m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+                    m_left->setHidden(false);
+                    break;
+                case StatusCode::error:
+                    m_left->setText(data->statusMessage);
+                    m_left->setIcon(qnSkin->icon("text_buttons/clear_error.png"));
+                    m_left->setHidden(false);
+                    errorStyle = true;
+                    break;
+                case StatusCode::idle:
+                    break;
+                case StatusCode::offline:
+                    break;
+                case StatusCode::installing:
+                    break;
+                default:
+                    // In fact we should not be here. All the states should be handled accordingly
+                    m_left->setHidden(false);
+                    m_left->setText(lit("Unhandled state: ") + data->statusMessage);
+                    errorStyle = true;
+                    break;
             }
         }
 
@@ -180,6 +176,11 @@ QPixmap ServerStatusItemDelegate::getCurrentAnimationFrame() const
     return m_updateAnimation ? m_updateAnimation->currentPixmap() : QPixmap();
 }
 
+void ServerStatusItemDelegate::setStatusVisible(bool value)
+{
+    m_statusVisible = value;
+}
+
 QWidget* ServerStatusItemDelegate::createEditor(QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
     return new ServerStatusWidget(this, parent);
@@ -197,6 +198,7 @@ void ServerStatusItemDelegate::setEditorData(QWidget* editor, const QModelIndex 
     if (!data)
         return;
     statusWidget->setState(data);
+    statusWidget->setVisible(m_statusVisible);
 }
 
 } // namespace desktop

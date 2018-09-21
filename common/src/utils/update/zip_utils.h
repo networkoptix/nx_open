@@ -47,7 +47,6 @@ protected:
 private:
     QDir m_dir;
     QScopedPointer<QuaZip> m_zip;
-    nx::utils::Mutex m_mutex;
     Error m_lastError;
 };
 

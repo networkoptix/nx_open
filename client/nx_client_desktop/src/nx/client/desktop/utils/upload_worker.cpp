@@ -198,7 +198,7 @@ void UploadWorker::handleMd5Calculated()
         d->md5.toHex(),
         d->upload.ttl,
         callback);
-    // We have a racing condition around this handle
+    // We have a race condition around this handle.
     d->requests.storeHandle(handle);
 }
 
@@ -206,7 +206,7 @@ void UploadWorker::handleFileUploadCreated(bool success, RemoteResult code, QStr
 {
     if (!success)
     {
-        switch(code)
+        switch (code)
         {
             case RemoteResult::ok:
                 // Should not be here. success should be true

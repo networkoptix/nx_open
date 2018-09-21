@@ -33,7 +33,7 @@ private:
     controller::AbstractConnectSessionManager* m_connectSessionManager = nullptr;
     TunnelingServer m_tunnelingServer;
 
-    void connectToPeerFinished(
+    void onConnectToPeerFinished(
         api::ResultCode resultCode,
         controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
         CompletionHandler completionHandler);

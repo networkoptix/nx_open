@@ -391,6 +391,10 @@ public:
         const nx::update::Information& info,
         QThread* targetThread = nullptr);
 
+    Handle getUpdateInfo(
+        Result<nx::update::Information>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle updateActionStop(
         std::function<void (Handle, bool)>&& callback,
         QThread* targetThread = nullptr);

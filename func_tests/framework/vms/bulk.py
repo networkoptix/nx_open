@@ -20,4 +20,10 @@ def many_allocated(machine_types, machine_configurations):
             else:
                 free_space_cm = machine.os_access.free_disk_space_limited(free_space_bytes)
                 stack.enter_context(free_space_cm)
+            try:
+                bandwidth_kbit = conf['bandwidth_kbit']
+            except KeyError:
+                pass
+            else:
+                machine.hardware.limit_bandwidth(bandwidth_kbit)
         yield machines

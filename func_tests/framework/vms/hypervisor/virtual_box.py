@@ -18,7 +18,27 @@ from framework.waiting import wait_for_truthy
 _logger = logging.getLogger(__name__)
 
 _DEFAULT_QUICK_RUN_TIMEOUT_SEC = 10
-_INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
+
+## This NIC is used for
+# - remote OS setup,
+# - working with remote filesystem,
+# - installing Mediaserver.
+#
+# Ports are forwarded to this NIC.
+_MANAGEMENT_NIC_INDEX = 1
+
+## This NIC is used for connections initiated from within VM, e.g. when tests runner is serving
+# data by HTTP and Mediaserver is downloading it. Such traffic goes through other NIC to make it
+# possible to limit it by means of VirtualBox.
+_HOST_CONNECTION_NIC_INDEX = 2
+
+## Others are used to combine VMs into internal networks. These are unplugged before every test.
+_INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
+
+## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
+# Theoretically, some NICs may not be used at all bur their indices should be listed here to get
+# non-random MAC address.
+_ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
 
 class VirtualBoxError(Exception):
@@ -186,13 +206,11 @@ class _VirtualBoxVm(VmHardware):
             '--options', 'link',
             '--register',
             ])
-        nat_subnet = self._virtual_box.__class__._nat_subnet
-        self._virtual_box.manage(['modifyvm', self.name, '--natnet1', nat_subnet])
         return self.__class__(self._virtual_box, clone_vm_name)
 
     def setup_mac_addresses(self, make_mac):
         modify_command = ['modifyvm', self.name]
-        for nic_index in [1] + _INTERNAL_NIC_INDICES:
+        for nic_index in _ALL_NIC_INDICES:
             raw_mac = make_mac(nic_index=nic_index)
             mac = EUI(raw_mac, dialect=mac_bare)
             modify_command.append('--macaddress{}={}'.format(nic_index, mac))
@@ -272,6 +290,36 @@ class _VirtualBoxVm(VmHardware):
         for nic_index in self.macs.keys():
             self._manage_nic(nic_index, 'nic', 'null')
 
+    def limit_bandwidth(self, speed_limit_kbit):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > The limits for each group can be changed while the VM is running, with changes being
+        picked up immediately. The example below changes the limit for the group created in the
+        example above to 100 Kbit/s:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set Limit --limit 100k
+        ```
+
+        In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...
+        """
+        for nic_index in [_HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES:
+            self._virtual_box.manage([
+                'bandwidthctl', self.name,
+                'set', 'network{}'.format(nic_index),
+                '--limit', '{}k'.format(speed_limit_kbit)])
+
+    def reset_bandwidth(self):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > It is also possible to disable shaping for all adapters assigned to a bandwidth group
+        while VM is running, by specifying the zero limit for the group. For example, for the
+        bandwidth group named "Limit" use:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set Limit --limit 0
+        ```
+        """
+        self.limit_bandwidth(0)
+
     def _manage_nic(self, nic_index, command, *arguments):
         if self._is_running:
             prefix = ['controlvm', self.name, command + str(nic_index)]
@@ -318,7 +366,12 @@ class VirtualBox(Hypervisor):
     ## Network for management. Host, as it's seen from VMs, is the part of this network and its
     # address, as seen from VMs, is in this network. Host has a special address in NAT network, it
     # is `(net & mask) + 2`. See: https://www.virtualbox.org/manual/ch09.html#idm8375.
-    _nat_subnet = IPNetwork('192.168.254.0/24')
+    #
+    # Network address is set in `./configure-vm.sh`.
+    #
+    # For connections that are initiated from VM,
+    # other NIC is used to make it possible to control traffic by the means of VirtualBox.
+    _nat_subnet = IPNetwork('192.168.253.0/24')
 
     def __init__(self, host_os_access, runner_address):
         """Create VirtualBox hypervisor.
