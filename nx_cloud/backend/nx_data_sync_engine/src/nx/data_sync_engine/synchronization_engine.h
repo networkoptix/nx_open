@@ -14,11 +14,13 @@
 #include "outgoing_transaction_dispatcher.h"
 #include "statistics/provider.h"
 #include "transaction_log.h"
+#include "transport/http_transport_acceptor.h"
+#include "transport/websocket_transport_acceptor.h"
 
 namespace nx {
 namespace data_sync_engine {
 
-class Settings;
+class SynchronizationSettings;
 
 class NX_DATA_SYNC_ENGINE_API SyncronizationEngine
 {
@@ -30,7 +32,7 @@ public:
     SyncronizationEngine(
         const std::string& applicationId,
         const QnUuid& moduleGuid,
-        const Settings& settings,
+        const SynchronizationSettings& settings,
         const ProtocolVersionRange& supportedProtocolRange,
         nx::sql::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
@@ -59,11 +61,14 @@ public:
         nx::network::http::server::rest::MessageDispatcher* dispatcher);
 
 private:
+    const ProtocolVersionRange m_supportedProtocolRange;
     OutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
     dao::rdb::StructureUpdater m_structureUpdater;
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
+    transport::HttpTransportAcceptor m_httpTransportAcceptor;
+    transport::WebSocketTransportAcceptor m_webSocketAcceptor;
     statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;

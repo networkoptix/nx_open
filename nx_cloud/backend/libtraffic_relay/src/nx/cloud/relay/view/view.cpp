@@ -15,7 +15,6 @@
 
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
 
-#include "create_get_post_tunnel_handler.h"
 #include "http_handlers.h"
 #include "options_request_handler.h"
 #include "proxy_handler.h"
@@ -55,10 +54,10 @@ View::View(
     m_settings(settings),
     m_model(model),
     m_controller(controller),
-    m_getPostServerTunnelProcessor(
+    m_listeningPeerConnectionTunnelingServer(
         m_settings,
         &model->listeningPeerPool()),
-    m_getPostClientTunnelProcessor(m_settings),
+    m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
@@ -131,14 +130,13 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerApiHandler<view::CreateGetPostServerTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_getPostServerTunnelProcessor);
+    m_listeningPeerConnectionTunnelingServer.registerHandlers(
+        api::kServerTunnelBasePath,
+        &m_httpMessageDispatcher);
 
-    registerApiHandler<view::CreateGetPostClientTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_controller->connectSessionManager(),
-        &m_getPostClientTunnelProcessor);
+    m_clientConnectionTunnelingServer.registerHandlers(
+        api::kClientTunnelBasePath,
+        &m_httpMessageDispatcher);
 
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
@@ -172,7 +170,7 @@ void View::registerApiHandler(
     Args ... args)
 {
     registerApiHandler<Handler, Args...>(
-        Handler::kPath, method, std::move(args)...);
+        Handler::kPath, method, args...);
 }
 
 template<typename Handler, typename ... Args>

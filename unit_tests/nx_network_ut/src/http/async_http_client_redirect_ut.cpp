@@ -189,13 +189,10 @@ private:
     boost::optional<nx::network::http::Request> m_prevReceivedPostRequest;
 
     void savePostedResource(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_postResourceRequests.push(std::move(request));
+        m_postResourceRequests.push(std::move(requestContext.request));
         completionHandler(nx::network::http::StatusCode::ok);
     }
 
@@ -211,7 +208,7 @@ private:
 
         ASSERT_TRUE(m_resourceServer->registerRequestProcessorFunc(
             nx::network::url::joinPath(kContentServerPathPrefix, kTestPath).c_str(),
-            std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2, _3, _4, _5),
+            std::bind(&AsyncHttpClientRedirect::savePostedResource, this, _1, _2),
             nx::network::http::Method::post));
     }
 };

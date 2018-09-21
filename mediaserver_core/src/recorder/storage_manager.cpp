@@ -2102,7 +2102,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
                 this,
                 lm("Cleanup. Won't cleanup storage %1 because this storage contains no archive")
                     .args(storage->getUrl()));
-            m_diskFullMap[storage->getId()] = true;
+            m_fullDisksIds << storage->getId();
             return true;
         }
 
@@ -2166,7 +2166,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays)
     {
-        m_diskFullMap[storage->getId()] = true;
+        m_fullDisksIds << storage->getId();
     }
     else
     {
@@ -2426,20 +2426,24 @@ void QnStorageManager::startAuxTimerTasks()
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
-            QnMutexLocker lock(&m_clearSpaceMutex);
-            /**
-             * Notify a user if a storage doesn't have enough space to write to and clear the
-             * corresponding flag. It (the flag) will be raised again in the clearOldestSpace()
-             * function if the issue persists.
-             */
-            for (const auto& storage: getClearableStorages())
+            QList<QnStorageResourcePtr> fullStorages;
             {
-                if (m_diskFullMap.contains(storage->getId()) && m_diskFullMap[storage->getId()])
+                QnMutexLocker lock(&m_clearSpaceMutex);
+                /**
+                 * Notify a user if a storage doesn't have enough space to write to and clear the
+                 * corresponding flag. It (the flag) will be raised again in the clearOldestSpace()
+                 * function if the issue persists.
+                 */
+                for (const auto &storage: getClearableStorages())
                 {
-                    emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
-                    m_diskFullMap[storage->getId()] = false;
+                    if (m_fullDisksIds.contains(storage->getId()) && !storage->isSystem())
+                        fullStorages << storage;
                 }
+                m_fullDisksIds.clear();
             }
+
+            for (const auto& storage: fullStorages)
+                emit storageFailure(storage, nx::vms::api::EventReason::storageFull);
         },
         kCheckStorageSpace,
         kCheckStorageSpace);

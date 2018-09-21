@@ -39,7 +39,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
@@ -487,7 +486,7 @@ void QnStorageConfigWidget::loadDataToUi()
     if (!m_server)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());

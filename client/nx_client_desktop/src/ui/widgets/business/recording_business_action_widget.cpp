@@ -8,7 +8,6 @@
 
 #include <nx/client/desktop/common/utils/stream_quality_strings.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -75,7 +74,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields)
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     int maxFps = 0;
 

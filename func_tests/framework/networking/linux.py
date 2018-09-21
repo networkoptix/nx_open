@@ -1,13 +1,13 @@
 import csv
 from pprint import pformat
 
-from netaddr import EUI
+from netaddr import EUI, IPNetwork
 
+from framework.context_logger import ContextLogger, context_logger
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.ssh_shell import SSH
-from framework.context_logger import ContextLogger, context_logger
 from framework.waiting import wait_for_truthy
 
 _logger = ContextLogger(__name__, 'networking')
@@ -74,6 +74,19 @@ class LinuxNetworking(Networking):
                 ''',
             env={'INTERFACE': interface, 'ADDRESS': ip, 'PREFIX_LENGTH': prefix_length})
         _logger.info("Machine %r has IP %s/%d on %s (%s).", self._ssh, ip, prefix_length, interface, mac)
+
+    def list_ips(self):
+        output = self._ssh.run_sh_script('ip address show scope global | grep -w inet')
+        # output consists of lines like this:
+        # inet 172.21.0.1/16 brd 172.21.255.255 scope global br-1c9c92bad510
+        # 'scope global' filters out localhost address
+        ip_address_list = [
+            IPNetwork(line.split()[1]).ip
+            for line in output.splitlines()
+            ]
+        # To be consistent with windows version:
+        # skip first address - usually this is NATed one. Although this is not really guaranteed anywhere.
+        return ip_address_list[1:]
 
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
         interface = self.interfaces[gateway_bound_mac]

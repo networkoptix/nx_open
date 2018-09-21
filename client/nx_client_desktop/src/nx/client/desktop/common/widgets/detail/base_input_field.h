@@ -7,6 +7,9 @@
 #include <nx/client/desktop/common/utils/validators.h>
 #include <nx/utils/std/optional.h>
 
+class QLabel;
+class QnWordWrappedLabel;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -49,6 +52,12 @@ public:
     QString text() const;
     void setText(const QString& value);
     void clear();
+
+    // Sets external controls for information representation. Caller is responsible for
+    // lifetime management of specified controls.
+    void setExternalControls(
+        QLabel* titleLabel,
+        QnWordWrappedLabel* hintLabel);
 
     QString placeholderText() const;
     void setPlaceholderText(const QString& value);

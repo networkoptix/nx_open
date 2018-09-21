@@ -20,7 +20,6 @@ def _pretty_format_xml(text):
 # https://docs.microsoft.com/en-us/windows/desktop/adsi/win32-error-codes
 _win32_error_codes = {
     0x80071392L: 'ERROR_OBJECT_ALREADY_EXISTS',
-    0x00000008L: 'ERROR_NOT_ENOUGH_MEMORY',
     }
 
 class CIMClass(object):

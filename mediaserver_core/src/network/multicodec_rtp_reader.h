@@ -65,7 +65,7 @@ public:
 
     /** Implementation of QnAbstractMediaStreamProvider::isStreamOpened. */
     virtual bool isStreamOpened() const override;
-    virtual CameraDiagnostics::Result openStreamResult() const override;
+    virtual CameraDiagnostics::Result lastOpenStreamResult() const override;
 
     /** Implementation of QnAbstractMediaStreamProvider::getLastResponseCode. */
     int getLastResponseCode() const;

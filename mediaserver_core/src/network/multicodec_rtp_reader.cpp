@@ -716,7 +716,7 @@ bool QnMulticodecRtpReader::isStreamOpened() const
     return m_RtpSession.isOpened();
 }
 
-CameraDiagnostics::Result QnMulticodecRtpReader::openStreamResult() const
+CameraDiagnostics::Result QnMulticodecRtpReader::lastOpenStreamResult() const
 {
     return m_openStreamResult;
 }

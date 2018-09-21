@@ -18,11 +18,11 @@ class TestOutgoingTransactionDispatcher:
 {
 public:
     typedef nx::utils::MoveOnlyFunc<
-        void(const nx::String&, const SerializableAbstractTransaction&)
+        void(const std::string&, const SerializableAbstractTransaction&)
     > OnNewTransactionHandler;
 
     virtual void dispatchTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler);

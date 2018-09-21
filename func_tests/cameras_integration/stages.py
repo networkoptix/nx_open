@@ -3,21 +3,21 @@ This file contains all test stages, implementation rules are simple:
 
 Exception is thrown = Failure, exception stack is returned.
 Success result = Success is returned.
-Failure result = Error is saved, retry will fallow.
-Halt = Next iteration will fallow.
+Failure result = Error is saved, retry will follow.
+Halt = Next iteration will follow.
 Stop iteration = Failure, last error is returned.
 """
 
 import logging
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+
 import pytz
 from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
+from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
-
-from helper_functions import ffprobe, metadata, configure_video, configure_audio
 
 # Filled by _stage decorator.
 LIST = []  # type: List[stage.Stage]
@@ -68,7 +68,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     checker = Checker()
     # Checking if the camera is recording already
@@ -99,13 +99,15 @@ def recording(run, **configurations):  # type: (stage.Run, dict) -> Generator[Re
                     profile, archive_url))
 
                 while True:
-                    streams = ffprobe(archive_url)
+                    streams = ffprobe_streams(archive_url)
                     if not streams:
+                        yield Halt('FFprobe returned no valid stream info')
                         continue
-                    yield expect_values(configuration, metadata(streams[0]), '{}'.format(profile))
+                    yield expect_values(
+                        configuration, ffprobe_metadata(streams[0]), '{}'.format(profile))
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Generator[Result]
     for profile, profile_configurations_list in configurations.items():
         stream_url = '{}?stream={}'.format(run.media_url, {'primary': 0, 'secondary': 1}[profile])
@@ -113,12 +115,13 @@ def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gener
             configure_video(
                 run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
             while True:
-                streams = ffprobe(stream_url)
+                streams = ffprobe_streams(stream_url)
                 if not streams:
+                    yield Halt('Video stream was not discovered by ffprobe.')
                     continue
 
                 yield expect_values(
-                    configuration, metadata(streams[0]), '{}[{}]'.format(profile, index))
+                    configuration, ffprobe_metadata(streams[0]), '{}[{}]'.format(profile, index))
 
     yield Success()
 
@@ -138,8 +141,9 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
-                    streams = ffprobe(run.media_url)
+                    streams = ffprobe_streams(run.media_url)
                     if not streams:
+                        yield Halt('Audio stream was not discovered by ffprobe.')
                         continue
                     audio_stream = streams[1]
                 except IndexError:

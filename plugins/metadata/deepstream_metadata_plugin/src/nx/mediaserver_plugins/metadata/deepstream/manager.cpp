@@ -95,8 +95,7 @@ Error Manager::setHandler(MetadataHandler* handler)
 }
 
 Error Manager::startFetchingMetadata(
-    nxpl::NX_GUID* /*eventTypeList*/,
-    int /*eventTypeListSize*/)
+    const char* const* /*typeList*/, int /*typeListSize*/)
 {
     NX_OUTPUT << __func__ << " Starting to fetch metadata. Doing nothing, actually...";
     return Error::noError;
@@ -142,23 +141,19 @@ const char* Manager::capabilitiesManifest(Error* error)
         return m_manifest.c_str();
 
     m_manifest = kManifestPrefix;
-    const auto descriptions = m_plugin->objectClassDescritions();
+    const auto& objectClassDescritions = m_plugin->objectClassDescritions();
 
     if (ini().pipelineType == kOpenAlprPipeline)
     {
-        m_manifest += "\""
-            + nxpt::toStdString(kLicensePlateGuid);
-            +"\"";
+        m_manifest += "\"" + kLicensePlateGuid +"\"";
     }
     else
     {
-        for (auto i = 0; i < descriptions.size(); ++i)
+        for (auto i = 0; i < objectClassDescritions.size(); ++i)
         {
-            m_manifest += "\""
-                + nxpt::toStdString(descriptions[i].guid);
-                +"\"";
+            m_manifest += "\"" + objectClassDescritions[i].typeId + "\"";
 
-            if (i < descriptions.size() - 1)
+            if (i < objectClassDescritions.size() - 1)
                 m_manifest += ',';
         }
     }

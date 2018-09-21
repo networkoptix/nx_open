@@ -92,7 +92,7 @@ static bool informersEnabled()
 bool isBinaryExportSupported()
 {
     if (nx::utils::AppInfo::isWindows())
-        return !qnRuntime->isActiveXMode();
+        return !qnRuntime->isAcsMode();
     return false;
 }
 

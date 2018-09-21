@@ -35,7 +35,7 @@ QN_FUSION_DECLARE_FUNCTIONS(ObjectPosition, (json)(ubjson));
 struct DetectedObject
 {
     QnUuid objectId;
-    QnUuid objectTypeId;
+    QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
     std::vector<common::metadata::Attribute> attributes;
     qint64 firstAppearanceTimeUsec = 0;
@@ -54,7 +54,7 @@ QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 struct Filter
 {
     QnUuid deviceId;
-    std::vector<QnUuid> objectTypeId;
+    std::vector<QString> objectTypeId;
     QnUuid objectId;
     QnTimePeriod timePeriod;
     /**

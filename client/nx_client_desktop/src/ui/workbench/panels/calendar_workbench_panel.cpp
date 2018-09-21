@@ -28,7 +28,6 @@
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 
 #include <utils/common/event_processors.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -246,7 +245,7 @@ void CalendarWorkbenchPanel::setOpened(bool opened, bool animate)
 
     ensureAnimationAllowed(&animate);
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    QScopedValueRollback<bool> guard(m_ignoreClickEvent, true);
     action(action::ToggleCalendarAction)->setChecked(opened);
 
     qreal newY = m_origin.y();

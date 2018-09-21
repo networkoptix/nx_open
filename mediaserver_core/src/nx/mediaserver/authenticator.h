@@ -72,7 +72,8 @@ public:
     void setAccessCookie(
         const nx::network::http::Request& request,
         nx::network::http::Response* response,
-        Qn::UserAccessData access);
+        Qn::UserAccessData access,
+        bool secure);
 
     void removeAccessCookie(
         const nx::network::http::Request& request,

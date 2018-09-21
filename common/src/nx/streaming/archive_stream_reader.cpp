@@ -918,8 +918,10 @@ begin_label:
          * (&& m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)) we may end up
          * with a frame with MediaFlags_BOF flag being dropped because it is not a key frame and
          * consumer won't never get a BOF frame.
+         * Above is true only for the video packets => '!videoData' condition.
          */
-        if (m_BOF && m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        if (m_BOF
+            && (!videoData || m_currentData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)))
         {
             m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
             m_BOF = false;

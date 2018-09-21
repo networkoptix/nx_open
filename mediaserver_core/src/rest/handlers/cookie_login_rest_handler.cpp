@@ -76,7 +76,9 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    authenticator->setAccessCookie(owner->request(), owner->response(), accessRights);
+    authenticator->setAccessCookie(
+        owner->request(), owner->response(), accessRights, owner->isConnectionSecure());
+
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);
 }

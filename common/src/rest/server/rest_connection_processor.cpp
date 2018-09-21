@@ -186,7 +186,7 @@ void QnRestConnectionProcessor::run()
         /*multipartBoundary*/ QByteArray(), /*displayDebug*/ false,
         response.isUndefinedContentLength);
 
-    if (handler)
+    if (handler && nx::network::http::StatusCode::isSuccessCode(response.statusCode))
         handler->afterExecute(request, response.content.body);
 }
 

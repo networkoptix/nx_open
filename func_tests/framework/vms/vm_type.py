@@ -4,11 +4,11 @@ from functools import partial
 
 from contextlib2 import ExitStack
 
+from framework.context_logger import context_logger
 from framework.os_access.exceptions import AlreadyExists
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
-from framework.context_logger import context_logger
 from framework.vms.hypervisor import VMNotFound, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
@@ -25,8 +25,6 @@ class VM(object):
         self.port_map = hardware.port_map  # TODO: Remove.
         self.hardware = hardware
         self.os_access = os_access
-        # IPAddress list; TODO: Populate by methods other than setup_flat_network
-        self.ip_address_list = []
 
 
 class UnknownOsFamily(Exception):

@@ -1,8 +1,8 @@
 import json
 from datetime import timedelta
 
-import pytest
 import oyaml as yaml
+import pytest
 from pathlib2 import Path
 
 from . import execution

@@ -1,3 +1,7 @@
+machines:
+- {alias: first, type: linux}
+- {alias: second, type: linux}
+- {alias: proxy-1, type: linux}
 networks:
   10.254.1.0/24:
     first:
@@ -9,9 +13,5 @@ networks:
     second:
     first:
 mergers:
-  first:
-    proxy-1:
-      network: 10.254.1.0/24
-      settings: remote
-    second:
-      network: 10.254.3.0/24
+- {local: proxy-1, remote: first, settings: remote, network: 10.254.1.0/24}
+- {local: second, remote: first, network: 10.254.3.0/24}

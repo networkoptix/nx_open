@@ -65,7 +65,6 @@ extern "C"
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -1407,7 +1406,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         return;
 
     const bool keepInWindow = mode == UpdateSliderMode::KeepInWindow;
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromReader, true);
+    QScopedValueRollback<bool> guard(m_updatingSliderFromReader, true);
 
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     bool isSearch = searchState.step > 0;
@@ -1437,7 +1436,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         }
         else if (noRecordedPeriodsFound)
         {
-            if (qnRuntime->isActiveXMode())
+            if (qnRuntime->isAcsMode())
             {
                 /* Set to default value. */
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
@@ -1529,7 +1528,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
             qint64 timeUSec;
             if (isCurrentWidgetSynced())
             {
-                timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
+                timeUSec = m_streamSynchronizer->state().timeUs; // Fetch "current" time instead of "displayed"
             }
             else if (mediaWidget->resource()->toResource()->flags().testFlag(Qn::local_media))
             {
@@ -1830,7 +1829,7 @@ void QnWorkbenchNavigator::updateSliderFromScrollBar()
     if (!m_timeSlider)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updatingSliderFromScrollBar, true);
+    QScopedValueRollback<bool> guard(m_updatingSliderFromScrollBar, true);
 
     m_timeSlider->setWindow(milliseconds(m_timeScrollBar->value()),
         milliseconds(m_timeScrollBar->value() + m_timeScrollBar->pageStep()));
@@ -1845,7 +1844,7 @@ void QnWorkbenchNavigator::updateScrollBarFromSlider()
         return;
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingScrollBarFromSlider, true);
+        QScopedValueRollback<bool> guard(m_updatingScrollBarFromSlider, true);
 
         milliseconds windowSize = m_timeSlider->windowEnd() - m_timeSlider->windowStart();
 
@@ -2061,7 +2060,7 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
         return;
 
     /* This option should never be cleared in ActiveX mode */
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return;
 
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());

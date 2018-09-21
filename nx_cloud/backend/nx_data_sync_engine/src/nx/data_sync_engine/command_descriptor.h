@@ -2,6 +2,8 @@
 
 #include <transaction/transaction_descriptor.h>
 
+#include "command.h"
+
 namespace nx::data_sync_engine::command {
 
 struct TranSyncRequest
@@ -64,5 +66,7 @@ Command<typename CommandDescriptor::Data> make(
         static_cast<::ec2::ApiCommand::Value>(CommandDescriptor::code),
         sourcePeerId);
 }
+
+static constexpr int kUserCommand = 20000;
 
 } // namespace nx::data_sync_engine::command

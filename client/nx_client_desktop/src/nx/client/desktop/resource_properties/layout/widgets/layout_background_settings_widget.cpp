@@ -28,7 +28,6 @@
 #include <nx/client/desktop/utils/local_file_cache.h>
 
 #include <utils/common/delayed.h>
-#include <utils/common/scoped_value_rollback.h>
 
 #include "../redux/layout_settings_dialog_store.h"
 #include "../redux/layout_settings_dialog_state.h"

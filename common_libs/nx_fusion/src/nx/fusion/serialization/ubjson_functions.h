@@ -8,6 +8,7 @@
 #include <map>
 #include <array>
 #include <chrono>
+#include <string>
 
 
 #ifndef Q_MOC_RUN
@@ -197,6 +198,7 @@ QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(float,         readFloat,      w
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(double,        readDouble,     writeDouble)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QString,       readUtf8String, writeUtf8String)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QnLatin1Array, readUtf8String, writeUtf8String)
+QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(std::string,   readUtf8String, writeUtf8String)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QByteArray,    readBinaryData, writeBinaryData)
 #undef QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS
 

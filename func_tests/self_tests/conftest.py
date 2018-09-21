@@ -41,6 +41,6 @@ def os_access_temp_dir(os_access, node_dir):
     if os_access is local_access:
         return node_dir
     else:
-        dir = os_access.Path.tmp()
+        dir = os_access.path_cls.tmp()
         dir.mkdir(parents=True, exist_ok=True)
         return dir

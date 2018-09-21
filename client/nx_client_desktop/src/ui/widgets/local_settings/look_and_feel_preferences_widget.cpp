@@ -23,7 +23,6 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 
 using namespace nx::client::desktop;
@@ -104,7 +103,7 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
 
 void QnLookAndFeelPreferencesWidget::loadDataToUi()
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     ui->tourCycleTimeSpinBox->setValue(qnSettings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree() != Qn::RI_NameOnly);

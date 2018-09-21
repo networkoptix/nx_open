@@ -489,7 +489,6 @@ class MediaserverApi(object):
         attributes.update(kwargs)
         self.generic.post('ec2/saveCameraUserAttributes', attributes)
 
-
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
@@ -544,6 +543,9 @@ class MediaserverApi(object):
     def system_mediaserver_ids(self):
         return set(self.system_mediaservers_status().keys())
 
+    def system_mediaservers_all_online(self):
+        return all(status == 'Online' for status in self.system_mediaservers_status().values())
+
     _merge_logger = _logger.getChild('merge')
 
     @context_logger(_setup_logger, 'framework.waiting')
@@ -588,9 +590,8 @@ class MediaserverApi(object):
         wait_for_truthy(servant_api.credentials_work, timeout_sec=30)
         wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
         all_ids = master_ids | servant_ids
-        all_online = {id: 'Online' for id in all_ids}
         wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
-        wait_for_equal(master_api.system_mediaservers_status, all_online, timeout_sec=30)
+        wait_for_truthy(master_api.system_mediaservers_all_online, timeout_sec=30)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):

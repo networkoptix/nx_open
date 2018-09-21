@@ -30,12 +30,12 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
     auto addItem = [this](
         QStandardItem* parent,
         const nx::api::TranslatableString& name,
-        const QnUuid& driverId,
-        const QnUuid& id)
+        const QString& pluginId,
+        const QString& id)
     {
         auto item = new QStandardItem(name.text(qnRuntime->locale()));
         item->setData(qVariantFromValue(id), EventTypeIdRole);
-        item->setData(qVariantFromValue(driverId), DriverIdRole);
+        item->setData(qVariantFromValue(pluginId), DriverIdRole);
         if (parent)
             parent->appendRow(item);
         else
@@ -53,27 +53,27 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
 
     const bool useDriverName = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(items);
 
-    QMap<QnUuid, QStandardItem*> groups;
-    QMap<QnUuid, QStandardItem*> drivers;
-    for (const auto& descriptor : items)
+    QMap<QString, QStandardItem*> groups;
+    QMap<QString, QStandardItem*> drivers;
+    for (const auto& descriptor: items)
     {
-        if (useDriverName && !drivers.contains(descriptor.driverId))
+        if (useDriverName && !drivers.contains(descriptor.pluginId))
         {
-            auto item = addItem(nullptr, descriptor.driverName, descriptor.driverId, QnUuid());
+            auto item = addItem(nullptr, descriptor.pluginName, descriptor.pluginId, QString());
             item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
-            drivers.insert(descriptor.driverId, item);
+            drivers.insert(descriptor.pluginId, item);
         }
 
-        QStandardItem* driver = drivers.value(descriptor.driverId);
+        QStandardItem* driver = drivers.value(descriptor.pluginId);
         if (!descriptor.groupId.isNull() && !groups.contains(descriptor.groupId))
         {
             auto group = AnalyticsHelper(commonModule()).groupDescriptor(descriptor.groupId);
-            auto item = addItem(driver, group.name, descriptor.driverId, descriptor.groupId);
+            auto item = addItem(driver, group.name, descriptor.pluginId, descriptor.groupId);
             groups.insert(descriptor.groupId, item);
         }
 
         addItem(descriptor.groupId.isNull() ? driver : groups[descriptor.groupId],
-            descriptor.name, descriptor.driverId, descriptor.typeId);
+            descriptor.name, descriptor.pluginId, descriptor.id);
     }
 
     endResetModel();

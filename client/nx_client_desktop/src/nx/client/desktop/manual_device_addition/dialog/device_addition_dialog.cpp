@@ -1,6 +1,8 @@
 #include "device_addition_dialog.h"
 #include "ui_device_addition_dialog.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include "private/found_devices_model.h"
 #include "private/manual_device_searcher.h"
 #include "private/presented_state_delegate.h"
@@ -16,12 +18,22 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/event_processors.h>
-
+#include <utils/common/delayed.h>
 #include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
 
 namespace {
 
 using namespace nx::client::desktop;
+
+QHostAddress fixedAddress(const QnIpLineEdit* edit)
+{
+    auto fixed = edit->text();
+    edit->validator()->fixup(fixed);
+    return QHostAddress(fixed);
+}
 
 bool isKnownAddressPage(QTabWidget* tabWidget)
 {
@@ -49,6 +61,20 @@ FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
     return result;
 }
 
+
+using ResourceCallback = std::function<void (const QnResourcePtr& resource)>;
+using CameraCallback = std::function<void (const QnVirtualCameraResourcePtr& camera)>;
+
+ResourceCallback createCameraCallback(const CameraCallback& cameraCallback)
+{
+    return
+        [cameraCallback](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                cameraCallback(camera);
+        };
+}
+
 } // namespace
 
 namespace nx {
@@ -57,6 +83,7 @@ namespace desktop {
 
 DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     base_type(parent),
+    m_pool(commonModule()->resourcePool()),
     m_serversWatcher(parent),
     m_serverStatusWatcher(this),
     ui(new Ui::DeviceAdditionDialog())
@@ -64,6 +91,19 @@ DeviceAdditionDialog::DeviceAdditionDialog(QWidget* parent):
     ui->setupUi(this);
 
     initializeControls();
+
+    connect(m_pool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                setDeviceAdded(camera->getUniqueId());
+        });
+    connect(m_pool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                handleDeviceRemoved(camera->getUniqueId());
+        });
 }
 
 DeviceAdditionDialog::~DeviceAdditionDialog()
@@ -80,6 +120,9 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->foundDevicesTable->setSortingEnabled(false);
 
+    ui->searchButton->setFocusPolicy(Qt::StrongFocus);
+    ui->stopSearchButton->setFocusPolicy(Qt::StrongFocus);
+
     connect(ui->searchButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleStartSearchClicked);
     connect(ui->stopSearchButton, &QPushButton::clicked,
@@ -87,20 +130,8 @@ void DeviceAdditionDialog::initializeControls()
     connect(ui->addDevicesButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleAddDevicesClicked);
 
-    connect(ui->tabWidget, &QTabWidget::tabBarClicked, this,
-        [this](int index)
-        {
-            if (index == -1)
-                return;
-
-            // We reset minimum height for current widget to prevent tab widget height stuck.
-            ui->tabWidget->widget(index ? 0 : 1)->setFixedHeight(0);
-
-            // We manually set new hight to prevent content blinking when page is changed.
-            const auto widget = ui->tabWidget->widget(index);
-            widget->setFixedHeight(widget->layout()->minimumSize().height());
-        });
-
+    connect(ui->tabWidget, &QTabWidget::tabBarClicked,
+        this, &DeviceAdditionDialog::handleTabClicked);
     connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &DeviceAdditionDialog::handleSearchTypeChanged);
 
@@ -115,12 +146,22 @@ void DeviceAdditionDialog::initializeControls()
     for (const auto server: m_serversWatcher.servers())
         ui->selectServerMenuButton->addServer(server);
 
-    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->startAddressEdit->setPlaceholderText(tr("Start address"));
+    ui->startAddressEdit->setText(lit("0.0.0.0"));
     ui->endAddressEdit->setPlaceholderText(tr("End address"));
+    ui->endAddressEdit->setText(lit("0.0.0.255"));
+    connect(ui->startAddressEdit, &QLineEdit::textChanged,
+        this, &DeviceAdditionDialog::handleStartAddressFieldTextChanged);
+    connect(ui->startAddressEdit, &QLineEdit::editingFinished,
+        this, &DeviceAdditionDialog::handleStartAddressEditingFinished);
+    connect(ui->endAddressEdit, &QLineEdit::textChanged,
+        this, &DeviceAdditionDialog::handleEndAddressFieldTextChanged);
 
-    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->hintLabel->setToolTip(tr("Examples:")
+    ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
+    ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
+    ui->addressHint->setVisible(false);
+    ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
+    ui->explanationLabel->setToolTip(tr("Examples:")
         + lit("\n192.168.1.15\n"
               "www.example.com:8080\n"
               "http://example.com:7090/image.jpg\n"
@@ -138,7 +179,6 @@ void DeviceAdditionDialog::initializeControls()
         this, &DeviceAdditionDialog::handleSelectedServerChanged);
 
     ui->serverOfflineAlertBar->setText(tr("Server offline"));
-
     updateSelectedServerButtonVisibility();
     connect(&m_serversWatcher, &CurrentSystemServers::serversCountChanged,
         this, &DeviceAdditionDialog::updateSelectedServerButtonVisibility);
@@ -160,6 +200,74 @@ void DeviceAdditionDialog::initializeControls()
     PasswordPreviewButton::createInline(ui->subnetScanPasswordEdit);
 
     updateResultsWidgetState();
+
+    handleTabClicked(ui->tabWidget->currentIndex());
+}
+
+void DeviceAdditionDialog::handleStartAddressFieldTextChanged(const QString& value)
+{
+    if (m_addressEditing)
+        return;
+
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
+    ui->endAddressEdit->setText(fixedAddress(ui->startAddressEdit).toString());
+}
+
+void DeviceAdditionDialog::handleStartAddressEditingFinished()
+{
+    const auto startAddress = fixedAddress(ui->startAddressEdit).toIPv4Address();
+    if (startAddress % 256 == 0)
+        ui->endAddressEdit->setText(QHostAddress(startAddress + 255).toString());
+}
+
+void DeviceAdditionDialog::handleEndAddressFieldTextChanged(const QString& value)
+{
+    if (m_addressEditing)
+        return;
+
+    QScopedValueRollback<bool> rollback(m_addressEditing, true);
+
+    const auto startAddress = fixedAddress(ui->startAddressEdit);
+    const auto endAddress = fixedAddress(ui->endAddressEdit);
+
+    const quint32 startSubnet = startAddress.toIPv4Address() >> 8;
+    const quint32 endSubnet = endAddress.toIPv4Address() >> 8;
+    if (startSubnet != endSubnet)
+    {
+        const QHostAddress fixed(startAddress.toIPv4Address() + ((endSubnet - startSubnet) << 8));
+        ui->startAddressEdit->setText(fixed.toString());
+    }
+}
+
+void DeviceAdditionDialog::handleTabClicked(int index)
+{
+    // We need two functions below to prevent blinking when page is changed.
+    static const auto resetPageSize = [](QWidget* widget) { widget->setFixedHeight(0); };
+    const auto setHeightFromLayout =
+        [this](QWidget* widget)
+        {
+            const auto layout = widget->layout();
+            widget->setFixedHeight(layout->minimumSize().height());
+            executeLater(
+                [widget, layout]() { widget->setMaximumHeight(layout->maximumSize().height()); },
+                this);
+        };
+
+    if (index)
+    {
+        ui->addressEdit->setValidator(TextValidateFunction(), true);
+        ui->startAddressEdit->setFocus();
+        resetPageSize(ui->knownAddressesPage);
+        setHeightFromLayout(ui->subnetScanPage);
+    }
+    else
+    {
+        ui->addressEdit->setValidator(
+            defaultNonEmptyValidator(tr("Address field can't be empty")));
+        ui->addressEdit->setFocus();
+        resetPageSize(ui->subnetScanPage);
+        setHeightFromLayout(ui->knownAddressesPage);
+    }
 }
 
 void DeviceAdditionDialog::updateSelectedServerButtonVisibility()
@@ -274,9 +382,15 @@ void DeviceAdditionDialog::handleStartSearchClicked()
     if (m_currentSearch)
         stopSearch();
 
-    const bool isKnownAddressTabPage = isKnownAddressPage(ui->tabWidget);
-    if (isKnownAddressTabPage)
+    if (isKnownAddressPage(ui->tabWidget))
     {
+        if (!ui->addressEdit->isValid())
+        {
+            ui->addressEdit->setFocus();
+            ui->addressEdit->validate();
+            return;
+        }
+
         m_currentSearch.reset(new ManualDeviceSearcher(ui->selectServerMenuButton->currentServer(),
             ui->addressEdit->text().simplified(), login(), password(), port()));
     }
@@ -316,6 +430,51 @@ void DeviceAdditionDialog::handleStartSearchClicked()
         m_model, &FoundDevicesModel::addDevices);
     connect(m_currentSearch, &ManualDeviceSearcher::devicesRemoved,
         m_model, &FoundDevicesModel::removeDevices);
+
+    ui->stopSearchButton->setFocus();
+}
+
+void DeviceAdditionDialog::appendAddingDevices(const AddingDevicesSet& value)
+{
+    const int lastCount = m_addingDevices.size();
+    m_addingDevices += value;
+    if (m_addingDevices.size() > lastCount)
+        updateMessageBar();
+}
+
+void DeviceAdditionDialog::updateMessageBar()
+{
+    ui->messageBar->setText(m_addingDevices.isEmpty()
+        ? QString()
+        : tr("%n devices are being added. You can close this dialog or start a new search",
+            nullptr, m_addingDevices.size()));
+}
+
+void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
+{
+    if (!m_addingDevices.remove(uniqueId))
+        return;
+
+    updateMessageBar();
+    const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
+    if (!index.isValid())
+        return;
+
+    m_model->setData(
+        index, FoundDevicesModel::alreadyAddedState, FoundDevicesModel::presentedStateRole);
+}
+
+void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
+{
+    const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
+    if (!index.isValid())
+        return;
+
+    const auto state = index.data(FoundDevicesModel::presentedStateRole);
+    if (state == FoundDevicesModel::alreadyAddedState)
+        m_model->setData(index, FoundDevicesModel::notPresentedState, FoundDevicesModel::presentedStateRole);
+    else
+        NX_ASSERT(false, "Wrong presented state");
 }
 
 void DeviceAdditionDialog::handleAddDevicesClicked()
@@ -326,7 +485,7 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
 
     QnManualResourceSearchList devices;
 
-    QHash<QString, FoundDevicesModel::PresentedState> prevStates;
+    AddingDevicesSet addingDevices;
 
     const bool checkSelection = ui->foundDevicesTable->getCheckedCount();
     const int rowsCount = m_model->rowCount();
@@ -336,17 +495,20 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
         if (checkSelection && !m_model->data(choosenIndex, Qt::CheckStateRole).toBool())
             continue;
 
+        const auto stateIndex = m_model->index(row, FoundDevicesModel::presentedStateColumn);
+        const auto presentedState = stateIndex.data(FoundDevicesModel::presentedStateRole);
+        if (presentedState == FoundDevicesModel::alreadyAddedState)
+            continue;
+
         const auto dataIndex = m_model->index(row);
         const auto device = m_model->data(dataIndex, FoundDevicesModel::dataRole)
             .value<QnManualResourceSearchEntry>();
 
-        const auto stateIndex = m_model->index(row, FoundDevicesModel::presentedStateColumn);
-        prevStates[device.uniqueId] = stateIndex.data(FoundDevicesModel::presentedStateRole)
-            .value<FoundDevicesModel::PresentedState>();
         m_model->setData(stateIndex, FoundDevicesModel::addingInProgressState,
             FoundDevicesModel::presentedStateRole);
 
         devices.append(device);
+        addingDevices.insert(device.uniqueId);
     }
 
     if (devices.isEmpty())
@@ -355,31 +517,11 @@ void DeviceAdditionDialog::handleAddDevicesClicked()
     const auto login = m_currentSearch->login();
     const auto password = m_currentSearch->password();
     server->restConnection()->addCamera(devices, login, password,
-        [this, prevStates, devices, guard = QPointer<DeviceAdditionDialog>(this)]
+        [this, addingDevices, devices, guard = QPointer<DeviceAdditionDialog>(this)]
             (bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
-            if (!guard)
-                return;
-
-            auto states = prevStates;
-            if (success && result.error == QnRestResult::NoError)
-            {
-                for (auto& state: states)
-                    state = FoundDevicesModel::alreadyAddedState;
-            }
-            else
-            {
-                showAdditionFailedDialog(toFakeResourcesList(devices));
-            }
-
-            for (auto it = states.begin(); it != states.end(); ++it)
-            {
-                const auto id = it.key();
-                const auto state = it.value();
-                const auto index = m_model->indexByUniqueId(
-                    id, FoundDevicesModel::presentedStateColumn);
-                m_model->setData(index, state, FoundDevicesModel::presentedStateRole);
-            }
+            if (guard && success)
+                appendAddingDevices(addingDevices);
         }, QThread::currentThread());
 }
 

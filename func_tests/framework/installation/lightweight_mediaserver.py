@@ -12,9 +12,9 @@ from .custom_posix_installation import CustomPosixInstallation
 from .installer import InstallIdentity, Version, find_customization
 from .mediaserver import BaseMediaserver
 from .. import serialize
+from ..context_logger import context_logger
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..context_logger import context_logger
 from ..template_renderer import TemplateRenderer
 from ..waiting import wait_for_truthy
 

@@ -22,6 +22,15 @@ INSERT INTO access_role VALUES(7, 'cloudAdmin');
 INSERT INTO access_role VALUES(8, 'maintenance');
 INSERT INTO access_role VALUES(9, 'owner');
 
+CREATE TABLE account_status (
+  code INTEGER NOT NULL PRIMARY KEY,
+  description text
+);
+
+INSERT INTO account_status VALUES(1, 'awaiting email confirmation');
+INSERT INTO account_status VALUES(2, 'activated');
+INSERT INTO account_status VALUES(3, 'blocked');
+INSERT INTO account_status VALUES(4, 'invite message has been sent');
 
 CREATE TABLE account (
   id varchar(64) NOT NULL PRIMARY KEY,
@@ -51,23 +60,22 @@ CREATE TABLE account_password (
   FOREIGN KEY (account_id) REFERENCES account (id) ON DELETE CASCADE
 );
 
-CREATE TABLE account_status (
-  code INTEGER NOT NULL PRIMARY KEY,
-  description text
-);
-
-INSERT INTO account_status VALUES(1, 'awaiting email confirmation');
-INSERT INTO account_status VALUES(2, 'activated');
-INSERT INTO account_status VALUES(3, 'blocked');
-INSERT INTO account_status VALUES(4, 'invite message has been sent');
-
-
 CREATE TABLE email_verification (
   account_id varchar(64) NOT NULL,
   verification_code text NOT NULL,
   expiration_date datetime NOT NULL,
   FOREIGN KEY (account_id) REFERENCES account (id) ON DELETE CASCADE
 );
+
+CREATE TABLE system_status (
+  code INTEGER NOT NULL PRIMARY KEY,
+  description text
+);
+
+INSERT INTO system_status VALUES(1, 'not activated');
+INSERT INTO system_status VALUES(2, 'activated');
+INSERT INTO system_status VALUES(3, 'deleted');
+INSERT INTO system_status VALUES(4, 'beingMerged');
 
 CREATE TABLE system (
   seq %bigint_primary_key_auto_increment%,
@@ -90,14 +98,6 @@ CREATE TABLE system_auth_info (
   FOREIGN KEY (system_id) REFERENCES system (id) ON DELETE CASCADE
 );
 
-CREATE TABLE system_health_history (
-  system_id varchar(64) NOT NULL,
-  state INTEGER DEFAULT NULL,
-  timestamp_utc BIGINT DEFAULT NULL,
-  FOREIGN KEY (system_id) REFERENCES system (id) ON DELETE CASCADE,
-  FOREIGN KEY (state) REFERENCES system_health_state (code)
-);
-
 CREATE TABLE system_health_state (
   code INTEGER NOT NULL PRIMARY KEY,
   description text
@@ -106,23 +106,19 @@ CREATE TABLE system_health_state (
 INSERT INTO system_health_state VALUES(0, 'offline');
 INSERT INTO system_health_state VALUES(1, 'online');
 
+CREATE TABLE system_health_history (
+  system_id varchar(64) NOT NULL,
+  state INTEGER DEFAULT NULL,
+  timestamp_utc BIGINT DEFAULT NULL,
+  FOREIGN KEY (system_id) REFERENCES system (id) ON DELETE CASCADE,
+  FOREIGN KEY (state) REFERENCES system_health_state (code)
+);
 
 CREATE TABLE system_merge_info (
   master_system_id varchar(64) DEFAULT NULL,
   slave_system_id varchar(64) DEFAULT NULL,
   start_time_utc BIGINT DEFAULT NULL
 );
-
-CREATE TABLE system_status (
-  code INTEGER NOT NULL PRIMARY KEY,
-  description text
-);
-
-INSERT INTO system_status VALUES(1, 'not activated');
-INSERT INTO system_status VALUES(2, 'activated');
-INSERT INTO system_status VALUES(3, 'deleted');
-INSERT INTO system_status VALUES(4, 'beingMerged');
-
 
 CREATE TABLE system_to_account (
   account_id varchar(64) NOT NULL,

@@ -1,6 +1,6 @@
 from pprint import pformat
 
-from netaddr import EUI, IPNetwork, mac_eui48
+from netaddr import EUI, IPAddress, IPNetwork, mac_eui48
 from winrm.exceptions import WinRMError
 
 from framework.context_logger import ContextLogger, context_logger
@@ -143,6 +143,7 @@ class WindowsNetworking(Networking):
             raise RuntimeError('EnableStatic returned {}'.format(pformat(invoke_result)))
 
     def list_ips(self):
+        # -PolicyStore:PersistentStore filters out first NATed address
         result = self._winrm.run_powershell_script(
             # language=PowerShell
             '''
@@ -150,7 +151,7 @@ class WindowsNetworking(Networking):
                     select InterfaceAlias,IPAddress
                     ''',
             {})
-        return result
+        return [IPAddress(d['IPAddress']) for d in result]
 
     def remove_ips(self):
         self._winrm.run_powershell_script(

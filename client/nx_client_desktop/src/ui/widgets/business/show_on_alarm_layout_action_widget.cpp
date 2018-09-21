@@ -9,7 +9,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
-#include <utils/common/scoped_value_rollback.h>
 
 #include <nx/vms/event/action_parameters.h>
 
