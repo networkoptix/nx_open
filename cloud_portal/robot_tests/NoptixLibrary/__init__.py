@@ -176,3 +176,8 @@ class NoptixLibrary(object):
         pat = '(<p).*({}).*(</p>)'.format(cloudName)
         if re.search(pat, body)==None:
             raise Exception("Cloud name was not in the email.")
+
+    def check_for_blank_target(self, body, url):
+        pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
+        if re.search(pat, body)==None:
+            raise Exception("Button target was not 'blank'.")

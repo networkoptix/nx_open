@@ -198,7 +198,7 @@ should handle click I forgot my password link at restore password page
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
 
 
-Check restore password email links, colors, cloud name
+Check restore password email links, colors, cloud name, and open link in new tab
     [tags]    C26260
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
@@ -213,9 +213,10 @@ Check restore password email links, colors, cloud name
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${random email}    timeout=120    status=UNSEEN
     ${email text}    Get Email Body    ${email}
-
+    log    ${email text}
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
+    Check for blank target    ${email text}    ${ENV}/restore_password
 
     Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
