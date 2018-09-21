@@ -14,7 +14,7 @@ class SystemInternetAccessWatcher:
     Q_OBJECT
 
 public:
-    SystemInternetAccessWatcher(QObject* parent = nullptr);
+    explicit SystemInternetAccessWatcher(QObject* parent = nullptr);
     virtual ~SystemInternetAccessWatcher() override;
 
     bool systemHasInternetAccess() const;
@@ -30,7 +30,7 @@ private:
 
 private:
     bool m_hasInternetAccess = false;
-    bool m_initialResourcesReceived = false;
+    bool m_processRuntimeUpdates = false;
 };
 
 } // namespace nx::client::desktop

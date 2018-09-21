@@ -9,37 +9,41 @@ namespace data_sync_engine {
 
 SyncronizationEngine::SyncronizationEngine(
     const std::string& /*applicationId*/, // TODO: #ak CLOUD-2249.
-    const QnUuid& moduleGuid,
+    const QnUuid& peerId,
     const SynchronizationSettings& settings,
     const ProtocolVersionRange& supportedProtocolRange,
     nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
+    m_peerId(peerId),
     m_supportedProtocolRange(supportedProtocolRange),
+    m_outgoingTransactionDispatcher(m_outgoingCommandFilter),
     m_structureUpdater(dbManager),
     m_transactionLog(
-        moduleGuid,
+        peerId,
         m_supportedProtocolRange,
         dbManager,
         &m_outgoingTransactionDispatcher),
     m_incomingTransactionDispatcher(
-        moduleGuid,
+        peerId,
         &m_transactionLog),
     m_connectionManager(
-        moduleGuid,
+        peerId,
         settings,
         m_supportedProtocolRange,
         &m_incomingTransactionDispatcher,
         &m_outgoingTransactionDispatcher),
     m_httpTransportAcceptor(
-        moduleGuid,
+        peerId,
         m_supportedProtocolRange,
         &m_transactionLog,
-        &m_connectionManager),
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_webSocketAcceptor(
-        moduleGuid,
+        peerId,
         m_supportedProtocolRange,
         &m_transactionLog,
-        &m_connectionManager),
+        &m_connectionManager,
+        m_outgoingCommandFilter),
     m_statisticsProvider(
         m_connectionManager,
         &m_incomingTransactionDispatcher,
@@ -102,6 +106,12 @@ const statistics::Provider& SyncronizationEngine::statisticsProvider() const
     return m_statisticsProvider;
 }
 
+void SyncronizationEngine::setOutgoingCommandFilter(
+    const OutgoingCommandFilterConfiguration& configuration)
+{
+    m_outgoingCommandFilter.configure(configuration);
+}
+
 void SyncronizationEngine::subscribeToSystemDeletedNotification(
     nx::utils::Subscription<std::string>& subscription)
 {
@@ -121,6 +131,11 @@ void SyncronizationEngine::unsubscribeFromSystemDeletedNotification(
 static constexpr char kEstablishEc2TransactionConnectionPath[] = "/events/ConnectingStage1";
 static constexpr char kEstablishEc2P2pTransactionConnectionPath[] = "/transactionBus";
 static constexpr char kPushEc2TransactionPath[] = "/forward_events/{sequence}";
+
+QnUuid SyncronizationEngine::peerId() const
+{
+    return m_peerId;
+}
 
 void SyncronizationEngine::registerHttpApi(
     const std::string& pathPrefix,
@@ -190,7 +205,7 @@ void SyncronizationEngine::onSystemDeleted(const std::string& systemId)
         systemId.c_str(),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
         {
-            m_transactionLog.clearTransactionLogCacheForSystem(systemId.c_str());
+            m_transactionLog.markSystemForDeletion(systemId.c_str());
         });
 }
 

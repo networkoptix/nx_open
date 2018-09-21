@@ -2,7 +2,33 @@
 
 #include <nx/utils/datetime.h>
 
-namespace nx_rtsp {
+namespace nx {
+namespace network {
+namespace rtsp {
+
+QString toString(int statusCode)
+{
+    switch (statusCode)
+    {
+        case StatusCode::lowOnStorageSpace: return "Low on storage space";
+        case StatusCode::parameterNotUnderstood: return "Parameter not understood";
+        case StatusCode::conferenceNotFound: return "Conference not found";
+        case StatusCode::notEnoughBandwidth: return "Not enough bandwidth";
+        case StatusCode::sessionNotFound: return "Session not found";
+        case StatusCode::methodNotValidInThisState: return "Method not valid in this state";
+        case StatusCode::headerFieldNotValidForResource: return "Header field not valid for resource";
+        case StatusCode::invalidRange: return "Invalid range";
+        case StatusCode::parameterIsReadOnly: return "Parameter is read-only";
+        case StatusCode::aggregateOperationNotAllowed: return "Aggregate operation not allowed";
+        case StatusCode::onlyAggregateOperationAllowed: return "Only aggregation operation allowed";
+        case StatusCode::unsupportedTransport: return "Unsupported transport";
+        case StatusCode::destinationUnreachable: return "Destination unreachable";
+        case StatusCode::keyManagementFailure: return "Key management failure";
+        case StatusCode::rtspVersionNotSupported: return "RTSP version not supported";
+        case StatusCode::optionNotSupported: return "Option not supported";
+        default: return nx::network::http::StatusCode::toString(statusCode);
+    }
+}
 
 const char* const kUrlSchemeName = "rtsp";
 const char* const kSecureUrlSchemeName = "rtsps";
@@ -77,4 +103,6 @@ bool RtspResponse::parse(const nx::network::http::ConstBufferRefType &data)
         true);
 }
 
-} // namespace nx_rtsp
+} // namespace rtsp
+} // namespace network
+} // namespace nx

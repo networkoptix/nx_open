@@ -180,6 +180,18 @@ void remove_if(Container& container, UnaryPredicate p)
         container.end());
 }
 
+template<typename Key, typename Value, typename UnaryPredicate>
+void remove_if(std::map<Key, Value>& container, UnaryPredicate predicate)
+{
+    for (auto it = container.begin(); it != container.end();)
+    {
+        if (predicate(it->first, it->second))
+            it = container.erase(it);
+        else
+            ++it;
+    }
+}
+
 template<typename Container, typename UnaryPredicate>
 const typename Container::value_type* find_if(const Container& container, UnaryPredicate p)
 {
@@ -191,7 +203,7 @@ template<typename Container, typename UnaryPredicate>
 typename Container::value_type* find_if(Container& container, UnaryPredicate p)
 {
     const auto it = std::find_if(container.begin(), container.end(), p);
-    return it == container.end() ? nullptr : *it;
+    return it == container.end() ? (typename Container::value_type*) nullptr : &(*it);
 }
 
 template<typename StringType>

@@ -33,6 +33,7 @@ bool isLowMediaQuality(MediaQuality q)
 }
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType ):
+    dataProvider(nullptr),
     dataType(_dataType),
     compressionType(AV_CODEC_ID_NONE),
     flags(MediaFlags_None),

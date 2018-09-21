@@ -109,7 +109,7 @@ int QnWearableCameraRestHandler::executeAdd(
 {
     QString name;
     if (!requireParameter(params, lit("name"), result, &name))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     nx::vms::api::CameraData apiCamera;
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
@@ -157,16 +157,16 @@ int QnWearableCameraRestHandler::executePrepare(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearablePrepareData data;
     if(!QJson::deserialize(body, &data) || data.elements.empty())
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnVirtualCameraResourcePtr camera =
         owner->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId);
     if (!camera)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableUploadManager* uploader = uploadManager(result);
     if (!uploader)
@@ -219,7 +219,7 @@ int QnWearableCameraRestHandler::executeStatus(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableLockManager* locker = lockManager(result);
     if (!locker)
@@ -249,15 +249,15 @@ int QnWearableCameraRestHandler::executeLock(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnUuid userId;
     if (!requireParameter(params, lit("userId"), result, &userId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     qint64 ttl;
     if (!requireParameter(params, lit("ttl"), result, &ttl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableLockManager* locker = lockManager(result);
     if (!locker)
@@ -295,21 +295,21 @@ int QnWearableCameraRestHandler::executeExtend(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnUuid userId;
     if (!requireParameter(params, lit("userId"), result, &userId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnUuid token;
     if (!requireParameter(params, lit("token"), result, &token))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     if (token.isNull())
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     qint64 ttl;
     if (!requireParameter(params, lit("ttl"), result, &ttl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableLockManager* locker = lockManager(result);
     if (!locker)
@@ -343,11 +343,11 @@ int QnWearableCameraRestHandler::executeRelease(const QnRequestParams& params,
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnUuid token;
     if (!requireParameter(params, lit("token"), result, &token))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableLockManager* locker = lockManager(result);
     if (!locker)
@@ -379,19 +379,19 @@ int QnWearableCameraRestHandler::executeConsume(
 {
     QnUuid cameraId;
     if (!requireParameter(params, lit("cameraId"), result, &cameraId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     qint64 startTimeMs;
     if (!requireParameter(params, lit("startTime"), result, &startTimeMs))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QString uploadId;
     if (!requireParameter(params, lit("uploadId"), result, &uploadId))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnUuid token;
     if (!requireParameter(params, lit("token"), result, &token))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnWearableUploadManager* uploader = uploadManager(result);
     if (!uploader)
@@ -405,7 +405,7 @@ int QnWearableCameraRestHandler::executeConsume(
         return nx::network::http::StatusCode::notAllowed;
 
     if (!uploader->consume(cameraId, token, uploadId, startTimeMs))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     return nx::network::http::StatusCode::ok;
 }

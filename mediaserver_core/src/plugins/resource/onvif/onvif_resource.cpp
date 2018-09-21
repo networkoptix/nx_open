@@ -1275,11 +1275,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioResourceOptions()
     return CameraDiagnostics::NoErrorResult();
 }
 
-//CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
-//{
-//    return CameraDiagnostics::NoErrorResult();
-//}
-
 int QnPlOnvifResource::innerQualityToOnvif(
     Qn::StreamQuality quality, int minQuality, int maxQuality) const
 {

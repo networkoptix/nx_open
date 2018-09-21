@@ -36,10 +36,10 @@ class ScopedRef
 {
 public:
     /** Intended to be applied to queryInterface(). */
-    ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
+    explicit ScopedRef(void* ptr): ScopedRef(static_cast<T*>(ptr), /*increaseRef*/ false) {}
 
     /** Calls ptr->addRef() if ptr is not null and increaseRef is true. */
-    ScopedRef(T* ptr = nullptr, bool increaseRef = true):
+    explicit ScopedRef(T* ptr = nullptr, bool increaseRef = true):
         m_ptr(ptr)
     {
         if (m_ptr && increaseRef)
@@ -57,12 +57,19 @@ public:
         return *this;
     }
 
+    ScopedRef(const ScopedRef<T>&) = delete;
+
+    ScopedRef<T>& operator=(const ScopedRef<T>&) = delete;
+
     ~ScopedRef() { reset(); }
 
     operator bool() const { return m_ptr != nullptr; }
 
     /** @return Protected pointer, without releasing it. */
     T* get() { return m_ptr; }
+	
+    /** @return Protected pointer, without releasing it. */
+    const T* get() const { return m_ptr; }
 
     T* operator->() { return m_ptr; }
     const T* operator->() const { return m_ptr; }
@@ -99,10 +106,6 @@ private:
         if(m_ptr)
             m_ptr->addRef();
     }
-
-    ScopedRef(const ScopedRef&);
-
-    ScopedRef& operator=(const ScopedRef&);
 };
 
 /** Alignes val up to alignment boundary. */
@@ -259,6 +262,13 @@ public:
         return newRefCounter;
     }
 
+	unsigned int refCount() const
+	{
+		if (m_refCountingDelegate)
+			return m_refCountingDelegate->refCount();
+		return m_refCount;
+	}
+
 private:
     atomic::AtomicLong m_refCount;
     nxpl::PluginInterface* m_objToWatch;
@@ -275,12 +285,27 @@ public:
     virtual unsigned int addRef() override { return m_refManager.addRef(); }
     virtual unsigned int releaseRef() override { return m_refManager.releaseRef(); }
 
+	unsigned int refCount() const { return m_refManager.refCount(); }
+
 protected:
     CommonRefManager m_refManager;
 
     CommonRefCounter(): m_refManager(static_cast<T*>(this)) {}
     CommonRefCounter(CommonRefManager* refManager): m_refManager(refManager) {}
 };
+
+/**
+ * Intended for debug.
+ * @return Reference counter, or 0 if object is null.
+ */
+template<typename Interface>
+unsigned int refCount(Interface* object)
+{
+	if (const auto commonRefCounter = dynamic_cast<CommonRefCounter<Interface>*>(object))
+		return commonRefCounter->refCount();
+
+	return 0;
+}
 
 enum NxGuidFormatOption
 {

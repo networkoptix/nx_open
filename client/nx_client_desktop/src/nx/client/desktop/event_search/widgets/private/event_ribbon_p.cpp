@@ -241,6 +241,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         tile->setProgressBarVisible(true);
         tile->setProgressValue(progress.value<qreal>());
         tile->setProgressTitle(index.data(Qt::DisplayRole).toString());
+        tile->setDescription(index.data(Qn::DescriptionTextRole).toString());
         tile->setToolTip(index.data(Qn::DescriptionTextRole).toString());
         return;
     }
@@ -259,6 +260,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
+    tile->setResourceList(index.data(Qn::ResourceListRole).value<QnResourceList>());
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 

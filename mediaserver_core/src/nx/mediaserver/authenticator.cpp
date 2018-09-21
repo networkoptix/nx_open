@@ -295,7 +295,7 @@ Qn::AuthResult Authenticator::tryAllMethods(
             auto authResult = tryAuthRecord(
                 clientIp,
                 authQueryParam,
-                request.requestLine.version.protocol == nx_rtsp::rtsp_1_0.protocol
+                request.requestLine.version.protocol == nx::network::rtsp::rtsp_1_0.protocol
                 ? "PLAY"    //for rtsp always using PLAY since client software does not know
                             //which request underlying player will issue first
                 : request.requestLine.method,

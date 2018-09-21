@@ -1,4 +1,5 @@
 import base64
+from contextlib import contextmanager, closing
 import hashlib
 import json
 from abc import ABCMeta, abstractmethod
@@ -8,6 +9,7 @@ import requests
 import requests.exceptions
 from requests.auth import HTTPDigestAuth
 from urllib3.util import Url
+import websocket
 
 from .context_logger import ContextLogger
 
@@ -63,10 +65,6 @@ class HttpClient(object):
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]).encode())
         return key.decode('ascii')
 
-    @property
-    def base_url(self):
-        return self._base_url
-
     def url(self, path):
         # noinspection PyProtectedMember
         return self._base_url._replace(auth=None, path='/' + path.lstrip('/')).url
@@ -78,6 +76,17 @@ class HttpClient(object):
     def media_url(self, path):
         # noinspection PyProtectedMember
         return self._base_url._replace(scheme='rtsp', path='/' + path.lstrip('/')).url
+
+    @contextmanager
+    def websocket_opened(self, path, timeout_sec=0.5):
+        url = self._base_url._replace(scheme='ws', path=path).url
+        credentials = '%s:%s' % (self.user, self.password)
+        authorization = 'Basic ' + base64.b64encode(credentials.encode())
+        headers = dict(Authorization=authorization)
+        _logger.debug('Create websocket connection: %s', url)
+        ws = websocket.create_connection(url, header=headers, timeout=timeout_sec)
+        with closing(ws):
+            yield ws
 
     def request(self, method, path, timeout=None, **kwargs):
         # noinspection PyProtectedMember

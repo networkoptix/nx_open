@@ -174,6 +174,11 @@ std::string VmsSystem::cloudSystemId() const
 
 //-------------------------------------------------------------------------------------------------
 
+CloudSystemFixture::CloudSystemFixture(const std::string& baseDir):
+    m_baseDir(baseDir)
+{
+}
+
 bool CloudSystemFixture::initializeCloud()
 {
     return m_cloud.initialize();
@@ -186,7 +191,7 @@ Cloud& CloudSystemFixture::cloud()
 
 std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 {
-    ::ec2::test::SystemMergeFixture systemMergeFixture;
+    ::ec2::test::SystemMergeFixture systemMergeFixture(m_baseDir + "/vms_peers/");
 
     systemMergeFixture.addSetting(
         "-cloudIntegration/cloudDbUrl",
@@ -202,7 +207,8 @@ std::unique_ptr<VmsSystem> CloudSystemFixture::createVmsSystem(int serverCount)
 
     if (serverCount > 1)
     {
-        systemMergeFixture.mergeSystems();
+        if (systemMergeFixture.mergeSystems() != QnRestResult::NoError)
+            return nullptr;
         systemMergeFixture.waitUntilAllServersSynchronizedData();
     }
 
@@ -224,12 +230,6 @@ void CloudSystemFixture::waitUntilVmsTransactionLogMatchesCloudOne(
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
-
-        ::ec2::ApiTransactionDataList fullVmsTransactionLog;
-        ASSERT_EQ(
-            ::ec2::ErrorCode::ok,
-            mediaServerClient->ec2GetTransactionLog(
-                ::ec2::ApiTranLogFilter(), &fullVmsTransactionLog));
 
         ::ec2::ApiTransactionDataList cloudTransactionLog;
         m_cloud.cdb().getTransactionLog(

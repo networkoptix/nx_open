@@ -16,6 +16,7 @@ namespace nx::data_sync_engine {
 
 class ConnectionManager;
 class ProtocolVersionRange;
+class OutgoingCommandFilter;
 class TransactionLog;
 
 } // namespace nx::data_sync_engine
@@ -29,7 +30,8 @@ public:
         const QnUuid& moduleGuid,
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* transactionLog,
-        ConnectionManager* connectionManager);
+        ConnectionManager* connectionManager,
+        const OutgoingCommandFilter& outgoingCommandFilter);
 
     /**
      * Mediaserver calls this method to open 2-way transaction exchange channel.
@@ -52,6 +54,7 @@ private:
     const ProtocolVersionRange& m_protocolVersionRange;
     TransactionLog* m_transactionLog;
     ConnectionManager* m_connectionManager;
+    const OutgoingCommandFilter& m_outgoingCommandFilter;
     const vms::api::PeerData m_localPeerData;
     std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
 

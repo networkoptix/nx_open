@@ -79,14 +79,19 @@ int QnExternalEventRestHandler::executeGet(
     if (params.contains("inputPortId"))
         businessParams.inputPortId = params["inputPortId"];
 
+    auto fromEncoded = [](const QString& s)
+    {
+        return QUrl::fromPercentEncoding(QString(s).replace('+', "%20").toUtf8());
+    };
+
     if (params.contains("source"))
-        businessParams.resourceName = params["source"];
+        businessParams.resourceName = fromEncoded(params["source"]);
 
     if (params.contains("caption"))
-        businessParams.caption = params["caption"];
+        businessParams.caption = fromEncoded(params["caption"]);
 
     if (params.contains("description"))
-        businessParams.description = params["description"];
+        businessParams.description = fromEncoded(params["description"]);
 
     if (params.contains("metadata"))
     {

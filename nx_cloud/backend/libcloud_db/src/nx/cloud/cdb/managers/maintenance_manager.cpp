@@ -63,9 +63,7 @@ void MaintenanceManager::getTransactionLog(
 
     m_syncronizationEngine->transactionLog().readTransactions(
         systemId.systemId.c_str(),
-        boost::none,
-        boost::none,
-        std::numeric_limits<int>::max(),
+        nx::data_sync_engine::ReadCommandsFilter::kEmptyFilter,
         std::bind(&MaintenanceManager::onTransactionLogRead, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             systemId.systemId,

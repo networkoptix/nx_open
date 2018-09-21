@@ -10,16 +10,18 @@ Optix, Inc.
 ---------------------------------------------------------------------------------------------------
 # Introduction
 
-This package provides an SDK to create video analytics plugins for Nx Witness VMS. A plugin should
-be created in the form of a dynamic library (`.dll` on Windows, `.so` on Linux) which exports a
-single `extern "C"` function - a factory for objects inherited from a dedicated SDK abstract class
-(in other words, implementing a dedicated interface) `class PluginInterface` declared in
-`src/plugins/plugin_api.h`.
+This package provides an SDK to create video analytics plugins for Nx Witness VMS.
 
-From business logic point of view, such Metadata Plugin is connected to a video camera, may receive
+From business logic point of view, a Metadata Plugin is connected to a video camera, may receive
 video frames from the camera or interact with the camera using a certain proprietary way, and may
 generate metadata - events and objects (rectangles on a frame) - which is sent to Mediaserver to be
 stored in its database and visualized in Client.
+
+From developers point of view, a Metadata Plugin is a dynamic library (`.dll` on Windows, `.so` on
+Linux) which exports a single function referred to as the "entry function". The entry function is a
+factory for objects inherited from a dedicated SDK abstract class (in other words, implementing a
+dedicated interface) `class PluginInterface` declared in `src/plugins/plugin_api.h`. This header
+file also defines (in a comment) the name, prototype and linkage type of the entry function.
 
 To make it possible to develop plugins using a different C++ compiler (e.g. with incompatible ABI)
 rather than the one used to compile Nx Witness VMS, or potentially in languages other than C++,
@@ -27,6 +29,8 @@ a COM-like approach is offered: all objects created in a plugin inherit abstract
 in header files of this SDK, which have only pure virtual functions with C-style arguments (not
 using C++ standard library classes). To manage lifetime of such objects, they have a reference
 counter.
+
+The SDK C++ files have extensive documentation in Doxygen format, included within the SDK as HTML.
 
 ---------------------------------------------------------------------------------------------------
 # Helper tools
@@ -50,10 +54,11 @@ rudimentary framework for simple unit tests.
 ---------------------------------------------------------------------------------------------------
 # Sample: building and installing
 
-This package includes a sample plugin written in C++ using this SDK: `Stub Metadata Plugin`,
-located at `samples/stub_metadata_plugin/`. It receives video frames from a camera, ignores them,
-and generates stub metadata objects looking as a rectangle moving diagonally across the frame, and
-also some hard-coded events.
+This package includes a sample Metadata plugin written in C++: `Stub Metadata Plugin`, located at
+`samples/stub_metadata_plugin/`. It receives video frames from a camera, ignores them, and
+generates stub metadata objects looking as a rectangle moving diagonally across the frame, and also
+some hard-coded events. This plugin has certain settings which allow to test various SDK features,
+see `samples/stub_metadata_plugin/stub_metadata_plugin_ini.h` for details.
 
 The included `Stub Metadata Plugin` source files can be compiled and linked using CMake, yielding
 `stub_metadata_plugin.dll` on Windows, or `libstub_metadata_plugin.so` on Linux.
@@ -61,12 +66,12 @@ The included `Stub Metadata Plugin` source files can be compiled and linked usin
 Prerequisites:
 ```
 CMake >= 3.3.2
-Windows: Microsoft Visual Studio >= 2015
-Linux (including Nvidia Tegra native compiling): g++ >= 5.4.0, make or Ninja
+Windows (7 or 10): Microsoft Visual Studio >= 2015
+Linux (Ubuntu 16.04) (including Nvidia Tegra native compiling): g++ >= 5.4.0, make or Ninja
 Nvidia Tegra cross-compiling: aarch-64 g++ >= 5.4.0 (e.g. Linaro), make or Ninja
 ```
 
-To compile the sample and run unit tests (if not cross-compiling), execute the commands collected
+To compile the sample, and (if not cross-compiling) run unit tests, execute the commands collected
 into the provided scripts (use their source code as a reference):
 ```
 # Windows:

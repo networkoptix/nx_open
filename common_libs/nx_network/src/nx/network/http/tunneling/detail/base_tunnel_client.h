@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <nx/network/aio/basic_pollable.h>
 
 #include "../../http_async_client.h"
@@ -33,6 +35,8 @@ public:
     virtual ~BaseTunnelClient() = default;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
+    virtual void setTimeout(std::chrono::milliseconds timeout) = 0;
 
     virtual void openTunnel(
         OpenTunnelCompletionHandler completionHandler) = 0;

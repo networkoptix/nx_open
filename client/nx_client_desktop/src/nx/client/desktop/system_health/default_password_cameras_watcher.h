@@ -16,7 +16,7 @@ class DefaultPasswordCamerasWatcher:
     using base_type = Connective<QObject>;
 
 public:
-    DefaultPasswordCamerasWatcher(QObject* parent = nullptr);
+    explicit DefaultPasswordCamerasWatcher(QObject* parent = nullptr);
     virtual ~DefaultPasswordCamerasWatcher() override;
 
     QnVirtualCameraResourceSet camerasWithDefaultPassword() const;

@@ -20,6 +20,7 @@ extern "C"
 
 #include <nx/network/socket.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtp/rtcp.h>
 
 
@@ -280,7 +281,7 @@ public:
     QList<QByteArray> getSdpByType(TrackType trackType) const;
     int getTrackCount(TrackType trackType) const;
 
-    int getLastResponseCode() const;
+    nx::network::rtsp::StatusCodeValue getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
     bool isAudioEnabled() const;
@@ -377,7 +378,7 @@ private:
     qint64 m_endTime;
     float m_scale;
     std::chrono::milliseconds m_tcpTimeout;
-    int m_responseCode;
+    nx::network::rtsp::StatusCodeValue m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     unsigned int m_TimeOut;

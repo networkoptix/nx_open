@@ -3,19 +3,23 @@
 #include <chrono>
 #include <limits>
 
+#include <QtWidgets/QApplication>
+
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <core/resource_management/resource_pool.h>
 #include <health/system_health_helper.h>
 #include <ui/common/notification_levels.h>
-#include <ui/dialogs/resource_properties/user_settings_dialog.h>
-#include <ui/dialogs/resource_properties/server_settings_dialog.h>
-#include <ui/dialogs/system_administration_dialog.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
+// TODO: #vkutin Dialogs are included just for tab identifiers. Needs refactoring to avoid it.
+#include <ui/dialogs/resource_properties/user_settings_dialog.h>
+#include <ui/dialogs/resource_properties/server_settings_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -23,10 +27,9 @@
 #include <nx/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/utils/string.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 using namespace ui;
 
@@ -71,19 +74,25 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     base_type(),
     QnWorkbenchContextAware(q),
     q(q),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule())),
+    m_popupSystemHealthFilter(qnSettings->popupSystemHealth())
 {
     // Handle system health state.
 
     const auto systemHealthState = context()->instance<SystemHealthState>();
-    for (int i = 0; i < QnSystemHealth::MessageType::Count; ++i)
-    {
-        toggleSystemHealthEvent(QnSystemHealth::MessageType(i),
-            systemHealthState->value(QnSystemHealth::MessageType(i)));
-    }
+    connect(systemHealthState, &SystemHealthState::stateChanged, this, &Private::toggleItem);
+    connect(systemHealthState, &SystemHealthState::dataChanged, this, &Private::updateItem);
 
-    connect(systemHealthState, &SystemHealthState::changed,
-        this, &Private::toggleSystemHealthEvent);
+    for (const auto index: QnSystemHealth::allVisibleMessageTypes())
+        toggleItem(index, systemHealthState->state(index));
+
+    auto userChangesListener = new QnResourceChangesListener(this);
+    userChangesListener->connectToResources<QnUserResource>(&QnUserResource::nameChanged,
+        [this](const QnUserResourcePtr& user)
+        {
+            if (m_usersWithInvalidEmail.contains(user))
+                updateItem(QnSystemHealth::MessageType::UsersEmailIsEmpty);
+        });
 
     // Handle system health notifications.
 
@@ -91,10 +100,31 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q) :
     connect(notificationHandler, &QnWorkbenchNotificationsHandler::cleared, this, &Private::clear);
 
     connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventAdded,
-        this, &Private::addSystemHealthEvent);
+        this, &Private::addItem);
 
     connect(notificationHandler, &QnWorkbenchNotificationsHandler::systemHealthEventRemoved,
-        this, &Private::removeSystemHealthEvent);
+        this, &Private::removeItem);
+
+    connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH),
+        &QnPropertyNotifier::valueChanged, this,
+        [this](int id)
+        {
+            if (id != QnClientSettings::POPUP_SYSTEM_HEALTH)
+                return;
+
+            const auto filter = qnSettings->popupSystemHealth();
+            const auto systemHealthState = context()->instance<SystemHealthState>();
+
+            for (const auto index: QnSystemHealth::allVisibleMessageTypes())
+            {
+                const bool wasVisible = m_popupSystemHealthFilter.contains(index);
+                const bool isVisible = filter.contains(index);
+                if (wasVisible != isVisible)
+                    toggleItem(index, isVisible && systemHealthState->state(index));
+            }
+
+            m_popupSystemHealthFilter = filter;
+        });
 }
 
 SystemHealthListModel::Private::~Private()
@@ -121,6 +151,9 @@ QString SystemHealthListModel::Private::text(int index) const
     const auto& item = m_items[index];
     switch (item.message)
     {
+        case QnSystemHealth::UsersEmailIsEmpty:
+            return tr("Email address is not set for %n users", "", m_usersWithInvalidEmail.size());
+
         case QnSystemHealth::RemoteArchiveSyncStarted:
         case QnSystemHealth::RemoteArchiveSyncFinished:
         case QnSystemHealth::RemoteArchiveSyncProgress:
@@ -136,6 +169,19 @@ QString SystemHealthListModel::Private::text(int index) const
         default:
             return QnSystemHealthStringsHelper::messageText(item.message,
                 QnResourceDisplayInfo(item.resource).toString(qnSettings->extraInfoInTree()));
+    }
+}
+
+QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) const
+{
+    const auto& item = m_items[index];
+    switch (item.message)
+    {
+        case QnSystemHealth::UsersEmailIsEmpty:
+            return m_usersWithInvalidEmail;
+
+        default:
+            return {};
     }
 }
 
@@ -187,9 +233,8 @@ CommandActionPtr SystemHealthListModel::Private::commandAction(int index) const
         [this]()
         {
             const auto state = context()->instance<SystemHealthState>();
-            const auto parameters = action::Parameters(
-                state->data(QnSystemHealth::MessageType::DefaultCameraPasswords))
-                    .withArgument(Qn::ForceShowCamerasList, true);
+            const auto parameters = action::Parameters(m_camerasWithDefaultPassword)
+                .withArgument(Qn::ForceShowCamerasList, true);
 
             menu()->triggerIfPossible(action::ChangeDefaultCameraPasswordAction, parameters);
         });
@@ -243,9 +288,15 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
 
         case QnSystemHealth::UsersEmailIsEmpty:
-            return action::Parameters(m_items[index].resource)
+        {
+            const auto user = m_usersWithInvalidEmail.empty()
+                ? QnUserResourcePtr()
+                : m_usersWithInvalidEmail.front();
+
+            return action::Parameters(user)
                 .withArgument(Qn::FocusElementRole, lit("email"))
                 .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage);
+        }
 
         case QnSystemHealth::NoInternetForTimeSync:
             return action::Parameters()
@@ -264,10 +315,19 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
     }
 }
 
-void SystemHealthListModel::Private::addSystemHealthEvent(
+void SystemHealthListModel::Private::addItem(
     QnSystemHealth::MessageType message,
     const QVariant& params)
 {
+    if (!QnSystemHealth::isMessageVisible(message))
+        return;
+
+    if (QnSystemHealth::isMessageVisibleInSettings(message))
+    {
+        if (!qnSettings->popupSystemHealth().contains(message))
+            return; //< Not allowed by filter.
+    }
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
@@ -286,21 +346,23 @@ void SystemHealthListModel::Private::addSystemHealthEvent(
         }
     }
 
-    // TODO: #vkutin We may want multiple resource aggregation as one event.
     Item item(message, resource);
     item.serverData = action;
 
-    auto position = std::lower_bound(m_items.begin(), m_items.end(), item);
+    const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
+    const auto index = std::distance(m_items.cbegin(), position);
+
     if (position != m_items.end() && *position == item)
-        return; //< Already exists.
+        return; //< Item already exists.
 
-    const auto index = std::distance(m_items.begin(), position);
+    updateCachedData(message);
 
-    ScopedInsertRows insertRows(q,  index, index);
+    // New item.
+    ScopedInsertRows insertRows(q, index, index);
     m_items.insert(position, item);
 }
 
-void SystemHealthListModel::Private::removeSystemHealthEvent(
+void SystemHealthListModel::Private::removeItem(
     QnSystemHealth::MessageType message,
     const QVariant& params)
 {
@@ -324,14 +386,60 @@ void SystemHealthListModel::Private::removeSystemHealthEvent(
     }
 }
 
-void SystemHealthListModel::Private::toggleSystemHealthEvent(
+void SystemHealthListModel::Private::toggleItem(
     QnSystemHealth::MessageType message, bool isOn)
 {
-    // TODO: #vkutin FIXME: Support params (resource?)
     if (isOn)
-        addSystemHealthEvent(message, {});
+        addItem(message, {});
     else
-        removeSystemHealthEvent(message, {});
+        removeItem(message, {});
+}
+
+void SystemHealthListModel::Private::updateItem(QnSystemHealth::MessageType message)
+{
+    Item item(message, {});
+    const auto position = std::lower_bound(m_items.cbegin(), m_items.cend(), item);
+
+    if (position == m_items.end() || *position != item)
+        return; //< Item does not exist.
+
+    updateCachedData(message);
+
+    const auto index = q->index(std::distance(m_items.cbegin(), position));
+    emit q->dataChanged(index, index);
+}
+
+void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageType message)
+{
+    const auto systemHealthState = context()->instance<SystemHealthState>();
+    switch (message)
+    {
+        case QnSystemHealth::MessageType::UsersEmailIsEmpty:
+        {
+            m_usersWithInvalidEmail = systemHealthState->data(
+                QnSystemHealth::MessageType::UsersEmailIsEmpty).value<QnUserResourceList>();
+
+            std::sort(m_usersWithInvalidEmail.begin(), m_usersWithInvalidEmail.end(),
+                [](const QnUserResourcePtr& left, const QnUserResourcePtr& right)
+                {
+                    return nx::utils::naturalStringCompare(
+                        left->getName(), right->getName(), Qt::CaseInsensitive) < 0;
+                });
+
+            break;
+        }
+
+        case QnSystemHealth::MessageType::DefaultCameraPasswords:
+        {
+            m_camerasWithDefaultPassword =
+                systemHealthState->data(QnSystemHealth::MessageType::DefaultCameraPasswords)
+                    .value<QnVirtualCameraResourceList>();
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 void SystemHealthListModel::Private::clear()
@@ -418,6 +526,4 @@ QPixmap SystemHealthListModel::Private::pixmap(QnSystemHealth::MessageType messa
     }
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -57,19 +57,20 @@ private:
 /**
  * Encapsulates transaction and its ubjson presentation.
  */
-template<typename TransactionDataType>
+template<typename CommandDescriptor>
 class UbjsonSerializedTransaction:
-    public BaseUbjsonSerializedTransaction<SerializableTransaction<TransactionDataType>>
+    public BaseUbjsonSerializedTransaction<SerializableTransaction<CommandDescriptor>>
 {
-    typedef BaseUbjsonSerializedTransaction<SerializableTransaction<TransactionDataType>> BaseType;
+    using base_type =
+        BaseUbjsonSerializedTransaction<SerializableTransaction<CommandDescriptor>>;
 
 public:
     UbjsonSerializedTransaction(
-        Command<TransactionDataType> transaction,
+        Command<typename CommandDescriptor::Data> transaction,
         QByteArray ubjsonData,
         int serializedTransactionVersion)
         :
-        BaseType(
+        base_type(
             std::move(ubjsonData),
             serializedTransactionVersion,
             std::move(transaction))
@@ -77,10 +78,10 @@ public:
     }
 
     UbjsonSerializedTransaction(
-        Command<TransactionDataType> command,
+        Command<typename CommandDescriptor::Data> command,
         int serializedTransactionVersion)
         :
-        BaseType(
+        base_type(
             QnUbjson::serialized(command),
             serializedTransactionVersion,
             command)

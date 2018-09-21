@@ -77,6 +77,9 @@ private:
 class CloudSystemFixture
 {
 public:
+    CloudSystemFixture(const std::string& baseDir);
+    virtual ~CloudSystemFixture() = default;
+
     bool initializeCloud();
 
     Cloud& cloud();
@@ -93,6 +96,7 @@ public:
         const nx::cdb::AccountWithPassword& account);
 
 private:
+    std::string m_baseDir;
     Cloud m_cloud;
 };
 

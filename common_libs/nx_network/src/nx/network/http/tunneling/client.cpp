@@ -18,6 +18,11 @@ void Client::bindToAioThread(aio::AbstractAioThread* aioThread)
         m_actualClient->bindToAioThread(aioThread);
 }
 
+void Client::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_actualClient->setTimeout(timeout);
+}
+
 void Client::openTunnel(
     OpenTunnelCompletionHandler completionHandler)
 {

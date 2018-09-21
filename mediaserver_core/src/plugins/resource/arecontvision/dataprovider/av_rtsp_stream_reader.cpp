@@ -84,7 +84,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         requestStr += lit("&MIC=on");
 
     const QString url = lit("rtsp://%1:%2/%3").arg(m_camera->getHostAddress()).arg(
-        nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
+        nx::network::rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
 	m_camera->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
