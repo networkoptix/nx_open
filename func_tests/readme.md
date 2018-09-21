@@ -2,20 +2,23 @@
 
 ## Setup
 
-On Ubuntu/Debian `cd .../nx_vms/func_tests` and run `BASE_DIR=~/develop ./bootstrap.sh`. It will
-install VirtualBox and prepare virtual environment in `~/develop/func_tets-venv`. Activate it:
+Functional Tests can only run on Linux OS.
+
+On Ubuntu/Debian:
+1. `cd .../nx_vms/func_tests`.
+2. Run `BASE_DIR=~/develop ./bootstrap.sh`.
+It will install VirtualBox and prepare virtual environment in `~/develop/func_tets-venv`.
+3. Activate it:
 `. ~/develop/func_tests-venv/bin/activate`.
 
 Manual setup: https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85717618.
 
-Install PyCharm Community Edition: https://www.jetbrains.com/pycharm/download/#section=linux. With
-it, you can do step-by-step debugging, run tests conveniently, and get as much IDE features (code
-completion, quick checks, refactorings) as possible for Python.
+PyCharm Community Edition is the recommended way of working with Functional Tests:
+https://www.jetbrains.com/pycharm/download/#section=linux.
 
 ## Writing a Test
 
-Read `pytest` basics on https://docs.pytest.org/en/latest/getting-started.html. What's below is
-specific to this project.
+Read `pytest` basics on https://docs.pytest.org/en/latest/getting-started.html.
 
 Start with empty test. Create `tests/test_example.py`; name should start with `test_` or end with
 `_test`. Add test, which is just a function starting with `test_`:
@@ -34,32 +37,58 @@ pytest tests/test_example.py
 More on running selected tests:
 https://docs.pytest.org/en/latest/usage.html#specifying-tests-selecting-tests
 
-Use Mediaserver API:
+## Writing a Mediaserver Test
+
 ```{.py}
 def test_online(one_mediaserver_api):
     assert one_mediaserver_api.is_online()
 ```
 
-What is passed into test function is a fixture. Fixtures is how the framework is used within tests.
-More on this: https://docs.pytest.org/en/latest/fixture.html.
+What is passed into the test function is a fixture. From tests, the framework is seen as a set of
+fixtures. More on this: https://docs.pytest.org/en/latest/fixture.html. To get a working
+mediaserver in the test, just use one of the mediaserver fixtures.
 
-To run this test against local Mediaserver, do `export PYTHONPATH=.`. Otherwise, `pytest` can't
-import `fixtures.local_mediaservers` plugin. Run it on you local mediaserver first:
+Functional Tests can either setup its own VMs and install Mediaservers there (**provisioned
+mediaservers**) or use an API of the mediaservers that are set up and started manually (**live
+mediaservers**).
+
+### Live Mediaservers
+
+Currently, it's possible to test only one live Mediaserver.
+
+The fixtures for live Mediaservers reside in the `fixtures.local_mediaservers` plugin. It has to
+be specified explicitly with `-p fixtures.local_mediaservers` option. Set `export PYTHONPATH=.`
+(where `.` is `.../nx_vms/func_tests`), otherwise, `pytest` can't import
+`fixtures.local_mediaservers` plugin. More on plugins:
+https://docs.pytest.org/en/latest/plugins.html.
+
+This is the simplest but not the default case. Setup and start a Mediaserver manually. If it's not
+on `localhost:7001` or credentials differ, use the `--api` option.
+
+Run it on you local mediaserver first:
 ```{.sh}
 pytest -p fixtures.local_mediaservers tests/test_example.py::test_online
 ```
 
-Let framework setup VM with mediaserver. Download installers to `~/Downloads` and run:
+### Provisioned Mediaservers
+
+The fixtures for provisioned Mediaservers reside in the `fixtures.provisioned_mediaservers` plugin.
+This plugin is imported automatically if plugin with the live Mediaservers fixtures is not used.
+
+Let framework setup a VM with a mediaserver. Download installers to `~/Downloads` and run:
 ```{.sh}
 pytest --mediaserver-installers-dir=$HOME/Downloads tests/test_example.py::test_online
 ```
 
-To test Linux only:
+The framework will download VM templates, import them and clone them to get VM to work with. Then
+the framework will upload Mediaserver installer from `~/Downloads` and install into VM.
+
+To test on the Linux VMs only:
 ```{.sh}
 pytest --mediaserver-installers-dir=$HOME/Downloads -k 'not windows' tests/test_example.py::test_online
 ```
 
-More on `-k` keywords:
+More on the `-k` keywords:
 https://docs.pytest.org/en/latest/example/markers.html#using-k-expr-to-select-tests-based-on-their-name.
 
 ## Artifacts
