@@ -47,8 +47,11 @@ public:
     void unregisterCamera(int cameraLogicalId);
 
 private:
-    void onDataReceived(int index);
+    void readAllowedPortNames();
+    void initPorts();
+    void initPort(const QString& portName, int index);
     void configureSerialPort(QSerialPort* portToTune, const QString& name, int index);
+    void onDataReceived(int index);
 
 private:
     QByteArray m_manifest;
@@ -56,6 +59,7 @@ private:
     AnalyticsEventType cameraEventType;
     AnalyticsEventType resetEventType;
 
+    AllowedPortNames m_allowedPortNames;
     QList<QSerialPort*> m_serialPortList;
     QList<QByteArray> m_receivedDataList;
 
