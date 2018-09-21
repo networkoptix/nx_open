@@ -414,6 +414,7 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
+    d->lineEdit->event(event);
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
         const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
