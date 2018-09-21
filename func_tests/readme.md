@@ -2,7 +2,7 @@
 
 ## Setup
 
-Functional Tests can only run on Linux OS.
+Functional Tests can only run on Linux OS and Python 2.7.
 
 On Ubuntu/Debian:
 1. `cd .../nx_vms/func_tests`.
