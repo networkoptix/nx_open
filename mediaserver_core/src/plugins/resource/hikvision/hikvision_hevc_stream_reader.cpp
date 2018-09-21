@@ -356,7 +356,23 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     auto codecElement = videoElement.firstChildElement(kVideoCodecTypeTag);
     auto fpsElement = videoElement.firstChildElement(kMaxFrameRateTag);
     auto qualityElement = videoElement.firstChildElement(kFixedQualityTag);
-    auto bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+
+    auto bitrateControlTypeElement = videoElement.firstChildElement(kBitrateControlTypeTag);
+    QDomElement bitrateElement;
+    if (!bitrateControlTypeElement.isNull())
+    {
+        auto controlType = bitrateControlTypeElement.text().trimmed().toUpper();
+        if (controlType == kVbr)
+            bitrateElement = videoElement.firstChildElement(kVariableBitrateTag);
+        else
+            bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+    }
+    else
+    {
+        bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+        if (bitrateElement.isNull())
+            bitrateElement = videoElement.firstChildElement(kVariableBitrateTag);
+    }
 
     bool elementsAreOk = !resolutionWidthElement.isNull()
         && !resolutionHeightElement.isNull()

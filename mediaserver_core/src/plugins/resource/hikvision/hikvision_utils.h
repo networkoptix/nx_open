@@ -34,13 +34,18 @@ static const QString kVideoCodecTypeTag = lit("videoCodecType");
 static const QString kVideoResolutionWidthTag = lit("videoResolutionWidth");
 static const QString kVideoResolutionHeightTag = lit("videoResolutionHeight");
 static const QString kFixedQualityTag = lit("fixedQuality");
+static const QString kBitrateControlTypeTag = lit("videoQualityControlType");
 static const QString kFixedBitrateTag = lit("constantBitRate");
+static const QString kVariableBitrateTag = lit("vbrUpperCap");
 static const QString kMaxFrameRateTag = lit("maxFrameRate");
 
 static const QString kRtspPortNumberTag = lit("rtspPortNo");
 
 static const QString kPrimaryStreamNumber = lit("01");
 static const QString kSecondaryStreamNumber = lit("02");
+
+static const QString kVbr = lit("VBR");
+static const QString kCbr = lit("CBR");
 
 static const QString kCapabilitiesRequestPathTemplate =
     lit("/ISAPI/Streaming/channels/%1/capabilities");
