@@ -18,9 +18,15 @@ QString makeLeftFloat(const QString& text)
 
 QString keyToString(int key)
 {
-    return key == Qt::Key_Enter
-        ? lit("Enter")
-        : QKeySequence(key).toString(QKeySequence::NativeText);
+    switch (key)
+    {
+        case Qt::Key_Enter:
+            return lit("Enter");
+        case Qt::Key_Control:
+            return lit("Ctrl");
+        default:
+            return QKeySequence(key).toString(QKeySequence::NativeText);
+    }
 }
 
 QString getHintItemText(const nx::client::desktop::ShortcutHintWidget::Description& description)
