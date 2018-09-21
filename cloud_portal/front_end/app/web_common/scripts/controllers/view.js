@@ -452,6 +452,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.player = null;
             $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
+            $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
+
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);
