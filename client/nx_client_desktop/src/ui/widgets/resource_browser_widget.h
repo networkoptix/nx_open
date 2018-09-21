@@ -125,7 +125,10 @@ private:
 
     void selectIndices(const QModelIndexList& indices);
 
-    void initNewSearch();
+    void initInstantSearch();
+    void updateNewFilter();
+    void updateShortcutHintVisibility();
+    static QStringList filterTags();
 
 private slots:
     void updateFilter(bool force = false);

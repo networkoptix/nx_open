@@ -41,6 +41,8 @@
 #include <nx/client/desktop/ui/workbench/workbench_animations.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
+#include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/utils/app_info.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -51,6 +53,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
 #include <ui/processors/hover_processor.h>
@@ -105,6 +108,21 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     tree->update(resource);
 }
 
+// Must correlate with QnResourceTreeWidget::filterTags() method.
+static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
+    {
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        ResourceTreeNodeType::filteredServers,
+        ResourceTreeNodeType::filteredCameras,
+        ResourceTreeNodeType::filteredLayouts,
+        ResourceTreeNodeType::layoutTours,
+        ResourceTreeNodeType::filteredVideowalls,
+        ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::filteredUsers,
+        ResourceTreeNodeType::localResources
+    });
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -136,7 +154,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_thumbnailManager->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
 
     m_resourceModel = new QnResourceTreeModel(QnResourceTreeModel::FullScope, this);
-    ui->resourceTreeWidget->setModel(m_resourceModel, QnResourceTreeWidget::allowNewSearch);
+    ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
@@ -166,7 +184,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
-    initNewSearch();
+    initInstantSearch();
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
@@ -240,15 +258,30 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     at_workbench_currentLayoutChanged();
 }
 
-void QnResourceBrowserWidget::initNewSearch()
+QnResourceBrowserWidget::~QnResourceBrowserWidget()
 {
-    if (!nx::client::desktop::ini().enableResourceFilteringByDefault)
+    disconnect(workbench(), nullptr, this, nullptr);
+
+    at_workbench_currentLayoutAboutToBeChanged();
+
+    setTooltipResource(QnResourcePtr());
+    ui->searchTreeWidget->setWorkbench(nullptr);
+    ui->resourceTreeWidget->setWorkbench(nullptr);
+
+    /* This class is one of the most significant reasons of crashes on exit. Workarounding it.. */
+    m_disconnectHelper.reset();
+
+    ui->typeComboBox->setEnabled(false); // #3797
+}
+void QnResourceBrowserWidget::initInstantSearch()
+{
+    const bool visible = nx::client::desktop::ini().enableResourceFilteringByDefault;
+    const auto filterEdit = ui->instantFilterLineEdit;
+    filterEdit->setVisible(visible);
+    if (!visible)
         return;
 
     ui->tabWidget->tabBar()->hide();
-
-    ui->resourceTreeWidget->setFilterVisible();
-
     auto getFilteredResources =
         [this]()
         {
@@ -300,22 +333,79 @@ void QnResourceBrowserWidget::initNewSearch()
             const auto selected = getFilteredResources();
             menu()->trigger(action::OpenInNewTabAction, {selected});
         });
+
+    // Initializes new filter edit
+    const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
+    ui->shortcutHintWidget->setDescriptions({
+        {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
+        {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
+    updateShortcutHintVisibility();
+
+    filterEdit->setPlaceholderText(tr("Cameras & Resources"));
+    filterEdit->setTags(filterTags());
+    filterEdit->setClearingTagIndex(0);
+
+    connect(filterEdit, &SearchEdit::textChanged,
+        this, &QnResourceBrowserWidget::updateNewFilter);
+    connect(filterEdit, &SearchEdit::editingFinished,
+        this, &QnResourceBrowserWidget::updateNewFilter);
+    connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
+        this, &QnResourceBrowserWidget::updateNewFilter);
+
+    connect(filterEdit, &SearchEdit::enterPressed,
+        ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed);
+    connect(filterEdit, &SearchEdit::ctrlEnterPressed,
+        ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed);
 }
 
-QnResourceBrowserWidget::~QnResourceBrowserWidget()
+void QnResourceBrowserWidget::updateNewFilter()
 {
-    disconnect(workbench(), nullptr, this, nullptr);
+    const auto filterEdit = ui->instantFilterLineEdit;
+    const auto queryText = filterEdit->text();
 
-    at_workbench_currentLayoutAboutToBeChanged();
+    /* Don't allow empty filters. */
+    const auto trimmed = queryText.trimmed();
+    updateShortcutHintVisibility();
 
-    setTooltipResource(QnResourcePtr());
-    ui->searchTreeWidget->setWorkbench(nullptr);
-    ui->resourceTreeWidget->setWorkbench(nullptr);
+    if (trimmed.isEmpty())
+        filterEdit->clear();
 
-    /* This class is one of the most significant reasons of crashes on exit. Workarounding it.. */
-    m_disconnectHelper.reset();
+    const auto index = filterEdit->selectedTagIndex();
+    if (index >= kTagIndexToAllowedNodeMapping.size())
+    {
+        NX_ASSERT(false, "Wrong tag index");
+        return;
+    }
 
-    ui->typeComboBox->setEnabled(false); // #3797
+    const auto allowedNode = index == -1
+        ? QnResourceSearchQuery::kAllowAllNodeTypes
+        : kTagIndexToAllowedNodeMapping.at(index);
+    ui->resourceTreeWidget->searchModel()->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
+}
+
+void QnResourceBrowserWidget::updateShortcutHintVisibility()
+{
+    const bool hasFilterText = !ui->instantFilterLineEdit->text().trimmed().isEmpty();
+    const bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText;
+    ui->shortcutHintWidget->setVisible(hintIsVisible);
+}
+
+QStringList QnResourceBrowserWidget::filterTags()
+{
+    // Must correlate with kTagIndexToAllowedNodeMapping.
+    static const auto kFilterCategories = QStringList({
+        tr("All types"),
+        QString(), // splitter
+        tr("Servers"),
+        tr("Cameras & Devices"),
+        tr("Layouts"),
+        tr("Layout Tours"),
+        tr("Video Walls"),
+        tr("Web Pages"),
+        tr("Users"),
+        tr("Local Files")});
+
+    return kFilterCategories;
 }
 
 QComboBox* QnResourceBrowserWidget::typeComboBox() const
@@ -926,7 +1016,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
     if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->disableUpdates();
 
-    ui->searchTreeWidget->setModel(nullptr, QnResourceTreeWidget::allowNewSearch);
+    ui->searchTreeWidget->setModel(nullptr);
     setQuery({});
     killSearchTimer();
 }
@@ -982,7 +1072,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         auto model = layoutModel(layout, true);
 
-        ui->searchTreeWidget->setModel(model, QnResourceTreeWidget::allowNewSearch);
+        ui->searchTreeWidget->setModel(model);
         ui->searchTreeWidget->expandAll();
 
         /* View re-creates selection model for each model that is supplied to it,

@@ -61,6 +61,9 @@ protected:
     void focusOutEvent(QFocusEvent* event) override;
     void keyPressEvent(QKeyEvent* event) override;
     void inputMethodEvent(QInputMethodEvent* event) override;
+    void enterEvent(QEvent* event) override;
+    void leaveEvent(QEvent* event) override;
+
     bool event(QEvent* event) override;
 
 private:
@@ -70,19 +73,14 @@ private:
     void setSelectedTagIndex(int value);
     void handleTagButtonStateChanged();
     void updateTagButton();
+    void setHovered(bool value);
+    void setButtonHovered(bool value);
 
 private:
+    struct Private;
+    const QScopedPointer<Private> d;
+
     QStringList m_tags;
-
-    QWidget* const m_lineEditHolder;
-    QLineEdit* const m_lineEdit = nullptr;
-    QPushButton* const m_menuButton = nullptr;
-    QMenu* const m_menu = nullptr;
-    SelectableTextButton* const m_tagButton = nullptr;
-
-    bool m_hightlighted = false;
-    int m_selectedTagIndex = -1;
-    int m_clearingTagIndex = -1;
 };
 
 } // namespace desktop

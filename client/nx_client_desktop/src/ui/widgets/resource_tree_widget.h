@@ -11,6 +11,7 @@ class QAbstractItemView;
 class QSortFilterProxyModel;
 
 class QnResourceItemDelegate;
+class QnResourceSearchProxyModel;
 class QnWorkbench;
 class QnResourceTreeSortProxyModel;
 class QnResourceTreeModelCustomColumnDelegate;
@@ -43,15 +44,10 @@ public:
     ~QnResourceTreeWidget();
 
     QAbstractItemModel *model() const;
-    enum NewSearchOption
-    {
-        standardSearch,
-        allowNewSearch
-    };
 
-    void setModel(QAbstractItemModel *model, NewSearchOption searchOption);
+    void setModel(QAbstractItemModel *model);
 
-    QSortFilterProxyModel* searchModel() const;
+    QnResourceSearchProxyModel* searchModel() const;
 
     QItemSelectionModel *selectionModel();
     void setWorkbench(QnWorkbench *workbench);
@@ -164,15 +160,9 @@ private:
 
     void initializeFilter();
     void updateColumns();
-    void updateOldFilter();
-    void updateNewFilter();
-    void initializeNewFilter();
+    void updateFilter();
 
     void expandCheckedRecursively(const QModelIndex& from);
-
-    void updateShortcutHintVisibility();
-
-    static QStringList filterTags();
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
