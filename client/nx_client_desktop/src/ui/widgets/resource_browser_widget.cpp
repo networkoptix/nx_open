@@ -141,6 +141,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 {
     ui->setupUi(this);
 
+    const auto scrollBar = new SnappedScrollBar(ui->resourcesHolder);
+    scrollBar->setUseItemViewPaddingWhenVisible(true);
+    scrollBar->setUseMaximumSpace(true);
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     ui->typeComboBox->addItem(tr("Any Type"), 0);
     ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
@@ -282,6 +287,8 @@ void QnResourceBrowserWidget::initInstantSearch()
         return;
 
     ui->tabWidget->tabBar()->hide();
+
+    ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
     auto getFilteredResources =
         [this]()
         {
@@ -380,7 +387,9 @@ void QnResourceBrowserWidget::updateNewFilter()
     const auto allowedNode = index == -1
         ? QnResourceSearchQuery::kAllowAllNodeTypes
         : kTagIndexToAllowedNodeMapping.at(index);
-    ui->resourceTreeWidget->searchModel()->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+    searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
+    ui->resourcesHolder->setCurrentIndex(searchModel->rowCount() > 0 ? 0 : 1);
 }
 
 void QnResourceBrowserWidget::updateShortcutHintVisibility()
