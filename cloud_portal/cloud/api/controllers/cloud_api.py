@@ -36,6 +36,7 @@ class System(object):
         request = CLOUD_DB_URL + "/system/get"
         if one_customization:
             request += "?customization=" + settings.CUSTOMIZATION
+
         return requests.get(request, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
@@ -221,7 +222,6 @@ class Account(object):
             'passwordHa1Sha256': password_ha1_sha256
         }
         request = CLOUD_DB_URL + '/account/update'
-
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
@@ -288,4 +288,5 @@ class Account(object):
             headers['X-Forwarded-For'] = ip
 
         request = CLOUD_DB_URL + '/account/get'
+
         return requests.get(request, auth=HTTPDigestAuth(email, password), headers=headers)

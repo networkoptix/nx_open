@@ -9,7 +9,7 @@ from django.utils import timezone
 from api.controllers.cloud_api import Account
 from api.account_backend import AccountBackend, get_ip
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
-    APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params
+    APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params, kill_session
 from api.views.account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
 
 from dal import autocomplete
@@ -17,8 +17,8 @@ from api import models
 
 
 import logging
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
@@ -88,10 +88,7 @@ def login(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def logout(request):
-    request.session.pop('login', None)
-    request.session.pop('password', None)
-    request.session.pop('timezone', None)
-    django.contrib.auth.logout(request)
+    kill_session(request)
     return api_success()
 
 
@@ -109,7 +106,7 @@ def index(request):
 
     elif request.method == 'POST':
         serializer = AccountUpdateSerializer(request.user, data=request.data)
-            
+
         if not serializer.is_valid():
             raise APIRequestException('Wrong form parameters',
                                       ErrorCodes.wrong_parameters,
