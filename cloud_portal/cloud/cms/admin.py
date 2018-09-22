@@ -13,7 +13,7 @@ class ProductFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         products = Product.objects.all()
-        if True or not request.user.is_superuser:
+        if not request.user.is_superuser:
             products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
             return [(p.id, p.name) for p in products]
         return[(p.id, p.__str__()) for p in products]
@@ -63,16 +63,19 @@ class ProductAdmin(CMSAdmin):
     list_filter = ('product_type', )
     form = ProductForm
 
-    def context_actions(self, obj):
-        return format_html('<a class="btn btn-sm" href="{}">settings</a>',
-                           reverse('product_settings', args=[obj.id]))
+    def product_actions(self, obj):
+        if not obj.product_type or obj.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+            return format_html('<a class="btn btn-sm" href="{}">settings</a>',
+                               reverse('product_settings', args=[obj.id]))
+        context = Context.objects.get(product=obj)
+        return format_html('<a class="btn btn-sm" href="{}">edit information</a>',
+                           reverse('page_editor', args=[context.id, None, obj.id]))
 
-    context_actions.short_description = 'Admin Options'
-    context_actions.allow_tags = True
+    product_actions.short_description = ''
+    product_actions.allow_tags = True
 
     def customizations_list(self, obj):
         return ", ".join(obj.customizations.values_list('name', flat=True))
-    context_actions.short_description = 'Customizations'
 
 
 admin.site.register(Product, ProductAdmin)
@@ -88,6 +91,8 @@ class ContextAdmin(CMSAdmin):
     def changelist_view(self, request, extra_context=None):
         if not request.user.is_superuser:
             self.list_display_links = (None,)
+        else:
+            self.list_filter = ('product_type', )
         return super(ContextAdmin, self).changelist_view(request, extra_context)
 
     def context_actions(self, obj):
@@ -96,9 +101,9 @@ class ContextAdmin(CMSAdmin):
 
     def get_queryset(self, request):  # show only users for cloud_portal product type
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         if not request.user.is_superuser:
-            qs = qs.filter(hidden=False)  # only superuser sees hidden contexts
+            qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
+                filter(hidden=False)  # only superuser sees hidden contexts
         return qs
 
     context_actions.short_description = 'Admin Options'

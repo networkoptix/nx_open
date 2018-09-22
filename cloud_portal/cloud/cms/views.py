@@ -137,8 +137,12 @@ def context_editor_action(request, product, context_id, language_code):
 # Create your views here.
 @require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
-def page_editor(request, context_id=None, language_code=None):
-    product = get_product_by_context(context_id)
+def page_editor(request, context_id=None, language_code=None, product_id=None):
+    if product_id:
+        product = Product.objects.get(id=product_id)
+    else:
+        product = get_product_by_context(context_id)
+
     if request.method == "GET":
         context, language = get_context_and_language(request, context_id, language_code, product.default_language)
         form = initialize_form(product, context, language, request.user)
@@ -151,7 +155,9 @@ def page_editor(request, context_id=None, language_code=None):
         context, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
 
         if 'SendReview' in request.POST and preview_link:
-            return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
+            if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+                return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
+
 
     return render(request, 'context_editor.html',
                   {'context': context,

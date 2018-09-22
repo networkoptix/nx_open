@@ -1,7 +1,8 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 from .views import *
 
 urlpatterns = [
+    url(r'edit/(?P<context_id>.+?)/(?P<language_code>.+?)/(?P<product_id>.+?)/', page_editor, name="page_editor"),
     url(r'edit/(?P<context_id>.+?)/(?P<language_code>.+?)/', page_editor, name="page_editor"),
     url(r'edit/(?P<context_id>.+?)/', page_editor, name="page_editor"),
 
