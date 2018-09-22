@@ -7,7 +7,7 @@ import * as angular from 'angular';
 
     angular
         .module('cloudApp')
-        .service('systemsProvider', ['cloudApi', '$interval', '$q', '$poll',
+        .service('systemsProvider', [ 'cloudApi', '$interval', '$q', '$poll',
             'configService', 'languageService', 'account',
 
             function (cloudApi, $interval, $q, $poll,
@@ -27,7 +27,7 @@ import * as angular from 'angular';
                 this.delayedUpdateSystems = function () {
                     this.pollingSystemsUpdate = $poll(() => {
                         this.forceUpdateSystems();
-                        }, CONFIG.updateInterval);
+                    }, CONFIG.updateInterval);
                 };
 
                 this.abortUpdateSystems = function () {
@@ -42,7 +42,7 @@ import * as angular from 'angular';
                     });
 
                     if (system) { // Cache success
-                        return $q.resolve({data: [system]});
+                        return $q.resolve({ data: [ system ] });
                     } else { // Cache miss
                         return cloudApi.systems(systemId);
                     }
@@ -56,7 +56,7 @@ import * as angular from 'angular';
                         return languageService.lang.system.yourSystem;
                     }
 
-                    if (system.ownerFullName && system.ownerFullName.trim() != '') {
+                    if (system.ownerFullName && system.ownerFullName.trim() !== '') {
                         return system.ownerFullName;
                     }
 
@@ -81,9 +81,9 @@ import * as angular from 'angular';
                 };
 
                 account.checkLoginState()
-                   .then(() => {
-                       this.forceUpdateSystems();
-                       this.delayedUpdateSystems();
-                   });
-            }]);
+                    .then(() => {
+                        this.forceUpdateSystems();
+                        this.delayedUpdateSystems();
+                    });
+            } ]);
 })();
