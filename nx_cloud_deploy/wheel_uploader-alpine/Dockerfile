@@ -1,14 +1,16 @@
-FROM python:3.6-alpine3.7
+FROM python:3.7-alpine3.7
 MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
             gcc \
+            g++ \
             make \
             libc-dev \
             musl-dev \
             linux-headers \
             mariadb-dev \
+            postgresql-dev \
             libffi-dev \
             yaml-dev \
             curl-dev \
