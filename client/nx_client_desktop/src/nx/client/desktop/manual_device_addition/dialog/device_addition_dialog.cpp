@@ -189,6 +189,17 @@ void DeviceAdditionDialog::initializeControls()
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
 
+    connect(ui->searchControls, &QStackedWidget::currentChanged, this,
+        [this](int currentPageIndex)
+        {
+            static constexpr int kStartSearchPage = 0;
+            const bool enabled = currentPageIndex == kStartSearchPage;
+            const QList<QWidget*> widgets =
+                { ui->tabWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+            for (const auto widget: widgets)
+                widget->setEnabled(enabled);
+        });
+
     setupTable();
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
