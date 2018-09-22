@@ -30,8 +30,8 @@ export class LoginModalContent implements OnInit {
     password: string;
     remember: boolean;
 
-    nxWrongPassword: boolean;
-    nxAccountBlocked: boolean;
+    wrongPassword: boolean;
+    accountBlocked: boolean;
 
     @ViewChild('loginForm') loginForm: HTMLFormElement;
 
@@ -47,7 +47,7 @@ export class LoginModalContent implements OnInit {
         this.auth = this.localStorage;
         this.password = '';
         this.remember = true;
-        this.nxWrongPassword = false;
+        this.wrongPassword = false;
     }
 
     resendActivation(email) {
@@ -83,8 +83,8 @@ export class LoginModalContent implements OnInit {
     resetForm() {
         if (!this.loginForm.valid) {
             this.loginForm.controls['login_password'].setErrors(null);
-            this.nxWrongPassword = false;
-            this.nxAccountBlocked = false;
+            this.wrongPassword = false;
+            this.accountBlocked = false;
         }
     }
 
@@ -94,8 +94,8 @@ export class LoginModalContent implements OnInit {
         this.login = this.process.init(() => {
             this.loginForm.controls['login_email'].setErrors(null);
             this.loginForm.controls['login_password'].setErrors(null);
-            this.nxWrongPassword = false;
-            this.nxAccountBlocked = false;
+            this.wrongPassword = false;
+            this.accountBlocked = false;
 
             return this.account.login(this.auth.email, this.password, this.remember);
         }, {
@@ -110,7 +110,7 @@ export class LoginModalContent implements OnInit {
                     this.renderer.selectRootElement('#login_email').select();
                 },
                 notAuthorized: () => {
-                    this.nxWrongPassword = true;
+                    this.wrongPassword = true;
                     this.loginForm.controls['login_password'].setErrors({'nx_wrong_password': true});
                     this.password = '';
 
@@ -129,7 +129,7 @@ export class LoginModalContent implements OnInit {
                     this.loginForm.controls['login_password'].markAsPristine();
                     this.loginForm.controls['login_password'].markAsUntouched();
 
-                    this.nxAccountBlocked = true;
+                    this.accountBlocked = true;
                     this.loginForm.controls['login_password'].setErrors({'nx_account_blocked': true});
                 },
                 wrongParameters: () => {
@@ -138,7 +138,7 @@ export class LoginModalContent implements OnInit {
             }
         }).then(() => {
             if (this.keepPage) {
-                if (this.location.path() === ''){
+                if (this.location.path() === '') {
                     // TODO: Repace this once 'register' page is moved to A5
                     // AJS and A5 routers freak out about route change *****
                     // this.location.go(this.configService.config.redirectAuthorised);
@@ -210,7 +210,7 @@ export class NxModalLoginComponent implements OnInit {
                    .then((result) => {
                        this.closeResult = `Closed with: ${result}`;
                    }, (reason) => {
-                       this.closeResult = `Dismissed`;
+                       this.closeResult = 'Dismissed';
                    });
     }
 
