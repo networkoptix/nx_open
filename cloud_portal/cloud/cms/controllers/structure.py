@@ -14,7 +14,7 @@ def find_or_add_product_type(product_type):
     try:
         product_type = ProductType.objects.get(type=product_type)
     except ObjectDoesNotExist:
-        product_type = ProductType(type=product_type)
+        product_type = ProductType(type=ProductType.PRODUCT_TYPES.cloud_portal)
         product_type.save()
 
     return product_type
@@ -65,7 +65,8 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 def update_from_object(cms_structure):
     for product in cms_structure:
-        product_type_name = product['type'] if 'type' in product else ""
+        # If product type cannot be found in the structure
+        product_type_name = product['type'] if 'type' in product else ProductType.PRODUCT_TYPES[0]
         product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
         order = 0
 

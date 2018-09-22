@@ -40,7 +40,6 @@ def target_file(file_name, save_location, language_code, preview):
 
 def process_context_structure(product, context, content, language,
                               version_id, preview, force_global_files):
-    #logger.info("process_context_structure: " + context.name)
 
     def replace_in(adict, key, value):
         for dict_key in adict.keys():
@@ -340,7 +339,6 @@ def fill_content(product,
         else:
             save_context(product, context, context.file_path, None, preview, version_id, global_contexts)
 
-    # TODO: FIX remove customization
     generate_languages_json(product.product_root, languages_list,  preview)
 
 

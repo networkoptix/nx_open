@@ -1,6 +1,5 @@
 [
   {
-    "product":"cloud_portal",
     "type": "cloud_portal",
     "canPreview":true,
     "contexts":[
