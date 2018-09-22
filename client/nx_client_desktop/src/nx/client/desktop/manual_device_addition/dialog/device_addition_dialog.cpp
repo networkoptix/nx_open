@@ -467,6 +467,9 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
         return;
 
     updateMessageBar();
+
+    if (!m_model)
+        return;
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
     if (!index.isValid())
         return;
@@ -477,6 +480,9 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
 
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
 {
+    if (!m_model)
+        return;
+
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
     if (!index.isValid())
         return;
