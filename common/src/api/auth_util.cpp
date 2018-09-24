@@ -7,7 +7,7 @@
 void AuthKey::calcResponse(
     const nx::network::http::AuthToken& authToken,
     nx::network::http::Method::ValueType httpMethod,
-    const nx::String& /*url*/)
+    const nx::String& url)
 {
     const auto ha1 =
         authToken.type == nx::network::http::AuthTokenType::ha1
@@ -17,14 +17,8 @@ void AuthKey::calcResponse(
             nx::network::AppInfo::realm().toUtf8(),
             authToken.value);
 
-    response = createHttpQueryAuthParam(
-        username,
-        ha1,
-        httpMethod,
-        nonce);
-
-    //const auto ha2 = nx::network::http::calcHa2(httpMethod, url);
-    //response = nx::network::http::calcResponse(ha1, nonce, ha2);
+    const auto ha2 = nx::network::http::calcHa2(httpMethod, url);
+    response = nx::network::http::calcResponse(ha1, nonce, ha2);
 }
 
 nx::String AuthKey::toString() const

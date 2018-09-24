@@ -112,10 +112,10 @@ MergeSystemData VmsGateway::prepareMergeRequestParameters(
     authKey.username = userCredentials.username.toUtf8();
     authKey.nonce = api::generateNonce(api::generateCloudNonceBase(systemIdToMergeTo)).c_str();
 
-    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::get, "/api/mergeSystems");
+    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::get, "");
     mergeSystemData.getKey = authKey.toString();
 
-    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::post, "/api/mergeSystems");
+    authKey.calcResponse(userCredentials.authToken, nx::network::http::Method::post, "");
     mergeSystemData.postKey = authKey.toString();
 
     mergeSystemData.url =
