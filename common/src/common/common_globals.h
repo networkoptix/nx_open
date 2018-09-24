@@ -28,7 +28,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
-    Permissions
+    Permissions StorageStatuses
     )
 
     enum ExtrapolationMode {
@@ -726,12 +726,13 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     enum StorageStatus
     {
         unknown = 0,
-        notUsed = 1 << 1,
-        tooSmall = 1 << 2,
-        systemTooSmall = 1 << 3,
-        removable = 1 << 4,
-        beingChecked = 1 << 5,
-        beingRebuilded = 1 << 6
+        used = 1 << 1,
+        notUsed = 1 << 2,
+        tooSmall = 1 << 3,
+        systemTooSmall = 1 << 4,
+        removable = 1 << 5,
+        beingChecked = 1 << 6,
+        beingRebuilded = 1 << 7
     };
     Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
     Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)

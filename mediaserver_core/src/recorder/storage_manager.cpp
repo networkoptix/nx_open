@@ -2278,6 +2278,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             if (available >= bigStorageThreshold)
             {
                 result << fileStorage;
+                fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
@@ -2285,6 +2286,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             }
             else
             {
+                fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
@@ -2305,6 +2307,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::systemTooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2320,6 +2323,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                     .args((*it)->getUrl()));
 
             result.remove(*it);
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::systemTooSmall);
         }
     }
 
@@ -3047,20 +3051,12 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         return result;
     }
 
+    result = Qn::StorageStatus::used;
     if (storage->getStatus() == Qn::Offline)
         return result | Qn::StorageStatus::beingChecked;
 
     if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
         result | Qn::StorageStatus::beingRebuilded;
 
-    auto writableStorages = getAllWritableStorages();
-    if (!writableStorages.contains(storage))
-    {
-        if (storage->isSystem())
-            result |= Qn::StorageStatus::systemTooSmall;
-        else
-            result |= Qn::StorageStatus::tooSmall;
-    }
-
-    return result;
+    return result | storage->statusFlag();
 }
