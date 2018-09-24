@@ -108,7 +108,7 @@
                 <number>8</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>4</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
@@ -157,8 +157,6 @@
             </widget>
            </item>
           </layout>
-          <zorder>instantFilterLineEdit</zorder>
-          <zorder>scrollArea</zorder>
          </widget>
          <widget class="QWidget" name="nothingFoundPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">

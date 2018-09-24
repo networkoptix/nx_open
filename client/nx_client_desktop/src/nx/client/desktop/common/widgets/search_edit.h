@@ -54,6 +54,7 @@ signals:
 
     void enterPressed();
     void ctrlEnterPressed();
+    void focusedChanged();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;

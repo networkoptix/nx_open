@@ -127,8 +127,9 @@ private:
 
     void initInstantSearch();
     void updateNewFilter();
-    void updateShortcutHintVisibility();
+    void handleNewFilterUpdated();
     static QStringList filterTags();
+
 
 private slots:
     void updateFilter(bool force = false);
@@ -153,6 +154,9 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
+    bool m_hasOpenInLayoutItems = false;
+    bool m_hasOpenInEntityItems = false;
+    bool m_hasUnopenableItems = false;
     QnResourceTreeModel* m_resourceModel;
     QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;

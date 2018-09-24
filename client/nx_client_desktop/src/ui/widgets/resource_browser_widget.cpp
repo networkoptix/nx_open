@@ -191,6 +191,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     initInstantSearch();
 
+    ui->shortcutHintWidget->setContentsMargins(4, 0, 0, 0);
+
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
     /* This is needed so that control's context menu is not embedded into the scene. */
@@ -312,8 +314,14 @@ void QnResourceBrowserWidget::initInstantSearch()
                     else
                     {
                         const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                        if (!resource || !QnResourceAccessFilter::isOpenableInLayout(resource))
+                        if (!resource)
                             return;
+
+                        if (!QnResourceAccessFilter::isOpenableInLayout(resource)
+                            && !QnResourceAccessFilter::isOpenableInEntity(resource))
+                        {
+                            return;
+                        }
 
                         if (resources.contains(resource))
                             return;
@@ -330,6 +338,9 @@ void QnResourceBrowserWidget::initInstantSearch()
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
         [this, getFilteredResources]
         {
+            if (!ui->shortcutHintWidget->isVisible() || !m_hasOpenInLayoutItems)
+                return;
+
             const auto selected = getFilteredResources();
             menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
         });
@@ -337,16 +348,18 @@ void QnResourceBrowserWidget::initInstantSearch()
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
         [this, getFilteredResources]
         {
+            if (!ui->shortcutHintWidget->isVisible())
+                return;
+
+            if (!m_hasOpenInLayoutItems && !m_hasOpenInEntityItems)
+                return;
+
             const auto selected = getFilteredResources();
             menu()->trigger(action::OpenInNewTabAction, {selected});
         });
 
     // Initializes new filter edit
-    const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
-    ui->shortcutHintWidget->setDescriptions({
-        {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
-        {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
-    updateShortcutHintVisibility();
+    handleNewFilterUpdated();
 
     filterEdit->setPlaceholderText(tr("Cameras & Resources"));
     filterEdit->setTags(filterTags());
@@ -358,6 +371,8 @@ void QnResourceBrowserWidget::initInstantSearch()
         this, &QnResourceBrowserWidget::updateNewFilter);
     connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
         this, &QnResourceBrowserWidget::updateNewFilter);
+    connect(filterEdit, &SearchEdit::focusedChanged,
+        this, &QnResourceBrowserWidget::handleNewFilterUpdated);
 
     connect(filterEdit, &SearchEdit::enterPressed,
         ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed);
@@ -372,7 +387,6 @@ void QnResourceBrowserWidget::updateNewFilter()
 
     /* Don't allow empty filters. */
     const auto trimmed = queryText.trimmed();
-    updateShortcutHintVisibility();
 
     if (trimmed.isEmpty())
         filterEdit->clear();
@@ -389,14 +403,84 @@ void QnResourceBrowserWidget::updateNewFilter()
         : kTagIndexToAllowedNodeMapping.at(index);
     const auto searchModel = ui->resourceTreeWidget->searchModel();
     searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
-    ui->resourcesHolder->setCurrentIndex(searchModel->rowCount() > 0 ? 0 : 1);
+
+    handleNewFilterUpdated();
 }
 
-void QnResourceBrowserWidget::updateShortcutHintVisibility()
+void QnResourceBrowserWidget::handleNewFilterUpdated()
 {
+    if (!ui->instantFilterLineEdit->hasFocus())
+    {
+        ui->shortcutHintWidget->setVisible(false);
+        return;
+    }
+
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+
+    const int emptyResults = searchModel->rowCount() == 0;
+    static constexpr int kResourcesPage = 0;
+    static constexpr int kNothingFoundPage = 1;
+    ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
+
     const bool hasFilterText = !ui->instantFilterLineEdit->text().trimmed().isEmpty();
-    const bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText;
-    ui->shortcutHintWidget->setVisible(hintIsVisible);
+    bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText;
+
+    m_hasOpenInLayoutItems = false;
+    m_hasOpenInEntityItems = false;
+    m_hasUnopenableItems = false;
+
+    const auto groupsCount = searchModel->rowCount();
+    for (int groupRow = 0; groupRow != groupsCount; ++groupRow)
+    {
+        const auto groupIndex = searchModel->index(groupRow, 0);
+        const int childrenCount = searchModel->rowCount(groupIndex);
+        if (!childrenCount)
+            continue;
+
+        for (int childRow = 0; childRow != childrenCount; ++childRow)
+        {
+            const auto index = groupIndex.child(childRow, 0);
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resource)
+                continue;
+
+            if (QnResourceAccessFilter::isOpenableInLayout(resource))
+                m_hasOpenInLayoutItems = true;
+            else if (QnResourceAccessFilter::isOpenableInEntity(resource))
+                m_hasOpenInEntityItems = true;
+            else
+                m_hasUnopenableItems = true;
+
+            break;
+        }
+
+        if (m_hasUnopenableItems)
+            break;
+    }
+
+    if (m_hasUnopenableItems || m_hasOpenInLayoutItems == m_hasOpenInEntityItems)
+        hintIsVisible = false;
+
+    if (!hintIsVisible)
+    {
+        ui->shortcutHintWidget->setVisible(false);
+        return;
+    }
+
+    const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
+    if (m_hasOpenInLayoutItems)
+    {
+        ui->shortcutHintWidget->setDescriptions({
+            {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
+            {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
+    }
+    else
+    {
+        ui->shortcutHintWidget->setDescriptions({
+            {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all")}});
+    }
+
+    ui->shortcutHintWidget->setVisible(true);
 }
 
 QStringList QnResourceBrowserWidget::filterTags()

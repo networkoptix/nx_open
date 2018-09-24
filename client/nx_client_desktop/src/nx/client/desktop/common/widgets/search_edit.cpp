@@ -404,7 +404,8 @@ void SearchEdit::focusInEvent(QFocusEvent* event)
 
     base_type::focusInEvent(event);
 
-    updatePalette();
+    updatePalette(); 
+    emit focusedChanged();
 }
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
@@ -421,6 +422,7 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
     base_type::focusOutEvent(event);
 
     updatePalette();
+    emit focusedChanged();
 }
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)
