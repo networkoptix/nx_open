@@ -14,7 +14,7 @@
 
 namespace nx::mediaserver::camera {
 
-ErrorProcessor::ErrorProcessor(QnMediaServerModule* serverModule)
+ErrorProcessor::ErrorProcessor()
 {}
 
 /**

@@ -3019,12 +3019,10 @@ QnScheduleSync* QnStorageManager::scheduleSync() const
     return m_scheduleSync.get();
 }
 
-Qn::StorageStatuses QnStorageManager::storageStatus(const QnStorageResourcePtr& storage)
+Qn::StorageStatuses QnStorageManager::storageStatus(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& storage)
 {
-    auto serverModule = dynamic_cast<QnMediaServerModule*>(storage->commonModule());
-    if (!serverModule)
-        return Qn::StorageStatus::unknown;
-
     Qn::StorageStatuses result =
         serverModule->normalStorageManager()->storageStatusInternal(storage);
     if (result.testFlag(Qn::notUsed))
