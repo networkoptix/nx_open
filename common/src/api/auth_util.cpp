@@ -2,8 +2,6 @@
 
 #include <nx/network/app_info.h>
 
-#include <network/authutil.h>
-
 void AuthKey::calcResponse(
     const nx::network::http::AuthToken& authToken,
     nx::network::http::Method::ValueType httpMethod,
@@ -16,7 +14,6 @@ void AuthKey::calcResponse(
             username,
             nx::network::AppInfo::realm().toUtf8(),
             authToken.value);
-
     const auto ha2 = nx::network::http::calcHa2(httpMethod, url);
     response = nx::network::http::calcResponse(ha1, nonce, ha2);
 }
