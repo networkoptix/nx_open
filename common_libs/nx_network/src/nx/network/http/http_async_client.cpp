@@ -316,10 +316,8 @@ bool AsyncClient::hasRequestSuccesed() const
         return false;
 
     if (auto resp = response())
-    {
-        auto status = resp->statusLine.statusCode;
-        return status >= 200 && status < 300; // SUCCESS codes 2XX
-    }
+        return StatusCode::isSuccessCode(resp->statusLine.statusCode);
+
     return false;
 }
 

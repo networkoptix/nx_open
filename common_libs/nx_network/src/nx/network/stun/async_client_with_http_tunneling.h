@@ -7,6 +7,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/tunneling/client.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
@@ -82,7 +83,7 @@ private:
 
     Settings m_settings;
     std::unique_ptr<AsyncClient> m_stunClient;
-    std::unique_ptr<nx_http::AsyncClient> m_httpClient;
+    std::unique_ptr<nx_http::tunneling::Client> m_httpTunnelingClient;
     ConnectHandler m_httpTunnelEstablishedHandler;
     /** map<stun method, handler> */
     std::map<int, HandlerContext> m_indicationHandlers;
@@ -107,18 +108,20 @@ private:
     void createStunClient(
         const QnMutexLockerBase& /*lock*/,
         std::unique_ptr<AbstractStreamSocket> connection);
-    void dispatchIndication(nx::stun::Message indication);
+    void dispatchIndication(Message indication);
     void sendPendingRequests();
 
     void openHttpTunnel(
         const QnMutexLockerBase&,
         const QUrl& url,
         ConnectHandler handler);
-    void onHttpConnectionUpgradeDone();
+
+    void onOpenHttpTunnelCompletion(
+        nx_http::tunneling::OpenTunnelResult tunnelResult);
 
     void onRequestCompleted(
         SystemError::ErrorCode sysErrorCode,
-        nx::stun::Message response,
+        Message response,
         int requestId);
 
     void onStunConnectionClosed(SystemError::ErrorCode closeReason);
