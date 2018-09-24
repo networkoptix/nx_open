@@ -1,8 +1,8 @@
 import { Location }              from '@angular/common';
-import { Component }             from '@angular/core';
-import { TranslateService }      from "@ngx-translate/core";
-import { CookieService }         from "ngx-cookie-service";
-import { DeviceDetectorService } from "ngx-device-detector";
+import { Component, OnInit }     from '@angular/core';
+import { TranslateService }      from '@ngx-translate/core';
+import { CookieService }         from 'ngx-cookie-service';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
     selector: 'nx-app',
@@ -15,6 +15,7 @@ import { DeviceDetectorService } from "ngx-device-detector";
 export class AppComponent {
     deviceInfo: any;
     allowedDevices: {};
+    hlsIsSupported: boolean;
 
     constructor(private cookieService: CookieService,
                 private deviceService: DeviceDetectorService,
@@ -24,34 +25,34 @@ export class AppComponent {
         // TODO: Componentize this
         this.allowedDevices = {
             windows: {
-                ie: 10,
-                safari: 10,
-                chrome: 64,
+                ie     : 10,
+                safari : 10,
+                chrome : 64,
                 firefox: 60
             },
-            mac: {
-                safari: 10,
-                chrome: 64,
+            mac    : {
+                safari : 10,
+                chrome : 64,
                 firefox: 60
             },
-            linux: {
-                chrome: 64,
+            linux  : {
+                chrome : 64,
                 firefox: 60
             }
         };
 
         this.deviceInfo = this.deviceService.getDeviceInfo();
-        let allowedDevice = this.allowedDevices[this.deviceInfo.os];
+        let allowedDevice = this.allowedDevices[ this.deviceInfo.os ];
 
         // Special case for Kyle's robot tests
         // ... device detector doesn't detect it correctly
-        if (this.deviceInfo.userAgent.indexOf('HeadlessChrome') > -1){
+        if (this.deviceInfo.userAgent.indexOf('HeadlessChrome') > -1) {
             allowedDevice = undefined;
         }
 
         if (allowedDevice !== undefined) {
-            let allowedVersion = allowedDevice[this.deviceInfo.browser] || 0;
-            let majorVersion = this.deviceInfo.browser_version.split('.')[0];
+            const allowedVersion = allowedDevice[ this.deviceInfo.browser ] || 0;
+            const majorVersion = this.deviceInfo.browser_version.split('.')[ 0 ];
 
             if (majorVersion < allowedVersion) {
                 // redirect
@@ -59,8 +60,8 @@ export class AppComponent {
             }
         } // else -> unknown platform or device ... cross fingers and hope for the best
 
-        let langCookie = this.cookieService.get('language'),
-            lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');
+        const langCookie = this.cookieService.get('language');
+        const lang = langCookie || translate.getBrowserCultureLang().replace('-', '_');
 
         // this language will be used as a fallback when a translation
         // isn't found in the current language
