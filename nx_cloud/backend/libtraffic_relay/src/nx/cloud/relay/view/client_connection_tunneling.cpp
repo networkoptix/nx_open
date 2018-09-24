@@ -47,14 +47,14 @@ void ClientConnectionTunnelingServer::authorize(
             api::ResultCode resultCode,
             controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc) mutable
         {
-            connectToPeerFinished(
+            onConnectToPeerFinished(
                 resultCode,
                 std::move(startRelayingFunc),
                 std::move(completionHandler));
         });
 }
 
-void ClientConnectionTunnelingServer::connectToPeerFinished(
+void ClientConnectionTunnelingServer::onConnectToPeerFinished(
     api::ResultCode resultCode,
     controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
     CompletionHandler completionHandler)

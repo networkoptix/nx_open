@@ -28,7 +28,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     ServerFlags IOPortTypes
-    Permissions
+    Permissions StorageStatuses
     )
 
     enum ExtrapolationMode {
@@ -723,6 +723,21 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamIndex)
 
+    enum StorageStatus
+    {
+        unknown = 0,
+        used = 1 << 1,
+        notUsed = 1 << 2,
+        tooSmall = 1 << 3,
+        systemTooSmall = 1 << 4,
+        removable = 1 << 5,
+        beingChecked = 1 << 6,
+        beingRebuilded = 1 << 7
+    };
+    Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageStatus)
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -768,7 +783,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions),
+    (Qn::IOPortTypes)(Qn::Permission)(Qn::Permissions)(Qn::StorageStatus)(Qn::StorageStatuses),
     (metatype)(numeric)(lexical)
 )
 

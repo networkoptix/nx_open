@@ -161,6 +161,9 @@ public:
 
         ALL_LAYOUTS_SELECTION_DIALOG_MODE, //< Tree mode in MultipleLayoutSelectionDialog.
 
+        // Upload state for ServerUpdateTool.
+        SYSTEM_UPDATER_STATE,
+
         VARIABLE_COUNT
     };
 
@@ -259,6 +262,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         acceptedEulaVersion,    setAcceptedEulaVersion,     ACCEPTED_EULA_VERSION,      0)
 
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
+        QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

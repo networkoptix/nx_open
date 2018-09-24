@@ -76,6 +76,17 @@ QSet<QnUuid> ServerUpdatesModel::getServersInState(StatusCode state) const
     return result;
 }
 
+
+void ServerUpdatesModel::clearState()
+{
+    for (auto& item: m_items)
+    {
+        item->state = StatusCode::idle;
+        item->progress = 0;
+        item->statusMessage = "Waiting for server response";
+    }
+}
+
 UpdateItemPtr ServerUpdatesModel::findItemById(QnUuid id)
 {
     for (auto item: m_items)
@@ -147,7 +158,7 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
                 return tr("Current Version");
             case ProgressColumn:
                 return tr("Status");
-            case StatusColumn:
+            case StatusMessageColumn:
                 return tr("Message");
             case StorageSettingsColumn:
                 return tr("Store Update Files");
@@ -210,7 +221,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                     return item->server->getVersion().toString(nx::utils::SoftwareVersion::FullFormat);
                 //case ProgressColumn:
                 //    return item->progress;
-                case StatusColumn:
+                case StatusMessageColumn:
                     return item->statusMessage;
                 default:
                     break;

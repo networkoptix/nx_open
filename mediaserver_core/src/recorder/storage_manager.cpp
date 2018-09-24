@@ -2278,6 +2278,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             if (available >= bigStorageThreshold)
             {
                 result << fileStorage;
+                fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
@@ -2285,6 +2286,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             }
             else
             {
+                fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
@@ -2305,6 +2307,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::systemTooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2320,6 +2323,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                     .args((*it)->getUrl()));
 
             result.remove(*it);
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::systemTooSmall);
         }
     }
 
@@ -3013,4 +3017,44 @@ const std::array<QnServer::StoragePool, 2> QnStorageManager::getPools() {
 QnScheduleSync* QnStorageManager::scheduleSync() const
 {
     return m_scheduleSync.get();
+}
+
+Qn::StorageStatuses QnStorageManager::storageStatus(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& storage)
+{
+    Qn::StorageStatuses result =
+        serverModule->normalStorageManager()->storageStatusInternal(storage);
+    if (result.testFlag(Qn::notUsed))
+        result = serverModule->backupStorageManager()->storageStatusInternal(storage);
+
+    return result;
+}
+
+Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResourcePtr& storage)
+{
+    QnStorageResourceList allStorages;
+    QnStorageScanData storageScanData;
+    {
+        QnMutexLocker lock(&m_mutexStorages);
+        std::transform(m_storageRoots.cbegin(), m_storageRoots.cend(),
+            std::back_inserter(allStorages), [](const auto& storage){ return storage; });
+        storageScanData = m_archiveRebuildInfo;
+    }
+
+    Qn::StorageStatuses result;
+    if (!allStorages.contains(storage))
+    {
+        result = Qn::StorageStatus::notUsed;
+        return result;
+    }
+
+    result = Qn::StorageStatus::used;
+    if (storage->getStatus() == Qn::Offline)
+        return result | Qn::StorageStatus::beingChecked;
+
+    if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
+        result | Qn::StorageStatus::beingRebuilded;
+
+    return result | storage->statusFlag();
 }

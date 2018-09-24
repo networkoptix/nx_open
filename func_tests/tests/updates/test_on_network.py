@@ -8,6 +8,7 @@ from framework.waiting import wait_for_equal, wait_for_truthy, ensure_persistenc
     'triangle.net.yaml',
     'square.net.yaml',
     'three-proxy-three.net.yaml',
+    'triangle-low_bandwidth.net.yaml',
     ])
 def test_update_installed(system, update_info, updates_set):
     mediaserver = next(iter(system.values()))  # type: Mediaserver  # Random mediaserver.

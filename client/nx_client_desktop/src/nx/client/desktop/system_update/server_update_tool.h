@@ -30,9 +30,15 @@ class UploadManager;
 //using Downloader = vms::common::p2p::downloader::Downloader;
 //using FileInformation = vms::common::p2p::downloader::FileInformation;
 
-// A tool to interact with remote server state.
-// Wraps up /api/update2 part of REST protocol.
-// Note: this class should survive some time until its internal threads are dead.
+/**
+ * A tool to interact with remote server state.
+ * Wraps up the following requests:
+ *   /ec2/updateInformation
+ *   /api/installUpdate
+ *   /ec2/cancelUpdate
+ *   /ec2/updateStatus
+ * Note: this class should survive some time until its internal threads are dead.
+ */
 class ServerUpdateTool:
         public Connective<QObject>,
         public QnConnectionContextAware,
@@ -47,8 +53,6 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    using RemoteStatus = std::map<QnUuid, nx::update::Status>;
-
     /** Generate url for download update file, depending on actual targets list. */
     static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
         const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
@@ -58,49 +62,105 @@ public:
 
     bool hasOfflineUpdateChanges() const;
 
-    // Try to get status changes from the server
-    // Should be non-blocking and fast.
-    // Check if we've got update for all the servers
-    bool getServersStatusChanges(RemoteStatus& status);
-
-    void requestStartUpdate(const nx::update::Information& info);
-    void requestStopAction(QSet<QnUuid> targets);
-    void requestInstallAction(QSet<QnUuid> targets);
-
-    // Sends GET https://localhost:7001/ec2/updateInformation and stores response in m_statusRequest
+    /**
+     * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
+     * cache. Data from consequent requests is integrated into this cache, for each server.
+     * This data can be obtained by getServersStatusChanges method.
+     */
     void requestRemoteUpdateState();
 
+    using RemoteStatus = std::map<QnUuid, nx::update::Status>;
+    /**
+     * Tries to get status changes from the server
+     * @param status storage for remote status
+     * @returns true if there were some new data.
+     * Consequent calls to this function will return false until new data arrives.
+     */
+    bool getServersStatusChanges(RemoteStatus& status);
+
+    /**
+     * Asks mediaservers to start the update process
+     * @param info - update manifest
+     */
+    void requestStartUpdate(const nx::update::Information& info);
+
+    /**
+     * Asks mediaservers to stop the update process
+     * Client expects all mediaservers to return to nx::update::Status::Code::idle state.
+     */
+    void requestStopAction();
+
+    /**
+     * Asks mediaservers to start installation process
+     */
+    void requestInstallAction(QSet<QnUuid> targets);
+
+    // State for uploading offline update package
     enum class OfflineUpdateState
     {
-        Initial,
-        Unpack,     //< Unpacking all the packages and checking the contents.
-        Ready,      //< Ready to push packages to the servers.
-        Push,       //< Pushing to the servers.
-        Done        //< All update contents are pushed to the servers. They can start the update.
+        initial,
+        // Unpacking all the packages and checking the contents.
+        unpack,
+        // Data is unpacked and we are ready to push packages to the servers.
+        ready,
+        // Pushing to the servers.
+        push,
+        // All update contents are pushed to the servers. They can start the update.
+        done,
+        // Failed to push all the data.
+        error,
     };
 
-    enum class CheckMode
+    enum class UpdateCheckMode
     {
-        Internet,
-        File,
-        Mediaservers,
+        // Got update info from the internet.
+        internet,
+        // Got update info from the internet for specific build.
+        internetSpecific,
+        // Got update info from offline update package.
+        file,
+        // Got update info from mediaserver swarm.
+        mediaservers,
     };
 
-    struct UpdateCheckResult
+    /**
+     * Wraps up update info and summary for its verification.
+     */
+    struct UpdateContents
     {
-        CheckMode mode = CheckMode::Internet;
+        UpdateCheckMode mode = UpdateCheckMode::internet;
+        QString source;
+
+        // A set of servers without proper update file.
+        QSet<QnMediaServerResourcePtr> missingUpdate;
+        // A set of servers that can not accept update version.
+        QSet<QnMediaServerResourcePtr> invalidVersion;
+
+        QString eulaPath;
+
+        // A list of files to be uploaded.
+        QStringList filesToUpload;
+        // Information for the clent update.
+        nx::update::Package clientPackage;
+
         nx::update::Information info;
         nx::update::InformationError error = nx::update::InformationError::noError;
+
+        // Check if we can apply this update.
+        bool isValid() const;
     };
 
-    std::future<UpdateCheckResult> checkLatestUpdate();
-    std::future<UpdateCheckResult> checkSpecificChangeset(QString build, QString password);
-    std::future<UpdateCheckResult> checkUpdateFromFile(QString file);
+    std::future<UpdateContents> checkLatestUpdate();
+    std::future<UpdateContents> checkSpecificChangeset(QString build, QString password);
+    std::future<UpdateContents> checkUpdateFromFile(QString file);
+
+    // Check if update info contains all the packages necessary to update the system.
+    // @param contents - current update contents.
+    // @param root - path to directory with update package.
+    bool verifyUpdateManifest(UpdateContents& contents, QDir root = QDir("")) const;
 
     // Start uploading local update packages to the server(s).
-    // TODO: There can be some status
-    // @param changeset
-    void startUpload(QString changeset);
+    void startUpload(const UpdateContents& contents);
     void stopUpload();
 
     struct ProgressInfo
@@ -110,13 +170,18 @@ public:
     };
 
     // Calculates a progress for uploading files to the server.
-    ProgressInfo calcUploadProgress();
+    ProgressInfo calculateUploadProgress();
     // Calculates a progress for remote downloading.
-    ProgressInfo calcRemoteDownloadProgress();
+    ProgressInfo calculateRemoteDownloadProgress();
     // Calculates a progress for remote downloading.
-    ProgressInfo calcInstallProgress();
+    ProgressInfo calculateInstallProgress();
 
     OfflineUpdateState getUploaderState() const;
+
+    // Get information about current update
+    nx::update::Information getActiveUpdateInformation() const;
+    bool haveActiveUpdate() const;
+
 private:
     // Handlers for resource updates.
     void at_resourceAdded(const QnResourcePtr& resource);
@@ -127,7 +192,6 @@ private:
     // Handler for status update from a single server.
     void at_updateStatusResponse(bool success, rest::Handle handle, const nx::update::Status& response);
 
-    // Note: should keep long name for UploadState to make Qt moc catch this signal properly.
     void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
 
     // Werapper to get REST connection to specified server.
@@ -139,16 +203,18 @@ private:
     // Called by QnZipExtractor when the offline update package is unpacked.
     void at_extractFilesFinished(int code);
 
-    static UpdateCheckResult readUpdateManifest(QString path);
+    static void readUpdateManifest(QString path, UpdateContents& result);
     QnMediaServerResourceList getServersForUpload();
+
+    void markUploadCompleted(QString uploadId);
 
 private:
 
-    OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::Initial;
+    OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
     bool m_offlineUpdateStateChanged = false;
 
     QString m_offlineUpdateFile;
-    std::promise<UpdateCheckResult> m_offlineUpdateCheckResult;
+    std::promise<UpdateContents> m_offlineUpdateCheckResult;
 
     std::shared_ptr<QnZipExtractor> m_extractor;
 
@@ -166,8 +232,6 @@ private:
 
     // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
     std::unique_ptr<UploadManager> m_uploadManager;
-    QStringList m_filesToUpload;
-
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
     std::map<QString, nx::client::desktop::UploadState> m_uploadState;
@@ -176,9 +240,14 @@ private:
     nx::update::Information m_updateManifest;
 
     QString m_uploadDestination;
-
+    // Cached path to file with offline updates.
+    QString m_localUpdateFile;
     QDir m_outputDir;
     QString m_changeset;
+
+    //std::unique_ptr<Downloader> m_downloader;
+    // Downloader needs this strange thing.
+    //std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
 };
 
 } // namespace desktop

@@ -198,6 +198,10 @@ public:
     std::vector<QnUuid> getCamerasWithArchiveHelper() const;
 
     QnScheduleSync* scheduleSync() const;
+    static Qn::StorageStatuses storageStatus(
+        QnMediaServerModule* serverModule,
+        const QnStorageResourcePtr& storage);
+
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
@@ -280,6 +284,7 @@ private:
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();
     void checkWritableStoragesExist();
+    Qn::StorageStatuses storageStatusInternal(const QnStorageResourcePtr& storage);
 
 private:
     nx::analytics::storage::AbstractEventsStorage* m_analyticsEventsStorage;

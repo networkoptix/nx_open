@@ -32,7 +32,7 @@ public:
      * @param server                    Mediaserver to upload to.
      * @param config                    Contains upload description
      * @returns                         Upload id, or null in case of an error.
-     * It will write additional information to config structure
+     * It will write additional information to config structure.
      * UploadManager keeps a local copy of 'UploadState config' structure.
      */
 
