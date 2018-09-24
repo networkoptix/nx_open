@@ -81,10 +81,8 @@ protected:
 
     CyclicAllocator m_allocator;
 
-    bool m_consumerAdded;
-    bool m_interrupted;
-
-    uint64_t m_lastTs;
+    std::atomic_bool m_consumerAdded;
+    std::atomic_bool m_interrupted;
 
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);

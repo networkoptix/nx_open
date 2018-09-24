@@ -25,6 +25,7 @@ public:
     const uint8_t * data() const;
     int flags() const;
     int64_t pts() const;
+    int64_t dts() const;
     AVPacket * packet() const;
 
     void initialize();

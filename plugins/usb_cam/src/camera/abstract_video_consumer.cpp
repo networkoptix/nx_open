@@ -12,7 +12,7 @@ AbstractVideoConsumer::AbstractVideoConsumer(
 {
 }
 
-int AbstractVideoConsumer::fps() const
+float AbstractVideoConsumer::fps() const
 {
     return m_params.fps;
 }
@@ -27,7 +27,7 @@ int AbstractVideoConsumer::bitrate() const
     return m_params.bitrate;
 }
 
-void AbstractVideoConsumer::setFps(int fps)
+void AbstractVideoConsumer::setFps(float fps)
 {
     if(m_params.fps != fps)
     {

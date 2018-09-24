@@ -20,14 +20,10 @@ Codec::~Codec()
 
 int Codec::open()
 {
-    int codecOpenCode = avcodec_open2(m_codecContext, m_codec, &m_options);
-    if (codecOpenCode < 0)
-    {
+    int result = avcodec_open2(m_codecContext, m_codec, &m_options);
+    if (result < 0)
         close();
-        return codecOpenCode;
-    }
-
-    return codecOpenCode;
+    return result;
 }
 
 void Codec::close()
@@ -135,7 +131,7 @@ int Codec::initializeDecoder(AVCodecID codecID)
     close();
     m_codec = avcodec_find_decoder(codecID);
     if (!m_codec)
-        return AVERROR_ENCODER_NOT_FOUND;
+        return AVERROR_DECODER_NOT_FOUND;
 
     m_codecContext = avcodec_alloc_context3(m_codec);
     if(!m_codecContext)
@@ -146,11 +142,15 @@ int Codec::initializeDecoder(AVCodecID codecID)
 
 int Codec::initializeDecoder(const AVCodecParameters * codecParameters)
 {
-    int initCode = initializeDecoder(codecParameters->codec_id);
-    if(initCode < 0)
-        return initCode;
+    int result = initializeDecoder(codecParameters->codec_id);
+    if (result < 0)
+        return result;
     
-    return avcodec_parameters_to_context(m_codecContext, codecParameters);
+    result = avcodec_parameters_to_context(m_codecContext, codecParameters);
+    if (result < 0)
+        avcodec_free_context(&m_codecContext);
+    
+    return result;
 }
 
 int Codec::initializeDecoder(const char * codecName)

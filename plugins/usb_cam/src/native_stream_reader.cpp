@@ -41,7 +41,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     *lpPacket = nullptr;
 
     ensureConsumerAdded();
-    maybeDropPackets();
+    maybeFlush();
     
     auto packet = nextPacket();
     if (m_interrupted)
@@ -91,7 +91,7 @@ void NativeStreamReader::ensureConsumerAdded()
     }
 }
 
-void NativeStreamReader::maybeDropPackets()
+void NativeStreamReader::maybeFlush()
 {
     if (m_avConsumer->timeSpan() > kMsecInSec)
         m_avConsumer->flush();

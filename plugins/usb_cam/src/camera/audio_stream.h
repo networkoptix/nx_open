@@ -9,6 +9,7 @@
 #include <condition_variable>
 
 #include "stream_consumer_manager.h"
+#include "timestamp_mapper.h"
 #include "ffmpeg/input_format.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/packet.h"
@@ -67,6 +68,10 @@ private:
         int m_bufferMaxSize;
         std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetBuffer;
 
+        TimeStampMapper m_timeStamps;
+        uint64_t m_lastTimeStamp = 0;
+        int64_t m_lastPts = 0;
+
     private:
         std::string ffmpegUrl() const;
         void waitForConsumers();
@@ -78,8 +83,8 @@ private:
         int initializeEncoder();
         int initializeResampledFrame();
         int initalizeResampleContext(const AVFrame * frame);
-        int decodeNextFrame(AVFrame * outFrame);
-        int resample(const AVFrame * frame, AVFrame * outFrame);
+        int decodeNextFrame(ffmpeg::Frame * outFrame);
+        int resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame);
         std::shared_ptr<ffmpeg::Packet> getNextData(int * outError);
         std::shared_ptr<ffmpeg::Packet> addToBuffer(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
         void start();

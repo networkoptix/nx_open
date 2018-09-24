@@ -49,6 +49,8 @@ public:
     void updateBitrate();
     void updateResolution();
     
+    float actualFps() const;
+
 private:
     enum CameraState
     {
@@ -67,6 +69,10 @@ private:
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
     bool m_waitForKeyPacket;
+
+    std::atomic_int m_updatingFps;
+    std::atomic_int m_actualFps;
+    uint64_t m_oneSecondAgo;
 
     /**
      * Some cameras crash the plugin if they are uninitialized while there are still packets and 
@@ -94,9 +100,8 @@ private:
     int m_retries;
     int m_initCode;
 
-    std::deque<std::shared_ptr<ffmpeg::Packet>> m_packetBuffer;
-
 private:
+    void updateActualFps(uint64_t now);
     std::string ffmpegUrl() const;
     bool consumersEmpty() const;
     void waitForConsumers();

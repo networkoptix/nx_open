@@ -109,8 +109,7 @@ StreamReaderPrivate::StreamReaderPrivate(
     m_camera(camera),
     m_avConsumer(new BufferedAudioVideoPacketConsumer(m_camera->videoStream(), m_codecParams)),
     m_consumerAdded(false),
-    m_interrupted(false),
-    m_lastTs(0)
+    m_interrupted(false)
 {
 }
 
@@ -170,8 +169,6 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
     nxPacket->resizeBuffer(packet->size());
     if (nxPacket->data())
         memcpy(nxPacket->data(), packet->data(), packet->size());
-
-    m_lastTs = packet->timeStamp();
 
     return nxPacket;
 }

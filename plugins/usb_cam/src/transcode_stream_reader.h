@@ -4,6 +4,7 @@
 
 #include <map>
 #include <deque>
+#include <thread>
 
 #include "camera/buffered_stream_consumer.h"
 #include "camera/timestamp_mapper.h"
@@ -42,10 +43,11 @@ private:
     int m_retries;
     int m_initCode;
 
+    uint64_t m_lastVideoPts;
     uint64_t m_lastVideoTimeStamp;
+    uint64_t m_lastTimeStamp;
     uint64_t m_timePerFrame;
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
-    std::vector<std::shared_ptr<ffmpeg::Packet>> m_videoPackets;
     
     std::unique_ptr<ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
@@ -53,7 +55,8 @@ private:
     TimeStampMapper m_timeStamps;
 
 private:
-    bool shouldDrop(const ffmpeg::Frame * frame) const;
+    bool shouldDrop(const ffmpeg::Frame * frame);
+    void transcode(const std::shared_ptr<ffmpeg::Frame>& frame);
     std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
@@ -67,7 +70,7 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
-    void maybeDrop();
+    void maybeFlush();
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
 };

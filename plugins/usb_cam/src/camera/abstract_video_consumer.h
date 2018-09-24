@@ -17,11 +17,11 @@ public:
         const std::weak_ptr<VideoStream>& streamReader,
         const CodecParameters& params);
 
-    virtual int fps() const override;
+    virtual float fps() const override;
     virtual void resolution(int *width, int *height) const override;
     virtual int bitrate() const override;
 
-    virtual void setFps(int fps);
+    virtual void setFps(float fps);
     virtual void setResolution(int width, int height);
     virtual void setBitrate(int bitrate);
 

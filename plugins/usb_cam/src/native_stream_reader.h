@@ -24,7 +24,7 @@ public:
 
 private:
     void ensureConsumerAdded() override;
-    void maybeDropPackets();
+    void maybeFlush();
     std::shared_ptr<ffmpeg::Packet> nextPacket();
 };
 

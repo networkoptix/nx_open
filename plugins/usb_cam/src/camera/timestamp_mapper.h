@@ -27,6 +27,16 @@ public:
         return found;
     }
 
+    size_t size() const
+    {
+        return m_timeStamps.size();
+    }
+
+    void clear()
+    {
+        m_timeStamps.clear();
+    }
+
 private:
     std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timeStamp*/> m_timeStamps;
 };

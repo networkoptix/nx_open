@@ -27,7 +27,7 @@ public:
 class VideoConsumer
 {
 public:
-    virtual int fps() const = 0;
+    virtual float fps() const = 0;
     virtual void resolution(int *width, int *height) const = 0;
     virtual int bitrate() const = 0;
 };

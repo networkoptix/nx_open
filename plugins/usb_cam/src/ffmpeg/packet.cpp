@@ -73,6 +73,11 @@ int64_t Packet::pts() const
     return m_packet->pts; 
 }
 
+int64_t Packet::dts() const 
+{
+    return m_packet->dts; 
+}
+
 AVPacket* Packet::packet() const 
 {
     return m_packet; 

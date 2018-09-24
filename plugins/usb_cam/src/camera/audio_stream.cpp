@@ -275,12 +275,11 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const AVFrame * fr
     return result;
 }
 
-int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
+int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
-    int result = 0;
     for(;;)
     {
-        result = m_decoder->receiveFrame(outFrame);
+        int result = m_decoder->receiveFrame(outFrame->frame());
         if (result == 0)
             return result;
         else if (result < 0 && result != AVERROR(EAGAIN))
@@ -295,23 +294,25 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(AVFrame * outFrame)
         if(result < 0 && result != AVERROR(EAGAIN))
             return result;
     }
-
-    return result;
 }
 
-int AudioStream::AudioStreamPrivate::resample(const AVFrame * frame, AVFrame * outFrame)
+int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame)
 {
     if(!m_resampleContext)
     {
-        m_initCode = initalizeResampleContext(frame);
+        m_initCode = initalizeResampleContext(frame->frame());
         if(m_initCode < 0)
+        {
+            if(auto cam = m_camera.lock())
+                cam->setLastError(m_initCode);
             return m_initCode;
+        }
     }
 
     if(!m_resampleContext)
         return m_initCode;
 
-    return swr_convert_frame(m_resampleContext, outFrame, frame);
+    return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
 }
 
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int * outError)
@@ -323,6 +324,9 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         m_encoder->codecID(),
         AVMEDIA_TYPE_AUDIO,
         m_packetCount);
+
+    bool drainedResampler = false;
+
     for(;;)
     {
         result = m_encoder->receivePacket(packet->packet());
@@ -331,24 +335,31 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         else if (result < 0 && result != AVERROR(EAGAIN))
             returnData(result, nullptr);
 
-        if(m_resampleContext && swr_get_delay(m_resampleContext, kMsecInSec) > timePerVideoFrame())
+        drainedResampler =
+            m_resampleContext && swr_get_delay(m_resampleContext, kMsecInSec) > timePerVideoFrame();
+        if(drainedResampler)
         {
-            result = resample(nullptr, m_resampledFrame->frame());
+            m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;
+            m_resampledFrame->frame()->pkt_pts = AV_NOPTS_VALUE;
+            result = resample(nullptr, m_resampledFrame.get());
             if (result < 0)
                 continue;
         }
         else
         {
-            result = decodeNextFrame(m_decodedFrame->frame());
+            result = decodeNextFrame(m_decodedFrame.get());
             if (result < 0)
                 returnData(result, nullptr);
 
-            result = resample(m_decodedFrame->frame(), m_resampledFrame->frame());
+            result = resample(m_decodedFrame.get(), m_resampledFrame.get());
             if(result < 0)
             {
                 ++m_retries;
                 returnData(result, nullptr);
             }
+
+            m_resampledFrame->frame()->pts = m_decodedFrame->pts();
+            m_resampledFrame->frame()->pkt_pts = m_decodedFrame->packetPts();
         }
 
         result = m_encoder->sendFrame(m_resampledFrame->frame());
@@ -373,14 +384,12 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
 {
     *outFfmpegError = 0;
 
+    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+
     if(m_encoder->codecID() == AV_CODEC_ID_PCM_S16LE)
-    {
-        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
         return packet;
-    }
 
     m_packetBuffer.push_back(packet);
-    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
     if (packet->timeStamp() - m_packetBuffer[0]->timeStamp() < timePerVideoFrame())
         return nullptr;
 
@@ -389,7 +398,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
         size += pkt->size();
 
     auto newPacket = std::make_shared<ffmpeg::Packet>(
-        m_packetBuffer[0]->codecID(),
+        packet->codecID(),
         AVMEDIA_TYPE_AUDIO);
 
     *outFfmpegError = newPacket->newPacket(size);
@@ -405,6 +414,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
 
     newPacket->setTimeStamp(packet->timeStamp());
     m_packetBuffer.clear();
+
     return newPacket;
 }
 
@@ -472,7 +482,7 @@ int AudioStream::AudioStreamPrivate::timePerVideoFrame() const
 {
     float fps = 30;
     if (auto cam = m_camera.lock())
-        fps = cam->videoStream()->fps();
+        fps = cam->videoStream()->actualFps();
     return 1.0 / fps * kMsecInSec;
 }
 

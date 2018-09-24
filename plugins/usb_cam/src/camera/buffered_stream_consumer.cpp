@@ -82,11 +82,9 @@ bool BufferedPacketConsumer::waitForTimeSpan(uint64_t msecDifference)
     m_wait.wait(lock,
         [&]()
     {
-        if (!m_buffer.empty())
-        {
-            return m_buffer.rbegin()->first - m_buffer.begin()->first >= msecDifference;
-        }
-        return m_interrupted;
+        return m_buffer.empty()
+            ? m_interrupted 
+            : m_buffer.rbegin()->first - m_buffer.begin()->first >= msecDifference;
     });
     return !interrupted();
 }

@@ -30,7 +30,8 @@ const char * deviceType()
 #endif
 }
 
-const int kRetryLimit = 10;
+int constexpr kRetryLimit = 10;
+std::chrono::milliseconds constexpr kOneSecond = std::chrono::milliseconds(1000);
 
 } // namespace
 
@@ -45,6 +46,9 @@ VideoStream::VideoStream(
     m_timeProvider(camera.lock()->timeProvider()),
     m_cameraState(csOff),
     m_waitForKeyPacket(true),
+    m_updatingFps(0),
+    m_actualFps(0),
+    m_oneSecondAgo(0),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
     m_frameCount(std::make_shared<std::atomic_int>(0)),
     m_terminated(false),
@@ -69,6 +73,11 @@ std::string VideoStream::url() const
 float VideoStream::fps() const
 {
     return m_codecParams.fps;
+}
+
+float VideoStream::actualFps() const
+{
+    return m_actualFps > 0 ? m_actualFps.load() : m_codecParams.fps;
 }
 
 AVPixelFormat VideoStream::decoderPixelFormat() const
@@ -123,6 +132,20 @@ void VideoStream::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateResolutionUnlocked();
+}
+
+void VideoStream::updateActualFps(uint64_t now)
+{
+    if(now - m_oneSecondAgo <= kOneSecond.count())
+    {
+        ++m_updatingFps;
+    }
+    else
+    {
+        m_actualFps = m_updatingFps.load();
+        m_updatingFps = 0;
+        m_oneSecondAgo = now;
+    }
 }
 
 std::string VideoStream::ffmpegUrl() const
@@ -208,7 +231,10 @@ void VideoStream::run()
 
         auto frame = maybeDecode(packet.get());
 
-        std::lock_guard<std::mutex> lock(m_mutex);
+        uint64_t now = m_timeProvider->millisSinceEpoch();
+
+        std::lock_guard<std::mutex> lock(m_mutex);        
+        updateActualFps(now);
         m_packetConsumerManager.givePacket(packet);
         if (frame)
             m_frameConsumerManager.giveFrame(frame);
@@ -254,7 +280,6 @@ int VideoStream::initialize()
 
 void VideoStream::uninitialize()
 {
-    m_packetBuffer.clear();
     m_packetConsumerManager.consumerFlush();
     m_frameConsumerManager.consumerFlush();
 
@@ -328,24 +353,24 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
 int VideoStream::initializeDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
-    int initCode;
+    int result;
     if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
     {
-        initCode = decoder->initializeDecoder("h264_mmal");
+        result = decoder->initializeDecoder("h264_mmal");
     }
     else
     {
         AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
-        initCode = stream
+        result = stream
             ? decoder->initializeDecoder(stream->codecpar)
             : AVERROR_DECODER_NOT_FOUND;
     }
-    if (initCode < 0)
-        return initCode;
+    if (result < 0)
+        return result;
 
-    int openCode = decoder->open();
-    if (openCode < 0)
-        return openCode;
+    result = decoder->open();
+    if (result < 0)
+        return result;
 
     m_waitForKeyPacket = true;
     m_decoder = std::move(decoder);
@@ -388,15 +413,13 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     if (result < 0)
         return nullptr;
 
-    if (frame->pts() == AV_NOPTS_VALUE)
+    if(frame->pts() == AV_NOPTS_VALUE)
         frame->frame()->pts = frame->packetPts();
 
     uint64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(frame->pts(), &nxTimeStamp, true/*eraseEntry*/))
-    {
-        if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true))
-            nxTimeStamp = m_timeProvider->millisSinceEpoch();
-    }
+    if (!m_timeStamps.getNxTimeStamp(frame->packetPts(), &nxTimeStamp, true /*eraseEntry*/))
+        nxTimeStamp = m_timeProvider->millisSinceEpoch();
+
     frame->setTimeStamp(nxTimeStamp);
 
     return frame;
@@ -404,9 +427,7 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
 
 int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 {
-    int result = 0;
-    bool gotFrame = false;
-    result = m_decoder->sendPacket(packet->packet());
+    int result = m_decoder->sendPacket(packet->packet());
     if(result == 0 || result == AVERROR(EAGAIN))
         return m_decoder->receiveFrame(frame->frame());
     return result;
@@ -521,7 +542,7 @@ void VideoStream::updateBitrateUnlocked()
 void VideoStream::updateUnlocked()
 {
     /**
-     * Could call updateFpsUnlocked() and updateResolutionUnlcoked here, but this way
+     * Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
      * closestHardwareConfiguration(), which queries hardware, only gets called once.
      */
 
