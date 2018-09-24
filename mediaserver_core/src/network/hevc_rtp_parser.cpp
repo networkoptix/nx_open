@@ -31,7 +31,6 @@ bool HevcParser::processData(
     quint8* rtpBufferBase,
     int rtpBufferOffset,
     int bytesRead,
-    const QnRtspStatistic& statistics,
     bool& gotData)
 {
     gotData = false;
@@ -71,7 +70,7 @@ bool HevcParser::processData(
 
     if (!m_trustMarkerBit)
     {
-        createVideoDataIfNeeded(&gotData, statistics, rtpTimestamp);
+        createVideoDataIfNeeded(&gotData, rtpTimestamp);
         // Restore pointer to the buffer after data creation. It will be needed for payload processing.
         m_rtpBufferBase = rtpBufferBase;
     }
@@ -83,7 +82,7 @@ bool HevcParser::processData(
         backupCurrentData(rtpBufferBase);
 
     if (m_trustMarkerBit)
-        createVideoDataIfNeeded(&gotData, statistics, rtpTimestamp);
+        createVideoDataIfNeeded(&gotData, rtpTimestamp);
 
     m_lastRtpTimestamp = rtpTimestamp;
     return true;
@@ -536,10 +535,7 @@ void HevcParser::updateNalFlags(
     }
 }
 
-QnCompressedVideoDataPtr HevcParser::createVideoData(
-    const uint8_t* rtpBuffer,
-    uint32_t rtpTime,
-    const QnRtspStatistic& statistics)
+QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime)
 {
     int totalSize = m_videoFrameSize + additionalBufferSize();
 
@@ -577,25 +573,18 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(
             m_chunks[i].len);
     }
 
-    if (m_timeHelper)
-        result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_context.frequency);
-    else
-        result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
+    result->timestamp = rtpTime;
     return result;
 }
 
-void HevcParser::createVideoDataIfNeeded(
-    bool* outGotData,
-    const QnRtspStatistic& statistic,
-    uint32_t rtpTimestamp)
+void HevcParser::createVideoDataIfNeeded(bool* outGotData, uint32_t rtpTimestamp)
 {
     bool needToCreateVideoData = (m_trustMarkerBit && m_gotMarkerBit)
         || (!m_trustMarkerBit && !m_chunks.empty() && rtpTimestamp != m_lastRtpTimestamp);
 
     if (needToCreateVideoData)
     {
-        m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTimestamp, statistic);
+        m_mediaData = createVideoData(m_rtpBufferBase, m_lastRtpTimestamp);
         m_lastCreatedPacketTimestamp = m_lastRtpTimestamp;
         *outGotData = !!m_mediaData;
         reset(/*softReset*/ true);

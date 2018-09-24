@@ -18,6 +18,7 @@
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/time_helper.h>
 
 namespace RtpTransport {
 
@@ -127,7 +128,6 @@ private:
     };
 
     void updateTimePolicy();
-
     QnRtpStreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
     void clearKeyData(int channelNum);
@@ -141,7 +141,7 @@ private:
 
     void calcStreamUrl();
 
-    QnRtspStatistic rtspStatistics(
+    void updateRtcpStatistics(
         int rtpBufferOffset,
         int rtpPacketSize,
         int track,
