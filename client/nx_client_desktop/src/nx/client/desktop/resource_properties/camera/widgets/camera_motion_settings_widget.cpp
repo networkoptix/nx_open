@@ -9,6 +9,7 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <client_core/client_core_module.h>
+#include <helpers/max_texture_size_informer.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
@@ -94,6 +95,8 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
     m_sensitivityButtons->button(QnMotionRegion::kDefaultSensitivity)->setChecked(true);
 
     setHelpTopic(this, Qn::CameraSettings_Motion_Help);
+
+    nx::client::core::MaxTextureSizeInformer::obtainMaxTextureSize(m_motionView, "maxTextureSize");
 
     connect(m_motionView, &QQuickView::statusChanged, this,
         [this](QQuickView::Status status)

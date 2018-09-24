@@ -25,6 +25,8 @@ Rectangle
     readonly property real kMotionRegionOpacity: 0.3
     readonly property real kSelectionOpacity: 0.2
 
+    property int maxTextureSize: -1
+
     color: ColorTheme.window
 
     MediaResourceHelper
@@ -282,19 +284,30 @@ Rectangle
         }
     }
 
+    onVisibleChanged: updatePlayingState()
+    onMaxTextureSizeChanged: updatePlayingState()
+
     MediaPlayer
     {
         id: player
         resourceId: cameraResourceId
+        maxTextureSize: videoContainer.maxTextureSize
 
         onResourceIdChanged: video.clear()
-
-        onSourceChanged: playLive()
+        onSourceChanged: videoContainer.updatePlayingState()
     }
 
     MediaPlayerMotionProvider
     {
         id: motionProvider
         mediaPlayer: player
+    }
+
+    function updatePlayingState()
+    {
+        if (visible && maxTextureSize != -1)
+            player.playLive()
+        else
+            player.pause()
     }
 }
