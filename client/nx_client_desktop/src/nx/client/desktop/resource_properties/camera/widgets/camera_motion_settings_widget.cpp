@@ -9,9 +9,9 @@
 #include <QtWidgets/QButtonGroup>
 
 #include <client_core/client_core_module.h>
-#include <helpers/max_texture_size_informer.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
@@ -96,8 +96,6 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
 
     setHelpTopic(this, Qn::CameraSettings_Motion_Help);
 
-    nx::client::core::MaxTextureSizeInformer::obtainMaxTextureSize(m_motionView, "maxTextureSize");
-
     connect(m_motionView, &QQuickView::statusChanged, this,
         [this](QQuickView::Status status)
         {
@@ -109,7 +107,9 @@ CameraMotionSettingsWidget::CameraMotionSettingsWidget(
             motionItem->setProperty("cameraMotionHelper", QVariant::fromValue(m_motionHelper.data()));
             motionItem->setProperty("currentSensitivity", m_sensitivityButtons->checkedId());
             motionItem->setProperty("sensitivityColors", QVariant::fromValue(m_sensitivityColors));
-        });
+            motionItem->setProperty("maxTextureSize",
+                QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
+    });
 
     m_motionView->setSource(lit("Nx/Motion/MotionSettingsItem.qml"));
     m_motionView->setResizeMode(QQuickView::SizeRootObjectToView);

@@ -285,7 +285,6 @@ Rectangle
     }
 
     onVisibleChanged: updatePlayingState()
-    onMaxTextureSizeChanged: updatePlayingState()
 
     MediaPlayer
     {
@@ -305,7 +304,7 @@ Rectangle
 
     function updatePlayingState()
     {
-        if (visible && maxTextureSize != -1)
+        if (visible)
             player.playLive()
         else
             player.pause()
