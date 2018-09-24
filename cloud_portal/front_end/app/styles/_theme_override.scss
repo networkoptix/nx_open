@@ -260,6 +260,9 @@ select {
 ngb-tabset {
     .nav-tabs {
         .nav-item {
+
+            height: 48px;
+
             .nav-link {
                 border-top-left-radius  : 2px;
                 border-top-right-radius : 2px;

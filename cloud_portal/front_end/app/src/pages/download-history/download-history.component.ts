@@ -8,10 +8,13 @@ import { DOCUMENT, Location }           from '@angular/common';
 import { isNumeric }                    from 'rxjs/util/isNumeric';
 import { NgbTabChangeEvent, NgbTabset } from '@ng-bootstrap/ng-bootstrap';
 
+import isArray = require('core-js/fn/array/is-array');
+import angular = require('angular');
+
 @Component({
-    selector: 'download-history',
+    selector   : 'download-history',
     templateUrl: 'download-history.component.html',
-    styleUrls: ['download-history.component.scss']
+    styleUrls  : [ 'download-history.component.scss' ]
 })
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy {
@@ -47,9 +50,18 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
         this.location = location;
         this.userAuthorized = false;
+        this.downloadTypes = [];
     }
 
-    private getData () {
+    private getAvailableDownloadTypes(data) {
+        angular.forEach(data, (downloadType, name) => {
+            if (isArray(downloadType) && downloadType.length) {
+                this.downloadTypes.push(name);
+            }
+        });
+    }
+
+    private getData() {
         this.authorizationService
             .requireLogin()
             .then((result) => {
@@ -59,10 +71,16 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                         .getDownloadsHistory(this.build)
                         .then(result => {
                                 this.linkbase = result.data.updatesPrefix;
-
+                                debugger;
                                 if (!this.build) { // only one build
-                                    this.activeBuilds = result.data.releases;
+
+                                    result.data.betas = [];
+
                                     this.downloadsData = result.data;
+                                    this.activeBuilds = this.downloadsData[ this.section ];
+
+                                    this.getAvailableDownloadTypes(this.downloadsData);
+
                                 } else {
                                     this.activeBuilds = [ result.data ];
                                     this.downloadTypes = [ result.data.type ];
@@ -71,7 +89,12 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                                 }
 
                                 this.titleService.setTitle(this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
-                                this.activeBuilds = this.downloadsData[ this.section ];
+
+                                setTimeout(() => {
+                                    if (this.tabs) {
+                                        this.tabs.select(this.section);
+                                    }
+                                });
 
                             }, () => {
                                 // TODO: Repace this once this page is moved to A5
@@ -110,15 +133,15 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 this.section = this.routeParam;
             }
 
-            if (!this.build) { // only one build
-                this.downloadTypes = ['releases', 'patches', 'betas'];
-            }
+            // if (!this.build) { // only one build
+            //     this.downloadTypes = [ 'releases', 'patches', 'betas' ];
+            // }
 
-            setTimeout(() => {
-                if (this.tabs) {
-                    this.tabs.select(this.section);
-                }
-            });
+            // setTimeout(() => {
+            //     if (this.tabs) {
+            //         this.tabs.select(this.section);
+            //     }
+            // }, 100);
 
             this.getData();
         });
