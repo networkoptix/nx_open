@@ -655,7 +655,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
         {
             auto status = getClientResponse(client);
             NX_DEBUG(this, lm("Error requesting url %1: %2")
-                .args(url, nx::network::http::StatusCode::toString(status)));
+                .args(requestUrl, nx::network::http::StatusCode::toString(status)));
             return status == nx::network::http::StatusCode::undefined
                 ? nx::network::http::StatusCode::serviceUnavailable
                 : status;

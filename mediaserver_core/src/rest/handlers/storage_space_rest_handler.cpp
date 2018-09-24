@@ -45,7 +45,7 @@ int QnStorageSpaceRestHandler::executeGet(
 
     QnStorageSpaceReply reply;
 
-    auto enumerate = [fastRequest, &reply](
+    auto enumerate = [fastRequest, &reply, this](
         const QnStorageResourceList& storages,
         const QSet<QnStorageResourcePtr>& writableStorages)
         {
@@ -55,7 +55,7 @@ int QnStorageSpaceRestHandler::executeGet(
                 data.url = QnStorageResource::urlWithoutCredentials(data.url);
                 if (!fastRequest)
                     data.isWritable = writableStorages.contains(storage);
-                data.storageStatus = QnStorageManager::storageStatus(storage);
+                data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
                 reply.storages.push_back(data);
             }
         };
@@ -171,6 +171,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
 
+            data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
             data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
             if (data.isOnline)
             {

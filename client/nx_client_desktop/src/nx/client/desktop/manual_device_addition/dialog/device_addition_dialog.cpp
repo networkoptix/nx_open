@@ -189,6 +189,17 @@ void DeviceAdditionDialog::initializeControls()
     connect(this, &DeviceAdditionDialog::rejected,
         this, &DeviceAdditionDialog::handleDialogClosed);
 
+    connect(ui->searchControls, &QStackedWidget::currentChanged, this,
+        [this](int currentPageIndex)
+        {
+            static constexpr int kStartSearchPage = 0;
+            const bool enabled = currentPageIndex == kStartSearchPage;
+            const QList<QWidget*> widgets =
+                { ui->tabWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+            for (const auto widget: widgets)
+                widget->setEnabled(enabled);
+        });
+
     setupTable();
     setupPortStuff(ui->knownAddressAutoPortCheckBox, ui->knownAddressPortSpinWidget);
     setupPortStuff(ui->subnetScanAutoPortCheckBox, ui->subnetScanPortSpinWidget);
@@ -401,7 +412,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
             login(), password(), port()));
     }
 
-    if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted)
+    if (m_currentSearch->status().state == QnManualResourceSearchStatus::Aborted)
     {
 
         QnMessageBox::critical(this, tr("Device search failed"), m_currentSearch->initialError());
@@ -415,7 +426,7 @@ void DeviceAdditionDialog::handleStartSearchClicked()
 
     updateResultsWidgetState();
 
-    connect(m_currentSearch, &ManualDeviceSearcher::progressChanged,
+    connect(m_currentSearch, &ManualDeviceSearcher::statusChanged,
         this, &DeviceAdditionDialog::updateResultsWidgetState);
     connect(m_model, &FoundDevicesModel::rowCountChanged,
         this, &DeviceAdditionDialog::updateResultsWidgetState);
@@ -456,6 +467,9 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
         return;
 
     updateMessageBar();
+
+    if (!m_model)
+        return;
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
     if (!index.isValid())
         return;
@@ -466,6 +480,9 @@ void DeviceAdditionDialog::setDeviceAdded(const QString& uniqueId)
 
 void DeviceAdditionDialog::handleDeviceRemoved(const QString& uniqueId)
 {
+    if (!m_model)
+        return;
+
     const auto index = m_model->indexByUniqueId(uniqueId, FoundDevicesModel::presentedStateColumn);
     if (!index.isValid())
         return;
@@ -550,7 +567,7 @@ void DeviceAdditionDialog::stopSearch()
         m_unfinishedSearches.append(m_currentSearch);
 
         // Next state may be only "Finished".
-        connect(m_currentSearch, &ManualDeviceSearcher::progressChanged, this,
+        connect(m_currentSearch, &ManualDeviceSearcher::statusChanged, this,
             [this, searcher = m_currentSearch]()
             {
                 if (!searcher->searching())
@@ -623,14 +640,14 @@ QString DeviceAdditionDialog::progressMessage() const
     if (!m_currentSearch)
         return QString();
 
-    switch(m_currentSearch->progress())
+    switch(m_currentSearch->status().state)
     {
         case QnManualResourceSearchStatus::Init:
-            return lit("%1\t").arg(tr("Initializing scan"));
+            return lit("%1\t").arg(tr("Initializing scan..."));
         case QnManualResourceSearchStatus::CheckingOnline:
-            return lit("%1\t").arg(tr("Scanning online hosts"));
+            return lit("%1\t").arg(tr("Scanning online hosts..."));
         case QnManualResourceSearchStatus::CheckingHost:
-            return lit("%1\t").arg(tr("Checking host"));
+            return lit("%1\t").arg(tr("Checking host..."));
         case QnManualResourceSearchStatus::Finished:
             return lit("%1\t").arg(tr("Finished"));
         case QnManualResourceSearchStatus::Aborted:
@@ -657,7 +674,11 @@ void DeviceAdditionDialog::updateResultsWidgetState()
     }
     else
     {
-        const auto progress = m_currentSearch->progress();
+        const auto status = m_currentSearch->status();
+        const int total = status.total ? status.total : 1;
+        const int current = status.total ? status.current : 0;
+        ui->searchProgressBar->setMaximum(total);
+        ui->searchProgressBar->setValue(current);
         const auto text = m_currentSearch->searching()
             ? tr("Searching...")
             : tr("No devices found");
@@ -680,7 +701,7 @@ void DeviceAdditionDialog::updateResultsWidgetState()
 
     ui->searchProgressBar->setFormat(progressMessage());
 
-    if (m_currentSearch->progress() == QnManualResourceSearchStatus::Aborted
+    if (m_currentSearch->status().state == QnManualResourceSearchStatus::Aborted
         && !m_currentSearch->initialError().isEmpty())
     {
         QnMessageBox::critical(this, tr("Device search failed"));

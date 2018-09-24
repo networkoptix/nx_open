@@ -445,7 +445,9 @@ class VirtualBox(Hypervisor):
                 raise VirtualBoxError(message)
             code = mo.group(1)
             if code == 'VBOX_E_OBJECT_NOT_FOUND':
-                raise VMNotFound("Cannot find VM:\n{}".format(message))
+                mo = re.match(prefix + r"Could not find a registered machine named '(.+)'", first_line)
+                if mo:
+                    raise VMNotFound("Cannot find VM: {!r}\n{}".format(mo.group(1), message))
             if code == 'VBOX_E_FILE_ERROR' and 'already exists' in message:
                 raise VMAlreadyExists(message)
             raise virtual_box_error_cls(code)(message)
