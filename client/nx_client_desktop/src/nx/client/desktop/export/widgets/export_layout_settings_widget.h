@@ -21,14 +21,24 @@ public:
     ExportLayoutSettingsWidget(QWidget* parent = nullptr);
     virtual ~ExportLayoutSettingsWidget();
 
-    bool isLayoutReadOnly() const;
-    void setLayoutReadOnly(bool value);
+    struct Data
+    {
+        bool readOnly = false;
+        bool cryptVideo = false;
+        QString password;
+    };
+
+    void setData(const Data& data);
+
+    bool validate();
 
 signals:
-    void dataChanged(bool isLayoutReadOnly);
+    void dataChanged(Data& data);
 
 private:
     QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;
+
+    void emitDataChanged();
 };
 
 } // namespace desktop

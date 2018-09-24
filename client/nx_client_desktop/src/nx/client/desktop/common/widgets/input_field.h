@@ -54,6 +54,8 @@ public:
         bool showImmediately = false,
         PasswordInformation::AnalyzeFunction analyzeFunction = nx::utils::passwordStrength);
 
+    QLineEdit * lineEdit();
+    
 signals:
     void editingFinished();
 

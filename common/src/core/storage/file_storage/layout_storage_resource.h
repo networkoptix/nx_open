@@ -90,10 +90,15 @@ public:
 private:
     bool readIndexHeader();
     bool writeIndexHeader();
+
+    int getTailSize() const;
     void writeFileTail(QFile& file);
+
     void closeOpenedFiles();
     void restoreOpenedFiles();
-    int getPostfixSize() const;
+
+    bool shouldCrypt(const QString& streamName);
+
     static QString stripName(const QString& fileName); //< Returns part after '?'.
 
 private:

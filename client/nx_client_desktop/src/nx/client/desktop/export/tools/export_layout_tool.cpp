@@ -177,8 +177,11 @@ bool ExportLayoutTool::prepareStorage()
         QFile::remove(d->actualFilename);
     }
 
-    d->storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(d->settings.layout->commonModule()));
-    d->storage->setUrl(d->actualFilename);
+    auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule());
+    fileStorage->setUrl(d->actualFilename);
+    if (d->settings.cryptVideo)
+        fileStorage->usePasswordForExport(d->settings.password);
+    d->storage = QnStorageResourcePtr(fileStorage);
     return true;
 }
 

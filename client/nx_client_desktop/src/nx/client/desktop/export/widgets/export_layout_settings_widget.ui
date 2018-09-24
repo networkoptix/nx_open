@@ -31,21 +31,43 @@
      <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QCheckBox" name="readOnlyCheckBox">
-        <property name="text">
-         <string>Make read-only</string>
+      <property name="horizontalSpacing">
+       <number>0</number>
+      </property>
+      <item row="3" column="0">
+       <spacer name="passwordSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="1">
+       <widget class="nx::client::desktop::InputField" name="passwordEdit" native="true">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Password</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="4" column="1">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -58,11 +80,33 @@
         </property>
        </spacer>
       </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QCheckBox" name="cryptCheckBox">
+        <property name="text">
+         <string>Protect with password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="readOnlyCheckBox">
+        <property name="text">
+         <string>Make read-only</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::client::desktop::InputField</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

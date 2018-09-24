@@ -141,6 +141,11 @@ void InputField::setPasswordIndicatorEnabled(
     }
 }
 
+QLineEdit* InputField::lineEdit()
+{
+    return dynamic_cast<QLineEdit*>(input());
+}
+
 ValidationResult InputField::calculateValidationResult() const
 {
     auto result = base_type::calculateValidationResult();

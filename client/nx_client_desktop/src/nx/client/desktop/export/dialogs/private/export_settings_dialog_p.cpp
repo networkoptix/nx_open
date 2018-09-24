@@ -273,15 +273,17 @@ bool ExportSettingsDialog::Private::hasVideo() const
     return m_exportMediaSettings.mediaResource != nullptr && m_exportMediaSettings.mediaResource->hasVideo();
 }
 
-void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
-{
-    m_exportLayoutPersistentSettings.readOnly = value;
-}
-
 void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& watermark)
 {
     m_exportMediaSettings.transcodingSettings.watermark = watermark;
     m_exportLayoutSettings.watermark = watermark;
+}
+
+void ExportSettingsDialog::Private::setLayoutWidgetSettings(ExportLayoutSettingsWidget::Data data)
+{
+    m_exportLayoutSettings.readOnly = data.readOnly;
+    m_exportLayoutSettings.cryptVideo = data.cryptVideo;
+    m_exportLayoutSettings.password = data.password;
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)

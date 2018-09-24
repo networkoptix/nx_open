@@ -128,7 +128,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
         d, &Private::setApplyFilters);
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
-        d, &Private::setLayoutReadOnly);
+        d, &Private::setLayoutWidgetSettings);
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged,
         d, &Private::setMediaFilename);
@@ -372,16 +372,16 @@ SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayTy
 {
     switch (type)
     {
-    case ExportOverlayType::timestamp:
-        return ui->timestampButton;
-    case ExportOverlayType::image:
-        return ui->imageButton;
-    case ExportOverlayType::text:
-        return ui->textButton;
-    case ExportOverlayType::bookmark:
-        return ui->bookmarkButton;
-    default:
-        return static_cast<SelectableTextButton*>(nullptr);
+        case ExportOverlayType::timestamp:
+            return ui->timestampButton;
+        case ExportOverlayType::image:
+            return ui->imageButton;
+        case ExportOverlayType::text:
+            return ui->textButton;
+        case ExportOverlayType::bookmark:
+            return ui->bookmarkButton;
+        default:
+            return static_cast<SelectableTextButton*>(nullptr);
     }
 };
 
@@ -410,7 +410,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
     if (mediaPersistentSettings.canExportOverlays())
     {
-        ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
+        ui->exportLayoutSettingsPage->
+            setData({ d->exportLayoutPersistentSettings().readOnly,
+                !d->exportLayoutSettings().password.isEmpty(),
+                d->exportLayoutSettings().password });
+
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
 
         if(mediaPersistentSettings.rapidReview.enabled)
@@ -653,6 +657,9 @@ void ExportSettingsDialog::accept()
         : ui->layoutFilenamePanel;
 
     if (!filenamePanel->validate())
+        return;
+
+    if (!ui->exportLayoutSettingsPage->validate())
         return;
 
     if (isFileNameValid && !isFileNameValid(filenamePanel->filename(), false))

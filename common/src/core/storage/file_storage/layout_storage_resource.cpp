@@ -110,10 +110,10 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
     const auto fileName = stripName(url);
 
     QIODevice* stream = nullptr;
-    if (isCrypted() && (FileTypeSupport::isMovieFileExt(fileName)
-        || FileTypeSupport::isImageFileExt(fileName)))
+    if (shouldCrypt(fileName))
     {
-        if (m_password.isEmpty())
+        NX_ASSERT(!(openMode & QIODevice::WriteOnly) || !m_password.isEmpty()); // Want to write but no password.
+        if (m_password.isEmpty()) // Cannot read crypted stream without a password.
             return nullptr;
         stream = new QnLayoutCryptoStream(*this, url, m_password);
     }
@@ -314,7 +314,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
                     stream.size = m_index.entries[i + 1].offset + m_info.offset - stream.position;
                 else
                 {
-                    qint64 endPos = file.size() - getPostfixSize();
+                    qint64 endPos = file.size() - getTailSize();
                     stream.size = endPos - stream.position;
                 }
                 return stream;
@@ -346,7 +346,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream
             return Stream();
 
     QFile file(getUrl());
-    const qint64 fileSize = file.size() -  getPostfixSize();
+    const qint64 fileSize = file.size() -  getTailSize();
 
     m_index.entries[m_index.entryCount++] =
         StreamIndexEntry{fileSize - m_info.offset, qt4Hash(fileName)};
@@ -449,6 +449,11 @@ bool QnLayoutFileStorageResource::writeIndexHeader()
     return true;
 }
 
+int QnLayoutFileStorageResource::getTailSize() const
+{
+    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
+}
+
 void QnLayoutFileStorageResource::writeFileTail(QFile& file)
 {
     if (m_info.offset > 0)
@@ -483,9 +488,15 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     }
 }
 
-int QnLayoutFileStorageResource::getPostfixSize() const
+bool QnLayoutFileStorageResource::shouldCrypt(const QString& streamName)
 {
-    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
+    if (!isCrypted())
+        return false;
+
+    if (FileTypeSupport::isMovieFileExt(streamName) || FileTypeSupport::isImageFileExt(streamName))
+        return true;
+
+    return streamName.startsWith("chunk") && QFileInfo(streamName).suffix().toLower() == "bin";
 }
 
 QString QnLayoutFileStorageResource::stripName(const QString& fileName)

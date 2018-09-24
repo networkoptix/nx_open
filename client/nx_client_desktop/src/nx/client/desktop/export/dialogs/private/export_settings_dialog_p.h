@@ -10,6 +10,7 @@
 
 #include <nx/client/desktop/common/utils/filesystem.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
+#include <nx/client/desktop/export/widgets/export_layout_settings_widget.h>
 #include <nx/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/client/desktop/export/tools/export_media_validator.h>
@@ -57,8 +58,8 @@ public:
     void setServerTimeZoneOffsetMs(qint64 offsetMs);
     void setTimestampOffsetMs(qint64 offsetMs);
     void setApplyFilters(bool value);
-    void setLayoutReadOnly(bool value);
     void setWatermark(const nx::core::Watermark& watermark);
+    void setLayoutWidgetSettings(ExportLayoutSettingsWidget::Data data);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(Mode mode) const;
