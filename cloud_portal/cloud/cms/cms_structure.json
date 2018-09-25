@@ -359,5 +359,23 @@
         ]
       }
     ]
+  },
+  {
+    "type": "integration",
+    "canPreview": false,
+    "contexts": [
+      {
+        "name": "Integration Information",
+        "translatable": false,
+        "values":[
+          {
+            "name": "Integration Name",
+            "value": "Insert Name!!",
+            "description": "Name of the integration",
+            "type": "text"
+          }
+        ]
+      }
+    ]
   }
 ]

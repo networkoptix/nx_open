@@ -357,8 +357,8 @@ class UserGroupsToCustomizationPermissions(models.Model):
 class ContentVersion(models.Model):
 
     class Meta:
-        verbose_name = 'revision'
-        verbose_name_plural = 'revisions'
+        verbose_name = 'cloud revision'
+        verbose_name_plural = 'cloud revisions'
         permissions = (
             ("publish_version", "Can publish content to production"),
             ("force_update", "Can forcibly update content"),
@@ -382,6 +382,11 @@ class ContentVersion(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def create_reviews(self):
+        for customziation in self.product.customizations.all():
+            ProductCustomizationReview(customization=customziation, version=self).save()
+
+
     @property
     def state(self):
         if not self.accepted_by:
@@ -393,6 +398,22 @@ class ContentVersion(models.Model):
             return 'old'
 
         return 'current'
+
+
+class ProductCustomizationReview(models.Model):
+    class Meta:
+        verbose_name = 'product review'
+        verbose_name_plural = 'product reviews'
+
+    REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (3, "rejected", "Rejected"))
+    customization = models.ForeignKey(Customization)
+    version = models.ForeignKey(ContentVersion)
+    state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
+    notes = models.TextField()
+    reviewed_date = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        related_name='accepted_%(class)s')
 
 
 class DataRecord(models.Model):

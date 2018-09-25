@@ -98,8 +98,12 @@ img.preview-image{
     color: #333 !important;
 }
 
-.module h2{
+.module h2 {
     background: #35464F;
+}
+
+.custom-block {
+    margin-bottom: 40px !important;
 }
 
 .show-html{

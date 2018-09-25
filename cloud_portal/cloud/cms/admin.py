@@ -5,6 +5,26 @@ from django.urls import reverse
 from django.utils.html import format_html
 from .forms import *
 from cloud import settings
+from cms.controllers.modify_db import get_records_for_version
+
+from datetime import datetime
+
+
+class CloudFilter(SimpleListFilter):
+    title = 'Product'
+    parameter_name = 'product'
+
+    def lookups(self, request, model_admin):
+        products = Product.objects.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+        if not request.user.is_superuser:
+            products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
+            return [(p.id, p.name) for p in products]
+        return [(p.id, p.__str__()) for p in products]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(product=self.value())
+        return queryset
 
 
 class ProductFilter(SimpleListFilter):
@@ -12,7 +32,7 @@ class ProductFilter(SimpleListFilter):
     parameter_name = 'product'
 
     def lookups(self, request, model_admin):
-        products = Product.objects.all()
+        products = Product.objects.exclude(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
             return [(p.id, p.name) for p in products]
@@ -58,7 +78,7 @@ admin.site.register(ProductType, ProductTypeAdmin)
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name', 'product_type', 'customizations_list')
+    list_display = ('product_actions', 'name', 'product_type', 'customizations_list')
     list_display_links = ('name',)
     list_filter = ('product_type', )
     form = ProductForm
@@ -67,7 +87,7 @@ class ProductAdmin(CMSAdmin):
         if not obj.product_type or obj.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
             return format_html('<a class="btn btn-sm" href="{}">settings</a>',
                                reverse('product_settings', args=[obj.id]))
-        context = Context.objects.get(product=obj)
+        context = Context.objects.get(product_type=obj.product_type)
         return format_html('<a class="btn btn-sm" href="{}">edit information</a>',
                            reverse('page_editor', args=[context.id, None, obj.id]))
 
@@ -163,7 +183,7 @@ class ContentVersionAdmin(CMSAdmin):
                     'accepted_date', 'accepted_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = ('product__product_type', ProductFilter,)
+    list_filter = (CloudFilter,)
     search_fields = ('accepted_by__email', 'created_by__email')
     readonly_fields = ('created_by', 'accepted_by',)
 
@@ -178,6 +198,7 @@ class ContentVersionAdmin(CMSAdmin):
 
     def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = qs.filter(product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         if True or not request.user.is_superuser:
             qs = qs.filter(product__customizations__name__in=[settings.CUSTOMIZATION])
         return qs
@@ -187,6 +208,48 @@ class ContentVersionAdmin(CMSAdmin):
 
 
 admin.site.register(ContentVersion, ContentVersionAdmin)
+
+
+class ProductCustomizationReviewAdmin(CMSAdmin):
+    list_display = ('product', 'version', 'reviewed_by', 'reviewed_date', 'state')
+    readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by', )
+
+    list_filter = ('version__product__product_type', ProductFilter)
+
+    change_form_template = 'cms/product_customization_review_change_form.html'
+    fieldsets = (
+        (None, {
+            "fields": (
+                'version', 'state', 'notes', 'reviewed_date', 'reviewed_by'
+            )
+        }),
+    )
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        version = ProductCustomizationReview.objects.get(id=object_id).version
+        extra_context['contexts'] = get_records_for_version(version)
+        extra_context['title'] = "Changes for {}".format(version.product.name)
+        return super(ProductCustomizationReviewAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
+
+    def get_queryset(self, request):
+        qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
+        if True or not request.user.is_superuser:
+            qs = qs.filter(customization__name=settings.CUSTOMIZATION)
+        return qs
+
+    def product(self, obj):
+        return obj.version.product
+
+    def save_model(self, request, obj, form, change):
+        obj.reviewed_by = request.user
+        obj.reviewed_date = datetime.now()
+        obj.save()
+
+
+admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
 
 
 class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):

@@ -23,13 +23,15 @@ def accept_latest_draft(product, version_id, user):
     return None
 
 
-def notify_version_ready(product_name, version_id, exclude_user):
+def notify_version_ready(product, version_id, exclude_user):
     perm = Permission.objects.get(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
-        filter(subscribe=True).\
+        filter(subscribe=True, customization__in=product.customizations.all()).\
         exclude(pk=exclude_user.pk).\
         distinct()
+
+    product_name = product.name
 
     for user in users:
         send(user.email, "review_version",
@@ -207,10 +209,12 @@ def send_version_for_review(product, user):
 
     version = ContentVersion(product=product, created_by=user)
     version.save()
+    if product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
+        version.create_reviews()
 
     update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 
-    notify_version_ready(product.name, version.id, user)
+    notify_version_ready(product, version.id, user)
 
 
 def get_records_for_version(version):

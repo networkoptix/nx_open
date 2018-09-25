@@ -14,7 +14,7 @@ def find_or_add_product_type(product_type):
     try:
         product_type = ProductType.objects.get(type=product_type)
     except ObjectDoesNotExist:
-        product_type = ProductType(type=ProductType.PRODUCT_TYPES.cloud_portal)
+        product_type = ProductType(type=product_type)
         product_type.save()
 
     return product_type
