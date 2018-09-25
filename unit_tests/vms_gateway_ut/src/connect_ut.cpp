@@ -126,6 +126,38 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
     ASSERT_TRUE(writeData.startsWith(readData));
 }
 
+TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+    const auto clientSocketFirst = connectProxySocket();
+    const auto clientSocketSecond = connectProxySocket();
+
+    ASSERT_TRUE(clientSocketFirst->waitForConnected(kTimeoutMsec))
+        << "Connect failed: " << clientSocketFirst->errorString().toStdString();
+    ASSERT_TRUE(clientSocketSecond->waitForConnected(kTimeoutMsec))
+        << "Connect failed: " << clientSocketSecond->errorString().toStdString();
+
+    QByteArray writeData(utils::random::generate(
+        network::test::TestConnection::kReadBufferSize));
+    ASSERT_EQ(clientSocketFirst->write(writeData), writeData.size());
+    ASSERT_EQ(clientSocketSecond->write(writeData), writeData.size());
+
+    ASSERT_TRUE(clientSocketFirst->waitForReadyRead(kTimeoutMsec))
+        << "ReadyRead failed: " << clientSocketFirst->errorString().toStdString();
+    ASSERT_TRUE(clientSocketSecond->waitForReadyRead(kTimeoutMsec))
+        << "ReadyRead failed: " << clientSocketSecond->errorString().toStdString();
+    server.pleaseStopSync();
+
+    auto readData = clientSocketFirst->readAll();
+    ASSERT_GT(readData.size(), 0);
+    ASSERT_TRUE(writeData.startsWith(readData));
+
+    readData = clientSocketSecond->readAll();
+    ASSERT_GT(readData.size(), 0);
+    ASSERT_TRUE(writeData.startsWith(readData));
+}
+
+
 // Tests correct handling of CONNECT request when client sends data right after request without
 // waiting of response.
 TEST_F(VmsGatewayConnectTest, httpPipelining)
