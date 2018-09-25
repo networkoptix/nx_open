@@ -14,6 +14,7 @@ QnFlirResourceSearcher::QnFlirResourceSearcher(QnMediaServerModule* serverModule
 {
     m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
     m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
+    m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
 }
 
 QnFlirResourceSearcher::~QnFlirResourceSearcher()
@@ -200,6 +201,11 @@ void QnFlirResourceSearcher::createResource(const FlirDeviceInfo& info, const QA
     resource->setFirmware(info.firmware);
 
     result << resource;
+}
+
+nx::plugins::flir::IoExecutor* QnFlirResourceSearcher::ioExecutor() const
+{
+    return m_flirIoExecutor.get();
 }
 
 #endif // ENABLE_FLIR

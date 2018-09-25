@@ -103,8 +103,6 @@ void QnMediaServerResourceSearchers::start()
         registerSearcher(new QnAdamResourceSearcher(serverModule()));
     #endif
     #ifdef ENABLE_FLIR
-        m_flirIoExecutor = std::make_unique<nx::plugins::flir::IoExecutor>();
-
         registerSearcher(new flir::FcResourceSearcher(serverModule()));
         registerSearcher(new QnFlirResourceSearcher(serverModule()));
         #ifdef ENABLE_ONVIF
@@ -143,7 +141,4 @@ void QnMediaServerResourceSearchers::stop()
     for (auto searcher: m_searchers.values())
         delete searcher;
     m_searchers.clear();
-#ifdef ENABLE_FLIR
-    m_flirIoExecutor.reset();
-#endif
 }
