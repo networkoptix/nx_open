@@ -8,7 +8,7 @@ vm_types:
       machines_per_slot: 20
       slots_per_type: 5
       mac_address_format: 0A-00-{slot:02X}-01-{vm_index:02X}-0{nic_index:01X}
-      template_vm: trusty-{slot}-template
+      template_vm: trusty-{slot}-template-20180921
       template_file: trusty-template-20180921.ova
       port_forwarding:
         host_ports_base: 43000
@@ -25,7 +25,7 @@ vm_types:
       machines_per_slot: 10
       slots_per_type: 5
       mac_address_format: 0A-00-{slot:02X}-02-{vm_index:02X}-0{nic_index:01X}
-      template_vm: win10-{slot}-template
+      template_vm: win10-{slot}-template-20180921
       template_file: win10-template-20180921.ova
       port_forwarding:
         host_ports_base: 45000
@@ -45,7 +45,7 @@ vm_types:
       machines_per_slot: 10
       slots_per_type: 5
       mac_address_format: 0A-00-{slot:02X}-03-{vm_index:02X}-0{nic_index:01X}
-      template_vm: trusty-{slot}-template
+      template_vm: trusty-{slot}-template-20180921
       template_file: trusty-template-20180921.ova
       port_forwarding:
         host_ports_base: 47000
