@@ -99,16 +99,11 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
     Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
 
-    auto securityCamResource = res.dynamicCast<QnSecurityCamResource>();
-    if (securityCamResource)
-    {
-        auto resourceData = qnStaticCommon->dataPool()->data(securityCamResource);
-        const bool ignoreCameraTimeIfBigJitter = resourceData.value<bool>(
-            Qn::IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME);
-        if (ignoreCameraTimeIfBigJitter)
-            m_defaultTimePolicy = nx::streaming::rtp::TimePolicy::ignoreCameraTimeIfBigJitter;
-    }
-    updateTimePolicy();
+    auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
+    if (secResource && secResource->trustCameraTime())
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
+    else
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -241,7 +236,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
                 const QnRtspStatistic& statistics = track.ioDevice ?
                     track.ioDevice->getStatistic() : QnRtspStatistic();
                 result->timestamp = m_timeHelper.getUsecTime(
-                    result->timestamp, statistics, track.parser->getFrequency());
+                    result->timestamp, statistics, track.parser->getFrequency(), m_role == Qn::CR_LiveVideo);
                 result->channelNumber = track.parser->logicalChannelNum();
                 if (result->dataType == QnAbstractMediaData::VIDEO)
                 {
@@ -810,8 +805,7 @@ void QnMulticodecRtpReader::setDateTimeFormat(const QnRtspClient::DateTimeFormat
 
 void QnMulticodecRtpReader::setTimePolicy(nx::streaming::rtp::TimePolicy timePolicy)
 {
-    m_defaultTimePolicy = timePolicy;
-    updateTimePolicy();
+    m_timeHelper.setTimePolicy(timePolicy);
 }
 
 void QnMulticodecRtpReader::updateTimePolicy()
@@ -820,7 +814,7 @@ void QnMulticodecRtpReader::updateTimePolicy()
     if (secResource && secResource->trustCameraTime())
         m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
     else
-        m_timeHelper.setTimePolicy(m_defaultTimePolicy);
+        m_timeHelper.setTimePolicy(nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime);
 }
 
 void QnMulticodecRtpReader::addRequestHeader(
