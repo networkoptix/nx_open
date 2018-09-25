@@ -264,9 +264,6 @@ private:
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
-    std::unique_ptr<QnMdnsListener> m_mdnsListener;
-    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
-    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
     std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
 

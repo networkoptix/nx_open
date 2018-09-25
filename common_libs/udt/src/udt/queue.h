@@ -369,14 +369,11 @@ private:
     };
     std::list<CRL> m_lRendezvousID;      // The sockets currently in rendezvous mode
 
-    pthread_mutex_t m_RIDVectorLock;
+    std::mutex m_RIDVectorLock;
 };
 
 class CSndQueue
 {
-    friend class CUDT;
-    friend class CUDTUnited;
-
 public:
     CSndQueue();
     ~CSndQueue();
@@ -403,6 +400,12 @@ public:
 
     int sendto(const sockaddr* addr, CPacket& packet);
 
+    // List of UDT instances for data sending.
+    CSndUList* sndUList() { return m_pSndUList; }
+
+    // The UDP channel for data sending.
+    CChannel* channel() { return m_pChannel; }
+
 private:
     void worker();
 
@@ -425,9 +428,6 @@ private:
 
 class CRcvQueue
 {
-    friend class CUDT;
-    friend class CUDTUnited;
-
 public:
     CRcvQueue();
     ~CRcvQueue();
@@ -460,6 +460,19 @@ public:
 
     int recvfrom(int32_t id, CPacket& packet);
 
+    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
+    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
+
+    void registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl);
+    void removeConnector(const UDTSOCKET& id);
+
+    void setNewEntry(std::shared_ptr<CUDT> u);
+    std::shared_ptr<CUDT> getNewEntry();
+
+    // The received packet queue.
+    CUnitQueue* unitQueue() { return &m_UnitQueue; }
+
 private:
     void worker();
 
@@ -478,16 +491,7 @@ private:
     volatile bool m_bClosing;            // closing the workder
 
 private:
-    // TODO: #ak Remove following calls. CUDT should be passed in constructor and live longer.
-    int setListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
-    void removeListener(std::shared_ptr<ServerSideConnectionAcceptor> listener);
-
-    void registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl);
-    void removeConnector(const UDTSOCKET& id);
-
-    void setNewEntry(std::shared_ptr<CUDT> u);
     bool ifNewEntry();
-    std::shared_ptr<CUDT> getNewEntry();
 
     void storePkt(int32_t id, CPacket* pkt);
 

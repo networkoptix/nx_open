@@ -370,7 +370,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     if (!resource)
         return resource;
 
-    resource->setTypeId(getOnvifResourceType(manufacturerAlias, model));
+    auto typeId = getOnvifResourceType(manufacturerAlias, model);
+    NX_ASSERT(!typeId.isNull());
+    resource->setTypeId(typeId);
 
     resource->setHostAddress(QHostAddress(sender).toString());
     resource->setModel(model);

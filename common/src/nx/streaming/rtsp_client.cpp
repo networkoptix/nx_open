@@ -1165,7 +1165,6 @@ QnRtspStatistic QnRtspClient::parseServerRTCPReport(
     *gotStatistics = false;
     if (!stats.senderReport.read(srcBuffer, srcBufferSize))
         return stats;
-    stats.localTime = qnSyncTime->currentMSecsSinceEpoch() / 1000.0;
     *gotStatistics = true;
     return stats;
 }

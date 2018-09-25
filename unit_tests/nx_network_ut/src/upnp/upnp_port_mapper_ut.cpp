@@ -14,14 +14,13 @@ class UpnpPortMapper: public ::testing::Test
 {
 public:
     UpnpPortMapper():
-        deviceSearcher(deviceSearcherSettings),
+        deviceSearcher(std::make_unique<DeviceSearcherDefaultSettings>()),
         portMapper(lit("192.168.0.10"), 100)
     {
         portMapper.clientMock().changeExternalIp(lit("12.34.56.78"));
     }
 
     nx::utils::TimerManager timerManager;
-    DeviceSearcherDefaultSettings deviceSearcherSettings;
     DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper;
 };

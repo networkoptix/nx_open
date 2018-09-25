@@ -8,11 +8,15 @@
 #include <network/tcp_listener.h>
 
 #include <nx/utils/log/log_main.h>
+#include <media_server/media_server_module.h>
+#include <media_server/media_server_resource_searchers.h>
 
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
+    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
+    nx::mediaserver::ServerModuleAware(serverModule),
     QnTCPConnectionProcessor(std::move(socket), owner)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -32,7 +36,9 @@ void QnDesktopCameraRegistrator::run()
         uniqueId = getHeaderValue(d->request.headers, "user-id");
 
     // Make sure desktop camera of another user will not substitute existing one.
-    if (auto searcher = QnDesktopCameraResourceSearcher::instance())
+    auto searcher =
+        serverModule()->resourceSearchers()->searcher<QnDesktopCameraResourceSearcher>();
+    if (searcher)
     {
         NX_VERBOSE(this, lm("Registered desktop camera %1").arg(userName));
         searcher->registerCamera(std::move(d->socket), userName, uniqueId);

@@ -198,7 +198,9 @@ public:
     std::vector<QnUuid> getCamerasWithArchiveHelper() const;
 
     QnScheduleSync* scheduleSync() const;
-    static Qn::StorageStatuses storageStatus(const QnStorageResourcePtr& storage);
+    static Qn::StorageStatuses storageStatus(
+        QnMediaServerModule* serverModule,
+        const QnStorageResourcePtr& storage);
 
 signals:
     void storagesAvailable();

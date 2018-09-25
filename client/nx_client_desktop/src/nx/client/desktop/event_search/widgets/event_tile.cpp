@@ -75,7 +75,7 @@ struct EventTile::Private
 
     void handleHoverChanged(bool hovered)
     {
-        const auto showCloseButton = hovered & closeable;
+        const auto showCloseButton = hovered && closeable;
         q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
         closeButton->setVisible(showCloseButton);
         updateBackgroundRole(hovered);

@@ -16,6 +16,31 @@
 namespace ec2 {
 namespace test {
 
+namespace MergeAttributes {
+
+enum class AttributeName
+{
+    takeRemoteSettings,
+};
+
+struct Attribute
+{
+    AttributeName name;
+    std::variant<bool> value;
+};
+
+struct TakeRemoteSettings: Attribute
+{
+    TakeRemoteSettings(bool value_)
+    {
+        value = value_;
+    }
+};
+
+} // namespace MergeAttributes
+
+//-------------------------------------------------------------------------------------------------
+
 // TODO: #ak Get rid of this class. ec2GetTransactionLog should be in MediaServerClient.
 // Though, it requires some refactoring: moving ec2::ApiTransactionDataList out of appserver2.
 class MediaServerClientEx:
@@ -62,7 +87,9 @@ public:
 
     bool detachFromSystem();
 
-    QnRestResult::Error mergeTo(const PeerWrapper& remotePeer);
+    QnRestResult::Error mergeTo(
+        const PeerWrapper& remotePeer,
+        std::vector<MergeAttributes::Attribute> attributes = {});
 
     ec2::ErrorCode getTransactionLog(ec2::ApiTransactionDataList* result) const;
 

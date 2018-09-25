@@ -4,6 +4,7 @@
 #include <nx/streaming/video_data_packet.h>
 
 #include <utils/media/hevc_common.h>
+#include <nx/network/buffer.h>
 
 namespace nx {
 namespace network {
@@ -45,7 +46,6 @@ public:
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
-        const QnRtspStatistic& statistics,
         bool& gotData) override;
 
     // Implementation of QnRtpStreamParser::setSDPInfo
@@ -118,15 +118,8 @@ private:
     int additionalBufferSize() const;
     void addSdpParameterSetsIfNeeded(QnByteArray& buffer);
 
-    void createVideoDataIfNeeded(
-        bool* outGotData,
-        const QnRtspStatistic& statistic,
-        uint32_t rtpTimestamp);
-
-    QnCompressedVideoDataPtr createVideoData(
-        const uint8_t* rtpBuffer,
-        uint32_t rtpTime,
-        const QnRtspStatistic& statistics);
+    void createVideoDataIfNeeded(bool* outGotData, uint32_t rtpTimestamp);
+    QnCompressedVideoDataPtr createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime);
 
     void parseRtpMap(const nx::Buffer& rtpMapLine);
     void parseFmtp(const nx::Buffer& fmtpLine);

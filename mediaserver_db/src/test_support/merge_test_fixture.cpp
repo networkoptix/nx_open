@@ -51,6 +51,15 @@ PeerWrapper& SystemMergeFixture::peer(int index)
     return *m_servers[index];
 }
 
+QnRestResult::Error SystemMergeFixture::mergePeers(
+    PeerWrapper& what,
+    PeerWrapper& to,
+    std::vector<MergeAttributes::Attribute> attributes)
+{
+    m_prevResult = what.mergeTo(to, std::move(attributes));
+    return m_prevResult;
+}
+
 QnRestResult::Error SystemMergeFixture::mergeSystems()
 {
     m_prevResult = m_servers.back()->mergeTo(*m_servers.front());

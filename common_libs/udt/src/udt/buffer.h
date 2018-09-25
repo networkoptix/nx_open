@@ -41,6 +41,7 @@ Yunhong Gu, last updated 05/05/2009
 #ifndef __UDT_BUFFER_H__
 #define __UDT_BUFFER_H__
 
+#include <mutex>
 
 #include "udt.h"
 #include "list.h"
@@ -122,7 +123,7 @@ private:
     void increase();
 
 private:
-    pthread_mutex_t m_BufLock;           // used to synchronize buffer operation
+    std::mutex m_BufLock;           // used to synchronize buffer operation
 
     struct Block
     {

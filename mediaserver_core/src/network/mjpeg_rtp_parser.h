@@ -15,8 +15,7 @@ public:
     virtual void setSdpInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(
-        quint8* rtpBufferBase, int bufferOffset, int bytesRead, const QnRtspStatistic& statistics,
-        bool& gotData) override;
+        quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData) override;
 
 private:
     int makeHeaders(
@@ -29,7 +28,6 @@ private:
 private:
     bool resolutionWorkaroundLogged = false;
     bool mjpeg16BitWarningLogged = false;
-    int m_frequency;
 
     // TODO: Consider adding pix_fmt to QnMediaContext. Currently m_context is not used.
     //QnMediaContextPtr m_context;

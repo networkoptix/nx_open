@@ -113,6 +113,10 @@ public:
     bool isSubscribedTo(const vms::api::PersistentIdData& peer) const;
     qint32 distanceTo(const vms::api::PersistentIdData& peer) const;
 
+    /* Check remote peer identityTime and set local value if it greater.
+     * @return false if system identity time has been changed.
+     */
+    virtual bool validateRemotePeerData(const vms::api::PeerDataEx& remotePeer);
 protected:
     template<class T>
     void sendTransactionImpl(

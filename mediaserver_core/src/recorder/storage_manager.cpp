@@ -416,8 +416,13 @@ public:
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage, m_settings))
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
+                m_owner->serverModule()->platform(),
+                storage,
+                m_settings))
+            {
                 fileStorage->setMounted(true);
+            }
         }
 
         for (const auto& storage : storagesToTest())
@@ -1142,7 +1147,10 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == moduleGUID())
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage, &serverModule()->settings()))
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(
+            serverModule()->platform(),
+            fileStorage,
+            &serverModule()->settings()))
             fileStorage->setMounted(false);
 
         if (checkIfMyStorage(storage))
@@ -2278,6 +2286,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             if (available >= bigStorageThreshold)
             {
                 result << fileStorage;
+                fileStorage->setStatusFlag(fileStorage->statusFlag() & ~Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 size seems appropriate")
@@ -2285,6 +2294,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             }
             else
             {
+                fileStorage->setStatusFlag(fileStorage->statusFlag() | Qn::StorageStatus::tooSmall);
                 NX_VERBOSE(
                     this,
                     lm("[ApiStorageSpace, Writable storages] candidate: %1 available size %2 is less than the treshold %3.")
@@ -2305,6 +2315,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::systemTooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2320,6 +2331,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                     .args((*it)->getUrl()));
 
             result.remove(*it);
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::systemTooSmall);
         }
     }
 
@@ -3015,12 +3027,10 @@ QnScheduleSync* QnStorageManager::scheduleSync() const
     return m_scheduleSync.get();
 }
 
-Qn::StorageStatuses QnStorageManager::storageStatus(const QnStorageResourcePtr& storage)
+Qn::StorageStatuses QnStorageManager::storageStatus(
+    QnMediaServerModule* serverModule,
+    const QnStorageResourcePtr& storage)
 {
-    auto serverModule = dynamic_cast<QnMediaServerModule*>(storage->commonModule());
-    if (!serverModule)
-        return Qn::StorageStatus::unknown;
-
     Qn::StorageStatuses result =
         serverModule->normalStorageManager()->storageStatusInternal(storage);
     if (result.testFlag(Qn::notUsed))
@@ -3047,20 +3057,12 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         return result;
     }
 
+    result = Qn::StorageStatus::used;
     if (storage->getStatus() == Qn::Offline)
         return result | Qn::StorageStatus::beingChecked;
 
     if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
         result | Qn::StorageStatus::beingRebuilded;
 
-    auto writableStorages = getAllWritableStorages();
-    if (!writableStorages.contains(storage))
-    {
-        if (storage->isSystem())
-            result |= Qn::StorageStatus::systemTooSmall;
-        else
-            result |= Qn::StorageStatus::tooSmall;
-    }
-
-    return result;
+    return result | storage->statusFlag();
 }

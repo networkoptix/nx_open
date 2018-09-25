@@ -221,7 +221,7 @@ CUDT::~CUDT()
     //
     // This workaround is here to prevent a segfault:
     if (m_pSNode)
-        m_pSndQueue->m_pSndUList->remove(this);
+        m_pSndQueue->sndUList()->remove(this);
 
     // release mutex/condtion variables
     destroySynch();
@@ -840,7 +840,7 @@ POST_CONNECT:
     try
     {
         m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(&(m_pRcvQueue->m_UnitQueue), m_iRcvBufSize);
+        m_pRcvBuffer = new CRcvBuffer(m_pRcvQueue->unitQueue(), m_iRcvBufSize);
         // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
         m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
         m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
@@ -939,7 +939,7 @@ void CUDT::connect(const sockaddr* peer, CHandShake* hs)
     try
     {
         m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(&(m_pRcvQueue->m_UnitQueue), m_iRcvBufSize);
+        m_pRcvBuffer = new CRcvBuffer(m_pRcvQueue->unitQueue(), m_iRcvBufSize);
         m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
         m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
         m_pACKWindow = new CACKWindow(1024);
@@ -1031,7 +1031,7 @@ void CUDT::close()
 
     // remove this socket from the snd queue
     if (m_bConnected)
-        m_pSndQueue->m_pSndUList->remove(this);
+        m_pSndQueue->sndUList()->remove(this);
 
     // trigger any pending IO events.
     s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_ERR, true);
@@ -1184,7 +1184,7 @@ int CUDT::send(const char* data, int len)
     m_pSndBuffer->addBuffer(data, size);
 
     // insert this socket to snd list if it is not on the list yet
-    m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
+    m_pSndQueue->sndUList()->update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1364,7 +1364,7 @@ int CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     m_pSndBuffer->addBuffer(data, len, msttl, inorder);
 
     // insert this socket to the snd list if it is not on the list yet
-    m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
+    m_pSndQueue->sndUList()->update(shared_from_this(), false);
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1550,7 +1550,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
         }
 
         // insert this socket to snd list if it is not on the list yet
-        m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
+        m_pSndQueue->sndUList()->update(shared_from_this(), false);
     }
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -2098,7 +2098,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             s_UDTUnited.m_EPoll.update_events(m_SocketID, m_sPollID, UDT_EPOLL_OUT, true);
 
             // insert this socket to snd list if it is not on the list yet
-            m_pSndQueue->m_pSndUList->update(shared_from_this(), false);
+            m_pSndQueue->sndUList()->update(shared_from_this(), false);
 
             // Update RTT
             //m_iRTT = *((int32_t *)ctrlpkt.m_pcData + 1);
@@ -2214,7 +2214,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             }
 
             // the lost packet (retransmission) should be sent out immediately
-            m_pSndQueue->m_pSndUList->update(shared_from_this());
+            m_pSndQueue->sndUList()->update(shared_from_this());
 
             ++m_iRecvNAK;
             ++m_iRecvNAKTotal;
@@ -2577,7 +2577,7 @@ void CUDT::checkTimers(bool forceAck)
             m_bShutdown = false;
 
             // update snd U list to remove this socket
-            m_pSndQueue->m_pSndUList->update(shared_from_this());
+            m_pSndQueue->sndUList()->update(shared_from_this());
 
             releaseSynch();
 
@@ -2604,7 +2604,7 @@ void CUDT::checkTimers(bool forceAck)
             CCUpdate();
 
             // immediately restart transmission
-            m_pSndQueue->m_pSndUList->update(shared_from_this());
+            m_pSndQueue->sndUList()->update(shared_from_this());
         }
         else
         {
