@@ -13,6 +13,7 @@
     "AUTOTESTS OFFLINE TEXT": "offiline",
     "NEW PERMISSIONS SAVED": "Nuove autorizzazioni salvate",
     "PERMISSIONS WERE REMOVED FROM": "Le autorizzazioni sono state rimosse da %email%",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
     "RESET SUCCESS MESSAGE TEXT": "Password salvata correttamente",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Il suo account è stato salvato con successo",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Il suo account è stato creato con successo",

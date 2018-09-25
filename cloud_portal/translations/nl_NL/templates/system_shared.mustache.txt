@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+Hallo, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) heeft met u de toegang tot het video management systeem "{{message.system_name}}" gedeeld.

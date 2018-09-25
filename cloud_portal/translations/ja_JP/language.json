@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "拡張ビューアー",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "ライブ表示、アーカイブ表示、PTZコントロール 等"
     },
     "Administrator": {
       "label": "アドミニストレーター",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "削除",
     "successDisconnected": "システムが正常に %PRODUCT_NAME% から切断されました",
     "successDeleted": "システム {{systemName}} はあなたのアカウントから正常に削除されました",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "システム {{systemName}} が {{systemName}} と統合されました",
     "permissionsRemoved": "{{email}} からアクセス権限が削除されました"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "クリップボードにコピーしました"
     },
     "systemOffline": "システムはオフライン",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "カメラなし",
     "cameraStates": {
       "offline": "オフライン",
       "error": "エラー",

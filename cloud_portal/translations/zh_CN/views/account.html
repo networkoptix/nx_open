@@ -17,7 +17,10 @@
                 <label for="firstName" class="text-left text-md-right control-label">名</label>
             </div>
             <div class="col-md-4">
-                <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
+                <input type="text" class="form-control" ng-model="account.first_name"
+                       name="firstName" id="firstName" maxlength="255"
+                       required
+ autofocus>
             </div>
             <div class="col-md-4">
                 <span class="help-block input-error" ng-if="accountForm.firstName.$touched && accountForm.firstName.$error.required">名字是必填项</span>
@@ -66,8 +69,8 @@
             <div class="col-md-4">
                 <input type="password" class="form-control"
                        ng-model="pass.password"
-                       name="password"
-                       id="password" required>
+                       name="password" autofocus
+ id="password" required>
             </div>
             <div class="col-md-4">
                 <span class="help-block input-error" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">当前密码是必需的。</span>

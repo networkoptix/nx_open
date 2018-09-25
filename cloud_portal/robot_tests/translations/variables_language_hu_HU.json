@@ -13,6 +13,7 @@
     "AUTOTESTS OFFLINE TEXT": "offline",
     "NEW PERMISSIONS SAVED": "Új engedélyek mentve",
     "PERMISSIONS WERE REMOVED FROM": "%email% engedélyei vissavonva",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
     "RESET SUCCESS MESSAGE TEXT": "Jelszó sikeresen frissítve",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "A fiók mentése sikeres",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "A felhasználói fiókot sikeresen aktiválta",
