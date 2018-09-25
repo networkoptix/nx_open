@@ -3394,8 +3394,6 @@ void MediaServerProcess::stopObjects()
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
 
-    m_statusWatcher.reset();
-
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
     m_ec2ConnectionFactory->shutdown();
 
@@ -3422,7 +3420,6 @@ void MediaServerProcess::stopObjects()
         "ms", commonModule()->moduleGUID());
 
     m_autoRequestForwarder.reset();
-    m_serverConnector.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
 
@@ -3845,7 +3842,7 @@ void MediaServerProcess::startObjects()
     if (!isDiscoveryDisabled)
         m_mserverResourceSearcher->start();
     m_universalTcpListener->start();
-    m_serverConnector->start();
+    serverModule()->serverConnector()->start();
     serverModule()->backupStorageManager()->scheduleSync()->start();
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
@@ -4051,15 +4048,11 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    m_serverConnector = std::make_unique<QnServerConnector>(commonModule());
-
     serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
 
     createResourceProcessor();
-
-    m_statusWatcher = std::make_unique<QnResourceStatusWatcher>(commonModule());
 
     // Searchers must be initialized before the resources are loaded as resources instances
     // are created by searchers.
