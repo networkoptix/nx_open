@@ -193,7 +193,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
 
     CameraInfoParams info;
 
-    if (QnResource::isStopping())
+    auto commonModule = m_onvifRes->serverModule()->commonModule();
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     CameraDiagnostics::Result result = fetchUpdateVideoEncoder(
@@ -202,12 +203,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
 
-    if (QnResource::isStopping())
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary, isCameraControlRequired);
 
-    if (QnResource::isStopping())
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     result = fetchUpdateProfile(soapWrapper, info, isPrimary, isCameraControlRequired);
@@ -218,7 +219,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
         return result;
     }
 
-    if (QnResource::isStopping())
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     ////Printing chosen profile

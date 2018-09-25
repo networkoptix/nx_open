@@ -47,6 +47,7 @@ QnResourcePool::QnResourcePool(QObject* parent):
     m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
+    m_threadPool.reset(new QThreadPool());
 }
 
 QnResourcePool::~QnResourcePool()
@@ -54,6 +55,11 @@ QnResourcePool::~QnResourcePool()
     QnMutexLocker locker(&m_resourcesMtx);
     m_adminResource.clear();
     m_resources.clear();
+}
+
+ QThreadPool* QnResourcePool::threadPool() const
+{
+    return m_threadPool.get();
 }
 
 void QnResourcePool::beginTran()

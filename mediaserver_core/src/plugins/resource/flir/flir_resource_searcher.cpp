@@ -9,7 +9,7 @@ QnFlirResourceSearcher::QnFlirResourceSearcher(QnMediaServerModule* serverModule
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    base_type(serverModule->commonModule()),
+    base_type(serverModule),
     m_serverModule(serverModule)
 {
     m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);

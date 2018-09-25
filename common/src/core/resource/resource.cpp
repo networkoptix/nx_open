@@ -19,11 +19,7 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/metrics/metrics_storage.h>
 
-std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
-
-// TODO: #rvasilenko move it to QnResourcePool
-Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
@@ -633,16 +629,11 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
-QnInitResPool* QnResource::initAsyncPoolInstance(int threadCount)
-{
-    initResPool()->setMaxThreadCount(threadCount);
-    return initResPool();
-}
 // -----------------------------------------------------------------------------
 
 bool QnResource::init()
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     {
@@ -691,27 +682,15 @@ private:
     QnResourcePtr m_resource;
 };
 
-void QnResource::stopAsyncTasks()
-{
-    pleaseStopAsyncTasks();
-    initResPool()->waitForDone();
-}
-
-void QnResource::pleaseStopAsyncTasks()
-{
-    QnMutexLocker lock(&m_initAsyncMutex);
-    m_appStopping = true;
-}
-
 void QnResource::reinitAsync()
 {
-    if (m_appStopping || hasFlags(Qn::foreigner))
+    if (commonModule()->isNeedToStop() || hasFlags(Qn::foreigner))
         return;
 
     setStatus(Qn::Offline);
     QnMutexLocker lock(&m_initAsyncMutex);
     m_lastInitTime = getUsecTimer();
-    initResPool()->start(new InitAsyncTask(toSharedPointer(this)));
+    resourcePool()->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
 
 void QnResource::initAsync(bool optional)
@@ -723,7 +702,7 @@ void QnResource::initAsync(bool optional)
     if (t - m_lastInitTime < MIN_INIT_INTERVAL)
         return;
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return;
 
     if (hasFlags(Qn::foreigner))
@@ -732,7 +711,7 @@ void QnResource::initAsync(bool optional)
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional)
     {
-        if (initResPool()->tryStart(task))
+        if (resourcePool()->threadPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -740,7 +719,7 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        initResPool()->start(task);
+        resourcePool()->threadPool()->start(task);
     }
 }
 

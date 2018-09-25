@@ -323,7 +323,7 @@ public:
                             .arg(scanPeriodDuration / (1000 * 60 * 60)));
                     filter.scanPeriod.durationMs = scanPeriodDuration;
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
-                    if (needToStop() || QnResource::isStopping())
+                    if (needToStop() || m_owner->serverModule()->commonModule()->isNeedToStop())
                         return;
                     ++currentStorageStep;
                 }
@@ -376,7 +376,7 @@ public:
                     if (fullscanProcessed)
                     {
                         // Do not reset position if server is going to restart.
-                        if (!QnResource::isStopping())
+                        if (!m_owner->serverModule()->commonModule()->isNeedToStop())
                             ArchiveScanPosition::reset(m_owner->m_role, m_owner->serverModule());
 
                         m_owner->createArchiveCameras(archiveCameras);
@@ -633,7 +633,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
     QString cameraUniqueId = fileCatalog->cameraUniqueId();
     for(const DeviceFileCatalog::Chunk& chunk: newChunks) {
-        if (QnResource::isStopping())
+        if (serverModule()->commonModule()->isNeedToStop())
             break;
         if (sdb)
             sdb->addRecord(cameraUniqueId, catalog, chunk);
@@ -1550,7 +1550,7 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
         {
             for (const auto& entry: fl)
             {
-                if (QnResource::isStopping())
+                if (serverModule()->commonModule()->isNeedToStop())
                     return false;
 
                 if (entry.isDir())
@@ -2123,7 +2123,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     while (toDelete > 0)
     {
-        if (QnResource::isStopping())
+        if (serverModule()->commonModule()->isNeedToStop())
         {   // Return true to mark this storage as succesfully cleaned since
             // we don't want this storage to be added in clear-again list when
             // server is going to stop.

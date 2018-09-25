@@ -2737,6 +2737,7 @@ void MediaServerProcess::prepareOsResources()
 void MediaServerProcess::initializeUpnpPortMapper()
 {
     m_upnpPortMapper = std::make_unique<nx::network::upnp::PortMapper>(
+        serverModule()->upnpDeviceSearcher(),
         /*isEnabled*/ false,
         nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
         QnAppInfo::organizationName());
@@ -3356,7 +3357,7 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    QnResource::pleaseStopAsyncTasks();
+    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)
@@ -3387,7 +3388,7 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->metadataManagerPool()->stop(); //< Stop processing analytics events.
 
-    QnResource::stopAsyncTasks();
+    serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
@@ -4050,7 +4051,8 @@ void MediaServerProcess::run()
 
     serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
-    QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
+    serverModule->resourcePool()->threadPool()->setMaxThreadCount(
+        serverModule->settings().resourceInitThreadsCount());
 
     createResourceProcessor();
 

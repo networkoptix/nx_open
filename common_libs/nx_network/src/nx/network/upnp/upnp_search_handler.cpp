@@ -1,20 +1,22 @@
 #include "upnp_search_handler.h"
-
 #include "upnp_device_searcher.h"
 
 namespace nx {
 namespace network {
 namespace upnp {
 
-SearchAutoHandler::SearchAutoHandler(const QString& devType)
+SearchAutoHandler::SearchAutoHandler(
+    nx::network::upnp::DeviceSearcher* deviceSearcher,
+    const QString& devType)
+    :
+    m_deviceSearcher(deviceSearcher)
 {
-    DeviceSearcher::instance()->registerHandler(this, devType);
+    m_deviceSearcher->registerHandler(this, devType);
 }
 
 SearchAutoHandler::~SearchAutoHandler()
 {
-    if (auto searcher = DeviceSearcher::instance())
-        searcher->unregisterHandler(this);
+    m_deviceSearcher->unregisterHandler(this);
 }
 
 } // namespace nx

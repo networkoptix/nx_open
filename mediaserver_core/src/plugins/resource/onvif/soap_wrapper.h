@@ -13,6 +13,8 @@
 #include <plugins/resource/onvif/onvif_namespace_registrar.h>
 #include <plugins/resource/onvif/soap_helpers.h>
 
+class QnCommonModule;
+
 struct SoapTimeouts
 {
     const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
@@ -437,7 +439,7 @@ public:
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
-    bool fetchLoginPassword(const QString& manufacturer, const QString& model);
+    bool fetchLoginPassword(QnCommonModule* commonModule, const QString& manufacturer, const QString& model);
 
     int getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response );
     int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );

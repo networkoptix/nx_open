@@ -105,7 +105,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
             {
                 static const std::chrono::milliseconds kFlushQueueWaitDelay(50);
                 while (m_recorder->queueSize() > 0 && m_recorder->isRunning()
-                       && !QnResource::isStopping())
+                       && !m_resource->commonModule()->isNeedToStop())
                 {
                     std::this_thread::sleep_for(kFlushQueueWaitDelay);
                 }

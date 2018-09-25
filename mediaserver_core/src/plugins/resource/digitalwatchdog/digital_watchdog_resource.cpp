@@ -204,7 +204,7 @@ std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() cons
 
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     auto http = httpClient();
@@ -243,7 +243,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false)
     {
-        if (m_appStopping)
+        if (commonModule()->isNeedToStop())
             return CameraDiagnostics::UnknownErrorResult();
 
         // The camera most likely is going to reset after enabling dual streaming

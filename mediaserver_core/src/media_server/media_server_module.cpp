@@ -318,8 +318,6 @@ void QnMediaServerModule::stop()
     m_statusWatcher->stop();
 
     resourceDiscoveryManager()->stop();
-    m_mdnsListener.reset();
-    m_upnpDeviceSearcher.reset();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -605,4 +603,14 @@ QnServerConnector* QnMediaServerModule::serverConnector() const
 QnResourceStatusWatcher* QnMediaServerModule::statusWatcher() const
 {
     return m_statusWatcher;
+}
+
+QnMdnsListener* QnMediaServerModule::mdnsListener() const
+{
+    return m_mdnsListener.get();
+}
+
+nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() const
+{
+    return m_upnpDeviceSearcher.get();
 }

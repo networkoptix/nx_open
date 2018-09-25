@@ -98,7 +98,8 @@ protected:
             url += "/" + mediaFolderName;
 
         unmountedStorages = unmountedFilter.getUnmountedStorages(
-              QnStorageResourceList() << storageTestHelper.createStorage(url, spaceLimit),
+              QnStorageResourceList() << nx::ut::utils::FileStorageTestHelper::createStorage(
+                  &serverModule(), url, spaceLimit),
               isPathFound == PathFound::yes ? QStringList() << url : QStringList());
     }
 
@@ -110,7 +111,6 @@ protected:
             ASSERT_TRUE(unmountedStorages.isEmpty());
     }
 
-    nx::ut::utils::FileStorageTestHelper storageTestHelper;
     QString basePath = "/some/path";
     QString mediaFolderName;
     nx::mserver_aux::UnmountedLocalStoragesFilter unmountedFilter;

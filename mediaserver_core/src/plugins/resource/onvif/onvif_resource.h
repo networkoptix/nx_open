@@ -257,6 +257,7 @@ public:
 
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(
+        QnCommonModule* commonModule,
         const SoapTimeouts& onvifTimeouts,
         const QString& onvifUrl,
         const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);

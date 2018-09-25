@@ -175,7 +175,8 @@ public:
     void setPlatform(QnPlatformAbstraction* platform);
     QnServerConnector* serverConnector () const;
     QnResourceStatusWatcher* statusWatcher() const;
-
+    QnMdnsListener* mdnsListener() const;
+    nx::network::upnp::DeviceSearcher* upnpDeviceSearcher() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
