@@ -3,9 +3,9 @@
 #include <functional>
 #include <memory>
 #include <utility>
+#include <boost/optional.hpp>
 
 #include "move_only_func.h"
-#include "std/optional.h"
 
 namespace nx::utils {
 
@@ -26,7 +26,7 @@ public:
     ScopeGuard& operator=(const ScopeGuard&) = delete;
 
     ScopeGuard(ScopeGuard&& rhs):
-        m_callback(std::exchange(rhs.m_callback, std::nullopt))
+        m_callback(std::exchange(rhs.m_callback, boost::none))
     {
     }
 
@@ -34,7 +34,7 @@ public:
     ScopeGuard& operator=(ScopeGuard&& rhs)
     {
         fire();
-        m_callback = std::exchange(rhs.m_callback, std::nullopt);
+        m_callback = std::exchange(rhs.m_callback, boost::none);
         return *this;
     }
 
@@ -49,7 +49,7 @@ public:
     {
         if (m_callback)
         {
-            auto callback = std::exchange(m_callback, std::nullopt);
+            auto callback = std::exchange(m_callback, boost::none);
             (*callback)();
         }
     }
@@ -57,7 +57,7 @@ public:
     /** Disarms guard, so callback is newer called */
     void disarm()
     {
-        m_callback = std::nullopt;
+        m_callback = boost::none;
     }
 
     explicit operator bool() const
@@ -66,7 +66,7 @@ public:
     }
 
 private:
-    std::optional<Callback> m_callback;
+    boost::optional<Callback> m_callback;
 };
 
 using Guard = ScopeGuard<std::function<void()>>;
