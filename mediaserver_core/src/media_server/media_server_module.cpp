@@ -267,7 +267,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
 
     m_recordingManager = store(new QnRecordingManager(this, nullptr)); //< Mutex manager disabled
 
-    m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(commonModule()));
+    m_hostSystemPasswordSynchronizer = store(new HostSystemPasswordSynchronizer(this));
     m_cameraErrorProcessor = store(new nx::mediaserver::camera::ErrorProcessor());
 
     commonModule()->setResourceDiscoveryManager(
