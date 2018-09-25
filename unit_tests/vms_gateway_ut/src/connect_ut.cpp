@@ -12,7 +12,8 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-const constexpr int kTimeoutMsec = 10;
+const constexpr int kTimeoutMsec = 100;
+const QByteArray successResponse = "HTTP/1.1 200 Connection estabilished\r\n";
 
 class VmsGatewayConnectTest:
     public BasicComponentTest
@@ -25,55 +26,46 @@ public:
             network::test::TestTransmissionMode::pong)
     {
         NX_CRITICAL(server.start());
-
-        m_QtThread = nx::utils::thread(
-            [this]() {
-                int argc = 1;
-                NX_VERBOSE(this, "Running QCoreApplication");
-                QCoreApplication a(argc, nullptr);
-                a.exec();
-                NX_VERBOSE(this, "Finished QCoreApplication::exec()");
-            });
     }
 
-    ~VmsGatewayConnectTest()
+    // NOTE: Socket is out parameter, as gtest does not support assertions in non-void functions.
+    void connectProxySocket(const network::SocketAddress serverAddress,
+        std::unique_ptr<network::TCPSocket>& socket,
+        const QByteArray &connectResponse = successResponse)
     {
-        qApp->exit();
-        m_QtThread.join();
-    }
+        socket = std::make_unique<network::TCPSocket>();
+        socket->setRecvTimeout(kTimeoutMsec);
 
+        // Connect to proxy
+        ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
+            << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
-    std::unique_ptr<QTcpSocket> connectProxySocket()
-    {
-        auto socket = std::make_unique<QTcpSocket>();
-        socket->setProxy(QNetworkProxy(
-            QNetworkProxy::HttpProxy,
-            endpoint().address.toString(),
-            endpoint().port));
+        const QByteArray connectRequest(QString(
+            "CONNECT %1 HTTP/1.1\r\n"
+            "Host: localhost\r\n\r\n"
+            ).arg(serverAddress.toString()).toStdString().c_str());
 
-        const auto addr = server.addressBeingListened();
+        // Send CONNECT request to proxy.
+        ASSERT_EQ(socket->send(connectRequest, connectRequest.size()), connectRequest.size());
 
-        // FIXME: "Network proxy is not used if the address used in connectToHost(), bind() or
-        //       listen() is equivalent to QHostAddress::LocalHost or QHostAddress::LocalHostIPv6"
-        //       (but Qt on linux has another opinion about this and works well...).
-        // see: http://doc.qt.io/qt-5/qnetworkproxy.html
-        socket->connectToHost(addr.address.toString(), addr.port);
-        return socket;
+        QByteArray responseReceiveBuffer;
+        responseReceiveBuffer.resize(connectResponse.size());
+
+        // Check that CONNECT was successfull.
+        ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
+            responseReceiveBuffer.size());
+        // We want to check only the first response line.
+        ASSERT_TRUE(responseReceiveBuffer.startsWith(connectResponse));
+
+        // Clean http options which can be left in socket buffer.
+        socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), MSG_DONTWAIT);
     }
 
     network::test::RandomDataTcpServer server;
-
-private:
-    nx::utils::thread m_QtThread;
 };
 
 
-// FIXME: Should fix waitForConnected and waitForReadyRead functions
-//        "This function may fail randomly on Windows. Consider using the event loop and the
-//        connected() signal if your software will run on Windows."
-// See: http://doc.qt.io/qt-5/qabstractsocket.html#waitForConnected.
-
-TEST_F(VmsGatewayConnectTest, connectionClose)
+TEST_F(VmsGatewayConnectTest, ConnectionClose)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
 
@@ -85,9 +77,8 @@ TEST_F(VmsGatewayConnectTest, connectionClose)
         });
 
     // Client closes connection.
-    auto clientSocket = connectProxySocket();
-    ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
-        << "Connect failed: " << clientSocket->errorString().toStdString();
+    std::unique_ptr<network::TCPSocket> clientSocket;
+    connectProxySocket(server.addressBeingListened(), clientSocket);
 
     clientSocket->close();
     waitQueue.pop();
@@ -96,71 +87,61 @@ TEST_F(VmsGatewayConnectTest, connectionClose)
     clientSocket.reset();
 
     // Server closes connection.
-    clientSocket = connectProxySocket();
-    ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
-        << "Connect failed: " << clientSocket->errorString().toStdString();
+    connectProxySocket(server.addressBeingListened(), clientSocket);
 
     server.pleaseStopSync();
-    ASSERT_FALSE(clientSocket->waitForReadyRead(kTimeoutMsec));
-    ASSERT_EQ(clientSocket->error(), QAbstractSocket::RemoteHostClosedError);
+    QByteArray receiveBuffer(1, 0);  //< It should be >0 to differentiate EOF and zero bytes read.
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0), 0);
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 }
 
 TEST_F(VmsGatewayConnectTest, IpSpecified)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
-    const auto clientSocket = connectProxySocket();
 
-    ASSERT_TRUE(clientSocket->waitForConnected(kTimeoutMsec))
-        << "Connect failed: " << clientSocket->errorString().toStdString();
+    std::unique_ptr<network::TCPSocket> clientSocket;
+    connectProxySocket(server.addressBeingListened(), clientSocket);
 
     QByteArray writeData(utils::random::generate(
         network::test::TestConnection::kReadBufferSize));
-    ASSERT_EQ(clientSocket->write(writeData), writeData.size());
+    ASSERT_EQ(clientSocket->send(writeData, writeData.size()), writeData.size());
 
-    ASSERT_TRUE(clientSocket->waitForReadyRead(kTimeoutMsec))
-        << "ReadyRead failed: " << clientSocket->errorString().toStdString();
+    QByteArray receiveBuffer;
+    receiveBuffer.resize(writeData.size());
+    ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+        receiveBuffer.size());
+
     server.pleaseStopSync();
 
-    const auto readData = clientSocket->readAll();
-    ASSERT_GT(readData.size(), 0);
-    ASSERT_TRUE(writeData.startsWith(readData));
+    ASSERT_EQ(receiveBuffer, writeData);
 }
 
 TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
-    const auto clientSocketFirst = connectProxySocket();
-    const auto clientSocketSecond = connectProxySocket();
 
-    ASSERT_TRUE(clientSocketFirst->waitForConnected(kTimeoutMsec))
-        << "Connect failed: " << clientSocketFirst->errorString().toStdString();
-    ASSERT_TRUE(clientSocketSecond->waitForConnected(kTimeoutMsec))
-        << "Connect failed: " << clientSocketSecond->errorString().toStdString();
+    std::unique_ptr<network::TCPSocket> clientSocketFirst;
+    connectProxySocket(server.addressBeingListened(), clientSocketFirst);
+    std::unique_ptr<network::TCPSocket> clientSocketSecond;
+    connectProxySocket(server.addressBeingListened(), clientSocketSecond);
 
     QByteArray writeData(utils::random::generate(
         network::test::TestConnection::kReadBufferSize));
-    ASSERT_EQ(clientSocketFirst->write(writeData), writeData.size());
-    ASSERT_EQ(clientSocketSecond->write(writeData), writeData.size());
+    ASSERT_EQ(clientSocketFirst->send(writeData, writeData.size()), writeData.size());
+    ASSERT_EQ(clientSocketSecond->send(writeData, writeData.size()), writeData.size());
 
-    ASSERT_TRUE(clientSocketFirst->waitForReadyRead(kTimeoutMsec))
-        << "ReadyRead failed: " << clientSocketFirst->errorString().toStdString();
-    ASSERT_TRUE(clientSocketSecond->waitForReadyRead(kTimeoutMsec))
-        << "ReadyRead failed: " << clientSocketSecond->errorString().toStdString();
+    QByteArray receiveBuffer;
+    receiveBuffer.resize(writeData.size());
+    ASSERT_EQ(clientSocketFirst->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+        receiveBuffer.size());
+    ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
+        receiveBuffer.size());
     server.pleaseStopSync();
-
-    auto readData = clientSocketFirst->readAll();
-    ASSERT_GT(readData.size(), 0);
-    ASSERT_TRUE(writeData.startsWith(readData));
-
-    readData = clientSocketSecond->readAll();
-    ASSERT_GT(readData.size(), 0);
-    ASSERT_TRUE(writeData.startsWith(readData));
 }
-
 
 // Tests correct handling of CONNECT request when client sends data right after request without
 // waiting of response.
-TEST_F(VmsGatewayConnectTest, httpPipelining)
+TEST_F(VmsGatewayConnectTest, HttpPipelining)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
 
@@ -207,16 +188,16 @@ TEST_F(VmsGatewayConnectTest, httpPipelining)
 TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));
-    const auto socket = connectProxySocket();
-    ASSERT_FALSE(socket->waitForConnected());
+    std::unique_ptr<network::TCPSocket> clientSocket;
+    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
     server.pleaseStopSync();
 }
 
 TEST_F(VmsGatewayConnectTest, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, true));
-    const auto socket = connectProxySocket();
-    ASSERT_FALSE(socket->waitForConnected());
+    std::unique_ptr<network::TCPSocket> clientSocket;
+    connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
     server.pleaseStopSync();
 }
 
