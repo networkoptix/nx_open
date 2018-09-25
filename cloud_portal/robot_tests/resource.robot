@@ -26,7 +26,7 @@ Regular Open Browser
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    Set Window Size    1920    1080
 
 Docker Open Browser
     [Arguments]    ${url}
@@ -44,7 +44,7 @@ Set Chrome Options
     [Return]    ${options}
 
 Check Language
-    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
+#    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
