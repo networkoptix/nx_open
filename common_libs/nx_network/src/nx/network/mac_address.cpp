@@ -9,16 +9,17 @@ QnMacAddress::QnMacAddress(const unsigned char *mac) {
     memcpy(m_data.bytes, mac, 6);
 }
 
-QnMacAddress::QnMacAddress(const QLatin1String &mac) {
+QnMacAddress::QnMacAddress(const QLatin1String &mac): QnMacAddress()
+{
     init(mac);
 }
 
-QnMacAddress::QnMacAddress(const QByteArray &mac)
+QnMacAddress::QnMacAddress(const QByteArray &mac): QnMacAddress()
 {
     init(QLatin1String(mac));
 }
 
-QnMacAddress::QnMacAddress(const QString &mac) {
+QnMacAddress::QnMacAddress(const QString &mac): QnMacAddress() {
     init(mac);
 }
 
