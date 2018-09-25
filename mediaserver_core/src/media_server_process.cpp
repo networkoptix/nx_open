@@ -2464,7 +2464,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    /**%apidoc GET /api/analyticsLookupDetectedObjects
+    /**%apidoc GET /ec2/analyticsLookupDetectedObjects
      * Search analytics DB for objects that match filter specified.
      * %param[opt] deviceId Id of camera.
      * %param[opt] objectTypeId Analytics object type id.
