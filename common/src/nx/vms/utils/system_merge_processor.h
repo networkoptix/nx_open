@@ -58,6 +58,10 @@ private:
         const MergeSystemData& data,
         QnJsonRestResult* result);
 
+    nx::network::http::StatusCode::Value checkIfSystemsHaveServerWithSameId(
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result);
+
     nx::network::http::StatusCode::Value checkIfCloudSystemsMergeIsPossible(
         const MergeSystemData& data,
         MediaServerClient* remoteMediaServerClient,

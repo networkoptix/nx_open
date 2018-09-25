@@ -8,6 +8,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 
 #include <api/global_settings.h>
 #include <api/mediaserver_client.h>
@@ -182,7 +183,13 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     MediaServerClient remoteMediaServerClient(remoteServerUrl);
     remoteMediaServerClient.setAuthenticationKey(data.getKey);
 
-    auto resultCode = checkIfCloudSystemsMergeIsPossible(
+    auto resultCode = checkIfSystemsHaveServerWithSameId(
+        &remoteMediaServerClient,
+        result);
+    if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+        return resultCode;
+
+    resultCode = checkIfCloudSystemsMergeIsPossible(
         data,
         &remoteMediaServerClient,
         result);
@@ -227,6 +234,50 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         NX_DEBUG(this, lit("Cannot merge to the unconfigured system"));
         setMergeError(result, MergeStatus::unconfiguredSystem);
         return nx::network::http::StatusCode::badRequest;
+    }
+
+    return nx::network::http::StatusCode::ok;
+}
+
+nx::network::http::StatusCode::Value 
+    SystemMergeProcessor::checkIfSystemsHaveServerWithSameId(
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result)
+{
+    nx::vms::api::MediaServerDataExList remoteMediaServers;
+    auto resultCode = remoteMediaServerClient->ec2GetMediaServersEx(&remoteMediaServers);
+    if (resultCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lm("Error fetching mediaserver list from remote system. %1")
+            .args(::ec2::toString(resultCode)));
+        setMergeError(result, MergeStatus::configurationFailed);
+        return nx::network::http::StatusCode::serviceUnavailable;
+    }
+
+    auto serverManager = 
+        m_commonModule->ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
+    nx::vms::api::MediaServerDataExList localMediaServers;
+    resultCode = serverManager->getServersExSync(&localMediaServers);
+    if (resultCode != ec2::ErrorCode::ok)
+    {
+        NX_DEBUG(this, lm("Error fetching local mediaserver list. %1")
+            .args(::ec2::toString(resultCode)));
+        setMergeError(result, MergeStatus::configurationFailed);
+        return nx::network::http::StatusCode::serviceUnavailable;
+    }
+
+    for (const auto& localMediaServer: localMediaServers)
+    {
+        const auto sameMserverIter = std::find_if(
+            remoteMediaServers.begin(), remoteMediaServers.end(),
+            [id = localMediaServer.id](const auto& ms) { return id == ms.id; });
+        if (sameMserverIter != remoteMediaServers.end())
+        {
+            NX_DEBUG(this, lm("Merge error. Both systems have same mediaserver %1")
+                .args(sameMserverIter->id));
+            setMergeError(result, MergeStatus::configurationFailed);
+            return nx::network::http::StatusCode::serviceUnavailable;
+        }
     }
 
     return nx::network::http::StatusCode::ok;

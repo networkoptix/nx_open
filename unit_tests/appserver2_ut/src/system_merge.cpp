@@ -39,6 +39,22 @@ protected:
         ASSERT_TRUE(initializeSingleServerSystems(2));
     }
 
+    void givenTwoSystemsWithServersWithSameId()
+    {
+        givenTwoSingleServerSystems();
+
+        nx::vms::api::MediaServerData newServer;
+        newServer.id = QnUuid::createUuid();
+        newServer.name = "Shared server";
+
+        for (int i = 0; i < peerCount(); ++i)
+        {
+            ASSERT_EQ(
+                ec2::ErrorCode::ok,
+                peer(i).mediaServerClient()->ec2SaveMediaServer(newServer));
+        }
+    }
+
     void merge(
         PeerWrapper& what,
         PeerWrapper& to,
@@ -50,6 +66,11 @@ protected:
     void thenMergeSucceeded()
     {
         ASSERT_EQ(QnRestResult::Error::NoError, prevMergeResult());
+    }
+
+    void thenMergedFailed()
+    {
+        ASSERT_NE(QnRestResult::Error::NoError, prevMergeResult());
     }
 
     void thenMergeHistoryRecordIsAdded()
@@ -124,6 +145,13 @@ TEST_F(SystemMerge, three_systems_merge_wierd_scenario)
 
     waitUntilAllServersSynchronizedData();
     waitUntilEveryServerSeesEveryoneElseAsOnline();
+}
+
+TEST_F(SystemMerge, cannot_merge_systems_with_servers_with_same_id)
+{
+    givenTwoSystemsWithServersWithSameId();
+    mergeSystems();
+    thenMergedFailed();
 }
 
 } // namespace test
