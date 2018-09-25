@@ -14,7 +14,6 @@ namespace gateway {
 
 static const int kDefaultBufferSize = 16 * 1024;
 
-// TODO: check what happens with connectHandler when it will close connection in stream()
 ConnectHandler::ConnectHandler(const conf::Settings& settings):
     m_settings(settings)
 {
@@ -35,7 +34,7 @@ void ConnectHandler::processRequest(
     if (!network::SocketGlobals::addressResolver()
             .isCloudHostName(targetAddress.address.toString()))
     {
-        // No cloud address means direct IP
+        // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
             return completionHandler(nx::network::http::StatusCode::forbidden);
         if (targetAddress.port == 0)
@@ -74,7 +73,7 @@ void ConnectHandler::connect(const network::SocketAddress& address)
         .arg(m_connection->socket()).arg(m_targetSocket));
 
     // NOTE: Socket is taken before connect because otherwise some data received from client after
-    // CONNECT request can be parsed by HTTP connection parser and do not get here
+    // CONNECT request can be parsed by HTTP connection parser and do not get here.
     m_connectionSocket = m_connection->takeSocket();
     m_connectionSocket->cancelIOSync(network::aio::etNone);
 
@@ -85,32 +84,40 @@ void ConnectHandler::connect(const network::SocketAddress& address)
             NX_VERBOSE(this, lm("Connect result: %1")
                 .arg(SystemError::toString(result)));
 
-            if (result != SystemError::noError)
-                return socketError(m_targetSocket.get(), result);
-
             m_request.requestLine.version.serialize(&m_connectionBuffer);
-            m_connectionBuffer.append(Buffer(" 200 Connection estabilished\r\n\r\n"));
+            if (result != SystemError::noError)
+            {
+                m_connectionBuffer.append(Buffer(" 503 Service Unavailable\r\n\r\n"));
+                m_connectionSocket->sendAsync(
+                    m_connectionBuffer,
+                    [this, result](SystemError::ErrorCode, size_t)
+                    {
+                        return socketError(m_targetSocket.get(), result);
+                    });
+            }
+            else
+            {
+                m_connectionBuffer.append(Buffer(" 200 Connection estabilished\r\n\r\n"));
 
-            m_connectionSocket->sendAsync(
-                m_connectionBuffer,
-                [this](SystemError::ErrorCode result, size_t)
-                {
-                    if (result != SystemError::noError)
-                        return socketError(m_connectionSocket.get(), result);
+                m_connectionSocket->sendAsync(
+                    m_connectionBuffer,
+                    [this](SystemError::ErrorCode result, size_t)
+                    {
+                        if (result != SystemError::noError)
+                            return socketError(m_connectionSocket.get(), result);
 
-                    m_connectionBuffer.reserve(kDefaultBufferSize);
-                    m_connectionBuffer.resize(0);
-                    stream(m_connectionSocket.get(), m_targetSocket.get(), &m_connectionBuffer);
+                        m_connectionBuffer.reserve(kDefaultBufferSize);
+                        m_connectionBuffer.resize(0);
+                        stream(m_connectionSocket.get(), m_targetSocket.get(), &m_connectionBuffer);
 
-                    m_targetBuffer.reserve(kDefaultBufferSize);
-                    m_targetBuffer.resize(0);
-                    stream(m_targetSocket.get(), m_connectionSocket.get(), &m_targetBuffer);
-                });
+                        m_targetBuffer.reserve(kDefaultBufferSize);
+                        m_targetBuffer.resize(0);
+                        stream(m_targetSocket.get(), m_connectionSocket.get(), &m_targetBuffer);
+                    });
+            }
         });
 }
 
-// TODO: what will happen, when it is called after stealing of socket? It can't send any answer
-// TODO: check how did it work before me...
 void ConnectHandler::socketError(Socket* socket, SystemError::ErrorCode error)
 {
     NX_WARNING(this, "Socket %1 returned error: %2", socket, SystemError::toString(error));
@@ -130,8 +137,8 @@ void ConnectHandler::stream(Socket* source, Socket* target, Buffer* buffer)
 
             if (size == 0)
             {
-                closeConnection(SystemError::noError, nullptr);
-                return;
+                const auto handler = std::move(m_completionHandler);
+                return handler(nx::network::http::StatusCode::ok);
             }
 
 

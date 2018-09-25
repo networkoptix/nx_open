@@ -36,7 +36,7 @@ public:
         socket = std::make_unique<network::TCPSocket>();
         socket->setRecvTimeout(kTimeoutMsec);
 
-        // Connect to proxy
+        // Connect to proxy.
         ASSERT_TRUE(socket->connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
             << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
@@ -159,7 +159,6 @@ TEST_F(VmsGatewayConnectTest, HttpPipelining)
     ASSERT_TRUE(clientSocket.connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
         << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
 
-
     // Send CONNECT request and other data right after it.
     ASSERT_EQ(clientSocket.send(connectRequest + dataAfterRequest,
         connectRequest.size() + dataAfterRequest.size()),
@@ -182,6 +181,14 @@ TEST_F(VmsGatewayConnectTest, HttpPipelining)
 
     // Graceful shutdown.
     clientSocket.shutdown();
+    server.pleaseStopSync();
+}
+
+TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
+{
+    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+    std::unique_ptr<network::TCPSocket> clientSocket;
+    connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable\r\n");
     server.pleaseStopSync();
 }
 
