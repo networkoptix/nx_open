@@ -24,6 +24,11 @@
 
 namespace {
 
+static const int kLineEditHeight = 32;
+static const int kTagHolderHeight = 40;
+static const int kLineHeight = 1;
+static const int kControlMaxHeight = kLineEditHeight + kTagHolderHeight + kLineHeight;
+
 /**
  * We have to use double empersand to preserve it in the menu item.
  * Since we use same string as the button and menu item text simultaneously we need to fix
@@ -47,7 +52,7 @@ void addLineTo(QLayout* layout)
 {
     const auto line = new QFrame();
     line->setFrameShape(QFrame::HLine);
-    line->setFixedHeight(1);
+    line->setFixedHeight(kLineHeight);
     layout->addWidget(line);
 }
 
@@ -153,7 +158,6 @@ struct SearchEdit::Private
     bool hovered = false;
     int selectedTagIndex = -1;
     int clearingTagIndex = -1;
-
 };
 
 SearchEdit::SearchEdit(QWidget* parent):
@@ -172,7 +176,7 @@ SearchEdit::SearchEdit(QWidget* parent):
 
     d->lineEdit->setFrame(false);
     d->lineEdit->setFocusProxy(this);
-    d->lineEdit->setFixedHeight(32);
+    d->lineEdit->setFixedHeight(kLineEditHeight);
     d->lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
     d->lineEdit->setClearButtonEnabled(true);
 
@@ -192,7 +196,7 @@ SearchEdit::SearchEdit(QWidget* parent):
     addLineTo(holderLayout);
 
     const auto tagHolderWidget = new QWidget(this);
-    tagHolderWidget->setFixedHeight(40);
+    tagHolderWidget->setFixedHeight(kTagHolderHeight);
     tagHolderWidget->setLayout(holderLayout);
 
     d->tagButton->setFixedHeight(24);
@@ -218,7 +222,7 @@ SearchEdit::SearchEdit(QWidget* parent):
     layout->addWidget(tagHolderWidget);
     setLayout(layout);
 
-    setupMenuButton();;
+    setupMenuButton();
     updateTagButton();
     updatePalette();
 }
@@ -348,6 +352,7 @@ void SearchEdit::setSelectedTagIndex(int value)
         return;
 
     d->selectedTagIndex = value;
+    d->lineEdit->setFocus();
     emit selectedTagIndexChanged();
 }
 
@@ -359,7 +364,11 @@ void SearchEdit::updateTagButton()
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
-    d->tagButton->parentWidget()->setVisible(d->selectedTagIndex != -1);
+    const bool tagVisible = d->selectedTagIndex != -1;
+    setFixedHeight(tagVisible
+        ? kLineEditHeight + kTagHolderHeight + kLineHeight
+        : kLineEditHeight);
+    d->tagButton->parentWidget()->setVisible(tagVisible);
 }
 
 void SearchEdit::setClearingTagIndex(int index)
@@ -404,7 +413,7 @@ void SearchEdit::focusInEvent(QFocusEvent* event)
 
     base_type::focusInEvent(event);
 
-    updatePalette(); 
+    updatePalette();
     emit focusedChanged();
 }
 
