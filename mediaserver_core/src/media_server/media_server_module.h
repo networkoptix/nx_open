@@ -8,6 +8,8 @@
 #include <utils/common/instance_storage.h>
 
 #include "settings.h"
+#include <plugins/resource/mdns/mdns_listener.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
 
 class QnCommonModule;
 class StreamingChunkCache;
@@ -40,6 +42,7 @@ class QnFileDeletor;
 class QnResourceAccessManager;
 class QnResourceDiscoveryManager;
 class QnAuditManager;
+class QnMediaServerResourceSearchers;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
@@ -164,7 +167,7 @@ public:
     QnAuditManager* auditManager() const;
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
     nx::mediaserver::camera::ErrorProcessor* cameraErrorProcessor() const;
-
+    QnMediaServerResourceSearchers* resourceSearchers() const;
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -211,4 +214,8 @@ private:
     QnPtzControllerPool* m_ptzControllerPool = nullptr;
     QnFileDeletor* m_fileDeletor = nullptr;
     nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor;
+
+    std::unique_ptr<QnMdnsListener> m_mdnsListener;
+    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
+    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
 };

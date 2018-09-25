@@ -97,8 +97,6 @@
 
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
 
-#include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
-
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <core/storage/file_storage/db_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
@@ -2661,7 +2659,7 @@ bool MediaServerProcess::initTcpListener(
         m_universalTcpListener->disableAuth();
 
     #if defined(ENABLE_DESKTOP_CAMERA)
-        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
+        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera", serverModule());
     #endif
 
     return true;
@@ -3354,7 +3352,6 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    commonModule()->resourceDiscoveryManager()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
     m_multicastHttp.reset();
 
@@ -3395,10 +3392,6 @@ void MediaServerProcess::stopObjects()
 
     m_statusWatcher.reset();
 
-    m_mdnsListener.reset();
-    m_upnpDeviceSearcher.reset();
-    m_resourceSearchers.reset();
-
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
     m_ec2ConnectionFactory->shutdown();
 
@@ -3410,8 +3403,6 @@ void MediaServerProcess::stopObjects()
     m_timeBasedNonceProvider.reset();
     m_ec2Connection.reset();
     m_ec2ConnectionFactory.reset();
-
-    commonModule()->setResourceDiscoveryManager(nullptr);
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
@@ -3971,8 +3962,6 @@ void MediaServerProcess::run()
 
     m_serverMessageProcessor =
         commonModule()->createMessageProcessor<QnServerMessageProcessor>(this->serverModule());
-    commonModule()->setResourceDiscoveryManager(
-        new QnMServerResourceDiscoveryManager(this->serverModule()));
 
     m_remoteArchiveSynchronizer = std::make_unique<
         nx::mediaserver_core::recorder::RemoteArchiveSynchronizer>(serverModule.get());
@@ -4064,20 +4053,13 @@ void MediaServerProcess::run()
 
     QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
 
-    auto settingsToDeviceSearcherSettingsAdaptor =
-        GlobalSettingsToDeviceSearcherSettingsAdapter(commonModule()->resourceDiscoveryManager());
-    m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
-        settingsToDeviceSearcherSettingsAdaptor);
-
-    m_mdnsListener = std::make_unique<QnMdnsListener>();
-
     createResourceProcessor();
 
     m_statusWatcher = std::make_unique<QnResourceStatusWatcher>(commonModule());
 
     // Searchers must be initialized before the resources are loaded as resources instances
     // are created by searchers.
-    m_resourceSearchers = std::make_unique<QnMediaServerResourceSearchers>(serverModule.get());
+    serverModule->resourceSearchers()->start();
 
     m_audioStreamerPool = std::make_unique<QnAudioStreamerPool>(serverModule.get());
 

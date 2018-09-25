@@ -35,10 +35,10 @@ const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
     nx::utils::AppInfo::organizationName() + "Server";
 
 DeviceSearcher::DeviceSearcher(
-    const AbstractDeviceSearcherSettings& settings,
+    std::unique_ptr<AbstractDeviceSearcherSettings> settings,
     unsigned int discoverTryTimeoutMS)
     :
-    m_settings(settings),
+    m_settings(std::move(settings)),
     m_discoverTryTimeoutMS(discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS),
     m_timerID(0),
     m_terminated(false),
@@ -204,7 +204,7 @@ void DeviceSearcher::processDiscoveredDevices(SearchHandler* handlerToUse)
 
 int DeviceSearcher::cacheTimeout() const
 {
-    return m_settings.cacheTimeout();
+    return m_settings->cacheTimeout();
 }
 
 DeviceSearcher* DeviceSearcher::instance()
@@ -522,7 +522,7 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     if (it == m_upnpDescCache.end())
         return nullptr;
 
-    if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout())
+    if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings->cacheTimeout())
     {
         //item has expired
         m_upnpDescCache.erase(it);

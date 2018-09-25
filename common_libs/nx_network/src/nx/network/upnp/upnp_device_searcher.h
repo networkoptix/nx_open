@@ -69,7 +69,7 @@ public:
      * @param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch.
      */
     explicit DeviceSearcher(
-        const AbstractDeviceSearcherSettings& settings,
+        std::unique_ptr<AbstractDeviceSearcherSettings> settings,
         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS);
     virtual ~DeviceSearcher();
 
@@ -141,7 +141,7 @@ private:
         nx::Buffer buf;
     };
 
-    const AbstractDeviceSearcherSettings& m_settings;
+    std::unique_ptr<AbstractDeviceSearcherSettings> m_settings;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QnMutex m_mutex;
     quint64 m_timerID;
