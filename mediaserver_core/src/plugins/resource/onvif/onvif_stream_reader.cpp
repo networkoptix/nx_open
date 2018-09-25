@@ -405,7 +405,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     if (m_onvifRes->m_serviceUrls.media2ServiceUrl.isEmpty())
     {
         // Use old Media1 interface.
-        Media::VideoEncoderConfigurations veConfigurations(m_onvifRes->makeRequestParams());
+        Media::VideoEncoderConfigurations veConfigurations(m_onvifRes);
         veConfigurations.receiveBySoap();
         if (!veConfigurations)
         {
@@ -444,7 +444,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     else
     {
         // Use old Media2 interface.
-        Media2::VideoEncoderConfigurations veConfigurations(m_onvifRes->makeRequestParams());
+        Media2::VideoEncoderConfigurations veConfigurations(m_onvifRes);
         veConfigurations.receiveBySoap();
         if (!veConfigurations)
         {
@@ -528,7 +528,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     bool useExistingProfiles = resData.value<bool>(
         Qn::USE_EXISTING_ONVIF_PROFILES_PARAM_NAME);
 
-    Media::Profiles profiles(m_onvifRes->makeRequestParams());
+    Media::Profiles profiles(m_onvifRes);
     profiles.receiveBySoap();
     if (!profiles)
     {
@@ -565,7 +565,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
 CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(
     const QString& name, const QString& token) const
 {
-    Media::ProfileCreator profileCreator(m_onvifRes->makeRequestParams());
+    Media::ProfileCreator profileCreator(m_onvifRes);
     std::string stdStrToken = token.toStdString();
 
     Media::ProfileCreator::Request request;
@@ -814,7 +814,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                     << ", uniqueId: " << m_onvifRes->getUniqueId()
                     << "profile=" << info.profileToken << "audioSourceId=" << info.audioSourceId;
                 #endif
-                //return false; //< ignore audio error
+                // Ignore audio error and do not return here.
             }
         }
 
@@ -856,7 +856,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    Media::AudioEncoderConfigurations aeConfigurations(m_onvifRes->makeRequestParams());
+    Media::AudioEncoderConfigurations aeConfigurations(m_onvifRes);
     aeConfigurations.receiveBySoap();
     if (!aeConfigurations)
     {
@@ -943,7 +943,7 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder) const
 CameraDiagnostics::Result QnOnvifStreamReader::sendAudioEncoderToCamera(
     onvifXsd__AudioEncoderConfiguration& encoderConfig) const
 {
-    Media::AudioEncoderConfigurationSetter setter(m_onvifRes->makeRequestParams());
+    Media::AudioEncoderConfigurationSetter setter(m_onvifRes);
     Media::AudioEncoderConfigurationSetter::Request request;
     request.Configuration = &encoderConfig;
     request.ForcePersistence = false;

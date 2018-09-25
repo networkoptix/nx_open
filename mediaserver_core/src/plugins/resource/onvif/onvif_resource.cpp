@@ -807,7 +807,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::initializePtz(
-    const CapabilitiesResp& onvifCapabilities)
+    const CapabilitiesResp& /*onvifCapabilities*/)
 {
     const bool result = fetchPtzInfo();
     if (!result)
@@ -1735,25 +1735,9 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
     if (!m_portAliases.empty())
         return true;
 
-#if 0
-    QAuthenticator auth = getAuth();
-    DeviceIOWrapper soapWrapper(
-        getDeviceioUrl().toStdString(),
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
-
-    _onvifDeviceIO__GetDigitalInputs request;
-    _onvifDeviceIO__GetDigitalInputsResponse response;
-    const int soapCallResult = soapWrapper.getDigitalInputs(request, response);
-#else
-
-    DeviceIO::DigitalInputs digitalInputs(makeRequestParams());
+    DeviceIO::DigitalInputs digitalInputs(this);
     digitalInputs.receiveBySoap();
 
-#endif
-
-    //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     if (!digitalInputs && digitalInputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
         NX_DEBUG(this, lit("Failed to get relay digital input list. endpoint %1")
@@ -2030,8 +2014,7 @@ void QnPlOnvifResource::scheduleRenewSubscriptionTimer(unsigned int timeoutSec)
 CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
     QList<VideoOptionsLocal>& optionsList)
 {
-
-    Media::Profiles profiles(makeRequestParams());
+    Media::Profiles profiles(this);
     profiles.receiveBySoap();
     if (!profiles)
         return profiles.requestFailedResult();
@@ -2138,7 +2121,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
         _onvifMedia__GetVideoEncoderConfigurationOptions request;
         request.ConfigurationToken = const_cast<std::string*>(&token);
 
-        Media::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+        Media::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(this);
         videoEncoderConfigurationOptions.receiveBySoap(request);
 
         if (!videoEncoderConfigurationOptions)
@@ -2168,7 +2151,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
     {
         // New code - Media2.
 
-        Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(makeRequestParams());
+        Media2::VideoEncoderConfigurationOptions videoEncoderConfigurationOptions(this);
         Media2::VideoEncoderConfigurationOptions::Request request;
         request.ConfigurationToken = const_cast<std::string*>(&token);
         videoEncoderConfigurationOptions.receiveBySoap(request);
@@ -2197,8 +2180,7 @@ CameraDiagnostics::Result QnPlOnvifResource::ReadVideoEncoderOptionsForToken(
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 {
     // Step 1. Get videoEncoderConfigurations and videoEncodersTokenList
-    const auto requestParams(makeRequestParams());
-    Media::VideoEncoderConfigurations videoEncoderConfigurations(requestParams);
+    Media::VideoEncoderConfigurations videoEncoderConfigurations(this);
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     QnOnvifConfigDataPtr forcedOnvifParams =
@@ -3098,9 +3080,10 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(
     return success;
 }
 
-RequestParams QnPlOnvifResource::makeRequestParams(bool tcpKeepAlive) const
+SoapParams QnPlOnvifResource::makeSoapParams(bool tcpKeepAlive) const
 {
-    return RequestParams(onvifTimeouts(), getDeviceioUrl().toStdString(), getAuth(), m_timeDrift, tcpKeepAlive);
+    return SoapParams(onvifTimeouts(), getDeviceioUrl().toStdString(), getAuth(),
+        m_timeDrift, tcpKeepAlive);
 }
 
 /*
@@ -3220,7 +3203,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCameraEx(
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__VideoEncoderConfiguration& encoderConfig)
 {
-    Media::VideoEncoderConfigurationSetter vecSetter(makeRequestParams());
+    Media::VideoEncoderConfigurationSetter vecSetter(this);
 
     SetVideoConfigReq request;
     request.Configuration = &encoderConfig;
@@ -3241,7 +3224,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(onvifXsd__
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoder2ToCamera(onvifXsd__VideoEncoder2Configuration& encoderConfig)
 {
-    Media2::VideoEncoderConfigurationSetter vecSetter(makeRequestParams());
+    Media2::VideoEncoderConfigurationSetter vecSetter(this);
     Media2::VideoEncoderConfigurationSetter::Request request;
     request.Configuration = &encoderConfig;
     vecSetter.performRequest(request);
@@ -3867,21 +3850,9 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
 bool QnPlOnvifResource::fetchRelayOutputs(std::vector<RelayOutputInfo>* relayOutputInfoList)
 {
-    //QAuthenticator auth = getAuth();
-    //DeviceSoapWrapper soapWrapper(
-    //    getDeviceOnvifUrl().toStdString(),
-    //    auth.user(),
-    //    auth.password(),
-    //    m_timeDrift);
-
-    //_onvifDevice__GetRelayOutputs request;
-    //_onvifDevice__GetRelayOutputsResponse response;
-    //const int soapCallResult = soapWrapper.getRelayOutputs(request, response);
-
-    DeviceIO::RelayOutputs relayOutputs(makeRequestParams());
+    DeviceIO::RelayOutputs relayOutputs(this);
     relayOutputs.receiveBySoap();
 
-    //if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     if (!relayOutputs && relayOutputs.soapError() != SOAP_MUSTUNDERSTAND)
     {
         NX_DEBUG(this, lit("Failed to get relay input/output info. endpoint %1").arg(relayOutputs.endpoint()));

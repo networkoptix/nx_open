@@ -17,6 +17,9 @@
 #include <onvif/soapMediaBindingProxy.h>
 #include <onvif/soapMedia2BindingProxy.h>
 
+// Instead of including onvif/soapStub.h we use forward declaration of needed classes.
+//#include <onvif/soapStub.h>
+
 struct SoapTimeouts
 {
     const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
@@ -103,6 +106,8 @@ class PullPointSubscriptionBindingProxy;
 class EventBindingProxy;
 class SubscriptionManagerBindingProxy;
 
+// All the following classes are defined in <onvif/soapStub.h>
+// In order not to include it here, we place forward declarations.
 class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
 class _onvifDevice__GetServiceCapabilities;
@@ -134,6 +139,7 @@ class _onvifDeviceIO__GetRelayOutputOptions;
 class _onvifDeviceIO__GetRelayOutputOptionsResponse;
 class _onvifDeviceIO__SetRelayOutputSettings;
 class _onvifDeviceIO__SetRelayOutputSettingsResponse;
+
 class _onvifMedia__GetVideoSources;
 class _onvifMedia__GetVideoSourcesResponse;
 class _onvifMedia__GetAudioOutputs;
@@ -477,7 +483,7 @@ private:
 
 };
 
-struct RequestParams
+struct SoapParams
 {
     SoapTimeouts timeouts;
     std::string endpoint;
@@ -485,11 +491,11 @@ struct RequestParams
     QString passwd;
     int timeDrift = 0;
     bool tcpKeepAlive = false;
-    RequestParams() = default;
-    RequestParams(const SoapTimeouts& timeouts, std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false):
+    SoapParams() = default;
+    SoapParams(const SoapTimeouts& timeouts, std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false):
         timeouts(timeouts), endpoint(std::move(endpoint)), login(std::move(login)), passwd(std::move(passwd)),
         timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
-    RequestParams(const SoapTimeouts& timeouts, std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false):
+    SoapParams(const SoapTimeouts& timeouts, std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false):
         timeouts(timeouts), endpoint(std::move(endpoint)), login(auth.user()), passwd(auth.password()),
         timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
 };
@@ -634,11 +640,19 @@ public:
     friend class ResponseHolder<Request, Response>;
     using BindingProxy = typename RequestTraits<Request, Response>::BindingProxy;
 
-    explicit RequestWrapper(RequestParams params):
+    explicit RequestWrapper(SoapParams params):
         m_wrapper(params.timeouts, std::move(params.endpoint), std::move(params.login),
-            std::move(params.passwd), params.timeDrift, params.tcpKeepAlive)
+        std::move(params.passwd), params.timeDrift, params.tcpKeepAlive)
     {
         m_response.soap_default(m_response.soap);
+    }
+
+    // Resource should be QnPlOnvifResource class, template is used to eliminate dependency
+    // between soap_wrapper and onvif_resource. Usually "this" will be passed as a parameter.
+    template<class Resource>
+    explicit RequestWrapper(const Resource& resource):
+        RequestWrapper(resource->makeSoapParams())
+    {
     }
 
     RequestWrapper(const RequestWrapper&) = delete;
@@ -752,13 +766,13 @@ namespace Media
         _onvifMedia__GetVideoEncoderConfigurations,
         _onvifMedia__GetVideoEncoderConfigurationsResponse>;
 
-    using VideoEncoderConfigurationOptions = RequestWrapper<
-        _onvifMedia__GetVideoEncoderConfigurationOptions,
-        _onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
-
     using VideoEncoderConfigurationSetter = RequestWrapper<
         _onvifMedia__SetVideoEncoderConfiguration,
         _onvifMedia__SetVideoEncoderConfigurationResponse>;
+
+    using VideoEncoderConfigurationOptions = RequestWrapper<
+        _onvifMedia__GetVideoEncoderConfigurationOptions,
+        _onvifMedia__GetVideoEncoderConfigurationOptionsResponse>;
 
     using AudioEncoderConfigurations = RequestWrapper<
         _onvifMedia__GetAudioEncoderConfigurations,
@@ -783,13 +797,13 @@ namespace Media2
         onvifMedia2__GetConfiguration,
         _onvifMedia2__GetVideoEncoderConfigurationsResponse>;
 
-    using VideoEncoderConfigurationOptions =
-        RequestWrapper<onvifMedia2__GetConfiguration,
-        _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
-
     using VideoEncoderConfigurationSetter = RequestWrapper<
         _onvifMedia2__SetVideoEncoderConfiguration,
         onvifMedia2__SetConfigurationResponse>;
+
+    using VideoEncoderConfigurationOptions =
+        RequestWrapper<onvifMedia2__GetConfiguration,
+        _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse>;
 
     using Profiles = RequestWrapper<
         _onvifMedia2__GetProfiles,
@@ -799,24 +813,6 @@ namespace Media2
         _onvifMedia2__CreateProfile,
         _onvifMedia2__CreateProfileResponse>;
 }
-
-class DeviceIOWrapper: public SoapWrapper<DeviceIOBindingProxy>
-{
-public:
-    DeviceIOWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint,
-        const QString &login,
-        const QString &passwd,
-        int timeDrift,
-        bool tcpKeepAlive = false );
-    virtual ~DeviceIOWrapper();
-
-//    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
-//    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
-////    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
-//    int setRelayOutputSettings_( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
-};
 
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 {

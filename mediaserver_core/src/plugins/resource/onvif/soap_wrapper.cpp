@@ -433,40 +433,6 @@ DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
 DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
 
 // -------------------------------------------------------------------------- //
-// DeviceIOWrapper
-// -------------------------------------------------------------------------- //
-
-DeviceIOWrapper::DeviceIOWrapper(const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceIOBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
-{
-}
-
-DeviceIOWrapper::~DeviceIOWrapper()
-{
-}
-
-//int DeviceIOWrapper::getDigitalInputs(_onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response)
-//{
-//    return invokeMethod(&DeviceIOBindingProxy::GetDigitalInputs, &request, response);
-//}
-//
-//int DeviceIOWrapper::getRelayOutputs(_onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response)
-//{
-//    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputs, &request, response);
-//}
-//
-//int DeviceIOWrapper::getRelayOutputOptions(_onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response)
-//{
-//    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputOptions, &request, response);
-//}
-//
-//int DeviceIOWrapper::setRelayOutputSettings_(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response)
-//{
-//    return invokeMethod(&DeviceIOBindingProxy::SetRelayOutputSettings, &request, response);
-//}
-
-// -------------------------------------------------------------------------- //
 // MediaSoapWrapper
 // -------------------------------------------------------------------------- //
 MediaSoapWrapper::MediaSoapWrapper(
@@ -917,6 +883,23 @@ int SubscriptionManagerSoapWrapper::unsubscribe(_oasisWsnB2__Unsubscribe& reques
 //
 // Explicit instantiating.
 //
+template SoapWrapper<DeviceIOBindingProxy>::SoapWrapper(const SoapTimeouts& timeouts,
+    const std::string& endpoint,
+    const QString& login,
+    const QString& passwd,
+    int timeDrift,
+    bool tcpKeepAlive);
+
+template QString SoapWrapper<DeviceIOBindingProxy>::getLogin();
+template QString SoapWrapper<DeviceIOBindingProxy>::getPassword();
+template void SoapWrapper<DeviceIOBindingProxy>::setLogin(const QString &login);
+template void SoapWrapper<DeviceIOBindingProxy>::setPassword(const QString &password);
+template int SoapWrapper<DeviceIOBindingProxy>::getTimeDrift();
+template const QString SoapWrapper<DeviceIOBindingProxy>::getLastError();
+template const QString SoapWrapper<DeviceIOBindingProxy>::getEndpointUrl();
+template bool SoapWrapper<DeviceIOBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<DeviceIOBindingProxy>::isConflictError();
+
 template QString SoapWrapper<DeviceBindingProxy>::getLogin();
 template QString SoapWrapper<DeviceBindingProxy>::getPassword();
 template void SoapWrapper<DeviceBindingProxy>::setLogin(const QString &login);

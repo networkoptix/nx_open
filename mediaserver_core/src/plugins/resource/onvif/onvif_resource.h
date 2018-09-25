@@ -263,7 +263,7 @@ public:
 
     AUDIO_CODEC getAudioCodec() const;
 
-    RequestParams makeRequestParams(bool tcpKeepAlive = false) const;
+    SoapParams makeSoapParams(bool tcpKeepAlive = false) const;
 
     virtual void setOnvifRequestsRecieveTimeout(int timeout);
     virtual void setOnvifRequestsSendTimeout(int timeout);
