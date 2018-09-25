@@ -416,8 +416,13 @@ public:
         for (const auto& storage: storagesToTest())
         {
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(storage, m_settings))
+            if (fileStorage && !nx::mserver_aux::isStorageUnmounted(
+                m_owner->serverModule()->platform(),
+                storage,
+                m_settings))
+            {
                 fileStorage->setMounted(true);
+            }
         }
 
         for (const auto& storage : storagesToTest())
@@ -1142,7 +1147,10 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     if (storage && storage->getParentId() == moduleGUID())
     {
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage && nx::mserver_aux::isStorageUnmounted(fileStorage, &serverModule()->settings()))
+        if (fileStorage && nx::mserver_aux::isStorageUnmounted(
+            serverModule()->platform(),
+            fileStorage,
+            &serverModule()->settings()))
             fileStorage->setMounted(false);
 
         if (checkIfMyStorage(storage))

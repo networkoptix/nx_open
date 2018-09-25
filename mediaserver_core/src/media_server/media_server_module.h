@@ -43,6 +43,7 @@ class QnResourceAccessManager;
 class QnResourceDiscoveryManager;
 class QnAuditManager;
 class QnMediaServerResourceSearchers;
+class QnPlatformAbstraction;
 
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
@@ -168,6 +169,8 @@ public:
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
     nx::mediaserver::camera::ErrorProcessor* cameraErrorProcessor() const;
     QnMediaServerResourceSearchers* resourceSearchers() const;
+    QnPlatformAbstraction* platform() const;
+    void setPlatform(QnPlatformAbstraction* platform);
 private:
     void registerResourceDataProviders();
     QDir downloadsDirectory() const;
@@ -215,6 +218,7 @@ private:
     QnFileDeletor* m_fileDeletor = nullptr;
     nx::mediaserver::camera::ErrorProcessor* m_cameraErrorProcessor;
 
+    QnPlatformAbstraction* m_platform;
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;

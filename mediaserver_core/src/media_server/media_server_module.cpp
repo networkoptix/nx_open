@@ -253,14 +253,10 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     auto dataDir = settings().dataDir();
     m_motionHelper = store(new QnMotionHelper(settings().dataDir(), this));
 
-
-
     m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
     store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
-
     store(new QnWearableLockManager(this));
-
     store(new QnWearableUploadManager(this));
 
     m_serverDb = store(new QnServerDb(this));
@@ -583,4 +579,14 @@ nx::mediaserver::camera::ErrorProcessor* QnMediaServerModule::cameraErrorProcess
 QnMediaServerResourceSearchers* QnMediaServerModule::resourceSearchers() const
 {
     return m_resourceSearchers.get();
+}
+
+QnPlatformAbstraction* QnMediaServerModule::platform() const
+{
+    return m_platform;
+}
+
+void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
+{
+    m_platform = platform;
 }

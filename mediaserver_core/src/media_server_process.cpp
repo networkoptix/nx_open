@@ -489,7 +489,7 @@ QnStorageResourcePtr MediaServerProcess::createStorage(const QnUuid& serverId, c
     storage->setUrl(path);
 
     const QString storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
     { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
@@ -534,7 +534,8 @@ QStringList MediaServerProcess::listRecordFolders(bool includeNonHdd) const
 {
     using namespace nx::mediaserver::fs::media_paths;
 
-    auto mediaPathList = get(FilterConfig::createDefault(includeNonHdd, &serverModule()->settings()));
+    auto mediaPathList = get(FilterConfig::createDefault(
+        m_platform.get(), includeNonHdd, &serverModule()->settings()));
     NX_VERBOSE(this, lm("Record folders: %1").container(mediaPathList));
     return mediaPathList;
 }
@@ -593,7 +594,7 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
 
 QnStorageResourceList MediaServerProcess::updateStorages(QnMediaServerResourcePtr mServer)
 {
-    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto partitions = m_platform->monitor()->totalPartitionSpaceInfo();
 
     QMap<QnUuid, QnStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
@@ -687,7 +688,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         }
 
         const auto unmountedStorages =
-            nx::mserver_aux::getUnmountedStorages(m_mediaServer->getStorages(), &serverModule()->settings());
+            nx::mserver_aux::getUnmountedStorages(
+                m_platform.get(),
+                m_mediaServer->getStorages(),
+                &serverModule()->settings());
         for (const auto& storageResource: unmountedStorages)
         {
             auto fileStorageResource = storageResource.dynamicCast<QnFileStorageResource>();
@@ -858,18 +862,18 @@ static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
-    if (!qnPlatform->monitor())
+    if (!m_platform->monitor())
         return;
 
-    qnPlatform->monitor()->totalCpuUsage();
-    qnPlatform->monitor()->totalRamUsage();
-    qnPlatform->monitor()->totalHddLoad();
+    m_platform->monitor()->totalCpuUsage();
+    m_platform->monitor()->totalRamUsage();
+    m_platform->monitor()->totalHddLoad();
 
     // TODO: #mu
     //  - Add some more fields that might be interesting
     //  - Make and use JSON serializable struct rather than just a string
     QStringList networkIfList;
-    for (const auto& iface : qnPlatform->monitor()->totalNetworkLoad())
+    for (const auto& iface : m_platform->monitor()->totalNetworkLoad())
         if (iface.type != QnPlatformMonitor::LoopbackInterface)
             networkIfList.push_back(lit("%1: %2 bps").arg(iface.interfaceName)
                                                      .arg(iface.bytesPerSecMax));
@@ -1475,7 +1479,7 @@ void MediaServerProcess::registerRestHandlers(
      * Return server info: CPU usage, HDD usage e.t.c.
      * %return:object JSON data with statistics.
      */
-    reg("api/statistics", new QnStatisticsRestHandler());
+    reg("api/statistics", new QnStatisticsRestHandler(serverModule()));
 
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
@@ -3943,7 +3947,7 @@ void MediaServerProcess::run()
     m_serverModule = serverModule;
 
     m_platform->setServerModule(serverModule.get());
-
+    serverModule->setPlatform(m_platform.get());
     if (m_serviceMode)
         initializeHardwareId();
 
