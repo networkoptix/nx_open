@@ -133,6 +133,7 @@ ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), "${SYSTEM NO ACCESS TEXT}")]
+${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']
