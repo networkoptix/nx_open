@@ -26,7 +26,7 @@ namespace desktop {
 class EventTile;
 class SearchLineEdit;
 class SelectableTextButton;
-class UnifiedAsyncSearchListModel;
+class VisualSearchListModel;
 
 class UnifiedSearchWidget:
     public QWidget,
@@ -39,8 +39,8 @@ public:
     UnifiedSearchWidget(QWidget* parent);
     virtual ~UnifiedSearchWidget() override;
 
-    UnifiedAsyncSearchListModel* model() const;
-    void setModel(UnifiedAsyncSearchListModel* value);
+    VisualSearchListModel* model() const;
+    void setModel(VisualSearchListModel* value);
 
     SearchLineEdit* filterEdit() const;
     SelectableTextButton* typeButton() const;
@@ -83,8 +83,6 @@ private:
     void setupTimeSelection();
     void updatePlaceholderState();
 
-    void fetchMoreIfNeeded();
-
 private:
     QScopedPointer<Ui::UnifiedSearchWidget> ui;
     SearchLineEdit* m_searchLineEdit;
@@ -95,7 +93,7 @@ private:
     QString m_placeholderTextConstrained;
     QString m_placeholderTextUnconstrained;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
-    UnifiedAsyncSearchListModel* m_model = nullptr;
+    VisualSearchListModel* m_model = nullptr;
     QScopedPointer<QnDisconnectHelper> m_modelConnections;
 };
 

@@ -17,12 +17,9 @@
 class QTimer;
 class QnUuid;
 
-namespace nx {
+namespace nx::vms::event { class StringsHelper; }
 
-namespace vms { namespace event { class StringsHelper; }}
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class EventSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -33,30 +30,31 @@ public:
     explicit Private(EventSearchListModel* q);
     virtual ~Private() override;
 
-    virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
-
     vms::api::EventType selectedEventType() const;
     void setSelectedEventType(vms::api::EventType value);
 
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
-    virtual void clear() override;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
-    void periodicUpdate();
-    void refreshUpdateTimer();
-    void addNewlyReceivedEvents(vms::event::ActionDataList&& data);
-
     using GetCallback = std::function<void(bool, rest::Handle, vms::event::ActionDataList&&)>;
-    rest::Handle getEvents(qint64 startMs, qint64 endMs, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
+    rest::Handle getEvents(
+        const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit);
+
+    void fetchLive();
+
+    template<typename Iter>
+    bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
+        int position, bool handleOverlaps);
 
     QString title(vms::api::EventType eventType) const;
     QString description(const vms::event::EventParameters& parameters) const;
@@ -67,17 +65,13 @@ private:
 private:
     EventSearchListModel* const q = nullptr;
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
-    QScopedPointer<QTimer> m_updateTimer;
     mutable QScopedPointer<vms::event::StringsHelper> m_helper;
-    qint64 m_latestTimeMs = 0;
-    rest::Handle m_currentUpdateId = rest::Handle();
-    int m_requestLimitMultiplier = 1;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;
-    bool m_success = false;
+
+    QScopedPointer<QTimer> m_liveUpdateTimer;
+    FetchInformation m_liveFetch;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

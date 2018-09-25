@@ -1,7 +1,5 @@
 #include "motion_search_list_model_p.h"
 
-#include <QtCore/QScopedValueRollback>
-
 #include <core/resource/camera_resource.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -15,12 +13,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-
-namespace {
-
-static constexpr int kFetchBatchSize = 110;
-
-} // namespace
 
 MotionSearchListModel::Private::Private(MotionSearchListModel* q):
     QObject(),
@@ -112,7 +104,7 @@ void MotionSearchListModel::Private::reset()
     const auto periods = this->periods();
     newTotalCount = periods.size();
 
-    m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - kFetchBatchSize, 0),
+    m_data.insert(m_data.end(), periods.cbegin() + qMax(periods.size() - q->fetchBatchSize(), 0),
         periods.cend());
 }
 
@@ -178,23 +170,20 @@ bool MotionSearchListModel::Private::canFetchMore() const
 
 void MotionSearchListModel::Private::fetchMore()
 {
-    if (!m_loader || m_fetchInProgress)
+    if (!m_loader)
         return;
-
-    QScopedValueRollback<bool> progressRollback(m_fetchInProgress, true);
 
     const auto periods = this->periods();
     const auto oldCount = count();
 
     const auto remaining = periods.size() - oldCount;
     if (remaining == 0)
+    {
+        q->finishFetch(FetchResult::complete);
         return;
+    }
 
-    q->beginFinishFetch();
-    auto finishFetch = nx::utils::makeScopeGuard(
-        [this]() { q->endFinishFetch(); });
-
-    const auto delta = qMin(remaining, kFetchBatchSize);
+    const auto delta = qMin(remaining, q->fetchBatchSize());
     const auto newCount = oldCount + delta;
 
     ScopedInsertRows insertRows(q,  oldCount, newCount - 1);
@@ -202,11 +191,10 @@ void MotionSearchListModel::Private::fetchMore()
 
     for (auto chunk = range.first; chunk != range.second; ++chunk)
         m_data.push_front(*chunk);
-}
 
-bool MotionSearchListModel::Private::fetchInProgress() const
-{
-    return m_fetchInProgress;
+    q->finishFetch(remaining > q->fetchBatchSize()
+        ? FetchResult::incomplete
+        : FetchResult::complete);
 }
 
 int MotionSearchListModel::Private::totalCount() const

@@ -16,7 +16,7 @@
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
-#include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/event_search/models/visual_search_list_model.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 
 #include <nx/utils/disconnect_helper.h>
@@ -28,10 +28,13 @@ namespace desktop {
 
 namespace {
 
+using namespace std::literals::chrono_literals;
+using namespace std::chrono;
+
 static constexpr int kPlaceholderFontPixelSize = 15;
-static constexpr int kQueuedFetchMoreDelayMs = 50;
-static constexpr int kTimeSelectionDelayMs = 250;
-static constexpr int kTextFilterDelayMs = 250;
+static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
+static constexpr milliseconds kTimeSelectionDelay = 250ms;
+static constexpr milliseconds kTextFilterDelay = 250ms;
 
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
@@ -54,7 +57,7 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
     result->setAutoFillBackground(false);
-    result->setTextChangedSignalFilterMs(kTextFilterDelayMs);
+    result->setTextChangedSignalFilterMs(kTextFilterDelay.count());
     setPaletteColor(result, QPalette::Shadow, Qt::transparent);
     return result;
 }
@@ -67,8 +70,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui(new Ui::UnifiedSearchWidget()),
     m_searchLineEdit(createSearchLineEdit(this)),
     m_dayChangeTimer(new QTimer(this)),
-    m_fetchMoreOperation(new utils::PendingOperation([this]() { fetchMoreIfNeeded(); },
-        kQueuedFetchMoreDelayMs, this))
+    m_fetchMoreOperation(new utils::PendingOperation(this))
 {
     ui->setupUi(this);
     ui->headerLayout->insertWidget(0, m_searchLineEdit);
@@ -104,18 +106,21 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     setPaletteColor(ui->filterLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
+        this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
 
-    installEventHandler(ui->ribbon->scrollBar(), QEvent::Hide,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
-
-    installEventHandler(ui->ribbon, QEvent::Show,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded);
+    installEventHandler(this, QEvent::Show, this, &UnifiedSearchWidget::requestFetch);
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
+    m_fetchMoreOperation->setCallback(
+        [this]()
+        {
+            if (model() && model()->canFetchMore())
+                model()->fetchMore();
+        });
 
     auto applyTimePeriod = new utils::PendingOperation([this]() { updateCurrentTimePeriod(); },
-        kTimeSelectionDelayMs, this);
+        kTimeSelectionDelay.count(), this);
 
     applyTimePeriod->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
 
@@ -190,12 +195,12 @@ UnifiedSearchWidget::~UnifiedSearchWidget()
     m_modelConnections.reset();
 }
 
-UnifiedAsyncSearchListModel* UnifiedSearchWidget::model() const
+VisualSearchListModel* UnifiedSearchWidget::model() const
 {
     return m_model;
 }
 
-void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
+void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
 {
     if (m_model == value)
         return;
@@ -210,8 +215,9 @@ void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
-    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
-        this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
+// TODO: #vkutin Re-check whether this is needed.
+//    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
+//        this, &UnifiedSearchWidget::requestFetch);
 
     *m_modelConnections << connect(value, &QAbstractItemModel::modelReset,
         this, &UnifiedSearchWidget::updatePlaceholderState);
@@ -222,11 +228,12 @@ void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
     *m_modelConnections << connect(value, &QAbstractItemModel::rowsInserted,
         this, &UnifiedSearchWidget::updatePlaceholderState);
 
+    *m_modelConnections << connect(value, &VisualSearchListModel::liveChanged,
+        ui->ribbon, &EventRibbon::setLive);
+
     // For busy indicator going on/off.
     *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);
-
-    fetchMoreIfNeeded();
 }
 
 SearchLineEdit* UnifiedSearchWidget::filterEdit() const
@@ -394,27 +401,24 @@ void UnifiedSearchWidget::setupTimeSelection()
 
 void UnifiedSearchWidget::requestFetch()
 {
-    m_fetchMoreOperation->requestOperation();
-}
-
-void UnifiedSearchWidget::fetchMoreIfNeeded()
-{
     if (!ui->ribbon->isVisible() || !model())
         return;
 
     const auto scrollBar = ui->ribbon->scrollBar();
-//   if (scrollBar->isVisible() && scrollBar->value() < scrollBar->maximum())
-//        return;
 
-    if (!model()->canFetchMore(QModelIndex()))
-        return;
+    if (model()->relevantCount() == 0 || scrollBar->value() == scrollBar->maximum())
+        model()->setFetchDirection(AbstractSearchListModel::FetchDirection::earlier);
+    else if (scrollBar->value() == scrollBar->minimum())
+        model()->setFetchDirection(AbstractSearchListModel::FetchDirection::later);
+    else
+        return; //< Scroll bar is not at the beginning or the end.
 
-    model()->fetchMore(QModelIndex());
+    m_fetchMoreOperation->requestOperation();
 }
 
 void UnifiedSearchWidget::updatePlaceholderState()
 {
-    const bool hidden = m_model && m_model->relevantCount() > 0;
+    const bool hidden = m_model && m_model->rowCount() > 0;
     if (!hidden)
     {
         ui->placeholderText->setText(m_model && m_model->isConstrained()

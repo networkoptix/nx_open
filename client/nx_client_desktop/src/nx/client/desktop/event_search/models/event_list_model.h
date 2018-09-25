@@ -1,5 +1,7 @@
 #pragma once
 
+#include "abstract_event_list_model.h"
+
 #include <QtCore/QScopedPointer>
 #include <QtGui/QPixmap>
 
@@ -9,8 +11,6 @@
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/common/utils/command_action.h>
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
-#include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {

@@ -2,6 +2,7 @@
 
 #include "../analytics_search_list_model.h"
 
+#include <chrono>
 #include <deque>
 #include <limits>
 
@@ -24,7 +25,6 @@ class QMenu;
 namespace nx {
 
 namespace api { struct AnalyticsManifestObjectAction; }
-
 namespace utils { class PendingOperation; }
 
 namespace client {
@@ -50,14 +50,13 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    virtual void clear() override;
-
-    static constexpr int kMaximumItemCount = 1000;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) override;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -66,34 +65,28 @@ private:
 
     int indexOf(const QnUuid& objectId) const;
 
-    void periodicUpdate();
-    void refreshUpdateTimer();
-    void addNewlyReceivedObjects(analytics::storage::LookupResult&& data);
-    void emitDataChangedIfNeeded();
+    template<typename Iter>
+    bool commitInternal(const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd,
+        int position, bool handleOverlaps);
 
+    void emitDataChangedIfNeeded();
     void advanceObject(analytics::storage::DetectedObject& object,
         analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(qint64 startMs, qint64 endMs, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit);
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
-    static qint64 startTimeMs(const analytics::storage::DetectedObject& object);
-
-    utils::PendingOperation* createUpdateWorkbenchFilterOperation();
 
     void executePluginAction(const QString& pluginId,
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
-    void constrainLength();
-
     struct PreviewParams
     {
-        qint64 timestampUs = 0;
+        std::chrono::microseconds timestamp = std::chrono::microseconds(0);
         QRectF boundingBox;
     };
 
@@ -103,20 +96,16 @@ private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
     QString m_filterText;
-    const QScopedPointer<QTimer> m_updateTimer;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
     QnResourceDisplayPtr m_display;
-    qint64 m_latestTimeMs = 0;
-    rest::Handle m_currentUpdateId = rest::Handle();
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
-    bool m_success = true;
 
-    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+    QHash<QnUuid, std::chrono::milliseconds> m_objectIdToTimestamp;
 
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
     QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;

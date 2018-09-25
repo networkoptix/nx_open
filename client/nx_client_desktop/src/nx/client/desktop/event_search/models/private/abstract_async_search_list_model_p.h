@@ -7,9 +7,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AbstractAsyncSearchListModel::Private: public QObject
 {
@@ -23,50 +21,64 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     virtual void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
-
     virtual int count() const = 0;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
 
-    virtual void clear();
+    virtual void clearData() = 0;
+    virtual void truncateToMaximumCount() = 0;
+    virtual void truncateToRelevantTimePeriod() = 0;
 
-    bool canFetchMore() const;
-    bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commit(qint64 earliestTimeToCommitMs);
+    bool canFetch() const;
+    bool requestFetch();
     bool fetchInProgress() const;
-
-    QnTimePeriod fetchedTimePeriod() const;
-
-protected:
-    virtual rest::Handle requestPrefetch(qint64 fromMs, qint64 toMs) = 0;
-    virtual bool commitPrefetch(qint64 earliestTimeToCommitMs, bool& fetchedAll) = 0;
-    virtual void clipToSelectedTimePeriod() = 0;
-    virtual bool hasAccessRights() const = 0;
-
-    bool shouldSkipResponse(rest::Handle requestId) const;
-    void complete(qint64 earliestTimeMs); //< Calls and clears m_prefetchCompletionHandler.
     void cancelPrefetch();
 
+    using PrefetchCompletionHandler = std::function<
+        void(const QnTimePeriod& fetchedPeriod, FetchResult result)>;
+    bool prefetch(PrefetchCompletionHandler completionHandler);
+    void commit(const QnTimePeriod& periodToCommit);
+
+protected:
+    virtual rest::Handle requestPrefetch(const QnTimePeriod& period) = 0;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) = 0;
+    virtual bool hasAccessRights() const = 0;
+
+    void completePrefetch(const QnTimePeriod& actuallyFetched, bool success, int fetchedCount);
+
     template<class DataContainer, class UpperBoundPredicate>
-    void clipToTimePeriod(DataContainer& data,
+    void truncateDataToTimePeriod(DataContainer& data,
         UpperBoundPredicate upperBoundPredicate,
         const QnTimePeriod& period,
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
+    template<class DataContainer>
+    void truncateDataToMaximumCount(DataContainer& data,
+        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
+
+    struct FetchInformation
+    {
+        rest::Handle id = rest::Handle();
+        FetchDirection direction = FetchDirection::earlier;
+        QnTimePeriod period;
+        int batchSize = 0;
+    };
+
+    const FetchInformation& currentRequest() const;
+
 private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    qint64 m_earliestTimeMs = std::numeric_limits<qint64>::max();
-    rest::Handle m_currentFetchId = rest::Handle();
+
     PrefetchCompletionHandler m_prefetchCompletionHandler;
-    bool m_fetchedAll = false;
+    FetchInformation m_request;
 };
 
 //-------------------------------------------------------------------------------------------------
 // Template method implementation.
 
 template<class DataContainer, class UpperBoundPredicate>
-void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
+void AbstractAsyncSearchListModel::Private::truncateDataToTimePeriod(
     DataContainer& data,
     UpperBoundPredicate upperBoundPredicate,
     const QnTimePeriod& period,
@@ -77,7 +89,7 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
 
     // Remove records later than end of the period.
     const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTimeMs(), upperBoundPredicate);
+        period.endTime(), upperBoundPredicate);
 
     const auto frontLength = std::distance(data.begin(), frontEnd);
     if (frontLength != 0)
@@ -90,7 +102,7 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
 
     // Remove records earlier than start of the period.
     const auto tailBegin = std::upper_bound(data.begin(), data.end(),
-        period.startTimeMs, upperBoundPredicate);
+        period.startTime(), upperBoundPredicate);
 
     const auto tailLength = std::distance(tailBegin, data.end());
     if (tailLength != 0)
@@ -103,6 +115,50 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
     }
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+template<class DataContainer>
+void AbstractAsyncSearchListModel::Private::truncateDataToMaximumCount(DataContainer& data,
+    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
+    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+{
+    if (q->maximumCount() <= 0)
+        return;
+
+    const int toRemove = int(data.size()) - q->maximumCount();
+    if (toRemove <= 0)
+        return;
+
+    if (q->fetchDirection() == FetchDirection::earlier)
+    {
+        ScopedRemoveRows removeRows(q, 0, toRemove - 1);
+        const auto removeEnd = data.begin() + toRemove;
+        if (itemCleanup)
+            std::for_each(data.begin(), removeEnd, itemCleanup);
+
+        data.erase(data.begin(), removeEnd);
+
+        // If top is truncated, go out of live mode.
+        q->setLive(false);
+    }
+    else
+    {
+        NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+        const auto index = int(data.size()) - toRemove;
+        const auto removeBegin = data.begin() + index;
+
+        ScopedRemoveRows removeRows(q, index, index + toRemove - 1);
+        if (itemCleanup)
+            std::for_each(removeBegin, data.end(), itemCleanup);
+
+        data.erase(removeBegin, data.end());
+    }
+
+    auto timeWindow = q->fetchedTimeWindow();
+    if (q->fetchDirection() == FetchDirection::earlier)
+        timeWindow.truncate(timestamp(data.front()).count());
+    else
+        timeWindow.truncateFront(timestamp(data.back()).count());
+
+    q->setFetchedTimeWindow(timeWindow);
+}
+
+} // namespace nx::client::desktop

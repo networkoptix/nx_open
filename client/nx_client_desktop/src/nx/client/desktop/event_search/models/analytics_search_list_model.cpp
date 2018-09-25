@@ -9,6 +9,7 @@ AnalyticsSearchListModel::AnalyticsSearchListModel(QObject* parent):
     base_type([this]() { return new Private(this); }, parent),
     d(qobject_cast<Private*>(d_func()))
 {
+    setLiveSupported(true);
 }
 
 QRectF AnalyticsSearchListModel::filterRect() const
@@ -33,12 +34,7 @@ void AnalyticsSearchListModel::setFilterText(const QString& value)
 
 bool AnalyticsSearchListModel::isConstrained() const
 {
-    return filterRect().isValid() || base_type::isConstrained();
-}
-
-bool AnalyticsSearchListModel::canFetchMore(const QModelIndex& parent) const
-{
-    return rowCount() < Private::kMaximumItemCount && base_type::canFetchMore(parent);
+    return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();
 }
 
 } // namespace desktop

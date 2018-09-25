@@ -225,6 +225,8 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     const auto busyIndicatorVisibility = index.data(Qn::BusyIndicatorVisibleRole);
     if (busyIndicatorVisibility.isValid())
     {
+        constexpr int kIndicatorHeight = 24;
+        tile->setFixedHeight(kIndicatorHeight);
         tile->setBusyIndicatorVisible(busyIndicatorVisibility.toBool());
         return;
     }
@@ -447,7 +449,12 @@ void EventRibbon::Private::insertNewTiles(int index, int count, UpdateMode updat
 
     m_scrollBar->setMaximum(m_scrollBar->maximum() + delta);
 
-    if (position < m_scrollBar->value())
+    const int kThreshold = 100;
+    const int kLiveThreshold = 10;
+
+    const bool live = m_live && index == 0 && m_scrollBar->value() < kLiveThreshold;
+
+    if (!live && position < m_scrollBar->value() + kThreshold)
     {
         m_scrollBar->setValue(m_scrollBar->value() + delta);
         updateMode = UpdateMode::instant;
@@ -560,6 +567,7 @@ void EventRibbon::Private::clear()
     m_positions.clear();
     m_visible.clear();
     m_totalHeight = 0;
+    m_live = true;
 
     clearShiftAnimations();
     setScrollBarRelevant(false);
@@ -696,6 +704,16 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
 
     m_scrollBarPolicy = value;
     updateScrollBarVisibility();
+}
+
+bool EventRibbon::Private::live() const
+{
+    return m_live;
+}
+
+void EventRibbon::Private::setLive(bool value)
+{
+    m_live = value;
 }
 
 void EventRibbon::Private::updateScrollRange()
