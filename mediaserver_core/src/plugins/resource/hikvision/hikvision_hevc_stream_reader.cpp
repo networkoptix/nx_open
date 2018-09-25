@@ -235,7 +235,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
 {
     const auto kRequestName = lit("Fetch channel properties");
     nx_http::StatusCode::Value statusCode = nx_http::StatusCode::undefined;
-    for (const auto& path: {kChannelStreamingPathTemplate, kChannelStreamingPathForNvrTemplate})
+    for (const auto& path: {kIsapiChannelStreamingPathTemplate, kChannelStreamingPathTemplate})
     {
         auto url = hikvisionRequestUrlFromPath(path.arg(
             buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
