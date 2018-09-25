@@ -368,8 +368,13 @@ def handle_exceptions(func):
             return data
 
         except APINotAuthorisedException as error:
-            kill_session(args[0])  # kill session if user is not authorized
-            log_error(args[0], error, error.log_level())
+            # check if user session exist
+            # and kill it if user is not authorized
+            if 'login' in args[0].session:
+                logger.debug("Kill!!!")
+                kill_session(args[0])
+                log_error(args[0], error, error.log_level())
+
             return error.response()
 
         except APIException as error:
