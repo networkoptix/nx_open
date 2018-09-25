@@ -410,8 +410,6 @@ void QnResourceBrowserWidget::updateNewFilter()
     const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
 
     const auto treeView = ui->resourceTreeWidget->treeView();
-    qWarning() << !newRootNode.isValid();
-
     treeView->setRootIndex(newRootNode);
     treeView->setRootIsDecorated(!newRootNode.isValid());
     const auto indents = treeView->rootIsDecorated()
