@@ -143,7 +143,7 @@ QnRestResult::Error PeerWrapper::mergeTo(
     for (const auto& attribute: attributes)
     {
         if (attribute.name == MergeAttributes::AttributeName::takeRemoteSettings)
-            mergeSystemData.takeRemoteSettings = std::get<bool>(attribute.value);
+            mergeSystemData.takeRemoteSettings = attribute.value.toBool();
     }
 
     AuthKey authKey;
