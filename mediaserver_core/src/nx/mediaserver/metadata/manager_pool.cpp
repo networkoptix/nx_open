@@ -851,7 +851,7 @@ void ManagerPool::putVideoFrame(
         if (DataPacket* const dataPacket = frameConverter.getDataPacket(
             pixelFormatFromManifest(managerData->manifest())))
         {
-            if (managerData->canAcceptData())
+            if (managerData->canAcceptData() && NX_ASSERT(dataPacket->timestampUsec() >= 0))
             {
                 managerData->putData(std::make_shared<DataPacketAdapter>(dataPacket));
             }
