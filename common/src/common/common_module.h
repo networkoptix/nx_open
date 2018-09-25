@@ -173,7 +173,7 @@ public:
         return m_eventRuleManager;
     }
 
-    void setNeedToStop(bool value) { m_needToStop = true; }
+    void setNeedToStop(bool value) { m_needToStop = value; }
     bool isNeedToStop() const { return m_needToStop; }
 
     QnLicensePool* licensePool() const;
