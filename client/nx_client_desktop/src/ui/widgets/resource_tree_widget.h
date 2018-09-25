@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-class QAbstractItemView;
+class QTreeView;
 class QSortFilterProxyModel;
 
 class QnResourceItemDelegate;
@@ -124,7 +124,7 @@ public:
     using AutoExpandPolicy = std::function<bool(const QModelIndex&)>;
     void setAutoExpandPolicy(AutoExpandPolicy policy);
 
-    QAbstractItemView* treeView() const;
+    QTreeView* treeView() const;
     QnResourceItemDelegate* itemDelegate() const;
 
     using base_type::update;

@@ -4,7 +4,7 @@
 #include <QtCore/QIdentityProxyModel>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QTreeView>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>

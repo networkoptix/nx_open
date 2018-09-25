@@ -415,7 +415,7 @@ bool QnResourceTreeWidget::isSimpleSelectionEnabled() const
     return m_simpleSelectionEnabled;
 }
 
-QAbstractItemView* QnResourceTreeWidget::treeView() const
+QTreeView* QnResourceTreeWidget::treeView() const
 {
     return ui->resourcesTreeView;
 }

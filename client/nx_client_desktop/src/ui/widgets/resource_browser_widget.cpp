@@ -15,7 +15,6 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QGraphicsLinearLayout>
-
 #include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <client/client_runtime_settings.h>
@@ -72,6 +71,7 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/common/indents.h>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -85,6 +85,9 @@ using namespace nx::client::desktop::ui;
 using NodeType = ResourceTreeNodeType;
 
 namespace {
+
+static const auto kStandardResourceTreeIndents = qVariantFromValue(QnIndents(2, 0));
+static const auto kTaggedResourceTreeIndents = qVariantFromValue(QnIndents(8, 0));
 
 const char* kSearchModelPropertyName = "_qn_searchModel";
 const char* kSearchSynchronizerPropertyName = "_qn_searchSynchronizer";
@@ -191,7 +194,9 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     initInstantSearch();
 
-    ui->shortcutHintWidget->setContentsMargins(4, 0, 0, 0);
+    ui->shortcutHintWidget->setContentsMargins(6, 0, 0, 0);
+    ui->resourceTreeWidget->treeView()->setProperty(
+        style::Properties::kSideIndentation, kStandardResourceTreeIndents);
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
@@ -402,7 +407,17 @@ void QnResourceBrowserWidget::updateNewFilter()
         ? QnResourceSearchQuery::kAllowAllNodeTypes
         : kTagIndexToAllowedNodeMapping.at(index);
     const auto searchModel = ui->resourceTreeWidget->searchModel();
-    searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
+    const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
+
+    const auto treeView = ui->resourceTreeWidget->treeView();
+    qWarning() << !newRootNode.isValid();
+
+    treeView->setRootIndex(newRootNode);
+    treeView->setRootIsDecorated(!newRootNode.isValid());
+    const auto indents = treeView->rootIsDecorated()
+        ? kStandardResourceTreeIndents
+        : kTaggedResourceTreeIndents;
+    treeView->setProperty(style::Properties::kSideIndentation, indents);
 
     handleNewFilterUpdated();
 }
@@ -423,7 +438,8 @@ void QnResourceBrowserWidget::handleNewFilterUpdated()
     ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
 
     const bool hasFilterText = !ui->instantFilterLineEdit->text().trimmed().isEmpty();
-    bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText;
+    bool hintIsVisible = ini().enableResourceFilteringByDefault
+        && (hasFilterText || searchModel->query().allowedNode != QnResourceSearchQuery::kAllowAllNodeTypes);
 
     m_hasOpenInLayoutItems = false;
     m_hasOpenInEntityItems = false;
