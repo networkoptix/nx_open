@@ -30,6 +30,7 @@ std::unique_ptr<AbstractLogger> buildLogger(
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
     bool isDefaultLoggerUsed = true;
+    bool defaultLoggerModified = false;
 
     if (const auto value = arguments.get("log-file", "lf"))
     {
@@ -38,6 +39,7 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         logSettings.loggers.front().logBaseName = *value;
         setMainLogger(buildLogger(logSettings, QString()));
         isDefaultLoggerUsed = false;
+        defaultLoggerModified = true;
     }
 
     if (const auto value = arguments.get("log-level", "ll"))
@@ -46,6 +48,7 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         level.parse(*value);
         mainLogger()->setDefaultLevel(level.primary);
         mainLogger()->setLevelFilters(level.filters);
+        defaultLoggerModified = true;
     }
     else if (isDefaultLoggerUsed)
     {
@@ -55,7 +58,13 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
     log::Settings logSettings;
     logSettings.load(QnSettings(arguments));
     if (!logSettings.loggers.empty())
-        addLogger(buildLogger(logSettings, QString()));
+    {
+        auto logger = buildLogger(logSettings, QString());
+        if (!defaultLoggerModified)
+            setMainLogger(std::move(logger));
+        else
+            addLogger(std::move(logger));
+    }
 }
 
 } // namespace log
