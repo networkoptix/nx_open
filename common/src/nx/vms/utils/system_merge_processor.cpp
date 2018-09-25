@@ -162,7 +162,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
     const MergeSystemData& data,
     QnJsonRestResult* result)
 {
-    const nx::utils::Url url(data.url);
+    const nx::utils::Url remoteServerUrl(data.url);
 
     QnUserResourcePtr adminUser = m_commonModule->resourcePool()->getAdministrator();
     if (!adminUser)
@@ -179,14 +179,71 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         return nx::network::http::StatusCode::badRequest;
     }
 
+    MediaServerClient remoteMediaServerClient(remoteServerUrl);
+    remoteMediaServerClient.setAuthenticationKey(data.getKey);
+
+    auto resultCode = checkIfCloudSystemsMergeIsPossible(
+        data,
+        &remoteMediaServerClient,
+        result);
+    if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+        return resultCode;
+
+    const auto connectionResult = QnConnectionValidator::validateConnection(m_remoteModuleInformation);
+    if (connectionResult == Qn::IncompatibleInternalConnectionResult
+        || connectionResult == Qn::IncompatibleCloudHostConnectionResult
+        || connectionResult == Qn::IncompatibleVersionConnectionResult)
+    {
+        NX_DEBUG(this, lm("Incompatible systems. Local customization %1, cloud host %2, "
+            "remote customization %3, cloud host %4, version %5")
+            .args(QnAppInfo::customizationName(),
+                nx::network::SocketGlobals::cloud().cloudHost(),
+                m_remoteModuleInformation.customization,
+                m_remoteModuleInformation.cloudHost,
+                m_remoteModuleInformation.version.toString()));
+        setMergeError(result, MergeStatus::incompatibleVersion);
+        return nx::network::http::StatusCode::badRequest;
+    }
+
+    if (connectionResult == Qn::IncompatibleProtocolConnectionResult
+        && !data.ignoreIncompatible)
+    {
+        NX_DEBUG(this, lm("Incompatible systems protocol. Local %1, remote %2")
+            .args(QnAppInfo::ec2ProtoVersion(), m_remoteModuleInformation.protoVersion));
+        setMergeError(result, MergeStatus::incompatibleVersion);
+        return nx::network::http::StatusCode::badRequest;
+    }
+
+    QnMediaServerResourcePtr mServer =
+        m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+            m_commonModule->moduleGUID());
+    bool isDefaultSystemName;
+    if (data.takeRemoteSettings)
+        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(api::SF_NewSystem);
+    else
+        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
+    if (isDefaultSystemName)
+    {
+        NX_DEBUG(this, lit("Cannot merge to the unconfigured system"));
+        setMergeError(result, MergeStatus::unconfiguredSystem);
+        return nx::network::http::StatusCode::badRequest;
+    }
+
+    return nx::network::http::StatusCode::ok;
+}
+
+nx::network::http::StatusCode::Value
+    SystemMergeProcessor::checkIfCloudSystemsMergeIsPossible(
+        const MergeSystemData& data,
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result)
+{
     const bool isLocalInCloud = !m_commonModule->globalSettings()->cloudSystemId().isEmpty();
     const bool isRemoteInCloud = !m_remoteModuleInformation.cloudSystemId.isEmpty();
     if (isLocalInCloud && isRemoteInCloud)
     {
-        MediaServerClient remoteMediaServerClient(url);
-        remoteMediaServerClient.setAuthenticationKey(data.getKey);
         nx::vms::api::ResourceParamDataList remoteSettings;
-        const auto resultCode = remoteMediaServerClient.ec2GetSettings(&remoteSettings);
+        const auto resultCode = remoteMediaServerClient->ec2GetSettings(&remoteSettings);
         if (resultCode != ::ec2::ErrorCode::ok)
         {
             NX_DEBUG(this, lm("Error fetching remote system settings. %1")
@@ -196,7 +253,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         }
 
         QString remoteSystemCloudOwner;
-        for (const auto& remoteSetting : remoteSettings)
+        for (const auto& remoteSetting: remoteSettings)
         {
             if (remoteSetting.name == nx::settings_names::kNameCloudAccountName)
                 remoteSystemCloudOwner = remoteSetting.value;
@@ -232,49 +289,6 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
         NX_DEBUG(this, lit("SystemMergeProcessor (%1). Cannot merge systems bound to cloud")
             .arg(data.url));
         setMergeError(result, MergeStatus::dependentSystemBoundToCloud);
-        return nx::network::http::StatusCode::badRequest;
-    }
-
-    const auto connectionResult = QnConnectionValidator::validateConnection(m_remoteModuleInformation);
-    if (connectionResult == Qn::IncompatibleInternalConnectionResult
-        || connectionResult == Qn::IncompatibleCloudHostConnectionResult
-        || connectionResult == Qn::IncompatibleVersionConnectionResult)
-    {
-        NX_DEBUG(this, lit("Incompatible systems. "
-            "Local customization %1, cloud host %2, "
-            "remote customization %3, cloud host %4, version %5")
-            .arg(QnAppInfo::customizationName())
-            .arg(nx::network::SocketGlobals::cloud().cloudHost())
-            .arg(m_remoteModuleInformation.customization)
-            .arg(m_remoteModuleInformation.cloudHost)
-            .arg(m_remoteModuleInformation.version.toString()));
-        setMergeError(result, MergeStatus::incompatibleVersion);
-        return nx::network::http::StatusCode::badRequest;
-    }
-
-    if (connectionResult == Qn::IncompatibleProtocolConnectionResult
-        && !data.ignoreIncompatible)
-    {
-        NX_DEBUG(this, lit("Incompatible systems protocol. "
-            "Local %1, remote %2")
-            .arg(QnAppInfo::ec2ProtoVersion())
-            .arg(m_remoteModuleInformation.protoVersion));
-        setMergeError(result, MergeStatus::incompatibleVersion);
-        return nx::network::http::StatusCode::badRequest;
-    }
-
-    QnMediaServerResourcePtr mServer =
-        m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
-            m_commonModule->moduleGUID());
-    bool isDefaultSystemName;
-    if (data.takeRemoteSettings)
-        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(api::SF_NewSystem);
-    else
-        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
-    if (isDefaultSystemName)
-    {
-        NX_DEBUG(this, lit("Can not merge to the non configured system"));
-        setMergeError(result, MergeStatus::unconfiguredSystem);
         return nx::network::http::StatusCode::badRequest;
     }
 
@@ -390,7 +404,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
     /**
      * Save current admin and cloud users to the foreign system
      */
-    for (const auto& user : m_commonModule->resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: m_commonModule->resourcePool()->getResources<QnUserResource>())
     {
         if (user->isCloud() || user->isBuiltInAdmin())
         {
@@ -515,7 +529,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
     data.tranLogTime = pingReply.tranLogTime;
     data.systemName = systemName;
 
-    for (const auto& userData : users)
+    for (const auto& userData: users)
     {
         QnUserResourcePtr user = ec2::fromApiToResource(userData);
         if (user->isCloud() || user->isBuiltInAdmin())

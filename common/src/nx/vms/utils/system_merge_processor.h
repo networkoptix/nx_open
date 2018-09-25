@@ -12,6 +12,7 @@
 
 class QnCommonModule;
 struct QnJsonRestResult;
+class MediaServerClient;
 
 namespace nx {
 namespace vms {
@@ -57,6 +58,11 @@ private:
         const MergeSystemData& data,
         QnJsonRestResult* result);
 
+    nx::network::http::StatusCode::Value checkIfCloudSystemsMergeIsPossible(
+        const MergeSystemData& data,
+        MediaServerClient* remoteMediaServerClient,
+        QnJsonRestResult* result);
+
     nx::network::http::StatusCode::Value mergeSystems(
         Qn::UserAccessData accessRights,
         MergeSystemData data,
@@ -85,7 +91,8 @@ private:
 
     bool isResponseOK(const nx::network::http::HttpClient& client);
 
-    nx::network::http::StatusCode::Value getClientResponse(const nx::network::http::HttpClient& client);
+    nx::network::http::StatusCode::Value getClientResponse(
+        const nx::network::http::HttpClient& client);
 
     template <class ResultDataType>
     bool executeRequest(
