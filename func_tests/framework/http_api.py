@@ -25,7 +25,7 @@ class HttpError(Exception):
 
     def __init__(self, server_name, url, status_code, reason, json=None):
         super(HttpError, self).__init__(
-            self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
+            '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
         self.status_code = status_code
         self.reason = reason
         self.json = json
