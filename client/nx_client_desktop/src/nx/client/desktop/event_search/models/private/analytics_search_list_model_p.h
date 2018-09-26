@@ -16,6 +16,7 @@
 
 #include <nx/client/desktop/camera/camera_fwd.h>
 #include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
+#include <nx/client/desktop/event_search/utils/live_analytics_receiver.h>
 #include <nx/media/signaling_metadata_consumer.h>
 
 class QnUuid;
@@ -58,7 +59,6 @@ protected:
 
 private:
     void processMetadata();
-    media::SignalingMetadataConsumer* createMetadataSource();
 
     int indexOf(const QnUuid& objectId) const;
 
@@ -95,18 +95,14 @@ private:
     QString m_filterText;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
-    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
-    media::AbstractMetadataConsumerPtr m_metadataSource;
-    QnResourceDisplayPtr m_display;
+    const QScopedPointer<LiveAnalyticsReceiver> m_metadataReceiver;
+    const QScopedPointer<QTimer> m_metadataProcessingTimer;
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
 
+    QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     QHash<QnUuid, std::chrono::milliseconds> m_objectIdToTimestamp;
-
-    const QScopedPointer<QTimer> m_metadataProcessingTimer;
-    QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
-    mutable QnMutex m_metadataMutex;
 };
 
 } // namespace nx::client::desktop

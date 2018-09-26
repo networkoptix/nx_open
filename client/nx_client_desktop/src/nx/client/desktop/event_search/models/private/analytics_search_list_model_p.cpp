@@ -7,7 +7,6 @@
 
 #include <analytics/common/object_detection_metadata.h>
 #include <api/server_rest_connection.h>
-#include <camera/resource_display.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -19,7 +18,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
@@ -39,7 +37,7 @@ namespace {
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-static constexpr milliseconds kMetadataTimerInterval = 10ms;
+static constexpr milliseconds kMetadataTimerInterval = 250ms;
 static constexpr milliseconds kDataChangedInterval = 250ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
@@ -68,13 +66,17 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
         kDataChangedInterval.count(), this)),
     m_updateWorkbenchFilter(new utils::PendingOperation(this)),
-    m_metadataSource(createMetadataSource()),
+    m_metadataReceiver(new LiveAnalyticsReceiver(this)),
     m_metadataProcessingTimer(new QTimer())
 {
     m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
+
     m_metadataProcessingTimer->setInterval(kMetadataTimerInterval.count());
     connect(m_metadataProcessingTimer.data(), &QTimer::timeout, this, &Private::processMetadata);
     m_metadataProcessingTimer->start();
+
+    connect(m_metadataReceiver.data(), &LiveAnalyticsReceiver::dataOverflow,
+        this, &Private::processMetadata);
 
     const auto updateWorkbenchFilter =
         [this]()
@@ -98,52 +100,10 @@ AnalyticsSearchListModel::Private::~Private()
 {
 }
 
-media::SignalingMetadataConsumer* AnalyticsSearchListModel::Private::createMetadataSource()
-{
-    const auto processMetadataInSourceThread =
-        [this](const QnAbstractCompressedMetadataPtr& packet)
-        {
-            QnMutexLocker lock(&m_metadataMutex);
-            m_metadataPackets.push_back(packet);
-        };
-
-    auto metadataSource = new media::SignalingMetadataConsumer(MetadataType::ObjectDetection);
-
-    // TODO: #vkutin Rewrite all metadata stuff after new mechanics
-    //  of receiving live object detection is implemented.
-    //  Old metadata handling is temporarily disabled now.
-    //connect(metadataSource, &media::SignalingMetadataConsumer::metadataReceived,
-    //    this, processMetadataInSourceThread, Qt::DirectConnection);
-
-    return metadataSource;
-}
-
 void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (camera == this->camera())
-        return;
-
     base_type::setCamera(camera);
-
-    if (m_display)
-        m_display->removeMetadataConsumer(m_metadataSource);
-
-    m_display.reset();
-
-    if (!camera)
-        return;
-
-    auto widget = qobject_cast<QnMediaResourceWidget*>(q->navigator()->currentWidget());
-    NX_ASSERT(widget && widget->resource() == camera);
-
-    if (!widget)
-        return;
-
-    m_display = widget->display();
-    NX_ASSERT(m_display);
-
-    if (m_display)
-        m_display->addMetadataConsumer(m_metadataSource);
+    m_metadataReceiver->setCamera(camera);
 }
 
 int AnalyticsSearchListModel::Private::count() const
@@ -402,13 +362,11 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
 void AnalyticsSearchListModel::Private::processMetadata()
 {
-    QnMutexLocker locker(&m_metadataMutex);
-    auto packets = m_metadataPackets;
-    m_metadataPackets.clear();
-    locker.unlock();
-
-    if (!q->navigator()->isLive() || !q->relevantTimePeriod().isInfinite() || packets.empty())
+    auto packets = m_metadataReceiver->takeData();
+    if (!q->isLive() || packets.empty())
         return;
+
+    NX_VERBOSE(this) << "Processing" << packets.size() << "live metadata packets";
 
     QVector<DetectedObject> newObjects;
     QHash<QnUuid, int> newObjectIndices;

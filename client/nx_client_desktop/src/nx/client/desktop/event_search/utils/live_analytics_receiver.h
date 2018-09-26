@@ -1,0 +1,36 @@
+#pragma once
+
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+
+#include <client_core/connection_context_aware.h>
+#include <core/resource/resource_fwd.h>
+
+#include <nx/streaming/media_data_packet.h>
+
+namespace nx::client::desktop {
+
+class LiveAnalyticsReceiver:
+    public QObject,
+    public QnConnectionContextAware
+{
+    Q_OBJECT
+
+public:
+    LiveAnalyticsReceiver(QObject* parent = nullptr);
+    virtual ~LiveAnalyticsReceiver() override;
+
+    QnSecurityCamResourcePtr camera() const;
+    void setCamera(const QnSecurityCamResourcePtr& value);
+
+    QList<QnAbstractCompressedMetadataPtr> takeData();
+
+signals:
+    void dataOverflow(QPrivateSignal); //< takeData must be called as soon as possible.
+
+private:
+    class Private;
+    const QScopedPointer<Private> d;
+};
+
+} // namespace nx::client::desktop
