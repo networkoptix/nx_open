@@ -633,11 +633,11 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 bool QnResource::init()
 {
-    if (commonModule()->isNeedToStop())
-        return false;
-
     {
         QnMutexLocker lock(&m_initMutex);
+        if (commonModule() && commonModule()->isNeedToStop())
+            return false;
+
         if (m_initialized)
             return true; /* Nothing to do. */
         if (m_initInProgress)
