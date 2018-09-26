@@ -314,7 +314,7 @@ class DataStructure(models.Model):
         # try to get translated content
         if language and self.translatable:
             content_record = content_record.filter(language=language)
-        else:
+        elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
             content_record = content_record.filter(language=product.customizations.first().default_language)
 
         if content_record and content_record.exists():
@@ -383,8 +383,8 @@ class ContentVersion(models.Model):
         return str(self.id)
 
     def create_reviews(self):
-        for customziation in self.product.customizations.all():
-            ProductCustomizationReview(customization=customziation, version=self).save()
+        for customization in self.product.customizations.all():
+            ProductCustomizationReview(customization=customization, version=self).save()
 
 
     @property

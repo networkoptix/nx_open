@@ -199,13 +199,26 @@ def publish_latest_version(product, version_id, user):
     return publish_errors
 
 
+def revision_untouched(version):
+    pending = ProductCustomizationReview.REVIEW_STATES.pending
+    reviews_for_customizations = ProductCustomizationReview.objects.\
+        filter(version=version, customization__in=version.product.customizations.all())
+
+    for customization_review in reviews_for_customizations:
+        if customization_review.state != pending:
+            return False
+    return True
+
+
 def send_version_for_review(product, user):
     old_versions = ContentVersion.objects.filter(product=product, accepted_date=None)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
-        strip_version_from_records(old_version, product)
-        old_version.delete()
+        # If a non cloud_portal product is untouched migrate the records otherwise just create a new version
+        if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal or revision_untouched(old_versions):
+            strip_version_from_records(old_version, product)
+            old_version.delete()
 
     version = ContentVersion(product=product, created_by=user)
     version.save()

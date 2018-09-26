@@ -82,6 +82,25 @@ class ProductAdmin(CMSAdmin):
     list_display_links = ('name',)
     list_filter = ('product_type', )
     form = ProductForm
+    change_form_template = 'cms/product_change_form.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['current_versions'] = []
+        approved = ProductCustomizationReview.REVIEW_STATES.accepted
+        product = Product.objects.get(id=object_id)
+        product_customizations = ProductCustomizationReview.objects.filter(version__product=product)
+        for customization in product.customizations.all():
+            approved_versions = product_customizations.filter(customization=customization, state=approved)
+            if approved_versions.exists():
+                extra_context['current_versions'].append(approved_versions.latest('id'))
+            else:
+                extra_context['current_versions'].append({'customization': customization.name,
+                                                          'id': None})
+
+        return super(ProductAdmin, self).change_view(
+            request, object_id, form_url, extra_context=extra_context,
+        )
 
     def product_actions(self, obj):
         if not obj.product_type or obj.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
@@ -230,6 +249,9 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         version = ProductCustomizationReview.objects.get(id=object_id).version
         extra_context['contexts'] = get_records_for_version(version)
         extra_context['title'] = "Changes for {}".format(version.product.name)
+        if request.user == version.product.created_by:
+            extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
+            extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
@@ -239,6 +261,18 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         if True or not request.user.is_superuser:
             qs = qs.filter(customization__name=settings.CUSTOMIZATION)
         return qs
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user != obj.version.product.created_by:
+            return self.readonly_fields
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
+
+    def has_delete_permission(self, request, obj=None):
+        if obj:
+            return request.user == obj.version.product.created_by
+        return False
 
     def product(self, obj):
         return obj.version.product

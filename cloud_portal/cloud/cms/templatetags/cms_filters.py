@@ -49,3 +49,8 @@ def has_value(data_structure_name, product, context, language):
 @register.simple_tag
 def get_datastructure_type(data_structure):
     return DataStructure.DATA_TYPES[data_structure.type]
+
+
+@register.simple_tag
+def get_review_state(state):
+    return ProductCustomizationReview.REVIEW_STATES[state]
