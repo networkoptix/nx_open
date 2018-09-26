@@ -14,7 +14,7 @@ namespace usb_cam {
 
 namespace {
 
-uint64_t kMsecInSec = 1000;
+std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
 
 }
 
@@ -93,7 +93,7 @@ void NativeStreamReader::ensureConsumerAdded()
 
 void NativeStreamReader::maybeFlush()
 {
-    if (m_avConsumer->timeSpan() > kMsecInSec)
+    if (m_avConsumer->timeSpan() > kMsecInSec.count())
         m_avConsumer->flush();
 }
 

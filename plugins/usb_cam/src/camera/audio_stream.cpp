@@ -17,7 +17,7 @@ namespace usb_cam {
 namespace {
 
 int constexpr kRetryLimit = 10;
-constexpr int kMsecInSec = 100;
+std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
 
 const char * ffmpegDeviceType()
 {
@@ -325,8 +325,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         AVMEDIA_TYPE_AUDIO,
         m_packetCount);
 
-    bool drainedResampler = false;
-
     for(;;)
     {
         result = m_encoder->receivePacket(packet->packet());
@@ -335,9 +333,9 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
         else if (result < 0 && result != AVERROR(EAGAIN))
             returnData(result, nullptr);
 
-        drainedResampler =
-            m_resampleContext && swr_get_delay(m_resampleContext, kMsecInSec) > timePerVideoFrame();
-        if(drainedResampler)
+        // need to drain the the resampler to avoid increasing audio delay
+        if(m_resampleContext 
+            && swr_get_delay(m_resampleContext, kMsecInSec.count()) > timePerVideoFrame())
         {
             m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;
             m_resampledFrame->frame()->pkt_pts = AV_NOPTS_VALUE;
@@ -412,7 +410,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
         data += pkt->size();
     }
 
-    newPacket->setTimeStamp(packet->timeStamp());
+    newPacket->setTimeStamp(m_packetBuffer[0]->timeStamp());
     m_packetBuffer.clear();
 
     return newPacket;
@@ -483,7 +481,7 @@ int AudioStream::AudioStreamPrivate::timePerVideoFrame() const
     float fps = 30;
     if (auto cam = m_camera.lock())
         fps = cam->videoStream()->actualFps();
-    return 1.0 / fps * kMsecInSec;
+    return 1.0 / fps * kMsecInSec.count();
 }
 
 

@@ -140,7 +140,7 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
      * throws an error if the frame that it encodes is earlier in time than the previous frame,
      * so drop it to avoid this error.
      */
-    if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() < m_lastVideoPts)
+    if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
         return true;
 
     uint64_t now = m_camera->millisSinceEpoch();
