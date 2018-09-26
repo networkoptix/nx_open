@@ -74,19 +74,24 @@ void VisualSearchListModel::setFetchDirection(FetchDirection value)
     m_sourceModel->setFetchDirection(value);
 }
 
+void VisualSearchListModel::setLivePaused(bool value)
+{
+    m_sourceModel->setLivePaused(value);
+}
+
 bool VisualSearchListModel::isConstrained() const
 {
-    return m_sourceModel && m_sourceModel->isConstrained();
+    return m_sourceModel->isConstrained();
 }
 
 int VisualSearchListModel::relevantCount() const
 {
-    return m_sourceModel ? m_sourceModel->rowCount() : 0;
+    return m_sourceModel->rowCount();
 }
 
 bool VisualSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
-    return m_sourceModel && m_sourceModel->canFetchMore();
+    return m_sourceModel->canFetchMore();
 }
 
 BusyIndicatorModel* VisualSearchListModel::relevantIndicatorModel() const

@@ -10,6 +10,7 @@ EventSearchListModel::EventSearchListModel(QObject* parent):
     d(qobject_cast<Private*>(d_func()))
 {
     setLiveSupported(true);
+    setLivePaused(true);
 }
 
 vms::api::EventType EventSearchListModel::selectedEventType() const

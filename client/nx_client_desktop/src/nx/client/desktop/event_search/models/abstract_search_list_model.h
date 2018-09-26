@@ -53,6 +53,10 @@ public:
     bool isLive() const;
     void setLive(bool value);
 
+    /** Whether live updates are paused, e.g. when the model's item view is invisible. */
+    bool livePaused() const;
+    void setLivePaused(bool value);
+
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;
 
@@ -78,6 +82,7 @@ public:
 signals:
     void fetchFinished(FetchResult result, QPrivateSignal);
     void liveChanged(bool isLive, QPrivateSignal);
+    void livePausedChanged(bool isPaused, QPrivateSignal);
 
 protected:
     // These functions must be overridden in derived classes.
@@ -114,6 +119,7 @@ private:
     int m_fetchBatchSize = 100; //< Item count acquired by one fetch.
     bool m_liveSupported = false; //< Whether underlying data store can be updated in live.
     bool m_live = false; //< Live mode enabled state.
+    bool m_livePaused = false; //< Live mode paused state.
 
     FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
 

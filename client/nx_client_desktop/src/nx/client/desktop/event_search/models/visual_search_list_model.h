@@ -34,6 +34,8 @@ public:
     FetchDirection fetchDirection() const;
     void setFetchDirection(FetchDirection value);
 
+    void setLivePaused(bool value);
+
     bool isConstrained() const;
 
     int relevantCount() const;

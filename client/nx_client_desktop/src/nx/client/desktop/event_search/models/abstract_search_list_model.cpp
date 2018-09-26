@@ -158,6 +158,20 @@ void AbstractSearchListModel::setLive(bool value)
     emit liveChanged(m_live, {});
 }
 
+bool AbstractSearchListModel::livePaused() const
+{
+    return m_livePaused;
+}
+
+void AbstractSearchListModel::setLivePaused(bool value)
+{
+    if (m_livePaused == value)
+        return;
+
+    m_livePaused = value;
+    emit livePausedChanged(m_livePaused, {});
+}
+
 void AbstractSearchListModel::setLiveSupported(bool value)
 {
     if (m_liveSupported == value)

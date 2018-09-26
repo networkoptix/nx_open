@@ -242,8 +242,11 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
 
 void EventSearchListModel::Private::fetchLive()
 {
-    if (m_liveFetch.id || !q->isLive())
+    if (m_liveFetch.id || !q->isLive() || q->livePaused())
         return;
+
+    if (m_data.empty() && fetchInProgress())
+        return; //< Don't fetch live if first fetch from archive is in progress.
 
     const milliseconds from = (m_data.empty() ? 0ms : startTime(m_data.front()));
     m_liveFetch.period = QnTimePeriod(from.count(), QnTimePeriod::infiniteDuration());

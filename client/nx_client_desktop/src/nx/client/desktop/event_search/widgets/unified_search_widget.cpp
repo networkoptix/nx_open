@@ -110,6 +110,13 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     installEventHandler(this, QEvent::Show, this, &UnifiedSearchWidget::requestFetch);
 
+    installEventHandler(this, {QEvent::Show, QEvent::Hide}, this,
+        [this]()
+        {
+            if (m_model)
+                m_model->setLivePaused(!isVisible());
+        });
+
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
     m_fetchMoreOperation->setCallback(
