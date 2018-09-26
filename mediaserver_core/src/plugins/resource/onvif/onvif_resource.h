@@ -339,7 +339,7 @@ protected:
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
-    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual void initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params);
     virtual QSet<QString> calculateSupportedAdvancedParameters() const;
     virtual void fetchAndSetAdvancedParameters();
 

@@ -2821,7 +2821,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
     return result;
 }
 
-void QnPlOnvifResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
+void QnPlOnvifResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {
     QAuthenticator auth = getAuth();
     QString imagingUrl = getImagingUrl();
@@ -2853,13 +2853,15 @@ QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const
 
 void QnPlOnvifResource::fetchAndSetAdvancedParameters()
 {
+    QnMutexLocker lock(&m_physicalParamsMutex);
+
     m_advancedParametersProvider.clear();
 
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplate(params))
         return;
 
-    initAdvancedParametersProviders(params);
+    initAdvancedParametersProvidersUnderLock(params);
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
