@@ -22,13 +22,10 @@ class QnUuid;
 class QnMediaResourceWidget;
 class QMenu;
 
-namespace nx {
+namespace nx::api { struct AnalyticsManifestObjectAction; }
+namespace nx::utils { class PendingOperation; }
 
-namespace api { struct AnalyticsManifestObjectAction; }
-namespace utils { class PendingOperation; }
-
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class AnalyticsSearchListModel::Private: public AbstractAsyncSearchListModel::Private
 {
@@ -112,6 +109,4 @@ private:
     mutable QnMutex m_metadataMutex;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

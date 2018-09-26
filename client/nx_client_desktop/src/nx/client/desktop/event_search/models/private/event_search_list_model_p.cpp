@@ -304,7 +304,8 @@ rest::Handle EventSearchListModel::Private::getEvents(
     NX_VERBOSE(q) << "Requesting events from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
         << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.order).toString();
+        << QVariant::fromValue(request.order).toString()
+        << "maximum count" << request.limit;
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)](

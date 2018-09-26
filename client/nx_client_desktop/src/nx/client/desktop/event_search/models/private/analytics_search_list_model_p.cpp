@@ -30,9 +30,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 using namespace analytics::storage;
 
@@ -387,7 +385,8 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     NX_VERBOSE(q) << "Requesting analytics from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
         << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(request.sortOrder).toString();
+        << QVariant::fromValue(request.sortOrder).toString()
+        << "maximum objects" << request.maxObjectsToSelect;
 
     const auto internalCallback =
         [callback, guard = QPointer<Private>(this)](
@@ -556,9 +555,10 @@ QString AnalyticsSearchListModel::Private::description(
     const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
 
     using namespace std::chrono;
-    return lit("Timestamp: %1 us<br>%2<br>Duration: %3 ms<br>%4")
+    return lit("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4")
         .arg(object.firstAppearanceTimeUsec)
         .arg(start.toString(Qt::RFC2822Date))
+        .arg(durationUs)
         .arg(core::HumanReadable::timeSpan(duration_cast<milliseconds>(microseconds(durationUs))));
 }
 
@@ -694,15 +694,16 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
         [&attribute](const QString& name, qreal defaultValue)
         {
             bool ok = false;
-            const QString valueStr = attribute(name);
+            QString valueStr = attribute(name);
             if (valueStr.isNull())
                 return defaultValue; //< Attribute is missing.
 
+            valueStr.replace(',', '.'); //< Protection against localized decimal point.
             const qreal value = valueStr.toDouble(&ok);
             if (ok)
                 return value;
 
-            NX_WARNING(typeid(Private)) << lm("Invalid %1 value: [%2]").args(name, valueStr);
+            NX_WARNING(typeid(Private)) << lm("Invalid %1 value: \"%2\"").args(name, valueStr);
             return defaultValue;
         };
 
@@ -716,7 +717,7 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
         }
         else
         {
-            NX_WARNING(typeid(Private)) << lm("Invalid nx.sys.preview.timestampUs value: [%1]")
+            NX_WARNING(typeid(Private)) << lm("Invalid nx.sys.preview.timestampUs value: \"%1\"")
                 .arg(previewTimestampStr);
         }
     }
@@ -736,6 +737,4 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
     return result;
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

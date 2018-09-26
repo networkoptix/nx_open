@@ -169,7 +169,8 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
     NX_VERBOSE(q) << "Requesting bookmarks from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
         << utils::timestampToDebugString(period.endTimeMs()) << "in"
-        << QVariant::fromValue(filter.orderBy.order).toString();
+        << QVariant::fromValue(filter.orderBy.order).toString()
+        << "maximum count" << filter.limit;
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
         [this, guard = QPointer<QObject>(this)](

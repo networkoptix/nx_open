@@ -1,9 +1,7 @@
 #include "analytics_search_list_model.h"
 #include "private/analytics_search_list_model_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 AnalyticsSearchListModel::AnalyticsSearchListModel(QObject* parent):
     base_type([this]() { return new Private(this); }, parent),
@@ -37,6 +35,4 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
