@@ -17,7 +17,7 @@
                     {% for customization_version in current_versions %}
                         <tr>
                             <td> {{ customization_version.customization }} </td>
-                            <td> {{ customization_version.id }} </td>
+                            <td> {{ customization_version.version.id }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>

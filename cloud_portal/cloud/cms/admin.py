@@ -218,7 +218,7 @@ class ContentVersionAdmin(CMSAdmin):
     def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         qs = qs.filter(product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
-        if True or not request.user.is_superuser:
+        if not request.user.is_superuser:
             qs = qs.filter(product__customizations__name__in=[settings.CUSTOMIZATION])
         return qs
 
@@ -258,7 +258,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
-        if True or not request.user.is_superuser:
+        if not request.user.is_superuser:
             qs = qs.filter(customization__name=settings.CUSTOMIZATION)
         return qs
 
@@ -278,6 +278,10 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         return obj.version.product
 
     def save_model(self, request, obj, form, change):
+        # Once someone reviews the product we need to lock the version
+        if not obj.version.accepted_date:
+            obj.version.accepted_date = datetime.now()
+            obj.version.save()
         obj.reviewed_by = request.user
         obj.reviewed_date = datetime.now()
         obj.save()
