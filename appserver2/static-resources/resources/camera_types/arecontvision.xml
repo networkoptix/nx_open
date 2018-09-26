@@ -244,5 +244,13 @@
                 <param name = "MaxFPS" default_value = "2"/>
             </params>
         </resource>
+        <resource name = "12ZMD-401" public = "08ZMD-400">
+            <params>
+                <param name = "MaxSensorWidth" default_value = "3968"/>
+                <param name = "MaxSensorHeight" default_value = "2992"/>
+                <param name = "MaxFPS" default_value = "20"/>
+            </params>
+        </resource>
+        <resource name = "08ZMV-300" public = "08ZMD-400"/>
     </oem>
 </resources>
