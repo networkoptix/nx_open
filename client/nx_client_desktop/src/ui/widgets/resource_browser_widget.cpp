@@ -506,7 +506,7 @@ QStringList QnResourceBrowserWidget::filterTags()
         tr("Servers"),
         tr("Cameras && Devices"),
         tr("Layouts"),
-        tr("Layout Tours"),
+        tr("Showreels"),
         tr("Video Walls"),
         tr("Web Pages"),
         tr("Users"),

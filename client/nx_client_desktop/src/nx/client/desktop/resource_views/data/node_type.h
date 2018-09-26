@@ -23,33 +23,32 @@ enum class ResourceTreeNodeType
     separator,
     // Root node for servers for admin user.
     servers,
+    // Root node for filtered servers
+    filteredServers,
     // Root node for cameras, i/o modules and statistics for non-admin user.
     userResources,
+    // Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes.
+    filteredCameras,
     // Root node for current user's layouts and shared layouts.
     layouts,
+    // Root node for filtered layouts
+    filteredLayouts,
     // Root node for the layout tours.
     layoutTours,
+    // Root node for filtered videowalls
+    filteredVideowalls,
     // Root node for web pages.
     webPages,
     // Root node for user resources.
     users,
     // Root node for remote systems.
+    // Root node for filtered users
+    filteredUsers,
     otherSystems,
     // Root node for local resources.
     localResources,
     // Root node for spacing between local resources header and resources.
     localSeparator,
-
-    // Root node for filtered servers
-    filteredServers,
-    // Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes.
-    filteredCameras,
-    // Root node for filtered layouts
-    filteredLayouts,
-    // Root node for filtered users
-    filteredUsers,
-    // Root node for filtered videowalls
-    filteredVideowalls,
 
     // Root node for hidden resources.
     bastard,
