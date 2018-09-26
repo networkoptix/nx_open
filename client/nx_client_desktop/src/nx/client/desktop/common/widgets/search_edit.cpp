@@ -242,10 +242,18 @@ void SearchEdit::setupMenuButton()
     connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
         {
-            const auto buttonGeometry = d->menuButton->geometry();
-            const auto bottomPoint = QPoint(0, buttonGeometry.height());
-            const auto globalPoint = d->menuButton->mapToGlobal(bottomPoint);
-            QnHiDpiWorkarounds::showMenu(d->menu, globalPoint);
+            if (d->menu->actions().size())
+            {
+                const auto buttonGeometry = d->menuButton->geometry();
+                const auto bottomPoint = QPoint(0, buttonGeometry.height());
+                const auto globalPoint = d->menuButton->mapToGlobal(bottomPoint);
+                QnHiDpiWorkarounds::showMenu(d->menu, globalPoint);
+            }
+            else
+            {
+                d->lineEdit->setFocus();
+                emit selectedTagIndexChanged();
+            }
         });
 
     connect(d->lineEdit, &QLineEdit::textChanged, this,

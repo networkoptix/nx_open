@@ -1,5 +1,7 @@
 #include "resource_tree_model.h"
 
+#include <ini.h>
+
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 #include <QtCore/QCoreApplication>
@@ -462,7 +464,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }
@@ -483,7 +485,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }

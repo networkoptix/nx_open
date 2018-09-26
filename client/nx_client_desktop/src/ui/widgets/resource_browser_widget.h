@@ -126,6 +126,7 @@ private:
     void selectIndices(const QModelIndexList& indices);
 
     void initInstantSearch();
+    void updateSearchMode();
     void updateNewFilter();
     void handleNewFilterUpdated();
     static QStringList filterTags();

@@ -192,11 +192,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         }
     );
 
-    initInstantSearch();
-
     ui->shortcutHintWidget->setContentsMargins(6, 0, 0, 0);
     ui->resourceTreeWidget->treeView()->setProperty(
         style::Properties::kSideIndentation, kStandardResourceTreeIndents);
+
+    initInstantSearch();
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 
@@ -296,6 +296,7 @@ void QnResourceBrowserWidget::initInstantSearch()
     ui->tabWidget->tabBar()->hide();
 
     ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
+    ui->nothingFoundDescriptionLabel->setForegroundRole(QPalette::Mid);
     auto getFilteredResources =
         [this]()
         {
@@ -364,10 +365,8 @@ void QnResourceBrowserWidget::initInstantSearch()
         });
 
     // Initializes new filter edit
-    handleNewFilterUpdated();
 
     filterEdit->setPlaceholderText(tr("Cameras & Resources"));
-    filterEdit->setTags(filterTags());
     filterEdit->setClearingTagIndex(0);
 
     connect(filterEdit, &SearchEdit::textChanged,
@@ -383,6 +382,22 @@ void QnResourceBrowserWidget::initInstantSearch()
         ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed);
     connect(filterEdit, &SearchEdit::ctrlEnterPressed,
         ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed);
+
+    connect(commonModule(), &QnCommonModule::remoteIdChanged,
+        this, &QnResourceBrowserWidget::updateSearchMode);
+
+    updateSearchMode();
+    handleNewFilterUpdated();
+}
+
+void QnResourceBrowserWidget::updateSearchMode()
+{
+    const auto filterEdit = ui->instantFilterLineEdit;
+    const bool localResourcesMode = commonModule()->remoteGUID().isNull();
+    const auto tags = localResourcesMode ? QStringList() : filterTags();
+    filterEdit->setTags(tags);
+    filterEdit->setText(QString());
+    updateNewFilter();
 }
 
 void QnResourceBrowserWidget::updateNewFilter()
@@ -403,9 +418,18 @@ void QnResourceBrowserWidget::updateNewFilter()
         return;
     }
 
-    const auto allowedNode = index == -1
-        ? QnResourceSearchQuery::kAllowAllNodeTypes
-        : kTagIndexToAllowedNodeMapping.at(index);
+    const auto allowedNode =
+        [this, index]()
+        {
+            if (index > -1)
+                return kTagIndexToAllowedNodeMapping.at(index);
+
+            const bool localResourcesMode = commonModule()->remoteGUID().isNull();
+            return localResourcesMode
+                ? QnResourceSearchQuery::NodeType::localResources
+                : QnResourceSearchQuery::kAllowAllNodeTypes;
+        }();
+
     const auto searchModel = ui->resourceTreeWidget->searchModel();
     const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
 
@@ -422,18 +446,24 @@ void QnResourceBrowserWidget::updateNewFilter()
 
 void QnResourceBrowserWidget::handleNewFilterUpdated()
 {
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+    const auto rootIndex = ui->resourceTreeWidget->treeView()->rootIndex();
+    const bool emptyResults = searchModel->rowCount(rootIndex) == 0;
+    const bool noLocalFiles = commonModule()->remoteGUID().isNull()
+        && searchModel->query().text.trimmed().isEmpty()
+        && emptyResults;
+    ui->nothingFoundDescriptionLabel->setVisible(noLocalFiles);
+    ui->nothingFoundLabel->setText(noLocalFiles ? tr("No local files") : tr("Nothing found"));
+
+    static constexpr int kResourcesPage = 0;
+    static constexpr int kNothingFoundPage = 1;
+    ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
+
     if (!ui->instantFilterLineEdit->hasFocus())
     {
         ui->shortcutHintWidget->setVisible(false);
         return;
     }
-
-    const auto searchModel = ui->resourceTreeWidget->searchModel();
-
-    const int emptyResults = searchModel->rowCount() == 0;
-    static constexpr int kResourcesPage = 0;
-    static constexpr int kNothingFoundPage = 1;
-    ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
 
     const bool hasFilterText = !ui->instantFilterLineEdit->text().trimmed().isEmpty();
     bool hintIsVisible = ini().enableResourceFilteringByDefault
