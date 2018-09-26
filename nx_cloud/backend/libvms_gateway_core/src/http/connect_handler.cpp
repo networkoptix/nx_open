@@ -29,6 +29,9 @@ void ConnectHandler::processRequest(
     static_cast<void>(authInfo);
     static_cast<void>(response);
 
+    // NOTE: this validation should be done somewhere in more general place
+    if (!request.requestLine.url.isValid())
+        return completionHandler(network::http::StatusCode::badRequest);
     network::SocketAddress targetAddress(request.requestLine.url.host(),
         request.requestLine.url.port());
     if (!network::SocketGlobals::addressResolver()
