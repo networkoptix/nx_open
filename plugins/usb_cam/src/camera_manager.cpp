@@ -25,10 +25,11 @@ CameraManager::CameraManager(
     m_pluginRef( Plugin::instance() ),
     m_capabilities(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
-        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability |
-        nxcip::BaseCameraManager::audioCapability),
+        nxcip::BaseCameraManager::primaryStreamSoftMotionCapability),
     m_audioEnabled(false)
 {
+    if(m_info.auxiliaryData[0] != '\0')
+        m_capabilities |= nxcip::BaseCameraManager::audioCapability;
 }
 
 CameraManager::~CameraManager()

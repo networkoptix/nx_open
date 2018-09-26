@@ -16,7 +16,7 @@ namespace {
 
 std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
 
-}
+} // namespace
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
