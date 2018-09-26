@@ -418,16 +418,16 @@ void UnifiedSearchWidget::requestFetch()
 
 void UnifiedSearchWidget::updatePlaceholderState()
 {
-    const bool hidden = m_model && m_model->rowCount() > 0;
-    if (!hidden)
+    const bool placeholderVisible = !m_model || m_model->relevantCount() == 0;
+    if (placeholderVisible)
     {
         ui->placeholderText->setText(m_model && m_model->isConstrained()
             ? m_placeholderTextConstrained
             : m_placeholderTextUnconstrained);
     }
 
-    ui->placeholder->setHidden(hidden);
-    ui->counterContainer->setVisible(hidden);
+    ui->placeholder->setVisible(placeholderVisible);
+    ui->counterContainer->setVisible(!placeholderVisible);
 }
 
 QLabel* UnifiedSearchWidget::counterLabel() const
