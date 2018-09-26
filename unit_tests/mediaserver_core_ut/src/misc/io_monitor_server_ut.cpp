@@ -151,8 +151,9 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        [&allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
+        [contentParser, &allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
         {
+            contentParser->flush();
             allDataProcessed.set_value();
         });
 
@@ -179,7 +180,6 @@ TEST(IoServerMonitorTest, main)
     ASSERT_EQ(
         std::future_status::ready,
         allDataProcessed.get_future().wait_for(kMaxTestTime));
-
 
     ASSERT_TRUE(ioParser->isEof());
 }
