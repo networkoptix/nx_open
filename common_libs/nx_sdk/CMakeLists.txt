@@ -7,3 +7,8 @@ nx_add_target(nx_sdk LIBRARY ${library_type} NO_MOC NO_PCH
     PRIVATE_LIBS
         nx_kit
 )
+
+target_compile_definitions(nx_sdk
+    PRIVATE NX_SDK_API=
+    INTERFACE NX_SDK_API=
+)

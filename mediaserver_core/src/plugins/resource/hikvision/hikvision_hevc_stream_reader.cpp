@@ -168,11 +168,17 @@ int HikvisionHevcStreamReader::chooseFps(
     const ChannelCapabilities& channelCapabilities, float fps) const
 {
     int choosenFps = 0;
-    auto minDifference = std::numeric_limits<double>::max();
+    if (channelCapabilities.fpsInDeviceUnits.empty())
+        return choosenFps;
 
-    for (const auto& hikvisionFramerate: channelCapabilities.fps)
+    auto divider = 1.0;
+    if (channelCapabilities.fpsInDeviceUnits.at(0) > kFpsThreshold)
+        divider = 100.0;
+
+    auto minDifference = std::numeric_limits<double>::max();
+    for (const auto& hikvisionFramerate: channelCapabilities.fpsInDeviceUnits)
     {
-        auto difference = std::abs(hikvisionFramerate / 100.0f - fps);
+        auto difference = std::abs(hikvisionFramerate / divider - fps);
 
         if (difference < minDifference)
         {
@@ -229,7 +235,7 @@ CameraDiagnostics::Result HikvisionHevcStreamReader::fetchChannelProperties(
 {
     const auto kRequestName = lit("Fetch channel properties");
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
-    for (const auto& path: {kChannelStreamingPathTemplate, kChannelStreamingPathForNvrTemplate})
+    for (const auto& path: {kIsapiChannelStreamingPathTemplate, kChannelStreamingPathTemplate})
     {
         auto url = hikvisionRequestUrlFromPath(path.arg(
             buildChannelNumber(getRole(), m_hikvisionResource->getChannel())));
@@ -350,7 +356,23 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     auto codecElement = videoElement.firstChildElement(kVideoCodecTypeTag);
     auto fpsElement = videoElement.firstChildElement(kMaxFrameRateTag);
     auto qualityElement = videoElement.firstChildElement(kFixedQualityTag);
-    auto bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+
+    auto bitrateControlTypeElement = videoElement.firstChildElement(kBitrateControlTypeTag);
+    QDomElement bitrateElement;
+    if (!bitrateControlTypeElement.isNull())
+    {
+        auto controlType = bitrateControlTypeElement.text().trimmed().toUpper();
+        if (controlType == kVbr)
+            bitrateElement = videoElement.firstChildElement(kVariableBitrateTag);
+        else
+            bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+    }
+    else
+    {
+        bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
+        if (bitrateElement.isNull())
+            bitrateElement = videoElement.firstChildElement(kVariableBitrateTag);
+    }
 
     bool elementsAreOk = !resolutionWidthElement.isNull()
         && !resolutionHeightElement.isNull()

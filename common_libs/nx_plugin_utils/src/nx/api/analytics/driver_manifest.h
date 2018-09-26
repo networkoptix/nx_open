@@ -17,7 +17,7 @@ namespace api {
 /**
  * Description of the mediaserver metadata plugin.
  */
-struct /*NX_PLUGIN_UTILS_API*/ AnalyticsDriverManifestBase
+struct NX_PLUGIN_UTILS_API AnalyticsDriverManifestBase
 {
     Q_GADGET
     Q_ENUMS(Capability)
@@ -62,7 +62,7 @@ struct AnalyticsManifestObjectAction
 #define AnalyticsManifestObjectAction_Fields \
     (id)(name)(supportedObjectTypeIds)
 
-struct AnalyticsDriverManifest: AnalyticsDriverManifestBase
+struct NX_PLUGIN_UTILS_API AnalyticsDriverManifest: AnalyticsDriverManifestBase
 {
     QList<Analytics::EventType> outputEventTypes;
     QList<Analytics::ObjectType> outputObjectTypes;

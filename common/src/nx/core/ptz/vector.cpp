@@ -345,3 +345,12 @@ QDebug operator<<(QDebug dbg, const nx::core::ptz::Vector& ptzVector)
 
     return dbg.maybeSpace();
 }
+
+nx::core::ptz::Vector linearCombine(
+    qreal a,
+    const nx::core::ptz::Vector& x,
+    qreal b,
+    const nx::core::ptz::Vector& y)
+{
+    return a * x + b * y;
+}

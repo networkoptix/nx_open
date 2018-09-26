@@ -471,7 +471,6 @@
             "keys": [
                 "DW|*"
             ],
-            "bitratePerGOP": true,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
@@ -559,7 +558,10 @@
                 "BOSCH|VIP_X16_XF_E",
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
-                "DS-6701HWI|Embedded Net DVS",
+                "DS-6701*|Embedded Net DVS",
+                "DS-6704*|Embedded*",
+                "DS-6708*|Embedded*",
+                "DS-6716*|Embedded*",
                 "DS-6716HQHI-SATA|Embedded_Net_DVR",
                 "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
@@ -607,7 +609,7 @@
                 "Customer|9534E2",
                 "*|NVR201-08LP",
                 "UNIVIEW|NVR302-08E-P8",
-                "Samsung Techwin|SPE-400*",
+                "Samsung Techwin|SPE-400", "Samsung|SPE-400", "Hanwha|SPE-400",
                 "VIVOTEK|VS8102",
                 "TCS-300|TCAM",
                 "UNIVEW|NVR302-16S-P16*",
@@ -982,7 +984,8 @@
                 "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
                 "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "ONVIF|NC328-VBZ"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -1008,7 +1011,9 @@
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
                 "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"                
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
+                "Hikvision|DS-2CD2625FWD*", "hikvision|DS-2CD2625FWD*", "HIKVISION|DS-2CD2625FWD*",
+                "Hikvision|DS-2TD2166*", "hikvision|DS-2TD2166", "HIKVISION|DS-2TD2166"
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2775,7 +2780,7 @@
         },
         {
             "keys": [
-                "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*"
+                "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*", "UNIVIEW|IPC6252SR*"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -2786,8 +2791,8 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-0.1666667, 1],
-                        "logical": [-15, 90]
+                        "device":  [1, -0.1666667],
+                        "logical": [-90, 15]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
@@ -2836,7 +2841,7 @@
         },
         {
             "keys": [
-            "9W-H3-3MH*|*",
+            "9W-H3-3MH*|*", "Avigilon|9W-H3-3M*",
             "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
             "AXIS|AXIS P3707*",
             "Axis|AXISP3707*",
@@ -2849,7 +2854,14 @@
             "AXIS|AXISQ3708*",
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
             "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
-            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B",
+            "Hikvision|DS-2CD6D24*", "HIKVISION|DS-2CD6D24*",
+            "Hikvision|DS-2TD2636*", "HIKVISION|DS-2TD2636*",
+            "Dahua|IPC-PDBW8800*",
+            "Geovision|GV-SV48000",
+            "Hikvision|DS-2CD6924F*", "HIKVISION|DS-2CD6924F*",
+            "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
+            "NVM3-A16|IP-Camera", "IPNC|NVM3-A16"
             ],
             "canShareLicenseGroup": true
         },

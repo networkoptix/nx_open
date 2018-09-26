@@ -194,6 +194,7 @@ private:
 
     HanwhaPtzRangeMap fetchPtzRanges();
     QnPtzAuxilaryTraitList calculatePtzTraits() const;
+    QnPtzAuxilaryTraitList calculateCameraOnlyTraits() const;
     void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;

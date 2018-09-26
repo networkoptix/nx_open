@@ -75,9 +75,7 @@ nx::mediaserver::resource::StreamCapabilityMap HikvisionResource::getStreamCapab
             capability.minBitrateKbps = capabilities->bitrateRange.first;
             capability.maxBitrateKbps = capabilities->bitrateRange.second;
 
-            const auto maxFps = std::max_element(capabilities->fps.begin(), capabilities->fps.end());
-            if (maxFps != capabilities->fps.end())
-                capability.maxFps = *maxFps;
+            const auto maxFps = capabilities->realMaxFps();
         }
     }
 
@@ -145,8 +143,8 @@ CameraDiagnostics::Result HikvisionResource::initializeMedia(
                 if (role == Qn::ConnectionRole::CR_LiveVideo)
                 {
                     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, 1);
-                    if (!channelCapabilities.fps.empty())
-                        setMaxFps(channelCapabilities.fps[0] / 100);
+                    if (!channelCapabilities.fpsInDeviceUnits.empty())
+                        setMaxFps(channelCapabilities.realMaxFps());
                 }
                 if (!channelCapabilities.resolutions.empty())
                     setResolutionList(channelCapabilities, role);

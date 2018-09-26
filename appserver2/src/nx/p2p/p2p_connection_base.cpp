@@ -267,7 +267,11 @@ void ConnectionBase::onHttpClientDone()
     socket->setNonBlockingMode(true);
 
     using namespace nx::network;
-    m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
+    m_webSocket.reset(new websocket::WebSocket(
+        std::move(socket),
+        remotePeer.dataFormat == Qn::JsonFormat
+            ? websocket::FrameType::text
+            : websocket::FrameType::binary));
     m_httpClient.reset();
     m_webSocket->setAliveTimeout(m_keepAliveTimeout);
     m_webSocket->start();
