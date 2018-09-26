@@ -344,6 +344,9 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->customMediaPortWidget->setEnabled(
         state.devicesDescription.hasCustomMediaPortCapability == CombinedValue::All);
 
+    check_box_utils::setupTristateCheckbox(ui->trustCameraTimeCheckBox, state.expert.trustCameraTime);
+    ::setReadOnly(ui->trustCameraTimeCheckBox, state.readOnly);
+
     // PTZ.
 
     // PTZ controls are visible if and only if at least one selected camera has PTZ presets capability.
