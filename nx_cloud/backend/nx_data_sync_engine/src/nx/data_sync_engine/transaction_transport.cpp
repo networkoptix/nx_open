@@ -62,6 +62,8 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.connectionId =
         connectionRequestAttributes.connectionId;
     m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
+    m_commonTransportHeaderOfRemoteTransaction.peerId = 
+        connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString();
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender =
         connectionRequestAttributes.remotePeer.id;

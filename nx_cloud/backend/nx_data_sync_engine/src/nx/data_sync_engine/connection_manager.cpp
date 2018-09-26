@@ -218,9 +218,7 @@ ConnectionManager::SystemStatusChangedSubscription&
     return m_systemStatusChangedSubscription;
 }
 
-bool ConnectionManager::addNewConnection(
-    ConnectionContext context,
-    const vms::api::PeerDataEx& remotePeerInfo)
+bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
     using namespace std::placeholders;
 
@@ -248,6 +246,8 @@ bool ConnectionManager::addNewConnection(
             .arg(context.connection->commonTransportHeaderOfRemoteTransaction()));
 
     const auto systemId = context.fullPeerName.systemId;
+    const auto protocolVersion = context.connection->
+        commonTransportHeaderOfRemoteTransaction().transactionFormatVersion;
 
     if (!m_connections.insert(std::move(context)).second)
     {
@@ -260,7 +260,7 @@ bool ConnectionManager::addNewConnection(
         lock.unlock();
         m_systemStatusChangedSubscription.notify(
             systemId,
-            { true /*online*/, remotePeerInfo.protoVersion });
+            { true /*online*/, protocolVersion });
     }
 
     return true;

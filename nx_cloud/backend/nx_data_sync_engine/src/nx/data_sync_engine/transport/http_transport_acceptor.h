@@ -27,7 +27,7 @@ class HttpTransportAcceptor
 {
 public:
     HttpTransportAcceptor(
-        const QnUuid& moduleGuid,
+        const QnUuid& peerId,
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* transactionLog,
         ConnectionManager* connectionManager,

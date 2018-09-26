@@ -121,9 +121,7 @@ void WebSocketTransportAcceptor::addWebSocketTransactionTransport(
         {systemId, remotePeerInfo.id.toByteArray().toStdString()},
         userAgent};
 
-    if (!m_connectionManager->addNewConnection(
-            std::move(context),
-            remotePeerInfo))
+    if (!m_connectionManager->addNewConnection(std::move(context)))
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Failed to add new websocket transaction connection from (%1.%2; %3). connectionId %4")

@@ -40,6 +40,7 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     bindToAioThread(this->webSocket()->getAioThread());
 
     m_commonTransactionHeader.systemId = systemId;
+    m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
     m_commonTransactionHeader.endpoint = remoteSocketAddr();
     m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
     m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;

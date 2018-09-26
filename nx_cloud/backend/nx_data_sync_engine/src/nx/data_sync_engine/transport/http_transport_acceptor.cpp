@@ -13,7 +13,7 @@
 namespace nx::data_sync_engine::transport {
 
 HttpTransportAcceptor::HttpTransportAcceptor(
-    const QnUuid& moduleGuid,
+    const QnUuid& peerId,
     const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* transactionLog,
     ConnectionManager* connectionManager,
@@ -24,7 +24,7 @@ HttpTransportAcceptor::HttpTransportAcceptor(
     m_connectionManager(connectionManager),
     m_outgoingCommandFilter(outgoingCommandFilter),
     m_localPeerData(
-        moduleGuid,
+        peerId,
         QnUuid::createUuid(),
         vms::api::PeerType::cloudServer,
         Qn::UbjsonFormat),
@@ -98,12 +98,7 @@ void HttpTransportAcceptor::createConnection(
         {systemId, connectionRequestAttributes.remotePeer.id.toByteArray().toStdString()},
         network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
 
-    vms::api::PeerDataEx remotePeer;
-    remotePeer.assign(connectionRequestAttributes.remotePeer);
-    remotePeer.protoVersion = connectionRequestAttributes.remotePeerProtocolVersion;
-    remotePeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
-
-    if (!m_connectionManager->addNewConnection(std::move(context), remotePeer))
+    if (!m_connectionManager->addNewConnection(std::move(context)))
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
