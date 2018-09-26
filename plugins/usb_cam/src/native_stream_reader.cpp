@@ -101,7 +101,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
     if (m_camera->audioEnabled())
     {
-        uint64_t msecPerFrame = utils::msecPerFrame(m_camera->videoStream()->fps());
+        uint64_t msecPerFrame = utils::msecPerFrame(m_camera->videoStream()->actualFps());
         if (!m_avConsumer->waitForTimeSpan(msecPerFrame))
             return nullptr;
     }

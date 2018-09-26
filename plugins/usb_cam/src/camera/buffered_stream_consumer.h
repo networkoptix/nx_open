@@ -48,25 +48,20 @@ public:
         m_wait.notify_all();
     }
 
-    V peekFront(bool waitForItem = false)
+    V peekFront(uint64_t timeOutMsec = 0)
     {
-        if (!waitForItem)
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            return m_buffer.empty() ? V() : m_buffer.begin()->second;
-        }
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock))
+        if (m_buffer.empty() && !wait(lock, 0, timeOutMsec))
             return V();
         if (m_buffer.empty())
             return V();
         return m_buffer.begin()->second;
     }
 
-    virtual V popFront(uint64_t timeOut = 0)
+    virtual V popFront(uint64_t timeOutMsec = 0)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock, 0, timeOut))
+        if (m_buffer.empty() && !wait(lock, 0, timeOutMsec))
             return V();
         if (m_buffer.empty())
             return V();
