@@ -1700,10 +1700,11 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
-    /**%apidoc GET /api/activateLicense
-     * Activate new license and return license JSON data if success
-     * %param:string key License serial number
-     * %return:object JSON data.
+    /**%apidoc POST /api/activateLicense
+     * Activate new license and return license JSON data if success. It requires Internet to
+     * connect to license server.
+     * %param:string licenseKey License serial number
+     * %return:object License JSON data.
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 
