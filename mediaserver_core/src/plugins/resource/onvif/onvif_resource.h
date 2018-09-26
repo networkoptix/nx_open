@@ -430,7 +430,7 @@ private:
     CameraDiagnostics::Result ReadVideoEncoderOptionsForToken(
         const std::string& token, QList<VideoOptionsLocal>* dstOptionsList, const QnBounds& frameRateBounds);
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions();
-    CameraDiagnostics::Result fetchAndSetVideoEncoderOptionsNew();
+    //CameraDiagnostics::Result fetchAndSetVideoEncoderOptionsNew();
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming();
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);

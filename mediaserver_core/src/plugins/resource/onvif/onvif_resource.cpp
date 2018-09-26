@@ -1431,9 +1431,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoResourceOptions()
     if (!result)
         return result;
 
-    result = fetchAndSetVideoEncoderOptionsNew();
-    if (!result)
-        return result;
+    //result = fetchAndSetVideoEncoderOptionsNew();
+    //if (!result)
+    //    return result;
 
     result = updateResourceCapabilities();
     if (!result)
@@ -2323,47 +2323,47 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptionsNew()
-{
-    const QAuthenticator auth = getAuth();
-    int soapRes = SOAP_OK;
-    QString error;
-
-    if (m_serviceUrls.media2ServiceUrl.isEmpty())
-    {
-        MediaSoapWrapper soapWrapper(
-            onvifTimeouts(),
-            getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
-
-        VideoOptionsReq optRequest;
-        VideoOptionsResp optResp;
-
-        soapRes = soapWrapper.getVideoEncoderConfigurationOptions(optRequest, optResp);
-        if (soapRes == SOAP_OK)
-            m_videoEncoderConfigOptionsList = VideoEncoderConfigOptionsList(optResp);
-        else
-            error = soapWrapper.getLastError();
-    }
-    else
-    {
-        Media2SoapWrapper soapWrapper2(
-            onvifTimeouts(),
-            getMedia2Url().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
-        //onvifMedia2__GetConfiguration optRequest2;
-        VideoOptionsResp2 optResp2;
-
-        soapRes = soapWrapper2.getVideoEncoderConfigurationOptions(optResp2);
-        if (soapRes == SOAP_OK)
-            m_videoEncoderConfigOptionsList = VideoEncoderConfigOptionsList(optResp2);
-        else
-            error = soapWrapper2.getLastError();
-    }
-    if (soapRes == SOAP_OK)
-        return CameraDiagnostics::NoErrorResult();
-    else
-        return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getVideoEncoderConfigurationOptionsNew"), error);
-}
+//CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptionsNew()
+//{
+//    const QAuthenticator auth = getAuth();
+//    int soapRes = SOAP_OK;
+//    QString error;
+//
+//    if (m_serviceUrls.media2ServiceUrl.isEmpty())
+//    {
+//        MediaSoapWrapper soapWrapper(
+//            onvifTimeouts(),
+//            getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+//
+//        VideoOptionsReq optRequest;
+//        VideoOptionsResp optResp;
+//
+//        soapRes = soapWrapper.getVideoEncoderConfigurationOptions(optRequest, optResp);
+//        if (soapRes == SOAP_OK)
+//            m_videoEncoderConfigOptionsList = VideoEncoderConfigOptionsList(optResp);
+//        else
+//            error = soapWrapper.getLastError();
+//    }
+//    else
+//    {
+//        Media2SoapWrapper soapWrapper2(
+//            onvifTimeouts(),
+//            getMedia2Url().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+//        //onvifMedia2__GetConfiguration optRequest2;
+//        VideoOptionsResp2 optResp2;
+//
+//        soapRes = soapWrapper2.getVideoEncoderConfigurationOptions(optResp2);
+//        if (soapRes == SOAP_OK)
+//            m_videoEncoderConfigOptionsList = VideoEncoderConfigOptionsList(optResp2);
+//        else
+//            error = soapWrapper2.getLastError();
+//    }
+//    if (soapRes == SOAP_OK)
+//        return CameraDiagnostics::NoErrorResult();
+//    else
+//        return CameraDiagnostics::RequestFailedResult(
+//            QLatin1String("getVideoEncoderConfigurationOptionsNew"), error);
+//}
 
 bool QnPlOnvifResource::fetchAndSetDualStreaming()
 {
