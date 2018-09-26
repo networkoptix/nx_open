@@ -13,64 +13,64 @@ export class NxMainComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
         this.content = {
-            'level1': [
+            level1: [
                 {
-                    'id':'servers',
-                    'label': 'Servers',
-                    'path': 'servers',
-                    'level2': [
+                    id: 'servers',
+                    label: 'Servers',
+                    path: 'servers',
+                    level2: [
                         {
-                            'id': '12345',
-                            'label': 'Good server',
-                            'path': 'servers',
+                            id: '12345',
+                            label: 'Good server',
+                            path: 'servers',
                         },
                         {
-                            'id': '67890',
-                            'label': 'Bad server',
-                            'path': 'servers',
-                            'level3': [
+                            id: '67890',
+                            label: 'Bad server',
+                            path: 'servers',
+                            level3: [
                                 {
-                                    'id': '1234absd',
-                                    'label': 'Status',
-                                    'path': 'servers',
+                                    id: '1234absd',
+                                    label: 'Status',
+                                    path: 'servers',
                                 },
                                 {
-                                    'id': '5678efgh',
-                                    'label': 'Settings',
-                                    'path': 'servers',
+                                    id: '5678efgh',
+                                    label: 'Settings',
+                                    path: 'servers',
                                 }
                             ]
                         }
                     ]
                 },
                 {
-                    'id': 'users',
-                    'label': 'Users',
-                    'path': 'users',
-                    'level3': [
+                    id: 'users',
+                    label: 'Users',
+                    path: 'users',
+                    level3: [
                         {
-                            'id': 'absd',
-                            'label': 'Tsanko',
-                            'path': 'users',
+                            id: 'absd',
+                            label: 'Tsanko',
+                            path: 'users',
                         },
                         {
-                            'id': 'efgh',
-                            'label': 'Evgeny',
-                            'path': 'users',
+                            id: 'efgh',
+                            label: 'Evgeny',
+                            path: 'users',
                         }
                     ]
                 },
                 {
-                    'id': 'other',
-                    'label': 'Other',
-                    'path': 'other',
-                    'target': 'secondary'
+                    id: 'other',
+                    label: 'Other',
+                    path: 'other',
+                    target: 'secondary'
                 }]
         };
 
         this.elements = [
             'servers-static', 'users-static'
-        ]
+        ];
     }
 
     constructor() {
@@ -78,14 +78,12 @@ export class NxMainComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-    };
+    }
 
     ngOnDestroy() {
-
     }
 
     onSubmit() {
-
     }
 }
 

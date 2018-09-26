@@ -35,11 +35,13 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
             url.toString().startsWith('/main') ||
             url.toString().startsWith('/other') ||
             url.toString().startsWith('/servers') ||
-            url.toString().startsWith('/users');
-        //return false;
-        //url.toString().startsWith('/download') ||
-        //url.toString().startsWith('/downloads') ||
-        //url.toString().startsWith('/browser');
+            url.toString().startsWith('/users') ||
+            url.toString().startsWith('/integrations') ||
+            url.toString().startsWith('/list');
+        // return false;
+        // url.toString().startsWith('/download') ||
+        // url.toString().startsWith('/downloads') ||
+        // url.toString().startsWith('/browser');
     }
 
     extract(url: UrlTree) {

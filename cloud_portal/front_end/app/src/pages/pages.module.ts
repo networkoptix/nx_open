@@ -10,8 +10,11 @@ import { ServersDetailModule }       from './details/servers/servers.module';
 import { UsersDetailModule }         from './details/users/users.module';
 import { OtherDetailsModule }        from './details/others/others.module';
 
+import { IntegrationsModule }     from './integration/integrations.module';
+import { IntegrationsListModule } from './integration//list/list.module';
+
 @NgModule({
-    imports: [
+    imports        : [
         SandboxModule,
         MainModule,
         DownloadModule,
@@ -19,12 +22,14 @@ import { OtherDetailsModule }        from './details/others/others.module';
         NonSupportedBrowserModule,
         ServersDetailModule,
         UsersDetailModule,
-        OtherDetailsModule
+        OtherDetailsModule,
+        IntegrationsModule,
+        IntegrationsListModule,
     ],
-    declarations: [],
+    declarations   : [],
     entryComponents: [],
-    providers: [],
-    exports: [
+    providers      : [],
+    exports        : [
         SandboxModule,
         MainModule,
         DownloadModule,
@@ -32,7 +37,9 @@ import { OtherDetailsModule }        from './details/others/others.module';
         NonSupportedBrowserModule,
         ServersDetailModule,
         UsersDetailModule,
-        OtherDetailsModule
+        OtherDetailsModule,
+        IntegrationsModule,
+        IntegrationsListModule,
     ]
 })
 export class PagesModule {

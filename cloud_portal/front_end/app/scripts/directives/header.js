@@ -19,7 +19,7 @@
             templateUrl: CONFIG.viewsDir + 'components/header.html',
             link       : function (scope) {
                 scope.config = CONFIG;
-                scope.inline = typeof($location.search().inline) != 'undefined';
+                scope.inline = typeof($location.search().inline) !== 'undefined';
 
                 if (scope.inline) {
                     $('body').addClass('inline-portal');
@@ -35,7 +35,7 @@
                 scope.systemsProvider = systemsProvider;
                 scope.$watch('systemsProvider.systems', function () {
                     scope.systems = scope.systemsProvider.systems;
-                    scope.singleSystem = (scope.systems.length == 1);
+                    scope.singleSystem = (scope.systems.length === 1);
                     scope.systemCounter = scope.systems.length;
 
                     updateActiveSystem();
@@ -43,17 +43,14 @@
 
 
                 function isActive(val) {
-                    var currentPath = $location.path();
-                    if (currentPath.indexOf(val) < 0) { // no match
-                        return false;
-                    }
-                    return true;
+                    return $location.path().indexOf(val) >= 0;
                 }
 
                 scope.active = {};
                 // scope.activeSystem = {};
 
                 function updateActive() {
+                    scope.active.integrations = isActive('/integrations');
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');
                     scope.active.settings = $route.current.params.systemId && !isActive('/view');
@@ -65,7 +62,7 @@
                     }
 
                     scope.activeSystem = _.find(scope.systems, function (system) {
-                        return $route.current.params.systemId == system.id;
+                        return $route.current.params.systemId === system.id;
                     });
                     if (scope.singleSystem) { // Special case for a single system - it always active
                         scope.activeSystem = scope.systems[ 0 ];
