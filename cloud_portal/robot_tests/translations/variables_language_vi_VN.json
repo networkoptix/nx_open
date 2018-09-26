@@ -13,6 +13,7 @@
     "AUTOTESTS OFFLINE TEXT": "ngoại tuyến",
     "NEW PERMISSIONS SAVED": "Cấp phép mới được lưu",
     "PERMISSIONS WERE REMOVED FROM": "Các quyền đã bị xóa khỏi %email%",
+    "SYSYEM DELETED FROM ACCOUNT": "System {{message.system_name}} is successfully deleted from your account",
     "RESET SUCCESS MESSAGE TEXT": "Thay đổi mật khẩu thành công",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Tài khoản của bạn đã được lưu thành công",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Tài khoản của bạn đã được kích hoạt thành công",

@@ -56,16 +56,14 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
         'or-else': 'tristate'
     };
 
-    //Placeholders for the callbacks which are later provided
-    //by the Control Value Accessor
-    private onTouchedCallback = () => {
-    };
-    private onChangeCallback = (_: any) => {
-    };
+    // Placeholders for the callbacks which are later provided
+    // by the Control Value Accessor
+    private onTouchedCallback = () => {};
+    private onChangeCallback = (_: any) => {};
 
     // validates the form, returns null when valid else the validation object
     public validate(c: FormControl) {
-        let err = {
+        const err = {
             requiredError: {
                 required: true
             }
@@ -130,7 +128,7 @@ export class NxCheckboxComponent implements OnInit, ControlValueAccessor, Valida
 
     changeState(event) {
         if (this.disabled) {
-            return
+            return;
         }
 
         this.onTouchedCallback();

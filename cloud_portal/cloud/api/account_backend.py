@@ -34,7 +34,7 @@ class AccountBackend(ModelBackend):
     @staticmethod
     def authenticate(request=None, username=None, password=None):
         try:
-            ip = request.session.pop('IP', "")
+            ip = get_ip(request)
             user = Account.get(username, password, ip)  # first - check cloud_db
         except APINotAuthorisedException as exception:
             if request and exception.error_code == ErrorCodes.account_blocked:
@@ -114,18 +114,20 @@ class AccountManager(db.models.Manager):
         return self._create_user(email, password, **extra_fields)
 
 
+def get_ip(request):
+    return request.META.get('HTTP_X_FORWARDED_FOR')
 
 
 @receiver(user_logged_in)
 def user_logged_in_callback(sender, request, user, **kwargs):
-    ip = request.META.get('REMOTE_ADDR')
+    ip = get_ip(request)
     logger.info('User logged in: {}, IP: {}'.format(user.email, ip))
     models.AccountLoginHistory.objects.create(action='user_logged_in', ip=ip, email=user.email)
 
 
 @receiver(user_logged_out)
 def user_logged_out_callback(sender, request, user, **kwargs):
-    ip = request.META.get('REMOTE_ADDR')
+    ip = get_ip(request)
     logger.info('User logged our: {}, IP: {}'.format(user.email, ip))
     models.AccountLoginHistory.objects.create(action='user_logged_out', ip=ip, email=user.email)
 

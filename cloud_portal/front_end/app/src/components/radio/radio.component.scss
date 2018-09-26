@@ -10,6 +10,8 @@ nx-radio {
 
     .nx-radio {
         display : flex;
+        float   : left;
+        margin   : 0;
 
         input[type="radio"] {
             position : absolute;
@@ -92,7 +94,7 @@ nx-radio {
         width  : 20px;
 
         & path.circle {
-            fill         : $dark9;
+            fill : $dark9;
         }
 
         & circle {

@@ -26,7 +26,7 @@ ${TM TEXT}                            qweasdzxc123®™
 ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
 ${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
-${LOG IN BUTTON}                      //form[@name='loginForm']//button[text()= 'Log In']
+${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
 ${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
@@ -43,7 +43,7 @@ ${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//butt
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
 ${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
-${RELEASE HISTORY BUTTON}             //a[contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
+${RELEASE HISTORY BUTTON}             //a[@href="/downloads/history" and contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
 ${SYSTEMS DROPDOWN}                   //header//li[contains(@class, 'collapse-second')]//button[@id='systemsDropdown']
 ${ALL SYSTEMS}                        //header//li[contains(@class, 'collapse-second')]//a[@href='/systems']
 
@@ -53,13 +53,16 @@ ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //body//a[@href='/register']
 
 #Forgot Password
+${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
 ${RESTORE PASSWORD EMAIL INPUT}       //form[@name='restorePassword']//input[@type='email']
 ${RESET PASSWORD BUTTON}              //form[@name='restorePassword']//button[@ng-click='checkForm()']
-${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@type='password']
+${RESET PASSWORD INPUT}               //form[@name='restorePasswordWithCode']//input[@id='newPassword']
 ${SAVE PASSWORD}                      //form[@name='restorePasswordWithCode']//button[@ng-click='checkForm()']
 ${RESET EMAIL SENT MESSAGE}           //div[@ng-if='restoringSuccess']/h1
 ${RESET SUCCESS MESSAGE}              //h1[contains(text(), "${RESET SUCCESS MESSAGE TEXT}")]
 ${RESET SUCCESS LOG IN LINK}          //div[@ng-if='change.success || changeSuccess']//a[@href='/login']
+${RESET EYE ICON OPEN}                ${RESET PASSWORD FORM}${EYE ICON OPEN}
+${RESET EYE ICON CLOSED}              ${RESET PASSWORD FORM}${EYE ICON CLOSED}
 
 #Change Password
 ${CHANGE PASSWORD FORM}               //form[@name='passwordForm']
@@ -130,6 +133,7 @@ ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
 ${SYSTEM NO ACCESS}                   //div[@ng-if='systemNoAccess']/h1[contains(text(), "${SYSTEM NO ACCESS TEXT}")]
+${AVAILABLE SYSTEMS LIST}             //a[@href='/systems']
 
 #Disconnect from cloud portal
 ${DISCONNECT FORM}                    //form[@name='disconnectForm']

@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+Hallo {{message.userFullName}},
 
   Open de onderstaande link om uw e-mailadres te bevestigen en het account te activeren.
 

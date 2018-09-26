@@ -40,8 +40,14 @@
             "check-space"
         ],
         "curly"                           : [
+            true
+        ],
+        "brace-style"                     : [
             true,
-            "ignore-same-line"
+            "1tbs",
+            {
+                "allowSingleLine": false
+            }
         ],
         "debug-assert"                    : true,
         "indent"                          : [
@@ -54,10 +60,6 @@
         ],
         "interface-over-type-literal"     : true,
         "jsdoc-format"                    : true,
-        "linebreak-style"                 : [
-            true,
-            "LF"
-        ],
         "next-line"                       : [
             true,
             "check-catch",

@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+Buongiorno, {{message.userFullName}},
 
   Si prega di aprire il link qui sotto per confermare il tuo indirizzo email e attivare l'account.
 

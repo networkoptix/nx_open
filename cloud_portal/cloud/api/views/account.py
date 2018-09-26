@@ -7,9 +7,9 @@ import base64
 from django.utils import timezone
 
 from api.controllers.cloud_api import Account
-from api.account_backend import AccountBackend
+from api.account_backend import AccountBackend, get_ip
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
-    APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params
+    APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params, kill_session
 from api.views.account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
 
 from dal import autocomplete
@@ -17,17 +17,8 @@ from api import models
 
 
 import logging
+
 logger = logging.getLogger(__name__)
-
-
-def get_ip(request):
-    x_forward_ip = request.META.get('HTTP_X_FORWARDED_FOR')
-    user = request.session['email'] if 'email' in request.session else ""
-    if not user:
-        user = request.data['email'] if 'email' in request.data else ""
-    logger.info('Account request for: {}, IP: {}'.format(user, x_forward_ip))
-    return x_forward_ip
-
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
@@ -54,7 +45,6 @@ def register(request):
 @handle_exceptions
 def login(request):
     user = None
-    request.session['IP'] = get_ip(request)
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
@@ -98,10 +88,7 @@ def login(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def logout(request):
-    request.session.pop('login', None)
-    request.session.pop('password', None)
-    request.session.pop('timezone', None)
-    django.contrib.auth.logout(request)
+    kill_session(request)
     return api_success()
 
 
@@ -119,7 +106,7 @@ def index(request):
 
     elif request.method == 'POST':
         serializer = AccountUpdateSerializer(request.user, data=request.data)
-            
+
         if not serializer.is_valid():
             raise APIRequestException('Wrong form parameters',
                                       ErrorCodes.wrong_parameters,

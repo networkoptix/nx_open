@@ -79,12 +79,12 @@ export class ShareModalContent {
     }
 
     formatUserName() {
-        if (!this.user.fullName || this.user.fullName.trim() == '') {
+        if (!this.user.fullName || this.user.fullName.trim() === '') {
             return this.user.email;
         }
 
         return this.user.fullName + ' (' + this.user.email + ')';
-    };
+    }
 
     doShare() {
         this.user.role = this.selectedPermission;
@@ -112,7 +112,7 @@ export class ShareModalContent {
             this.account
                 .get()
                 .then((account) => {
-                    if (account.email == this.user.email) {
+                    if (account.email === this.user.email) {
                         this.activeModal.close();
                         this.toast.create({
                             className: 'error',
@@ -175,7 +175,7 @@ export class NxModalShareComponent implements OnInit {
     }
 
     private dialog(system?, user?) {
-        this.modalRef = this.modalService.open(ShareModalContent, {centered: true});
+        this.modalRef = this.modalService.open(ShareModalContent, {backdrop: 'static', centered: true});
         this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.user = user;

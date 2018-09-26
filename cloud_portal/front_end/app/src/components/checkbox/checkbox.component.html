@@ -1,5 +1,6 @@
 <label class="nx-checkbox">
-    <input type="checkbox" id="{{compId}}"
+    <input type="checkbox"
+           id="{{compId}}"
            [attr.checked]="value ? '' : null"
            [attr.disabled]="disabled ? '' : null"
            (click)="changeState($event)">

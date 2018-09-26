@@ -37,9 +37,7 @@ body {
 }
 
 [data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
-[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled),
-[data-whatintent='keyboard'] input:focus,
-[data-whatintent='keyboard'] input:active{
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
     outline : none !important;
     @extend #outline;
 
@@ -48,28 +46,34 @@ body {
     }
 }
 
-[data-whatintent='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
+[data-whatinput='keyboard'] input:focus,
+[data-whatinput='keyboard'] input:active {
+    outline : none !important;
+    @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatinput='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
     & + .checkmark {
         outline : none !important;
         @extend #outline;
     }
-}
 
-[data-whatintent='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
-    & + .checkmark {
-        outline : none !important;
-        @extend #outline;
-    }
-}
-
-[data-whatintent='keyboard'] input[type=checkbox]:focus:not([disabled]):not(.disabled) {
     & + .check {
         outline : none !important;
         @extend #outline;
     }
 }
 
-[data-whatintent='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+[data-whatinput='keyboard'] input[type=radio]:focus:not([disabled]):not(.disabled) {
+    & + .checkmark {
+        outline : none !important;
+        @extend #outline;
+    }
+
     & + .check {
         outline : none !important;
         @extend #outline;

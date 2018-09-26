@@ -24,9 +24,15 @@ Reset DB and Open New Browser On Failure
     Clean up email noperm
     Open Browser and go to URL    ${url}
 
+Clear Register Fields
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    Clear Element Text    ${REGISTER PASSWORD INPUT}
+    Clear Element Text    ${REGISTER LAST NAME INPUT}
+    Clear Element Text    ${REGISTER FIRST NAME INPUT}
+    Clear Element Text    ${REGISTER EMAIL INPUT}
+
 *** Test Cases ***
 should open register page in anonymous state by clicking Register button on top right corner
-    Go To    ${url}
     Wait Until Element Is Visible    ${CREATE ACCOUNT HEADER}
     Click Link    ${CREATE ACCOUNT HEADER}
     Location Should Be    ${url}/register
@@ -125,14 +131,14 @@ should respond to Tab key
     Press Key    ${REGISTER EMAIL INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
-    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
+    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}/../input
 
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${SPACEBAR}
     Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-not-empty") and @ng-model='account.accept']
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${SPACEBAR}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${SPACEBAR}
     Wait Until Page Contains Element    //form[@name='registerForm']//input[contains(@class, "ng-empty") and @ng-model='account.accept']
 
-    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}/../input    ${TAB}
     Press Key    ${TERMS AND CONDITIONS LINK}    ${ENTER}
     Element Should Be Focused    ${TERMS AND CONDITIONS LINK}
     ${tabs}    Get Window Handles
@@ -147,6 +153,7 @@ should respond to Tab key
     Location Should Be    ${PRIVACY POLICY URL}
     Select Window    @{tabs}[0]
 
+    Clear Register Fields
     Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
     Press Key    ${CREATE ACCOUNT BUTTON}    ${ENTER}

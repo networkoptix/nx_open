@@ -123,7 +123,7 @@
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",
     "accountNotActivated": "Dit account is nog niet geactiveerd. <a href=\"/activate\">Stuur de activeringslink opnieuw</a>",
-    "accountBlocked": "This account is temporarily blocked. Please try again in a few minutes.",
+    "accountBlocked": "Account is tijdelijk niet bereikbaar. Probeer het over een paar minuten nogmaals.",
     "notFound": "Niet gevonden",
     "alreadyExists": "Deze account bestaat al",
     "unknownError": "Er is een onverwachte fout opgetreden",

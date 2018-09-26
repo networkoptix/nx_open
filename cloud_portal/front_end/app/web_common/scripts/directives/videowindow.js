@@ -1,5 +1,7 @@
 'use strict';
 
+import * as Hls from 'hls.js';
+
 /**
  * This is smart video-plugin.
  * 1. It gets list of possible video-sources in different formats (each requires mime-type)
@@ -378,7 +380,8 @@ angular.module('nxCommon')
                                 scope.videoFlags.errorLoading = response;
 
                                 if (scope.videoFlags.errorLoading) {
-                                    $http.get(err.url)
+                                    $http
+                                        .get(err.context.url)
                                         .then(function (response) {
                                             scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
                                             scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';

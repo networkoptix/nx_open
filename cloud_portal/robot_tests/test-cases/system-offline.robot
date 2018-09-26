@@ -85,10 +85,14 @@ should open System page by link to not authorized user and show it, after owner 
     Verify In System    Auto Tests 2
 
 should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)
+    [tags]    C41572
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
-    Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
+    Wait Until Elements Are Visible    ${SYSTEM NO ACCESS}    ${AVAILABLE SYSTEMS LIST}
+    Click Link    ${AVAILABLE SYSTEMS LIST}
+    Location Should Be    ${url}/systems
+
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
     Go To    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}

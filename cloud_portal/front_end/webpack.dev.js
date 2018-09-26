@@ -21,7 +21,9 @@ module.exports = merge(common, {
                 context: [ '/api/', '/gateway/' ],
                 //target : 'http://cloud-local',
                 target : 'https://cloud-dev2.hdw.mx',
-                changeOrigin: true
+                //target : 'https://cloud-test.hdw.mx',
+                changeOrigin: true,
+                //secure: false
 
             },
             // Rewrite English translations to be served from DEV files
@@ -62,6 +64,12 @@ module.exports = merge(common, {
             {
                 from: '../../translations/ru_RU/',
                 to  : 'static/lang_ru_RU/'
+            },
+            // *****************************************
+            // Local test for commonPasswordsList ******
+            {
+                from: 'scripts/commonPasswordsList.json',
+                to  : 'static/scripts/commonPasswordsList.json'
             }
             // *****************************************
         ])

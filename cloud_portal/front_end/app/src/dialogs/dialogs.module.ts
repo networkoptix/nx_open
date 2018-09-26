@@ -5,15 +5,15 @@ import { ComponentsModule } from '../components/components.module';
 import { DirectivesModule } from '../directives/directives.module';
 import { DropdownsModule }  from '../dropdowns/dropdowns.module';
 
-import { NxDialogsService }                                   from "./dialogs.service";
-import { NxModalLoginComponent, LoginModalContent }           from "./login/login.component";
-import { GenericModalContent, NxModalGenericComponent }       from "./generic/generic.component";
-import { DisconnectModalContent, NxModalDisconnectComponent } from "./disconnect/disconnect.component";
-import { RenameModalContent, NxModalRenameComponent }         from "./rename/rename.component";
-import { ShareModalContent, NxModalShareComponent }           from "./share/share.component";
-import { MergeModalContent, NxModalMergeComponent }           from "./merge/merge.component";
-import { downgradeInjectable }                                from "@angular/upgrade/static";
-import { FormsModule, EmailValidator }                        from "@angular/forms";
+import { NxDialogsService }                                   from './dialogs.service';
+import { NxModalLoginComponent, LoginModalContent }           from './login/login.component';
+import { GenericModalContent, NxModalGenericComponent }       from './generic/generic.component';
+import { DisconnectModalContent, NxModalDisconnectComponent } from './disconnect/disconnect.component';
+import { RenameModalContent, NxModalRenameComponent }         from './rename/rename.component';
+import { ShareModalContent, NxModalShareComponent }           from './share/share.component';
+import { MergeModalContent, NxModalMergeComponent }           from './merge/merge.component';
+import { downgradeInjectable }                                from '@angular/upgrade/static';
+import { FormsModule, EmailValidator }                        from '@angular/forms';
 import { TranslateModule }                                    from '@ngx-translate/core';
 
 

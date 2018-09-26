@@ -51,14 +51,13 @@ can be closed by clicking on the X
     Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
 
 allows to log in with existing credentials and to log out
-    [tags]    C24212
+    [tags]    C24212    C24213
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
     Validate Log Out
 
 redirects to systems after log In
-    [tags]    not-ready
     Log In    ${email}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
@@ -92,6 +91,7 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 passes email from email input to Restore password page, even without clicking 'Log in' button
+    [tags]    C41872
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${EMAIL INPUT}
@@ -104,16 +104,18 @@ passes email from email input to Restore password page, even without clicking 'L
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
 
 shows non-activated user message when not activated at login; Resend activation button sends email
-    [tags]    email
+    [tags]    email    C41865
     Go To    ${url}/register
     ${random email}    get random email    ${BASE EMAIL}
-    Register    'mark'    'hamill'    ${random email}    ${BASE PASSWORD}
+    Register    'mark'    'hamill'    ${random email}    ${password}
     Wait Until Element Is Visible    //h1[contains(@class,'process-success')]
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
     Click Link    ${RESEND ACTIVATION LINK BUTTON}
-    Validate Register Email Received    ${random email}
+    Activate    ${random email}
+    Log In    ${random email}    ${password}
+    Validate Log In
 
 displays password masked
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
@@ -184,12 +186,12 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}/..
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}/..
-    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}
-    Press Key    ${REMEMBER ME CHECKBOX}/..    ${SPACEBAR}
-    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
+    Set Focus To Element    ${REMEMBER ME CHECKBOX}/../input
+    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
+    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}/../input
 
 handles two tabs, updates second tab state if logout is done on first
     Go To    ${url}/register

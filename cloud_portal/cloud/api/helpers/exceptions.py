@@ -1,3 +1,8 @@
+import django
+import logging
+import json
+import traceback
+
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
@@ -5,12 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 from enum import Enum
-import logging
-import json
-import traceback
 
 logger = logging.getLogger(__name__)
-
 
 class ErrorCodes(Enum):
     ok = 'ok'
@@ -344,6 +345,13 @@ def log_error(request, error, log_level):
     return error_formatted
 
 
+def kill_session(request):
+    request.session.pop('login', None)
+    request.session.pop('password', None)
+    request.session.pop('timezone', None)
+    django.contrib.auth.logout(request)
+
+
 def handle_exceptions(func):
     """
     Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
@@ -358,6 +366,17 @@ def handle_exceptions(func):
             if not isinstance(data, Response):
                 return Response(data, status=status.HTTP_200_OK)
             return data
+
+        except APINotAuthorisedException as error:
+            # check if user session exist
+            # and kill it if user is not authorized
+            if 'login' in args[0].session:
+                logger.debug("Kill!!!")
+                kill_session(args[0])
+                log_error(args[0], error, error.log_level())
+
+            return error.response()
+
         except APIException as error:
             # Do not log not_authorized errors
             log_error(args[0], error, error.log_level())

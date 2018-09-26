@@ -15,7 +15,7 @@ export class DisconnectModalContent {
     @Input() closable;
 
     password: string;
-    nx_wrong_password: boolean;
+    wrongPassword: boolean;
     auth = {
       password: ''
     };
@@ -34,14 +34,14 @@ export class DisconnectModalContent {
 
         this.disconnect = this.process.init(() => {
             this.disconnectForm.controls['password'].setErrors(null);
-            this.nx_wrong_password = false;
+            this.wrongPassword = false;
 
             return this.cloudApi.disconnect(this.systemId, this.auth.password);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
                 wrongPassword: () => {
-                    this.nx_wrong_password = true;
+                    this.wrongPassword = true;
                     this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
                     this.auth.password = '';
 

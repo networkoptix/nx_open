@@ -62,7 +62,7 @@ const appRoutes: Routes = [
         TranslateModule,
         ComponentsModule,
 
-        //RouterModule.forChild(appRoutes)
+        // RouterModule.forChild(appRoutes)
     ],
     providers: [
         OsResolver

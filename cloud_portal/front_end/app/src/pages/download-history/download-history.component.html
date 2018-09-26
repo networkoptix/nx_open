@@ -1,18 +1,18 @@
-<div class="container" *ngIf="userAuthorized || configService.publicDownloads">
+<div class="container" *ngIf="userAuthorized">
     <h1 translate>Release notes</h1>
 
     <div class="col-12 p-0" style="min-height: 80px;">
+        <nx-pre-loader type="page" *ngIf="!activeBuilds"></nx-pre-loader>
         <ngb-tabset *ngIf="downloadTypes"
                     (tabChange)="beforeChange($event)" #tabs>
 
             <ngb-tab *ngFor="let type of downloadTypes"
                      [id]="type">
-                <ng-template ngbTabTitle>
-                    <span class="tab-heading">{{language.lang.downloads.releasesTypes[type] || type}}</span>
+                <ng-template ngbTabTitle *ngIf="!hideTabs">
+                    <span class="tab-heading">{{language.lang.downloads.releasesTypes[type] || type.name}}</span>
                 </ng-template>
                 <ng-template ngbTabContent>
                     <div class="card card-default">
-                        <nx-pre-loader *ngIf="!activeBuilds"></nx-pre-loader>
                         <div class="card-body" *ngIf="activeBuilds">
                             <div *ngFor="let release of activeBuilds">
                                 <nx-release [release]="release"></nx-release>

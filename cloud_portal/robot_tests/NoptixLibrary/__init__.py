@@ -144,7 +144,9 @@ class NoptixLibrary(object):
 
     def check_in_list(self, expected, found):
         for url in expected:
-            if url in found:
+            if found in url:
+                return
+            elif re.search(url, found):
                 return
         raise Exception(url+ " was not in the email.")
 
@@ -161,7 +163,7 @@ class NoptixLibrary(object):
 
 
     def check_email_button(self, body, env, color):
-        pat = '(<a class="btn" href="{}/activate/)(.[^>]*)(background-color: {};)'.format(env, color)
+        pat = '(<a class="btn" href="{})(.[^>]*)(background-color: {};)'.format(env, color)
         if re.search(pat, body)==None:
             raise Exception("Button background-color was not found.")
 
@@ -174,3 +176,8 @@ class NoptixLibrary(object):
         pat = '(<p).*({}).*(</p>)'.format(cloudName)
         if re.search(pat, body)==None:
             raise Exception("Cloud name was not in the email.")
+
+    def check_for_blank_target(self, body, url):
+        pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
+        if re.search(pat, body)==None:
+            raise Exception("Button target was not 'blank'.")

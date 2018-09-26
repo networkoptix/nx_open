@@ -26,7 +26,7 @@ Regular Open Browser
     [Arguments]    ${url}
     Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
     Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    Set Window Size    1920    1080
 
 Docker Open Browser
     [Arguments]    ${url}
@@ -44,7 +44,7 @@ Set Chrome Options
     [Return]    ${options}
 
 Check Language
-    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
+#    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -60,15 +60,14 @@ Log In
     [arguments]    ${email}    ${password}    ${button}=${LOG IN NAV BAR}
     Run Keyword Unless    '''${button}''' == "None"    Wait Until Element Is Visible    ${button}
     Run Keyword Unless    '''${button}''' == "None"    Click Link    ${button}
-    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}
+    Wait Until Elements Are Visible    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${REMEMBER ME CHECKBOX}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Input Text    ${EMAIL INPUT}    ${email}
     Input Text    ${PASSWORD INPUT}    ${password}
-
     Wait Until Element Is Visible    ${LOG IN BUTTON}
-    Click Element    ${LOG IN BUTTON}
+    Click Button    ${LOG IN BUTTON}
 
 Validate Log In
-    Wait Until Page Contains Element    ${AUTHORIZED BODY}
+    Wait Until Page Contains Element    ${AUTHORIZED BODY}    10
     Check Language
 
 Log Out
@@ -83,7 +82,7 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Page Contains Element    ${ANONYMOUS BODY}
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}    10
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
