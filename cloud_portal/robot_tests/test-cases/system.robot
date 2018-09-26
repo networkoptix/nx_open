@@ -144,7 +144,8 @@ contains user emails and names
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${ADMIN FIRST NAME} ${ADMIN LAST NAME}')]
 
-rename button opens dialog; cancel closes without rename; save renames system
+rename button opens dialog and clicking cancel closes rename dialog without rename
+    [tags]    C41880
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
     Click Button    ${RENAME SYSTEM}
@@ -152,6 +153,36 @@ rename button opens dialog; cancel closes without rename; save renames system
     Click Button    ${RENAME CANCEL}
     Wait Until Page Does Not Contain Element    //div[@uib-modal-backdrop="modal-backdrop"]
     Verify In System    Auto Tests
+
+clicking 'X' closes rename dialog without rename
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME X BUTTON}
+    Wait Until Textfield Contains    ${RENAME INPUT}    ${AUTO TESTS}
+    Click Button    ${RENAME X BUTTON}
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
+    Verify In System    Auto Tests
+
+clicking save with no input in rename dialoge throws error
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    sleep    2
+    Input Text    ${RENAME INPUT}    ${SPACE}
+    Press Key    ${RENAME INPUT}    ${BACKSPACE}
+    Click Button    ${RENAME SAVE}
+    Wait Until Elements Are Visible    ${RENAME INPUT WITH ERROR}    ${SYSTEM NAME IS REQUIRED}
+    Click Button    ${RENAME CANCEL}
+
+clicking save in rename dialog renames system
+    [tags]    C41880
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${OPEN IN NX BUTTON}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
     Click Button    ${RENAME SYSTEM}
     Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}

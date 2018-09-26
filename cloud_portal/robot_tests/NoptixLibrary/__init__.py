@@ -61,9 +61,9 @@ class NoptixLibrary(object):
                 if value == expected:
                     return
             except:
-                not_found = "No element found with text " + expected
+                pass
             time.sleep(.2)
-        raise AssertionError(not_found)
+        raise Exception("No element found with text " + expected)
 
     def wait_until_element_has_style(self, locator, styleAttribute, expected, timeout=10):
         seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')

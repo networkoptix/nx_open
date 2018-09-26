@@ -117,9 +117,12 @@ ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbod
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME X BUTTON}                    //form[@name='renameForm']//button[@class='close']
 ${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
+${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
+${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),'${SYSTEM NAME IS REQUIRED TEXT}')]
 
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
@@ -232,4 +235,5 @@ ${ESCAPE}                             \\27
 ${ENTER}                              \\13
 ${TAB}                                \\9
 ${SPACEBAR}                           \\32
+${BACKSPACE}                          \\8
 
