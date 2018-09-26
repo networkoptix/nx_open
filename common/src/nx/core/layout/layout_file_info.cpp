@@ -5,17 +5,23 @@
 
 #include <utils/crypt/crypted_file_stream.h>
 
-namespace {
+namespace nx {
+namespace core {
+namespace layout {
 
-} // namespace
+bool isLayoutExtension(const QString& fileName)
+{
+    const QString extension = QFileInfo(fileName).suffix().toLower();
+    return extension == "nov" || extension == "exe";
+}
 
-nx::core::layout::FileInfo nx::core::layout::identifyFile(const QString& fileName,  bool allowTemp)
+FileInfo identifyFile(const QString& fileName, bool allowTemp)
 {
     FileInfo info;
 
     try
     {
-        QString extension = QFileInfo(fileName).suffix().toLower();
+        const QString extension = QFileInfo(fileName).suffix().toLower();
         if (extension != "nov" && extension != "exe" && !(allowTemp && fileName.endsWith(".exe.tmp")))
             throw std::exception();
 
@@ -66,7 +72,11 @@ nx::core::layout::FileInfo nx::core::layout::identifyFile(const QString& fileNam
     return info;
 }
 
-bool nx::core::layout::checkPassword(const QString& password, const FileInfo& fileInfo)
+bool checkPassword(const QString& password, const FileInfo& fileInfo)
 {
     return nx::utils::CryptedFileStream::checkPassword(password, fileInfo.passwordHash);
 }
+
+} // namespace layout
+} // namespace core
+} // namespace nx

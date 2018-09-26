@@ -22,6 +22,7 @@ namespace client {
 namespace desktop {
 
 class SelectableTextButton;
+class ExportPasswordWidget;
 struct ExportMediaSettings;
 struct ExportLayoutSettings;
 
@@ -70,7 +71,7 @@ public:
 private:
     SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
     void setupSettingsButtons();
-    void updateSettingsWidgets();
+    void initSettingsWidgets();
     void updateMode();
     void updateTabWidgetSize();
     void updateAlerts(Mode mode, const QStringList& weakAlerts, const QStringList& severeAlerts);
@@ -84,8 +85,9 @@ private:
 private:
     class Private;
     QScopedPointer<Private> d;
-    QScopedPointer<Ui::ExportSettingsDialog> ui;
+    QScopedPointer<::Ui::ExportSettingsDialog> ui;
     FileNameValidator isFileNameValid;
+    ExportPasswordWidget * m_passwordWidget;
 };
 
 } // namespace desktop

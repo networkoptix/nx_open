@@ -179,8 +179,8 @@ bool ExportLayoutTool::prepareStorage()
 
     auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule());
     fileStorage->setUrl(d->actualFilename);
-    if (d->settings.cryptVideo)
-        fileStorage->usePasswordForExport(d->settings.password);
+    if (d->settings.encryption.on)
+        fileStorage->usePasswordForExport(d->settings.encryption.password);
     d->storage = QnStorageResourcePtr(fileStorage);
     return true;
 }

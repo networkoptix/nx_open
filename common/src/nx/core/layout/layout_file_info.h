@@ -3,13 +3,24 @@
 
 #include <QtCore/QtGlobal>
 
+// This module defines basic constants and POD structures for layout files,
+// provides basic info about .nov and .exe layout files,
+// and checks protected layout file passwords.
+
 namespace nx {
 namespace core {
 namespace layout {
 
-// This module defines basic POD structures for layout files,
-// provides basic info about .nov and .exe layout files,
-// and checks protected layout file passwords.
+struct FileInfo;
+
+// Just checks extension.
+bool isLayoutExtension(const QString& fileName);
+
+// Reads basic info for layout file. Allows .exe.tmp extension if allowTemp is set.
+FileInfo identifyFile(const QString& fileName, bool allowTemp = false);
+
+// Checks a layout password against pre-loaded the hash.
+bool checkPassword(const QString& password, const FileInfo& fileInfo);
 
 constexpr int kMaxStreams = 256;
 
@@ -52,11 +63,6 @@ struct FileInfo
     std::array<unsigned char, kHashSize> passwordHash = {};
     qint64 offset = 0;
 };
-
-// Reads basic info for layout file. Allows .exe.tmp extension if allowTemp is set.
-FileInfo identifyFile(const QString& fileName, bool allowTemp = false);
-
-bool checkPassword(const QString& password, const FileInfo& fileInfo);
 
 } // namespace layout
 } // namespace core

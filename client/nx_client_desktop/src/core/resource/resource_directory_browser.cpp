@@ -226,9 +226,11 @@ int QnResourceDirectoryBrowser::findResources(const QString& directory, const Re
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
+    qDebug() << "QnResourceDirectoryBrowser::layoutFromFile" << filename;
     const QString layoutUrl = fixSeparators(filename);
     NX_ASSERT(layoutUrl == filename);
 
+    // Create storage handler and read layout info.
     QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule());
     layoutStorage.setUrl(layoutUrl);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
@@ -455,7 +457,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
         return rez;
     }
 
-    if (FileTypeSupport::isLayoutFileExt(path))
+    if (FileTypeSupport::isValidLayoutFile(path))
         return layoutFromFile(path, resourcePool);
 
     return QnResourcePtr();

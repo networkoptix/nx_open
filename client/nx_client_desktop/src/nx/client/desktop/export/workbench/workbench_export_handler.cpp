@@ -509,6 +509,9 @@ WorkbenchExportHandler::ExportInstance WorkbenchExportHandler::prepareExportTool
                 layoutSettings.readOnly = false;
                 layoutSettings.watermark = settings.transcodingSettings.watermark;
 
+                // Extract encryption options from layout-specific settings.
+                layoutSettings.encryption = dialog.exportLayoutSettings().encryption;
+
                 // Forcing camera rotation to match a rotation, used for camera in export preview.
                 // This rotation properly matches either to:
                 //  - export from the scene, uses rotation from the layout.

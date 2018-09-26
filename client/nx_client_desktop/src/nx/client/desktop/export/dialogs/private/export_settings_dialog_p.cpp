@@ -279,11 +279,15 @@ void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& wate
     m_exportLayoutSettings.watermark = watermark;
 }
 
-void ExportSettingsDialog::Private::setLayoutWidgetSettings(ExportLayoutSettingsWidget::Data data)
+void ExportSettingsDialog::Private::setLayoutReadOnly(bool value)
 {
-    m_exportLayoutSettings.readOnly = data.readOnly;
-    m_exportLayoutSettings.cryptVideo = data.cryptVideo;
-    m_exportLayoutSettings.password = data.password;
+    m_exportLayoutPersistentSettings.readOnly = value;
+}
+
+void ExportSettingsDialog::Private::setLayoutEncryption(bool on, const QString& password)
+{
+    m_exportLayoutSettings.encryption.on = on;
+    m_exportLayoutSettings.encryption.password = password;
 }
 
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)

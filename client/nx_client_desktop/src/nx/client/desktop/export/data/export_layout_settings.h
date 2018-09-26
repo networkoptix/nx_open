@@ -26,8 +26,12 @@ struct ExportLayoutSettings
     Mode mode = Mode::Export;   //< Export mode.
     bool readOnly = false;      //< Make exported layout read-only.
     nx::core::Watermark watermark;
-    bool cryptVideo = false;
-    QString password;
+
+    struct Encryption
+    {
+        bool on = false;
+        QString password;
+    } encryption;
 };
 
 } // namespace desktop

@@ -2,6 +2,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QLayout>
 
 namespace Ui { class ExportLayoutSettingsWidget; }
 
@@ -24,16 +25,14 @@ public:
     struct Data
     {
         bool readOnly = false;
-        bool cryptVideo = false;
-        QString password;
     };
 
     void setData(const Data& data);
 
-    bool validate();
+    QLayout* passwordPlaceholder();
 
 signals:
-    void dataChanged(Data& data);
+    void dataChanged(Data& data); //< No signal on setData()!
 
 private:
     QScopedPointer<Ui::ExportLayoutSettingsWidget> ui;

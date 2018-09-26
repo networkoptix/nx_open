@@ -1,6 +1,10 @@
 #include "export_media_settings_widget.h"
 #include "ui_export_media_settings_widget.h"
 
+#include <QtWidgets/QStyle>
+
+#include <nx/client/desktop/common/widgets/password_preview_button.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -10,44 +14,31 @@ ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
     ui(new Ui::ExportMediaSettingsWidget())
 {
     ui->setupUi(this);
-    connect(ui->filtersCheckBox, &QCheckBox::toggled, this,
-        [this](bool checked)
-        {
-            ui->filtersCheckBox->repaint();
-            emit dataChanged(checked);
-        });
+
+    connect(ui->filtersCheckBox, &QCheckBox::clicked,
+        this, &ExportMediaSettingsWidget::emitDataChanged);
 }
 
 ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
 {
 }
 
-bool ExportMediaSettingsWidget::applyFilters() const
+void ExportMediaSettingsWidget::emitDataChanged()
 {
-    return ui->filtersCheckBox->isChecked();
+    Data data;
+    data.applyFilters = ui->filtersCheckBox->isChecked();
+    emit dataChanged(data);
 }
 
-void ExportMediaSettingsWidget::setApplyFilters(bool value, bool suppressSignal)
+void ExportMediaSettingsWidget::setData(const Data& data)
 {
-    if (suppressSignal)
-    {
-        QSignalBlocker blocker(ui->filtersCheckBox);
-        ui->filtersCheckBox->setChecked(value);
-    }
-    else
-    {
-        ui->filtersCheckBox->setChecked(value);
-    }
+    ui->filtersCheckBox->setEnabled(data.transcodingAllowed);
+    ui->filtersCheckBox->setChecked(data.applyFilters);
 }
 
-bool ExportMediaSettingsWidget::transcodingAllowed() const
+QLayout* ExportMediaSettingsWidget::passwordPlaceholder()
 {
-    return ui->filtersCheckBox->isEnabledTo(this);
-}
-
-void ExportMediaSettingsWidget::setTranscodingAllowed(bool value)
-{
-    ui->filtersCheckBox->setEnabled(value);
+    return ui->passwordWidget->layout();
 }
 
 } // namespace desktop

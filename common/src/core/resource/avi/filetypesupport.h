@@ -11,7 +11,7 @@ public:
 
     static bool isMovieFileExt(const QString &filename);
     static bool isImageFileExt(const QString &filename);
-    static bool isLayoutFileExt(const QString &filename);
+    static bool isValidLayoutFile(const QString &filename);
 };
 
 #endif // uniclient_filetypesupport_h

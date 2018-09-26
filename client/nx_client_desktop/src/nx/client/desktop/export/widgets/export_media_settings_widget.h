@@ -2,6 +2,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QLayout>
 
 namespace Ui { class ExportMediaSettingsWidget; }
 
@@ -15,24 +16,29 @@ namespace desktop {
 class ExportMediaSettingsWidget: public QWidget
 {
     Q_OBJECT
-    using base_type = QWidget;
+        using base_type = QWidget;
 
 public:
     ExportMediaSettingsWidget(QWidget* parent = nullptr);
     virtual ~ExportMediaSettingsWidget();
 
-    bool applyFilters() const;
-    void setApplyFilters(bool value, bool suppressSignal=false);
+    struct Data
+    {
+        bool applyFilters = true;
+        bool transcodingAllowed = true;
+    };
 
-    // Check if transcoding settings are locked and can't be changed by the user.
-    bool transcodingAllowed() const;
-    void setTranscodingAllowed(bool value);
+    void setData(const Data& data);
+
+    QLayout* passwordPlaceholder();
 
 signals:
-    void dataChanged(bool applyFilters);
+    void dataChanged(Data& data); //< No signal on setData()!
 
 private:
     QScopedPointer<Ui::ExportMediaSettingsWidget> ui;
+
+    void emitDataChanged();
 };
 
 } // namespace desktop

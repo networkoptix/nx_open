@@ -11,6 +11,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <nx/core/layout/layout_file_info.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,6 +26,7 @@
 #include <nx/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/client/desktop/common/widgets/message_bar.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button_group.h>
+#include <nx/client/desktop/export/widgets/export_password_widget.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
@@ -56,11 +58,10 @@ ExportSettingsDialog::ExportSettingsDialog(
     :
     base_type(parent),
     d(new Private(bookmark, kPreviewSize)),
-    ui(new Ui::ExportSettingsDialog),
-    isFileNameValid(isFileNameValid)
+    ui(new ::Ui::ExportSettingsDialog),
+    isFileNameValid(isFileNameValid),
+    m_passwordWidget(new ExportPasswordWidget(this))
 {
-
-    qDebug() << "ExportSettingsDialog::ExportSettingsDialog(...) start";
     ui->setupUi(this);
     setHelpTopic(this, Qn::Exporting_Help);
 
@@ -123,12 +124,14 @@ ExportSettingsDialog::ExportSettingsDialog(
     ui->mediaFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Media));
     ui->layoutFilenamePanel->setAllowedExtensions(d->allowedFileExtensions(Mode::Layout));
 
-    updateSettingsWidgets();
+    initSettingsWidgets();
 
     connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
-        d, &Private::setApplyFilters);
+        d, [this](const ExportMediaSettingsWidget::Data& data) { d->setApplyFilters(data.applyFilters); });
     connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
-        d, &Private::setLayoutWidgetSettings);
+        d, [this](const ExportLayoutSettingsWidget::Data& data) { d->setLayoutReadOnly(data.readOnly); });
+    connect(m_passwordWidget, &ExportPasswordWidget::dataChanged,
+        d, [this](const ExportPasswordWidget::Data& data) { d->setLayoutEncryption(data.cryptVideo, data.password); });
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged,
         d, &Private::setMediaFilename);
@@ -212,7 +215,7 @@ ExportSettingsDialog::ExportSettingsDialog(
     else
         ui->cameraExportSettingsButton->click(); //< Set current page to settings
 
-    qDebug() << "ExportSettingsDialog::ExportSettingsDialog(...) exit";
+    updateMode(); //< Will also reparent m_passwordWidget.
 }
 
 void ExportSettingsDialog::setupSettingsButtons()
@@ -405,17 +408,14 @@ void ExportSettingsDialog::setWatermark(const nx::core::Watermark& watermark)
     d->setWatermark(watermark);
 }
 
-void ExportSettingsDialog::updateSettingsWidgets()
+void ExportSettingsDialog::initSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
     if (mediaPersistentSettings.canExportOverlays())
     {
-        ui->exportLayoutSettingsPage->
-            setData({ d->exportLayoutPersistentSettings().readOnly,
-                !d->exportLayoutSettings().password.isEmpty(),
-                d->exportLayoutSettings().password });
+        ui->exportLayoutSettingsPage->setData({ d->exportLayoutPersistentSettings().readOnly });
 
-        ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
+        // No settings for exportMediaSettingsPage - it will be set up in updateWidgetsState().
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -449,8 +449,15 @@ void ExportSettingsDialog::updateMode()
     const auto isCameraMode = ui->tabWidget->currentIndex() == cameraTabIndex
         && ui->tabWidget->isTabEnabled(cameraTabIndex);
 
+    // Place password input into the appropriate page.
+    if(isCameraMode)
+        ui->exportMediaSettingsPage->passwordPlaceholder()->addWidget(m_passwordWidget);
+    else
+        ui->exportLayoutSettingsPage->passwordPlaceholder()->addWidget(m_passwordWidget);
+
     const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
+
     updateWidgetsState();
 }
 
@@ -516,12 +523,14 @@ void ExportSettingsDialog::updateWidgetsState()
     auto mode = d->mode();
     bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
 
+    // No transcoding if no video.
     if (mode == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
     }
 
+    // Force transcoding for watermark.
     if (d->exportMediaSettings().transcodingSettings.watermark.visible())
     {
         transcodingLocked = true;
@@ -530,22 +539,19 @@ void ExportSettingsDialog::updateWidgetsState()
 
     // Applying data to UI.
     // All UI events should be locked here.
-    ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
-    ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
+    ui->exportMediaSettingsPage->setData({transcodingChecked, !transcodingLocked});
+    m_passwordWidget->setVisible(mode == Mode::Layout
+        || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName()));
 
     if (overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
     // Yep, we need exactly this condition.
     if (overlayOptionsAvailable == ui->transcodingButtonsWidget->isHidden())
-    {
         ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
-    }
 
     if (settings.canExportOverlays())
-    {
         ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
-    }
 
     // Update button state for used overlays.
     for (auto overlay: settings.usedOverlays)
@@ -613,8 +619,7 @@ void ExportSettingsDialog::setMediaParams(
         ui->imageButton->setEnabled(false);
         ui->textButton->setEnabled(false);
         ui->speedButton->setEnabled(false);
-        ui->exportMediaSettingsPage->setApplyFilters(true);
-        ui->exportMediaSettingsPage->setTranscodingAllowed(false);
+        ui->exportMediaSettingsPage->setData({false, false});
     }
 }
 
@@ -659,8 +664,11 @@ void ExportSettingsDialog::accept()
     if (!filenamePanel->validate())
         return;
 
-    if (!ui->exportLayoutSettingsPage->validate())
+    if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName())
+            && !m_passwordWidget->validate())
+    {
         return;
+    }
 
     if (isFileNameValid && !isFileNameValid(filenamePanel->filename(), false))
         return;
