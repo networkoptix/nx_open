@@ -250,6 +250,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context['contexts'] = get_records_for_version(version)
         extra_context['title'] = "Changes for {}".format(version.product.name)
         if request.user == version.product.created_by:
+            extra_context['READONLY'] = True
             extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
             extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
         return super(ProductCustomizationReviewAdmin, self).change_view(
@@ -279,6 +280,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def save_model(self, request, obj, form, change):
         # Once someone reviews the product we need to lock the version
+
+        print request.POST
         if not obj.version.accepted_date:
             obj.version.accepted_date = datetime.now()
             obj.version.save()
