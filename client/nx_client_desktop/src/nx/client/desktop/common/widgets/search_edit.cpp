@@ -61,17 +61,19 @@ class ColoredLineEdit: public QLineEdit
     using base_type = QLineEdit;
 
 public:
-    ColoredLineEdit(QWidget* parent, const QColor& placeholderTextColor);
+    ColoredLineEdit(QWidget* parent);
 
     void setPlaceholderText(const QString& text);
 
     QString placeholderText() const;
 
+    void setIndentOn(bool on);
+
 private:
     QLabel* const m_label;
 };
 
-ColoredLineEdit::ColoredLineEdit(QWidget* parent, const QColor& placeholderTextColor):
+ColoredLineEdit::ColoredLineEdit(QWidget* parent):
     base_type(parent),
     m_label(new QLabel())
 {
@@ -84,9 +86,14 @@ ColoredLineEdit::ColoredLineEdit(QWidget* parent, const QColor& placeholderTextC
     connect(this, &QLineEdit::textChanged, this, updatePlaceholderVisibility);
     updatePlaceholderVisibility(text());
 
-    m_label->setIndent(style::Metrics::kStandardPadding / 2);
+    setIndentOn(false);
+}
+
+void ColoredLineEdit::setIndentOn(bool on)
+{
+    m_label->setIndent(on ? style::Metrics::kStandardPadding / 2 : 0);
     auto margins = textMargins();
-    margins.setLeft(-style::Metrics::kStandardPadding / 2);
+    margins.setLeft(-style::Metrics::kStandardPadding / (on ? 2 : 1));
     setTextMargins(margins);
 }
 
@@ -162,7 +169,7 @@ struct SearchEdit::Private
 
 SearchEdit::SearchEdit(QWidget* parent):
     base_type(parent),
-    d(new Private({new QWidget(this), new ColoredLineEdit(this, Qt::red),
+    d(new Private({new QWidget(this), new ColoredLineEdit(this),
         new HoverablePushButton(this, [this](bool hovered){ setButtonHovered(hovered); }),
         new QMenu(this), new SelectableTextButton(this)}))
 {
@@ -234,10 +241,10 @@ SearchEdit::~SearchEdit()
 void SearchEdit::setupMenuButton()
 {
     d->menuButton->setFlat(true);
-    d->menuButton->setFixedSize(40, 32);
     d->menuButton->setFocusPolicy(Qt::NoFocus);
-    d->menuButton->setIcon(qnSkin->icon("theme/search_drop.png"));
     d->menuButton->setAutoFillBackground(true);
+
+    updateMenuButtonIcon();
 
     connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
@@ -256,13 +263,20 @@ void SearchEdit::setupMenuButton()
             }
         });
 
-    connect(d->lineEdit, &QLineEdit::textChanged, this,
-        [this]()
-        {
-            d->menuButton->setIcon(d->lineEdit->text().isEmpty()
-                ? qnSkin->icon("theme/search_drop.png")
-                : qnSkin->icon("theme/search_drop_selected.png"));
-        });
+    connect(d->lineEdit, &QLineEdit::textChanged, this, &SearchEdit::updateMenuButtonIcon);
+}
+
+void SearchEdit::updateMenuButtonIcon()
+{
+    const auto kIcon = m_tags.isEmpty()
+        ? qnSkin->icon("theme/search.png")
+        : qnSkin->icon("theme/search_drop.png");
+    const auto kSelectedIcon = m_tags.isEmpty()
+        ? qnSkin->icon("theme/search_selected.png")
+        : qnSkin->icon("theme/search_drop_selected.png");
+
+    d->menuButton->setFixedSize(m_tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
+    d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
 }
 
 QString SearchEdit::text() const
@@ -301,14 +315,17 @@ QStringList SearchEdit::tagsList() const
 
 void SearchEdit::setTags(const QStringList& value)
 {
+
     if (m_tags == value)
         return;
 
     m_tags = value;
-
     setSelectedTagIndex(-1);
 
     d->menu->clear();
+    d->lineEdit->setIndentOn(!m_tags.isEmpty());
+    updateMenuButtonIcon();
+
     for (int index = 0; index != m_tags.size(); ++ index)
     {
         const auto tag = m_tags.at(index);

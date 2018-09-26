@@ -386,6 +386,26 @@ void QnResourceBrowserWidget::initInstantSearch()
     connect(commonModule(), &QnCommonModule::remoteIdChanged,
         this, &QnResourceBrowserWidget::updateSearchMode);
 
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+    const auto rootIndex = [this]() { return ui->resourceTreeWidget->treeView()->rootIndex(); };
+
+    connect(searchModel, &QAbstractItemModel::rowsInserted, this,
+        [this, rootIndex, searchModel]()
+        {
+            if (searchModel->rowCount(rootIndex()) == 1)
+                handleNewFilterUpdated();
+        });
+
+    connect(searchModel, &QAbstractItemModel::rowsRemoved, this,
+        [this, rootIndex, searchModel]()
+        {
+            if (searchModel->rowCount(rootIndex()) == 0)
+                handleNewFilterUpdated();
+        });
+
+    connect(searchModel, &QAbstractItemModel::modelReset,
+        this, [this]() { handleNewFilterUpdated(); });
+
     updateSearchMode();
     handleNewFilterUpdated();
 }

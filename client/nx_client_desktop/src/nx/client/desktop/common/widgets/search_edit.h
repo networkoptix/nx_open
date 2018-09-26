@@ -76,6 +76,7 @@ private:
     void updateTagButton();
     void setHovered(bool value);
     void setButtonHovered(bool value);
+    void updateMenuButtonIcon();
 
 private:
     struct Private;
