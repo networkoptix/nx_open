@@ -1701,9 +1701,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
     /**%apidoc POST /api/activateLicense
-     * Activate new license and return license JSON data if success. It requires Internet to
-     * connect to license server.
-     * %param:string licenseKey License serial number
+     * Activate new license and return license JSON data if success. It requires internet to
+     * connect to the license server.
+     * %param:string licenseKey License serial number.
      * %return:object License JSON data.
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());

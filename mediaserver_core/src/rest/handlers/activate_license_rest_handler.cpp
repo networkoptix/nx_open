@@ -32,62 +32,62 @@ using namespace nx;
 
 namespace {
 
-const QString kLicenseKey = lit("license_key");
-const QString kBox = lit("box");
-const QString kBrand = lit("brand");
-const QString kVersion = lit("version");
-const QString kMac = lit("mac");
-const QString kSerial = lit("serial");
-const QString kLang = lit("lang");
-const QString kOldHwidArray = lit("oldhwid[]");
-const QString kHwid = lit("hwid");
-const QString kHwidArray = lit("hwid[]");
-const QString kMode = lit("mode");
-const QString kInfo = lit("info");
-const QString kKey = lit("key");
+const QString kLicenseKey = "license_key";
+const QString kBox = "box";
+const QString kBrand = "brand";
+const QString kVersion = "version";
+const QString kMac = "mac";
+const QString kSerial = "serial";
+const QString kLang = "lang";
+const QString kOldHwidArray = "oldhwid[]";
+const QString kHwid = "hwid";
+const QString kHwidArray = "hwid[]";
+const QString kMode = "mode";
+const QString kInfo = "info";
+const QString kKey = "key";
 
 // TODO: Some strings can be reused when when the server supports translations.
 QString activationMessage(const QJsonObject& errorMessage)
 {
-    QString messageId = errorMessage.value(lit("messageId")).toString();
+    QString messageId = errorMessage.value("messageId").toString();
 
     // TODO: Feature #3629 case J
-    if (messageId == lit("DatabaseError"))
-        return lit("There was a problem activating your License Key. A database error occurred.");
+    if (messageId == "DatabaseError")
+        return "There was a problem activating your License Key. A database error occurred.";
 
-    if (messageId == lit("InvalidData"))
+    if (messageId == "InvalidData")
     {
-        return lit("There was a problem activating your License Key. Invalid data received. "
-            "Please contact the support team to report the issue.");
+        return "There was a problem activating your License Key. Invalid data received. "
+            "Please contact the support team to report the issue.";
     }
 
-    if (messageId == lit("InvalidKey"))
+    if (messageId == "InvalidKey")
     {
-        return lit("License Key you have entered is invalid. Please check that License Key is "
+        return "License Key you have entered is invalid. Please check that License Key is "
             "entered correctly. If problem persists, please contact the support team to confirm "
-            "if License Key is valid or to obtain a valid License Key.");
+            "if License Key is valid or to obtain a valid License Key.";
     }
 
-    if (messageId == lit("InvalidBrand"))
+    if (messageId == "InvalidBrand")
     {
-        return lit("You are trying to activate a license incompatible with your software. Please "
-            "contact the support team to obtain a valid License Key.");
+        return "You are trying to activate a license incompatible with your software. Please "
+            "contact the support team to obtain a valid License Key.";
     }
 
-    if (messageId == lit("AlreadyActivated"))
+    if (messageId == "AlreadyActivated")
     {
         QString message =
-            lit("This License Key has been previously activated to Hardware Id %1 on %2. "
-            "Please contact the support team to obtain a valid License Key.");
+            "This License Key has been previously activated to Hardware Id %1 on %2. "
+            "Please contact the support team to obtain a valid License Key.";
 
-        QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-        QString hwid = arguments.value(lit("hwid")).toString();
-        QString time = arguments.value(lit("time")).toString();
+        QVariantMap arguments = errorMessage.value("arguments").toObject().toVariantMap();
+        QString hwid = arguments.value("hwid").toString();
+        QString time = arguments.value("time").toString();
 
         return message.arg(hwid).arg(time);
     }
 
-    return errorMessage.value(lit("message")).toString();
+    return errorMessage.value("message").toString();
 }
 
 }
@@ -159,30 +159,28 @@ struct LicenseKey
 {
     QString licenseKey;
 };
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((LicenseKey), (json))
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseKey, (json), (licenseKey))
 
 
-int QnActivateLicenseRestHandler::executePost(const QString &path, const QnRequestParams &params,
-    const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor *owner)
+int QnActivateLicenseRestHandler::executePost(const QString& path, const QnRequestParams& params,
+    const QByteArray& body, QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
     vms::api::DetailedLicenseData reply;
 
     LicenseKey licenseKeyStruct;
     if (!QJson::deserialize<LicenseKey>(body, &licenseKeyStruct))
     {
-        result.setError(QnJsonRestResult::MissingParameter, lit("Body can't be deserealized"));
+        result.setError(QnJsonRestResult::InvalidParameter, "Invalid content");
         return nx::network::http::StatusCode::ok;
     }
 
-    QString licenseKey = licenseKeyStruct.licenseKey;
+    const QString licenseKey = licenseKeyStruct.licenseKey;
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
     {
-        result.setError(QnJsonRestResult::MissingParameter,
-            lit("Invalid license serial number provided. "
-                "Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
+        result.setError(QnJsonRestResult::InvalidParameter,
+            "Invalid license serial number provided. "
+            "Serial number MUST be in format AAAA-BBBB-CCCC-DDDD");
         return nx::network::http::StatusCode::ok;
     }
 
@@ -195,7 +193,7 @@ int QnActivateLicenseRestHandler::executePost(const QString &path, const QnReque
         if (errCode != CL_HTTP_SUCCESS || response.isEmpty())
         {
             result.setError(QnJsonRestResult::CantProcessRequest,
-                lit("Network error has occurred during license activation. "
+                QString("Network error has occurred during license activation. "
                     "Error code: %1").arg(errCode));
             return nx::network::http::StatusCode::ok;
         }
@@ -205,7 +203,7 @@ int QnActivateLicenseRestHandler::executePost(const QString &path, const QnReque
         {
             QString message = activationMessage(errorMessage);
             result.setError(QnJsonRestResult::CantProcessRequest,
-                lit("Can't activate license:  %1").arg(message));
+                QString("Can't activate license:  %1").arg(message));
             return nx::network::http::StatusCode::ok;
         }
 
@@ -219,7 +217,7 @@ int QnActivateLicenseRestHandler::executePost(const QString &path, const QnReque
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
-                lit("Can't activate license: %1").arg(
+                QString("Can't activate license: %1").arg(
                     QnLicenseValidator::errorMessage(licenseErrCode)));
             return nx::network::http::StatusCode::ok;
         }
@@ -234,7 +232,7 @@ int QnActivateLicenseRestHandler::executePost(const QString &path, const QnReque
     if( errorCode != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
-            lit("Internal server error: %1").arg(ec2::toString(errorCode)));
+            QString("Internal server error: %1").arg(ec2::toString(errorCode)));
         return nx::network::http::StatusCode::ok;
     }
     ec2::fromResourceToApi(license, reply);

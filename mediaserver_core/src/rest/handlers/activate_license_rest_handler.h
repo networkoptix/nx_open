@@ -11,11 +11,12 @@ class QnActivateLicenseRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    virtual int executePost(const QString &path, const QnRequestParams &params,
-        const QByteArray &body, QnJsonRestResult &result,
-        const QnRestConnectionProcessor *owner) override;
+    virtual int executePost(const QString& path, const QnRequestParams& params,
+        const QByteArray& body, QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner) override;
 private:
-    CLHttpStatus makeRequest(QnCommonModule* commonModule, const QString& licenseKey, bool infoMode, QByteArray& response);
+    CLHttpStatus makeRequest(QnCommonModule* commonModule, const QString& licenseKey, bool infoMode,
+        QByteArray& response);
 };
 
 #endif // QN_ACTIVATE_LICENSE_REST_HANDLER_H
