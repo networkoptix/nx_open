@@ -4,6 +4,7 @@
 
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/http/server/handler/http_server_handler_create_tunnel.h>
+#include <nx/network/http/tunneling/detail/request_paths.h>
 
 #include "message_dispatcher.h"
 #include "server_connection.h"
@@ -36,6 +37,15 @@ public:
             {
                 return std::make_unique<CreateStunOverHttpConnectionHandler>(
                     kStunProtocolName,
+                    std::bind(&StunOverHttpServer::createStunConnection, this, _1));
+            });
+
+        httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
+            stunOverHttpPath + nx_http::tunneling::detail::kConnectionUpgradeTunnelPath,
+            [this]()
+            {
+                return std::make_unique<CreateStunOverHttpConnectionHandler>(
+                    nx_http::tunneling::detail::kConnectionUpgradeTunnelProtocol,
                     std::bind(&StunOverHttpServer::createStunConnection, this, _1));
             });
     }
