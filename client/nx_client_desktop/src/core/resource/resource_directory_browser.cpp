@@ -326,6 +326,11 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         watermarkFile.reset();
     }
 
+    // Check if the layout is crypted.
+    const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
+    if (fileInfo.isCrypted)
+        layout->setData(Qn::LayoutEncryptionRole, true);
+
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
     layout->addFlags(Qn::exported_layout);

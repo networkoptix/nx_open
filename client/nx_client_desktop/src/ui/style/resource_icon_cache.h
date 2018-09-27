@@ -28,6 +28,7 @@ public:
         HealthMonitor,
 
         Layout,
+        EncryptedLayout,
         SharedLayout,
         Layouts,
         SharedLayouts,

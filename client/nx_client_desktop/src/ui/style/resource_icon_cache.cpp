@@ -53,6 +53,7 @@ QString baseToString(QnResourceIconCache::Key base)
         QN_STRINGIFY(HealthMonitor);
 
         QN_STRINGIFY(Layout);
+        QN_STRINGIFY(EncryptedLayout);
         QN_STRINGIFY(SharedLayout);
         QN_STRINGIFY(Layouts);
         QN_STRINGIFY(SharedLayouts);
@@ -117,6 +118,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
     m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
+    m_cache.insert(EncryptedLayout,         loadIcon(lit("tree/layout_encrypted.png")));
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
     m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
     m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
@@ -252,7 +254,11 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     else if (flags.testFlag(Qn::server))
         key = Server;
     else if (flags.testFlag(Qn::layout))
-        key = Layout;
+    {
+        key = resource.dynamicCast<QnLayoutResource>()->data(Qn::LayoutEncryptionRole).toBool()
+            ? EncryptedLayout
+            : Layout;
+    }
     else if (flags.testFlag(Qn::io_module))
         key = IOModule;
     else if (flags.testFlag(Qn::wearable_camera))
