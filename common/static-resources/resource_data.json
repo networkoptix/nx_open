@@ -2823,7 +2823,7 @@
         },
         {
             "keys": [
-            "9W-H3-3MH*|*",
+            "9W-H3-3MH*|*", "Avigilon|9W-H3-3M*",
             "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
             "AXIS|AXIS P3707*",
             "Axis|AXISP3707*",
@@ -2838,7 +2838,12 @@
             "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
             "Dahua|IPC-HDBW7233X-AS-E2-0280B",
             "Hikvision|DS-2CD6D24*", "HIKVISION|DS-2CD6D24*",
-            "Hikvision|DS-2TD2636*", "HIKVISION|DS-2TD2636*"
+            "Hikvision|DS-2TD2636*", "HIKVISION|DS-2TD2636*",
+            "Dahua|IPC-PDBW8800*",
+            "Geovision|GV-SV48000",
+            "Hikvision|DS-2CD6924F*", "HIKVISION|DS-2CD6924F*",
+            "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
+            "NVM3-A16|IP-Camera", "IPNC|NVM3-A16"
             ],
             "canShareLicenseGroup": true
         },

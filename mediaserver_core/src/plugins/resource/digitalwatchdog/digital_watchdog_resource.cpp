@@ -333,12 +333,12 @@ static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
 static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
 static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
 
-void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
+void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
     {
-        base_type::initAdvancedParametersProviders(params);
+        base_type::initAdvancedParametersProvidersUnderLock(params);
         return;
     }
 

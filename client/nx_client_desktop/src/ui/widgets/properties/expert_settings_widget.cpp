@@ -296,7 +296,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         if (canSwitchPresetTypes(camera))
         {
             ++supportBothPresetTypeCount;
-            const auto preferredPtzPresetType = camera->preferredPtzPresetType();
+            const auto preferredPtzPresetType = camera->userPreferredPtzPresetType();
 
             if (preferredPtzPresetType == nx::core::ptz::PresetType::system)
                 ++preferSystemPresetsCount;

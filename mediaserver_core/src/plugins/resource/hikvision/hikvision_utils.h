@@ -52,7 +52,7 @@ static const QString kCapabilitiesRequestPathTemplate =
 
 // TODO: Find out if we have to try both paths.
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
-static const QString kChannelStreamingPathForNvrTemplate = lit("/ISAPI/Streaming/channels/%1");
+static const QString kIsapiChannelStreamingPathTemplate = lit("/ISAPI/Streaming/channels/%1");
 
 static const int kFpsThreshold = 200;
 
