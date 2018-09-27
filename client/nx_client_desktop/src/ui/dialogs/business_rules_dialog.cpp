@@ -136,7 +136,7 @@ namespace {
             auto resourcePassText =
                 [this](const QnResourcePtr& resource)
                 {
-                    return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
+                    return resource->toSearchString(true).contains(m_filterText, Qt::CaseInsensitive);
                 };
 
             auto passText =

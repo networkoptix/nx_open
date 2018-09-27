@@ -156,7 +156,7 @@ void QnResourceSelectionDialog::initModel()
             break;
     }
 
-    m_resourceModel = new QnResourceTreeModel(scope, this);
+    m_resourceModel = new QnResourceTreeModel(scope, true, this);
 
     // Auto expand if and only if server count <= 1 or cameras count <= 50.
     if (scope == QnResourceTreeModel::CamerasScope)

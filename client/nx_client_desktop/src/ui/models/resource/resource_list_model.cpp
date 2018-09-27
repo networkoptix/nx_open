@@ -246,7 +246,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
         case Qn::ResourceFlagsRole:
             return static_cast<int>(resource->flags());
         case Qn::ResourceSearchStringRole:
-            return resource->toSearchString();
+            return resource->toSearchString(true);
         case Qn::ResourceStatusRole:
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
