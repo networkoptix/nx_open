@@ -385,8 +385,41 @@ class VirtualBox(Hypervisor):
             runner_address = self.__class__._nat_subnet.ip + 2
         super(VirtualBox, self).__init__(host_os_access, runner_address)
 
+    def _get_file_path_for_import_vm(self, vm_image_path, timeout_sec):
+        if vm_image_path.suffix == '.ova':
+            try:
+                # TODO: unpack command to run under Windows or, at least, check OS before un-tar
+                stdout = self.host_os_access.run_command(
+                    ['tar', 'xvf', vm_image_path, '-C', vm_image_path.parent],
+                    timeout_sec=timeout_sec)
+            # www.gnu.org/software/tar/manual/html_section/tar_19.html
+            # Possible exit codes of GNU tar are summarized in the following table:
+            #
+            # 0 `Successful termination'.
+            # 1 `Some files differ'. If tar was invoked with `--compare' (`--diff', `-d')
+            #   command line option, this means that some files in the archive differ from
+            #   their disk counterparts (see section Comparing Archive Members with the File System).
+            #   If tar was given `--create', `--append' or `--update' option, this exit code means
+            #   that some files were changed while being archived and so the resulting archive
+            #   does not contain the exact copy of the file set.
+            # 2 `Fatal error'. This means that some fatal, unrecoverable error occurred.
+            except exit_status_error_cls(2) as x:
+                stderr_decoded = x.stderr.decode('ascii')
+                raise VirtualBoxError(
+                    "Unpack image OVA archive '%s' error: %s" % (
+                        vm_image_path, stderr_decoded))
+
+            for line in stdout.strip().splitlines():
+                if line.endswith('.ovf'):
+                    return vm_image_path.parent / line
+            raise VirtualBoxError(
+                "Image OVA archive '%s' doesn't contain OVF file" % vm_image_path)
+
+        return vm_image_path
+
     def import_vm(self, vm_image_path, vm_name):
-        self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
+        vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
+        self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self.manage(['snapshot', vm_name, 'take', 'template'])
         # Group is assigned only when imported: cloned VMs are created nearby.
         group = '/' + vm_name.rsplit('-', 1)[0]
@@ -426,6 +459,7 @@ class VirtualBox(Hypervisor):
             name = quoted_name[1:-1]
             vm_names.append(name)
         return vm_names
+
 
     def manage(self, args, timeout_sec=_DEFAULT_QUICK_RUN_TIMEOUT_SEC):
         try:
