@@ -77,8 +77,6 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
 
     def save_model(self, request, obj, form, change):
         # Once someone reviews the product we need to lock the version
-
-        print request.POST
         if not obj.version.accepted_date:
             obj.version.accepted_date = datetime.now()
             obj.version.save()
