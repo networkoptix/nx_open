@@ -153,7 +153,6 @@ class ProductForm(forms.ModelForm):
 
     def clean_customizations(self):
         data = self.cleaned_data['customizations']
-        cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
-        if self.instance.product_type and self.instance.product_type.type == cloud_portal and len(data) > 1:
+        if self.instance.product_type and self.instance.product_type.one_customization and len(data) > 1:
             raise ValueError('Too many customizations selected')
         return data
