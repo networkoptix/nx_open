@@ -16,7 +16,7 @@ ClientFactory::ClientFactory():
         std::placeholders::_1))
 {
     registerClientType<GetPostTunnelClient>();
-    //registerClientType<ConnectionUpgradeTunnelClient>();
+    registerClientType<ConnectionUpgradeTunnelClient>();
 }
 
 void ClientFactory::clear()
