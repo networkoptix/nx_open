@@ -460,7 +460,6 @@ class VirtualBox(Hypervisor):
             vm_names.append(name)
         return vm_names
 
-
     def manage(self, args, timeout_sec=_DEFAULT_QUICK_RUN_TIMEOUT_SEC):
         try:
             return self.host_os_access.run_command(
