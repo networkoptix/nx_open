@@ -87,6 +87,34 @@ button, .btn {
     border-radius : 4px;
 }
 
+.btn.btn-toggle {
+    color            : $dark9;
+    background-color : $light4;
+    max-width        : 180px;
+    display          : flex;
+    align-content    : center;
+    justify-content  : center;
+
+    input {
+        position : absolute;
+        opacity  : 0;
+    }
+
+    &:hover:not([disabled]):not(.disabled) {
+        background-color : $light5;
+    }
+
+    &:active,
+    &.active {
+        background-color : $light6 !important;
+    }
+
+    &.selected {
+        color : $light1;
+        background-color : $light16 !important;
+    }
+}
+
 // (END) Overwrite Boostrap section ******
 
 .btn-dropdown-toggle {

@@ -23,7 +23,7 @@ const appRoutes: Routes = [
         NgbModule,
 
         ComponentsModule
-        //RouterModule.forChild(appRoutes)
+        // RouterModule.forChild(appRoutes)
     ],
     providers: [],
     declarations: [

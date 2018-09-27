@@ -1,0 +1,51 @@
+@import '../../../../styles/native-theme/theme_palette';
+@import '../../../../styles/custom/custom_palette';
+@import '../../../../styles/theme_variables';
+
+.list {
+    flex : 0 0;
+}
+
+.card {
+    width : 300px;
+
+    &--header {
+        background-color : $light2;
+        padding          : 1rem;
+        border-bottom    : 1px solid $light3;
+
+        &-info {
+            float : right;
+
+            > div {
+                color       : $light10;
+                font-size   : $font-size-sm;
+                line-height : rem(14px);
+            }
+        }
+    }
+
+    &--body {
+        padding : .5rem 1rem 2rem;
+        height  : 200px;
+
+        &-by {
+            color     : $light16;
+            font-size : $font-size-ssm;
+        }
+
+        &-descr {
+            margin-top : .75rem;
+        }
+    }
+
+    &--footer {
+        position : absolute;
+        bottom   : 0;
+        padding  : .5rem 1rem 1rem;
+
+        > h3 {
+            font-family: "robotomedium", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    }
+}

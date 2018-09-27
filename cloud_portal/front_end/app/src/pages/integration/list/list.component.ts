@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 @Component({
     selector: 'integrations-list-component',
@@ -7,6 +7,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 })
 
 export class NxIntegrationsListComponent implements OnInit, OnDestroy {
+
+    @Input() list;
 
     private setupDefaults() {
     }

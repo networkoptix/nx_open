@@ -349,11 +349,6 @@ window.L = {};
                             .when('/sandbox', {
                                 template: ''
                             })
-                            // **** routes for integrations views should state full path ****
-                            .when('/integrations/:route', {
-                                template: ''
-                            })
-                            // ********************************************************
                             .when('/integrations', {
                                 template: ''
                             })

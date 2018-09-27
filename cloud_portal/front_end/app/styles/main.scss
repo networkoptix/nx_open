@@ -398,13 +398,14 @@ a.disabled {
 .preloader{
     display: none;
 }
+
 .process-loading{
     position: relative;
 }
+
 .process-loading>*{
     visibility:hidden;
 }
-
 
 .process-loading>.preloader {
 
@@ -956,3 +957,6 @@ h1 .badge {
   padding-left: 4px;
 }
 
+span.marked {
+    background-color: $light4;
+}

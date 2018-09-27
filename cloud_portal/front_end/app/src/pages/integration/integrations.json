@@ -1,0 +1,116 @@
+{
+    "integrations": [
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration",
+            "provider"     : "NetworkOptix Inc.",
+            "providerUrl"  : "www.networkoptix.com",
+            "isRecommended": true,
+            "type"         : "access",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration1",
+            "providerUrl"  : "",
+            "provider"     : "",
+            "isRecommended": false,
+            "type"         : "home",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration2",
+            "provider"     : "NetworkOptix Inc.",
+            "providerUrl"  : "",
+            "isRecommended": true,
+            "type"         : "psim",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration3",
+            "provider"     : "NetworkOptix Inc.",
+            "providerUrl"  : "",
+            "isRecommended": false,
+            "type"         : "access",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration4",
+            "provider"     : "NetworkOptix Inc.",
+            "providerUrl"  : "",
+            "isRecommended": true,
+            "type"         : "cameras",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration5",
+            "provider"     : "NetworkOptix Inc.",
+            "providerUrl"  : "",
+            "isRecommended": true,
+            "type"         : "cameras",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        },
+        {
+            "logo"         : "https://d2t44wh9rnwl5y.cloudfront.net/gsc/JHLDDI/e9/3b/a1/e93ba15a826b49659920a7eb84504c41/images/integrations_store/u82.png?token=93f9aea49c5ebbe258e3d350138dafb0",
+            "name"         : "Paxton Integration6",
+            "provider"     : "",
+            "providerUrl"  : "",
+            "isRecommended": false,
+            "type"         : "analytics",
+            "version"      : "3.14",
+            "date"         : "6/29/2018",
+            "os"           : [
+                "mac",
+                "win",
+                "android"
+            ],
+            "description"  : "User-friendly and flexible networked access control system, designed to make the management of any building incredibly simple."
+        }
+    ]
+}

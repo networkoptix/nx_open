@@ -1,4 +1,29 @@
-<div class="container" >
-    <h1>Integrations</h1>
+<div class="">
+    <div class="row p-0 m-0">
+        <div *ngFor="let plugin of list" class="list mb-3">
+            <div class="card mr-3 hoverable">
+                <div class="card--header clearfix">
+                    <div class="float-left"><img [src]="plugin.logo" style="width: 100px;"></div>
+                    <div class="card--header-info">
+                        <div >v. {{ plugin.version }}</div>
+                        <div [innerHtml]="plugin.date"></div>
+                    </div>
+                </div>
+                <div class="card--body">
+                    <div><h3 [innerHtml]="plugin.name"></h3></div>
+                    <div class="card--body-by" *ngIf="plugin.provider">By <a target="_blank" [href]="plugin.providerUrl" [innerHtml]="plugin.provider"></a></div>
+                    <div class="card--body-descr" [innerHtml]="plugin.description"></div>
+                </div>
+                <div class="card--footer">
+                    <h3 class="float-left mr-1" *ngIf="plugin.isRecommended">
+                        <span class="text-capitalize badge badge-primary" translate>Recommended</span>
+                    </h3>
+                    <h3 class="float-left">
+                        <span class="text-capitalize badge badge-secondary" [innerHtml]="plugin.type"></span>
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 

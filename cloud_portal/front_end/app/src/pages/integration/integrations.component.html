@@ -1,11 +1,51 @@
-<div class="container">
-    <div class="row">
-        <div class="col-3">
-            <nx-menu [content]="content" [elements]="elements"></nx-menu>
+<div>
+    <div class="m-3 clearfix">
+        <input placeholder="Search"
+               (ngModelChange)="searchFilterFor($event)"
+               [(ngModel)]="search">
+    </div>
+    <div class="m-3 clearfix">
+        <!--<div class="col-3">-->
+        <!--<nx-menu [content]="content" [elements]="elements"></nx-menu>-->
+        <!--</div>-->
+        <div class="float-left mr-1">
+            <label class="btn btn-toggle m-0" [ngClass]="{'selected': selectors.access}">
+                <input type="checkbox" id="access"
+                       (ngModelChange)="setFilter($event, 'access')"
+                       [(ngModel)]="selectors.access">Access control
+            </label>
         </div>
+        <div class="float-left mr-1">
+            <label class="btn btn-toggle m-0" [ngClass]="{'selected': selectors.analytics}">
+                <input type="checkbox" id="analytics"
+                       (ngModelChange)="setFilter($event, 'analytics')"
+                       [(ngModel)]="selectors.analytics">Analytics
+            </label>
+        </div>
+        <div class="float-left mr-1">
+            <label class="btn btn-toggle m-0" [ngClass]="{'selected': selectors.cameras}">
+                <input type="checkbox" id="cameras"
+                       (ngModelChange)="setFilter($event, 'cameras')"
+                       [(ngModel)]="selectors.cameras">Camera integrations
+            </label>
+        </div>
+        <div class="float-left mr-1">
+            <label class="btn btn-toggle m-0" [ngClass]="{'selected': selectors.home}">
+                <input type="checkbox" id="home"
+                       (ngModelChange)="setFilter($event, 'home')"
+                       [(ngModel)]="selectors.home">Home automation
+            </label>
+        </div>
+        <div class="float-left mr-1">
+            <label class="btn btn-toggle m-0" [ngClass]="{'selected': selectors.psim}">
+                <input type="checkbox" id="psim"
+                       (ngModelChange)="setFilter($event, 'psim')"
+                       [(ngModel)]="selectors.psim">PSIM
+            </label>
+        </div>
+    </div>
 
-        <div class="col-9" style="border: 1px solid gold;">
-            <router-outlet></router-outlet>
-        </div>
+    <div class="ml-3 mr-3">
+        <integrations-list-component [list]="elements"></integrations-list-component>
     </div>
 </div>

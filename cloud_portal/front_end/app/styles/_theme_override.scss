@@ -241,6 +241,16 @@ select {
     &-default {
         background-color : $light8;
     }
+
+    &-primary {
+        background-color : $brand_core;
+        color            : $brand_contrast;
+    }
+
+    &-secondary {
+        background-color : $light6;
+        color            : $dark9;
+    }
 }
 
 .table {
