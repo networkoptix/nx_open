@@ -36,7 +36,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.userAuthorized = false;
+        this.userAuthorized = false || this.configService.config.publicDownloads;
         this.downloads = this.configService.config.downloads;
 
         this.downloadsData = {
@@ -170,7 +170,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
                 this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
             });
 
-        if (!this.configService.publicDownloads) {
+        if (!this.configService.config.publicDownloads) {
             this.authorizationService
                 .requireLogin()
                 .then(result => {
