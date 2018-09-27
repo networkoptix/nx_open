@@ -18,11 +18,7 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
-using namespace nx::client::desktop;
-
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 namespace {
 
@@ -56,11 +52,14 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     check_box_utils::autoClearTristate(ui->checkBoxForceMotionDetection);
     check_box_utils::autoClearTristate(ui->secondStreamDisableCheckBox);
+    check_box_utils::autoClearTristate(ui->forcedPanTiltCheckBox);
+    check_box_utils::autoClearTristate(ui->forcedZoomCheckBox);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
     setWarningStyle(ui->logicalIdWarningLabel);
+    setWarningStyle(ui->presetTypeLimitationsLabel);
 
     ui->settingsWarningLabel->setVisible(false);
     ui->bitrateIncreaseWarningLabel->setVisible(false);
@@ -71,6 +70,15 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         QVariant::fromValue(vms::api::RtpTransportType::automatic));
     ui->comboBoxTransport->addItem(lit("TCP"), QVariant::fromValue(vms::api::RtpTransportType::tcp));
     ui->comboBoxTransport->addItem(lit("UDP"), QVariant::fromValue(vms::api::RtpTransportType::udp));
+
+    ui->preferredPtzPresetTypeComboBox->clear();
+    combo_box_utils::insertMultipleValuesItem(ui->preferredPtzPresetTypeComboBox);
+    ui->preferredPtzPresetTypeComboBox->addItem(tr("Auto", "Automatic PTZ preset type"),
+        QVariant::fromValue(nx::core::ptz::PresetType::automatic));
+    ui->preferredPtzPresetTypeComboBox->addItem(tr("System", "System PTZ preset type"),
+        QVariant::fromValue(nx::core::ptz::PresetType::system));
+    ui->preferredPtzPresetTypeComboBox->addItem(tr("Native", "Native PTZ preset type"),
+        QVariant::fromValue(nx::core::ptz::PresetType::native));
 
     ui->iconLabel->setPixmap(qnSkin->pixmap("theme/warning.png"));
     ui->iconLabel->setScaledContents(true);
@@ -106,8 +114,11 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     connect(ui->checkBoxSecondaryRecorder, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setSecondaryRecordingDisabled);
 
-    connect(ui->checkBoxDisableNativePtzPresets, &QCheckBox::clicked,
-        store, &CameraSettingsDialogStore::setNativePtzPresetsDisabled);
+    connect(ui->forcedPanTiltCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setForcedPtzPanTiltCapability);
+
+    connect(ui->forcedZoomCheckBox, &QCheckBox::clicked,
+        store, &CameraSettingsDialogStore::setForcedPtzZoomCapability);
 
     connect(ui->customMediaPortCheckBox, &QCheckBox::clicked,
         store, &CameraSettingsDialogStore::setCustomMediaPortUsed);
@@ -126,6 +137,13 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
 
     connect(ui->resetLogicalIdButton, &QPushButton::clicked, store,
         [store]() { store->setLogicalId({}); });
+
+    connect(ui->preferredPtzPresetTypeComboBox, QnComboboxCurrentIndexChanged, store,
+        [this, store](int index)
+        {
+            store->setPreferredPtzPresetType(ui->preferredPtzPresetTypeComboBox->itemData(index)
+                .value<nx::core::ptz::PresetType>());
+        });
 
     connect(ui->comboBoxTransport, QnComboboxCurrentIndexChanged, store,
         [this, store](int index)
@@ -283,7 +301,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             const auto index = ui->comboBoxForcedMotionStream->findData(
                 QVariant::fromValue(state.expert.motionStreamType()));
 
-            NX_ASSERT(index > 0, Q_FUNC_INFO, "Unknown motion stream type");
+            NX_ASSERT(index > 0, "Unknown motion stream type");
             ui->comboBoxForcedMotionStream->setCurrentIndex(index);
         }
         else
@@ -317,7 +335,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         const auto index = ui->comboBoxTransport->findData(
             QVariant::fromValue(state.expert.rtpTransportType()));
 
-        NX_ASSERT(index > 0, Q_FUNC_INFO, "Unknown RTP stream type");
+        NX_ASSERT(index > 0, "Unknown RTP stream type");
         ui->comboBoxTransport->setCurrentIndex(index);
     }
     else
@@ -348,25 +366,47 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // PTZ.
 
-    // PTZ controls are visible if and only if at least one selected camera has PTZ presets capability.
-    // PTZ controls are enabled if and only if at least one selected camera allows disabling
-    //  native PTZ presets.
+    // Preset types are now displayed only if they are editable.
+    // Greyed out uneditable preset types are no longer displayed.
 
-    const bool hasPtzPresets =
-        state.devicesDescription.hasPtzPresets != CombinedValue::None;
+    ui->groupBoxPtzControl->setVisible(
+        state.canSwitchPtzPresetTypes() || state.canForcePtzCapabilities());
 
-    const bool canDisableNativePtzPresets =
-        state.devicesDescription.canDisableNativePtzPresets != CombinedValue::None;
+    ui->preferredPtzPresetTypeWidget->setVisible(state.canSwitchPtzPresetTypes());
+    ui->forcedPtzWidget->setVisible(state.canForcePtzCapabilities());
 
-    ui->groupBoxPtzControl->setVisible(hasPtzPresets);
-    ui->groupBoxPtzControl->setEnabled(canDisableNativePtzPresets);
+    ui->presetTypeLimitationsLabel->setVisible(state.canSwitchPtzPresetTypes()
+        && state.expert.preferredPtzPresetType.hasValue()
+        && state.expert.preferredPtzPresetType() == nx::core::ptz::PresetType::system);
 
-    check_box_utils::setupTristateCheckbox(
-        ui->checkBoxDisableNativePtzPresets,
-        state.expert.nativePtzPresetsDisabled.hasValue() || !canDisableNativePtzPresets,
-        state.expert.nativePtzPresetsDisabled.valueOr(false) && canDisableNativePtzPresets);
+    if (state.canSwitchPtzPresetTypes())
+    {
+        if (state.expert.preferredPtzPresetType.hasValue())
+        {
+            const auto index = ui->preferredPtzPresetTypeComboBox->findData(
+                QVariant::fromValue(state.expert.preferredPtzPresetType()));
 
-    ::setReadOnly(ui->checkBoxDisableNativePtzPresets, state.readOnly);
+            NX_ASSERT(index > 0, "Unknown PTZ preset type");
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(index);
+        }
+        else
+        {
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(0/*multiple values*/);
+        }
+    }
+
+    if (state.canForcePtzCapabilities())
+    {
+        check_box_utils::setupTristateCheckbox(ui->forcedPanTiltCheckBox,
+            state.expert.forcedPtzPanTiltCapability);
+
+        check_box_utils::setupTristateCheckbox(ui->forcedZoomCheckBox,
+            state.expert.forcedPtzZoomCapability);
+    }
+
+    ::setReadOnly(ui->preferredPtzPresetTypeComboBox, state.readOnly);
+    ::setReadOnly(ui->forcedPanTiltCheckBox, state.readOnly);
+    ::setReadOnly(ui->forcedZoomCheckBox, state.readOnly);
 
     // Logical ID.
 
@@ -410,6 +450,4 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->leftWidget});
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

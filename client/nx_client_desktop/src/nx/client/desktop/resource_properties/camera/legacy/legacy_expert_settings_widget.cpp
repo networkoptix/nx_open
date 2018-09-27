@@ -75,6 +75,9 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
     setWarningStyle(ui->logicalIdWarningLabel);
+    setWarningStyle(ui->presetTypeLimitationsLabel);
+
+    ui->presetTypeLimitationsLabel->hide();
 
     ui->settingsWarningLabel->setVisible(false);
     ui->bitrateIncreaseWarningLabel->setVisible(false);
@@ -310,7 +313,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         if (canSwitchPresetTypes(camera))
         {
             ++supportBothPresetTypeCount;
-            const auto preferredPtzPresetType = camera->preferredPtzPresetType();
+            const auto preferredPtzPresetType = camera->userPreferredPtzPresetType();
 
             if (preferredPtzPresetType == nx::core::ptz::PresetType::system)
                 ++preferSystemPresetsCount;
@@ -319,7 +322,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
                 ++preferNativePresetsCount;
         }
 
-        if (camera->isUserAllowedToModifyPtzCapabilites())
+        if (camera->isUserAllowedToModifyPtzCapabilities())
             ++modifiablePtzCapabilitiesCount;
 
         const auto capabilitiesAddedByUser = camera->ptzCapabilitiesAddedByUser();
@@ -522,7 +525,7 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
             camera->setUserPreferredPtzPresetType(presetTypeByIndex(preferredPtzPresetTypeIndex));
         }
 
-        if (camera->isUserAllowedToModifyPtzCapabilites())
+        if (camera->isUserAllowedToModifyPtzCapabilities())
         {
             auto userAddedPtzCapabilities = camera->ptzCapabilitiesAddedByUser();
             if (ui->forcedPanTiltCheckBox->checkState() == Qt::Checked)

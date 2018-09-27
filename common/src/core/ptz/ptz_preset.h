@@ -32,7 +32,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PresetType);
 } // namespace core
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::core::ptz::PresetType, (lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::core::ptz::PresetType, (metatype)(lexical));
 
 struct QnPtzPreset
 {

@@ -1415,7 +1415,7 @@ void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::Pres
     setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
 }
 
-bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilites() const
+bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
 {
     return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
 }

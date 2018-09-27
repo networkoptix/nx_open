@@ -1,6 +1,7 @@
 #include "camera_settings_dialog_state_conversion_functions.h"
 #include "../redux/camera_settings_dialog_state.h"
 
+#include <core/ptz/ptz_preset.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 
@@ -9,9 +10,7 @@
 #include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 namespace {
 
@@ -168,16 +167,33 @@ void setSecondaryRecordingDisabled(bool value, const Cameras& cameras)
     }
 }
 
-void setNativePtzPresetsDisabled(bool value, const Cameras& cameras)
+void setPreferredPtzPresetType(nx::core::ptz::PresetType value, const Cameras& cameras)
 {
     for (const auto& camera: cameras)
     {
-        if (camera->canDisableNativePtzPresets())
-        {
-            // TODO: FIXME: #vkutin
-            //camera->setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-            //    value ? lit("true") : QString());
-        }
+        if (camera->canSwitchPtzPresetTypes())
+            camera->setUserPreferredPtzPresetType(value);
+    }
+}
+
+void setForcedPtzCapabilities(std::optional<bool> panTilt, std::optional<bool> zoom,
+    const Cameras& cameras)
+{
+    if (!panTilt && !zoom)
+        return;
+
+    for (const auto& camera: cameras)
+    {
+        if (!camera->isUserAllowedToModifyPtzCapabilities())
+            continue;
+
+        auto capabilities = camera->ptzCapabilitiesAddedByUser();
+        if (panTilt)
+            capabilities.setFlag(Ptz::ContinuousPanTiltCapabilities, *panTilt);
+        if (zoom)
+            capabilities.setFlag(Ptz::ContinuousZoomCapability, *zoom);
+
+        camera->setPtzCapabilitiesAddedByUser(capabilities);
     }
 }
 
@@ -404,10 +420,13 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setMotionStreamType(state.expert.motionStreamType(), cameras);
     }
 
-    if (state.devicesDescription.canDisableNativePtzPresets != State::CombinedValue::None
-        && state.expert.nativePtzPresetsDisabled.hasValue())
+    if (state.canSwitchPtzPresetTypes() && state.expert.preferredPtzPresetType.hasValue())
+        setPreferredPtzPresetType(state.expert.preferredPtzPresetType(), cameras);
+
+    if (state.canForcePtzCapabilities())
     {
-        setNativePtzPresetsDisabled(state.expert.nativePtzPresetsDisabled(), cameras);
+        setForcedPtzCapabilities(
+            state.expert.forcedPtzPanTiltCapability, state.expert.forcedPtzZoomCapability, cameras);
     }
 
     if (state.expert.rtpTransportType.hasValue())
@@ -420,6 +439,4 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
         setTrustCameraTime(state.expert.trustCameraTime(), cameras);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
