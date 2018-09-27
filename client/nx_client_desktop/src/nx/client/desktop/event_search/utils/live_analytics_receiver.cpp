@@ -12,8 +12,6 @@
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
-#include <nx/streaming/audio_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
 
 namespace nx::client::desktop {
 
@@ -65,11 +63,9 @@ void LiveAnalyticsReceiver::Private::setCamera(const QnSecurityCamResourcePtr& v
         return;
 
     m_reader.reset(new QnArchiveStreamReader(m_camera));
+    m_reader->setArchiveDelegate(new QnRtspClientArchiveDelegate(m_reader.get()));
+    m_reader->setStreamDataFilter(vms::api::StreamDataFilter::objectDetection);
     m_reader->addDataProcessor(this);
-
-    auto archiveDelegate = new QnRtspClientArchiveDelegate(m_reader.get());
-    archiveDelegate->setStreamDataFilter(vms::api::StreamDataFilter::objectDetection);
-    m_reader->setArchiveDelegate(archiveDelegate);
     m_reader->start();
 }
 
