@@ -56,7 +56,7 @@ ArecontMetaReader::ArecontMetaReader(
 
 ArecontMetaReader::~ArecontMetaReader()
 {
-    m_metaDataClient.pleaseStopSync(false);
+    m_metaDataClient.pleaseStopSync();
 }
 
 bool ArecontMetaReader::hasData()
