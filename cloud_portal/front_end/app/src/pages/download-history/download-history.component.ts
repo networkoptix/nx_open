@@ -71,7 +71,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                         .getDownloadsHistory(this.build)
                         .then(result => {
                                 this.linkbase = result.data.updatesPrefix;
-                                debugger;
                                 if (!this.build) { // only one build
 
                                     result.data.betas = [];
