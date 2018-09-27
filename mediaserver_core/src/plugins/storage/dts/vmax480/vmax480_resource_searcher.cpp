@@ -27,7 +27,7 @@ QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnMediaServerModule* se
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnUpnpResourceSearcherAsync(serverModule->commonModule(), kUpnpDeviceType),
+    QnUpnpResourceSearcherAsync(serverModule, kUpnpDeviceType),
     m_serverModule(serverModule)
 {
 }

@@ -15,7 +15,12 @@ class FileStorageTestHelper
 {
 public:
     FileStorageTestHelper();
+
     QnStorageResourcePtr createStorage(
+        const QString& url,
+        qint64 spaceLimit);
+    static QnStorageResourcePtr createStorage(
+        QnMediaServerModule* serverModule,
         const QString& url,
         qint64 spaceLimit);
 

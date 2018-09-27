@@ -382,7 +382,7 @@ bool isDefaultExpertSettings(const State& state)
         return false;
     }
 
-    if (state.expert.trustCameraTime())
+    if (state.expert.trustCameraTime.valueOr(true))
         return false;
 
     return state.expert.rtpTransportType.hasValue()

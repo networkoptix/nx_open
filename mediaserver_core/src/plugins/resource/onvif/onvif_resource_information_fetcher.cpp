@@ -227,7 +227,7 @@ void OnvifResourceInformationFetcher::findResources(
         soapWrapper.setPassword(info.defaultPassword);
     }
     else if (discoveryMode != DiscoveryMode::partiallyEnabled)
-        soapWrapper.fetchLoginPassword(info.manufacturer, info.name);
+        soapWrapper.fetchLoginPassword(serverModule()->commonModule(), info.manufacturer, info.name);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
         return; //ignoring unknown cameras
@@ -260,6 +260,7 @@ void OnvifResourceInformationFetcher::findResources(
         auth.setUser(soapWrapper.login());
         auth.setPassword(soapWrapper.password());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(
+            serverModule()->commonModule(),
             SoapTimeouts(serverModule()->settings().onvifTimeouts()), endpoint, auth, INT_MAX, &extInfo);
 
         if (m_shouldStop)
@@ -370,7 +371,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     if (!resource)
         return resource;
 
-    resource->setTypeId(getOnvifResourceType(manufacturerAlias, model));
+    auto typeId = getOnvifResourceType(manufacturerAlias, model);
+    NX_ASSERT(!typeId.isNull());
+    resource->setTypeId(typeId);
 
     resource->setHostAddress(QHostAddress(sender).toString());
     resource->setModel(model);

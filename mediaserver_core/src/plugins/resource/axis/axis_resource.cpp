@@ -1564,7 +1564,7 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
     for (const auto& query: queries)
     {
-        if (QnResource::isStopping())
+        if (commonModule()->isNeedToStop())
             break;
 
         nx::utils::Url url = lit("http://%1:%2/%3")

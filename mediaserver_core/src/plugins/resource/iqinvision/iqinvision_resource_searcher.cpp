@@ -35,7 +35,7 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule),
     m_serverModule(serverModule)
 {
 }

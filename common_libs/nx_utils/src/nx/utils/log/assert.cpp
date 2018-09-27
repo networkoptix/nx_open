@@ -45,7 +45,7 @@ void crashProgram(const log::Message& message)
     #endif
 }
 
-void assertFailure(bool isCritical, const log::Message& message)
+bool assertFailure(bool isCritical, const log::Message& message)
 {
     static const log::Tag kCrashTag(QLatin1String("CRASH"));
     static const log::Tag kAssertTag(QLatin1String("ASSERT"));
@@ -60,6 +60,8 @@ void assertFailure(bool isCritical, const log::Message& message)
 
     if (isCrashRequired)
         crashProgram(message);
+
+    return false;
 }
 
 static QtMessageHandler g_defaultQtMessageHandler = 0;

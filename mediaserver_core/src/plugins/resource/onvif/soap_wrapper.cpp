@@ -114,7 +114,9 @@ nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
     return credentials;
 }
 
-bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
+bool DeviceSoapWrapper::fetchLoginPassword(
+    QnCommonModule* commonModule,
+    const QString& manufacturer, const QString& model)
 {
     auto forcedCredentials = getForcedCredentials(manufacturer, model);
 
@@ -172,7 +174,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     calcTimeDrift();
     for (const auto& credentials: possibleCredentials)
     {
-        if (QnResource::isStopping())
+        if (commonModule->isNeedToStop())
             return false;
 
         setLogin(credentials.user);

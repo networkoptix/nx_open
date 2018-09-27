@@ -499,7 +499,7 @@ QnCameraAdvancedParamValueMap HanwhaResource::getApiParameters(const QSet<QStrin
 
         for (const auto& submenuEntry: submenuMap)
         {
-            if (QnResource::isStopping())
+            if (commonModule()->isNeedToStop())
                 return QnCameraAdvancedParamValueMap();
 
             auto submenu = submenuEntry.first;
@@ -642,7 +642,7 @@ QSet<QString> HanwhaResource::setApiParameters(const QnCameraAdvancedParamValueM
     bool success = true;
     for (const auto& request: requests)
     {
-        if (QnResource::isStopping())
+        if (commonModule()->isNeedToStop())
             return QSet<QString>();
 
         const auto requestCommon = request.first;
@@ -962,7 +962,7 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 
 CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& info)
 {
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     m_deviceType = info.deviceType;
@@ -1078,7 +1078,7 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
     if (!ini().initMedia)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isVideoSourceActive())
@@ -1192,7 +1192,7 @@ CameraDiagnostics::Result HanwhaResource::initIo()
     if (!ini().initIo)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     QnIOPortDataList ioPorts;
@@ -1302,7 +1302,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
     if (!ini().initPtz)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME, QString());
@@ -1539,7 +1539,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
     if (!ini().initAdvancedParameters)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (isNvr() && !isBypassSupported())
@@ -1588,7 +1588,7 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
     if (!ini().initTwoWayAudio)
         return CameraDiagnostics::NoErrorResult();
 
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     const auto channel = getChannel();
@@ -1615,7 +1615,7 @@ CameraDiagnostics::Result HanwhaResource::initTwoWayAudio()
 
 CameraDiagnostics::Result HanwhaResource::initRemoteArchive()
 {
-    if (QnResource::isStopping())
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (!ini().enableEdge || isNvr())
@@ -2098,7 +2098,7 @@ CameraDiagnostics::Result HanwhaResource::createProfile(
         *outProfileNumber = kHanwhaInvalidProfile;
         for (auto i = 0; i < kMaxUpdateProfileTries; ++i)
         {
-            if (QnResource::isStopping())
+            if (commonModule()->isNeedToStop())
                 return CameraDiagnostics::ServerTerminatedResult();
 
             const auto profileNumber = verifyProfile(role);

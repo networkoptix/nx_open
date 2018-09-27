@@ -9,6 +9,7 @@
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 #include <nx/network/http/custom_headers.h>
+#include <media_server/media_server_resource_searchers.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
@@ -24,20 +25,31 @@ QnDesktopCameraStreamReader::~QnDesktopCameraStreamReader()
     stop();
 }
 
+QnDesktopCameraResourceSearcher* QnDesktopCameraStreamReader::searcher() const
+{
+    auto desktopResource = m_resource.dynamicCast<QnDesktopCameraResource>();
+    if (!NX_ASSERT(desktopResource))
+        return nullptr;
+    return desktopResource->serverModule()->resourceSearchers()
+        ->searcher<QnDesktopCameraResourceSearcher>();
+}
+
 CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
     bool isCameraControlRequired, const QnLiveStreamParams& /*params*/)
 {
     closeStream();
 
-    if (!m_socket) {
-        if (!QnDesktopCameraResourceSearcher::instance())
+    if (!m_socket)
+    {
+        auto desktopCameraSearcher = searcher();
+        if (!desktopCameraSearcher)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
 
         QString userId = m_resource->getUniqueId();
-        m_socket = QnDesktopCameraResourceSearcher::instance()->acquireConnection(userId);
+        m_socket = desktopCameraSearcher->acquireConnection(userId);
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
-        quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
+        quint32 cseq = desktopCameraSearcher->incCSeq(m_socket);
         QString extraHeaders;
         if (!isCameraControlRequired)
             extraHeaders = QString(lit("%1: \r\n")).arg(QLatin1String(Qn::DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME));
@@ -51,12 +63,13 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStreamInternal(
 
 void QnDesktopCameraStreamReader::closeStream()
 {
-    if (m_socket && QnDesktopCameraResourceSearcher::instance())
+    auto desktopCameraSearcher = searcher();
+    if (m_socket && desktopCameraSearcher)
     {
-        quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
+        quint32 cseq = desktopCameraSearcher->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);
         m_socket->send(request.toLatin1());
-        QnDesktopCameraResourceSearcher::instance()->releaseConnection(m_socket);
+        desktopCameraSearcher->releaseConnection(m_socket);
     }
     m_socket.clear();
 }
@@ -107,7 +120,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         return QnAbstractMediaDataPtr(0);
 
     QnAbstractMediaDataPtr result;
-
+    auto desktopCameraSearcher = searcher();
     int bufferSize = 0;
     while (!m_needStop && m_socket->isConnected() && !result)
     {
@@ -154,7 +167,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         if (bufferSize == packetSize)
         {
             bool gotData;
-            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, QnRtspStatistic(), gotData);
+            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, gotData);
             result = m_parsers[streamIndex].nextData();
             if (result)
                 result->channelNumber = streamIndex;
@@ -164,9 +177,9 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         if (!m_needStop
             && m_socket->isConnected()
             && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL
-            && QnDesktopCameraResourceSearcher::instance())
+            && desktopCameraSearcher)
         {
-            quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
+            quint32 cseq = desktopCameraSearcher->incCSeq(m_socket);
             QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
             if (m_socket->send(request.toLatin1()) < request.size())
             {

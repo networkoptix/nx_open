@@ -13,7 +13,6 @@
 class QnMediaServerModule;
 
 class QnDesktopCameraResourceSearcher:
-    public Singleton<QnDesktopCameraResourceSearcher>,
     public QnAbstractNetworkResourceSearcher,
     public nx::mediaserver::ServerModuleAware
 {

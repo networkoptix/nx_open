@@ -34,7 +34,6 @@ bool OnvifHeaderExtension::read(const uint8_t* data, int size)
         const uint64_t msec =
             uint64_t(fractions) * std::micro::den / std::numeric_limits<uint32_t>::max();
         ntp = std::chrono::seconds(seconds) + std::chrono::microseconds(msec) - kNtpEpochTimeDiff;
-
     }
     catch(const BitStreamException&)
     {

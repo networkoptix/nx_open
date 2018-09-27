@@ -28,7 +28,7 @@
 #include <onvif/soapEventBindingProxy.h>
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
-
+class QnCommonModule;
 // Instead of including onvif/soapStub.h we use forward declaration of needed classes.
 //#include <onvif/soapStub.h>
 
@@ -540,7 +540,7 @@ public:
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
-    bool fetchLoginPassword(const QString& manufacturer, const QString& model);
+    bool fetchLoginPassword(QnCommonModule* commonModule, const QString& manufacturer, const QString& model);
 
     int getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response );
     int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );

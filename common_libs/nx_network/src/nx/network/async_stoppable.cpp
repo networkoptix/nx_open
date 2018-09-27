@@ -19,11 +19,8 @@ void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
 
 void QnStoppableAsync::pleaseStopSync(
     const nx::network::aio::AIOService* aioService,
-    bool checkForLocks)
+    bool /*checkForLocks*/)
 {
-    if (checkForLocks)
-        nx::utils::MutexLockAnalyzer::instance()->expectNoLocks();
-
     if (aioService)
     {
         NX_CRITICAL(!aioService->isInAnyAioThread());

@@ -366,7 +366,7 @@ bool QnFileStorageResource::checkDBCap() const
 
     // Same for mounted by hand remote storages (NAS)
     QList<QnPlatformMonitor::PartitionSpace> partitions =
-        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+        m_serverModule->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
     bool dbReady = true;
@@ -898,7 +898,7 @@ bool QnFileStorageResource::isLocal()
             || storageTypeString == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
     }
 
-    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(m_serverModule->platform()->monitor());
     auto partitions = platformMonitor->totalPartitionSpaceInfo(QnPlatformMonitor::NetworkPartition);
 
     for (const auto &partition : partitions)

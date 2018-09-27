@@ -293,6 +293,7 @@ public:
     /** In the future we may want to distinguish lite client layout from the others. */
     static void markLayoutLiteClient(const QnLayoutResourcePtr& layout);
 
+    QThreadPool* threadPool() const;
 signals:
     void resourceAdded(const QnResourcePtr& resource);
     void resourceRemoved(const QnResourcePtr& resource);
@@ -319,4 +320,5 @@ private:
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnMediaServerResourcePtr> m_incompatibleServers;
     mutable QnUserResourcePtr m_adminResource;
+    std::unique_ptr<QThreadPool> m_threadPool;
 };

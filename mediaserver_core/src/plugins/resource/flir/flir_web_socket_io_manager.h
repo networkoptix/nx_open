@@ -100,7 +100,8 @@ private:
     void connectNotificationWebSocketUnsafe();
 
     QString buildNotificationSubscriptionPath() const; 
-    
+    void createWebSocketProxy();
+
     void handleServerWhoAmIResponseUnsafe(const nexus::CommandResponse& response);
     void handleRemoteControlRequestResponseUnsafe(const nexus::CommandResponse& response);
     void handleRemoteControlReleaseResponseUnsafe(const nexus::CommandResponse& response);

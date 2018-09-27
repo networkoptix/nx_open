@@ -173,6 +173,9 @@ public:
         return m_eventRuleManager;
     }
 
+    void setNeedToStop(bool value) { m_needToStop = value; }
+    bool isNeedToStop() const { return m_needToStop; }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -337,4 +340,5 @@ private:
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
+    std::atomic<bool> m_needToStop{false};
 };

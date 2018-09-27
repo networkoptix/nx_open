@@ -23,9 +23,15 @@ QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
     connect(&m_checkStatusTimer, &QTimer::timeout, this, &QnResourceStatusWatcher::at_timer);
 }
 
-QnResourceStatusWatcher::~QnResourceStatusWatcher()
+void QnResourceStatusWatcher::stop()
 {
     m_checkStatusTimer.stop();
+    commonModule()->resourcePool()->disconnect(this);
+}
+
+QnResourceStatusWatcher::~QnResourceStatusWatcher()
+{
+    stop();
 }
 
 void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)

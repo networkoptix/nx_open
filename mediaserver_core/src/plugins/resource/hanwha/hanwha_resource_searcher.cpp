@@ -39,7 +39,7 @@ namespace plugins {
 HanwhaResourceSearcher::HanwhaResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    nx::network::upnp::SearchAutoHandler(kUpnpBasicDeviceType),
+    nx::network::upnp::SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
     mediaserver::ServerModuleAware(serverModule),
     m_sunapiProbePackets(createProbePackets())
 {

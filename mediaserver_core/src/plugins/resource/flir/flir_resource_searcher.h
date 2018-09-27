@@ -5,6 +5,7 @@
 #include "../mdns/mdns_resource_searcher.h"
 #include "flir_eip_data.h"
 #include "simple_eip_client.h"
+#include "flir_io_executor.h"
 
 class QnMediaServerModule;
 
@@ -28,7 +29,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
     virtual QString manufacture() const override;
-
+    nx::plugins::flir::IoExecutor* ioExecutor() const;
 protected:
     virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,
@@ -50,6 +51,7 @@ private:
     QString getFirmwareFromDevice(SimpleEIPClient& eipClient) const;
 private:
     QnMediaServerModule* m_serverModule = nullptr;
+    std::unique_ptr<nx::plugins::flir::IoExecutor> m_flirIoExecutor;
 };
 
 #endif // #ifdef ENABLE_FLIR

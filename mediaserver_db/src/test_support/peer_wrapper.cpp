@@ -131,12 +131,20 @@ bool PeerWrapper::detachFromSystem()
     return mserverClient->detachFromSystem(data).error == QnRestResult::Error::NoError;
 }
 
-QnRestResult::Error PeerWrapper::mergeTo(const PeerWrapper& remotePeer)
+QnRestResult::Error PeerWrapper::mergeTo(
+    const PeerWrapper& remotePeer,
+    std::vector<MergeAttributes::Attribute> attributes)
 {
     MergeSystemData mergeSystemData;
     mergeSystemData.takeRemoteSettings = true;
     mergeSystemData.mergeOneServer = false;
     mergeSystemData.ignoreIncompatible = false;
+
+    for (const auto& attribute: attributes)
+    {
+        if (attribute.name == MergeAttributes::AttributeName::takeRemoteSettings)
+            mergeSystemData.takeRemoteSettings = attribute.value.toBool();
+    }
 
     AuthKey authKey;
     authKey.username = m_ownerCredentials.username.toUtf8();

@@ -95,7 +95,7 @@ public:
         nx::vms::discovery::ModuleEndpoint endpoint2;
         endpoint2.id = server2->moduleInstance()->commonModule()->moduleGUID();
         endpoint2.endpoint = server2->moduleInstance()->endpoint();
-        QnServerConnector::instance()->addConnection(endpoint2);
+        mediaServerLauncher->serverModule()->serverConnector()->addConnection(endpoint2);
 
         vms::api::UserDataList users2;
         nx::utils::ElapsedTimer timer;

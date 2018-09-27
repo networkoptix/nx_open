@@ -18,6 +18,7 @@
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtp/camera_time_helper.h>
 
 namespace RtpTransport {
 
@@ -127,7 +128,6 @@ private:
     };
 
     void updateTimePolicy();
-
     QnRtpStreamParser* createParser(const QString& codecName);
     bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
     void clearKeyData(int channelNum);
@@ -141,7 +141,7 @@ private:
 
     void calcStreamUrl();
 
-    QnRtspStatistic rtspStatistics(
+    void updateRtcpStatistics(
         int rtpBufferOffset,
         int rtpPacketSize,
         int track,
@@ -160,7 +160,7 @@ private:
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
-    nx::streaming::rtp::TimeHelper m_timeHelper;
+    nx::streaming::rtp::CameraTimeHelper m_timeHelper;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
@@ -181,7 +181,6 @@ private:
     std::atomic<qint64> m_positionUsec{AV_NOPTS_VALUE};
     OnSocketReadTimeoutCallback m_onSocketReadTimeoutCallback;
     std::chrono::milliseconds m_callbackTimeout{0};
-    nx::streaming::rtp::TimePolicy m_defaultTimePolicy {nx::streaming::rtp::TimePolicy::bindCameraTimeToLocalTime};
     CameraDiagnostics::Result m_openStreamResult;
 };
 

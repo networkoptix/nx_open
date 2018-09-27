@@ -355,7 +355,7 @@ bool QnRecordingManager::startOrStopRecording(
 
 void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
-    if (QnResource::isStopping())
+    if (serverModule()->commonModule()->isNeedToStop())
         return;
 
     if (!cameraRes)
@@ -431,7 +431,7 @@ void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &re
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
 {
     QnMutexLocker lock(&m_resourceConnectionMutex);
-    if (QnResource::isStopping())
+    if (serverModule()->commonModule()->isNeedToStop())
         return;
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);

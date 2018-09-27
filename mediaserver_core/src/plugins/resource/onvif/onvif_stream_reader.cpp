@@ -396,7 +396,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params) const
 {
-    if (QnResource::isStopping())
+    if (m_onvifRes->commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     if (!isCameraControlRequired || m_mustNotConfigureResource)
@@ -521,7 +521,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     bool isPrimary,
     bool isCameraControlRequired) const
 {
-    if (QnResource::isStopping())
+    if (m_onvifRes->commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
@@ -853,7 +853,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
 CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
     CameraInfoParams* outInfo, bool isPrimary, bool isCameraControlRequired) const
 {
-    if (QnResource::isStopping())
+    if (m_onvifRes->commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     Media::AudioEncoderConfigurations aeConfigurations(m_onvifRes);

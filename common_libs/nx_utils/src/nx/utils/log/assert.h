@@ -25,13 +25,15 @@ namespace nx::utils {
 
 void NX_UTILS_API setOnAssertHandler(std::function<void(const log::Message&)> handler);
 void NX_UTILS_API crashProgram(const log::Message& message);
-void NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
+/** Always returns false. */
+bool NX_UTILS_API assertFailure(bool isCritical, const log::Message& message);
 
 void NX_UTILS_API enableQtMessageAsserts();
 void NX_UTILS_API disableQtMessageAsserts();
 
+/** Always returns false. */
 template<typename Reason>
-void assertFailure(
+bool assertFailure(
     bool isCritical, const char* file, int line, const char* condition, const Reason& message)
 {
     // NOTE: If message is empty, an extra space will appear before newline, which is hard to avoid.
@@ -43,7 +45,7 @@ void assertFailure(
             .arg(file).arg(line).arg(condition).arg(message);
     #endif
 
-    assertFailure(isCritical, out);
+    return assertFailure(isCritical, out);
 }
 
 class NX_UTILS_API AssertTimer
@@ -81,29 +83,25 @@ private:
 } // namespace nx::utils
 
 #if defined(NX_CHECK_MEASURE_TIME)
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) \
-        [&]() \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
+        [begin = std::chrono::steady_clock::now(), \
+            result = (CONDITION) || ::nx::utils::assertFailure( \
+                IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
-            auto begin = std::chrono::steady_clock::now(); \
-            bool isOk = static_cast<bool>(condition); \
-            auto time = std::chrono::steady_clock::now() - begin; \
-            \
+            const auto time = std::chrono::steady_clock::now() - begin; \
             static const auto info = nx::utils::AssertTimer::instance.info(__FILE__, __LINE__); \
             info->add(std::chrono::duration_cast<std::chrono::microseconds>(time)); \
-            \
-            if (!isOk) \
-                ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
-            return isOk;
-        }()
+            return result; \
+        }() \
+    )
 #else
-    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) \
-        [&]() \
+    #define NX_CHECK(IS_CRITICAL, CONDITION, MESSAGE) ( \
+        [result = (CONDITION) || ::nx::utils::assertFailure( \
+            IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE)]() \
         { \
-            if (CONDITION) \
-                return true; \
-            ::nx::utils::assertFailure(IS_CRITICAL, __FILE__, __LINE__, #CONDITION, MESSAGE); \
-            return false; \
-        }()
+            return result; \
+        }() \
+    )
 #endif
 
 /**

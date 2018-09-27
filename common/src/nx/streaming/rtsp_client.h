@@ -56,7 +56,6 @@ public:
             && !ntpOnvifExtensionTime.is_initialized();
     }
     nx::streaming::rtp::RtcpSenderReport senderReport;
-    double localTime = 0;
     boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
 };
 

@@ -5,12 +5,14 @@
 #include <nx/network/nettools.h>
 
 #include "mdns_listener.h"
+#include <media_server/media_server_module.h>
 
-QnMdnsResourceSearcher::QnMdnsResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnMdnsResourceSearcher::QnMdnsResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    m_serverModule(serverModule)
 {
-    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
+    serverModule->mdnsListener()->registerConsumer((std::uintptr_t) this);
 }
 
 QnMdnsResourceSearcher::~QnMdnsResourceSearcher()
@@ -27,7 +29,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    auto consumerData = QnMdnsListener::instance()->getData((std::uintptr_t) this);
+    auto consumerData = m_serverModule->mdnsListener()->getData((std::uintptr_t) this);
     consumerData->forEachEntry(
         [this, &result](
             const QString& remoteAddress,

@@ -89,8 +89,8 @@
     - {'codec': 'H264', 'resolution': '512x224', 'fps': [25, 35]}
     - {'codec': 'H265', 'resolution': '1024x452', 'fps': [17, 23]}
 
-  audio_parameters:
-    - {'codec': 'AAC'}  # The camera has audio_parameters input, but ffprobe does not
+#  audio_parameters:
+#    - {'codec': 'AAC'}  # The camera has audio_parameters input, but ffprobe does not
     #- {'codec': 'G711'} # detect any sound. Need to connect a mic???
     #- {'codec': 'G726'}
 
@@ -128,7 +128,7 @@
     - {'codec': 'MJPEG', 'resolution': '720x576', 'fps': [25, 35]}
 
   audio_parameters:
-    - {'codec': 'G711'} # MP2
+    - {'skip_codec_change': True, 'codec': 'MP2'} # When setting G711, camera gives MP2.
     #- {'codec': 'G726'} # codec is 'G711', expected 'G726' - server bug?
 
   io_events:
@@ -191,7 +191,7 @@
     firmware: 65225
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]} #primary.fps 9000!
     secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
   audio_parameters:
@@ -212,6 +212,7 @@
     isAudioSupported: 0
 
   recording:
+    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [12, 18]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
@@ -241,6 +242,7 @@
     ptzCapabilities: 8405004
 
   recording:
+    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [10, 30]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [2, 10]}
 
@@ -278,6 +280,7 @@
     ptzCapabilities: 8405004
 
   recording:
+    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [12, 18]}
     secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
@@ -290,7 +293,7 @@
       - {'codec': 'H264', 'resolution': '704x528', 'fps': [17, 23]}
 
   audio_parameters:
-    # Didn't find any data on supported audio_parameters codecs. This needs checking.
+    # "'0.skip_codec_change' is None, expected True". Looks up for skip_codec... setting on a cam!
     - {'skip_codec_change': True, 'codec': 'MP2'}
 
   io_events:
@@ -307,6 +310,7 @@
     password: auto
 
   recording:
+    #"FFprobe returned no valid stream info" in >10 mins. This cam is unpredictable.
     primary: {'codec': 'MJPEG', 'resolution': '352x240', 'fps': [0.1, 30]}
 
 
@@ -324,7 +328,7 @@
     isAudioSupported: 1
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [12, 18]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [40, 60]}
     secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [10, 20]}
 
   video_parameters:
@@ -337,6 +341,7 @@
 
   audio_parameters:
   # Also has G722 and MP2L2 in spec. But no advanced setting to switch to those.
+  # "Audio stream was not discovered by ffprobe."
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -383,6 +388,7 @@ AC-CC-8E-48-FC-DA:
     isAudioSupported: 0
 
   recording:
+    # "'primary.fps' is 90000, expected to be in [25, 35]"!
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [25, 35]}
     secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
@@ -401,6 +407,7 @@ AC-CC-8E-95-33-57:
     model: AXISM3046V
 
   authorization:
+    #"'camera.status' is u'Unauthorized', expected 'Online'"
     password: auto
 
   attributes:
@@ -463,7 +470,7 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [55, 60]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [20, 30]}
     secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
 
@@ -482,7 +489,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
 
   recording:
     fps: 25
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [20, 35]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [10, 20]}
 
   video_parameters:
     primary:
@@ -523,6 +530,7 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
       - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
 
   audio_parameters: # Didn't find any data on supported audio_parameters codecs. This needs checking
+    #"Audio stream was not discovered by ffprobe."
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -585,6 +593,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
 
   # No normal specs, fps/res may require adjusting
   video_parameters:
+    #"Video stream was not discovered by ffprobe."
     primary:
       - {'codec': 'H264', 'resolution': '2560x1440'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
@@ -594,6 +603,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
 
   audio_parameters:
   # Didn't find any data on supported audio_parameters codecs. This needs checking.
+    #"Audio stream was not discovered by ffprobe."
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:

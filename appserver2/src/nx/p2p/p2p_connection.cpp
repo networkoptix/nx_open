@@ -18,7 +18,8 @@ Connection::Connection(QnCommonModule* commonModule,
     const vms::api::PeerDataEx& localPeer,
     const utils::Url &remotePeerUrl,
     std::unique_ptr<QObject> opaqueObject,
-    ConnectionLockGuard connectionLockGuard)
+    ConnectionLockGuard connectionLockGuard,
+    ValidateRemotePeerFunc validateRemotePeerFunc)
     :
     ConnectionBase(
         remoteId,
@@ -27,7 +28,8 @@ Connection::Connection(QnCommonModule* commonModule,
         commonModule->globalSettings()->aliveUpdateInterval(),
         std::move(opaqueObject),
         std::make_unique<ConnectionLockGuard>(std::move(connectionLockGuard))),
-    QnCommonModuleAware(commonModule)
+    QnCommonModuleAware(commonModule),
+    m_validateRemotePeerFunc(std::move(validateRemotePeerFunc))
 {
     nx::network::http::HttpHeaders headers;
     headers.emplace(Qn::EC2_PEER_DATA, QnUbjson::serialized(localPeer).toBase64());
@@ -129,24 +131,7 @@ void Connection::fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool a
 
 bool Connection::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer) const
 {
-    if (!localPeer().isServer())
-        return true;
-    return !checkAndSetSystemIdentityTime(remotePeer, commonModule());
-}
-
-bool Connection::checkAndSetSystemIdentityTime(
-    const vms::api::PeerDataEx& remotePeer, QnCommonModule* commonModule)
-{
-    if (remotePeer.identityTime > commonModule->systemIdentityTime())
-    {
-        // Switch to the new systemIdentityTime. It allows to push restored from backup database data.
-        NX_INFO(typeid(Connection), lm("Remote peer %1 has database restore time greater then "
-            "current peer. Restarting and resync database with remote peer")
-            .arg(remotePeer.id.toString()));
-        commonModule->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
-        return true;
-    }
-    return false;
+    return m_validateRemotePeerFunc ? m_validateRemotePeerFunc(remotePeer) : true;
 }
 
 } // namespace p2p

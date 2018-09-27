@@ -18,6 +18,7 @@
 namespace {
     static const std::chrono::seconds kMaxTestTime(500);
     static const QString kTestCamPhysicalId("testCam15");
+    static const int kSteps = 1000;
 }
 
 namespace nx {
@@ -41,7 +42,11 @@ protected:
         bool ok = false;
         QnIOStateDataList receivedDataList = QJson::deserialized<QnIOStateDataList>(data, QnIOStateDataList(), &ok);
         if (!ok)
+        {
+            QnMutexLocker lock(&m_mutex);
+            NX_WARNING(this, "QnIOStateDataList deserialization error at step %1", kSteps - m_data.size());
             return false;
+        }
 
         for (const auto& receivedData: receivedDataList)
         {
@@ -52,9 +57,13 @@ protected:
             {
                 expectData = m_data.front();
                 m_data.erase(m_data.begin());
+                NX_DEBUG(this, "Got data %1, %2 records left", expectData.timestamp, m_data.size());
             }
             if (expectData != receivedData)
+            {
+                NX_WARNING(this, "QnIOStateDataList is not match to expected data at step %1", kSteps - m_data.size());
                 return false;
+            }
         }
 
         return true;
@@ -73,7 +82,7 @@ static QnIOStateDataList genTestData()
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> stateGen(0, 1);
 
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < kSteps; ++i)
     {
         QnIOStateData data(
             lit("A%1").arg(i), //< port
@@ -151,8 +160,9 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        [&allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
+        [contentParser, &allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
         {
+            contentParser->flush();
             allDataProcessed.set_value();
         });
 
@@ -179,7 +189,6 @@ TEST(IoServerMonitorTest, main)
     ASSERT_EQ(
         std::future_status::ready,
         allDataProcessed.get_future().wait_for(kMaxTestTime));
-
 
     ASSERT_TRUE(ioParser->isEof());
 }
