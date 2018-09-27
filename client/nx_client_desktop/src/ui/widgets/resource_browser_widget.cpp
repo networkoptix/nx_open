@@ -366,7 +366,6 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     // Initializes new filter edit
 
-    filterEdit->setPlaceholderText(tr("Cameras & Resources"));
     filterEdit->setClearingTagIndex(0);
 
     connect(filterEdit, &SearchEdit::textChanged,
@@ -417,6 +416,10 @@ void QnResourceBrowserWidget::updateSearchMode()
     const auto tags = localResourcesMode ? QStringList() : filterTags();
     filterEdit->setTags(tags);
     filterEdit->setText(QString());
+    filterEdit->setPlaceholderText(localResourcesMode
+        ? tr("Local files")
+        : tr("Cameras & Resources"));
+
     updateNewFilter();
 }
 
