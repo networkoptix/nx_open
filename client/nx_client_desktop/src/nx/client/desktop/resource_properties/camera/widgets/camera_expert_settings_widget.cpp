@@ -217,8 +217,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     check_box_utils::setupTristateCheckbox(ui->bitratePerGopCheckBox, state.expert.useBitratePerGOP);
 
     // TODO: #vkutin #gdm Should we disable it too when camera control is disabled?
-    ui->bitratePerGopCheckBox->setEnabled(state.settingsOptimizationEnabled
-        && state.devicesDescription.hasPredefinedBitratePerGOP == CombinedValue::None);
+    ui->bitratePerGopCheckBox->setEnabled(state.settingsOptimizationEnabled);
 
     ui->bitrateIncreaseWarningLabel->setVisible(ui->bitratePerGopCheckBox->isEnabled()
         && ui->bitratePerGopCheckBox->isChecked());

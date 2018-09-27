@@ -329,8 +329,8 @@ bool QnLiveStreamProvider::isMaxFps() const
 bool QnLiveStreamProvider::needHardwareMotion()
 {
     return getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MT_MotionWindow);
+        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
 }
 
 bool QnLiveStreamProvider::needMetadata()

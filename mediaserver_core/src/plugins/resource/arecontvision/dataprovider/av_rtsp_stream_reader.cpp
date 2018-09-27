@@ -127,10 +127,10 @@ void QnArecontRtspStreamReader::pleaseReopenStream()
 }
 
 // Override needMetaData due to we have async method of meta data obtaining in hardware case
-bool QnArecontRtspStreamReader::needMetaData()
+bool QnArecontRtspStreamReader::needMetadata()
 {
     if (!parent_type::needHardwareMotion())
-        return parent_type::needMetaData();
+        return parent_type::needMetadata();
 
     if (m_metaReader->hasData())
         return true;

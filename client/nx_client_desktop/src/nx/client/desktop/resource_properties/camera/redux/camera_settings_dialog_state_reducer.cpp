@@ -130,7 +130,7 @@ float calculateBitrateForQualityMbps(const State& state, Qn::StreamQuality quali
             state.recording.defaultStreamResolution,
             state.recording.brush.fps,
             state.recording.mediaStreamCapability,
-            state.recording.bitratePerGopType));
+            state.recording.useBitratePerGop));
 }
 
 Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitrateMbps)
@@ -349,8 +349,7 @@ bool isDefaultExpertSettings(const State& state)
     {
         if ((state.devicesDescription.isArecontCamera == State::CombinedValue::None
                 && state.expert.cameraControlDisabled.valueOr(true))
-            || (state.devicesDescription.hasPredefinedBitratePerGOP == State::CombinedValue::None
-                && state.expert.useBitratePerGOP.valueOr(true))
+            || state.expert.useBitratePerGOP.valueOr(true)
             || state.expert.dualStreamingDisabled.valueOr(true))
         {
             return false;
@@ -504,12 +503,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
             return cameraType && cameraType->getManufacture() == lit("ArecontVision");
         });
 
-    state.devicesDescription.hasPredefinedBitratePerGOP = combinedValue(cameras,
-        [](const Camera& camera)
-        {
-            return camera->bitratePerGopType() == Qn::BPG_Predefined;
-        });
-
     state.devicesDescription.hasPtzPresets = combinedValue(cameras,
         [](const Camera& camera)
         {
@@ -558,7 +551,6 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state = loadNetworkInfo(std::move(state), firstCamera);
 
-        state.recording.bitratePerGopType = firstCamera->bitratePerGopType();
         state.recording.defaultStreamResolution = firstCamera->streamInfo().getResolution();
         state.recording.mediaStreamCapability = firstCamera->cameraMediaCapability().
             streamCapabilities.value(Qn::StreamIndex::primary);
@@ -659,9 +651,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     fetchFromCameras<bool>(state.expert.cameraControlDisabled, cameras,
         [](const Camera& camera) { return camera->isCameraControlDisabled(); });
 
-    fetchFromCameras<bool, Qn::BitratePerGopType>(state.expert.useBitratePerGOP, cameras,
-        [](const Camera& camera) { return camera->bitratePerGopType(); },
-        [](Qn::BitratePerGopType bpg) { return bpg != Qn::BPG_None; });
+    fetchFromCameras<bool>(state.expert.useBitratePerGOP, cameras,
+        [](const Camera& camera) { return camera->useBitratePerGop(); });
 
     fetchFromCameras<bool>(state.expert.primaryRecordingDisabled, cameras,
         [](const Camera& camera)
@@ -708,8 +699,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
         fetchFromCameras<bool>(state.expert.nativePtzPresetsDisabled, cameras,
             [](const Camera& camera)
             {
-                return camera->canDisableNativePtzPresets()
-                    & !camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
+                // TODO: FIXME: #vkutin Adjust for new PTZ
+                return false; // camera->canDisableNativePtzPresets()
+                    //& !camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
             });
     }
 
@@ -1111,10 +1103,7 @@ State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bo
 
 State CameraSettingsDialogStateReducer::setUseBitratePerGOP(State state, bool value)
 {
-    const bool hasPredefinedBitratePerGOP =
-        state.devicesDescription.hasPredefinedBitratePerGOP != State::CombinedValue::None;
-
-    if (hasPredefinedBitratePerGOP || !state.settingsOptimizationEnabled)
+    if (!state.settingsOptimizationEnabled)
         return state;
 
     state.expert.useBitratePerGOP.setUser(value);

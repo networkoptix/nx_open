@@ -91,7 +91,7 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
     if (m_channelCount > 1)
         path += QString::number(m_currentChannel + 1);
     auto auth = resource->getAuth();
-    QUrl url = nx::network::url::Builder()
+    auto url = nx::network::url::Builder()
         .setScheme("http")
         .setHost(resource->getHostAddress())
         .setPort(80)
@@ -108,7 +108,7 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
     };
     m_metaDataClientBusy = true;
     m_metaDataClient.doGet(url,
-        [this, info]()
+        [this, info](nx::network::http::AsyncHttpClientPtr)
         {
             onMetaData(info);
             if (m_channelCount > 1)
@@ -120,7 +120,7 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
 
 void ArecontMetaReader::onMetaData(const ParsingInfo& info)
 {
-    if (m_metaDataClient.state() == nx_http::AsyncClient::sFailed)
+    if (m_metaDataClient.state() == nx::network::http::AsyncClient::State::sFailed)
     {
         NX_WARNING(this, lm("Failed to get motion meta data, error: %1").arg(
             SystemError::toString(m_metaDataClient.lastSysErrorCode())));
@@ -134,7 +134,7 @@ void ArecontMetaReader::onMetaData(const ParsingInfo& info)
     }
 
     const int statusCode = m_metaDataClient.response()->statusLine.statusCode;
-    if (statusCode != nx_http::StatusCode::ok)
+    if (statusCode != nx::network::http::StatusCode::ok)
     {
         NX_WARNING(this, lm("Failed to get motion meta data. Http error code %1")
             .arg(statusCode));

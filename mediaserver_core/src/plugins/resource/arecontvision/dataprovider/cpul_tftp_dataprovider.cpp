@@ -75,10 +75,10 @@ CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamCon
 }
 
 // Override needMetaData due to we have async method of meta data obtaining in hardware case
-bool AVClientPullSSTFTPStreamreader::needMetaData()
+bool AVClientPullSSTFTPStreamreader::needMetadata()
 {
     if (!QnPlAVClinetPullStreamReader::needHardwareMotion())
-        return QnPlAVClinetPullStreamReader::needMetaData();
+        return QnPlAVClinetPullStreamReader::needMetadata();
 
     if (m_metaReader->hasData())
         return true;

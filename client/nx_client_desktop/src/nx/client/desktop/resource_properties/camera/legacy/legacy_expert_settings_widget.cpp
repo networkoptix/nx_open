@@ -432,12 +432,12 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     ui->forcedPanTiltCheckBox->setEnabled(canModifyPtzCapabilities);
     ui->forcedZoomCheckBox->setEnabled(canModifyPtzCapabilities);
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->forcedPanTiltCheckBox,
         cameras.size() == addedPanTiltCount || addedPanTiltCount == 0,
         cameras.size() == addedPanTiltCount);
 
-    CheckboxUtils::setupTristateCheckbox(
+    check_box_utils::setupTristateCheckbox(
         ui->forcedZoomCheckBox,
         cameras.size() == addedZoomCount || addedZoomCount == 0,
         cameras.size() == addedZoomCount);

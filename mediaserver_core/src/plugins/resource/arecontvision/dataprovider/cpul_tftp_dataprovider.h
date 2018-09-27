@@ -30,7 +30,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();
-    virtual bool needMetaData() override;
+    virtual bool needMetadata() override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 protected:

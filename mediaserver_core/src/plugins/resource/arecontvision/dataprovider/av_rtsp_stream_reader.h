@@ -39,7 +39,7 @@ protected:
     virtual void beforeRun() override;
 
 private:
-    virtual bool needMetaData() override;
+    virtual bool needMetadata() override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 private:

@@ -171,7 +171,6 @@ struct CameraSettingsDialogState
         CombinedValue hasMotion;
         CombinedValue hasDualStreamingCapability;
         CombinedValue hasRemoteArchiveCapability;
-        CombinedValue hasPredefinedBitratePerGOP;
         CombinedValue hasPtzPresets;
         CombinedValue canDisableNativePtzPresets;
         CombinedValue supportsMotionStreamOverride;
@@ -222,7 +221,7 @@ struct CameraSettingsDialogState
         ScheduleCellParams brush;
 
         media::CameraStreamCapability mediaStreamCapability;
-        Qn::BitratePerGopType bitratePerGopType = Qn::BPG_None;
+        bool useBitratePerGop = false;
         QSize defaultStreamResolution;
 
         /** Some cameras do not allow to setup parameters (fps, quality). */

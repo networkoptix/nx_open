@@ -33,7 +33,7 @@ private:
         int channel, const QString& response, const ParsingInfo& info);
 
 private:
-    nx_http::AsyncClient m_metaDataClient;
+    nx::network::http::AsyncHttpClient m_metaDataClient;
     QnMutex m_metaDataMutex;
     std::atomic<bool> m_metaDataClientBusy = false;
     const int m_channelCount = 0;

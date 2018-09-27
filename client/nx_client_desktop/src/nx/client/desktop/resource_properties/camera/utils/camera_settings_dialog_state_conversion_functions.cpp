@@ -146,11 +146,9 @@ void setUseBitratePerGOP(bool value, const Cameras& cameras)
 {
     const auto valueStr = boolToPropertyStr(value);
     for (const auto& camera: cameras)
-    {
-        if (camera->bitratePerGopType() != Qn::BPG_Predefined)
-            camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, valueStr);
-    }
+        camera->setProperty(Qn::FORCE_BITRATE_PER_GOP, valueStr);
 }
+
 
 void setPrimaryRecordingDisabled(bool value, const Cameras& cameras)
 {
@@ -176,8 +174,9 @@ void setNativePtzPresetsDisabled(bool value, const Cameras& cameras)
     {
         if (camera->canDisableNativePtzPresets())
         {
-            camera->setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-                value ? lit("true") : QString());
+            // TODO: FIXME: #vkutin
+            //camera->setProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
+            //    value ? lit("true") : QString());
         }
     }
 }
@@ -381,7 +380,6 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             setDualStreamingDisabled(state.expert.dualStreamingDisabled(), cameras);
 
         if (state.expert.useBitratePerGOP.hasValue()
-            && state.devicesDescription.hasPredefinedBitratePerGOP == State::CombinedValue::None
             && !state.expert.cameraControlDisabled.valueOr(false))
         {
             setUseBitratePerGOP(state.expert.useBitratePerGOP(), cameras);
