@@ -96,7 +96,7 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
     bool m_isBackup;
-    Qn::StorageStatuses m_status = Qn::StorageStatus::unknown;
+    Qn::StorageStatuses m_status = Qn::StorageStatus::none;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

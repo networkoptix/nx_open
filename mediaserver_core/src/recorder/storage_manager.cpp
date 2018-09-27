@@ -2315,7 +2315,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
-            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::systemTooSmall);
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2331,7 +2331,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                     .args((*it)->getUrl()));
 
             result.remove(*it);
-            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::systemTooSmall);
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
         }
     }
 
@@ -3033,7 +3033,7 @@ Qn::StorageStatuses QnStorageManager::storageStatus(
 {
     Qn::StorageStatuses result =
         serverModule->normalStorageManager()->storageStatusInternal(storage);
-    if (result.testFlag(Qn::notUsed))
+    if (result.testFlag(Qn::none))
         result = serverModule->backupStorageManager()->storageStatusInternal(storage);
 
     return result;
@@ -3051,13 +3051,19 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
     }
 
     Qn::StorageStatuses result;
+    if (storage->getStorageType() == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition))
+        result |= Qn::StorageStatus::removable;
+
+    if (storage->isSystem())
+        result |= Qn::StorageStatus::system;
+
     if (!allStorages.contains(storage))
     {
-        result = Qn::StorageStatus::notUsed;
+        result = Qn::StorageStatus::none;
         return result;
     }
 
-    result = Qn::StorageStatus::used;
+    result |= Qn::StorageStatus::used;
     if (storage->getStatus() == Qn::Offline)
         return result | Qn::StorageStatus::beingChecked;
 

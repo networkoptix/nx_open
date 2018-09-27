@@ -719,14 +719,13 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
     enum StorageStatus
     {
-        unknown = 0,
+        none = 0,
         used = 1 << 1,
-        notUsed = 1 << 2,
-        tooSmall = 1 << 3,
-        systemTooSmall = 1 << 4,
-        removable = 1 << 5,
-        beingChecked = 1 << 6,
-        beingRebuilded = 1 << 7
+        tooSmall = 1 << 2,
+        system = 1 << 3,
+        removable = 1 << 4,
+        beingChecked = 1 << 5,
+        beingRebuilded = 1 << 6
     };
     Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
     Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
