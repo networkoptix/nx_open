@@ -614,7 +614,8 @@
                 "Dahua|DHI-HCVR7108H*",
                 "Siqura|EVE FOUR",
                 "Hikvision|DS-6708*",
-                "HIKVISION|DS-6708*"
+                "HIKVISION|DS-6708*",
+                "Samsung Techwin|SPE-110", "Samsung|SPE-110", "Hanwha|SPE-110"
             ],
             "analogEncoder": true
         },
