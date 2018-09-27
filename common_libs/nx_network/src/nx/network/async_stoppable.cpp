@@ -9,17 +9,15 @@
 namespace nx {
 namespace network {
 
-void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
+void QnStoppableAsync::pleaseStopSync()
 {
     const nx::network::aio::AIOService* aioService = nullptr;
     if (nx::network::SocketGlobals::isInitialized())
         aioService = &nx::network::SocketGlobals::aioService();
-    pleaseStopSync(aioService, checkForLocks);
+    pleaseStopSync(aioService);
 }
 
-void QnStoppableAsync::pleaseStopSync(
-    const nx::network::aio::AIOService* aioService,
-    bool /*checkForLocks*/)
+void QnStoppableAsync::pleaseStopSync(const nx::network::aio::AIOService* aioService)
 {
     if (aioService)
     {

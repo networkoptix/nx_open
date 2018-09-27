@@ -237,7 +237,7 @@ void AsyncClient::closeConnection(
 
     if (baseConnection)
     {
-        baseConnection->pleaseStopSync(false);
+        baseConnection->pleaseStopSync();
 
         // Reporting "connection closed" only if there was a connection to close.
         if (m_onConnectionClosedHandler)

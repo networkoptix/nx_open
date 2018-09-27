@@ -56,7 +56,7 @@ public:
     std::unique_ptr<AbstractStreamSocket> accept() override;
 
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
+    void pleaseStopSync() override;
 
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;

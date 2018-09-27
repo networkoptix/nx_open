@@ -58,9 +58,9 @@ public:
         m_acceptor->dispatch(std::move(handler));
     }
 
-    virtual void pleaseStopSync(bool hz) override
+    virtual void pleaseStopSync() override
     {
-        m_acceptor->pleaseStopSync(hz);
+        m_acceptor->pleaseStopSync();
     }
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
