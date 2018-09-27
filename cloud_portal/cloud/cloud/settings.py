@@ -73,6 +73,7 @@ INSTALLED_APPS = (
     'notifications',
     'api',
     'cms',
+    'integration',
     'zapier',
     'tinymce'
 )
