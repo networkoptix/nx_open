@@ -56,6 +56,7 @@ BasicTestFixture::~BasicTestFixture()
 
 void BasicTestFixture::SetUp()
 {
+    m_trafficRelay.addArg("--http/listenOn=127.0.0.1:0");
     ASSERT_TRUE(m_trafficRelay.startAndWaitUntilStarted());
 
     m_mediator.addArg("-trafficRelay/url");
