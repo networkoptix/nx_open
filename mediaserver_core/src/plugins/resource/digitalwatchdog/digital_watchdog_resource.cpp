@@ -390,8 +390,8 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
     if (soapRes != SOAP_OK)
     {
         qWarning() << "QnDigitalWatchdogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
-            << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
-            << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
+            << soapWrapper.endpoint() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastErrorDescription() << ". Only base (base for DW) advanced settings will be available for this camera.";
 
         return QString();
     }

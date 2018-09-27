@@ -257,8 +257,8 @@ void OnvifResourceInformationFetcher::findResources(
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
-        auth.setUser(soapWrapper.getLogin());
-        auth.setPassword(soapWrapper.getPassword());
+        auth.setUser(soapWrapper.login());
+        auth.setPassword(soapWrapper.password());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(
             SoapTimeouts(serverModule()->settings().onvifTimeouts()), endpoint, auth, INT_MAX, &extInfo);
 
@@ -288,7 +288,7 @@ void OnvifResourceInformationFetcher::findResources(
     }
 
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                              model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+                                              model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), endpoint);
     if (res)
         result << res;
     else
@@ -322,7 +322,7 @@ void OnvifResourceInformationFetcher::findResources(
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
             auto subres = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+                model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), endpoint);
             if (res) {
                 QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
                 subres->setUrl(endpoint + suffix);

@@ -386,10 +386,11 @@ class _oasisWsnB2__RenewResponse;
 class _oasisWsnB2__Unsubscribe;
 class _oasisWsnB2__UnsubscribeResponse;
 
-template <class BindingProxy>
+template <class BindingProxyT>
 class SoapWrapper
 {
 public:
+    using BindingProxy = BindingProxyT;
     SoapWrapper(
         const SoapTimeouts& timeouts,
         std::string endpoint,
@@ -404,28 +405,42 @@ public:
     SoapWrapper& operator=(const SoapWrapper&) = delete;
     SoapWrapper& operator=(SoapWrapper&&) = delete;
 
-    const BindingProxy* getProxy() const { return &m_soapProxy; }
-    BindingProxy* getProxy() { return &m_soapProxy; }
+    BindingProxy& bindingProxy() { return m_bindingProxy; }
+    const BindingProxy& bindingProxy() const { return m_bindingProxy; }
+
+    struct soap* soap() { return m_bindingProxy.soap; }
+    const struct soap* soap() const { return m_bindingProxy.soap; }
+
     const char* endpoint() const { return m_endpoint; }
-    QString getLogin() const { return m_login; }
-    QString getPassword() const { return m_passwd; }
-    int getTimeDrift() const { return m_timeDrift; }
-    const QString getLastError();
-    const QString getEndpointUrl();
-    bool isNotAuthenticated();
-    bool isConflictError();
+    QString login() const { return m_login; }
+    QString password() const { return m_passwd; }
+    int timeDrift() const { return m_timeDrift; }
     void setLogin(const QString& login) { m_login = login; }
     void setPassword(const QString& password) { m_passwd = password; }
 
-    //!Invokes method \a methodToInvoke, which is member of \a BindingProxy, with pre-supplied endpoint, username and password
+    const QString getLastErrorDescription()
+    {
+        return SoapErrorHelper::fetchDescription(m_bindingProxy.soap_fault());
+    }
+    bool lastErrorIsNotAuthenticated()
+    {
+        return PasswordHelper::isNotAuthenticated(m_bindingProxy.soap_fault());
+    }
+    bool lastErrorIsConflict()
+    {
+        return PasswordHelper::isConflict(m_bindingProxy.soap_fault());
+    }
+
+    // Invokes method \a methodToInvoke, which is member of \a BindingProxy,
+    // with pre-supplied endpoint, username and password
     template<class RequestType, class ResponseType>
     int invokeMethod(
-        int (BindingProxy::*methodToInvoke)( const char*, const char*, RequestType*, ResponseType& ),
+        int (BindingProxy::*methodToInvoke)(const char*, const char*, RequestType*, ResponseType&),
         RequestType* const request,
         ResponseType& response )
     {
         beforeMethodInvocation<RequestType>();
-        return (m_soapProxy.*methodToInvoke)( m_endpoint, NULL, request, response );
+        return (m_bindingProxy.*methodToInvoke)(m_endpoint, NULL, request, response);
     }
 
     template<typename Request>
@@ -434,8 +449,8 @@ public:
         using namespace nx::mediaserver_core::plugins;
         if (m_invoked)
         {
-            soap_destroy(m_soapProxy.soap);
-            soap_end(m_soapProxy.soap);
+            soap_destroy(m_bindingProxy.soap);
+            soap_end(m_bindingProxy.soap);
         }
         else
         {
@@ -445,12 +460,12 @@ public:
         const auto namespaces = onvif::requestNamespaces<Request>();
         //########################################################
         if (namespaces != nullptr)
-            soap_set_namespaces(m_soapProxy.soap, namespaces);
+            soap_set_namespaces(m_bindingProxy.soap, namespaces);
 
         if (!m_login.isEmpty())
         {
             onvif::soapWsseAddUsernameTokenDigest(
-                m_soapProxy.soap,
+                m_bindingProxy.soap,
                 NULL,
                 m_login.toUtf8().constData(),
                 m_passwd.toUtf8().constData(),
@@ -466,11 +481,11 @@ public:
     QString m_passwd;
     bool m_invoked;
 
-    BindingProxy m_soapProxy;
+    BindingProxy m_bindingProxy;
 };
 
-template <class BindingProxy>
-SoapWrapper<BindingProxy>::SoapWrapper(
+template <class BindingProxyT>
+SoapWrapper<BindingProxyT>::SoapWrapper(
     const SoapTimeouts& timeouts,
     std::string endpoint,
     QString login,
@@ -488,26 +503,26 @@ SoapWrapper<BindingProxy>::SoapWrapper(
     NX_ASSERT(!m_endpointHolder.empty());
     if (tcpKeepAlive)
     {
-        soap_imode(m_soapProxy.soap, SOAP_IO_KEEPALIVE);
-        soap_omode(m_soapProxy.soap, SOAP_IO_KEEPALIVE);
+        soap_imode(m_bindingProxy.soap, SOAP_IO_KEEPALIVE);
+        soap_omode(m_bindingProxy.soap, SOAP_IO_KEEPALIVE);
 
     }
 
-    m_soapProxy.soap->send_timeout = timeouts.sendTimeoutSeconds.count();
-    m_soapProxy.soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
-    m_soapProxy.soap->connect_timeout = timeouts.connectTimeoutSeconds.count();
-    m_soapProxy.soap->accept_timeout = timeouts.acceptTimeoutSeconds.count();
+    m_bindingProxy.soap->send_timeout = timeouts.sendTimeoutSeconds.count();
+    m_bindingProxy.soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
+    m_bindingProxy.soap->connect_timeout = timeouts.connectTimeoutSeconds.count();
+    m_bindingProxy.soap->accept_timeout = timeouts.acceptTimeoutSeconds.count();
 
-    soap_register_plugin(m_soapProxy.soap, soap_wsse);
+    soap_register_plugin(m_bindingProxy.soap, soap_wsse);
 }
 
-template <class BindingProxy>
-SoapWrapper<BindingProxy>::~SoapWrapper()
+template <class BindingProxyT>
+SoapWrapper<BindingProxyT>::~SoapWrapper()
 {
     if (m_invoked)
     {
-        soap_destroy(m_soapProxy.soap);
-        soap_end(m_soapProxy.soap);
+        soap_destroy(m_bindingProxy.soap);
+        soap_end(m_bindingProxy.soap);
     }
 }
 
@@ -556,7 +571,7 @@ private:
 
 };
 
-template<class Request, class Response>
+template<class RequestT, class ResponseT>
 class RequestTraits;
 
 /**
@@ -642,7 +657,7 @@ DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
 DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template<class RequestType, class ResponseType>
+template<class RequestT, class ResponseT>
 class RequestWrapper;
 
 template<class RequestT, class ResponseT>
@@ -721,8 +736,8 @@ public:
         NX_CRITICAL(responseHolderCount == 0);
         if (m_wrapper.m_invoked)
         {
-            soap_destroy(m_wrapper.getProxy()->soap);
-            soap_end(m_wrapper.getProxy()->soap);
+            soap_destroy(m_wrapper.soap());
+            soap_end(m_wrapper.soap());
         }
     }
 
@@ -739,7 +754,7 @@ public:
         m_wrapper.template beforeMethodInvocation<Request>();
 
         std::invoke(RequestTraits<Request, Response>::requestFunc,
-            m_wrapper.getProxy(), m_wrapper.endpoint(), nullptr, &request, m_response);
+            m_wrapper.bindingProxy(), m_wrapper.endpoint(), nullptr, &request, m_response);
 
         return soapError() == SOAP_OK;
     }
@@ -753,8 +768,8 @@ public:
     {
         if (m_wrapper.m_invoked)
         {
-            soap_destroy(m_wrapper.getProxy()->soap);
-            soap_end(m_wrapper.getProxy()->soap);
+            soap_destroy(m_wrapper.bindingProxy()->soap);
+            soap_end(m_wrapper.bindingProxy()->soap);
 
             m_response.soap_default(m_response.soap);
 
@@ -778,11 +793,11 @@ public:
         return RequestTraits<Request, Response>::funcName;
     }
 
-    int soapError() const noexcept { return m_wrapper.getProxy()->soap->error; }
+    int soapError() const noexcept { return m_wrapper.soap()->error; }
 
     QString soapErrorAsString() const
     {
-        return SoapErrorHelper::fetchDescription(m_wrapper.getProxy()->soap->fault);
+        return SoapErrorHelper::fetchDescription(m_wrapper.soap()->fault);
     }
     CameraDiagnostics::RequestFailedResult requestFailedResult() const
     {

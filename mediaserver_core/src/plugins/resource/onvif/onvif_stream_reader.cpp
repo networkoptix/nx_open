@@ -353,10 +353,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& 
             << "): can't get stream URL of ONVIF device (URL: " << m_onvifRes->getMediaUrl()
             << ", UniqueId: " << m_onvifRes->getUniqueId()
             << "). Root cause: SOAP request failed. GSoap error code: "
-            << soapRes << ". " << soapWrapper.getLastError();
+            << soapRes << ". " << soapWrapper.getLastErrorDescription();
     #endif
         return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getStreamUri"), soapWrapper.getLastError());
+            QLatin1String("getStreamUri"), soapWrapper.getLastErrorDescription());
     }
 
     if (!response.MediaUri)
@@ -410,7 +410,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         if (!veConfigurations)
         {
             //LOG.
-            if (veConfigurations.innerWrapper().isNotAuthenticated())
+            if (veConfigurations.innerWrapper().lastErrorIsNotAuthenticated())
                 return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
             else
                 return veConfigurations.requestFailedResult();
@@ -449,7 +449,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         if (!veConfigurations)
         {
             //LOG.
-            if (veConfigurations.innerWrapper().isNotAuthenticated())
+            if (veConfigurations.innerWrapper().lastErrorIsNotAuthenticated())
                 return CameraDiagnostics::NotAuthorisedResult(veConfigurations.endpoint());
             else
                 return veConfigurations.requestFailedResult();
@@ -649,7 +649,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
     if (soapRes != SOAP_OK)
     {
         return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("addAudioOutputConfiguration"), soapWrapper.getLastError());
+            QLatin1String("addAudioOutputConfiguration"), soapWrapper.getLastErrorDescription());
     }
 
     GetCompatibleAudioDecoderConfigurationsReq audioDecodersRequest;
@@ -659,7 +659,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
     if (soapRes != SOAP_OK)
     {
         return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getCompatibleAudioDecoderConfigurations"), soapWrapper.getLastError());
+            QLatin1String("getCompatibleAudioDecoderConfigurations"), soapWrapper.getLastErrorDescription());
     }
     if (!audioDecodersResponse.Configurations.empty() && audioDecodersResponse.Configurations[0])
     {
@@ -673,7 +673,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
         if (soapRes != SOAP_OK)
         {
             return CameraDiagnostics::RequestFailedResult(
-                QLatin1String("addAudioDecoderConfiguration"), soapWrapper.getLastError());
+                QLatin1String("addAudioDecoderConfiguration"), soapWrapper.getLastErrorDescription());
         }
     }
 
@@ -708,8 +708,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             #if defined(PL_ONVIF_DEBUG)
                 qCritical() << "QnOnvifStreamReader::addVideoSourceConfiguration: "
                     << "can't add video source to profile. Gsoap error: "
-                    << soapRes << ", description: " << soapWrapper.getLastError()
-                    << ". URL: " << soapWrapper.getEndpointUrl()
+                    << soapRes << ", description: " << soapWrapper.getLastErrorDescription()
+                    << ". URL: " << soapWrapper.endpoint()
                     << ", uniqueId: " << m_onvifRes->getUniqueId() <<
                     "current vSourceID=" << profile->VideoSourceConfiguration->token.data()
                     << "requested vSourceID=" << info.videoSourceId;
@@ -717,7 +717,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             if (m_onvifRes->getMaxChannels() > 1)
             {
                     return CameraDiagnostics::RequestFailedResult(
-                        QLatin1String("addVideoSourceConfiguration"), soapWrapper.getLastError());
+                        QLatin1String("addVideoSourceConfiguration"), soapWrapper.getLastErrorDescription());
             }
         }
     }
@@ -739,12 +739,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             #if defined(PL_ONVIF_DEBUG)
                 qCritical() << "QnOnvifStreamReader::addVideoEncoderConfiguration: "
                     << "can't add video encoder to profile. Gsoap error: "
-                    << soapRes << ", description: " << soapWrapper.getLastError()
-                    << ". URL: " << soapWrapper.getEndpointUrl()
+                    << soapRes << ", description: " << soapWrapper.getLastErrorDescription()
+                    << ". URL: " << soapWrapper.endpoint()
                     << ", uniqueId: " << m_onvifRes->getUniqueId();
             #endif
             return CameraDiagnostics::RequestFailedResult(
-                QLatin1String("addVideoEncoderConfiguration"), soapWrapper.getLastError());
+                QLatin1String("addVideoEncoderConfiguration"), soapWrapper.getLastErrorDescription());
         }
     }
 
@@ -779,12 +779,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                     #if defined(PL_ONVIF_DEBUG)
                         qCritical() << "QnOnvifStreamReader::addPTZConfiguration: "
                             << "can't add ptz configuration to profile. Gsoap error: "
-                            << soapRes << ", description: " << soapWrapper.getLastError()
-                            << ". URL: " << soapWrapper.getEndpointUrl()
+                            << soapRes << ", description: " << soapWrapper.getLastErrorDescription()
+                            << ". URL: " << soapWrapper.endpoint()
                             << ", uniqueId: " << m_onvifRes->getUniqueId();
                     #endif
                     return CameraDiagnostics::RequestFailedResult(
-                        QLatin1String("addPTZConfiguration"), soapWrapper.getLastError());
+                        QLatin1String("addPTZConfiguration"), soapWrapper.getLastErrorDescription());
                 }
             }
         }
@@ -809,8 +809,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                 #if defined(PL_ONVIF_DEBUG)
                 qCritical() << "QnOnvifStreamReader::addAudioSourceConfiguration: "
                     << "can't add audio source to profile. Gsoap error: "
-                    << soapRes << ", description: " << soapWrapper.getLastError()
-                    << ". URL: " << soapWrapper.getEndpointUrl()
+                    << soapRes << ", description: " << soapWrapper.getLastErrorDescription()
+                    << ". URL: " << soapWrapper.endpoint()
                     << ", uniqueId: " << m_onvifRes->getUniqueId()
                     << "profile=" << info.profileToken << "audioSourceId=" << info.audioSourceId;
                 #endif
@@ -835,8 +835,8 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
                 #if defined(PL_ONVIF_DEBUG)
                     qCritical() << "QnOnvifStreamReader::addAudioEncoderConfiguration: "
                         << "can't add audio encoder to profile. Gsoap error: "
-                        << soapRes << ", description: " << soapWrapper.getEndpointUrl()
-                        << ". URL: " << soapWrapper.getEndpointUrl()
+                        << soapRes << ", description: " << soapWrapper.endpoint()
+                        << ". URL: " << soapWrapper.endpoint()
                         << ", uniqueId: " << m_onvifRes->getUniqueId()
                         << "profile=" << info.profileToken
                         << "audioEncoderId=" << info.audioEncoderId;

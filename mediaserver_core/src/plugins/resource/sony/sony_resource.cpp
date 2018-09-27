@@ -56,9 +56,9 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     int soapRes = soapWrapperGet.getVideoEncoderConfiguration(confRequest, confResponse);
     if (soapRes != SOAP_OK || !confResponse.Configuration || !confResponse.Configuration->Resolution) {
         qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't get video encoder (or received data is null) (token="
-            << confToken.c_str() << ") from camera (URL: " << soapWrapperGet.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-            << "). GSoap error code: " << soapRes << ". " << soapWrapperGet.getLastError();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
+            << confToken.c_str() << ") from camera (URL: " << soapWrapperGet.endpoint() << ", UniqueId: " << getUniqueId()
+            << "). GSoap error code: " << soapRes << ". " << soapWrapperGet.getLastErrorDescription();
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastErrorDescription());
     }
 
     MediaSoapWrapper soapWrapper(
@@ -98,17 +98,19 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         while (soapRes != SOAP_OK && --retryCount >= 0)
         {
             soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
-            if (soapRes != SOAP_OK) {
-                if (soapWrapper.isConflictError()) {
+            if (soapRes != SOAP_OK)
+            {
+                if (soapWrapper.lastErrorIsConflict())
+                {
                     continue;
                 }
 
                 qWarning() << "QnPlSonyResource::updateResourceCapabilities: can't set video encoder options (token="
-                    << confToken.c_str() << ") from camera (URL: " << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-                    << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+                    << confToken.c_str() << ") from camera (URL: " << soapWrapper.endpoint() << ", UniqueId: " << getUniqueId()
+                    << "). GSoap error code: " << soapRes << ". " << soapWrapper.getLastErrorDescription();
                 return CameraDiagnostics::RequestFailedResult(
                     lit("setVideoEncoderConfiguration(%1x%2)").arg(it->width()).arg(it->height()),
-                    soapWrapper.getLastError() );
+                    soapWrapper.getLastErrorDescription() );
             }
         }
 
@@ -121,7 +123,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     }
 
     if (soapRes != SOAP_OK)
-        return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
+        return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastErrorDescription() );
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
         return CameraDiagnostics::NoErrorResult();

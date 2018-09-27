@@ -72,7 +72,6 @@ struct UdtEpollHandlerHelper
     UDTSOCKET udt_handler;
 };
 
-
 static void setLastSystemErrorCodeAppropriately()
 {
     const auto systemErrorCode =
@@ -528,7 +527,6 @@ bool UdtSocket<InterfaceToImplement>::open()
 
 template class UdtSocket<AbstractStreamSocket>;
 template class UdtSocket<AbstractStreamServerSocket>;
-
 
 //=================================================================================================
 // UdtStreamSocket implementation.

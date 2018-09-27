@@ -37,8 +37,8 @@ CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera ("
-            << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
-            << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << getUniqueId();
+            << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastErrorDescription()
+            << ". URL: " << soapWrapper.endpoint() << ", uniqueId: " << getUniqueId();
         return CameraDiagnostics::UnknownErrorResult();
     }
 

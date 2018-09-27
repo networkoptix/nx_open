@@ -40,8 +40,8 @@ std::unique_ptr<PtzSoapWrapper> makePtzSoapWrapper(
         auth.password(),
         resource->getTimeDrift());
 
-    ptz->getProxy()->soap->float_format = floatFormat;
-    ptz->getProxy()->soap->double_format = doubleFormat;
+    ptz->soap()->float_format = floatFormat;
+    ptz->soap()->double_format = doubleFormat;
 
     return ptz;
 }
@@ -138,8 +138,8 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
@@ -251,8 +251,8 @@ bool QnOnvifPtzController::readBuiltinPresets()
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     GetPresetsReq request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
@@ -288,8 +288,8 @@ Ptz::Capabilities QnOnvifPtzController::initContinuousFocus() {
     ImagingSoapWrapper imaging(
         m_resource->onvifTimeouts(),
         imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    imaging.getProxy()->soap->float_format = m_floatFormat;
-    imaging.getProxy()->soap->double_format = m_doubleFormat;
+    imaging.soap()->float_format = m_floatFormat;
+    imaging.soap()->double_format = m_doubleFormat;
 
     _onvifImg__GetMoveOptions moveOptionsRequest;
     moveOptionsRequest.VideoSourceToken = m_resource->getVideoSourceToken().toStdString();
@@ -335,8 +335,8 @@ bool QnOnvifPtzController::stopInternal()
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     bool stopValue = true;
 
@@ -347,7 +347,7 @@ bool QnOnvifPtzController::stopInternal()
 
     _onvifPtz__StopResponse response;
     if (ptz.doStop(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ stop command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ stop command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 
@@ -368,8 +368,8 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector
     PtzSoapWrapper ptz (
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speedVector.pan, m_panSpeedLimits);
@@ -388,7 +388,7 @@ bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector
 
     _onvifPtz__ContinuousMoveResponse response;
     if (ptz.doContinuousMove(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ continuous move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ continuous move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 
@@ -440,8 +440,8 @@ bool QnOnvifPtzController::continuousFocus(
     ImagingSoapWrapper imaging(
         m_resource->onvifTimeouts(),
         imagingUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    imaging.getProxy()->soap->float_format = m_floatFormat;
-    imaging.getProxy()->soap->double_format = m_doubleFormat;
+    imaging.soap()->float_format = m_floatFormat;
+    imaging.soap()->double_format = m_doubleFormat;
 
     onvifXsd__ContinuousFocus onvifContinuousFocus;
     onvifContinuousFocus.Speed = normalizeSpeed(speed, m_focusSpeedLimits);
@@ -455,7 +455,7 @@ bool QnOnvifPtzController::continuousFocus(
 
     _onvifImg__MoveResponse response;
     if (imaging.move(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ continuous focus command for resource '%1' has failed with error %2.", m_resource->getName(), imaging.getLastError());
+        qnWarning("Execution of PTZ continuous focus command for resource '%1' has failed with error %2.", m_resource->getName(), imaging.getLastErrorDescription());
         return false;
     }
 
@@ -491,8 +491,8 @@ bool QnOnvifPtzController::absoluteMove(
     PtzSoapWrapper ptz (
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTilt;
     onvifPanTilt.x = position.pan;
@@ -530,7 +530,7 @@ bool QnOnvifPtzController::absoluteMove(
 
     const bool result = ptz.doAbsoluteMove(request, response) == SOAP_OK;
     if (!result)
-        qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
 
     return result;
 }
@@ -572,7 +572,7 @@ bool QnOnvifPtzController::relativeMove(
     if (!wrapper->doRelativeMove(request, response))
     {
         NX_ERROR(this, lm("Failed to perform relative movement. Resource %1 (%2), error: %3")
-            .args(m_resource->getName(), m_resource->getId(), wrapper->getLastError()));
+            .args(m_resource->getName(), m_resource->getId(), wrapper->getLastErrorDescription()));
 
         return false;
     }
@@ -607,15 +607,15 @@ bool QnOnvifPtzController::getPosition(
     PtzSoapWrapper ptz (
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     _onvifPtz__GetStatus request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
 
     _onvifPtz__GetStatusResponse response;
     if (ptz.doGetStatus(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ status command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ status command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 
@@ -704,15 +704,15 @@ bool QnOnvifPtzController::removePreset(const QString &presetId)
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     RemovePresetReq request;
     RemovePresetResp response;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     request.PresetToken = presetToken(presetId).toStdString();
     if (ptz.removePreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 
@@ -743,8 +743,8 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
@@ -779,7 +779,7 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
     }
 
     if (ptz.gotoPreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 
@@ -805,8 +805,8 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
     PtzSoapWrapper ptz(
         m_resource->onvifTimeouts(),
         ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
-    ptz.getProxy()->soap->float_format = m_floatFormat;
-    ptz.getProxy()->soap->double_format = m_doubleFormat;
+    ptz.soap()->float_format = m_floatFormat;
+    ptz.soap()->double_format = m_doubleFormat;
 
     SetPresetReq request;
     SetPresetResp response;
@@ -815,7 +815,7 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
     request.PresetName = &stdPresetName;
 
     if (ptz.setPreset(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ create preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        qnWarning("Execution of PTZ create preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
         return false;
     }
 

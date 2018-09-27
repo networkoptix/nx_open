@@ -24,7 +24,6 @@
 #include "soap_wrapper.h"
 #include <onvif/soapDeviceBindingProxy.h>
 
-
 class GSoapAsyncCallWrapperBase
 {
 public:
@@ -79,10 +78,10 @@ public:
         pleaseStop();
         join();
 
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
-        soap_destroy(m_syncWrapper->getProxy()->soap);
-        soap_end(m_syncWrapper->getProxy()->soap);
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
+        soap_destroy(m_syncWrapper->soap());
+        soap_end(m_syncWrapper->soap());
         m_syncWrapper.reset();
 
         //if we are here, it is garanteed that
@@ -152,18 +151,18 @@ public:
             false,
             nx::network::NatTraversalSupport::disabled);
 
-        m_syncWrapper->getProxy()->soap->user = this;
-        m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->getProxy()->soap->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
-        m_syncWrapper->getProxy()->soap->fopen = NULL;
-        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fclose = [](struct soap*) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fclosesocket = [](struct soap*, SOAP_SOCKET) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int) -> int { return SOAP_OK; };
-        m_syncWrapper->getProxy()->soap->socket = m_socket->handle();
-        m_syncWrapper->getProxy()->soap->master = m_socket->handle();
+        m_syncWrapper->soap()->user = this;
+        m_syncWrapper->soap()->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->fsend = &custom_soap_fsend<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->soap()->frecv = &custom_soap_frecv<typename std::remove_reference<decltype(*this)>::type>;
+        m_syncWrapper->soap()->fopen = NULL;
+        m_syncWrapper->soap()->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->fclose = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->fclosesocket = [](struct soap*, SOAP_SOCKET) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int) -> int { return SOAP_OK; };
+        m_syncWrapper->soap()->socket = m_socket->handle();
+        m_syncWrapper->soap()->master = m_socket->handle();
 
         //serializing request
         m_request = std::forward<RequestType>(request);
@@ -238,10 +237,10 @@ private:
         m_state = sendingRequest;
         (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
         NX_ASSERT( !m_serializedRequest.isEmpty() );
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
-        soap_destroy( m_syncWrapper->getProxy()->soap );
-        soap_end(m_syncWrapper->getProxy()->soap);
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
+        soap_destroy(m_syncWrapper->soap());
+        soap_end(m_syncWrapper->soap());
 
         QnMutexLocker lk( &m_mutex );
         if( !m_socket )
@@ -378,8 +377,8 @@ private:
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
-        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
-        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->soap()->master = SOAP_INVALID_SOCKET;
         m_state = done;
         return resultCode;
     }
