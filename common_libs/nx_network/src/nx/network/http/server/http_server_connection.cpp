@@ -307,7 +307,7 @@ void HttpServerConnection::prepareAndSendResponse(
 }
 
 void HttpServerConnection::scheduleResponseDelivery(
-    const RequestDescriptor& requestDescriptor,
+    const RequestDescriptor& /*requestDescriptor*/,
     ResponseMessageContext responseMessageContext)
 {
     m_responseQueue.push_back(std::move(responseMessageContext));
