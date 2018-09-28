@@ -47,8 +47,10 @@ export class DropdownsModule {
 declare var angular: angular.IAngularStatic;
 angular
     .module('cloudApp.directives')
+    .directive('nxLanguageSelect',
+        downgradeComponent({
+            component: NxLanguageDropdown}) as angular.IDirectiveFactory)
     .directive('nxSelect', downgradeComponent({component: NxGenericDropdown}) as angular.IDirectiveFactory)
-    .directive('nxLanguageSelect', downgradeComponent({component: NxLanguageDropdown}) as angular.IDirectiveFactory)
     .directive('nxAccountSettingsSelect', downgradeComponent({component: NxAccountSettingsDropdown}) as angular.IDirectiveFactory)
     .directive('nxActiveSystem', downgradeComponent({component: NxActiveSystemDropdown}) as angular.IDirectiveFactory)
     .directive('nxSystems', downgradeComponent({component: NxSystemsDropdown}) as angular.IDirectiveFactory)

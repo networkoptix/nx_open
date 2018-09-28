@@ -33,16 +33,25 @@
             newPassword: ''
         };
 
+        $scope.changeLanguage = function (lang) {
+            changedlanguage = lang;
+        };
+
         $scope.save = process.init(function () {
+
             return cloudApi.accountPost($scope.account)
                 .then(function (result) {
-                    systemsProvider.forceUpdateSystems();
-                    if (languageService.lang.language !== $scope.account.language) {
-                        $localStorage.langChanged = true;
-                        //Need to reload page
-                        window.location.reload(true); // reload window to catch new language
-                        return false;
+                    if (languageService.lang.language !== changedlanguage) {
+                        cloudApi
+                            .changeLanguage(changedlanguage)
+                            .then(() => {
+                                $localStorage.langChanged = true;
+                                window.location.reload(); // reload window to catch new language
+                            });
+                    } else {
+                        systemsProvider.forceUpdateSystems();
                     }
+
                     return result;
                 });
         }, {
