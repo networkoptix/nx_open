@@ -34,7 +34,7 @@ class AbstractAuthenticationManager;
 namespace deprecated {
 
 using AsyncMessagePipeline =
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::StreamProtocolConnection<
         nx::network::http::Message,
         nx::network::http::deprecated::MessageParser,
         nx::network::http::MessageSerializer>;
@@ -42,7 +42,7 @@ using AsyncMessagePipeline =
 } // namespace deprecated
 
 using AsyncMessagePipeline =
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::StreamProtocolConnection<
         nx::network::http::Message,
         nx::network::http::MessageParser,
         nx::network::http::MessageSerializer>;

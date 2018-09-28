@@ -22,11 +22,14 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
-    m_controlConnection(std::make_unique<ConnectionType>(this, std::move(udtConnection))),
+    m_controlConnection(std::make_unique<ConnectionType>(std::move(udtConnection))),
     m_timeouts(timeouts),
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
+    m_controlConnection->setOnConnectionClosed(
+        [this](auto reason) { onConnectionClosed(reason); });
+
     m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
 
@@ -242,9 +245,8 @@ void OutgoingTunnelConnection::reportConnectResult(
         m_controlConnection != nullptr);
 }
 
-void OutgoingTunnelConnection::closeConnection(
-    SystemError::ErrorCode closeReason,
-    ConnectionType* connection)
+void OutgoingTunnelConnection::onConnectionClosed(
+    SystemError::ErrorCode closeReason)
 {
     NX_DEBUG(this, lm("cross-nat %1. Control connection has been closed: %2")
         .arg(m_connectionId).arg(SystemError::toString(closeReason)));
@@ -257,12 +259,6 @@ void OutgoingTunnelConnection::closeConnection(
             std::move(m_controlConnectionClosedHandler);
         controlConnectionClosedHandler(closeReason);
     }
-
-    if (!controlConnection)
-        return; //pleaseStop has already been called...
-
-    //we are in connection's aio thread
-    NX_ASSERT(connection == controlConnection.get());
 }
 
 void OutgoingTunnelConnection::onStunMessageReceived(

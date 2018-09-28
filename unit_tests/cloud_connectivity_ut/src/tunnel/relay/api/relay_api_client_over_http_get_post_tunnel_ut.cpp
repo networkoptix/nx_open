@@ -6,9 +6,7 @@
 namespace nx::cloud::relay::api::test {
 
 class RelayApiClientOverHttpGetPostTunnelTypeSet:
-    public BasicRelayApiClientTestFixture,
-    public network::server::StreamConnectionHolder<
-        network::http::AsyncMessagePipeline>
+    public BasicRelayApiClientTestFixture
 {
 public:
     using Client = ClientOverHttpGetPostTunnel;
@@ -48,12 +46,6 @@ private:
     std::list<std::unique_ptr<network::http::AsyncMessagePipeline>> m_connections;
     network::aio::BasicPollable m_asyncCallProvider;
 
-    virtual void closeConnection(
-        SystemError::ErrorCode /*closeReason*/,
-        network::http::AsyncMessagePipeline* /*connection*/) override
-    {
-    }
-
     void openTunnelChannelDown(
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
@@ -79,7 +71,6 @@ private:
 
         m_connections.push_back(
             std::make_unique<network::http::AsyncMessagePipeline>(
-                this,
                 connection->takeSocket()));
         m_connections.back()->bindToAioThread(m_asyncCallProvider.getAioThread());
         m_connections.back()->setMessageHandler(

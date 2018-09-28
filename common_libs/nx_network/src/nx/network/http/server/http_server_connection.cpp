@@ -18,7 +18,9 @@ HttpServerConnection::HttpServerConnection(
     nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
     nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher)
     :
-    base_type(socketServer, std::move(sock)),
+    base_type(
+        [socketServer](auto... args) { socketServer->closeConnection(args...); },
+        std::move(sock)),
     m_authenticationManager(authenticationManager),
     m_httpMessageDispatcher(httpMessageDispatcher),
     m_isPersistent(false),
