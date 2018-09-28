@@ -141,8 +141,7 @@ class Command(BaseCommand):
         read_languages(settings.DEFAULT_SKIN)
         if not Customization.objects.filter(name=settings.CUSTOMIZATION).exists():
             default_customization = Customization(name=settings.CUSTOMIZATION,
-                                                  default_language=Language.by_code('en_US'),
-                                                  preview_status=0)
+                                                  default_language=Language.by_code('en_US'))
             default_customization.save()
             default_customization.languages = [Language.by_code('en_US')]
             default_customization.save()
