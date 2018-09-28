@@ -124,8 +124,10 @@ public:
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
 
-    QnResourceWidget *currentWidget() const;
+    QnResourceWidget* currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
+
+    QnResourcePtr currentResource() const;
 
     Q_SLOT void jumpBackward();
     Q_SLOT void jumpForward();
@@ -150,6 +152,7 @@ public:
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
+    void currentResourceChanged();
     void liveChanged();
     void liveSupportedChanged();
     void hasArchiveChanged();

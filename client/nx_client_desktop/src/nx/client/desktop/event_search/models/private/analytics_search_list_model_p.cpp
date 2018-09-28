@@ -11,6 +11,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -81,14 +82,17 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     const auto updateWorkbenchFilter =
         [this]()
         {
+            // TODO: FIXME:
+        /*
             if (!camera())
                 return;
 
             Filter filter;
-            filter.deviceIds = {camera()->getId()};
+            filter.deviceId = camera()->getId();
             filter.boundingBox = m_filterRect;
             filter.freeText = m_filterText;
             this->q->navigator()->setAnalyticsFilter(filter);
+        */
         };
 
     m_updateWorkbenchFilter->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
@@ -100,11 +104,14 @@ AnalyticsSearchListModel::Private::~Private()
 {
 }
 
+// TODO: FIXME:
+#if 0
 void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
 {
     base_type::setCamera(camera);
     m_metadataReceiver->setCamera(camera);
 }
+#endif
 
 int AnalyticsSearchListModel::Private::count() const
 {
@@ -123,7 +130,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qt::DisplayRole:
         {
             const auto name = vms::event::AnalyticsHelper::objectTypeName(
-                camera(), object.objectTypeId, kDefaultLocale);
+                camera(object), object.objectTypeId, kDefaultLocale);
 
             return name.isEmpty() ? tr("Unknown object") : name;
         }
@@ -154,7 +161,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return Qn::Empty_Help;
 
         case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(camera());
+            return QVariant::fromValue<QnResourcePtr>(camera(object));
 
         case Qn::ItemZoomRectRole:
             return QVariant::fromValue(previewParams(object).boundingBox);
@@ -332,8 +339,9 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     if (!server || !server->restConnection())
         return false;
 
+    // TODO: FIXME:
     Filter request;
-    request.deviceIds = {camera()->getId()};
+    //request.deviceId = q->cameras().empty() ? QnUuid() : (*q->cameras().cbegin())->getId();
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
     request.boundingBox = m_filterRect;
@@ -553,12 +561,13 @@ QString AnalyticsSearchListModel::Private::attributes(
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const analytics::storage::DetectedObject& object) const
 {
-    if (!camera())
+    const auto camera = this->camera(object);
+    if (!camera)
         return QSharedPointer<QMenu>();
 
     // TODO: #vkutin Is this a correct way of choosing servers for analytics actions?
-    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera(), true);
-    servers.push_back(camera()->getParentServer());
+    auto servers = q->cameraHistoryPool()->getCameraFootageData(camera, true);
+    servers.push_back(camera->getParentServer());
 
     const auto allActions = vms::event::AnalyticsHelper::availableActions(
         servers, object.objectTypeId);
@@ -693,6 +702,23 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
         result.boundingBox.height()));
 
     return result;
+}
+
+QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
+    const analytics::storage::DetectedObject& object) const
+{
+    NX_ASSERT(!object.track.empty());
+    if (object.track.empty())
+        return {};
+
+    if (q->cameras().size() == 1) //< An optimization.
+    {
+        const auto result = *q->cameras().cbegin();
+        NX_ASSERT(result->getId() == object.track[0].deviceId);
+        return result;
+    }
+
+    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(object.track[0].deviceId);
 }
 
 } // namespace nx::client::desktop

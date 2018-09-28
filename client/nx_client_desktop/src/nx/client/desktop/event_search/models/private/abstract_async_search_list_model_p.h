@@ -18,9 +18,6 @@ public:
     explicit Private(AbstractAsyncSearchListModel* q);
     virtual ~Private() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    virtual void setCamera(const QnVirtualCameraResourcePtr& camera);
-
     virtual int count() const = 0;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
 
@@ -67,9 +64,7 @@ protected:
     const FetchInformation& currentRequest() const;
 
 private:
-    AbstractAsyncSearchListModel* const q = nullptr;
-    QnVirtualCameraResourcePtr m_camera;
-
+    AbstractAsyncSearchListModel * const q;
     PrefetchCompletionHandler m_prefetchCompletionHandler;
     FetchInformation m_request;
 };

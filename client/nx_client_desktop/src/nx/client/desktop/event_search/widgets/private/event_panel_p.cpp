@@ -38,8 +38,6 @@ namespace nx::client::desktop {
 
 namespace {
 
-static constexpr int kPermanentTabCount = 1;
-
 using ButtonState = SelectableTextButton::State;
 
 } // namespace
@@ -86,6 +84,26 @@ EventPanel::Private::Private(EventPanel* q):
     m_analyticsTab->hide();
     m_counterLabel->hide();
 
+    const auto addTab =
+        [this](QWidget* tab, const QIcon& icon, const QString& text)
+        {
+            const int index = m_tabs->count();
+            m_tabs->insertTab(index, tab, icon, text);
+            m_tabs->setTabToolTip(index, text);
+        };
+
+    addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
+        tr("Motion", "Motion tab title"));
+
+    addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
+        tr("Bookmarks", "Bookmarks tab title"));
+
+    addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
+        tr("Events", "Events tab title"));
+
+    addTab(m_analyticsTab, qnSkin->icon(lit("events/tabs/analytics.png")),
+        tr("Objects", "Analytics tab title"));
+
     static constexpr int kTabBarShift = 10;
     m_tabs->setProperty(style::Properties::kTabBarIndent, kTabBarShift);
     setTabShape(m_tabs->tabBar(), style::TabShape::Compact);
@@ -118,50 +136,6 @@ EventPanel::Private::Private(EventPanel* q):
 
 EventPanel::Private::~Private()
 {
-}
-
-void EventPanel::Private::updateTabs()
-{
-    const bool hasVideo = m_camera && m_camera->hasVideo();
-    const bool hasMotion = hasVideo && m_camera->hasFlags(Qn::motion);
-
-    int nextTabIndex = kPermanentTabCount;
-
-    const auto updateTab =
-        [this, &nextTabIndex](QWidget* tab, bool visible, const QIcon& icon, const QString& text)
-        {
-            const int index = m_tabs->indexOf(tab);
-            if (visible)
-            {
-                if (index < 0)
-                    m_tabs->insertTab(nextTabIndex, tab, icon, text);
-                else
-                    NX_ASSERT(index == nextTabIndex);
-
-                m_tabs->setTabToolTip(nextTabIndex, text);
-                ++nextTabIndex;
-            }
-            else
-            {
-                if (index >= 0)
-                {
-                    NX_ASSERT(index == nextTabIndex);
-                    m_tabs->removeTab(index);
-                }
-            }
-        };
-
-    updateTab(m_motionTab, hasMotion, qnSkin->icon(lit("events/tabs/motion.png")),
-        tr("Motion", "Motion tab title"));
-
-    updateTab(m_bookmarksTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/bookmarks.png")),
-        tr("Bookmarks", "Bookmarks tab title"));
-
-    updateTab(m_eventsTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/events.png")),
-        tr("Events", "Events tab title"));
-
-    updateTab(m_analyticsTab, hasVideo, qnSkin->icon(lit("events/tabs/analytics.png")),
-        tr("Objects", "Analytics tab title"));
 }
 
 void EventPanel::Private::setupMotionSearch()
@@ -325,26 +299,6 @@ void EventPanel::Private::setupAnalyticsSearch()
         });
 }
 
-QnVirtualCameraResourcePtr EventPanel::Private::camera() const
-{
-    return m_camera;
-}
-
-void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
-{
-    if (m_camera == camera)
-        return;
-
-    m_camera = camera;
-
-    m_eventsModel->setCamera(camera);
-    m_motionModel->setCamera(camera);
-    m_bookmarksModel->setCamera(camera);
-    m_analyticsModel->setCamera(camera);
-
-    updateTabs();
-}
-
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 {
     if (role != Qn::CentralRole)
@@ -359,12 +313,12 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
         ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>()
         : QnVirtualCameraResourcePtr();
 
-    setCamera(camera);
-
     if (!camera)
         return;
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
+
+    // TODO: FIXME: #vkutin Make this work in multi-camera mode.
 
     *m_mediaWidgetConnections << connect(
         m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,

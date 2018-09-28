@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -112,10 +113,17 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
         case Qn::TimestampRole:
             return QVariant::fromValue(event.eventParams.eventTimestampUsec);
 
-        case Qn::ResourceRole:
-            return hasPreview(event.eventParams.eventType)
-                ? QVariant::fromValue<QnResourcePtr>(camera())
-                : QVariant();
+        case Qn::ResourceRole: //< Resource for thumbnail preview only.
+        {
+            if (!hasPreview(event.eventParams.eventType))
+                return false;
+
+            if (q->cameras().size() == 1)
+                return QVariant::fromValue<QnResourcePtr>(*q->cameras().cbegin());
+
+            return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
+                getResourceById<QnVirtualCameraResource>(event.eventParams.eventResourceId));
+        }
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
@@ -289,8 +297,10 @@ void EventSearchListModel::Private::fetchLive()
 rest::Handle EventSearchListModel::Private::getEvents(
     const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
 {
-    if (!camera() || !callback)
+    if (!callback)
         return false;
+
+    // TODO: FIXME: #vkutin How to request non-camera events? Design and implementation question.
 
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());
@@ -298,7 +308,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
         return false;
 
     QnEventLogMultiserverRequestData request;
-    request.filter.cameras.push_back(camera());
+    request.filter.cameras = q->cameras().toList();
     request.filter.period = period;
     request.filter.eventType = m_selectedEventType;
     request.limit = limit;

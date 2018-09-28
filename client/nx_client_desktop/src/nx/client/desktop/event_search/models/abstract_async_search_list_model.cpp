@@ -22,16 +22,6 @@ AbstractAsyncSearchListModel::Private* AbstractAsyncSearchListModel::d_func()
     return d.data();
 }
 
-QnVirtualCameraResourcePtr AbstractAsyncSearchListModel::camera() const
-{
-    return d->camera();
-}
-
-void AbstractAsyncSearchListModel::setCamera(const QnVirtualCameraResourcePtr& camera)
-{
-    d->setCamera(camera);
-}
-
 bool AbstractAsyncSearchListModel::cancelFetch()
 {
     if (!fetchInProgress())

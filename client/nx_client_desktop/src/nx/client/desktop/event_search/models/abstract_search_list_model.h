@@ -2,6 +2,7 @@
 
 #include "abstract_event_list_model.h"
 
+#include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
 namespace nx::client::desktop {
@@ -21,6 +22,9 @@ public:
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
+
+    QnVirtualCameraResourceSet cameras() const;
+    void setCameras(const QnVirtualCameraResourceSet& value);
 
     enum class FetchDirection
     {
@@ -83,6 +87,8 @@ signals:
     void fetchFinished(FetchResult result, QPrivateSignal);
     void liveChanged(bool isLive, QPrivateSignal);
     void livePausedChanged(bool isPaused, QPrivateSignal);
+    void camerasAboutToBeChanged(QPrivateSignal);
+    void camerasChanged(QPrivateSignal);
 
 protected:
     // These functions must be overridden in derived classes.
@@ -124,6 +130,8 @@ private:
     FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
 
     QnTimePeriod m_fetchedTimeWindow; //< Time window of currently fetched data.
+
+    QnVirtualCameraResourceSet m_cameras; //< Relevant cameras.
 };
 
 } // namespace nx::client::desktop

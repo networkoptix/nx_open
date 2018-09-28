@@ -436,6 +436,7 @@ void QnWorkbench::submit(QnWorkbenchState& state)
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     Q_UNUSED(item)
     updateSingleRoleItem();
+    emit currentLayoutItemsChanged();
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
@@ -445,6 +446,7 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
 
     updateSingleRoleItem();
     updateActiveRoleItem();
+    emit currentLayoutItemsChanged();
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

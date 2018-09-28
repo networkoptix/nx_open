@@ -17,20 +17,6 @@ AbstractAsyncSearchListModel::Private::~Private()
 {
 }
 
-QnVirtualCameraResourcePtr AbstractAsyncSearchListModel::Private::camera() const
-{
-    return m_camera;
-}
-
-void AbstractAsyncSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
-{
-    if (m_camera == camera)
-        return;
-
-    q->clear();
-    m_camera = camera;
-}
-
 bool AbstractAsyncSearchListModel::Private::requestFetch()
 {
     return prefetch(
@@ -61,7 +47,7 @@ void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 
 bool AbstractAsyncSearchListModel::Private::canFetch() const
 {
-    if (!m_camera || fetchInProgress() || !hasAccessRights())
+    if (fetchInProgress() || !hasAccessRights())
         return false;
 
     if (q->fetchedTimeWindow().isEmpty())

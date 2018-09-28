@@ -35,12 +35,8 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
-
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
-    void updateTabs();
 
     void setupMotionSearch();
     void setupBookmarkSearch();

@@ -29,9 +29,6 @@ protected:
 public:
     virtual ~AbstractAsyncSearchListModel() override;
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr& camera);
-
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 

@@ -839,9 +839,14 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     updateLiveSupported();
 }
 
-QnResourceWidget *QnWorkbenchNavigator::currentWidget() const
+QnResourceWidget* QnWorkbenchNavigator::currentWidget() const
 {
     return m_currentWidget;
+}
+
+QnResourcePtr QnWorkbenchNavigator::currentResource() const
+{
+    return m_currentWidget ? m_currentWidget->resource() : QnResourcePtr();
 }
 
 QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::currentWidgetFlags() const
@@ -1117,6 +1122,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
 
+    const auto previousResource = currentResource();
+
     emit currentWidgetAboutToBeChanged();
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
@@ -1216,6 +1223,9 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     updateThumbnailsLoader();
 
     emit currentWidgetChanged();
+
+    if (previousResource != currentResource())
+        emit currentResourceChanged();
 }
 
 void QnWorkbenchNavigator::updateLocalOffset()

@@ -37,8 +37,6 @@ public:
     explicit Private(AnalyticsSearchListModel* q);
     virtual ~Private() override;
 
-    virtual void setCamera(const QnVirtualCameraResourcePtr& camera) override;
-
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
@@ -76,6 +74,8 @@ private:
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
     QSharedPointer<QMenu> contextMenu(const analytics::storage::DetectedObject& object) const;
+
+    QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
 
     void executePluginAction(const QString& pluginId,
         const api::AnalyticsManifestObjectAction& action,

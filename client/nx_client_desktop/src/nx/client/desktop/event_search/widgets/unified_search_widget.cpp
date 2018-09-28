@@ -6,9 +6,15 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
@@ -91,7 +97,6 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     ui->typeButton->hide();
     ui->areaButton->hide();
-    ui->cameraButton->hide();
 
     ui->timeButton->setSelectable(false);
     ui->typeButton->setSelectable(false);
@@ -146,6 +151,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
         this, &UnifiedSearchWidget::updateCurrentTimePeriod);
 
     setupTimeSelection();
+    setupCameraSelection();
 
     ui->areaButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
 
@@ -195,6 +201,28 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->ribbon->scrollBar()->ensurePolished();
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
+
+    const auto updaterFor =
+        [this](Cameras mode)
+        {
+            const auto updater =
+                [this, mode]()
+                {
+                    if (m_cameras == mode)
+                        updateCurrentCameras();
+                };
+
+            return updater;
+        };
+
+    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, updaterFor(Cameras::current));
+
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, updaterFor(Cameras::all));
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, updaterFor(Cameras::all));
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, updaterFor(Cameras::layout));
+    connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this, updaterFor(Cameras::layout));
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
@@ -406,6 +434,125 @@ void UnifiedSearchWidget::setupTimeSelection()
     ui->timeButton->setMenu(timeMenu);
 }
 
+void UnifiedSearchWidget::setupCameraSelection()
+{
+    ui->cameraButton->setIcon(qnSkin->icon(lit("text_buttons/camera.png")));
+
+    auto cameraMenu = new QMenu(this);
+    cameraMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    cameraMenu->setWindowFlags(cameraMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    auto addMenuAction =
+        [this, cameraMenu](const QString& title, UnifiedSearchWidget::Cameras cameras)
+        {
+            auto action = cameraMenu->addAction(title);
+            connect(action, &QAction::triggered, this,
+                [this, action, cameras]()
+                {
+                    ui->cameraButton->setText(action->text());
+                    ui->cameraButton->setState(cameras == UnifiedSearchWidget::Cameras::all
+                        ? SelectableTextButton::State::deactivated
+                        : SelectableTextButton::State::unselected);
+
+                    setSelectedCameraSet(cameras);
+                });
+
+            return action;
+        };
+
+    auto defaultAction = addMenuAction(tr("All cameras"), UnifiedSearchWidget::Cameras::all);
+    addMenuAction(tr("Cameras on layout"), UnifiedSearchWidget::Cameras::layout);
+    addMenuAction(tr("Current camera"), UnifiedSearchWidget::Cameras::current);
+
+    connect(ui->cameraButton, &SelectableTextButton::stateChanged, this,
+        [defaultAction](SelectableTextButton::State state)
+        {
+            if (state == SelectableTextButton::State::deactivated)
+                defaultAction->trigger();
+        });
+
+    defaultAction->trigger();
+    ui->cameraButton->setMenu(cameraMenu);
+}
+
+UnifiedSearchWidget::Cameras UnifiedSearchWidget::selectedCameraSet() const
+{
+    return m_cameras;
+}
+
+void UnifiedSearchWidget::setSelectedCameraSet(Cameras value)
+{
+    if (value == m_cameras)
+        return;
+
+    m_cameras = value;
+    updateCurrentCameras();
+}
+
+QnVirtualCameraResourceSet UnifiedSearchWidget::currentCameras() const
+{
+    return m_currentCameras;
+}
+
+void UnifiedSearchWidget::updateCurrentCameras()
+{
+    const auto newCameras = effectiveCameras();
+    if (m_currentCameras == newCameras)
+        return;
+
+    m_currentCameras = newCameras;
+    m_model->setCameras(m_currentCameras);
+    requestFetch();
+}
+
+QnVirtualCameraResourceSet UnifiedSearchWidget::effectiveCameras() const
+{
+    switch (m_cameras)
+    {
+        case Cameras::all:
+        {
+            const auto filter =
+                [this](const QnVirtualCameraResourcePtr& camera)
+                {
+                    return isCameraAccepted(camera);
+                };
+
+            return resourcePool()->getResources<QnVirtualCameraResource>(filter).toSet();
+        }
+
+        case Cameras::current:
+            return {navigator()->currentResource().dynamicCast<QnVirtualCameraResource>()};
+
+        case Cameras::layout:
+        {
+            QnVirtualCameraResourceSet cameras;
+            if (auto workbenchLayout = workbench()->currentLayout())
+            {
+                for (const auto& item: workbenchLayout->items())
+                {
+                    const auto camera = item->resource().dynamicCast<QnVirtualCameraResource>();
+                    if (camera && !cameras.contains(camera) && isCameraAccepted(camera))
+                        cameras.insert(camera);
+                }
+            }
+
+            if (cameras.empty())
+                return {QnVirtualCameraResourcePtr()};
+
+            return cameras;
+        }
+
+        default:
+            NX_ASSERT(false);
+            return {QnVirtualCameraResourcePtr()};
+    }
+}
+
+bool UnifiedSearchWidget::isCameraAccepted(const QnVirtualCameraResourcePtr& camera) const
+{
+    return true; //< TODO: #vkutin Implement changeable filter.
+}
+
 void UnifiedSearchWidget::requestFetch()
 {
     if (!ui->ribbon->isVisible() || !model())
@@ -418,7 +565,7 @@ void UnifiedSearchWidget::requestFetch()
     else if (scrollBar->value() == scrollBar->minimum())
         model()->setFetchDirection(AbstractSearchListModel::FetchDirection::later);
     else
-        return; //< Scroll bar is not at the beginning or the end.
+        return; //< Scroll bar is not at the beginning nor the end.
 
     m_fetchMoreOperation->requestOperation();
 }

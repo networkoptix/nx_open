@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource.h>
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -65,10 +66,21 @@ public:
         selection //< Timeline selection.
     };
 
+    enum class Cameras
+    {
+        all, //< All cameras.
+        current, //< Current camera.
+        layout //< All cameras on current layout.
+    };
+
     Period selectedPeriod() const;
     void setSelectedPeriod(Period value);
 
+    Cameras selectedCameraSet() const;
+    void setSelectedCameraSet(Cameras value);
+
     QnTimePeriod currentTimePeriod() const;
+    QnVirtualCameraResourceSet currentCameras() const;
 
     void requestFetch();
 
@@ -80,7 +92,13 @@ private:
     void updateCurrentTimePeriod();
     QnTimePeriod effectiveTimePeriod() const;
 
+    void updateCurrentCameras();
+    QnVirtualCameraResourceSet effectiveCameras() const;
+
+    bool isCameraAccepted(const QnVirtualCameraResourcePtr& camera) const;
+
     void setupTimeSelection();
+    void setupCameraSelection();
     void updatePlaceholderState();
 
 private:
@@ -90,9 +108,11 @@ private:
     nx::utils::PendingOperation* m_fetchMoreOperation;
     QnTimePeriod m_timelineSelection;
     Period m_period = Period::all;
+    Cameras m_cameras = Cameras::all;
     QString m_placeholderTextConstrained;
     QString m_placeholderTextUnconstrained;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
+    QnVirtualCameraResourceSet m_currentCameras;
     VisualSearchListModel* m_model = nullptr;
     QScopedPointer<QnDisconnectHelper> m_modelConnections;
 };

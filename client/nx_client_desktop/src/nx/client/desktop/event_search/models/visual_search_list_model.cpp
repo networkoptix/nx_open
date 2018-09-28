@@ -57,6 +57,16 @@ void VisualSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     m_sourceModel->setRelevantTimePeriod(value);
 }
 
+QnVirtualCameraResourceSet VisualSearchListModel::cameras() const
+{
+    return m_sourceModel->cameras();
+}
+
+void VisualSearchListModel::setCameras(const QnVirtualCameraResourceSet& value)
+{
+    m_sourceModel->setCameras(value);
+}
+
 VisualSearchListModel::FetchDirection VisualSearchListModel::fetchDirection() const
 {
     return m_sourceModel->fetchDirection();

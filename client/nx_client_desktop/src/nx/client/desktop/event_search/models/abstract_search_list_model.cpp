@@ -25,6 +25,24 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
         requestFetch();
 }
 
+QnVirtualCameraResourceSet AbstractSearchListModel::cameras() const
+{
+    return m_cameras;
+}
+
+void AbstractSearchListModel::setCameras(const QnVirtualCameraResourceSet& value)
+{
+    if (m_cameras == value)
+        return;
+
+    emit camerasAboutToBeChanged({});
+
+    clear();
+    m_cameras = value;
+
+    emit camerasChanged({});
+}
+
 bool AbstractSearchListModel::fetchInProgress() const
 {
     return false;

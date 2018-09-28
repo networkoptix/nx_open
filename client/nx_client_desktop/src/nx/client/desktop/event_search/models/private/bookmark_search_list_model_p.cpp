@@ -7,10 +7,12 @@
 
 #include <camera/camera_bookmarks_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <nx/utils/datetime.h>
@@ -43,12 +45,18 @@ BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     const auto updateBookmarksWatcher =
         [this]()
         {
-            if (!camera())
-                return;
-
             if (auto watcher = this->q->context()->instance<QnTimelineBookmarksWatcher>())
-                watcher->setTextFilter(m_filterText);
+            {
+                const auto cameras = this->q->cameras();
+                const auto currentCamera = this->q->navigator()->currentResource()
+                    .dynamicCast<QnVirtualCameraResource>();
+                const bool relevant = cameras.empty() || cameras.contains(currentCamera);
+                watcher->setTextFilter(relevant ? m_filterText : QString());
+            }
         };
+
+    connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
+        this, updateBookmarksWatcher);
 
     m_updateBookmarks->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_updateBookmarks->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
@@ -100,7 +108,9 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
             return QVariant::fromValue(bookmark.guid);
 
         case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(camera());
+            return QVariant::fromValue<QnResourcePtr>(q->cameras().size() == 1
+                ? *q->cameras().cbegin()
+                : q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId));
 
         case Qn::HelpTopicIdRole:
             return Qn::Bookmarks_Usage_Help;
@@ -172,7 +182,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         << QVariant::fromValue(filter.orderBy.order).toString()
         << "maximum count" << filter.limit;
 
-    return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
+    return qnCameraBookmarksManager->getBookmarksAsync(q->cameras(), filter,
         [this, guard = QPointer<QObject>(this)](
             bool success,
             const QnCameraBookmarkList& bookmarks,

@@ -30,6 +30,9 @@ public:
     QnTimePeriod relevantTimePeriod() const;
     void setRelevantTimePeriod(const QnTimePeriod& value);
 
+    QnVirtualCameraResourceSet cameras() const;
+    void setCameras(const QnVirtualCameraResourceSet& value);
+
     using FetchDirection = AbstractSearchListModel::FetchDirection;
     FetchDirection fetchDirection() const;
     void setFetchDirection(FetchDirection value);
