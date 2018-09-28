@@ -27,7 +27,7 @@ def register(request):
     from util.helpers import detect_language_by_request
     logger.debug('/api/account/register called')
     lang = detect_language_by_request(request)
-    data = request.data
+    data = request.data.copy()
     data['language'] = lang
     data['IP'] = get_ip(request)
     AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
