@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "È possibile visualizzare video in diretta e sfogliare l'archivio",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Possibilita' di visualizzare solo video Live",
     "SHARE PERMISSIONS HINT CUSTOM": "Utilizzare l'applicazione client %VMS_NAME% per impostare le autorizzazioni personalizzate",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "Account",
     "EDIT USER BUTTON TEXT": "Modifica",
     "DELETE USER BUTTON TEXT": "Elimina",

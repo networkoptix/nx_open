@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "สามารถดูวิดีโอสดได้เท่านั้น",
     "SHARE PERMISSIONS HINT CUSTOM": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "บัญชีผู้ใช้",
     "EDIT USER BUTTON TEXT": "แก้ไข",
     "DELETE USER BUTTON TEXT": "ลบ",

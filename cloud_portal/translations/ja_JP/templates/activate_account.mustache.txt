@@ -1,4 +1,4 @@
-Hello {{message.userFullName}},
+こんにちは{{message.userFullName}},
 
   下のリンクを開いてメールアドレスを確認し、アカウントを有効にしてください
 

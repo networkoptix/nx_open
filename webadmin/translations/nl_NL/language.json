@@ -111,7 +111,7 @@
         "timeSynchronizationEnabled": "Tijdsynchronisatie ingeschakeld",
         "primaryTimeServer": "Primaire tijdsynchronisatieserver",
         "osTimeChangeCheckPeriodMs": "Controle van de tijd van het besturingssysteem",
-        "syncTimeExchangePeriod": "Sync time exchange period",
+        "syncTimeExchangePeriod": "Tijdsychronisatie uitwisselingsperiode",
         "maxWearableArchiveSynchronizationThreads": "Max. aantal draagbare camera archief synchronisatie verbindingen",
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",

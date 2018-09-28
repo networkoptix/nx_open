@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "Podgląd wideo na żywo i przeglądanie archiwum",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Tylko podgląd wideo na żywo",
     "SHARE PERMISSIONS HINT CUSTOM": "Użyj aplikacji klienckiej %VMS_NAME% , aby skonfigurować niestandardowe uprawnienia",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "Konto",
     "EDIT USER BUTTON TEXT": "Edytuj",
     "DELETE USER BUTTON TEXT": "Usuń",

@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "Может смотреть видео в реальном времени и архив",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Может смотреть только видео в реальном времени",
     "SHARE PERMISSIONS HINT CUSTOM": "Используйте клиентское приложение %VMS_NAME% для настройки особых полномочий",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "Учетная запись",
     "EDIT USER BUTTON TEXT": "Изменить",
     "DELETE USER BUTTON TEXT": "Удалить",

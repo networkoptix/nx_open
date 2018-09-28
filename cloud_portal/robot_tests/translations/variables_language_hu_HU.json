@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "Élő videó megtekintése és rögzített visszajátszása",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Csak élőkép megtekintése",
     "SHARE PERMISSIONS HINT CUSTOM": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "Fiók",
     "EDIT USER BUTTON TEXT": "Szerkesztés",
     "DELETE USER BUTTON TEXT": "Törlés",

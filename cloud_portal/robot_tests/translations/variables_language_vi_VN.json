@@ -32,6 +32,7 @@
     "SHARE PERMISSIONS HINT VIEWER": "Có thể xem video trực tuyến và duyệt qua kho lưu trữ",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Chỉ có thể xem video trực tiếp",
     "SHARE PERMISSIONS HINT CUSTOM": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh",
+    "SYSTEM NAME IS REQUIRED TEXT": "System name is required",
     "ACCOUNT TEXT": "Tài khoản",
     "EDIT USER BUTTON TEXT": "Sửa",
     "DELETE USER BUTTON TEXT": "Xóa bỏ",

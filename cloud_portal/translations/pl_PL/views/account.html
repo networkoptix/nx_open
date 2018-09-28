@@ -42,7 +42,7 @@
                 <label for="lastName" class="text-left text-md-right control-label">Język</label>
             </div>
             <div class="col-md-4">
-                <nx-language-select></nx-language-select>
+                <nx-language-select (on-selected)="changeLanguage($event)"></nx-language-select>
                 <!--<language-select account-mode="true" ng-model="account.language"></language-select>-->
             </div>
             <div class="col-md-4">
