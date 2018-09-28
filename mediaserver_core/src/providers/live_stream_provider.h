@@ -19,6 +19,7 @@
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 
+static const int META_FRAME_INTERVAL = 10;
 static const int META_DATA_DURATION_MS = 300;
 static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 1024 * 768;
 
@@ -46,7 +47,7 @@ public:
     void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
 
-    bool needMetadata();
+    virtual bool needMetadata();
 
     void onStreamReopen();
 
@@ -76,6 +77,7 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual Qn::ConnectionRole roleForMotionEstimation();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
+    bool needHardwareMotion();
 protected:
     mutable QnMutex m_liveMutex;
 

@@ -494,9 +494,8 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     }
 
     if (result)
-    {
         Qn::directConnect(result, &QnRtpStreamParser::packetLostDetected, this, &QnMulticodecRtpReader::at_packetLost);
-    }
+
     return result;
 }
 
@@ -794,7 +793,6 @@ void QnMulticodecRtpReader::calcStreamUrl()
             if (requestParts.size() > 1)
                 m_currentStreamUrl.setQuery(requestParts[1]);
         }
-
     }
 }
 

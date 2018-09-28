@@ -5,9 +5,7 @@
 #include "camera_settings_dialog_state.h"
 #include "camera_settings_dialog_state_reducer.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 using State = CameraSettingsDialogState;
 using Reducer = CameraSettingsDialogStateReducer;
@@ -290,10 +288,22 @@ void CameraSettingsDialogStore::setSecondaryRecordingDisabled(bool value)
         [&](State state) { return Reducer::setSecondaryRecordingDisabled(std::move(state), value); });
 }
 
-void CameraSettingsDialogStore::setNativePtzPresetsDisabled(bool value)
+void CameraSettingsDialogStore::setPreferredPtzPresetType(nx::core::ptz::PresetType value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setNativePtzPresetsDisabled(std::move(state), value); });
+        [&](State state) { return Reducer::setPreferredPtzPresetType(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setForcedPtzPanTiltCapability(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedPtzPanTiltCapability(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setForcedPtzZoomCapability(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setForcedPtzZoomCapability(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setRtpTransportType(vms::api::RtpTransportType value)
@@ -369,6 +379,4 @@ void CameraSettingsDialogStore::setCredentials(
         [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

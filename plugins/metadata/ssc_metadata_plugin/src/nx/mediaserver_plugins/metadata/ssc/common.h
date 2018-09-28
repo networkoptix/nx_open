@@ -27,10 +27,16 @@ struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 };
 #define SscAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (serialPortName)(outputEventTypes)
 
+struct AllowedPortNames
+{
+    bool useAllPorts = true;
+    QList<QString> values;
+};
+#define AllowedPorts_Fields (useAllPorts)(values)
+
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
-
-//bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh);
+QN_FUSION_DECLARE_FUNCTIONS(AllowedPortNames, (json))
 
 } // namespace ssc
 } // namespace metadata

@@ -334,9 +334,7 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
-#ifdef QN_RESOURCE_DEBUG
-    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
-#endif
+    NX_VERBOSE(this, "Change status. oldValue=%1,  new value=%2, name=%3, id=%4", oldStatus, newStatus, getName(), m_id);
 
     if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {

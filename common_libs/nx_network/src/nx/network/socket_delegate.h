@@ -327,7 +327,7 @@ public:
     StreamServerSocketDelegate(AbstractStreamServerSocket* target);
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
+    virtual void pleaseStopSync() override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
     virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;

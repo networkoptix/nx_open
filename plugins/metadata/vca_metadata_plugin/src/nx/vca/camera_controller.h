@@ -41,27 +41,22 @@ struct SupportedRule
 
 struct Heartbeat
 {
-    std::chrono::seconds interval;
-    bool isEnabled;
-    Heartbeat(): interval(1), isEnabled(false) {}
-    Heartbeat(std::chrono::seconds interval, bool isEnabled):
-        interval(interval), isEnabled(isEnabled)
-    {
-    }
+    std::chrono::seconds interval = std::chrono::seconds(1);
+    bool isEnabled = false;
 };
 
 class CameraControllerImpl;
 
-/*
+/**
  * Class to work with VCA-camera settings.
  *
  * Methods which names start with "read" obtain appropriate information from camera and save it
  * into class private members. Further information may be accessed with corresponding methods.
  *
  * All read methods are synchronous and may last quite long (depending on the request and camera
- * performance). Default read timeout is set to 10 seconds, longer requests will fail. Read-timeout
- * may be enlarged with setReadTimeout method. Timeout also may be reduces though it is not
- * recommended.
+ * performance). Default read timeout is set to 10 seconds, longer requests will fail.
+ * Read-timeout may be enlarged with setReadTimeout method. Timeout also may be reduces though
+ * it is not recommended.
  *
  * All read methods return boolean value (true - in case of successful reading).
  */
@@ -87,7 +82,7 @@ public:
     }
     int16_t tcpServerPort() const noexcept { return m_tcpServerPort; }
 
-    /*
+    /**
      * readSupportedRules & readSupportedRules2 do the same thing - they read all necessary
      * information about rules on the camera and save it into the internal rule table of the
      * CameraController object.
@@ -97,7 +92,7 @@ public:
     bool readSupportedRules();
     bool readSupportedRules2();
 
-    /*
+    /**
      * Read information about supported rules enable/disable state and update current rule table.
      */
     bool readSupportedRulesState();
@@ -110,8 +105,8 @@ public:
 
     bool setHeartbeat(Heartbeat heartbeat) const;
 
-    /* Read the number of tcp port through which camera server sends notifications when events
-     * occur. To obtain port number use tcpServerPort() after readTcpServerPort().
+    /** Read the number of tcp port through which the camera server sends notifications when events
+     * occur. To obtain port number, use tcpServerPort() after readTcpServerPort().
      */
     bool readTcpServerPort();
 

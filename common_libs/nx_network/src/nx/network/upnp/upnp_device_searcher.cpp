@@ -364,7 +364,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(const QnIn
     }
 
     if (oldSock)
-        oldSock->pleaseStopSync(true);
+        oldSock->pleaseStopSync();
     if (isReceiveSocketUpdated)
     {
         QnMutexLocker lock(&m_mutex);

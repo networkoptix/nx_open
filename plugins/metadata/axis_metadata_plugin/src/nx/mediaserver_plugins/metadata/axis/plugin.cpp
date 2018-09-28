@@ -37,6 +37,7 @@ Plugin::Plugin()
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
+
     {
         QFile file("plugins/axis/manifest.json");
         if (file.open(QFile::ReadOnly))

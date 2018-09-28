@@ -101,8 +101,6 @@ private:
     std::list<nxcip::CameraInputEventHandler*> m_eventHandlers;
     //!For synchronizing access to event handler list
     mutable QMutex m_mutex;
-    //map<port index, http reply>
-    std::map<unsigned int, QNetworkReply*> m_inputPortHttpMonitor;
     QWaitCondition m_cond;
     QAtomicInt m_asyncCallCounter;
     //!map<asyncCallID, callContext>

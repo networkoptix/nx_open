@@ -9,9 +9,7 @@
 
 namespace Ui { class CameraExpertSettingsWidget; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
 class CameraSettingsDialogStore;
@@ -34,6 +32,4 @@ private:
     const QScopedPointer<Ui::CameraExpertSettingsWidget> ui;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

@@ -22,7 +22,11 @@ func_tests/report.html
 func_tests/doc/html
 
 *.orig
+*.rej
 .vscode
+
+*.qmlc
+*.jsc
 
 build/*
 build-*/*

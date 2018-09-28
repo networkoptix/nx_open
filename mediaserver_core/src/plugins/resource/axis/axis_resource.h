@@ -138,8 +138,6 @@ private:
     nx::network::http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
 
-
-    nx::network::http::AsyncHttpClientPtr m_inputPortHttpMonitor;
     nx::network::http::BufferType m_currentMonitorData;
 
     QnWaitCondition m_stopInputMonitoringWaitCondition;

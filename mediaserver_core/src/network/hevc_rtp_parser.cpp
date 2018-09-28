@@ -27,6 +27,11 @@ static const nx::Buffer kSdpSeiPrefix("sprop-sei");
 
 namespace hevc = nx::media_utils::hevc;
 
+HevcParser::HevcParser()
+{
+    QnRtpStreamParser::setFrequency(90000);
+}
+
 bool HevcParser::processData(
     quint8* rtpBufferBase,
     int rtpBufferOffset,
@@ -124,7 +129,7 @@ void HevcParser::parseRtpMap(const nx::Buffer& rtpMapLine)
     if (!success)
         return;
 
-    m_context.frequency = frequency;
+    QnRtpStreamParser::setFrequency(frequency);
 
     values = values[0].split(':');
     if (values.size() < 2)

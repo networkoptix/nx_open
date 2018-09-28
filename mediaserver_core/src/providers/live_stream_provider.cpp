@@ -326,15 +326,19 @@ bool QnLiveStreamProvider::isMaxFps() const
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
+bool QnLiveStreamProvider::needHardwareMotion()
+{
+    return getRole() == Qn::CR_LiveVideo
+        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
+}
+
 bool QnLiveStreamProvider::needMetadata()
 {
     // I assume this function is called once per video frame
     if (!m_metadataReceptor->metadataQueue.isEmpty())
         return true;
 
-    bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
@@ -354,9 +358,9 @@ bool QnLiveStreamProvider::needMetadata()
 #endif
         return false;
     }
-    else if (needHardwareMotion)
+    else if (needHardwareMotion())
     {
-        bool result = m_framesSinceLastMetaData > 10
+        bool result = m_framesSinceLastMetaData > META_FRAME_INTERVAL
             || (m_framesSinceLastMetaData > 0
                 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 
@@ -705,7 +709,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
-    info.bitratePerGop = m_cameraRes->bitratePerGopType();
+    info.bitratePerGop = m_cameraRes->useBitratePerGop();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
     info.numberOfChannels = getNumberOfChannels();
 

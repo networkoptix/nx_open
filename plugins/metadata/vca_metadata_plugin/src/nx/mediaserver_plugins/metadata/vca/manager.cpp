@@ -86,38 +86,39 @@ static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
 
 static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
 
+// TODO: use string_view here and further.
 std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)
 {
     const char* keyValue = std::search(messageBegin, messageEnd, key.begin(), key.end());
     if (keyValue == messageEnd)
         return std::make_pair(messageBegin, messageBegin);
-    const char* Value = keyValue + key.size();
-    const char* ValueEnd = std::find(Value, messageEnd, '\n');
-    return std::make_pair(Value, ValueEnd);
+    const char* valueBegin = keyValue + key.size();
+    const char* valueEnd = std::find(valueBegin, messageEnd, '\n');
+    return std::make_pair(valueBegin, valueEnd);
 }
 
 EventMessage parseMessage(const char* message, int messageLength)
 {
     const char* current = message;
-    const char* end = message + messageLength;
+    const char* const end = message + messageLength;
     EventMessage eventMessage;
 
     for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
     {
-        auto view = findString(current, end, kEventMessageSearchKeys[i]);
-        QByteArray value = QByteArray(view.first, view.second - view.first);
+        const auto view = findString(current, end, kEventMessageSearchKeys[i]);
+        const QByteArray value = QByteArray(view.first, view.second - view.first);
         eventMessage.parameters.insert(std::make_pair(kEventMessageKeys[i], value));
         current = view.second;
     }
     return eventMessage;
 }
 
-//** Remove size bytes from the beginning of a buffer while saving current capacity. */
-void cleanBuffer(QByteArray& buffer, int size)
+//** Remove byteCount bytes from the beginning of a buffer while saving current capacity. */
+void removeFirstBytes(QByteArray& buffer, int byteCount)
 {
     const int capacity = buffer.capacity();
-    buffer.remove(0, size);
+    buffer.remove(0, byteCount);
     // Such remove doesn't decrease capacity in Qt5, but it's not guarantied in future.
     buffer.reserve(capacity);
 }
@@ -161,9 +162,9 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
-        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true)))
+        nx::vca::Heartbeat{ kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true }))
     {
-        NX_PRINT << "Failed to set VCA-camera heartbeat";
+        NX_PRINT << "Failed to set VCA-camera heartbeat.";
         return nx::sdk::Error::networkError;
     }
 
@@ -190,13 +191,13 @@ Manager::Manager(Plugin* plugin,
 
     static const int kBufferCapacity = 4096;
     m_buffer.reserve(kBufferCapacity);
-    NX_PRINT << "VCA metadata manager created";
+    NX_PRINT << "VCA metadata manager created.";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "VCA metadata manager destroyed";
+    NX_PRINT << "VCA metadata manager destroyed.";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -221,11 +222,11 @@ void Manager::treatMessage(int size)
 
     const auto parameterIterator = message.parameters.find("type");
     if (parameterIterator != message.parameters.end())
-        NX_PRINT << "Message received. Type = " << parameterIterator->second.constData();
+        NX_PRINT << "Message received. Type = " << parameterIterator->second.constData() << ".";
     else
     {
         NX_PRINT << "Message with unknown type received. Type = "
-            << parameterIterator->second.constData();
+            << parameterIterator->second.constData() << ".";
         return;
     }
     const QString internalName = parameterIterator->second;
@@ -248,10 +249,10 @@ void Manager::treatMessage(int size)
     {
 
         NX_PRINT << "Packed with undefined event type received. Uuid = "
-            << internalName.toStdString();
+            << internalName.toStdString() << ".";
     }
 
-    cleanBuffer(m_buffer, size);
+    removeFirstBytes(m_buffer, size);
 }
 
 void Manager::onReceive(SystemError::ErrorCode code , size_t size)
@@ -272,52 +273,55 @@ void Manager::onReceive(SystemError::ErrorCode code , size_t size)
     static int id = 0;
     ++id;
     NX_PRINT << "\n\n\nBuffer processing started. Iteration id = " << id
-        << " buffer size = " << m_buffer.size() << "\n";
+        << " buffer size = " << m_buffer.size() << ".\n";
 
     if (m_buffer.isEmpty())
     {
-        NX_PRINT << "Connection broken\n";
+        NX_PRINT << "Connection is broken.\n";
     }
 
     while (m_buffer.size() > 0)
     {
         if (m_buffer.size() < kHeaderSize)
         {
-            NX_PRINT << "Message header is not complete"
-                << ", buffer size = " << m_buffer.size();
+            NX_PRINT << "Message header is not complete" << ", buffer size = "
+                << m_buffer.size() << ".";
             break;
         }
         if (memcmp(m_buffer.data(), kPreamble, kPrefixSize) != 0)
         {
+            // TODO: #szaitsev: reopen connection on parsing error, this might help in case of
+            // parser error, when it drops all messages because of corrupted state.
             NX_PRINT << "Corrupted message. Wrong preamble, preamble = "
                 << m_buffer.mid(0, kPrefixSize).data()
-                << ", buffer size = " << m_buffer.size();
-            cleanBuffer(m_buffer, m_buffer.size());
+                << ", buffer size = " << m_buffer.size() << ".";
+            removeFirstBytes(m_buffer, m_buffer.size());
             break;
         }
         const char* const p = m_buffer.data() + kPrefixSize;
-        int size = atoi(p);
+        const int size = std::atoi(p); //< // TODO: #szaitsev: replace atoi
         if (size == 0 || size > m_buffer.capacity())
         {
             NX_PRINT << "Corrupted message. Wrong message size, message size = " << size
-                << ", buffer size = " << m_buffer.size();
-            cleanBuffer(m_buffer, m_buffer.size());
+                << ", buffer size = " << m_buffer.size() << ".";
+            removeFirstBytes(m_buffer, m_buffer.size());
             break;
         }
         if (size > m_buffer.size())
         {
             NX_PRINT << "Message is not complete, message size = " << size
-                << ", buffer size = " << m_buffer.size();
+                << ", buffer size = " << m_buffer.size() << ".";
             break;
         }
 
-        NX_PRINT << "Message ready, size = " << size << " buffer size = " << m_buffer.size();
+        NX_PRINT << "Message ready, size = " << size << " buffer size = "
+            << m_buffer.size() << ".";
         treatMessage(size);
-        NX_PRINT << "Message treated, size = " << size << " buffer size = " << m_buffer.size()
-            << "\n";
+        NX_PRINT << "Message treated, size = " << size << " buffer size = "
+            << m_buffer.size() << ".\n";
     }
     NX_PRINT << "Buffer processing finished. Iteration id = " << id
-        << " buffer size = " << m_buffer.size();
+        << " buffer size = " << m_buffer.size() << ".";
 
     m_tcpSocket->readSomeAsync(
         &m_buffer,
@@ -347,7 +351,7 @@ void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
         << event.internalName.toUtf8().constData()
-        << " sent to server";
+        << " sent to server.";
 }
 
 void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
@@ -355,7 +359,7 @@ void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
     NX_PRINT << "Event [stop] " << event.internalName.toUtf8().constData()
-        << " sent to server";
+        << " sent to server.";
 }
 
 void Manager::onTimer()
@@ -396,9 +400,9 @@ void Manager::onConnect(SystemError::ErrorCode code)
         m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
         return;
     }
-    NX_PRINT << "Connection to VCA camera notification server established";
+    NX_PRINT << "Connection to VCA camera notification server established.";
 
-    cleanBuffer(m_buffer, m_buffer.size());
+    removeFirstBytes(m_buffer, m_buffer.size());
 
     m_tcpSocket->readSomeAsync(
         &m_buffer,
@@ -441,7 +445,7 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
     QString host = m_url.host();
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
 
-    auto error = prepare(vcaCameraConrtoller);
+    const auto error = prepare(vcaCameraConrtoller);
     if (error != nx::sdk::Error::noError)
         return error;
 
@@ -450,7 +454,7 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
         QString id = typeList[i];
         const AnalyticsEventType* eventType = m_plugin->eventTypeById(id);
         if (!eventType)
-            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
+            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString() << ".";
         else
             m_eventsToCatch.emplace_back(*eventType);
     }
@@ -460,7 +464,7 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
     {
         eventNames = eventNames + event.type.internalName.toUtf8() + " ";
     }
-    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames.toStdString();
+    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames.toStdString() << ".";
 
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
@@ -468,7 +472,7 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
         return nx::sdk::Error::networkError;
     }
 
-    QString kAddressPattern("%1:%2");
+    static const QString kAddressPattern("%1:%2");
     QString ipPort = kAddressPattern.arg(
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
@@ -504,11 +508,11 @@ const char* Manager::capabilitiesManifest(nx::sdk::Error* error)
     nx::vca::CameraController vcaCameraConrtoller(host, m_auth.user(), m_auth.password());
     if (!vcaCameraConrtoller.readSupportedRulesState())
     {
-        NX_PRINT << "Failed to read AVC-camera rules state.";
+        NX_PRINT << "Failed to read VCA camera rules state.";
     }
     for (const auto& rule: vcaCameraConrtoller.suppotedRules())
     {
-        if(rule.second.ruleEnabled) //< At least one enabled rule.
+        if (rule.second.ruleEnabled) //< At least one enabled rule.
             return m_cameraManifest;
     }
     return "";

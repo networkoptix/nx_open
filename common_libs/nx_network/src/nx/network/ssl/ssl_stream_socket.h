@@ -60,7 +60,7 @@ public:
     virtual ~StreamSocket() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

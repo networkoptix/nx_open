@@ -1006,12 +1006,12 @@ void UdtStreamServerSocket::pleaseStop(
         });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void UdtStreamServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 void UdtStreamServerSocket::cancelIoInAioThread()
