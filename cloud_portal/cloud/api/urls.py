@@ -1,7 +1,7 @@
 __author__ = 'noptix'
 
 from django.conf.urls import url
-from api.views import account, systems, integration, common, utils
+from api.views import account, systems, common, utils
 
 urlpatterns = [
     url(r'^account-autocomplete/$', account.AccountAutocomplete.as_view(), name='account-autocomplete',),
@@ -34,8 +34,6 @@ urlpatterns = [
     url(r'^systems/(?P<system_id>.+?)/proxy/(?P<system_url>.+?)$',         systems.proxy),
     url(r'^systems/(?P<system_id>.+?)/?$',           systems.system),
     url(r'^systems/?$',                              systems.list_systems),
-
-    url(r'^integration$',                            integration.get_integration),
 
     url(r'^ping$',                                   common.ping),
 ]

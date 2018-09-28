@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.core.exceptions import ObjectDoesNotExist
 
 from cloud import settings
 from api.helpers.exceptions import APINotFoundException, api_success, handle_exceptions
@@ -35,8 +36,11 @@ def process_product(product):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def get_integration(request):
-    products = Product.objects.exclude(product_type__type=CLOUD_PORTAL)
-    if products.exists() and 'product_id' in request.GET:
-        return api_success(process_product(products.get(id=request.GET['product_id'])))
+    if 'product_id' in request.GET:
+        products = Product.objects.exclude(product_type__type=CLOUD_PORTAL)
+        try:
+            return api_success(process_product(products.get(id=request.GET['product_id'])))
+        except ObjectDoesNotExist:
+            pass
 
     raise APINotFoundException("Could not find integration", )
