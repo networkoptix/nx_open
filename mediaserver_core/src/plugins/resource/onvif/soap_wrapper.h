@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef ENABLE_ONVIF
-
 #include <list>
 #include <string>
 #include <map>
@@ -34,75 +32,20 @@ class QnCommonModule;
 
 struct SoapTimeouts
 {
-    static const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
-    static const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
-    static const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
-    static const int kSoapDefaultAcceptTimeoutSeconds = 5 * 5;
+    static const int kDefaultSendTimeoutSeconds = 50;
+    static const int kDefaultRecvTimeoutSeconds = 50;
+    static const int kDefaultConnectTimeoutSeconds = 25;
+    static const int kDefaultAcceptTimeoutSeconds = 25;
 
-    SoapTimeouts():
-        sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
-        recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
-        connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
-        acceptTimeoutSeconds(kSoapDefaultAcceptTimeoutSeconds)
-    {};
+    SoapTimeouts() = default;
+    SoapTimeouts(const QString& serialized);
+    QString serialize() const;
+    void assignTo(struct soap* soap) const;
 
-    SoapTimeouts(const QString& serialized):
-        SoapTimeouts()
-    {
-        if (serialized.isEmpty())
-            return;
-
-        static const int kTimeoutsCount = 4;
-
-        bool success = false;
-        auto timeouts = serialized.split(';');
-        auto paramsNum = timeouts.size();
-
-        std::vector<std::chrono::seconds*> fieldsToSet =
-        {
-            &sendTimeoutSeconds,
-            &recvTimeoutSeconds,
-            &connectTimeoutSeconds,
-            &acceptTimeoutSeconds
-        };
-
-        if (paramsNum == 1)
-        {
-            auto timeout = timeouts[0].toInt(&success);
-
-            if (!success)
-                return;
-
-            for (auto i = 0; i < kTimeoutsCount; ++i)
-                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
-        }
-        else if (paramsNum == 4)
-        {
-            for (auto i = 0; i < kTimeoutsCount; ++i)
-            {
-                auto timeout = timeouts[i].toInt(&success);
-
-                if (!success)
-                    continue;
-
-                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
-            }
-        }
-    }
-
-    QString serialize()
-    {
-        return lit("%1;%2;%3;%4")
-            .arg(sendTimeoutSeconds.count())
-            .arg(recvTimeoutSeconds.count())
-            .arg(connectTimeoutSeconds.count())
-            .arg(acceptTimeoutSeconds.count());
-    };
-
-    std::chrono::seconds sendTimeoutSeconds;
-    std::chrono::seconds recvTimeoutSeconds;
-    std::chrono::seconds connectTimeoutSeconds;
-    std::chrono::seconds acceptTimeoutSeconds;
+    std::chrono::seconds sendTimeout = std::chrono::seconds(kDefaultSendTimeoutSeconds);
+    std::chrono::seconds recvTimeout = std::chrono::seconds(kDefaultRecvTimeoutSeconds);
+    std::chrono::seconds connectTimeout = std::chrono::seconds(kDefaultConnectTimeoutSeconds);
+    std::chrono::seconds acceptTimeout = std::chrono::seconds(kDefaultAcceptTimeoutSeconds);
 };
 
 struct SoapParams
@@ -113,27 +56,24 @@ struct SoapParams
     QString passwd;
     int timeDrift = 0;
     bool tcpKeepAlive = false;
-    SoapParams() = default;
-    SoapParams(const SoapTimeouts& timeouts, std::string endpoint, QString login, QString passwd, int timeDrift, bool tcpKeepAlive = false) :
-        timeouts(timeouts), endpoint(std::move(endpoint)), login(std::move(login)), passwd(std::move(passwd)),
-        timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
-    SoapParams(const SoapTimeouts& timeouts, std::string endpoint, const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false) :
-        timeouts(timeouts), endpoint(std::move(endpoint)), login(auth.user()), passwd(auth.password()),
-        timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive) {}
-};
 
-struct soap;
-//class DeviceBindingProxy;
-////class DeviceIOBindingProxy;
-////class MediaBindingProxy;
-////class Media2BindingProxy;
-//class PTZBindingProxy;
-//class ImagingBindingProxy;
-//class NotificationProducerBindingProxy;
-//class CreatePullPointBindingProxy;
-//class PullPointSubscriptionBindingProxy;
-//class EventBindingProxy;
-//class SubscriptionManagerBindingProxy;
+    SoapParams() = default;
+    SoapParams(const SoapTimeouts& timeouts, std::string endpoint, QString login,
+        QString passwd, int timeDrift, bool tcpKeepAlive = false)
+        :
+        timeouts(timeouts), endpoint(std::move(endpoint)), login(std::move(login)),
+        passwd(std::move(passwd)), timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive)
+    {
+    }
+
+    SoapParams(const SoapTimeouts& timeouts, std::string endpoint,
+        const QAuthenticator& auth, int timeDrift, bool tcpKeepAlive = false)
+        :
+        timeouts(timeouts), endpoint(std::move(endpoint)), login(auth.user()),
+        passwd(auth.password()), timeDrift(timeDrift), tcpKeepAlive(tcpKeepAlive)
+    {
+    }
+};
 
 // All the following classes are defined in <onvif/soapStub.h>
 // In order not to include it here, we place forward declarations.
@@ -398,6 +338,9 @@ public:
         QString passwd,
         int timeDrift,
         bool tcpKeepAlive);
+
+    SoapWrapper(SoapParams soapParams);
+
     virtual ~SoapWrapper();
 
     SoapWrapper(const SoapWrapper&) = delete;
@@ -479,7 +422,7 @@ public:
     int m_timeDrift;
     QString m_login;
     QString m_passwd;
-    bool m_invoked;
+    bool m_invoked = false;
 
     BindingProxy m_bindingProxy;
 };
@@ -497,8 +440,7 @@ SoapWrapper<BindingProxyT>::SoapWrapper(
     m_endpoint(m_endpointHolder.c_str()),
     m_timeDrift(timeDrift),
     m_login(std::move(login)),
-    m_passwd(std::move(passwd)),
-    m_invoked(false)
+    m_passwd(std::move(passwd))
 {
     NX_ASSERT(!m_endpointHolder.empty());
     if (tcpKeepAlive)
@@ -508,11 +450,27 @@ SoapWrapper<BindingProxyT>::SoapWrapper(
 
     }
 
-    m_bindingProxy.soap->send_timeout = timeouts.sendTimeoutSeconds.count();
-    m_bindingProxy.soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
-    m_bindingProxy.soap->connect_timeout = timeouts.connectTimeoutSeconds.count();
-    m_bindingProxy.soap->accept_timeout = timeouts.acceptTimeoutSeconds.count();
+    timeouts.assignTo(m_bindingProxy.soap);
+    soap_register_plugin(m_bindingProxy.soap, soap_wsse);
+}
 
+template <class BindingProxyT>
+SoapWrapper<BindingProxyT>::SoapWrapper(SoapParams soapParams):
+    m_endpointHolder(std::move(soapParams.endpoint)),
+    m_endpoint(m_endpointHolder.c_str()),
+    m_timeDrift(soapParams.timeDrift),
+    m_login(std::move(soapParams.login)),
+    m_passwd(std::move(soapParams.passwd))
+{
+    NX_ASSERT(!m_endpointHolder.empty());
+    if (tcpKeepAlive)
+    {
+        soap_imode(m_bindingProxy.soap, SOAP_IO_KEEPALIVE);
+        soap_omode(m_bindingProxy.soap, SOAP_IO_KEEPALIVE);
+
+    }
+
+    timeouts.assignTo(m_bindingProxy.soap);
     soap_register_plugin(m_bindingProxy.soap, soap_wsse);
 }
 
@@ -555,8 +513,8 @@ public:
 
     int createUsers(CreateUsersReq& request, CreateUsersResp& response);
 
-    int systemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response);
-    int systemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response);
+    int setSystemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response);
+    int setSystemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response);
     int systemReboot(RebootReq& request, RebootResp& response);
 
 private:
@@ -687,12 +645,17 @@ public:
         --m_responseOwner->responseHolderCount;
         m_responseOwner = nullptr;
     }
+    Response* operator->()
+    {
+        NX_CRITICAL(m_responseOwner);
+        return &m_responseOwner->m_response;
+    }
     const Response* operator->() const
     {
         NX_CRITICAL(m_responseOwner);
         return &m_responseOwner->m_response;
     }
-    // Forbidden in order to suppress error-prone code.
+    // Temporary forbidden in order to suppress error-prone code.
     //const Response& operator*() const
     //{
     //    NX_CRITICAL(m_responseOwner);
@@ -781,11 +744,6 @@ public:
     ResponseHolder<Request, Response> get()
     {
         return ResponseHolder<Request, Response>(this);
-    }
-
-    Response& getEphemeralReference()
-    {
-        return m_response;
     }
 
     const char* requestFunctionName() const
@@ -1047,5 +1005,3 @@ public:
     int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
     int unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response );
 };
-
-#endif //ENABLE_ONVIF

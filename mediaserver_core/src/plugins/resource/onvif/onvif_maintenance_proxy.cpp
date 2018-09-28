@@ -59,7 +59,7 @@ bool QnOnvifMaintenanceProxy::callOperation(const QString &id) {
         FactoryDefaultReq request;
         FactoryDefaultResp response;
 
-        int soapRes = m_deviceSoapWrapper->systemFactoryDefaultSoft(request, response);
+        int soapRes = m_deviceSoapWrapper->setSystemFactoryDefaultSoft(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "MaintenanceSoftSystemFactoryDefaultOperation::set: can't perform soft factory default on camera. UniqId: "
                 << ". Reason: SOAP to endpoint " << m_deviceSoapWrapper->endpoint() << " failed. GSoap error code: "
@@ -72,7 +72,7 @@ bool QnOnvifMaintenanceProxy::callOperation(const QString &id) {
         FactoryDefaultReq request;
         FactoryDefaultResp response;
 
-        int soapRes = m_deviceSoapWrapper->systemFactoryDefaultHard(request, response);
+        int soapRes = m_deviceSoapWrapper->setSystemFactoryDefaultHard(request, response);
         if (soapRes != SOAP_OK) {
             qWarning() << "MaintenanceSoftSystemFactoryDefaultOperation::set: can't perform hard factory default on camera. UniqId: "
                 << ". Reason: SOAP to endpoint " << m_deviceSoapWrapper->endpoint() << " failed. GSoap error code: "

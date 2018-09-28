@@ -142,7 +142,8 @@ public:
     public:
         VideoOptionsLocal() = default;
 
-        VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
+        VideoOptionsLocal(const QString& id,
+            const onvifXsd__VideoEncoderConfigurationOptions& options,
             QnBounds frameRateBounds = QnBounds());
 
         VideoOptionsLocal(const QString& id,

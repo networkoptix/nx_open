@@ -419,7 +419,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         // The pointer currentVEConfig points to the object that is valid until
         // veConfigurations destructor is called.
         onvifXsd__VideoEncoderConfiguration* currentVEConfig = selectVideoEncoderConfig(
-            veConfigurations.getEphemeralReference().Configurations, isPrimary);
+            veConfigurations.get()->Configurations, isPrimary);
 
         if (!currentVEConfig)
             return CameraDiagnostics::RequestFailedResult("selectVideoEncoderConfig", QString());
@@ -458,7 +458,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateVideoEncoder(
         // The pointer currentVEConfig points to the object that is valid until
         // veConfigurations destructor is called.
         onvifXsd__VideoEncoder2Configuration* currentVEConfig = selectVideoEncoder2Config(
-            veConfigurations.getEphemeralReference().Configurations, isPrimary);
+            veConfigurations.get()->Configurations, isPrimary);
 
         if (!currentVEConfig)
             return CameraDiagnostics::RequestFailedResult("selectVideoEncoder2Config", QString());
@@ -537,7 +537,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     }
 
     onvifXsd__Profile* profile = selectExistingProfile(
-        profiles.getEphemeralReference().Profiles, isPrimary, info);
+        profiles.get()->Profiles, isPrimary, info);
     if (profile)
     {
         info.profileToken = QString::fromStdString(profile->token);
@@ -865,7 +865,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateAudioEncoder(
     }
 
     onvifXsd__AudioEncoderConfiguration* currentAEConfig = selectAudioEncoderConfig(
-        aeConfigurations.getEphemeralReference().Configurations, isPrimary);
+        aeConfigurations.get()->Configurations, isPrimary);
     if (!currentAEConfig)
         return CameraDiagnostics::RequestFailedResult("selectAudioEncoderConfig", QString());
 
