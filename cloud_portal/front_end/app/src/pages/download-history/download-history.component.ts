@@ -132,16 +132,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 this.section = this.routeParam;
             }
 
-            // if (!this.build) { // only one build
-            //     this.downloadTypes = [ 'releases', 'patches', 'betas' ];
-            // }
-
-            // setTimeout(() => {
-            //     if (this.tabs) {
-            //         this.tabs.select(this.section);
-            //     }
-            // }, 100);
-
             this.getData();
         });
     }
