@@ -1,22 +1,26 @@
 #include "stream_mixer.h"
 
+#include <algorithm>
+
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
-namespace
-{
-    const size_t kDataQueueSize = 100;
-    const quint32 kFramesBeforeReopen = 100;
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnChannelMapping, (json), (originalChannel)(mappedChannels))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnResourceChannelMapping, (json), (resourceChannel)(channelMap))
 
+namespace {
+
+static const size_t kDataQueueSize = 100;
+static const quint32 kFramesBeforeReopen = 100;
+
+} // namespace
+
+using namespace std::literals::chrono_literals;
+
 #ifdef ENABLE_DATA_PROVIDERS
 
-QnStreamMixer::QnStreamMixer() :
-    m_queue(kDataQueueSize)
+QnStreamMixer::QnStreamMixer()
 {
 }
 
@@ -144,7 +148,8 @@ void QnStreamMixer::unmapSourceAudioChannel(
 
 bool QnStreamMixer::canAcceptData() const
 {
-    return m_queue.size() < (int)kDataQueueSize;
+    QnMutexLocker lock(&m_mutex);
+    return m_buffer->canAcceptData();
 }
 
 void QnStreamMixer::putData(const QnAbstractDataPacketPtr &data)
@@ -180,6 +185,10 @@ void QnStreamMixer::proxyOpenStream(
     {
         QnMutexLocker lock(&m_mutex);
         sourceMap = m_sourceMap;
+        m_buffer =
+            std::make_shared<nx::streaming::MultiChannelBuffer>(
+                channelCount(QnAbstractMediaData::DataType::VIDEO),
+                channelCount(QnAbstractMediaData::DataType::AUDIO));
     }
 
     for (auto& source: sourceMap)
@@ -204,6 +213,8 @@ void QnStreamMixer::proxyCloseStream()
     {
         QnMutexLocker lock(&m_mutex);
         sourceMap = m_sourceMap;
+        if (m_buffer)
+            m_buffer->terminate();
     }
 
     for (auto& source: sourceMap)
@@ -216,17 +227,16 @@ void QnStreamMixer::proxyCloseStream()
 QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
 {
     QnAbstractDataPacketPtr data(nullptr);
-
-    int triesLeft = 3;
-    const int kWaitingTime = 100;
-
-    while (!data && triesLeft--)
+    decltype(m_buffer) buffer;
     {
-        m_queue.pop(data, kWaitingTime);
-        if (data)
-            break;
+        QnMutexLocker lock(&m_mutex);
+        buffer = m_buffer;
     }
 
+    if (!buffer)
+        return nullptr;
+
+    data = buffer->nextData(5000ms);
     return std::dynamic_pointer_cast<QnAbstractMediaData>(data);
 }
 
@@ -306,11 +316,36 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
 
                 dataToPush->channelNumber = mappedChannel;
                 dataToPush->dataProvider = m_user;
-                m_queue.push(dataToPush);
+
+                m_buffer->pushData(dataToPush);
                 isFirstIteration = false;
             }
         }
     }
+}
+
+int QnStreamMixer::channelCount(QnAbstractMediaData::DataType dataType) const
+{
+    std::set<quint32> mappedChannels;
+    for (const auto& providerInfo: m_sourceMap)
+    {
+        const auto& channelMap = dataType == QnAbstractMediaData::DataType::VIDEO
+            ? providerInfo.videoChannelMap
+            : providerInfo.audioChannelMap;
+
+        for (const auto& entry : channelMap)
+        {
+            std::set<quint32> temp;
+            const auto& providerMappedChannels = entry.second;
+            std::set_union(
+                mappedChannels.cbegin(), mappedChannels.cend(),
+                providerMappedChannels.cbegin(), providerMappedChannels.cend(),
+                std::inserter(temp, temp.end()));
+
+            mappedChannels = std::move(temp);
+        }
+    }
+    return mappedChannels.size();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

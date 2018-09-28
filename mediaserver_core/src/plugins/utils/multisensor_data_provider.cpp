@@ -42,7 +42,6 @@ QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
         return getMetaData();
 
     auto data = m_dataSource.retrieveData();
-
     return data;
 }
 
