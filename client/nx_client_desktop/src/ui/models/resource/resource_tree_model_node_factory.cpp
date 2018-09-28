@@ -39,7 +39,8 @@ bool isAcceptableForModelLayout(
     const auto context = model->context();
     return model->scope() == QnResourceTreeModel::FullScope
         && context->resourceAccessProvider()->hasAccess(context->user(), resource)
-        && resource->hasFlags(Qn::layout);
+        && resource->flags().testFlag(Qn::layout)
+        && !resource->flags().testFlag(Qn::local);
 }
 
 bool isAcceptableForModelServer(
