@@ -443,5 +443,9 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     }
     while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
         gotFrame = true; //< flush decoder buffer
+
+    if (gotFrame)
+        outFrame->channel = firstFrame->channelNumber;
+
     return gotFrame ? outFrame : CLVideoDecoderOutputPtr();
 }
