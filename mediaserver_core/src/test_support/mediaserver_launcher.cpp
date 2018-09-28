@@ -4,9 +4,18 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
 
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
+namespace {
+
+
+} // namespace
+
+MediaServerLauncher::MediaServerLauncher(
+    const QString& tmpDir,
+    int port,
+    DisabledFeatures disabledFeatures)
+    :
     m_workDirResource(tmpDir),
-    m_serverEndpoint(nx::network::HostAddress::localhost, 0),
+    m_serverEndpoint(nx::network::HostAddress::localhost, port),
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
@@ -14,6 +23,19 @@ MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
     m_serverGuid = QnUuid::createUuid();
+    fillDefaultSettings();
+}
+
+void MediaServerLauncher::fillDefaultSettings()
+{
+    m_settings = {
+	{"serverGuid", m_serverGuid.toString()},
+	{"removeDbOnStartup", m_firstStartup ? QString("true") : QString("false")},
+	{"varDir", *m_workDirResource.getDirName()},
+	{"dataDir", *m_workDirResource.getDirName()},
+	{"systemName", QnUuid::createUuid().toString()},
+	{"port", QString::number(m_serverEndpoint.port)}
+    };
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -46,9 +68,9 @@ nx::mediaserver::Authenticator* MediaServerLauncher::authenticator() const
     return m_mediaServerProcess->authenticator();
 }
 
-void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
+void MediaServerLauncher::addSetting(const std::string& name, const QVariant& value)
 {
-    m_customSettings.emplace_back(name, value.toString());
+    m_settings[name] = value.toString();
 }
 
 void MediaServerLauncher::prepareToStart()
@@ -56,18 +78,8 @@ void MediaServerLauncher::prepareToStart()
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
     m_configFile.open(m_configFilePath.toUtf8().constData());
 
-    m_configFile << "serverGuid = " << m_serverGuid.toString().toStdString() << std::endl;
-    m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
-    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
-
-    for (const auto& customSetting: m_customSettings)
-    {
-        m_configFile << customSetting.first.toStdString() << " = "
-            << customSetting.second.toStdString() << std::endl;
-    }
+    for (const auto& p: m_settings)
+        m_configFile << p.first << " = " << p.second.toStdString() << std::endl;
 
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
     const char* argv[] = { "", "-e", configFileOption.data() };
