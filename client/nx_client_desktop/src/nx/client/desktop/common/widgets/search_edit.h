@@ -43,6 +43,8 @@ public:
     void setClearingTagIndex(int index);
     int clearingTagIndex() const;
 
+    bool focused() const;
+
 public:
     QSize sizeHint() const override;
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const override;
@@ -55,6 +57,7 @@ signals:
     void enterPressed();
     void ctrlEnterPressed();
     void focusedChanged();
+    void filteringChanged();
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -78,11 +81,12 @@ private:
     void setButtonHovered(bool value);
     void updateMenuButtonIcon();
 
+    void setFocused(bool value);
+    void updateFocused();
+
 private:
     struct Private;
     const QScopedPointer<Private> d;
-
-    QStringList m_tags;
 };
 
 } // namespace desktop

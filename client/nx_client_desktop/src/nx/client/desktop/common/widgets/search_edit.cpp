@@ -162,6 +162,9 @@ struct SearchEdit::Private
     QMenu* const menu = nullptr;
     SelectableTextButton* const tagButton = nullptr;
 
+    QStringList tags;
+
+    bool focused = false;
     bool hovered = false;
     int selectedTagIndex = -1;
     int clearingTagIndex = -1;
@@ -182,8 +185,8 @@ SearchEdit::SearchEdit(QWidget* parent):
     setAttribute(Qt::WA_InputMethodEnabled);
 
     d->lineEdit->setFrame(false);
-    d->lineEdit->setFocusProxy(this);
     d->lineEdit->setFixedHeight(kLineEditHeight);
+    d->lineEdit->setFocusProxy(this);
     d->lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
     d->lineEdit->setClearButtonEnabled(true);
 
@@ -209,6 +212,7 @@ SearchEdit::SearchEdit(QWidget* parent):
     d->tagButton->setFixedHeight(24);
     d->tagButton->setDeactivatable(true);
     d->tagButton->setSelectable(false);
+    d->tagButton->setFocusPolicy(Qt::NoFocus);
     d->tagButton->setState(SelectableTextButton::State::unselected);
     connect(d->tagButton, &SelectableTextButton::stateChanged,
         this, &SearchEdit::handleTagButtonStateChanged);
@@ -238,6 +242,29 @@ SearchEdit::~SearchEdit()
 {
 }
 
+bool SearchEdit::focused() const
+{
+    return d->focused;
+}
+
+void SearchEdit::setFocused(bool value)
+{
+    if (d->focused == value)
+        return;
+
+    d->focused = value;
+    emit focusedChanged();
+}
+
+void SearchEdit::updateFocused()
+{
+    setFocused(
+        hasFocus()
+        || d->menu->hasFocus()
+        || d->menuButton->hasFocus()
+        || d->menu->isVisible());
+}
+
 void SearchEdit::setupMenuButton()
 {
     d->menuButton->setFlat(true);
@@ -246,6 +273,7 @@ void SearchEdit::setupMenuButton()
 
     updateMenuButtonIcon();
 
+    connect(d->menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
     connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
         {
@@ -263,19 +291,20 @@ void SearchEdit::setupMenuButton()
             }
         });
 
+
     connect(d->lineEdit, &QLineEdit::textChanged, this, &SearchEdit::updateMenuButtonIcon);
 }
 
 void SearchEdit::updateMenuButtonIcon()
 {
-    const auto kIcon = m_tags.isEmpty()
+    const auto kIcon = d->tags.isEmpty()
         ? qnSkin->icon("theme/search.png")
         : qnSkin->icon("theme/search_drop.png");
-    const auto kSelectedIcon = m_tags.isEmpty()
+    const auto kSelectedIcon = d->tags.isEmpty()
         ? qnSkin->icon("theme/search_selected.png")
         : qnSkin->icon("theme/search_drop_selected.png");
 
-    d->menuButton->setFixedSize(m_tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
+    d->menuButton->setFixedSize(d->tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
 }
 
@@ -310,25 +339,25 @@ void SearchEdit::setPlaceholderText(const QString& value)
 
 QStringList SearchEdit::tagsList() const
 {
-    return m_tags;
+    return d->tags;
 }
 
 void SearchEdit::setTags(const QStringList& value)
 {
 
-    if (m_tags == value)
+    if (d->tags == value)
         return;
 
-    m_tags = value;
+    d->tags = value;
     setSelectedTagIndex(-1);
 
     d->menu->clear();
-    d->lineEdit->setIndentOn(!m_tags.isEmpty());
+    d->lineEdit->setIndentOn(!d->tags.isEmpty());
     updateMenuButtonIcon();
 
-    for (int index = 0; index != m_tags.size(); ++ index)
+    for (int index = 0; index != d->tags.size(); ++ index)
     {
-        const auto tag = m_tags.at(index);
+        const auto tag = d->tags.at(index);
         const auto action = tag.isEmpty()
             ? d->menu->addSeparator()
             : d->menu->addAction(tag);
@@ -370,14 +399,10 @@ void SearchEdit::updatePalette()
 
 void SearchEdit::setSelectedTagIndex(int value)
 {
-    if (value == d->clearingTagIndex)
-        value = -1; // Clears selected index.
-
     if (value == d->selectedTagIndex)
         return;
 
     d->selectedTagIndex = value;
-    d->lineEdit->setFocus();
     emit selectedTagIndexChanged();
 }
 
@@ -385,7 +410,7 @@ void SearchEdit::updateTagButton()
 {
     if (d->selectedTagIndex != -1)
     {
-        d->tagButton->setText(fixAmpersand(m_tags.at(d->selectedTagIndex)));
+        d->tagButton->setText(fixAmpersand(d->tags.at(d->selectedTagIndex)));
         d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
@@ -436,10 +461,10 @@ void SearchEdit::focusInEvent(QFocusEvent* event)
     d->lineEdit->event(event);
     d->lineEdit->selectAll();
 
-    base_type::focusInEvent(event);
-
     updatePalette();
-    emit focusedChanged();
+    updateFocused();
+
+    base_type::focusInEvent(event);
 }
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
@@ -453,10 +478,10 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
             d->lineEdit, SLOT(_q_completionHighlighted));
     }
 
-    base_type::focusOutEvent(event);
-
     updatePalette();
-    emit focusedChanged();
+    updateFocused();
+
+    base_type::focusOutEvent(event);
 }
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)
