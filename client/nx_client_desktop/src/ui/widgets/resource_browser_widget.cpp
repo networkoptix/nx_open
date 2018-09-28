@@ -126,6 +126,22 @@ static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
         ResourceTreeNodeType::localResources
     });
 
+bool hasParentNodes(const QModelIndex& index)
+{
+    if (!index.isValid())
+        return true; //< We suppose that real root node always contains parent nodes.
+
+    const auto model = index.model();
+    const int rowCount = model->rowCount(index);
+    for (int row = 0; row != rowCount; ++row)
+    {
+        const auto childIndex = index.child(row, 0);
+        if (model->rowCount(childIndex) > 0)
+            return true;
+    }
+    return false;
+}
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -455,10 +471,9 @@ void QnResourceBrowserWidget::updateNewFilter()
 
     const auto searchModel = ui->resourceTreeWidget->searchModel();
     const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
-
     const auto treeView = ui->resourceTreeWidget->treeView();
     treeView->setRootIndex(newRootNode);
-    treeView->setRootIsDecorated(!newRootNode.isValid());
+    treeView->setRootIsDecorated(hasParentNodes(newRootNode));
     const auto indents = treeView->rootIsDecorated()
         ? kStandardResourceTreeIndents
         : kTaggedResourceTreeIndents;
