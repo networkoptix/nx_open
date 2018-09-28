@@ -15,7 +15,7 @@ class UpnpPortMapper: public ::testing::Test
 public:
     UpnpPortMapper():
         deviceSearcher(std::make_unique<DeviceSearcherDefaultSettings>()),
-        portMapper(lit("192.168.0.10"), 100)
+        portMapper(&deviceSearcher, lit("192.168.0.10"), 100)
     {
         portMapper.clientMock().changeExternalIp(lit("12.34.56.78"));
     }
@@ -127,7 +127,9 @@ TEST_F(UpnpPortMapper, ChangeExternalIp)
 
 TEST_F(UpnpPortMapper, DISABLED_RealRouter)
 {
-    PortMapper portMapper(true, 10000);
+    nx::network::upnp::DeviceSearcher deviceSearcher(
+        std::make_unique<DeviceSearcherDefaultSettings>());
+    PortMapper portMapper(&deviceSearcher, true, 10000);
     EXPECT_TRUE(portMapper.enableMapping(7001, PortMapper::Protocol::TCP, [&](SocketAddress) {}));
     QThread::sleep(60 * 60);
 }

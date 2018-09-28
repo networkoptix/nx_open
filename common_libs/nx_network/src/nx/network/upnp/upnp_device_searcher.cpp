@@ -29,8 +29,6 @@ int DeviceSearcherDefaultSettings::cacheTimeout() const
     return XML_DESCRIPTION_LIVE_TIME_MS;
 }
 
-static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
-
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
     nx::utils::AppInfo::organizationName() + "Server";
 
@@ -52,16 +50,11 @@ DeviceSearcher::DeviceSearcher(
             std::chrono::milliseconds(m_discoverTryTimeoutMS));
     }
     m_cacheTimer.start();
-
-    NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
-    UPNPDeviceSearcherInstance = this;
 }
 
 DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
-
-    UPNPDeviceSearcherInstance = nullptr;
 }
 
 void DeviceSearcher::pleaseStop()
@@ -205,11 +198,6 @@ void DeviceSearcher::processDiscoveredDevices(SearchHandler* handlerToUse)
 int DeviceSearcher::cacheTimeout() const
 {
     return m_settings->cacheTimeout();
-}
-
-DeviceSearcher* DeviceSearcher::instance()
-{
-    return UPNPDeviceSearcherInstance;
 }
 
 void DeviceSearcher::onTimer(const quint64& /*timerID*/)
@@ -376,7 +364,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(const QnIn
     }
 
     if (oldSock)
-        oldSock->pleaseStopSync(true);
+        oldSock->pleaseStopSync();
     if (isReceiveSocketUpdated)
     {
         QnMutexLocker lock(&m_mutex);

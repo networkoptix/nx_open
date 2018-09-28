@@ -140,7 +140,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceFlags>();
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
-    qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<nx::vms::api::EventReason>();
     qRegisterMetaType<nx::vms::event::AnalyticsSdkEventPtr>();
 

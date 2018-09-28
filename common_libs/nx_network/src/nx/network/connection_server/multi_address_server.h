@@ -53,10 +53,10 @@ public:
     }
 
     // TODO: #ak Inherit this class from QnStoppableAsync.
-    void pleaseStopSync(bool assertIfCalledUnderMutex = true)
+    void pleaseStopSync()
     {
         for (auto& listener: m_listeners)
-            listener->pleaseStopSync(assertIfCalledUnderMutex);
+            listener->pleaseStopSync();
     }
 
     /**

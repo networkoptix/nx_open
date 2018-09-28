@@ -102,8 +102,6 @@ public:
     void processDiscoveredDevices(SearchHandler* handlerToUse = NULL);
     int cacheTimeout() const;
 
-    static DeviceSearcher* instance();
-
 private:
     class DiscoveredDeviceInfo
     {

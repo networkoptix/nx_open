@@ -17,6 +17,10 @@ QnArecontRtspStreamReader::QnArecontRtspStreamReader(
     parent_type(res),
     m_rtpStreamParser(res)
 {
+    m_metaReader = std::make_unique<ArecontMetaReader>(
+        res->getVideoLayout(0)->channelCount(),
+        std::chrono::milliseconds(META_DATA_DURATION_MS),
+        META_FRAME_INTERVAL);
 }
 
 QnArecontRtspStreamReader::~QnArecontRtspStreamReader()
@@ -103,7 +107,7 @@ bool QnArecontRtspStreamReader::isStreamOpened() const
 
 QnMetaDataV1Ptr QnArecontRtspStreamReader::getCameraMetadata()
 {
-    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    auto motion = m_metaReader->getData();
     if (!motion)
         return motion;
     filterMotionByMask(motion);
@@ -120,6 +124,21 @@ void QnArecontRtspStreamReader::pleaseReopenStream()
 {
     parent_type::pleaseReopenStream();
     CLServerPushStreamReader::pleaseReopenStream();
+}
+
+// Override needMetaData due to we have async method of meta data obtaining in hardware case
+bool QnArecontRtspStreamReader::needMetadata()
+{
+    if (!parent_type::needHardwareMotion())
+        return parent_type::needMetadata();
+
+    if (m_metaReader->hasData())
+        return true;
+
+    auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+    NX_ASSERT(resource);
+    m_metaReader->requestIfReady(resource.data());
+    return false;
 }
 
 QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
@@ -144,7 +163,7 @@ QnAbstractMediaDataPtr QnArecontRtspStreamReader::getNextData()
             break;
         }
     }
-
+    m_metaReader->onNewFrame();
     return rez;
 }
 

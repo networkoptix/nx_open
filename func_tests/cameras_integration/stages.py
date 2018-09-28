@@ -126,7 +126,7 @@ def video_parameters(run, **configurations):  # type: (stage.Run, dict) -> Gener
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=1))
 def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
@@ -137,17 +137,21 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             if not configuration.get('skip_codec_change'):
                 configure_audio(
                     run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+            else:
+                del configuration["skip_codec_change"]
 
             _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
                     streams = ffprobe_streams(run.media_url)
                     if not streams:
-                        yield Halt('Audio stream was not discovered by ffprobe.')
+                        yield Halt(
+                            'No stream (neither audio nor video) was discovered by ffprobe.')
                         continue
                     audio_stream = streams[1]
                 except IndexError:
-                    yield Halt('Audio stream was not discovered by ffprobe.')
+                    yield Halt(
+                        'Audio stream was not discovered by ffprobe (video stream was found).')
                     continue
 
                 yield expect_values(

@@ -137,7 +137,7 @@ QStringList ServerWriterHandler::camerasIds(QnServer::ChunksCatalog catalog) con
 
 bool ServerWriterHandler::needStop() const
 {
-    return QnResource::isStopping();
+    return m_resPool->commonModule()->isNeedToStop();
 }
 
 bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& data)

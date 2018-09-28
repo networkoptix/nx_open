@@ -109,6 +109,11 @@ public:
         std::function<void(ec2::ErrorCode, nx::vms::api::MediaServerDataExList)> completionHandler);
     ec2::ErrorCode ec2GetMediaServersEx(nx::vms::api::MediaServerDataExList* result);
 
+    void ec2SaveMediaServer(
+        const nx::vms::api::MediaServerData& request,
+        std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode ec2SaveMediaServer(const nx::vms::api::MediaServerData& request);
+
     void ec2GetSettings(
         std::function<void(
             ec2::ErrorCode,

@@ -94,10 +94,10 @@ void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     network::aio::Timer::pleaseStop(std::move(handler));
 }
 
-void AsyncClientUser::pleaseStopSync(bool checkForLocks)
+void AsyncClientUser::pleaseStopSync()
 {
     disconnectFromClient();
-    network::aio::Timer::pleaseStopSync(checkForLocks);
+    network::aio::Timer::pleaseStopSync();
 }
 
 AbstractAsyncClient* AsyncClientUser::client() const

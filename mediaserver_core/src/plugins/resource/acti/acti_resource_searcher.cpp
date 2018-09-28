@@ -43,7 +43,7 @@ QnActiResourceSearcher::QnActiResourceSearcher(QnMediaServerModule* serverModule
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    base_type(kUpnpBasicDeviceType),
+    base_type(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
     nx::mediaserver::ServerModuleAware(serverModule)
 {
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));

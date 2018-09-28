@@ -22,7 +22,7 @@
 #include <core/resource/combined_sensors_description.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/dataprovider/live_stream_params.h>
-
+#include <core/ptz/ptz_preset.h>
 class QnAbstractArchiveDelegate;
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
@@ -289,7 +289,7 @@ public:
         const QVariant& value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
-    virtual Qn::BitratePerGopType bitratePerGopType() const;
+    virtual bool useBitratePerGop() const;
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
@@ -332,6 +332,23 @@ public:
     virtual int suggestBitrateForQualityKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     static Qn::StreamIndex toStreamIndex(Qn::ConnectionRole role);
+
+    nx::core::ptz::PresetType preferredPtzPresetType() const;
+
+    nx::core::ptz::PresetType userPreferredPtzPresetType() const;
+    void setUserPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+    nx::core::ptz::PresetType defaultPreferredPtzPresetType() const;
+    void setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType);
+
+    bool isUserAllowedToModifyPtzCapabilities() const;
+
+    void setIsUserAllowedToModifyPtzCapabilities(bool allowed);
+
+    Ptz::Capabilities ptzCapabilitiesAddedByUser() const;
+
+    void setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities);
+
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();

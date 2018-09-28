@@ -18,6 +18,7 @@ class NX_NETWORK_API PortMapper:
 {
 public:
     PortMapper(
+        nx::network::upnp::DeviceSearcher* deviceSearcher,
         bool isEnabled = true,
         quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
         const QString& description = QString(),

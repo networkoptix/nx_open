@@ -257,6 +257,7 @@ public:
 
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(
+        QnCommonModule* commonModule,
         const SoapTimeouts& onvifTimeouts,
         const QString& onvifUrl,
         const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
@@ -340,7 +341,7 @@ protected:
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
-    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual void initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params);
     virtual QSet<QString> calculateSupportedAdvancedParameters() const;
     virtual void fetchAndSetAdvancedParameters();
 

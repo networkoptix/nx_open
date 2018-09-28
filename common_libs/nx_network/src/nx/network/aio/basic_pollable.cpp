@@ -53,7 +53,7 @@ void BasicPollable::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler
         });
 }
 
-void BasicPollable::pleaseStopSync(bool checkForLocks)
+void BasicPollable::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {
@@ -67,7 +67,7 @@ void BasicPollable::pleaseStopSync(bool checkForLocks)
     else
     {
         NX_ASSERT(!m_aioService->isInAnyAioThread());
-        QnStoppableAsync::pleaseStopSync(m_aioService, checkForLocks);
+        QnStoppableAsync::pleaseStopSync(m_aioService);
     }
 }
 

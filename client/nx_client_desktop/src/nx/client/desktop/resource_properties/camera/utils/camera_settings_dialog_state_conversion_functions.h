@@ -2,9 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState;
 
@@ -15,6 +13,4 @@ struct CameraSettingsDialogStateConversionFunctions
         const QnVirtualCameraResourceList& cameras);
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

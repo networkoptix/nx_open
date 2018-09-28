@@ -58,7 +58,7 @@ int64_t CameraTimeHelper::getUsecTime(
     const int64_t resultUsec =
         cameraTimeToLocalTime(cameraUsec, localTimeUsec, usePrivateOffset, primaryStream);
     const int64_t deviationSeconds = std::abs(resultUsec - localTimeUsec);
-    NX_DEBUG(this,
+    NX_VERBOSE(this,
         "ResourceId: %1. cameraTime: %2ms, resultTime %3ms, rtpTime %4, rtcpTime %5, ntpTime %6, onvif %7",
         m_resourceId,
         cameraUsec / 1000,

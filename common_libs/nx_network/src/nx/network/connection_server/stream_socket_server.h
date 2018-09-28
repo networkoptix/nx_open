@@ -187,7 +187,7 @@ public:
 
     virtual ~StreamSocketServer()
     {
-        pleaseStopSync(false);
+        pleaseStopSync();
         this->closeAllConnections();
     }
 

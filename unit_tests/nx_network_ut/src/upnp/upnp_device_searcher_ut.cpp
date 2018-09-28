@@ -23,8 +23,8 @@ class TestSearchHandler:
     public SearchAutoHandler
 {
 public:
-    TestSearchHandler():
-        SearchAutoHandler(QLatin1String("InternetGatewayDevice"))
+    TestSearchHandler(DeviceSearcher* deviceSearcher):
+        SearchAutoHandler(deviceSearcher, QLatin1String("InternetGatewayDevice"))
     {
     }
 
@@ -53,7 +53,7 @@ TEST(UpnpDeviceSearcher, DISABLED_General)
 {
     nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher(std::make_unique<DeviceSearcherDefaultSettings>());
-    TestSearchHandler testSearcher;
+    TestSearchHandler testSearcher(&deviceSearcher);
     QThread::sleep(5);
 }
 

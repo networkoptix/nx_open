@@ -1700,10 +1700,11 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
     reg("api/getCurrentUser", new QnCurrentUserRestHandler());
 
-    /**%apidoc GET /api/activateLicense
-     * Activate new license and return license JSON data if success
-     * %param:string key License serial number
-     * %return:object JSON data.
+    /**%apidoc POST /api/activateLicense
+     * Activate new license and return license JSON data if success. It requires internet to
+     * connect to the license server.
+     * %param:string licenseKey License serial number.
+     * %return:object License JSON data.
      */
     reg("api/activateLicense", new QnActivateLicenseRestHandler());
 
@@ -2737,6 +2738,7 @@ void MediaServerProcess::prepareOsResources()
 void MediaServerProcess::initializeUpnpPortMapper()
 {
     m_upnpPortMapper = std::make_unique<nx::network::upnp::PortMapper>(
+        serverModule()->upnpDeviceSearcher(),
         /*isEnabled*/ false,
         nx::network::upnp::PortMapper::DEFAULT_CHECK_MAPPINGS_INTERVAL,
         QnAppInfo::organizationName());
@@ -3356,7 +3358,7 @@ void MediaServerProcess::stopObjects()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(dumpSystemResourceUsageTaskID);
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    QnResource::pleaseStopAsyncTasks();
+    commonModule()->setNeedToStop(true);
     m_multicastHttp.reset();
 
     if (m_universalTcpListener)
@@ -3387,14 +3389,12 @@ void MediaServerProcess::stopObjects()
     commonModule()->resourceDiscoveryManager()->stop();
     serverModule()->metadataManagerPool()->stop(); //< Stop processing analytics events.
 
-    QnResource::stopAsyncTasks();
+    serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
     //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     m_serverResourceProcessor.reset();
-
-    m_statusWatcher.reset();
 
     commonModule()->deleteMessageProcessor(); // stop receiving notifications
     m_ec2ConnectionFactory->shutdown();
@@ -3422,7 +3422,6 @@ void MediaServerProcess::stopObjects()
         "ms", commonModule()->moduleGUID());
 
     m_autoRequestForwarder.reset();
-    m_serverConnector.reset();
     m_audioStreamerPool.reset();
     m_upnpPortMapper.reset();
 
@@ -3845,7 +3844,7 @@ void MediaServerProcess::startObjects()
     if (!isDiscoveryDisabled)
         m_mserverResourceSearcher->start();
     m_universalTcpListener->start();
-    m_serverConnector->start();
+    serverModule()->serverConnector()->start();
     serverModule()->backupStorageManager()->scheduleSync()->start();
     serverModule()->unusedWallpapersWatcher()->start();
     if (m_serviceMode)
@@ -4051,15 +4050,12 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    m_serverConnector = std::make_unique<QnServerConnector>(commonModule());
-
     serverModule->serverUpdateTool()->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
-    QnResource::initAsyncPoolInstance(serverModule->settings().resourceInitThreadsCount());
+    serverModule->resourcePool()->threadPool()->setMaxThreadCount(
+        serverModule->settings().resourceInitThreadsCount());
 
     createResourceProcessor();
-
-    m_statusWatcher = std::make_unique<QnResourceStatusWatcher>(commonModule());
 
     // Searchers must be initialized before the resources are loaded as resources instances
     // are created by searchers.

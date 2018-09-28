@@ -193,7 +193,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(
 
         // Rewrite resource status to DB and send to the foreign peer
         if (resource->getStatus() != status)
-            QnResourceStatusWatcher::instance()->updateResourceStatus(resource);
+            m_serverModule->statusWatcher()->updateResourceStatus(resource);
     }
     else
     {

@@ -19,7 +19,7 @@ Q_OBJECT
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     StreamFpsSharingMethod TimePeriodContent SystemComponent
-    ConnectionRole ResourceStatus BitratePerGopType
+    ConnectionRole ResourceStatus
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent StreamIndex
@@ -297,12 +297,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     QString toString(StatusChangeReason reason);
 
-    enum BitratePerGopType {
-        BPG_None,
-        BPG_Predefined,
-        BPG_User
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     enum IOPortType {
         PT_Unknown  = 0x0,
@@ -725,14 +719,13 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
 
     enum StorageStatus
     {
-        unknown = 0,
+        none = 0,
         used = 1 << 1,
-        notUsed = 1 << 2,
-        tooSmall = 1 << 3,
-        systemTooSmall = 1 << 4,
-        removable = 1 << 5,
-        beingChecked = 1 << 6,
-        beingRebuilded = 1 << 7
+        tooSmall = 1 << 2,
+        system = 1 << 3,
+        removable = 1 << 4,
+        beingChecked = 1 << 5,
+        beingRebuilded = 1 << 6
     };
     Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
     Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)
@@ -772,7 +765,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::StorageInitResult)
     (Qn::PanicMode)
     (Qn::ResourceStatus)(Qn::StatusChangeReason)
-    (Qn::ConnectionRole)(Qn::BitratePerGopType)
+    (Qn::ConnectionRole)
     (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)
     (Qn::RebuildAction)(Qn::BackupAction)

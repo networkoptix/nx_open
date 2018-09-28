@@ -74,7 +74,7 @@ public:
     float suggestedBitrate;     //< Megabits per second
     float actualBitrate;        //< Megabits per second
 
-    Qn::BitratePerGopType bitratePerGop;
+    bool bitratePerGop;
     float bitrateFactor;
 
     int fps;
@@ -90,7 +90,7 @@ public:
         , rawSuggestedBitrate(-1)
         , suggestedBitrate(-1)
         , actualBitrate(-1)
-        , bitratePerGop(Qn::BPG_None)
+        , bitratePerGop(false)
         , bitrateFactor(-1)
         , fps(-1)
         , actualFps(-1)

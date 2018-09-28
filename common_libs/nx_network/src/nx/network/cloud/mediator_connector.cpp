@@ -37,7 +37,7 @@ MediatorConnector::MediatorConnector(const std::string& cloudHost):
 MediatorConnector::~MediatorConnector()
 {
     NX_ASSERT((m_stunClient == nullptr) || m_stunClient.use_count() == 1);
-    pleaseStopSync(false);
+    pleaseStopSync();
 }
 
 void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThread)

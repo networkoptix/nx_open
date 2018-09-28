@@ -84,6 +84,8 @@
 #include "media_server_resource_searchers.h"
 #include <plugins/resource/upnp/global_settings_to_device_searcher_settings_adapter.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
+#include "server_connector.h"
+#include "resource_status_watcher.h"
 
 using namespace nx;
 using namespace nx::mediaserver;
@@ -279,6 +281,8 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_upnpDeviceSearcher = std::make_unique<nx::network::upnp::DeviceSearcher>(
         std::move(settingsToDeviceSearcherSettingsAdaptor));
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
+    m_serverConnector = store(new QnServerConnector(commonModule()));
+    m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -310,10 +314,10 @@ void QnMediaServerModule::stop()
     stopLongRunnables();
     m_recordingManager->stop();
     m_videoCameraPool->stop();
+    m_serverConnector->stop();
+    m_statusWatcher->stop();
 
     resourceDiscoveryManager()->stop();
-    m_mdnsListener.reset();
-    m_upnpDeviceSearcher.reset();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -589,4 +593,24 @@ QnPlatformAbstraction* QnMediaServerModule::platform() const
 void QnMediaServerModule::setPlatform(QnPlatformAbstraction* platform)
 {
     m_platform = platform;
+}
+
+QnServerConnector* QnMediaServerModule::serverConnector() const
+{
+    return m_serverConnector;
+}
+
+QnResourceStatusWatcher* QnMediaServerModule::statusWatcher() const
+{
+    return m_statusWatcher;
+}
+
+QnMdnsListener* QnMediaServerModule::mdnsListener() const
+{
+    return m_mdnsListener.get();
+}
+
+nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() const
+{
+    return m_upnpDeviceSearcher.get();
 }

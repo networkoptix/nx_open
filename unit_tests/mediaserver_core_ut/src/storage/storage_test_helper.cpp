@@ -22,7 +22,15 @@ QnStorageResourcePtr FileStorageTestHelper::createStorage(
     const QString& url,
     qint64 spaceLimit)
 {
-    QnStorageResourcePtr result(new QnFileStorageResource(m_serverModule.get()));
+    return createStorage(m_serverModule.get(), url, spaceLimit);
+}
+
+QnStorageResourcePtr FileStorageTestHelper::createStorage(
+    QnMediaServerModule* serverModule,
+    const QString& url,
+    qint64 spaceLimit)
+{
+    QnStorageResourcePtr result(new QnFileStorageResource(serverModule));
     result->setUrl(url);
     result->setSpaceLimit(spaceLimit);
     result->setId(QnUuid::createUuid());

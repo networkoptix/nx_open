@@ -4,6 +4,7 @@
 #include <string>
 
 #include <QtCore/QString>
+#include <QtCore/QVariant>
 
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
@@ -26,7 +27,7 @@ enum class AttributeName
 struct Attribute
 {
     AttributeName name;
-    std::variant<bool> value;
+    QVariant value;
 };
 
 struct TakeRemoteSettings: Attribute
