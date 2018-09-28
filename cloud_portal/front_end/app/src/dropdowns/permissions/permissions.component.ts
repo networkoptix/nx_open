@@ -29,6 +29,8 @@ export class NxPermissionsDropdown implements OnInit {
                  });
     }
 
+    // TODO: Bind ngModel to the component and eliminate EventEmitter
+
     ngOnInit(): void {
         const role = this.roles.filter(x => x.name === this.selected.name)[0];
         this.selection = role.optionLabel || this.message;

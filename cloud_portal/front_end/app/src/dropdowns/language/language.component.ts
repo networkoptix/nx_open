@@ -31,6 +31,8 @@ export class NxLanguageDropdown implements OnInit {
         this.show = false;
     }
 
+    // TODO: Bind ngModel to the component and eliminate EventEmitter
+
     private splitLanguages() {
         if (this.languages.length > 12) {
             const halfWayThough = Math.ceil(this.languages.length / 2);
