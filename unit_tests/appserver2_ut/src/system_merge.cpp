@@ -123,6 +123,19 @@ TEST_F(SystemMerge, two_systems_can_be_merged)
     mergeSystems();
 
     thenMergeSucceeded();
+
+    nx::vms::api::ResourceParamDataList peer0Settings;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        peer(0).mediaServerClient()->ec2GetSettings(&peer0Settings));
+
+    nx::vms::api::ResourceParamDataList peer1Settings;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        peer(1).mediaServerClient()->ec2GetSettings(&peer1Settings));
+
+    ASSERT_TRUE(peer0Settings == peer1Settings);
+
     waitUntilAllServersSynchronizedData();
 }
 
