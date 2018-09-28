@@ -92,7 +92,6 @@ private:
 
     DeviceCheckedStateHash m_checked;
     PresentedStateHash m_presentedState;
-    FieldsDifferenceHash m_fieldsDifference;
 
     QnManualResourceSearchList m_devices;
 };

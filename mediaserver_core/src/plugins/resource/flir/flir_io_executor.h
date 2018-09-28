@@ -5,15 +5,11 @@
 #include <QtCore/QThread>
 #include <QtWebSockets/QWebSocket>
 
-#include <nx/utils/singleton.h>
-
 namespace nx {
 namespace plugins {
 namespace flir {
 
-class IoExecutor:
-    public QObject,
-    public Singleton<IoExecutor>
+class IoExecutor: public QObject
 {
     Q_OBJECT
 public:

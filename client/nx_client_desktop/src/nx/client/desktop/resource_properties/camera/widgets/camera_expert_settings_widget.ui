@@ -74,8 +74,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>979</width>
-        <height>768</height>
+        <width>973</width>
+        <height>747</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
@@ -344,7 +344,7 @@
                <item>
                 <widget class="QLabel" name="labelTransport">
                  <property name="text">
-                  <string>RTP transport:</string>
+                  <string>RTP transport</string>
                  </property>
                 </widget>
                </item>
@@ -437,17 +437,81 @@
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_10">
              <item>
-              <widget class="QCheckBox" name="checkBoxDisableNativePtzPresets">
-               <property name="text">
-                <string>Disable native presets, use system presets instead</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="settingsDisableNativePtzWarningLabel">
-               <property name="text">
-                <string>Warning! Native camera presets will not be avaliable.</string>
-               </property>
+              <widget class="QWidget" name="preferredPtzPresetTypeWidget" native="true">
+               <layout class="QVBoxLayout" name="preferredPtzPresetTypeLayout">
+                <property name="leftMargin">
+                 <number>1</number>
+                </property>
+                <property name="topMargin">
+                 <number>1</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_10">
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="preferredPtzPresetTypeLabel">
+                    <property name="text">
+                     <string>Preferred PTZ preset type:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="preferredPtzPresetTypeComboBox">
+                    <item>
+                     <property name="text">
+                      <string>Auto</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>System</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Native</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_7">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="presetTypeLimitationsLabel">
+                  <property name="text">
+                   <string>Native camera presets will not be avaliable.</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>10</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
@@ -465,6 +529,32 @@
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QWidget" name="forcedPtzWidget" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_12">
+                <item>
+                 <widget class="QCheckBox" name="forcedPanTiltCheckBox">
+                  <property name="text">
+                   <string>This camera supports pan and tilt</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="forcedZoomCheckBox">
+                  <property name="text">
+                   <string>This camera supports zoom</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -593,7 +683,6 @@
   <tabstop>checkBoxPrimaryRecorder</tabstop>
   <tabstop>checkBoxSecondaryRecorder</tabstop>
   <tabstop>comboBoxTransport</tabstop>
-  <tabstop>checkBoxDisableNativePtzPresets</tabstop>
   <tabstop>restoreDefaultsButton</tabstop>
  </tabstops>
  <resources/>

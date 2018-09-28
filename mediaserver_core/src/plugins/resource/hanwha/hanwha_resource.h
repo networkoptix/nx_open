@@ -54,21 +54,13 @@ public:
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids) override;
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values) override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-
-    virtual QnIOPortDataList getInputPortList() const override;
-
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& outputId,
         bool activate,
         unsigned int autoResetTimeoutMs = 0) override;
 
-    virtual bool startInputPortMonitoringAsync(
-        std::function<void(bool)>&& completionHandler) override;
-
-    virtual void stopInputPortMonitoringAsync() override;
-
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
@@ -202,6 +194,7 @@ private:
 
     HanwhaPtzRangeMap fetchPtzRanges();
     QnPtzAuxilaryTraitList calculatePtzTraits() const;
+    QnPtzAuxilaryTraitList calculateCameraOnlyTraits() const;
     void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
@@ -319,7 +312,7 @@ private:
 
     HanwhaPortInfo portInfoFromId(const QString& id) const;
 
-    bool setRelayOutputStateInternal(const QString& outputId, bool activate);
+    bool setOutputPortStateInternal(const QString& outputId, bool activate);
 
     const HanwhaAttributes& attributes() const;
     const HanwhaCgiParameters& cgiParameters() const;

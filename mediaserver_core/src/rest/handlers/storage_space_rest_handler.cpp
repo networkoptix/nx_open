@@ -45,26 +45,31 @@ int QnStorageSpaceRestHandler::executeGet(
 
     QnStorageSpaceReply reply;
 
-    auto enumerate = [fastRequest, &reply] (
+    auto enumerate = [fastRequest, &reply, this](
         const QnStorageResourceList& storages,
         const QSet<QnStorageResourcePtr>& writableStorages)
-    {
-        for (const auto& storage: storages)
         {
-            QnStorageSpaceData data(storage, fastRequest);
-            data.url = QnStorageResource::urlWithoutCredentials(data.url);
-            if (!fastRequest)
-                data.isWritable = writableStorages.contains(storage);
-            reply.storages.push_back(data);
-        }
-    };
+            for (const auto& storage: storages)
+            {
+                QnStorageSpaceData data(storage, fastRequest);
+                data.url = QnStorageResource::urlWithoutCredentials(data.url);
+                if (!fastRequest)
+                    data.isWritable = writableStorages.contains(storage);
+                data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
+                reply.storages.push_back(data);
+            }
+        };
 
     enumerate(
         serverModule()->normalStorageManager()->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->normalStorageManager()->getAllWritableStorages());
+        fastRequest
+            ? QSet<QnStorageResourcePtr>()
+            : serverModule()->normalStorageManager()->getAllWritableStorages());
     enumerate(
         serverModule()->backupStorageManager()->getStorages(),
-        fastRequest ? QSet<QnStorageResourcePtr>() : serverModule()->backupStorageManager()->getAllWritableStorages());
+        fastRequest
+            ? QSet<QnStorageResourcePtr>()
+            : serverModule()->backupStorageManager()->getAllWritableStorages());
 
     if (!fastRequest)
     {
@@ -73,8 +78,8 @@ int QnStorageSpaceRestHandler::executeGet(
     }
 
     reply.storageProtocols = getStorageProtocols();
-
     result.setReply(reply);
+
     return nx::network::http::StatusCode::ok;
 }
 
@@ -119,7 +124,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
-    QnPlatformMonitor* monitor = qnPlatform->monitor();
+    QnPlatformMonitor* monitor = serverModule()->platform()->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         monitor->totalPartitionSpaceInfo(
             QnPlatformMonitor::LocalDiskPartition
@@ -142,10 +147,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             storagePaths.cbegin(),
             storagePaths.cend(),
             [&partition](const QString &storagePath)
-        {
-            return closeDirPath(storagePath).startsWith(partition.path);
-        }
-        );
+            {
+                return closeDirPath(storagePath).startsWith(partition.path);
+            });
 
         if(hasStorage)
             continue;
@@ -167,6 +171,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
 
+            data.storageStatus = QnStorageManager::storageStatus(serverModule(), storage);
             data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
             if (data.isOnline)
             {

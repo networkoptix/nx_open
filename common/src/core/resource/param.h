@@ -72,7 +72,6 @@ namespace Qn
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
-    static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
@@ -88,7 +87,7 @@ namespace Qn
     static const QString kConfigurationalPtzCapabilities = lit("configurationalPtzCapabilities");
     static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
     static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
-    static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
+
     static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
@@ -97,6 +96,14 @@ namespace Qn
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
     static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
+
+    static const QString kUserPreferredPtzPresetType("userPreferredPtzPresetType");
+    static const QString kDefaultPreferredPtzPresetType("defaultPreferredPtzPresetType");
+
+    static const QString kUserIsAllowedToOverridePtzCapabilities(
+        "userIsAllowedToOverridePtzCapabilities");
+
+    static const QString kPtzCapabilitiesAddedByUser("ptzCapabilitiesAddedByUser");
 
     // Mediaserver common info
     static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");

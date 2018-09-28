@@ -24,6 +24,7 @@ struct ServiceGuard
 {
     ServiceGuard(T& service) : m_service(service) {}
     ~ServiceGuard() { m_service.destroy(); }
+
 private:
     T& m_service;
 };
@@ -38,10 +39,12 @@ public:
     {
         http_da_save(soap, &info, soap->authrealm, user, password);
     }
+
     ~SoapAuthentificator()
     {
         http_da_release(m_soap, &info);
     }
+
 private:
     soap* m_soap;
     http_da_info info;
@@ -104,7 +107,7 @@ private:
     T m_oldValue;
 };
 
-// Concatenates vector elements into a string, interleaving them with a separator.
+/** Concatenates vector elements into a string, interleaving them with a separator. */
 std::string joinTags(const std::vector<const char*>& st, char separator = '/')
 {
     std::string result;
@@ -118,8 +121,10 @@ std::string joinTags(const std::vector<const char*>& st, char separator = '/')
     return result;
 }
 
-// Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
-// A "topic" member of every found event gets "topicName" value.
+/**
+  * Recursively finds all events in subtree "element" (if any) and appends them to "events" vector.
+  * A "topic" member of every found event gets "topicName" value.
+  */
 void replanishEventsFromElement(const soap_dom_element* element, const char* topicName,
     std::vector<const char*>& tagStack, std::vector<nx::axis::SupportedEventType>& events)
 {
@@ -154,7 +159,7 @@ void replanishEventsFromElement(const soap_dom_element* element, const char* top
     tagStack.pop_back();
 }
 
-// Finds events in topic "topic" and adds them to vector "events"
+/** Find events in topic "topic" and add them to vector "events". */
 void replanishEventsFromTopic(const soap_dom_element* topic, const char* topicName,
     std::vector<nx::axis::SupportedEventType>& events)
 {
@@ -176,7 +181,7 @@ bool startsWith(const std::string& name, const std::string& prefix)
     return it == name.cbegin();
 }
 
-//Calculated how many namespaces are there in array
+/** Calculated how many namespaces are there in the array. */
 int countNamespaces(const Namespace* start)
 {
     int count = 0;
@@ -187,15 +192,15 @@ int countNamespaces(const Namespace* start)
 
 std::vector<Namespace> buildExtentedNamespaceArray(const Namespace* baseNamespaceArray)
 {
-    int baseNamespaceCount = countNamespaces(baseNamespaceArray); //< There are baseNamespaceCount
-    // namespaces and one null namespace indicating the end of array.
+    // There are baseNamespaceCount namespaces and one null namespace indicating the end of array.
+    int baseNamespaceCount = countNamespaces(baseNamespaceArray);
 
     static const int kAdditionalNamespaceCount = 3;
     static const Namespace kAdditionalNamespaces[kAdditionalNamespaceCount + 1] = {
-        { "tns1", "http://www.onvif.org/ver10/topics", nullptr, nullptr },
-        { "wsnt", "http://docs.oasis-open.org/wsn/b-2", nullptr, nullptr },
-        { "tnsaxis", "http://www.axis.com/2009/event/topics", nullptr, nullptr },
-        { nullptr, nullptr, nullptr, nullptr } };
+        {"tns1", "http://www.onvif.org/ver10/topics", nullptr, nullptr},
+        {"wsnt", "http://docs.oasis-open.org/wsn/b-2", nullptr, nullptr},
+        {"tnsaxis", "http://www.axis.com/2009/event/topics", nullptr, nullptr},
+        {nullptr, nullptr, nullptr, nullptr}};
 
     std::vector<Namespace> newNamespaceArray(
         baseNamespaceArray, baseNamespaceArray + baseNamespaceCount);
@@ -387,7 +392,9 @@ bool CameraController::readActiveActions()
     _ns5__GetActionConfigurationsResponse response;
     if (!makeSoapRequest(service, &ActionBindingProxy::GetActionConfigurations, request, response,
         m_user.c_str(), m_password.c_str()))
+    {
         return false;
+    }
 
     std::vector<ActiveAction> actions;
     for (const ns5__ActionConfiguration* const configuration:
@@ -419,7 +426,9 @@ bool CameraController::readActiveRules()
     _ns5__GetActionRulesResponse response;
     if (!makeSoapRequest(service, &ActionBindingProxy::GetActionRules, request, response,
         m_user.c_str(), m_password.c_str()))
+    {
         return false;
+    }
 
     std::vector<ActiveRule> rules;
     for (const ns5__ActionRule* rule: response.ActionRules->ActionRule)
@@ -446,7 +455,9 @@ bool CameraController::readActiveRecipients()
     _ns5__GetRecipientConfigurationsResponse response;
     if (!makeSoapRequest(service, &ActionBindingProxy::GetRecipientConfigurations, request,
         response, m_user.c_str(), m_password.c_str()))
+    {
         return false;
+    }
 
     std::vector<ActiveRecipient> recipients;
     for (const ns5__RecipientConfiguration* const configuration:
@@ -499,8 +510,8 @@ int CameraController::addActiveAction(const ActiveAction& action)
         response, m_user.c_str(), m_password.c_str()))
         return 0;
 
-    // If "response.ConfigurationID" is not an integer atoi returns 0. It suits us because 0 means
-    // that insertion failed.
+    // If "response.ConfigurationID" is not an integer, atoi() returns 0. It suits us
+    // because 0 means that insertion failed.
     return atoi(response.ConfigurationID.c_str());
 }
 
@@ -565,8 +576,8 @@ int CameraController::addActiveRecipient(const ActiveRecipient& recipient)
         response, m_user.c_str(), m_password.c_str()))
         return 0;
 
-    // If "response.ConfigurationID" is not an integer atoi returns 0. It suits us because 0 means
-    // that insertion failed.
+    // If "response.ConfigurationID" is not an integer, atoi() returns 0. It suits us
+    // because 0 means that insertion failed.
     return atoi(response.ConfigurationID.c_str());
 }
 
@@ -615,7 +626,7 @@ int CameraController::addActiveRule(const ActiveRule& rule)
         service.soap, nullptr, kRuleAttributeName, kRuleAttributeValue);
     addCommand.NewActionRule->StartEvent->__any.push_back(topicExpression);
 
-    // We need to temporarily enlarge namespace array to execute soap request correctly.
+    // We need to temporarily enlarge namespace array to execute the soap request correctly.
     const std::vector<Namespace> extendedNamespaceArray =
         buildExtentedNamespaceArray(service.soap->namespaces);
     const ValueRestorer<const Namespace*> valueRestorer(
@@ -625,7 +636,7 @@ int CameraController::addActiveRule(const ActiveRule& rule)
         response, m_user.c_str(), m_password.c_str()))
         return 0;
 
-    // If "response.RuleID" is not an integer atoi returns 0. It suits us because 0 means that
+    // If "response.RuleID" is not an integer, atoi() returns 0. It suits us because 0 means that
     // insertion failed.
     return atoi(response.RuleID.c_str());
 }
@@ -647,7 +658,7 @@ int CameraController::removeAllActiveActions(const char* namePrefix)
         return 0;
 
     int counter = 0;
-    std::string prefix(namePrefix ? namePrefix : "");
+    const std::string prefix(namePrefix ? namePrefix : "");
     for (const auto& action: m_activeActions)
     {
         if (startsWith(action.name, prefix) && removeActiveAction(action.id))
@@ -662,7 +673,7 @@ int CameraController::removeAllActiveRecipients(const char* namePrefix)
         return 0;
 
     int counter = 0;
-    std::string prefix(namePrefix ? namePrefix : "");
+    const std::string prefix(namePrefix ? namePrefix : "");
     for (const auto& recipient: m_activeRecipients)
     {
         if (startsWith(recipient.name, prefix) && removeActiveRecipient(recipient.id))
@@ -677,7 +688,7 @@ int CameraController::removeAllActiveRules(const char* namePrefix)
         return 0;
 
     int counter = 0;
-    std::string prefix(namePrefix ? namePrefix : "");
+    const std::string prefix(namePrefix ? namePrefix : "");
     for (const auto& rule: m_activeRules)
     {
         if (startsWith(rule.name, prefix) && removeActiveRule(rule.id))

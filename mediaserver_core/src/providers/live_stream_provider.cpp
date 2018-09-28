@@ -326,15 +326,19 @@ bool QnLiveStreamProvider::isMaxFps() const
     return m_liveParams.fps >= m_cameraRes->getMaxFps() - 0.1;
 }
 
+bool QnLiveStreamProvider::needHardwareMotion()
+{
+    return getRole() == Qn::CR_LiveVideo
+        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
+            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
+}
+
 bool QnLiveStreamProvider::needMetadata()
 {
     // I assume this function is called once per video frame
     if (!m_metadataReceptor->metadataQueue.isEmpty())
         return true;
 
-    bool needHardwareMotion = getRole() == Qn::CR_LiveVideo
-        && (m_cameraRes->getMotionType() == Qn::MotionType::MT_HardwareGrid
-            || m_cameraRes->getMotionType() == Qn::MotionType::MT_MotionWindow);
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
@@ -354,9 +358,9 @@ bool QnLiveStreamProvider::needMetadata()
 #endif
         return false;
     }
-    else if (needHardwareMotion)
+    else if (needHardwareMotion())
     {
-        bool result = m_framesSinceLastMetaData > 10
+        bool result = m_framesSinceLastMetaData > META_FRAME_INTERVAL
             || (m_framesSinceLastMetaData > 0
                 && m_timeSinceLastMetaData.elapsed() > META_DATA_DURATION_MS);
 
@@ -413,6 +417,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
     const QnLiveStreamParams& currentLiveParams,
     bool isCameraControlRequired)
 {
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
     m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
@@ -461,8 +468,8 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         NX_VERBOSE(this) << lm("Analyzing motion; needUncompressedFrame: %1")
             .arg(needUncompressedFrame);
-        if (motionEstimation.analyzeFrame(compressedFrame),
-            needUncompressedFrame ? &uncompressedFrame : nullptr)
+        if (motionEstimation.analyzeFrame(compressedFrame,
+            needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
             updateStreamResolution(channel, motionEstimation.videoResolution());
         }
@@ -480,7 +487,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (videoDataReceptor)
     {
-        NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
+        NX_VERBOSE(this, "Pushing frame (%2) to receptor, timestamp: %1",
+            compressedFrame->timestamp,
+            uncompressedFrame ? "compressed and uncompressed" : "compressed");
         videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 
@@ -700,7 +709,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
         liveParams, getRole())) / 1024;
     info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
-    info.bitratePerGop = m_cameraRes->bitratePerGopType();
+    info.bitratePerGop = m_cameraRes->useBitratePerGop();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
     info.numberOfChannels = getNumberOfChannels();
 

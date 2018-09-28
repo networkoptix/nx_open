@@ -1,6 +1,7 @@
 #include "legacy_expert_settings_widget.h"
 #include "ui_legacy_expert_settings_widget.h"
 
+#include <QtCore/QtGlobal>
 #include <QtWidgets/QListView>
 
 #include <ui/style/skin.h>
@@ -29,11 +30,25 @@ using namespace nx::client::desktop;
 namespace {
 
 // Native ptz presets can be disabled if they are supported and nx presets are supported too.
-bool canDisableNativePresets(const QnVirtualCameraResourcePtr& camera)
+bool canSwitchPresetTypes(const QnVirtualCameraResourcePtr& camera)
 {
     const auto caps = camera->getPtzCapabilities();
     return caps.testFlag(Ptz::NativePresetsPtzCapability)
         && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
+}
+
+static const int kAutoPresetsIndex = 0;
+static const int kSystemPresetsIndex = 1;
+static const int kNativePresetsIndex = 2;
+
+nx::core::ptz::PresetType presetTypeByIndex(int index)
+{
+    switch (index)
+    {
+        case kSystemPresetsIndex: return nx::core::ptz::PresetType::system;
+        case kNativePresetsIndex: return nx::core::ptz::PresetType::native;
+        default: return nx::core::ptz::PresetType::automatic;
+    }
 }
 
 } // namespace
@@ -60,6 +75,9 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
     setWarningStyle(ui->generalWarningLabel);
     setWarningStyle(ui->logicalIdWarningLabel);
+    setWarningStyle(ui->presetTypeLimitationsLabel);
+
+    ui->presetTypeLimitationsLabel->hide();
 
     ui->settingsWarningLabel->setVisible(false);
     ui->bitrateIncreaseWarningLabel->setVisible(false);
@@ -96,7 +114,22 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     connect(ui->bitratePerGopCheckBox, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
-    connect(ui->checkBoxDisableNativePtzPresets, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
+        this, SLOT(at_preferredPresetTypeChanged(int)));
+
+    connect(
+        ui->forcedPanTiltCheckBox, SIGNAL(toggled(bool)),
+        this, SLOT(at_dataChanged()));
+
+    connect(
+        ui->forcedZoomCheckBox, SIGNAL(toggled(bool)),
+        this, SLOT(at_dataChanged()));
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &LegacyExpertSettingsWidget::at_dataChanged);
@@ -135,6 +168,8 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     setHelpTopic(ui->checkBoxSecondaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
     setHelpTopic(ui->groupBoxRTP, Qn::CameraSettings_Expert_Rtp_Help);
 
+    // TODO: Help topic for PTZ stuff.
+
     ui->settingsDisableControlHint->setHint(tr("Server will not change any cameras settings, it will receive and use camera stream as-is."));
     setHelpTopic(ui->settingsDisableControlHint, Qn::CameraSettings_Expert_SettingsControl_Help);
 
@@ -172,7 +207,6 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     int secondaryRecorderDisabled = -1;
     bool samePrimaryRec = true;
     bool sameBitratePerGOP = true;
-    bool enableBitratePerGop = true;
     bool sameSecRec = true;
 
     bool sameRtpTransport = true;
@@ -188,8 +222,13 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     int forcedMotionStreamIndex = -1;
     bool allCamerasSupportForceMotion = true;
 
-    int supportedNativePtzCount = 0;
-    int disabledNativePtzCount = 0;
+    int supportBothPresetTypeCount = 0;
+    int preferSystemPresetsCount = 0;
+    int preferNativePresetsCount = 0;
+
+    int modifiablePtzCapabilitiesCount = 0;
+    int addedPanTiltCount = 0;
+    int addedZoomCount = 0;
 
     int camCnt = 0;
     for (const auto& camera: cameras)
@@ -236,10 +275,7 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         else if (primaryRecorderDisabled != primaryRecDisabled)
             samePrimaryRec = false;
 
-        Qn::BitratePerGopType bpgType = camera->bitratePerGopType();
-        if (bpgType == Qn::BPG_Predefined)
-            enableBitratePerGop = false;
-        int bitratePerGop = bpgType == Qn::BPG_None ? 0 : 1;
+        int bitratePerGop = camera->useBitratePerGop() ? 1 : 0;
         if (bitratePerGopPresent == -1)
             bitratePerGopPresent = bitratePerGop;
         else if (bitratePerGopPresent != bitratePerGop)
@@ -274,12 +310,27 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
             }
         }
 
-        if (canDisableNativePresets(camera))
+        if (canSwitchPresetTypes(camera))
         {
-            ++supportedNativePtzCount;
-            if (!camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
-                ++disabledNativePtzCount;
+            ++supportBothPresetTypeCount;
+            const auto preferredPtzPresetType = camera->userPreferredPtzPresetType();
+
+            if (preferredPtzPresetType == nx::core::ptz::PresetType::system)
+                ++preferSystemPresetsCount;
+
+            if (preferredPtzPresetType == nx::core::ptz::PresetType::native)
+                ++preferNativePresetsCount;
         }
+
+        if (camera->isUserAllowedToModifyPtzCapabilities())
+            ++modifiablePtzCapabilitiesCount;
+
+        const auto capabilitiesAddedByUser = camera->ptzCapabilitiesAddedByUser();
+        if (capabilitiesAddedByUser & Ptz::ContinuousPanTiltCapabilities)
+            ++addedPanTiltCount;
+
+        if (capabilitiesAddedByUser & Ptz::ContinuousZoomCapability)
+            ++addedZoomCount;
 
         camCnt++;
     }
@@ -303,8 +354,6 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
         ui->bitratePerGopCheckBox->setChecked(bitratePerGopPresent);
     else
         ui->bitratePerGopCheckBox->setCheckState(Qt::PartiallyChecked);
-
-    ui->bitratePerGopCheckBox->setEnabled(enableBitratePerGop);
 
     ui->checkBoxSecondaryRecorder->setEnabled(m_hasDualStreaming);
     if (m_hasDualStreaming)
@@ -359,14 +408,42 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount != 0);
-    ui->checkBoxDisableNativePtzPresets->setEnabled(supportedNativePtzCount != 0);
-    if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Checked);
-    else if (disabledNativePtzCount != 0)
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::PartiallyChecked);
-    else
-        ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    const bool canSwitchPresetTypeOnCameras = supportBothPresetTypeCount != 0;
+    const bool canModifyPtzCapabilities = modifiablePtzCapabilitiesCount != 0;
+
+    ui->groupBoxPtzControl->setEnabled(canSwitchPresetTypeOnCameras || canModifyPtzCapabilities);
+    ui->groupBoxPtzControl->setVisible(canSwitchPresetTypeOnCameras || canModifyPtzCapabilities);
+
+    ui->preferredPtzPresetTypeWidget->setVisible(canSwitchPresetTypeOnCameras);
+    ui->preferredPtzPresetTypeWidget->setEnabled(canSwitchPresetTypeOnCameras);
+    ui->preferredPtzPresetTypeComboBox->setEnabled(canSwitchPresetTypeOnCameras);
+
+    if (canSwitchPresetTypeOnCameras)
+    {
+        if (preferSystemPresetsCount == supportBothPresetTypeCount)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kSystemPresetsIndex);
+        else if (preferNativePresetsCount == supportBothPresetTypeCount)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kNativePresetsIndex);
+        else if (preferSystemPresetsCount == 0 && preferNativePresetsCount == 0)
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kAutoPresetsIndex);
+        else
+            ui->preferredPtzPresetTypeComboBox->setCurrentIndex(-1);
+    }
+
+    ui->forcedPtzWidget->setVisible(canModifyPtzCapabilities);
+    ui->forcedPtzWidget->setEnabled(canModifyPtzCapabilities);
+    ui->forcedPanTiltCheckBox->setEnabled(canModifyPtzCapabilities);
+    ui->forcedZoomCheckBox->setEnabled(canModifyPtzCapabilities);
+
+    check_box_utils::setupTristateCheckbox(
+        ui->forcedPanTiltCheckBox,
+        cameras.size() == addedPanTiltCount || addedPanTiltCount == 0,
+        cameras.size() == addedPanTiltCount);
+
+    check_box_utils::setupTristateCheckbox(
+        ui->forcedZoomCheckBox,
+        cameras.size() == addedZoomCount || addedZoomCount == 0,
+        cameras.size() == addedZoomCount);
 
     const bool canSetupVideoStream = std::all_of(cameras.cbegin(), cameras.cend(),
         [](const QnVirtualCameraResourcePtr& camera)
@@ -393,7 +470,6 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
     bool disableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Checked;
     bool enableControls = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked;
     bool globalControlEnabled = qnGlobalSettings->isCameraSettingsOptimizationEnabled();
-    auto disableNativePtz = ui->checkBoxDisableNativePtzPresets->checkState();
 
     for (const auto& camera: cameras)
     {
@@ -443,11 +519,26 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
             }
         }
 
-        if (disableNativePtz != Qt::PartiallyChecked && canDisableNativePresets(camera))
+        const auto preferredPtzPresetTypeIndex = ui->preferredPtzPresetTypeComboBox->currentIndex();
+        if (preferredPtzPresetTypeIndex != -1 && canSwitchPresetTypes(camera))
         {
-            camera->setProperty(
-                Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-                (disableNativePtz == Qt::Checked) ? lit("true") : QString());
+            camera->setUserPreferredPtzPresetType(presetTypeByIndex(preferredPtzPresetTypeIndex));
+        }
+
+        if (camera->isUserAllowedToModifyPtzCapabilities())
+        {
+            auto userAddedPtzCapabilities = camera->ptzCapabilitiesAddedByUser();
+            if (ui->forcedPanTiltCheckBox->checkState() == Qt::Checked)
+                userAddedPtzCapabilities |= Ptz::ContinuousPanTiltCapabilities;
+            else if (ui->forcedPanTiltCheckBox->checkState() == Qt::Unchecked)
+                userAddedPtzCapabilities &= ~Ptz::ContinuousPanTiltCapabilities;
+
+            if (ui->forcedZoomCheckBox->checkState() == Qt::Checked)
+                userAddedPtzCapabilities |= Ptz::ContinuousZoomCapability;
+            else if (ui->forcedZoomCheckBox->checkState() == Qt::Unchecked)
+                userAddedPtzCapabilities &= ~Ptz::ContinuousZoomCapability;
+
+            camera->setPtzCapabilitiesAddedByUser(userAddedPtzCapabilities);
         }
 
         if (ui->logicalIdGroupBox->isEnabled())
@@ -538,6 +629,11 @@ void LegacyExpertSettingsWidget::at_dataChanged()
         emit dataChanged();
 }
 
+void LegacyExpertSettingsWidget::at_preferredPresetTypeChanged(int index)
+{
+    ui->presetTypeLimitationsLabel->setVisible(index == kSystemPresetsIndex);
+}
+
 bool LegacyExpertSettingsWidget::areDefaultValues() const
 {
     if (ui->bitratePerGopCheckBox->isEnabled() && ui->bitratePerGopCheckBox->isChecked())
@@ -548,8 +644,10 @@ bool LegacyExpertSettingsWidget::areDefaultValues() const
         && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
         && ui->comboBoxTransport->currentIndex() == 0
         && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked
-        && ui->checkBoxDisableNativePtzPresets->checkState() == Qt::Unchecked
-        && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked;
+        && ui->preferredPtzPresetTypeComboBox->currentIndex() == kAutoPresetsIndex
+        && ui->secondStreamDisableCheckBox->checkState() == Qt::Unchecked
+        && ui->forcedZoomCheckBox->checkState() == Qt::Unchecked
+        && ui->forcedPanTiltCheckBox->checkState() == Qt::Unchecked;
 }
 
 void LegacyExpertSettingsWidget::at_restoreDefaultsButton_clicked()
@@ -562,8 +660,10 @@ void LegacyExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->comboBoxTransport->setCurrentIndex(0);
     ui->checkBoxForceMotionDetection->setCheckState(Qt::Unchecked);
     ui->comboBoxForcedMotionStream->setCurrentIndex(0);
-    ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
+    ui->preferredPtzPresetTypeComboBox->setCurrentIndex(kAutoPresetsIndex);
     ui->logicalIdSpinBox->setValue(0);
+    ui->forcedZoomCheckBox->setCheckState(Qt::Unchecked);
+    ui->forcedPanTiltCheckBox->setCheckState(Qt::Unchecked);
 }
 
 void LegacyExpertSettingsWidget::updateControlBlock()

@@ -10,7 +10,6 @@
 
 #include <providers/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/timer_manager.h>
 
 #include "data_source_cache.h"
@@ -32,7 +31,6 @@ class QnVideoCameraPool;
 class StreamingChunkTranscoder:
     public QObject,
     public nx::utils::TimerEventHandler,
-    public Singleton<StreamingChunkTranscoder>,
     public Qn::EnableSafeDirectConnection,
     public nx::mediaserver::ServerModuleAware
 {

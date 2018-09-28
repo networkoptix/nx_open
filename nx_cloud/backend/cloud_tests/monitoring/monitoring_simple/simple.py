@@ -1,4 +1,5 @@
 # Specification is at https://networkoptix.atlassian.net/wiki/display/SD/Auto-test+for+cloud+portal+backend
+from contextlib import contextmanager
 from io import StringIO
 import time
 import sys
@@ -12,11 +13,34 @@ import requests
 import boto3
 import docker
 from requests.auth import HTTPDigestAuth
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20100'
-RETRY_TIMEOUT = 5                                   # seconds
+MEDIASERVER_VERSION = '3.1.0.17256'
+CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
+RETRY_TIMEOUT = 5  # seconds
 
 log = logging.getLogger('simple_cloud_test')
+
+
+def requests_retry_session(
+        retries=3,
+        backoff_factor=0.3,
+        status_forcelist=(404, 500, 502, 504),
+        session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 def setup_logging():
@@ -57,7 +81,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                     time.sleep(delay)
 
                 for n_try in range(1, tries + 1):
-                    log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
+                    log.info(
+                        'Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
                     try:
                         f(self)
                         break
@@ -125,6 +150,8 @@ class CloudSession(object):
         self.email = 'noptixqa-owner@hdw.mx'
         self.password = 'qweasd123'
         self.user_email = 'vasily@hdw.mx'
+
+        self.auth = HTTPDigestAuth(self.email, self.password)
 
         self.vms_user_id = None
         self.system_id = None
@@ -276,8 +303,7 @@ class CloudSession(object):
 
     @testmethod()
     def test_cloud_db_get_system_id(self):
-        auth = HTTPDigestAuth(self.email, self.password)
-        r = requests.get(self._url('/cdb/system/get'), auth=auth).json()
+        r = requests.get(self._url('/cdb/system/get'), auth=self.auth).json()
 
         assert 'systems' in r, 'Invalid response from cloud_db. No systems'
         assert len(r['systems']) == 1, 'Invalid response from cloud_db. Number of systems != 1'
@@ -291,23 +317,20 @@ class CloudSession(object):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
             CLOUD_CONNECT_TEST_UTIL_VERSION)
 
-
         log.info('Running image: {} command: {}'.format(image, command))
 
         client = docker.client.from_env()
         container = client.containers.run(image, command, detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
-        stdout = container.logs(stdout=True, stderr=False)
-        stderr = container.logs(stdout=False, stderr=True)
+        out = container.logs(stdout=True, stderr=True)
 
-        log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
-        log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        log.info('Output:\n{}'.format(out.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (command: {})'.format(
+        assert b'HTTP/1.1 200 OK' in out, 'Received invalid output from cloud connect (command: {})'.format(
             command)
-        assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
+        assert status['StatusCode'] == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
 
     def test_cloud_connect_base(self, extra_args=''):
         command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
@@ -343,7 +366,7 @@ class CloudSession(object):
             return
 
         ms_url = 'http://{}:7001/ec2/getUsers'.format(mediaserver_ip)
-        r = requests.get(ms_url, auth=HTTPDigestAuth(self.email, self.password))
+        r = requests.get(ms_url, auth=self.auth)
 
         assert r.status_code == 200, 'ERROR: Status code is {}'.format(r.status_code)
 
@@ -395,6 +418,20 @@ class CloudSession(object):
     @testmethod(tries=3, debug_skip=True)
     def share_system(self):
         request_data = {
+            "systemId": self.system_id,
+            "accountEmail": self.user_email,
+            "accessRole": "liveViewer"
+        }
+
+        r = requests.post('{}/cdb/system/share'.format(self.base_url),
+                          json=request_data, auth=self.auth)
+
+        assert r.status_code == 200, "Failed to share via cdb. Code: {}".format(r.status_code)
+        data = r.json()
+        log.info('Share response: {}'.format(data))
+
+    def share_system_via_vms(self):
+        request_data = {
             "email": self.user_email,
             "name": self.user_email,
             "userRoleId": "{00000000-0000-0000-0000-000000000000}",
@@ -411,6 +448,8 @@ class CloudSession(object):
                       request_data, headers=headers)
 
         data = r.json()
+        log.info('Share response: {}'.format(data))
+
         assert 'id' in data, 'No ID'
 
     @testmethod(delay=30, metric='view_and_settings_failure', tries=3, debug_skip=True)
@@ -427,12 +466,33 @@ class CloudSession(object):
         assert user is not None, 'No users returned'
         self.vms_user_id = user['vmsUserId']
 
+        r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
+                      auth=self.auth)
+        assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
+
+        data = r.json()
+        user = next(filter(lambda x: x['email'] == self.user_email, data), None)
+        assert user is not None, 'No users returned'
+
     @testmethod(debug_skip=True)
     def remove_user(self):
+        request_data = {
+            "systemId": self.system_id,
+            "accountEmail": self.user_email,
+            "accessRole": "none"
+        }
+
+        r = requests.post('{}/cdb/system/share'.format(self.base_url),
+                          json=request_data, auth=self.auth)
+
+        assert r.status_code == 200, "Failed to remove user via cdb. Code: {}".format(r.status_code)
+        data = r.json()
+        log.info('Remove response: {}'.format(data))
+
+    def remove_user_via_vms(self):
         request_data = {'id': self.vms_user_id}
-        auth = HTTPDigestAuth(self.email, self.password)
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
-                  json=request_data, auth=auth)
+                      json=request_data, auth=self.auth)
 
     @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
@@ -444,7 +504,68 @@ class CloudSession(object):
         data = r.json()
         assert data[0]['systemId'] == self.system_id, 'Wrong System ID'
 
-        assert next(filter(lambda x: x['accountEmail'] == self.user_email, data), None) is None, 'User still exists'
+        assert next(filter(lambda x: x['accountEmail'] == self.user_email, data),
+                    None) is None, 'User still exists in cdb'
+
+        r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
+                      auth=self.auth)
+        assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
+
+        data = r.json()
+        assert next(filter(lambda x: x['email'] == self.user_email, data),
+                    None) is None, 'User still exists in vms'
+
+
+@contextmanager
+def mediaserver():
+    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(MEDIASERVER_VERSION)
+
+    client = docker.client.from_env()
+
+    log.info('Running mediaserver')
+    container = client.containers.run(image, ports={7001: 7001}, detach=True)
+
+    try:
+        mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
+
+        for i in range(12):
+            try:
+                log.info('Testing mediaserver connection...')
+                r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
+                assert r.status_code == 200, 'Status code != 200: {}'.format(r.status_code)
+                response_data = r.json()
+                system_id = response_data['reply']['cloudSystemId']
+                if system_id:
+                    break
+
+                time.sleep(RETRY_TIMEOUT)
+            except ConnectionError as e:
+                assert False, "Couldn't connect to local mediaserver directly: {}".format(e)
+
+        assert system_id, 'Couldn\'t get System ID'
+        log.info('System ID: {}'.format(system_id))
+
+        try:
+            log.info('Waiting for connection through proxy...')
+
+            r = requests_retry_session().get(
+                'https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
+            assert r.status_code == 200, "Status != 200: {}".format(r.status_code)
+            assert system_id == r.json()['reply']['cloudSystemId'], "Wrong system id"
+        except ConnectionError as e:
+            assert False, "Couldn't connect to local mediaserver through proxy: {}".format(e)
+
+        yield
+    finally:
+        log.info('Stopping mediaserver')
+        status = container.stop()
+        log.info('Mediaserver exited with exit status {}'.format(status))
+        # stdout = container.logs(stdout=True, stderr=False)
+        # stderr = container.logs(stdout=False, stderr=True)
+        #
+        # log.info('Stdout:\n{}'.format(stdout.decode('utf-8')))
+        # log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
+        container.remove()
 
 
 def main():
@@ -457,9 +578,10 @@ def main():
     if len(sys.argv) == 3:
         debug = sys.argv[2] == "debug"
 
-    session = CloudSession(host, debug)
-    status = session.run_tests()
-    session.close()
+    with mediaserver():
+        session = CloudSession(host, debug)
+        status = session.run_tests()
+        session.close()
 
     return status
 

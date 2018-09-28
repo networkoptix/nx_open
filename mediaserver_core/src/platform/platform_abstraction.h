@@ -4,6 +4,7 @@
 
 #include <platform/core_platform_abstraction.h>
 #include "monitoring/global_monitor.h"
+#include <nx/utils/singleton.h>
 
 class QnPlatformAbstraction: public QnCorePlatformAbstraction
 {
@@ -25,6 +26,3 @@ public:
 private:
     QnGlobalMonitor *m_monitor;
 };
-
-#undef  qnPlatform
-#define qnPlatform (static_cast<QnPlatformAbstraction *>(QnCorePlatformAbstraction::instance()))

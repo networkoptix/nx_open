@@ -187,12 +187,12 @@ class Shell(object):
     def run_command(self, args, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
         return self.command(
-            args, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
+            args, cwd=cwd, env=env, logger=logger).run(input=input, timeout_sec=timeout_sec)
 
     def run_sh_script(self, script, input=None, cwd=None, logger=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
         return self.sh_script(
-            script, cwd=cwd, env=env, logger=logger).check_output(input=input, timeout_sec=timeout_sec)
+            script, cwd=cwd, env=env, logger=logger).run(input=input, timeout_sec=timeout_sec)
 
     def copy_posix_file_to(self, posix_source, destination):
         copy_file_using_read_and_write(posix_source, destination)

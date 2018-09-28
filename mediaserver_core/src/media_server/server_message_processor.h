@@ -11,7 +11,8 @@
 class QHostAddress;
 class QnMediaServerModule;
 
-class QnServerMessageProcessor: public QnCommonMessageProcessor
+class QnServerMessageProcessor:
+    public QnCommonMessageProcessor
 {
     Q_OBJECT
     using base_type = QnCommonMessageProcessor;

@@ -220,7 +220,7 @@ void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabiliti
         toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
 }
 
-bool QnMediaResource::canDisableNativePtzPresets() const
+bool QnMediaResource::canSwitchPtzPresetTypes() const
 {
     const auto caps = getPtzCapabilities();
     return caps.testFlag(Ptz::NativePresetsPtzCapability)

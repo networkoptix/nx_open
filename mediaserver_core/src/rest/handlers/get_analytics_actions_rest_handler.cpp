@@ -26,7 +26,7 @@ int QnGetAnalyticsActionsRestHandler::executeGet(
     if (objectTypeId.isNull())
     {
         result.setError(QnRestResult::InvalidParameter, "Parameter objectTypeId is missing or invalid");
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     AvailableAnalyticsActions actions;

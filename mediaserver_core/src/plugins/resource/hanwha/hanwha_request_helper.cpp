@@ -223,7 +223,6 @@ bool HanwhaRequestHelper::doRequestInternal(
 
     nx::network::http::HttpClient httpClient;
 
-    httpClient.setIgnoreMutexAnalyzer(true);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
     httpClient.setSendTimeout(kHttpTimeout);

@@ -319,7 +319,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         //checking url type and creating corresponding data provider
 
         QUrl mediaUrl( mediaUrlStr );
-        if( nx_rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
+        if( nx::network::rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());

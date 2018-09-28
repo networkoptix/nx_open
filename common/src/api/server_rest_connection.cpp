@@ -376,21 +376,19 @@ Handle ServerConnection::addFileUpload(
     qint64 chunkSize,
     const QByteArray& md5,
     qint64 ttl,
-    PostCallback callback,
+    AddUploadCallback callback,
     QThread* targetThread)
 {
-    return executePost(
-        lit("/api/downloads/%1").arg(fileName),
-        QnRequestParamList{
-            { lit("size"), QString::number(size) },
-            { lit("chunkSize"), QString::number(chunkSize) },
-            { lit("md5"), QString::fromUtf8(md5) },
-            { lit("ttl"), QString::number(ttl) },
-            { lit("upload"), lit("true") } },
-        QByteArray(),
-        QByteArray(),
-        callback,
-        targetThread);
+    QnRequestParamList params
+    {
+        { lit("size"), QString::number(size) },
+        { lit("chunkSize"), QString::number(chunkSize) },
+        { lit("md5"), QString::fromUtf8(md5) },
+        { lit("ttl"), QString::number(ttl) },
+        { lit("upload"), lit("true") }
+    };
+    QString path = lit("/api/downloads/%1").arg(fileName);
+    return executePost(path, params, QByteArray(), QByteArray(), callback, targetThread);
 }
 
 Handle ServerConnection::validateFileInformation(
@@ -767,6 +765,12 @@ Handle ServerConnection::updateActionStart(const nx::update::Information& info, 
     const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
     auto request = QJson::serialized(info);
     return executePost<EmptyResponseType>(lit("/ec2/startUpdate"), QnRequestParamList(), contentType, request, callback, targetThread);
+}
+
+Handle ServerConnection::getUpdateInfo(Result<nx::update::Information>::type&& callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
 Handle ServerConnection::updateActionStop(std::function<void (Handle, bool)>&& callback, QThread* targetThread)

@@ -90,8 +90,7 @@ CUDTSocket::~CUDTSocket()
         delete (sockaddr_in6*)m_pPeerAddr;
     }
 
-    delete m_pUDT;
-    m_pUDT = NULL;
+    m_pUDT = nullptr;
 
     delete m_pQueuedSockets;
     delete m_pAcceptSockets;
@@ -248,7 +247,7 @@ UDTSOCKET CUDTUnited::newSocket(int af, int type)
     try
     {
         ns = new CUDTSocket;
-        ns->m_pUDT = new CUDT;
+        ns->m_pUDT = std::make_shared<CUDT>();
         if (AF_INET == af)
         {
             ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in);
@@ -346,7 +345,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
     try
     {
         ns = new CUDTSocket;
-        ns->m_pUDT = new CUDT(*(ls->m_pUDT));
+        ns->m_pUDT = std::make_shared<CUDT>(*(ls->m_pUDT));
         if (AF_INET == ls->m_iIPversion)
         {
             ns->m_pSelfAddr = (sockaddr*)(new sockaddr_in);
@@ -402,7 +401,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
     ns->m_Status = CONNECTED;
 
     // copy address information of local node
-    ns->m_pUDT->sndQueue()->m_pChannel->getSockAddr(ns->m_pSelfAddr);
+    ns->m_pUDT->sndQueue()->channel()->getSockAddr(ns->m_pSelfAddr);
     CIPAddress::pton(ns->m_pSelfAddr, ns->m_pUDT->selfIp(), ns->m_iIPversion);
 
     {
@@ -453,7 +452,7 @@ ERR_ROLLBACK:
     return 1;
 }
 
-CUDT* CUDTUnited::lookup(const UDTSOCKET u)
+std::shared_ptr<CUDT> CUDTUnited::lookup(const UDTSOCKET u)
 {
     // protects the m_Sockets structure
     CGuard cg(m_ControlLock);
@@ -516,7 +515,7 @@ int CUDTUnited::bind(const UDTSOCKET u, const sockaddr* name, int namelen)
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
 
     return 0;
 }
@@ -557,7 +556,7 @@ int CUDTUnited::bind(UDTSOCKET u, UDPSOCKET udpsock)
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
 
     return 0;
 }
@@ -753,7 +752,7 @@ void CUDTUnited::connect_complete(const UDTSOCKET u)
     // copy address information of local node
     // the local port must be correctly assigned BEFORE CUDT::connect(),
     // otherwise if connect() fails, the multiplexer cannot be located by garbage collection and will cause leak
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
     CIPAddress::pton(s->m_pSelfAddr, s->m_pUDT->selfIp(), s->m_iIPversion);
 
     s->m_Status = CONNECTED;
@@ -1721,7 +1720,7 @@ int CUDT::getsockopt(UDTSOCKET u, int, UDTOpt optname, void* optval, int* optlen
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         udt->getOpt(optname, optval, *optlen);
         return 0;
     }
@@ -1741,7 +1740,7 @@ int CUDT::setsockopt(UDTSOCKET u, int, UDTOpt optname, const void* optval, int o
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         udt->setOpt(optname, optval, optlen);
         return 0;
     }
@@ -1761,7 +1760,7 @@ int CUDT::send(UDTSOCKET u, const char* buf, int len, int)
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         return udt->send(buf, len);
     }
     catch (CUDTException e)
@@ -1785,7 +1784,7 @@ int CUDT::recv(UDTSOCKET u, char* buf, int len, int)
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         int ret = udt->recv(buf, len);
         if (ret <= 0)
         {
@@ -1815,7 +1814,7 @@ int CUDT::sendmsg(UDTSOCKET u, const char* buf, int len, int ttl, bool inorder)
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         return udt->sendmsg(buf, len, ttl, inorder);
     }
     catch (CUDTException e)
@@ -1839,7 +1838,7 @@ int CUDT::recvmsg(UDTSOCKET u, char* buf, int len)
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         return udt->recvmsg(buf, len);
     }
     catch (CUDTException e)
@@ -1858,7 +1857,7 @@ int64_t CUDT::sendfile(UDTSOCKET u, fstream& ifs, int64_t& offset, int64_t size,
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         return udt->sendfile(ifs, offset, size, block);
     }
     catch (CUDTException e)
@@ -1882,7 +1881,7 @@ int64_t CUDT::recvfile(UDTSOCKET u, fstream& ofs, int64_t& offset, int64_t size,
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         return udt->recvfile(ofs, offset, size, block);
     }
     catch (CUDTException e)
@@ -2111,7 +2110,7 @@ int CUDT::perfmon(UDTSOCKET u, CPerfMon* perf, bool clear)
 {
     try
     {
-        CUDT* udt = s_UDTUnited.lookup(u);
+        auto udt = s_UDTUnited.lookup(u);
         udt->sample(perf, clear);
         return 0;
     }
@@ -2127,7 +2126,7 @@ int CUDT::perfmon(UDTSOCKET u, CPerfMon* perf, bool clear)
     }
 }
 
-CUDT* CUDT::getUDTHandle(UDTSOCKET u)
+std::shared_ptr<CUDT> CUDT::getUDTHandle(UDTSOCKET u)
 {
     try
     {

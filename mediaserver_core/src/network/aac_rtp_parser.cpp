@@ -27,7 +27,7 @@ QnAacRtpParser::QnAacRtpParser():
     m_streamStateIndication = 0;
     m_profile = 0;
     m_bitrate = 0;
-    m_frequency = 16000;
+    QnRtpStreamParser::setFrequency(16000);
     m_channels = 0;
     m_streamtype = 0;
     m_auHeaderExists = false;
@@ -51,7 +51,7 @@ void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
-                m_frequency = params[1].trimmed().toInt();
+                QnRtpStreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
                 m_channels = params[2].trimmed().toInt();
         }
@@ -96,7 +96,7 @@ void QnAacRtpParser::setSdpInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -194,11 +194,7 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
         audioData->compressionType = AV_CODEC_ID_AAC;
         audioData->context = m_context;
-        if (m_timeHelper)
-            audioData->timestamp = m_timeHelper->getUsecTime(rtpTime+rtpTimeOffset, statistics, m_frequency);
-        else
-            audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
+        audioData->timestamp = rtpTime+rtpTimeOffset;
 
         //quint8 adtsHeaderBuff[AAC_HEADER_LEN];
         //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);

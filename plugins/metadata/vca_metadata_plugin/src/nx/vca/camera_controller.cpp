@@ -167,7 +167,7 @@ RuleTuple extractParameter(const QByteArray& line)
 
 void filterOutUnnamedRules(std::map<int, SupportedRule>& rules)
 {
-    for (auto it = rules.begin(); it != rules.end(); )
+    for (auto it = rules.begin(); it != rules.end();)
     {
         if (it->second.name.isEmpty())
             rules.erase(it++);
@@ -495,7 +495,12 @@ bool CameraController::setHeartbeat(Heartbeat heartbeat) const
     static const std::chrono::seconds kMaxInterval(300);
 
     if (heartbeat.interval > kMaxInterval || heartbeat.interval < kMinInterval)
+    {
+        NX_PRINT << "Trying to set inappropriate heartbeat interval: "
+            << heartbeat.interval.count() << " seconds. The value should fall within ["
+            << kMinInterval.count() << ", " << kMaxInterval.count() << "]";
         return false;
+    }
 
     const QString yesno = heartbeat.isEnabled ? "yes" : "no";
     const QString interval = QString::number(heartbeat.interval.count());

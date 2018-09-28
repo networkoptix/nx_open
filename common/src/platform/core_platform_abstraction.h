@@ -2,12 +2,10 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/singleton.h>
-
 #include "notification/platform_notifier.h"
 #include "process/platform_process.h"
 
-class QnCorePlatformAbstraction: public QObject, public Singleton<QnCorePlatformAbstraction> {
+class QnCorePlatformAbstraction: public QObject {
     Q_OBJECT
 public:
     QnCorePlatformAbstraction(QObject *parent = NULL);
@@ -16,7 +14,7 @@ public:
     QnPlatformNotifier *notifier() const {
         return m_notifier;
     }
-    
+
     QnPlatformProcess *process(QProcess *source = NULL) const;
 
 private:

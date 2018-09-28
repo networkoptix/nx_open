@@ -50,10 +50,10 @@ class _ReadOnlyPosixTime(Time):
 
     def get(self):
         started_at = timeit.default_timer()
-        timestamp_output = self._shell.command(['date', '+%s']).check_output(timeout_sec=2)
+        timestamp_output = self._shell.command(['date', '+%s']).run(timeout_sec=2)
         timestamp = int(timestamp_output.decode('ascii').rstrip())
         delay_sec = timeit.default_timer() - started_at
-        timezone_output = self._shell.command(['cat', '/etc/timezone']).check_output(timeout_sec=2)
+        timezone_output = self._shell.command(['cat', '/etc/timezone']).run(timeout_sec=2)
         timezone_name = timezone_output.decode('ascii').rstrip()
         timezone = pytz.timezone(timezone_name)
         local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
@@ -66,7 +66,7 @@ class _ReadOnlyPosixTime(Time):
 class _PosixTime(_ReadOnlyPosixTime):
     def set(self, new_time):
         started_at = datetime.datetime.now(pytz.utc)
-        self._shell.command(['date', '--set', new_time.isoformat()]).check_output()
+        self._shell.command(['date', '--set', new_time.isoformat()]).run()
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
 
 
@@ -147,7 +147,7 @@ class PosixAccess(OSAccess):
                 env={'PID': pid},
                 set_eux=False,
                 )
-            command.check_output(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
+            command.run(timeout_sec=MAKE_CORE_DUMP_TIMEOUT_SEC)
         except exceptions.exit_status_error_cls(1) as e:
             if "You can't do that without a process to debug." not in e.stderr:
                 raise
@@ -194,17 +194,16 @@ class PosixAccess(OSAccess):
             '--output=target,avail',  # Only mount point (target) and free (available) space.
             '--block-size=1',  # By default it's 1024 and all values are in kilobytes.
             ])
-        output = command.check_output()
+        output = command.run()
         for line in output.splitlines()[1:]:  # Mind header.
             mount_point, free_space_raw = line.split()
             if mount_point == '/':
                 return int(free_space_raw)
         raise RuntimeError("Cannot find mount point / in output:\n{}".format(output))
 
-    def consume_disk_space(self, should_leave_bytes):
-        to_consume_bytes = self.free_disk_space_bytes() - should_leave_bytes
+    def _hold_disk_space(self, to_consume_bytes):
         holder_path = self._disk_space_holder()
-        self.shell.command(['fallocate', '-l', to_consume_bytes, holder_path]).check_call()
+        self.shell.command(['fallocate', '-l', to_consume_bytes, holder_path]).run()
 
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)

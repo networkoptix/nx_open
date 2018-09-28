@@ -351,7 +351,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
             if (!outputTask.active)
             {
                 //returning port to inactive state
-                setRelayOutputStateNonSafe(
+                setOutputPortStateNonSafe(
                     0,
                     outputTask.outputID,
                     outputTask.active,
@@ -362,7 +362,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         }
     }
 
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 
     QnMutexLocker lock(&m_physicalParamsMutex);
     m_imagingParamsProxy.reset();
@@ -576,7 +576,7 @@ nx::mediaserver::resource::StreamCapabilityMap QnPlOnvifResource::getStreamCapab
 
 CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     setCameraCapability(Qn::customMediaPortCapability, true);
@@ -594,22 +594,22 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
     if (!checkResultAndSetStatus(result))
         return result;
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     initializeAdvancedParameters(capabilitiesResponse); //< step 3
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     initializeIo(capabilitiesResponse); //< step 4
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     initializePtz(capabilitiesResponse); //< step 5
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     result = customInitialization(capabilitiesResponse);
@@ -637,7 +637,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
 
     calcTimeDrift();
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     QAuthenticator auth = getAuth();
@@ -675,12 +675,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
     if (!result)
         return result;
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     fetchAndSetAudioSource();
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     result = fetchAndSetVideoResourceOptions();
@@ -701,15 +701,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeMedia(
 CameraDiagnostics::Result QnPlOnvifResource::initializePtz(
     const CapabilitiesResp& onvifCapabilities)
 {
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    const bool onfivPtzBroken = resourceData.value(QString("onfivPtzBroken"), false);
-    if (onfivPtzBroken)
-    {
-        return CameraDiagnostics::RequestFailedResult(
-            lit("Fetch Onvif PTZ configurations."),
-            lit("According to resource_data.json camera does not support Onvif PTZ."));
-    }
-
     const bool result = fetchPtzInfo();
     if (!result)
     {
@@ -733,18 +724,18 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     fetchRelayOutputs(&relayOutputs);
     if (!relayOutputs.empty())
     {
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
         // TODO #ak it's not clear yet how to get input port list for sure
         // (on DW cam getDigitalInputs returns nothing),
         // but all cameras I've seen have either both input & output or none.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
 
         //resetting all ports states to inactive
         for (auto i = 0; i < relayOutputs.size(); ++i)
-            setRelayOutputStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
+            setOutputPortStateNonSafe(0, QString::fromStdString(relayOutputs[i].token), false, 0);
     }
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     fetchRelayInputInfo(onvifCapabilities);
@@ -802,19 +793,16 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
             ->InputConnectors;
     }
 
-    auto allPorts = getRelayOutputList();
+    auto allPorts = generateOutputPorts();
     const auto inputPorts = generateInputPorts(inputCount);
 
     m_inputPortCount = inputPorts.size();
     const auto outputPortCount = allPorts.size();
 
     allPorts.insert(allPorts.cend(), inputPorts.cbegin(), inputPorts.cend());
-    setIOPorts(std::move(allPorts));
+    setIoPortDescriptions(std::move(allPorts), /*needMerge*/ true);
 
     m_portNamePrefixToIgnore = resourceData.value<QString>("portNamePrefixToIgnore", QString());
-    setCameraCapability(Qn::RelayInputCapability, m_inputPortCount > 0);
-    setCameraCapability(Qn::RelayOutputCapability, outputPortCount > 0);
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -982,8 +970,8 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
     OnvifResExtInfo extInfo;
 
     QAuthenticator auth = getAuth();
-    CameraDiagnostics::Result result =
-        readDeviceInformation(onvifTimeouts(), getDeviceOnvifUrl(), auth, m_timeDrift, &extInfo);
+    CameraDiagnostics::Result result = readDeviceInformation(
+        commonModule(), onvifTimeouts(), getDeviceOnvifUrl(), auth, m_timeDrift, &extInfo);
     if (result)
     {
         if (getName().isEmpty())
@@ -1008,6 +996,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
+    QnCommonModule* commonModule,
     const SoapTimeouts& onvifTimeouts,
     const QString& onvifUrl,
     const QAuthenticator& auth,
@@ -1024,7 +1013,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
     DeviceInfoReq request;
     DeviceInfoResp response;
 
-    if (m_appStopping)
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     int soapRes = soapWrapper.getDeviceInformation(request, response);
@@ -1052,7 +1041,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(
         extInfo->serial = QString::fromStdString(response.SerialNumber);
     }
 
-    if (m_appStopping)
+    if (commonModule->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     //Trying to get MAC
@@ -1243,7 +1232,7 @@ void QnPlOnvifResource::onRelayInputStateChange(const QString& name, const Relay
     }
 
     NX_DEBUG(this, lm("Input port '%1' = %2").args(portId, state.value));
-    emit cameraInput(
+    emit inputPortStateChanged(
         toSharedPointer(),
         portId,
         state.value,
@@ -1286,11 +1275,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioResourceOptions()
 
     return CameraDiagnostics::NoErrorResult();
 }
-
-//CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
-//{
-//    return CameraDiagnostics::NoErrorResult();
-//}
 
 int QnPlOnvifResource::innerQualityToOnvif(
     Qn::StreamQuality quality, int minQuality, int maxQuality) const
@@ -1510,8 +1494,7 @@ static QString getRelayOutpuToken(const QnPlOnvifResource::RelayOutputInfo& rela
     return QString::fromStdString(relayInfo.token);
 }
 
-// !Implementation of QnSecurityCamResource::getRelayOutputList
-QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
+QnIOPortDataList QnPlOnvifResource::generateOutputPorts() const
 {
     QStringList idList;
     std::transform(
@@ -1531,12 +1514,6 @@ QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
     return result;
 }
 
-QnIOPortDataList QnPlOnvifResource::getInputPortList() const
-{
-    //TODO/IMPL
-    return QnIOPortDataList();
-}
-
 bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilitiesResponse)
 {
     if (m_deviceIOUrl.empty())
@@ -1551,7 +1528,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
         < (int) MAX_IO_PORTS_PER_DEVICE)
     {
         // Camera has input port.
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     }
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
@@ -1606,8 +1583,8 @@ bool QnPlOnvifResource::fetchPtzInfo()
     return true;
 }
 
-//!Implementation of QnSecurityCamResource::setRelayOutputState
-bool QnPlOnvifResource::setRelayOutputState(
+//!Implementation of QnSecurityCamResource::setOutputPortState
+bool QnPlOnvifResource::setOutputPortState(
     const QString& outputID,
     bool active,
     unsigned int autoResetTimeoutMS)
@@ -1616,7 +1593,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
     using namespace std::placeholders;
     const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, active,
+        std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, active,
             autoResetTimeoutMS),
         std::chrono::milliseconds::zero());
     m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, active, autoResetTimeoutMS);
@@ -1687,7 +1664,7 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
 
 bool QnPlOnvifResource::registerNotificationConsumer()
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     QnMutexLocker lk(&m_ioPortMutex);
@@ -1754,7 +1731,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     NX_VERBOSE(this, lit("%1 subscribed to notifications").arg(getUrl()));
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     // TODO: #ak if this variable is unused following code may be deleted as well
@@ -1814,7 +1791,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     scheduleRenewSubscriptionTimer(renewSubsciptionTimeoutSec);
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     /* Note that we don't pass shared pointer here as this would create a
@@ -1917,7 +1894,7 @@ CameraDiagnostics::Result QnPlOnvifResource::getVideoEncoderTokens(
             QLatin1String("getVideoEncoderConfigurations"), soapWrapper.getLastError());
     }
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     int confRangeStart = 0;
@@ -2011,7 +1988,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(
 
         for (;soapRes != SOAP_OK && retryCount >= 0; --retryCount)
         {
-            if (m_appStopping)
+            if (commonModule()->isNeedToStop())
                 return CameraDiagnostics::ServerTerminatedResult();
 
             VideoOptionsReq optRequest;
@@ -2060,7 +2037,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(
             QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
@@ -2082,7 +2059,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(
     if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     {
@@ -2598,7 +2575,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         return result;
     }
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     QAuthenticator auth = getAuth();
@@ -2623,7 +2600,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
             QLatin1String("getVideoSourceConfigurations"), soapWrapper.getLastError());
     }
 
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     std::string srcToken = m_videoSourceToken.toStdString();
@@ -2653,7 +2630,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
             return CameraDiagnostics::NoErrorResult();
         }
 
-        if (m_appStopping)
+        if (commonModule()->isNeedToStop())
             return CameraDiagnostics::ServerTerminatedResult();
     }
 
@@ -2736,7 +2713,7 @@ std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
 
 QnCameraAdvancedParamValueMap QnPlOnvifResource::getApiParameters(const QSet<QString>& ids)
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return {};
 
     QnMutexLocker lock(&m_physicalParamsMutex);
@@ -2862,7 +2839,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
     return result;
 }
 
-void QnPlOnvifResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
+void QnPlOnvifResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {
     QAuthenticator auth = getAuth();
     QString imagingUrl = getImagingUrl();
@@ -2896,13 +2873,15 @@ QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const
 
 void QnPlOnvifResource::fetchAndSetAdvancedParameters()
 {
+    QnMutexLocker lock(&m_physicalParamsMutex);
+
     m_advancedParametersProvider.clear();
 
     QnCameraAdvancedParams params;
     if (!loadAdvancedParametersTemplate(params))
         return;
 
-    initAdvancedParametersProviders(params);
+    initAdvancedParametersProvidersUnderLock(params);
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParametersProvider.assign(params.filtered(supportedParams));
@@ -3055,7 +3034,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         bool invalidFpsDetected = false;
         for (int i = 0; i < getMaxOnvifRequestTries(); ++i)
         {
-            if (m_appStopping)
+            if (commonModule()->isNeedToStop())
                 return;
 
             vEncoder->RateControl->FrameRateLimit = currentFps;
@@ -3135,17 +3114,10 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal() const
     return result.take();
 }
 
-bool QnPlOnvifResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& /*completionHandler*/)
+void QnPlOnvifResource::startInputPortStatesMonitoring()
 {
-    if (hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability))
-    {
-        return false;
-    }
-
     if (!m_eventCapabilities.get())
-        return false;
+        return;
 
     {
         QnMutexLocker lk(&m_ioPortMutex);
@@ -3155,7 +3127,6 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync(
 
     const auto result = subscribeToCameraNotifications();
     NX_DEBUG(this, lit("Port monitoring has started: %1").arg(result));
-    return result;
 }
 
 void QnPlOnvifResource::scheduleRetrySubscriptionTimer()
@@ -3194,7 +3165,7 @@ bool QnPlOnvifResource::subscribeToCameraNotifications()
         return false;
 }
 
-void QnPlOnvifResource::stopInputPortMonitoringAsync()
+void QnPlOnvifResource::stopInputPortStatesMonitoring()
 {
     //TODO #ak this method MUST become asynchronous
     quint64 nextPullMessagesTimerIDBak = 0;
@@ -3483,12 +3454,6 @@ void QnPlOnvifResource::removePullPointSubscription()
     }
 }
 
-bool QnPlOnvifResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk(&m_ioPortMutex);
-    return m_inputMonitored;
-}
-
 template<class _NumericInt>
 _NumericInt roundUp(_NumericInt val, _NumericInt step, typename std::enable_if<std::is_integral<_NumericInt>::value>::type* = nullptr)
 {
@@ -3551,8 +3516,22 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
         char* buf = (char*)malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
         memToFreeOnResponseDone.push_back(buf);
         strcpy(buf, onvifNotificationSubscriptionReferenceUtf8.constData());
-        soapWrapper->getProxy()->soap->header->wsa__To = buf;
+        header->wsa__To = buf;
     }
+
+    // Very few devices need wsa__Action and wsa__ReplyTo to be filled, but sometimes they do.
+    wsa__EndpointReferenceType* replyTo =
+        (wsa__EndpointReferenceType*)malloc(sizeof(wsa__EndpointReferenceType));
+    memToFreeOnResponseDone.push_back(replyTo);
+    memset(replyTo, 0, sizeof(*replyTo));
+    static const char* kReplyTo = "http://www.w3.org/2005/08/addressing/anonymous";
+    replyTo->Address = const_cast<char*>(kReplyTo);
+    header->wsa__ReplyTo = replyTo;
+
+    static const char* kAction =
+        "http://www.onvif.org/ver10/events/wsdl/PullPointSubscription/PullMessagesRequest";
+    header->wsa__Action = const_cast<char*>(kAction);
+
     _onvifEvents__PullMessagesResponse response;
 
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
@@ -3810,7 +3789,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
     return m_videoLayout;
 }
 
-void QnPlOnvifResource::setRelayOutputStateNonSafe(
+void QnPlOnvifResource::setOutputPortStateNonSafe(
     quint64 timerID,
     const QString& outputID,
     bool active,
@@ -3899,7 +3878,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         //adding task to reset port state
         using namespace std::placeholders;
         const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::setRelayOutputStateNonSafe, this, _1, outputID, !active, 0),
+            std::bind(&QnPlOnvifResource::setOutputPortStateNonSafe, this, _1, outputID, !active, 0),
             std::chrono::milliseconds(autoResetTimeoutMS));
         m_triggerOutputTasks[timerID] = TriggerOutputTask(outputID, !active, 0);
     }

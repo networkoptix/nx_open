@@ -108,7 +108,7 @@ public:
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual void pleaseStop();
+    virtual void stop();
 
     void setReady(bool ready);
 

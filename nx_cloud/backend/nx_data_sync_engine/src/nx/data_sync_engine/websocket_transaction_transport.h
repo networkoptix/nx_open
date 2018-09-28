@@ -27,6 +27,7 @@ public:
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
         const std::string& systemId,
+        const OutgoingCommandFilter& filter,
         const QnUuid& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         vms::api::PeerDataEx localPeerData,

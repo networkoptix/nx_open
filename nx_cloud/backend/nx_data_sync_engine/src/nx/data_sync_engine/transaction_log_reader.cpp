@@ -1,5 +1,6 @@
 #include "transaction_log_reader.h"
 
+#include "outgoing_command_filter.h"
 #include "transaction_log.h"
 
 namespace nx {
@@ -8,11 +9,13 @@ namespace data_sync_engine {
 TransactionLogReader::TransactionLogReader(
     TransactionLog* const transactionLog,
     const std::string& systemId,
-    Qn::SerializationFormat dataFormat)
+    Qn::SerializationFormat dataFormat,
+    const OutgoingCommandFilter& outgoingCommandFilter)
     :
     m_transactionLog(transactionLog),
     m_systemId(systemId),
     m_dataFormat(dataFormat),
+    m_outgoingCommandFilter(outgoingCommandFilter),
     m_terminated(false)
 {
 }
@@ -32,16 +35,15 @@ void TransactionLogReader::stopWhileInAioThread()
 }
 
 void TransactionLogReader::readTransactions(
-    boost::optional<vms::api::TranState> from,
-    boost::optional<vms::api::TranState> to,
-    int maxTransactionsToReturn,
+    const ReadCommandsFilter& readFilter,
     TransactionsReadHandler completionHandler)
 {
+    ReadCommandsFilter effectiveReadFilter = readFilter;
+    m_outgoingCommandFilter.updateReadFilter(&effectiveReadFilter);
+
     m_transactionLog->readTransactions(
         m_systemId,
-        std::move(from),
-        std::move(to),
-        maxTransactionsToReturn,
+        effectiveReadFilter,
         [this,
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](

@@ -1482,12 +1482,12 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
         });
 }
 
-void TCPServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void TCPServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 std::unique_ptr<AbstractStreamSocket> TCPServerSocket::accept()
@@ -1651,7 +1651,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
-        qWarning() << "failed to join multicast group" << multicastGroup;
+        NX_WARNING(this, "failed to join multicast group %1", multicastGroup);
         return false;
     }
     return true;
@@ -1668,8 +1668,8 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
-        qWarning() << "failed to join multicast group" << multicastGroup
-            << "from IF" << multicastIF << ". " << SystemError::getLastOSErrorText();
+        NX_WARNING(this, "Failed to join multicast group %1 from interface with IP %2. %3",
+                   multicastGroup, multicastIF, SystemError::getLastOSErrorText());
         return false;
     }
     return true;

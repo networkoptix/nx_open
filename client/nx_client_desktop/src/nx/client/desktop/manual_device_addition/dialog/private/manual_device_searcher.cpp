@@ -19,6 +19,13 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+bool operator==(const QnManualResourceSearchStatus& left, const QnManualResourceSearchStatus& right)
+{
+    return left.state == right.state
+        && left.current == right.current
+        && left.total == right.total;
+}
+
 ManualDeviceSearcher::ManualDeviceSearcher(
     const QnMediaServerResourcePtr& server,
     const QString& address,
@@ -61,9 +68,9 @@ ManualDeviceSearcher::~ManualDeviceSearcher()
     stop(); //< Last try to stop search.
 }
 
-QnManualResourceSearchStatus::State ManualDeviceSearcher::progress() const
+const QnManualResourceSearchStatus& ManualDeviceSearcher::status() const
 {
-    return m_progress;
+    return m_status;
 }
 
 QString ManualDeviceSearcher::initialError() const
@@ -97,8 +104,8 @@ void ManualDeviceSearcher::stop()
 
             if (!success || result.error != QnRestResult::NoError)
                 stop(); //< Try to stop one more time.
-            else if (m_progress != QnManualResourceSearchStatus::Finished)
-                setProgress(QnManualResourceSearchStatus::Aborted);
+            else if (m_status.state != QnManualResourceSearchStatus::Finished)
+                abort();
         };
 
     m_server->restConnection()->searchCameraStop(
@@ -117,16 +124,16 @@ const QString& ManualDeviceSearcher::password() const
 
 void ManualDeviceSearcher::init()
 {
-    static constexpr auto kUpdateProgressIntervalMs = 1000;
+    static constexpr auto kUpdateProgressIntervalMs = 200;
     m_updateProgressTimer.setInterval(kUpdateProgressIntervalMs);
     connect(&m_updateProgressTimer, &QTimer::timeout,
-        this, &ManualDeviceSearcher::updateProgress);
+        this, &ManualDeviceSearcher::updateStatus);
 
     connect(m_server, &QnMediaServerResource::statusChanged, this,
         [this]()
         {
             if (m_server->getStatus() != Qn::Online)
-                setProgress(QnManualResourceSearchStatus::Aborted);
+                abort();
         });
 }
 
@@ -139,7 +146,7 @@ bool ManualDeviceSearcher::checkServer()
     else
          return true;
 
-    setProgress(QnManualResourceSearchStatus::Aborted);
+    abort();
     return false;
 }
 
@@ -151,7 +158,7 @@ bool ManualDeviceSearcher::checkUrl(const QString& stringUrl)
     setLastErrorText(
         tr("Device address field must contain a valid URL, IP address, or RTSP link."));
 
-    setProgress(QnManualResourceSearchStatus::Aborted);
+    abort();
     return false;
 }
 
@@ -168,7 +175,7 @@ bool ManualDeviceSearcher::checkAddresses(
     else
         return true;
 
-    setProgress(QnManualResourceSearchStatus::Aborted);
+    abort();
     return false;
 }
 
@@ -191,13 +198,14 @@ void ManualDeviceSearcher::searchForDevices(
             if (!success || result.error != QnRestResult::NoError)
             {
                 setLastErrorText(tr("Can't start searching process"));
-                setProgress(QnManualResourceSearchStatus::Aborted);
+                abort();
             }
             else
             {
                 const auto reply = result.deserialized<QnManualCameraSearchReply>();
                 m_searchProcessId = reply.processUuid;
                 m_updateProgressTimer.start();
+                setStatus(reply.status);
             }
         };
 
@@ -208,17 +216,22 @@ void ManualDeviceSearcher::searchForDevices(
 
 bool ManualDeviceSearcher::searching() const
 {
-    return m_progress != QnManualResourceSearchStatus::Aborted
-        && m_progress != QnManualResourceSearchStatus::Finished;
+    return m_status.state != QnManualResourceSearchStatus::Aborted
+        && m_status.state != QnManualResourceSearchStatus::Finished;
 }
 
-void ManualDeviceSearcher::setProgress(QnManualResourceSearchStatus::State value)
+void ManualDeviceSearcher::abort()
 {
-    if (m_progress == value)
+    setStatus(QnManualResourceSearchStatus());
+}
+
+void ManualDeviceSearcher::setStatus(const QnManualResourceSearchStatus& value)
+{
+    if (m_status == value)
         return;
 
-    m_progress = value;
-    emit progressChanged();
+    m_status = value;
+    emit statusChanged();
 }
 
 void ManualDeviceSearcher::setLastErrorText(const QString& text)
@@ -257,7 +270,7 @@ void ManualDeviceSearcher::updateDevices(const QnManualResourceSearchList& devic
     emit devicesAdded(addedDevices);
 }
 
-void ManualDeviceSearcher::updateProgress()
+void ManualDeviceSearcher::updateStatus()
 {
     if (!searching())
         return;
@@ -277,7 +290,7 @@ void ManualDeviceSearcher::updateProgress()
             NX_ASSERT(!m_searchProcessId.isNull());
 
             const auto reply = result.deserialized<QnManualCameraSearchReply>();
-            setProgress(static_cast<QnManualResourceSearchStatus::State>(reply.status.state));
+            setStatus(reply.status);
             updateDevices(reply.cameras);
         };
 

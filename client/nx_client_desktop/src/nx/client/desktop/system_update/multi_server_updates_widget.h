@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>   // for unique_ptr
-#include <future>   // for the future
+#include <memory>
+#include <future>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
@@ -79,15 +79,16 @@ protected:
 
     void at_startUpdateAction();
     bool at_cancelCurrentAction();
-
-    //void at_updateItemCommand(std::shared_ptr<UpdateItem> item);
-
-    void setModeLocalFile();
-    void setModeSpecificBuild();
-    void setModeLatestAvailable();
     void hideStatusColumns(bool value);
 
+    void clearUpdateInfo();
+    void pickLocalFile();
+    void pickSpecificBuild();
+
 private:
+
+    using UpdateCheckMode = ServerUpdateTool::UpdateCheckMode;
+    /*
     // UI Mode for picking the source of update.
     enum class UpdateSourceMode
     {
@@ -97,7 +98,7 @@ private:
         SpecificBuild,
         // Manual update using local file.
         LocalFile
-    };
+    };*/
 
     enum class WidgetUpdateState
     {
@@ -119,11 +120,11 @@ private:
         Installing,
     };
 
-    static QString toString(UpdateSourceMode mode);
+    static QString toString(UpdateCheckMode mode);
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
 
-    void setUpdateSourceMode(UpdateSourceMode mode);
+    void setUpdateSourceMode(UpdateCheckMode mode);
 
     void initDropdownActions();
     void initDownloadActions();
@@ -139,19 +140,17 @@ private:
 
     static bool restartClient(const nx::utils::SoftwareVersion& version);
 
-    struct ProgressInfo
-    {
-        int current = 0;
-        int max = 0;
-    };
-
-    ProgressInfo calculateActionProgress() const;
+    ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
     bool processRemoteChanges(bool force = false);
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
     void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
     void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
+
+    bool processUploaderChanges(bool force = false);
+
+    void closePanelNotifications();
 
     // Advances UI FSM towards selected state.
     void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});
@@ -168,30 +167,24 @@ private:
     bool m_updateRemoteStateChanged = true;
     bool m_latestVersionChanged = true;
     // Flag shows that we have an update.
-    bool m_haveUpdate = false;
-    bool m_haveClientUpdate = false;
+    bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
 
-    UpdateSourceMode m_updateSourceMode = UpdateSourceMode::LatestVersion;
+    UpdateCheckMode m_updateSourceMode = UpdateCheckMode::internet;
 
     std::shared_ptr<ServerUpdateTool> m_updatesTool;
     std::unique_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
 
-    //std::unique_ptr<Downloader> m_downloader;
-    // Downloader needs this strange thing.
-    //std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
+    // ServerUpdateTool promises this.
+    std::future<ServerUpdateTool::UpdateContents> m_updateCheck;
 
-    // TODO: Move it to ServerUpdateTool
-    std::future<ServerUpdateTool::UpdateCheckResult> m_updateCheck;
-    nx::update::Information m_updateInfo;
+    // TODO: We could move it inside serverUpdateTool
+    ServerUpdateTool::UpdateContents m_updateInfo;
     QString m_updateCheckError;
     // We get this version either from internet, or zip package.
     nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
-
-    // Information for clent update.
-    nx::update::Package m_clientUpdatePackage;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
     WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
@@ -206,6 +199,8 @@ private:
 
     qint64 m_lastAutoUpdateCheck = 0;
 
+    // Id of the progress notification at the right panel.
+    QnUuid m_rightPanelDownloadProgress;
     // TODO: We used this sets, when we commanded each server directly. So update state could diverge.
     // Right now we do not need to track that much
     // This sets are changed every time we are initiating some update action.

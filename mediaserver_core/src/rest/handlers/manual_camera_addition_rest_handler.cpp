@@ -53,7 +53,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
     if (addr1.isNull())
     {
         NX_WARNING(this, lm("Invalid parameter 'start_ip'."));
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
     }
 
     if (addr2 == addr1)
@@ -90,7 +90,7 @@ int QnManualCameraAdditionRestHandler::searchStatusAction(
     QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     if (!isSearchActive(processUuid))
         return nx::network::http::StatusCode::notFound;
@@ -108,7 +108,7 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     QnUuid processUuid = QnUuid(params.value("uuid"));
 
     if (processUuid.isNull())
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     QnManualCameraSearcher* process(NULL);
     {
@@ -194,7 +194,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         {
             result.setError(QnJsonRestResult::InvalidParameter,
                 lit("Invalid camera manufacturer '%1'.").arg(camera.manufacturer));
-            return nx::network::http::StatusCode::invalidParameter;
+            return nx::network::http::StatusCode::unprocessableEntity;
         }
 
         cameraList.push_back(info);

@@ -137,6 +137,7 @@ public:
     bool isLive() const;
 
 public:
+    QnAbstractStreamDataProvider* dataProvider;
     DataType dataType;
     AVCodecID compressionType;
     MediaFlags flags;

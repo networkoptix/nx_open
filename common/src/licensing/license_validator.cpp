@@ -67,9 +67,6 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
     if (isArmBox && !isAllowedForArm(license))
         return QnLicenseErrorCode::InvalidType; // strict allowed license type for ARM devices
 
-    if (isArmBox && license->type() == Qn::LC_Edge)
-        return isValidEdgeLicense(license, mode);
-
     if (license->type() == Qn::LC_Start)
         return isValidStartLicense(license, mode);
 
@@ -128,30 +125,6 @@ QnUuid QnLicenseValidator::serverId(const QnLicensePtr& license) const
             return info.uuid;
     }
     return QnUuid();
-}
-
-QnLicenseErrorCode QnLicenseValidator::isValidEdgeLicense(const QnLicensePtr& license,
-    ValidationMode mode) const
-{
-    for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
-    {
-        // skip other license types and current license itself
-        if (otherLicense->type() != license->type() || otherLicense->key() == license->key())
-            continue;
-
-        // Only single EDGE license per ARM device is allowed
-        if (otherLicense->hardwareId() == license->hardwareId())
-        {
-            // mark current as invalid for any of special (non regular) mode
-            if (mode != VM_Regular)
-                return QnLicenseErrorCode::TooManyLicensesPerDevice;
-            // mark the most least license as valid
-            else if (otherLicense->key() < license->key())
-                return QnLicenseErrorCode::TooManyLicensesPerDevice;
-        }
-    }
-
-    return QnLicenseErrorCode::NoError;
 }
 
 QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license,

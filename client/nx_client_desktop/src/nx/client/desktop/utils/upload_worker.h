@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/vms/common/p2p/downloader/result_code.h>
 #include "upload_state.h"
 
 namespace nx {
@@ -18,8 +19,7 @@ class UploadWorker: public QObject
 public:
     UploadWorker(
         const QnMediaServerResourcePtr& server,
-        const QString& path,
-        qint64 ttl,
+        UploadState& config,
         QObject* parent = nullptr);
     virtual ~UploadWorker() override;
 
@@ -27,6 +27,8 @@ public:
     void cancel();
 
     UploadState state() const;
+
+    using RemoteResult = nx::vms::common::p2p::downloader::ResultCode;
 
 signals:
     void progress(const UploadState&);
@@ -36,11 +38,12 @@ private:
     void handleStop();
     void handleError(const QString& message);
     void handleMd5Calculated();
-    void handleFileUploadCreated(bool success);
+
     void handleUpload();
     void handleChunkUploaded(bool success);
     void handleAllUploaded();
     void handleCheckFinished(bool success, bool ok);
+    void handleFileUploadCreated(bool success, RemoteResult code, QString error);
 
 private:
     struct Private;

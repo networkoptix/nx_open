@@ -106,7 +106,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -120,6 +119,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -609,7 +609,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
          [this, changeCameraPassword]()
          {
              const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
+             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
          });
 }
 

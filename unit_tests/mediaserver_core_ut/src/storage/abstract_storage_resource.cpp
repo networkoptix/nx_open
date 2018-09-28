@@ -61,25 +61,25 @@ protected:
 
         QString fileStorageUrl = *workDirResource.getDirName();
         QnStorageResourcePtr fileStorage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(serverModule.commonModule(), fileStorageUrl));
+            QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
-        serverModule.normalStorageManager()->addStorage(fileStorage);
+        serverModule().normalStorageManager()->addStorage(fileStorage);
 
         if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
             QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
-                serverModule.commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
+                serverModule().commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!nx::ut::cfg::configInstance().smbUrl.isEmpty())
         {
             QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
-                serverModule.commonModule(), nx::ut::cfg::configInstance().smbUrl));
+                serverModule().commonModule(), nx::ut::cfg::configInstance().smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
-            serverModule.normalStorageManager()->addStorage(smbStorage);
+            serverModule().normalStorageManager()->addStorage(smbStorage);
         }
    }
 
@@ -96,13 +96,13 @@ protected:
             "file",
             [this](QnCommonModule*, const QString& path)
             {
-                return QnFileStorageResource::instance(&serverModule, path);
+                return QnFileStorageResource::instance(&serverModule(), path);
             }, /*isDefaultProtocol*/ true);
-        pluginManager->loadPlugins(serverModule.roSettings());
+        pluginManager->loadPlugins(serverModule().roSettings());
 
         for (const auto storagePlugin: pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
-            const auto settings = &serverModule.settings();
+            const auto settings = &serverModule().settings();
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 storagePlugin->storageType(),
                 std::bind(
@@ -119,14 +119,13 @@ protected:
     QString                             smbStorageUrl;
     std::unique_ptr<PluginManager>      pluginManager;
     nx::ut::utils::WorkDirResource workDirResource;
-    QnMediaServerModule serverModule;
     std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
 };
 } // namespace <anonymous>
 
 TEST_F(AbstractStorageResourceTest, Capabilities)
 {
-    for (auto storage: serverModule.normalStorageManager()->getStorages())
+    for (auto storage: serverModule().normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
         // storage general functions
@@ -179,7 +178,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         return pathStream.str();
     };
 
-    for (auto storage: serverModule.normalStorageManager()->getStorages())
+    for (auto storage: serverModule().normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 
@@ -274,7 +273,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 
 TEST_F(AbstractStorageResourceTest, IODevice)
 {
-    for (auto storage: serverModule.normalStorageManager()->getStorages())
+    for (auto storage: serverModule().normalStorageManager()->getStorages())
     {
         std::cout << "Storage: " << storage->getUrl().toStdString() << std::endl;
 

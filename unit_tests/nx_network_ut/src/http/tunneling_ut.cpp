@@ -6,6 +6,7 @@
 #include <nx/network/http/tunneling/client.h>
 #include <nx/network/http/tunneling/server.h>
 #include <nx/network/http/tunneling/detail/client_factory.h>
+#include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -71,6 +72,7 @@ protected:
     void whenRequestTunnel()
     {
         m_tunnelingClient = std::make_unique<Client>(m_baseUrl);
+        m_tunnelingClient->setTimeout(nx::network::kNoTimeout);
 
         m_tunnelingClient->openTunnel(
             std::bind(&HttpTunneling::saveClientTunnel, this, std::placeholders::_1));
@@ -122,13 +124,16 @@ private:
 
     void enableTunnelMethods(int tunnelMethodMask)
     {
-        if (tunnelMethodMask & TunnelMethod::all)
+        if ((tunnelMethodMask & TunnelMethod::all) == TunnelMethod::all)
             return; //< By default, the factory is initialized with all methods.
 
         m_localFactory.clear();
 
         if (tunnelMethodMask & TunnelMethod::getPost)
             m_localFactory.registerClientType<detail::GetPostTunnelClient>();
+        
+        if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
+            m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
     }
 
     void saveClientTunnel(OpenTunnelResult result)
@@ -192,10 +197,14 @@ INSTANTIATE_TEST_CASE_P(
     HttpTunneling,
     ::testing::Values(TunnelMethod::all));
 
-
 INSTANTIATE_TEST_CASE_P(
     GetPostWithLargeMessageBody,
     HttpTunneling,
     ::testing::Values(TunnelMethod::getPost));
+
+INSTANTIATE_TEST_CASE_P(
+    ConnectionUpgrade,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::connectionUpgrade));
 
 } // namespace nx::network::http::tunneling::test

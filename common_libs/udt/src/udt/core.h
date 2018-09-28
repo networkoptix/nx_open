@@ -89,7 +89,8 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class CUDT
+class CUDT:
+    public std::enable_shared_from_this<CUDT>
 {
 public: //API
     CUDT();
@@ -134,7 +135,7 @@ public: //API
     static UDTSTATUS getsockstate(UDTSOCKET u);
 
 public: // internal API
-    static CUDT* getUDTHandle(UDTSOCKET u);
+    static std::shared_ptr<CUDT> getUDTHandle(UDTSOCKET u);
 
     void setConnecting(bool val);
     bool isConnecting() const;

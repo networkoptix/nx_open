@@ -227,3 +227,15 @@ bool QnStorageResource::isBackup() const
 bool QnStorageResource::isWritable() const {
     return (getCapabilities() & QnAbstractStorageResource::cap::WriteFile) == QnAbstractStorageResource::cap::WriteFile;
 }
+
+void QnStorageResource::setStatusFlag(Qn::StorageStatuses status)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_status = status;
+}
+
+Qn::StorageStatuses QnStorageResource::statusFlag() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_status;
+}

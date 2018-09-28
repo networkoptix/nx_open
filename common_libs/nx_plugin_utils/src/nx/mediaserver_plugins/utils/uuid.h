@@ -7,8 +7,8 @@ namespace nx {
 namespace mediaserver_plugins {
 namespace utils {
 
-QnUuid /*NX_PLUGIN_UTILS_API*/ fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid);
-nxpl::NX_GUID /*NX_PLUGIN_UTILS_API*/ fromQnUuidToPluginGuid(const QnUuid& uuid);
+QnUuid NX_PLUGIN_UTILS_API fromPluginGuidToQnUuid(const nxpl::NX_GUID& guid);
+nxpl::NX_GUID NX_PLUGIN_UTILS_API fromQnUuidToPluginGuid(const QnUuid& uuid);
 
 } // namespace utils
 } // namespace mediaserver_plugins

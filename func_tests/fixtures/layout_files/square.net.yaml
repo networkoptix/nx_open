@@ -17,6 +17,6 @@ networks:
     proxy-2:
     first:
 mergers:
-- {local: proxy-1, remote: first, settings: remote, network: 10.254.1.0/24}
-- {local: proxy-2, remote: first, settings: remote, network: 10.254.4.0/24}
-- {local: second, remote: proxy-1, settings: remote, network: 10.254.2.0/24}
+- {local: proxy-1, remote: first, take_remote_settings: true, network: 10.254.1.0/24}
+- {local: proxy-2, remote: first, take_remote_settings: true, network: 10.254.4.0/24}
+- {local: second, remote: proxy-1, take_remote_settings: true, network: 10.254.2.0/24}

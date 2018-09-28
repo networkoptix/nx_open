@@ -25,6 +25,8 @@ Rectangle
     readonly property real kMotionRegionOpacity: 0.3
     readonly property real kSelectionOpacity: 0.2
 
+    property int maxTextureSize: -1
+
     color: ColorTheme.window
 
     MediaResourceHelper
@@ -41,6 +43,23 @@ Rectangle
         sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
 
         item: video
+
+        customAspectRatio:
+        {
+            var aspectRatio = helper ? helper.customAspectRatio : 0.0
+            if (aspectRatio === 0.0)
+            {
+                if (player)
+                    aspectRatio = player.aspectRatio
+                else
+                    aspectRatio = sourceSize.width / sourceSize.height
+            }
+
+            var layoutSize = helper ? helper.layoutSize : Qt.size(1, 1)
+            aspectRatio *= layoutSize.width / layoutSize.height
+
+            return aspectRatio
+        }
 
         MultiVideoOutput
         {
@@ -265,19 +284,29 @@ Rectangle
         }
     }
 
+    onVisibleChanged: updatePlayingState()
+
     MediaPlayer
     {
         id: player
         resourceId: cameraResourceId
+        maxTextureSize: videoContainer.maxTextureSize
 
         onResourceIdChanged: video.clear()
-
-        onSourceChanged: playLive()
+        onSourceChanged: videoContainer.updatePlayingState()
     }
 
     MediaPlayerMotionProvider
     {
         id: motionProvider
         mediaPlayer: player
+    }
+
+    function updatePlayingState()
+    {
+        if (visible)
+            player.playLive()
+        else
+            player.pause()
     }
 }

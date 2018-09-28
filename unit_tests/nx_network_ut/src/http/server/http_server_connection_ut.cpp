@@ -1,4 +1,5 @@
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -287,6 +288,119 @@ TEST_F(HttpServerConnectionClientEndpoint, forwarded_header_with_port)
 {
     whenIssueRequestWithForwardedHeaderWithPort();
     thenHttpClientEndpointIsCorrect();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static constexpr char kPipeliningTestPath[] = "/HttpServerConnectionRequestPipelining";
+
+class HttpServerConnectionRequestPipelining:
+    public HttpServerConnection
+{
+     using base_type = HttpServerConnection;
+
+public:
+    ~HttpServerConnectionRequestPipelining()
+    {
+        for (const auto& client: m_httpClients)
+            client->pleaseStopSync();
+
+        m_timer.pleaseStopSync();
+    }
+
+protected:
+    void givenServerThatReordersResponses()
+    {
+        httpServer().registerRequestProcessorFunc(
+            kPipeliningTestPath,
+            [this](auto... args) { replyWhileReorderingResponses(std::move(args)...); });
+    }
+
+    void whenSendMultipleRequests()
+    {
+        m_expectedResponseCount = 2;
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            m_httpClients.push_back(std::make_unique<AsyncClient>());
+            m_httpClients.back()->setResponseReadTimeout(kNoTimeout);
+            m_httpClients.back()->setMessageBodyReadTimeout(kNoTimeout);
+            m_httpClients.back()->addAdditionalHeader(
+                "Sequence", std::to_string(i).c_str());
+            m_httpClients.back()->doGet(
+                prepareRequestUrl(kPipeliningTestPath),
+                [this, client = m_httpClients.back().get()]() { saveResponse(client); });
+        }
+    }
+
+    void thenResponsesAreReceivedInRequestOrder()
+    {
+        std::optional<int> prevSequence;
+        for (int i = 0; i < m_expectedResponseCount; ++i)
+        {
+            auto response = m_responseQueue.pop();
+            ASSERT_NE(nullptr, response);
+
+            const auto sequence = response->headers.find("Sequence")->second.toInt();
+            if (prevSequence)
+            {
+                ASSERT_EQ(*prevSequence + 1, sequence);
+            }
+
+            prevSequence = sequence;
+        }
+    }
+
+private:
+    nx::utils::SyncQueue<std::unique_ptr<Response>> m_responseQueue;
+    int m_expectedResponseCount = 0;
+    std::vector<std::unique_ptr<AsyncClient>> m_httpClients;
+    std::vector<nx::network::http::RequestProcessedHandler> m_postponedRequestCompletionHandlers;
+    aio::Timer m_timer;
+
+    void replyWhileReorderingResponses(
+        RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        const auto requestSequence = requestContext.request.headers.find("Sequence")->second;
+        requestContext.response->headers.emplace(
+            "Sequence",
+            requestSequence);
+
+        if (m_postponedRequestCompletionHandlers.empty())
+        {
+            m_postponedRequestCompletionHandlers.push_back(
+                std::move(completionHandler));
+        }
+        else
+        {
+            completionHandler(StatusCode::ok);
+
+            m_timer.start(
+                std::chrono::milliseconds(10),
+                [this]() { sendPostponedResponse(); });
+        }
+    }
+
+    void sendPostponedResponse()
+    {
+        for (auto& handler: m_postponedRequestCompletionHandlers)
+            handler(StatusCode::ok);
+    }
+
+    void saveResponse(AsyncClient* asyncClient)
+    {
+        if (asyncClient->hasRequestSucceeded())
+            m_responseQueue.push(std::make_unique<Response>(*asyncClient->response()));
+        else
+            m_responseQueue.push(nullptr);
+    }
+};
+
+TEST_F(HttpServerConnectionRequestPipelining, DISABLED_response_order_matches_request_order)
+{
+    givenServerThatReordersResponses();
+    whenSendMultipleRequests();
+    thenResponsesAreReceivedInRequestOrder();
 }
 
 } // namespace test
