@@ -51,7 +51,7 @@ ${ALL SYSTEMS}                        //header//li[contains(@class, 'collapse-se
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
-${CREATE ACCOUNT BODY}                //body//a[@href='/register']
+${CREATE ACCOUNT BODY}                //nx-app//a[@href='/register']
 
 #Forgot Password
 ${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
@@ -196,6 +196,17 @@ ${RELEASES TAB}                       //span[@class='tab-heading' and text()='${
 ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${PATCHES TEXT}']/..
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
+
+#About
+${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
+
+#Footer
+${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT}")]/span[contains(text(),"${PRODUCT_NAME}")]/..
+${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]
+${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
+${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
+${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
+${FOOTER COPYWRIGHT LINK}            //footer//a[contains(text(),"${COPYWRIGHT TEXT}")]
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
