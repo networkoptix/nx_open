@@ -32,11 +32,11 @@ static void calc_nonce(struct soap* /*soap*/, char nonce[SOAP_WSSE_NONCELEN])
 /**
  * Calculates digest value SHA1(created, nonce, password)
  * @param soap context
- * @param[in] created string (XSD dateTime format)
- * @param[in] nonce value
- * @param[in] noncelen length of nonce value
- * @param[in] password string
- * @param[out] hash SHA1 digest
+ * @param[in] created - string (XSD dateTime format)
+ * @param[in] nonce - value
+ * @param[in] noncelen - length of nonce value
+ * @param[in] password - string
+ * @param[out] hash - SHA1 digest
  */
 static void calc_digest(
     struct soap *soap,

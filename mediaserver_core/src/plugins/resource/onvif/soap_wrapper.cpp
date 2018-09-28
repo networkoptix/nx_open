@@ -6,17 +6,6 @@
 
 #include "soap_wrapper.h"
 #include <onvif/Onvif.nsmap>
-//#include <onvif/soapDeviceBindingProxy.h>
-//#include <onvif/soapDeviceIOBindingProxy.h>
-//#include <onvif/soapMediaBindingProxy.h>
-//#include <onvif/soapMedia2BindingProxy.h>
-//#include <onvif/soapPTZBindingProxy.h>
-//#include <onvif/soapImagingBindingProxy.h>
-//#include <onvif/soapNotificationProducerBindingProxy.h>
-//#include <onvif/soapCreatePullPointBindingProxy.h>
-//#include <onvif/soapEventBindingProxy.h>
-//#include <onvif/soapSubscriptionManagerBindingProxy.h>
-//#include <onvif/soapPullPointSubscriptionBindingProxy.h>
 
 #include <nx/utils/log/log.h>
 #include <QtCore/QtGlobal>
@@ -93,7 +82,51 @@ void SoapTimeouts::assignTo(struct soap* soap) const
     soap->connect_timeout = std::chrono::seconds(connectTimeout).count();
     soap->accept_timeout = std::chrono::seconds(acceptTimeout).count();
 }
+/**
+ Generate code that initializes static constant members "kRequestFunc" and "kFuncName".
+ The example of generated code:
+const RequestTraits<_onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
+    RequestTraits<_onvifDeviceIO__GetDigitalInputsResponse>::kRequestFunc
+    = &DeviceIOBindingProxy::GetDigitalInputs;
+    const char RequestTraits<_onvifDeviceIO__GetDigitalInputsResponse>::kFuncName[64] = "GetDigitalInputs";
+ */
+#define DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
+    const RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
+        RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kRequestFunc = \
+        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+    \
+    const char RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kFuncName[64] = \
+        #FUNCTION;
 
+#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, REQUEST, RESPONSE) \
+    const RequestTraits<REQUEST, RESPONSE>::RequestFunc \
+        RequestTraits<REQUEST, RESPONSE>::kRequestFunc = \
+        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+    \
+    const char RequestTraits<REQUEST, RESPONSE>::kFuncName[64] = \
+        #FUNCTION;
+
+DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
+
+DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
+DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
+DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
+DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
+DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
+DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
+
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurations,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurationOptions,
+    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
+DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
+    _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
+DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
+DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
+// ------------------------------------------------------------------------------------------------
 // DeviceSoapWrapper
 // ------------------------------------------------------------------------------------------------
 DeviceSoapWrapper::DeviceSoapWrapper(
@@ -105,6 +138,11 @@ DeviceSoapWrapper::DeviceSoapWrapper(
     bool tcpKeepAlive)
     :
     SoapWrapper<DeviceBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+}
+
+DeviceSoapWrapper::DeviceSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<DeviceBindingProxy>(std::move(soapParams))
 {
 }
 
@@ -124,7 +162,7 @@ void DeviceSoapWrapper::calcTimeDrift()
         onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
 
         QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
-        m_timeDrift = datetime.toMSecsSinceEpoch()/1000 - QDateTime::currentMSecsSinceEpoch()/1000;
+        m_timeDrift = datetime.toMSecsSinceEpoch() / 1000 - QDateTime::currentMSecsSinceEpoch() / 1000;
     }
 }
 
@@ -184,7 +222,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(
     auto possibleCredentials = oldCredentials;
 
     const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
-    for (const auto& credentials: credentialsFromResourceData)
+    for (const auto& credentials : credentialsFromResourceData)
     {
         if (!oldCredentials.contains(credentials))
             possibleCredentials.append(credentials);
@@ -223,7 +261,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(
     };
 
     calcTimeDrift();
-    for (const auto& credentials: possibleCredentials)
+    for (const auto& credentials : possibleCredentials)
     {
         if (commonModule->isNeedToStop())
             return false;
@@ -291,9 +329,6 @@ int DeviceSoapWrapper::setRelayOutputSettings(_onvifDevice__SetRelayOutputSettin
 int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
 {
     return invokeMethod(&DeviceBindingProxy::GetCapabilities, &request, response);
-//    beforeMethodInvocation<CapabilitiesReq>();
-//    int rez = m_bindingProxy.GetCapabilities(m_endpoint, NULL, &request, response);
-//    return rez;
 }
 
 int DeviceSoapWrapper::getServices(GetServicesReq& request, GetServicesResp& response)
@@ -328,53 +363,6 @@ int DeviceSoapWrapper::setSystemFactoryDefaultSoft(FactoryDefaultReq& request, F
     request.FactoryDefault = onvifXsd__FactoryDefaultType::Soft;
     return m_bindingProxy.SetSystemFactoryDefault(m_endpoint, NULL, &request, response);
 }
-
-// -------------------------------------------------------------------------- //
-
-/**
- Generate code that initializes static constant member "requestFunc".
- The example of generated code:
-const RequestTraits<_onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigitalInputsResponse>::RequestFunc
-    RequestTraits<_onvifDeviceIO__GetDigitalInputsResponse>::requestFunc
-    = &DeviceIOBindingProxy::GetDigitalInputs;
- */
-#define DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
-    const RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
-        RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::requestFunc = \
-        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
-    \
-    const char RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::funcName[64] = \
-        #FUNCTION;
-
-#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, REQUEST, RESPONSE) \
-    const RequestTraits<REQUEST, RESPONSE>::RequestFunc \
-        RequestTraits<REQUEST, RESPONSE>::requestFunc = \
-        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
-    \
-    const char RequestTraits<REQUEST, RESPONSE>::funcName[64] = \
-        #FUNCTION;
-
-DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
-DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
-
-DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
-DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
-DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
-DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
-DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
-DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
-DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
-
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurations,
-    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurationOptions,
-    onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
-    _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
-DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
-DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
-
 // ------------------------------------------------------------------------------------------------
 // MediaSoapWrapper
 // ------------------------------------------------------------------------------------------------
@@ -384,7 +372,11 @@ MediaSoapWrapper::MediaSoapWrapper(
     :
     SoapWrapper<MediaBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
+}
 
+MediaSoapWrapper::MediaSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<MediaBindingProxy>(std::move(soapParams))
+{
 }
 
 MediaSoapWrapper::~MediaSoapWrapper()
@@ -575,6 +567,11 @@ ImagingSoapWrapper::ImagingSoapWrapper(
 {
 }
 
+ImagingSoapWrapper::ImagingSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<ImagingBindingProxy>(std::move(soapParams))
+{
+}
+
 ImagingSoapWrapper::~ImagingSoapWrapper()
 {
 }
@@ -615,6 +612,11 @@ PtzSoapWrapper::PtzSoapWrapper(
     const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
     :
     SoapWrapper<PTZBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+}
+
+PtzSoapWrapper::PtzSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<PTZBindingProxy>(std::move(soapParams))
 {
 }
 
@@ -719,6 +721,11 @@ NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(
 {
 }
 
+NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<NotificationProducerBindingProxy>(std::move(soapParams))
+{
+}
+
 int NotificationProducerSoapWrapper::Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response)
 {
     return invokeMethod(&NotificationProducerBindingProxy::Subscribe, request, *response);
@@ -732,6 +739,11 @@ CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(
     const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
     :
     SoapWrapper<CreatePullPointBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+}
+
+CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<CreatePullPointBindingProxy>(std::move(soapParams))
 {
 }
 
@@ -751,6 +763,11 @@ PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(
 {
 }
 
+PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(SoapParams soapParams) :
+    SoapWrapper<PullPointSubscriptionBindingProxy>(std::move(soapParams))
+{
+}
+
 int PullPointSubscriptionWrapper::pullMessages(_onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response)
 {
     return invokeMethod(&PullPointSubscriptionBindingProxy::PullMessages, &request, response);
@@ -764,6 +781,11 @@ EventSoapWrapper::EventSoapWrapper(
     const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
     :
     SoapWrapper<EventBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+}
+
+EventSoapWrapper::EventSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<EventBindingProxy>(std::move(soapParams))
 {
 }
 
@@ -782,6 +804,11 @@ SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(
     const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
     :
     SoapWrapper<SubscriptionManagerBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+{
+}
+
+SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(SoapParams soapParams) :
+    SoapWrapper<SubscriptionManagerBindingProxy>(std::move(soapParams))
 {
 }
 

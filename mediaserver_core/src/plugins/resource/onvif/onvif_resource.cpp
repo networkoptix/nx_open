@@ -127,6 +127,20 @@ static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
     return res1 > res2? true: (res1 == res2 && s1.width() > s2.width()? true: false);
 }
 
+QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
+{
+    switch (onvifWebService)
+    {
+        case OnvifWebService::Media: return mediaServiceUrl; break;
+        case OnvifWebService::Media2: return media2ServiceUrl; break;
+        case OnvifWebService::Ptz: return ptzServiceUrl; break;
+        case OnvifWebService::Imaging: return imagingServiceUrl; break;
+        case OnvifWebService::DeviceIO: return deviceioServiceUrl; break;
+        default: NX_ASSERT(0);
+    }
+    return QString();
+}
+
 QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(
     const QString& id,
     const onvifXsd__VideoEncoderConfigurationOptions& options,
@@ -1603,13 +1617,13 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_serviceUrls.imagingServiceUrl = src;
 }
 
-QString QnPlOnvifResource::getDeviceioUrl() const
+QString QnPlOnvifResource::getDeviceIOUrl() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_serviceUrls.deviceioServiceUrl;
 }
 
-void QnPlOnvifResource::setDeviceioUrl(const QString& src)
+void QnPlOnvifResource::setDeviceIOUrl(const QString& src)
 {
     QnMutexLocker lock(&m_mutex);
     m_serviceUrls.deviceioServiceUrl = src;
@@ -1714,7 +1728,7 @@ QnIOPortDataList QnPlOnvifResource::generateOutputPorts() const
 
 bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilitiesResponse)
 {
-    if (getDeviceioUrl().isEmpty())
+    if (getDeviceIOUrl().isEmpty())
         return false;
 
     if (capabilitiesResponse.Capabilities
@@ -3080,10 +3094,11 @@ bool QnPlOnvifResource::setAdvancedParametersUnderLock(
     return success;
 }
 
-SoapParams QnPlOnvifResource::makeSoapParams(bool tcpKeepAlive) const
+SoapParams QnPlOnvifResource::makeSoapParams(
+    OnvifWebService onvifWebService, bool tcpKeepAlive) const
 {
-    return SoapParams(onvifTimeouts(), getDeviceioUrl().toStdString(), getAuth(),
-        m_timeDrift, tcpKeepAlive);
+    return SoapParams(onvifTimeouts(), m_serviceUrls.getUrl(onvifWebService).toStdString(),
+        getAuth(), m_timeDrift, tcpKeepAlive);
 }
 
 /*
@@ -4274,11 +4289,11 @@ void QnPlOnvifResource::fillFullUrlInfo(const CapabilitiesResp& response)
     }
     if (response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO)
     {
-        setDeviceioUrl(fromOnvifDiscoveredUrl(response.Capabilities->Extension->DeviceIO->XAddr));
+        setDeviceIOUrl(fromOnvifDiscoveredUrl(response.Capabilities->Extension->DeviceIO->XAddr));
     }
     else
     {
-        setDeviceioUrl(getDeviceOnvifUrl());
+        setDeviceIOUrl(getDeviceOnvifUrl());
     }
 }
 

@@ -57,7 +57,7 @@ static const std::map<RequestTypeId, std::vector<Namespace>> kOverridenNamespace
             COMMON_NAMESPACES,
             {"onvifMedia", "http://www.onvif.org/ver10/media/wsdl", nullptr, nullptr},
             { nullptr, nullptr, nullptr, nullptr }
-}
+        }
     }
 };
 

@@ -84,7 +84,7 @@ struct QnOnvifServiceUrls
     //QString anlyticsServiceUrl; //< currently not used
     //QString eventsServiceUrl; //< currently not used, m_eventsCapabilities->XAddr used instead
     //QString thermalServiceUrl; //< currently not used
-
+    QString getUrl(OnvifWebService onvifWebService) const;
 };
 
 class QnPlOnvifResource:
@@ -244,8 +244,8 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
-    QString getDeviceioUrl() const;
-    void setDeviceioUrl(const QString& src);
+    QString getDeviceIOUrl() const;
+    void setDeviceIOUrl(const QString& src);
 
     QString getVideoSourceToken() const;
     void setVideoSourceToken(const QString &src);
@@ -264,7 +264,7 @@ public:
 
     AUDIO_CODEC getAudioCodec() const;
 
-    SoapParams makeSoapParams(bool tcpKeepAlive = false) const;
+    SoapParams makeSoapParams(OnvifWebService onvifWebService, bool tcpKeepAlive = false) const;
 
     virtual void setOnvifRequestsRecieveTimeout(int timeout);
     virtual void setOnvifRequestsSendTimeout(int timeout);
