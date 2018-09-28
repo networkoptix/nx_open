@@ -54,6 +54,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     check_box_utils::autoClearTristate(ui->secondStreamDisableCheckBox);
     check_box_utils::autoClearTristate(ui->forcedPanTiltCheckBox);
     check_box_utils::autoClearTristate(ui->forcedZoomCheckBox);
+    check_box_utils::autoClearTristate(ui->trustCameraTimeCheckBox);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->bitrateIncreaseWarningLabel);
