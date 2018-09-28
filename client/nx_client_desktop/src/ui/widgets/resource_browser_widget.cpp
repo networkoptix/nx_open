@@ -301,6 +301,36 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget()
 
     ui->typeComboBox->setEnabled(false); // #3797
 }
+
+using IndexCallback = std::function<void (const QModelIndex& index, bool hasChildren)>;
+void forEachIndex(
+    const QAbstractItemModel* model,
+    const QModelIndex& root,
+    const IndexCallback& callback)
+{
+    if (!callback)
+    {
+        NX_ASSERT(false, "Callback can't be null");
+        return;
+    }
+
+    if (!model)
+    {
+        NX_ASSERT(false, "Model can't be null.");
+        return;
+    }
+
+    const int childrenCount = model->rowCount(root);
+    if (root.isValid())
+        callback(root, childrenCount);
+
+    if (childrenCount)
+    {
+        for (int row = 0; row != childrenCount; ++row)
+            forEachIndex(model, model->index(row, 0, root), callback);
+    }
+}
+
 void QnResourceBrowserWidget::initInstantSearch()
 {
     const bool visible = nx::client::desktop::ini().enableResourceFilteringByDefault;
@@ -313,47 +343,37 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
     ui->nothingFoundDescriptionLabel->setForegroundRole(QPalette::Mid);
+
     auto getFilteredResources =
         [this]()
         {
-            const auto model = ui->resourceTreeWidget->searchModel();
             QnResourceList result;
-            if (!model)
-                return result;
-
             QSet<QnResourcePtr> resources;
-            std::function<void(const QModelIndex& index)> getRecursive;
-            getRecursive =
-                [model, &resources, &result, &getRecursive](const QModelIndex& index)
+
+            const auto callback =
+                [&resources, &result](const QModelIndex& index, bool hasChildren)
                 {
-                    const int childCount = model->rowCount(index);
-                    const bool hasChildren = childCount > 0;
                     if (hasChildren)
+                        return;
+
+                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+                    if (!resource)
+                        return;
+
+                    if (!QnResourceAccessFilter::isOpenableInLayout(resource)
+                        && !QnResourceAccessFilter::isOpenableInEntity(resource))
                     {
-                        for (int i = 0; i < childCount; i++)
-                            getRecursive(model->index(i, 0, index));
+                        return;
                     }
-                    else
-                    {
-                        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                        if (!resource)
-                            return;
 
-                        if (!QnResourceAccessFilter::isOpenableInLayout(resource)
-                            && !QnResourceAccessFilter::isOpenableInEntity(resource))
-                        {
-                            return;
-                        }
+                    if (resources.contains(resource))
+                        return;
 
-                        if (resources.contains(resource))
-                            return;
-
-                        resources.insert(resource); //< Avoid duplicates.
-                        result.push_back(resource); //< Keep sort order.
-                    }
+                    resources.insert(resource); //< Avoid duplicates.
+                    result.push_back(resource); //< Keep sort order.
                 };
 
-            getRecursive(QModelIndex());
+            forEachIndex(ui->resourceTreeWidget->searchModel(), QModelIndex(), callback);
             return result;
         };
 
@@ -439,6 +459,52 @@ void QnResourceBrowserWidget::updateSearchMode()
     updateNewFilter();
 }
 
+bool QnResourceBrowserWidget::updateFilteringMode(bool value)
+{
+    if (m_filtering == value)
+        return false;
+
+    m_filtering = value;
+    return true;
+}
+
+void QnResourceBrowserWidget::storeExpandedStates()
+{
+    if (!m_expandedStatesList.isEmpty())
+    {
+        NX_ASSERT(false, "Expanded states list should be empty.");
+        m_expandedStatesList.clear();
+    }
+
+    const auto tree = ui->resourceTreeWidget->treeView();
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+    const auto callback =
+        [this, tree, searchModel](const QModelIndex& index, bool hasChildren)
+        {
+            if (!hasChildren)
+                return;
+
+            const auto searchIndex = searchModel->mapFromSource(index);
+            m_expandedStatesList.append(ExpandedState(index, tree->isExpanded(searchIndex)));
+        };
+
+    forEachIndex(ui->resourceTreeWidget->model(), QModelIndex(), callback);
+}
+
+void QnResourceBrowserWidget::restoreExpandedStates()
+{
+    const auto tree = ui->resourceTreeWidget->treeView();
+    const auto searchModel = ui->resourceTreeWidget->searchModel();
+    for (const auto& data: m_expandedStatesList)
+    {
+        const auto& index = data.first;
+        const auto searchIndex = searchModel->mapFromSource(index);
+        if (searchIndex.isValid())
+            tree->setExpanded(searchIndex, data.second);
+    }
+    m_expandedStatesList.clear();
+}
+
 void QnResourceBrowserWidget::updateNewFilter()
 {
     const auto filterEdit = ui->instantFilterLineEdit;
@@ -469,6 +535,11 @@ void QnResourceBrowserWidget::updateNewFilter()
                 : QnResourceSearchQuery::kAllowAllNodeTypes;
         }();
 
+    const bool filtering = !trimmed.isEmpty();
+    const bool filteringUpdated = updateFilteringMode(filtering);
+    if (filteringUpdated && filtering)
+        storeExpandedStates();
+
     const auto searchModel = ui->resourceTreeWidget->searchModel();
     const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
     const auto treeView = ui->resourceTreeWidget->treeView();
@@ -478,6 +549,11 @@ void QnResourceBrowserWidget::updateNewFilter()
         ? kStandardResourceTreeIndents
         : kTaggedResourceTreeIndents;
     treeView->setProperty(style::Properties::kSideIndentation, indents);
+    if (filtering)
+        treeView->expandAll();
+
+    if (filteringUpdated && !filtering)
+        restoreExpandedStates();
 
     handleNewFilterUpdated();
 }
@@ -497,7 +573,7 @@ void QnResourceBrowserWidget::handleNewFilterUpdated()
     static constexpr int kNothingFoundPage = 1;
     ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
 
-    if (!ui->instantFilterLineEdit->hasFocus())
+    if (!ui->instantFilterLineEdit->focused())
     {
         ui->shortcutHintWidget->setVisible(false);
         return;

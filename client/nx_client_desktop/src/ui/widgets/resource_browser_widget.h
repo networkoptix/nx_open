@@ -125,12 +125,15 @@ private:
 
     void selectIndices(const QModelIndexList& indices);
 
+    bool updateFilteringMode(bool value);
+    void storeExpandedStates();
+    void restoreExpandedStates();
+
     void initInstantSearch();
     void updateSearchMode();
     void updateNewFilter();
     void handleNewFilterUpdated();
     static QStringList filterTags();
-
 
 private slots:
     void updateFilter(bool force = false);
@@ -167,4 +170,7 @@ private:
 
     QScopedPointer<nx::client::desktop::CameraThumbnailManager> m_thumbnailManager;
     QnResourcePtr m_tooltipResource;
+    using ExpandedState = QPair<QPersistentModelIndex, bool>;
+    QList<ExpandedState> m_expandedStatesList;
+    bool m_filtering = false;
 };
