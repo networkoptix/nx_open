@@ -1,1 +1,0 @@
-This plugin adds support for usb web cameras to the media server.
