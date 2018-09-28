@@ -110,6 +110,7 @@ private:
     {
         nx::network::http::MimeProtoVersion httpVersion;
         nx::network::http::StringType protocolToUpgradeTo;
+        std::int64_t sequence = 0;
     };
 
     struct RequestContext
@@ -141,8 +142,11 @@ private:
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> m_currentMsgBody;
     bool m_isPersistent;
     bool m_persistentConnectionEnabled;
-    std::deque<ResponseMessageContext> m_responseQueue;
+    std::deque<std::unique_ptr<ResponseMessageContext>> m_responseQueue;
     std::optional<SocketAddress> m_clientEndpoint;
+    std::atomic<std::int64_t> m_lastRequestSequence{0};
+    std::map<int /*sequence*/, std::unique_ptr<ResponseMessageContext>>
+        m_requestsBeingProcessed;
 
     void extractClientEndpoint(const HttpHeaders& headers);
     void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);
@@ -168,15 +172,15 @@ private:
     void processResponse(
         std::shared_ptr<HttpServerConnection> strongThis,
         RequestDescriptor requestDescriptor,
-        ResponseMessageContext responseMessageContext);
+        std::unique_ptr<ResponseMessageContext> responseMessageContext);
 
     void prepareAndSendResponse(
         RequestDescriptor requestDescriptor,
-        ResponseMessageContext responseMessageContext);
+        std::unique_ptr<ResponseMessageContext> responseMessageContext);
 
     void scheduleResponseDelivery(
         const RequestDescriptor& requestDescriptor,
-        ResponseMessageContext responseMessageContext);
+        std::unique_ptr<ResponseMessageContext> responseMessageContext);
 
     void addResponseHeaders(
         const RequestDescriptor& requestDescriptor,

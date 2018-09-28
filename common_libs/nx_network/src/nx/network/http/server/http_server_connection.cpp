@@ -176,10 +176,14 @@ std::unique_ptr<HttpServerConnection::RequestContext>
         nx::network::http::Request request)
 {
     auto requestContext = std::make_unique<RequestContext>();
+    requestContext->descriptor.sequence = ++m_lastRequestSequence;
     requestContext->descriptor.httpVersion = request.requestLine.version;
     requestContext->descriptor.protocolToUpgradeTo =
         nx::network::http::getHeaderValue(request.headers, "Upgrade");
     requestContext->request = std::move(request);
+
+    m_requestsBeingProcessed[requestContext->descriptor.sequence] = nullptr;
+
     return requestContext;
 }
 
@@ -202,7 +206,7 @@ void HttpServerConnection::sendUnauthorizedResponse(
 
     prepareAndSendResponse(
         std::move(requestContext->descriptor),
-        ResponseMessageContext(
+        std::make_unique<ResponseMessageContext>(
             std::move(response),
             std::move(authenticationResult.msgBody),
             ConnectionEvents()));
@@ -228,7 +232,7 @@ void HttpServerConnection::dispatchRequest(
             processResponse(
                 std::move(strongThis),
                 std::move(requestDescriptor),
-                ResponseMessageContext(
+                std::make_unique<ResponseMessageContext>(
                     std::move(response),
                     std::move(responseMsgBody),
                     std::move(connectionEvents)));
@@ -245,14 +249,17 @@ void HttpServerConnection::dispatchRequest(
         response.response->statusLine.statusCode = nx::network::http::StatusCode::notFound;
         return prepareAndSendResponse(
             std::move(requestContext->descriptor),
-            ResponseMessageContext(std::move(response), nullptr, ConnectionEvents()));
+            std::make_unique<ResponseMessageContext>(
+                std::move(response),
+                nullptr,
+                ConnectionEvents()));
     }
 }
 
 void HttpServerConnection::processResponse(
     std::shared_ptr<HttpServerConnection> strongThis,
     RequestDescriptor requestDescriptor,
-    ResponseMessageContext responseMessageContext)
+    std::unique_ptr<ResponseMessageContext> responseMessageContext)
 {
     if (!socket())  //< Connection has been removed while request was being processed.
     {
@@ -261,9 +268,9 @@ void HttpServerConnection::processResponse(
     }
 
     NX_ASSERT(
-        !responseMessageContext.msgBody ||
+        !responseMessageContext->msgBody ||
         nx::network::http::StatusCode::isMessageBodyAllowed(
-            responseMessageContext.msg.response->statusLine.statusCode));
+            responseMessageContext->msg.response->statusLine.statusCode));
 
     strongThis->post(
         [this, strongThis = std::move(strongThis),
@@ -278,30 +285,30 @@ void HttpServerConnection::processResponse(
 
 void HttpServerConnection::prepareAndSendResponse(
     RequestDescriptor requestDescriptor,
-    ResponseMessageContext responseMessageContext)
+    std::unique_ptr<ResponseMessageContext> responseMessageContext)
 {
-    responseMessageContext.msg.response->statusLine.version =
+    responseMessageContext->msg.response->statusLine.version =
         std::move(requestDescriptor.httpVersion);
 
-    responseMessageContext.msg.response->statusLine.reasonPhrase =
+    responseMessageContext->msg.response->statusLine.reasonPhrase =
         nx::network::http::StatusCode::toString(
-            responseMessageContext.msg.response->statusLine.statusCode);
+            responseMessageContext->msg.response->statusLine.statusCode);
 
-    if (responseMessageContext.msgBody)
+    if (responseMessageContext->msgBody)
     {
-        responseMessageContext.msgBody->bindToAioThread(getAioThread());
-        if (responseMessageContext.msgBody->mimeType().isEmpty())
+        responseMessageContext->msgBody->bindToAioThread(getAioThread());
+        if (responseMessageContext->msgBody->mimeType().isEmpty())
         {
             // Malformed message body?
             // TODO: #ak Add assert here and ensure no one uses this path.
-            responseMessageContext.msgBody.reset();
+            responseMessageContext->msgBody.reset();
         }
     }
 
     addResponseHeaders(
         requestDescriptor,
-        responseMessageContext.msg.response,
-        responseMessageContext.msgBody.get());
+        responseMessageContext->msg.response,
+        responseMessageContext->msgBody.get());
 
     scheduleResponseDelivery(
         requestDescriptor,
@@ -309,12 +316,22 @@ void HttpServerConnection::prepareAndSendResponse(
 }
 
 void HttpServerConnection::scheduleResponseDelivery(
-    const RequestDescriptor& /*requestDescriptor*/,
-    ResponseMessageContext responseMessageContext)
+    const RequestDescriptor& requestDescriptor,
+    std::unique_ptr<ResponseMessageContext> responseMessageContext)
 {
-    m_responseQueue.push_back(std::move(responseMessageContext));
-    if (m_responseQueue.size() == 1)
-        sendNextResponse();
+    m_requestsBeingProcessed[requestDescriptor.sequence] =
+        std::move(responseMessageContext);
+
+    while (!m_requestsBeingProcessed.empty()
+        && m_requestsBeingProcessed.begin()->second != nullptr)
+    {
+        m_responseQueue.push_back(
+            std::move(m_requestsBeingProcessed.begin()->second));
+        m_requestsBeingProcessed.erase(m_requestsBeingProcessed.begin());
+
+        if (m_responseQueue.size() == 1)
+            sendNextResponse();
+    }
 }
 
 void HttpServerConnection::addResponseHeaders(
@@ -386,9 +403,9 @@ void HttpServerConnection::sendNextResponse()
 {
     NX_ASSERT(!m_responseQueue.empty());
 
-    m_currentMsgBody = std::move(m_responseQueue.front().msgBody);
+    m_currentMsgBody = std::move(m_responseQueue.front()->msgBody);
     sendMessage(
-        std::move(m_responseQueue.front().msg),
+        std::move(m_responseQueue.front()->msg),
         std::bind(&HttpServerConnection::responseSent, this));
 }
 
@@ -411,7 +428,8 @@ void HttpServerConnection::someMsgBodyRead(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_DEBUG(this, lm("Error fetching message body to send. %1").args(SystemError::toString(errorCode)));
+        NX_DEBUG(this, lm("Error fetching message body to send. %1")
+            .args(SystemError::toString(errorCode)));
         closeConnection(errorCode);
         return;
     }
@@ -453,18 +471,18 @@ void HttpServerConnection::fullMessageHasBeenSent()
     NX_VERBOSE(this, lm("Complete response message has been sent"));
 
     NX_ASSERT(!m_responseQueue.empty());
-    if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
+    if (m_responseQueue.front()->connectionEvents.onResponseHasBeenSent)
     {
         nx::utils::swapAndCall(
-            m_responseQueue.front().connectionEvents.onResponseHasBeenSent,
+            m_responseQueue.front()->connectionEvents.onResponseHasBeenSent,
             this);
     }
     m_responseQueue.pop_front();
 
-    //if connection is NOT persistent then closing it
+    // If connection is NOT persistent then closing it.
     m_currentMsgBody.reset();
 
-    if (!socket() ||           //< socket could be taken by event handler
+    if (!socket() ||        //< Socket could be taken by event handler.
         !m_isPersistent)
     {
         closeConnection(SystemError::noError);
