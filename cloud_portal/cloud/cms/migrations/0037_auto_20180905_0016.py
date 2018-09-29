@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
             name='ProductType',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('one_customization', models.BooleanField(default=False)),
+                ('single_customization', models.BooleanField(default=False)),
                 ('type', models.IntegerField(choices=[(0, 'Cloud Portal'), (1, 'Vms'), (2, 'Plugin'), (3, 'Integration')], default=0)),
             ],
         ),

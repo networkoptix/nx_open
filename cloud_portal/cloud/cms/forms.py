@@ -164,7 +164,7 @@ class ProductForm(forms.ModelForm):
         # Do the normal form initialisation.
         super(ProductForm, self).__init__(*args, **kwargs)
         cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
-        if self.instance.product_type and self.instance.product_type.type == cloud_portal:
+        if self.instance.product_type and self.instance.product_type.single_customization:
             cloud_customization = self.instance.customizations.first()
             used_customizations = [product.customizations.first().name
                                    for product in Product.objects.filter(product_type__type=cloud_portal)
@@ -174,6 +174,6 @@ class ProductForm(forms.ModelForm):
 
     def clean_customizations(self):
         data = self.cleaned_data['customizations']
-        if self.instance.product_type and self.instance.product_type.one_customization and len(data) > 1:
+        if self.instance.product_type and self.instance.product_type.single_customization and len(data) > 1:
             raise ValueError('Too many customizations selected')
         return data

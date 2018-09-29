@@ -109,7 +109,7 @@ class ProductType(models.Model):
                             (1, "vms", "Vms"),
                             (2, "plugin", "Plugin"),
                             (3, "integration", "Integration"))
-    one_customization = models.BooleanField(default=False)
+    single_customization = models.BooleanField(default=False)
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
     def __str__(self):

@@ -2,6 +2,7 @@
   {
     "type": "cloud_portal",
     "canPreview":true,
+    "single_customization": true,
     "contexts":[
       {
         "name": "Cloud maintenance page (503)",

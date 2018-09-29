@@ -72,7 +72,7 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductTypeAdmin(CMSAdmin):
-    list_display = ('type', 'one_customization',)
+    list_display = ('type', 'single_customization',)
 
 
 admin.site.register(ProductType, ProductTypeAdmin)

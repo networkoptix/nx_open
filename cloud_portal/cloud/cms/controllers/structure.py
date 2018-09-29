@@ -10,12 +10,14 @@ from zipfile import ZipFile
 from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, ProductType
 
 
-def find_or_add_product_type(product_type):
+def find_or_add_product_type(product_type, single_customization=False):
     try:
         product_type = ProductType.objects.get(type=product_type)
     except ObjectDoesNotExist:
         product_type = ProductType(type=product_type)
-        product_type.save()
+
+    product_type.single_customization = single_customization
+    product_type.save()
 
     return product_type
 
@@ -67,7 +69,8 @@ def update_from_object(cms_structure):
     for product in cms_structure:
         # If product type cannot be found in the structure
         product_type_name = product['type'] if 'type' in product else ProductType.PRODUCT_TYPES[0]
-        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
+        single_customization = product['single_customization'] if 'single_customization' in product else False
+        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name), single_customization)
         order = 0
 
         for context_data in product['contexts']:
