@@ -40,7 +40,7 @@ window.L = {};
                 responseError: function(error) {
                     if (error.status === 401) {
                         // Session expired - try to trigger browser reload
-                        $rootScope.session.loginState = false;
+                        $rootScope.session.loginState = undefined;
                     }
                     return $q.reject(error);
                 }
