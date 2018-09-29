@@ -10,9 +10,13 @@ touch_config_file()
     fi
 }
 
-enable_camera()
+enableCamera()
 {
-    if grep -q "start_x" $CONFIG_FILE
+    local line=`grep "start_x" $CONFIG_FILE`
+    if [ ! -z "$line" ]
+    then
+        local enabled=`echo $line | grep -o -E '[0-9]+'`
+        if [ "$enabled" -eq "0" ]
     then
         sed -i "s/start_x=0/start_x=1/" $CONFIG_FILE
     else
@@ -24,11 +28,11 @@ enable_camera()
 
 set_gpu_memory()
 {
-    local line=`grep gpu_mem $CONFIG_FILE` 
-    if [ "$?" = "0" ]
+    local line=`grep "gpu_mem" $CONFIG_FILE`
+    if [ ! -z "$line" ]
     then
         local mem=`echo $line | grep -o -E '[0-9]+'`
-        if (( $mem < 256 ))
+        if [ "$mem" -lt "256" ] 
         then
             sed -i "s/\bgpu_mem=$mem\b/gpu_mem=256/" $CONFIG_FILE
         fi        
