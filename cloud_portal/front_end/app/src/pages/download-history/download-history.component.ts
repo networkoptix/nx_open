@@ -62,48 +62,42 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     private getData() {
-        this.authorizationService
-            .requireLogin()
-            .then((result) => {
-                if (result) {
-                    this.userAuthorized = true;
-                    this.cloudApi
-                        .getDownloadsHistory(this.build)
-                        .then(result => {
-                                this.linkbase = result.data.updatesPrefix;
-                                if (!this.build) { // only one build
+        this.userAuthorized = true;
+        this.cloudApi
+            .getDownloadsHistory(this.build)
+            .then(result => {
+                    this.linkbase = result.data.updatesPrefix;
+                    if (!this.build) { // only one build
 
-                                    result.data.betas = [];
+                        result.data.betas = [];
 
-                                    this.downloadsData = result.data;
-                                    this.activeBuilds = this.downloadsData[ this.section ];
+                        this.downloadsData = result.data;
+                        this.activeBuilds = this.downloadsData[ this.section ];
 
-                                    this.getAvailableDownloadTypes(this.downloadsData);
+                        this.getAvailableDownloadTypes(this.downloadsData);
 
-                                } else {
-                                    this.activeBuilds = [ result.data ];
-                                    this.downloadTypes = [ result.data.type ];
-                                    this.downloadsData = {};
-                                    this.downloadsData[ result.data.type ] = this.activeBuilds;
-                                }
+                    } else {
+                        this.activeBuilds = [ result.data ];
+                        this.downloadTypes = [ result.data.type ];
+                        this.downloadsData = {};
+                        this.downloadsData[ result.data.type ] = this.activeBuilds;
+                    }
 
-                                this.titleService.setTitle(this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
+                    this.titleService.setTitle(this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
 
-                                setTimeout(() => {
-                                    if (this.tabs) {
-                                        this.tabs.select(this.section);
-                                    }
-                                });
+                    setTimeout(() => {
+                        if (this.tabs) {
+                            this.tabs.select(this.section);
+                        }
+                    });
 
-                            }, () => {
-                                // TODO: Repace this once this page is moved to A5
-                                // AJS and A5 routers freak out about route change *****
-                                // this.router.navigate(['404']); // Can't find downloads.json in specific build
-                                this.location.go('404');
-                            }
-                        );
+                }, () => {
+                    // TODO: Repace this once this page is moved to A5
+                    // AJS and A5 routers freak out about route change *****
+                    // this.router.navigate(['404']); // Can't find downloads.json in specific build
+                    this.location.go('404');
                 }
-            });
+            );
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
@@ -132,7 +126,29 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 this.section = this.routeParam;
             }
 
-            this.getData();
+            if (!this.configService.config.publicReleases) {
+                this.authorizationService
+                    .requireLogin()
+                    .then(result => {
+                        if (!result) {
+                            this.document.location.href = this.configService.config.redirectUnauthorised;
+                            return;
+                        }
+
+                        this.account
+                            .get()
+                            .then(result => {
+                                if (result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1){
+                                    this.getData();
+                                } else {
+                                    this.document.location.href = this.configService.config.redirectUnauthorised;
+                                    return;
+                                }
+                            });
+                    });
+            } else {
+                this.getData();
+            }
         });
     }
 
