@@ -156,7 +156,7 @@ should not allow to use one restore link twice
     Check For Alert Dismissable    ${CANNOT SAVE PASSWORD} ${CODE USED/INCORRECT}
 
 should make not-activated user active by restoring password
-    [tags]    email
+    [tags]    email    C41871
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
