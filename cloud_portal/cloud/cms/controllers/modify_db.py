@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 from PIL import Image
-import base64, re, uuid
+import base64, json, re, uuid
 
 from .filldata import fill_content
 from api.models import Account
@@ -39,7 +39,6 @@ def notify_version_ready(product, version_id, exclude_user):
              user.customization)
 
 
-# TODO: remove customization
 def save_unrevisioned_records(product, context, language, data_structures,
                               request_data, request_files, user, version_id=None):
     upload_errors = []
@@ -99,6 +98,13 @@ def save_unrevisioned_records(product, context, language, data_structures,
                 upload_errors.append((data_structure_name,
                                       'No submitted GUID or default value. GUID has been generated as {}'
                                       .format(new_record_value)))
+
+        elif data_structure.type == DataStructure.DATA_TYPES.select:
+            values = request_data.getlist(data_structure_name)
+            if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
+                new_record_value = json.dumps(values)
+            else:
+                new_record_value = values[0]
 
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]

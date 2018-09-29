@@ -17,7 +17,7 @@ def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
 
 
 def get_product_by_context(context_id):
-    return Product.objects.get(product_type__context__id=context_id)
+    return Product.objects.get(product_type__context__id=context_id, customizations__name__in=[settings.CUSTOMIZATION])
 
 
 def get_product_by_revision(version_id):
@@ -282,7 +282,8 @@ class DataStructure(models.Model):
                          (2, 'html', 'HTML'),
                          (3, 'long_text', 'Long Text'),
                          (4, 'file', 'File'),
-                         (5, 'guid', 'GUID'))
+                         (5, 'guid', 'GUID'),
+                         (6, 'select', 'Select'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
@@ -312,10 +313,11 @@ class DataStructure(models.Model):
         content_record = DataRecord.objects.filter(product=product, data_structure=self)
 
         # try to get translated content
-        if language and self.translatable:
-            content_record = content_record.filter(language=language)
-        elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-            content_record = content_record.filter(language=product.customizations.first().default_language)
+        if self.translatable:
+            if language:
+                content_record = content_record.filter(language=language)
+            elif product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+                content_record = content_record.filter(language=product.customizations.first().default_language)
 
         if content_record and content_record.exists():
             if not version_id:

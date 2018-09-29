@@ -1,3 +1,4 @@
+import yaml
 from django import forms
 from .models import *
 
@@ -104,6 +105,26 @@ class CustomContextForm(forms.Form):
                                                                    initial=record_value,
                                                                    required=False,
                                                                    disabled=disabled)
+                continue
+
+            elif data_structure.type == DataStructure.DATA_TYPES.select:
+                queryset = data_structure.meta_settings['choices'] if 'choices' in data_structure.meta_settings else []
+                queryset = [(choice, choice) for choice in queryset]
+                if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
+                    record_value = yaml.safe_load(record_value)
+                    self.initial[data_structure.name] = record_value
+                    self.fields[data_structure.name] = forms.MultipleChoiceField(label=ds_label,
+                                                                                 help_text=ds_description,
+                                                                                 choices=queryset,
+                                                                                 required=False,
+                                                                                 disabled=disabled)
+                else:
+                    self.fields[data_structure.name] = forms.ChoiceField(label=ds_label,
+                                                                         help_text=ds_description,
+                                                                         initial=record_value,
+                                                                         choices=queryset,
+                                                                         required=False,
+                                                                         disabled=disabled)
                 continue
 
             self.fields[data_structure.name] = forms.CharField(required=False,

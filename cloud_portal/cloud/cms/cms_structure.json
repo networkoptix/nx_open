@@ -64,7 +64,16 @@
             "name": "%SKIN%",
             "value": "blue",
             "description": "Skin. Supported values: blue, orange, green. Changing skin requires forcing update.",
-            "advanced": true
+            "advanced": true,
+            "type": "select",
+            "meta": {
+              "multi": false,
+              "choices": [
+                "blue",
+                "green",
+                "orange"
+              ]
+            }
           },
           {
             "label": "VMS Name",
