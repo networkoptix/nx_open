@@ -59,8 +59,17 @@ Copyright leads to the proper site
     Location Should Be    ${COPYWRIGHT URL}
 
 Change interface language
+    [tags]    C41549
+    :FOR    ${lang}    ${account}   IN ZIP    ${LANGUAGES LIST}    ${LANGUAGES CREATE ACCOUNT TEXT LIST}
+    \  Sleep    1
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Button    ${LANGUAGE DROPDOWN}
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //nx-footer//span[@lang='${lang}']/..
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Click Element    //nx-footer//span[@lang='${lang}']/..
+    \  Sleep    1    #to allow the system to change languages
+    \  Run Keyword Unless    "${lang}"=="${LANGUAGE}"    Wait Until Element Is Visible    //h1['${account}']
+    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
     Click Button    ${LANGUAGE DROPDOWN}
-    Wait Until Element Is Visible    //nx-footer//span[@lang='ru_RU']/..
-    Click Element    //nx-footer//span[@lang='ru_RU']/..
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='ru_RU']    5
-    Check Language
+    Wait Until Element Is Visible    //nx-footer//span[@lang='${lang}']/..
+    Click Element    //nx-footer//span[@lang='${lang}']/..
+    Sleep    1
+    Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']
