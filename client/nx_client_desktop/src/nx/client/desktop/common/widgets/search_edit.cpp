@@ -298,11 +298,11 @@ void SearchEdit::setupMenuButton()
 void SearchEdit::updateMenuButtonIcon()
 {
     const auto kIcon = d->tags.isEmpty()
-        ? qnSkin->icon("theme/search.png")
-        : qnSkin->icon("theme/search_drop.png");
+        ? qnSkin->icon("tree/search.png")
+        : qnSkin->icon("tree/search_drop.png");
     const auto kSelectedIcon = d->tags.isEmpty()
-        ? qnSkin->icon("theme/search_selected.png")
-        : qnSkin->icon("theme/search_drop_selected.png");
+        ? qnSkin->icon("tree/search_selected.png")
+        : qnSkin->icon("tree/search_drop_selected.png");
 
     d->menuButton->setFixedSize(d->tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
