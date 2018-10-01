@@ -7,6 +7,7 @@
 #include <core/storage/memory/ext_iodevice_storage.h>
 #include <plugins/utils/motion_delegate_wrapper.h>
 #include <core/resource/avi/avi_resource.h>
+#include <core/resource/security_cam_resource.h>
 
 #include <nx/mediaserver/event/event_connector.h>
 
