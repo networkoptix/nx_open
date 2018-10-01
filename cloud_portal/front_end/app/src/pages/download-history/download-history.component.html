@@ -1,4 +1,4 @@
-<div class="container" *ngIf="userAuthorized || configService.config.publicReleases">
+<div class="container" *ngIf="canViewRelease || configService.config.publicReleases">
     <h1 translate>Release notes</h1>
 
     <div class="col-12 p-0" style="min-height: 80px;">
