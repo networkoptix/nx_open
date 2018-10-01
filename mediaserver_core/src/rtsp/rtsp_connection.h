@@ -146,7 +146,6 @@ private:
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
     void updatePredefinedTracks();
-    QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);
     QnConstMediaContextPtr getAudioCodecContext(int audioTrackIndex) const;
