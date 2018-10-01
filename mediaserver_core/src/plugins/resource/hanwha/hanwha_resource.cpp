@@ -1098,7 +1098,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
-            if(!isPropertyBelongsToChannel(entry.first, channel))
+            const auto propertyChannel = extractPropertyChannel(entry.first);
+            if (propertyChannel != boost::none && *propertyChannel == channel)
                 continue;
 
             const bool isFixedProfile = entry.first.endsWith(kHanwhaIsFixedProfileProperty)
