@@ -46,17 +46,17 @@ void MetadataHandler::handleMetadata(
     MetadataPacket* metadata)
 {
     if (metadata == nullptr)
-	{
-	    NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
+    {
+        NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
         return;
-	}
+    }
 
     if (error != Error::noError)
-	{
-	    NX_VERBOSE(this) << "WARNING: Received metadata packet along with an error ccde "
-			<< (int) error << "; ignoring";
+    {
+        NX_VERBOSE(this) << "WARNING: Received metadata packet along with an error ccde "
+            << (int) error << "; ignoring";
         return;
-	}
+    }
 
     bool handled = false;
 
@@ -76,7 +76,7 @@ void MetadataHandler::handleMetadata(
         handled = true;
     }
 
-	if (!handled)
+    if (!handled)
     {
         NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
             << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec()
@@ -86,14 +86,14 @@ void MetadataHandler::handleMetadata(
 
 void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> packet)
 {
-	int eventsCount = 0;
+    int eventsCount = 0;
     while (true)
     {
         nxpt::ScopedRef<MetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
-		++eventsCount;
+        ++eventsCount;
 
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
@@ -107,7 +107,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
         }
     }
 
-	if (eventsCount == 0)
+    if (eventsCount == 0)
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
@@ -140,13 +140,16 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
         }
         data.objects.push_back(std::move(object));
     }
-	if (data.objects.empty())
-	    NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
+    if (data.objects.empty())
+        NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
     data.deviceId = m_resource->getId();
 
-    if (m_dataReceptor)
+    if (data.timestampUsec <= 0)
+        NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUsec);
+
+    if (m_dataReceptor && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
 
     if (m_visualDebugger)
