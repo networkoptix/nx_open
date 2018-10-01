@@ -18,7 +18,7 @@ from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import Wait, WaitTimeout, wait_for_truthy, wait_for_equal
+from framework.waiting import Wait, WaitTimeout, wait_for_equal, wait_for_truthy
 from .context_logger import ContextLogger, context_logger
 
 _logger = ContextLogger(__name__, 'mediaserver_api')
