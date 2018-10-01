@@ -62,7 +62,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     private getData() {
-        this.userAuthorized = true;
         this.cloudApi
             .getDownloadsHistory(this.build)
             .then(result => {
@@ -138,7 +137,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                         this.account
                             .get()
                             .then(result => {
-                                if (result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1){
+                                this.userAuthorized = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                                if (this.userAuthorized) {
                                     this.getData();
                                 } else {
                                     this.document.location.href = this.configService.config.redirectUnauthorised;
@@ -147,6 +147,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                             });
                     });
             } else {
+                this.userAuthorized = true;
                 this.getData();
             }
         });
