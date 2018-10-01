@@ -21,7 +21,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     private platform: any;
     private activeOs: string;
     private routeData: any;
-    private userAuthorized: boolean;
+    private canViewDownloads: boolean;
 
     installers: any;
     downloads: any;
@@ -36,7 +36,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.userAuthorized = false;
+        this.canViewDownloads = false;
         this.downloads = this.configService.config.downloads;
 
         this.downloadsData = {
@@ -178,12 +178,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
                         return;
                     }
 
-                    this.userAuthorized = true;
+                    this.canViewDownloads = true;
                     this.getDownloads();
                 });
 
         } else {
-            this.userAuthorized = true;
+            this.canViewDownloads = true;
             this.getDownloads();
         }
     }
