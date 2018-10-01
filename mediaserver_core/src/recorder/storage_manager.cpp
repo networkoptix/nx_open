@@ -2330,8 +2330,8 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                 lm("[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates")
                     .args((*it)->getUrl()));
 
-            result.remove(*it);
             (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
+            result.remove(*it);
         }
     }
 
