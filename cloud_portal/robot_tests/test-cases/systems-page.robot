@@ -16,6 +16,7 @@ Check Systems Text
     [arguments]    ${user}
     Log Out
     Validate Log Out
+    sleep    5
     Log In    ${user}    ${password}
     Validate Log In
     Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
@@ -63,9 +64,28 @@ should show system's state for systems if they are offline. Otherwise - button O
 
 should show the no systems connected message when you have no systems
     [tags]    C41866
-    Log In    ${EMAIL NO PERM}    ${EMAIL NOPERM}
+    Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
+
+should show the system page instead of all systems when user only has one
+    [tags]    C41878
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEM NAME}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Remove User Permissions    ${EMAIL NOPERM}
 
 should open system page (users list) when clicked on system
     Log In    ${EMAIL OWNER}    ${password}

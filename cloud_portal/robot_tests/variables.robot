@@ -115,6 +115,7 @@ ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || register
 ${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
 ${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]/following-sibling::h1/a[@href="/login"]
 #In system settings
+${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
