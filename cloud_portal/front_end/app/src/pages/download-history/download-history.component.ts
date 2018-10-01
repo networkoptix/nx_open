@@ -23,7 +23,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
     private sub: any;
     private build: any;
-    private userAuthorized: boolean;
+    private canViewRelease: boolean;
 
     user: any;
     downloads: any;
@@ -49,7 +49,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 location: Location) {
 
         this.location = location;
-        this.userAuthorized = false;
+        this.canViewRelease = false;
         this.downloadTypes = [];
     }
 
@@ -137,8 +137,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                         this.account
                             .get()
                             .then(result => {
-                                this.userAuthorized = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
-                                if (this.userAuthorized) {
+                                this.canViewRelease = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                                if (this.canViewRelease) {
                                     this.getData();
                                 } else {
                                     this.document.location.href = this.configService.config.redirectUnauthorised;
@@ -147,7 +147,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                             });
                     });
             } else {
-                this.userAuthorized = true;
+                this.canViewRelease = true;
                 this.getData();
             }
         });
