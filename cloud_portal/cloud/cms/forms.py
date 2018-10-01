@@ -108,7 +108,7 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.select:
-                queryset = data_structure.meta_settings['choices'] if 'choices' in data_structure.meta_settings else []
+                queryset = data_structure.meta_settings['options'] if 'options' in data_structure.meta_settings else []
                 queryset = [(choice, choice) for choice in queryset]
                 if 'multi' in data_structure.meta_settings and data_structure.meta_settings['multi']:
                     record_value = yaml.safe_load(record_value)

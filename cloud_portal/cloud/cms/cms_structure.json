@@ -69,7 +69,7 @@
             "type": "select",
             "meta": {
               "multi": false,
-              "choices": [
+              "options": [
                 "blue",
                 "green",
                 "orange"
