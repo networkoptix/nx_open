@@ -1489,7 +1489,7 @@ Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
 nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
 {
     auto userPreference = userPreferredPtzPresetType();
-    if (userPreference != nx::core::ptz::PresetType::automatic)
+    if (userPreference != nx::core::ptz::PresetType::undefined)
         return userPreference;
 
     return defaultPreferredPtzPresetType();
@@ -1499,7 +1499,7 @@ nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() co
 {
     return QnLexical::deserialized(
         getProperty(Qn::kUserPreferredPtzPresetType),
-        nx::core::ptz::PresetType::automatic);
+        nx::core::ptz::PresetType::undefined);
 }
 
 void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
@@ -1511,7 +1511,7 @@ nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType()
 {
     return QnLexical::deserialized(
         getProperty(Qn::kDefaultPreferredPtzPresetType),
-        nx::core::ptz::PresetType::automatic);
+        nx::core::ptz::PresetType::native);
 }
 
 void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)

@@ -22,7 +22,7 @@ namespace ptz {
 
 enum class PresetType
 {
-    automatic,
+    undefined,
     system,
     native,
 };

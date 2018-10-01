@@ -49,7 +49,7 @@ nx::core::ptz::PresetType presetTypeByIndex(int index)
     {
         case kSystemPresetsIndex: return nx::core::ptz::PresetType::system;
         case kNativePresetsIndex: return nx::core::ptz::PresetType::native;
-        default: return nx::core::ptz::PresetType::automatic;
+        default: return nx::core::ptz::PresetType::undefined;
     }
 }
 
