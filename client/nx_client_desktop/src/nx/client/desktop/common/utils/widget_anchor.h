@@ -3,13 +3,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QMargins>
 #include <QtCore/QPointer>
-#include <QtCore/qnamespace.h>
+#include <QtCore/Qt>
 
 class QWidget;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
  * Common class to anchor a widget to edges of its parent.
@@ -35,6 +33,9 @@ public:
     void setMargins(int left, int top, int right, int bottom);
     const QMargins& margins() const;
 
+    static constexpr Qt::Edges kAllEdges =
+        Qt::Edges(Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
+
 protected:
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
@@ -42,11 +43,18 @@ private:
     void updateGeometry();
 
 private:
-    Qt::Edges m_edges = Qt::Edges(Qt::LeftEdge | Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
+    Qt::Edges m_edges = WidgetAnchor::kAllEdges;
     QMargins m_margins = QMargins(0, 0, 0, 0);
     QPointer<QWidget> m_widget;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+/**
+ * Utility function for easy usage of WidgetAnchor class.
+ */
+WidgetAnchor* anchorWidgetToParent(QWidget* widget,
+    Qt::Edges edges = WidgetAnchor::kAllEdges,
+    const QMargins& margins = QMargins());
+
+WidgetAnchor* anchorWidgetToParent(QWidget* widget, const QMargins& margins);
+
+} // namespace nx::client::desktop
