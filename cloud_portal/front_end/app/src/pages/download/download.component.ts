@@ -36,7 +36,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.userAuthorized = false || this.configService.config.publicDownloads;
+        this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
 
         this.downloadsData = {
@@ -114,7 +114,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     private getDownloads () {
-        this.userAuthorized = true;
         // TODO: Commented until we ged rid of AJS
         // this.routeData = this.route.snapshot.data;
 
@@ -179,10 +178,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
                         return;
                     }
 
+                    this.userAuthorized = true;
                     this.getDownloads();
                 });
 
         } else {
+            this.userAuthorized = true;
             this.getDownloads();
         }
     }
