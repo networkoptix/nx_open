@@ -736,9 +736,9 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     return true;
 }
 
-bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
+bool HanwhaResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
 {
-    return base_type::doesEventComeFromAnalyticsDriver(eventType)
+    return base_type::isAnalyticsDriverEvent(eventType)
         || eventType == nx::vms::api::EventType::cameraInputEvent;
 }
 

@@ -309,7 +309,7 @@ public:
     static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
+    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const;
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
