@@ -3050,18 +3050,17 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         storageScanData = m_archiveRebuildInfo;
     }
 
-    Qn::StorageStatuses result;
-    if (storage->getStorageType() == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition))
+    Qn::StorageStatuses result = Qn::StorageStatus::none;
+    auto partitionType =
+        QnLexical::deserialized<QnPlatformMonitor::PartitionType>(storage->getStorageType());
+    if (partitionType == QnPlatformMonitor::RemovableDiskPartition)
         result |= Qn::StorageStatus::removable;
 
     if (storage->isSystem())
         result |= Qn::StorageStatus::system;
 
     if (!allStorages.contains(storage))
-    {
-        result = Qn::StorageStatus::none;
         return result;
-    }
 
     result |= Qn::StorageStatus::used;
     if (storage->getStatus() == Qn::Offline)
@@ -3072,3 +3071,4 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
+
