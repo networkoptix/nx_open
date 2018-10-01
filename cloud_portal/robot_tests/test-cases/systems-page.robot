@@ -61,6 +61,12 @@ should show system's state for systems if they are offline. Otherwise - button O
     ${systems}    Get WebElements    //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']
     Check Online Or Offline    ${systems}    ${AUTOTESTS OFFLINE TEXT}
 
+should show the no systems connected message when you have no systems
+    [tags]    C41866
+    Log In    ${EMAIL NO PERM}    ${EMAIL NOPERM}
+    Validate Log In
+    Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
+
 should open system page (users list) when clicked on system
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
