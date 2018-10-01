@@ -3333,7 +3333,8 @@ void MediaServerProcess::stopObjects()
     safeDisconnect(serverModule()->backupStorageManager(), this);
     safeDisconnect(commonModule(), this);
     safeDisconnect(commonModule()->runtimeInfoManager(), this);
-    safeDisconnect(m_ec2Connection->getTimeNotificationManager().get(), this);
+    if (m_ec2Connection)
+        safeDisconnect(m_ec2Connection->getTimeNotificationManager().get(), this);
     safeDisconnect(m_ec2Connection.get(), this);
     safeDisconnect(m_updatePiblicIpTimer.get(), this);
     m_updatePiblicIpTimer.reset();
