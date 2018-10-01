@@ -556,11 +556,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
         setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
-#else
-        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("hardwaregrid"));
-#endif
     }
     else
     {
