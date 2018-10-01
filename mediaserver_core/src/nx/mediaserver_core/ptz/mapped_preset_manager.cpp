@@ -36,7 +36,7 @@ bool MappedPresetManager::updatePreset(const QnPtzPreset& preset)
     if (devicePresetId.isEmpty())
         devicePresetId = preset.id;
 
-    createOrUpdateMapping(devicePresetId, preset);    
+    createOrUpdateMapping(devicePresetId, preset);
     return true;
 }
 
@@ -127,23 +127,20 @@ void MappedPresetManager::applyMapping(
 {
     QnMutexLocker lock(&m_mutex);
     QSet<QString> currentDevicePresets;
-    for (const auto& devicePreset: devicePresets)
+    for (auto devicePreset: devicePresets)
     {
         currentDevicePresets.insert(devicePreset.id);
-        if (m_presetMapping.contains(devicePreset.id))
-        {
-            auto presetId = m_presetMapping[devicePreset.id].id;
-            if (presetId.isEmpty())
-                presetId = devicePreset.id;
-
-            outNxPresets->push_back(
-                QnPtzPreset(presetId, m_presetMapping[devicePreset.id].name));
-        }
-        else
-        {
-            outNxPresets->push_back(devicePreset);
+        if (!m_presetMapping.contains(devicePreset.id))
             NX_VERBOSE(this, lm("Camera only preset %1").arg(QJson::serialized(devicePreset)));
-        }
+
+        const auto nxPreset = m_presetMapping.value(devicePreset.id);
+        if (!nxPreset.id.isEmpty())
+            devicePreset.id = nxPreset.id;
+
+        if (!nxPreset.name.isEmpty())
+            devicePreset.name = nxPreset.name;
+
+        outNxPresets->push_back(devicePreset);
     }
 
     bool hasChanges = false;
