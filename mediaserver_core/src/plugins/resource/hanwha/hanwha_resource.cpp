@@ -2916,7 +2916,7 @@ bool HanwhaResource::addFrameRateRanges(
 
 bool HanwhaResource::addResolutionRanges(
     QnCameraAdvancedParameter* inOutParameter,
-    const HanwhaAdavancedParameterInfo & info) const
+    const HanwhaAdavancedParameterInfo& info) const
 {
     const auto codecs = m_codecInfo.codecs(getChannel());
     const auto streamPrefix =
@@ -2942,7 +2942,7 @@ bool HanwhaResource::addResolutionRanges(
         }
 
         if (!resolutionRangeString.isEmpty())
-            resolutionRangeString = resolutionRangeString.left(resolutionRangeString.size() - 1);
+            resolutionRangeString.chop(1);
 
         QnCameraAdvancedParameterDependency dependency;
         dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;
