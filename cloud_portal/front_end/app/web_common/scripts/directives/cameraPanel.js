@@ -9,18 +9,6 @@
 
     function CameraPanel($localStorage, $timeout, $filter) {
 
-        function init(scope) {
-            scope.mediaServers.forEach(function (server) {
-                if (Object.keys(scope.storage.serverStates).length === 0) {
-                    server.collapsed = true;
-                    return;
-                }
-
-                server.collapsed = false; // initialize
-                server.collapsed = scope.storage.serverStates[ server.id ] !== undefined && scope.storage.serverStates[ server.id ];
-            })
-        }
-
         return {
             restrict   : 'E',
             scope      : {
@@ -35,52 +23,47 @@
                 scope.storage = $localStorage;
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
-                var updateCameras = function () {
+                scope.selectCamera = function (activeCamera) {
+                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
+                        return;
+                    }
+                    scope.activeCamera = activeCamera;
+                };
+
+                function updateCameras () {
                     scope.cameras = scope.camerasProvider.cameras;
 
-                    // Check local storage for last user's interaction
-                    // If none - open first server and select first camera
-                    // else select last opened server and last selected camera
-                    if (Object.keys(scope.storage.serverStates).length === 0) {
-                        if (Object.keys(scope.cameras).length !== 0 && !!scope.mediaServers) {
-                            scope.selectCamera(scope.cameras[ scope.mediaServers[ 0 ].id ][ 0 ]);
+                    scope.toggleInfo = scope.storage.infoStatus;
+                    var selected = false;
+                    for (var serverId in scope.cameras) {
+                        if (scope.cameras.hasOwnProperty(serverId)) {
 
-                            scope.toggleInfo = false;
-                            scope.storage.infoStatus = scope.toggleInfo;
-                        }
-                    } else {
-                        var selected = false;
-                        for (var server in scope.cameras) {
-                            if (scope.cameras.hasOwnProperty(server)) {
-
-                                for (var idx = 0; idx < scope.cameras[ server ].length; idx++) {
-                                    if (scope.cameras[ server ][ idx ].id === scope.storage.cameraId) {
-                                        scope.selectCamera(scope.cameras[ server ][ idx ]);
-                                        selected = true;
-                                        break;
-                                    }
-                                }
-
-                                if (selected) {
+                            for (var idx = 0; idx < scope.cameras[serverId].length; idx++) {
+                                if (scope.cameras[serverId][idx].id === scope.storage.activeCameras[serverId]) {
+                                    scope.selectCamera(scope.cameras[serverId][idx]);
+                                    selected = true;
                                     break;
                                 }
+                            }
+
+                            if (selected) {
+                                break;
                             }
                         }
                     }
 
-                    searchCams();
-                };
-
-                var updateMediaServers = function () {
-                    scope.mediaServers = scope.camerasProvider.getMediaServers();
-
-                    if (scope.mediaServers) {
-                        init(scope);
+                    if (!selected) {
+                        if (Object.keys(scope.cameras).length !== 0 && !!scope.mediaServers) {
+                            scope.selectCamera(scope.cameras[scope.mediaServers[0].id][0]);
+                            scope.storage.serverStates[scope.mediaServers[0].id] = true; // expand default
+                            scope.mediaServers[0].expanded = true;
+                            scope.toggleInfo = false;
+                            scope.storage.infoStatus = scope.toggleInfo;
+                        }
                     }
-                };
 
-                scope.$watch('camerasProvider.cameras', updateCameras, true);
-                scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
+                    searchCams();
+                }
 
                 scope.toggleInfoFn = function () {
                     scope.toggleInfo = !scope.toggleInfo;
@@ -92,15 +75,9 @@
                     scope.selectCamera(camera);
                 };
 
-                scope.selectCamera = function (activeCamera) {
-                    if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {
-                        return;
-                    }
-                    scope.activeCamera = activeCamera;
-                };
                 scope.toggleServerCollapsed = function (server) {
-                    server.collapsed = !server.collapsed;
-                    scope.storage.serverStates[ server.id ] = server.collapsed;
+                    server.expanded = !server.expanded;
+                    scope.storage.serverStates[ server.id ] = server.expanded;
                 };
 
                 function searchCams(searchText) {
@@ -130,7 +107,24 @@
                     });
                 }
 
+                function updateMediaServers () {
+                    scope.mediaServers = scope.camerasProvider.getMediaServers();
+
+                    if (scope.mediaServers) {
+                        scope.mediaServers.forEach(function (server) {
+                            if (Object.keys(scope.storage.serverStates).length === 0) {
+                                server.expanded = false;
+                                return;
+                            }
+
+                            server.expanded = scope.storage.serverStates[server.id] !== undefined && scope.storage.serverStates[server.id];
+                        })
+                    }
+                }
+
                 scope.$watch('searchCams', searchCams);
+                scope.$watch('camerasProvider.cameras', updateCameras, true);
+                scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
             }
         };
     }
