@@ -153,7 +153,7 @@ def wait_for_equal(
         desc = "{} returns {}".format(actual_desc, expected_desc)
     wait_for_truthy(
         lambda: _get_by_path(get_actual(), path) == expected,
-        description=desc, timeout_sec=timeout_sec)
+        description=desc, timeout_sec=timeout_sec, max_delay_sec=max_delay_sec)
 
 
 class NotPersistent(Exception):
