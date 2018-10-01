@@ -30,7 +30,6 @@ void MediaServerLauncher::fillDefaultSettings()
 {
     m_settings = {
 	{"serverGuid", m_serverGuid.toString()},
-	{"removeDbOnStartup", m_firstStartup ? QString("true") : QString("false")},
 	{"varDir", *m_workDirResource.getDirName()},
 	{"dataDir", *m_workDirResource.getDirName()},
 	{"systemName", QnUuid::createUuid().toString()},
@@ -78,6 +77,7 @@ void MediaServerLauncher::prepareToStart()
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
     m_configFile.open(m_configFilePath.toUtf8().constData());
 
+    m_settings["removeDbOnStartup"] = m_firstStartup ? "true" : "false";
     for (const auto& p: m_settings)
         m_configFile << p.first << " = " << p.second.toStdString() << std::endl;
 
