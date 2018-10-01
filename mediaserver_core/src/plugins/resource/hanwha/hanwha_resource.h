@@ -310,7 +310,7 @@ private:
         QString prefix;
     };
 
-    HanwhaPortInfo portInfoFromId(const QString& id) const;
+    boost::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
 
     bool setOutputPortStateInternal(const QString& outputId, bool activate);
 

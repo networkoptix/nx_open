@@ -30,7 +30,7 @@ public:
         std::function<void()> callback,
         std::chrono::milliseconds delay);
 
-    // Cancels timer for specified object
+    // Cancels timer for specified object.
     void cancelTimerSync(const TimerOwnerId& timerObjectId);
 
     // Cancels all timers for all objects
