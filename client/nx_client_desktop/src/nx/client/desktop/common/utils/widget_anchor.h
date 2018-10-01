@@ -15,7 +15,7 @@ namespace nx::client::desktop {
 class WidgetAnchor: public QObject
 {
     Q_OBJECT
-    typedef QObject base_type;
+    using base_type = QObject;
 
     /** Edges to anchor, default all anchored: */
     Q_PROPERTY(Qt::Edges edges READ edges WRITE setEdges)
@@ -44,8 +44,8 @@ private:
 
 private:
     Qt::Edges m_edges = WidgetAnchor::kAllEdges;
-    QMargins m_margins = QMargins(0, 0, 0, 0);
-    QPointer<QWidget> m_widget;
+    QMargins m_margins;
+    const QPointer<QWidget> m_widget;
 };
 
 /**
