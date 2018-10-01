@@ -89,40 +89,54 @@ int EventSearchListModel::Private::count() const
 QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
     bool& handled) const
 {
-    const auto& event = m_data[index.row()];
+    const auto& eventParams = m_data[index.row()].eventParams;
     handled = true;
 
     switch (role)
     {
         case Qt::DisplayRole:
-            return title(event.eventParams.eventType);
+            return title(eventParams.eventType);
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(pixmap(event.eventParams));
+            return QVariant::fromValue(pixmap(eventParams));
 
         case Qt::ForegroundRole:
-            return QVariant::fromValue(color(event.eventParams.eventType));
+            return QVariant::fromValue(color(eventParams.eventType));
 
         case Qn::DescriptionTextRole:
-            return description(event.eventParams);
+            return description(eventParams);
 
         case Qn::PreviewTimeRole:
-            if (!hasPreview(event.eventParams.eventType))
+            if (!hasPreview(eventParams.eventType))
                 return QVariant();
             [[fallthrough]];
         case Qn::TimestampRole:
-            return QVariant::fromValue(event.eventParams.eventTimestampUsec);
+            return QVariant::fromValue(eventParams.eventTimestampUsec);
+
+        case Qn::ResourceListRole:
+        {
+            // TODO: #vkutin Display "[camera removed]" or "[server removed]"
+            // for event sources no longer in the system.
+
+            if (eventParams.eventResourceId.isNull() && !eventParams.resourceName.isEmpty())
+                return QVariant::fromValue(QStringList({eventParams.resourceName}));
+
+            const auto resource = q->resourcePool()->getResourceById(eventParams.eventResourceId);
+            return resource
+                ? QVariant::fromValue(QnResourceList({resource}))
+                : QVariant();
+        }
 
         case Qn::ResourceRole: //< Resource for thumbnail preview only.
         {
-            if (!hasPreview(event.eventParams.eventType))
+            if (!hasPreview(eventParams.eventType))
                 return false;
 
             if (q->cameras().size() == 1)
                 return QVariant::fromValue<QnResourcePtr>(*q->cameras().cbegin());
 
             return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
-                getResourceById<QnVirtualCameraResource>(event.eventParams.eventResourceId));
+                getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
         }
 
         case Qn::HelpTopicIdRole:

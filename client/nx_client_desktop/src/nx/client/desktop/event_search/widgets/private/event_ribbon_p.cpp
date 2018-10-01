@@ -257,7 +257,15 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     tile->setCloseable(index.data(Qn::RemovableRole).toBool());
     tile->setAutoCloseTimeMs(index.data(Qn::TimeoutRole).toInt());
     tile->setAction(index.data(Qn::CommandActionRole).value<CommandActionPtr>());
-    tile->setResourceList(index.data(Qn::ResourceListRole).value<QnResourceList>());
+
+    const auto resourceList = index.data(Qn::ResourceListRole);
+    if (resourceList.isValid())
+    {
+        if (resourceList.canConvert<QnResourceList>())
+            tile->setResourceList(resourceList.value<QnResourceList>());
+        else if (resourceList.canConvert<QStringList>())
+            tile->setResourceList(resourceList.value<QStringList>());
+    }
 
     setHelpTopic(tile, index.data(Qn::HelpTopicIdRole).toInt());
 

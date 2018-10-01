@@ -51,6 +51,8 @@ private:
 
     int indexOf(const QnUuid& guid) const; //< Logarithmic complexity.
 
+    QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
+
     utils::PendingOperation* createUpdateBookmarksWatcherOperation();
 
     template<typename Iter>

@@ -309,6 +309,15 @@ void EventTile::setDescription(const QString& value)
 
 void EventTile::setResourceList(const QnResourceList& list)
 {
+    QStringList items;
+    for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
+        items.push_back(list[i]->getName());
+
+    setResourceList(items);
+}
+
+void EventTile::setResourceList(const QStringList& list)
+{
     if (list.empty())
     {
         ui->resourceListLabel->hide();
@@ -316,11 +325,7 @@ void EventTile::setResourceList(const QnResourceList& list)
     }
     else
     {
-        QStringList items;
-        for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
-            items.push_back(list[i]->getName());
-
-        QString text = lm("<b>%1</b>").arg(items.join("<br>"));
+        QString text = lm("<b>%1</b>").arg(list.join("<br>"));
 
         const int numExtra = list.size() - kMaximumResourceListSize;
         if (numExtra > 0)

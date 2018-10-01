@@ -160,6 +160,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
 
+        case Qn::ResourceListRole:
+            return QVariant::fromValue(QnResourceList({camera(object)}));
+
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(object));
 

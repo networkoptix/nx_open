@@ -107,10 +107,11 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
 
+        case Qn::ResourceListRole:
+            return QVariant::fromValue(QnResourceList({camera(bookmark)}));
+
         case Qn::ResourceRole:
-            return QVariant::fromValue<QnResourcePtr>(q->cameras().size() == 1
-                ? *q->cameras().cbegin()
-                : q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId));
+            return QVariant::fromValue<QnResourcePtr>(camera(bookmark));
 
         case Qn::HelpTopicIdRole:
             return Qn::Bookmarks_Usage_Help;
@@ -339,6 +340,17 @@ int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const
         [&guid](const QnCameraBookmark& item) { return item.guid == guid; });
 
     return pos != range.second ? std::distance(m_data.cbegin(), pos) : -1;
+}
+
+QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
+    const QnCameraBookmark& bookmark) const
+{
+    if (q->cameras().size() != 1)
+        return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+
+    const auto camera = *q->cameras().cbegin();
+    NX_ASSERT(camera && camera->getId() == bookmark.cameraId);
+    return camera;
 }
 
 // TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.
