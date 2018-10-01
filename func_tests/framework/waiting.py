@@ -14,7 +14,7 @@ DEFAULT_MAX_DELAY_SEC = 5
 
 class Wait(object):
     def __init__(self, until, timeout_sec=30, max_delay_sec=DEFAULT_MAX_DELAY_SEC, logger=None):
-        # type: (str, float, int, ...) -> None
+        # type: (str, float, float, ...) -> None
         self._until = until
         assert timeout_sec is not None
         self._timeout_sec = timeout_sec
@@ -93,13 +93,12 @@ def _description_from_func(func):  # type: (Any) -> str
 
 
 def wait_for_truthy(
-        get_value,
-        description=None,
-        timeout_sec=30,
-        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        get_value,  # type: Callable[[], Any]
+        description=None,  # type: Optional[str]
+        timeout_sec=30,  # type: float
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,  # type: float
         logger=None,
         ):
-    # type: (Callable[[], Any], Optional, float, ...) -> None
     if description is None:
         description = _description_from_func(get_value)
     wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
@@ -134,10 +133,10 @@ def wait_for_equal(
         get_actual,  # type: Callable[[], Any]
         expected,  # type: Any
         path=(),  # type: Sequence[Union[str, int]]
-        actual_desc=None,  # type: str
-        expected_desc=None,  # type: str
+        actual_desc=None,  # type: Optional[str]
+        expected_desc=None,  # type: Optional[str]
         timeout_sec=30,  # type: float
-        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,  # type: float
         ):
     """
     @param path: If returned value is a big structure but only one value should be checked.
@@ -162,17 +161,17 @@ class NotPersistent(Exception):
 
 
 def ensure_persistence(
-        condition_is_true,
-        description,
-        timeout_sec=10,
-        max_delay_sec=DEFAULT_MAX_DELAY_SEC,
+        get_bool_value,  # type: Callable[[], bool]
+        description,  # type: Optional[str]
+        timeout_sec=10,  # type: float
+        max_delay_sec=DEFAULT_MAX_DELAY_SEC,  # type: float
         logger=None,
         ):
     if description is None:
-        description = _description_from_func(condition_is_true)
+        description = _description_from_func(get_bool_value)
     wait = Wait(description, timeout_sec, max_delay_sec, logger=logger)
     while True:
-        if not condition_is_true():
+        if not get_bool_value():
             raise NotPersistent("Have waited until " + description)
         if not wait.again():
             break
