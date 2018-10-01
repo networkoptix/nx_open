@@ -176,7 +176,7 @@ private:
     void loadObject(
         nx::sql::SqlQuery* selectEventsQuery,
         DetectedObject* object);
-    void mergeObjects(DetectedObject from, DetectedObject* to);
+    void mergeObjects(DetectedObject from, DetectedObject* to, bool loadTrack);
 
     void queryTrackInfo(
         nx::sql::QueryContext* queryContext,
