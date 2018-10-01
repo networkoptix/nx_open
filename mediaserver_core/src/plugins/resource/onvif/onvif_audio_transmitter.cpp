@@ -9,7 +9,7 @@ namespace plugins {
 AVCodecID toFfmpegCodec(const QString& codec)
 {
     const auto lCodec = codec.toLower();
-    if (lCodec == lit("aac"))
+    if (lCodec == lit("aac") || lCodec == lit("mpeg4-generic"))
         return AV_CODEC_ID_AAC;
     else if (lCodec == lit("g726"))
         return AV_CODEC_ID_ADPCM_G726;
