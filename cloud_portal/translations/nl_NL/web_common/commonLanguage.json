@@ -3,7 +3,7 @@
     "highStream": "Primaire stream",
     "lowStream": "Secundaire stream",
     "transcoding": "Transcoding",
-    "unknown": "Unknown",
+    "unknown": "Onbekend",
     "copyToClipboard": "kopiëren naar klembord",
     "copyDefaultText": "kopiëren",
     "copyActiveText": "gekopieerd naar het klembord"
@@ -11,7 +11,7 @@
   "systemOffline": "Systeem Offline",
   "cameraStates": {
     "offline": "Offline",
-    "error": "Error",
+    "error": "Fout",
     "unauthorized": "Authenticatie vereist",
     "noData": "Geen data",
     "iosVideoTooLarge": "iOS ondersteunt geen video die groter is dan FullHD (2MP: 1920x1080).",
@@ -32,15 +32,15 @@
   "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
   "voiceCommands": {
     "play": "afspelen",
-    "pause": "pauseren",
+    "pause": "pauze",
     "live": "go to live | show me live",
     "view": "view + [camera name]",
     "search": "find + [text for searchbar]",
-    "clear search": "wis zoekopdracht",
+    "clear search": "wis de zoekopdracht",
     "expand server": "expand server + [server name]",
     "collapse server": "collapse server + [server name]",
-    "expand all servers": "vouw alle servers uit",
-    "collapse all servers": "vouw alle servers samen",
+    "expand all servers": "toon alle servers",
+    "collapse all servers": "verberg alle servers",
     "stop listening": "stop met luisteren",
     "help": "help | show commands"
   }

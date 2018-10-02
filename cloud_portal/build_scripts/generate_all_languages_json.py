@@ -31,6 +31,10 @@ def generate_languages_files():
 
     translations_path = os.path.join("../../../..", "translations")
     for lang in os.listdir(translations_path):
+
+        if '.' in lang:
+            continue
+
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
         if not os.path.isfile(language_json_filename): # ignore incomplete languages without language.json
@@ -39,6 +43,7 @@ def generate_languages_files():
             continue
 
         print("Load: " + language_json_filename)
+
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
             name = data["language_name"]
@@ -57,6 +62,7 @@ def generate_languages_files():
                 "language": lang,
                 "name": name
             })
+
     print(languages_json)
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
