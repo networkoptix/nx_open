@@ -300,7 +300,7 @@ void EventsStorage::prepareLookupQuery(
     // selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
     constexpr int kMaxFilterEventsResultSize = 100000;
 
-#define QUERY_VERSION 0
+#define QUERY_VERSION 1
 
 #if QUERY_VERSION == 1
     query->prepare(lm(R"sql(
