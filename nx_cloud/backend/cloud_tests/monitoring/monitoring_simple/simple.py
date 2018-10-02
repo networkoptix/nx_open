@@ -494,19 +494,21 @@ class CloudSession(object):
         requests.post('https://{system_id}.relay.vmsproxy.com/ec2/removeUser'.format(system_id=self.system_id),
                       json=request_data, auth=self.auth)
 
-    @testmethod(delay=20, debug_skip=True)
+    @testmethod(delay=20, debug_skip=True, tries=3)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
             'x-csrftoken': self.session.cookies['csrftoken']
         }
+        # get users from cloud portal
         r = self.get('/api/systems/{system_id}/users'.format(system_id=self.system_id), headers=headers)
         data = r.json()
         assert data[0]['systemId'] == self.system_id, 'Wrong System ID'
 
         assert next(filter(lambda x: x['accountEmail'] == self.user_email, data),
-                    None) is None, 'User still exists in cdb'
+                    None) is None, 'User still exists in portal'
 
+        # get users from mediaserver
         r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
                       auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
