@@ -112,8 +112,8 @@ ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON 
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
-${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]/following-sibling::h1/a[@href="/login"]
+${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success && !loading' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
+${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success && !loading' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]/following-sibling::h1/a[@href="/login"]
 #In system settings
 ${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
@@ -154,7 +154,7 @@ ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='Disconnect ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
-${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),"${ALREADY ACTIVATED TEXT}")]
+${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success && !loading' and contains(text(),"${ALREADY ACTIVATED TEXT}")]
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
 ${SHARE MODAL}                        //form[@name='shareForm']
