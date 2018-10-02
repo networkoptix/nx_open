@@ -34,6 +34,7 @@ def redirect_login(request):
         target_url += '?%s' % request.META['QUERY_STRING']
     return redirect(target_url)
 
+
 urlpatterns = [
     url(r'^admin/login/', redirect_login),
     url(r'^admin/cms/', include('cms.urls')),
@@ -42,7 +43,7 @@ urlpatterns = [
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
     url(r'^admin_tools/', include('admin_tools.urls')),
-    url(r'^api/zapier/', include('zapier.urls')),
+    url(r'^zapier/', include('zapier.urls')),
 
     url(r'^apple-app-site-association',
         TemplateView.as_view(template_name="static/apple-app-site-association",
