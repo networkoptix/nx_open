@@ -8,7 +8,7 @@ namespace utils {
 
 std::string decodeCameraInfoUrl(const char * url);
 
-std::string encodeCameraInfoUrl(const char * url);
+std::string encodeCameraInfoUrl(const char * host, const char * cameraResource);
 
 float msecPerFrame(float fps);
 

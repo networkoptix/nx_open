@@ -1,6 +1,6 @@
 #include "utils.h"
 
-#include <nx/utils/url.h>
+#include <string>
 
 namespace nx {
 namespace usb_cam {
@@ -8,24 +8,29 @@ namespace utils {
 
 namespace {
 
-const std::string kWebcamUrlPrefix = "webcam://";
-
 } // namespace 
 
 std::string decodeCameraInfoUrl(const char * url)
 {
-    std::string urlStr(url);
-    return urlStr.length() > kWebcamUrlPrefix.length() 
-        ? urlStr.substr(kWebcamUrlPrefix.length())
-        : urlStr;
-    //QString encodeUrl = QString(url).mid(kWebcamUrlPrefix.length()); /* webcam:// == 9 chars */
-    //return nx::utils::Url::fromPercentEncoding(encodeUrl.toLatin1()).toStdString();
+    /**
+     * Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
+     * where <camera-resource> is /dev/video* on Linux or the device-instance-id on Windows.
+     */
+    std::string hostWithResource(url);
+    
+    // find the second occurence of ":" in the url
+    int colon = hostWithResource.find(":", hostWithResource.find(":") + 1);
+    if(colon == std::string::npos)
+        return std::string();
+
+    hostWithResource = hostWithResource.substr(colon);
+    
+    return hostWithResource.substr(hostWithResource.find("/") + 1);
 }
 
-std::string encodeCameraInfoUrl(const char * url)
+std::string encodeCameraInfoUrl(const char * host, const char * cameraResource)
 {
-    return kWebcamUrlPrefix + url;
-    //return QByteArray(kWebcamUrlPrefix.c_str()).append(nx::utils::Url::toPercentEncoding(url)).data();
+    return std::string(host) + "/" + cameraResource;
 }
 
 float msecPerFrame(float fps)
