@@ -3750,28 +3750,24 @@ void QnPlOnvifResource::updateToChannel(int value)
 QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const
 {
-    if (m_videoLayout)
-        return m_videoLayout;
+    {
+        QnMutexLocker lock(&m_layoutMutex);
+        if (m_videoLayout)
+            return m_videoLayout;
+    }
 
     auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
-
-    if (!layoutStr.isEmpty())
-    {
-        m_videoLayout = QnResourceVideoLayoutPtr(
-            QnCustomResourceVideoLayout::fromString(layoutStr));
-    }
-    else
-    {
-        m_videoLayout = QnMediaResource::getVideoLayout(dataProvider)
-            .constCast<QnResourceVideoLayout>();
-    }
-
-    auto resourceId = getId();
+    auto videoLayout = layoutStr.isEmpty() ? QnMediaResource::getVideoLayout(dataProvider)
+        : QnCustomResourceVideoLayout::fromString(layoutStr);
 
     auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
-    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
-    nonConstThis->saveParams();
+    {
+        QnMutexLocker lock(&m_layoutMutex);
+        m_videoLayout = videoLayout;
+        nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, videoLayout->toString());
+        nonConstThis->saveParams();
+    }
 
     return m_videoLayout;
 }
