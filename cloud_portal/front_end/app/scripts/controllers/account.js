@@ -13,6 +13,7 @@
                          systemsProvider, authorizationCheckService, $localStorage, dialogs) {
 
         $scope.lang = languageService.lang;
+        var currentLanguageCode = $scope.lang.language;
 
         if ($localStorage && $localStorage.langChanged) {
             $localStorage.langChanged = false;
@@ -33,17 +34,17 @@
             newPassword: ''
         };
 
-        $scope.changeLanguage = function (lang) {
-            changedlanguage = lang;
+        $scope.changeLanguage = function (langCode) {
+            currentLanguageCode = langCode;
         };
 
         $scope.save = process.init(function () {
 
             return cloudApi.accountPost($scope.account)
                 .then(function (result) {
-                    if (languageService.lang.language !== changedlanguage) {
+                    if (languageService.lang.language !== currentLanguageCode) {
                         cloudApi
-                            .changeLanguage(changedlanguage)
+                            .changeLanguage(currentLanguageCode)
                             .then(() => {
                                 $localStorage.langChanged = true;
                                 window.location.reload(); // reload window to catch new language

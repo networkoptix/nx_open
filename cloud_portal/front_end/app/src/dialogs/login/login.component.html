@@ -33,10 +33,10 @@
                    (ngModelChange)="resetForm()"
                    maxlength="255"
                    required>
-            <div *ngIf="login_password.invalid && nx_wrong_password">
+            <div *ngIf="login_password.invalid && wrongPassword">
                 <label class="input-error" translate>Wrong password</label>
             </div>
-            <div *ngIf="login_password.invalid && nx_account_blocked">
+            <div *ngIf="login_password.invalid && accountBlocked">
                 <label class="input-error" translate>Too many attempts. Try again in a minute.</label>
             </div>
         </div>
