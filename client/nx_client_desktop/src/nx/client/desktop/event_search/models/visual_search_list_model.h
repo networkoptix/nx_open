@@ -12,6 +12,7 @@
 namespace nx::client::desktop {
 
 class BusyIndicatorModel;
+class ManagedCameraSet;
 
 class VisualSearchListModel: public ConcatenationListModel
 {
@@ -30,8 +31,7 @@ public:
     QnTimePeriod relevantTimePeriod() const;
     void setRelevantTimePeriod(const QnTimePeriod& value);
 
-    QnVirtualCameraResourceSet cameras() const;
-    void setCameras(const QnVirtualCameraResourceSet& value);
+    ManagedCameraSet* cameraSet() const;
 
     using FetchDirection = AbstractSearchListModel::FetchDirection;
     FetchDirection fetchDirection() const;
@@ -45,6 +45,8 @@ public:
 
 signals:
     void liveChanged(bool isLive);
+    void camerasChanged();
+    void isOnlineChanged(bool isOnline);
 
 private:
     BusyIndicatorModel* relevantIndicatorModel() const;

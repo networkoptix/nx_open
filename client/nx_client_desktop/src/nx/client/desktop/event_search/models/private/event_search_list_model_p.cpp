@@ -16,6 +16,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/vms/event/strings_helper.h>
@@ -132,8 +133,11 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             if (!hasPreview(eventParams.eventType))
                 return false;
 
-            if (q->cameras().size() == 1)
-                return QVariant::fromValue<QnResourcePtr>(*q->cameras().cbegin());
+            if (q->cameraSet()->type() != ManagedCameraSet::Type::all
+                && q->cameraSet()->cameras().size() == 1)
+            {
+                return QVariant::fromValue<QnResourcePtr>(*q->cameraSet()->cameras().cbegin());
+            }
 
             return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
                 getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
@@ -322,7 +326,10 @@ rest::Handle EventSearchListModel::Private::getEvents(
         return false;
 
     QnEventLogMultiserverRequestData request;
-    request.filter.cameras = q->cameras().toList();
+    request.filter.cameras = q->cameraSet()->type() != ManagedCameraSet::Type::all
+        ? q->cameraSet()->cameras().toList()
+        : QnVirtualCameraResourceList();
+
     request.filter.period = period;
     request.filter.eventType = m_selectedEventType;
     request.limit = limit;

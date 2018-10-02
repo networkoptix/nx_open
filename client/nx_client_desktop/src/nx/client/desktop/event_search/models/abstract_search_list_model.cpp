@@ -2,19 +2,71 @@
 
 #include <chrono>
 
+#include <client/client_message_processor.h>
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <ui/workbench/workbench_access_controller.h>
+
+#include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::client::desktop {
 
 AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_cameraSet(new ManagedCameraSet(resourcePool(),
+        [this](const QnVirtualCameraResourcePtr& camera)
+        {
+            return isCameraApplicable(camera);
+        }))
 {
+    NX_CRITICAL(commonModule() && commonModule()->messageProcessor() && resourcePool());
+
+    const auto updateIsOnline =
+        [this]()
+        {
+            const bool isOnline =
+                qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready;
+
+            if (m_isOnline == isOnline)
+                return;
+
+            m_isOnline = isOnline;
+            if (!m_isOnline)
+                m_cameraSet->setMultipleCameras({});
+
+            emit isOnlineChanged(m_isOnline, {});
+        };
+
+    updateIsOnline();
+
+    connect(qnClientMessageProcessor->connectionStatus(), &QnClientConnectionStatus::stateChanged,
+        this, updateIsOnline);
+
+    connect(m_cameraSet.data(), &ManagedCameraSet::camerasAboutToBeChanged, this,
+        [this]()
+        {
+            emit camerasAboutToBeChanged({});
+            clear();
+        });
+
+    connect(m_cameraSet.data(), &ManagedCameraSet::camerasChanged, this,
+        [this]()
+        {
+            NX_ASSERT(isOnline() || m_cameraSet->cameras().isEmpty());
+            emit camerasChanged({});
+        });
+}
+
+AbstractSearchListModel::~AbstractSearchListModel()
+{
+    // Required here for forward-declared scoped pointer destruction.
 }
 
 bool AbstractSearchListModel::canFetchMore(const QModelIndex& parent) const
 {
-    return parent.isValid() || (isLive() && fetchDirection() == FetchDirection::later)
+    return parent.isValid() || !isOnline() || (isLive() && fetchDirection() == FetchDirection::later)
         ? false
         : canFetch();
 }
@@ -25,22 +77,19 @@ void AbstractSearchListModel::fetchMore(const QModelIndex& parent)
         requestFetch();
 }
 
-QnVirtualCameraResourceSet AbstractSearchListModel::cameras() const
+ManagedCameraSet* AbstractSearchListModel::cameraSet() const
 {
-    return m_cameras;
+    return m_cameraSet.data();
 }
 
-void AbstractSearchListModel::setCameras(const QnVirtualCameraResourceSet& value)
+bool AbstractSearchListModel::isOnline() const
 {
-    if (m_cameras == value)
-        return;
+    return m_isOnline;
+}
 
-    emit camerasAboutToBeChanged({});
-
-    clear();
-    m_cameras = value;
-
-    emit camerasChanged({});
+QnVirtualCameraResourceSet AbstractSearchListModel::cameras() const
+{
+    return m_cameraSet->cameras();
 }
 
 bool AbstractSearchListModel::fetchInProgress() const
@@ -204,6 +253,12 @@ void AbstractSearchListModel::setLiveSupported(bool value)
 QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const
 {
     return m_fetchedTimeWindow;
+}
+
+bool AbstractSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
+{
+    return camera && accessController()->hasPermissions(camera,
+        Qn::ReadPermission | Qn::ViewContentPermission);
 }
 
 void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)

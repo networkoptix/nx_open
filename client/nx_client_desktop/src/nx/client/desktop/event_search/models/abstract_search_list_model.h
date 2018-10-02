@@ -7,6 +7,8 @@
 
 namespace nx::client::desktop {
 
+class ManagedCameraSet;
+
 /**
  * Abstract Right Panel data model that provides interface and basic mechanics of sliding window
  * synchronous or asynchronous lookup into underlying data store.
@@ -18,13 +20,14 @@ class AbstractSearchListModel: public AbstractEventListModel
 
 public:
     explicit AbstractSearchListModel(QObject* parent = nullptr);
-    virtual ~AbstractSearchListModel() override = default;
+    virtual ~AbstractSearchListModel() override;
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
+    ManagedCameraSet* cameraSet() const;
     QnVirtualCameraResourceSet cameras() const;
-    void setCameras(const QnVirtualCameraResourceSet& value);
+    bool isOnline() const; //< Connected to server, initial resources received.
 
     enum class FetchDirection
     {
@@ -89,6 +92,7 @@ signals:
     void livePausedChanged(bool isPaused, QPrivateSignal);
     void camerasAboutToBeChanged(QPrivateSignal);
     void camerasChanged(QPrivateSignal);
+    void isOnlineChanged(bool isOnline, QPrivateSignal);
 
 protected:
     // These functions must be overridden in derived classes.
@@ -110,6 +114,9 @@ protected:
      * depending on current fetch direction. Must update fetched time window correspondingly. */
     virtual void truncateToMaximumCount() = 0;
 
+    /** Returns whether specified camera is applicable for this model. */
+    virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const;
+
     /** Should be called during every successful fetch to update fetched time window. */
     void setFetchedTimeWindow(const QnTimePeriod& value);
 
@@ -126,12 +133,13 @@ private:
     bool m_liveSupported = false; //< Whether underlying data store can be updated in live.
     bool m_live = false; //< Live mode enabled state.
     bool m_livePaused = false; //< Live mode paused state.
+    bool m_isOnline = false; //< Whether connection with server is fully established.
 
     FetchDirection m_fetchDirection = FetchDirection::earlier; //< Direction for next fetch.
 
     QnTimePeriod m_fetchedTimeWindow; //< Time window of currently fetched data.
 
-    QnVirtualCameraResourceSet m_cameras; //< Relevant cameras.
+    const QScopedPointer<ManagedCameraSet> m_cameraSet; //< Relevant camera set.
 };
 
 } // namespace nx::client::desktop

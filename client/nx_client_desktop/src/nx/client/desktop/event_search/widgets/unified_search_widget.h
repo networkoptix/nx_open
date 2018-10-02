@@ -95,8 +95,6 @@ private:
     void updateCurrentCameras();
     QnVirtualCameraResourceSet effectiveCameras() const;
 
-    bool isCameraAccepted(const QnVirtualCameraResourcePtr& camera) const;
-
     void setupTimeSelection();
     void setupCameraSelection();
     void updatePlaceholderState();

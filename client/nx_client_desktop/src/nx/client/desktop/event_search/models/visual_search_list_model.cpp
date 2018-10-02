@@ -33,6 +33,12 @@ VisualSearchListModel::VisualSearchListModel(
     connect(m_sourceModel, &AbstractSearchListModel::fetchFinished,
         this, &VisualSearchListModel::handleFetchFinished);
 
+    connect(m_sourceModel, &AbstractSearchListModel::camerasChanged,
+        this, &VisualSearchListModel::camerasChanged);
+
+    connect(m_sourceModel, &AbstractSearchListModel::isOnlineChanged,
+        this, &VisualSearchListModel::isOnlineChanged);
+
     connect(m_sourceModel, &AbstractSearchListModel::liveChanged, this,
         [this](bool isLive)
         {
@@ -57,14 +63,9 @@ void VisualSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     m_sourceModel->setRelevantTimePeriod(value);
 }
 
-QnVirtualCameraResourceSet VisualSearchListModel::cameras() const
+ManagedCameraSet* VisualSearchListModel::cameraSet() const
 {
-    return m_sourceModel->cameras();
-}
-
-void VisualSearchListModel::setCameras(const QnVirtualCameraResourceSet& value)
-{
-    m_sourceModel->setCameras(value);
+    return m_sourceModel->cameraSet();
 }
 
 VisualSearchListModel::FetchDirection VisualSearchListModel::fetchDirection() const

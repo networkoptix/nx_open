@@ -24,6 +24,7 @@
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <nx/client/desktop/event_search/models/visual_search_list_model.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/client/desktop/utils/managed_camera_set.h>
 
 #include <nx/utils/disconnect_helper.h>
 #include <nx/utils/pending_operation.h>
@@ -218,9 +219,6 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, updaterFor(Cameras::current));
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, updaterFor(Cameras::all));
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, updaterFor(Cameras::all));
-
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, updaterFor(Cameras::layout));
     connect(workbench(), &QnWorkbench::currentLayoutItemsChanged, this, updaterFor(Cameras::layout));
 }
@@ -250,9 +248,8 @@ void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
-// TODO: #vkutin Re-check whether this is needed.
-//    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
-//        this, &UnifiedSearchWidget::requestFetch);
+    *m_modelConnections << connect(value, &VisualSearchListModel::camerasChanged,
+        this, &UnifiedSearchWidget::requestFetch);
 
     *m_modelConnections << connect(value, &QAbstractItemModel::modelReset,
         this, &UnifiedSearchWidget::updatePlaceholderState);
@@ -266,9 +263,18 @@ void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
     *m_modelConnections << connect(value, &VisualSearchListModel::liveChanged,
         ui->ribbon, &EventRibbon::setLive);
 
+    *m_modelConnections << connect(value, &VisualSearchListModel::isOnlineChanged, this,
+        [this](bool isOnline)
+        {
+            if (isOnline)
+                updateCurrentCameras();
+        });
+
     // For busy indicator going on/off.
     *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);
+
+    updateCurrentCameras();
 }
 
 SearchLineEdit* UnifiedSearchWidget::filterEdit() const
@@ -496,32 +502,16 @@ QnVirtualCameraResourceSet UnifiedSearchWidget::currentCameras() const
 
 void UnifiedSearchWidget::updateCurrentCameras()
 {
-    const auto newCameras = effectiveCameras();
-    if (m_currentCameras == newCameras)
-        return;
-
-    m_currentCameras = newCameras;
-    m_model->setCameras(m_currentCameras);
-    requestFetch();
-}
-
-QnVirtualCameraResourceSet UnifiedSearchWidget::effectiveCameras() const
-{
     switch (m_cameras)
     {
         case Cameras::all:
-        {
-            const auto filter =
-                [this](const QnVirtualCameraResourcePtr& camera)
-                {
-                    return isCameraAccepted(camera);
-                };
-
-            return resourcePool()->getResources<QnVirtualCameraResource>(filter).toSet();
-        }
+            m_model->cameraSet()->setAllCameras();
+            break;
 
         case Cameras::current:
-            return {navigator()->currentResource().dynamicCast<QnVirtualCameraResource>()};
+            m_model->cameraSet()->setSingleCamera(
+                navigator()->currentResource().dynamicCast<QnVirtualCameraResource>());
+            break;
 
         case Cameras::layout:
         {
@@ -530,27 +520,18 @@ QnVirtualCameraResourceSet UnifiedSearchWidget::effectiveCameras() const
             {
                 for (const auto& item: workbenchLayout->items())
                 {
-                    const auto camera = item->resource().dynamicCast<QnVirtualCameraResource>();
-                    if (camera && !cameras.contains(camera) && isCameraAccepted(camera))
+                    if (const auto camera = item->resource().dynamicCast<QnVirtualCameraResource>())
                         cameras.insert(camera);
                 }
             }
 
-            if (cameras.empty())
-                return {QnVirtualCameraResourcePtr()};
-
-            return cameras;
+            m_model->cameraSet()->setMultipleCameras(cameras);
+            break;
         }
 
         default:
             NX_ASSERT(false);
-            return {QnVirtualCameraResourcePtr()};
     }
-}
-
-bool UnifiedSearchWidget::isCameraAccepted(const QnVirtualCameraResourcePtr& camera) const
-{
-    return true; //< TODO: #vkutin Implement changeable filter.
 }
 
 void UnifiedSearchWidget::requestFetch()
