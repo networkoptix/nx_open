@@ -15,7 +15,8 @@ import { CookieService }                    from 'ngx-cookie-service';
 import {
     cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
     accountServiceModule, processServiceModule, uuid2ServiceModule,
-    ngToastModule, configServiceModule, authorizationCheckServiceModule, localStorageModule
+    ngToastModule, configServiceModule, authorizationCheckServiceModule,
+    localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
 import { AppComponent }     from './app.component';
@@ -32,10 +33,10 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/sandbox');
-        //return false;
-        //url.toString().startsWith('/download') ||
-        //url.toString().startsWith('/downloads') ||
-        //url.toString().startsWith('/browser');
+        // return false;
+        // url.toString().startsWith('/download') ||
+        // url.toString().startsWith('/downloads') ||
+        // url.toString().startsWith('/browser');
     }
 
     extract(url: UrlTree) {
@@ -65,6 +66,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         ngToastModule,
         configServiceModule,
         authorizationCheckServiceModule,
+        locationProxyModule,
         DropdownsModule,
         DialogsModule,
         PagesModule,
