@@ -2,7 +2,7 @@
 # Ask @syuldashev if there are any problems with hardware.
 
 
--SERVER-:
+SERVER_STAGES:
   before if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0

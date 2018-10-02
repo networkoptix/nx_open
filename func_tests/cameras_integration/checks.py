@@ -4,46 +4,34 @@ from abc import abstractmethod
 
 class Result(object):
     @property
-    @abstractmethod
-    def report(self):
-        pass
+    def details(self):
+        return self.__dict__
 
 
 class Success(Result):
-    @property
-    def report(self):
-        return dict(condition='success')
+    def __init__(self):
+        self.status = 'success'
 
 
 class Failure(Result):
     def __init__(self, errors=[], is_exception=False):
+        self.status = 'failure'
         assert errors or is_exception
         self.errors = errors if isinstance(errors, list) else [errors]
-        self.exception = traceback.format_exc().strip() if is_exception else None
+        self.exception = traceback.format_exc().strip().splitlines() if is_exception else None
 
     def __repr__(self):
         return '<{} errors={}, exception={}>'.format(
             type(self).__name__, len(self.errors), bool(self.exception))
 
-    @property
-    def report(self):
-        data = dict(
-            errors=(self.errors[0] if len(self.errors) == 1 else self.errors),
-            exception=self.exception.split('\n') if self.exception else self.exception)
-
-        return dict(condition='failure', **{k: v for k, v in data.items() if v})
-
 
 class Halt(Result):
     def __init__(self, message):  # types: (str) -> None
+        self.status = 'halt'
         self.message = message
 
     def __repr__(self):
         return '{}({!r})'.format(type(self).__name__, self.message)
-
-    @property
-    def report(self):
-        return dict(condition='halt', **self.__dict__)
 
 
 def expect_values(expected, actual, *args, **kwargs):
