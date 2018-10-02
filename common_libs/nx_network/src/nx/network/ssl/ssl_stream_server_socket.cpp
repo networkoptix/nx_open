@@ -80,7 +80,7 @@ void StreamServerSocket::pleaseStop(
         });
 }
 
-void StreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+void StreamServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {

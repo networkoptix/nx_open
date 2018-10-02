@@ -87,7 +87,7 @@ protected:
         qint64& firstVTime,
         qint64& lastVTime,
         bool checkLQ) const;
-    QByteArray getRangeHeaderIfChanged();
+    void sendRangeHeaderIfChanged();
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
 
@@ -144,8 +144,7 @@ private:
     qint64 m_previousScaledRtpTimestamp;
 
     int m_framesSinceRangeCheck;
-    qint64 m_prevStartTime;
-    qint64 m_prevEndTime;
+    QByteArray m_prevRangeHeader;
     quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
     nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::mediaOnly};

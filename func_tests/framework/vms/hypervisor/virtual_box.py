@@ -36,7 +36,7 @@ _HOST_CONNECTION_NIC_INDEX = 2
 _INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
 
 ## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
-# Theoretically, some NICs may not be used at all bur their indices should be listed here to get
+# Theoretically, some NICs may not be used at all but their indices should be listed here to get
 # non-random MAC address.
 _ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
@@ -297,7 +297,7 @@ class _VirtualBoxVm(VmHardware):
         picked up immediately. The example below changes the limit for the group created in the
         example above to 100 Kbit/s:
         ```{.sh}
-        VBoxManage bandwidthctl "VM name" set Limit --limit 100k
+        VBoxManage bandwidthctl "VM name" set network1 --limit 100k
         ```
 
         In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...
@@ -385,8 +385,41 @@ class VirtualBox(Hypervisor):
             runner_address = self.__class__._nat_subnet.ip + 2
         super(VirtualBox, self).__init__(host_os_access, runner_address)
 
+    def _get_file_path_for_import_vm(self, vm_image_path, timeout_sec):
+        if vm_image_path.suffix == '.ova':
+            try:
+                # TODO: unpack command to run under Windows or, at least, check OS before un-tar
+                stdout = self.host_os_access.run_command(
+                    ['tar', 'xvf', vm_image_path, '-C', vm_image_path.parent],
+                    timeout_sec=timeout_sec)
+            # www.gnu.org/software/tar/manual/html_section/tar_19.html
+            # Possible exit codes of GNU tar are summarized in the following table:
+            #
+            # 0 `Successful termination'.
+            # 1 `Some files differ'. If tar was invoked with `--compare' (`--diff', `-d')
+            #   command line option, this means that some files in the archive differ from
+            #   their disk counterparts (see section Comparing Archive Members with the File System).
+            #   If tar was given `--create', `--append' or `--update' option, this exit code means
+            #   that some files were changed while being archived and so the resulting archive
+            #   does not contain the exact copy of the file set.
+            # 2 `Fatal error'. This means that some fatal, unrecoverable error occurred.
+            except exit_status_error_cls(2) as x:
+                stderr_decoded = x.stderr.decode('ascii')
+                raise VirtualBoxError(
+                    "Unpack image OVA archive '%s' error: %s" % (
+                        vm_image_path, stderr_decoded))
+
+            for line in stdout.strip().splitlines():
+                if line.endswith('.ovf'):
+                    return vm_image_path.parent / line
+            raise VirtualBoxError(
+                "Image OVA archive '%s' doesn't contain OVF file" % vm_image_path)
+
+        return vm_image_path
+
     def import_vm(self, vm_image_path, vm_name):
-        self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
+        vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
+        self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self.manage(['snapshot', vm_name, 'take', 'template'])
         # Group is assigned only when imported: cloned VMs are created nearby.
         group = '/' + vm_name.rsplit('-', 1)[0]

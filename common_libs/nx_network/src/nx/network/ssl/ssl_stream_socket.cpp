@@ -116,7 +116,7 @@ void StreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
         });
 }
 
-void StreamSocket::pleaseStopSync(bool /*checkForLocks*/)
+void StreamSocket::pleaseStopSync()
 {
     if (!m_delegate)
         return;

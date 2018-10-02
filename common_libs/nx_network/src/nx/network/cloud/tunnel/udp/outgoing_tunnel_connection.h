@@ -46,12 +46,7 @@ public:
  *     can be safely freed while in aio thread (e.g., in any handler).
  */
 class NX_NETWORK_API OutgoingTunnelConnection:
-    public AbstractOutgoingTunnelConnection,
-    public nx::network::server::StreamConnectionHolder<
-        nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-            nx::network::stun::Message,
-            nx::network::stun::MessageParser,
-            nx::network::stun::MessageSerializer>>
+    public AbstractOutgoingTunnelConnection
 {
 public:
     /**
@@ -87,11 +82,11 @@ public:
     virtual std::string toString() const override;
 
 private:
-    typedef nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx::network::stun::Message,
-        nx::network::stun::MessageParser,
-        nx::network::stun::MessageSerializer
-    > ConnectionType;
+    using ConnectionType =
+        nx::network::server::StreamProtocolConnection<
+            nx::network::stun::Message,
+            nx::network::stun::MessageParser,
+            nx::network::stun::MessageSerializer>;
 
     struct ConnectionContext
     {
@@ -122,9 +117,8 @@ private:
         UdtStreamSocket* connectionPtr,
         SystemError::ErrorCode errorCode);
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override;
+    void onConnectionClosed(SystemError::ErrorCode closeReason);
+    
     void onStunMessageReceived(nx::network::stun::Message message);
 };
 

@@ -26,7 +26,7 @@ namespace
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnMdnsResourceSearcher(serverModule->commonModule()),
+    QnMdnsResourceSearcher(serverModule),
     m_serverModule(serverModule)
 {
 }

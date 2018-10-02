@@ -22,16 +22,18 @@ struct NX_NETWORK_API RequestResult
     ConnectionEvents connectionEvents;
 
     RequestResult(StatusCode::Value statusCode);
+
     RequestResult(
         nx::network::http::StatusCode::Value statusCode,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource);
+
     RequestResult(
         nx::network::http::StatusCode::Value statusCode,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> dataSource,
         ConnectionEvents connectionEvents);
 };
 
-typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
+using RequestProcessedHandler = nx::utils::MoveOnlyFunc<void(RequestResult)>;
 
 struct RequestContext
 {
@@ -59,13 +61,12 @@ public:
 
     /**
      * @param connection This object is valid only in this method.
-     *       One cannot rely on its availability after return of this method
-     * @param request Message received
-     * @param completionHandler Functor to be invoked to send response
+     *     One cannot rely on its availability after return of this method.
+     * @param completionHandler Functor to be invoked to send response.
      */
     bool processRequest(
         nx::network::http::HttpServerConnection* const connection,
-        nx::network::http::Message&& request,
+        nx::network::http::Request request,
         nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
 

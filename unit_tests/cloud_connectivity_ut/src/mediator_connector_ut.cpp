@@ -351,8 +351,8 @@ class MediatorHttpAndUdpEndpointsOnDifferentHostsListGenerator:
 public:
     MediatorHttpAndUdpEndpointsOnDifferentHostsListGenerator()
     {
-        m_httpHost = nx::utils::generateRandomName(7).toStdString();
-        m_stunHost = nx::utils::generateRandomName(7).toStdString();
+        m_httpHost = nx::utils::generateRandomName(7).toLower().toStdString();
+        m_stunHost = nx::utils::generateRandomName(7).toLower().toStdString();
 
         nx::network::SocketGlobals::addressResolver().dnsResolver().addEtcHost(
             m_httpHost.c_str(), { nx::network::HostAddress::localhost });

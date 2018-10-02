@@ -20,7 +20,6 @@ function checkdir()
 checkdir /etc/letsencrypt
 checkdir /var/lib/letsencrypt
 checkdir /var/log/letsencrypt
-checkdir /root/.aws
 checkdir /ssl
 
 ARGS=$@

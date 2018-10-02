@@ -128,17 +128,12 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
     for (const auto& param: params)
     {
         auto widget = m_paramWidgetsById[param.id];
-        disconnect(
-            widget,
-            &AbstractCameraAdvancedParamWidget::valueChanged,
-            this,
-            &CameraAdvancedParamWidgetsManager::paramValueChanged);
-
         connect(
             widget,
             &AbstractCameraAdvancedParamWidget::valueChanged,
             this,
-            &CameraAdvancedParamWidgetsManager::paramValueChanged);
+            &CameraAdvancedParamWidgetsManager::paramValueChanged,
+            Qt::UniqueConnection);
     }
 }
 

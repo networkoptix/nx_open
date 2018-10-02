@@ -401,7 +401,7 @@ int CUDTUnited::newConnection(const UDTSOCKET listen, const sockaddr* peer, CHan
     ns->m_Status = CONNECTED;
 
     // copy address information of local node
-    ns->m_pUDT->sndQueue()->m_pChannel->getSockAddr(ns->m_pSelfAddr);
+    ns->m_pUDT->sndQueue()->channel()->getSockAddr(ns->m_pSelfAddr);
     CIPAddress::pton(ns->m_pSelfAddr, ns->m_pUDT->selfIp(), ns->m_iIPversion);
 
     {
@@ -515,7 +515,7 @@ int CUDTUnited::bind(const UDTSOCKET u, const sockaddr* name, int namelen)
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
 
     return 0;
 }
@@ -556,7 +556,7 @@ int CUDTUnited::bind(UDTSOCKET u, UDPSOCKET udpsock)
     s->m_Status = OPENED;
 
     // copy address information of local node
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
 
     return 0;
 }
@@ -752,7 +752,7 @@ void CUDTUnited::connect_complete(const UDTSOCKET u)
     // copy address information of local node
     // the local port must be correctly assigned BEFORE CUDT::connect(),
     // otherwise if connect() fails, the multiplexer cannot be located by garbage collection and will cause leak
-    s->m_pUDT->sndQueue()->m_pChannel->getSockAddr(s->m_pSelfAddr);
+    s->m_pUDT->sndQueue()->channel()->getSockAddr(s->m_pSelfAddr);
     CIPAddress::pton(s->m_pSelfAddr, s->m_pUDT->selfIp(), s->m_iIPversion);
 
     s->m_Status = CONNECTED;

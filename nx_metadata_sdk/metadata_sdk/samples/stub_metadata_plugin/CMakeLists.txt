@@ -47,6 +47,7 @@ endif()
 target_compile_definitions(stub_metadata_plugin
     PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}
     INTERFACE NX_PLUGIN_API=${API_IMPORT_MACRO}
+    PRIVATE NX_SDK_API=
 )
 
 if(NOT WIN32)

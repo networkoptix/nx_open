@@ -86,14 +86,14 @@ private:
 
         m_handler.setHttpStatusCode(statusCode);
 
-        nx::network::http::Message message(nx::network::http::MessageType::request);
-        message.request->requestLine.method = nx::network::http::Method::get;
-        message.request->requestLine.url = "/some/url";
-        message.request->requestLine.version = nx::network::http::http_1_1;
+        nx::network::http::Request request;
+        request.requestLine.method = nx::network::http::Method::get;
+        request.requestLine.url = "/some/url";
+        request.requestLine.version = nx::network::http::http_1_1;
 
         m_handler.AbstractHttpRequestHandler::processRequest(
             nullptr,
-            std::move(message),
+            std::move(request),
             nx::utils::stree::ResourceContainer(),
             std::bind(&HttpServerAbstractFusionRequestHandler::onRequestProcessed, this,
                 _1, _2, _3));

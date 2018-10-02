@@ -124,7 +124,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
-    QnPlatformMonitor* monitor = qnPlatform->monitor();
+    QnPlatformMonitor* monitor = serverModule()->platform()->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         monitor->totalPartitionSpaceInfo(
             QnPlatformMonitor::LocalDiskPartition

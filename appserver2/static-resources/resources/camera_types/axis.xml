@@ -364,5 +364,9 @@
             </params>
         </resource> 
         <resource name = "AXISP1448" public = "AXISP1447"/>
+        <resource name = "AXISP1445" public = "AXISQ1942"/>
+        <resource name = "AXISP3807" public = "AXISQ1942"/>
+        <resource name = "AXISP3235" public = "AXISP1365"/>
+        <resource name = "AXISP3518" public = "AXISP1365"/>
     </oem>
 </resources>

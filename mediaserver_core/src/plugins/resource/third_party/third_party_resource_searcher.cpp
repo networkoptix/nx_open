@@ -28,8 +28,8 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serv
     :
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    QnMdnsResourceSearcher(serverModule->commonModule()),
-    QnUpnpResourceSearcherAsync(serverModule->commonModule(), kUpnpBasicDeviceType),
+    QnMdnsResourceSearcher(serverModule),
+    QnUpnpResourceSearcherAsync(serverModule, kUpnpBasicDeviceType),
     m_serverModule(serverModule)
 {
     auto pluginManager = serverModule->pluginManager();

@@ -5,6 +5,7 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/data_packet_queue.h>
+#include <nx/streaming/multichannel_buffer.h>
 #include "live_stream_provider.h"
 #include <core/dataprovider/stream_mixer_data.h>
 
@@ -84,12 +85,14 @@ private:
         quint32 audioChannelNumber,
         quint32 mappedAudioChannelNumber);
 
+    int channelCount(QnAbstractMediaData::DataType dataType) const;
+
 private:
     mutable QnMutex m_mutex;
     QMap<uintptr_t, QnProviderChannelInfo> m_sourceMap;
 
     QnAbstractStreamDataProvider* m_user;
-    QnDataPacketQueue m_queue;
+    std::shared_ptr<nx::streaming::MultiChannelBuffer> m_buffer;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

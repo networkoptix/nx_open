@@ -14,17 +14,18 @@ def is_empty(any_structure):
     else:
         return True
 
-referer_url = "https://www.axis.com/za/en/products/product-selector"
 api_key = "apikey da6cac02-e554-44c5-8125-1281982c3cdb"
-headers={"Host":"www.axis.com", "referer": referer_url, "Authorization": api_key}
+headers={"authorization": api_key}
 home_dir = expanduser("~")
 
-axis_base_url = "https://www.axis.com/api/pia/v2/items/"
+axis_base_url = "https://www.axis.com/api/pia/v2/items"
 parameters = ""
-parameters += '?categories=cameras,encoders,modular&'
-parameters += 'fields=properties,parents&orderBy=name'
-parameters += '&propertyFilterMap=%7B%22archived%22:0,'
-parameters += '%22compare%22:1,%22targetGrouping%22:%22--%22%7D'
+parameters += '?categories=cameras,encoders,'
+parameters += 'doorstations,'
+parameters += '&fields=none,category,categories,'
+parameters += 'id,name,properties,parents,type&orderBy=name'
+parameters += '&propertyFilterMap=%7B%22compare%22:1,%22series%22:%22'
+parameters += '!Companion%22%7D&state=40&tagKey=prodsel'
 parameters += '&type=ProductVariant'
 axis_url = axis_base_url + parameters
 
@@ -55,11 +56,12 @@ for i in range(len(get_list)):
 
 xml_path = '/appserver2/static-resources/resources/camera_types/axis.xml'
 old_db_path = '/appserver2/static-resources/02_insert_all_vendors.sql'
-f1_path = os.path.abspath(os.path.join(os.getcwd() + xml_path))
-f2_path = os.path.abspath(os.path.join(os.getcwd() + old_db_path))
+f1_path = os.path.abspath(os.getcwd() + '/..' + '/..' + xml_path)
+f2_path = os.path.abspath(os.getcwd() + '/..' + '/..' + old_db_path)
 f1 = open(f1_path, 'r')
 f2 = open(f2_path, 'r')
-cur_list_draft = set(re.findall('AXIS\w\d\d\d+', f1.read()) + re.findall('AXIS\w\d\d\d+', f2.read()))
+cur_list_draft = set(re.findall('AXIS\w\d\d\d+', f1.read()) + 
+    re.findall('AXIS\w\d\d\d+', f2.read()))
 cur_list = set(map(lambda x:x.lower()[4:], cur_list_draft))
 result_file = open(os.path.join(home_dir, "new_axis_models.txt"), 'w')
 

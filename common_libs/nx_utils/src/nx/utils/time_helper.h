@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
 #include <memory>
@@ -38,16 +40,20 @@ public:
 
 protected:
     void reset();
+    qint64 lastPrimaryFrameUs();
+    bool isLocalTimeChanged();
     qint64 getTimeUsInternal(qint64 cameraTimeUs, bool recursionAllowed);
+    qint64 cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs, bool primaryStream) const;
+    QString m_resourceId;
 
-protected:
+private:
     struct CamSyncInfo
     {
         QnMutex mutex;
+        qint64 lastPrimaryFrameUs;
         qint64 timeDiff = DATETIME_INVALID;
     };
 
-    QString m_resourceId;
     GetCurrentTimeFunc m_getTime;
     std::shared_ptr<CamSyncInfo> m_cameraClockToLocalDiff;
     static QnMutex m_camClockMutex;
@@ -57,10 +63,6 @@ protected:
 
     qint64 m_prevCameraTimeUs = 0;
     qint64 m_prevCurrentUs = 0;
-
-private:
-    qint64 cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs) const;
-    bool isLocalTimeChanged();
 };
 
 } // namespace utils

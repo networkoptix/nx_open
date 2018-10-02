@@ -1,5 +1,3 @@
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-
 #include "motion_estimation.h"
 
 #include <cmath>
@@ -1016,8 +1014,6 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
     }
 }
 
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
 CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedVideoDataPtr& frame)
 {
     QnMutexLocker lock(&m_mutex);
@@ -1217,8 +1213,6 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     return true;
 }
 
-#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
 void QnMotionEstimation::postFiltering()
 {
     for (int y = 0; y < Qn::kMotionGridHeight; ++y)
@@ -1362,5 +1356,3 @@ void QnMotionEstimation::setChannelNum(int value)
 {
     m_channelNum = value;
 }
-
-#endif //ENABLE_SOFTWARE_MOTION_DETECTION

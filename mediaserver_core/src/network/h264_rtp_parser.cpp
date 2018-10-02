@@ -12,10 +12,9 @@ static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 static const int kMinIdrCountToDetectIFrameByIdr = 2;
 
-CLH264RtpParser::CLH264RtpParser():
+CLH264RtpParser::CLH264RtpParser(const QString& resourceId):
         QnRtpVideoStreamParser(),
         m_spsInitialized(false),
-        m_frequency(90000), // default value
         m_rtpChannel(98),
         m_prevSequenceNum(-1),
         m_builtinSpsFound(false),
@@ -28,6 +27,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_videoFrameSize(0),
         m_lastRtpTime(0)
 {
+    QnRtpStreamParser::setFrequency(90000);
 }
 
 CLH264RtpParser::~CLH264RtpParser()
@@ -50,7 +50,7 @@ void CLH264RtpParser::setSdpInfo(QList<QByteArray> lines)
             QList<QByteArray> values2 = codecName.split('/');
             if (values2.size() < 2)
                 continue;
-            m_frequency = values2[1].toUInt();
+            QnRtpStreamParser::setFrequency(values2[1].toUInt());
 
             values = values[0].split(':');
             if (values.size() < 2)
@@ -155,10 +155,7 @@ bool CLH264RtpParser::isBufferOverflow() const
     return totalSize > (int) MAX_ALLOWED_FRAME_SIZE;
 }
 
-QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
-    const quint8* rtpBuffer,
-    quint32 rtpTime,
-    const QnRtspStatistic& statistics)
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime)
 {
     int addHeaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
@@ -217,26 +214,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
             result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize));
     }
 
-    if (m_timeHelper)
-    {
-        result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
-#if 0
-        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-        if (qAbs(currentTime - result->timestamp) > 500 * 1000)
-        {
-            qDebug()
-                << "large RTSP video jitter "
-                << (result->timestamp - currentTime) / 1000
-                << "RtpTime="
-                << rtpTime;
-        }
-#endif
-    }
-    else
-    {
-        result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-    }
-
+    result->timestamp = rtpTime;
     clearInternalBuffer();
     return result;
 }
@@ -360,7 +338,6 @@ bool CLH264RtpParser::processData(
     quint8* rtpBufferBase,
     int bufferOffset,
     int bytesRead,
-    const QnRtspStatistic& statistics,
     bool& gotData)
 {
     gotData = false;
@@ -401,16 +378,8 @@ bool CLH264RtpParser::processData(
 
     auto processPacketLost = [this, sequenceNum]()
     {
-        if (m_timeHelper) {
-            NX_WARNING(this, QString(
-                lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
-                .arg(m_timeHelper->getResourceId())
-                .arg(m_prevSequenceNum)
-                .arg(sequenceNum));
-        }
-        else {
-            NX_WARNING(this, "RTP Packet loss detected!!!!");
-        }
+        NX_WARNING(this, "RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3",
+            m_resourceId, m_prevSequenceNum, sequenceNum);
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     };
@@ -434,11 +403,7 @@ bool CLH264RtpParser::processData(
 
     if (isPacketStartsNewFrame(curPtr, bufferEnd))
     {
-        m_mediaData = createVideoData(
-            rtpBufferBase,
-            m_lastRtpTime,
-            statistics
-            ); // last packet
+        m_mediaData = createVideoData(rtpBufferBase, m_lastRtpTime); // last packet
         gotData = true;
     }
     m_lastRtpTime = ntohl(rtpHeader->timestamp);
@@ -548,11 +513,7 @@ bool CLH264RtpParser::processData(
 
     if (rtpHeader->marker && m_frameExists)
     {
-        m_mediaData = createVideoData(
-            rtpBufferBase,
-            m_lastRtpTime,
-            statistics
-        ); // last packet
+        m_mediaData = createVideoData(rtpBufferBase, m_lastRtpTime); // last packet
         gotData = true;
     }
 

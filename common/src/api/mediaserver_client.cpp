@@ -215,6 +215,48 @@ ec2::ErrorCode MediaServerClient::ec2SaveUser(const nx::vms::api::UserData& requ
         request);
 }
 
+void MediaServerClient::ec2GetMediaServersEx(
+    std::function<void(ec2::ErrorCode, nx::vms::api::MediaServerDataExList)> completionHandler)
+{
+    performAsyncEc2Call("ec2/getMediaServersEx", std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2GetMediaServersEx(
+    nx::vms::api::MediaServerDataExList* result)
+{
+    using Ec2GetMediaServersExAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            std::function<void(ec2::ErrorCode, nx::vms::api::MediaServerDataExList)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2GetMediaServersExAsyncFuncPointer>(
+            &MediaServerClient::ec2GetMediaServersEx),
+        result);
+}
+
+void MediaServerClient::ec2SaveMediaServer(
+    const nx::vms::api::MediaServerData& request,
+    std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    performAsyncEc2Call("ec2/saveMediaServer", request, std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2SaveMediaServer(
+    const nx::vms::api::MediaServerData& request)
+{
+    using Ec2SaveMediaServerAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const nx::vms::api::MediaServerData& request,
+            std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        this,
+        static_cast<Ec2SaveMediaServerAsyncFuncPointer>(
+            &MediaServerClient::ec2SaveMediaServer),
+        request);
+}
+
 void MediaServerClient::ec2GetSettings(
     std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {

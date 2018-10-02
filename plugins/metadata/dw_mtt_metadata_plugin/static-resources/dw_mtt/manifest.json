@@ -143,7 +143,7 @@
         {
             "id": "nx.dw_mtt.VFD", 
             "name": {
-                "value": "Video face detection [exclusive]", 
+                "value": "Video Face Detection [exclusive]", 
                 "localization": {}
             }, 
             "flags": "stateDependent", 

@@ -41,7 +41,7 @@ public:
 
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     /** Return AbstractAsyncClient for configuration purposes */
     AbstractAsyncClient* client() const;

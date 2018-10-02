@@ -89,7 +89,7 @@ protected:
             }
 
             bool gotData;
-            m_parser.processData(m_recvBuffer, 0, packetSize, QnRtspStatistic(), gotData);
+            m_parser.processData(m_recvBuffer, 0, packetSize, gotData);
             if (gotData)
                 return m_parser.nextData();
         }

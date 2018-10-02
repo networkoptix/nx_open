@@ -29,7 +29,6 @@ namespace vca {
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
  * last time.
- * @note ElapsedEvent is non-copyable and non-movable.
  */
 struct ElapsedEvent
 {
@@ -91,7 +90,6 @@ private:
     QByteArray m_buffer;
     nx::sdk::metadata::MetadataHandler* m_handler = nullptr;
 
-    //nx::network::TCPSocket* m_tcpSocket = nullptr;
     std::unique_ptr<nx::network::TCPSocket> m_tcpSocket;
     nx::network::aio::Timer m_stopEventTimer;
     nx::network::aio::Timer m_reconnectTimer;

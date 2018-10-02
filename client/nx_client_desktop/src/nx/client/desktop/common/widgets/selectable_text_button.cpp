@@ -122,9 +122,8 @@ void SelectableTextButton::setDeactivatable(bool value)
         d->deactivateButton.reset(new CloseButton(this));
         d->deactivateButton->setToolTip(d->deactivationToolTip);
 
-        auto anchor = new WidgetAnchor(d->deactivateButton.data());
-        anchor->setEdges(Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge);
-        anchor->setMargins(0, 0, 0, 1);
+        anchorWidgetToParent(
+            d->deactivateButton.data(), Qt::TopEdge | Qt::RightEdge | Qt::BottomEdge, {0, 0, 0, 1});
 
         connect(d->deactivateButton.data(), &CloseButton::clicked,
             [this]() { setState(State::deactivated); });

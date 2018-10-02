@@ -92,7 +92,7 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
     auto webView = webWidget->view();
     webView->setPage(new WebPage(webView));
 
-    new WidgetAnchor(webWidget);
+    anchorWidgetToParent(webWidget);
 
     // Special actions list for context menu for links.
     webView->insertActions(nullptr, {

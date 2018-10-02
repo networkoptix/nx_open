@@ -6,6 +6,9 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <streaming/rtp_stream_reader.h>
+#include <media_server/media_server_module.h>
+#include <media_server/media_server_resource_searchers.h>
+#include "flir_resource_searcher.h"
 
 namespace {
 
@@ -102,7 +105,8 @@ CameraDiagnostics::Result FcResource::initializeCameraDriver()
     if (!m_ioManager)
     {
         m_ioManager = new nexus::WebSocketIoManager(this, port);
-        m_ioManager->moveToThread(IoExecutor::instance()->getThread());
+        auto flirSearcher = serverModule()->resourceSearchers()->searcher<QnFlirResourceSearcher>();
+        m_ioManager->moveToThread(flirSearcher->ioExecutor()->getThread());
     }
 
     QnIOPortDataList allPorts = m_ioManager->getInputPortList();

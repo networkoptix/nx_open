@@ -89,8 +89,8 @@ void UdpMulticastFinder::removeObsoleteSenders()
         if (localIpList.find(it->first) == localIpList.end())
         {
             it->second->cancelIOSync(network::aio::etNone);
-            it = m_senders.erase(it);
             NX_DEBUG(this, "Deleted obsolete sender: %1", it->first);
+            it = m_senders.erase(it);
         }
         else
         {

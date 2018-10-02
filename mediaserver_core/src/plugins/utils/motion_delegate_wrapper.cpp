@@ -1,5 +1,3 @@
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
 #include "motion_delegate_wrapper.h"
 
 namespace nx {
@@ -65,5 +63,3 @@ QnMetaDataV1Ptr MotionDelegateWrapper::analyzeMotion(const QnAbstractMediaDataPt
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // ENABLE_SOFTWARE_MOTION_DETECTION

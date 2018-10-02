@@ -4,6 +4,7 @@
 #include <nx/streaming/video_data_packet.h>
 
 #include <utils/media/hevc_common.h>
+#include <nx/network/buffer.h>
 
 namespace nx {
 namespace network {
@@ -11,7 +12,6 @@ namespace rtp {
 
 struct HevcContext
 {
-    int frequency = 90000;
     int rtpChannel = 0;
     int spropMaxDonDiff = 0;
     boost::optional<nx::Buffer> spropVps = boost::none;
@@ -39,13 +39,13 @@ class HevcParser: public QnRtpVideoStreamParser
     };
 
 public:
+    HevcParser();
 
     // Implementation of QnRtpStreamParser::processData
     virtual bool processData(
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
-        const QnRtspStatistic& statistics,
         bool& gotData) override;
 
     // Implementation of QnRtpStreamParser::setSDPInfo
@@ -118,15 +118,8 @@ private:
     int additionalBufferSize() const;
     void addSdpParameterSetsIfNeeded(QnByteArray& buffer);
 
-    void createVideoDataIfNeeded(
-        bool* outGotData,
-        const QnRtspStatistic& statistic,
-        uint32_t rtpTimestamp);
-
-    QnCompressedVideoDataPtr createVideoData(
-        const uint8_t* rtpBuffer,
-        uint32_t rtpTime,
-        const QnRtspStatistic& statistics);
+    void createVideoDataIfNeeded(bool* outGotData, uint32_t rtpTimestamp);
+    QnCompressedVideoDataPtr createVideoData(const uint8_t* rtpBuffer, uint32_t rtpTime);
 
     void parseRtpMap(const nx::Buffer& rtpMapLine);
     void parseFmtp(const nx::Buffer& fmtpLine);

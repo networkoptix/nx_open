@@ -489,7 +489,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
-        if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
+        if (getMyStorageMan()->needToStopMediaScan() || serverModule()->commonModule()->isNeedToStop())
         {
             NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             return; // canceled
@@ -517,7 +517,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QnMutex scanFilesMutex;
     for(const auto& fi: files)
     {
-        if (QnResource::isStopping())
+        if (serverModule()->commonModule()->isNeedToStop())
         {
             NX_VERBOSE(this, lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO));
             break;

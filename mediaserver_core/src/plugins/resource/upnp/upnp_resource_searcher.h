@@ -1,5 +1,4 @@
-#ifndef upnp_resource_searcher_h_1806
-#define upnp_resource_searcher_h_1806
+#pragma once
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QElapsedTimer>
@@ -12,19 +11,12 @@
 #include <nx/network/upnp/upnp_device_searcher.h>
 
 
-//struct UpnpDeviceInfo
-//{
-//    QString friendlyName;
-//    QString manufacturer;
-//    QString modelName;
-//    QString serialNumber;
-//    QString presentationUrl;
-//};
+class QnMediaServerModule;
 
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
-    QnUpnpResourceSearcher(QnCommonModule* commonModule);
+    QnUpnpResourceSearcher(QnMediaServerModule* serverModule);
     ~QnUpnpResourceSearcher();
 
     void setSendRequests(bool value);
@@ -70,6 +62,7 @@ private:
     QMap<QByteArray, QByteArray> m_deviceXmlCache;
     QElapsedTimer m_cacheLivetime;
     nx::network::AbstractDatagramSocket* m_receiveSocket;
+    QnMediaServerModule* m_serverModule = nullptr;
 };
 
 
@@ -80,7 +73,7 @@ class QnUpnpResourceSearcherAsync
     public nx::network::upnp::SearchAutoHandler
 {
 public:
-    QnUpnpResourceSearcherAsync(QnCommonModule* commonModule, const QString& deviceType);
+    QnUpnpResourceSearcherAsync(QnMediaServerModule* serverModule, const QString& deviceType);
 
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
     virtual QnResourceList findResources() override;
@@ -109,5 +102,3 @@ private:
     QnResourceList m_resList;
     QnMutex m_mutex;
 };
-
-#endif // upnp_resource_searcher_h_1806

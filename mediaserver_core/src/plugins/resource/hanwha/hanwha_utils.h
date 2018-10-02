@@ -103,7 +103,7 @@ std::set<int> findProfilesToRemove(
     boost::optional<HanwhaVideoProfile> primaryProfile,
     boost::optional<HanwhaVideoProfile> secondaryProfile);
 
-bool isPropertyBelongsToChannel(const QString& fullPropertyName, int channel);
+boost::optional<int> extractPropertyChannel(const QString& fullPropertyName);
 
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 

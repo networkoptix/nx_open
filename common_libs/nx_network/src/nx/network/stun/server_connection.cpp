@@ -11,7 +11,9 @@ ServerConnection::ServerConnection(
     std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
-    base_type(socketServer, std::move(sock)),
+    base_type(
+        [socketServer](auto... args) { socketServer->closeConnection(args...); },
+        std::move(sock)),
     m_peerAddress(base_type::getForeignAddress()),
     m_dispatcher(dispatcher)
 {
