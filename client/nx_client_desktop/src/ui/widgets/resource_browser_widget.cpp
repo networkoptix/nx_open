@@ -447,24 +447,11 @@ void QnResourceBrowserWidget::initInstantSearch()
         this, &QnResourceBrowserWidget::updateSearchMode);
 
     const auto searchModel = ui->resourceTreeWidget->searchModel();
-    const auto rootIndex = [this]() { return ui->resourceTreeWidget->treeView()->rootIndex(); };
 
-    connect(searchModel, &QAbstractItemModel::rowsInserted, this,
-        [this, rootIndex, searchModel]()
-        {
-            if (searchModel->rowCount(rootIndex()) == 1)
-                handleInstantFilterUpdated();
-        });
-
-    connect(searchModel, &QAbstractItemModel::rowsRemoved, this,
-        [this, rootIndex, searchModel]()
-        {
-            if (searchModel->rowCount(rootIndex()) == 0)
-                handleInstantFilterUpdated();
-        });
-
-    connect(searchModel, &QAbstractItemModel::modelReset,
-        this, [this]() { handleInstantFilterUpdated(); });
+    const auto callHandleFilterUpdated = [this, searchModel]() { handleInstantFilterUpdated(); };
+    connect(searchModel, &QAbstractItemModel::rowsInserted, this, callHandleFilterUpdated);
+    connect(searchModel, &QAbstractItemModel::rowsRemoved, this, callHandleFilterUpdated);
+    connect(searchModel, &QAbstractItemModel::modelReset, this, callHandleFilterUpdated);
 
     updateSearchMode();
     handleInstantFilterUpdated();
@@ -569,11 +556,6 @@ void QnResourceBrowserWidget::updateInstantFilter()
     const auto newRootNode = searchModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
     const auto treeView = ui->resourceTreeWidget->treeView();
     treeView->setRootIndex(newRootNode);
-    treeView->setRootIsDecorated(hasParentNodes(newRootNode));
-    const auto indents = treeView->rootIsDecorated()
-        ? kStandardResourceTreeIndents
-        : kTaggedResourceTreeIndents;
-    treeView->setProperty(style::Properties::kSideIndentation, indents);
     if (filtering)
         treeView->expandAll();
 
@@ -586,7 +568,8 @@ void QnResourceBrowserWidget::updateInstantFilter()
 void QnResourceBrowserWidget::handleInstantFilterUpdated()
 {
     const auto searchModel = ui->resourceTreeWidget->searchModel();
-    const auto rootIndex = ui->resourceTreeWidget->treeView()->rootIndex();
+    const auto treeView = ui->resourceTreeWidget->treeView();
+    const auto rootIndex = treeView->rootIndex();
     const bool emptyResults = searchModel->rowCount(rootIndex) == 0;
     const bool noLocalFiles = commonModule()->remoteGUID().isNull()
         && searchModel->query().text.trimmed().isEmpty()
@@ -597,6 +580,12 @@ void QnResourceBrowserWidget::handleInstantFilterUpdated()
     static constexpr int kResourcesPage = 0;
     static constexpr int kNothingFoundPage = 1;
     ui->resourcesHolder->setCurrentIndex(emptyResults ? kNothingFoundPage : kResourcesPage);
+
+    treeView->setRootIsDecorated(hasParentNodes(treeView->rootIndex()));
+    const auto indents = treeView->rootIsDecorated()
+        ? kStandardResourceTreeIndents
+        : kTaggedResourceTreeIndents;
+    treeView->setProperty(style::Properties::kSideIndentation, indents);
 
     updateHintVisibilityByBasicState();
     updateHintVisibilityByFilterState();
