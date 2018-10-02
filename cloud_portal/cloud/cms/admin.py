@@ -72,7 +72,7 @@ class CMSAdmin(admin.ModelAdmin):
 
 
 class ProductTypeAdmin(CMSAdmin):
-    list_display = ('type', 'single_customization',)
+    list_display = ('type', 'can_preview', 'single_customization',)
 
 
 admin.site.register(ProductType, ProductTypeAdmin)
@@ -97,7 +97,7 @@ class ProductAdmin(CMSAdmin):
                 extra_context['current_versions'].append(approved_versions.latest('id'))
             else:
                 extra_context['current_versions'].append({'customization': customization.name,
-                                                          'id': None})
+                                                          'id': "No Current Version"})
 
         return super(ProductAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
@@ -240,7 +240,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     fieldsets = (
         (None, {
             "fields": (
-                'version', 'state', 'notes', 'reviewed_date', 'reviewed_by'
+                'notes',
             )
         }),
     )
@@ -249,8 +249,8 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context = extra_context or {}
         version = ProductCustomizationReview.objects.get(id=object_id).version
         extra_context['contexts'] = get_records_for_version(version)
-        extra_context['title'] = "Changes for {}".format(version.product.name)
-        if request.user == version.product.created_by:
+        extra_context['title'] = "Changes for {} - Version: {}".format(version.product.name, version.id)
+        if request.user == version.product.created_by or request.user.is_superuser:
             # extra_context['READONLY'] = True
             extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
             extra_context['customization_reviews'] = version.productcustomizationreview_set.all()

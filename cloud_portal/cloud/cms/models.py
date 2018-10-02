@@ -109,6 +109,7 @@ class ProductType(models.Model):
                             (1, "vms", "Vms"),
                             (2, "plugin", "Plugin"),
                             (3, "integration", "Integration"))
+    can_preview = models.BooleanField(default=False)
     single_customization = models.BooleanField(default=False)
     type = models.IntegerField(choices=PRODUCT_TYPES, default=PRODUCT_TYPES.cloud_portal)
 
@@ -130,7 +131,6 @@ class ProductType(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    can_preview = models.BooleanField(default=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s')
@@ -416,6 +416,9 @@ class ProductCustomizationReview(models.Model):
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
         related_name='accepted_%(class)s')
+
+    def __str__(self):
+        return self.version.product.__str__()
 
 
 class DataRecord(models.Model):

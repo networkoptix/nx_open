@@ -171,7 +171,7 @@ def process_files(file_iterator, product):
     log_errors = []
     structure = OrderedDict([('product', product.name),
                              ('type', ProductType.PRODUCT_TYPES[product.product_type.type]),
-                             ('canPreview', product.can_preview),
+                             ('can_preview', product.can_preview),
                              ('contexts', [])])
     find_context('root', '.', structure, product.name)
     for short_name, context_name, data in iterate_contexts(file_iterator):

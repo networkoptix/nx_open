@@ -91,7 +91,7 @@
         <a class="btn btn-sm btn-default" href="{% url 'download_file' context.file_path %}?lang={{language.code}}&draft"
            download>Download Draft</a>
         {% endif %}
-        {% if context.product.can_preview %}
+        {% if context.product.product_type.can_preview %}
         <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
         {% endif %}
         <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>

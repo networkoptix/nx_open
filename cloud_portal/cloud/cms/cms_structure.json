@@ -1,7 +1,7 @@
 [
   {
     "type": "cloud_portal",
-    "canPreview":true,
+    "can_preview":true,
     "single_customization": true,
     "contexts":[
       {
@@ -372,7 +372,8 @@
   },
   {
     "type": "integration",
-    "canPreview": false,
+    "can_preview": false,
+    "single_customization": false,
     "contexts": [
       {
         "name": "Integration Information",
@@ -380,8 +381,8 @@
         "values":[
           {
             "name": "Integration Name",
-            "value": "Insert Name!!",
-            "description": "Name of the integration",
+            "value": "",
+            "description": "",
             "type": "text"
           }
         ]

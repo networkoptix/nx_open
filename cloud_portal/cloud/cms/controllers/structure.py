@@ -5,32 +5,28 @@ import os
 import re
 
 from django.core.exceptions import ObjectDoesNotExist
-from cloud import settings
 from zipfile import ZipFile
-from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, ProductType
+from ..models import Context, ContextTemplate, DataStructure, DataRecord, Product, ProductType
 
 
-def find_or_add_product_type(product_type, single_customization=False):
+def find_or_add_product_type(product_type):
     try:
         product_type = ProductType.objects.get(type=product_type)
     except ObjectDoesNotExist:
         product_type = ProductType(type=product_type)
-
-    product_type.single_customization = single_customization
-    product_type.save()
+        product_type.save()
 
     return product_type
 
 
-def find_or_add_product(name, customization, can_preview, product_type_name='cloud_portal'):
+def find_or_add_product(name, customization, product_type_name='cloud_portal'):
     product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
     if Product.objects.filter(name=name, customizations__in=[customization], product_type=product_type).exists():
         product = Product.objects.get(name=name, customizations__in=[customization], product_type=product_type)
-        product.can_preview = can_preview
     else:
-        product = Product(name=name, can_preview=can_preview)
-    product.product_type = product_type
-    product.save()
+        product = Product(name=name)
+        product.product_type = product_type
+        product.save()
     return product
 
 
@@ -66,14 +62,25 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 
 def update_from_object(cms_structure):
-    for product in cms_structure:
-        # If product type cannot be found in the structure
-        product_type_name = product['type'] if 'type' in product else ProductType.PRODUCT_TYPES[0]
-        single_customization = product['single_customization'] if 'single_customization' in product else False
-        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name), single_customization)
+    for product_type_structure in cms_structure:
+        # If product_type_structure type cannot be found in the structure
+        product_type_name = ProductType.PRODUCT_TYPES[0]
+        can_preview = False
+        single_customization = False
+        if 'type' in product_type_structure:
+            product_type_name = product_type_structure['type']
+        if 'can_preview' in product_type_structure:
+            can_preview = product_type_structure['can_preview']
+        if 'single_customization' in product_type_structure:
+            single_customization = product_type_structure['single_customization']
+
+        product_type = find_or_add_product_type(ProductType.get_type_by_name(product_type_name))
+        product_type.can_preview = can_preview
+        product_type.single_customization = single_customization
+        product_type.save()
         order = 0
 
-        for context_data in product['contexts']:
+        for context_data in product_type_structure['contexts']:
             has_language = context_data["translatable"]
             is_global = context_data["is_global"] if "is_global" in context_data else False
             old_name = context_data["old_name"] if "old_name" in context_data else None
@@ -91,6 +98,7 @@ def update_from_object(cms_structure):
 
             for record in context_data["values"]:
                 if not isinstance(record, dict):
+                    name = None
                     old_name = None
                     description = None
                     record_type = "text"

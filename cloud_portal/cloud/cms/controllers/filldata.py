@@ -228,7 +228,7 @@ def fill_content(product,
     # else
     #   if version_id is None - preview latest available datarecords
     #   else - preview specific version
-    if not product.can_preview:
+    if not product.product_type.can_preview:
         return
 
     if preview:  # Here we decide, if we need to change preview state

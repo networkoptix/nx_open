@@ -2,14 +2,48 @@
 {% load i18n admin_urls static admin_modify %}
 {% load cms_filters %}
 {% block content %}
+    {% get_product_type original.version.product as product_type %}
+    {% with version=original.version product=original.version.product can_preview=product.product_type.can_preview%}
+    <form action="{% url 'version_action' version.id %}" method="post">
+        {% csrf_token %}
+        {% if version.state != 'old' and product_type == "Cloud Portal"%}
+            <div class="submit-row">
+                {% if perms.cms.force_update and version.state == 'current' and can_preview %}
+                    <button class="btn btn-sm btn-danger" type="submit" name="Force Update">Force Update</button>
+                {% endif %}
+                {% if version.state == 'current' and not can_preview and product.name %}
+                    <button class="btn btn-sm btn-default">
+                        <a href="{% url 'download_package' product.name %}?version_id={{ version.id }}" download>Download</a>
+                    </button>
+                {% endif %}
+                {% if can_preview %}
+                    <button class='btn btn-sm btn-info' onClick="openPreview(event)">Open Preview</button>
+                {% endif %}
+                {% if not original.accepted_date %}
+                    {% if can_preview %}
+                        <button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
+                    {% elif product.name %}
+                        <button class="btn btn-sm btn-default">
+                            <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}" download>Download</a>
+                        </button>
+                    {% endif %}
+                    {% if perms.cms.publish_version %}
+                        <button class="btn btn-sm btn-danger" type="submit" name="Publish">Publish</button>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </form>
+    {% endwith %}
     <div class="module custom-block">
+        {% if customizations_reviews %}
         <div style="margin-bottom: 20px;">
-            <h2>Review Status for each customization</h2>
+            <h2>Review Status {% if product_type != 'Cloud Portal' %}for each customization{% endif %}</h2>
             <div class="table-responsive">
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            <td><strong>Customization</strong></td>
+                            {% if product_type != 'Cloud Portal' %}<td><strong>Customization</strong></td>{% endif %}
                             <td><strong>Status</strong></td>
                             <td><strong>Last reviewed by</strong></td>
                             <td><strong>Last checked on</strong></td>
@@ -20,7 +54,7 @@
                     {% for review in customization_reviews %}
                         {% get_review_state review.state as state %}
                         <tr>
-                            <td> {{ review.customization }} </td>
+                            {% if product_type != 'Cloud Portal' %}<td> {{ review.customization }} </td>{% endif %}
                             <td> {{ state }} </td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
@@ -31,52 +65,59 @@
                 </table>
             </div>
         </div>
+        {% endif %}
         <div>
             <h2>Change list</h2>
+            <ul>
             {% for context_name, records in contexts.items %}
-            <div style="margin-bottom: 20px">
-                <div>{{ context_name }}</div>
-                <div class="table-responsive">
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr>
-                                <td><strong>Field</strong></td>
-                                <td><strong>Changed Value</strong></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {%  for record in records %}
-                            <tr>
-                                {% with data_structure=record.data_structure language=record.language %}
-                                    {% get_datastructure_type data_structure as data_structure_type %}
-                                    <td>{% if data_structure.label %}
-                                        {{ data_structure.label }}:
-                                    {% else %}
-                                        {{ data_structure.name }}
-                                    {% endif %}
+                <li>
+                    <div>
+                        {% with context_url=records.0.data_structure.context.url %}
+                            {{ context_name }}
+                            {% if context_url %}
+                                - <a href="{{ context_url }}" target="_blank">{{ context_url }}</a>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                    <ul>
+                    {% for record in records %}
+                        {% with data_structure=record.data_structure language=record.language %}
+                        <li>
+                            {% get_datastructure_type data_structure as data_structure_type %}
+                            {% if data_structure.label %}
+                                {{ data_structure.label }}:
+                            {% else %}
+                                {{ data_structure.name }}
+                            {% endif %}
 
-                                    {% if language %}
-                                        ({{ language.code }})
-                                    {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if data_structure_type == "Image" %}
-                                            <div><img class="preview-image review-preview" src="data:image/png;base64,{{ record }}"></div>
-                                        {% elif data_structure_type == "File" %}
-                                            <a href="{% url 'download_file' data_structure.name %}?version_id={{ version.id }}&lang={{ language.code }}&draft"
-                                               download>Download</a>
-                                        {% else %}
-                                            <div class="show-html" style="border: none">{{ record|safe }}</div>
-                                        {% endif %}
-                                    </td>
-                                {% endwith %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            {% if language %}
+                                ({{ language.code }})
+                            {% endif %}
+
+                            {% if data_structure_type == "Image" %}
+                                <div><img class="preview-image review-preview" src="data:image/png;base64,{{ record }}"></div>
+                            {% elif data_structure_type == "File" %}
+                                <a href="{% url 'download_file' data_structure.name %}?version_id={{ version.id }}&lang={{ language.code }}&draft"
+                                   download>Download</a>
+                            {% else %}
+                                <div class="show-html">{{ record|safe }}</div>
+                            {% endif %}
+                            {% if product_type == "Cloud Portal" %}
+                                <a
+                                {% if language %}
+                                    href="{% url 'page_editor' data_structure.context.id language.code %}"
+                                {% else %}
+                                    href="{% url 'page_editor' data_structure.context.id %}"
+                                {% endif %}
+                                    target="_blank">(edit)</a>
+                            {% endif %}
+                        </li>
+                        {% endwith %}
+                    {% endfor %}
+                    </ul>
+                </li>
             {% endfor %}
+            </ul>
         </div>
         <h2>Review</h2>
     </div>

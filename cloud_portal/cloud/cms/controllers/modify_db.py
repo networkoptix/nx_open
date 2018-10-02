@@ -216,8 +216,8 @@ def send_version_for_review(product, user):
 
     version = ContentVersion(product=product, created_by=user)
     version.save()
-    if product.product_type.type != ProductType.PRODUCT_TYPES.cloud_portal:
-        version.create_reviews()
+
+    version.create_reviews()
 
     update_records_to_version(product, Context.objects.filter(product_type=product.product_type), version)
 

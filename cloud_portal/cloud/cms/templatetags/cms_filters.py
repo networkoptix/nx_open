@@ -52,5 +52,11 @@ def get_datastructure_type(data_structure):
 
 
 @register.simple_tag
+def get_product_type(product):
+    if product:
+        return ProductType.PRODUCT_TYPES[product.product_type.type]
+    return product
+
+@register.simple_tag
 def get_review_state(state):
     return ProductCustomizationReview.REVIEW_STATES[state]

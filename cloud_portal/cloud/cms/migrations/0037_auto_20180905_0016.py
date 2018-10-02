@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             else:
                 product_name = "Nx Cloud"
                 print "\tCouldnt find product name for {} using {}".format(customization.name, product_name)
-            cloud = find_or_add_product(product_name, customization,  True)
+            cloud = find_or_add_product(product_name, customization)
             cloud.customizations = [customization.id]
             cloud.save()
             print "\t\t", cloud.customizations.all()
@@ -73,6 +73,7 @@ class Migration(migrations.Migration):
             name='ProductType',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('can_preview', models.BooleanField(default=False)),
                 ('single_customization', models.BooleanField(default=False)),
                 ('type', models.IntegerField(choices=[(0, 'Cloud Portal'), (1, 'Vms'), (2, 'Plugin'), (3, 'Integration')], default=0)),
             ],
@@ -110,6 +111,10 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='customization',
             name='preview_status',
+        ),
+        migrations.RemoveField(
+            model_name='product',
+            name='can_preview',
         ),
         migrations.AddField(
             model_name='product',
