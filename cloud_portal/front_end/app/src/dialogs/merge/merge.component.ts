@@ -35,7 +35,7 @@ export class MergeModalContent {
 
     // Add system can merge where added to systems form api call
     checkMergeAbility(system) {
-        if (system.stateOfHealth === 'offline') {
+        if (system.stateOfHealth === 'offline' || !system.isOnline) {
             return 'offline';
         }
         if (!system.canMerge) {
@@ -108,8 +108,8 @@ export class MergeModalContent {
             this.activeModal.close({
                 anotherSystemId: this.targetSystem.id,
                 role: this.masterId === this.system.id ?
-                    this.configService.systemStatuses.master :
-                    this.configService.systemStatuses.slave
+                    this.configService.config.systemStatuses.master :
+                    this.configService.config.systemStatuses.slave
             });
         });
     }
