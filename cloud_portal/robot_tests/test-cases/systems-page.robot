@@ -36,26 +36,31 @@ Restart
 
 *** Test Cases ***
 should show list of Systems
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${ACCOUNT DROPDOWN}    ${SYSTEMS TILE}
 
 has system name, owner and OpenInNx button visible on systems page
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS TITLE}    Auto Tests
 
 should show Open in NX client button for online system
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
 
 should not show Open in NX client button for offline system
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTOTESTS OFFLINE}
 
 should show system's state for systems if they are offline. Otherwise - button Open in Nx
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
@@ -88,6 +93,7 @@ should show the system page instead of all systems when user only has one
     Remove User Permissions    ${EMAIL NOPERM}
 
 should open system page (users list) when clicked on system
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
@@ -98,6 +104,7 @@ should open system page (users list) when clicked on system
     Verify In System    Auto Tests
 
 Should show your system for owner and owner name for non-owners
+    [tags]    C41893
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Wait Until Elements Are Visible    ${SYSTEMS SEARCH INPUT}    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
