@@ -128,10 +128,8 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
         this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
-        ui->forcedZoomCheckBox,
-        static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),
-        this,
-        &LegacyExpertSettingsWidget::at_dataChanged);
+        ui->forcedZoomCheckBox, &QCheckBox::toggled,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &LegacyExpertSettingsWidget::at_dataChanged);
