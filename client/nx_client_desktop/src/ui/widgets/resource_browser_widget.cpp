@@ -398,10 +398,12 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     const auto searchModel = ui->resourceTreeWidget->searchModel();
 
-    const auto callHandleFilterUpdated = [this, searchModel]() { handleInstantFilterUpdated(); };
-    connect(searchModel, &QAbstractItemModel::rowsInserted, this, callHandleFilterUpdated);
-    connect(searchModel, &QAbstractItemModel::rowsRemoved, this, callHandleFilterUpdated);
-    connect(searchModel, &QAbstractItemModel::modelReset, this, callHandleFilterUpdated);
+    connect(searchModel, &QAbstractItemModel::rowsInserted,
+        this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
+    connect(searchModel, &QAbstractItemModel::rowsRemoved,
+        this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
+    connect(searchModel, &QAbstractItemModel::modelReset,
+        this, &QnResourceBrowserWidget::handleInstantFilterUpdated);
 
     updateSearchMode();
     handleInstantFilterUpdated();
