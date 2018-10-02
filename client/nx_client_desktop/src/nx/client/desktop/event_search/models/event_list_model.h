@@ -46,7 +46,7 @@ public:
     };
 
 public:
-    explicit EventListModel(QObject* parent = nullptr);
+    explicit EventListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~EventListModel() override;
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

@@ -5,9 +5,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-EventSearchListModel::EventSearchListModel(QObject* parent):
-    base_type([this]() { return new Private(this); }, parent),
-    d(qobject_cast<Private*>(d_func()))
+EventSearchListModel::EventSearchListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, [this]() { return new Private(this); }, parent),
+    d(qobject_cast<Private*>(base_type::d.data()))
 {
     setLiveSupported(true);
     setLivePaused(true);

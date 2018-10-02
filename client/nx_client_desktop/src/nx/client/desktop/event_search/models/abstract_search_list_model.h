@@ -19,7 +19,7 @@ class AbstractSearchListModel: public AbstractEventListModel
     using base_type = AbstractEventListModel;
 
 public:
-    explicit AbstractSearchListModel(QObject* parent = nullptr);
+    explicit AbstractSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~AbstractSearchListModel() override;
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;

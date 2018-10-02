@@ -7,19 +7,16 @@
 
 namespace nx::client::desktop {
 
-AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(CreatePrivate dCreator, QObject* parent):
-    base_type(parent),
+AbstractAsyncSearchListModel::AbstractAsyncSearchListModel(
+    QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent)
+    :
+    base_type(context, parent),
     d(dCreator())
 {
 }
 
 AbstractAsyncSearchListModel::~AbstractAsyncSearchListModel()
 {
-}
-
-AbstractAsyncSearchListModel::Private* AbstractAsyncSearchListModel::d_func()
-{
-    return d.data();
 }
 
 bool AbstractAsyncSearchListModel::cancelFetch()

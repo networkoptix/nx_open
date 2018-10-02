@@ -52,10 +52,10 @@ EventPanel::Private::Private(EventPanel* q):
     m_eventsTab(new UnifiedSearchWidget(m_tabs)),
     m_analyticsTab(new UnifiedSearchWidget(m_tabs)),
     m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
-    m_eventsModel(new EventSearchListModel(this)),
-    m_motionModel(new MotionSearchListModel(this)),
-    m_bookmarksModel(new BookmarkSearchListModel(this)),
-    m_analyticsModel(new AnalyticsSearchListModel(this)),
+    m_eventsModel(new EventSearchListModel(q->context(), this)),
+    m_motionModel(new MotionSearchListModel(q->context(), this)),
+    m_bookmarksModel(new BookmarkSearchListModel(q->context(), this)),
+    m_analyticsModel(new AnalyticsSearchListModel(q->context(), this)),
     m_helper(new vms::event::StringsHelper(q->commonModule()))
 {
     auto layout = new QVBoxLayout(q);

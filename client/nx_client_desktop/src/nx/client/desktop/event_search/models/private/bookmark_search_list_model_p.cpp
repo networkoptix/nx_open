@@ -42,31 +42,27 @@ BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     q(q),
     m_updateBookmarks(new utils::PendingOperation(this))
 {
-    const auto updateBookmarksWatcher =
-        [this]()
-        {
-            if (auto watcher = this->q->context()->instance<QnTimelineBookmarksWatcher>())
-            {
-                const auto cameras = this->q->cameras();
-                const auto currentCamera = this->q->navigator()->currentResource()
-                    .dynamicCast<QnVirtualCameraResource>();
-                const bool relevant = cameras.empty() || cameras.contains(currentCamera);
-                watcher->setTextFilter(relevant ? m_filterText : QString());
-            }
-        };
-
-    connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, updateBookmarksWatcher);
-
     m_updateBookmarks->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_updateBookmarks->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
-    m_updateBookmarks->setCallback(updateBookmarksWatcher);
+    m_updateBookmarks->setCallback([this]() { updateBookmarksWatcher(); });
 
     watchBookmarkChanges();
 }
 
 BookmarkSearchListModel::Private::~Private()
 {
+}
+
+void BookmarkSearchListModel::Private::updateBookmarksWatcher()
+{
+    if (auto watcher = q->context()->instance<QnTimelineBookmarksWatcher>())
+    {
+        const auto cameras = q->cameras();
+        const auto currentCamera = q->navigator()->currentResource()
+            .dynamicCast<QnVirtualCameraResource>();
+        const bool relevant = cameras.empty() || cameras.contains(currentCamera);
+        watcher->setTextFilter(relevant ? m_filterText : QString());
+    }
 }
 
 int BookmarkSearchListModel::Private::count() const

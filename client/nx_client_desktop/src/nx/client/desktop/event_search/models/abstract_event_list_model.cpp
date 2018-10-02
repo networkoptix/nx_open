@@ -12,10 +12,11 @@
 
 namespace nx::client::desktop {
 
-AbstractEventListModel::AbstractEventListModel(QObject* parent):
+AbstractEventListModel::AbstractEventListModel(QnWorkbenchContext* context, QObject* parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(context)
 {
+    NX_CRITICAL(context, "Workbench context must be specified.");
 }
 
 QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const

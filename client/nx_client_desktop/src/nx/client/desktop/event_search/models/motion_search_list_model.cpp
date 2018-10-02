@@ -32,8 +32,8 @@ std::chrono::microseconds midTime(const QnTimePeriod& period, qreal fraction = k
 
 } // namespace
 
-MotionSearchListModel::MotionSearchListModel(QObject* parent):
-    base_type(parent),
+MotionSearchListModel::MotionSearchListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, parent),
     d(new Private(this))
 {
 }

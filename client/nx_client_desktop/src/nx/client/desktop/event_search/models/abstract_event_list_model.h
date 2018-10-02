@@ -19,7 +19,7 @@ class AbstractEventListModel:
     using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    explicit AbstractEventListModel(QObject* parent = nullptr);
+    explicit AbstractEventListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~AbstractEventListModel() override = default;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

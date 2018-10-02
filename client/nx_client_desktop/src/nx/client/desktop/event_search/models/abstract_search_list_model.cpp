@@ -13,8 +13,8 @@
 
 namespace nx::client::desktop {
 
-AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
-    base_type(parent),
+AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QObject* parent):
+    base_type(context, parent),
     m_cameraSet(new ManagedCameraSet(resourcePool(),
         [this](const QnVirtualCameraResourcePtr& camera)
         {

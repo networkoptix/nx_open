@@ -23,9 +23,11 @@ class AbstractAsyncSearchListModel: public AbstractSearchListModel
 protected:
     class Private;
     using CreatePrivate = std::function<Private*()>;
-    explicit AbstractAsyncSearchListModel(CreatePrivate dCreator, QObject* parent = nullptr);
-    Private* d_func();
 
+    const QScopedPointer<Private> d;
+
+    explicit AbstractAsyncSearchListModel(
+        QnWorkbenchContext* context, CreatePrivate dCreator, QObject* parent = nullptr);
 public:
     virtual ~AbstractAsyncSearchListModel() override;
 
@@ -41,9 +43,6 @@ protected:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
     virtual void clearData() override;
-
-private:
-    QScopedPointer<Private> d;
 };
 
 } // namespace nx::client::desktop

@@ -64,8 +64,9 @@ private:
 
 private:
     EventSearchListModel* const q = nullptr;
+    const QScopedPointer<vms::event::StringsHelper> m_helper;
+
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
-    mutable QScopedPointer<vms::event::StringsHelper> m_helper;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;

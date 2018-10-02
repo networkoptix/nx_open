@@ -21,7 +21,7 @@ class MotionSearchListModel: public AbstractSearchListModel
     using base_type = AbstractSearchListModel;
 
 public:
-    explicit MotionSearchListModel(QObject* parent = nullptr);
+    explicit MotionSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~MotionSearchListModel() override;
 
     QnVirtualCameraResourcePtr camera() const;

@@ -11,7 +11,7 @@ class EventSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit EventSearchListModel(QObject* parent = nullptr);
+    explicit EventSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~EventSearchListModel() override = default;
 
     vms::api::EventType selectedEventType() const;
@@ -21,7 +21,7 @@ public:
 
 private:
     class Private;
-    Private* const d = nullptr;
+    Private* const d;
 };
 
 } // namespace nx::client::desktop

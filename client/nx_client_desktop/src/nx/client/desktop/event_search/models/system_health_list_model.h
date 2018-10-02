@@ -14,7 +14,7 @@ class SystemHealthListModel: public AbstractEventListModel
     using base_type = AbstractEventListModel;
 
 public:
-    explicit SystemHealthListModel(QObject* parent = nullptr);
+    explicit SystemHealthListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~SystemHealthListModel() override;
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;

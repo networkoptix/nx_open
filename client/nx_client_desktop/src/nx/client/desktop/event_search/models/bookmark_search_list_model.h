@@ -10,7 +10,7 @@ class BookmarkSearchListModel: public AbstractAsyncSearchListModel
     using base_type = AbstractAsyncSearchListModel;
 
 public:
-    explicit BookmarkSearchListModel(QObject* parent = nullptr);
+    explicit BookmarkSearchListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~BookmarkSearchListModel() override = default;
 
     QString filterText() const;
@@ -20,7 +20,7 @@ public:
 
 private:
     class Private;
-    Private* const d = nullptr;
+    Private* const d;
 };
 
 } // namespace nx::client::desktop

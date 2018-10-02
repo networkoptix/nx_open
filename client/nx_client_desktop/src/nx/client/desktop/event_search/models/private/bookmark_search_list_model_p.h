@@ -37,6 +37,8 @@ public:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
 
+    void updateBookmarksWatcher();
+
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
