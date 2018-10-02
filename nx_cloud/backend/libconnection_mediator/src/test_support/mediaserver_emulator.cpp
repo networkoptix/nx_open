@@ -386,7 +386,6 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
         return;
 
     m_stunPipeline = std::make_unique<network::stun::MessagePipeline>(
-        this,
         std::move(m_udtStreamSocket));
     m_stunPipeline->bindToAioThread(getAioThread());
     m_udtStreamSocket.reset();
@@ -442,13 +441,6 @@ void MediaServerEmulator::onMessageReceived(
     {
         return;
     }
-}
-
-void MediaServerEmulator::closeConnection(
-    SystemError::ErrorCode /*closeReason*/,
-    stun::MessagePipeline* connection)
-{
-    NX_ASSERT(connection == m_stunPipeline.get());
 }
 
 void MediaServerEmulator::stopWhileInAioThread()

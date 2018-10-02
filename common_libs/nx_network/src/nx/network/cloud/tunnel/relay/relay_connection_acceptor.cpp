@@ -110,11 +110,9 @@ void ReverseConnection::stopWhileInAioThread()
     m_httpPipeline.reset();
 }
 
-void ReverseConnection::closeConnection(
-    SystemError::ErrorCode closeReason,
-    nx::network::http::AsyncMessagePipeline* connection)
+void ReverseConnection::onConnectionClosed(
+    SystemError::ErrorCode closeReason)
 {
-    NX_ASSERT(m_httpPipeline.get() == connection);
     m_httpPipeline.reset();
 
     if (m_onConnectionActivated)
@@ -143,7 +141,9 @@ void ReverseConnection::onConnectDone(
         }
 
         m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
-            this, std::move(streamSocket));
+            std::move(streamSocket));
+        m_httpPipeline->setOnConnectionClosed(
+            [this](auto... args) { onConnectionClosed(args...); });
         m_httpPipeline->setMessageHandler(
             std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
         m_beginListeningResponse = response;

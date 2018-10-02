@@ -204,6 +204,7 @@ public:
         if (thumbnailsDP)
             thumbnailsDP->removeDataProcessor(dataProcessor);
         archiveDP.clear();
+        archiveDpOpened = false;
         delete dataProcessor;
         dataProcessor = 0;
 
@@ -222,6 +223,7 @@ public:
     QnLiveStreamProviderPtr liveDpHi;
     QnLiveStreamProviderPtr liveDpLow;
     QSharedPointer<QnArchiveStreamReader> archiveDP;
+    bool archiveDpOpened = false;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
     PlaybackMode playbackMode;
     AuditHandle auditRecordHandle;
@@ -557,6 +559,11 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
     QByteArray range;
     if (d->archiveDP)
     {
+        if (!d->archiveDpOpened && !d->archiveDP->offlineRangeSupported())
+        {
+            d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+            d->archiveDpOpened = true;
+        }
         qint64 archiveEndTime = d->archiveDP->endTime();
         bool endTimeIsNow = d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)
@@ -595,9 +602,6 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
 void QnRtspConnectionProcessor::addResponseRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
-
-    if (d->archiveDP && !d->archiveDP->offlineRangeSupported())
-        d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
 
     QByteArray range = getRangeStr();
     if (!range.isEmpty())
@@ -1700,13 +1704,6 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return d->tcpMode;
-}
-
-QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
-{
-    Q_D(QnRtspConnectionProcessor);
-    QnMutexLocker lock(&d->archiveDpMutex);
-    return d->archiveDP;
 }
 
 QnMediaServerModule* QnRtspConnectionProcessor::serverModule() const

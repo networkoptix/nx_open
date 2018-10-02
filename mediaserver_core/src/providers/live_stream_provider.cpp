@@ -80,9 +80,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
         m_motionMaskBinData[i] =
             (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
         memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         m_motionEstimation[i].setChannelNum(i);
-#endif
     }
 
     m_role = Qn::CR_LiveVideo;
@@ -264,7 +262,6 @@ void QnLiveStreamProvider::onStreamResolutionChanged( int /*channelNumber*/, con
 
 void QnLiveStreamProvider::updateSoftwareMotion()
 {
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
         for (int i = 0; i < m_videoChannels; ++i)
@@ -273,7 +270,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
             m_motionEstimation[i].setMotionMask(region);
         }
     }
-#endif
+
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
 }
@@ -342,7 +339,6 @@ bool QnLiveStreamProvider::needMetadata()
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
     {
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (needAnalyzeMotion(getRole()))
         {
             for (int i = 0; i < m_videoChannels; ++i)
@@ -355,7 +351,6 @@ bool QnLiveStreamProvider::needMetadata()
                 }
             }
         }
-#endif
         return false;
     }
     else if (needHardwareMotion())
@@ -427,8 +422,6 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
         saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
 
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-
     NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
 
     bool needToAnalyzeMotion = false;
@@ -492,8 +485,6 @@ void QnLiveStreamProvider::onGotVideoFrame(
             uncompressedFrame ? "compressed and uncompressed" : "compressed");
         videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
-
-#endif // ENABLE_SOFTWARE_MOTION_DETECTION
 }
 
 void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audioData)
@@ -534,11 +525,9 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         return metadata;
     }
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
         return m_motionEstimation[m_softMotionLastChannel].getMotion();
     else
-#endif
         return getCameraMetadata();
 }
 

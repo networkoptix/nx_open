@@ -820,10 +820,11 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
         [&attribute](const QString& name, qreal defaultValue)
         {
             bool ok = false;
-            const QString valueStr = attribute(name);
+            QString valueStr = attribute(name);
             if (valueStr.isNull())
                 return defaultValue; //< Attribute is missing.
 
+            valueStr.replace(',', '.'); //< Protection against localized decimal point.
             const qreal value = valueStr.toDouble(&ok);
             if (ok)
                 return value;

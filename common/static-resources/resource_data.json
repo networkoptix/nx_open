@@ -1852,7 +1852,6 @@
                 "PelcoOptera|IMM12027",
                 "PelcoOptera|IMM12036"
             ],
-            "doNotConfigureCamera": false,
             "ignoreMultisensors": true
         },
         {
@@ -2101,7 +2100,7 @@
                     ]
                 }
             ],
-            "doNotConfigureCamera": false,
+            "configureAllStitchedSensors": true,
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=3;height=1;sensors=0,1,2"
@@ -2408,7 +2407,6 @@
                     ]
                 }
             ],
-            "doNotConfigureCamera": false,
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=2;height=2;sensors=0,1,2,3"
@@ -2455,7 +2453,6 @@
                     ]
                 }
             ],
-            "doNotConfigureCamera": false,
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=4;height=1;sensors=0,1,2,3"
