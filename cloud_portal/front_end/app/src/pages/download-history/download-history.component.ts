@@ -125,7 +125,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 this.section = this.routeParam;
             }
 
-            if (!this.configService.config.publicReleases) {
                 this.authorizationService
                     .requireLogin()
                     .then(result => {
@@ -134,22 +133,23 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                             return;
                         }
 
-                        this.account
-                            .get()
-                            .then(result => {
-                                this.canViewRelease = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
-                                if (this.canViewRelease) {
-                                    this.getData();
-                                } else {
-                                    this.document.location.href = this.configService.config.redirectUnauthorised;
-                                    return;
-                                }
-                            });
+                        if (!this.configService.config.publicReleases) {
+                            this.account
+                                .get()
+                                .then(result => {
+                                    this.canViewRelease = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                                    if (this.canViewRelease) {
+                                        this.getData();
+                                    } else {
+                                        this.document.location.href = this.configService.config.redirectUnauthorised;
+                                        return;
+                                    }
+                                });
+                        } else {
+                            this.canViewRelease = true;
+                            this.getData();
+                        }
                     });
-            } else {
-                this.canViewRelease = true;
-                this.getData();
-            }
         });
     }
 
