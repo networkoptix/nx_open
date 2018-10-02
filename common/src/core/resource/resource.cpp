@@ -688,7 +688,8 @@ void QnResource::reinitAsync()
     setStatus(Qn::Offline);
     QnMutexLocker lock(&m_initAsyncMutex);
     m_lastInitTime = getUsecTimer();
-    resourcePool()->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
+    if (const auto pool = resourcePool())
+        pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
 
 void QnResource::initAsync(bool optional)
@@ -706,10 +707,14 @@ void QnResource::initAsync(bool optional)
     if (hasFlags(Qn::foreigner))
         return; // removed to other server
 
+    auto resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return;
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional)
     {
-        if (resourcePool()->threadPool()->tryStart(task))
+        if (resourcePool->threadPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -717,7 +722,7 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        resourcePool()->threadPool()->start(task);
+        resourcePool->threadPool()->start(task);
     }
 }
 
