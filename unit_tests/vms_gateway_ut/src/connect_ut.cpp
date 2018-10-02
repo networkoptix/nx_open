@@ -70,13 +70,15 @@ public:
 
 TEST_F(VmsGatewayConnectTest, ConnectionClose)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
+        /*connectSupport*/ true));
 
-    utils::TestSyncQueue<bool> waitQueue{std::chrono::milliseconds(kTimeoutMsec)};
+    std::promise<void> connectionFinishedPromise;
+    auto connectionFinishedFuture = connectionFinishedPromise.get_future();
     server.setOnFinishedConnectionHandler(
-        [&waitQueue](network::test::TestConnection*)
+        [&connectionFinishedPromise](network::test::TestConnection*)
         {
-            waitQueue.push(true);
+            connectionFinishedPromise.set_value();
         });
 
     // Client closes connection.
@@ -84,7 +86,8 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
     connectProxySocket(server.addressBeingListened(), clientSocket);
 
     clientSocket->close();
-    waitQueue.pop();
+    ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kTimeoutMsec)),
+        std::future_status::ready);
     ASSERT_EQ(server.statistics().onlineConnections, 0);
 
     clientSocket.reset();
@@ -120,7 +123,8 @@ TEST_F(VmsGatewayConnectTest, IpSpecified)
 
 TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
+        /*connectSupport*/ true));
 
     std::unique_ptr<network::TCPSocket> clientSocketFirst;
     connectProxySocket(server.addressBeingListened(), clientSocketFirst);
@@ -143,7 +147,8 @@ TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 
 TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
+        /*connectSupport*/ true));
     std::unique_ptr<network::TCPSocket> clientSocket;
     connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable\r\n");
     server.pleaseStopSync();
@@ -151,7 +156,8 @@ TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
 
 TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, false));
+    ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
+        /*connectSupport*/ false));
     std::unique_ptr<network::TCPSocket> clientSocket;
     connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
     server.pleaseStopSync();
@@ -159,7 +165,8 @@ TEST_F(VmsGatewayConnectTest, ConnectNotSupported)
 
 TEST_F(VmsGatewayConnectTest, IpForbidden)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted(false, false, true));
+    ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ false, /*proxyTargetPort*/ false,
+        /*connectSupport*/ true));
     std::unique_ptr<network::TCPSocket> clientSocket;
     connectProxySocket(server.addressBeingListened(), clientSocket, "HTTP/1.1 403 Forbidden\r\n");
     server.pleaseStopSync();
