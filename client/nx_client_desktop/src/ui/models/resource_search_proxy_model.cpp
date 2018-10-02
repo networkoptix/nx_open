@@ -117,6 +117,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
         case NodeType::userResources:
         case NodeType::layouts:
         case NodeType::users:
+        case NodeType::otherSystems:
             if (searchMode)
                 return false;
             break;
