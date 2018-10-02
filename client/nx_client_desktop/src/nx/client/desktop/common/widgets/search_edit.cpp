@@ -3,6 +3,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFocusEvent>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QCompleter>
@@ -18,13 +19,32 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
+#include <nx/utils/app_info.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
+
+static const int kLineEditHeight = 32;
+static const int kTagHolderHeight = 40;
+static const int kLineHeight = 1;
+static const int kControlMaxHeight = kLineEditHeight + kTagHolderHeight + kLineHeight;
+
+/**
+ * We have to use double empersand to preserve it in the menu item.
+ * Since we use same string as the button and menu item text simultaneously we need to fix
+ * it for the button (for example) to get rid of double ampersand.
+ */
+QString fixAmpersand(QString value)
+{
+    value.replace(lit("&&"), lit("&"));
+    return value;
+}
 
 QPalette modifiedPalette(QPalette palette, const QColor& backgroundColor = Qt::transparent)
 {
     palette.setBrush(QPalette::Base, QBrush(backgroundColor));
     palette.setBrush(QPalette::Shadow, QBrush(backgroundColor));
+    palette.setBrush(QPalette::Button, QBrush(backgroundColor));
     return palette;
 }
 
@@ -32,47 +52,153 @@ void addLineTo(QLayout* layout)
 {
     const auto line = new QFrame();
     line->setFrameShape(QFrame::HLine);
-    line->setFixedHeight(1);
+    line->setFixedHeight(kLineHeight);
     layout->addWidget(line);
+}
+
+class ColoredLineEdit: public QLineEdit
+{
+    using base_type = QLineEdit;
+
+public:
+    ColoredLineEdit(QWidget* parent);
+
+    void setPlaceholderText(const QString& text);
+
+    QString placeholderText() const;
+
+    void setIndentOn(bool on);
+
+private:
+    QLabel* const m_label;
+};
+
+ColoredLineEdit::ColoredLineEdit(QWidget* parent):
+    base_type(parent),
+    m_label(new QLabel())
+{
+    const auto layout = new QHBoxLayout(this);
+    layout->addWidget(m_label);
+    setPaletteColor(m_label, QPalette::Text, QPalette().color(QPalette::WindowText));
+
+    const auto updatePlaceholderVisibility =
+        [this](const QString& text) { m_label->setVisible(text.isEmpty()); };
+    connect(this, &QLineEdit::textChanged, this, updatePlaceholderVisibility);
+    updatePlaceholderVisibility(text());
+
+    setIndentOn(false);
+}
+
+void ColoredLineEdit::setIndentOn(bool on)
+{
+    m_label->setIndent(on ? style::Metrics::kStandardPadding / 2 : 0);
+    auto margins = textMargins();
+    margins.setLeft(-style::Metrics::kStandardPadding / (on ? 2 : 1));
+    setTextMargins(margins);
+}
+
+void ColoredLineEdit::setPlaceholderText(const QString& text)
+{
+    m_label->setText(text);
+}
+
+QString ColoredLineEdit::placeholderText() const
+{
+    return m_label->text();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HoverablePushButton: public QPushButton
+{
+    using base_type = QPushButton;
+
+public:
+    using Callback = std::function<void (bool hovered)>;
+
+    HoverablePushButton(QWidget* widget, const Callback& hoverCallback);
+
+    void enterEvent(QEvent* event) override;
+    void leaveEvent(QEvent* event) override;
+
+private:
+    const Callback m_hoverCallback;
+};
+
+HoverablePushButton::HoverablePushButton(QWidget* widget, const Callback& hoverCallback)
+    :
+    base_type(widget),
+    m_hoverCallback(hoverCallback)
+{
+    setMouseTracking(true);
+    setAttribute(Qt::WA_Hover);
+    setAttribute(Qt::WA_NoMousePropagation);
+}
+
+void HoverablePushButton::enterEvent(QEvent* /*event*/)
+{
+    if (m_hoverCallback)
+        m_hoverCallback(true);
+}
+
+void HoverablePushButton::leaveEvent(QEvent* /*event*/)
+{
+    if (m_hoverCallback)
+        m_hoverCallback(false);
 }
 
 } //namespace
 
+#include <utils/common/delayed.h>
 namespace nx {
 namespace client {
 namespace desktop {
 
+struct SearchEdit::Private
+{
+    QWidget* const lineEditHolder;
+    ColoredLineEdit* const lineEdit = nullptr;
+    HoverablePushButton* const menuButton = nullptr;
+    QMenu* const menu = nullptr;
+    SelectableTextButton* const tagButton = nullptr;
+
+    QStringList tags;
+
+    bool focused = false;
+    bool hovered = false;
+    int selectedTagIndex = -1;
+    int clearingTagIndex = -1;
+};
+
 SearchEdit::SearchEdit(QWidget* parent):
     base_type(parent),
-    m_lineEditHolder(new QWidget(this)),
-    m_lineEdit(new QLineEdit(this)),
-    m_menuButton(new QPushButton(this)),
-    m_menu(new QMenu(this)),
-    m_tagButton(new SelectableTextButton(this))
+    d(new Private({new QWidget(this), new ColoredLineEdit(this),
+        new HoverablePushButton(this, [this](bool hovered){ setButtonHovered(hovered); }),
+        new QMenu(this), new SelectableTextButton(this)}))
 {
-    setFocusPolicy(m_lineEdit->focusPolicy());
-    setSizePolicy(m_lineEdit->sizePolicy());
-    setBackgroundRole(m_lineEdit->backgroundRole());
+    setFocusPolicy(d->lineEdit->focusPolicy());
+    setSizePolicy(d->lineEdit->sizePolicy());
+    setBackgroundRole(d->lineEdit->backgroundRole());
 
     setMouseTracking(true);
     setAcceptDrops(true);
     setAttribute(Qt::WA_InputMethodEnabled);
 
-    m_lineEdit->setFrame(false);
-    m_lineEdit->setFocusProxy(this);
-    m_lineEdit->setFixedHeight(32);
-    m_lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
-    m_lineEdit->setClearButtonEnabled(true);
+    d->lineEdit->setFrame(false);
+    d->lineEdit->setFixedHeight(kLineEditHeight);
+    d->lineEdit->setFocusProxy(this);
+    d->lineEdit->setAttribute(Qt::WA_MacShowFocusRect, false);
+    d->lineEdit->setClearButtonEnabled(true);
 
-    connect(m_lineEdit, &QLineEdit::returnPressed, this, &SearchEdit::editingFinished);
-    connect(m_lineEdit, &QLineEdit::editingFinished, this, &SearchEdit::editingFinished);
-    connect(m_lineEdit, &QLineEdit::textChanged, this, &SearchEdit::textChanged);
+    connect(d->lineEdit, &QLineEdit::returnPressed, this, &SearchEdit::editingFinished);
+    connect(d->lineEdit, &QLineEdit::editingFinished, this, &SearchEdit::editingFinished);
+    connect(d->lineEdit, &QLineEdit::textChanged, this, &SearchEdit::textChanged);
 
     const auto marginsLayout = new QVBoxLayout();
     marginsLayout->setContentsMargins(style::Metrics::kStandardPadding, 0,
         style::Metrics::kStandardPadding, 0);
-    marginsLayout->addWidget(m_tagButton);
-    marginsLayout->setAlignment(m_tagButton, Qt::AlignLeft | Qt::AlignVCenter);
+    marginsLayout->addWidget(d->tagButton);
+    marginsLayout->setAlignment(d->tagButton, Qt::AlignLeft | Qt::AlignVCenter);
 
     const auto holderLayout = new QVBoxLayout(this);
     holderLayout->setSpacing(0);
@@ -80,29 +206,29 @@ SearchEdit::SearchEdit(QWidget* parent):
     addLineTo(holderLayout);
 
     const auto tagHolderWidget = new QWidget(this);
-    tagHolderWidget->setFixedHeight(40);
+    tagHolderWidget->setFixedHeight(kTagHolderHeight);
     tagHolderWidget->setLayout(holderLayout);
 
-    m_tagButton->setFixedHeight(24);
-    m_tagButton->setDeactivatable(true);
-    m_tagButton->setSelectable(false);
-    m_tagButton->setState(SelectableTextButton::State::unselected);
-    connect(m_tagButton, &SelectableTextButton::stateChanged,
+    d->tagButton->setFixedHeight(24);
+    d->tagButton->setDeactivatable(true);
+    d->tagButton->setSelectable(false);
+    d->tagButton->setFocusPolicy(Qt::NoFocus);
+    d->tagButton->setState(SelectableTextButton::State::unselected);
+    connect(d->tagButton, &SelectableTextButton::stateChanged,
         this, &SearchEdit::handleTagButtonStateChanged);
     connect(this, &SearchEdit::selectedTagIndexChanged, this, &SearchEdit::updateTagButton);
 
-
     const auto searchLineLayout = new QHBoxLayout(this);
     searchLineLayout->setSpacing(0);
-    searchLineLayout->addWidget(m_menuButton);
-    searchLineLayout->addWidget(m_lineEdit);
+    searchLineLayout->addWidget(d->menuButton);
+    searchLineLayout->addWidget(d->lineEdit);
 
-    m_lineEditHolder->setLayout(searchLineLayout);
-    m_lineEditHolder->setAutoFillBackground(true);
+    d->lineEditHolder->setLayout(searchLineLayout);
+    d->lineEditHolder->setAutoFillBackground(true);
 
     const auto layout = new QVBoxLayout(this);
     layout->setSpacing(0);
-    layout->addWidget(m_lineEditHolder);
+    layout->addWidget(d->lineEditHolder);
     addLineTo(layout);
     layout->addWidget(tagHolderWidget);
     setLayout(layout);
@@ -116,34 +242,75 @@ SearchEdit::~SearchEdit()
 {
 }
 
+bool SearchEdit::focused() const
+{
+    return d->focused;
+}
+
+void SearchEdit::setFocused(bool value)
+{
+    if (d->focused == value)
+        return;
+
+    d->focused = value;
+    emit focusedChanged();
+}
+
+void SearchEdit::updateFocused()
+{
+    setFocused(
+        hasFocus()
+        || d->menu->hasFocus()
+        || d->menuButton->hasFocus()
+        || d->menu->isVisible());
+}
+
 void SearchEdit::setupMenuButton()
 {
-    m_menuButton->setFlat(true);
-    m_menuButton->setFixedSize(40, 32);
-    m_menuButton->setFocusPolicy(Qt::NoFocus);
-    m_menuButton->setIcon(qnSkin->icon("theme/search_drop.png"));
+    d->menuButton->setFlat(true);
+    d->menuButton->setFocusPolicy(Qt::NoFocus);
+    d->menuButton->setAutoFillBackground(true);
 
-    connect(m_menuButton, &QPushButton::clicked, this,
+    updateMenuButtonIcon();
+
+    connect(d->menu, &QMenu::aboutToHide, this, [this]() { d->lineEdit->setFocus(); });
+    connect(d->menuButton, &QPushButton::clicked, this,
         [this]()
         {
-            const auto buttonGeometry = m_menuButton->geometry();
-            const auto bottomPoint = QPoint(0, buttonGeometry.height());
-            const auto globalPoint = m_menuButton->mapToGlobal(bottomPoint);
-            QnHiDpiWorkarounds::showMenu(m_menu, globalPoint);
+            if (d->menu->actions().size())
+            {
+                const auto buttonGeometry = d->menuButton->geometry();
+                const auto bottomPoint = QPoint(0, buttonGeometry.height());
+                const auto globalPoint = d->menuButton->mapToGlobal(bottomPoint);
+                QnHiDpiWorkarounds::showMenu(d->menu, globalPoint);
+            }
+            else
+            {
+                d->lineEdit->setFocus();
+                emit selectedTagIndexChanged();
+            }
         });
 
-    connect(m_lineEdit, &QLineEdit::textChanged, this,
-        [this]()
-        {
-            m_menuButton->setIcon(m_lineEdit->text().isEmpty()
-                ? qnSkin->icon("theme/search_drop.png")
-                : qnSkin->icon("theme/search_drop_selected.png"));
-        });
+
+    connect(d->lineEdit, &QLineEdit::textChanged, this, &SearchEdit::updateMenuButtonIcon);
+}
+
+void SearchEdit::updateMenuButtonIcon()
+{
+    const auto kIcon = d->tags.isEmpty()
+        ? qnSkin->icon("tree/search.png")
+        : qnSkin->icon("tree/search_drop.png");
+    const auto kSelectedIcon = d->tags.isEmpty()
+        ? qnSkin->icon("tree/search_selected.png")
+        : qnSkin->icon("tree/search_drop_selected.png");
+
+    d->menuButton->setFixedSize(d->tags.isEmpty() ? QSize(32, 32) : QSize(40, 32));
+    d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);
 }
 
 QString SearchEdit::text() const
 {
-    return m_lineEdit->text();
+    return d->lineEdit->text();
 }
 
 void SearchEdit::setText(const QString& value)
@@ -151,7 +318,7 @@ void SearchEdit::setText(const QString& value)
     if (value == text())
         return;
 
-    m_lineEdit->setText(value);
+    d->lineEdit->setText(value);
     emit textChanged();
 }
 
@@ -162,35 +329,38 @@ void SearchEdit::clear()
 
 QString SearchEdit::placeholderText() const
 {
-    return m_lineEdit->placeholderText();
+    return d->lineEdit->placeholderText();
 }
 
 void SearchEdit::setPlaceholderText(const QString& value)
 {
-    m_lineEdit->setPlaceholderText(value);
+    d->lineEdit->setPlaceholderText(value);
 }
 
 QStringList SearchEdit::tagsList() const
 {
-    return m_tags;
+    return d->tags;
 }
 
 void SearchEdit::setTags(const QStringList& value)
 {
-    if (m_tags == value)
+
+    if (d->tags == value)
         return;
 
-    m_tags = value;
-
+    d->tags = value;
     setSelectedTagIndex(-1);
 
-    m_menu->clear();
-    for (int index = 0; index != m_tags.size(); ++ index)
+    d->menu->clear();
+    d->lineEdit->setIndentOn(!d->tags.isEmpty());
+    updateMenuButtonIcon();
+
+    for (int index = 0; index != d->tags.size(); ++ index)
     {
-        const auto tag = m_tags.at(index);
+        const auto tag = d->tags.at(index);
         const auto action = tag.isEmpty()
-            ? m_menu->addSeparator()
-            : m_menu->addAction(tag);
+            ? d->menu->addSeparator()
+            : d->menu->addAction(tag);
 
         connect(action, &QAction::triggered, this,
             [this, index]() { setSelectedTagIndex(index); });
@@ -199,116 +369,130 @@ void SearchEdit::setTags(const QStringList& value)
 
 void SearchEdit::handleTagButtonStateChanged()
 {
-    if (m_tagButton->state() == SelectableTextButton::State::deactivated)
+    if (d->tagButton->state() == SelectableTextButton::State::deactivated)
         setSelectedTagIndex(-1);
 }
 
 int SearchEdit::selectedTagIndex() const
 {
-    return m_selectedTagIndex;
+    return d->selectedTagIndex;
 }
 
 void SearchEdit::updatePalette()
 {
-    const auto backgroundColor = hasFocus()
-        ? colorTheme()->color("dark2")
-        : QColor(Qt::transparent);
+    const auto backgroundColor =
+        [this]() -> QColor
+        {
+            if (hasFocus())
+                return colorTheme()->color("dark2");
 
-    const auto controlPalette = modifiedPalette(m_lineEdit->palette(), backgroundColor);
-    m_lineEditHolder->setPalette(controlPalette);
-    m_lineEdit->setPalette(controlPalette);
+            return d->hovered
+                ? toTransparent(colorTheme()->color("dark9"), 0.2)
+                : QColor(Qt::transparent);
+        }();
+
+    const auto controlPalette = modifiedPalette(d->lineEdit->palette(), backgroundColor);
+    d->lineEditHolder->setPalette(controlPalette);
+    d->lineEdit->setPalette(controlPalette);
+    d->menuButton->setPalette(controlPalette);
 }
 
 void SearchEdit::setSelectedTagIndex(int value)
 {
-    if (value == m_clearingTagIndex)
-        value = -1; // Clears selected index.
-
-    if (value == m_selectedTagIndex)
+    if (value == d->selectedTagIndex)
         return;
 
-    m_selectedTagIndex = value;
+    d->selectedTagIndex = value;
     emit selectedTagIndexChanged();
 }
 
 void SearchEdit::updateTagButton()
 {
-    if (m_selectedTagIndex != -1)
+    if (d->selectedTagIndex != -1)
     {
-        m_tagButton->setText(m_tags.at(m_selectedTagIndex));
-        m_tagButton->setState(SelectableTextButton::State::unselected);
+        d->tagButton->setText(fixAmpersand(d->tags.at(d->selectedTagIndex)));
+        d->tagButton->setState(SelectableTextButton::State::unselected);
     }
 
-    m_tagButton->parentWidget()->setVisible(m_selectedTagIndex != -1);
+    const bool tagVisible = d->selectedTagIndex != -1;
+    setFixedHeight(tagVisible
+        ? kLineEditHeight + kTagHolderHeight + kLineHeight
+        : kLineEditHeight);
+    d->tagButton->parentWidget()->setVisible(tagVisible);
 }
 
 void SearchEdit::setClearingTagIndex(int index)
 {
-    m_clearingTagIndex = index;
+    d->clearingTagIndex = index;
 }
 
 int SearchEdit::clearingTagIndex() const
 {
-    return m_clearingTagIndex;
+    return d->clearingTagIndex;
 }
 
 QSize SearchEdit::sizeHint() const
 {
     const QnScopedTypedPropertyRollback<bool, QLineEdit>
-        frameRollback(m_lineEdit, &QLineEdit::setFrame, &QLineEdit::hasFrame, true);
+        frameRollback(d->lineEdit, &QLineEdit::setFrame, &QLineEdit::hasFrame, true);
 
-    const auto tagVerticalSize = m_selectedTagIndex == -1
+    const auto tagVerticalSize = d->selectedTagIndex == -1
         ? QSize()
-        : QSize(0, m_tagButton->parentWidget()->sizeHint().height());
+        : QSize(0, d->tagButton->parentWidget()->sizeHint().height());
 
-    const auto menuButtonHorizontalSize = QSize(m_menuButton->sizeHint().width(), 0);
-    const auto result = m_lineEdit->sizeHint() + menuButtonHorizontalSize + tagVerticalSize;
+    const auto menuButtonHorizontalSize = QSize(d->menuButton->sizeHint().width(), 0);
+    const auto result = d->lineEdit->sizeHint() + menuButtonHorizontalSize + tagVerticalSize;
     return result;
 }
 
 QVariant SearchEdit::inputMethodQuery(Qt::InputMethodQuery property) const
 {
-    return m_lineEdit->inputMethodQuery(property);
+    return d->lineEdit->inputMethodQuery(property);
 }
 
 void SearchEdit::resizeEvent(QResizeEvent *event)
 {
     base_type::resizeEvent(event);
-    m_lineEdit->setGeometry(rect());
+    d->lineEdit->setGeometry(rect());
 }
 
 void SearchEdit::focusInEvent(QFocusEvent* event)
 {
-    m_lineEdit->event(event);
-    m_lineEdit->selectAll();
-
-    base_type::focusInEvent(event);
+    d->lineEdit->event(event);
+    d->lineEdit->selectAll();
 
     updatePalette();
+    updateFocused();
+
+    base_type::focusInEvent(event);
 }
 
 void SearchEdit::focusOutEvent(QFocusEvent* event)
 {
-    m_lineEdit->event(event);
+    d->lineEdit->event(event);
 
-    if (const auto completer = m_lineEdit->completer())
+    if (const auto completer = d->lineEdit->completer())
     {
-        connect(completer, QnCompleterActivated, m_lineEdit, &QLineEdit::setText);
+        connect(completer, QnCompleterActivated, d->lineEdit, &QLineEdit::setText);
         connect(completer, SIGNAL(highlighted(QString)),
-            m_lineEdit, SLOT(_q_completionHighlighted));
+            d->lineEdit, SLOT(_q_completionHighlighted));
     }
 
-    base_type::focusOutEvent(event);
-
     updatePalette();
+    updateFocused();
+
+    base_type::focusOutEvent(event);
 }
 
 void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
-    m_lineEdit->event(event);
+    d->lineEdit->event(event);
     if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
     {
-        if (event->modifiers().testFlag(Qt::ControlModifier))
+        const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
+            ? Qt::MetaModifier
+            : Qt::ControlModifier;
+        if (event->modifiers().testFlag(ctrlModifier))
             emit ctrlEnterPressed();
         else
             emit enterPressed();
@@ -319,7 +503,39 @@ void SearchEdit::keyPressEvent(QKeyEvent* event)
 
 void SearchEdit::inputMethodEvent(QInputMethodEvent* event)
 {
-    m_lineEdit->event(event);
+    d->lineEdit->event(event);
+}
+
+void SearchEdit::enterEvent(QEvent* /*event*/)
+{
+    setHovered(true);
+}
+
+void SearchEdit::leaveEvent(QEvent* /*event*/)
+{
+    setHovered(false);
+}
+
+void SearchEdit::setHovered(bool value)
+{
+    if (d->hovered == value)
+        return;
+
+    d->hovered = value;
+    updatePalette();
+}
+
+void SearchEdit::setButtonHovered(bool value)
+{
+    if (value)
+    {
+        const auto color = toTransparent(colorTheme()->color("dark9"), 0.2);
+        d->menuButton->setPalette(modifiedPalette(d->menuButton->palette(), color));
+    }
+    else
+    {
+        updatePalette();
+    }
 }
 
 bool SearchEdit::event(QEvent* event)
@@ -328,7 +544,7 @@ bool SearchEdit::event(QEvent* event)
         return QWidget::event(event);
 
     const auto keyEvent = static_cast<QKeyEvent*>(event);
-    const bool result = m_lineEdit->event(event);
+    const bool result = d->lineEdit->event(event);
     if (keyEvent->key() == Qt::Key_Escape)
         keyEvent->accept();
 

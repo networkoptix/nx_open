@@ -65,7 +65,7 @@ public:
     virtual int mediaPort() const;
     void setMediaPort(int value);
 
-    virtual QStringList searchFilters() const override;
+    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
 
     void addNetworkStatus(NetworkStatus status);
     void removeNetworkStatus(NetworkStatus status);
