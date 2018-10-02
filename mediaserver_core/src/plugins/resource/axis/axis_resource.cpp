@@ -135,7 +135,8 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource():
+QnPlAxisResource::QnPlAxisResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
     m_outputIoMonitor(Qn::PT_Output),
@@ -209,14 +210,13 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnPlAxisResource::startInputPortStatesMonitoring()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        m_ioStates.clear();
+        m_ioPortStates.clear();
     }
     m_timer.post([this]() { startInputPortMonitoring(); });
-    return true;
 }
 
 void QnPlAxisResource::startInputPortMonitoring()
@@ -248,7 +248,7 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     QString requestQuery = lit("monitor=");
 
     QString portList;
-    for (const auto& port: getIOPorts())
+    for (const auto& port: ioPortDescriptions())
     {
         if (port.portType == ioMonitor.portType)
         {
@@ -282,7 +282,7 @@ bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
     return true;
 }
 
-void QnPlAxisResource::stopInputPortMonitoringAsync()
+void QnPlAxisResource::stopInputPortStatesMonitoring()
 {
     m_timer.post(
         [this]()
@@ -300,16 +300,11 @@ void QnPlAxisResource::stopInputPortMonitoringSync()
     m_timer.cancelSync();
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
-    for (const auto& state : ioStates())
+    for (const auto& state: ioPortStates())
     {
         if (state.isActive)
             updateIOState(state.id, false /*inactive*/, timeMs, true /*override*/);
     }
-}
-
-bool QnPlAxisResource::isInputPortMonitored() const
-{
-    return m_inputIoMonitor.httpClient != nullptr;
 }
 
 void QnPlAxisResource::clear()
@@ -788,8 +783,8 @@ int QnPlAxisResource::getChannelNumAxis() const
     return result;
 }
 
-//!Implementation of QnSecurityCamResource::setRelayOutputState
-bool QnPlAxisResource::setRelayOutputState(
+//!Implementation of QnSecurityCamResource::setOutputPortState
+bool QnPlAxisResource::setOutputPortState(
     const QString& outputID,
     bool activate,
     unsigned int autoResetTimeoutMS )
@@ -824,8 +819,8 @@ bool QnPlAxisResource::setRelayOutputState(
     CLHttpStatus status = httpClient.doGET( cmd );
     if (status / 100 != 2)
     {
-        NX_LOG( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
-            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
+            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)));
         return false;
     }
 
@@ -865,8 +860,8 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     }
     else
     {
-        NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
-            arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
+            arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
         if (status == CL_HTTP_AUTH_REQUIRED)
             setStatus(Qn::Unauthorized);
     }
@@ -893,8 +888,8 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     }
     else
     {
-        NX_LOG( lit("Failed to read params from path %1 of camera %2. Result: %3").
-            arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read params from path %1 of camera %2. Result: %3").
+            arg(rootPath).arg(getHostAddress()).arg(::toString(status)));
     }
     return status;
 }
@@ -991,8 +986,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpCl
 
     if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_LOG( lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
-            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        NX_WARNING(this, lit("Axis camera %1. Failed to subscribe to input port(s) monitoring. %2").
+            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return;
     }
 
@@ -1002,8 +997,8 @@ void QnPlAxisResource::onMonitorResponseReceived( nx::network::http::AsyncHttpCl
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
         //unexpected content type
-        NX_LOG( lit("Error monitoring input port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
-            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        NX_WARNING(this, lit("Error monitoring input port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+            arg(getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)));
         return;
     }
 }
@@ -1014,12 +1009,12 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx::network::http::Asyn
 
     if (httpClient->failed())
     {
-        NX_LOG( lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()), cl_logWARNING );
+        NX_WARNING (this, lit("Axis camera %1. Failed to read current IO state. No HTTP response").arg(getUrl()));
     }
     else if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_LOG( lit("Axis camera %1. Failed to read current IO state. %2").
-            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        NX_WARNING(this, lit("Axis camera %1. Failed to read current IO state. %2").
+            arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
     }
     else
     {
@@ -1089,8 +1084,8 @@ bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPor
     CLHttpStatus status = readAxisParameters( QLatin1String("root.IOPort"), http, params );
     if( status != CL_HTTP_SUCCESS )
     {
-        NX_LOG( lit("Failed to read number of input ports of camera %1. Result: %2").
-            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to read number of input ports of camera %1. Result: %2").
+            arg(getHostAddress()).arg(::toString(status)));
         return false;
     }
 
@@ -1241,7 +1236,7 @@ void QnPlAxisResource::readPortIdLIst()
         m_ioPortIdList << portId;
 }
 
-bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
+bool QnPlAxisResource::initializeIOPorts(CLSimpleHTTPClient* const http)
 {
     readPortIdLIst();
 
@@ -1249,29 +1244,16 @@ bool QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     if (!readPortSettings(http, cameraPorts))
         return ioPortErrorOccured();
 
-    QnIOPortDataList savedPorts = getIOPorts();
-    if (savedPorts.empty() && !cameraPorts.empty()) {
-        QnMutexLocker lock(&m_mutex);
+    if (setIoPortDescriptions(cameraPorts, /*needMerge*/ true))
+    {
+        m_ioPorts = ioPortDescriptions();
+        if (!savePortSettings(m_ioPorts, cameraPorts))
+            return ioPortErrorOccured();
+    }
+    else
+    {
         m_ioPorts = cameraPorts;
     }
-    else {
-        auto mergedData = mergeIOSettings(cameraPorts, savedPorts);
-        if (!savePortSettings(mergedData, cameraPorts))
-            return ioPortErrorOccured();
-        QnMutexLocker lock(&m_mutex);
-        m_ioPorts = mergedData;
-    }
-    if (m_ioPorts != savedPorts)
-        setIOPorts(m_ioPorts);
-
-    Qn::CameraCapabilities caps = Qn::NoCapabilities;
-    for (const auto& port: m_ioPorts) {
-        if (port.supportedPortTypes & Qn::PT_Input)
-            caps |= Qn::RelayInputCapability;
-        if (port.supportedPortTypes & Qn::PT_Output)
-            caps |= Qn::RelayOutputCapability;
-    }
-    setCameraCapabilities(getCameraCapabilities() | caps);
     return true;
 
     //TODO/IMPL periodically update port names in case some one changes it via camera's webpage
@@ -1283,7 +1265,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
     QnMutexLocker lock(&m_mutex);
     QnIOStateData newValue(portId, isActive, timestampMs);
     bool found = false;
-    for (auto& ioState: m_ioStates) {
+    for (auto& ioState: m_ioPortStates) {
         if (ioState.id == portId)
         {
             if (overrideIfExist && ioState != newValue)
@@ -1297,7 +1279,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
 
     if (!found)
     {
-        m_ioStates.push_back(newValue);
+        m_ioPortStates.push_back(newValue);
         if (!isActive)
             return;
     }
@@ -1307,7 +1289,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
         if (port.id == portId) {
             if (port.portType == Qn::PT_Input) {
                 lock.unlock();
-                emit cameraInput(
+                emit inputPortStateChanged(
                     toSharedPointer(),
                     portId,
                     isActive,
@@ -1315,7 +1297,7 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
             }
             else if (port.portType == Qn::PT_Output) {
                 lock.unlock();
-                emit cameraOutput(
+                emit outputPortStateChanged(
                     toSharedPointer(),
                     portId,
                     isActive,
@@ -1326,10 +1308,10 @@ void QnPlAxisResource::updateIOState(const QString& portId, bool isActive, qint6
     }
 }
 
-QnIOStateDataList QnPlAxisResource::ioStates() const
+QnIOStateDataList QnPlAxisResource::ioPortStates() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ioStates;
+    return m_ioPortStates;
 }
 
 void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBufferRefType& notification )
@@ -1337,33 +1319,33 @@ void QnPlAxisResource::notificationReceived( const nx::network::http::ConstBuffe
     //1I:H, 1I:L, 1I:/, "1I:\"
     if (notification.isEmpty())
         return;
-    NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
 
     //notification
     size_t sepPos = nx::utils::find_first_of( notification, ":" );
     if (sepPos == nx::utils::BufferNpos || sepPos+1 >= notification.size())
     {
-        NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_INFO (this, lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
         return;
     }
     const char eventType = notification[sepPos+1];
     size_t portTypePos = nx::utils::find_first_not_of( notification, "0123456789" );
     if (portTypePos == nx::utils::BufferNpos)
     {
-        NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_INFO (this, lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()));
         return;
     }
 
     QString portDisplayName = QString::fromLatin1(notification.mid(0, sepPos));
     int portIndex = portDisplayNameToIndex(portDisplayName);
     if (portIndex == -1) {
-        NX_LOG( lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Error parsing Axis notification message %1. Camera: %2").arg(QString::fromLatin1(notification)).arg(getUrl()));
         return;
     }
     QString portId = portIndexToId(portIndex);
     const char portType = notification[portTypePos];
-    NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
-        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
+    NX_DEBUG(this, lit("%1 port %2 changed its state to %3. Camera %4").
+        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portId).arg(QLatin1String(eventType == '/' || eventType == 'H' ? "active" : "inactive")).arg(getUrl()));
 
     if (eventType != '/' && eventType != '\\' /*&& eventType != 'H' && eventType != 'L'*/)
         return; // skip unknown event
@@ -1418,7 +1400,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     QString requestQuery = lit("checkactive=");
 
     QString portList;
-    for (const auto& port: getIOPorts()) {
+    for (const auto& port: ioPortDescriptions()) {
         if (port.portType != Qn::PT_Disabled) {
             if (!portList.isEmpty())
                 portList += lit(",");
@@ -1465,7 +1447,7 @@ void QnPlAxisResource::updateIOSettings()
             QnMutexLocker lock(&m_mutex);
             m_ioPorts = newValue;
         }
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
+        startInputPortStatesMonitoring();
     }
     else
         setStatus(Qn::Offline); // reinit
@@ -1614,12 +1596,11 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
         else
         {
             isSuccessful = false;
-            NX_LOG(lit("Failed to execute params query. Query: %1, device: %2 (%3), status: %4")
+            NX_VERBOSE(this, lit("Failed to execute params query. Query: %1, device: %2 (%3), status: %4")
                 .arg(query)
                 .arg(getModel())
                 .arg(getHostAddress())
-                .arg(::toString(statusCode)),
-                cl_logDEBUG2);
+                .arg(::toString(statusCode)));
         }
     }
     return result;

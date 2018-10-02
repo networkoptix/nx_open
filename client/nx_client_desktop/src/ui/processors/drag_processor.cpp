@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QApplication>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
@@ -12,7 +13,6 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/math/fuzzy.h>
 
 #include "drag_process_handler.h"
@@ -404,7 +404,7 @@ void DragProcessor::drag(QEvent *event, const QPoint &screenPos, const QPointF &
     }
 
     if(m_handler != NULL) {
-        QN_SCOPED_VALUE_ROLLBACK(&m_handling, true)
+        QScopedValueRollback<bool> guard(m_handling, true);
         do {
             m_rehandle = false;
             m_handler->dragMove(&m_info);

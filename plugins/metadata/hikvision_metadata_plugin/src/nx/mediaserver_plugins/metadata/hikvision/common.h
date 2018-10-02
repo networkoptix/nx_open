@@ -20,7 +20,7 @@ namespace plugins {
 struct Hikvision
 {
 public:
-    struct EventDescriptor: public nx::api::Analytics::EventType
+    struct EventTypeDescriptor: public nx::api::Analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
@@ -30,25 +30,27 @@ public:
         QString regionDescription;
         QString dependedEvent;
     };
-    #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)\
-        (internalMonitoringName)\
-        (description)\
-        (positiveState)\
-        (negativeState)\
-        (regionDescription)\
+    #define EventTypeDescriptor_Fields AnalyticsEventType_Fields (internalName) \
+        (internalMonitoringName) \
+        (description) \
+        (positiveState) \
+        (negativeState) \
+        (regionDescription) \
         (dependedEvent)
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
     {
-        QList<EventDescriptor> outputEventTypes;
+        QList<EventTypeDescriptor> outputEventTypes;
 
-        QnUuid eventTypeByInternalName(const QString& internalEventName) const;
-        const Hikvision::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
-        const Hikvision::EventDescriptor eventDescriptorByInternalName(const QString& internalName) const;
+        QString eventTypeByInternalName(const QString& internalEventName) const;
+        const Hikvision::EventTypeDescriptor& eventTypeDescriptorById(const QString& id) const;
+        Hikvision::EventTypeDescriptor eventTypeDescriptorByInternalName(
+            const QString& internalName) const;
+
     private:
         static QnMutex m_cachedIdMutex;
-        static QMap<QString, QnUuid> m_idByInternalName;
-        static QMap<QnUuid, EventDescriptor> m_recordById;
+        static QMap<QString, QString> m_eventTypeIdByInternalName;
+        static QMap<QString, EventTypeDescriptor> m_eventTypeDescriptorById;
 
     };
     #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
@@ -57,7 +59,7 @@ public:
 struct HikvisionEvent
 {
     QDateTime dateTime;
-    QnUuid typeId;
+    QString typeId;
     QString caption;
     QString description;
     boost::optional<int> channel;
@@ -69,7 +71,7 @@ struct HikvisionEvent
 using HikvisionEventList = std::vector<HikvisionEvent>;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Hikvision::EventDescriptor)
+    (Hikvision::EventTypeDescriptor)
     (Hikvision::DriverManifest),
     (json)
 )

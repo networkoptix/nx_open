@@ -24,8 +24,6 @@
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
@@ -108,7 +106,7 @@ void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
 
     ensureAnimationAllowed(&animate);
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
+    QScopedValueRollback<bool> guard(m_ignoreClickEvent, true);
     action(action::ToggleTitleBarAction)->setChecked(opened);
 
     m_yAnimator->stop();

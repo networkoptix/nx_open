@@ -16,8 +16,9 @@ public:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
     /**
-     * Accept a video frame. Either one of the supplied pointers may be null if the respective
-     * frame kind was not requested by acceptedFrameKind().
+     * Accept a video frame.
+     * @param compressedFrame Not null.
+     * @param uncompressedFrame Can be null if uncompressed frame will not be needed.
      */
     using Callback = std::function<void(
         const QnConstCompressedVideoDataPtr& compressedFrame,
@@ -44,8 +45,9 @@ public:
     }
 
     /**
-     * Call the callback for a video frame. Either one of the supplied pointers may be null if the
-     * respective frame kind is not in acceptedFrameKinds().
+     * Call the callback for a video frame.
+     * @param compressedFrame Not null.
+     * @param uncompressedFrame Can be null if uncompressed frame will not be needed.
      */
     void putFrame(
         const QnConstCompressedVideoDataPtr& compressedFrame,

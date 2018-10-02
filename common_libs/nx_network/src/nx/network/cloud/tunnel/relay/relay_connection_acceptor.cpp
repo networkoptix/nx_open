@@ -158,8 +158,8 @@ void ReverseConnection::relayNotificationReceived(
     api::OpenTunnelNotification openTunnelNotification;
     if (!openTunnelNotification.parse(message))
     {
-        NX_LOGX(lm("Could not parse received notification. \r\n%1")
-            .arg(message), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not parse received notification. \r\n%1")
+            .arg(message));
         m_httpPipeline.reset();
         return; //< Just ignoring.
     }

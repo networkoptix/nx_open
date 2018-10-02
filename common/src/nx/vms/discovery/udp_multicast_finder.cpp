@@ -45,7 +45,7 @@ void UdpMulticastFinder::multicastInformation(
     m_updateTimer.post(
         [this, information = QJson::serialized(information)]() mutable
         {
-            NX_LOGX(lm("Set module information: %1").arg(information), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Set module information: %1").arg(information));
             m_ownModuleInformation = std::move(information);
             for (auto it = m_senders.begin(); it != m_senders.end(); ++it)
                 sendModuleInformation(it);
@@ -57,7 +57,7 @@ void UdpMulticastFinder::listen(ModuleHandler handler)
     m_updateTimer.post(
         [this, handler = std::move(handler)]() mutable
         {
-            NX_LOGX("Listening handler", cl_logDEBUG1);
+            NX_DEBUG(this, "Listening handler");
             m_moduleHandler = std::move(handler); //< Module handler will be called during recv.
         });
 }
@@ -69,27 +69,39 @@ void UdpMulticastFinder::stopWhileInAioThread()
     m_receiver.reset();
 }
 
-void UdpMulticastFinder::updateInterfaces()
+void UdpMulticastFinder::createReceiver()
 {
-    std::set<nx::network::HostAddress> localIpList;
-    for (const auto& ip: nx::network::getLocalIpV4AddressList())
-        localIpList.insert(ip);
+    NX_DEBUG(this, "Creating receiver on %1:%2",
+        nx::network::HostAddress::anyHost, m_multicastEndpoint.port);
+    m_receiver = makeSocket({nx::network::HostAddress::anyHost, m_multicastEndpoint.port});
+    for (const auto& [ip, sock]: m_senders)
+        joinMulticastGroup(ip);
 
-    NX_LOGX(lm("Update interfaces to %1").container(localIpList), cl_logDEBUG1);
+    receiveModuleInformation();
+}
+
+void UdpMulticastFinder::removeObsoleteSenders()
+{
+    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalIpV4HostAddressList();
+
     for (auto it = m_senders.begin(); it != m_senders.end(); )
     {
         if (localIpList.find(it->first) == localIpList.end())
         {
             it->second->cancelIOSync(network::aio::etNone);
             it = m_senders.erase(it);
+            NX_DEBUG(this, "Deleted obsolete sender: %1", it->first);
         }
         else
         {
             ++it;
         }
     }
+}
 
-    for (const auto& ip: localIpList)
+void UdpMulticastFinder::addNewSenders()
+{
+    for (const auto& ip: nx::network::getLocalIpV4HostAddressList())
     {
         const auto insert = m_senders.emplace(ip, std::unique_ptr<network::UDPSocket>());
         if (insert.second)
@@ -104,23 +116,30 @@ void UdpMulticastFinder::updateInterfaces()
             else
             {
                 //< Will be fixed in next updateInterfaces().
-                insert.first->second->cancelIOSync(network::aio::etNone);
                 m_senders.erase(insert.first);
             }
         }
     }
+}
 
+void UdpMulticastFinder::updateInterfacesInAioThread()
+{
+    std::set<nx::network::HostAddress> localIpList = nx::network::getLocalIpV4HostAddressList();
     if (!m_receiver)
-    {
-        m_receiver = makeSocket({nx::network::HostAddress::anyHost, m_multicastEndpoint.port});
-        for (const auto& ip: localIpList)
-            joinMulticastGroup(ip);
+        createReceiver();
 
-        receiveModuleInformation();
-    }
+    NX_DEBUG(this, lm("Update interfaces to %1").container(localIpList));
+    removeObsoleteSenders();
+    addNewSenders();
 
-    NX_LOGX(lm("Schedule update interfaces in %1").arg(m_updateInterfacesInterval), cl_logDEBUG2);
-    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfaces(); });
+    NX_VERBOSE(this, lm("Schedule update interfaces in %1").arg(m_updateInterfacesInterval));
+    m_updateTimer.start(m_updateInterfacesInterval, [this](){ updateInterfacesInAioThread(); });
+}
+
+void UdpMulticastFinder::updateInterfaces()
+{
+    // Make sure everything is called inside bound thread.
+    m_updateTimer.dispatch([this]() { updateInterfacesInAioThread(); });
 }
 
 void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
@@ -140,12 +159,12 @@ std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const nx::net
     if (socket->setNonBlockingMode(true)
         && socket->setReuseAddrFlag(true) && socket->bind(endpoint))
     {
-        NX_LOGX(lm("New socket %1").arg(socket->getLocalAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("New socket %1").arg(socket->getLocalAddress()));
         return socket;
     }
 
-    NX_LOGX(lm("Failed to create socket %1: %2").args(
-        endpoint, SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Failed to create socket %1: %2").args(
+        endpoint, SystemError::getLastOSErrorText()));
 
     return nullptr;
 }
@@ -157,13 +176,13 @@ void UdpMulticastFinder::joinMulticastGroup(const nx::network::HostAddress& ip)
 
     if (m_receiver->joinGroup(m_multicastEndpoint.address.toString(), ip.toString()))
     {
-        NX_LOGX(lm("Joined group %1 on %2").args(m_multicastEndpoint.address, ip), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Joined group %1 on %2").args(m_multicastEndpoint.address, ip));
         return; //< Ok.
     }
 
     m_receiver.reset();
-    NX_LOGX(lm("Could not join socket %1 to multicast group: %2").args(
-        ip, SystemError::getLastOSErrorText()), cl_logDEBUG1);
+    NX_DEBUG(this, "Could not join socket %1 to multicast group: %2",
+        ip, SystemError::getLastOSErrorText());
 }
 
 void UdpMulticastFinder::receiveModuleInformation()
@@ -177,19 +196,18 @@ void UdpMulticastFinder::receiveModuleInformation()
         {
             if (code != SystemError::noError)
             {
-                NX_LOGX(lm("Failed to read reciever: %2").args(
-                    SystemError::toString(code)), cl_logWARNING);
+                NX_WARNING(this, lm("Failed to read reciever: %2").args(
+                    SystemError::toString(code)));
 
                 m_receiver.reset();
                 return;
             }
 
-            NX_LOGX(lm("From %1 got: %2").args(endpoint, m_inData), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("From %1 got: %2").args(endpoint, m_inData));
             nx::vms::api::ModuleInformationWithAddresses moduleInformation;
             if (!QJson::deserialize(m_inData, &moduleInformation))
             {
-                NX_LOGX(lm("From %1 unable to deserialize: %2").args(endpoint, m_inData),
-                    cl_logWARNING);
+                NX_WARNING(this, lm("From %1 unable to deserialize: %2").args(endpoint, m_inData));
             }
             else
             {
@@ -207,31 +225,38 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
     socket->cancelIOSync(network::aio::etNone);
     if (m_isMulticastEnabledFunction && !m_isMulticastEnabledFunction())
     {
-        NX_LOGX(lm("Multicasts are disabled by function"), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Multicasts are disabled by function"));
         return socket->registerTimer(m_sendInterval,
             [this, senderIterator](){ sendModuleInformation(senderIterator); });
     }
 
-    socket->sendToAsync(m_ownModuleInformation, m_multicastEndpoint,
-        [this, senderIterator, socket](SystemError::ErrorCode code, nx::network::SocketAddress, size_t)
+    // Work-around to support dynamic port allocation for testing purposes.
+    auto multicastEndpoint = m_multicastEndpoint;
+    if (multicastEndpoint.port == 0) {
+        NX_ASSERT(m_receiver);
+        multicastEndpoint.port = m_receiver->getLocalAddress().port;
+    }
+
+    socket->sendToAsync(m_ownModuleInformation, multicastEndpoint,
+        [this, senderIterator, socket](
+            SystemError::ErrorCode code, nx::network::SocketAddress destination, size_t)
         {
             if (code == SystemError::noError)
             {
-                NX_LOGX(lm("Successfully sent from %1 to %2").args(
-                    socket->getLocalAddress(), m_multicastEndpoint), cl_logDEBUG2);
+                NX_VERBOSE(this, lm("Successfully sent from %1 to %2").args(
+                    socket->getLocalAddress(), destination));
 
                 socket->registerTimer(m_sendInterval,
                     [this, senderIterator](){ sendModuleInformation(senderIterator); });
             }
             else
             {
-                NX_LOGX(lm("Failed to send from %1 to %2: %3").args(
-                    socket->getLocalAddress(), m_multicastEndpoint, SystemError::toString(code)),
-                    cl_logWARNING);
+                NX_WARNING(this, lm("Failed to send from %1 to %2: %3").args(
+                    socket->getLocalAddress(), destination, SystemError::toString(code)));
 
                 m_senders.erase(senderIterator);
             }
-        });
+    });
 }
 
 } // namespace discovery

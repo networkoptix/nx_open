@@ -13,6 +13,7 @@
 #include "server_edge_stream_recorder.h"
 
 #include <nx/utils/std/cpp14.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -111,7 +112,7 @@ QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate(
 void WearableArchiveSynchronizationTask::createArchiveReader(qint64 startTimeMs, qint64* durationMs)
 {
     QString temporaryFilePath = QString::number(nx::utils::random::number());
-    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(commonModule()));
+    QnExtIODeviceStorageResourcePtr storage(new QnExtIODeviceStorageResource(serverModule()->commonModule()));
     // Storage takes ownership on file data.
     storage->registerResourceData(temporaryFilePath, m_file.data());
     storage->setIsIoDeviceOwner(false);
@@ -161,6 +162,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
 
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        serverModule(),
         m_resource,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());

@@ -46,8 +46,6 @@ function(set_distribution_names)
         "${prefix}-client_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
-    set(paxton_distribution_name
-        "${prefix}-paxton-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(paxton_plugin_distribution_name
         "${prefix}-paxton_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(cdb_distribution_name
@@ -74,6 +72,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(metadata_sdk_distribution_name
         "${prefix}-metadata_sdk-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+    set(ssc_metadata_plugin_distribution_name
+        "${prefix}-ssc_metadata_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name
         "${prefix}" PARENT_SCOPE)
 endfunction()

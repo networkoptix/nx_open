@@ -57,7 +57,7 @@ protected:
 
 private:
     const AddressEntry m_targetPeerAddress;
-    const nx::String m_connectSessionId;
+    const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
     SocketAddress m_mediatorUdpEndpoint;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;

@@ -17,6 +17,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <nx/client/desktop/system_health/system_internet_access_watcher.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/connection_types.h>
 #include <utils/common/synctime.h>
@@ -30,6 +31,7 @@
 #endif
 
 using namespace nx;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -181,10 +183,11 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled,
         this, onSyncWithInternetCheckboxToggled);
 
-    connect(m_model, &QnTimeServerSelectionModel::hasInternetAccessChanged,
+    connect(commonModule()->instance<SystemInternetAccessWatcher>(),
+        &SystemInternetAccessWatcher::internetAccessChanged,
         this, &QnTimeServerSelectionWidget::updateAlert);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::timeSynchronizationSettingsChanged, this,
+    connect(globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged, this,
         &QnTimeServerSelectionWidget::loadDataToUi);
 
     onSyncWithInternetCheckboxToggled(ui->syncWithInternetCheckBox->isChecked());
@@ -197,8 +200,8 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
 void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
-    m_model->setSelectedServer(qnGlobalSettings->primaryTimeServer());
-    ui->syncWithInternetCheckBox->setChecked(qnGlobalSettings->isSynchronizingTimeWithInternet());
+    m_model->setSelectedServer(globalSettings()->primaryTimeServer());
+    ui->syncWithInternetCheckBox->setChecked(globalSettings()->isSynchronizingTimeWithInternet());
     updateTime();
 }
 
@@ -226,12 +229,12 @@ void QnTimeServerSelectionWidget::applyChanges()
 bool QnTimeServerSelectionWidget::hasChanges() const
 {
     const bool syncWithInternet = ui->syncWithInternetCheckBox->isChecked();
-    if (qnGlobalSettings->isSynchronizingTimeWithInternet() != syncWithInternet)
+    if (globalSettings()->isSynchronizingTimeWithInternet() != syncWithInternet)
         return true;
 
     return syncWithInternet
         ? false
-        : m_model->selectedServer() != qnGlobalSettings->primaryTimeServer();
+        : m_model->selectedServer() != globalSettings()->primaryTimeServer();
 }
 
 void QnTimeServerSelectionWidget::updateTime()
@@ -266,7 +269,10 @@ void QnTimeServerSelectionWidget::updateDescription()
 
 void QnTimeServerSelectionWidget::updateAlert()
 {
-    ui->alertBar->setText(ui->syncWithInternetCheckBox->isChecked() && !m_model->hasInternetAccess()
+    const bool showAlert = ui->syncWithInternetCheckBox->isChecked()
+        && !commonModule()->instance<SystemInternetAccessWatcher>()->systemHasInternetAccess();
+
+    ui->alertBar->setText(showAlert
         ? tr("No server has Internet access. Time is not being synchronized.")
         : QString());
 }

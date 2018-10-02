@@ -20,6 +20,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
@@ -823,20 +824,21 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     qreal opacity = 0.0;
     bool interactive = false;
     bool instant = false;
+    auto options = widget->options();
     if (widget == display()->widget(Qn::ZoomedRole))
     {
         /* Leave invisible. */
     }
-    else if (widget->options() & QnResourceWidget::DisplayDewarped)
+    else if (options & QnResourceWidget::DisplayDewarped)
     {
         /* Leave invisible. */
         instant = true;
     }
-    else if (widget->options() & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
+    else if (options & (QnResourceWidget::DisplayMotion | QnResourceWidget::DisplayMotionSensitivity))
     {
         /* Leave invisible. */
     }
-    else if (widget->options() & QnResourceWidget::DisplayCrosshair)
+    else if (options & QnResourceWidget::DisplayCrosshair)
     {
         /* PTZ mode - transparent, non-interactive. */
         opacity = 0.3;
@@ -844,7 +846,9 @@ void ZoomWindowInstrument::updateOverlayMode(QnMediaResourceWidget* widget)
     else
     {
         opacity = 1.0;
-        interactive = true;
+        // Locking interaction for the locked layouts.
+        QnWorkbenchLayout* layout = widget->item()->layout();
+        interactive = layout ? !layout->locked() : true;
     }
 
     if (instant)

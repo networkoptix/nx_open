@@ -1,4 +1,5 @@
 import calendar
+from functools import wraps
 import itertools
 import logging
 import socket
@@ -153,3 +154,14 @@ def get_internet_time(address='time.rfc868server.com', port=37):
     remote_as_posix_timestamp = remote_as_rfc868_timestamp - posix_to_rfc868_diff.total_seconds()
     remote_as_datetime = datetime.fromtimestamp(remote_as_posix_timestamp, utc)
     return RunningTime(remote_as_datetime, request_duration)
+
+
+def with_traceback(fn):
+    @wraps(fn)  # critical for VMFactory.map to work
+    def wrapper(*args, **kw):
+        try:
+            return fn(*args, **kw)
+        except Exception:
+            _logger.exception('Exception in %r:', fn)
+            raise
+    return wrapper

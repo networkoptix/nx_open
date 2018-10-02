@@ -15,7 +15,6 @@
 
 #include <nx/cloud/relaying/http_view/begin_listening_http_handler.h>
 
-#include "create_get_post_tunnel_handler.h"
 #include "http_handlers.h"
 #include "options_request_handler.h"
 #include "proxy_handler.h"
@@ -55,10 +54,10 @@ View::View(
     m_settings(settings),
     m_model(model),
     m_controller(controller),
-    m_getPostServerTunnelProcessor(
-        m_settings,
+    m_listeningPeerConnectionTunnelingServer(
+        &controller->listeningPeerManager(),
         &model->listeningPeerPool()),
-    m_getPostClientTunnelProcessor(m_settings),
+    m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
     m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
@@ -119,10 +118,6 @@ const View::MultiHttpServer& View::httpServer() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<relaying::BeginListeningHandler>(
-        nx::network::http::Method::post,
-        &m_controller->listeningPeerManager());
-
     registerApiHandler<view::CreateClientSessionHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
@@ -131,14 +126,13 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerApiHandler<view::CreateGetPostServerTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_getPostServerTunnelProcessor);
+    m_listeningPeerConnectionTunnelingServer.registerHandlers(
+        api::kServerTunnelBasePath,
+        &m_httpMessageDispatcher);
 
-    registerApiHandler<view::CreateGetPostClientTunnelHandler>(
-        nx::network::http::Method::get,
-        &m_controller->connectSessionManager(),
-        &m_getPostClientTunnelProcessor);
+    m_clientConnectionTunnelingServer.registerHandlers(
+        api::kClientTunnelBasePath,
+        &m_httpMessageDispatcher);
 
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
@@ -149,21 +143,6 @@ void View::registerApiHandlers()
         registerApiHandler<view::OptionsRequestHandler>(
             nx::network::http::Method::options);
     }
-
-    // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
-    // Keep until 3.2 release just in case.
-    registerCompatibilityHandlers();
-}
-
-void View::registerCompatibilityHandlers()
-{
-    registerApiHandler<relaying::BeginListeningHandler>(
-        nx::network::http::Method::options,
-        &m_controller->listeningPeerManager());
-
-    registerApiHandler<view::ConnectToListeningPeerWithHttpUpgradeHandler>(
-        nx::network::http::Method::options,
-        &m_controller->connectSessionManager());
 }
 
 template<typename Handler, typename ... Args>
@@ -172,7 +151,7 @@ void View::registerApiHandler(
     Args ... args)
 {
     registerApiHandler<Handler, Args...>(
-        Handler::kPath, method, std::move(args)...);
+        Handler::kPath, method, args...);
 }
 
 template<typename Handler, typename ... Args>
@@ -222,7 +201,7 @@ void View::startAcceptor()
     const auto& httpsEndpoints = m_settings.https().endpoints;
     if (httpEndpoints.empty() && httpsEndpoints.empty())
     {
-        NX_LOGX("No HTTP address to listen", cl_logALWAYS);
+        NX_ALWAYS(this, "No HTTP address to listen");
         throw std::runtime_error("No HTTP address to listen");
     }
 

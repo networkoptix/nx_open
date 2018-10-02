@@ -26,7 +26,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/synctime.h>
-#include <utils/common/scoped_value_rollback.h>
 
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/client/desktop/common/delegates/customizable_item_delegate.h>
@@ -177,7 +176,7 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
     , qint64 utcFinishTimeMs)
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingParametersNow, true);
+        QScopedValueRollback<bool> guard(m_updatingParametersNow, true);
 
         resetToAllAvailableCameras();
         m_ui->filterLineEdit->lineEdit()->setText(filterText);
@@ -299,7 +298,7 @@ void QnSearchBookmarksDialogPrivate::cancelUpdateOperation()
 void QnSearchBookmarksDialogPrivate::refresh()
 {
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingParametersNow, true);
+        QScopedValueRollback<bool> guard(m_updatingParametersNow, true);
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
         m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }

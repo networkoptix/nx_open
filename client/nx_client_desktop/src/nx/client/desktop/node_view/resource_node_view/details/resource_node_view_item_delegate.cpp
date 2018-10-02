@@ -91,7 +91,7 @@ void ResourceNodeViewItemDelegate::paintItemText(
 {
     auto option = styleOption;
     const auto style = option.widget ? option.widget->style() : QApplication::style();
-    auto baseColor = invalidNode(index) ? invalidColor : mainColor;
+    auto baseColor = isValidNode(index) ? mainColor : invalidColor;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
         baseColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());

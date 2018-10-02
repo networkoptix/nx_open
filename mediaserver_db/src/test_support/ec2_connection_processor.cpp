@@ -103,7 +103,7 @@ void Ec2ConnectionProcessor::run()
 
             if (!authenticate())
             {
-                sendUnauthorizedResponse(nx::network::http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx::network::http::StatusCode::unauthorized);
                 ready = readRequest();
                 ++authenticateTries;
                 continue;
@@ -150,7 +150,7 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     {
         auto nxUserName =
             nx::network::http::getHeaderValue(d->request.headers, Qn::CUSTOM_USERNAME_HEADER_NAME);
-        const bool isSystemRequest = !QnUuid(nxUserName).isNull();
+        const bool isSystemRequest = !QnUuid::fromStringSafe(nxUserName).isNull();
         if (isSystemRequest)
             d->accessRights = Qn::kSystemAccess;
         else

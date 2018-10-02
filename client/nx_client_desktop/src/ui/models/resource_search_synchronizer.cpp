@@ -8,7 +8,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/delete_later.h>
 
 QnResourceSearchSynchronizer::QnResourceSearchSynchronizer(QObject* parent):

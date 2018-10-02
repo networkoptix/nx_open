@@ -49,5 +49,12 @@ private:
     AVFormatContext* m_inputFormatContext;
 };
 
+inline const char* ffmpegErrorText(const int error)
+{
+    static char error_buffer[255];
+    av_strerror(error, error_buffer, sizeof(error_buffer));
+    return error_buffer;
+}
+
 } // namespace transcoding
 } // namespace nx

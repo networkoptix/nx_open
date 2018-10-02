@@ -1,5 +1,4 @@
-#ifndef __VMAX480_TCP_SERVER_H__
-#define __VMAX480_TCP_SERVER_H__
+#pragma once
 
 #ifdef ENABLE_VMAX
 
@@ -14,10 +13,10 @@ class VMaxStreamFetcher;
 class QnVMax480ConnectionProcessor;
 class QnVMax480ConnectionProcessorPrivate;
 
-class QnVMax480Server: public QnTcpListener, public Singleton<QnVMax480Server>
+class QnVMax480Server: public QnTcpListener
 {
 public:
-    QnVMax480Server();
+    QnVMax480Server(QObject* parent = nullptr);
     virtual ~QnVMax480Server();
 
     bool waitForConnection(const QString& tcpID, int timeoutMs);
@@ -58,4 +57,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_VMAX
-#endif // __VMAX480_TCP_SERVER_H__

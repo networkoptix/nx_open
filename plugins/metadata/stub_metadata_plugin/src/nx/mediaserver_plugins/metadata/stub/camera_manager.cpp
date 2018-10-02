@@ -32,11 +32,11 @@ std::string CameraManager::capabilitiesManifest()
     return R"json(
         {
             "supportedEventTypes": [
-                ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
-                ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json("
+                ")json" + kLineCrossingEventType + R"json(",
+                ")json" + kObjectInTheAreaEventType + R"json("
             ],
             "supportedObjectTypes": [
-                ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
+                ")json" + kCarObjectType + R"json("
             ],
             "settings": {
                 "params": [
@@ -123,11 +123,11 @@ bool CameraManager::pullMetadataPackets(std::vector<MetadataPacket*>* metadataPa
     return true;
 }
 
-Error CameraManager::startFetchingMetadata(nxpl::NX_GUID* /*typeList*/, int /*typeListSize*/)
+Error CameraManager::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
 
-    m_eventTypeId = kLineCrossingEventGuid; //< First event to produce.
+    m_eventTypeId = kLineCrossingEventType; //< First event to produce.
 
     auto metadataDigger =
         [this]()
@@ -181,10 +181,10 @@ MetadataPacket* CameraManager::cookSomeEvents()
     ++m_counter;
     if (m_counter > 1)
     {
-        if (m_eventTypeId == kLineCrossingEventGuid)
-            m_eventTypeId = kObjectInTheAreaEventGuid;
+        if (m_eventTypeId == kLineCrossingEventType)
+            m_eventTypeId = kObjectInTheAreaEventType;
         else
-            m_eventTypeId = kLineCrossingEventGuid;
+            m_eventTypeId = kLineCrossingEventType;
 
         m_counter = 0;
     }
@@ -202,14 +202,7 @@ MetadataPacket* CameraManager::cookSomeEvents()
     eventPacket->addItem(commonEvent);
 
     NX_OUTPUT << "Firing event: "
-        << "type: " << (
-            (m_eventTypeId == kLineCrossingEventGuid)
-            ? "LineCrossing"
-            : (m_eventTypeId == kObjectInTheAreaEventGuid)
-                ? "ObjectInTheArea"
-                : "Unknown"
-        )
-        << ", isActive: " << ((m_counter == 1) ? "true" : "false");
+        << "type: " << m_eventTypeId << ", isActive: " << ((m_counter == 1) ? "true" : "false");
 
     return eventPacket;
 }
@@ -225,7 +218,7 @@ MetadataPacket* CameraManager::cookSomeObjects()
     auto commonObject = new CommonObject();
 
     commonObject->setAuxilaryData(R"json({ "auxilaryData": "someJson2" })json");
-    commonObject->setTypeId(kCarObjectGuid);
+    commonObject->setTypeId(kCarObjectType);
 
     // To be binary modified to be unique for each object.
     nxpl::NX_GUID objectId =
@@ -303,9 +296,11 @@ bool CameraManager::checkFrame(const UncompressedVideoFrame* frame) const
 
     for (int plane = 0; plane < frame->planeCount(); ++plane)
     {
-        const int bytesPerPlane =
-            (frame->height() / pixelFormatDescriptor->chromaHeightFactor) * frame->lineSize(plane)
-            * (plane == 0 ? 1 : (pixelFormatDescriptor->lumaBitsPerPixel / 8));
+        const int bytesPerPlane = (plane == 0)
+            ? (frame->height() * frame->lineSize(plane))
+            : ((frame->height() / pixelFormatDescriptor->chromaHeightFactor)
+                * frame->lineSize(plane));
+
         if (frame->dataSize(plane) != bytesPerPlane)
         {
             NX_PRINT << __func__ << "() ERROR: dataSize(/*plane*/ " << plane << ") is "

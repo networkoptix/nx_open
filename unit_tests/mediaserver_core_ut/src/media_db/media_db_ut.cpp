@@ -939,12 +939,12 @@ TEST_F(MediaDbTest, StorageDB)
     const QString workDirPath = *workDirResource.getDirName();
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
 
-    QnStorageDb sdb(storage, 1);
+    QnStorageDb sdb(&serverModule(), storage, 1);
     result = sdb.open(workDirPath + lit("/test.nxdb"));
     ASSERT_TRUE(result);
 
@@ -1063,8 +1063,6 @@ TEST_F(MediaDbTest, StorageDB)
     }
 
     ASSERT_EQ(allVisited, true);
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
 }
 
 TEST_F(MediaDbTest, Migration_from_sqlite)
@@ -1094,9 +1092,11 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
     {
-        auto catalog = DeviceFileCatalogPtr(new DeviceFileCatalog(QString::number(i),
-                                                                  i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
-                                                                  QnServer::StoragePool::Normal));
+        auto catalog = DeviceFileCatalogPtr(new DeviceFileCatalog(
+            &serverModule(),
+            QString::number(i),
+            i % 2 ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog,
+            QnServer::StoragePool::Normal));
         std::deque<DeviceFileCatalog::Chunk> chunks;
         for (size_t j = 0; j < kMaxChunks; ++j)
             chunks.push_back(DeviceFileCatalog::Chunk((j + 10) * j + 10, 0, DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION, 1, 0, 1, 1));
@@ -1130,7 +1130,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule().commonModule()));
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(&serverModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -1140,7 +1140,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
     sqlDb.reset();
     QSqlDatabase::removeDatabase(connectionName);
 
-    auto sdb = qnStorageDbPool->getSDB(storage);
+    auto sdb = serverModule().storageDbPool()->getSDB(storage);
     ASSERT_TRUE(result);
     sdb->loadFullFileCatalog();
 
@@ -1154,7 +1154,7 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         }
     }
 
-    qnNormalStorageMan->migrateSqliteDatabase(storage);
+    serverModule().normalStorageManager()->migrateSqliteDatabase(storage);
     auto mergedCatalogs = sdb->loadFullFileCatalog();
 
     for (size_t i = 0; i < kMaxCatalogs; ++i)
@@ -1169,8 +1169,5 @@ TEST_F(MediaDbTest, Migration_from_sqlite)
         ASSERT_TRUE(left == right);
 
     }
-
-    qnNormalStorageMan->stopAsyncTasks();
-    qnBackupStorageMan->stopAsyncTasks();
 }
 

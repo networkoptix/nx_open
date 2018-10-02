@@ -36,7 +36,7 @@ public:
 
     static const int MAX_STREAMS = 2;
 
-    QnActiResource();
+    QnActiResource(QnMediaServerModule* serverModule);
     ~QnActiResource();
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
@@ -66,19 +66,12 @@ public:
 
     bool isAudioSupported() const;
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
-    /*!
-        Actual request is performed asynchronously. This method only posts task to the queue
-    */
-    virtual bool setRelayOutputState(
+    /** Actual request is performed asynchronously. This method only posts task to the queue*/
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
-    //!Implementation of TimerEventHandler::onTimer
+
     virtual void onTimer( const quint64& timerID );
 
     static CLHttpStatus makeActiRequest(
@@ -110,12 +103,8 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
-    virtual void stopInputPortMonitoringAsync() override;
-    //!Implementation of QnSecurityCamResource::isInputPortMonitored
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     struct CameraAdvancedParamQueryInfo

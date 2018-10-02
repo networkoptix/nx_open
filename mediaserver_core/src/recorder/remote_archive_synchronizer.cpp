@@ -17,6 +17,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -29,29 +30,27 @@ RemoteArchiveSynchronizer::RemoteArchiveSynchronizer(QnMediaServerModule* server
     m_tasks(std::make_unique<RemoteArchiveSynchronizer::TaskMap>()),
     m_workerPool(std::make_unique<RemoteArchiveWorkerPool>())
 {
-    if (!qnGlobalSettings->isEdgeRecordingEnabled())
+    if (!serverModule->globalSettings()->isEdgeRecordingEnabled())
         return;
 
-    NX_LOGX(lit("Creating remote archive synchronizer."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Creating remote archive synchronizer."));
 
     const auto threadCount = maxSynchronizationThreads();
-    NX_LOGX(
-        lit("Setting maximum number of archive synchronization threads to %1")
-        .arg(threadCount),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lit("Setting maximum number of archive synchronization threads to %1")
+        .arg(threadCount));
 
     m_workerPool->setMaxTaskCount(threadCount);
     m_workerPool->setTaskMapAccessor([this](){ return m_tasks.get(); });
     m_workerPool->start();
 
     connect(
-        commonModule()->resourcePool(),
+        serverModule->resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
         &RemoteArchiveSynchronizer::at_resourceAdded);
 
     connect(
-        commonModule()->resourcePool(),
+        serverModule->resourcePool(),
         &QnResourcePool::resourceRemoved,
         this,
         &RemoteArchiveSynchronizer::at_resourceRemoved);
@@ -168,7 +167,7 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
 
 int RemoteArchiveSynchronizer::maxSynchronizationThreads() const
 {
-    auto maxThreads = qnGlobalSettings->maxRemoteArchiveSynchronizationThreads();
+    auto maxThreads = serverModule()->globalSettings()->maxRemoteArchiveSynchronizationThreads();
     if (maxThreads > 0)
         return maxThreads;
 

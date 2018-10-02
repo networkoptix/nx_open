@@ -10,15 +10,9 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
-LilinResource::LilinResource():
-    QnPlOnvifResource()
+LilinResource::LilinResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
-
-}
-
-LilinResource::~LilinResource()
-{
-
 }
 
 CameraDiagnostics::Result LilinResource::initializeCameraDriver()

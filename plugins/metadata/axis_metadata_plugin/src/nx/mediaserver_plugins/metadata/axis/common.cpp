@@ -38,35 +38,24 @@ QString ignoreNamespaces(const QString& tags)
     return shortParts.join('/');
 }
 
-QnUuid guidFromEventName(const char* eventFullName)
-{
-    // TODO: Use guidFromArbitraryData here after moving QnUuid functions from common to common_libs
-    const QString kTrimmedEventFullName = ignoreNamespaces(QString(eventFullName));
-
-    QCryptographicHash md5Hash(QCryptographicHash::Md5);
-    md5Hash.addData(kTrimmedEventFullName.toUtf8());
-    QByteArray hashResult = md5Hash.result();
-    return QnUuid::fromRfc4122(hashResult);
-}
-
 } // namespace
 
-AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEvent& supportedEvent)
+AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEventType& supportedEventType)
 {
-    typeId = guidFromEventName(supportedEvent.fullName().c_str());
-    name.value = supportedEvent.description.c_str();
+    const QString eventTypeId = QString::fromLatin1(supportedEventType.fullName().c_str());
+    name.value = supportedEventType.description.c_str();
     if (name.value.simplified().isEmpty())
     {
-        name.value = supportedEvent.fullName().c_str();
+        name.value = supportedEventType.fullName().c_str();
         name.value = ignoreNamespaces(name.value);
     }
-    flags = (supportedEvent.stateful)
+    flags = (supportedEventType.stateful)
         ? nx::api::Analytics::EventTypeFlag::stateDependent
         : nx::api::Analytics::EventTypeFlag::noFlags;
 
-    topic = supportedEvent.topic.c_str();
-    caption = supportedEvent.name.c_str();
-    eventTypeIdExternal = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(typeId);
+    topic = supportedEventType.topic.c_str();
+    caption = supportedEventType.name.c_str();
+    eventTypeIdExternal = eventTypeId;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),

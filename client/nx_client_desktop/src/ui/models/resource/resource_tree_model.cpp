@@ -55,7 +55,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/client/desktop/utils/mime_data.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;

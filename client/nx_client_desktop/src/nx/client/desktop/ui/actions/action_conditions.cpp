@@ -1247,8 +1247,11 @@ ActionVisibility PtzCondition::check(const Parameters& parameters, QnWorkbenchCo
 ActionVisibility PtzCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
     foreach(const QnResourcePtr &resource, resources)
-        if (!check(qnPtzPool->controller(resource)))
+    {
+        auto ptzPool = resource->commonModule()->findInstance<QnPtzControllerPool>();
+        if (!check(ptzPool->controller(resource)))
             return InvisibleAction;
+    }
 
     if (m_disableIfPtzDialogVisible && QnPtzManageDialog::instance() && QnPtzManageDialog::instance()->isVisible())
         return DisabledAction;

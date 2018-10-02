@@ -33,6 +33,7 @@ bool isMessageVisibleInSettings(MessageType message)
     switch (message)
     {
         case CloudPromo:
+        case DefaultCameraPasswords:
 
         // TODO: remove these in VMS-7724
         case RemoteArchiveSyncFinished:
@@ -50,12 +51,14 @@ bool isMessageLocked(MessageType message)
     switch (message)
     {
         case CloudPromo:
+        case DefaultCameraPasswords:
         case EmailIsEmpty:
         case NoLicenses:
         case SmtpIsNotSet:
         case UsersEmailIsEmpty:
         case SystemIsReadOnly:
         case StoragesNotConfigured:
+        case NoInternetForTimeSync:
             return true;
         default:
             return false;

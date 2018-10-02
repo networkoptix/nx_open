@@ -56,9 +56,9 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
     // TODO: advanced params control is not implemented for this driver yet
 
     int channels = 1;
-    auto res = getResource().dynamicCast<QnPlAreconVisionResource>();
-    NX_ASSERT(res);
-    if (auto layout = res->getVideoLayout())
+    const auto resource = getResource().dynamicCast<QnPlAreconVisionResource>();
+    NX_CRITICAL(resource);
+    if (auto layout = resource->getVideoLayout())
         channels = layout->channelCount();
 
     const auto maxResolution = getMaxSensorSize();
@@ -84,7 +84,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
         requestStr += lit("&MIC=on");
 
     const QString url = lit("rtsp://%1:%2/%3").arg(m_camera->getHostAddress()).arg(
-        nx_rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
+        nx::network::rtsp::DEFAULT_RTSP_PORT).arg(requestStr);
 
     m_rtpStreamParser.setRequest(url);
 	m_camera->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());

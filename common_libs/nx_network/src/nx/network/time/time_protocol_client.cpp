@@ -66,9 +66,8 @@ void TimeProtocolClient::getTimeAsync(
 void TimeProtocolClient::getTimeAsyncInAioThread(
     CompletionHandler completionHandler)
 {
-    NX_LOGX(lm("rfc868 time_sync. Starting time synchronization with %1:%2")
-        .arg(m_timeServerEndpoint).arg(kTimeProtocolDefaultPort),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("rfc868 time_sync. Starting time synchronization with %1:%2")
+        .arg(m_timeServerEndpoint).arg(kTimeProtocolDefaultPort));
 
     m_completionHandler = std::move(completionHandler);
 
@@ -92,10 +91,9 @@ void TimeProtocolClient::getTimeAsyncInAioThread(
 void TimeProtocolClient::onConnectionEstablished(
     SystemError::ErrorCode errorCode)
 {
-    NX_LOGX(lm("rfc868 time_sync. Connection to time server %1 "
+    NX_VERBOSE(this, lm("rfc868 time_sync. Connection to time server %1 "
             "completed with following result: %2")
-            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
-        cl_logDEBUG2);
+            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)));
 
     if (errorCode)
     {
@@ -123,9 +121,8 @@ void TimeProtocolClient::onSomeBytesRead(
 
     if (errorCode)
     {
-        NX_LOGX(lm("rfc868 time_sync. Failed to recv from %1. %2")
-            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("rfc868 time_sync. Failed to recv from %1. %2")
+            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)));
 
         reportResult(-1, errorCode, std::chrono::milliseconds::zero());
         return;
@@ -133,22 +130,20 @@ void TimeProtocolClient::onSomeBytesRead(
 
     if (bytesRead == 0)
     {
-        NX_LOGX(lm("rfc868 time_sync. Connection to %1 has been closed. Received just %2 bytes")
-            .arg(m_timeServerEndpoint).arg(m_timeStr.size()),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("rfc868 time_sync. Connection to %1 has been closed. Received just %2 bytes")
+            .arg(m_timeServerEndpoint).arg(m_timeStr.size()));
 
         reportResult(-1, SystemError::notConnected, std::chrono::milliseconds::zero());
         return;
     }
 
-    NX_LOGX(lm("rfc868 time_sync. Read %1 bytes from time server %2").
-        arg(bytesRead).arg(m_timeServerEndpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("rfc868 time_sync. Read %1 bytes from time server %2").
+        arg(bytesRead).arg(m_timeServerEndpoint));
 
     if (m_timeStr.size() >= m_timeStr.capacity())
     {
-        NX_LOGX(lm("rfc868 time_sync. Read %1 from time server %2").
-            arg(m_timeStr.toHex()).arg(m_timeServerEndpoint),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("rfc868 time_sync. Read %1 from time server %2").
+            arg(m_timeStr.toHex()).arg(m_timeServerEndpoint));
 
         // Max data size has been read, ignoring futher data.
         reportResult(

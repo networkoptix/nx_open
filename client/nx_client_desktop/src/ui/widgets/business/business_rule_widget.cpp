@@ -35,10 +35,10 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <client/client_settings.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <nx/client/desktop/utils/mime_data.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/client/desktop/resource_dialogs/camera_selection_dialog.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -48,6 +48,16 @@ using nx::vms::api::EventType;
 using nx::vms::api::ActionType;
 
 namespace {
+
+template<typename Policy>
+void updateEventResources(
+    const QnBusinessRuleViewModelPtr model,
+    QWidget* parent)
+{
+    QnUuidSet selectedCameras = model->eventResources();
+    if (CameraSelectionDialog::selectCameras<Policy>(selectedCameras, parent))
+        model->setEventResources(selectedCameras);
+}
 
 QIcon iconHelper(QIcon base)
 {
@@ -145,7 +155,7 @@ void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
     }
 
     {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        QScopedValueRollback<bool> guard(m_updating, true);
         ui->eventTypeComboBox->setModel(m_model->eventTypesModel());
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
@@ -160,7 +170,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
     if (!m_model || m_updating)
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields & Field::eventType)
     {
@@ -458,20 +468,15 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     if (!m_model)
         return;
 
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); // TODO: #GDM #Business or servers?
-
     vms::api::EventType eventType = m_model->eventType();
     if (eventType == EventType::cameraMotionEvent)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
+        updateEventResources<QnCameraMotionPolicy>(m_model, this);
     else if (eventType == EventType::cameraInputEvent)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
+        updateEventResources<QnCameraInputPolicy>(m_model, this);
     else if (eventType == EventType::analyticsSdkEvent)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAnalyticsPolicy>(this));
-    dialog.setSelectedResources(m_model->eventResources());
-
-    if (dialog.exec() != QDialog::Accepted)
-        return;
-    m_model->setEventResources(dialog.selectedResources());
+        updateEventResources<QnCameraAnalyticsPolicy>(m_model, this);
+    else
+        updateEventResources<CameraSelectionDialog::DummyPolicy>(m_model, this);
 }
 
 void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()

@@ -1,9 +1,9 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 #include "disabled_ini_config_ut.h"
 
 #include <nx/kit/test.h>
 
-int disabled_ini_config_ut()
+int disabled_ini_config_ut(int argc, const char* const argv[])
 {
-    return nx::kit::test::runAllTests();
+    return nx::kit::test::runAllTests("disabled_ini_config", argc, argv);
 }

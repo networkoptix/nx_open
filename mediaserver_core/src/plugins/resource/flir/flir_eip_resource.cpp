@@ -18,7 +18,8 @@ const QString kAlarmsCountParamName("alarmsCount");
 
 } //namespace
 
-QnFlirEIPResource::QnFlirEIPResource() :
+QnFlirEIPResource::QnFlirEIPResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
     m_advancedParametersProvider(this),
     m_inputPortMonitored(false),
     m_currentCheckingPortNumber(0),
@@ -28,7 +29,7 @@ QnFlirEIPResource::QnFlirEIPResource() :
 
 QnFlirEIPResource::~QnFlirEIPResource()
 {
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 }
 
 QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
@@ -57,10 +58,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     if (!client->registerSession())
         return CameraDiagnostics::CannotEstablishConnectionResult(kDefaultEipPort);
 
-    setCameraCapabilities(
-        Qn::PrimaryStreamSoftMotionCapability |
-        Qn::RelayInputCapability |
-        Qn::RelayOutputCapability );
+    setCameraCapabilities(Qn::PrimaryStreamSoftMotionCapability);
 
     initializeIO();
 
@@ -456,7 +454,7 @@ bool QnFlirEIPResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedP
 
     if (!result)
     {
-        NX_LOG(lit("Error while parsing xml (flir) %1").arg(templateFilename), cl_logWARNING);
+        NX_WARNING(this, lit("Error while parsing xml (flir) %1").arg(templateFilename));
     }
 
     return result;
@@ -467,12 +465,12 @@ QSet<QString> QnFlirEIPResource::calculateSupportedAdvancedParameters(const QnCa
     return allParams.allParameterIds();
 }
 
-bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)> &&completionHandler)
+void QnFlirEIPResource::startInputPortStatesMonitoring()
 {
     QnMutexLocker lock(&m_ioMutex);
 
-    if(m_inputPortMonitored)
-        return false;
+    if (m_inputPortMonitored)
+        return;
 
     QObject::connect(
         m_eipAsyncClient.get(), &EIPAsyncClient::done,
@@ -485,8 +483,6 @@ bool QnFlirEIPResource::startInputPortMonitoringAsync(std::function<void (bool)>
         kIOCheckTimeout );
 
     startAlarmMonitoringAsync();
-
-    return true;
 }
 
 bool QnFlirEIPResource::startAlarmMonitoringAsync()
@@ -567,22 +563,10 @@ void QnFlirEIPResource::initializeIO()
     for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
-    setIOPorts(portList);
+    setIoPortDescriptions(std::move(portList), /*needMerge*/ true);
 }
 
-QnIOPortDataList QnFlirEIPResource::getRelayOutputList() const
-{
-    QnMutexLocker lock(&m_ioMutex);
-    return m_outputPorts;
-}
-
-QnIOPortDataList QnFlirEIPResource::getInputPortList() const
-{
-    QnMutexLocker lock(&m_ioMutex);
-    return m_inputPorts;
-}
-
-void QnFlirEIPResource::stopInputPortMonitoringAsync()
+void QnFlirEIPResource::stopInputPortStatesMonitoring()
 {
     QnMutexLocker lock(&m_ioMutex);
 
@@ -598,12 +582,6 @@ void QnFlirEIPResource::stopInputPortMonitoringAsync()
         this, &QnFlirEIPResource::routeAlarmMonitoringFlow);
 
     m_inputPortMonitored = false;
-}
-
-bool QnFlirEIPResource::isInputPortMonitored() const
-{
-    QnMutexLocker lock(&m_ioMutex);
-    return m_inputPortMonitored;
 }
 
 MessageRouterRequest QnFlirEIPResource::buildEIPOutputPortRequest(const QString &portId, bool portState) const
@@ -622,7 +600,7 @@ MessageRouterRequest QnFlirEIPResource::buildEIPOutputPortRequest(const QString 
     return request;
 }
 
-bool QnFlirEIPResource::setRelayOutputState(const QString &outputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnFlirEIPResource::setOutputPortState(const QString &outputID, bool activate, unsigned int autoResetTimeoutMS)
 {
     QnMutexLocker lock(&m_ioMutex);
     QString id = outputID.isEmpty() ?
@@ -663,7 +641,7 @@ bool QnFlirEIPResource::setRelayOutputState(const QString &outputID, bool activa
 
                 if (timerEntry)
                 {
-                    setRelayOutputState(
+                    setOutputPortState(
                         timerEntry->portId,
                         timerEntry->state,
                         0);
@@ -715,7 +693,7 @@ void QnFlirEIPResource::checkInputPortStatusDone()
     {
         m_inputPortStates[m_currentCheckingPortNumber] = portState;
         lock.unlock();
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             m_inputPorts[m_currentCheckingPortNumber].id,
             portState,
@@ -855,7 +833,7 @@ void QnFlirEIPResource::getAlarmMeasurementFuncIdDone()
     if (response.generalStatus == CIPGeneralStatus::kSuccess
         && findAlarmInputByTypeAndId(id, m_currentCheckingMeasFuncType, port))
     {
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             port.id,
             m_alarmStates[m_currentCheckingAlarmNumber],

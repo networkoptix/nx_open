@@ -28,9 +28,8 @@ void TimeProtocolConnection::startReadingConnection(
 
     std::uint32_t utcTimeSeconds = nx::utils::timeSinceEpoch().count();
 
-    NX_LOGX(lm("Sending %1 UTC time to %2")
-        .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Sending %1 UTC time to %2")
+        .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()));
 
     utcTimeSeconds += network::kSecondsFrom1900_01_01To1970_01_01;
     utcTimeSeconds = htonl(utcTimeSeconds);
@@ -67,10 +66,9 @@ void TimeProtocolConnection::onDataSent(
 {
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to send to %1. %2")
+        NX_VERBOSE(this, lm("Failed to send to %1. %2")
             .arg(m_socket->getForeignAddress())
-            .arg(SystemError::toString(errorCode)),
-            cl_logDEBUG2);
+            .arg(SystemError::toString(errorCode)));
     }
 
     m_socketServer->closeConnection(errorCode, this);

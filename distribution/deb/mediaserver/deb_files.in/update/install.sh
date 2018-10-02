@@ -6,7 +6,12 @@ RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/
 
 installDeb()
 {
-    dpkg -i "$1"
+    if [ '@withRootTool@' = 'true' ]
+    then
+        "/opt/@deb.customization.company.name@/mediaserver/bin/root-tool-bin" install "$1"
+    else
+        dpkg -i "$1"
+    fi
 }
 
 update()

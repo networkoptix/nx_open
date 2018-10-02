@@ -35,6 +35,7 @@ public:
     nx::network::SocketAddress endpoint() const;
     int port() const;
     QnCommonModule* commonModule() const;
+    QnMediaServerModule* serverModule() const;
     nx::mediaserver::Authenticator* authenticator() const;
 
     void addSetting(const QString& name, const QVariant& value);
@@ -78,4 +79,5 @@ private:
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
     std::list<std::pair<QString, QString>> m_customSettings;
+    QnUuid m_serverGuid;
 };

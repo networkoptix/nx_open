@@ -27,8 +27,8 @@ IncomingTunnelConnection::IncomingTunnelConnection(
         [this](SystemError::ErrorCode code)
         {
             m_controlConnection.reset();
-            NX_LOGX(lm("Control connection error (%1), closing tunnel...")
-                .arg(SystemError::toString(code)), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Control connection error (%1), closing tunnel...")
+                .arg(SystemError::toString(code)));
 
             m_state = code;
             if (m_serverSocket)
@@ -45,15 +45,15 @@ IncomingTunnelConnection::IncomingTunnelConnection(
         !m_serverSocket->bind(addressToBind) ||
         !m_serverSocket->listen())
     {
-        NX_LOGX(lm("Can not listen on server socket %1: %2")
-            .args(addressToBind, SystemError::getLastOSErrorText()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not listen on server socket %1: %2")
+            .args(addressToBind, SystemError::getLastOSErrorText()));
 
         m_state = SystemError::getLastOSErrorCode();
     }
     else
     {
-        NX_LOGX(lm("Listening for new connections on %1")
-            .arg(m_serverSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Listening for new connections on %1")
+            .arg(m_serverSocket->getLocalAddress().toString()));
     }
 }
 
@@ -79,8 +79,8 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
                     SystemError::ErrorCode code,
                     std::unique_ptr<AbstractStreamSocket> socket)
                 {
-                    NX_LOGX(lm("Accepted %1 (%2)")
-                        .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Accepted %1 (%2)")
+                        .arg(socket).arg(SystemError::toString(code)));
 
                     if (code != SystemError::noError)
                         m_state = code;

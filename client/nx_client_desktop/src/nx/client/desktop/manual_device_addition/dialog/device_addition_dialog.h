@@ -8,6 +8,7 @@
 #include <nx/client/desktop/resource_views/models/fake_resource_list_model.h>
 
 class QStackedWidget;
+class QnResourcePool;
 
 namespace Ui {
 class DeviceAdditionDialog;
@@ -32,6 +33,7 @@ public:
     virtual ~DeviceAdditionDialog() override;
 
     void setServer(const QnMediaServerResourcePtr& server);
+    void setMainPageActive();
 
 private:
     using SearcherPtr = QSharedPointer<ManualDeviceSearcher>;
@@ -59,7 +61,19 @@ private:
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
 
+    void handleStartAddressFieldTextChanged(const QString& value);
+    void handleStartAddressEditingFinished();
+    void handleEndAddressFieldTextChanged(const QString& value);
+
     void showAdditionFailedDialog(const FakeResourceList& resources);
+
+    void handleTabClicked(int index);
+    void updateMessageBar();
+
+    using AddingDevicesSet = QSet<QString>;
+    void appendAddingDevices(const AddingDevicesSet& value);
+    void setDeviceAdded(const QString& uniqueId);
+    void handleDeviceRemoved(const QString& uniqueId);
 
     int port() const;
     QString password() const;
@@ -67,6 +81,7 @@ private:
     QString progressMessage() const;
 
 private:
+    const QPointer<QnResourcePool> m_pool;
     CurrentSystemServers m_serversWatcher;
     ServerOnlineStatusWatcher m_serverStatusWatcher;
 
@@ -78,6 +93,8 @@ private:
     SearchersList m_unfinishedSearches;
 
     QScopedPointer<FoundDevicesModel> m_model;
+    AddingDevicesSet m_addingDevices;
+    bool m_addressEditing;
 };
 
 } // namespace desktop

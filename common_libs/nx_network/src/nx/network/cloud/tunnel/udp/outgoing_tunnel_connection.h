@@ -60,13 +60,15 @@ public:
      */
     OutgoingTunnelConnection(
         aio::AbstractAioThread* aioThread,
-        nx::String connectionId,
+        std::string connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection,
         Timeouts timeouts);
+
     OutgoingTunnelConnection(
         aio::AbstractAioThread* aioThread,
-        nx::String connectionId,
+        std::string connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection);
+
     ~OutgoingTunnelConnection();
 
     virtual void stopWhileInAioThread() override;
@@ -78,8 +80,10 @@ public:
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
+
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+
     virtual std::string toString() const override;
 
 private:
@@ -96,7 +100,7 @@ private:
         nx::network::aio::AbstractAioThread* aioThreadToUse;
     };
 
-    const nx::String m_connectionId;
+    const std::string m_connectionId;
     const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;

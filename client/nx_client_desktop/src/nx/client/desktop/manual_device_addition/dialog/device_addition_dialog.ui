@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>626</height>
+    <width>700</width>
+    <height>643</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,8 +16,8 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">so
-   <string>Add device(s)...</string>
+  <property name="windowTitle">
+   <string>Device Add</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -32,6 +32,13 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item>
+    <widget class="nx::client::desktop::MessageBar" name="messageBar" native="true">
+     <property name="text" stdset="0">
+      <string/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="nx::client::desktop::Panel" name="serverChoosePanel" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -135,18 +142,57 @@
           <property name="horizontalSpacing">
            <number>16</number>
           </property>
-          <item row="1" column="1">
+          <item row="0" column="0">
+           <widget class="QWidget" name="widget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="addressLabel">
+               <property name="text">
+                <string>Address</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="explanationLabel">
+               <property name="text">
+                <string>Example</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="2" column="1">
            <widget class="QWidget" name="widget_2" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QStackedWidget" name="knownAddressPortSpinWidget">
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="knownAddressSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
                  <item>
-                  <widget class="QSpinBox" name="knownAddressPortSpinBox"/>
+                  <widget class="QSpinBox" name="knownAddressPortSpinBox">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -154,6 +200,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <item>
                   <widget class="QLineEdit" name="lineEdit">
+                   <property name="focusPolicy">
+                    <enum>Qt::NoFocus</enum>
+                   </property>
                    <property name="text">
                     <string>Auto</string>
                    </property>
@@ -192,7 +241,7 @@
             </layout>
            </widget>
           </item>
-          <item row="1" column="2">
+          <item row="2" column="2">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Password</string>
@@ -201,12 +250,6 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="knownAddressLoginEdit"/>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="addressEdit"/>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="label_4">
@@ -218,10 +261,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QLineEdit" name="knownAddressPasswordEdit"/>
-          </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Port</string>
@@ -231,39 +271,20 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QWidget" name="widget" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="addressLabel">
-               <property name="text">
-                <string>Address</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="hintLabel">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+          <item row="0" column="1">
+           <widget class="nx::client::desktop::InputField" name="addressEdit" native="true"/>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLineEdit" name="knownAddressPasswordEdit"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="knownAddressLoginEdit"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QnWordWrappedLabel" name="addressHint" native="true">
+            <property name="text" stdset="0">
+             <string>Hint</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -291,7 +312,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="startAddressLabel">
             <property name="text">
-             <string>Start Ip</string>
+             <string>Start IP</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -299,7 +320,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QnIpLineEdit" name="startAddressEdit"/>
+           <widget class="QnIpLineEdit" name="startAddressEdit" native="true"/>
           </item>
           <item row="0" column="2">
            <widget class="QLabel" name="label_8">
@@ -317,7 +338,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>End Ip</string>
+             <string>End IP</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -325,7 +346,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QnIpLineEdit" name="endAddressEdit"/>
+           <widget class="QnIpLineEdit" name="endAddressEdit" native="true"/>
           </item>
           <item row="1" column="2">
            <widget class="QLabel" name="label_9">
@@ -355,13 +376,20 @@
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
               <widget class="QStackedWidget" name="subnetScanPortSpinWidget">
+               <property name="focusPolicy">
+                <enum>Qt::TabFocus</enum>
+               </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="subnetScanSpinBoxPage">
                 <layout class="QHBoxLayout" name="horizontalLayout_11">
                  <item>
-                  <widget class="QSpinBox" name="subnetScanPortSpinBox"/>
+                  <widget class="QSpinBox" name="subnetScanPortSpinBox">
+                   <property name="maximum">
+                    <number>65535</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -369,6 +397,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_12">
                  <item>
                   <widget class="QLineEdit" name="lineEdit_2">
+                   <property name="focusPolicy">
+                    <enum>Qt::NoFocus</enum>
+                   </property>
                    <property name="text">
                     <string>Auto</string>
                    </property>
@@ -438,6 +469,9 @@
           </property>
           <item>
            <widget class="QPushButton" name="searchButton">
+            <property name="focusPolicy">
+             <enum>Qt::StrongFocus</enum>
+            </property>
             <property name="text">
              <string>Search</string>
             </property>
@@ -490,62 +524,81 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="resultsPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>16</number>
+        <number>0</number>
        </property>
        <item>
-        <widget class="nx::client::desktop::SimpleSelectionTableView" name="foundDevicesTable">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>24</pointsize>
-          </font>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAsNeeded</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="showGrid">
-          <bool>false</bool>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="cornerButtonEnabled">
-          <bool>false</bool>
-         </property>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>110</number>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>24</number>
-         </attribute>
+        <widget class="QWidget" name="tableHolder" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>8</number>
+          </property>
+          <property name="topMargin">
+           <number>8</number>
+          </property>
+          <property name="rightMargin">
+           <number>16</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="nx::client::desktop::SimpleSelectionTableView" name="foundDevicesTable">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAsNeeded</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <property name="showGrid">
+             <bool>false</bool>
+            </property>
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+            <property name="cornerButtonEnabled">
+             <bool>false</bool>
+            </property>
+            <attribute name="horizontalHeaderMinimumSectionSize">
+             <number>110</number>
+            </attribute>
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderHighlightSections">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="verticalHeaderMinimumSectionSize">
+             <number>24</number>
+            </attribute>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -556,19 +609,19 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_4" native="true">
+        <widget class="QWidget" name="addDevicesPanel" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <property name="leftMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <item>
            <widget class="QPushButton" name="addDevicesButton">
@@ -650,9 +703,27 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>nx::client::desktop::InputField</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QnIpLineEdit</class>
-   <extends>QLineEdit</extends>
+   <extends>QWidget</extends>
    <header location="global">ui/widgets/common/ip_line_edit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::MessageBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -664,7 +735,6 @@
   <tabstop>knownAddressPasswordEdit</tabstop>
   <tabstop>searchButton</tabstop>
   <tabstop>stopSearchButton</tabstop>
-  <tabstop>foundDevicesTable</tabstop>
   <tabstop>addDevicesButton</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>startAddressEdit</tabstop>

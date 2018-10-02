@@ -18,14 +18,14 @@
 #include "../onvif/onvif_resource.h"
 
 
-class QnPlSonyResource : public QnPlOnvifResource
+class QnPlSonyResource: public QnPlOnvifResource
 {
     static int MAX_RESOLUTION_DECREASES_NUM;
 
     Q_OBJECT
 
 public:
-    QnPlSonyResource();
+    QnPlSonyResource(QnMediaServerModule* serverModule);
     virtual ~QnPlSonyResource();
 
     virtual int getMaxOnvifRequestTries() const override { return 5; }
@@ -34,9 +34,9 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& capabilitiesResponse) override;
 
     virtual CameraDiagnostics::Result updateResourceCapabilities() override;
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     nx::network::http::AsyncHttpClientPtr m_inputMonitorHttpClient;

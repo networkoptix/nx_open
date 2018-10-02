@@ -5,7 +5,7 @@ import datadiff
 import pytest
 import pytz
 
-from framework.mediaserver_api import TimePeriod, MediaserverApiRequestError, Unauthorized
+from framework.mediaserver_api import MediaserverApiRequestError, TimePeriod, Unauthorized
 from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
@@ -20,9 +20,10 @@ _logger = logging.getLogger(__name__)
     ('nat-merge_toward_inner.yaml', 'inner', 'outer'),
     ('nat-merge_toward_inner.yaml', 'outer', 'inner'),
     ])
-@pytest.mark.parametrize(
-    'api_endpoint',
-    [
+def test_responses_are_equal(system, target_alias, proxy_alias):
+    wait = Wait("until responses become equal")
+    target_guid = system[target_alias].api.get_server_id()
+    api_endpoints = [
         'api/moduleInformation',
         'ec2/getMediaServersEx',
         'ec2/testConnection',
@@ -30,35 +31,32 @@ _logger = logging.getLogger(__name__)
         'ec2/getResourceParams',
         'ec2/getCamerasEx',
         'ec2/getUsers',
-    ],
-    ids=lambda path: path.replace('/', '_'))
-def test_responses_are_equal(system, target_alias, proxy_alias, api_endpoint):
-    wait = Wait("until responses become equal")
-    target_guid = system[target_alias].api.get_server_id()
-    while True:
-        try:
-            response_via_proxy = system[proxy_alias].api.generic.get(
-                api_endpoint,
-                headers={'X-server-guid': target_guid})
-        except (MediaserverApiRequestError, Unauthorized) as exc:
-            # We can get MediaserverApiRequestError or Unauthorized here,
-            # if mediaservers doesn't sync some data (interfaces, users, etc) yet.
+        ]
+    for api_endpoint in api_endpoints:
+        while True:
+            try:
+                response_via_proxy = system[proxy_alias].api.generic.get(
+                    api_endpoint,
+                    headers={'X-server-guid': target_guid})
+            except (MediaserverApiRequestError, Unauthorized) as exc:
+                # We can get MediaserverApiRequestError or Unauthorized here,
+                # if mediaservers doesn't sync some data (interfaces, users, etc) yet.
+                if not wait.again():
+                    assert False, ("Can't send '{}' request via proxy: {}".format(
+                        api_endpoint, str(exc)))
+                else:
+                    wait.sleep()
+                    continue
+            response_direct = system[target_alias].api.generic.get(api_endpoint)
+            diff = datadiff.diff(
+                response_via_proxy, response_direct,
+                fromfile='via proxy', tofile='direct',
+                context=100)
+            if not diff:
+                break
             if not wait.again():
-                assert False, ("Can't send '{}' request via proxy: {}".format(
-                    api_endpoint, str(exc)))
-            else:
-                wait.sleep()
-                continue
-        response_direct = system[target_alias].api.generic.get(api_endpoint)
-        diff = datadiff.diff(
-            response_via_proxy, response_direct,
-            fromfile='via proxy', tofile='direct',
-            context=100)
-        if not diff:
-            break
-        if not wait.again():
-            assert not diff, 'Found difference:\n{}'.format(diff)
-        wait.sleep()
+                assert not diff, 'Found difference:\n{}'.format(diff)
+            wait.sleep()
 
     assert not system[target_alias].installation.list_core_dumps()
     assert not system[proxy_alias].installation.list_core_dumps()

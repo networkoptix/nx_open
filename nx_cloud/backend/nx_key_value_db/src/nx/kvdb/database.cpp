@@ -10,12 +10,14 @@ Database::Database(
     const Settings& settings,
     nx::sql::AsyncSqlQueryExecutor* dbManager)
     :
-    m_settings(settings),
-    m_dbManager(dbManager),
+    //m_settings(settings),
+    //m_dbManager(dbManager),
     m_moduleId(QnUuid::createUuid()), //< TODO: moduleId should be persistent.
     m_syncEngine(
+        kKeyValueDbApplicationId,
         m_moduleId,
         settings.dataSyncEngineSettings,
+        nx::data_sync_engine::ProtocolVersionRange(1, 1),
         dbManager),
     m_structureUpdater(dbManager),
     m_dataManager(dbManager),

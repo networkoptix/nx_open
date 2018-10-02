@@ -7872,6 +7872,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 couvre la période pour laquelle la vidéo est envoyer.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8974,16 +8978,20 @@ to %1</source>
       <translation>Caméras portables ne peuvent pas être déplacées entre les serveurs</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Attention! Cette version est uniquement à des fins de test! S.V.P. installer le prochain patch ou une nouvelle version dès qu'elle sera disponible.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>Échec de modification mot de passe</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Échec de modification des mots de passe sur %1 de %2 caméras</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

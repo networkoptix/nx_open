@@ -1,4 +1,4 @@
-FROM python:3.6-alpine3.7
+FROM python:3.7-alpine3.7
 MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
 
 RUN set -ex \
@@ -10,6 +10,7 @@ RUN set -ex \
             musl-dev \
             linux-headers \
             mariadb-dev \
+            postgresql-dev \
             libffi-dev \
             yaml-dev \
             curl-dev \

@@ -69,8 +69,8 @@ TEST(HttpAuthDigest, calcDigestResponse)
             {
                 for (const StringType& algorithm: {"", "MD5", "SHA-256"})
                 {
-                    NX_LOGX(lm("Test method='%1', user='%2', password='%3', algorithm='%4'")
-                        .args(method, user, password, algorithm), cl_logDEBUG1);
+                    NX_DEBUG(this, lm("Test method='%1', user='%2', password='%3', algorithm='%4'")
+                        .args(method, user, password, algorithm));
 
                     testCalcDigestResponse(method, user, password, boost::none, algorithm);
                 }

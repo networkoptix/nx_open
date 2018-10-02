@@ -1,4 +1,8 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 #pragma once
 
-DISABLED_INI_CONFIG_UT_API int disabled_ini_config_ut();
+/**
+ * Test ini_config in Disabled mode. The build system should define -DNX_INI_CONFIG_DISABLED when
+ * compiling ini_config implementation file(s).
+ */
+DISABLED_INI_CONFIG_UT_API int disabled_ini_config_ut(int argc, const char* const argv[]);

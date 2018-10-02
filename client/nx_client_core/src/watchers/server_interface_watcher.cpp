@@ -44,12 +44,10 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     const nx::network::SocketAddress address = 
         nx::network::url::getEndpoint(commonModule()->currentUrl());
     currentServer->setPrimaryAddress(address);
-    NX_LOG(
-        lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")
+    NX_DEBUG(this, lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")
             .arg(currentServer->getName())
             .arg(currentServer->getId().toString())
-            .arg(address.toString()),
-        cl_logDEBUG1);
+            .arg(address.toString()));
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
@@ -76,7 +74,7 @@ void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourc
     if (module->endpoint != server->getPrimaryAddress())
     {
         server->setPrimaryAddress(module->endpoint);
-        NX_LOG(lm("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
-            .args(server->getName(), server->getId(), module->endpoint), cl_logDEBUG1);
+        NX_DEBUG(this, lm("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
+            .args(server->getName(), server->getId(), module->endpoint));
     }
 }

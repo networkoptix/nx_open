@@ -28,7 +28,7 @@ class CA(object):
             _logger.info("New CA certificate %s can be added to browser or system as trusted.", self.cert_path)
         if not self._extensions_config_path.exists():
             _logger.debug("Save extensions config %s...", self._extensions_config_path)
-            self._extensions_config_path.write_bytes(dedent(b"""
+            self._extensions_config_path.write_text(dedent(u"""
                 basicConstraints = CA:FALSE
                 keyUsage = keyEncipherment
                 subjectAltName = @alt_names

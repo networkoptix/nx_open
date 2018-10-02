@@ -44,15 +44,15 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr& data
 
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_providers.empty() || m_providers.begin()->second.data() != data->dataProvider)
+        if (m_providers.empty() || m_providers.begin()->second.data() != media->dataProvider)
             return true; //< Data from non-active provider.
     }
 
     if (auto audioData = std::dynamic_pointer_cast<const QnCompressedAudioData>(data))
     {
-        if (m_prevUsedProvider != data->dataProvider)
+        if (m_prevUsedProvider != audioData->dataProvider)
         {
-            m_prevUsedProvider = data->dataProvider;
+            m_prevUsedProvider = audioData->dataProvider;
             m_transmittedPacketDuration = 0;
             m_elapsedTimer.restart();
             prepare();
@@ -92,7 +92,7 @@ void QnAbstractAudioTransmitter::removePacketsByProvider(
     auto randomAccess = m_dataQueue.lock();
     for (int i = randomAccess.size() - 1; i >= 0; --i)
     {
-        auto packet = randomAccess.at(i);
+        auto packet = std::dynamic_pointer_cast<const QnAbstractMediaData>(randomAccess.at(i));
         if (packet && providersToFlush.count(packet->dataProvider))
             randomAccess.removeAt(i);
     }

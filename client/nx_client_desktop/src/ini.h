@@ -18,7 +18,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableUnlimitedZoom, "Enable unlimited zoom feature.");
     NX_INI_FLAG(0, showVideoQualityOverlay, "Show video quality overlay.");
 
-    NX_INI_FLAG(1, unifiedEventPanel, "Use unified event panel instead of old notifications panel.");
     NX_INI_FLAG(1, enableAnalytics, "Enable analytics engine");
     NX_INI_FLAG(0, enableOldAnalyticsController, "Enable old analytics controller (zoom-window based).");
     NX_INI_FLAG(0, demoAnalyticsDriver, "Enable demo analytics driver.");
@@ -32,7 +31,6 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, redesignedCameraSettingsDialog, "Enable redesigned camera settings dialog.");
     NX_INI_FLAG(1, enableDetectedObjectsInterpolation, "Allow interpolation of detected objects between frames.");
     NX_INI_FLAG(0, displayAnalyticsDelay, "Add delay label to detected object description.");
-    NX_INI_FLAG(1, enableProgressInformers, "Enable global operation progress informers in the notification panel.");
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
     NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(0, enableResourceFiltering, "Enable reworked resource filtering");

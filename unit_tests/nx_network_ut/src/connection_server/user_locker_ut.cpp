@@ -9,7 +9,7 @@ namespace network {
 namespace server {
 namespace test {
 
-using AuthResult = server::UserLocker::AuthResult;
+using AuthResult = server::AuthResult;
 
 class UserLocker:
     public ::testing::Test
@@ -84,7 +84,7 @@ protected:
     }
 
 private:
-    const UserLockerPool::Key m_userKey;
+    const UserLockerPool::key_type m_userKey;
     server::UserLockerSettings m_settings;
     server::UserLockerPool m_locker;
     nx::utils::test::ScopedTimeShift m_timeShift;

@@ -32,14 +32,15 @@
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
-QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64),
-      m_zoneSite(8),
-      m_channelCount(0),
-      m_prevMotionChannel(0),
-      m_dualsensor(false),
-      m_inputPortState(false),
-      m_advancedParametersProvider{this}
+QnPlAreconVisionResource::QnPlAreconVisionResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule),
+    m_totalMdZones(64),
+    m_zoneSite(8),
+    m_channelCount(0),
+    m_prevMotionChannel(0),
+    m_dualsensor(false),
+    m_inputPortState(false),
+    m_advancedParametersProvider{this}
 {
     setVendor(lit("ArecontVision"));
 }
@@ -225,9 +226,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
         zone_size = 1;
 
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
-        setCameraCapability(Qn::RelayInputCapability, true);
+        setCameraCapability(Qn::InputPortCapability, true);
     if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
-        setCameraCapability(Qn::RelayOutputCapability, true);
+        setCameraCapability(Qn::OutputPortCapability, true);
 
     setFirmware(firmwareVersion);
     saveParams();
@@ -266,7 +267,7 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-bool QnPlAreconVisionResource::setRelayOutputState(
+bool QnPlAreconVisionResource::setOutputPortState(
     const QString& /*ouputID*/,
     bool activate,
     unsigned int autoResetTimeoutMS)
@@ -418,7 +419,7 @@ QString QnPlAreconVisionResource::generateRequestString(
         !streamParams.contains("image_right") || !streamParams.contains("image_bottom") ||
         (h264 && !streamParams.contains("streamID")))
     {
-        NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
+        NX_ERROR(this, "Error!!! parameter is missing in stream params.");
         //return QnAbstractMediaDataPtr(0);
     }
 
@@ -557,7 +558,8 @@ bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString&
     return false;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString& name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(
+    QnMediaServerModule* serverModule, const QString& name)
 {
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
@@ -568,32 +570,32 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
             if (rt.isNull())
             {
-                NX_LOG( lit("Unsupported AV resource found: %1").arg(name), cl_logERROR);
+                NX_ERROR(typeid(QnPlAreconVisionResource), lit("Unsupported AV resource found: %1").arg(name));
                 return 0;
             }
         }
     }
 
-    return createResourceByTypeId(rt);
+    return createResourceByTypeId(serverModule, rt);
 
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnUuid rt)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnMediaServerModule* serverModule, QnUuid rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
+        NX_ERROR(typeid(QnPlAreconVisionResource), lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()));
         return 0;
     }
 
     QnPlAreconVisionResource* res = 0;
 
     if (isPanoramic(resourceType))
-        res = new QnArecontPanoramicResource(resourceType->getName());
+        res = new QnArecontPanoramicResource(serverModule, resourceType->getName());
     else
-        res = new CLArecontSingleSensorResource(resourceType->getName());
+        res = new CLArecontSingleSensorResource(serverModule, resourceType->getName());
 
     res->setTypeId(rt);
 
@@ -643,8 +645,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
-bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
-    std::function<void(bool)>&& completionHandler)
+void QnPlAreconVisionResource::startInputPortStatesMonitoring()
 {
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -660,20 +661,13 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
 
     m_relayInputClient = nx::network::http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx::network::http::AsyncHttpClient::done,
-            this,
-            [this, completionHandler](nx::network::http::AsyncHttpClientPtr client) {
-                if (completionHandler)
-                    completionHandler(
-                        client->response() &&
-                        client->response()->statusLine.statusCode == nx::network::http::StatusCode::ok);
-                inputPortStateRequestDone(std::move(client));
-            },
+            this, [this](auto client) { inputPortStateRequestDone(std::move(client)); },
             Qt::DirectConnection);
+
     m_relayInputClient->doGet(url);
-    return true;
 }
 
-void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
+void QnPlAreconVisionResource::stopInputPortStatesMonitoring()
 {
     m_relayInputClient.reset();
 }
@@ -699,7 +693,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(
     if (m_inputPortState != portEnabled)
     {
         m_inputPortState = portEnabled;
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             lit("1"),
             m_inputPortState,

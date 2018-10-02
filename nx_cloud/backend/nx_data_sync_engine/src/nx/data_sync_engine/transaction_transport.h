@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <nx/network/aio/timer.h>
@@ -7,7 +8,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <nx/vms/api/data/tran_state_data.h>
-#include <nx_ec/ec_proto_version.h>
+
 #include <transaction/transaction_transport_base.h>
 
 #include "abstract_transaction_transport.h"
@@ -16,6 +17,11 @@
 #include "transaction_log_reader.h"
 #include "transaction_transport_header.h"
 
+namespace ec2 {
+class QnTransactionTransportBase;
+class ConnectionGuardSharedState;
+} // namespace ec2
+
 namespace nx {
 namespace data_sync_engine {
 
@@ -23,9 +29,9 @@ class TransactionLog;
 
 struct ConnectionRequestAttributes
 {
-    nx::String connectionId;
+    std::string connectionId;
     vms::api::PeerData remotePeer;
-    nx::String contentEncoding;
+    std::string contentEncoding;
     int remotePeerProtocolVersion = 0;
 };
 
@@ -40,11 +46,13 @@ public:
      * Initializer for incoming connection.
      */
     TransactionTransport(
+        const ProtocolVersionRange& protocolVersionRange,
         nx::network::aio::AbstractAioThread* aioThread,
-        ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
+        std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
         TransactionLog* const transactionLog,
+        const OutgoingCommandFilter& outgoingCommandFilter,
         const ConnectionRequestAttributes& connectionRequestAttributes,
-        const nx::String& systemId,
+        const std::string& systemId,
         const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
@@ -86,12 +94,14 @@ public:
         TransactionProcessedHandler handler);
 
 private:
-    ::ec2::QnTransactionTransportBase m_baseTransactionTransport;
+    const ProtocolVersionRange m_protocolVersionRange;
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> m_connectionGuardSharedState;
+    std::unique_ptr<::ec2::QnTransactionTransportBase> m_baseTransactionTransport;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
-    const nx::String m_systemId;
-    const nx::String m_connectionId;
+    const std::string m_systemId;
+    const std::string m_connectionId;
     const network::SocketAddress m_connectionOriginatorEndpoint;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
     /**
@@ -133,9 +143,9 @@ private:
     void restartInactivityTimer();
     void onInactivityTimeout();
 
-    template<class T>
+    template<typename CommandDescriptor>
     void sendTransaction(
-        Command<T> transaction,
+        Command<typename CommandDescriptor::Data> transaction,
         TransactionTransportHeader transportHeader);
 };
 

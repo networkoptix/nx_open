@@ -5,7 +5,6 @@
 #include <core/resource_access/resource_access_subject.h>
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
 /** Manager class for shared resources: layouts, cameras, web pages and server statistics. */

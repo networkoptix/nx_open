@@ -218,7 +218,14 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
         [](QGraphicsItem* item)
         {
             const auto widget = dynamic_cast<QnResourceWidget*>(item);
-            return widget && !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden);
+            if (!widget)
+                return false;
+            const auto workbenchItem = widget->item();
+            if (!workbenchItem)
+                return false;
+            const auto layout = workbenchItem->layout();
+            return !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden)
+                && !layout->locked();
         }));
 
     /* Item instruments. */
@@ -235,8 +242,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_dropInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, dndEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, dndEventTypes, this));
-
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
+
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(m_gridAdjustmentInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
@@ -1517,7 +1524,7 @@ void QnWorkbenchController::updateCurrentLayoutInstruments()
     const auto fixedViewport = layout->flags().testFlag(QnLayoutFlag::FixedViewport);
     m_wheelZoomInstrument->setEnabled(!fixedViewport);
     m_handScrollInstrument->setEnabled(!fixedViewport);
-    m_gridAdjustmentInstrument->setEnabled(!fixedViewport);
+    m_gridAdjustmentInstrument->setEnabled(!(fixedViewport || layout->locked()));
 }
 
 void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) {

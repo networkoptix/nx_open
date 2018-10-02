@@ -8,6 +8,8 @@ MEDIATOR_HTTP_PORT=${MEDIATOR_HTTP_PORT:-3355}
 [ -n "$MEDIATOR_HOST" ] || MEDIATOR_HOST="$CONNECTION_MEDIATOR_PUBLIC_IP"
 [ -n "$MEDIATOR_HOST" ] || MEDIATOR_HOST=$(LD_LIBRARY_PATH= wget -q -O- networkoptix.com/myip)
 
+export MEDIATOR_STUN_PORT MEDIATOR_HTTP_PORT MEDIATOR_HOST
+
 tmp=$(tempfile)
 envsubst < /opt/networkoptix/cloud_db/etc/cloud_db.conf > $tmp
 mv $tmp /opt/networkoptix/cloud_db/etc/cloud_db.conf

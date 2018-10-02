@@ -1,9 +1,9 @@
 #include "mobile_client_settings.h"
 
 #include <QtCore/QSettings>
+#include <QtCore/QScopedValueRollback>
 
 #include <nx/fusion/model_functions.h>
-#include <utils/common/scoped_value_rollback.h>
 
 #include "mobile_client_app_info.h"
 
@@ -67,7 +67,7 @@ void QnMobileClientSettings::updateValuesFromSettings(
         QSettings* settings,
         const QList<int>& ids)
 {
-    QN_SCOPED_VALUE_ROLLBACK(&m_loading, true);
+    QScopedValueRollback<bool> guard(m_loading, true);
 
     base_type::updateValuesFromSettings(settings, ids);
 }

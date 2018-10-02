@@ -69,7 +69,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
 :
-    CLServerPushStreamReader( res ),
+    CLServerPushStreamReader(res),
     m_thirdPartyRes(res),
     m_camManager(camManager)
 {
@@ -314,12 +314,12 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
 
         m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
-        NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
+        NX_INFO(this, lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()));
 
         //checking url type and creating corresponding data provider
 
         QUrl mediaUrl( mediaUrlStr );
-        if( nx_rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
+        if( nx::network::rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
@@ -362,12 +362,12 @@ bool ThirdPartyStreamReader::isStreamOpened() const
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
-int ThirdPartyStreamReader::getLastResponseCode() const
+CameraDiagnostics::Result ThirdPartyStreamReader::lastOpenStreamResult() const
 {
     QnMutexLocker lock(&m_streamReaderMutex);
-    return m_liveStreamReader
-        ? nx::network::http::StatusCode::ok
-        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx::network::http::StatusCode::ok);
+    if (!m_liveStreamReader && m_builtinStreamReader)
+        return m_builtinStreamReader->lastOpenStreamResult();
+    return CameraDiagnostics::NoErrorResult();
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const
@@ -538,7 +538,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     if (m_needCorrectTime && rez)
     {
         if (auto helper = timeHelper(rez))
-            rez->timestamp = helper->getTimeUs(rez->timestamp);
+            rez->timestamp = helper->getCurrentTimeUs(rez->timestamp);
     }
 
     return rez;

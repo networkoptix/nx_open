@@ -1,4 +1,10 @@
 Config.helpLinks.push({
+    url: "https://itunes.apple.com/us/app/ez-pro-mobile/id1167886315",
+    title: "iOS Client",
+    target: "new" // new|frame
+});
+
+Config.helpLinks.push({
     url: "https://play.google.com/store/apps/details?id=com.ioezio.ezpromobile",
     title: "Android Client",
     target: "new" // new|frame

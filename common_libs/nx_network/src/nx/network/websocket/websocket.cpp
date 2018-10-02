@@ -84,7 +84,9 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    m_lastError = ecode;
+    if (ecode != SystemError::noError)
+        m_lastError = ecode;
+
     if (m_lastError != SystemError::noError || bytesRead == 0)
     {
         NX_DEBUG(this, lm("Reporting error %1, read queue empty: %2").args(
@@ -93,7 +95,7 @@ void WebSocket::reportErrorIfAny(
         if (!m_readQueue.empty())
         {
             auto readData = m_readQueue.pop();
-            readData.handler(ecode, bytesRead);
+            readData.handler(m_lastError, bytesRead);
         }
         continueHandler(true);
         return;

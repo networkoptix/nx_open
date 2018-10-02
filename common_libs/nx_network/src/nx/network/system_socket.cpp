@@ -463,13 +463,13 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
     int flags = fcntl(m_fd, F_GETFD, 0);
     if (flags < 0)
     {
-        NX_LOGX(lm("Can not read options by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not read options by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()));
     }
     else if (fcntl(m_fd, F_SETFD, flags | FD_CLOEXEC) < 0)
     {
-        NX_LOGX(lm("Can not set FD_CLOEXEC by fcntl: %1")
-            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+        NX_WARNING(this, lm("Can not set FD_CLOEXEC by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()));
     }
 #endif
     return true;
@@ -1651,7 +1651,7 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
-        qWarning() << "failed to join multicast group" << multicastGroup;
+        NX_WARNING(this, "failed to join multicast group %1", multicastGroup);
         return false;
     }
     return true;
@@ -1668,8 +1668,8 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
             handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
             (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
-        qWarning() << "failed to join multicast group" << multicastGroup
-            << "from IF" << multicastIF << ". " << SystemError::getLastOSErrorText();
+        NX_WARNING(this, "Failed to join multicast group %1 from interface with IP %2. %3",
+                   multicastGroup, multicastIF, SystemError::getLastOSErrorText());
         return false;
     }
     return true;
@@ -1806,7 +1806,15 @@ void UDPSocket::sendToAsync(
             SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
         {
             if (code != SystemError::noError)
-                return handler(code, SocketAddress(), 0);
+            {
+                // Making sure that handler is never invoked within sendToAsync thread.
+                post(
+                    [handler = std::move(handler), code]()
+                    {
+                        handler(code, SocketAddress(), 0);
+                    });
+                return;
+            }
 
             auto addressIter = std::find_if(
                 ips.begin(), ips.end(),

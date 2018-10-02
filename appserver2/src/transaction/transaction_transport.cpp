@@ -127,11 +127,8 @@ bool QnTransactionTransport::sendSerializedTransaction(
     /* Check if remote peer has rights to receive transaction */
     if (m_userAccessData.userId != Qn::kSystemAccess.userId)
     {
-        NX_LOG(
-            QnLog::EC2_TRAN_LOG,
-            lit("Permission check failed while sending SERIALIZED transaction to peer %1")
-            .arg(remotePeer().id.toString()),
-            cl_logDEBUG1);
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending SERIALIZED transaction to peer %1")
+            .arg(remotePeer().id.toString()));
         return false;
     }
 
@@ -153,7 +150,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
                 QnAbstractTransaction abtractTran;
                 QnUbjsonReader<QByteArray> stream(&serializedTran);
                 QnUbjson::deserialize(&stream, &abtractTran);
-                NX_LOG(QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
+                NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()));
             }
 
             addDataToTheSendQueue(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));

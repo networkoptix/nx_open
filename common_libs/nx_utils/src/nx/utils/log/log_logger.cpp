@@ -117,7 +117,10 @@ Level Logger::maxLevel() const
 void Logger::setSettings(const LoggerSettings& loggerSettings)
 {
     QnMutexLocker lock(&m_mutex);
+
     m_settings = loggerSettings;
+    for (const auto[tag, level]: m_settings.level.filters)
+        m_tags.insert(tag);
 }
 
 void Logger::setApplicationName(const QString& applicationName)

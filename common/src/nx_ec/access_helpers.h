@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 
 #include <core/resource_access/user_access_data.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 namespace ec2 {
 namespace access_helpers {
@@ -34,6 +35,21 @@ void applyValueFilters(
     KeyValueFilterType* keyValue,
     const FilterFunctorListType& filterList,
     bool* allowed = nullptr);
+
+template<typename ResourceType>
+QnSharedResourcePointerList<ResourceType> getAccessibleResources(
+    const QnUserResourcePtr& subject,
+    QnSharedResourcePointerList<ResourceType> resources,
+    QnResourceAccessProvider* accessProvider)
+{
+    const auto itEnd = std::remove_if(resources.begin(), resources.end(),
+        [accessProvider, subject](const QnSharedResourcePointer<ResourceType>& other)
+        {
+            return !accessProvider->hasAccess(subject, other);
+        });
+    resources.erase(itEnd, resources.end());
+    return resources;
+}
 
 } // namespace access_helpers
 } // namespace ec2

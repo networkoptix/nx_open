@@ -23,7 +23,7 @@ if OS_IS_WINDOWS:
     ADDITIONAL_UPLOAD_ARGS = ["--chmod=ugo=rwX"]
 
 # Workaround against rsync bug:
-# all paths with semicolon are counted as remote,
+# all paths with colon are counted as remote,
 # so 'rsync rsync://server/path c:\test\path' won't work on windows
 def _cygwin_path(path):
     if len(path) > 1 and path[1] == ':':

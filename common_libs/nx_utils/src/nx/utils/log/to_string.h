@@ -90,7 +90,7 @@ QString toString(const T* value)
 template<typename T>
 QString toString(T* value)
 {
-    return toString((const T*) value);
+    return toString(const_cast<const T*>(value));
 }
 
 template<typename T>

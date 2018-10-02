@@ -9,7 +9,8 @@
 class MJPEGStreamReader: public CLServerPushStreamReader
 {
 public:
-    MJPEGStreamReader(const nx::mediaserver::resource::CameraPtr& res,
+    MJPEGStreamReader(
+        const nx::mediaserver::resource::CameraPtr& res,
         const QString& streamHttpPath);
     virtual ~MJPEGStreamReader();
 

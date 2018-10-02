@@ -1,59 +1,30 @@
 syntax: glob
 
-ecs.db-shm
-ecs.db-wal
-*.swp
-*.cache
-*make.cache
-*-build*
-*.idb
-*.log
-*.ncb
-*.opensdf
-*.pdb
 *.pyc
-*.sdf
-*.sln
-*.suo
-*.ipch
-*.orig
-*.xcodeproj/xcuserdata
-*.xcworkspace/xcuserdata
-*.vcproj.filters
-*.vcxproj
-*.vcxproj.filters
-*.vcproj
-*.tlog
-*.o
-*.qmlc
-*.jsc
-*.lastbuildstate
-!launcher*.vcproj
-*_tmp.py*
-donotrebuild
-vms*.pro
 .idea
-.branch.properties
-.ec_protocol.properties
-.cloudHost.properties
-.customization.properties
-x86/*
-x64/*
-target/*
-target-edge1/*
-target-rpi/*
-target-bpi/*
-target-bananapi/*
-target-tx1/*
-packages.config
-.vs
-.vscode
 .git
+tags
 TAGS
+*.swp
 *.kdev4
-*/*.VC.db
-CMakeLists.txt.user
+.DS_Store
+.vagrant
+**/node_modules
+**/stage
 
+doc/html
+doc/log.txt
+
+func_tests/.tox
+func_tests/.cache
+func_tests/.rnd
+func_tests/report.html
+func_tests/doc/html
+
+*.orig
+.vscode
+
+<<<<<<< local
 .DS_Store
 Debug
 Release
@@ -197,13 +168,18 @@ plugins\acs\Paxton\CustomProperties.cs
 plugins/NxControl/NxControl.cs
 
 mobile_client/build-*
+=======
+>>>>>>> other
 build/*
 build-*/*
 
-statserver/.venv
-statserver/build
-statserver/dist
+cloud_portal/env
+cloud_portal/cloud/static
+cloud_portal/front_end/app/images/{favicon.ico,logo.png,logo_small.png,promo/cloud.png}
+cloud_portal/front_end/app/styles/custom
+cloud_portal/robot_tests/{geckodriver.log,venv}
 
+<<<<<<< local
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
 
@@ -258,5 +234,7 @@ nx_cloud_deploy/log_alarm_dispatcher/event.json
 nx_cloud_deploy/log_alarm_dispatcher/message.json
 
 tags
-
+nx_cloud/backend/cloud_tests/monitoring/monitoring_simple.egg-info
 doc/html
+webadmin/static
+CMakeLists.txt.user

@@ -7,6 +7,7 @@
 #include <streaming/audio_streamer_pool.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <nx/streaming/nx_rtp_parser.h>
+#include <media_server/media_server_module.h>
 
 namespace
 {
@@ -122,10 +123,12 @@ private:
 typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
 
 QnAudioProxyReceiver::QnAudioProxyReceiver(
+    QnMediaServerModule* serverModule,
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
     :
-    QnTCPConnectionProcessor(std::move(socket), owner)
+    QnTCPConnectionProcessor(std::move(socket), owner),
+    m_serverModule(serverModule)
 {
     setObjectName(::toString(this));
 }
@@ -166,7 +169,7 @@ void QnAudioProxyReceiver::run()
     desktopDataProvider->setSocket(takeSocket());
 
     QString errString;
-    if (!QnAudioStreamerPool::instance()->startStopStreamToResource(desktopDataProvider, QnUuid(resourceId), action, errString))
+    if (!m_serverModule->audioStreamPool()->startStopStreamToResource(desktopDataProvider, QnUuid(resourceId), action, errString))
     {
         qWarning() << "Cant start audio uploading to camera" << resourceId << errString;
     }

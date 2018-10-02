@@ -26,10 +26,12 @@ public:
         nx::network::http::RequestProcessedHandler completionHandler) override
     {
         m_func(
-            connection,
-            std::move(authInfo),
-            std::move(request),
-            response,
+            RequestContext{
+                connection,
+                std::move(authInfo),
+                std::move(request),
+                response,
+                requestPathParams()},
             std::move(completionHandler));
     }
 

@@ -108,9 +108,8 @@ void TrafficRelay::startRelaying(
     RelayConnectionData clientConnection,
     RelayConnectionData serverConnection)
 {
-    NX_LOGX(lm("Starting relaying between %1 and %2")
-        .arg(clientConnection.peerId).arg(serverConnection.peerId),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Starting relaying between %1 and %2")
+        .arg(clientConnection.peerId).arg(serverConnection.peerId));
 
     RelaySession relaySession;
     relaySession.startTime = nx::utils::monotonicTime();
@@ -147,9 +146,8 @@ void TrafficRelay::onRelaySessionFinished(
     if (m_terminated)
         return;
 
-    NX_LOGX(lm("Done relaying between %1 and %2")
-        .arg(sessionIter->clientPeerId).arg(sessionIter->serverPeerId),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Done relaying between %1 and %2")
+        .arg(sessionIter->clientPeerId).arg(sessionIter->serverPeerId));
 
     m_statisticsCollector.onSessionStopped(
         sessionIter->serverPeerId,

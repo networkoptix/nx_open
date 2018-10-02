@@ -12,6 +12,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/client/desktop/event_rules/helpers/fullscreen_action_helper.h>
+#include <nx/client/desktop/resource_dialogs/camera_selection_dialog.h>
 #include <nx/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 
 using namespace nx::client::desktop;
@@ -132,15 +133,14 @@ void QnFullscreenCameraActionWidget::openCameraSelectionDialog()
 
     QScopedValueRollback<bool> guard(m_updating, true);
 
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this);
-    dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnFullscreenCameraPolicy>(this));
-    dialog.setSelectedResources(FullscreenActionHelper::cameraIds(model().data()));
-
-    if (dialog.exec() != QDialog::Accepted)
+    using namespace nx::client::desktop::node_view;
+    auto selectedCameras = FullscreenActionHelper::cameraIds(model().data());
+    if (!CameraSelectionDialog::selectCameras<QnFullscreenCameraPolicy>(selectedCameras, this))
         return;
 
     model()->setActionResourcesRaw(
-        FullscreenActionHelper::setCameraIds(model().data(), dialog.selectedResources()));
+        FullscreenActionHelper::setCameraIds(model().data(), selectedCameras));
+
     updateCameraButton();
     updateWarningLabel();
 }

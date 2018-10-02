@@ -289,14 +289,14 @@ void P2pMessageBusTestBase::waitForSync(int cameraCount)
     using namespace std::placeholders;
     checkMessageBus(std::bind(&P2pMessageBusTestBase::checkRuntimeInfo, this, _1, _2), lm("missing runtime info"));
 
-    int expectedCamerasCount = m_servers.size();
+    int expectedCamerasCount = (int) m_servers.size();
     expectedCamerasCount *= cameraCount;
     // wait for data sync
     int syncDoneCounter = 0;
     do
     {
         syncDoneCounter = 0;
-        for (const auto& server : m_servers)
+        for (const auto& server: m_servers)
         {
             const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
             const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
@@ -308,7 +308,22 @@ void P2pMessageBusTestBase::waitForSync(int cameraCount)
         ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while (syncDoneCounter != m_servers.size() && timer.elapsed() < kMaxSyncTimeoutMs);
-    NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
+    NX_INFO(this, lit("Sync data time: %1 ms").arg(timer.elapsed()));
+}
+
+void P2pMessageBusTestBase::setLowDelayIntervals()
+{
+    for (const auto& server: m_servers)
+    {
+        auto commonModule = server->moduleInstance()->commonModule();
+        const auto connection = server->moduleInstance()->ecConnection();
+        MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
+        auto intervals = bus->delayIntervals();
+        intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
+        intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+        intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
+        bus->setDelayIntervals(intervals);
+    }
 }
 
 } // namespace test

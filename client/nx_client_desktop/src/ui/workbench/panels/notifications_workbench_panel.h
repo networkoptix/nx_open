@@ -6,7 +6,6 @@
 
 class QnControlBackgroundWidget;
 class QnNotificationToolTipWidget;
-class QnNotificationsCollectionWidget;
 class QnImageButtonWidget;
 class QnBlinkingImageButtonWidget;
 class HoverFocusProcessor;
@@ -40,9 +39,10 @@ public:
 
     virtual ~NotificationsWorkbenchPanel() override;
 
-    QnControlBackgroundWidget* backgroundItem;
-    QnNotificationsCollectionWidget* item;
-    VariantAnimator* xAnimator;
+    QnControlBackgroundWidget* const backgroundItem;
+    QGraphicsWidget* const item;
+    VariantAnimator* const xAnimator;
+    QRectF tooltipsEnclosingRect;
 
 public:
     virtual bool isPinned() const override;
@@ -93,6 +93,7 @@ private:
     AnimatorGroup* m_opacityAnimatorGroup;
 
     /** New event panel. */
+    QGraphicsProxyWidget* m_eventPanelContainer = nullptr;
     QScopedPointer<nx::client::desktop::EventPanel> m_eventPanel;
     QPointer<HoverFocusProcessor> m_eventPanelHoverProcessor;
     const nx::client::desktop::EventTile* m_lastHoveredTile = nullptr;

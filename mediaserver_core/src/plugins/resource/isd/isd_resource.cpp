@@ -32,7 +32,8 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 // ==================================================================
 
 
-QnPlIsdResource::QnPlIsdResource()
+QnPlIsdResource::QnPlIsdResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setVendor(lit("ISD"));
 }

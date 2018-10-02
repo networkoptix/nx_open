@@ -294,10 +294,9 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
             if (result == api::ResultCode::ok)
                 return;
 
-            NX_LOG(lit("Error logging session %1: %2")
+            NX_INFO(typeid(QnCloudStatusWatcher), lit("Error logging session %1: %2")
                 .arg(cloudSystemId)
-                .arg(QString::fromStdString(api::toString(result))),
-                cl_logINFO);
+                .arg(QString::fromStdString(api::toString(result))));
         });
 }
 
@@ -375,8 +374,9 @@ void QnCloudStatusWatcher::resumeCloudInteraction()
 
 void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode result)
 {
-    setCloudEnabled((result != api::ResultCode::networkError)
-        && (result != api::ResultCode::serviceUnavailable));
+    setCloudEnabled(result != api::ResultCode::networkError
+        && result != api::ResultCode::serviceUnavailable
+        && result != api::ResultCode::accountBlocked);
 
     switch (result)
     {

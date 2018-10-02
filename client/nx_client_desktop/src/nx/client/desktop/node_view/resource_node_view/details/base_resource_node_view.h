@@ -16,12 +16,12 @@ class BaseResourceNodeView: public BaseNodeView
 public:
     using BaseNodeView::BaseNodeView;
 
-    void setInvalidLeafResources(const details::UuidSet& resourceIds, bool invalid);
+    void setInvalidLeafResources(const QnUuidSet& resourceIds, bool invalid);
 };
 
 template<typename BaseNodeView>
 void BaseResourceNodeView<BaseNodeView>::setInvalidLeafResources(
-    const details::UuidSet& resourceIds,
+    const QnUuidSet& resourceIds,
     bool invalid)
 {
     details::PathList paths;

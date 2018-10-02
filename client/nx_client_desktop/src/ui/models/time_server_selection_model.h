@@ -53,13 +53,9 @@ public:
 
     bool sameTimezone() const;
 
-    bool hasInternetAccess() const;
-
     const QVector<QColor>& colors() const;
     void setColors(const QVector<QColor>& colors);
     void updateTimeOffset();
-signals:
-    void hasInternetAccessChanged();
 
 private:
     void addItem(QnMediaServerResourcePtr server);
@@ -70,7 +66,6 @@ private:
 
     void updateFirstItemCheckbox();
 
-    void updateHasInternetAccess();
 private:
     struct Item
     {
@@ -86,8 +81,6 @@ private:
     QHash<QnUuid, qint64> m_serverOffsetCache;
 
     QVector<QColor> m_colors;
-
-    bool m_hasInternetAccess;
 
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;

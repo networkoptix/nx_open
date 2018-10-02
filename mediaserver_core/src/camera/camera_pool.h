@@ -1,5 +1,4 @@
-#ifndef __CAMERA_POOL_H__
-#define __CAMERA_POOL_H__
+#pragma once
 
 #include <memory>
 
@@ -14,7 +13,7 @@
 
 #include "camera_fwd.h"
 
-#define qnCameraPool QnVideoCameraPool::instance()
+class QnDataProviderFactory;
 
 namespace nx { namespace mediaserver { class Settings; } }
 class QnResourcePool;
@@ -32,12 +31,13 @@ private:
     QnVideoCameraPtr m_camera;
 };
 
-class QnVideoCameraPool:
-    public Singleton<QnVideoCameraPool>
+class QnVideoCameraPool: public  QObject
 {
+    Q_OBJECT
 public:
     QnVideoCameraPool(
         const nx::mediaserver::Settings& settings,
+        QnDataProviderFactory* dataProviderFactory,
         QnResourcePool* resourcePool);
     virtual ~QnVideoCameraPool();
 
@@ -58,9 +58,8 @@ private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
 
     const nx::mediaserver::Settings& m_settings;
+    QnDataProviderFactory* m_dataProviderFactory = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
     CameraMap m_cameras;
     mutable QnMutex m_mutex;
 };
-
-#endif //  __CAMERA_POOL_H__

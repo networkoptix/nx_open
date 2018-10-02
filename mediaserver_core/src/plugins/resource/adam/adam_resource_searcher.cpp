@@ -47,9 +47,10 @@ QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& co
     wordNum = byteNum / 2;
 }
 
-QnAdamResourceSearcher::QnAdamResourceSearcher(QnCommonModule* commonModule):
-    QnAbstractResourceSearcher(commonModule),
-    QnAbstractNetworkResourceSearcher(commonModule)
+QnAdamResourceSearcher::QnAdamResourceSearcher(QnMediaServerModule* serverModule):
+    QnAbstractResourceSearcher(serverModule->commonModule()),
+    QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
 }
 
@@ -157,7 +158,7 @@ QList<QnResourcePtr> QnAdamResourceSearcher::checkHostAddr(const nx::utils::Url 
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnAdamResourcePtr resource(new QnAdamResource());
+    QnAdamResourcePtr resource(new QnAdamResource(serverModule()));
     resource->setTypeId(typeId);
     resource->setName(model);
     resource->setModel(model);
@@ -226,7 +227,8 @@ QnResourceList QnAdamResourceSearcher::findResources()
             if (remoteEndpoint.port != kAdamAutodiscoveryPort)
                 continue;
 
-            auto existingResources = resourcePool()->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
+            auto existingResources = serverModule()->resourcePool()
+                ->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
 
             if (!existingResources.isEmpty())
             {
@@ -243,7 +245,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
                     if (typeId.isNull())
                         continue;
 
-                    QnAdamResourcePtr resource(new QnAdamResource());
+                    QnAdamResourcePtr resource(new QnAdamResource(serverModule()));
                     resource->setTypeId(typeId);
                     resource->setName(secRes->getModel());
                     resource->setModel(secRes->getName());
@@ -288,19 +290,18 @@ QnResourcePtr QnAdamResourceSearcher::createResource(const QnUuid& resourceTypeI
     if (resourceType.isNull())
     {
         qDebug() << "No resource type for for ID" << resourceTypeId;
-        NX_LOG(lit("No resource type for ID %1").arg(resourceTypeId.toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lit("No resource type for ID %1").arg(resourceTypeId.toString()));
         return result;
     }
 
     if (resourceType->getManufacture() != manufacture())
         return result;
 
-    result.reset(new QnAdamResource());
+    result.reset(new QnAdamResource(serverModule()));
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
-        .arg(resourceTypeId.toString()),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lit("Create Advantech ADAM-6000 series IO module resource. TypeID %1.")
+        .arg(resourceTypeId.toString()));
     return result;
 }
 

@@ -11,8 +11,8 @@ namespace metadata {
 class Yuv420UncompressedVideoFrame: public nxpt::CommonRefCounter<UncompressedVideoFrame>
 {
 public:
-    Yuv420UncompressedVideoFrame(const CLConstVideoDecoderOutputPtr& uncompressedFrame):
-        m_frame(uncompressedFrame)
+    Yuv420UncompressedVideoFrame(CLConstVideoDecoderOutputPtr uncompressedFrame):
+        m_frame(std::move(uncompressedFrame))
     {
     }
 
@@ -36,7 +36,7 @@ private:
     bool validatePlane(int plane) const;
 
 private:
-    const CLConstVideoDecoderOutputPtr& m_frame;
+    CLConstVideoDecoderOutputPtr m_frame;
 };
 
 } // namespace nx

@@ -90,7 +90,7 @@ The function accepts `nx::utils::log::Settings` that specify desired log filters
 parsed application configuration options taken whether from command line arguments 
 or conf file (Linux/Max) / registry (Mswin).
 
-Following parameters are supported:
+The following parameters are supported:
 - log/logger=LOGGER_SETTINGS.
     E.g., "--log/logger=file=/var/log/http,level=VERBOSE[nx::network::http],level=none"
     logs only messages with nx::network::http prefix with level <= VERBOSE to /var/log/http_log.

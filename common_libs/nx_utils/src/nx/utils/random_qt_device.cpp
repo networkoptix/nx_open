@@ -51,22 +51,22 @@ double QtDevice::entropy() const
 QtDevice& QtDevice::instance()
 {
     // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
-#if !defined(Q_OS_MAC)
-    thread_local QtDevice rd;
-    return rd;
-#else
-    static pthread_key_t key;
-    static auto init = pthread_key_create(
-        &key, [](void* p) { if (p) delete static_cast<QtDevice*>(p); });
+    #if !defined(Q_OS_MAC)
+        thread_local QtDevice rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(
+            &key, [](void* p) { if (p) delete static_cast<QtDevice*>(p); });
 
-    static_cast<void>(init);
-    if (auto rdp = static_cast<QtDevice*>(pthread_getspecific(key)))
+        static_cast<void>(init);
+        if (auto rdp = static_cast<QtDevice*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new QtDevice();
+        pthread_setspecific(key, rdp);
         return *rdp;
-
-    const auto rdp = new QtDevice();
-    pthread_setspecific(key, rdp);
-    return *rdp;
-#endif
+    #endif
 }
 
 } // namespace random

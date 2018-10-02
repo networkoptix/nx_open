@@ -13,13 +13,13 @@ constexpr const unsigned int kMaxConcurrentConnectionsFromSystemDefault = 2;
 
 } // namespace
 
-Settings::Settings():
+SynchronizationSettings::SynchronizationSettings():
     maxConcurrentConnectionsFromSystem(
         kMaxConcurrentConnectionsFromSystemDefault)
 {
 }
 
-void Settings::load(const QnSettings& settings)
+void SynchronizationSettings::load(const QnSettings& settings)
 {
     maxConcurrentConnectionsFromSystem = settings.value(
         kMaxConcurrentConnectionsFromSystem,

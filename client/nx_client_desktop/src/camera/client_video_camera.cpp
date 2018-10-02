@@ -229,7 +229,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         archiveReader->setStreamDataFilter(filter);
         m_exportRecorder->setMotionFileList(m_motionFileList);
     }
-    // TODO: add analytics objects to a export file as well.
+    // TODO: add analytics objects to an export file as well.
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setProgressBounds(startTimeUs, endTimeUs);

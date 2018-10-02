@@ -17,6 +17,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
+#include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/sync_call.h>
 
@@ -1380,7 +1381,7 @@ class AccountLockoutEnabled:
 public:
     AccountLockoutEnabled()
     {
-        m_settings.lockPeriod = std::chrono::seconds(3);
+        m_settings.lockPeriod = std::chrono::hours(1);
 
         addArg("--loginLockout/enabled=true");
 

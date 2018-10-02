@@ -2,12 +2,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(MSVC)
-    # Visual Studio 2017 currently (15.5.x) ignores "set(CMAKE_CXX_STANDARD 17)".
-    # So we need to set c++17 support explicitly.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-endif(MSVC)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(developerBuild)
@@ -182,6 +176,9 @@ if(MACOSX)
         -msse4.1
         -Wno-unused-local-typedef
     )
+    set(CMAKE_INSTALL_RPATH @executable_path/../lib)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

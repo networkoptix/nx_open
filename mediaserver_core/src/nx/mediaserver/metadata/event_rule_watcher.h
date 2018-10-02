@@ -6,16 +6,17 @@
 
 #include <nx/vms/event/rule_manager.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-class EventRuleWatcher: public Connective<QObject>
+class EventRuleWatcher: public Connective<QObject>, public ServerModuleAware
 {
     Q_OBJECT
 public:
-    EventRuleWatcher(QObject* parent);
+    EventRuleWatcher(QnMediaServerModule* serverModule);
     virtual ~EventRuleWatcher();
 
     void at_rulesReset(const nx::vms::event::RuleList& rules);
@@ -23,7 +24,7 @@ public:
     void at_ruleRemoved(const QnUuid& ruleId);
     void at_resourceAdded(const QnResourcePtr& resource);
 
-    QSet<QnUuid> watchedEventsForResource(const QnUuid& resourceId);
+    QSet<QString> watchedEventsForResource(const QnUuid& resourceId) const;
 
 signals:
     void rulesUpdated(const QSet<QnUuid>& affectedResources);

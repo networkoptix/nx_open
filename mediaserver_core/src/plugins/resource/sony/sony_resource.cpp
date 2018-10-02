@@ -15,7 +15,8 @@ static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
 using namespace nx::network::http;
 
-QnPlSonyResource::QnPlSonyResource()
+QnPlSonyResource::QnPlSonyResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
     setVendor(lit("Sony"));
 }
@@ -46,7 +47,9 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     QString password = auth.password();
     std::string endpoint = getMediaUrl().toStdString();
 
-    MediaSoapWrapper soapWrapperGet(endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapperGet(
+        onvifTimeouts(),
+        endpoint.c_str(), login, password, getTimeDrift());
     VideoConfigReq confRequest;
     confRequest.ConfigurationToken = confToken;
     VideoConfigResp confResponse;
@@ -59,7 +62,9 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
     }
 
-    MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapper(
+        onvifTimeouts(),
+        endpoint.c_str(), login, password, getTimeDrift());
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
     request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
@@ -119,7 +124,7 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 
     //if no input, exiting
-    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+    if( !hasCameraCapabilities(Qn::InputPortCapability) )
         return result;
 
     QAuthenticator auth = getAuth();
@@ -133,23 +138,16 @@ CameraDiagnostics::Result QnPlSonyResource::customInitialization(
     CLHttpStatus status = http.doGET( QLatin1String("/command/system.cgi?AlarmData=on") );
     if( status % 100 != 2 )
     {
-        NX_LOG( lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
-            arg(getHostAddress()).arg(status), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
+            arg(getHostAddress()).arg(status));
     }
 
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnPlSonyResource::startInputPortStatesMonitoring()
 {
     QnMutexLocker lk( &m_inputPortMutex );
-
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     if( m_inputMonitorHttpClient )
     {
         m_inputMonitorHttpClient->pleaseStopSync();
@@ -183,10 +181,9 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
     m_inputMonitorHttpClient->doGet( requestUrl );
-    return true;
 }
 
-void QnPlSonyResource::stopInputPortMonitoringAsync()
+void QnPlSonyResource::stopInputPortStatesMonitoring()
 {
     nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
@@ -198,23 +195,17 @@ void QnPlSonyResource::stopInputPortMonitoringAsync()
         inputMonitorHttpClient->pleaseStopSync();
 }
 
-bool QnPlSonyResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk( &m_inputPortMutex );
-    return m_inputMonitorHttpClient.get() != NULL;
-}
-
 void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoringAsync() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortStatesMonitoring() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
-        NX_LOG( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
-            arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
+            arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)));
         m_inputMonitorHttpClient.reset();
         return;
     }
@@ -264,7 +255,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
             continue;
         prevPortState = currentPortState;
 
-        emit cameraInput(
+        emit inputPortStateChanged(
             toSharedPointer(),
             QString::number(inputPortIndex),
             currentPortState,

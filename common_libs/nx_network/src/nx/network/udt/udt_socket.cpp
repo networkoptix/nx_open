@@ -1044,6 +1044,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
         !acceptedSocket->setRecvTimeout(0) ||
         !acceptedSocket->setNonBlockingMode(false))
     {
+        detail::setLastSystemErrorCodeAppropriately();
         return nullptr;
     }
 

@@ -97,8 +97,9 @@ public:
     }
 
     template<class T>
-    T deserialized() {
-        return QnUbjson::deserialized<T>(reply);
+    T deserialized(bool* success = nullptr)
+    {
+        return QnUbjson::deserialized<T>(reply, T(), success);
     }
 };
 

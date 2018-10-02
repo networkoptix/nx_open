@@ -111,8 +111,8 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttp
 
     if( httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
     {
-        NX_LOG( lit("Failed to subscribe to i/o monitor for camera %1. reason: %2").
-            arg(m_camera->getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        NX_WARNING(this, lit("Failed to subscribe to i/o monitor for camera %1. reason: %2").
+            arg(m_camera->getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return;
     }
 
@@ -121,8 +121,8 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx::network::http::AsyncHttp
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
         //unexpected content type
-        NX_LOG( lit("Error monitoring IO port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
-            arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        NX_WARNING(this, lit("Error monitoring IO port(s) on Axis camera %1. Unexpected Content-Type (%2) in monitor response. Expected: %3").
+            arg(m_camera->getUrl()).arg(QLatin1String(httpClient->contentType())).arg(QLatin1String(multipartContentType)));
         return;
     }
 

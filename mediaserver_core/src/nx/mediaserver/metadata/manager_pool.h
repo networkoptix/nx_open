@@ -5,6 +5,7 @@
 #include <QtCore/QThread>
 
 #include <map>
+#include <memory>
 
 #include <boost/optional/optional.hpp>
 
@@ -86,7 +87,7 @@ public slots:
 private:
     using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    nx::plugins::SettingsHolder loadSettingsFromFile(
+    std::unique_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
     void saveManifestToFile(
@@ -125,7 +126,7 @@ private:
     void fetchMetadataForResourceUnsafe(
         const QnUuid& resourceId,
         ResourceMetadataContext& context,
-        QSet<QnUuid>& eventTypeIds);
+        const QSet<QString>& eventTypeIds);
 
     template<typename T>
     boost::optional<T> deserializeManifest(const char* manifestString) const
@@ -175,20 +176,14 @@ private:
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame);
 
-    void warnOnce(bool* warningIssued, const QString& message);
-
     boost::optional<PixelFormat> pixelFormatFromManifest(
         const nx::api::AnalyticsDriverManifest& manifest);
 
-    static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
-
-    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToUncompressedVideoFrame(
-        const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat);
+    void issueMissingUncompressedFrameWarningOnce();
 
 private:
     ResourceMetadataContextMap m_contexts;
     QnMutex m_contextMutex;
-    bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
     QThread* m_thread;

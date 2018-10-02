@@ -13,8 +13,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <utils/common/scoped_value_rollback.h>
-
 QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::CameraOutputBusinessActionWidget)
@@ -81,7 +79,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
         auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(model()->actionResources());
         foreach(const QnVirtualCameraResourcePtr &camera, cameras)
         {
-            QnIOPortDataList cameraOutputs = camera->getRelayOutputList();
+            QnIOPortDataList cameraOutputs = camera->ioPortDescriptions(Qn::PT_Output);
             if (!inited)
             {
                 outputPorts = cameraOutputs;

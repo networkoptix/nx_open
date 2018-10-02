@@ -55,7 +55,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    const std::set<Tag> m_tags;
+    std::set<Tag> m_tags;
     Level m_defaultLevel = Level::none;
     OnLevelChanged m_onLevelChanged;
     LoggerSettings m_settings;

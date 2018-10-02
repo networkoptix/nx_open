@@ -7,6 +7,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
 
+#include <utils/common/synctime.h>
+
 #include <nx/mediaserver/event/event_connector.h>
 
 namespace nx {
@@ -73,7 +75,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     m_settings = archiveManager->settings();
 
     archiveManager->beforeSynchronization();
-    qnEventRuleConnector->at_remoteArchiveSyncStarted(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncStarted(m_resource);
     bool result = true;
     for (auto i = 0; i < m_settings.syncCyclesNumber; ++i)
     {
@@ -95,7 +97,7 @@ bool BaseRemoteArchiveSynchronizationTask::execute()
     }
 
     archiveManager->afterSynchronization(result);
-    qnEventRuleConnector->at_remoteArchiveSyncFinished(m_resource);
+    serverModule()->eventConnector()->at_remoteArchiveSyncFinished(m_resource);
     return result;
 }
 
@@ -141,8 +143,8 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
     const auto endTimeMs = m_chunks[overlappedId].back().startTimeMs
         + m_chunks[overlappedId].back().durationMs;
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,
@@ -151,7 +153,10 @@ bool BaseRemoteArchiveSynchronizationTask::synchronizeOverlappedTimeline(
             /*keepSmallChunks*/ true,
             std::numeric_limits<int>::max());
 
-    auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId]);
+    auto deviceTimePeriods = toTimePeriodList(m_chunks[overlappedId])
+        .intersected(
+            QnTimePeriod(QnTimePeriod::minTimeValue(), qnSyncTime->currentMSecsSinceEpoch()));
+
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Device time periods: %2. Device: %3.")
         .args(overlappedId, deviceTimePeriods, m_resource->getUserDefinedName()));
     NX_DEBUG(this, lm("Synchronizing overlapped ID %1. Server time periods: %2. Device: %3.")
@@ -172,6 +177,7 @@ void BaseRemoteArchiveSynchronizationTask::createStreamRecorderThreadUnsafe(
 {
     NX_ASSERT(m_archiveReader, lit("Archive reader should be created before stream recorder"));
     m_recorder = std::make_unique<QnServerEdgeStreamRecorder>(
+        serverModule(),
         m_resource,
         QnServer::ChunksCatalog::HiQualityCatalog,
         m_archiveReader.get());
@@ -203,11 +209,8 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
         NX_VERBOSE(this, lm("Saving motion data packet with timestamp %1. Device: %2.")
             .args(microseconds(motion->timestamp), m_resource->getUserDefinedName()));
 
-        auto helper = QnMotionHelper::instance();
-        QnMotionArchive* archive = helper->getArchive(
-            m_resource,
-            motion->channelNumber);
-
+        auto helper = serverModule()->motionHelper();
+        QnMotionArchive* archive = helper->getArchive(m_resource, motion->channelNumber);
         if (archive)
             archive->saveToArchive(motion);
     }
@@ -289,6 +292,19 @@ bool BaseRemoteArchiveSynchronizationTask::writeAllTimePeriods(
                 continue;
 
             writeTimePeriodToArchive(timePeriod, *chunk);
+        }
+        else
+        {
+            NX_VERBOSE(
+                this,
+                lm("Skipping chunk because its duration is less than %1ms, "
+                    "chunk start time: %2 (%3), resource %4 (%5)")
+                    .args(
+                        duration_cast<milliseconds>(kMinChunkDuration).count(),
+                        timePeriod.startTimeMs,
+                        QDateTime::fromMSecsSinceEpoch(timePeriod.startTimeMs),
+                        m_resource->getUserDefinedName(),
+                        m_resource->getId()));
         }
     }
 
@@ -406,8 +422,8 @@ void BaseRemoteArchiveSynchronizationTask::onFileHasBeenWritten(
 
     m_progress = progress;
 
-    NX_CRITICAL(qnEventRuleConnector);
-    qnEventRuleConnector->at_remoteArchiveSyncProgress(
+    NX_CRITICAL(serverModule()->eventConnector());
+    serverModule()->eventConnector()->at_remoteArchiveSyncProgress(
         m_resource,
         progress);
 }
@@ -427,8 +443,8 @@ milliseconds BaseRemoteArchiveSynchronizationTask::calculateDurationOfMediaToImp
     const auto startTimeMs = mergedDeviceTimePeriods.front().startTimeMs;
     const auto endTimeMs = mergedDeviceTimePeriods.back().endTimeMs();
 
-    NX_CRITICAL(qnNormalStorageMan);
-    auto serverTimePeriods = qnNormalStorageMan
+    NX_CRITICAL(serverModule()->normalStorageManager());
+    auto serverTimePeriods = serverModule()->normalStorageManager()
         ->getFileCatalog(m_resource->getUniqueId(), QnServer::ChunksCatalog::HiQualityCatalog)
         ->getTimePeriods(
             startTimeMs,

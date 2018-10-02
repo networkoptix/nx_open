@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/network/buffer.h>
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -15,7 +16,7 @@ namespace dao {
 
 struct TransactionData
 {
-    const nx::String& systemId;
+    const std::string& systemId;
     const CommandHeader& header;
     const QByteArray& hash;
     const QByteArray& ubjsonSerializedTransaction;
@@ -44,13 +45,13 @@ public:
 
     virtual nx::sql::DBResult updateTimestampHiForSystem(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         quint64 newValue) = 0;
 
     // TODO: #ak Too many arguments in following method.
     virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         const QString& peerId,
         const QString& dbInstanceId,
         std::int64_t minSequence,
@@ -58,30 +59,42 @@ public:
         std::vector<dao::TransactionLogRecord>* const transactions) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 enum class DataObjectType
 {
     rdbms,
     ram
 };
 
-class NX_DATA_SYNC_ENGINE_API TransactionDataObjectFactory
-{
-public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<std::unique_ptr<AbstractTransactionDataObject>()>;
+using TransactionDataObjectFactoryFunction =
+    std::unique_ptr<AbstractTransactionDataObject>(int /*commandFormatVersion*/);
 
-    static std::unique_ptr<AbstractTransactionDataObject> create();
+class NX_DATA_SYNC_ENGINE_API TransactionDataObjectFactory:
+    public nx::utils::BasicFactory<TransactionDataObjectFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<TransactionDataObjectFactoryFunction>;
+
+public:
+    TransactionDataObjectFactory();
+
+    static TransactionDataObjectFactory& instance();
 
     template<typename CustomDataObjectType>
-    static void setDataObjectType()
+    Function setDataObjectType()
     {
-        setFactoryFunc([](){ return std::make_unique<CustomDataObjectType>(); });
+        return setCustomFunc(
+            [](int commandFormatVersion)
+            {
+                return std::make_unique<CustomDataObjectType>(commandFormatVersion);
+            });
     }
 
-    static void setDataObjectType(DataObjectType dataObjectType);
+    Function setDataObjectType(DataObjectType dataObjectType);
 
-    static void setFactoryFunc(FactoryFunc func);
-
-    static void resetToDefaultFactory();
+private:
+    std::unique_ptr<AbstractTransactionDataObject> defaultFactoryFunction(
+        int commandFormatVersion);
 };
 
 } // namespace dao

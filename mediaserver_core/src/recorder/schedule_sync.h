@@ -20,7 +20,8 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/api/types/days_of_week.h>
 
-class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware
+class QnScheduleSync: 
+    public QnLongRunnable, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 private:
@@ -63,7 +64,7 @@ public:
     };
 
 public:
-    QnScheduleSync(QnCommonModule* commonModule);
+    QnScheduleSync(QnMediaServerModule* serverModule);
     ~QnScheduleSync();
 signals:
     void backupFinished(

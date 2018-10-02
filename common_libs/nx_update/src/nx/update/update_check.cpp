@@ -264,7 +264,7 @@ bool findPackage(
         if (package.arch == systemInformation.arch
             && package.platform == systemInformation.platform
             && package.variant == systemInformation.modification
-            && packageOsVariant <= selfOsVariant)
+            && (packageOsVariant <= selfOsVariant || selfOsVariant.isNull()))
         {
             *outPackage = package;
             return true;

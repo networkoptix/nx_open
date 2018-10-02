@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/http/server/handler/fusion_based_handlers.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -14,34 +15,6 @@
 namespace nx {
 namespace hpm {
 namespace http {
-
-// TODO: #ak Consider moving this class to some common location.
-template<typename ResultType>
-class GetHandler:
-    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
-{
-public:
-    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
-
-    GetHandler(FunctorType func):
-        m_func(std::move(func))
-    {
-    }
-
-private:
-    FunctorType m_func;
-
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        const nx::network::http::Request& /*request*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/) override
-    {
-        auto data = m_func();
-        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
 
 Server::Server(
     const conf::Settings& settings,
@@ -93,7 +66,8 @@ const Server::MultiAddressHttpServer& Server::server() const
 
 void Server::registerStatisticsApiHandlers(const stats::Provider& provider)
 {
-    using GetAllStatisticsHandler = GetHandler<stats::Statistics>;
+    using GetAllStatisticsHandler =
+        network::http::server::handler::GetHandler<stats::Statistics>;
 
     registerApiHandler<GetAllStatisticsHandler>(
         network::url::joinPath(api::kMediatorApiPrefix, api::kStatisticsMetricsPath).c_str(),
@@ -106,7 +80,7 @@ bool Server::launchHttpServerIfNeeded(
     const PeerRegistrator& peerRegistrator,
     nx::cloud::discovery::RegisteredPeerPool* registeredPeerPool)
 {
-    NX_LOGX("Bringing up HTTP server", cl_logINFO);
+    NX_INFO(this, "Bringing up HTTP server");
 
     m_httpMessageDispatcher = std::make_unique<nx::network::http::server::rest::MessageDispatcher>();
 
@@ -125,8 +99,8 @@ bool Server::launchHttpServerIfNeeded(
     if (!m_multiAddressHttpServer->bind(settings.http().addrToListenList))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
-            .arg(SystemError::toString(osErrorCode)), cl_logERROR);
+        NX_ERROR(this, lm("Failed to bind HTTP server to address ... . %1")
+            .arg(SystemError::toString(osErrorCode)));
         return false;
     }
 

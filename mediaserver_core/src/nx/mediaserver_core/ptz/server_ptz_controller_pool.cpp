@@ -187,7 +187,7 @@ QnPtzControllerPtr ServerPtzControllerPool::createController(
     wrappingParameters.absoluteMoveMapper = mapper(camera);
     wrappingParameters.relativeMoveMapping = relativeMoveMapping(camera);
     wrappingParameters.areNativePresetsDisabled = disableNativePresets;
-    wrappingParameters.ptzPool = qnPtzPool;
+    wrappingParameters.ptzPool = this;
     wrappingParameters.commonModule = commonModule();
 
     NX_DEBUG(

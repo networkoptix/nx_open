@@ -27,7 +27,7 @@ ConnectorFactory& ConnectorFactory::instance()
 
 CloudConnectors ConnectorFactory::defaultFactoryFunction(
     const AddressEntry& targetAddress,
-    const nx::String& connectSessionId,
+    const std::string& connectSessionId,
     const hpm::api::ConnectResponse& response,
     std::unique_ptr<UDPSocket> udpSocket)
 {

@@ -25,7 +25,6 @@ set(eulaVersion 1)
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
@@ -52,6 +51,7 @@ set(translations
     en_US
     en_GB
     fr_FR
+    cs_CZ
     de_DE
     ru_RU
     es_ES

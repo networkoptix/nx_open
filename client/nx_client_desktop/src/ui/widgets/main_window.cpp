@@ -66,6 +66,7 @@
 #include <nx/client/desktop/analytics/analytics_action_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
 #include <ui/workbench/handlers/workbench_wearable_handler.h>
+#include <ui/workbench/handlers/startup_actions_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -105,7 +106,6 @@
 
 #include <client_core/client_core_module.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
 
 #include <nx/client/core/utils/geometry.h>
@@ -149,11 +149,7 @@ void enable_animations(void* qnmainwindow)
 #endif
 
 MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags) :
-    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
-#ifdef Q_OS_MACX
-        | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
-#endif
-        ),
+    base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_welcomeScreen(qnRuntime->isDesktopMode() ? new QnWorkbenchWelcomeScreen(this) : nullptr),
     m_titleBar(new QnMainWindowTitleBarWidget(this, context))
@@ -259,6 +255,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<workbench::LayoutToursHandler>();
     context->instance<RadassActionHandler>();
     context->instance<AnalyticsActionHandler>();
+    context->instance<StartupActionsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -372,7 +369,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    if (!qnRuntime->isActiveXMode() && !qnRuntime->isProfilerMode())
+    if (!qnRuntime->isAcsMode() && !qnRuntime->isProfilerMode())
     {
         /* VSync workaround must always be enabled to limit fps usage in following cases:
          * * VSync is not supported by drivers
@@ -486,7 +483,7 @@ void MainWindow::setFullScreen(bool fullScreen) {
      */
     if (m_inFullscreenTransition)
         return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_inFullscreenTransition, true);
+    QScopedValueRollback<bool> guard(m_inFullscreenTransition, true);
 
 
     if(fullScreen) {
@@ -611,9 +608,9 @@ void MainWindow::updateDecorationsState()
     bool uiTitleUsed = fullScreen || maximized;
 #endif
 
-    bool windowTitleUsed = !uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode();
+    bool windowTitleUsed = !uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isAcsMode();
     setTitleVisible(windowTitleUsed);
-    m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode());
+    m_ui->setTitleUsed(uiTitleUsed && !qnRuntime->isVideoWallMode() && !qnRuntime->isAcsMode());
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
     updateContentsMargins();
 }

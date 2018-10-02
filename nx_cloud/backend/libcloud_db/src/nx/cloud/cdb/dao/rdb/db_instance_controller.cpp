@@ -23,7 +23,7 @@ DbInstanceController::DbInstanceController(
 
     if (!initialize())
     {
-        NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
+        NX_ALWAYS(this, lit("Failed to initialize DB connection"));
         throw nx::sql::Exception(
             nx::sql::DBResult::ioError,
             "Failed to initialize connection to DB");

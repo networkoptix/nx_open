@@ -343,7 +343,9 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
                 &QnLicenseUsageWatcher::licenseUsageChanged);
             connect(camera, &QnSecurityCamResource::licenseTypeChanged, this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
-        };
+            connect(camera, &QnSecurityCamResource::parentIdChanged, this,
+                &QnLicenseUsageWatcher::licenseUsageChanged);
+    };
 
     if (camera)
     {

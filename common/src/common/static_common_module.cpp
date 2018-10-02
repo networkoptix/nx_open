@@ -43,7 +43,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     // Providing mediaserver-specific way of validating peer id.
     m_private->endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const nx::String& connectSessionId)
+            [](const std::string& connectSessionId)
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
             {
                 return std::make_unique<CloudMediaServerEndpointVerificator>(

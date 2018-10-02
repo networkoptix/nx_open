@@ -12,9 +12,10 @@ namespace data_sync_engine {
 constexpr static const int kMaxTransactionsPerIteration = 17;
 
 WebSocketTransactionTransport::WebSocketTransactionTransport(
-    nx::network::aio::AbstractAioThread* aioThread,
+    const ProtocolVersionRange& protocolVersionRange,
     TransactionLog* const transactionLog,
-    const nx::String& systemId,
+    const std::string& systemId,
+    const OutgoingCommandFilter& filter,
     const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
     vms::api::PeerDataEx localPeerData,
@@ -24,14 +25,26 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
         remotePeerData,
         localPeerData,
         std::move(webSocket),
+        QUrlQuery(),
         std::make_unique<nx::p2p::ConnectionContext>()),
+    m_protocolVersionRange(protocolVersionRange),
+    m_commonTransactionHeader(protocolVersionRange.currentVersion()),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
         systemId,
-        remotePeerData.dataFormat)),
+        remotePeerData.dataFormat,
+        filter)),
+    m_systemId(systemId),
     m_connectionGuid(connectionId)
 {
-    bindToAioThread(aioThread);
+    bindToAioThread(this->webSocket()->getAioThread());
+
+    m_commonTransactionHeader.systemId = systemId;
+    m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
+    m_commonTransactionHeader.endpoint = remoteSocketAddr();
+    m_commonTransactionHeader.connectionId = connectionId.toSimpleString().toStdString();
+    m_commonTransactionHeader.vmsTransportHeader.sender = remotePeerData.id;
+    m_commonTransactionHeader.transactionFormatVersion = remotePeerData.protoVersion;
 
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeerData.aliveUpdateIntervalMs);
     this->webSocket()->setAliveTimeout(keepAliveTimeout);
@@ -77,10 +90,10 @@ void WebSocketTransactionTransport::onGotMessage(
     {
         case nx::p2p::MessageType::pushTransactionData:
         {
-            TransactionTransportHeader cdbTransportHeader;
+            TransactionTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
             cdbTransportHeader.endpoint = remoteSocketAddr();
             cdbTransportHeader.systemId = m_transactionLogReader->systemId();
-            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray();
+            cdbTransportHeader.connectionId = connectionGuid().toSimpleByteArray().toStdString();
             //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
             cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
             m_gotTransactionEventHandler(
@@ -103,7 +116,10 @@ void WebSocketTransactionTransport::onGotMessage(
             break;
         }
         default:
-            NX_ASSERT(0, "Not implemented!");
+            NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
+                "System id %2, source endpoint %3")
+                .args(toString(messageType), m_systemId, remoteSocketAddr()));
+            setState(State::Error);
             break;
     }
 }
@@ -112,10 +128,13 @@ void WebSocketTransactionTransport::readTransactions()
 {
     using namespace std::placeholders;
     m_tranLogRequestInProgress = true;
+    
+    ReadCommandsFilter filter;
+    filter.from = m_remoteSubscription;
+    filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
+
     m_transactionLogReader->readTransactions(
-        m_remoteSubscription,
-        boost::optional<vms::api::TranState>(), //< toState. Unlimited
-        kMaxTransactionsPerIteration,
+        filter,
         std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
 
@@ -203,8 +222,8 @@ void WebSocketTransactionTransport::sendTransaction(
 
 int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return remotePeer().protoVersion >= kMinSupportedProtocolVersion
-        ? kMaxSupportedProtocolVersion
+    return remotePeer().protoVersion >= m_protocolVersionRange.begin()
+        ? m_protocolVersionRange.currentVersion()
         : remotePeer().protoVersion;
 }
 

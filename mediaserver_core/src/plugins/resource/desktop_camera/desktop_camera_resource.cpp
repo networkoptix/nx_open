@@ -14,12 +14,14 @@ QString QnDesktopCameraResource::getDriverName() const
     return MANUFACTURE;
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource()
+QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource(const QString& userName)
+QnDesktopCameraResource::QnDesktopCameraResource(QnMediaServerModule* serverModule, const QString& userName):
+    nx::mediaserver::resource::Camera(serverModule)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
@@ -29,7 +31,7 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 {
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, bool /*activate*/,
+bool QnDesktopCameraResource::setOutputPortState(const QString& /*outputID*/, bool /*activate*/,
     unsigned int /*autoResetTimeoutMS*/)
 {
     return false;

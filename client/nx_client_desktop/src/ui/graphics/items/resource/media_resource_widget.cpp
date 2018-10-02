@@ -106,7 +106,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
-#include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -120,6 +119,7 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -272,7 +272,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
                 emit licenseStatusChanged();
             });
 
-        connect(qnPtzPool, &QnPtzControllerPool::controllerChanged, this,
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        connect(ptzPool, &QnPtzControllerPool::controllerChanged, this,
             [this](const QnResourcePtr& resource)
             {
                 // Make sure we will not handle resource removing.
@@ -434,11 +435,7 @@ void QnMediaResourceWidget::handleItemDataChanged(
             if (const auto reader = display()->archiveReader())
             {
                 const auto timestampUSec = data.toLongLong();
-                const auto timestampMs = timestampUSec == DATETIME_NOW
-                    ? DATETIME_NOW
-                    : timestampUSec * 1000;
-
-                reader->jumpTo(timestampMs, 0);
+                reader->jumpTo(timestampUSec, 0);
             }
             break;
         }
@@ -612,7 +609,7 @@ void QnMediaResourceWidget::initStatusOverlayController()
          [this, changeCameraPassword]()
          {
              const auto passwordWatcher = context()->instance<DefaultPasswordCamerasWatcher>();
-             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword(), true);
+             changeCameraPassword(passwordWatcher->camerasWithDefaultPassword().values(), true);
          });
 }
 
@@ -832,7 +829,8 @@ void QnMediaResourceWidget::updatePtzController()
 
     if (d->camera)
     {
-        if (QnPtzControllerPtr serverController = qnPtzPool->controller(d->camera))
+        auto ptzPool = qnClientCoreModule->ptzControllerPool();
+        if (QnPtzControllerPtr serverController = ptzPool->controller(d->camera))
         {
             serverController.reset(new QnActivityPtzController(commonModule(),
                 QnActivityPtzController::Client, serverController));
@@ -3160,8 +3158,8 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
 
             if (!success)
             {
-                NX_LOG(tr("Failed to invoke trigger %1 (%2)")
-                    .arg(id).arg(result.errorString), cl_logERROR);
+                NX_ERROR(this, tr("Failed to invoke trigger %1 (%2)")
+                    .arg(id).arg(result.errorString));
             }
 
             if (resultHandler)

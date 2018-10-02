@@ -6,10 +6,21 @@
 #include <utils/common/app_info.h>
 #include <audit/audit_manager.h>
 #include <api/model/audit/auth_session.h>
+#include <common/common_module.h>
 
 #include <QtCore>
 
 namespace nx {
+
+CommonUpdateInstaller::CommonUpdateInstaller(QObject* parent):
+    QnCommonModuleAware(parent)
+{
+}
+
+CommonUpdateInstaller::~CommonUpdateInstaller()
+{
+    stopSync();
+}
 
 void CommonUpdateInstaller::prepareAsync(const QString& path)
 {
@@ -148,9 +159,9 @@ bool CommonUpdateInstaller::install(const QnAuthSession& authInfo)
         NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
     }
 
-    auto authRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_UpdateInstall);
+    auto authRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
     authRecord.addParam("version", m_version.toLatin1());
-    qnAuditManager->addAuditRecord(authRecord);
+    commonModule()->auditManager()->addAuditRecord(authRecord);
 
     const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached(
         QDir(installerWorkDir()).absoluteFilePath(m_executable),
@@ -183,11 +194,6 @@ void CommonUpdateInstaller::stopSync()
     while (m_state == CommonUpdateInstaller::State::inProgress)
         m_condition.wait(lock.mutex());
     m_state = CommonUpdateInstaller::State::idle;
-}
-
-CommonUpdateInstaller::~CommonUpdateInstaller()
-{
-    stopSync();
 }
 
 bool CommonUpdateInstaller::cleanInstallerDirectory()

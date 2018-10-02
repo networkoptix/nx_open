@@ -9,7 +9,7 @@ from pathlib2 import Path
 import framework.utils as utils
 import server_api_data_generators as generator
 from framework.os_access.exceptions import NonZeroExitStatus
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ def get_storage(server, storage_path):
         return None
 
 def add_backup_storage(server, storage_path):
-    storage = wait_for_true(
+    storage = wait_for_truthy(
         lambda: get_storage(server, storage_path),
         BACKUP_STORAGE_APPEARS_TIMEOUT_SEC)
     assert storage, 'Mediaserver did not accept storage %r in %r seconds' % (
@@ -152,9 +152,10 @@ def wait_backup_finish(server, expected_backup_time):
         backup_time_ms = int(backup_response['backupTimeMs'])
         backup_state = backup_response['state']
         backup_time = utils.datetime_utc_from_timestamp(backup_time_ms / 1000.)
-        _logger.debug("'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
-                  server, utils.datetime_to_str(backup_time),
-                  utils.datetime_to_str(expected_backup_time))
+        _logger.debug(
+            "'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
+            server, utils.datetime_to_str(backup_time),
+            utils.datetime_to_str(expected_backup_time))
         if backup_state == 'BackupState_None' and backup_time_ms != 0:
             assert backup_time == expected_backup_time
             return

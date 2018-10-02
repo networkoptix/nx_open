@@ -158,30 +158,43 @@ enum Value
     switchingProtocols = 101,
 
     ok = 200,
+    created = 201,
     noContent = 204,
     partialContent = 206,
     lastSuccessCode = 299,
     multipleChoices = 300,
     movedPermanently = 301,
+    movedTemporarily = 302,
     found = 302,
     seeOther = 303,
     notModified = 304,
+    useProxy = 305,
 
     badRequest = 400,
     unauthorized = 401,
+    paymentRequired = 402,
     forbidden = 403,
     notFound = 404,
     notAllowed = 405,
     notAcceptable = 406,
     proxyAuthenticationRequired = 407,
+    requestTimeOut = 408,
+    conflict = 409,
+    gone = 410,
+    lengthRequired = 411,
+    preconditionFailed = 412,
+    requestEntityTooLarge = 413,
+    requestUriToLarge = 414,
     unsupportedMediaType = 415,
     rangeNotSatisfiable = 416,
-    invalidParameter = 451,
+    unprocessableEntity = 422,
+    unavailableForLegalReasons = 451,
 
     internalServerError = 500,
     notImplemented = 501,
     badGateway = 502,
-    serviceUnavailable = 503
+    serviceUnavailable = 503,
+    gatewayTimeOut = 504,
 };
 
 NX_NETWORK_API StringType toString(Value);
@@ -200,13 +213,13 @@ class NX_NETWORK_API Method
 public:
     typedef StringType ValueType;
 
+    static const StringType connect;
     static const StringType get;
     static const StringType head;
     static const StringType post;
     static const StringType put;
     static const StringType delete_;
     static const StringType options;
-    static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
     static bool isMessageBodyAllowedInResponse(
@@ -339,7 +352,10 @@ public:
     StringType toString() const;
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
 
-    void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
+    void setCookie(
+        const StringType& name, const StringType& value,
+        const StringType& path = "/", bool secure = false);
+
     void setDeletedCookie(const StringType& name);
     std::map<StringType, StringType> getCookies() const;
 };
@@ -398,6 +414,7 @@ namespace header {
 /** Common header name constants. */
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
+extern NX_NETWORK_API const StringType kAccept;
 
 //!Http authentication scheme enumeration
 namespace AuthScheme
@@ -721,6 +738,24 @@ public:
     bool parse(const StringType& str);
 
     bool operator==(const Forwarded& right) const;
+};
+
+struct NX_NETWORK_API ContentType
+{
+    static const StringType NAME;
+
+    static const StringType kAny;
+    static const StringType kDefaultCharset;
+
+    static const ContentType kPlain;
+    static const ContentType kHtml;
+    static const ContentType kJson;
+
+    StringType value;
+    StringType charset;
+
+    ContentType(const StringType& headerValue = kPlain.toString());
+    StringType toString() const;
 };
 
 } // namespace header

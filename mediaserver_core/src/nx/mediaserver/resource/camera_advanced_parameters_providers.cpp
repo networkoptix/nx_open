@@ -184,9 +184,10 @@ bool StreamCapabilityAdvancedParametersProvider::setParameters(const QnLiveStrea
 
     m_parameters = value;
 
-    if (qnCameraPool)
+    auto videoCameraPool = m_camera->serverModule()->videoCameraPool();
+    if (videoCameraPool)
     {
-        if (const auto camera = qnCameraPool->getVideoCamera(toSharedPointer(m_camera)))
+        if (const auto camera = videoCameraPool->getVideoCamera(toSharedPointer(m_camera)))
         {
             const auto stream =
                 (m_streamIndex == Qn::StreamIndex::primary)

@@ -105,7 +105,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
     QThread::currentThread()->setPriority(QThread::IdlePriority);
 
-    NX_LOG(lit("Browsing directories..."), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Browsing directories..."));
 
     QTime time;
     time.restart();
@@ -132,7 +132,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
             break;
     }
 
-    NX_LOG(lit("Done(Browsing directories). Time elapsed = %1.").arg(time.elapsed()), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Done(Browsing directories). Time elapsed = %1.").arg(time.elapsed()));
 
     QThread::currentThread()->setPriority(QThread::LowPriority);
 
@@ -182,7 +182,7 @@ QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString& filename) con
 int QnResourceDirectoryBrowser::findResources(const QString& directory, const ResourceCache& cache, BrowseHandler handler, int maxResources)
 {
     // Note: This method can be called from a separate thread. Beware!
-    NX_LOG(lit("Checking %1").arg(directory), cl_logDEBUG1);
+    NX_DEBUG(this, lit("Checking %1").arg(directory));
 
     if (shouldStop() || maxResources == 0)
         return 0;
@@ -383,9 +383,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             QScopedPointer<QIODevice> motionIO(layoutStorage.open(lit("motion%1_%2.bin")
                 .arg(channel)
                 .arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly));
-            if (motionIO)
+            // Doing some additional checks in case data is broken.
+            if (motionIO && (motionIO->size() % sizeof(QnMetaDataV1Light) == 0))
             {
-                NX_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
                 size_t motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
                 if (motionDataSize > 0)

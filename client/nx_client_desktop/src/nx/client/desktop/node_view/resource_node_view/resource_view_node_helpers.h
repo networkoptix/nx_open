@@ -23,9 +23,10 @@ QnResourcePtr getResource(const QModelIndex& index);
 QString extraText(const QModelIndex& index);
 void setExtraText(const QString& value, const details::NodePtr& node, int column);
 
-bool invalidNode(const details::NodePtr& node);
-bool invalidNode(const QModelIndex& index);
-details::ViewNodeData getInvalidNodeData(bool invalid);
+bool isValidNode(const details::NodePtr& node);
+bool isValidNode(const QModelIndex& index);
+details::ViewNodeData getDataForInvalidNode(bool invalid);
+void setNodeValidState(const details::NodePtr& node, bool valid);
 
 } // namespace node_view
 } // namespace desktop

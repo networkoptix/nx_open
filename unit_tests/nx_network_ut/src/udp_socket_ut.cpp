@@ -336,7 +336,7 @@ TEST_F(UdpSocket, DISABLED_Performance)
     UDPSocket server(AF_INET);
     server.bind(SocketAddress::anyPrivateAddress);
     const auto address = server.getLocalAddress();
-    NX_LOG(lm("%1").arg(address), cl_logINFO);
+    NX_INFO(this, lm("%1").arg(address));
     nx::utils::thread serverThread(
         [&]()
         {
@@ -359,14 +359,14 @@ TEST_F(UdpSocket, DISABLED_Performance)
             const auto durationMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - startTime);
 
-            NX_LOG(lm("Resieve ended (%1): %2")
-                .args(recv, SystemError::getLastOSErrorText()), cl_logINFO);
+            NX_INFO(this, lm("Resieve ended (%1): %2")
+                .args(recv, SystemError::getLastOSErrorText()));
 
             const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
-            NX_LOG(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
+            NX_INFO(this, lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
                 .args(nx::utils::bytesToString(transferSize), transferCount,
                     nx::utils::bytesToString(transferSize / transferCount),
-                    durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
+                    durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)));
         });
 
     nx::utils::thread clientThread(

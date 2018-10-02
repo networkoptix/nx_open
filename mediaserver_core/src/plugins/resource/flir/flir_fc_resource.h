@@ -28,20 +28,17 @@ class FcResource: public nx::mediaserver::resource::Camera
     };
 
 public:
-    FcResource();
+    FcResource(QnMediaServerModule* serverModule);
     virtual ~FcResource();
 
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    virtual QnIOPortDataList getInputPortList() const override;
-
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS) override;
