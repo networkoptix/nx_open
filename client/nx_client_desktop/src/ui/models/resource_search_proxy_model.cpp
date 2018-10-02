@@ -193,7 +193,6 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             if (filterAcceptsRow(i, index))
                 return true;
         }
-        return false;
     }
 
     // Simply filter by text first.
