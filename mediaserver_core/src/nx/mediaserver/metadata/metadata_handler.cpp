@@ -172,10 +172,10 @@ void MetadataHandler::handleMetadataEvent(
             ? nx::vms::api::EventState::active
             : nx::vms::api::EventState::inactive;
 
-        const bool isDublicate = eventState == nx::vms::api::EventState::inactive
+        const bool isDuplicate = eventState == nx::vms::api::EventState::inactive
             && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
 
-        if (isDublicate)
+        if (isDuplicate)
         {
             NX_VERBOSE(this) << __func__ << "(): Ignoring duplicate event";
             return;
