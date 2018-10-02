@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -62,7 +63,7 @@ private:
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/);
 
-    void prepareCreateDownTunnelResponse(
+    std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
         network::http::Response* response);
 
     void openUpTunnel(
@@ -127,7 +128,7 @@ network::http::RequestResult
     network::http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
 
-    prepareCreateDownTunnelResponse(response);
+    requestResult.dataSource = prepareCreateDownTunnelResponse(response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...),
@@ -158,14 +159,15 @@ void GetPostTunnelServer<ApplicationData...>::closeAllTunnels()
 }
 
 template<typename ...ApplicationData>
-void GetPostTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
-    network::http::Response* response)
+std::unique_ptr<AbstractMsgBodySource>
+    GetPostTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
+        network::http::Response* response)
 {
-    response->headers.emplace("Content-Type", "application/octet-stream");
-    response->headers.emplace("Content-Length", "10000000000");
     response->headers.emplace("Cache-Control", "no-store");
     response->headers.emplace("Pragma", "no-cache");
-    response->headers.emplace("Connection", "close");
+    return std::make_unique<EmptyMessageBodySource>(
+        "application/octet-stream",
+        10000000000ULL);
 }
 
 template<typename ...ApplicationData>
