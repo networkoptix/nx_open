@@ -362,7 +362,7 @@ bool HikvisionHevcStreamReader::updateVideoChannelConfiguration(
     if (!bitrateControlTypeElement.isNull())
     {
         auto controlType = bitrateControlTypeElement.text().trimmed().toUpper();
-        if (controlType == kVbr)
+        if (controlType == kVariableBitrateValue)
             bitrateElement = videoElement.firstChildElement(kVariableBitrateTag);
         else
             bitrateElement = videoElement.firstChildElement(kFixedBitrateTag);
