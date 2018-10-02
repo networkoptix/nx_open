@@ -381,6 +381,7 @@ CameraDiagnostics::Result Camera::initInternal()
     m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProvider = nullptr;
     m_advancedParametersProvidersByParameterId.clear();
+    setCameraCapability(Qn::CameraTimeCapability, true);
 
     const auto driverResult = initializeCameraDriver();
     if (driverResult.errorCode != CameraDiagnostics::ErrorCode::noError)

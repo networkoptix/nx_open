@@ -53,6 +53,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
         DualStreamingForLiveOnly            = 0x8000,
         customMediaPortCapability           = 0x10000, //< Camera's media streams port are editable.
+        CameraTimeCapability                = 0x20000, //< Camera sends absolute timestamps in media stream
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

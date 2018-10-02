@@ -496,6 +496,8 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
+    setCameraCapability(Qn::CameraTimeCapability,
+        cameraCapabilities & nxcip::BaseCameraManager::cameraTimeCapability);
     if(cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability)
         setCameraCapability( Qn::InputPortCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability)
