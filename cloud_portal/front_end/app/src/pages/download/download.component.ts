@@ -166,7 +166,9 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.account
             .get()
             .then(result => {
-                this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                this.canSeeHistory = (this.configService.config.publicReleases ||
+                    result.is_superuser ||
+                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
             });
 
         if (!this.configService.config.publicDownloads) {
