@@ -23,7 +23,7 @@ class ConsumingCameraManager: public CameraManager
 public:
     /**
      * Supplies data to the plugin. Called from a worker thread.
-     * @param dataPacket Never null. Has a valid timestamp > 0.
+     * @param dataPacket Never null. Has a valid timestamp >= 0.
      * @return noError in case of success, other value in case of failure.
      */
     virtual Error pushDataPacket(DataPacket* dataPacket) = 0;
