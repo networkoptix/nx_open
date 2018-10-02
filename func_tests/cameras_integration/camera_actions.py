@@ -9,7 +9,7 @@ from framework.os_access.local_shell import local_shell
 _logger = logging.getLogger(__name__)
 
 
-def _fps_avg(fps):
+def fps_avg(fps):
     try:
         fps_min, fps_max = fps
         fps_average = int((fps_min + fps_max) / 2)
@@ -84,7 +84,7 @@ def configure_video(api, camera_id, camera_advanced_params, profile, fps=None, *
     if fps:
         fps_param_id = _find_param_by_name_prefix(
             stream['params'], profile, 'fps', 'frame rate')['id']
-        new_cam_params[fps_param_id] = _fps_avg(fps)
+        new_cam_params[fps_param_id] = fps_avg(fps)
 
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 
