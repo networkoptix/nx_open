@@ -82,13 +82,13 @@ def downloads_history(request):
     customization = Customization.objects.get(name=settings.CUSTOMIZATION)
     can_view_releases = UserGroupsToCustomizationPermissions.check_permission(request.user, customization.name,
                                                                               'api.can_view_release')
-    if not customization.public_release_history and not can_view_releases:
+    if customization.public_release_history or can_view_releases:
+        downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization.name)
+        downloads_json = requests.get(downloads_url)
+        downloads_json.raise_for_status()
+        downloads_json = downloads_json.json()
+    else:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
-
-    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization.name)
-    downloads_json = requests.get(downloads_url)
-    downloads_json.raise_for_status()
-    downloads_json = downloads_json.json()
 
     return Response(downloads_json)
 

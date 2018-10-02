@@ -163,13 +163,17 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.account
-            .get()
-            .then(result => {
-                this.canSeeHistory = (this.configService.config.publicReleases ||
-                    result.is_superuser ||
-                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
-            });
+        if (!this.configService.config.publicReleases) {
+            this.account
+                .get()
+                .then(result => {
+                    this.canSeeHistory = (this.configService.config.publicReleases ||
+                        result.is_superuser ||
+                        result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
+                });
+        } else {
+            this.canSeeHistory = true;
+        }
 
         if (!this.configService.config.publicDownloads) {
             this.authorizationService
