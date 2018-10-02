@@ -188,12 +188,12 @@ void CommonVideoFrameProcessingCameraManager::pushMetadataPacket(
 
     if (!m_handler)
     {
-        NX_PRINT << __func__
-            << "(): INTERNAL ERROR: setHandler() was not called; ignoring the packet";
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
     }
     else
     {
-    m_handler->handleMetadata(Error::noError, metadataPacket);
+        m_handler->handleMetadata(Error::noError, metadataPacket);
     }
 
     metadataPacket->releaseRef();
