@@ -34,6 +34,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource_property.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
@@ -369,61 +370,10 @@ void QnResourceBrowserWidget::initInstantSearch()
     ui->nothingFoundLabel->setForegroundRole(QPalette::Mid);
     ui->nothingFoundDescriptionLabel->setForegroundRole(QPalette::Mid);
 
-    auto getFilteredResources =
-        [this]()
-        {
-            QnResourceList result;
-            QSet<QnResourcePtr> resources;
-
-            const auto callback =
-                [&resources, &result](const QModelIndex& index, bool hasChildren)
-                {
-                    if (hasChildren)
-                        return;
-
-                    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-                    if (!resource)
-                        return;
-
-                    if (!QnResourceAccessFilter::isOpenableInLayout(resource)
-                        && !QnResourceAccessFilter::isOpenableInEntity(resource))
-                    {
-                        return;
-                    }
-
-                    if (resources.contains(resource))
-                        return;
-
-                    resources.insert(resource); //< Avoid duplicates.
-                    result.push_back(resource); //< Keep sort order.
-                };
-
-            forEachIndex(ui->resourceTreeWidget->searchModel(), QModelIndex(), callback);
-            return result;
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            if (!ui->shortcutHintWidget->isVisible() || !m_hasOpenInLayoutItems)
-                return;
-
-            const auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
-        });
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
-        [this, getFilteredResources]
-        {
-            if (!ui->shortcutHintWidget->isVisible())
-                return;
-
-            if (!m_hasOpenInLayoutItems && !m_hasOpenInEntityItems)
-                return;
-
-            const auto selected = getFilteredResources();
-            menu()->trigger(action::OpenInNewTabAction, {selected});
-        });
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed,
+        this, [this] { handleEnterPressed(false);});
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed,
+        this, [this] { handleEnterPressed(true);});
 
     // Initializes new filter edit
 
@@ -455,6 +405,81 @@ void QnResourceBrowserWidget::initInstantSearch()
 
     updateSearchMode();
     handleInstantFilterUpdated();
+}
+
+void QnResourceBrowserWidget::handleEnterPressed(bool withControlKey)
+{
+    if (!ui->shortcutHintWidget->isVisible())
+        return;
+
+    if (!withControlKey && !m_hasOpenInLayoutItems)
+        return;
+
+    QnResourceList openableItems;
+    QnVideoWallResourceList videowalls;
+    QSet<QnUuid> showreels;
+
+    // Used to prevent duplicates for openable resources and videowalls.
+    QSet<QnResourcePtr> resources;
+
+    const auto callback =
+        [&](const QModelIndex& index, bool hasChildren)
+        {
+            if (getNodeType(index) == ResourceTreeNodeType::layoutTour)
+            {
+                showreels.insert(index.data(Qn::UuidRole).value<QnUuid>());
+                return;
+            }
+
+            if (hasChildren)
+                return;
+
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resource)
+                return;
+
+            if (!QnResourceAccessFilter::isOpenableInLayout(resource)
+                && !isOpenableInEntity(resource))
+            {
+                return;
+            }
+
+            if (resources.contains(resource))
+                return;
+
+            if (const auto videowall = resource.dynamicCast<QnVideoWallResource>())
+                videowalls.append(videowall);
+            else
+                openableItems.append(resource); //< Keep sort order.
+
+            resources.insert(resource); //< Avoid duplicates. //< TODO: keep uuid and for showreel
+        };
+
+    forEachIndex(ui->resourceTreeWidget->searchModel(), QModelIndex(), callback);
+
+    if (!openableItems.isEmpty())
+    {
+        const auto action = withControlKey
+            ? action::OpenInNewTabAction
+            : action::OpenInCurrentLayoutAction;
+
+        menu()->trigger(action, {openableItems});
+    }
+
+    if (withControlKey)
+    {
+        if (!videowalls.isEmpty())
+        {
+            for (const auto videowallResource: videowalls)
+                menu()->triggerIfPossible(action::OpenVideoWallReviewAction, videowallResource);
+        }
+
+        if (!showreels.isEmpty())
+        {
+            for (const auto showreelId: showreels)
+                menu()->triggerIfPossible(action::ReviewLayoutTourAction, {Qn::UuidRole, showreelId});
+        }
+    }
 }
 
 void QnResourceBrowserWidget::updateSearchMode()
@@ -632,9 +657,17 @@ void QnResourceBrowserWidget::updateHintVisibilityByFilterState()
     bool hasOpenInEntityItems = false;
     bool hasUnopenableItems = false;
 
+    const auto hintIsDefenetelyInvisible =
+        [&hasOpenInLayoutItems, &hasOpenInEntityItems, &hasUnopenableItems]()
+        {
+            return hasUnopenableItems
+                || (hasOpenInLayoutItems && hasOpenInLayoutItems == hasOpenInEntityItems);
+        };
+
     const auto searchModel = ui->resourceTreeWidget->searchModel();
     const auto iterateGroup =
-        [searchModel, &hasOpenInLayoutItems, &hasOpenInEntityItems, &hasUnopenableItems]
+        [searchModel, hintIsDefenetelyInvisible, &hasOpenInLayoutItems,
+            &hasOpenInEntityItems, &hasUnopenableItems]
             (const QModelIndex& groupIndex)
         {
             const bool hasSingleOpenTypeItems =
@@ -668,7 +701,7 @@ void QnResourceBrowserWidget::updateHintVisibilityByFilterState()
                     }
                 }
 
-                if (hasSingleOpenTypeItems)
+                if (hasSingleOpenTypeItems || hintIsDefenetelyInvisible())
                     break;
             }
         };
@@ -686,7 +719,7 @@ void QnResourceBrowserWidget::updateHintVisibilityByFilterState()
             const auto groupIndex = searchModel->index(groupRow, 0);
             iterateGroup(groupIndex);
 
-            if (hasUnopenableItems)
+            if (hintIsDefenetelyInvisible())
                 break;
         }
     }

@@ -140,6 +140,7 @@ private:
     void setHintVisibleByBasicState(bool value);
     bool hintIsVisibleByBasicState() const;
     void updateHintVisibilityByBasicState();
+    void handleEnterPressed(bool withControlKey);
 
     void setAvailableItemTypes(
         bool hasOpenInLayoutItems,
