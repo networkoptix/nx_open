@@ -12,8 +12,9 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
+
 const constexpr int kTimeoutMsec = 100;
-const QByteArray successResponse = "HTTP/1.1 200 Connection estabilished\r\n";
+const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
     public BasicComponentTest
@@ -58,7 +59,9 @@ public:
         ASSERT_TRUE(responseReceiveBuffer.startsWith(connectResponse));
 
         // Clean http options which can be left in socket buffer.
-        socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), MSG_DONTWAIT);
+        while(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
+            MSG_DONTWAIT) > 0);
+        ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::again);
     }
 
     network::test::RandomDataTcpServer server;
@@ -92,7 +95,6 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
     server.pleaseStopSync();
     QByteArray receiveBuffer(1, 0);  //< It should be >0 to differentiate EOF and zero bytes read.
     ASSERT_EQ(clientSocket->recv(receiveBuffer.data(), receiveBuffer.size(), 0), 0);
-    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 }
 
 TEST_F(VmsGatewayConnectTest, IpSpecified)
@@ -136,51 +138,6 @@ TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
         receiveBuffer.size());
     ASSERT_EQ(clientSocketSecond->recv(receiveBuffer.data(), receiveBuffer.size(), 0),
         receiveBuffer.size());
-    server.pleaseStopSync();
-}
-
-// Tests correct handling of CONNECT request when client sends data right after request without
-// waiting of response.
-TEST_F(VmsGatewayConnectTest, HttpPipelining)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted(true, false, true));
-
-    const QByteArray connectRequest(QString(
-        "CONNECT %1 HTTP/1.1\r\n"
-        "Host: localhost\r\n\r\n"
-        ).arg(server.addressBeingListened().toString()).toStdString().c_str());
-    const QByteArray dataAfterRequest("Some data not related to http\n");
-    const QByteArray connectResponse("HTTP/1.1 200 Connection estabilished\r\n\r\n");
-
-    server.setConnectionsReadBufferSize(dataAfterRequest.size());
-
-    nx::network::TCPSocket clientSocket;
-    clientSocket.setRecvTimeout(kTimeoutMsec);
-    ASSERT_TRUE(clientSocket.connect(endpoint(), std::chrono::milliseconds(kTimeoutMsec)))
-        << "Connect failed: " << SystemError::getLastOSErrorText().toStdString();
-
-    // Send CONNECT request and other data right after it.
-    ASSERT_EQ(clientSocket.send(connectRequest + dataAfterRequest,
-        connectRequest.size() + dataAfterRequest.size()),
-        connectRequest.size() + dataAfterRequest.size());
-
-    QByteArray responseReceiveBuffer;
-    responseReceiveBuffer.resize(connectResponse.size());
-    QByteArray dataAfterRequestReceiveBuffer;
-    dataAfterRequestReceiveBuffer.resize(dataAfterRequest.size());
-
-    // Receive connect response.
-    ASSERT_EQ(clientSocket.recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
-        responseReceiveBuffer.size());
-    ASSERT_EQ(connectResponse, responseReceiveBuffer);
-
-    // Receive data after connect response.
-    ASSERT_EQ(clientSocket.recv(dataAfterRequestReceiveBuffer.data(),
-        dataAfterRequestReceiveBuffer.size(), 0), dataAfterRequestReceiveBuffer.size());
-    ASSERT_EQ(dataAfterRequest, dataAfterRequestReceiveBuffer);
-
-    // Graceful shutdown.
-    clientSocket.shutdown();
     server.pleaseStopSync();
 }
 

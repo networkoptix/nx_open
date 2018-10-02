@@ -280,9 +280,19 @@ void VmsGatewayProcess::registerApiHandlers(
     {
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx::network::http::kAnyPath,
-            [&settings]() -> std::unique_ptr<ConnectHandler>
+            [this, &settings]() -> std::unique_ptr<ConnectHandler>
             {
-                return std::make_unique<ConnectHandler>(settings);
+                return std::make_unique<ConnectHandler>(settings,
+                    [this](std::unique_ptr<cloud::gateway::Tunnel> tunnel)
+                    {
+                        tunnel->start();
+                        m_httpConnectTunnelPool.saveConnection(std::move(tunnel));
+                    },
+                    [this](cloud::gateway::Tunnel* tunnel)
+                    {
+                        m_httpConnectTunnelPool.closeConnection(SystemError::noError, tunnel);
+                    }
+                );
             },
             nx::network::http::StringType("CONNECT"));
     }

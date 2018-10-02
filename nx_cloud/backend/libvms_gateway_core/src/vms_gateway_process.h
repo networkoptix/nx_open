@@ -22,6 +22,7 @@ namespace relaying { class RelayEngine; }
 
 namespace gateway {
 
+class Tunnel;
 class AuthorizationManager;
 
 class NX_VMS_GATEWAY_API VmsGatewayProcess:
@@ -46,6 +47,11 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
+    // TODO: Move it to the correct place.
+    using HttpConnectTunnelPool =
+        network::server::StreamServerConnectionHolder<nx::cloud::gateway::Tunnel>;
+    HttpConnectTunnelPool m_httpConnectTunnelPool;
+
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
