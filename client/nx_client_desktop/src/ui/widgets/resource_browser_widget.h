@@ -131,9 +131,22 @@ private:
 
     void initInstantSearch();
     void updateSearchMode();
-    void updateNewFilter();
-    void handleNewFilterUpdated();
+    void updateInstantFilter();
+    void handleInstantFilterUpdated();
     static QStringList filterTags();
+
+    void setHintVisible(bool value);
+
+    void setHintVisibleByBasicState(bool value);
+    bool hintIsVisibleByBasicState() const;
+    void updateHintVisibilityByBasicState();
+
+    void setAvailableItemTypes(
+        bool hasOpenInLayoutItems,
+        bool hasOpenInEntityItems,
+        bool hasUnopenableItems);
+    bool hintIsVisbleByFilterState() const;
+    void updateHintVisibilityByFilterState();
 
 private slots:
     void updateFilter(bool force = false);
@@ -158,9 +171,6 @@ private:
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
 
-    bool m_hasOpenInLayoutItems = false;
-    bool m_hasOpenInEntityItems = false;
-    bool m_hasUnopenableItems = false;
     QnResourceTreeModel* m_resourceModel;
     QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
@@ -172,5 +182,13 @@ private:
     QnResourcePtr m_tooltipResource;
     using ExpandedState = QPair<QPersistentModelIndex, bool>;
     QList<ExpandedState> m_expandedStatesList;
+
     bool m_filtering = false;
+
+
+    bool m_hasOpenInLayoutItems = false;
+    bool m_hasOpenInEntityItems = false;
+    bool m_hasUnopenableItems = false;
+
+    bool m_hintIsVisibleByBasicState = false;
 };
