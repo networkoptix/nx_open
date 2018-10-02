@@ -80,10 +80,10 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
         return Error::unknownError;
     }
 
-    if (dataPacket->timestampUsec < 0)
+    if (dataPacket->timestampUsec() < 0)
     {
         NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: "
-            << "dataPacket has invalid timestamp " << dataPacket->timestampUsec
+            << "dataPacket has invalid timestamp " << dataPacket->timestampUsec()
             << "; discarding the packet.";
         return Error::unknownError;
     }
