@@ -116,21 +116,16 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     connect(
-        ui->preferredPtzPresetTypeComboBox,
-        static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        this,
-        &LegacyExpertSettingsWidget::at_dataChanged);
+        ui->preferredPtzPresetTypeComboBox, QnComboboxCurrentIndexChanged,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
-        ui->preferredPtzPresetTypeComboBox,
-        static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        ui->preferredPtzPresetTypeComboBox, QnComboboxCurrentIndexChanged,
         this, &LegacyExpertSettingsWidget::at_preferredPresetTypeChanged);
 
     connect(
-        ui->forcedPanTiltCheckBox,
-        static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),
-        this,
-        &LegacyExpertSettingsWidget::at_dataChanged);
+        ui->forcedPanTiltCheckBox, &QCheckBox::toggled,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
         ui->forcedZoomCheckBox,
