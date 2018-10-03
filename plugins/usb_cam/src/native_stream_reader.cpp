@@ -14,7 +14,8 @@ namespace usb_cam {
 
 namespace {
 
-std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
+static constexpr int kMsecInSec = 1000;
+static constexpr uint64_t kStreamDelayMsec = 100;
 
 } // namespace
 
@@ -93,7 +94,7 @@ void NativeStreamReader::ensureConsumerAdded()
 
 void NativeStreamReader::maybeFlush()
 {
-    if (m_avConsumer->timeSpan() > kMsecInSec.count())
+    if (m_avConsumer->timeSpan() > kMsecInSec)
         m_avConsumer->flush();
 }
 
@@ -101,8 +102,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
     if (m_camera->audioEnabled())
     {
-        uint64_t msecPerFrame = utils::msecPerFrame(m_camera->videoStream()->actualFps());
-        if (!m_avConsumer->waitForTimeSpan(msecPerFrame))
+        if (!m_avConsumer->waitForTimeSpan(kStreamDelayMsec))
             return nullptr;
     }
    
