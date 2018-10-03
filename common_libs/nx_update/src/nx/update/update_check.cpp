@@ -239,6 +239,8 @@ Information updateInformation(
 
 Information updateInformation(const QString& /*zipFileName*/, InformationError* /*error*/)
 {
+    // TODO: Implement it.
+    // Right now ServerUpdateTool deals with zip package.
     return Information();
 }
 

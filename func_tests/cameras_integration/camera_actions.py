@@ -46,6 +46,10 @@ def ffprobe_streams(stream_url):
 
 def ffprobe_metadata(stream):
     fps = int(stream['r_frame_rate'].split('/')[0]) / int(stream['r_frame_rate'].split('/')[1])
+    # When ffprobe discovers a corrupted stream, it returns fps == 90000.
+    if fps >= 90000:
+        _logger.debug('FFprobe returned fps = {}. No/corrupted stream?'.format(fps))
+        return None
     metadata = {
         'resolution': '{}x{}'.format(stream['width'], stream['height']),
         'codec': stream['codec_name'].upper(),

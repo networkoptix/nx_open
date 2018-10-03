@@ -76,19 +76,19 @@ private:
         QnJsonRestResult* result,
         ::utils::MergeSystemsStatus::Value mergeStatus);
 
-    bool applyCurrentSettings(
+    nx::network::http::StatusCode::Value applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
         const QString& postKey,
         bool oneServer);
 
-    bool applyRemoteSettings(
+    nx::network::http::StatusCode::Value applyRemoteSettings(
         const nx::utils::Url& remoteUrl,
         const QnUuid& systemId,
         const QString& systemName,
         const QString& getKey,
         const QString& postKey);
 
-    bool executeRemoteConfigure(
+    nx::network::http::StatusCode::Value executeRemoteConfigure(
         const ConfigureSystemData& data,
         const nx::utils::Url &remoteUrl,
         const QString& postKey);

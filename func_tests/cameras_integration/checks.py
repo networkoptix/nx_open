@@ -1,11 +1,11 @@
 import traceback
-from abc import abstractmethod
+from fnmatch import fnmatch
 
 
 class Result(object):
     @property
     def details(self):
-        return self.__dict__
+        return {key: value for key, value in self.__dict__.items() if value}
 
 
 class Success(Result):
@@ -59,6 +59,16 @@ def retry_expect_values(expected_result, call, exceptions=None, *args, **kwargs)
             yield result
 
 
+def _compare(expected, actual, syntax=None):
+    if not syntax:
+        return expected == actual
+
+    if syntax in ('*', '?', 'fn'):
+        return fnmatch(str(actual), str(expected))
+
+    raise KeyError('Unsupported syntax: {}'.format(syntax))
+
+
 class Checker(object):
     def __init__(self):
         self._errors = []
@@ -71,21 +81,21 @@ class Checker(object):
         self._errors = []
         return Failure(errors) if errors else Success()
 
-    def expect_values(self, expected, actual, path='camera'):
+    def expect_values(self, expected, actual, path='camera', syntax=None):
         if isinstance(expected, dict):
-            self.expect_dict(expected, actual, path)
+            self.expect_dict(expected, actual, path, syntax)
 
         elif isinstance(expected, list):
             low, high = expected
             if not low <= actual <= high:
                 self.add_error('{} is {}, expected to be in {}', path, actual, expected)
 
-        elif expected != actual:
+        elif not _compare(expected, actual, syntax):
             self.add_error('{} is {}, expected {}', path, actual, expected)
 
         return not self._errors
 
-    def expect_dict(self, expected, actual, path='camera'):
+    def expect_dict(self, expected, actual, path='camera', syntax=None):
         actual_type = type(actual).__name__
         for key, expected_value in expected.items():
             if key.startswith('!'):
@@ -102,21 +112,22 @@ class Checker(object):
                     self.add_error('{} is {}, expected to be a list', path, actual_type)
                     continue
 
-                item = self._search_item(*key.split('=', 1), items=actual)
+                item = self._search_item(*key.split('=', 1), items=actual, syntax=syntax)
                 if item:
-                    self.expect_values(expected_value, item, '{}[{}]'.format(path, key))
+                    self.expect_values(expected_value, item, '{}[{}]'.format(path, key), syntax)
                 else:
                     self.add_error('{} does not have item with {}', path, key)
 
             elif dot_position and (not equal_position or dot_position < equal_position):
                 base_key, sub_key = key.split('.', 1)
-                self.expect_values({base_key: {sub_key: expected_value}}, actual, path)
+                self.expect_values({base_key: {sub_key: expected_value}}, actual, path, syntax)
 
             else:
                 if not isinstance(actual, dict):
                     self.add_error('{} is {}, expected to be a dict', path, actual_type)
                 else:
-                    self.expect_values(expected_value, self._get_key_value(key, actual), full_path)
+                    self.expect_values(
+                        expected_value, self._get_key_value(key, actual), full_path, syntax)
 
     # These are values that may be different between VMS version, so we normalize them.
     _KEY_VALUE_FIXES = {
@@ -133,7 +144,7 @@ class Checker(object):
             return value
 
     @classmethod
-    def _search_item(cls, key, value, items):
+    def _search_item(cls, key, value, items, syntax=None):
         for item in items:
-            if str(cls._get_key_value(key, item)) == value:
+            if _compare(value, str(cls._get_key_value(key, item)), syntax):
                 return item
