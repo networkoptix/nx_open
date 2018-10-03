@@ -318,8 +318,6 @@ rest::Handle EventSearchListModel::Private::getEvents(
     if (!callback)
         return false;
 
-    // TODO: FIXME: #vkutin How to request non-camera events? Design and implementation question.
-
     const auto server = q->commonModule()->currentServer();
     NX_ASSERT(server && server->restConnection());
     if (!server || !server->restConnection())

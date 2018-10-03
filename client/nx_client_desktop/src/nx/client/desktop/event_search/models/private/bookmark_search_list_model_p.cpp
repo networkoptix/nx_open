@@ -11,9 +11,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
@@ -27,8 +24,6 @@ namespace {
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
 
-static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
-
 static const auto lowerBoundPredicate =
     [](const QnCameraBookmark& left, milliseconds right) { return left.startTimeMs > right; };
 
@@ -39,30 +34,13 @@ static const auto upperBoundPredicate =
 
 BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     base_type(q),
-    q(q),
-    m_updateBookmarks(new utils::PendingOperation(this))
+    q(q)
 {
-    m_updateBookmarks->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
-    m_updateBookmarks->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
-    m_updateBookmarks->setCallback([this]() { updateBookmarksWatcher(); });
-
     watchBookmarkChanges();
 }
 
 BookmarkSearchListModel::Private::~Private()
 {
-}
-
-void BookmarkSearchListModel::Private::updateBookmarksWatcher()
-{
-    if (auto watcher = q->context()->instance<QnTimelineBookmarksWatcher>())
-    {
-        const auto cameras = q->cameras();
-        const auto currentCamera = q->navigator()->currentResource()
-            .dynamicCast<QnVirtualCameraResource>();
-        const bool relevant = cameras.empty() || cameras.contains(currentCamera);
-        watcher->setTextFilter(relevant ? m_filterText : QString());
-    }
 }
 
 int BookmarkSearchListModel::Private::count() const
@@ -138,7 +116,6 @@ void BookmarkSearchListModel::Private::clearData()
     m_data.clear();
     m_guidToTimestamp.clear();
     m_prefetch.clear();
-    m_updateBookmarks->requestOperation();
 }
 
 void BookmarkSearchListModel::Private::truncateToMaximumCount()

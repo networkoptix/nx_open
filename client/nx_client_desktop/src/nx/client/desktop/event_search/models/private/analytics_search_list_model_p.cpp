@@ -1,5 +1,6 @@
 #include "analytics_search_list_model_p.h"
 
+#include <algorithm>
 #include <chrono>
 
 #include <QtGui/QPalette>
@@ -25,6 +26,7 @@
 #include <ini.h>
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/event/analytics_helper.h>
@@ -66,7 +68,6 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
         kDataChangedInterval.count(), this)),
-    m_updateWorkbenchFilter(new utils::PendingOperation(this)),
     m_metadataReceiver(new LiveAnalyticsReceiver(this)),
     m_metadataProcessingTimer(new QTimer())
 {
@@ -78,26 +79,6 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
 
     connect(m_metadataReceiver.data(), &LiveAnalyticsReceiver::dataOverflow,
         this, &Private::processMetadata);
-
-    const auto updateWorkbenchFilter =
-        [this]()
-        {
-            // TODO: FIXME:
-        /*
-            if (!camera())
-                return;
-
-            Filter filter;
-            filter.deviceId = camera()->getId();
-            filter.boundingBox = m_filterRect;
-            filter.freeText = m_filterText;
-            this->q->navigator()->setAnalyticsFilter(filter);
-        */
-        };
-
-    m_updateWorkbenchFilter->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
-    m_updateWorkbenchFilter->setIntervalMs(kUpdateWorkbenchFilterDelay.count());
-    m_updateWorkbenchFilter->setCallback(updateWorkbenchFilter);
 }
 
 AnalyticsSearchListModel::Private::~Private()
@@ -190,7 +171,6 @@ void AnalyticsSearchListModel::Private::setFilterRect(const QRectF& relativeRect
 
     q->clear();
     m_filterRect = relativeRect;
-    m_updateWorkbenchFilter->requestOperation();
 }
 
 QString AnalyticsSearchListModel::Private::filterText() const
@@ -205,7 +185,6 @@ void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 
     q->clear();
     m_filterText = value;
-    m_updateWorkbenchFilter->requestOperation();
 }
 
 void AnalyticsSearchListModel::Private::clearData()
@@ -214,7 +193,6 @@ void AnalyticsSearchListModel::Private::clearData()
     m_data.clear();
     m_prefetch.clear();
     m_objectIdToTimestamp.clear();
-    m_updateWorkbenchFilter->requestOperation();
 }
 
 void AnalyticsSearchListModel::Private::truncateToMaximumCount()
@@ -342,9 +320,15 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     if (!server || !server->restConnection())
         return false;
 
-    // TODO: FIXME:
     Filter request;
-    //request.deviceId = q->cameras().empty() ? QnUuid() : (*q->cameras().cbegin())->getId();
+    if (q->cameraSet()->type() != ManagedCameraSet::Type::all)
+    {
+        const auto cameras = q->cameraSet()->cameras();
+        request.deviceIds.reserve(cameras.size());
+        std::transform(cameras.cbegin(), cameras.cend(), std::back_inserter(request.deviceIds),
+            [](const QnVirtualCameraResourcePtr& camera) { return camera->getId(); });
+    }
+
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
     request.boundingBox = m_filterRect;

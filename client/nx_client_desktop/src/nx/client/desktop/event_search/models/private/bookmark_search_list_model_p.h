@@ -14,8 +14,6 @@
 
 class QnUuid;
 
-namespace nx::utils { class PendingOperation; }
-
 namespace nx::client::desktop {
 
 class BookmarkSearchListModel::Private: public AbstractAsyncSearchListModel::Private
@@ -37,8 +35,6 @@ public:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
 
-    void updateBookmarksWatcher();
-
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
@@ -55,8 +51,6 @@ private:
 
     QnVirtualCameraResourcePtr camera(const QnCameraBookmark& bookmark) const;
 
-    utils::PendingOperation* createUpdateBookmarksWatcherOperation();
-
     template<typename Iter>
     bool commitPrefetch(const QnTimePeriod& periodToCommit,
         Iter prefetchBegin, Iter prefetchEnd, int position);
@@ -68,7 +62,6 @@ private:
     BookmarkSearchListModel* const q = nullptr;
     QString m_filterText;
     QnCameraBookmarkList m_prefetch;
-    QScopedPointer<utils::PendingOperation> m_updateBookmarks;
     std::deque<QnCameraBookmark> m_data;
     QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
 };

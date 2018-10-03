@@ -23,16 +23,13 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/client/desktop/event_search/models/visual_search_list_model.h>
-#include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
-#include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
-#include <nx/client/desktop/event_search/models/motion_search_list_model.h>
-#include <nx/client/desktop/event_search/models/event_search_list_model.h>
-#include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
-#include <nx/client/desktop/event_search/widgets/unified_search_widget.h>
-#include <nx/client/desktop/event_search/widgets/notification_counter_label.h>
 #include <nx/client/desktop/event_search/widgets/event_ribbon.h>
-#include <nx/vms/event/strings_helper.h>
+#include <nx/client/desktop/event_search/widgets/motion_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/bookmark_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/event_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/analytics_search_widget.h>
+#include <nx/client/desktop/event_search/widgets/notification_list_widget.h>
+#include <nx/client/desktop/event_search/widgets/notification_counter_label.h>
 
 namespace nx::client::desktop {
 
@@ -47,16 +44,11 @@ EventPanel::Private::Private(EventPanel* q):
     q(q),
     m_tabs(new AnimatedTabWidget(new CompactTabBar(), q)),
     m_notificationsTab(new NotificationListWidget(m_tabs)),
-    m_motionTab(new UnifiedSearchWidget(m_tabs)),
-    m_bookmarksTab(new UnifiedSearchWidget(m_tabs)),
-    m_eventsTab(new UnifiedSearchWidget(m_tabs)),
-    m_analyticsTab(new UnifiedSearchWidget(m_tabs)),
     m_counterLabel(new NotificationCounterLabel(m_tabs->tabBar())),
-    m_eventsModel(new EventSearchListModel(q->context(), this)),
-    m_motionModel(new MotionSearchListModel(q->context(), this)),
-    m_bookmarksModel(new BookmarkSearchListModel(q->context(), this)),
-    m_analyticsModel(new AnalyticsSearchListModel(q->context(), this)),
-    m_helper(new vms::event::StringsHelper(q->commonModule()))
+    m_motionTab(new MotionSearchWidget(q->context(), m_tabs)),
+    m_bookmarksTab(new BookmarkSearchWidget(q->context(), m_tabs)),
+    m_eventsTab(new EventSearchWidget(q->context(), m_tabs)),
+    m_analyticsTab(new AnalyticsSearchWidget(q->context(), m_tabs))
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
@@ -114,18 +106,14 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 
-    setupMotionSearch();
-    setupBookmarkSearch();
-    setupEventSearch();
-    setupAnalyticsSearch();
-
     connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         q, &EventPanel::tileHovered);
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         q, &EventPanel::unreadCountChanged);
 
-    for (auto tab: {m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
-        connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
+    using Tabs = std::initializer_list<AbstractSearchWidget*>;
+    for (auto tab: Tabs{m_eventsTab, m_motionTab, m_bookmarksTab, m_analyticsTab})
+        connect(tab, &AbstractSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
 
@@ -138,169 +126,10 @@ EventPanel::Private::~Private()
 {
 }
 
-void EventPanel::Private::setupMotionSearch()
-{
-    auto model = new VisualSearchListModel(m_motionModel, this);
-    m_motionTab->setModel(model);
-    m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
-
-    m_motionTab->filterEdit()->hide();
-    m_motionTab->showPreviewsButton()->show();
-
-    connect(m_motionModel, &MotionSearchListModel::totalCountChanged, this,
-        [this](int totalCount)
-        {
-            m_motionTab->counterLabel()->setText(totalCount
-                ? tr("%n motion events", "", totalCount)
-                : QString());
-        });
-}
-
-void EventPanel::Private::setupBookmarkSearch()
-{
-    static const QString kHtmlPlaceholder =
-        lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
-            .arg(tr("No bookmarks"))
-            .arg(tr("Select some period on timeline and click "
-                "with right mouse button on it to create a bookmark."));
-    m_bookmarksTab->setModel(new VisualSearchListModel(m_bookmarksModel, this));
-    m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
-    m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
-    m_bookmarksTab->showPreviewsButton()->show();
-
-    connect(m_bookmarksTab->filterEdit(), &SearchLineEdit::textChanged, m_bookmarksModel,
-        [this](const QString& text)
-        {
-            m_bookmarksModel->setFilterText(text);
-            m_bookmarksTab->requestFetch();
-        });
-
-    m_bookmarksTab->counterLabel()->setText(QString());
-    connectToRowCountChanges(m_bookmarksModel,
-        [this]()
-        {
-            const auto count = m_bookmarksModel->rowCount();
-            m_bookmarksTab->counterLabel()->setText(count > 0
-                ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
-                : QString());
-        });
-}
-
-void EventPanel::Private::setupEventSearch()
-{
-    auto model = new VisualSearchListModel(m_eventsModel, this);
-    m_eventsTab->setModel(model);
-    m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
-    m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
-
-    // TODO: #vkutin Implement serverside event log text filter.
-    m_eventsTab->filterEdit()->hide();
-
-    auto button = m_eventsTab->typeButton();
-    button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
-    button->show();
-
-    auto eventFilterMenu = new QMenu(q);
-    eventFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
-    auto addMenuAction =
-        [this, eventFilterMenu](const QString& title, vms::api::EventType type)
-        {
-            auto action = eventFilterMenu->addAction(title);
-            connect(action, &QAction::triggered, this,
-                [this, title, type]()
-                {
-                    m_eventsTab->typeButton()->setText(title);
-                    m_eventsTab->typeButton()->setState(type == vms::api::EventType::undefinedEvent
-                        ? ButtonState::deactivated
-                        : ButtonState::unselected);
-
-                    m_eventsModel->setSelectedEventType(type);
-                    m_eventsTab->requestFetch();
-                });
-
-            return action;
-        };
-
-    auto defaultAction = addMenuAction(tr("Any type"), vms::api::EventType::undefinedEvent);
-    for (const auto type: vms::event::allEvents())
-    {
-        if (vms::event::isSourceCameraRequired(type))
-            addMenuAction(m_helper->eventName(type), type);
-    }
-
-    connect(m_eventsTab->typeButton(), &SelectableTextButton::stateChanged, this,
-        [defaultAction](ButtonState state)
-        {
-            if (state == ButtonState::deactivated)
-                defaultAction->trigger();
-        });
-
-    defaultAction->trigger();
-    button->setMenu(eventFilterMenu);
-
-    m_eventsTab->counterLabel()->setText(QString());
-    connectToRowCountChanges(m_eventsModel,
-        [this]()
-        {
-            const auto count = m_eventsModel->rowCount();
-            m_eventsTab->counterLabel()->setText(count
-                ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
-                : QString());
-        });
-}
-
-void EventPanel::Private::setupAnalyticsSearch()
-{
-    m_analyticsTab->setModel(new VisualSearchListModel(m_analyticsModel, this));
-    m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
-    m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
-    m_analyticsTab->showPreviewsButton()->show();
-    m_analyticsTab->showInfoButton()->show();
-
-    connect(m_analyticsTab->filterEdit(), &SearchLineEdit::textChanged, m_analyticsModel,
-        [this](const QString& text)
-        {
-            m_analyticsModel->setFilterText(text);
-            m_analyticsTab->requestFetch();
-        });
-
-    auto button = m_analyticsTab->areaButton();
-    button->setDeactivatedText(tr("Anywhere on the video"));
-    button->show();
-
-    connect(button, &SelectableTextButton::stateChanged, this,
-        [this, button](ButtonState state)
-        {
-            if (!m_currentMediaWidget)
-                return;
-
-            m_currentMediaWidget->setAnalyticsSearchModeEnabled(
-                state != ButtonState::deactivated);
-
-            if (state == ButtonState::selected)
-                button->setText(tr("Select some area on video"));
-            else if (state == ButtonState::unselected)
-                button->setText(tr("In selected area"));
-
-            if (state == ButtonState::deactivated)
-                m_currentMediaWidget->setAnalyticsSearchRect(QRectF());
-    });
-
-    m_analyticsTab->counterLabel()->setText(QString());
-    connectToRowCountChanges(m_analyticsModel,
-        [this]()
-        {
-            const auto count = m_analyticsModel->rowCount();
-            m_analyticsTab->counterLabel()->setText(count
-                ? (count > 99 ? tr(">99 detected objects") : tr("%n detected objects", "", count))
-                : QString());
-        });
-}
-
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 {
+    // TODO: FIXME: #vkutin Rewrite this code properly.
+
     if (role != Qn::CentralRole)
         return;
 
@@ -318,32 +147,10 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     m_mediaWidgetConnections.reset(new QnDisconnectHelper());
 
-    // TODO: FIXME: #vkutin Make this work in multi-camera mode.
-
-    *m_mediaWidgetConnections << connect(
-        m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSearchAreaSelected, this,
-        [this](const QRectF& relativeRect)
-        {
-            m_analyticsModel->setFilterRect(relativeRect);
-            m_analyticsTab->areaButton()->setState(relativeRect.isValid()
-                ? ButtonState::unselected
-                : ButtonState::deactivated);
-
-            m_analyticsTab->requestFetch();
-        });
-
     *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
         &QnMediaResourceWidget::motionSearchModeEnabled, this, &Private::at_motionSearchToggled);
 
-    *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
-        &QnMediaResourceWidget::motionSelectionChanged, this, &Private::at_motionSelectionChanged);
-
-    at_motionSelectionChanged();
     at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
-
-    // This will reload tab content if the camera or resource was changed.
-    if (const auto searchWidget = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
-        searchWidget->requestFetch();
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
@@ -368,6 +175,8 @@ void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Va
 
 void EventPanel::Private::setupTabsSyncWithNavigator()
 {
+    // TODO: FIXME: #vkutin Adapt for multi-camera mode.
+
     connect(m_tabs, &QTabWidget::currentChanged, this,
         [this](int index)
         {
@@ -424,31 +233,6 @@ void EventPanel::Private::at_specialModeToggled(bool on, QWidget* correspondingT
         if (m_tabs->currentWidget() == correspondingTab)
             m_tabs->setCurrentIndex(m_previousTabIndex);
     }
-}
-
-void EventPanel::Private::at_motionSelectionChanged()
-{
-    if (!m_currentMediaWidget || m_currentMediaWidget->isMotionSelectionEmpty())
-    {
-        static const QString kHtmlPlaceholder =
-            lit("<center><p>%1</p><p><font size='-3'>%2</font></p></center>")
-                .arg(tr("No motion region"))
-                .arg(tr("Select some area on camera."));
-
-        m_motionTab->setPlaceholderTexts(QString(), kHtmlPlaceholder);
-    }
-    else
-    {
-        m_motionTab->setPlaceholderTexts(tr("No motion"), tr("No motion detected"));
-    }
-}
-
-void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
-    std::function<void()> handler)
-{
-    connect(model, &QAbstractItemModel::modelReset, this, handler);
-    connect(model, &QAbstractItemModel::rowsInserted, this, handler);
-    connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
 }
 
 void EventPanel::Private::showContextMenu(const QPoint& pos)

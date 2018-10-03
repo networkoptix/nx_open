@@ -94,7 +94,6 @@ private:
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
-    const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     const QScopedPointer<LiveAnalyticsReceiver> m_metadataReceiver;
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
 

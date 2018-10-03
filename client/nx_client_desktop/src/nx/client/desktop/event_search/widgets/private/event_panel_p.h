@@ -18,14 +18,13 @@ namespace nx::vms::event { class StringsHelper; }
 
 namespace nx::client::desktop {
 
-class EventSearchListModel;
-class MotionSearchListModel;
-class BookmarkSearchListModel;
-class AnalyticsSearchListModel;
-
 class NotificationListWidget;
-class UnifiedSearchWidget;
 class NotificationCounterLabel;
+
+class MotionSearchWidget;
+class BookmarkSearchWidget;
+class EventSearchWidget;
+class AnalyticsSearchWidget;
 
 class EventPanel::Private: public QObject
 {
@@ -38,16 +37,9 @@ public:
 private:
     void currentWorkbenchWidgetChanged(Qn::ItemRole role);
 
-    void setupMotionSearch();
-    void setupBookmarkSearch();
-    void setupEventSearch();
-    void setupAnalyticsSearch();
-
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
 
     void setupTabsSyncWithNavigator();
-
-    void connectToRowCountChanges(QAbstractItemModel* model, std::function<void()> handler);
 
     void showContextMenu(const QPoint& pos);
 
@@ -59,27 +51,20 @@ private:
     void at_motionSelectionChanged();
 
 private:
-    EventPanel* const q = nullptr;
-    QTabWidget* const m_tabs = nullptr;
+    EventPanel* const q;
+    QTabWidget* const m_tabs;
 
-    NotificationListWidget* const m_notificationsTab = nullptr;
-    UnifiedSearchWidget* const m_motionTab = nullptr;
-    UnifiedSearchWidget* const m_bookmarksTab = nullptr;
-    UnifiedSearchWidget* const m_eventsTab = nullptr;
-    UnifiedSearchWidget* const m_analyticsTab = nullptr;
-    NotificationCounterLabel* const m_counterLabel = nullptr;
+    NotificationListWidget* const m_notificationsTab;
+    NotificationCounterLabel* const m_counterLabel;
+
+    MotionSearchWidget* const m_motionTab;
+    BookmarkSearchWidget* const m_bookmarksTab;
+    EventSearchWidget* const m_eventsTab;
+    AnalyticsSearchWidget* const m_analyticsTab;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
     QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
-    QnVirtualCameraResourcePtr m_camera;
-
-    EventSearchListModel* const m_eventsModel = nullptr;
-    MotionSearchListModel* const m_motionModel = nullptr;
-    BookmarkSearchListModel* const m_bookmarksModel = nullptr;
-    AnalyticsSearchListModel* const m_analyticsModel = nullptr;
-
-    QScopedPointer<vms::event::StringsHelper> m_helper;
     int m_previousTabIndex = 0;
     int m_lastTabIndex = 0;
 };

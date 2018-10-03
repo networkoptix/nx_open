@@ -9,8 +9,6 @@ BookmarkSearchListModel::BookmarkSearchListModel(QnWorkbenchContext* context, QO
     base_type(context, [this]() { return new Private(this); }, parent),
     d(qobject_cast<Private*>(base_type::d.data()))
 {
-    connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        d, &Private::updateBookmarksWatcher);
 }
 
 QString BookmarkSearchListModel::filterText() const
