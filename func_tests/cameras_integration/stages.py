@@ -98,9 +98,10 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 
                 epoch = pytz.utc.localize(datetime.utcfromtimestamp(0))
                 time_since_epoch = recorded_periods[-1].start - epoch
+                delay_ms = 100 # Just to be sure stream is configured.
                 archive_url = '{}?stream={}&pos={}'.format(
                     run.media_url, {'primary': 0, 'secondary': 1}[profile],
-                    int(time_since_epoch.total_seconds() * 1000))
+                    int(time_since_epoch.total_seconds() * 1000 + delay_ms))
                 _logger.info('Archive request url for stream {}: {}'.format(
                     profile, archive_url))
 
@@ -143,7 +144,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
     """
-    with run.server.api.camera_audio_enabled(run.id):
+    with run.server.api.camera_audio_enabled(run.data['id']):
         # Changing the audio codec accordingly to config
         for index, configuration in enumerate(configurations):
             if not configuration.get('skip_codec_change'):

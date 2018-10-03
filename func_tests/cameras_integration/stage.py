@@ -55,8 +55,8 @@ class Stage(object):
             try:
                 run.update_data()
 
-            except (AssertionError, MediaserverApiError, MediaserverApiRequestError):
-                yield Failure(is_exception=True)
+            except (MediaserverApiError, MediaserverApiRequestError) as e:
+                yield Failure(str(e))
 
             else:
                 yield actions.next()

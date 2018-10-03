@@ -136,7 +136,7 @@ SERVER_STAGES:
       "1": "rtsp://192.168.200.2:554/profile3/media.smp"
       "2": "rtsp://192.168.200.2:554/profile4/media.smp"
 
-  audio_parameters:
+  audio_parameters if version >= '4':
     - {'skip_codec_change': True, 'codec': 'MP2'} # When setting G711, camera gives MP2.
     #- {'codec': 'G726'} # codec is 'G711', expected 'G726' - server bug?
 
