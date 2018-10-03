@@ -7,12 +7,12 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace ssc {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
-    SscAnalyticsEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
-    SscAnalyticsDriverManifest_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
+    SscEventType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PluginManifest, (json),
+    SscPluginManifest_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AllowedPortNames, (json),
-    AllowedPorts_Fields, (brief, true))
+    AllowedPortNames_Fields, (brief, true))
 
 } // namespace ssc
 } // namespace metadata

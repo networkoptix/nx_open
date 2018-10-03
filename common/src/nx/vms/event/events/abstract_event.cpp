@@ -5,7 +5,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
@@ -137,7 +137,7 @@ bool hasToggleState(
             return true;
         AnalyticsHelper helper(commonModule);
         auto descriptor = helper.eventTypeDescriptor(runtimeParams.getAnalyticsEventTypeId());
-        return descriptor.flags.testFlag(nx::api::Analytics::stateDependent);
+        return descriptor.flags.testFlag(nx::vms::api::analytics::stateDependent);
     }
     default:
         return false;

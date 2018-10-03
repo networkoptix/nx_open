@@ -2,8 +2,8 @@
 
 #include <QElapsedTimer>
 
-#include <nx/api/analytics/analytics_event.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/manifest_items.h>
+#include <nx/mediaserver_plugins/utils/plugin_manifest_base.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -13,29 +13,29 @@ namespace metadata {
 namespace ssc { //< SSC = Self Service Console
 
 /** Description of the SSC analytics event. */
-struct AnalyticsEventType: nx::api::Analytics::EventType
+struct EventType: nx::vms::api::analytics::EventType
 {
     // SSC-camera event type name: "camera specify command" or "reset command".
     QString internalName;
 };
-#define SscAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)
+#define SscEventType_Fields EventType_Fields(internalName)
 
-struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
+struct PluginManifest: nx::mediaserver_plugins::utils::PluginManifestBase
 {
-    QString serialPortName;
-    QList<AnalyticsEventType> outputEventTypes;
+    QString serialPortName; //< Proprietary.
+    QList<EventType> outputEventTypes;
 };
-#define SscAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields (serialPortName)(outputEventTypes)
+#define SscPluginManifest_Fields PluginManifestBase_Fields (serialPortName)(outputEventTypes)
 
 struct AllowedPortNames
 {
     bool useAllPorts = true;
     QList<QString> values;
 };
-#define AllowedPorts_Fields (useAllPorts)(values)
+#define AllowedPortNames_Fields (useAllPorts)(values)
 
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
+QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
+QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AllowedPortNames, (json))
 
 } // namespace ssc

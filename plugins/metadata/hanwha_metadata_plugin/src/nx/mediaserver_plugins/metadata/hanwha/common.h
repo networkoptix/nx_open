@@ -7,7 +7,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/mediaserver_plugins/utils/plugin_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
@@ -31,7 +31,7 @@ public:
         t3,
     };
 
-    struct EventTypeDescriptor: public nx::api::Analytics::EventType
+    struct EventType: public nx::vms::api::analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
@@ -40,7 +40,7 @@ public:
         QString negativeState;
         QString regionDescription;
     };
-    #define EventTypeDescriptor_Fields AnalyticsEventType_Fields \
+    #define HanwhaEventType_Fields EventType_Fields \
         (internalName) \
         (internalMonitoringName) \
         (description) \
@@ -48,24 +48,25 @@ public:
         (negativeState) \
         (regionDescription)
 
-    struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
+    struct PluginManifest: nx::mediaserver_plugins::utils::PluginManifestBase
     {
-        QList<EventTypeDescriptor> outputEventTypes;
+        QList<EventType> outputEventTypes;
 
         QString eventTypeIdByName(const QString& eventName) const;
-        const Hanwha::EventTypeDescriptor& eventTypeDescriptorById(const QString& id) const;
+        const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
+
     private:
         mutable QMap<QString, QString> m_eventTypeIdByInternalName;
-        mutable QMap<QString, EventTypeDescriptor> m_eventTypeDescriptorById;
+        mutable QMap<QString, EventType> m_eventTypeDescriptorById;
 
     };
-    #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
+    #define HanwhaPluginManifest_Fields PluginManifestBase_Fields (outputEventTypes)
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Hanwha::EventTypeDescriptor)
-    (Hanwha::DriverManifest),
+    (Hanwha::EventType)
+    (Hanwha::PluginManifest),
     (json)
 )
 

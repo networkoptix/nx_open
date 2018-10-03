@@ -17,13 +17,13 @@
 #include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/media/signaling_metadata_consumer.h>
 
+#include <nx/vms/api/analytics/plugin_manifest.h>
+
 class QnUuid;
 class QnMediaResourceWidget;
 class QMenu;
 
 namespace nx {
-
-namespace api { struct AnalyticsManifestObjectAction; }
 
 namespace utils { class PendingOperation; }
 
@@ -86,7 +86,7 @@ private:
     utils::PendingOperation* createUpdateWorkbenchFilterOperation();
 
     void executePluginAction(const QString& pluginId,
-        const api::AnalyticsManifestObjectAction& action,
+        const nx::vms::api::analytics::PluginManifest::ObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
     void constrainLength();

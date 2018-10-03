@@ -95,7 +95,7 @@ Error MetadataManager::startFetchingMetadata(const char* const* typeList, int ty
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(
             m_plugin->driverManifest(),
-            QJson::deserialized<nx::api::AnalyticsDeviceManifest>(m_deviceManifest),
+            QJson::deserialized<nx::vms::api::analytics::CameraManagerManifest>(m_deviceManifest),
             m_url,
             m_auth,
             eventTypes);
@@ -150,7 +150,7 @@ void MetadataManager::setDeviceManifest(const QByteArray& manifest)
     m_deviceManifest = manifest;
 }
 
-void MetadataManager::setDriverManifest(const Hikvision::DriverManifest& manifest)
+void MetadataManager::setDriverManifest(const Hikvision::PluginManifest& manifest)
 {
     m_driverManifest = manifest;
 }

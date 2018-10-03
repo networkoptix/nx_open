@@ -3,6 +3,7 @@ nx_add_server_plugin(axis_metadata_plugin
         openssl
         Qt5::Core
         nx_plugin_utils
+        nx_vms_api
         nx_network
         nx_utils
         nx_fusion

@@ -6,7 +6,6 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/uuid.h>
-//#include <utils/common/id.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -40,7 +39,7 @@ QString ignoreNamespaces(const QString& tags)
 
 } // namespace
 
-AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEventType& supportedEventType)
+EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 {
     const QString eventTypeId = QString::fromLatin1(supportedEventType.fullName().c_str());
     name.value = supportedEventType.description.c_str();
@@ -50,18 +49,18 @@ AnalyticsEventType::AnalyticsEventType(const nx::axis::SupportedEventType& suppo
         name.value = ignoreNamespaces(name.value);
     }
     flags = (supportedEventType.stateful)
-        ? nx::api::Analytics::EventTypeFlag::stateDependent
-        : nx::api::Analytics::EventTypeFlag::noFlags;
+        ? nx::vms::api::analytics::EventTypeFlag::stateDependent
+        : nx::vms::api::analytics::EventTypeFlag::noFlags;
 
     topic = supportedEventType.topic.c_str();
     caption = supportedEventType.name.c_str();
     eventTypeIdExternal = eventTypeId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
-    AxisAnalyticsEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
-    AxisAnalyticsDriverManifest_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),
+    AxisEventType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PluginManifest, (json),
+    AxisPluginManifest_Fields, (brief, true))
 
 } // axis
 } // metadata

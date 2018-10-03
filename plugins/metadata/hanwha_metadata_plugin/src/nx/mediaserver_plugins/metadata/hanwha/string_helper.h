@@ -17,7 +17,7 @@ class StringHelper
 {
 public:
     static QString buildCaption(
-        const Hanwha::DriverManifest& manifest,
+        const Hanwha::PluginManifest& manifest,
         const QString& eventTypeId,
         boost::optional<int> eventChannel,
         boost::optional<int> eventRegion,
@@ -25,7 +25,7 @@ public:
         bool isActive);
 
     static QString buildDescription(
-        const Hanwha::DriverManifest& manifest,
+        const Hanwha::PluginManifest& manifest,
         const QString& eventTypeId,
         boost::optional<int> eventChannel,
         boost::optional<int> eventRegion,

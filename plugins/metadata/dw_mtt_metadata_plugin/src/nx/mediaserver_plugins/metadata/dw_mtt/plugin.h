@@ -36,7 +36,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
+    const EventType* eventTypeById(const QString& id) const noexcept;
  
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
     virtual void executeAction(
@@ -44,7 +44,7 @@ public:
 
 private:
     QByteArray m_manifest;
-    AnalyticsDriverManifest m_typedManifest;
+    PluginManifest m_typedManifest;
 };
 
 } // namespace dw_mtt

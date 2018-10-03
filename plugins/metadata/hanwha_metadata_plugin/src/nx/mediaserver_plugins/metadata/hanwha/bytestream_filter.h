@@ -18,7 +18,7 @@ class BytestreamFilter: public nx::utils::bstream::AbstractByteStreamFilter
 public:
     using Handler = std::function<void(const EventList&)>;
 
-    BytestreamFilter(const Hanwha::DriverManifest& manifest, Handler handler);
+    BytestreamFilter(const Hanwha::PluginManifest& manifest, Handler handler);
     virtual ~BytestreamFilter() = default;
     virtual bool processData(const QnByteArrayConstRef& notification) override;
 
@@ -36,7 +36,7 @@ private:
         const QString& eventSource, const QString& eventState);
 
 private:
-    const Hanwha::DriverManifest m_manifest;
+    const Hanwha::PluginManifest m_manifest;
     Handler m_handler;
 };
 

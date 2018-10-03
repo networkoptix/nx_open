@@ -47,7 +47,7 @@ Plugin::Plugin()
             m_manifest = file.readAll();
         }
     }
-    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
+    m_typedManifest = QJson::deserialized<PluginManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -115,7 +115,7 @@ CameraManager* Plugin::obtainCameraManager(
     if (!vendor.startsWith(kAxisVendor))
         return nullptr;
 
-    AnalyticsDriverManifest events = fetchSupportedEvents(*cameraInfo);
+    PluginManifest events = fetchSupportedEvents(*cameraInfo);
     if (events.outputEventTypes.empty())
         return nullptr;
 
@@ -128,9 +128,9 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInfo)
+PluginManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInfo)
 {
-    AnalyticsDriverManifest result;
+    PluginManifest result;
     const char* const ip_port = cameraInfo.url + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(ip_port, cameraInfo.login,
         cameraInfo.password);
@@ -150,7 +150,7 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
 
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
-        [](const nx::axis::SupportedEventType& eventType) {return AnalyticsEventType(eventType); });
+        [](const nx::axis::SupportedEventType& eventType) {return EventType(eventType); });
 
     // Being uncommented, the next code line allows to get the list of supported events
     // in the same json format that is used in "static-resources/manifest.json".

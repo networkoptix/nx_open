@@ -32,9 +32,9 @@ namespace axis {
 struct ElapsedEvent
 {
 public:
-    const AnalyticsEventType type;
+    const EventType type;
     nx::utils::ElapsedTimerThreadSafe timer;
-    ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
+    ElapsedEvent(const EventType& analyticsEventType): type(analyticsEventType){}
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
@@ -64,7 +64,7 @@ class Monitor: public QObject
     Q_OBJECT
 
 public:
-    using Handler = std::function<void(const QList<AnalyticsEventType>&)>;
+    using Handler = std::function<void(const QList<EventType>&)>;
 
     Monitor(
         Manager* manager,
@@ -86,9 +86,9 @@ public:
 
     std::chrono::milliseconds timeTillCheck() const;
 
-    void sendEventStartedPacket(const AnalyticsEventType& event) const;
+    void sendEventStartedPacket(const EventType& event) const;
 
-    void sendEventStoppedPacket(const AnalyticsEventType& event) const;
+    void sendEventStoppedPacket(const EventType& event) const;
 
     void onTimer();
 

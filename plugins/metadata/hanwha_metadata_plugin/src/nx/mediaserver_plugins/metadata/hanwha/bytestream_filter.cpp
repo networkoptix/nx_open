@@ -22,7 +22,7 @@ static const QString kInactive("false");
 } // namespace
 
 BytestreamFilter::BytestreamFilter(
-    const Hanwha::DriverManifest& manifest,
+    const Hanwha::PluginManifest& manifest,
     Handler handler)
     :
     m_manifest(manifest),
@@ -69,7 +69,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     const QString& eventSource,
     const QString& eventState) const
 {
-    using namespace nx::api;
+    using namespace nx::vms::api::analytics;
 
     auto eventTypeId = m_manifest.eventTypeIdByName(eventSource);
     if (eventTypeId.isNull())
@@ -82,7 +82,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     event.region = eventRegion(eventSource);
     event.isActive = isEventActive(eventState);  //< Event start/stop.
     if (!event.isActive
-        && !eventTypeDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+        && !eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
         return {};
     }

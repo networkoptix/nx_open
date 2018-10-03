@@ -16,11 +16,11 @@ namespace plugins {
 namespace hikvision {
 
 QString buildCaption(
-    const Hikvision::DriverManifest& manifest,
+    const Hikvision::PluginManifest& manifest,
     const HikvisionEvent& event);
 
 QString buildDescription(
-    const Hikvision::DriverManifest& manifest,
+    const Hikvision::PluginManifest& manifest,
     const HikvisionEvent& event);
 
 } // namespace hikvision

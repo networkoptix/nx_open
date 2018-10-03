@@ -6,10 +6,11 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/api/analytics/driver_manifest.h>
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/mediaserver_plugins/utils/plugin_manifest_base.h>
 
 #include "nx/axis/camera_controller.h"
 
@@ -18,17 +19,17 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace axis {
 
-struct AnalyticsEventType: nx::api::Analytics::EventType
+struct EventType: nx::vms::api::analytics::EventType
 {
     QString topic;
     QString caption;
     QString eventTypeIdExternal;
 
-    AnalyticsEventType() = default; //< Fusion needs default constructor.
-    AnalyticsEventType(const nx::axis::SupportedEventType& supportedEventType);
+    EventType() = default; //< Fusion needs default constructor.
+    EventType(const nx::axis::SupportedEventType& supportedEventType);
     QString fullName() const { return topic + QString("/") + caption; }
 };
-#define AxisAnalyticsEventType_Fields AnalyticsEventType_Fields(topic)(name)
+#define AxisEventType_Fields EventType_Fields(topic)(name)
 
 /**
   * The algorithm of building of the valid event type list:
@@ -38,16 +39,17 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
   *  b) they are filtered with allowedTopics filter (only events with the allowed topics remain);
   *  c) event with descriptions form forbiddenDescriptions list are excised.
   */
-struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
+struct PluginManifest: nx::mediaserver_plugins::utils::PluginManifestBase
 {
-    QStringList allowedTopics; //< topic filter
-    QStringList forbiddenDescriptions; //< black list
-    QList<AnalyticsEventType> outputEventTypes; //< white list
+    QStringList allowedTopics; //< Prorietary. Topic filter.
+    QStringList forbiddenDescriptions; //< Proprietary. Black list.
+    QList<EventType> outputEventTypes; //< Extends the inherited field. White list.
 };
-#define AxisAnalyticsDriverManifest_Fields AnalyticsDriverManifestBase_Fields(allowedTopics)(forbiddenDescriptions)(outputEventTypes)
+#define AxisPluginManifest_Fields PluginManifestBase_Fields \
+    (allowedTopics)(forbiddenDescriptions)(outputEventTypes)
 
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
-QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
+QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
+QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json))
 
 } // axis
 } // namespace metadata

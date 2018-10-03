@@ -8,7 +8,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_tools.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/mediaserver_plugins/utils/plugin_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/sdk/metadata/events_metadata_packet.h>
@@ -20,7 +20,7 @@ namespace plugins {
 struct Hikvision
 {
 public:
-    struct EventTypeDescriptor: public nx::api::Analytics::EventType
+    struct EventType: public nx::vms::api::analytics::EventType
     {
         QString internalName;
         QString internalMonitoringName;
@@ -30,7 +30,7 @@ public:
         QString regionDescription;
         QString dependedEvent;
     };
-    #define EventTypeDescriptor_Fields AnalyticsEventType_Fields (internalName) \
+    #define HikvisionEventType_Fields EventType_Fields (internalName) \
         (internalMonitoringName) \
         (description) \
         (positiveState) \
@@ -38,24 +38,24 @@ public:
         (regionDescription) \
         (dependedEvent)
 
-    struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
+    struct PluginManifest: nx::mediaserver_plugins::utils::PluginManifestBase
     {
-        QList<EventTypeDescriptor> outputEventTypes;
+        QList<EventType> outputEventTypes;
 
         QString eventTypeByInternalName(const QString& internalEventName) const;
-        const Hikvision::EventTypeDescriptor& eventTypeDescriptorById(const QString& id) const;
-        Hikvision::EventTypeDescriptor eventTypeDescriptorByInternalName(
+        const Hikvision::EventType& eventTypeDescriptorById(const QString& id) const;
+        Hikvision::EventType eventTypeDescriptorByInternalName(
             const QString& internalName) const;
 
     private:
         static QnMutex m_cachedIdMutex;
         static QMap<QString, QString> m_eventTypeIdByInternalName;
-        static QMap<QString, EventTypeDescriptor> m_eventTypeDescriptorById;
+        static QMap<QString, EventType> m_eventTypeDescriptorById;
 
     };
-    #define DriverManifest_Fields AnalyticsDriverManifestBase_Fields (outputEventTypes)
-
+    #define HikvisionPluginManifest_Fields PluginManifestBase_Fields (outputEventTypes)
 };
+
 struct HikvisionEvent
 {
     QDateTime dateTime;
@@ -71,8 +71,8 @@ struct HikvisionEvent
 using HikvisionEventList = std::vector<HikvisionEvent>;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Hikvision::EventTypeDescriptor)
-    (Hikvision::DriverManifest),
+    (Hikvision::EventType)
+    (Hikvision::PluginManifest),
     (json)
 )
 

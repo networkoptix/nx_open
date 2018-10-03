@@ -5,6 +5,7 @@ nx_add_server_plugin(ssc_metadata_plugin OPTIONAL
         Qt5::Core
         Qt5::SerialPort
         nx_plugin_utils
+        nx_vms_api
         nx_network
         nx_utils
         nx_fusion

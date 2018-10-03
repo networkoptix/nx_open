@@ -17,8 +17,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
-#include <nx/api/analytics/driver_manifest.h>
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
@@ -78,7 +78,7 @@ public:
     /**
      * @return Deserialized plugin manifest, or none on error.
      */
-    boost::optional<nx::api::AnalyticsDriverManifest> loadPluginManifest(
+    boost::optional<nx::vms::api::analytics::PluginManifest> loadPluginManifest(
         nx::sdk::metadata::Plugin* plugin);
 
 public slots:
@@ -117,7 +117,7 @@ private:
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
-        const nx::api::AnalyticsDriverManifest& manifest);
+        const nx::vms::api::analytics::PluginManifest& manifest);
 
     void handleResourceChanges(const QnResourcePtr& resource);
 
@@ -147,16 +147,16 @@ private:
     }
 
     void assignPluginManifestToServer(
-        const nx::api::AnalyticsDriverManifest& manifest,
+        const nx::vms::api::analytics::PluginManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
-    nx::api::AnalyticsDriverManifest mergePluginManifestToServer(
-        const nx::api::AnalyticsDriverManifest& manifest,
+    nx::vms::api::analytics::PluginManifest mergePluginManifestToServer(
+        const nx::vms::api::analytics::PluginManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
     std::pair<
-        boost::optional<nx::api::AnalyticsDeviceManifest>,
-        boost::optional<nx::api::AnalyticsDriverManifest>
+        boost::optional<nx::vms::api::analytics::CameraManagerManifest>,
+        boost::optional<nx::vms::api::analytics::PluginManifest>
     >
     loadManagerManifest(
         const nx::sdk::metadata::Plugin* plugin,
@@ -164,7 +164,7 @@ private:
         const QnSecurityCamResourcePtr& camera);
 
     void addManifestToCamera(
-        const nx::api::AnalyticsDeviceManifest& manifest,
+        const nx::vms::api::analytics::CameraManagerManifest& manifest,
         const QnSecurityCamResourcePtr& camera);
 
     bool cameraInfoFromResource(
@@ -177,7 +177,7 @@ private:
         const CLConstVideoDecoderOutputPtr& uncompressedFrame);
 
     boost::optional<PixelFormat> pixelFormatFromManifest(
-        const nx::api::AnalyticsDriverManifest& manifest);
+        const nx::vms::api::analytics::PluginManifest& manifest);
 
     void issueMissingUncompressedFrameWarningOnce();
 

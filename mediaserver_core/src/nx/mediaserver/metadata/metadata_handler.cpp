@@ -31,14 +31,14 @@ MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
         Qt::QueuedConnection);
 }
 
-nx::api::Analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
+nx::vms::api::analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
 {
     for (const auto& descriptor: m_manifest.outputEventTypes)
     {
         if (descriptor.id == eventTypeId)
             return descriptor;
     }
-    return nx::api::Analytics::EventType();
+    return nx::vms::api::analytics::EventType();
 }
 
 void MetadataHandler::handleMetadata(
@@ -166,7 +166,7 @@ void MetadataHandler::handleMetadataEvent(
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
     auto descriptor = eventTypeDescriptor(eventTypeId);
-    if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    if (descriptor.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
             ? nx::vms::api::EventState::active
@@ -208,7 +208,7 @@ void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
     m_resource = resource;
 }
 
-void MetadataHandler::setManifest(const nx::api::AnalyticsDriverManifest& manifest)
+void MetadataHandler::setManifest(const nx::vms::api::analytics::PluginManifest& manifest)
 {
     m_manifest = manifest;
 }

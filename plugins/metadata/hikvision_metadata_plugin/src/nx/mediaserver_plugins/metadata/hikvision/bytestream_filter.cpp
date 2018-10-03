@@ -12,7 +12,7 @@ namespace plugins {
 namespace hikvision {
 
 BytestreamFilter::BytestreamFilter(
-    const Hikvision::DriverManifest& manifest,
+    const Hikvision::PluginManifest& manifest,
     HikvisionMetadataMonitor* monitor)
     :
     m_manifest(manifest),

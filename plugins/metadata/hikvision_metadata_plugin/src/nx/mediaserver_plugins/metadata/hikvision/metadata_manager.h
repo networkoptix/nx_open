@@ -46,11 +46,11 @@ public:
 
     void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
-    void setDriverManifest(const Hikvision::DriverManifest& manifest);
+    void setDriverManifest(const Hikvision::PluginManifest& manifest);
     void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
 private:
-    Hikvision::DriverManifest m_driverManifest;
+    Hikvision::PluginManifest m_driverManifest;
     QByteArray m_deviceManifest;
 
     nx::utils::Url m_url;

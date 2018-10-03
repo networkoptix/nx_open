@@ -11,7 +11,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log_main.h>
 
@@ -52,8 +52,8 @@ MetadataPlugin::MetadataPlugin()
     }
 
     bool success = false;
-    m_driverManifest = QJson::deserialized<Hikvision::DriverManifest>(
-        m_manifest, Hikvision::DriverManifest(), &success);
+    m_driverManifest = QJson::deserialized<Hikvision::PluginManifest>(
+        m_manifest, Hikvision::PluginManifest(), &success);
     if (!success)
         NX_WARNING(this, lm("Can't deserialize driver manifest file"));
 }
@@ -132,7 +132,7 @@ CameraManager* MetadataPlugin::obtainCameraManager(
     if (!supportedEvents)
         return nullptr;
 
-    nx::api::AnalyticsDeviceManifest deviceManifest;
+    nx::vms::api::analytics::CameraManagerManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new MetadataManager(this);
@@ -200,7 +200,7 @@ boost::optional<QList<QString>> MetadataPlugin::fetchSupportedEvents(
     return data.supportedEventTypes;
 }
 
-const Hikvision::DriverManifest& MetadataPlugin::driverManifest() const
+const Hikvision::PluginManifest& MetadataPlugin::driverManifest() const
 {
     return m_driverManifest;
 }

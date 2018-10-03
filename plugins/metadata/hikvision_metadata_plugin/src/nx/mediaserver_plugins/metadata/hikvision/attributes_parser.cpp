@@ -62,7 +62,7 @@ boost::optional<std::vector<QString>> AttributesParser::parseSupportedEventsXml(
 
 boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     const QByteArray& content,
-    const Hikvision::DriverManifest& manifest)
+    const Hikvision::PluginManifest& manifest)
 {
     using namespace nx::sdk::metadata;
 
@@ -122,9 +122,9 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
 
 std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     const QByteArray& content,
-    const Hikvision::DriverManifest& manifest)
+    const Hikvision::PluginManifest& manifest)
 {
-    using namespace nx::api;
+    using namespace nx::vms::api::analytics;
 
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
@@ -153,7 +153,7 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
 
 HikvisionEvent AttributesParser::parsePlateData(
     QXmlStreamReader& reader,
-    const Hikvision::DriverManifest& manifest)
+    const Hikvision::PluginManifest& manifest)
 {
     QString plateNumber;
     QString country;

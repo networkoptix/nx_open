@@ -152,7 +152,7 @@ protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     virtual bool allowRtspVideoLayout() const override { return false; }
-    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList) override;
+    virtual void setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventsList) override;
 
 private:
     CameraDiagnostics::Result initDevice();

@@ -13,7 +13,7 @@
 
 #include <nx/fusion/serialization/json.h>
 
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
@@ -46,7 +46,7 @@ static const int kBufferCapacity = 512 * 1024;
 static const QByteArray kXmlContentType = "application/xml";
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const AnalyticsEventType& eventType, bool active)
+    const EventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(eventType.id.toStdString());
@@ -58,7 +58,7 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
 }
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const AnalyticsEventType& event, bool active = true)
+    const EventType& event, bool active = true)
 {
     using namespace std::chrono;
 
@@ -75,14 +75,14 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
-    const AnalyticsDriverManifest& typedManifest)
+    const PluginManifest& typedManifest)
 {
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
     m_plugin = plugin;
 
-    nx::api::AnalyticsDeviceManifest typedCameraManifest;
+    nx::vms::api::analytics::CameraManagerManifest typedCameraManifest;
     for (const auto& eventType : typedManifest.outputEventTypes)
     {
         if(!eventType.unsupported)
@@ -310,7 +310,7 @@ void Manager::treatAlarmPairs(const QList<AlarmPair>& alarmPairs)
     }
 }
 
-void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
+void Manager::sendEventStartedPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, /*active*/ true);
@@ -323,7 +323,7 @@ void Manager::sendEventStartedPacket(const AnalyticsEventType& event) const
         << " sent to server";
 }
 
-void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
+void Manager::sendEventStoppedPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, /*active*/ false);
@@ -411,7 +411,7 @@ nx::sdk::Error Manager::startFetchingMetadata(const char* const* typeList, int t
     for (int i = 0; i < typeListSize; ++i)
     {
         const QString id = typeList[i];
-        const AnalyticsEventType* eventType = m_plugin->eventTypeById(id);
+        const EventType* eventType = m_plugin->eventTypeById(id);
         if (!eventType)
             NX_URL_PRINT << "Unknown event type. TypeId = " << id.toStdString();
         else

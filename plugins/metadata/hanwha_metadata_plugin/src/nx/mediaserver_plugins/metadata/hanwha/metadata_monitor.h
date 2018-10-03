@@ -29,7 +29,7 @@ public:
     using Handler = std::function<void(const EventList&)>;
 
     MetadataMonitor(
-        const Hanwha::DriverManifest& manifest,
+        const Hanwha::PluginManifest& manifest,
         const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth);
 
@@ -54,7 +54,7 @@ private:
     void at_connectionClosed(nx::network::http::AsyncHttpClientPtr httpClient);
 
 private:
-    const Hanwha::DriverManifest& m_manifest;
+    const Hanwha::PluginManifest& m_manifest;
     nx::utils::Url m_url;
     QAuthenticator m_auth;
     nx::network::aio::Timer m_timer;

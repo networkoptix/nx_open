@@ -49,11 +49,11 @@ public:
         nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
 
 private:
-    AnalyticsDriverManifest fetchSupportedEvents(
+    PluginManifest fetchSupportedEvents(
         const nx::sdk::CameraInfo& cameraInfo);
 
 private:
-    AnalyticsDriverManifest m_typedManifest;
+    PluginManifest m_typedManifest;
     QByteArray m_manifest;
 };
 

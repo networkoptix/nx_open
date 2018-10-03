@@ -14,8 +14,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
-#include <nx/api/analytics/driver_manifest.h>
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
@@ -41,7 +41,7 @@ public:
         int queueSize,
         HandlerPtr handler,
         ManagerPtr manager,
-        const nx::api::AnalyticsDriverManifest& manifest);
+        const nx::vms::api::analytics::PluginManifest& manifest);
     ~ManagerContext();
 
     bool isStreamConsumer() const;
@@ -52,12 +52,12 @@ public:
     const nx::sdk::metadata::CameraManager* manager() const { return m_manager.get(); }
 
     nx::sdk::metadata::MetadataHandler* handler() const { return m_handler.get(); }
-    const nx::api::AnalyticsDriverManifest& manifest() const { return m_manifest; }
+    const nx::vms::api::analytics::PluginManifest& manifest() const { return m_manifest; }
 
 private:
     HandlerPtr m_handler;
     ManagerPtr m_manager;
-    nx::api::AnalyticsDriverManifest m_manifest;
+    nx::vms::api::analytics::PluginManifest m_manifest;
 };
 
 using ManagerList = std::vector<std::unique_ptr<ManagerContext>>;
@@ -78,7 +78,7 @@ private:
     void addManager(
         ManagerPtr manager,
         HandlerPtr handler,
-        const nx::api::AnalyticsDriverManifest& manifest);
+        const nx::vms::api::analytics::PluginManifest& manifest);
     void clearManagers();
     void setVideoDataReceptor(const QSharedPointer<VideoDataReceptor>& receptor);
     void setMetadataDataReceptor(QWeakPointer<QnAbstractDataReceptor> receptor);
@@ -98,7 +98,7 @@ private:
 
     QSharedPointer<VideoDataReceptor> m_videoDataReceptor;
     QWeakPointer<QnAbstractDataReceptor> m_metadataReceptor;
-    nx::api::AnalyticsDriverManifest m_pluginManifest;
+    nx::vms::api::analytics::PluginManifest m_pluginManifest;
     bool m_isManagerInitialized = false;
 };
 

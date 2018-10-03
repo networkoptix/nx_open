@@ -20,7 +20,7 @@ ManagerContext::ManagerContext(
     int queueSize,
     HandlerPtr handler,
     ManagerPtr manager,
-    const nx::api::AnalyticsDriverManifest& manifest):
+    const nx::vms::api::analytics::PluginManifest& manifest):
     base_type(queueSize),
     m_handler(std::move(handler)),
     m_manager(std::move(manager)),
@@ -106,7 +106,7 @@ void ResourceMetadataContext::clearManagers()
 void ResourceMetadataContext::addManager(
     ManagerPtr manager,
     HandlerPtr handler,
-    const nx::api::AnalyticsDriverManifest& manifest)
+    const nx::vms::api::analytics::PluginManifest& manifest)
 {
 
     auto context = std::make_unique<ManagerContext>(

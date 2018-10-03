@@ -45,7 +45,7 @@ Plugin::Plugin()
             m_manifest = file.readAll();
         }
     }
-    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
+    m_typedManifest = QJson::deserialized<PluginManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -114,12 +114,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType* Plugin::eventTypeById(const QString& id) const noexcept
+const EventType* Plugin::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
+        [&id](const EventType& eventType) { return eventType.id == id; });
 
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }

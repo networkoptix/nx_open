@@ -149,7 +149,7 @@ Plugin::Plugin()
         }
     }
     f.close();
-    m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
+    m_typedManifest = QJson::deserialized<PluginManifest>(m_manifest);
 
     int eventCount = m_typedManifest.outputEventTypes.size();
     NX_PRINT << "Found "<< eventCount << " event(s) in the loaded manifest";
