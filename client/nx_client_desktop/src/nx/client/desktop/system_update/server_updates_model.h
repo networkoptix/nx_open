@@ -64,7 +64,7 @@ public:
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent = nullptr);
+    explicit ServerUpdatesModel(QObject* parent);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);
@@ -85,17 +85,7 @@ public:
     void setUpdateTarget(const nx::utils::SoftwareVersion& version,
         const QSet<nx::vms::api::SystemInformation>& selection);
 
-    // Get current set of servers
-    QSet<QnUuid> getAllServers() const;
-
-    // Get servers with specified update status
-    QSet<QnUuid> getServersInState(StatusCode status) const;
-
-    // Get servers that are offline right now
-    QSet<QnUuid> getOfflineServers() const;
-
-    // Get servers that are incompatible with new update system
-    QSet<QnUuid> getLegacyServers() const;
+    nx::utils::SoftwareVersion lowestInstalledVersion();
 
     // Clears internal state back to initial state
     void clearState();
@@ -106,12 +96,11 @@ public:
     // Set resource pool to be used as a source.
     void setResourceFeed(QnResourcePool* pool);
 
-    nx::utils::SoftwareVersion lowestInstalledVersion();
+    const QList<UpdateItemPtr>& getServerData() const;
 
 private:
     void resetResourses(QnResourcePool* pool);
     void updateVersionColumn();
-
     void updateContentsIndex();
     void addItemForServer(QnMediaServerResourcePtr server);
 
@@ -122,11 +111,11 @@ private:
 
     // Reads data from resource to UpdateItem
     void updateServerData(QnMediaServerResourcePtr server, UpdateItem& item);
+
 private:
     QList<UpdateItemPtr> m_items;
     nx::utils::SoftwareVersion m_latestVersion;
     QSet<nx::vms::api::SystemInformation> m_updatePlatforms;
-
     QnServerUpdatesColors m_versionColors;
 };
 
