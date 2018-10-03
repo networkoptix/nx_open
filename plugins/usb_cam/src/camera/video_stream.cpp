@@ -226,8 +226,8 @@ void VideoStream::run()
             continue;
         }
 
-        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
-        m_timeStamps.addTimeStamp(packet->pts(), packet->timeStamp());
+        packet->setTimestamp(m_timeProvider->millisSinceEpoch());
+        m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
 
         auto frame = maybeDecode(packet.get());
 
@@ -416,11 +416,11 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     if(frame->pts() == AV_NOPTS_VALUE)
         frame->frame()->pts = frame->packetPts();
 
-    uint64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(frame->packetPts(), &nxTimeStamp, true /*eraseEntry*/))
-        nxTimeStamp = m_timeProvider->millisSinceEpoch();
+    uint64_t nxTimestamp;
+    if (!m_timestamps.getNxTimestamp(frame->packetPts(), &nxTimestamp, true /*eraseEntry*/))
+        nxTimestamp = m_timeProvider->millisSinceEpoch();
 
-    frame->setTimeStamp(nxTimeStamp);
+    frame->setTimestamp(nxTimestamp);
 
     return frame;
 }

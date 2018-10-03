@@ -68,7 +68,6 @@ private:
         
         std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetMergeBuffer;
 
-        TimeStampMapper m_timeStamps;
         uint64_t m_lastTimeStamp = 0;
         int64_t m_lastPts = 0;
 

@@ -381,7 +381,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
 {
     *outFfmpegError = 0;
 
-    packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
+    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
     if(m_encoder->codecID() == AV_CODEC_ID_PCM_S16LE)
         return packet;
@@ -391,7 +391,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
      * to produce a video frame
      */
     m_packetMergeBuffer.push_back(packet);
-    if (packet->timeStamp() - m_packetMergeBuffer[0]->timeStamp() < timePerVideoFrame().count())
+    if (packet->timestamp() - m_packetMergeBuffer[0]->timestamp() < timePerVideoFrame().count())
         return nullptr;
 
 
@@ -416,7 +416,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
         data += pkt->size();
     }
 
-    newPacket->setTimeStamp(m_packetMergeBuffer[0]->timeStamp());
+    newPacket->setTimestamp(m_packetMergeBuffer[0]->timestamp());
     m_packetMergeBuffer.clear();
 
     return newPacket;

@@ -26,11 +26,14 @@ uint8_t firstDigit(uint8_t n)
 
 }
 
-Packet::Packet(AVCodecID codecID, AVMediaType mediaType, const std::shared_ptr<std::atomic_int>& packetCount):
+Packet::Packet(
+    AVCodecID codecID,
+    AVMediaType mediaType,
+    const std::shared_ptr<std::atomic_int>& packetCount)
+    :
     m_codecID(codecID),
     m_mediaType(mediaType),
     m_packetCount(packetCount),
-    m_timeStamp(0),
 #ifdef _WIN32
     m_parseNalUnitsVisited(false),
 #endif
@@ -110,14 +113,14 @@ AVMediaType Packet::mediaType() const
     return m_mediaType;
 }
 
-uint64_t Packet::timeStamp() const 
+uint64_t Packet::timestamp() const 
 {
-    return m_timeStamp; 
+    return m_timestamp; 
 }
 
-void Packet::setTimeStamp(uint64_t millis) 
+void Packet::setTimestamp(uint64_t millis) 
 {
-    m_timeStamp = millis; 
+    m_timestamp = millis; 
 }
 
 bool Packet::keyPacket() const

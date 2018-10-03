@@ -35,8 +35,8 @@ public:
     AVCodecID codecID() const;
     AVMediaType mediaType() const;
 
-    uint64_t timeStamp() const;
-    void setTimeStamp(uint64_t millis);
+    uint64_t timestamp() const;
+    void setTimestamp(uint64_t millis);
 
     bool keyPacket() const;
 
@@ -44,7 +44,7 @@ private:
     AVCodecID m_codecID;
     AVMediaType m_mediaType;
     std::shared_ptr<std::atomic_int> m_packetCount;
-    uint64_t m_timeStamp;
+    uint64_t m_timestamp = 0;
     AVPacket* m_packet;
 
 #ifdef _WIN32

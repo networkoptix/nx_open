@@ -14,8 +14,13 @@ namespace nx {
 namespace usb_cam {
 
 namespace  {
-int kMsecToUsec = 1000;
+
+int kUsecInMsec = 1000;
+
 }
+
+//--------------------------------------------------------------------------------------------------
+// StreamReader
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -96,8 +101,9 @@ void StreamReader::setBitrate(int bitrate)
     m_streamReader->setBitrate(bitrate);
 }
 
-//////////////////////////////////// StreamReaderPrivate /////////////////////////////////////////
 
+//--------------------------------------------------------------------------------------------------
+// StreamReaderPrivate
 
 StreamReaderPrivate::StreamReaderPrivate(
     int encoderIndex,
@@ -162,7 +168,7 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
         0,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
         ffmpeg::utils::toNxCompressionType(packet->codecID()),
-        packet->timeStamp() * kMsecToUsec,
+        packet->timestamp() * kUsecInMsec,
         keyPacket,
         0));
 

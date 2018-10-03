@@ -39,20 +39,21 @@ private:
         csInitialized,
         csModified
     };
-    StreamState m_cameraState;
-    int m_retries;
-    int m_initCode;
+    StreamState m_cameraState = csOff;
+    
+    int m_retries = 0;
+    int m_initCode = 0;
 
-    uint64_t m_lastVideoPts;
-    uint64_t m_lastVideoTimeStamp;
-    uint64_t m_lastTimeStamp;
-    uint64_t m_timePerFrame;
+    uint64_t m_lastVideoPts = 0;
+    uint64_t m_lastVideoTimestamp = 0;
+    uint64_t m_lastTimestamp = 0;
+    uint64_t m_timePerFrame = 0;
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;
     
     std::unique_ptr<ffmpeg::Codec> m_encoder;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
 
-    TimeStampMapper m_timeStamps;
+    TimestampMapper m_timestamps;
 
 private:
     bool shouldDrop(const ffmpeg::Frame * frame);

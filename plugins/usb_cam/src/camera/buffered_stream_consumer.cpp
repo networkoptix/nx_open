@@ -13,7 +13,7 @@ BufferedPacketConsumer::BufferedPacketConsumer():
 {
 }
 
-void BufferedPacketConsumer::pushBack(const uint64_t& timeStamp, const std::shared_ptr<ffmpeg::Packet>& packet)
+void BufferedPacketConsumer::pushBack(const uint64_t& timestamp, const std::shared_ptr<ffmpeg::Packet>& packet)
 {
     if (m_ignoreNonKeyPackets)
     {
@@ -21,7 +21,7 @@ void BufferedPacketConsumer::pushBack(const uint64_t& timeStamp, const std::shar
             return;
         m_ignoreNonKeyPackets = false;
     }
-    Map::pushBack(timeStamp, packet);
+    Map::pushBack(timestamp, packet);
 }
 
 int BufferedPacketConsumer::dropOldNonKeyPackets()
@@ -73,7 +73,7 @@ void BufferedPacketConsumer::flush()
 
 void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    pushBack(packet->timeStamp(), packet);
+    pushBack(packet->timestamp(), packet);
 }
 
 bool BufferedPacketConsumer::waitForTimeSpan(uint64_t msecDifference)
@@ -112,9 +112,9 @@ BufferedAudioVideoPacketConsumer::BufferedAudioVideoPacketConsumer(
 {
 }
 
-void BufferedAudioVideoPacketConsumer::pushBack(const uint64_t & timeStamp, const std::shared_ptr<ffmpeg::Packet>& packet)
+void BufferedAudioVideoPacketConsumer::pushBack(const uint64_t & timestamp, const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    BufferedPacketConsumer::pushBack(timeStamp, packet);
+    BufferedPacketConsumer::pushBack(timestamp, packet);
     std::lock_guard<std::mutex> lock(m_mutex);
     if (packet)
     {
@@ -167,7 +167,7 @@ void BufferedVideoFrameConsumer::flush()
 
 void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
-    pushBack(frame->timeStamp(), frame);
+    pushBack(frame->timestamp(), frame);
 }
 
 } // namespace usb_cam

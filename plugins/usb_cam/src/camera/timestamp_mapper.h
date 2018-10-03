@@ -5,40 +5,40 @@
 namespace nx {
 namespace usb_cam {
 
-class TimeStampMapper
+class TimestampMapper
 {
 public:
-    void addTimeStamp(int64_t ffmpegPts, uint64_t nxTimeStamp)
+    void addTimestamp(int64_t ffmpegPts, uint64_t nxTimestamp)
     {
-        m_timeStamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimeStamp));
+        m_timestamps.insert(std::pair<int64_t, uint64_t>(ffmpegPts, nxTimestamp));
     }
 
-    bool getNxTimeStamp(int64_t ffmpegPts, uint64_t * outNxTimeStamp, bool eraseEntry = true)
+    bool getNxTimestamp(int64_t ffmpegPts, uint64_t * outNxTimestamp, bool eraseEntry = true)
     {
-        *outNxTimeStamp = 0;
-        auto it = m_timeStamps.find(ffmpegPts);
-        bool found = it != m_timeStamps.end();
+        *outNxTimestamp = 0;
+        auto it = m_timestamps.find(ffmpegPts);
+        bool found = it != m_timestamps.end();
         if (found)
         {
-            *outNxTimeStamp = it->second;
+            *outNxTimestamp = it->second;
             if (eraseEntry)
-                m_timeStamps.erase(it);
+                m_timestamps.erase(it);
         }
         return found;
     }
 
     size_t size() const
     {
-        return m_timeStamps.size();
+        return m_timestamps.size();
     }
 
     void clear()
     {
-        m_timeStamps.clear();
+        m_timestamps.clear();
     }
 
 private:
-    std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timeStamp*/> m_timeStamps;
+    std::map<int64_t /*ffmpeg pts*/, uint64_t /*nx timestamp*/> m_timestamps;
 };
 
 } // namespace usb_cam

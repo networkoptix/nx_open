@@ -35,12 +35,6 @@ TranscodeStreamReader::TranscodeStreamReader(
         encoderIndex,
         codecParams,
         camera),
-    m_cameraState(csOff),
-    m_retries(0),
-    m_initCode(0),
-    m_lastVideoPts(0),
-    m_lastVideoTimeStamp(0),
-    m_lastTimeStamp(0),
     m_videoFrameConsumer(new BufferedVideoFrameConsumer(m_camera->videoStream(), m_codecParams))
 {
     calculateTimePerFrame();
@@ -52,7 +46,7 @@ TranscodeStreamReader::~TranscodeStreamReader()
     uninitialize();
     m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     m_videoFrameConsumer->interrupt();
-}
+}   
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
@@ -149,9 +143,9 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
      * If the time stamp of this frame minus the amount of time per video frame is lower
      * than the timestamp of the last transcoded frame, we should drop.
      */
-    bool drop = now - m_timePerFrame < m_lastTimeStamp;
+    bool drop = now - m_timePerFrame < m_lastTimestamp;
     if(!drop)
-        m_lastTimeStamp = now;
+        m_lastTimestamp = now;
 
     return drop;
 }
@@ -162,9 +156,9 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
 {
     *outNxError = nxcip::NX_NO_ERROR;
 
-    m_lastVideoTimeStamp = frame->timeStamp();
+    m_lastVideoTimestamp = frame->timestamp();
     m_lastVideoPts = frame->pts();
-    m_timeStamps.addTimeStamp(frame->packetPts(), frame->timeStamp());
+    m_timestamps.addTimestamp(frame->packetPts(), frame->timestamp());
 
     int result = scale(frame->frame(), m_scaledFrame->frame());
     if (result < 0)
@@ -185,15 +179,15 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
         return nullptr;
     }
 
-    uint64_t nxTimeStamp;
-    if (!m_timeStamps.getNxTimeStamp(packet->pts(), &nxTimeStamp, true /*eraseEntry*/))
+    uint64_t nxTimestamp;
+    if (!m_timestamps.getNxTimestamp(packet->pts(), &nxTimestamp, true /*eraseEntry*/))
     {
-        nxTimeStamp = m_camera->millisSinceEpoch();
-        if(m_timeStamps.size() > 30)
-            m_timeStamps.clear();
+        nxTimestamp = m_camera->millisSinceEpoch();
+        if(m_timestamps.size() > 30)
+            m_timestamps.clear();
     }
 
-    packet->setTimeStamp(nxTimeStamp);
+    packet->setTimestamp(nxTimestamp);
     return packet;
 }
 

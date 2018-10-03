@@ -20,23 +20,20 @@ Frame::Frame(const std::shared_ptr<std::atomic_int>& frameCount):
 Frame::~Frame()
 {
     if (m_frame)
-    {
-        //freeData();
         av_frame_free(&m_frame);
-    }
     
     if (m_frameCount)
         --(*m_frameCount);
 }
 
-uint64_t Frame::timeStamp() const
+uint64_t Frame::timestamp() const
 {
-    return m_timeStamp;
+    return m_timestamp;
 }
 
-void Frame::setTimeStamp(uint64_t millis)
+void Frame::setTimestamp(uint64_t millis)
 {
-    m_timeStamp = millis;
+    m_timestamp = millis;
 }
 
 void Frame::unreference()

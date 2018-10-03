@@ -88,7 +88,7 @@ private:
      */
     std::shared_ptr<std::atomic_int> m_frameCount;
 
-    TimeStampMapper m_timeStamps;    
+    TimestampMapper m_timestamps;    
 
     FrameConsumerManager m_frameConsumerManager;
     PacketConsumerManager m_packetConsumerManager;

@@ -19,8 +19,8 @@ public:
     Frame(const std::shared_ptr<std::atomic_int>& frameCount = nullptr);
     ~Frame();
 
-    uint64_t timeStamp() const;
-    void setTimeStamp(uint64_t millis);
+    uint64_t timestamp() const;
+    void setTimestamp(uint64_t millis);
 
     void unreference();
 
@@ -33,7 +33,7 @@ public:
     int getBuffer(AVSampleFormat format, int nbSamples, uint64_t channelLayout, int align = 32);
 
 private:
-    uint64_t m_timeStamp;
+    uint64_t m_timestamp = 0;
     AVFrame * m_frame = nullptr;
     std::shared_ptr<std::atomic_int> m_frameCount;
 };
