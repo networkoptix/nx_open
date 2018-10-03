@@ -282,17 +282,18 @@ void VmsGatewayProcess::registerApiHandlers(
             nx::network::http::kAnyPath,
             [this, &settings]() -> std::unique_ptr<ConnectHandler>
             {
-                return std::make_unique<ConnectHandler>(settings,
-                    [this](std::unique_ptr<cloud::gateway::Tunnel> tunnel)
+                auto tunnelCreatedHandler =
+                    [this](std::unique_ptr<network::aio::AsyncChannelBridge> tunnel)
                     {
-                        tunnel->start();
+                        NX_VERBOSE(tunnel.get(), "Starting CONNECT tunnel");
+                        tunnel->start(
+                            [this, tunnelPtr = tunnel.get()](SystemError::ErrorCode error)
+                            {
+                                m_httpConnectTunnelPool.closeConnection(error, tunnelPtr);
+                            });
                         m_httpConnectTunnelPool.saveConnection(std::move(tunnel));
-                    },
-                    [this](cloud::gateway::Tunnel* tunnel)
-                    {
-                        m_httpConnectTunnelPool.closeConnection(SystemError::noError, tunnel);
-                    }
-                );
+                    };
+                return std::make_unique<ConnectHandler>(settings, std::move(tunnelCreatedHandler));
             },
             nx::network::http::StringType("CONNECT"));
     }

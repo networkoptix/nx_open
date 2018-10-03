@@ -11,6 +11,7 @@
 #include <nx/utils/service.h>
 
 #include <nx/cloud/relaying/relay_engine.h>
+#include <nx/network/aio/async_channel_bridge.h>
 
 #include "settings.h"
 #include "run_time_options.h"
@@ -32,7 +33,7 @@ class NX_VMS_GATEWAY_API VmsGatewayProcess:
 
 public:
     VmsGatewayProcess(int argc, char **argv);
-    ~VmsGatewayProcess();
+    ~VmsGatewayProcess() override;
 
     const std::vector<network::SocketAddress>& httpEndpoints() const;
     network::SocketAddress reverseConnectionServerHttpEndpoint() const;
@@ -49,7 +50,7 @@ protected:
 private:
     // TODO: Move it to the correct place.
     using HttpConnectTunnelPool =
-        network::server::StreamServerConnectionHolder<nx::cloud::gateway::Tunnel>;
+        network::server::StreamServerConnectionHolder<network::aio::AsyncChannelBridge>;
     HttpConnectTunnelPool m_httpConnectTunnelPool;
 
     conf::RunTimeOptions m_runTimeOptions;
