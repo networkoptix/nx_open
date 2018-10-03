@@ -256,7 +256,9 @@ void CloudServerSocket::bindToAioThreadUnchecked(
 {
     base_type::bindToAioThread(aioThread);
 
-    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
+    NX_ASSERT(m_acceptors.empty());
+    if (m_tunnelPool)
+        m_tunnelPool->bindToAioThread(aioThread);
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
     m_aggregateAcceptor.bindToAioThread(aioThread);
