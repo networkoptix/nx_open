@@ -44,6 +44,25 @@ For more details see `toString()` for pointers and `std::type_info`.
 most cases because type info carries a lot more information in its name and namespace, e.g.
 `nx::network::Socket(...)` points to `nx_network` module class `Socket`.
 
+When using logs in standalone functions, recommended way to tag logs is to create a dummy object:
+```
+namespace nx::vms::utils {
+
+namespace {
+
+struct UtilsLog {};
+static const nx::utils::log::Tag kUtilsTag{typeid(UtilsLog)};
+
+} // namespace
+
+void logSomething()
+{
+    NX_INFO(kUtilsTag, "Log Something");
+}
+
+} // namespace nx::vms::utils
+```
+
 
 ## To string convertion and messages
 
@@ -86,8 +105,8 @@ There are several default writers:
 
 Loggers are built using `nx::utils::log::buildLogger()` function.
 The function accepts `nx::utils::log::Settings` that specify desired log filters.
-`nx::utils::log::Settings::load()` loads parameters from `QnSettings` that represents 
-parsed application configuration options taken whether from command line arguments 
+`nx::utils::log::Settings::load()` loads parameters from `QnSettings` that represents
+parsed application configuration options taken whether from command line arguments
 or conf file (Linux/Max) / registry (Mswin).
 
 The following parameters are supported:

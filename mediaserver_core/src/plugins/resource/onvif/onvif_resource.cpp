@@ -3580,7 +3580,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__CreatePullPointSubscription request;
-    std::string initialTerminationTime = "PT60S"; //"PT600S"
+    std::string initialTerminationTime = "PT600S";
     request.InitialTerminationTime = &initialTerminationTime;
     _onvifEvents__CreatePullPointSubscriptionResponse response;
     const int soapCallResult = soapWrapper.createPullPointSubscription(request, response);

@@ -135,6 +135,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     if (params.contains(lit("limit")))
         filter->maxObjectsToSelect = params.value(lit("limit")).toInt();
 
+    if (params.contains(lit("maxObjectsToSelect")))
+        filter->maxObjectsToSelect = params.value(lit("maxObjectsToSelect")).toInt();
+
     if (params.contains(lit("maxTrackSize")))
         filter->maxTrackSize = params.value(lit("maxTrackSize")).toInt();
 
@@ -161,6 +164,11 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
     }
     if (!filter.freeText.isEmpty())
         os << "freeText \"" << filter.freeText.toStdString() << "\"; ";
+
+    os << "maxObjectsToSelect " << filter.maxObjectsToSelect << "; ";
+    os << "maxTrackSize " << filter.maxTrackSize << "; ";
+    os << "sortOrder " << 
+        (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 
     return os;
 }

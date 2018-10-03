@@ -122,9 +122,7 @@ private:
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 
-    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-        QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
-    #endif
+    QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
 
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;

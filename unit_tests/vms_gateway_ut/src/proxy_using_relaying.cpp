@@ -21,8 +21,7 @@ namespace test {
 static const char* const kTestRequestPath = "ProxyUsingRelayingTest";
 
 class ProxyUsingRelaying:
-    public BasicComponentTest,
-    public network::server::StreamConnectionHolder<nx::network::http::AsyncMessagePipeline>
+    public BasicComponentTest
 {
 public:
     ProxyUsingRelaying():
@@ -72,9 +71,10 @@ protected:
             std::chrono::milliseconds::zero()));
 
         m_serverConnection = std::make_unique<nx::network::http::AsyncMessagePipeline>(
-            this,
             std::make_unique<nx::network::ssl::ServerSideStreamSocket>(
                 std::move(m_prevAcceptedConnection)));
+        m_serverConnection->setOnConnectionClosed(
+            [this](auto... args) { onConnectionClosed(args...); });
         m_serverConnection->setMessageHandler(
             std::bind(&ProxyUsingRelaying::saveMessageReceived, this, _1));
         m_serverConnection->startReadingConnection();
@@ -119,9 +119,7 @@ private:
             std::bind(&ProxyUsingRelaying::saveAcceptedConnection, this, _1, _2));
     }
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        nx::network::http::AsyncMessagePipeline* /*connection*/) override
+    void onConnectionClosed(SystemError::ErrorCode closeReason)
     {
         m_connectionClosureReasons.push(closeReason);
     }

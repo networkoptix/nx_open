@@ -190,6 +190,15 @@ TEST(IoServerMonitorTest, main)
         std::future_status::ready,
         allDataProcessed.get_future().wait_for(kMaxTestTime));
 
+    const nx::network::http::AsyncClient::State state = httpClient->state();
+    if (state == nx::network::http::AsyncClient::State::sFailed)
+    {
+        NX_WARNING(this, "Http request failed %1", httpClient->lastSysErrorCode());
+        return;
+    }
+    ASSERT_TRUE(httpClient->response());
+    ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient->response()->statusLine.statusCode);
+
     ASSERT_TRUE(ioParser->isEof());
 }
 

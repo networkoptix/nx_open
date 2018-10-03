@@ -23,8 +23,7 @@ namespace proxy {
  * Proxies HTTP request and corresponding response.
  */
 class NX_NETWORK_API ProxyWorker:
-    public nx::network::aio::BasicPollable,
-    public nx::network::http::StreamConnectionHolder
+    public nx::network::aio::BasicPollable
 {
     using base_type = nx::network::aio::BasicPollable;
 
@@ -50,10 +49,6 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        nx::network::http::AsyncMessagePipeline* connection) override;
-
 protected:
     virtual void stopWhileInAioThread() override;
 
@@ -68,6 +63,8 @@ private:
     const int m_proxyingId;
     static std::atomic<int> m_proxyingIdSequence;
     nx::network::http::Request m_translatedRequest;
+
+    void onConnectionClosed(SystemError::ErrorCode closeReason);
 
     void replaceTargetHostWithFullCloudNameIfAppropriate(
         const AbstractStreamSocket* connectionToTheTargetPeer);

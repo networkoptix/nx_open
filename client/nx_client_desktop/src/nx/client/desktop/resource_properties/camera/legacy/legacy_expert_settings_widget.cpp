@@ -116,20 +116,20 @@ LegacyExpertSettingsWidget::LegacyExpertSettingsWidget(QWidget* parent):
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     connect(
-        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
-        this, SLOT(at_dataChanged()));
+        ui->preferredPtzPresetTypeComboBox, QnComboboxCurrentIndexChanged,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
-        ui->preferredPtzPresetTypeComboBox, SIGNAL(currentIndexChanged(int)),
-        this, SLOT(at_preferredPresetTypeChanged(int)));
+        ui->preferredPtzPresetTypeComboBox, QnComboboxCurrentIndexChanged,
+        this, &LegacyExpertSettingsWidget::at_preferredPresetTypeChanged);
 
     connect(
-        ui->forcedPanTiltCheckBox, SIGNAL(toggled(bool)),
-        this, SLOT(at_dataChanged()));
+        ui->forcedPanTiltCheckBox, &QCheckBox::toggled,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(
-        ui->forcedZoomCheckBox, SIGNAL(toggled(bool)),
-        this, SLOT(at_dataChanged()));
+        ui->forcedZoomCheckBox, &QCheckBox::toggled,
+        this, &LegacyExpertSettingsWidget::at_dataChanged);
 
     connect(ui->secondStreamDisableCheckBox, &QCheckBox::stateChanged,
         this, &LegacyExpertSettingsWidget::at_dataChanged);

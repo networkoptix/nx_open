@@ -232,10 +232,6 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
     {
         if (track.parser)
         {
-//##################################WORKAROUND##################################
-            if (track.parser->getFrequency() == 0)
-                track.parser->setFrequency(90000);
-//##################################WORKAROUND##################################
             QnAbstractMediaDataPtr result = track.parser->nextData();
             if (result) {
                 const QnRtspStatistic& statistics = track.ioDevice ?

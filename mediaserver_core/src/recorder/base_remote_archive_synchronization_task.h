@@ -6,7 +6,7 @@
 #include <boost/optional.hpp>
 
 #include <core/resource/abstract_remote_archive_manager.h>
-#include <core/resource/security_cam_resource.h>
+#include <core/resource/resource_fwd.h>
 
 #include <recorder/abstract_remote_archive_synchronization_task.h>
 #include <recorder/server_edge_stream_recorder.h>

@@ -64,7 +64,7 @@ public:
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event) override;
 
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const override;
+    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const override;
 
     virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) override;
 
@@ -310,7 +310,7 @@ private:
         QString prefix;
     };
 
-    HanwhaPortInfo portInfoFromId(const QString& id) const;
+    boost::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
 
     bool setOutputPortStateInternal(const QString& outputId, bool activate);
 

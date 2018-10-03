@@ -14,7 +14,15 @@ public:
     virtual int executePost(const QString& path, const QnRequestParams& params,
         const QByteArray& body, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
+
+    // WARNING: Deprecated! Was left for a backward compatibility, should be removed in a future.
+    virtual int executeGet(const QString& path, const QnRequestParams& params,
+        QnJsonRestResult& result, const QnRestConnectionProcessor* owner) override;
+
 private:
+    int activateLicense(const QString licenseKey, QnJsonRestResult &result,
+        const QnRestConnectionProcessor* owner);
+
     CLHttpStatus makeRequest(QnCommonModule* commonModule, const QString& licenseKey, bool infoMode,
         QByteArray& response);
 };

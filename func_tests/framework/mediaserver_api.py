@@ -4,6 +4,7 @@ import timeit
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from uuid import UUID
 
 import pytz
 import requests
@@ -18,7 +19,7 @@ from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import Wait, WaitTimeout, wait_for_truthy, wait_for_equal
+from framework.waiting import Wait, WaitTimeout, wait_for_equal, wait_for_truthy
 from .context_logger import ContextLogger, context_logger
 
 _logger = ContextLogger(__name__, 'mediaserver_api')
@@ -179,6 +180,34 @@ class TimePeriod(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+class _MediaserverCameraApi(object):
+    def __init__(self, generic_mediaserver_api, camera_id):
+        # type: (_GenericMediaserverApi, ...) -> None
+        self.camera_id = camera_id
+        self._generic = generic_mediaserver_api
+
+    def __repr__(self):
+        return '{}({!r}, {!r})'.format(self.__class__.__name__, self._generic, self.camera_id)
+
+    def history(self):
+        params = {'cameraId': self.camera_id, 'startTime': 0, 'endTime': 'now'}
+        response = self._generic.get('ec2/cameraHistory', params)
+        history_items = response[0]['items']
+        history_ids = [item['serverGuid'] for item in history_items]
+        timestamps = [float(item['timestampMs']) / 1000 for item in history_items]
+        assert timestamps == sorted(timestamps)
+        return history_ids
+
+    def server(self):
+        response = self._generic.get('ec2/getCamerasEx')
+        for camera_info in response:
+            if camera_info['id'] == self.camera_id:
+                owner_server_id = camera_info['parentId']
+                _logger.info("%r: camera is on server %r", self, owner_server_id)
+                return owner_server_id
+        return None
 
 
 class MediaserverApi(object):
@@ -603,6 +632,19 @@ class MediaserverApi(object):
             if EUI(camera_info['physicalId']) == EUI(camera_mac):
                 _logger.info("Camera %r is discovered by server %r as %r", camera_mac, self, camera_info['id'])
                 return camera_info['id']
+
+    def take_camera(self, camera_id):
+        server_guid = self.get_server_id()
+        self.generic.post('ec2/saveCamera', dict(id=camera_id, parentId=server_guid))
+        for d in self.generic.get('ec2/getCamerasEx'):
+            if d['id'] == camera_id:
+                break
+        else:
+            raise RuntimeError("Camera %s is unknown for server %s" % (camera_id, self))
+        assert d['parentId'] == server_guid
+
+    def camera(self, camera_id):
+        return _MediaserverCameraApi(self.generic, camera_id)
 
     def make_event_rule(
             self, event_type, event_state, action_type, event_resource_ids=[],

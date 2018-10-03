@@ -36,7 +36,7 @@ _HOST_CONNECTION_NIC_INDEX = 2
 _INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
 
 ## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
-# Theoretically, some NICs may not be used at all bur their indices should be listed here to get
+# Theoretically, some NICs may not be used at all but their indices should be listed here to get
 # non-random MAC address.
 _ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
@@ -297,7 +297,7 @@ class _VirtualBoxVm(VmHardware):
         picked up immediately. The example below changes the limit for the group created in the
         example above to 100 Kbit/s:
         ```{.sh}
-        VBoxManage bandwidthctl "VM name" set Limit --limit 100k
+        VBoxManage bandwidthctl "VM name" set network1 --limit 100k
         ```
 
         In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...

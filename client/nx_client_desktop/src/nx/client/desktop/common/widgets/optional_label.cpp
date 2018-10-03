@@ -8,7 +8,7 @@ OptionalLabel::OptionalLabel(QWidget* parent):
     base_type(parent),
     m_placeholderLabel(new QLabel(this))
 {
-    new WidgetAnchor(m_placeholderLabel);
+    anchorWidgetToParent(m_placeholderLabel);
     m_placeholderLabel->setText(QString::fromWCharArray(L"\x2013\x2013\x2013\x2013"));
     m_placeholderLabel->setForegroundRole(QPalette::WindowText);
 }

@@ -7,6 +7,7 @@
 #include <core/storage/memory/ext_iodevice_storage.h>
 #include <plugins/utils/motion_delegate_wrapper.h>
 #include <core/resource/avi/avi_resource.h>
+#include <core/resource/security_cam_resource.h>
 
 #include <nx/mediaserver/event/event_connector.h>
 
@@ -59,16 +60,14 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
     aviDelegate->setUseAbsolutePos(false);
 
     std::unique_ptr<QnAbstractArchiveDelegate> archiveDelegate = std::move(aviDelegate);
-    #if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
-        if (m_resource->isRemoteArchiveMotionDetectionEnabled())
-        {
-            auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
-                std::move(archiveDelegate));
+    if (m_resource->isRemoteArchiveMotionDetectionEnabled())
+    {
+        auto motionDelegate = std::make_unique<plugins::MotionDelegateWrapper>(
+            std::move(archiveDelegate));
 
-            motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
-            archiveDelegate = std::move(motionDelegate);
-        }
-    #endif
+        motionDelegate->setMotionRegion(m_resource->getMotionRegion(0));
+        archiveDelegate = std::move(motionDelegate);
+    }
 
     QnAviResourcePtr aviResource(new QnAviResource(temporaryFilePath));
     m_archiveReader = std::make_unique<QnArchiveStreamReader>(aviResource);
