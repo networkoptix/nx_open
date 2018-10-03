@@ -3,9 +3,11 @@
 
 #include <nx/utils/log/log.h>
 #include <api/model/merge_system_data.h>
+#include <api/model/configure_system_data.h>
 #include <api/model/getnonce_reply.h>
 #include <nx/vms/api/data/module_information.h>
 #include <rest/server/json_rest_result.h>
+#include <network/authutil.cpp>
 
 #include "test_api_requests.h"
 
@@ -25,39 +27,55 @@ protected:
 
     void whenServerMergeRequestIssued(const LauncherPtr& requestTarget, const LauncherPtr& serverToMerge)
     {
-        QnGetNonceReply getNonceData;
-        issueGetRequest(requestTarget.get(), "api/getNonce", getNonceData);
-        ASSERT_FALSE(getNonceData.nonce.isEmpty());
-        ASSERT_FALSE(getNonceData.realm.isEmpty());
+        QnGetNonceReply nonceReply;
+        issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
+        ASSERT_FALSE(nonceReply.nonce.isEmpty());
+        ASSERT_FALSE(nonceReply.realm.isEmpty());
 
         MergeSystemData mergeSystemData;
+        mergeSystemData.url = serverToMerge->apiUrl().toString();
+        mergeSystemData.postKey = QString::fromLatin1(createHttpQueryAuthParam(
+            "admin", "admin", nonceReply.realm, "POST", nonceReply.nonce.toUtf8()));
+        mergeSystemData.getKey = QString::fromLatin1(createHttpQueryAuthParam(
+            "admin", "admin", nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
-        mergeSystemData.url = requestTarget->apiUrl().toString();
-        //mergeSystemData.postKey =
-        //     QString::fromLatin1(createHttpQueryAuthParam(
-        //        ctx.auth.user(),
-        //        ctx.auth.password(),
-        //        nonceReply.realm,
-        //        "POST",
-        //        nonceReply.nonce.toUtf8()));
+        NX_TEST_API_POST(requestTarget.get(), "api/mergeSystems", mergeSystemData,
+            [](const QByteArray& data) {return data;}, network::http::StatusCode::forbidden);
     }
 
-    LauncherPtr givenServerLaunched(int port, SafeMode mode)
+    LauncherPtr givenServer(int port)
     {
         LauncherPtr result = std::unique_ptr<MediaServerLauncher>(
             new MediaServerLauncher(/* tmpDir */ "", port));
 
         result->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
-        if (mode == SafeMode::on)
-            result->addSetting("ecDbReadOnly", "true");
+        return result;
+    }
 
-        [&]() { ASSERT_TRUE(result->start()); }();
+    void whenServerLaunched(const LauncherPtr& server, SafeMode mode)
+    {
+        if (mode == SafeMode::on)
+            server->addSetting("ecDbReadOnly", "true");
+
+        ASSERT_TRUE(server->start());
 
         vms::api::ModuleInformation moduleInformation;
-        issueGetRequest( result.get(), "api/moduleInformation", moduleInformation);
-        [&]() { ASSERT_FALSE(moduleInformation.id.isNull()); }();
+        issueGetRequest(server.get(), "api/moduleInformation", moduleInformation);
+        ASSERT_FALSE(moduleInformation.id.isNull());
+    }
 
-        return result;
+    void whenServerStopped(const LauncherPtr& server)
+    {
+        server->stop();
+    }
+
+    void whenServerIsConfigured(const LauncherPtr& server)
+    {
+        ConfigureSystemData configureData;
+        configureData.localSystemId = QnUuid::createUuid();
+        configureData.systemName = configureData.localSystemId.toString();
+
+        NX_TEST_API_POST(server.get(), "api/configure", configureData);
     }
 
     void thenResultCodeShouldBe(network::http::StatusCode::Value desiredCode)
@@ -77,11 +95,35 @@ private:
     }
 };
 
-TEST_F(MergeSystems, DISABLED_SafeMode)
+TEST_F(MergeSystems, SafeMode_From)
 {
-    auto server1 = givenServerLaunched(8901, SafeMode::on);
-    auto server2 = givenServerLaunched(8902, SafeMode::off);
-    whenServerMergeRequestIssued(/* requestTarget */ server2, /* serverToMerge */ server1);
+    auto server1 = givenServer(8901);
+    whenServerLaunched(server1, SafeMode::off);
+    whenServerIsConfigured(server1);
+    whenServerStopped(server1);
+    whenServerLaunched(server1, SafeMode::on);
+
+    auto server2 = givenServer(8902);
+    whenServerLaunched(server2, SafeMode::off);
+    whenServerIsConfigured(server2);
+
+    whenServerMergeRequestIssued(/* requestTarget */ server1, /* serverToMerge */ server2);
+    thenResultCodeShouldBe(network::http::StatusCode::forbidden);
+}
+
+TEST_F(MergeSystems, SafeMode_To)
+{
+    auto server1 = givenServer(8901);
+    whenServerLaunched(server1, SafeMode::off);
+    whenServerIsConfigured(server1);
+
+    auto server2 = givenServer(8902);
+    whenServerLaunched(server2, SafeMode::off);
+    whenServerIsConfigured(server2);
+    whenServerStopped(server2);
+    whenServerLaunched(server2, SafeMode::on);
+
+    whenServerMergeRequestIssued(/* requestTarget */ server1, /* serverToMerge */ server2);
     thenResultCodeShouldBe(network::http::StatusCode::forbidden);
 }
 

@@ -1,7 +1,6 @@
 #include <QtCore>
 
 #include <nx/network/test_support/run_test.h>
-#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
