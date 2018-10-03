@@ -25,7 +25,10 @@ protected:
 
     using LauncherPtr = std::unique_ptr<MediaServerLauncher>;
 
-    void whenServerMergeRequestIssued(const LauncherPtr& requestTarget, const LauncherPtr& serverToMerge)
+    void assertMergeRequestReturn(
+        const LauncherPtr& requestTarget,
+        const LauncherPtr& serverToMerge,
+        network::http::StatusCode::Value expectedCode)
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -40,7 +43,7 @@ protected:
             "admin", "admin", nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
         NX_TEST_API_POST(requestTarget.get(), "api/mergeSystems", mergeSystemData,
-            [](const QByteArray& data) {return data;}, network::http::StatusCode::forbidden);
+            [](const QByteArray& data) {return data;}, expectedCode);
     }
 
     LauncherPtr givenServer(int port)
@@ -78,10 +81,6 @@ protected:
         NX_TEST_API_POST(server.get(), "api/configure", configureData);
     }
 
-    void thenResultCodeShouldBe(network::http::StatusCode::Value desiredCode)
-    {
-    }
-
 private:
     template<typename ResponseData>
     void issueGetRequest(
@@ -107,8 +106,10 @@ TEST_F(MergeSystems, SafeMode_From)
     whenServerLaunched(server2, SafeMode::off);
     whenServerIsConfigured(server2);
 
-    whenServerMergeRequestIssued(/* requestTarget */ server1, /* serverToMerge */ server2);
-    thenResultCodeShouldBe(network::http::StatusCode::forbidden);
+    assertMergeRequestReturn(
+        /* requestTarget */ server1,
+        /* serverToMerge */ server2,
+        /* expectedCode */ network::http::StatusCode::forbidden);
 }
 
 TEST_F(MergeSystems, SafeMode_To)
@@ -123,8 +124,10 @@ TEST_F(MergeSystems, SafeMode_To)
     whenServerStopped(server2);
     whenServerLaunched(server2, SafeMode::on);
 
-    whenServerMergeRequestIssued(/* requestTarget */ server1, /* serverToMerge */ server2);
-    thenResultCodeShouldBe(network::http::StatusCode::forbidden);
+    assertMergeRequestReturn(
+        /* requestTarget */ server1,
+        /* serverToMerge */ server2,
+        /* expectedCode */ network::http::StatusCode::forbidden);
 }
 
 } // namespace test
