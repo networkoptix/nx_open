@@ -14,6 +14,8 @@ from datetime import datetime, timedelta
 import pytz
 from typing import Generator, List
 
+from mako.ext.pygmentplugin import syntax_highlight
+
 from framework.http_api import HttpError
 from . import stage
 from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams, \
@@ -135,7 +137,7 @@ def video_parameters(run, stream_urls=None, **profiles
                             profile, index))
 
         while stream_urls:
-            yield expect_values({'streamUrls': stream_urls}, run.data)
+            yield expect_values({'streamUrls': stream_urls}, run.data, syntax='*')
 
 
 @_stage(timeout=timedelta(minutes=3))
