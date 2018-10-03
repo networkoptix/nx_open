@@ -70,7 +70,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
 
 
 @_stage(timeout=timedelta(minutes=10))
-def recording(run, primary, secondary):  # type: (stage.Run, dict, dict) -> Generator[Result]
+def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     checker = Checker()
     # Checking if the camera is recording already
     while not checker.expect_values(dict(status="Online"), run.data):
@@ -93,12 +93,14 @@ def recording(run, primary, secondary):  # type: (stage.Run, dict, dict) -> Gene
 
             for profile, configuration in (
                     ('primary', current_configuration), ('secondary', secondary)):
+                if not configuration:
+                    continue
+
                 epoch = pytz.utc.localize(datetime.utcfromtimestamp(0))
                 time_since_epoch = recorded_periods[-1].start - epoch
                 archive_url = '{}?stream={}&pos={}'.format(
                     run.media_url, {'primary': 0, 'secondary': 1}[profile],
-                    int(time_since_epoch.total_seconds() * 1000)
-                    )
+                    int(time_since_epoch.total_seconds() * 1000))
                 _logger.info('Archive request url for stream {}: {}'.format(
                     profile, archive_url))
 
@@ -111,7 +113,7 @@ def recording(run, primary, secondary):  # type: (stage.Run, dict, dict) -> Gene
                         configuration, ffprobe_metadata(streams[0]), profile)
 
 
-@_stage(timeout=timedelta(minutes=10))
+@_stage(timeout=timedelta(minutes=6))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
         for profile, configurations in profiles.items():
@@ -136,7 +138,7 @@ def video_parameters(run, stream_urls=None, **profiles
             yield expect_values({'streamUrls': stream_urls}, run.data)
 
 
-@_stage(timeout=timedelta(minutes=1))
+@_stage(timeout=timedelta(minutes=3))
 def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.

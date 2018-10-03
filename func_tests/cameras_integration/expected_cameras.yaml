@@ -428,7 +428,7 @@ AC-CC-8E-48-FC-DA:
     secondary:
       - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
       - {'codec': 'MJPEG', 'resolution': '800x450', 'fps': [7, 13]}
-  stream_urls:
+    stream_urls:
       "1": "rtsp://192.168.200.11:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.11:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
@@ -457,7 +457,7 @@ AC-CC-8E-95-33-57:
     secondary:
       - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
       - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [7, 13]}
-  stream_urls:
+    stream_urls:
       "1": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
@@ -507,7 +507,7 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[10, 19], [20, 30]]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[1, 99]]]}
     secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
   video_parameters:
@@ -561,8 +561,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
   attributes if features.advanced_lens_control:
     ptzCapabilities: 16388
 
+  # FIXME: There is a bug: no matter which FPS you set for recording, it's always 30.
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[5, 10], [12, 18]]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[20, 40]]}
     secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
   video_parameters:

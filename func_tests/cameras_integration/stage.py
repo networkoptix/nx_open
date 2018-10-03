@@ -6,6 +6,7 @@ from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
+from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
 from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
@@ -54,8 +55,8 @@ class Stage(object):
             try:
                 run.update_data()
 
-            except AssertionError:
-                yield Failure('Unable to update camera data')
+            except (AssertionError, MediaserverApiError, MediaserverApiRequestError):
+                yield Failure(is_exception=True)
 
             else:
                 yield actions.next()
