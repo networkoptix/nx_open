@@ -53,7 +53,10 @@ QN_FUSION_DECLARE_FUNCTIONS(DetectedObject, (json)(ubjson));
 
 struct Filter
 {
-    QnUuid deviceId;
+    /**
+     * If empty than any device is matched.
+     */
+    std::vector<QnUuid> deviceIds;
     std::vector<QString> objectTypeId;
     QnUuid objectId;
     QnTimePeriod timePeriod;
@@ -91,7 +94,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter);
 QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
-    (deviceId)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
+    (deviceIds)(objectTypeId)(objectId)(timePeriod)(boundingBox)(requiredAttributes)(freeText)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json)(ubjson));
 
 //-------------------------------------------------------------------------------------------------
