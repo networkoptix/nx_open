@@ -1641,7 +1641,7 @@ void MediaServerProcess::registerRestHandlers(
      *     rules to assign actions depending on this text.
      * %param[opt]:objectJson metadata Additional information associated with the event, in the
      *     form of a JSON object. Currently this object can specify the only field "cameraRefs",
-     *     but other fields could be added in the future. <ul> <li>"cameraRefs" specifies a number
+     *     but other fields could be added in the future. <ul> <li>"cameraRefs" specifies the list
      *     of cameras which are linked to the event (e.g. the event will appear on their
      *     timelines), in the form of a list of camera ids (can be obtained from "id" field via
      *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting). </li> </ul>
@@ -2963,11 +2963,7 @@ void MediaServerProcess::updateGuidIfNeeded()
     QString hwidGuid = hardwareIdAsGuid();
 
     if (guidIsHWID == YES) {
-        if (serverGuid.isEmpty())
-            serverModule()->mutableSettings()->serverGuid.set(hwidGuid);
-        else if (serverGuid != hwidGuid)
-            serverModule()->mutableSettings()->guidIsHWID.set(NO);
-
+        serverModule()->mutableSettings()->serverGuid.set(hwidGuid);
         serverModule()->mutableSettings()->serverGuid2.remove();
     }
     else if (guidIsHWID == NO) {
@@ -2999,6 +2995,14 @@ void MediaServerProcess::updateGuidIfNeeded()
             }
         }
     }
+
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged, 
+        [this, serverGuid, hwidGuid]()
+        {
+            // Stop moving HwId to serverGuid as soon as first setup wizard is done.
+            if (!commonModule()->globalSettings()->localSystemId().isNull())
+                serverModule()->mutableSettings()->guidIsHWID.set(NO);
+        });
 
     QnUuid obsoleteGuid = QnUuid(serverModule()->settings().obsoleteServerGuid());
     if (!obsoleteGuid.isNull())

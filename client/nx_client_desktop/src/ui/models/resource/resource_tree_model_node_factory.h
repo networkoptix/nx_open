@@ -14,7 +14,9 @@ class QnResourceTreeModelNodeFactory
 public:
     static QnResourceTreeModelNodePtr createNode(
         NodeType nodeType,
-        QnResourceTreeModel* model, bool initialize = true);
+        QnResourceTreeModel* model,
+        bool initialize = true,
+        bool useExtraSearchInformation = true);
 
     static QnResourceTreeModelNodePtr createNode(
         NodeType nodeType, const QnUuid& id,

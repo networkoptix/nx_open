@@ -560,10 +560,8 @@ QByteArray QnRtspConnectionProcessor::getRangeStr()
     if (d->archiveDP)
     {
         if (!d->archiveDpOpened && !d->archiveDP->offlineRangeSupported())
-        {
-            d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
-            d->archiveDpOpened = true;
-        }
+            d->archiveDpOpened = d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+
         qint64 archiveEndTime = d->archiveDP->endTime();
         bool endTimeIsNow = d->serverModule->recordingManager()->isCameraRecoring(d->archiveDP->getResource()); // && !endTimeInFuture;
         if (d->useProprietaryFormat)

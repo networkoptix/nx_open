@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -583,7 +584,7 @@ private:
     template<typename T>
     bool satisfiesCommonConditions(const Filter& filter, const T& data)
     {
-        if (!filter.deviceId.isNull() && data.deviceId != filter.deviceId)
+        if (!filter.deviceIds.empty() && !nx::utils::contains(filter.deviceIds, data.deviceId))
             return false;
 
         if (!filter.timePeriod.isNull() &&
@@ -658,7 +659,8 @@ protected:
     void addRandomKnownDeviceIdToFilter()
     {
         ASSERT_FALSE(allowedDeviceIds().empty());
-        m_filter.deviceId = nx::utils::random::choice(allowedDeviceIds());
+        m_filter.deviceIds.push_back(
+            nx::utils::random::choice(allowedDeviceIds()));
     }
 
     void addRandomNonEmptyTimePeriodToFilter()
@@ -751,6 +753,17 @@ protected:
             addRandomTextFoundInDataToFilter();
     }
 
+    void givenRandomFilterWithMultipleDeviceIds()
+    {
+        givenRandomFilter();
+
+        m_filter.deviceIds.clear();
+        for (const auto& deviceId: allowedDeviceIds())
+            m_filter.deviceIds.push_back(deviceId);
+
+        m_filter.objectId = QnUuid();
+    }
+    
     void givenObjectWithLongTrack()
     {
         using namespace std::chrono;
@@ -998,6 +1011,13 @@ TEST_F(AnalyticsEventsStorageLookup, lookup_stress_test)
 
     whenLookupObjects();
 
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsEventsStorageLookup, quering_data_from_multiple_cameras)
+{
+    givenRandomFilterWithMultipleDeviceIds();
+    whenLookupObjects();
     thenResultMatchesExpectations();
 }
 

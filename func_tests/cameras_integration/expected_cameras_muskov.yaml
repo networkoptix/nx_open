@@ -1,7 +1,10 @@
 # TODO: This is a local test, production file should be prepared separately.
 
+SERVER_STAGES:
+  after:
+    api/dev-mode-key?razrazraz:
+      resultCode: 0
 
--SERVER-:
   before if features.mediaserver_metrics:
     api/metrics?brief:
       offlineStatus: 0
@@ -106,3 +109,17 @@ BC-AD-28-02-62-EE:
     - {point: '195-23-1', preset: '2:Xstream2'}
     - {point: '5-19-1', preset: '4:NxWitness4'}
     - {point: '171-34-1', preset: '6:NxWitness6'}
+
+
+ACTI_E12A-A-XX-15C-00471:
+  discovery:
+    vendor: ACTI
+    model: E12A
+    mac: 00-0F-7C-0F-AF-0C
+    name: ACTi-E12A
+
+  authorization:
+    password: auto
+
+  attributes:
+    firmware: A1D-500-V6.08.30-AC

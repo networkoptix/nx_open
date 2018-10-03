@@ -132,6 +132,7 @@ private:
     nx::sql::DBResult savePacket(
         nx::sql::QueryContext*,
         common::metadata::ConstDetectionMetadataPacketPtr packet);
+
     /**
      * @return Inserted event id.
      * Throws on error.
@@ -140,6 +141,7 @@ private:
         nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
+
     /**
      * Throws on error.
      */
@@ -156,26 +158,32 @@ private:
         std::vector<DetectedObject>* result);
 
     void prepareLookupQuery(const Filter& filter, nx::sql::SqlQuery* query);
-    nx::sql::InnerJoinFilterFields prepareSqlFilterExpression(
+
+    nx::sql::Filter prepareSqlFilterExpression(
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
+
     void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypeIds,
-        nx::sql::InnerJoinFilterFields* sqlFilter);
+        nx::sql::Filter* sqlFilter);
+
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::sql::InnerJoinFilterFields* sqlFilter);
+        nx::sql::Filter* sqlFilter);
+
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
-        nx::sql::InnerJoinFilterFields* sqlFilter);
+        nx::sql::Filter* sqlFilter);
 
     void loadObjects(
         nx::sql::SqlQuery& selectEventsQuery,
         const Filter& filter,
         std::vector<DetectedObject>* result);
+
     void loadObject(
         nx::sql::SqlQuery* selectEventsQuery,
         DetectedObject* object);
+
     void mergeObjects(DetectedObject from, DetectedObject* to, bool loadTrack);
 
     void queryTrackInfo(

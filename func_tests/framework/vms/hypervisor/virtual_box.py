@@ -36,7 +36,7 @@ _HOST_CONNECTION_NIC_INDEX = 2
 _INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
 
 ## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
-# Theoretically, some NICs may not be used at all bur their indices should be listed here to get
+# Theoretically, some NICs may not be used at all but their indices should be listed here to get
 # non-random MAC address.
 _ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
@@ -199,13 +199,25 @@ class _VirtualBoxVm(VmHardware):
         self._virtual_box.manage(['export', self.name, '-o', vm_image_path, '--options', 'nomacs'])
 
     def clone(self, clone_vm_name):  # type: (str) -> VmHardware
-        self._virtual_box.manage([
-            'clonevm', self.name,
-            '--snapshot', 'template',
-            '--name', clone_vm_name,
-            '--options', 'link',
-            '--register',
-            ])
+        """Clone VM and, if needed, create template from current state. VirtualBox can create
+        linked clone only from template.
+        """
+        snapshot_name = 'template'
+
+        def _try():
+            self._virtual_box.manage([
+                'clonevm', self.name,
+                '--snapshot', snapshot_name,
+                '--name', clone_vm_name,
+                '--options', 'link',
+                '--register',
+                ])
+        try:
+            _try()
+        except virtual_box_error_cls('VBOX_E_OBJECT_NOT_FOUND'):
+            self._virtual_box.manage(['snapshot', self.name, 'take', snapshot_name])
+            _try()
+
         return self.__class__(self._virtual_box, clone_vm_name)
 
     def setup_mac_addresses(self, make_mac):
@@ -297,7 +309,7 @@ class _VirtualBoxVm(VmHardware):
         picked up immediately. The example below changes the limit for the group created in the
         example above to 100 Kbit/s:
         ```{.sh}
-        VBoxManage bandwidthctl "VM name" set Limit --limit 100k
+        VBoxManage bandwidthctl "VM name" set network1 --limit 100k
         ```
 
         In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...
@@ -420,7 +432,6 @@ class VirtualBox(Hypervisor):
     def import_vm(self, vm_image_path, vm_name):
         vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
         self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
-        self.manage(['snapshot', vm_name, 'take', 'template'])
         # Group is assigned only when imported: cloned VMs are created nearby.
         group = '/' + vm_name.rsplit('-', 1)[0]
         try:

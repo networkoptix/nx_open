@@ -29,7 +29,7 @@ public:
     void setAudioEnabled(bool value);
 
 private:
-    void writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
+    void writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
 
 private:
     const QString m_debugSourceId;

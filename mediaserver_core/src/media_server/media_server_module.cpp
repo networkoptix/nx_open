@@ -317,6 +317,8 @@ void QnMediaServerModule::stop()
     m_serverConnector->stop();
     m_statusWatcher->stop();
 
+    m_upnpDeviceSearcher->pleaseStop();
+
     resourceDiscoveryManager()->stop();
 }
 

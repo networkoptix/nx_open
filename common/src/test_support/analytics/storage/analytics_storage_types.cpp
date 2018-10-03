@@ -56,7 +56,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
     Filter filter;
 
     if (nx::utils::random::number<bool>())
-        filter.deviceId = QnUuid::createUuid();
+        filter.deviceIds.push_back(QnUuid::createUuid());
 
     filter.objectTypeId.resize(nx::utils::random::number<int>(0, 5));
     std::generate(

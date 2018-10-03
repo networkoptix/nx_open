@@ -701,9 +701,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<ServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
     /**%apidoc GET /ec2/getCameraHistoryItems
-     * Read information about which server was hosting the camera at which period.
+     * Read information about which servers have archive for which camera.
      * This information is used for archive playback if camera has been moved from
      * one server to another.
+     * There is no detail information about archive time periods.
+     * To obtain detail information please use method ec2/recordedTimePeriods.
      * %param[default] format
      * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
