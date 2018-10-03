@@ -5,7 +5,7 @@ from abc import abstractmethod
 class Result(object):
     @property
     def details(self):
-        return self.__dict__
+        return {key: value for key, value in self.__dict__.items() if value}
 
 
 class Success(Result):

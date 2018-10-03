@@ -8,21 +8,22 @@ def _exception_failure(**kwargs):
         raise KeyError(7)
     except KeyError:
         failure = Failure(is_exception=True, **kwargs)
-        failure.exception = failure.exception.split('\n')[-1]  # Remove stack.
+        failure.exception = [failure.exception[-1]]  # Remove stack.
         return failure
 
 
 @pytest.mark.parametrize("result, report", [
-    (Success(), {'condition': 'success'}),
-    (Failure(errors=['shit', 'happens']), {'condition': 'failure', 'errors': ['shit', 'happens']}),
-    (Failure(errors=['shit happens']), {'condition': 'failure', 'errors': 'shit happens'}),
-    (Failure(errors=['shit happens']), {'condition': 'failure', 'errors': 'shit happens'}),
-    (_exception_failure(), {'condition': 'failure', 'exception': ['KeyError: 7']}),
-    (_exception_failure(errors=1), {'condition': 'failure', 'exception': ['KeyError: 7'], 'errors': 1}),
-    (Halt('waiting'), {'condition': 'halt', 'message': 'waiting'}),
+    (Success(), {'status': 'success'}),
+    (Failure(errors=['shit', 'happens']), {'status': 'failure', 'errors': ['shit', 'happens']}),
+    (Failure(errors=['shit happens']), {'status': 'failure', 'errors': ['shit happens']}),
+    (Failure(errors=['shit happens']), {'status': 'failure', 'errors': ['shit happens']}),
+    (_exception_failure(), {'status': 'failure', 'exception': ['KeyError: 7']}),
+    (_exception_failure(errors='shit'),
+        {'status': 'failure', 'exception': ['KeyError: 7'], 'errors': ['shit']}),
+    (Halt('waiting'), {'status': 'halt', 'message': 'waiting'}),
 ])
 def test_results(result, report):
-    assert repr(result.report) == repr(report)
+    assert repr(result.details) == repr(report)
 
 
 @pytest.mark.parametrize("expected, actual, errors", [
