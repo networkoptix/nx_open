@@ -55,8 +55,8 @@ bool Filter::operator!=(const Filter& right) const
 
 void serializeToParams(const Filter& filter, QnRequestParamList* params)
 {
-    if (!filter.deviceId.isNull())
-        params->insert(lit("deviceId"), filter.deviceId.toSimpleString());
+    for (const auto deviceId: filter.deviceIds)
+        params->insert(lit("deviceId"), deviceId.toSimpleString());
 
     for (const auto& objectTypeId: filter.objectTypeId)
         params->insert(lit("objectTypeId"), objectTypeId);
@@ -95,8 +95,8 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
 bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 {
-    if (params.contains(lit("deviceId")))
-        filter->deviceId = QnUuid::fromStringSafe(params.value(lit("deviceId")));
+    for (const auto& deviceIdStr: params.allValues(lit("deviceId")))
+        filter->deviceIds.push_back(QnUuid::fromStringSafe(deviceIdStr));
 
     for (const auto& objectTypeId: params.allValues(lit("objectTypeId")))
         filter->objectTypeId.push_back(objectTypeId);
@@ -146,8 +146,8 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter)
 
 ::std::ostream& operator<<(::std::ostream& os, const Filter& filter)
 {
-    if (!filter.deviceId.isNull())
-        os << "deviceId " << filter.deviceId.toSimpleString().toStdString() << "; ";
+    for (const auto& deviceId: filter.deviceIds)
+        os << "deviceId " << deviceId.toSimpleString().toStdString() << "; ";
     if (!filter.objectTypeId.empty())
         os << "objectTypeId " << lm("%1").container(filter.objectTypeId).toStdString() << "; ";
     if (!filter.objectId.isNull())
