@@ -29,12 +29,10 @@ public:
     std::vector<SocketAddress> endpoints() const;
     std::vector<SocketAddress> sslEndpoints() const;
 
-    template<typename SocketServerRelatedType, typename ... Args>
-    void forEachListener(
-        void(SocketServerRelatedType::*function)(Args...),
-        const Args& ... args)
+    template<typename... Args>
+    void forEachListener(const Args&... args)
     {
-        m_multiAddressHttpServer->forEachListener(function, args...);
+        m_multiAddressHttpServer->forEachListener(args...);
     }
 
 private:
