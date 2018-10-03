@@ -507,7 +507,7 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[1, 99]]]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[1, 99]]}
     secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
   video_parameters:
