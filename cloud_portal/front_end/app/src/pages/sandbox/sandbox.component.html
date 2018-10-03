@@ -2,6 +2,23 @@
     <h1>SANDBOX</h1>
 
     <div class="row">
+        <div class="col-12 col-md-4">
+            <nx-content-block
+                    title="Test header"
+                    [content]="content">
+            </nx-content-block>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <nx-content-block
+                    title="Test header"
+                    [content]="content"
+                    type="gray">
+            </nx-content-block>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-12 col-md-4 border-right">
             <form #testForm="ngForm" (ngSubmit)="onSubmit()" name="testForm" novalidate>
 

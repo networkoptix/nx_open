@@ -1,10 +1,10 @@
-import { Component, ViewChild } from "@angular/core";
-import { NgForm }               from "@angular/forms";
+import { Component, ViewChild } from '@angular/core';
+import { NgForm }               from '@angular/forms';
 
 @Component({
-    selector   : "sandbox-component",
-    templateUrl: "sandbox.component.html",
-    styleUrls  : [ "sandbox.component.scss" ]
+    selector   : 'sandbox-component',
+    templateUrl: 'sandbox.component.html',
+    styleUrls  : [ 'sandbox.component.scss' ]
 })
 
 export class NxSandboxComponent {
@@ -15,19 +15,28 @@ export class NxSandboxComponent {
     show: boolean;
     show5: boolean;
     edit: boolean;
+    content: any;
 
     submitted = false;
 
-    @ViewChild("testForm") public testForm: NgForm;
+    @ViewChild('testForm') public testForm: NgForm;
 
     private setupDefaults() {
 
         this.show = false;
         this.show5 = false;
-        this.blah = "blah1";
-        this.group = "Tsanko";
+        this.blah = 'blah1';
+        this.group = 'Tsanko';
         this.agree = false;
         this.edit = false;
+
+        this.content = {
+            main: 'Main content',
+            sections: [
+                { header: 'section1', content: 'Some content' },
+                { header: 'section2', content: 'Other content' }
+            ]
+        };
 
     }
 
@@ -52,7 +61,7 @@ export class NxSandboxComponent {
         }
 
         this.submitted = true;
-        window.alert("SUBMIT!");
+        window.alert('SUBMIT!');
     }
 }
 

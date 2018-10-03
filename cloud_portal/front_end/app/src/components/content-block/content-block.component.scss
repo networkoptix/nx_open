@@ -1,0 +1,68 @@
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
+//nx-content-block {
+.card {
+    box-shadow   : none;
+    border-color : $light4;
+
+    &--header {
+        height           : rem(48px);
+        background-color : $additional_light1;
+        padding          : 0 1rem;
+        border-bottom    : 1px solid $light3;
+
+        h3 {
+            margin      : 0;
+            line-height : rem(48px);
+        }
+    }
+
+    &--body {
+        padding : 1rem;
+
+        &-subheader {
+            height     : 2rem;
+            margin-top : .5rem;
+
+            h4 {
+                margin      : 0;
+                line-height : 2rem;
+            }
+        }
+
+        & > div {
+            margin-top : .5rem;
+        }
+
+        &.section {
+            margin-left : 1rem;
+            padding-top : 0;
+        }
+    }
+
+    &--separator {
+        margin        : 0 -1rem 0 -2rem !important;
+        height        : 1px;
+        border-bottom : 1px solid $light3;
+    }
+
+    &.gray {
+        background-color : $light4;
+        border           : none;
+
+        .card--header {
+            background-color    : $light4;
+            border-bottom-color : $light6;
+        }
+
+        .card--separator {
+            border-bottom-color : $light6;
+        }
+    }
+}
+
+//}
+
+
+

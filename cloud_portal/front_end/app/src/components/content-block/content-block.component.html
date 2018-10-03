@@ -1,0 +1,21 @@
+<div class="card hoverable"
+     [ngClass]="type">
+    <div class="card--header">
+        <h3 [innerHtml]="title"></h3>
+    </div>
+    <div class="card--body"
+         [innerHtml]="content.main">
+    </div>
+
+    <div class="card--body section" *ngFor="let section of content.sections">
+        <div class="card--separator"></div>
+
+        <div class="card--body-subheader">
+            <h4 [innerHtml]="section.header"></h4>
+        </div>
+        <div [innerHtml]="section.content"></div>
+    </div>
+    <div class="card--footer">
+
+    </div>
+</div>
