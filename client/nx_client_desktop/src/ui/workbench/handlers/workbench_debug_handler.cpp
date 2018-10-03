@@ -32,6 +32,7 @@
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <nx/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
+#include <nx/client/desktop/interactive_settings/dialogs/interactive_settings_test_dialog.h>
 #include <nx/client/desktop/debug_utils/widgets/palette_widget.h>
 
 #include <finders/test_systems_finder.h>
@@ -138,6 +139,13 @@ public:
 
         addButton(lit("Custom Settings Test"), [this]
             { (new CustomSettingsTestDialog(this))->show(); });
+
+        addButton(lit("Interactive Settings Test"),
+            [this]
+            {
+                const auto dialog = new InteractiveSettingsTestDialog(this);
+                dialog->show();
+            });
 
         addButton(lit("Web View"), [this]
             {
