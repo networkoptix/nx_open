@@ -101,7 +101,7 @@ utils::PendingOperation* AnalyticsSearchListModel::Private::createUpdateWorkbenc
                 return;
 
             Filter filter;
-            filter.deviceId = camera()->getId();
+            filter.deviceIds.push_back(camera()->getId());
             filter.boundingBox = m_filterRect;
             filter.freeText = m_filterText;
             q->navigator()->setAnalyticsFilter(filter);
@@ -485,7 +485,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(qint64 startMs, qint6
         return false;
 
     Filter request;
-    request.deviceId = camera()->getId();
+    request.deviceIds.push_back(camera()->getId());
     request.timePeriod = QnTimePeriod::fromInterval(startMs, endMs);
     request.sortOrder = Qt::DescendingOrder;
     request.maxObjectsToSelect = kFetchBatchSize;

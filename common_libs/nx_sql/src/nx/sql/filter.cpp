@@ -92,7 +92,7 @@ SqlFilterFieldAnyOf::SqlFilterFieldAnyOf(
 std::string SqlFilterFieldAnyOf::toString() const
 {
     std::string result = std::string(m_name) + " IN (";
-    for (int i = 0; i < m_values.size(); ++i)
+    for (int i = 0; i < (int) m_values.size(); ++i)
     {
         if (i > 0)
             result += ",";
@@ -105,7 +105,7 @@ std::string SqlFilterFieldAnyOf::toString() const
 
 void SqlFilterFieldAnyOf::bindFields(QSqlQuery* query) const
 {
-    for (int i = 0; i < m_values.size(); ++i)
+    for (int i = 0; i < (int) m_values.size(); ++i)
         query->bindValue((m_placeHolderName + std::to_string(i)).c_str(), m_values[i]);
 }
 
