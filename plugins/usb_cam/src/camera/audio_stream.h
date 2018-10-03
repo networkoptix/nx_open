@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 
 #include "stream_consumer_manager.h"
@@ -50,9 +51,9 @@ private:
         std::unique_ptr<ffmpeg::Codec> m_decoder;
         std::unique_ptr<ffmpeg::Codec> m_encoder;
 
-        bool m_initialized;
-        int m_initCode;
-        int m_retries;
+        bool m_initialized = false;
+        int m_initCode = 0;
+        int m_retries = 0;
 
         bool m_terminated;
         mutable std::mutex m_mutex;
@@ -61,12 +62,11 @@ private:
 
         std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
         std::unique_ptr<ffmpeg::Frame> m_resampledFrame;
-        struct SwrContext * m_resampleContext;
+        struct SwrContext * m_resampleContext = nullptr;
 
         std::shared_ptr<std::atomic_int> m_packetCount;
         
-        int m_bufferMaxSize;
-        std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetBuffer;
+        std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetMergeBuffer;
 
         TimeStampMapper m_timeStamps;
         uint64_t m_lastTimeStamp = 0;
@@ -85,13 +85,22 @@ private:
         int initalizeResampleContext(const AVFrame * frame);
         int decodeNextFrame(ffmpeg::Frame * outFrame);
         int resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame);
-        std::shared_ptr<ffmpeg::Packet> getNextData(int * outError);
-        std::shared_ptr<ffmpeg::Packet> addToBuffer(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
+        std::chrono::milliseconds resampleDelay() const;
+        std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
+
+        /**
+         * Buffers the given packet to be merged later with packets given previously.
+         * If enough packets have been given, then it merges all packets returning the merged packet.
+         * @param[in] - the packet to buffer
+         * @params[out] - outFfmpegError an error < 0 if one occured, 0 otherwise
+         * @return - all previously given packets, merged into one
+         */
+        std::shared_ptr<ffmpeg::Packet> mergeAllPackets(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
         void start();
         void stop();
         void run();
 
-        int timePerVideoFrame() const;
+        std::chrono::milliseconds timePerVideoFrame() const;
     };
 
 public:

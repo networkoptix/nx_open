@@ -16,8 +16,9 @@ namespace usb_cam {
 
 namespace {
 
-int constexpr kRetryLimit = 10;
-std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
+static constexpr int kRetryLimit = 10;
+static constexpr int kMsecInSec = 1000;
+static constexpr float kDefaultFps = 30;
 
 const char * ffmpegDeviceType()
 {
@@ -30,7 +31,9 @@ const char * ffmpegDeviceType()
 
 } // namespace
 
-/////////////////////////////////////// AudioStreamPrivate /////////////////////////////////////////
+
+//--------------------------------------------------------------------------------------------------
+// AudioStreamPrivate
 
 AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     const std::string& url,
@@ -41,13 +44,7 @@ AudioStream::AudioStreamPrivate::AudioStreamPrivate(
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
     m_packetConsumerManager(packetConsumerManager),
-    m_initialized(false),
-    m_initCode(0),
-    m_retries(0),
-    m_terminated(false),
-    m_resampleContext(nullptr),
-    m_packetCount(std::make_shared<std::atomic_int>()),
-    m_bufferMaxSize(3)
+    m_packetCount(std::make_shared<std::atomic_int>())
 {
     start();
 }
@@ -134,7 +131,7 @@ int AudioStream::AudioStreamPrivate::initialize()
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
     m_packetConsumerManager->consumerFlush();
-    m_packetBuffer.clear();
+    m_packetMergeBuffer.clear();
 
     while(*m_packetCount > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -315,11 +312,15 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
     return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
 }
 
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int * outError)
+std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
 {
-    #define returnData(res, retObj) do{ *outError = res; return retObj; }while(0)
+    return m_resampleContext 
+        ? std::chrono::milliseconds(swr_get_delay(m_resampleContext, kMsecInSec))
+        : std::chrono::milliseconds(0);
+}
 
-    int result = 0;
+std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int * outFfmpegError)
+{
     auto packet = std::make_shared<ffmpeg::Packet>(
         m_encoder->codecID(),
         AVMEDIA_TYPE_AUDIO,
@@ -327,56 +328,54 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::getNextData(int
 
     for(;;)
     {
-        result = m_encoder->receivePacket(packet->packet());
-        if (result == 0)
+        *outFfmpegError = m_encoder->receivePacket(packet->packet());
+        if (*outFfmpegError == 0)
             break;
-        else if (result < 0 && result != AVERROR(EAGAIN))
-            returnData(result, nullptr);
+        else if (*outFfmpegError < 0 && *outFfmpegError != AVERROR(EAGAIN))
+            return nullptr;
 
         // need to drain the the resampler to avoid increasing audio delay
-        if(m_resampleContext 
-            && swr_get_delay(m_resampleContext, kMsecInSec.count()) > timePerVideoFrame())
+        if(m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;
             m_resampledFrame->frame()->pkt_pts = AV_NOPTS_VALUE;
-            result = resample(nullptr, m_resampledFrame.get());
-            if (result < 0)
+            *outFfmpegError = resample(nullptr, m_resampledFrame.get());
+            if (*outFfmpegError < 0)
                 continue;
         }
         else
         {
-            result = decodeNextFrame(m_decodedFrame.get());
-            if (result < 0)
-                returnData(result, nullptr);
+            *outFfmpegError = decodeNextFrame(m_decodedFrame.get());
+            if (*outFfmpegError < 0)
+                return nullptr;
 
-            result = resample(m_decodedFrame.get(), m_resampledFrame.get());
-            if(result < 0)
+            *outFfmpegError = resample(m_decodedFrame.get(), m_resampledFrame.get());
+            if(*outFfmpegError < 0)
             {
                 ++m_retries;
-                returnData(result, nullptr);
+                return nullptr;
             }
 
             m_resampledFrame->frame()->pts = m_decodedFrame->pts();
             m_resampledFrame->frame()->pkt_pts = m_decodedFrame->packetPts();
         }
 
-        result = m_encoder->sendFrame(m_resampledFrame->frame());
-        if (result < 0 && result != AVERROR(EAGAIN))
-            returnData(result, nullptr);
+        *outFfmpegError = m_encoder->sendFrame(m_resampledFrame->frame());
+        if (*outFfmpegError < 0 && *outFfmpegError != AVERROR(EAGAIN))
+            return nullptr;
     }
     
-    if (auto pkt = addToBuffer(packet, &result))
-        returnData(result, pkt);
+    /**
+    * AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets 
+    * fixes the issue, but we don't want to lose any, so merge multiple packets.
+    */
+    if (auto pkt = mergeAllPackets(packet, outFfmpegError))
+        return pkt;
 
-    returnData(result, nullptr);
+    return nullptr;
 }
 
-/**
-* AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets fixes
-* the issue, but we don't want to lose any, so copy multiple packets into one and then provide 
-* just the one.
-*/
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
+std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets(
     const std::shared_ptr<ffmpeg::Packet>& packet,
     int * outFfmpegError)
 {
@@ -387,12 +386,19 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
     if(m_encoder->codecID() == AV_CODEC_ID_PCM_S16LE)
         return packet;
 
-    m_packetBuffer.push_back(packet);
-    if (packet->timeStamp() - m_packetBuffer[0]->timeStamp() < timePerVideoFrame())
+    /** 
+     * Only merge if the timestamp difference is >= the amount of time it takes the video stream
+     * to produce a video frame
+     */
+    m_packetMergeBuffer.push_back(packet);
+    if (packet->timeStamp() - m_packetMergeBuffer[0]->timeStamp() < timePerVideoFrame().count())
         return nullptr;
 
+
+    /** Do the merge now */
+
     int size = 0;
-    for (const auto& pkt : m_packetBuffer)
+    for (const auto& pkt : m_packetMergeBuffer)
         size += pkt->size();
 
     auto newPacket = std::make_shared<ffmpeg::Packet>(
@@ -404,14 +410,14 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::addToBuffer(
         return nullptr;
        
     uint8_t * data = newPacket->data();
-    for (const auto & pkt : m_packetBuffer)
+    for (const auto & pkt : m_packetMergeBuffer)
     {
         memcpy(data, pkt->data(), pkt->size());
         data += pkt->size();
     }
 
-    newPacket->setTimeStamp(m_packetBuffer[0]->timeStamp());
-    m_packetBuffer.clear();
+    newPacket->setTimeStamp(m_packetMergeBuffer[0]->timeStamp());
+    m_packetMergeBuffer.clear();
 
     return newPacket;
 }
@@ -451,8 +457,8 @@ void AudioStream::AudioStreamPrivate::run()
             continue;
         }
 
-        int result;
-        auto packet = getNextData(&result);
+        int result = 0;
+        auto packet = nextPacket(&result);
         if (result < 0)
         {
             // EIO is returned when the device is unplugged for audio
@@ -476,17 +482,22 @@ void AudioStream::AudioStreamPrivate::run()
     }
 }
 
-int AudioStream::AudioStreamPrivate::timePerVideoFrame() const
+std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
 {
-    float fps = 30;
+    float fps = 0;
     if (auto cam = m_camera.lock())
-        fps = cam->videoStream()->actualFps();
-    return 1.0 / fps * kMsecInSec.count();
+        fps = cam->videoStream()->fps();
+
+    /** should never happen */
+    if (fps == 0)
+        fps == kDefaultFps;
+
+    return std::chrono::milliseconds((int)(1.0 / fps * kMsecInSec));
 }
 
 
-/////////////////////////////////////////// AudioStream ////////////////////////////////////////////
-
+//--------------------------------------------------------------------------------------------------
+// AudioStream
 
 AudioStream::AudioStream(
     const std::string url,
