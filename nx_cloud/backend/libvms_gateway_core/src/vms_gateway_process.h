@@ -23,7 +23,6 @@ namespace relaying { class RelayEngine; }
 
 namespace gateway {
 
-class Tunnel;
 class AuthorizationManager;
 
 class NX_VMS_GATEWAY_API VmsGatewayProcess:
@@ -48,10 +47,8 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
-    // TODO: Move it to the correct place.
     using HttpConnectTunnelPool =
         network::server::StreamServerConnectionHolder<network::aio::AsyncChannelBridge>;
-    HttpConnectTunnelPool m_httpConnectTunnelPool;
 
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;
@@ -70,7 +67,8 @@ private:
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         relaying::RelayEngine* relayEngine,
-        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher,
+            HttpConnectTunnelPool* httpConnectTunnelPool);
 };
 
 } // namespace gateway
