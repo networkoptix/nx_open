@@ -21,7 +21,9 @@ static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
-QnVMax480LiveProvider::QnVMax480LiveProvider(const QnPlVmax480ResourcePtr& dev ):
+QnVMax480LiveProvider::QnVMax480LiveProvider(
+    const QnPlVmax480ResourcePtr& dev)
+    :
     CLServerPushStreamReader(dev),
     m_networkRes(dev)
 {
@@ -65,11 +67,6 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     }
 
     return std::dynamic_pointer_cast<QnAbstractMediaData>(result);
-}
-
-bool QnVMax480LiveProvider::canChangeStatus() const
-{
-    return false; // do not allow to ancessor update status
 }
 
 CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(

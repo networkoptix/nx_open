@@ -187,7 +187,9 @@
         },
         {
             "keys": [
-                "ActiveCam|*"
+                "ActiveCam|*",
+                "ACTI|B915", 
+                "*|ACTi-915"
             ],
             "forceONVIF": true
         },
@@ -721,6 +723,7 @@
                 "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
                 "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V",
                 "AVTECH|AVM542B",
+                "AVer|FV3028-RTM",
                 "DW|DWC-MPA20M","Win4NET Co., Ltd.|Clebo-MD20","DW|DWC-MC421D","Win4NET Co., Ltd.|Clebo-BX20",
                 "DW|DWC-MB721M4TIR","Win4NET Co., Ltd.|Clebo-MB721M4TIR",
                 "DW|DWC-MB721M8TIR","Win4NET Co., Ltd.|Clebo-MB721M8TIR",
@@ -965,21 +968,21 @@
                 "HIKVISION|DS-2CD2655FWD-IZS",
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2CD4A26FWD-IZS",
                 "HIKVISION|DS-2CD63C2F-IS",
                 "HIKVISION|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
                 "Hikvision|DS-2DE4A220IW-DE",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
                 "hikvision|DS-2CD2142FWD*",
                 "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*",
+                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -989,13 +992,11 @@
                 "HIKVISION|DS-2CD2655FWD-IZS",
                 "HIKVISION|DS-2CD2742FWD-IS",
                 "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2CD4A26FWD-IZS",
                 "HIKVISION|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2132F-IWS",
                 "Hikvision|DS-2CD2655FWD-IZS",
                 "Hikvision|DS-2CD2742FWD-IS",
                 "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2DE4A220IW-DE",
                 "Hikvision|DS-2CD2522FWD*",
                 "HIKVISION|DS-2CD2522FWD*",
@@ -1005,7 +1006,9 @@
                 "ONVIF|IP-2CD4B26FWD-IZS",
                 "*|NC304-WDA",
                 "HIKVISION|DS-2CD2142FWD*",
-                "hikvision|DS-2CD2142FWD*"
+                "hikvision|DS-2CD2142FWD*",
+                "HIKVISION|DS-2CD4A26FWD-*", "hikvision|DS-2CD4A26FWD-*",
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"                
             ],
             "relayOutputInversed": true,
             "portNamePrefixToIgnore": "AlarmOut"
@@ -2190,7 +2193,8 @@
             "keys": [
                 "iPIXA|INVDHDW32812IR"
             ],
-            "clearInputsTimeoutSec": 3
+            "clearInputsTimeoutSec": 3,
+            "comment": "considers input state as 0 after specified timeout"
         },
         {
             "keys": [
@@ -2207,15 +2211,9 @@
         },
         {
             "keys": [
-                "AVer|FV3028-RTM"
-            ],
-            "onfivPtzBroken": true,
-            "_comment": "Camera says, that it supports onvif ptz, but it lies. It support proprietary ptz only."
-        },
-        {
-            "keys": [
                 "HIKVISION|DS-2DF5220S-DE4/W"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2465,6 +2463,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2491,6 +2490,7 @@
             "keys": [
                 "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2544,6 +2544,7 @@
             "keys": [
                 "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2677,6 +2678,7 @@
             "keys": [
                 "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
             ],
+            "useOnvifPtz": true,
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2834,7 +2836,8 @@
         },
         {
             "keys": [
-            "VIVOTEK|MA8391*",
+            "9W-H3-3MH*|*",
+            "VIVOTEK|MA8391*", "MA8391*|VIVOTEK",
             "AXIS|AXIS P3707*",
             "Axis|AXISP3707*",
             "AXIS|AXISP3707*",
@@ -2844,9 +2847,22 @@
             "AXIS|AXIS Q3708*",
             "Axis|AXISQ3708*",
             "AXIS|AXISQ3708*",
-            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
+            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "Dahua|IPC-HDBW7233X-AS-E2-0280B"
             ],
             "canShareLicenseGroup": true
+        },
+        {
+            "keys": ["hanwha|QRN-1610S","hanwha|QRN-810S","hanwha|QRN-410S"],
+            "bypassFirmware":"1.0.0"
+        },
+        {
+            "keys": [
+                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*"
+            ],
+            "clearInputsTimeoutSec": 1,
+            "comment": "considers input state as 0 after specified timeout"
         }
     ]
 }

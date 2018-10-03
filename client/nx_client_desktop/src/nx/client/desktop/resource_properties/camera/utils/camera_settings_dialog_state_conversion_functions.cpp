@@ -18,6 +18,7 @@ namespace {
 using State = CameraSettingsDialogState;
 using Cameras = QnVirtualCameraResourceList;
 
+//TODO #lbusygin: move conversion to resource layer
 QString boolToPropertyStr(bool value)
 {
     return value ? lit("1") : lit("0");
@@ -191,6 +192,12 @@ void setRtpTransportType(vms::api::RtpTransportType value, const Cameras& camera
         camera->setProperty(QnMediaResource::rtpTransportKey(), valueStr);
 }
 
+void setTrustCameraTime(bool value, const Cameras& cameras)
+{
+    for (const auto& camera: cameras)
+        camera->setTrustCameraTime(value);
+}
+
 void setMotionStreamType(vms::api::MotionStreamType value, const Cameras& cameras)
 {
     const auto isValueSupported =
@@ -324,7 +331,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
             const auto ioPortDataList = state.singleIoModuleSettings.ioPortsData();
             if (!ioPortDataList.empty()) //< Can happen if it's just discovered unauthorized module.
-                camera->setIOPorts(ioPortDataList);
+                camera->setIoPortDescriptions(ioPortDataList, /*needMerge*/ false);
         }
     }
 
@@ -410,6 +417,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
     if (state.expert.customMediaPort.hasValue())
         setCustomMediaPort(state.expert.customMediaPort(), cameras);
+
+    if (state.expert.trustCameraTime.hasValue())
+        setTrustCameraTime(state.expert.trustCameraTime(), cameras);
 }
 
 } // namespace desktop

@@ -7,7 +7,7 @@
 	"Cannot be merged with the current one.": "Cannot be merged with the current one.",
 	"Change Password": "Change Password",
 	"Close": "Close",
-	"Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.": "Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.",
+	"Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.",
 	"Disconnect": "Disconnect",
 	"Disconnect System from %PRODUCT_NAME%?": "Disconnect System from %PRODUCT_NAME%?",
 	"Download": "Download",

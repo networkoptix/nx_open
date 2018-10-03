@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+こんにちは{{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) があなたとビデオマネージメントシステム "{{message.system_name}}"へのアクセスを共有しています

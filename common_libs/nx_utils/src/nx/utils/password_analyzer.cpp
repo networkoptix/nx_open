@@ -139,6 +139,9 @@ PasswordStrength passwordStrength(const QString& password)
     if (password.length() < PasswordLimitations::kMinimumLength)
         return PasswordStrength::Short;
 
+    if (password.length() > PasswordLimitations::kMaximumLength)
+        return PasswordStrength::Long;
+
     static const CommonPasswordsDictionary commonPasswords;
     if (commonPasswords(password))
         return PasswordStrength::Common;

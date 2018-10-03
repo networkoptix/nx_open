@@ -119,18 +119,18 @@ const nx::cdb::api::ConnectionFactory& CloudConnectionManager::connectionFactory
 void CloudConnectionManager::processCloudErrorCode(
     nx::cdb::api::ResultCode resultCode)
 {
-    NX_LOGX(lm("Error %1 while referring to cloud")
-        .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Error %1 while referring to cloud")
+        .arg(nx::cdb::api::toString(resultCode)));
 
     if (resultCode == nx::cdb::api::ResultCode::credentialsRemovedPermanently)
     {
-        NX_LOGX(lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
-            .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
+            .arg(nx::cdb::api::toString(resultCode)));
 
         // System has been disconnected from cloud: cleaning up cloud credentials...
         if (!detachSystemFromCloud())
         {
-            NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+            NX_WARNING(this, lit("Error resetting cloud credentials in local DB"));
         }
     }
 }
@@ -154,7 +154,7 @@ bool CloudConnectionManager::detachSystemFromCloud()
     qnGlobalSettings->resetCloudParams();
     if (!qnGlobalSettings->synchronizeNowSync())
     {
-        NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
+        NX_WARNING(this, lit("Error resetting cloud credentials in local DB"));
         return false;
     }
 
@@ -168,8 +168,8 @@ void CloudConnectionManager::setCloudCredentials(
     const QString& cloudSystemId,
     const QString& cloudAuthKey)
 {
-    NX_LOGX(lm("New cloud credentials: %1:%2")
-        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logINFO);
+    NX_INFO(this, lm("New cloud credentials: %1:%2")
+        .arg(cloudSystemId).arg(cloudAuthKey.size()));
 
     if (cloudSystemId.isEmpty() != cloudAuthKey.isEmpty())
         return; //< Ignoring intermediate state.
@@ -202,14 +202,14 @@ void CloudConnectionManager::setCloudCredentials(
 
 bool CloudConnectionManager::makeSystemLocal()
 {
-    NX_LOGX(lm("Making system local"), cl_logINFO);
+    NX_INFO(this, lm("Making system local"));
 
     auto adminUser = resourcePool()->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
         if (!nx::vms::utils::resetSystemToStateNew(commonModule()))
         {
-            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
+            NX_WARNING(this, lit("Error resetting system state to new"));
             return false;
         }
     }
@@ -231,9 +231,8 @@ bool CloudConnectionManager::removeCloudUsers()
         NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_LOGX(lit("Error removing cloud user (%1:%2) from local DB: %3")
-                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)),
-                cl_logWARNING);
+            NX_WARNING(this, lit("Error removing cloud user (%1:%2) from local DB: %3")
+                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)));
             return false;
         }
     }
@@ -243,9 +242,8 @@ bool CloudConnectionManager::removeCloudUsers()
 
 void CloudConnectionManager::cloudSettingsChanged()
 {
-    NX_LOGX(lm("Cloud settings has been changed. cloudSystemId %1, cloudAuthKey %2")
-        .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey().size()),
-        cl_logINFO);
+    NX_INFO(this, lm("Cloud settings has been changed. cloudSystemId %1, cloudAuthKey %2")
+        .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey().size()));
 
     setCloudCredentials(
         qnGlobalSettings->cloudSystemId(),

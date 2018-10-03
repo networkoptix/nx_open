@@ -8,199 +8,109 @@
 
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
-#include <api/applauncher_api.h>
-#include <api/ipc_pipe_names.h>
-#include <utils/ipc/named_pipe_socket.h>
+
+#include <nx/vms/applauncher/api/commands.h>
+
 #include <nx/utils/log/log.h>
 
 namespace applauncher {
+namespace api {
 
 namespace {
 
-constexpr int MAX_MSG_LEN = 1024 * 64; //64K ought to be enough for anybody
-constexpr int kDefaultTimeoutMs = 3000;
-constexpr int kZipInstallationTimeoutMs = 30000;
-
 } // namespace
 
-static api::ResultType::Value sendCommandToLauncher(
-    const applauncher::api::BaseTask& commandToSend,
-    applauncher::api::Response* const response,
-    int timeoutMs = kDefaultTimeoutMs)
-{
-    NamedPipeSocket sock;
-    SystemError::ErrorCode resultCode = sock.connectToServerSync(launcherPipeName());
-    if( resultCode != SystemError::noError )
-    {
-        NX_LOG( lit("Failed to connect to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
-        return api::ResultType::connectError;
-    }
+static const int kZipInstallationTimeoutMs = 30000;
 
-    //const QByteArray &serializedTask = applauncher::api::StartApplicationTask(
-    //    version.toString(nx::utils::SoftwareVersion::MinorFormat), arguments).serialize();
-    const QByteArray& serializedTask = commandToSend.serialize();
-    unsigned int bytesWritten = 0;
-    resultCode = sock.write(serializedTask.data(), serializedTask.size(), &bytesWritten);
-    if( resultCode != SystemError::noError )
-    {
-        NX_LOG( lit("Failed to send launch task to local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
-        return api::ResultType::connectError;
-    }
-
-    char buf[MAX_MSG_LEN];
-    unsigned int bytesRead = 0;
-    resultCode = sock.read(buf, sizeof(buf), &bytesRead, timeoutMs);  //ignoring return code
-    if( resultCode != SystemError::noError )
-    {
-        NX_LOG( lit("Failed to read response from local server %1. %2").arg(launcherPipeName()).arg(SystemError::toString(resultCode)), cl_logWARNING );
-        return api::ResultType::connectError;
-    }
-    if( response )
-        if( !response->deserialize( QByteArray::fromRawData(buf, bytesRead) ) )
-            return api::ResultType::badResponse;
-    return api::ResultType::ok;
-}
-
-api::ResultType::Value isVersionInstalled(
-    nx::utils::SoftwareVersion version, bool* const installed)
+ResultType::Value isVersionInstalled(nx::utils::SoftwareVersion version, bool* const installed)
 {
     if (version.isNull())
         version = qnStaticCommon->engineVersion();
 
-    api::IsVersionInstalledRequest request;
+    IsVersionInstalledRequest request;
     request.version = version;
-    api::IsVersionInstalledResponse response;
-    api::ResultType::Value result = sendCommandToLauncher( request, &response );
-    if( result != api::ResultType::ok )
+    IsVersionInstalledResponse response;
+    ResultType::Value result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
         return result;
-    if( response.result != api::ResultType::ok )
+    if (response.result != ResultType::ok)
         return response.result;
     *installed = response.installed;
-    return api::ResultType::ok;
+    return ResultType::ok;
 }
 
-//bool canRestart(nx::utils::SoftwareVersion version) {
-//    if (version.isNull())
-//        version = nx::utils::SoftwareVersion(qnStaticCommon->engineVersion());
-//    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../")
-//      + version.toString(nx::utils::SoftwareVersion::MinorFormat));
-//}
-
-api::ResultType::Value restartClient(nx::utils::SoftwareVersion version, const QString& auth)
+ResultType::Value restartClient(nx::utils::SoftwareVersion version, const QString& auth)
 {
     if (version.isNull())
         version = nx::utils::SoftwareVersion(qnStaticCommon->engineVersion());
 
     QStringList arguments;
     arguments << QLatin1String("--no-single-application");
-    if (!auth.isEmpty()) {
+    if (!auth.isEmpty())
+    {
         arguments << QLatin1String("--auth");
         arguments << auth;
     }
     arguments << QnStartupParameters::kScreenKey;
     arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));
 
-    api::Response response;
+    Response response;
 
-    //return sendCommandToLauncher(version, arguments);
-    const api::ResultType::Value result = sendCommandToLauncher(
-        applauncher::api::StartApplicationTask(version, arguments),
+    const ResultType::Value result = sendCommandToApplauncher(
+        StartApplicationTask(version, arguments),
         &response);
-    return result != api::ResultType::ok ? result : response.result;
+    return result != ResultType::ok ? result : response.result;
 }
 
-api::ResultType::Value startInstallation(
+ResultType::Value installZip(
     const nx::utils::SoftwareVersion& version,
-    unsigned int* installationID )
+    const QString& zipFileName)
 {
-    api::StartInstallationTask request;
-    request.version = version;
-    api::StartInstallationResponse response;
-    api::ResultType::Value result = sendCommandToLauncher( request, &response );
-    if( result != api::ResultType::ok )
-        return result;
-    if( response.result != api::ResultType::ok )
-        return response.result;
-    *installationID = response.installationID;
-    return response.result;
-}
-
-api::ResultType::Value getInstallationStatus(
-    unsigned int installationID,
-    api::InstallationStatus::Value* const status,
-    float* progress )
-{
-    api::GetInstallationStatusRequest request;
-    request.installationID = installationID;
-    api::InstallationStatusResponse response;
-    api::ResultType::Value result = sendCommandToLauncher( request, &response );
-    if( result != api::ResultType::ok )
-        return result;
-    if( response.result != api::ResultType::ok )
-        return response.result;
-    *status = response.status;
-    *progress = response.progress;
-    return response.result;
-}
-
-api::ResultType::Value installZip(
-    const nx::utils::SoftwareVersion& version,
-    const QString &zipFileName )
-{
-    api::InstallZipTask request;
+    InstallZipTask request;
     request.version = version;
     request.zipFileName = zipFileName;
-    api::Response response;
-    const auto result = sendCommandToLauncher(request, &response, kZipInstallationTimeoutMs);
-    if (result != api::ResultType::ok)
+    Response response;
+    const auto result = sendCommandToApplauncher(request, &response, kZipInstallationTimeoutMs);
+    if (result != ResultType::ok)
         return result;
-    if (response.result != api::ResultType::ok)
+    if (response.result != ResultType::ok)
         return response.result;
     return response.result;
 }
 
-api::ResultType::Value cancelInstallation( unsigned int installationID )
+ResultType::Value scheduleProcessKill(qint64 processID, quint32 timeoutMillis)
 {
-    api::CancelInstallationRequest request;
-    request.installationID = installationID;
-    api::CancelInstallationResponse response;
-    api::ResultType::Value result = sendCommandToLauncher( request, &response );
-    if( result != api::ResultType::ok )
-        return result;
-    return response.result;
-}
-
-api::ResultType::Value scheduleProcessKill( qint64 processID, quint32 timeoutMillis )
-{
-    api::AddProcessKillTimerRequest request;
+    AddProcessKillTimerRequest request;
     request.processID = processID;
     request.timeoutMillis = timeoutMillis;
-    api::AddProcessKillTimerResponse response;
-    api::ResultType::Value result = sendCommandToLauncher( request, &response );
-    if( result != api::ResultType::ok )
+    AddProcessKillTimerResponse response;
+    ResultType::Value result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
         return result;
     return response.result;
 }
 
-applauncher::api::ResultType::Value quitApplauncher()
+ResultType::Value quitApplauncher()
 {
-    api::QuitTask task;
-    api::Response response;
-    api::ResultType::Value result = sendCommandToLauncher(task, &response);
-    if (result != api::ResultType::ok)
+    QuitTask task;
+    Response response;
+    ResultType::Value result = sendCommandToApplauncher(task, &response);
+    if (result != ResultType::ok)
         return result;
-    if (response.result != api::ResultType::ok)
+    if (response.result != ResultType::ok)
         return response.result;
     return response.result;
 }
 
-api::ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
+ResultType::Value getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
-    api::GetInstalledVersionsRequest request;
-    api::GetInstalledVersionsResponse response;
-    api::ResultType::Value result = sendCommandToLauncher(request, &response);
-    if( result != api::ResultType::ok )
+    GetInstalledVersionsRequest request;
+    GetInstalledVersionsResponse response;
+    ResultType::Value result = sendCommandToApplauncher(request, &response);
+    if (result != ResultType::ok)
         return result;
+
+
     *versions = response.versions;
     return response.result;
 }
@@ -212,11 +122,12 @@ bool checkOnline(bool runWhenOffline)
     bool notUsed = false;
     const auto result = isVersionInstalled(anyVersion, &notUsed);
 
-    if (result == api::ResultType::ok)
+    if (result == ResultType::ok)
         return true;
 
-    return ((result == api::ResultType::connectError) && runWhenOffline
+    return ((result == ResultType::connectError) && runWhenOffline
         && nx::vms::client::SelfUpdater::runMinilaucher());
 }
 
+} // namespace api
 } // namespace applauncher

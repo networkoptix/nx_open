@@ -4,7 +4,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_role_data.h>
 

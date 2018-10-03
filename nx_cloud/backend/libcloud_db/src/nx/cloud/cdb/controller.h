@@ -5,10 +5,13 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/utils/timer_manager.h>
 
+#include <nx/data_sync_engine/serialization/serializable_transaction.h>
 #include <nx/data_sync_engine/synchronization_engine.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
+#include "access_control/security_manager.h"
+#include "access_control/access_blocker.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/vms_p2p_command_bus.h"
 #include "managers/account_manager.h"
@@ -29,6 +32,9 @@ namespace nx {
 namespace cdb {
 
 namespace conf { class Settings; }
+
+extern const int kMinSupportedProtocolVersion;
+extern const int kMaxSupportedProtocolVersion;
 
 class Controller
 {
@@ -60,9 +66,7 @@ public:
 
     CloudModuleUrlProvider& cloudModuleUrlProvider();
 
-    AuthenticationManager& authenticationManager();
-
-    AuthorizationManager& authorizationManager();
+    SecurityManager& securityManager();
 
 private:
     const conf::Settings& m_settings;
@@ -88,11 +92,19 @@ private:
     std::unique_ptr<nx::network::http::AuthMethodRestrictionList> m_authRestrictionList;
     std::unique_ptr<AuthenticationManager> m_authenticationManager;
     std::unique_ptr<AuthorizationManager> m_authorizationManager;
+    std::unique_ptr<AccessBlocker> m_transportSecurityManager;
+    std::unique_ptr<SecurityManager> m_securityManager;
 
     void performDataMigrations();
     void generateUserAuthRecords(nx::sql::QueryContext* queryContext);
 
     void initializeDataSynchronizationEngine();
+    
+    nx::sql::DBResult copyExternalTransaction(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const nx::data_sync_engine::EditableSerializableTransaction& transaction);
+
     void initializeSecurity();
 };
 

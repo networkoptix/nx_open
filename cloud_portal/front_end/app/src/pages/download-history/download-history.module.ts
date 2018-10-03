@@ -12,7 +12,7 @@ import { DownloadHistoryComponent } from './download-history.component';
 
 const appRoutes: Routes = [
     {path: 'downloads/history', component: DownloadHistoryComponent},
-    {path: 'downloads/:build', component: DownloadHistoryComponent}
+    {path: 'downloads/:type', component: DownloadHistoryComponent}
 ];
 
 @NgModule({

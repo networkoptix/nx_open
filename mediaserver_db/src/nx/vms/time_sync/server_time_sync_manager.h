@@ -43,6 +43,8 @@ private:
     void initializeTimeFetcher();
     void broadcastSystemTime();
     QnRoute routeToNearestServerWithInternet();
+    void saveSystemTimeDeltaMs(qint64 systemTimeDeltaMs);
+    void updateSyncTimeToOsTimeDelta();
 private:
     std::unique_ptr<AbstractAccurateTimeFetcher> m_internetTimeSynchronizer;
     std::atomic<bool> m_internetSyncInProgress {false};
@@ -52,6 +54,7 @@ private:
     nx::utils::ElapsedTimer m_lastNetworkSyncTime;
     QnUuid m_timeLoadFromServer;
     ec2::AbstractECConnectionPtr m_connection;
+    qint64 m_systemTimeDeltaMs = 0;
 };
 
 } // namespace time_sync

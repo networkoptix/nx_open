@@ -179,10 +179,9 @@ void QnDualQualityHelper::findDataForTimeHelper(
 
     qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
 
-    NX_LOG(lit("seek time: %4, current chunk: %1, current distance: %2, previous distance: %3, camera: %5")
+    NX_VERBOSE(this, lit("seek time: %4, current chunk: %1, current distance: %2, previous distance: %3, camera: %5")
                 .arg(currentChunk.startTimeMs).arg(currentDistance).arg(previousDistance)
-                .arg(time).arg(currentCatalog->cameraUniqueId()),
-           cl_logDEBUG2);
+                .arg(time).arg(currentCatalog->cameraUniqueId()));
 
     if (previousDistance == -1)
     {

@@ -15,7 +15,7 @@ VmsTransactionLogCache::VmsTransactionLogCache():
 }
 
 bool VmsTransactionLogCache::isShouldBeIgnored(
-    const nx::String& systemId,
+    const std::string& systemId,
     const CommandHeader& tran,
     const QByteArray& hash) const
 {
@@ -28,12 +28,10 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
     const auto currentSequence = m_committedData.transactionState.values.value(key);
     if (currentSequence >= tran.persistentInfo.sequence)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
                 "because of persistent sequence: %5 <= %6")
             .arg(systemId).arg(ApiCommand::toString(tran.command)).arg(tran)
-            .arg(hash).arg(tran.persistentInfo.sequence).arg(currentSequence),
-            cl_logDEBUG1);
+            .arg(hash).arg(tran.persistentInfo.sequence).arg(currentSequence));
         return true;    //< Transaction should be ignored.
     }
 
@@ -47,12 +45,10 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
         rez = key < itr->second.updatedBy;
     if (rez)
     {
-        NX_LOG(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
+        NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("systemId %1. Ignoring transaction %2 (%3, hash %4)"
                 "because of timestamp: %5 <= %6")
             .arg(systemId).arg(ApiCommand::toString(tran.command)).arg(tran)
-            .arg(hash).arg(tran.persistentInfo.timestamp).arg(lastTime),
-            cl_logDEBUG1);
+            .arg(hash).arg(tran.persistentInfo.timestamp).arg(lastTime));
         return true;    //< Transaction should be ignored.
     }
 
@@ -124,7 +120,13 @@ void VmsTransactionLogCache::commit(TranId tranId)
         m_committedData.timestampSequence = std::max(
             m_committedData.timestampSequence,
             tranContext.data.timestampSequence);
+
+        m_timestampCalculator.shiftTimestampIfNeeded(Timestamp(
+            *m_committedData.timestampSequence,
+            m_timestampCalculator.calculateNextTimeStamp().ticks));
     }
+
+    m_tranIdToContext.erase(tranId);
 }
 
 void VmsTransactionLogCache::rollback(TranId tranId)
@@ -173,9 +175,10 @@ const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
 vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
-    vms::api::Timestamp timestamp;
-    timestamp.sequence = timestampSequence(lock, tranId);
-    timestamp.ticks = m_timestampCalculator.calculateNextTimeStamp().ticks;
+    vms::api::Timestamp timestamp = m_timestampCalculator.calculateNextTimeStamp();
+    timestamp.sequence = std::max<decltype(timestamp.sequence)>(
+        timestamp.sequence,
+        timestampSequence(lock, tranId)); //< Increased timestamp sequence can still be not commited.
     return timestamp;
 }
 
@@ -207,6 +210,12 @@ std::uint64_t VmsTransactionLogCache::committedTimestampSequence() const
 {
     QnMutexLocker lock(&m_mutex);
     return *m_committedData.timestampSequence;
+}
+
+int VmsTransactionLogCache::activeTransactionCount() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return (int) m_tranIdToContext.size();
 }
 
 std::uint64_t VmsTransactionLogCache::timestampSequence(

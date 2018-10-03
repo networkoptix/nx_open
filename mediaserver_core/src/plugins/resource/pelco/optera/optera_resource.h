@@ -19,7 +19,7 @@ class QnOpteraResource : public QnPlOnvifResource
 
 public:
 
-    QnOpteraResource();
+    QnOpteraResource(QnMediaServerModule* serverModule);
     virtual ~QnOpteraResource();
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(

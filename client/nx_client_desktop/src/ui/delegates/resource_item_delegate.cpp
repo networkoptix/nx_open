@@ -40,7 +40,6 @@
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/utils/wearable_state.h>
 
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 using namespace nx::client::desktop;

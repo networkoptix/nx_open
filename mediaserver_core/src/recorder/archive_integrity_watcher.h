@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 
 namespace nx {
@@ -18,12 +19,15 @@ private:
     static QByteArray hashWithSalt(const QByteArray& value);
 };
 
-class ServerArchiveIntegrityWatcher: public QObject, public AbstractArchiveIntegrityWatcher
+class ServerArchiveIntegrityWatcher: 
+    public QObject, 
+    public AbstractArchiveIntegrityWatcher,
+    public ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    ServerArchiveIntegrityWatcher();
+    ServerArchiveIntegrityWatcher(QnMediaServerModule* serverModule);
 
     virtual bool fileRequested(
         const QnAviArchiveMetadata& metadata,
@@ -35,7 +39,7 @@ signals:
     void fileIntegrityCheckFailed(const QnStorageResourcePtr& storage);
 
 private:
-    std::atomic<bool> m_fired;
+    std::atomic<bool> m_fired{false};
 
     bool checkMetaDataIntegrity(const QnAviArchiveMetadata& metadata);
     bool checkFileName(const QnAviArchiveMetadata& metadata, const QString& fileName);

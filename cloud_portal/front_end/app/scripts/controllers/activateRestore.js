@@ -23,6 +23,7 @@ angular.module('cloudApp')
             $scope.restoringSuccess = $routeParams.restoringSuccess;
             $scope.changeSuccess = $routeParams.changeSuccess;
 
+            $scope.loading = true;
 
             if($scope.reactivating){
                 authorizationCheckService.redirectAuthorised();
@@ -116,15 +117,18 @@ angular.module('cloudApp')
             };
 
             $scope.activate = process.init(function(){
+                $scope.loading = true;
                 return cloudApi.activate($scope.data.activateCode);
             },{
                 errorCodes:{
                     notFound: function(){
                         $scope.activationSuccess = false;
+                        $scope.loading = false;
                         return false;
                     },
                     notAuthorized: function(){
                         $scope.activationSuccess = false;
+                        $scope.loading = false;
                         return false;
                     },
                 },
@@ -132,6 +136,7 @@ angular.module('cloudApp')
             }).then(function(){
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
+                $scope.loading = false;
                 dialogs.dismissNotifications();
                 $location.path('/activate/success', false); // Change url, do not reload
             });

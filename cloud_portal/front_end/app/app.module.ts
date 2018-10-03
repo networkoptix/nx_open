@@ -15,7 +15,8 @@ import { CookieService }                    from 'ngx-cookie-service';
 import {
     cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
     accountServiceModule, processServiceModule, uuid2ServiceModule,
-    ngToastModule, configServiceModule, authorizationCheckServiceModule, localStorageModule
+    ngToastModule, configServiceModule, authorizationCheckServiceModule,
+    localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
 import { AppComponent }     from './app.component';
@@ -70,6 +71,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         ngToastModule,
         configServiceModule,
         authorizationCheckServiceModule,
+        locationProxyModule,
         DropdownsModule,
         DialogsModule,
         PagesModule,

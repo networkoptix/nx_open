@@ -8,6 +8,9 @@
 #include <nx/utils/mac_address.h>
 #include <core/resource/resource_fwd.h>
 #include "hanwha_shared_resource_context.h"
+#include <nx/mediaserver/server_module_aware.h>
+
+class QnMediaServerModule;
 
 namespace nx {
 namespace mediaserver_core {
@@ -15,11 +18,13 @@ namespace plugins {
 
 class HanwhaResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
-    public nx::network::upnp::SearchAutoHandler
+    public nx::network::upnp::SearchAutoHandler,
+    public nx::mediaserver::ServerModuleAware
+
 {
 public:
-    HanwhaResourceSearcher(QnCommonModule* commonModule);
-    virtual ~HanwhaResourceSearcher() = default;
+    HanwhaResourceSearcher(QnMediaServerModule* serverModule);
+    virtual ~HanwhaResourceSearcher() override = default;
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,

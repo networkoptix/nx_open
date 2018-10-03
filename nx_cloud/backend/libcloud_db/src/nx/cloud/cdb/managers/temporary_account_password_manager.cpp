@@ -93,10 +93,9 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                NX_LOG(lm("add_temporary_account_password (%1). "
+                NX_DEBUG(this, lm("add_temporary_account_password (%1). "
                         "Failed to save password to DB. DB error: %2")
-                    .arg(tempPasswordData.accountEmail).arg(dbResult),
-                    cl_logDEBUG1);
+                    .arg(tempPasswordData.accountEmail).arg(dbResult));
             }
 
             return completionHandler(dbResultToApiResult(dbResult));
@@ -135,9 +134,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::removeTemporaryPasswordsFromD
     removeTempPasswordsQuery.addBindValue(QnSql::serialized_field(accountEmail));
     if (!removeTempPasswordsQuery.exec())
     {
-        NX_LOGX(lm("Failed to remove temporary passwords of account %1. %2")
-            .arg(accountEmail).arg(removeTempPasswordsQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to remove temporary passwords of account %1. %2")
+            .arg(accountEmail).arg(removeTempPasswordsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -188,9 +186,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentials(
         QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
     if (!fetchTempPasswordQuery.exec())
     {
-        NX_LOG(lm("Error fetching temporary password for account %1. %2")
-            .arg(tempPasswordData.accountEmail).arg(fetchTempPasswordQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error fetching temporary password for account %1. %2")
+            .arg(tempPasswordData.accountEmail).arg(fetchTempPasswordQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -245,9 +242,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::updateCredentialsAttributes(
         QnSql::serialized_field(passwordString));
     if (!updateTempPasswordQuery.exec())
     {
-        NX_LOG(lm("Could not update temporary password for account %1. %2")
-            .arg(tempPasswordData.accountEmail).arg(updateTempPasswordQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not update temporary password for account %1. %2")
+            .arg(tempPasswordData.accountEmail).arg(updateTempPasswordQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -364,8 +360,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
          FROM account_password ap LEFT JOIN account a ON ap.account_id=a.id");
     if (!readPasswordsQuery.exec())
     {
-        NX_LOG(lit("Failed to read temporary passwords from DB. %1").
-            arg(readPasswordsQuery.lastError().text()), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to read temporary passwords from DB. %1").
+            arg(readPasswordsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -415,9 +411,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(
         QnSql::serialized_field(passwordString));
     if (!insertTempPasswordQuery.exec())
     {
-        NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2")
-            .arg(tempPasswordData.accountEmail).arg(insertTempPasswordQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not insert temporary password for account %1 into DB. %2")
+            .arg(tempPasswordData.accountEmail).arg(insertTempPasswordQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -447,9 +442,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     deleteTempPassword.bindValue(":id", QnSql::serialized_field(tempPasswordID));
     if (!deleteTempPassword.exec())
     {
-        NX_LOG(lm("Could not delete temporary password %1 from DB. %2")
-            .arg(tempPasswordID).arg(deleteTempPassword.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not delete temporary password %1 from DB. %2")
+            .arg(tempPasswordID).arg(deleteTempPassword.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

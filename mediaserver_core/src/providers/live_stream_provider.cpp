@@ -29,6 +29,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/mediaserver/resource/camera.h>
 
 using nx::mediaserver::metadata::VideoDataReceptor;
 using nx::mediaserver::metadata::VideoDataReceptorPtr;
@@ -60,8 +61,10 @@ public:
     QnSafeQueue<QnAbstractCompressedMetadataPtr> metadataQueue;
 };
 
-QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
+QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::CameraPtr& res)
+    :
     QnAbstractMediaStreamDataProvider(res),
+    nx::mediaserver::ServerModuleAware(res->serverModule()),
     m_liveMutex(QnMutex::Recursive),
     m_framesSinceLastMetaData(0),
     m_totalVideoFrames(0),
@@ -87,11 +90,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_cameraRes = res.dynamicCast<QnVirtualCameraResource>();
     NX_CRITICAL(m_cameraRes && m_cameraRes->flags().testFlag(Qn::local_live_cam));
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+    m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
     m_resolutionCheckTimer.invalidate();
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
-        m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+        m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
         QnMutexLocker lock(&m_liveMutex);
         updateSoftwareMotion();
     });
@@ -100,11 +103,11 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
     // Forwarding metadata to analytics events DB.
-    if (qnServerModule)
+    if (serverModule())
     {
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new nx::analytics::storage::AnalyticsEventsReceptor(
-                qnServerModule->analyticsEventsStorage()));
+                serverModule()->analyticsEventsStorage()));
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
                 m_analyticsEventsSaver,
@@ -113,7 +116,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
@@ -144,9 +147,9 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
         ? Qn::ConnectionRole::CR_SecondaryLiveVideo
         : Qn::ConnectionRole::CR_LiveVideo;
 
-    if (role == roleForAnalytics && qnServerModule)
+    if (role == roleForAnalytics && serverModule())
     {
-        auto pool = qnServerModule->metadataManagerPool();
+        auto pool = serverModule()->metadataManagerPool();
         m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
     }
 }
@@ -273,11 +276,6 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 #endif
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         QnMetaDataV1::createMask(m_cameraRes->getMotionMask(i), (char*)m_motionMaskBinData[i]);
-}
-
-bool QnLiveStreamProvider::canChangeStatus() const
-{
-    return m_role == Qn::CR_LiveVideo;
 }
 
 float QnLiveStreamProvider::getDefaultFps() const
@@ -415,6 +413,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
     const QnLiveStreamParams& currentLiveParams,
     bool isCameraControlRequired)
 {
+    if (!NX_ASSERT(compressedFrame))
+        return;
+
     m_totalVideoFrames++;
     m_framesSinceLastMetaData++;
 
@@ -463,8 +464,8 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         NX_VERBOSE(this) << lm("Analyzing motion; needUncompressedFrame: %1")
             .arg(needUncompressedFrame);
-        if (motionEstimation.analyzeFrame(compressedFrame),
-            needUncompressedFrame ? &uncompressedFrame : nullptr)
+        if (motionEstimation.analyzeFrame(compressedFrame,
+            needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
             updateStreamResolution(channel, motionEstimation.videoResolution());
         }
@@ -482,7 +483,9 @@ void QnLiveStreamProvider::onGotVideoFrame(
 
     if (videoDataReceptor)
     {
-        NX_VERBOSE(this) << "Pushing to receptor, timestamp:" << compressedFrame->timestamp;
+        NX_VERBOSE(this, "Pushing frame (%2) to receptor, timestamp: %1",
+            compressedFrame->timestamp,
+            uncompressedFrame ? "compressed and uncompressed" : "compressed");
         videoDataReceptor->putFrame(compressedFrame, uncompressedFrame);
     }
 
@@ -715,8 +718,8 @@ void QnLiveStreamProvider::saveBitrateIfNeeded(
     if (m_cameraRes->saveBitrateIfNeeded(info))
     {
         m_cameraRes->saveParamsAsync();
-        NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
-                .arg(QnLexical::serialized(info.encoderIndex)), cl_logINFO);
+        NX_INFO(this, lm("bitrateInfo has been updated for %1 stream")
+                .arg(QnLexical::serialized(info.encoderIndex)));
     }
 }
 

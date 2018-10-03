@@ -41,6 +41,9 @@ public:
             std::bind(static_cast<RealFactoryFuncType>(&realFactoryFunc), args...);
     }
 
+    /**
+     * Combines multiple existing servers together.
+     */
     template<typename... Others>
     MultiAddressServer(
         MultiAddressServer&& one,
@@ -71,9 +74,8 @@ public:
             if (!socketServer->bind(addr))
             {
                 const auto osErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOG(lm("Failed to bind to address %1. %2")
-                    .arg(addr.toString()).arg(SystemError::toString(osErrorCode)),
-                    cl_logERROR);
+                NX_ERROR(this, lm("Failed to bind to address %1. %2")
+                    .arg(addr.toString()).arg(SystemError::toString(osErrorCode)));
                 m_listeners.clear();
                 return false;
             }
@@ -99,8 +101,8 @@ public:
             if (!(*it)->listen(backlogSize))
             {
                 const auto& errorText = SystemError::getLastOSErrorText();
-                NX_LOG(QString::fromLatin1("Failed to listen address %1. %2")
-                    .arg((*it)->address().toString()).arg(errorText), cl_logERROR);
+                NX_ERROR(this, QString::fromLatin1("Failed to listen address %1. %2")
+                    .arg((*it)->address().toString()).arg(errorText));
                 return false;
             }
             else
@@ -126,6 +128,19 @@ public:
     {
         for (auto& listener: m_listeners)
             (listener.get()->*function)(args...);
+    }
+
+    void append(MultiAddressServer&& other)
+    {
+        std::move(
+            other.m_listeners.begin(),
+            other.m_listeners.end(),
+            std::back_inserter(m_listeners));
+
+        std::move(
+            other.m_endpoints.begin(),
+            other.m_endpoints.end(),
+            std::back_inserter(m_endpoints));
     }
 
     virtual Statistics statistics() const override

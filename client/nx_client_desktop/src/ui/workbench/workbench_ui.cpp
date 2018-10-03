@@ -43,7 +43,6 @@
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
-#include <ui/graphics/items/notifications/notifications_collection_widget.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -669,8 +668,8 @@ void QnWorkbenchUi::tick(int deltaMSecs)
 
 void QnWorkbenchUi::at_freespaceAction_triggered()
 {
-    NX_ASSERT(!qnRuntime->isActiveXMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
-    if (qnRuntime->isActiveXMode())
+    NX_ASSERT(!qnRuntime->isAcsMode(), Q_FUNC_INFO, "This function must not be called in ActiveX mode.");
+    if (qnRuntime->isAcsMode())
         return;
 
     QAction *fullScreenAction = action(action::EffectiveMaximizeAction);
@@ -1198,7 +1197,8 @@ void QnWorkbenchUi::updateNotificationsGeometry()
         m_notifications->item->y(),
         m_controlsWidgetRect.width(),
         m_notifications->item->geometry().height());
-    m_notifications->item->setToolTipsEnclosingRect(m_controlsWidget->mapRectToItem(m_notifications->item, tooltipsEnclosingRect));
+    m_notifications->tooltipsEnclosingRect = m_controlsWidget->mapRectToItem(
+        m_notifications->item, tooltipsEnclosingRect);
 }
 
 void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)

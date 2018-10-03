@@ -37,7 +37,7 @@ public:
     /**
      * Sets selection state of all specified leaf resource nodes to the choosen one.
      */
-    void setLeafResourcesSelected(const details::UuidSet& resourceId, bool select);
+    void setLeafResourcesSelected(const QnUuidSet& resourceId, bool select);
 
 signals:
     void resourceSelectionChanged(const QnUuid& resourceId, Qt::CheckState checkedState);

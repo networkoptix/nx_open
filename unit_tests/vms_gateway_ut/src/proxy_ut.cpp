@@ -118,7 +118,7 @@ public:
         const nx::utils::Url& url,
         std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes)
     {
-        NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
+        NX_INFO(this, lm("testProxyUrl(%1)").arg(url));
         httpClient->setResponseReadTimeout(std::chrono::minutes(17));
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_TRUE(
@@ -443,16 +443,13 @@ private:
 
         testHttpServer()->registerRequestProcessorFunc(
             kEmptyResourcePath,
-            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2, _3, _4, _5));
+            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2));
 
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
     void returnEmptyHttpResponse(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         completionHandler(nx::network::http::StatusCode::noContent);

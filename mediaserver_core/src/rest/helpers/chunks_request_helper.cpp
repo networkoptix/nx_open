@@ -14,7 +14,12 @@
 #include "recorder/storage_manager.h"
 #include "media_server/media_server_module.h"
 
-QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
+QnChunksRequestHelper::QnChunksRequestHelper(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
+{
+}
+
+QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request) const
 {
     // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
     QnTimePeriodList periods;
@@ -24,7 +29,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         {
             QList<QRegion> motionRegions =
                 QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
-            periods = QnMotionHelper::instance()->matchImage(
+            periods = serverModule()->motionHelper()->matchImage(
                 motionRegions, request.resList, request.startTimeMs, request.endTimeMs,
                 request.detailLevel.count());
             break;
@@ -37,6 +42,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
         case Qn::RecordingContent:
         default:
             periods = QnStorageManager::getRecordedPeriods(
+                serverModule(),
                 request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel.count(),
                 request.keepSmallChunks,
                 QList<QnServer::ChunksCatalog>()
@@ -49,7 +55,7 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 }
 
 QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
-    const QnChunksRequestData& request)
+    const QnChunksRequestData& request) const
 {
     using namespace std::chrono;
     using namespace nx::analytics::storage;
@@ -75,7 +81,7 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
         filter.deviceId = cameraResource->getId();
 
         ++lookupsOngoing;
-        qnServerModule->analyticsEventsStorage()->lookupTimePeriods(
+        serverModule()->analyticsEventsStorage()->lookupTimePeriods(
             filter,
             options,
             [&resultsPerCamera](

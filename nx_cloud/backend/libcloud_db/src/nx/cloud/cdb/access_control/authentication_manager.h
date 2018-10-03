@@ -11,6 +11,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 
 #include "auth_types.h"
+#include "access_blocker.h"
 #include "../settings.h"
 
 namespace nx {
@@ -32,6 +33,40 @@ class TemporaryAccountPasswordManager;
 class StreeManager;
 class AbstractAuthenticationDataProvider;
 
+/**
+ * Performs authentication based on various parameters.
+ * Typically, username/digest is used to authenticate,
+ *   but IP address/network interface and other data can be used also.
+ * Uses account data and some predefined static data to authenticate incoming requests.
+ * NOTE: Listens to user data change events.
+ */
+class AuthenticationManager:
+    public nx::network::http::server::AbstractAuthenticationManager
+{
+public:
+    AuthenticationManager(
+        std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
+        const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
+        const StreeManager& stree,
+        AccessBlocker* accessBlocker);
+
+    virtual void authenticate(
+        const nx::network::http::HttpServerConnection& connection,
+        const nx::network::http::Request& request,
+        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
+
+    static nx::String realm();
+
+private:
+    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
+    const StreeManager& m_stree;
+    AccessBlocker* m_transportSecurityManager;
+    std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
+
+    nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
+    nx::Buffer generateNonce();
+};
+
 namespace detail {
 
 class AuthenticationHelper
@@ -39,7 +74,7 @@ class AuthenticationHelper
 public:
     AuthenticationHelper(
         const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-        network::server::UserLockerPool* userLocker,
+        AccessBlocker* accessBlocker,
         const nx::network::http::HttpServerConnection& connection,
         const nx::network::http::Request& request,
         nx::network::http::server::AuthenticationCompletionHandler handler);
@@ -50,9 +85,11 @@ public:
     bool userLocked() const;
 
     void reportSuccess(
+        AuthenticationType authenticationType,
         std::optional<nx::utils::stree::ResourceContainer> authProperties = std::nullopt);
 
     void reportFailure(
+        AuthenticationType authenticationType,
         api::ResultCode resultCode,
         std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate = std::nullopt);
 
@@ -70,7 +107,7 @@ public:
 
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
-    network::server::UserLockerPool* m_userLocker;
+    AccessBlocker* m_transportSecurityManager;
     const nx::network::http::HttpServerConnection& m_connection;
     const nx::network::http::Request& m_request;
     nx::network::http::server::AuthenticationCompletionHandler m_handler;
@@ -100,45 +137,9 @@ private:
     api::ResultCode authenticateInDataManagers(
         const std::vector<AbstractAuthenticationDataProvider*>& authDataProviders,
         nx::utils::stree::ResourceContainer* const authProperties);
-
-    void updateUserLockoutState(network::server::UserLocker::AuthResult authResult);
 };
 
 } // namespace detail
-
-/**
- * Performs authentication based on various parameters.
- * Typically, username/digest is used to authenticate,
- *   but IP address/network interface and other data can be used also.
- * Uses account data and some predefined static data to authenticate incoming requests.
- * NOTE: Listens to user data change events.
- */
-class AuthenticationManager:
-    public nx::network::http::server::AbstractAuthenticationManager
-{
-public:
-    AuthenticationManager(
-        const conf::Settings& settings,
-        std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-        const nx::network::http::AuthMethodRestrictionList& authRestrictionList,
-        const StreeManager& stree);
-
-    virtual void authenticate(
-        const nx::network::http::HttpServerConnection& connection,
-        const nx::network::http::Request& request,
-        nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
-
-    static nx::String realm();
-
-private:
-    const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
-    const StreeManager& m_stree;
-    std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
-    std::unique_ptr<network::server::UserLockerPool> m_userLocker;
-
-    nx::network::http::header::WWWAuthenticate prepareWwwAuthenticateHeader();
-    nx::Buffer generateNonce();
-};
 
 } // namespace cdb
 } // namespace nx

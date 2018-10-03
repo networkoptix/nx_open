@@ -138,7 +138,10 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
         Extras extras;
         if (!preprocessPacket(packet, &dataPointer, &dataSize, &extras))
+        {
+            av_packet_unref(&packet);
             continue;
+        }
 
         stream = m_formatContext->streams[packet.stream_index];
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>(&m_allocator);

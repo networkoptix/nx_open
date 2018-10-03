@@ -5,11 +5,17 @@
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 
+#include <nx_ec/ec_proto_version.h>
+
+#include "ec2/vms_command_descriptor.h"
 #include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx {
 namespace cdb {
+
+const int kMinSupportedProtocolVersion = 3024;
+const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
@@ -29,8 +35,12 @@ Controller::Controller(const conf::Settings& settings):
         m_emailManager.get()),
     m_eventManager(settings),
     m_ec2SyncronizationEngine(
+        std::string(), //< No application id.
         kCdbGuid,
         settings.p2pDb(),
+        nx::data_sync_engine::ProtocolVersionRange(
+            kMinSupportedProtocolVersion,
+            kMaxSupportedProtocolVersion),
         &m_dbInstanceController.queryExecutor()),
     m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
     m_systemHealthInfoProvider(
@@ -81,8 +91,8 @@ Controller::Controller(const conf::Settings& settings):
 
 Controller::~Controller()
 {
-    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler(
-        ::ec2::ApiCommand::saveSystemMergeHistoryRecord);
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler
+        <ec2::command::SaveSystemMergeHistoryRecord>();
 
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
@@ -148,14 +158,9 @@ CloudModuleUrlProvider& Controller::cloudModuleUrlProvider()
     return m_cloudModuleUrlProvider;
 }
 
-AuthenticationManager& Controller::authenticationManager()
+SecurityManager& Controller::securityManager()
 {
-    return *m_authenticationManager;
-}
-
-AuthorizationManager& Controller::authorizationManager()
-{
-    return *m_authorizationManager;
+    return *m_securityManager;
 }
 
 void Controller::performDataMigrations()
@@ -203,14 +208,17 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kStatisticsMetricsPath, nx::network::http::AuthMethod::noAuth);
 
+    m_transportSecurityManager =
+        std::make_unique<AccessBlocker>(m_settings);
+
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
     authDataProviders.push_back(&m_accountManager);
     authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
-        m_settings,
         std::move(authDataProviders),
         *m_authRestrictionList,
-        m_streeManager);
+        m_streeManager,
+        m_transportSecurityManager.get());
 
     m_authorizationManager = std::make_unique<AuthorizationManager>(
         m_streeManager,
@@ -218,25 +226,62 @@ void Controller::initializeSecurity()
         m_systemManager,
         m_systemManager,
         m_tempPasswordManager);
+
+    m_securityManager = std::make_unique<SecurityManager>(
+        m_authenticationManager.get(),
+        *m_authorizationManager,
+        *m_transportSecurityManager);
 }
 
 void Controller::initializeDataSynchronizationEngine()
 {
+    using namespace std::placeholders;
+
+    nx::data_sync_engine::OutgoingCommandFilterConfiguration outgoingCommandFilter;
+    outgoingCommandFilter.sendOnlyOwnCommands = true;
+
+    m_ec2SyncronizationEngine.setOutgoingCommandFilter(outgoingCommandFilter);
+
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
+        <ec2::command::SaveSystemMergeHistoryRecord>(
             [this](
                 nx::sql::QueryContext* queryContext,
-                const nx::String& /*systemId*/,
-                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
-                int*)
+                const std::string& /*systemId*/,
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
-            },
-            [](nx::sql::DBResult, int) {});
+            });
+
+    // Copying every remote transaction as our own to avoid
+    // broken synchronization between mediaservers.
+    m_ec2SyncronizationEngine.transactionLog().setOnTransactionReceived(
+        std::bind(&Controller::copyExternalTransaction, this, _1, _2, _3));
+}
+
+nx::sql::DBResult Controller::copyExternalTransaction(
+    nx::sql::QueryContext* queryContext,
+    const std::string& systemId,
+    const nx::data_sync_engine::EditableSerializableTransaction& transaction)
+{
+    if (transaction.header().peerID == m_ec2SyncronizationEngine.peerId())
+        return nx::sql::DBResult::ok;
+
+    // Copying transaction.
+    auto ownTransaction = transaction.clone();
+    ownTransaction->setHeader(
+        m_ec2SyncronizationEngine.transactionLog().prepareLocalTransactionHeader(
+            queryContext,
+            systemId,
+            ownTransaction->header().command));
+
+    return m_ec2SyncronizationEngine.transactionLog().saveLocalTransaction(
+        queryContext,
+        systemId,
+        std::move(ownTransaction));
 }
 
 } // namespace cdb

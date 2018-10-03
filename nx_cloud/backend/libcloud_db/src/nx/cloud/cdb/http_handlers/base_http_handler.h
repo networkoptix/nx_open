@@ -1,17 +1,20 @@
 #pragma once
 
-#include <nx/network/http/custom_headers.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/model_functions.h>
 
 #include "../access_control/authorization_manager.h"
 #include "../access_control/auth_types.h"
+#include "../access_control/security_manager.h"
+#include "../access_control/access_blocker.h"
 #include "../managers/managers_types.h"
 #include "../stree/cdb_ns.h"
 #include "../stree/http_request_attr_reader.h"
@@ -22,26 +25,25 @@ namespace cdb {
 namespace detail {
 
 template<typename Input = void, typename Output = void>
-class BaseFiniteMsgBodyHttpHandler:
+class BasicHttpRequestHandler:
     public nx::network::http::AbstractFusionRequestHandler<Input, Output>
 {
+    using base_type = 
+        nx::network::http::AbstractFusionRequestHandler<Input, Output>;
+
 public:
-    BaseFiniteMsgBodyHttpHandler(
+    BasicHttpRequestHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
         m_entityType(entityType),
         m_actionType(actionType),
-        m_authorizationManager(authorizationManager)
+        m_securityManager(securityManager)
     {
     }
 
 protected:
-    const EntityType m_entityType;
-    const DataActionType m_actionType;
-    const AuthorizationManager& m_authorizationManager;
-
     bool authorize(
         nx::network::http::HttpServerConnection* const connection,
         const nx::network::http::Request& request,
@@ -55,7 +57,7 @@ protected:
         // Performing authorization.
         // Authorization is performed here since it can depend on input data which
         // needs to be deserialized depending on request type.
-        if (!m_authorizationManager.authorize(
+        if (!m_securityManager.authorizer().authorize(
                 authenticationData,
                 nx::utils::stree::MultiSourceResourceReader(
                     socketResources,
@@ -86,6 +88,11 @@ protected:
         }
         return true;
     }
+
+private:
+    const EntityType m_entityType;
+    const DataActionType m_actionType;
+    const SecurityManager& m_securityManager;
 };
 
 } // namespace detail
@@ -94,7 +101,7 @@ protected:
 
 template<typename Input, typename ... Output>
 class AbstractFiniteMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>
+    public detail::BasicHttpRequestHandler<Input, Output...>
 {
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
@@ -102,12 +109,12 @@ public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<Input, Output...>(
+        detail::BasicHttpRequestHandler<Input, Output...>(
             entityType,
             actionType,
-            authorizationManager)
+            securityManager)
     {
     }
 
@@ -165,13 +172,13 @@ public:
     FiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
         AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }
@@ -196,7 +203,7 @@ private:
  */
 template<typename... Output>
 class AbstractFiniteMsgBodyHttpHandler<void, Output...>:
-    public detail::BaseFiniteMsgBodyHttpHandler<void, Output...>
+    public detail::BasicHttpRequestHandler<void, Output...>
 {
     static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
 
@@ -204,12 +211,12 @@ public:
     AbstractFiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager)
+        const SecurityManager& securityManager)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<void, Output...>(
+        detail::BasicHttpRequestHandler<void, Output...>(
             entityType,
             actionType,
-            authorizationManager)
+            securityManager)
     {
     }
 
@@ -258,13 +265,13 @@ public:
     FiniteMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
         AbstractFiniteMsgBodyHttpHandler<void, Output...>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }
@@ -285,7 +292,7 @@ private:
 
 template<typename... InputData>
 class AbstractFreeMsgBodyHttpHandler:
-    public detail::BaseFiniteMsgBodyHttpHandler<InputData...>
+    public detail::BasicHttpRequestHandler<InputData...>
 {
     static_assert(sizeof...(InputData) <= 1, "Specify input data type or leave blank");
 
@@ -301,13 +308,13 @@ public:
     AbstractFreeMsgBodyHttpHandler(
         EntityType entityType,
         DataActionType actionType,
-        const AuthorizationManager& authorizationManager,
+        const SecurityManager& securityManager,
         ExecuteRequestFunc requestFunc)
         :
-        detail::BaseFiniteMsgBodyHttpHandler<InputData..., void>(
+        detail::BasicHttpRequestHandler<InputData..., void>(
             entityType,
             actionType,
-            authorizationManager),
+            securityManager),
         m_requestFunc(std::move(requestFunc))
     {
     }

@@ -1,5 +1,4 @@
-#ifndef QN_PLATFORM_MONITOR_H
-#define QN_PLATFORM_MONITOR_H
+#pragma once
 
 #include <cstdint> /* For std::intptr_t. */
 
@@ -9,6 +8,8 @@
 
 #include <nx/utils/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
+
+class QnMediaServerModule;
 
 /**
  * Interface for monitoring performance in a platform-independent way.
@@ -130,6 +131,8 @@ public:
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
 
+    virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
+
     // TODO: #Elric remove 'total' from names.
 
     /**
@@ -188,5 +191,3 @@ QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionTypes, (metatype)(lexica
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
 QString toString(const QnPlatformMonitor::PartitionSpace& value);
-
-#endif // QN_PLATFORM_MONITOR_H

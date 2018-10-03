@@ -6,11 +6,12 @@
 
 #include <nx/fusion/serialization/lexical.h>
 
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "user_resource.h"
-#include "common/common_module.h"
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -24,6 +25,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 #include <utils/camera/camera_bitrate_calculator.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
@@ -47,6 +49,11 @@ bool isDeviceTypeEmpty(nx::core::resource::DeviceType value)
 {
     return value == nx::core::resource::DeviceType::unknown;
 };
+
+QString boolToPropertyStr(bool value)
+{
+    return value ? lit("1") : lit("0");
+}
 
 } // namespace
 
@@ -115,6 +122,13 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
                 getProperty(Qn::kDeviceType),
                 nx::core::resource::DeviceType::unknown);
         },
+        &m_mutex),
+    m_cachedHasVideo(
+        [this]()
+        {
+            const auto data = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+            return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+        },
         &m_mutex)
 {
     addFlags(Qn::live_cam);
@@ -126,6 +140,14 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     connect(this, &QnResource::resourceChanged, this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(this, &QnResource::propertyChanged, this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::licenseTypeChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
+        Qt::DirectConnection);
+    connect(
+        this, &QnSecurityCamResource::parentIdChanged,
+        this, &QnSecurityCamResource::resetCachedValues,
         Qt::DirectConnection);
     connect(
         this, &QnSecurityCamResource::motionRegionChanged,
@@ -255,10 +277,8 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         if (ok)
             return reservedSecondStreamFps;
 
-        NX_LOGX(
-            lm("Wrong reserved second stream fps value for camera %1")
-                .arg(getName()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Wrong reserved second stream fps value for camera %1")
+                .arg(getName()));
     }
 
     auto sharingMethod = streamFpsSharingMethod();
@@ -278,24 +298,13 @@ bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
 
 void QnSecurityCamResource::initializationDone()
 {
-    //m_initMutex is locked down the stack
     QnNetworkResource::initializationDone();
-    if( m_inputPortListenerCount.load() > 0 )
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
     resetCachedValues();
 }
 
-bool QnSecurityCamResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+bool QnSecurityCamResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    return false;
-}
-
-void QnSecurityCamResource::stopInputPortMonitoringAsync()
-{
-}
-
-bool QnSecurityCamResource::isInputPortMonitored() const {
-    return false;
+    return m_cachedHasVideo.get();
 }
 
 Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
@@ -324,7 +333,8 @@ Qn::LicenseType QnSecurityCamResource::calculateLicenseType() const
     if (isAnalog())
         return Qn::LC_Analog;
 
-    if (isEdge())
+    // Since 3.2 Edge license type is used by any ARM server.
+    if (QnMediaServerResource::isArmServer(getParentResource()))
         return Qn::LC_Edge;
 
     return Qn::LC_Professional;
@@ -491,11 +501,6 @@ bool QnSecurityCamResource::hasCombinedSensors() const
     return !combinedSensorsDescription().isEmpty();
 }
 
-bool QnSecurityCamResource::isEdge() const
-{
-    return QnMediaServerResource::isEdgeServer(getParentResource());
-}
-
 bool QnSecurityCamResource::isSharingLicenseInGroup() const
 {
     if (getGroupId().isEmpty())
@@ -566,74 +571,48 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     }
 }
 
-QnIOPortDataList QnSecurityCamResource::getRelayOutputList() const {
-    QnIOPortDataList result;
-    QnIOPortDataList ports = getIOPorts();
-    for (const auto& port: ports)
+bool QnSecurityCamResource::setIoPortDescriptions(QnIOPortDataList newPorts, bool needMerge)
+{
+    const auto savedPorts = ioPortDescriptions();
+    bool wasDataMerged = false;
+    bool hasInputs = false;
+    bool hasOutputs = false;
+    for (auto& newPort: newPorts)
     {
-        if (port.portType == Qn::PT_Output)
-            result.push_back(port);
+        if (needMerge)
+        {
+            if (const auto savedPort = nx::utils::find_if(savedPorts,
+                [&](const auto& port) { return port.id == newPort.id; }))
+            {
+                newPort = *savedPort;
+                wasDataMerged = true;
+            }
+        }
+
+        const auto supportedTypes = newPort.supportedPortTypes | newPort.portType;
+        hasInputs |= supportedTypes & Qn::PT_Input;
+        hasOutputs |= supportedTypes & Qn::PT_Output;
     }
-    return result;
+
+    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(newPorts)));
+    setCameraCapability(Qn::InputPortCapability, hasInputs);
+    setCameraCapability(Qn::OutputPortCapability, hasOutputs);
+    return wasDataMerged;
 }
 
-QnIOPortDataList QnSecurityCamResource::getInputPortList() const
+QnIOPortDataList QnSecurityCamResource::ioPortDescriptions(Qn::IOPortType type) const
 {
-    QnIOPortDataList result;
-    QnIOPortDataList ports = getIOPorts();
-    for (const auto& port: ports)
-    {
-        if (port.portType == Qn::PT_Input)
-            result.push_back(port);
-    }
-    return result;
-}
+    auto ports = QJson::deserialized<QnIOPortDataList>(
+        getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
 
-void QnSecurityCamResource::setIOPorts(const QnIOPortDataList& ports)
-{
-    setProperty(Qn::IO_SETTINGS_PARAM_NAME, QString::fromUtf8(QJson::serialized(ports)));
-}
+    if (type != Qn::PT_Unknown)
+        nx::utils::remove_if(ports, [&](auto p) { return p.portType != type; });
 
-QnIOPortDataList QnSecurityCamResource::getIOPorts() const
-{
-    return QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
-}
-
-bool QnSecurityCamResource::setRelayOutputState(const QString& /*ouputID*/, bool /*activate*/, unsigned int /*autoResetTimeout*/)
-{
-    return false;
-}
-
-void QnSecurityCamResource::inputPortListenerAttached()
-{
-    QnMutexLocker lk( &m_initMutex );
-
-    //if camera is not initialized yet, delayed input monitoring will start on initialization completion
-    const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
-    if( isInitialized() && (inputPortListenerCount == 0) )
-        startInputPortMonitoringAsync( std::function<void(bool)>() );
-    //if resource is not initialized, input port monitoring will start just after init() completion
-}
-
-void QnSecurityCamResource::inputPortListenerDetached()
-{
-    QnMutexLocker lk( &m_initMutex );
-
-    if( m_inputPortListenerCount.load() <= 0 )
-        return;
-
-    int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
-    if( result == 1 )
-        stopInputPortMonitoringAsync();
-    else if( result <= 0 )
-        m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
+    return ports;
 }
 
 void QnSecurityCamResource::at_initializedChanged()
 {
-    if( !isInitialized() )  //e.g., camera has been moved to a different server
-        stopInputPortMonitoringAsync();  //stopping input monitoring
-
     emit licenseTypeChanged(toSharedPointer());
 }
 
@@ -877,13 +856,24 @@ void QnSecurityCamResource::setModel(const QString &model)
 
 QString QnSecurityCamResource::getFirmware() const
 {
-    return getProperty( Qn::FIRMWARE_PARAM_NAME );
+    return getProperty(Qn::FIRMWARE_PARAM_NAME);
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware)
 {
-    setProperty( Qn::FIRMWARE_PARAM_NAME, firmware );
+    setProperty(Qn::FIRMWARE_PARAM_NAME, firmware);
 }
+
+bool QnSecurityCamResource::trustCameraTime() const
+{
+    return QnLexical::deserialized<bool>(getProperty(Qn::TRUST_CAMERA_TIME_NAME));
+}
+
+void QnSecurityCamResource::setTrustCameraTime(bool value)
+{
+    setProperty(Qn::TRUST_CAMERA_TIME_NAME, boolToPropertyStr(value));
+}
+
 
 QString QnSecurityCamResource::getVendor() const
 {

@@ -203,18 +203,21 @@ void WearableWorker::processCurrentFile()
 
     WearableState::EnqueuedFile file = d->state.currentFile();
 
-    QString errorMessage;
+    UploadState config;
+    config.source = file.path;
+    config.ttl = kDefaultUploadTtl;
+
     QString uploadId = qnClientModule->uploadManager()->addUpload(
-        d->server,
-        file.path,
-        kDefaultUploadTtl,
-        &errorMessage,
-        this,
-        [this](const UploadState& upload) { handleUploadProgress(upload); }
+        d->server, config, this,
+        [this](const UploadState& upload)
+        {
+            handleUploadProgress(upload);
+        }
     );
+
     if (uploadId.isEmpty())
     {
-        handleFailure(WearableState::UploadFailed, errorMessage);
+        handleFailure(WearableState::UploadFailed, config.errorMessage);
         return;
     }
 
@@ -413,7 +416,7 @@ void WearableWorker::handleUploadProgress(const UploadState& state)
         d->requests.storeHandle(d->connection()->consumeWearableCameraFile(
             d->camera,
             d->lockToken,
-            d->state.currentUpload.id,
+            d->state.currentUpload.destination,
             d->state.currentFile().startTimeMs,
             callback,
             thread()));

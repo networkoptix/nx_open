@@ -1,8 +1,11 @@
 import logging
 from contextlib import contextmanager
 
-from framework.lock import AlreadyAcquired
+from typing import Callable
+
+from framework.os_access.exceptions import AlreadyAcquired
 from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.path import FileSystemPath
 
 _logger = logging.getLogger(__name__)
 
@@ -19,8 +22,9 @@ class Registry(object):
     """Manage names allocation. Safe for parallel usage."""
 
     def __init__(self, os_access, locks_dir, make_name, limit):
+        # type: (OSAccess, FileSystemPath, Callable[..., str], int) -> None
         self._os_access = os_access  # type: OSAccess
-        self._dir = os_access.Path(locks_dir).expanduser()
+        self._dir = os_access.path_cls(locks_dir).expanduser()
         self._dir.mkdir(parents=True, exist_ok=True)
         self._make_name = make_name
         self._limit = limit
@@ -40,7 +44,7 @@ class Registry(object):
     def taken(self, alias):
         for index, name, lock_path in self.possible_entries():
             try:
-                with self._os_access.lock(lock_path).acquired(timeout_sec=0):
+                with self._os_access.lock_acquired(lock_path, timeout_sec=0):
                     _logger.info("%s: %s is taken with %r.", self, name, alias)
                     yield index, name
                     _logger.info("%s: %s is released from %r.", self, name, alias)

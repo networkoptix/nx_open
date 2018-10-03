@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>反転</translation>
+      <translation>トグル</translation>
     </message>
     <message>
       <source>Scroll Left</source>

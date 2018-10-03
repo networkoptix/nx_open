@@ -12,7 +12,7 @@ public:
     static QString MAX_FPS_PARAM_NAME;
     static const QString MANUFACTURE;
 
-    QnPlIsdResource();
+    QnPlIsdResource(QnMediaServerModule* serverModule);
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;

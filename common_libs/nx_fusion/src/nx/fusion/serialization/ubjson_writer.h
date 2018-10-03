@@ -2,6 +2,7 @@
 #define QN_UBJSON_WRITER_H
 
 #include <cassert>
+#include <string>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
@@ -79,6 +80,10 @@ public:
 
     void writeUtf8String(const QString &value) {
         writeUtf8String(value.toUtf8());
+    }
+
+    void writeUtf8String(const std::string& value) {
+        writeUtf8String(QByteArray::fromRawData(value.c_str(), (int) value.size()));
     }
 
     void writeBinaryData(const QByteArray &value) {

@@ -18,12 +18,12 @@ class MultipleLayoutSelectionDialog : public QnSessionAwareButtonBoxDialog
 
 public:
     static bool selectLayouts(
-        node_view::details::UuidSet& selectedLayouts,
+        QnUuidSet& selectedLayouts,
         QWidget* parent);
 
 private:
     MultipleLayoutSelectionDialog(
-        const node_view::details::UuidSet& selectedLayouts,
+        const QnUuidSet& selectedLayouts,
         QWidget* parent = nullptr);
 
     virtual ~MultipleLayoutSelectionDialog() override;

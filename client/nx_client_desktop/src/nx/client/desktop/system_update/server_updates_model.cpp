@@ -76,6 +76,17 @@ QSet<QnUuid> ServerUpdatesModel::getServersInState(StatusCode state) const
     return result;
 }
 
+
+void ServerUpdatesModel::clearState()
+{
+    for (auto& item: m_items)
+    {
+        item->state = StatusCode::idle;
+        item->progress = 0;
+        item->statusMessage = "Waiting for server response";
+    }
+}
+
 UpdateItemPtr ServerUpdatesModel::findItemById(QnUuid id)
 {
     for (auto item: m_items)
@@ -147,8 +158,10 @@ QVariant ServerUpdatesModel::headerData(int section, Qt::Orientation orientation
                 return tr("Current Version");
             case ProgressColumn:
                 return tr("Status");
-            case StatusColumn:
+            case StatusMessageColumn:
                 return tr("Message");
+            case StorageSettingsColumn:
+                return tr("Store Update Files");
             default:
                 break;
         }
@@ -177,13 +190,15 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
 
             if (m_latestVersion <= item->server->getVersion())
                 return m_versionColors.latest;
-
-            if (m_updatePlatforms.contains(item->server->getSystemInfo()))
+            else
                 return m_versionColors.target;
+
+            //if (m_updatePlatforms.contains(item->server->getSystemInfo()))
+            //    return m_versionColors.target;
 
             //if (m_updateTargets.contains(item->server->getId()))
             //    return m_versionColors.target;
-
+            // TODO: This color is for the servers that can not be updated.
             return m_versionColors.error;
         }
         else if (column == NameColumn)
@@ -206,11 +221,15 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                     return item->server->getVersion().toString(nx::utils::SoftwareVersion::FullFormat);
                 //case ProgressColumn:
                 //    return item->progress;
-                case StatusColumn:
+                case StatusMessageColumn:
                     return item->statusMessage;
                 default:
                     break;
             }
+            break;
+        case Qt::CheckStateRole:
+            if (column == StorageSettingsColumn)
+                return item->storeUpdates ? Qt::Checked : Qt::Unchecked;
             break;
         case Qt::DecorationRole:
             if (column == NameColumn)
@@ -231,6 +250,8 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
 {
     if (index.column() == ProgressColumn)
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    if (index.column() == StorageSettingsColumn)
+        return Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return base_type::flags(index);
 }
 
@@ -254,7 +275,7 @@ void ServerUpdatesModel::resetResourses(QnResourcePool* pool)
     beginResetModel();
     for (const auto& item: m_items)
     {
-        if(const auto server = item->server)
+        if (const auto server = item->server)
         {
             disconnect(server.data(), &QnResource::statusChanged,
                 this, &ServerUpdatesModel::at_resourceChanged);

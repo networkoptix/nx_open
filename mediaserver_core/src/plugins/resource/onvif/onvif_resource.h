@@ -29,6 +29,7 @@
 
 #include "soap_wrapper.h"
 
+struct SoapTimeouts;
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
@@ -171,7 +172,7 @@ public:
     static const QString fetchMacAddress(
         const NetIfacesResp& response, const QString& senderIpAddress);
 
-    QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
+    QnPlOnvifResource(QnMediaServerModule* serverModule);
     virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
@@ -189,15 +190,10 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; }
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue
     */
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -252,14 +248,17 @@ public:
 
     /** calculate clock diff between camera and local clock at seconds. */
     void calcTimeDrift(int* outSoapRes = nullptr) const;
-    static int calcTimeDrift(const QString& deviceUrl,
+    static int calcTimeDrift(
+        const SoapTimeouts& timeouts, const QString& deviceUrl,
         int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
     virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
-    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl,
+    static CameraDiagnostics::Result readDeviceInformation(
+        const SoapTimeouts& onvifTimeouts,
+        const QString& onvifUrl,
         const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
     CameraDiagnostics::Result getFullUrlInfo();
@@ -294,7 +293,9 @@ public:
     QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
     virtual void afterConfigureStream(Qn::ConnectionRole role);
-    virtual CameraDiagnostics::Result customStreamConfiguration(Qn::ConnectionRole role);
+    virtual CameraDiagnostics::Result customStreamConfiguration(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& params);
 
     double getClosestAvailableFps(double desiredFps);
 
@@ -312,6 +313,8 @@ public:
         const QnLiveStreamParams& streamParams);
 
     QString audioOutputConfigurationToken() const;
+    SoapTimeouts onvifTimeouts() const;
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -374,6 +377,8 @@ protected:
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
 private:
+    QnIOPortDataList generateOutputPorts() const;
+
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
@@ -401,10 +406,8 @@ protected:
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    virtual bool startInputPortMonitoringAsync(
-        std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
@@ -584,7 +587,7 @@ private:
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    void setRelayOutputStateNonSafe(
+    void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,
         bool active,

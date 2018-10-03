@@ -12,6 +12,8 @@
 #include <nx/system_commands.h>
 #include <core/resource/abstract_storage_resource.h>
 
+class QnMediaServerModule;
+
 namespace nx {
 namespace mediaserver {
 
@@ -44,7 +46,9 @@ private:
 };
 
 /** Finds tool next to a appticationPath. */
-std::unique_ptr<RootFileSystem> instantiateRootFileSystem(const QString& applicationPath);
+std::unique_ptr<RootFileSystem> instantiateRootFileSystem(
+    bool isRootToolEnabled,
+    const QString& applicationPath);
 
 } // namespace mediaserver
 } // namespace nx

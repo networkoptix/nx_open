@@ -38,7 +38,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
     // Invalid items may lead to very strange behavior bugs.
     if (item->uuid().isNull())
     {
-        NX_LOG(lit("ResourceWidgetFactory: null item uuid"), cl_logDEBUG1);
+        NX_DEBUG(typeid(ResourceWidgetFactory), lit("ResourceWidgetFactory: null item uuid"));
         return nullptr;
     }
 
@@ -52,7 +52,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
 
     if (!context->accessController()->hasPermissions(resource, requiredPermission))
     {
-        NX_LOG(lit("ResourceWidgetFactory: insufficient permissions"), cl_logDEBUG1);
+        NX_DEBUG(typeid(ResourceWidgetFactory), lit("ResourceWidgetFactory: insufficient permissions"));
         return nullptr;
     }
 

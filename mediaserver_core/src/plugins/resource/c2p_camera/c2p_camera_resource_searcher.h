@@ -2,7 +2,7 @@
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnPlC2pCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlC2pCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 public:
     QnPlC2pCameraResourceSearcher(QnCommonModule* commonModule);

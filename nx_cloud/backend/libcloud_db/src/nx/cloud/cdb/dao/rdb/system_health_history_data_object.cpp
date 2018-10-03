@@ -34,9 +34,8 @@ nx::sql::DBResult SystemHealthHistoryDataObject::insert(
     if (!insertHistoryItemQuery.exec())
     {
         const auto s = insertHistoryItemQuery.lastError().text();
-        NX_LOG(lm("Could not insert system %1 history into DB. %2")
-            .arg(systemId).arg(insertHistoryItemQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Could not insert system %1 history into DB. %2")
+            .arg(systemId).arg(insertHistoryItemQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -59,9 +58,8 @@ nx::sql::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
     selectSystemHealthHistoryQuery.bindValue(0, QnSql::serialized_field(systemId));
     if (!selectSystemHealthHistoryQuery.exec())
     {
-        NX_LOG(lm("Error selecting system %1 history. %2")
-            .arg(systemId).arg(selectSystemHealthHistoryQuery.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Error selecting system %1 history. %2")
+            .arg(systemId).arg(selectSystemHealthHistoryQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

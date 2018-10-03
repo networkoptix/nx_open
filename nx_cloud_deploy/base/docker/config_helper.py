@@ -16,7 +16,7 @@ def serialize(val):
     if isinstance(val, bool):
         return str(val).lower()
 
-    return str(val)
+    return '"{}"'.format(val)
 
 class ConfigHelper(object):
     def __init__(self, config_file):

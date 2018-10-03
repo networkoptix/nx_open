@@ -72,7 +72,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
 
     bool shouldNotStartMonitoring =
         securityResource->hasFlags(Qn::foreigner)
-        || !securityResource->hasCameraCapabilities(Qn::RelayInputCapability);
+        || !securityResource->hasCameraCapabilities(Qn::InputPortCapability);
 
     if (shouldNotStartMonitoring)
         return false;
@@ -459,7 +459,7 @@ void QnAdamModbusIOManager::handleMonitoringError()
 
     qDebug() << "Error occured << " << error;
 
-    NX_LOG(error, cl_logDEBUG2);
+    NX_VERBOSE(this, error);
 
     if (++m_networkFaultsCounter >= kMaxNetworkFaultsNumber)
     {

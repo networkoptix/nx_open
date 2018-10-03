@@ -289,13 +289,13 @@ bool isMessageBodyAllowed(int statusCode)
 
 } // namespace StatusCode
 
+const StringType Method::connect("CONNECT");
 const StringType Method::get("GET");
 const StringType Method::head("HEAD");
 const StringType Method::post("POST");
 const StringType Method::put("PUT");
 const StringType Method::delete_("DELETE");
 const StringType Method::options("OPTIONS");
-const StringType Method::connect("CONNECT");
 
 bool Method::isMessageBodyAllowed(ValueType method)
 {
@@ -696,16 +696,17 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
 
 static StringType kSetCookieHeaderName("Set-Cookie");
 
-void Response::setCookie(const StringType& name, const StringType& value, const StringType& path)
+void Response::setCookie(
+    const StringType& name, const StringType& value, const StringType& path, bool secure)
 {
-    insertHeader(&headers,
-        {kSetCookieHeaderName, name + "=" + value + "; Path=" + path});
+    insertHeader(&headers, {kSetCookieHeaderName,
+        name + "=" + value + "; Path=" + path + (secure ? "; Secure" : "")});
 }
 
 void Response::setDeletedCookie(const StringType& name)
 {
-    insertHeader(&headers,
-        {kSetCookieHeaderName,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+    insertHeader(&headers, {kSetCookieHeaderName,
+        name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
 }
 
 std::map<StringType, StringType> Response::getCookies() const
@@ -886,7 +887,7 @@ namespace header {
 
 const StringType kContentType = "Content-Type";
 const StringType kUserAgent = "User-Agent";
-
+const StringType kAccept = "Accept";
 
 namespace AuthScheme {
 
@@ -1861,6 +1862,38 @@ bool Forwarded::parse(const StringType& str)
 bool Forwarded::operator==(const Forwarded& right) const
 {
     return elements == right.elements;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+const StringType ContentType::NAME(kContentType);
+const StringType ContentType::kAny("*/*");
+const StringType ContentType::kDefaultCharset("utf-8");
+
+const ContentType ContentType::kPlain("text/plain");
+const ContentType ContentType::kHtml("text/html");
+const ContentType ContentType::kJson("application/json");
+
+ContentType::ContentType(const StringType& headerValue)
+{
+    const auto records = headerValue.split(';');
+    value = records[0];
+    charset = kDefaultCharset;
+    for (int i = 1; i < records.count(); ++i)
+    {
+        const auto parts = records[i].trimmed().split('=');
+        if (parts[0] == "charset" && parts.size() == 2)
+            charset = parts[1];
+    }
+}
+
+StringType ContentType::toString() const
+{
+    auto result = value;
+    if (!charset.isEmpty())
+        result += "; charset=" + charset;
+
+    return result;
 }
 
 } // namespace header

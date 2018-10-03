@@ -41,8 +41,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields,
     (optional, false))
 
-QnAvigilonResource::QnAvigilonResource()
-:
+QnAvigilonResource::QnAvigilonResource(QnMediaServerModule* serverModule)
+    :
+    QnPlOnvifResource(serverModule),
     m_inputMonitored( false ),
     m_checkInputPortStatusTimerID( 0 )
 {
@@ -53,19 +54,13 @@ QnAvigilonResource::QnAvigilonResource()
 
 QnAvigilonResource::~QnAvigilonResource()
 {
-    stopInputPortMonitoringAsync();
+    stopInputPortStatesMonitoring();
 }
 
 static const int INPUT_PORT_CHECK_PERIOD_MS = 1000;
 
-bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnAvigilonResource::startInputPortStatesMonitoring()
 {
-    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-        !hasCameraCapabilities(Qn::RelayInputCapability) )
-    {
-        return false;
-    }
-
     m_checkInputUrl = nx::utils::Url(getUrl());
     m_checkInputUrl.setScheme( lit("http") );
     m_checkInputUrl.setPath( lit("/cgi-x/get-digitalio") );
@@ -83,10 +78,9 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
     m_checkInputPortStatusTimerID = nx::utils::TimerManager::instance()->addTimer(
         std::bind(&QnAvigilonResource::checkInputPortState, this, std::placeholders::_1),
         std::chrono::milliseconds(INPUT_PORT_CHECK_PERIOD_MS));
-    return true;
 }
 
-void QnAvigilonResource::stopInputPortMonitoringAsync()
+void QnAvigilonResource::stopInputPortStatesMonitoring()
 {
     quint64 checkInputPortStatusTimerID = 0;
     {
@@ -100,12 +94,6 @@ void QnAvigilonResource::stopInputPortMonitoringAsync()
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(checkInputPortStatusTimerID);
 
     m_checkInputPortsRequest.reset();
-}
-
-bool QnAvigilonResource::isInputPortMonitored() const
-{
-    QnMutexLocker lk(&m_ioPortMutex);
-    return m_inputMonitored;
 }
 
 void QnAvigilonResource::checkInputPortState( qint64 timerID )
@@ -140,9 +128,9 @@ void QnAvigilonResource::onCheckPortRequestDone( nx::network::http::AsyncHttpCli
         httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok )
     {
         const auto& msgBody = httpClient->fetchMessageBodyBuffer();
-        const QnAvigilonCheckInputPortResponse inputPortsData = 
+        const QnAvigilonCheckInputPortResponse inputPortsData =
             QJson::deserialized<QnAvigilonCheckInputPortResponse>( msgBody );
-    
+
         if( m_relayInputStates.size() != inputPortsData.inputs.size() )
             m_relayInputStates.resize( inputPortsData.inputs.size() );
         for( size_t i = 0; i < inputPortsData.inputs.size(); ++i )
@@ -151,7 +139,7 @@ void QnAvigilonResource::onCheckPortRequestDone( nx::network::http::AsyncHttpCli
             if( m_relayInputStates[i] != isPortClosed )
             {
                 m_relayInputStates[i] = isPortClosed;
-                emit cameraInput(
+                emit inputPortStateChanged(
                     toSharedPointer(),
                     QString::number(i),
                     isPortClosed,

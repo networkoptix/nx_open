@@ -31,11 +31,13 @@
     "ACCOUNT DOES NOT EXIST"               :    "Account does not exist.",
     "CODE USED/INCORRECT"                  :    "Confirmation code is already used or incorrect",
 
-    "SHARE PERMISSIONS HINT ADMIN"         :    "Unrestricted access including the ability to share",
+    "SHARE PERMISSIONS HINT ADMINISTRATOR"         :    "Unrestricted access including the ability to share",
     "SHARE PERMISSIONS HINT ADV VIEWER"    :    "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER"        :    "Can view live video and browse the archive",
     "SHARE PERMISSIONS HINT LIVE VIEWER"   :    "Can only view live video",
     "SHARE PERMISSIONS HINT CUSTOM"        :    "Use the %VMS_NAME% Client application to set up custom permissions",
+
+    "SYSTEM NAME IS REQUIRED TEXT"      :    "System name is required",
 
     "ACCOUNT TEXT"                         :    "Account",
 
@@ -50,6 +52,13 @@
     "LIVE VIEWER TEXT"                     :    "Live Viewer",    
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
+
+    "ABOUT"                                :    "About",
+    "KNOWN LIMITATIONS"                    :    "Known limitations",
+    "SUPPORT"                              :    "Support",
+    "TERMS"                                :    "Terms",
+    "PRIVACY"                              :    "Privacy",
+    "COPYWRIGHT"                           :    "Copywright",
 
     "DOWNLOADS HEADER TEXT"                :    "Download",
 

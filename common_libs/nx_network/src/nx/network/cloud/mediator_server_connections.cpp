@@ -44,19 +44,19 @@ void MediatorServerTcpConnection::monitorListeningState(
                 {
                     if (code != ResultCode::ok)
                     {
-                        NX_LOGX(lm("Check own state has failed: %1").arg(code), cl_logDEBUG1);
+                        NX_DEBUG(this, lm("Check own state has failed: %1").arg(code));
                         return client()->closeConnection(SystemError::invalidData);
                     }
 
                     if (response.state < GetConnectionStateResponse::State::listening)
                     {
-                        NX_LOGX(lm("This peer is not listening, state=%1")
-                            .arg(response.state), cl_logWARNING);
+                        NX_WARNING(this, lm("This peer is not listening, state=%1")
+                            .arg(response.state));
 
                         return client()->closeConnection(SystemError::notConnected);
                     }
 
-                    NX_LOGX(lm("Listening state is verified"), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Listening state is verified"));
                 });
         });
 }

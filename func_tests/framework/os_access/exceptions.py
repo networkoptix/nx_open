@@ -2,17 +2,25 @@ from pylru import lrudecorator
 
 
 def _error_message_from_stderr(stderr):
-    """Simple heuristic to get short message from STDERR"""
-    for line in reversed(stderr.decode('ascii').splitlines()):
+    """Simple heuristic to get short message from STDERR: take last lines that doesn't begin with
+    plus `+` (command trace). Some lines may be continuation lines which start with space or tab.
+    First line of result is non-continuation, others are continuation.
+
+    `stderr` decoded as UTF-8 because shell sometimes shows quotation mark (`b'\xe2\x80\x98'`).
+    """
+    lines = []
+    for line in stderr.decode('utf-8').splitlines():
         if line and not line.startswith('+'):  # Omit empty lines and lines from set -x.
-            return line
-    return 'stderr empty'
+            if not line.startswith(' ') and not line.startswith('\t'):
+                lines = []
+            lines.append(line)
+    return '\n'.join(lines) if lines else 'stderr empty'
 
 
 class NonZeroExitStatus(Exception):
     def __init__(self, exit_status, stdout, stderr):
         super(NonZeroExitStatus, self).__init__(
-            "{}".format(_error_message_from_stderr(stderr)))
+            u"{}".format(_error_message_from_stderr(stderr)))
         self.exit_status = exit_status
         self.stdout = stdout
         self.stderr = stderr
@@ -44,12 +52,8 @@ class CannotDownload(DoesNotExist):
 
 
 class AlreadyExists(Exception):
-    pass
-
-
-class AlreadyDownloaded(AlreadyExists):
-    def __init__(self, message, path):
-        super(AlreadyDownloaded, self).__init__(message)
+    def __init__(self, message, path=None):
+        super(AlreadyExists, self).__init__(message)
         self.path = path
 
 
@@ -70,6 +74,10 @@ class FileIsADir(Exception):
 
 
 class DirIsAFile(Exception):
+    pass
+
+
+class AlreadyAcquired(Exception):
     pass
 
 

@@ -35,7 +35,6 @@ export class NxGenericDropdown implements OnInit {
     show: boolean;
 
     constructor(private translate: TranslateService) {
-
         this.show = false;
 
         translate.get('Please select...')
@@ -43,6 +42,8 @@ export class NxGenericDropdown implements OnInit {
                     this.message = res;
                 });
     }
+
+    // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
         const selected = this.items.filter(x => x.name === this.selected.name)[0];

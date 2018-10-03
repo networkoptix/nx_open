@@ -6,7 +6,8 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-OnvifResource::OnvifResource()
+OnvifResource::OnvifResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
 {
 }
 

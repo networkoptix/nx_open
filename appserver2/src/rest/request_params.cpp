@@ -67,6 +67,24 @@ void toUrlParams(const QByteArray& id, QUrlQuery* query)
 }
 
 bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command,
+    const QnRequestParamList& params,
+    QnCameraDataExQuery* query)
+{
+    // Semantics of the returned value is quite strange. We must parse both params anyway.
+    parseHttpRequestParams(commonModule, command, params, &query->id);
+    deserialize(params, lit("showDesktopCameras"), &query->showDesktopCameras);
+    return true;
+}
+
+void toUrlParams(const QnCameraDataExQuery& filter, QUrlQuery* query)
+{
+    serialize(filter.id, lit("id"), query);
+    serialize(filter.showDesktopCameras, lit("showDesktopCameras"), query);
+}
+
+bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
     const QString& command, const QnRequestParamList& params, QnUuid* id)
 {

@@ -84,15 +84,10 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
 }
 
-static bool informersEnabled()
-{
-    return ini().enableProgressInformers && ini().unifiedEventPanel;
-}
-
 bool isBinaryExportSupported()
 {
     if (nx::utils::AppInfo::isWindows())
-        return !qnRuntime->isActiveXMode();
+        return !qnRuntime->isAcsMode();
     return false;
 }
 
@@ -128,18 +123,15 @@ struct WorkbenchExportHandler::Private
         q(owner),
         exportManager(new ExportManager())
     {
-        if (informersEnabled())
-        {
-            const auto& manager = q->context()->instance<WorkbenchProgressManager>();
-            NX_ASSERT(manager);
+        const auto& manager = q->context()->instance<WorkbenchProgressManager>();
+        NX_ASSERT(manager);
 
-            connect(manager, &WorkbenchProgressManager::interactionRequested, q,
-                [this](const QnUuid& exportProcessId)
-                {
-                    if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
-                        dialog->show();
-                });
-        }
+        connect(manager, &WorkbenchProgressManager::interactionRequested, q,
+            [this](const QnUuid& exportProcessId)
+            {
+                if (const auto dialog = runningExports.value(exportProcessId).progressDialog)
+                    dialog->show();
+            });
     }
 
     bool isInRunningExports(const Filename& filename) const
@@ -156,9 +148,7 @@ struct WorkbenchExportHandler::Private
     {
         const auto& manager = q->context()->instance<WorkbenchProgressManager>();
         QString fullPath = fileName.completeFileName();
-        const auto exportProcessId = informersEnabled()
-            ? manager->add(tr("Exporting video"), fullPath)
-            : QnUuid::createUuid();
+        const auto exportProcessId = manager->add(tr("Exporting video"), fullPath);
 
         const auto progressDialog = new QnProgressDialog(
             fullPath,
@@ -167,18 +157,14 @@ struct WorkbenchExportHandler::Private
             100,
             q->mainWindowWidget());
 
-        if (informersEnabled())
-        {
-            auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
-            progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
-            connect(minimizeButton, &QPushButton::clicked, progressDialog, &QWidget::hide);
-        }
+        auto minimizeButton = new QPushButton(tr("Minimize"), progressDialog);
+        progressDialog->addButton(minimizeButton, QDialogButtonBox::ActionRole);
+        connect(minimizeButton, &QPushButton::clicked, progressDialog, &QWidget::hide);
 
         connect(progressDialog, &QnProgressDialog::canceled, exportManager.data(),
             [this, exportProcessId, progressDialog]
             {
-                if (informersEnabled())
-                    q->context()->instance<WorkbenchProgressManager>()->remove(exportProcessId);
+                q->context()->instance<WorkbenchProgressManager>()->remove(exportProcessId);
                 exportManager->stopExport(exportProcessId);
                 progressDialog->hide();
             });
@@ -304,11 +290,8 @@ void WorkbenchExportHandler::exportProcessUpdated(const ExportProcessInfo& info)
         dialog->setValue(info.progressValue);
     }
 
-    if (informersEnabled())
-    {
-        context()->instance<WorkbenchProgressManager>()->setProgress(info.id,
-            qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
-    }
+    context()->instance<WorkbenchProgressManager>()->setProgress(info.id,
+        qreal(info.progressValue - info.rangeStart) / (info.rangeEnd - info.rangeStart));
 }
 
 void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info)
@@ -317,8 +300,7 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
         return;
 
     const auto exportProcess = d->runningExports.take(info.id);
-    if (informersEnabled())
-        context()->instance<WorkbenchProgressManager>()->remove(info.id);
+    context()->instance<WorkbenchProgressManager>()->remove(info.id);
 
     if (auto dialog = exportProcess.progressDialog)
     {
@@ -332,12 +314,15 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
             d->addResourceToPool(exportProcess.filename, resourcePool());
             QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
             break;
+
         case ExportProcessStatus::failure:
             QnMessageBox::critical(mainWindowWidget(), tr("Export failed"),
                 ExportProcess::errorString(info.error));
             break;
+
         case ExportProcessStatus::cancelled:
             break;
+
         default:
             NX_ASSERT(false, "Invalid state");
     }

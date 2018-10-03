@@ -9,26 +9,28 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
-#include <core/resource/resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <database/server_db.h>
-#include <utils/common/synctime.h>
-#include <utils/common/app_info.h>
-#include <nx/vms/api/data/event_rule_data.h>
+#include <media_server/media_server_module.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/network/aio/aio_service.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/event/action_factory.h>
 #include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/actions/camera_output_action.h>
+#include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/actions/send_mail_action.h>
-#include <nx/vms/event/actions/camera_output_action.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/aio/aio_service.h>
+#include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -45,14 +47,14 @@ namespace nx {
 namespace mediaserver {
 namespace event {
 
-RuleProcessor::RuleProcessor(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
-    connect(qnEventMessageBus, &EventMessageBus::actionDelivered,
+    connect(eventMessageBus(), &EventMessageBus::actionDelivered,
         this, &RuleProcessor::at_actionDelivered);
-    connect(qnEventMessageBus, &EventMessageBus::actionDeliveryFail, this,
+    connect(eventMessageBus(), &EventMessageBus::actionDeliveryFail, this,
         &RuleProcessor::at_actionDeliveryFailed);
-    connect(qnEventMessageBus, &EventMessageBus::actionReceived,
+    connect(eventMessageBus(), &EventMessageBus::actionReceived,
         this, &RuleProcessor::executeAction, Qt::QueuedConnection);
 
     using namespace std::placeholders;
@@ -90,7 +92,7 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         {
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-                commonModule()->moduleGUID());
+                moduleGUID());
             if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
@@ -164,14 +166,14 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
         }
 
         ec2::fromApiToResource(actionData, actionToSend);
-        qnEventMessageBus->deliverAction(actionToSend, routeToServer->getId());
+        eventMessageBus()->deliverAction(actionToSend, routeToServer->getId());
 
         // We need to save action to the log before proxy.
         // It is needed for event log for 'view video' operation.
         // Foreign server won't be able to perform this.
         if (actionRequiresLogging(action))
         {
-            qnServerDb->saveActionToDB(action);
+            serverDb()->saveActionToDB(action);
         }
         else
         {
@@ -183,18 +185,14 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
 void RuleProcessor::doExecuteAction(const vms::event::AbstractActionPtr& action,
     const QnResourcePtr& res)
 {
-    if (needProxyAction(action, res))
-    {
-        doProxyAction(action, res);
-    }
-    else
-    {
-        auto actionCopy = vms::event::ActionFactory::cloneAction(action);
-        if (res)
-            actionCopy->getParams().actionResourceId = res->getId();
+    auto actionCopy = vms::event::ActionFactory::cloneAction(action);
+    if (res)
+        actionCopy->getParams().actionResourceId = res->getId();
 
+    if (needProxyAction(action, res))
+        doProxyAction(actionCopy, res);
+    else
         executeActionInternal(actionCopy);
-    }
 }
 
 void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
@@ -235,7 +233,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
                 // And we should skip logging for generic user events
                 if (actionRequiresLogging(action))
                 {
-                    qnServerDb->saveActionToDB(action);
+                    serverDb()->saveActionToDB(action);
                 }
                 else
                 {
@@ -450,10 +448,10 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
         // If toggle event goes to 'off', stop action.
         if (!condOK || event->getToggleState() == vms::api::EventState::inactive)
             action = vms::event::ActionFactory::instantiateAction(
-                commonModule(),
+                serverModule()->commonModule(),
                 rule,
                 event,
-                commonModule()->moduleGUID(),
+                moduleGUID(),
                 vms::api::EventState::inactive);
         else
             return vms::event::AbstractActionPtr(); //< Ignore repeating 'On' event.
@@ -461,10 +459,10 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     else if (condOK)
     {
         action = vms::event::ActionFactory::instantiateAction(
-            commonModule(),
+            serverModule()->commonModule(),
             rule,
             event,
-            commonModule()->moduleGUID());
+            moduleGUID());
     }
 
     bool isActionRunning = action && action->getToggleState() == vms::api::EventState::active;
@@ -512,8 +510,8 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
     {
         return vms::event::ActionFactory::instantiateAction(
-            commonModule(),
-            rule, event, commonModule()->moduleGUID());
+            serverModule()->commonModule(),
+            rule, event, moduleGUID());
     }
 
     QString eventKey = rule->getUniqueId();
@@ -529,10 +527,10 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (aggInfo.isExpired())
     {
         vms::event::AbstractActionPtr result = vms::event::ActionFactory::instantiateAction(
-            commonModule(),
+            serverModule()->commonModule(),
             aggInfo.rule(),
             aggInfo.event(),
-            commonModule()->moduleGUID(),
+            moduleGUID(),
             aggInfo.info());
         aggInfo.reset();
         return result;
@@ -543,7 +541,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
 
 bool RuleProcessor::actionRequiresLogging(const vms::event::AbstractActionPtr& action) const
 {
-    nx::vms::event::RuleManager* manager = commonModule()->eventRuleManager();
+    nx::vms::event::RuleManager* manager = eventRuleManager();
     const vms::event::RulePtr& rule = manager->rule(action->getRuleId());
     if (rule.isNull())
         return false;
@@ -564,10 +562,10 @@ void RuleProcessor::at_timer()
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
             executeAction(vms::event::ActionFactory::instantiateAction(
-                commonModule(),
+                serverModule()->commonModule(),
                 aggInfo.rule(),
                 aggInfo.event(),
-                commonModule()->moduleGUID(),
+                moduleGUID(),
                 aggInfo.info()));
             aggInfo.reset();
         }
@@ -591,7 +589,7 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!event->checkEventParams(rule->eventParams()))
         return false;
 
-    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), commonModule()))
+    if (!vms::event::hasToggleState(event->getEventType(), rule->eventParams(), serverModule()->commonModule()))
         return true;
 
     return true;
@@ -658,7 +656,7 @@ bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
     nx::vms::api::EventActionData actionData;
     ec2::fromResourceToApi(action, actionData);
-    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+    ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
         broadcastEventAction(
             actionData,
             this,
@@ -715,7 +713,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto camResource = resource.dynamicCast<QnVirtualCameraResource>();
+    auto camResource = resource.dynamicCast<nx::mediaserver::resource::Camera>();
     if (!camResource)
         return;
 
@@ -726,7 +724,8 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
 
         if (rule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
+            auto resList = resourcePool()->getResourcesByIds<nx::mediaserver::resource::Camera>(
+                rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
@@ -757,10 +756,10 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
             if (event)
             {
                 vms::event::AbstractActionPtr action = vms::event::ActionFactory::instantiateAction(
-                    commonModule(),
+                    serverModule()->commonModule(),
                     rule,
                     event,
-                    commonModule()->moduleGUID(),
+                    moduleGUID(),
                     vms::api::EventState::inactive);
                 if (action)
                     executeAction(action);
@@ -803,12 +802,22 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                businessRule->eventResources());
-            if (resList.isEmpty())
-                resList = resourcePool()->getAllCameras(QnResourcePtr(), true);
+            auto camerasToMonitor = resourcePool()
+                ->getResourcesByIds<nx::mediaserver::resource::Camera>(
+                    businessRule->eventResources());
 
-            for (const auto& camera: resList)
+            if (camerasToMonitor.isEmpty())
+            {
+                for (const auto camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    if (auto c = camera.dynamicCast<nx::mediaserver::resource::Camera>())
+                        camerasToMonitor.push_back(std::move(c));
+                    else
+                        NX_ASSERT(false, lm("Not a server camera in pool: %1").args(camera));
+                }
+            }
+
+            for (const auto& camera: camerasToMonitor)
             {
                 if (isRuleAdded)
                     camera->inputPortListenerAttached();
@@ -822,8 +831,9 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     {
         if (businessRule->actionType() == vms::api::ActionType::cameraRecordingAction)
         {
-            auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            auto resList = resourcePool()->getResourcesByIds<nx::mediaserver::resource::Camera>(
                 businessRule->actionResources());
+
             for (const auto& camera: resList)
             {
                 if (isRuleAdded)

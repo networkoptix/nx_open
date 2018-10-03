@@ -9,16 +9,15 @@ namespace mediaserver {
 namespace fs {
 namespace media_paths {
 
-FilterConfig FilterConfig::createDefault(bool includeNonHdd)
+FilterConfig FilterConfig::createDefault(bool includeNonHdd, const nx::mediaserver::Settings* settings)
 {
     FilterConfig result;
 
-    const auto& settings = qnServerModule->settings();
     result.isMultipleInstancesAllowed =
-        static_cast<bool>(settings.enableMultipleInstances());
+        static_cast<bool>(settings->enableMultipleInstances());
     result.isRemovableDrivesAllowed = includeNonHdd
         ? true
-        : static_cast<bool>(settings.allowRemovableStorages());
+        : static_cast<bool>(settings->allowRemovableStorages());
     result.isNetworkDrivesAllowed = includeNonHdd;
 
     result.partitions = ((QnPlatformMonitor *)qnPlatform->monitor())->totalPartitionSpaceInfo(
@@ -26,9 +25,9 @@ FilterConfig FilterConfig::createDefault(bool includeNonHdd)
         | QnPlatformMonitor::NetworkPartition
         | QnPlatformMonitor::RemovableDiskPartition);
 
-    result.dataDirectory = getDataDirectory();
+    result.dataDirectory = settings->dataDir();
     result.mediaFolderName = QnAppInfo::mediaFolderName();
-    result.serverUuid = serverGuid();
+    result.serverUuid = QnUuid(settings->serverGuid());
 
 #if defined (Q_OS_WIN)
     result.isWindows = true;

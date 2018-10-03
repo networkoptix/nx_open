@@ -23,10 +23,11 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.storage = $localStorage;
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
         $scope.storage.serverStates = $scope.storage.serverStates || {};
+        $scope.storage.activeCameras = $scope.storage.activeCameras || {};
 
         $scope.canViewArchive = false;
         $scope.searchCams = "";
-        $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
+        $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId || null;
 
         $scope.isWebAdmin = Config.webadminSystemApiCompatibility;
         $scope.cameraLinks = {enabled: $location.search().cameraLinks};
@@ -443,6 +444,17 @@ angular.module('nxCommon').controller('ViewCtrl',
         //timeFromUrl is used if we have a time from the url if not then set to false
         var timeFromUrl = $routeParams.time || null;
 
+        function resetSystemActiveCamera() {
+            // remove active camera record for this system (multiple media servers)
+            for (var serverId in $scope.camerasProvider.cameras) {
+                if ($scope.camerasProvider.cameras.hasOwnProperty(serverId)) {
+                    delete $scope.storage.activeCameras[$scope.activeCamera.server.id];
+                }
+            }
+
+            $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
+        }
+
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera) {
                 $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
@@ -453,6 +465,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
             $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
+
+            if ($scope.activeCamera.id !== $scope.storage.activeCameras[$scope.activeCamera.server.id]) {
+                resetSystemActiveCamera();
+            }
 
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;

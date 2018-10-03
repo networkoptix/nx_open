@@ -51,6 +51,11 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
     {
         mainLogger()->setDefaultLevel(Level::none);
     }
+
+    log::Settings logSettings;
+    logSettings.load(QnSettings(arguments));
+    if (!logSettings.loggers.empty())
+        addLogger(buildLogger(logSettings, QString()));
 }
 
 } // namespace log

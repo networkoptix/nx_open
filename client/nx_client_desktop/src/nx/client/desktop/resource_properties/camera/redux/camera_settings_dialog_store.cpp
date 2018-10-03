@@ -314,6 +314,12 @@ void CameraSettingsDialogStore::setCustomMediaPort(int value)
         [&](State state) { return Reducer::setCustomMediaPort(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setTrustCameraTime(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setTrustCameraTime(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setMotionStreamType(vms::api::MotionStreamType value)
 {
     d->executeAction(

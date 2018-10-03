@@ -41,6 +41,15 @@ Check Log In
     Log In    ${email}    ${password}    None
     Validate Log In
 
+Check Special Hint
+    [arguments]    ${type}
+        Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
+    ${type}    Convert To Uppercase    ${type}
+    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ${type}}
+
 Restart
     Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
@@ -100,17 +109,6 @@ After closing dialog, called by link - clear link
     Wait Until Element Is Not Visible    ${SHARE MODAL}
     Location Should Be    ${location}
 
-#Check Background Click
-    Go To    ${location}/share
-    Wait Until Elements Are Visible    ${SHARE MODAL}    ${BACKDROP}
-    # used instead of click because it's more generic and allows the dismissal of the dialog
-    # using "click element" would require the element to be on the top layer or it would throw an error
-    # I am clicking on the header here because it is the only thing I am sure will always be visible and not part of the modal
-    Mouse Down    //header
-    Mouse Up    //header
-    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
-    Location Should Be    ${location}
-
 Sharing roles are ordered: more access is on top of the list with options
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
@@ -123,40 +121,12 @@ Sharing roles are ordered: more access is on top of the list with options
     Wait Until Page Does Not Contain Element    ${SHARE MODAL}
 
 When user selects role - special hint appears
+    [tags]    C41901
     Log in to Auto Tests System    ${email}
     Click Button    ${SHARE BUTTON SYSTEMS}
-#Adminstrator check
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']/..
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADMIN}
-#Advanced Viewer Check
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADV VIEWER TEXT}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADV VIEWER TEXT}']/..
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT ADV VIEWER}
-#Viewer Check
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT VIEWER}
-#Live Viewer Check
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${LIVE VIEWER TEXT}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${LIVE VIEWER TEXT}']/..
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT LIVE VIEWER}
-#Custom Check
-    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
-    Click Button    ${SHARE PERMISSIONS DROPDOWN}
-    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${CUSTOM TEXT}']
-    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${CUSTOM TEXT}']/..
-    Wait Until Element Contains    ${SHARE PERMISSIONS HINT}    ${SHARE PERMISSIONS HINT CUSTOM}
-    Click Button    ${SHARE CLOSE}
-    Wait Until Page Does Not Contain Element    ${SHARE MODAL}
+    :FOR    ${type}    IN    @{USER TYPE LIST}
+    \  Run Keyword Unless    "${type}"=="${OWNER TEXT}"    Check Special Hint    ${type}
+    Click Button    ${SHARE CANCEL}
 
 Sharing works
     Log in to Auto Tests System    ${email}

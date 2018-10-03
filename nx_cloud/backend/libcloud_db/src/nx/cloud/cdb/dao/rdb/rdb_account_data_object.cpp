@@ -26,10 +26,9 @@ nx::sql::DBResult AccountDataObject::insert(
     QnSql::bind(account, &insertAccountQuery);
     if (!insertAccountQuery.exec())
     {
-        NX_LOG(lm("Could not insert account (%1, %2) into DB. %3")
+        NX_DEBUG(this, lm("Could not insert account (%1, %2) into DB. %3")
             .arg(account.email).arg(QnLexical::serialized(account.statusCode))
-            .arg(insertAccountQuery.lastError().text()),
-            cl_logDEBUG1);
+            .arg(insertAccountQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -50,10 +49,9 @@ nx::sql::DBResult AccountDataObject::update(
     QnSql::bind(account, &updateAccountQuery);
     if (!updateAccountQuery.exec())
     {
-        NX_LOG(lm("Could not update account (%1, %2) into DB. %3")
+        NX_DEBUG(this, lm("Could not update account (%1, %2) into DB. %3")
             .arg(account.email).arg(QnLexical::serialized(account.statusCode))
-            .arg(updateAccountQuery.lastError().text()),
-            cl_logDEBUG1);
+            .arg(updateAccountQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -111,8 +109,8 @@ nx::sql::DBResult AccountDataObject::fetchAccounts(
         )sql");
     if (!readAccountsQuery.exec())
     {
-        NX_LOG(lit("Failed to read account list from DB. %1").
-            arg(readAccountsQuery.lastError().text()), cl_logWARNING);
+        NX_WARNING(this, lit("Failed to read account list from DB. %1").
+            arg(readAccountsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -200,8 +198,8 @@ nx::sql::DBResult AccountDataObject::getAccountEmailByVerificationCode(
         return nx::sql::DBResult::ioError;
     if (!getAccountByVerificationCode.next())
     {
-        NX_LOG(lit("Email verification code %1 was not found in the database").
-            arg(QString::fromStdString(verificationCode.code)), cl_logDEBUG1);
+        NX_DEBUG(this, lit("Email verification code %1 was not found in the database").
+            arg(QString::fromStdString(verificationCode.code)));
         return nx::sql::DBResult::notFound;
     }
     *accountEmail = QnSql::deserialized_field<QString>(
@@ -221,10 +219,9 @@ nx::sql::DBResult AccountDataObject::removeVerificationCode(
     QnSql::bind(verificationCode, &removeVerificationCodeQuery);
     if (!removeVerificationCodeQuery.exec())
     {
-        NX_LOG(lit("Failed to remove account verification code %1 from DB. %2")\
+        NX_DEBUG(this, lit("Failed to remove account verification code %1 from DB. %2")\
             .arg(QString::fromStdString(verificationCode.code))
-            .arg(removeVerificationCodeQuery.lastError().text()),
-            cl_logDEBUG1);
+            .arg(removeVerificationCodeQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -245,9 +242,8 @@ nx::sql::DBResult AccountDataObject::updateAccountToActiveStatus(
     updateAccountStatus.bindValue(2, QnSql::serialized_field(accountEmail));
     if (!updateAccountStatus.exec())
     {
-        NX_LOG(lm("Failed to update account %1 status. %2").
-            arg(accountEmail).arg(updateAccountStatus.lastError().text()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to update account %1 status. %2").
+            arg(accountEmail).arg(updateAccountStatus.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

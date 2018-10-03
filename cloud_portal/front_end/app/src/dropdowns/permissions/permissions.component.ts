@@ -29,6 +29,8 @@ export class NxPermissionsDropdown implements OnInit {
                  });
     }
 
+    // TODO: Bind ngModel to the component and eliminate EventEmitter
+
     ngOnInit(): void {
         const role = this.roles.filter(x => x.name === this.selected.name)[0];
         this.selection = role.optionLabel || this.message;
@@ -36,7 +38,7 @@ export class NxPermissionsDropdown implements OnInit {
 
     changePermission(role) {
         this.selection = role.optionLabel;
-        this.onSelected.emit(this.selection);
+        this.onSelected.emit(role.name);
         return false; // return false so event will not bubble to HREF
     }
 }

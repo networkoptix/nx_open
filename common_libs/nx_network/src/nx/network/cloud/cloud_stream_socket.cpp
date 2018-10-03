@@ -262,7 +262,7 @@ void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
-    NX_LOGX(lm("connectAsync. %1").arg(address), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("connectAsync. %1").arg(address));
 
     nx::network::SocketGlobals::addressResolver().resolveAsync(
         address.address,
@@ -270,7 +270,7 @@ void CloudStreamSocket::connectAsync(
             port = address.port, handler = std::move(handler)](
                 SystemError::ErrorCode code, std::deque<AddressEntry> dnsEntries) mutable
         {
-            NX_LOGX(lm("done resolve. %1, %2").arg(code).arg(dnsEntries.size()), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("done resolve. %1, %2").arg(code).arg(dnsEntries.size()));
 
             if (operationGuard->lock())
             {
@@ -443,7 +443,7 @@ void CloudStreamSocket::onConnectDone(
     boost::optional<TunnelAttributes> cloudTunnelAttributes,
     std::unique_ptr<AbstractStreamSocket> connection)
 {
-    NX_LOGX(lm("Connect completed with result %1").arg(errorCode), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Connect completed with result %1").arg(errorCode));
 
     if (errorCode == SystemError::noError)
     {

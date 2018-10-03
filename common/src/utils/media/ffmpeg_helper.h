@@ -89,7 +89,7 @@ private:
     static void copyMediaContextFieldsToAvCodecContext(
         AVCodecContext* av, const QnConstMediaContextPtr& media);
 
-    /** Singleton.
+    /** 
      * Holds a globally shared static instance of a stub AVCodec used for
      * AVCodecContext when the proper codec is not available in ffmpeg.
      */

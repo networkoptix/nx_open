@@ -1,12 +1,17 @@
 #pragma once
 
 #include "core/resource_management/resource_searcher.h"
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnWearableCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
+class QnMediaServerModule;
+
+class QnWearableCameraResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public nx::mediaserver::ServerModuleAware
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnWearableCameraResourceSearcher(QnCommonModule* commonModule);
+    QnWearableCameraResourceSearcher(QnMediaServerModule* serverModule);
     virtual ~QnWearableCameraResourceSearcher() override;
 
     virtual QString manufacture() const override;

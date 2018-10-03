@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "nx/streaming/media_data_packet.h"
 #include "rtsp/abstract_rtsp_encoder.h"
+#include <nx/network/rtsp/rtsp_types.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -72,16 +73,19 @@ typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessorPrivate;
 class QnRtspFfmpegEncoder;
+class QnMediaServerModule;
 enum class PlaybackMode;
 
-class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
+class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
     Q_OBJECT
 
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(
+        QnMediaServerModule* serverModule,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -98,7 +102,7 @@ public:
     int getAVTcpChannel(int trackNum) const;
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
-
+    QnMediaServerModule* serverModule() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();
@@ -110,21 +114,23 @@ private:
     void checkQuality();
     void processRequest();
     void parseRequest();
-    void initResponse(int code = 200, const QString& message = "OK");
+    void initResponse(
+        nx::network::rtsp::StatusCodeValue code = nx::network::http::StatusCode::ok,
+        const QString& message = "OK");
     void generateSessionId();
-    void sendResponse(int code, const QByteArray& contentType);
+    void sendResponse(nx::network::rtsp::StatusCodeValue code, const QByteArray& contentType);
     PlaybackMode getStreamingMode() const;
 
     int numOfVideoChannels();
-    int composeDescribe();
-    int composeSetup();
-    int composePlay();
-    int composePause();
+    nx::network::rtsp::StatusCodeValue composeDescribe();
+    nx::network::rtsp::StatusCodeValue composeSetup();
+    nx::network::rtsp::StatusCodeValue composePlay();
+    nx::network::rtsp::StatusCodeValue composePause();
     int extractTrackId(const QString& path);
-    int composeTeardown();
+    nx::network::rtsp::StatusCodeValue composeTeardown();
     void processRangeHeader();
-    int composeSetParameter();
-    int composeGetParameter();
+    nx::network::rtsp::StatusCodeValue composeSetParameter();
+    nx::network::rtsp::StatusCodeValue composeGetParameter();
     void createDataProvider();
     void putLastIFrameToQueue();
     //QnAbstractMediaStreamDataProvider* getLiveDp();

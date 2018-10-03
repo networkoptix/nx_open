@@ -19,6 +19,9 @@ class VivotekResource: public QnPlOnvifResource
     using base_type = QnPlOnvifResource;
 
 public:
+
+    VivotekResource(QnMediaServerModule* serverModule);
+
     enum class StreamCodecCapability
     {
         mpeg4 = 0b0001,
@@ -34,8 +37,12 @@ public:
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
 
-    virtual CameraDiagnostics::Result customStreamConfiguration(Qn::ConnectionRole role) override;
-
+    virtual CameraDiagnostics::Result customStreamConfiguration(
+        Qn::ConnectionRole role,
+        const QnLiveStreamParams& params) override;
+protected:
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
 private:
     bool fetchHevcSupport();
 

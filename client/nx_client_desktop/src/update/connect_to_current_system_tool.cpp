@@ -118,8 +118,8 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
 {
     using nx::utils::log::Level;
 
-    NX_LOG(this, lm("Finished: %1").arg(errorCode),
-        errorCode == NoError ? Level::info : Level::error);
+    NX_UTILS_LOG(errorCode == NoError ? Level::info : Level::error,
+        this, lm("Finished: %1").arg(errorCode));
 
     emit finished(errorCode);
 }

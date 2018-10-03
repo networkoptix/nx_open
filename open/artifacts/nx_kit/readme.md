@@ -38,8 +38,8 @@ All classes and functions in this kit are prefixed with `NX_KIT_API` macro which
 symbol visibility if compiled as a dynamic library. See its usage in `CMakeLists.txt` for details.
 
 Tests for these utils are located in the `unit_tests` folder. The test project can be built and run
-on Linux using cmake, on Windows with Cygwin using cmake or CLion IDE, or on Windows using
-Microsoft Visual Studio 2012+.
+on Linux using cmake/ctest, on Windows with Cygwin using cmake/ctest or CLion IDE, or on Windows
+using Microsoft Visual Studio 2012+.
 
 To build and run tests on Linux or Windows+Cygwin, with `CMake >= 3.3.2` and `g++ >= 4.8.4`:
 ```

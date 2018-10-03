@@ -10,6 +10,11 @@ namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
+TransactionDataObject::TransactionDataObject(int transactionFormatVersion):
+    m_transactionFormatVersion(transactionFormatVersion)
+{
+}
+
 nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     nx::sql::QueryContext* queryContext,
     const TransactionData& tran)
@@ -21,7 +26,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
                                      timestamp_hi, timestamp, tran_hash, tran_data)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         )sql");
-    saveTranQuery.addBindValue(QLatin1String(tran.systemId));
+    saveTranQuery.addBindValue(tran.systemId.c_str());
     saveTranQuery.addBindValue(tran.header.peerID.toSimpleString());
     saveTranQuery.addBindValue(tran.header.persistentInfo.dbID.toSimpleString());
     saveTranQuery.addBindValue(tran.header.persistentInfo.sequence);
@@ -33,11 +38,9 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     {
         const auto str = saveTranQuery.lastError().text();
 
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Error saving transaction %2 (%3, hash %4) to log. %5")
             .arg(tran.systemId).arg(::ec2::ApiCommand::toString(tran.header.command))
-            .arg(tran.header).arg(tran.hash).arg(saveTranQuery.lastError().text()),
-            cl_logWARNING);
+            .arg(tran.header).arg(tran.hash).arg(saveTranQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -46,7 +49,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
 
 nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     quint64 newValue)
 {
     QSqlQuery saveSystemTimestampSequence(*queryContext->connection()->qtSqlConnection());
@@ -54,14 +57,12 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
         R"sql(
         REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
         )sql");
-    saveSystemTimestampSequence.addBindValue(QLatin1String(systemId));
+    saveSystemTimestampSequence.addBindValue(systemId.c_str());
     saveSystemTimestampSequence.addBindValue(newValue);
     if (!saveSystemTimestampSequence.exec())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
-            .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()),
-            cl_logWARNING);
+        NX_WARNING(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
+            .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -70,7 +71,7 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
 
 nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     nx::sql::QueryContext* queryContext,
-    const nx::String& systemId,
+    const std::string& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
     std::int64_t minSequence,
@@ -85,18 +86,16 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
             WHERE system_id=? AND peer_guid=? AND db_guid=? AND sequence>? AND sequence<=?
             ORDER BY sequence
         )sql");
-    fetchTransactionsOfAPeerQuery.addBindValue(QLatin1String(systemId));
+    fetchTransactionsOfAPeerQuery.addBindValue(systemId.c_str());
     fetchTransactionsOfAPeerQuery.addBindValue(peerId);
     fetchTransactionsOfAPeerQuery.addBindValue(dbInstanceId);
     fetchTransactionsOfAPeerQuery.addBindValue((qint64)minSequence);
     fetchTransactionsOfAPeerQuery.addBindValue((qint64)maxSequence);
     if (!fetchTransactionsOfAPeerQuery.exec())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG,
-            lm("systemId %1. Error executing fetch_transactions request "
+        NX_ERROR(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Error executing fetch_transactions request "
                 "for peer (%2; %3). %4")
-            .arg(peerId).arg(dbInstanceId).arg(fetchTransactionsOfAPeerQuery.lastError().text()),
-            cl_logERROR);
+            .arg(peerId).arg(dbInstanceId).arg(fetchTransactionsOfAPeerQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -107,7 +106,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 fetchTransactionsOfAPeerQuery.value("tran_hash").toByteArray(),
                 std::make_unique<UbjsonTransactionPresentation>(
                     fetchTransactionsOfAPeerQuery.value("tran_data").toByteArray(),
-                    nx_ec::EC2_PROTO_VERSION)
+                    m_transactionFormatVersion)
                 });
     }
 

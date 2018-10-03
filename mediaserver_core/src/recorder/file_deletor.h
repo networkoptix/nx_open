@@ -1,5 +1,4 @@
-#ifndef __FILE_DELETOR_H__
-#define __FILE_DELETOR_H__
+#pragma once
 
 #include <set>
 #include <QtCore/QElapsedTimer>
@@ -12,18 +11,19 @@
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include "nx/utils/thread/long_runnable.h"
-#include <common/common_module_aware.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware
+namespace nx::mediaserver { class RootTool; }
+
+class QnFileDeletor: public QnLongRunnable, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 public:
-    void init(const QString& tmpRoot);
-    static QnFileDeletor* instance();
-    void deleteFile(const QString& fileName, const QnUuid &storageId);
-
-    QnFileDeletor(QnCommonModule* commonModule);
+    QnFileDeletor(QnMediaServerModule* serverModule);
     ~QnFileDeletor();
+
+    void init(const QString& tmpRoot);
+    void deleteFile(const QString& fileName, const QnUuid &storageId);
 
     virtual void run() override;
 private:
@@ -62,7 +62,3 @@ inline bool operator < (const QnFileDeletor::PostponedFileData &lhs, const QnFil
                                          rhs.fileName < lhs.fileName ? false :
                                                                        lhs.storageId < rhs.storageId;
 }
-
-#define qnFileDeletor QnFileDeletor::instance()
-
-#endif // __FILE_DELETOR_H__

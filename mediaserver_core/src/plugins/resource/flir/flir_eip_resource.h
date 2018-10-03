@@ -25,7 +25,7 @@ class QnFlirEIPResource:
     Q_OBJECT
 public:
 
-    QnFlirEIPResource();
+    QnFlirEIPResource(QnMediaServerModule* serverModule);
     ~QnFlirEIPResource();
 
     struct PortTimerEntry
@@ -52,18 +52,14 @@ public:
     virtual void setIframeDistance(int, int) override;
     virtual bool  hasDualStreamingInternal() const override;
 
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    virtual QnIOPortDataList getInputPortList() const override;
-
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& outputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
 protected:
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
 private:
     nx::mediaserver::resource::ApiSingleAdvancedParametersProvider<QnFlirEIPResource> m_advancedParametersProvider;

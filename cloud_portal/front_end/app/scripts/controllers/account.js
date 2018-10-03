@@ -13,6 +13,7 @@
                          systemsProvider, authorizationCheckService, $localStorage, dialogs) {
 
         $scope.lang = languageService.lang;
+        var currentLanguageCode = $scope.lang.language;
 
         if ($localStorage && $localStorage.langChanged) {
             $localStorage.langChanged = false;
@@ -33,16 +34,25 @@
             newPassword: ''
         };
 
+        $scope.changeLanguage = function (langCode) {
+            currentLanguageCode = langCode;
+        };
+
         $scope.save = process.init(function () {
+
             return cloudApi.accountPost($scope.account)
                 .then(function (result) {
-                    systemsProvider.forceUpdateSystems();
-                    if (languageService.lang.language !== $scope.account.language) {
-                        $localStorage.langChanged = true;
-                        //Need to reload page
-                        window.location.reload(true); // reload window to catch new language
-                        return false;
+                    if (languageService.lang.language !== currentLanguageCode) {
+                        cloudApi
+                            .changeLanguage(currentLanguageCode)
+                            .then(() => {
+                                $localStorage.langChanged = true;
+                                window.location.reload(); // reload window to catch new language
+                            });
+                    } else {
+                        systemsProvider.forceUpdateSystems();
                     }
+
                     return result;
                 });
         }, {

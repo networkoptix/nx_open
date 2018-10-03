@@ -10,6 +10,7 @@
 #include <nx/streaming/media_data_packet.h>
 
 class QDomElement;
+class QnMediaServerModule;
 
 // TODO: #Elric rename class to *ArecontVision*, rename file
 class QnPlAreconVisionResource:
@@ -20,7 +21,7 @@ class QnPlAreconVisionResource:
 public:
     static const QString MANUFACTURE;
 
-    QnPlAreconVisionResource();
+    QnPlAreconVisionResource(QnMediaServerModule* serverModule);
 
     CLHttpStatus getRegister(int page, int num, int& val);
     CLHttpStatus setRegister(int page, int num, int val);
@@ -47,7 +48,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS) override;
@@ -67,8 +68,10 @@ public:
         int* const outQuality,
         QSize* const outResolution);
 
-    static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
+    static QnPlAreconVisionResource* createResourceByName(
+        QnMediaServerModule* serverModule, const QString &name);
+    static QnPlAreconVisionResource* createResourceByTypeId(
+        QnMediaServerModule* serverModule, QnUuid rt);
 
     static bool isPanoramic(QnResourceTypePtr resType);
 
@@ -82,8 +85,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setMotionMaskPhysical(int channel) override;
-    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     virtual bool isRTSPSupported() const;
 

@@ -102,9 +102,14 @@ int Service::exec()
     }
     catch (const std::exception& e)
     {
-        NX_LOGX(lm("Error starting. %1").arg(e.what()), cl_logERROR);
+        NX_ERROR(this, lm("Error starting. %1").arg(e.what()));
         return 3;
     }
+}
+
+std::string Service::applicationDisplayName() const
+{
+    return m_applicationDisplayName.toStdString();
 }
 
 int Service::runMainLoop()

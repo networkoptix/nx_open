@@ -7870,6 +7870,10 @@ to %1</source>
       <source>%1 covers period for which video is being uploaded.</source>
       <translation>%1 - olyan periódust fed le, amelyre egy videót töltenek fel.</translation>
     </message>
+    <message>
+      <source>Not enough space on server storage</source>
+      <translation type="unfinished">Not enough space on server storage</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -8972,16 +8976,20 @@ to %1</source>
       <translation>A hordozható kamerákat nem lehet áthelyezni a szerverek között</translation>
     </message>
     <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Figyelem! Ez a gyűjtemény csak tesztelési célokra szolgál! Kérjük, frissítse a következő rendelkezésre álló javításra vagy a rendelkezésre álló verzióra.</translation>
-    </message>
-    <message>
       <source>Failed to change password</source>
       <translation>A jelszó módosítása sikertelen</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>A jelszó megváltoztatása sikertelen %2/%1 kamerán</translation>
+    </message>
+    <message>
+      <source>Warning! This build is for testing purposes only!</source>
+      <translation type="unfinished">Warning! This build is for testing purposes only!</translation>
+    </message>
+    <message>
+      <source>Please upgrade to a next available patch or release version once available.</source>
+      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
     </message>
   </context>
   <context>

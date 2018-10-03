@@ -4,8 +4,12 @@
 #include "vista_focus_ptz_controller.h"
 #include "soap/soapserver.h"
 
+// Although Vista reports that it supports PullPoint subscription, it does not work...
+static const bool isIoSupported = false;
 
-QnVistaResource::QnVistaResource() {
+QnVistaResource::QnVistaResource(QnMediaServerModule* serverModule):
+    QnPlOnvifResource(serverModule)
+{
     setVendor(lit("VISTA"));
 }
 
@@ -22,21 +26,16 @@ QnAbstractPtzController* QnVistaResource::createPtzControllerInternal() const
     return new QnVistaFocusPtzController(QnPtzControllerPtr(result.take()));
 }
 
-//bool QnVistaResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
-//{
-//    if( hasFlags(Qn::foreigner) ||      //we do not own camera
-//        !hasCameraCapabilities(Qn::RelayInputCapability) )
-//    {
-//        return false;
-//    }
-//
-//    if( !m_eventCapabilities.get() )
-//        return false;
-//
-//    //although Vista reports that it supports PullPoint subscription, it does not work...
-//    if( QnSoapServer::instance()->initialized() )
-//        return registerNotificationConsumer();
-//    return false;
-//}
+void QnVistaResource::startInputPortStatesMonitoring()
+{
+    if (!isIoSupported)
+        return;
+
+    if (!m_eventCapabilities.get())
+        return;
+
+    if (QnSoapServer::instance()->initialized())
+        registerNotificationConsumer();
+}
 
 #endif //ENABLE_ONVIF

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <deque>
+#include <map>
 
 #include <QByteArray>
 #include <QtCore/QElapsedTimer>
@@ -155,6 +156,7 @@ public:
     int remotePeerProtocolVersion() const;
 
     virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -306,6 +308,7 @@ private:
     bool m_isKeepAliveEnabled;
     int m_remotePeerEcProtoVersion;
     int m_localPeerProtocolVersion;
+    std::multimap<QString, QString> m_httpQueryParams;
 
 private:
     QnTransactionTransportBase(

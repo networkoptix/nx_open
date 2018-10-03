@@ -9,7 +9,10 @@ const char* const StunOverHttpServer::kStunProtocolName = "STUN/rfc5389";
 StunOverHttpServer::StunOverHttpServer(
     nx::network::stun::MessageDispatcher* stunMessageDispatcher)
     :
-    m_dispatcher(stunMessageDispatcher)
+    m_dispatcher(stunMessageDispatcher),
+    m_httpTunnelingServer(
+        [this](auto connection) { createStunConnection(std::move(connection)); },
+        nullptr)
 {
 }
 

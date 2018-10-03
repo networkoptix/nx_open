@@ -18,12 +18,15 @@
 #include <media_server/media_server_module.h>
 #include <media_server/serverutil.h>
 
-#ifndef _WIN32
+namespace {
+
 static QString configDirectory = lit("/opt/%1/mediaserver/etc").arg(QnAppInfo::linuxOrganizationName());
 static QString templateConfigFileName = QString("%1/mediaserver.conf.template").arg(configDirectory);
-static QString defaultConfigFileName = QString("%1/mediaserver.conf").arg(configDirectory);
-static QString defaultConfigFileNameRunTime = QString("%1/running_time.conf").arg(configDirectory);
-#endif
+
+} // namespace
+
+QString MSSettings::defaultConfigFileName(QString("%1/mediaserver.conf").arg(configDirectory));
+QString MSSettings::defaultConfigFileNameRunTime(QString("%1/running_time.conf").arg(configDirectory));
 
 MSSettings::MSSettings(
     const QString& roSettingsPath,
@@ -41,15 +44,6 @@ MSSettings::MSSettings(
 
     m_settings.attach(m_roSettings);
     loadAnalyticEventsStorageSettings();
-}
-
-QString MSSettings::defaultROSettingsFilePath()
-{
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileName;
-#endif
 }
 
 void MSSettings::initializeROSettingsFromConfFile(const QString& fileName)
@@ -126,15 +120,6 @@ void MSSettings::close()
 {
     syncRoSettings();
     m_rwSettings->sync();
-}
-
-QString MSSettings::defaultRunTimeSettingsFilePath()
-{
-#ifdef _WIN32
-    return "windows registry is used";
-#else
-    return defaultConfigFileNameRunTime;
-#endif
 }
 
 QString MSSettings::defaultConfigDirectory()

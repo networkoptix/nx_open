@@ -24,8 +24,8 @@ namespace {
             const QUrl& identifier,
             const QSourceLocation& sourceLocation ) override {
                 if( type >= QtCriticalMsg ) {
-                    NX_LOG( lit("Camera parameters XML validation error. Identifier: %1. Description: %2. Location: %3:%4").
-                        arg(identifier.toString()).arg(description).arg(sourceLocation.line()).arg(sourceLocation.column()), cl_logDEBUG1 );
+                    NX_DEBUG(this, lit("Camera parameters XML validation error. Identifier: %1. Description: %2. Location: %3:%4").
+                        arg(identifier.toString()).arg(description).arg(sourceLocation.line()).arg(sourceLocation.column()));
                 }
         }
     };
@@ -228,9 +228,10 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
 
     QDomElement root = xmlDom.documentElement();
     if (root.tagName() != QnXmlTag::plugin) {
-        NX_LOG(lit("Parse xml error: could not find tag %1. Got %2 instead.")
+        NX_WARNING(typeid(QnCameraAdvacedParamsXmlParser),
+            lit("Parse xml error: could not find tag %1. Got %2 instead.")
             .arg(QnXmlTag::plugin)
-            .arg(root.tagName()), cl_logWARNING);
+            .arg(root.tagName()));
         return false;
     }
 

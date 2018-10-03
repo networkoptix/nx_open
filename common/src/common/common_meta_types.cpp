@@ -248,6 +248,8 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::PtzCommand>();
     qRegisterMetaType<Ptz::Traits>();
     qRegisterMetaType<Ptz::Capabilities>();
+    qRegisterMetaType<Qn::ResourceStatus>();
+    qRegisterMetaType<Qn::StatusChangeReason>();
 
     qRegisterMetaType<QnOnvifConfigDataPtr>();
 

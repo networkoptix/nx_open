@@ -17,6 +17,7 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 #include "../camera/camera_pool.h"
+#include <nx/mediaserver/server_module_aware.h>
 
 class StreamingChunkCacheKey;
 class StreamingChunkTranscoderThread;
@@ -32,7 +33,8 @@ class StreamingChunkTranscoder:
     public QObject,
     public nx::utils::TimerEventHandler,
     public Singleton<StreamingChunkTranscoder>,
-    public Qn::EnableSafeDirectConnection
+    public Qn::EnableSafeDirectConnection,
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
@@ -59,8 +61,7 @@ public:
      * @param flags Combination of input flags.
      */
     StreamingChunkTranscoder(
-        QnResourcePool* resPool,
-        QnVideoCameraPool* videoCameraPool,
+        QnMediaServerModule* serverModule,
         Flags flags);
     ~StreamingChunkTranscoder();
 
@@ -92,8 +93,6 @@ private:
         TranscodeContext();
     };
 
-    QnResourcePool* m_resPool = nullptr;
-    QnVideoCameraPool* m_videoCameraPool = nullptr;
     Flags m_flags;
     bool m_terminated = false;
     QnMutex m_mutex;

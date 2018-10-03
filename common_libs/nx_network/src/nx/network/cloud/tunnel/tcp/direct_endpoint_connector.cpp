@@ -12,7 +12,7 @@ namespace tcp {
 
 DirectEndpointConnector::DirectEndpointConnector(
     AddressEntry targetHostAddress,
-    nx::String connectSessionId)
+    std::string connectSessionId)
     :
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId))
@@ -130,8 +130,8 @@ void DirectEndpointConnector::launchVerificators(
 
     for (const SocketAddress& endpoint: endpoints)
     {
-        NX_LOGX(lm("cross-nat %1. Verifying host %2")
-            .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("cross-nat %1. Verifying host %2")
+            .arg(m_connectSessionId).arg(endpoint));
 
         m_verificators.push_back(
             EndpointVerificatorFactory::instance().create(m_connectSessionId));
@@ -192,17 +192,16 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
-    NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
-        .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("cross-nat %1. Reporting successful connection to %2")
+        .arg(m_connectSessionId).arg(endpoint));
 
     m_verificators.clear();
 
-    auto tunnel =
-        std::make_unique<DirectTcpEndpointTunnel>(
-            getAioThread(),
-            m_connectSessionId,
-            std::move(endpoint),
-            std::move(streamSocket));
+    auto tunnel = std::make_unique<DirectTcpEndpointTunnel>(
+        getAioThread(),
+        m_connectSessionId,
+        std::move(endpoint),
+        std::move(streamSocket));
 
     auto handler = std::move(m_completionHandler);
     m_completionHandler = nullptr;

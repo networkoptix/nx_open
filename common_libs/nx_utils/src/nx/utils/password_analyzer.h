@@ -7,22 +7,25 @@ namespace utils {
 
 struct NX_UTILS_API PasswordLimitations
 {
-    /** Minimal length of a password. */
+    /** Minimum length of a password. */
     static constexpr int kMinimumLength = 8;
 
-    /** Maximal length of a camera password. */
+    /** Maximum length of any password. */
+    static constexpr int kMaximumLength = 255;
+
+    /** Maximum length of a camera password. */
     static constexpr int kMaximumLengthForCamera = 15;
 
-    /** Maximal length of a consecutive characters sequence. */
+    /** Maximum length of a consecutive characters sequence. */
     static constexpr int kConsecutiveCharactersLimit = 4;
 
-    /** Maximal number of repating characters/ */
+    /** Maximum number of repating characters. */
     static constexpr int kRepeatingCharactersLimit = 4;
 
-    /* Minimal acceptable number of character categories: */
+    /** Minimum acceptable number of character categories. */
     static constexpr int kMinimumCategories = 2;
 
-    /* Preferred number of character categories: */
+    /** Preferred number of character categories. */
     static constexpr int kPreferredCategories = 3;
 
     static const QByteArray kAllowedSymbols;

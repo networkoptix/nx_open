@@ -1,4 +1,4 @@
-// Copyright 2018 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+// Copyright 2018-present Network Optix, Inc.
 #include "debug.h"
 
 #include <chrono>
@@ -29,19 +29,19 @@ std::string format(const std::string formatStr, ...)
 {
     va_list args;
     va_start(args, formatStr);
-    int size = vsnprintf(nullptr, 0, formatStr.c_str(), args) + 1; //< Extra space for '\0'.
-    if (size < 0)
-    {
-        va_end(args);
-        return formatStr; //< No better way to handle out-of-memory-like errors.
-    }
-    std::unique_ptr<char[]> buf(new char[size]);
+    const int size = vsnprintf(nullptr, 0, formatStr.c_str(), args) + /* Space for '\0' */ 1;
     va_end(args);
+
+    if (size < 0)
+        return formatStr; //< No better way to handle out-of-memory-like errors.
+
+    std::unique_ptr<char[]> buf(new char[size]);
 
     va_start(args, formatStr);
     vsnprintf(buf.get(), (size_t) size, formatStr.c_str(), args);
     va_end(args);
-    return std::string(buf.get(), buf.get() + size - 1); //< Trim trailing '\0'.
+
+    return std::string(buf.get(), buf.get() + size - /* Trim trailing '\0' */ 1);
 }
 
 bool isAsciiPrintable(int c)
@@ -73,8 +73,6 @@ const char* relativeSrcFilename(const char* file)
         return file;
 
     const std::string fileString = file;
-
-    // TODO: #mshevchenko: Reconsider the logic of relativeSrcFilename() and get rid of "nx".
 
     // If the path contains "/src/nx/", return starting with "nx/".
     {
@@ -132,6 +130,35 @@ std::string printPrefix(const char* file)
 } // namespace detail
 
 //-------------------------------------------------------------------------------------------------
+// Assertions
+
+namespace detail {
+
+void assertionFailed(
+    PrintFunc printFunc, const char* conditionStr, const std::string& message,
+    const char* file, int line)
+{
+    printFunc((std::string("\n")
+        + ">>> ASSERTION FAILED: "
+        + nx::kit::debug::relativeSrcFilename(file) + ":" + nx::kit::debug::toString(line)
+        + " (" + conditionStr + ") " + message
+    ).c_str());
+
+    #if !defined(NDEBUG)
+        #if defined(_WIN32)
+            // Copy error text to a stack variable so it is present in the mini-dump.
+            char messageOnStack[256] = {0};
+            snprintf(messageOnStack, sizeof(messageOnStack), "%s", message.c_str());
+        #endif
+
+        // Crash the process to let a dump/core be generated.
+        *reinterpret_cast<volatile int*>(0) = 0;
+    #endif
+}
+
+} // namespace detail
+
+//-------------------------------------------------------------------------------------------------
 // Print info
 
 std::string toString(std::string s)
@@ -177,9 +204,12 @@ std::string toString(char* s)
 
 std::string toString(const void* ptr)
 {
-    if (ptr == nullptr)
-        return "null";
-    return format("%p", ptr);
+    return ptr ? format("%p", ptr) : "null";
+}
+
+std::string toString(bool b)
+{
+    return b ? "true" : "false";
 }
 
 namespace detail {

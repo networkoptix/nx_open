@@ -1,11 +1,13 @@
+import errno
 import os
+import stat
 from errno import EEXIST, EISDIR, ENOENT, ENOTDIR
 from functools import wraps
 from shutil import rmtree
 
 from pathlib2 import PosixPath
 
-from framework.os_access.exceptions import AlreadyExists, BadParent, DirIsAFile, DoesNotExist, NotADir, NotAFile
+from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
 
 
@@ -28,19 +30,19 @@ def _reraising(raised_errors_cls_map):
 
 
 _reraising_new_file_errors = _reraising({
-    ENOENT: BadParent,
-    ENOTDIR: BadParent,
-    EEXIST: AlreadyExists,
-    EISDIR: NotAFile,
+    ENOENT: exceptions.BadParent,
+    ENOTDIR: exceptions.BadParent,
+    EEXIST: exceptions.AlreadyExists,
+    EISDIR: exceptions.NotAFile,
     })
 _reraising_existing_file_errors = _reraising({
-    ENOENT: DoesNotExist,
-    EISDIR: NotAFile,
+    ENOENT: exceptions.DoesNotExist,
+    EISDIR: exceptions.NotAFile,
     })
 _reraising_existing_dir_errors = _reraising({
-    ENOENT: DoesNotExist,
-    EEXIST: AlreadyExists,
-    EISDIR: DirIsAFile,
+    ENOENT: exceptions.DoesNotExist,
+    EEXIST: exceptions.AlreadyExists,
+    EISDIR: exceptions.DirIsAFile,
     })
 
 
@@ -67,9 +69,9 @@ class LocalPath(PosixPath, FileSystemPath):
 
     def glob(self, pattern):
         if not self.exists():
-            raise DoesNotExist(self)
+            raise exceptions.DoesNotExist(self)
         if not self.is_dir():
-            raise NotADir(self)
+            raise exceptions.NotADir(self)
         return super(LocalPath, self).glob(pattern)
 
     @_reraising_existing_dir_errors
@@ -96,5 +98,26 @@ class LocalPath(PosixPath, FileSystemPath):
             f.seek(offset)
             return f.read(max_length)
 
+    @_reraising_existing_file_errors
+    def size(self):
+        path_stat = self.stat()  # type: os.stat_result
+        if not stat.S_ISREG(path_stat.st_mode):
+            raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
+        return path_stat.st_size
+
     def copy_to(self, destination):
         destination.copy_from(self)
+
+    def take_from(self, local_source_path):
+        destination = self / local_source_path.name
+        if not local_source_path.exists():
+            raise exceptions.CannotDownload("Local file {} doesn't exist.".format(local_source_path))
+        try:
+            os.symlink(str(local_source_path), str(destination))
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+            raise exceptions.AlreadyExists(
+                "Creating symlink {!s} pointing to {!s}".format(destination, local_source_path),
+                destination)
+        return destination

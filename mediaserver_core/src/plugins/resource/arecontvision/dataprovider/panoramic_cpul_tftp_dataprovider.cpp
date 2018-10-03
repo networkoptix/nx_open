@@ -27,7 +27,8 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 // =========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(const QnPlAreconVisionResourcePtr& res):
+AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(
+    const QnPlAreconVisionResourcePtr& res):
     QnPlAVClinetPullStreamReader(res)
 {
 
@@ -153,7 +154,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         {
             if (!m_streamParam.contains("streamID"))
             {
-                NX_LOG("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                NX_ERROR(this, "Erorr!!! parameter is missing in stream params.");
                 return QnAbstractMediaDataPtr(0);
             }
 
@@ -279,7 +280,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     if (h264 && (lp_size < iframe_index))
     {
-        NX_LOG("last packet is too short!", cl_logERROR);
+        NX_ERROR(this, "last packet is too short!");
         return QnAbstractMediaDataPtr(0);
     }
 
@@ -317,7 +318,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
                 if (diff > 0)
                     img.startWriting(diff);
 
-                NX_LOG("Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data", cl_logINFO);
+                NX_INFO(this, "Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data");
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
                 img.finishWriting(diff);

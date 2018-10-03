@@ -177,7 +177,7 @@ qreal QnGlobalMonitor::totalCpuUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevCpuUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2), cl_logWARNING);
+        NX_WARNING(this, lit("Cpu usage %1%").arg(d->totalCpuUsage*100, 0, 'f', 2));
         d->prevCpuUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -194,7 +194,7 @@ qreal QnGlobalMonitor::totalRamUsage() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevMemUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logWARNING);
+        NX_WARNING(this, lit("Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2));
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
 
 #ifdef __linux__
@@ -210,61 +210,61 @@ qreal QnGlobalMonitor::totalRamUsage() {
 #if defined (Q_OS_LINUX)
 void logOpenedHandleCount()
 {
-	int fdCount = 0;
-	char buf[64];
-	struct dirent *dp;
+    int fdCount = 0;
+    char buf[64];
+    struct dirent *dp;
 
-	snprintf(buf, 64, "/proc/%i/fd/", getpid());
+    snprintf(buf, 64, "/proc/%i/fd/", getpid());
 
-	DIR *dir = opendir(buf);
-	while ((dp = readdir(dir)) != NULL)
-		fdCount++;
-	closedir(dir);
-	NX_LOG(lit("    Opened: %1").arg(fdCount), cl_logWARNING);
+    DIR *dir = opendir(buf);
+    while ((dp = readdir(dir)) != NULL)
+        fdCount++;
+    closedir(dir);
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Opened: %1").arg(fdCount));
 }
 #elif defined (Q_OS_WIN)
 void logOpenedHandleCount()
 {
-	DWORD typeChar = 0;
-	DWORD typeDisk = 0;
-	DWORD typePipe = 0;
-	DWORD typeRemote = 0;
-	DWORD typeUnknown = 0;
-	DWORD handlesCount = 0;
+    DWORD typeChar = 0;
+    DWORD typeDisk = 0;
+    DWORD typePipe = 0;
+    DWORD typeRemote = 0;
+    DWORD typeUnknown = 0;
+    DWORD handlesCount = 0;
 
-	GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
-	handlesCount *= 4;
-	for (DWORD handle = 0x4; handle < handlesCount; handle += 4)
-	{
-		switch (GetFileType((HANDLE)handle))
-		{
-			case FILE_TYPE_CHAR:
-				typeChar++;
-				break;
-			case FILE_TYPE_DISK:
-				typeDisk++;
-				break;
-			case FILE_TYPE_PIPE:
-				typePipe++;
-				break;
-			case FILE_TYPE_REMOTE:
-				typeRemote++;
-				break;
-			case FILE_TYPE_UNKNOWN:
-				if (GetLastError() == NO_ERROR) typeUnknown++;
-				break;
-		}
-	}
+    GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
+    handlesCount *= 4;
+    for (DWORD handle = 0x4; handle < handlesCount; handle += 4)
+    {
+        switch (GetFileType((HANDLE)handle))
+        {
+            case FILE_TYPE_CHAR:
+                typeChar++;
+                break;
+            case FILE_TYPE_DISK:
+                typeDisk++;
+                break;
+            case FILE_TYPE_PIPE:
+                typePipe++;
+                break;
+            case FILE_TYPE_REMOTE:
+                typeRemote++;
+                break;
+            case FILE_TYPE_UNKNOWN:
+                if (GetLastError() == NO_ERROR) typeUnknown++;
+                break;
+        }
+    }
 
-	NX_LOG(lit("    Disk files: %1").arg(typeDisk), cl_logWARNING);
-	NX_LOG(lit("    Sockets, pipes: %1").arg(typePipe), cl_logWARNING);
-	NX_LOG(lit("    Character devices: %1").arg(typeChar), cl_logWARNING);
-	NX_LOG(lit("    Unknown: %1").arg(typeUnknown), cl_logWARNING);
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Disk files: %1").arg(typeDisk));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Character devices: %1").arg(typeChar));
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
 }
 #else
 void logOpenedHandleCount()
 {
-	NX_LOG(lit("    Not implemented for this platform"), cl_logWARNING);
+    NX_WARNING(typeid(QnGlobalMonitor), lit("Not implemented for this platform"));
 }
 #endif
 
@@ -278,11 +278,11 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevHddUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. HDD usage:"), cl_logWARNING);
+        NX_WARNING(this, lit("HDD usage:"));
         for( const HddLoad& hddLoad : d->totalHddLoad )
-            NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
-        NX_LOG(lit("MONITORING. File handles:"), cl_logWARNING);
-		logOpenedHandleCount();
+            NX_WARNING(this, lit("%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
+        NX_WARNING(this, lit("File handles:"));
+        logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
         #if defined(__linux__) && defined(MALLOC_STATISTICS)
@@ -292,7 +292,7 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
             FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
             malloc_info(0, memStatStr);
             fclose(memStatStr);
-            NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+            NX_WARNING(this, lit("malloc statistics: \n%1").arg(memStatBuf.data()));
         #endif
     }
 
@@ -309,10 +309,10 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
     //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
     if( d->upTimeTimer.elapsed() - d->prevNetworkUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
     {
-        NX_LOG(lit("MONITORING. Network usage:"), cl_logWARNING);
+        NX_WARNING(this, lit("Network usage:"));
         for( const NetworkLoad& networkLoad : d->totalNetworkLoad )
-            NX_LOG(lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).
-                arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024), cl_logWARNING);
+            NX_WARNING(this, lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).
+                arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024));
         d->prevNetworkUsageLoggingClock = d->upTimeTimer.elapsed();
     }
 
@@ -356,4 +356,9 @@ qint64 QnGlobalMonitor::upTimeMs() const
 {
     Q_D(const QnGlobalMonitor);
     return d->upTimeTimer.elapsed();
+}
+
+void QnGlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
+{
+    d_ptr->base->setServerModule(serverModule);
 }

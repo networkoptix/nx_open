@@ -2,9 +2,13 @@
 
 #include "rest/server/json_rest_handler.h"
 
+class QnServerUpdateTool;
+
 class QnUpdateUnauthenticatedRestHandler: public QnJsonRestHandler
 {
 public:
+    QnUpdateUnauthenticatedRestHandler(QnServerUpdateTool* updateTool);
+
     virtual int executeGet(
         const QString& path,
         const QnRequestParams& params,
@@ -17,4 +21,6 @@ public:
         const QByteArray& body,
         QnJsonRestResult& result,
         const QnRestConnectionProcessor* processor) override;
+private:
+    QnServerUpdateTool* m_updateTool = nullptr;
 };

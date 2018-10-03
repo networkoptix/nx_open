@@ -10,24 +10,24 @@
 #include <nx/streaming/video_data_packet.h>
 #include <core/resource/camera_resource.h>
 
+namespace {
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):
+    static const int kErrorDelayTimeoutMs = 100;
+
+} // namespace
+
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const nx::mediaserver::resource::CameraPtr& dev)
+    :
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {
-}
-
-bool QnClientPullMediaStreamProvider::canChangeStatus() const
-{
-    const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
-    return liveProvider && liveProvider->canChangeStatus();
 }
 
 void QnClientPullMediaStreamProvider::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG2);
+    NX_VERBOSE(this, "stream reader started");
 
     int numberOfChnnels = 1;
 
@@ -53,8 +53,7 @@ void QnClientPullMediaStreamProvider::run()
         }
 
         // If command processor has something in the queue for this resource let it go first
-        if (qnServerModule->resourceCommandProcessor()->hasCommandsForResource(m_resource)
-            || !m_resource->isInitialized())
+        if (!m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;
@@ -62,28 +61,13 @@ void QnClientPullMediaStreamProvider::run()
 
         QnAbstractMediaDataPtr data = getNextData();
 
-        if (data==0)
+        if (data == nullptr)
         {
             setNeedKeyData();
-            mFramesLost++;
-            m_stat[0].onData(0, false);
-            m_stat[0].onEvent(CL_STAT_FRAME_LOST);
-
-            if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure
-            {
-                if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
-                    getResource()->setStatus(Qn::Offline);
-
-                m_stat[0].onLostConnection();
-            }
-
-            if (!needToStop())
-                QnSleep::msleep(30);
-
+            m_stat[0].onEvent(CameraDiagnostics::BadMediaStreamResult());
+            QnSleep::msleep(kErrorDelayTimeoutMs);
             continue;
         }
-
-
 
         if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
         {
@@ -100,16 +84,6 @@ void QnClientPullMediaStreamProvider::run()
         }
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
-
-        if (mFramesLost>0) // we are alive again
-        {
-            if (mFramesLost >= MAX_LOST_FRAME)
-            {
-                m_stat[0].onEvent(CL_STAT_CAMRESETED);
-            }
-
-            mFramesLost = 0;
-        }
 
         if (videoData && needKeyData())
         {
@@ -161,7 +135,7 @@ void QnClientPullMediaStreamProvider::run()
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG2);
+    NX_VERBOSE(this, "stream reader stopped");
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

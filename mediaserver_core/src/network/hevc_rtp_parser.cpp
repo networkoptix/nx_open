@@ -324,7 +324,7 @@ bool HevcParser::handlePacketLoss(
     int previousSequenceNumber,
     int currentSequenceNumber)
 {
-    NX_LOGX("Packet loss detected.", cl_logWARNING);
+    NX_WARNING(this, "Packet loss detected.");
     emit packetLostDetected(previousSequenceNumber, currentSequenceNumber);
     return reset();
 }
@@ -475,7 +475,7 @@ bool HevcParser::handlePaciPacket(
     const uint8_t* payload,
     int payloadLength)
 {
-    NX_LOGX("HEVC PACI RTP packet handling is not implemented yet.", cl_logWARNING);
+    NX_WARNING(this, "HEVC PACI RTP packet handling is not implemented yet.");
     return false;
 }
 

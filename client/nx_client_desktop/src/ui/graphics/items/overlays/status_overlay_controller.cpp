@@ -3,8 +3,9 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <ui/style/skin.h>
+
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
 

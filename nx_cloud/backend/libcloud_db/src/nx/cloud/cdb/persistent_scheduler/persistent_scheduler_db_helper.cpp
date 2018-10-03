@@ -44,7 +44,7 @@ nx::sql::DBResult SchedulerDbHelper::getScheduleData(
 
     if (!scheduleDataQuery.exec())
     {
-        NX_LOG(lit("[Scheduler, db] Failed to fetch schedule data"), cl_logERROR);
+        NX_ERROR(this, lit("[Scheduler, db] Failed to fetch schedule data"));
         return nx::sql::DBResult::ioError;
     }
 
@@ -98,8 +98,8 @@ nx::sql::DBResult SchedulerDbHelper::subscribe(
 
         if (!subscribeQuery.exec())
         {
-            NX_LOG(lit("[Scheduler, db] Failed to insert subscribe info, error: %1")
-                   .arg(subscribeQuery.lastError().text()), cl_logERROR);
+            NX_ERROR(this, lit("[Scheduler, db] Failed to insert subscribe info, error: %1")
+                   .arg(subscribeQuery.lastError().text()));
             return nx::sql::DBResult::ioError;
         }
     }
@@ -117,8 +117,8 @@ nx::sql::DBResult SchedulerDbHelper::unsubscribe(
 
     if (!unsubscribeQuery.exec())
     {
-        NX_LOG(lit("[Scheduler, db] Failed to delete task info, error: %1")
-               .arg(unsubscribeQuery.lastError().text()), cl_logERROR);
+        NX_ERROR(this, lit("[Scheduler, db] Failed to delete task info, error: %1")
+               .arg(unsubscribeQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 

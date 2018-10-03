@@ -252,11 +252,14 @@ class _MediaListener(_Interlocutor):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         super(_MediaListener, self).__init__(sock)
-        _logger.info("Bind socket in %s on %s:%d.", self.__class__.__name__, address, port)
+        _logger.info("%s: bind socket on %s:%d.", self, address, port)
         self._sock.bind((address, port))
-        _logger.info("Listen on socket in %r.", self.__class__.__name__, address, port)
+        _logger.info("%s: listen on socket %s:%d.", self, address, port)
         self._sock.listen(20)  # 6 is used in one of the tests.
         self.new_clients = []
+
+    def __str__(self):
+        return 'MediaListener'
 
     def has_to_recv(self):
         return True

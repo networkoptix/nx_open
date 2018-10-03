@@ -21,7 +21,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
     private platform: any;
     private activeOs: string;
     private routeData: any;
-    private userAuthorized: boolean;
+    private canViewDownloads: boolean;
 
     installers: any;
     downloads: any;
@@ -36,7 +36,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
 
-        this.userAuthorized = false;
+        this.canViewDownloads = false;
         this.downloads = this.configService.config.downloads;
 
         this.downloadsData = {
@@ -114,7 +114,6 @@ export class DownloadComponent implements OnInit, OnDestroy {
     }
 
     private getDownloads () {
-        this.userAuthorized = true;
         // TODO: Commented until we ged rid of AJS
         // this.routeData = this.route.snapshot.data;
 
@@ -167,10 +166,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
         this.account
             .get()
             .then(result => {
-                this.canSeeHistory = result.is_superuser || result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1;
+                this.canSeeHistory = (this.configService.config.publicReleases ||
+                    result.is_superuser ||
+                    result.permissions.indexOf(this.configService.config.permissions.canViewRelease) > -1);
             });
 
-        if (!this.configService.publicDownloads) {
+        if (!this.configService.config.publicDownloads) {
             this.authorizationService
                 .requireLogin()
                 .then(result => {
@@ -179,10 +180,12 @@ export class DownloadComponent implements OnInit, OnDestroy {
                         return;
                     }
 
+                    this.canViewDownloads = true;
                     this.getDownloads();
                 });
 
         } else {
+            this.canViewDownloads = true;
             this.getDownloads();
         }
     }

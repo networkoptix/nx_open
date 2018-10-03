@@ -1,5 +1,4 @@
-#ifndef panoramic_cpull_httpreader_1800
-#define panoramic_cpull_httpreader_1800
+#pragma once
 
 #ifdef ENABLE_ARECONT
 
@@ -44,5 +43,3 @@ protected:
 };
 
 #endif
-
-#endif //cpull_httpreader_1119

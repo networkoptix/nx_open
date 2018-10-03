@@ -16,6 +16,7 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/rule.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class EmailManagerImpl;
 
@@ -86,13 +87,12 @@ private:
 */
 class RuleProcessor:
     public QThread,
-    public Singleton<RuleProcessor>,
-    public QnCommonModuleAware
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    RuleProcessor(QnCommonModule* commonModule);
+    RuleProcessor(QnMediaServerModule* serverModule);
     virtual ~RuleProcessor() override;
 
     void addRule(const vms::event::RulePtr& value);
@@ -227,8 +227,6 @@ private:
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
 };
-
-#define qnEventRuleProcessor nx::mediaserver::event::RuleProcessor::instance()
 
 } // namespace event
 } // namespace mediaserver

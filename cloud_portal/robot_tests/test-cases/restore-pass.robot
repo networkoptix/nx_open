@@ -38,6 +38,26 @@ restores password
     Wait Until Element Is Visible    ${RESET EMAIL SENT MESSAGE}
     Location Should Be    ${url}/restore_password/sent
 
+can still log in if you don't finish the process
+    [tags]    C41873
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register
+    Register    mark    hamill    ${email}    ${password}
+    Activate    ${email}
+    Go To    ${url}/restore_password
+    Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
+    Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
+    Click Button    ${RESET PASSWORD BUTTON}
+    Log In    ${email}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
+    ${link}    Get Email Link    ${email}    restore_password
+    Go To    ${link}
+    Wait Until Elements Are Visible    ${RESET PASSWORD INPUT}    ${SAVE PASSWORD}
+    Log In    ${email}    ${password}
+    Validate Log In
+
 should not allow to access /restore_password/sent /restore_password/success by direct input
     Close Browser
     Open Browser and go to URL    ${url}
@@ -136,7 +156,7 @@ should not allow to use one restore link twice
     Check For Alert Dismissable    ${CANNOT SAVE PASSWORD} ${CODE USED/INCORRECT}
 
 should make not-activated user active by restoring password
-    [tags]    email
+    [tags]    email    C41871
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -216,8 +236,6 @@ Check restore password email links, colors, cloud name, and open link in new tab
     log    ${email text}
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     Check Email Cloud Name    ${email text}    ${PRODUCT NAME}
-    Check for blank target    ${email text}    ${ENV}/restore_password
-
     Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get Links From Email    ${email}
     @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/restore_password

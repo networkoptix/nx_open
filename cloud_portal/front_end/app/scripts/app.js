@@ -40,7 +40,7 @@ window.L = {};
                 responseError: function(error) {
                     if (error.status === 401) {
                         // Session expired - try to trigger browser reload
-                        $rootScope.session.loginState = false;
+                        $rootScope.session.loginState = undefined;
                     }
                     return $q.reject(error);
                 }
@@ -80,8 +80,7 @@ window.L = {};
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
                         previewPath: '',
                         viewsDirCommon: 'static/web_common/views/',
-                        trafficRelayHost: '{host}/gateway/{systemId}',
-                        publicDownloads: false
+                        trafficRelayHost: '{host}/gateway/{systemId}'
                     };
 
                 $.ajax({
@@ -89,18 +88,7 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
-                    angular.extend(CONFIG, appState);
-                });
-
-                $.ajax({
-                    url: 'api/utils/settings',
-                    async: false,
-                    dataType: 'json'
-                }).done(function(response){
-                    appState.trafficRelayHost = response.trafficRelayHost;
-                    appState.publicDownloads = response.publicDownloads;
-                    angular.extend(CONFIG, appState);
+                    angular.extend(CONFIG, response);
                 });
 
                 $.ajax({

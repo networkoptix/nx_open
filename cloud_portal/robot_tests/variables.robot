@@ -11,8 +11,10 @@ ${LANGUAGE DROPDOWN}                  //nx-footer//button[@id='dropdownMenuButto
 ${LANGUAGE TO SELECT}                 //nx-footer//span[@lang='${LANGUAGE}']/..
 ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 
-@{LANGUAGES LIST}                          en_US    en_GB    ru_RU           fr_FR   de_DE    es_ES   hu_HU  zh_CN  zh_TW  ja_JP    ko_KR   tr_TR  th_TH         nl_NL      he_IL  pl_PL  vi_VN
-@{LANGUAGES ACCOUNT TEXT LIST}             Account  Account  Учетная запись  Compte  Account  Cuenta  Fiók   帐户   帳號    アカウント  계정    Hesap   บัญชีผู้ใช้  Account  חשבון    Konto  Tài khoản
+@{LANGUAGES LIST}                        en_US           en_GB           ru_RU               fr_FR         de_DE              es_ES         hu_HU             zh_CN     zh_TW    ja_JP       ko_KR       tr_TR          th_TH         nl_NL            he_IL      pl_PL         vi_VN
+@{LANGUAGES ACCOUNT TEXT LIST}           Account         Account         Учетная запись      Compte        Account            Cuenta        Fiók              帐户      帳號     アカウント      계정         Hesap         บัญชีผู้ใช้  Account         חשבון        Konto         Tài khoản
+@{LANGUAGES CREATE ACCOUNT TEXT LIST}    Create Account  Create Account  Зарегистрироваться  Créer compte  Account erstellen  Crear Cuenta  Fiók létrehozása  创建帐户  新建帳號  アカウント作成  계정 만들기  Hesap oluştur  สร้างบัญชี   Account aanmaken  צור חשבון   Utwórz konto  Tạo tài khoản
+@{USER TYPE LIST}    ${OWNER TEXT}    ${ADMIN TEXT}    ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT
 
 ${BACKDROP}                           //ngb-modal-window
 
@@ -50,7 +52,7 @@ ${ALL SYSTEMS}                        //header//li[contains(@class, 'collapse-se
 ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
-${CREATE ACCOUNT BODY}                //body//a[@href='/register']
+${CREATE ACCOUNT BODY}                //nx-app//a[@href='/register']
 
 #Forgot Password
 ${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
@@ -110,16 +112,20 @@ ${OPEN NX WITNESS BUTTON FROM =}      //button[text()="${OPEN NX WITNESS BUTTON 
 ${EMAIL ALREADY REGISTERED}           //span[@ng-if="registerForm.registerEmail.$error.alreadyExists"]
 
 ${ACCOUNT CREATION SUCCESS}           //h1[@ng-if='(register.success || registerSuccess) && !activated']
-${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
-${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]/following-sibling::h1/a[@href="/login"]
+${ACTIVATION SUCCESS}                 //h1[@ng-if='activate.success && !loading' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]
+${SUCCESS LOG IN BUTTON}              //h1[@ng-if='activate.success && !loading' and contains(text(), "${ACCOUNT SUCCESSFULLY ACTIVATED TEXT}")]/following-sibling::h1/a[@href="/login"]
 #In system settings
+${SYSTEM NAME}                        //h1[@ng-if="gettingSystem.success"]
 ${FIRST USER OWNER}                   //table[@ng-if='system.users.length']/tbody/tr/td[3]/span[contains(text(),"${OWNER TEXT}")]
 ${DISCONNECT FROM NX}                 //button[@ng-click='disconnect()']
 ${RENAME SYSTEM}                      //button[@ng-click='rename()']
 ${RENAME CANCEL}                      //form[@name='renameForm']//button[text()='Cancel']
+${RENAME X BUTTON}                    //form[@name='renameForm']//button[@class='close']
 ${RENAME SAVE}                        //form[@name='renameForm']//button[text()='Save']
 
 ${RENAME INPUT}                       //form[@name='renameForm']//input[@id='systemName']
+${RENAME INPUT WITH ERROR}            //form[@name='renameForm']//input[@id='systemName' and contains(@class,'ng-invalid')]
+${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='input-error' and contains(text(),'${SYSTEM NAME IS REQUIRED TEXT}')]
 
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
@@ -148,7 +154,7 @@ ${DISCONNECT MODAL DISCONNECT BUTTON}    //button[text()='Disconnect ']
 
 ${JUMBOTRON}                          //div[@class='jumbotron']
 ${PROMO BLOCK}                        //div[contains(@class,'promo-block') and not(contains(@class, 'col-sm-4'))]
-${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success' and contains(text(),"${ALREADY ACTIVATED TEXT}")]
+${ALREADY ACTIVATED}                  //h1[@ng-if='!activate.success && !loading' and contains(text(),"${ALREADY ACTIVATED TEXT}")]
 
 #Share Elements (Note: Share and Permissions are the same form so these are the same variables.  Making two just in case they do diverge at some point.)
 ${SHARE MODAL}                        //form[@name='shareForm']
@@ -193,6 +199,17 @@ ${PATCHES TAB}                        //span[@class='tab-heading' and text()='${
 ${BETAS TAB}                          //span[@class='tab-heading' and text()='${BETAS TEXT}']/..
 ${RELEASE NUMBER}                     //div[contains(@class,"active")]//h1/b
 
+#About
+${ABOUT CLOUD NAME}                        //span[contains(@class,'product-name') and text()='${PRODUCT_NAME}']
+
+#Footer
+${FOOTER ABOUT LINK}                 //footer//a[contains(text(),"${ABOUT}")]/span[contains(text(),"${PRODUCT_NAME}")]/..
+${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITATIONS}")]
+${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
+${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
+${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
+${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT TEXT}")]
+
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]
 ${TAKE ME HOME}                       //a[@href='/' and contains(text(), "${TAKE ME HOME TEXT}")]
@@ -232,4 +249,5 @@ ${ESCAPE}                             \\27
 ${ENTER}                              \\13
 ${TAB}                                \\9
 ${SPACEBAR}                           \\32
+${BACKSPACE}                          \\8
 

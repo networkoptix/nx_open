@@ -11,7 +11,7 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
-class IoExecutor: 
+class IoExecutor:
     public QObject,
     public Singleton<IoExecutor>
 {

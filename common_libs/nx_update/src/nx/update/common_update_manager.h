@@ -8,7 +8,7 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
 
-class QnAuthSession;
+struct QnAuthSession;
 
 namespace nx {
 

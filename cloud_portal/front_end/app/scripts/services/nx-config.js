@@ -50,7 +50,9 @@
                     },
                     unavailable: {
                         style: 'badge-default'
-                    }
+                    },
+                    master: 'master',
+                    slave: 'slave'
                 },
                 systemCapabilities: {
                     cloudMerge: 'cloudMerge'

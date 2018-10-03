@@ -19,7 +19,7 @@ class TestOutgoingTransactionSorter:
 {
 public:
     TestOutgoingTransactionSorter(
-        const nx::String& systemId,
+        const std::string& systemId,
         VmsTransactionLogCache* vmsTransactionLogCache,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher)
     :
@@ -62,12 +62,12 @@ public:
         return nx::Buffer();
     }
 
-    virtual const CommandHeader& transactionHeader() const override
+    virtual const CommandHeader& header() const override
     {
         return m_header;
     }
 
-    CommandHeader& transactionHeader()
+    CommandHeader& header()
     {
         return m_header;
     }
@@ -107,9 +107,9 @@ public:
             targetFormat, transportHeader, transactionFormatVersion);
     }
 
-    virtual const CommandHeader& transactionHeader() const override
+    virtual const CommandHeader& header() const override
     {
-        return m_sharedTransaction->transactionHeader();
+        return m_sharedTransaction->header();
     }
 
 private:
@@ -122,7 +122,7 @@ class OutgoingTransactionSorter:
 public:
     OutgoingTransactionSorter():
         m_transactionSorter(
-            QnUuid::createUuid().toSimpleByteArray(),
+            QnUuid::createUuid().toSimpleByteArray().toStdString(),
             &m_transactionCache,
             &m_testOutgoingTransactionDispatcher),
         m_prevSequence(0),
@@ -245,7 +245,7 @@ private:
     void addTransaction(VmsTransactionLogCache::TranId tranId)
     {
         auto transaction = std::make_shared<TestTransaction>(QnUuid::createUuid(), tranId);
-        transaction->transactionHeader().persistentInfo.sequence = ++m_prevSequence;
+        transaction->header().persistentInfo.sequence = ++m_prevSequence;
         m_transactionSorter.addTransaction(
             tranId,
             std::make_unique<TransactionSharedWrapper>(transaction));

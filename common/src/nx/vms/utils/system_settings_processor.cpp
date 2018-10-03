@@ -13,7 +13,7 @@ namespace vms {
 namespace utils {
 
 SystemSettingsProcessor::SystemSettingsProcessor(QnCommonModule* commonModule):
-    m_commonModule(commonModule)
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -32,7 +32,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
     QnSystemSettingsReply reply;
 
     bool dirty = false;
-    const auto& settings = m_commonModule->globalSettings()->allSettings();
+    const auto& settings = commonModule()->globalSettings()->allSettings();
 
     QnRequestParams filteredParams(params);
     filteredParams.remove(lit("auth"));
@@ -51,7 +51,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
             accessRights,
             setting->key());
 
-        writeAllowed &= m_commonModule->resourceAccessManager()->hasGlobalPermission(
+        writeAllowed &= commonModule()->resourceAccessManager()->hasGlobalPermission(
             accessRights,
             GlobalPermission::admin);
 
@@ -77,7 +77,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
             reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
-        m_commonModule->globalSettings()->synchronizeNow();
+        commonModule()->globalSettings()->synchronizeNow();
 
     result->setReply(std::move(reply));
 

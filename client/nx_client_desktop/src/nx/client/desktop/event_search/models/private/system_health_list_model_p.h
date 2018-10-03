@@ -4,15 +4,17 @@
 
 #include <deque>
 
+#include <QtCore/QSet>
+#include <QtWidgets/QAction>
+
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 
+#include <nx/client/desktop/common/utils/command_action.h>
 #include <nx/client/desktop/ui/actions/action_fwd.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class SystemHealthListModel::Private:
     public QObject,
@@ -34,18 +36,23 @@ public:
     QString toolTip(int index) const;
     QPixmap pixmap(int index) const;
     QColor color(int index) const;
+    QnResourceList displayedResourceList(int index) const;
     int helpId(int index) const;
     int priority(int index) const;
     bool locked(int index) const;
-
-    ui::action::IDType action(int index) const;
-    ui::action::Parameters parameters(int index) const;
+    bool isCloseable(int index) const;
+    CommandActionPtr commandAction(int index) const; //< Additional button action with parameters.
+    ui::action::IDType action(int index) const; //< Click-on-tile action id.
+    ui::action::Parameters parameters(int index) const; // Click-on-tile action parameters.
 
     void remove(int first, int count);
 
 private:
-    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QVariant& params);
-    void removeSystemHealthEvent(QnSystemHealth::MessageType message, const QVariant& params);
+    void addItem(QnSystemHealth::MessageType message, const QVariant& params);
+    void removeItem(QnSystemHealth::MessageType message, const QVariant& params);
+    void toggleItem(QnSystemHealth::MessageType message, bool isOn);
+    void updateItem(QnSystemHealth::MessageType message);
+    void updateCachedData(QnSystemHealth::MessageType message);
     void clear();
 
     static int priority(QnSystemHealth::MessageType message);
@@ -64,14 +71,16 @@ private:
 
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType::Count;
         QnResourcePtr resource;
+        vms::event::AbstractActionPtr serverData;
     };
 
 private:
     SystemHealthListModel* const q = nullptr;
     QScopedPointer<vms::event::StringsHelper> m_helper;
     std::deque<Item> m_items; //< Kept sorted.
+    QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
+    QnUserResourceList m_usersWithInvalidEmail;
+    QnVirtualCameraResourceList m_camerasWithDefaultPassword;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

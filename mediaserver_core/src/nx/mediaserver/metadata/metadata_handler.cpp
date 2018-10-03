@@ -14,6 +14,7 @@
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/model_functions.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mediaserver {
@@ -22,18 +23,19 @@ namespace metadata {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-MetadataHandler::MetadataHandler()
+MetadataHandler::MetadataHandler(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
     connect(this, &MetadataHandler::sdkEventTriggered,
-        qnEventRuleConnector, &event::EventConnector::at_analyticsSdkEvent,
+        serverModule->eventConnector(), &event::EventConnector::at_analyticsSdkEvent,
         Qt::QueuedConnection);
 }
 
-nx::api::Analytics::EventType MetadataHandler::eventDescriptor(const QnUuid& eventId) const
+nx::api::Analytics::EventType MetadataHandler::eventTypeDescriptor(const QString& eventTypeId) const
 {
     for (const auto& descriptor: m_manifest.outputEventTypes)
     {
-        if (descriptor.typeId == eventId)
+        if (descriptor.id == eventTypeId)
             return descriptor;
     }
     return nx::api::Analytics::EventType();
@@ -55,9 +57,9 @@ void MetadataHandler::handleMetadata(
 			<< (int) error << "; ignoring";
         return;
 	}
-    
+
     bool handled = false;
-    
+
     nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
         metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)
@@ -65,19 +67,19 @@ void MetadataHandler::handleMetadata(
         handleEventsPacket(std::move(eventsPacket));
         handled = true;
     }
-    
+
     nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
         metadata->queryInterface(IID_ObjectsMetadataPacket));
     if (objectsPacket)
     {
         handleObjectsPacket(std::move(objectsPacket));
         handled = true;
-    }           
-	
+    }
+
 	if (!handled)
     {
         NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
-            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec() 
+            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec()
             << "; ignoring";
     }
 }
@@ -92,7 +94,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
             break;
 
 		++eventsCount;
-		
+
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
@@ -104,7 +106,7 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
             NX_VERBOSE(this) << __func__ << "(): ERROR: Received event does not implement Event";
         }
     }
-	
+
 	if (eventsCount == 0)
         NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
@@ -119,7 +121,7 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
-        object.objectTypeId = fromPluginGuidToQnUuid(item->typeId());
+        object.objectTypeId = item->typeId();
         object.objectId = fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
@@ -157,11 +159,10 @@ void MetadataHandler::handleMetadataEvent(
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
-    const auto eventTypeId =
-        nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->typeId());
+    const auto eventTypeId = eventData->typeId();
     NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-    auto descriptor = eventDescriptor(eventTypeId);
+    auto descriptor = eventTypeDescriptor(eventTypeId);
     if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
     {
         eventState = eventData->isActive()
@@ -182,7 +183,7 @@ void MetadataHandler::handleMetadataEvent(
 
     auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
-        m_manifest.driverId,
+        m_manifest.pluginId,
         eventTypeId,
         eventState,
         eventData->caption(),
@@ -225,17 +226,18 @@ void MetadataHandler::setVisualDebugger(
     m_visualDebugger = visualDebugger;
 }
 
-nx::vms::api::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
+nx::vms::api::EventState MetadataHandler::lastEventState(const QString& eventTypeId) const
 {
-    if (m_eventStateMap.contains(eventId))
-        return m_eventStateMap[eventId];
+    if (m_eventStateMap.contains(eventTypeId))
+        return m_eventStateMap[eventTypeId];
 
     return nx::vms::api::EventState::inactive;
 }
 
-void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState)
+void MetadataHandler::setLastEventState(
+    const QString& eventTypeId, nx::vms::api::EventState eventState)
 {
-    m_eventStateMap[eventId] = eventState;
+    m_eventStateMap[eventTypeId] = eventState;
 }
 
 } // namespace metadata

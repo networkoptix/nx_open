@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 namespace http {
 
-class ClientPool: public QObject, public Singleton<ClientPool>
+class ClientPool: public QObject
 {
     Q_OBJECT
 public:

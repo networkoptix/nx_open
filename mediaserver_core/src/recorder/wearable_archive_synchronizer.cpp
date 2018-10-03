@@ -24,13 +24,13 @@ WearableArchiveSynchronizer::WearableArchiveSynchronizer(QnMediaServerModule* se
     m_workerPool->start();
 
     connect(
-        commonModule()->resourcePool(),
+        resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
         &WearableArchiveSynchronizer::at_resourceAdded);
 
     connect(
-        commonModule()->resourcePool(),
+        resourcePool(),
         &QnResourcePool::resourceRemoved,
         this,
         &WearableArchiveSynchronizer::at_resourceRemoved);
@@ -45,7 +45,7 @@ WearableArchiveSynchronizer::~WearableArchiveSynchronizer()
 
 int WearableArchiveSynchronizer::maxSynchronizationThreads() const
 {
-    auto maxThreads = qnGlobalSettings->maxWearableArchiveSynchronizationThreads();
+    auto maxThreads = globalSettings()->maxWearableArchiveSynchronizationThreads();
     if (maxThreads > 0)
         return maxThreads;
 

@@ -58,6 +58,7 @@ class TimeSyncManager: public AbstractTimeSyncManager, public QnCommonModuleAwar
 {
     Q_OBJECT
 public:
+    static const std::chrono::milliseconds kMaxJitterForLocalClock;
 
     static const QString kTimeSyncUrlPath;
 

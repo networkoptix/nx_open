@@ -1,6 +1,6 @@
-#ifndef _HARDWARE_ID_PVT_H_
-#define _HARDWARE_ID_PVT_H_
+#pragma once
 
+#include <QtCore/QSettings>
 #include "licensing/hardware_info.h"
 
 namespace LLUtil {
@@ -36,7 +36,5 @@ void calcHardwareIds(HardwareIdListForVersion& macHardwareIds, const QnHardwareI
 void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility);
 
 QStringList getMacAddressList(const QnMacAndDeviceClassList& devices);
-QString saveMac(const QStringList& macs, QSettings *settings);
+QString saveMac(const QStringList& macs, QSettings* settings);
 }
-
-#endif // _HARDWARE_ID_PVT_H_

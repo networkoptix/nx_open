@@ -1,5 +1,4 @@
-#ifndef isd_STREAM_REDER_H__1914
-#define isd_STREAM_REDER_H__1914
+#pragma once
 
 #ifdef ENABLE_ISD
 
@@ -38,4 +37,3 @@ private:
 };
 
 #endif // #ifdef ENABLE_ISD
-#endif // isd_STREAM_REDER_H__1914

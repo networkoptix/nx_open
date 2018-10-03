@@ -104,7 +104,7 @@ bool ProxyConnectionProcessor::isProxyForCamera(
 bool ProxyConnectionProcessor::isProtocol(const QString& protocol) const
 {
 	return nx::network::http::isUrlSheme(protocol)
-		|| nx_rtsp::isUrlSheme(protocol);
+		|| nx::network::rtsp::isUrlSheme(protocol);
 }
 
 int ProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
@@ -143,7 +143,7 @@ bool ProxyConnectionProcessor::doProxyData(
 		{
 			if( SystemError::getLastOSErrorCode() == SystemError::interrupted )
 				continue;   //retrying interrupted call
-			NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+            NX_DEBUG(this, lit("doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()));
 			return false;
 		}
 		if( sended == 0 )

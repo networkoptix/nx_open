@@ -1088,8 +1088,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (m_widgets.size() >= maxItems)
     {
-        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
-            .arg(maxItems), cl_logDEBUG1);
+        NX_DEBUG(this, lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
+            .arg(maxItems));
         qnDeleteLater(item);
         return false;
     }
@@ -2481,7 +2481,7 @@ void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, con
 
 bool QnWorkbenchDisplay::canShowLayoutBackground() const
 {
-    if (qnRuntime->isActiveXMode())
+    if (qnRuntime->isAcsMode())
         return false;
 
     if (m_lightMode & Qn::LightModeNoLayoutBackground)

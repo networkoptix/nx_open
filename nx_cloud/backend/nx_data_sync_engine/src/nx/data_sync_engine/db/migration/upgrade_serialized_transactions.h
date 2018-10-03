@@ -75,9 +75,8 @@ nx::sql::DBResult upgradeSerializedTransactions(
         )sql");
     if (!fetchCurrentTransactions.exec())
     {
-        NX_LOG(lm("Error fetching transactions. %1")
-            .arg(fetchCurrentTransactions.lastError().text()),
-            cl_logWARNING);
+        NX_WARNING(this, lm("Error fetching transactions. %1")
+            .arg(fetchCurrentTransactions.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
@@ -101,9 +100,8 @@ nx::sql::DBResult upgradeSerializedTransactions(
         newTransaction.writeTo(&saveUpdatedTransactionQuery);
         if (!saveUpdatedTransactionQuery.exec())
         {
-            NX_LOG(lm("Error saving new transaction to DB. %1")
-                .arg(saveUpdatedTransactionQuery.lastError().text()),
-                cl_logWARNING);
+            NX_WARNING(this, lm("Error saving new transaction to DB. %1")
+                .arg(saveUpdatedTransactionQuery.lastError().text()));
             return nx::sql::DBResult::ioError;
         }
     }

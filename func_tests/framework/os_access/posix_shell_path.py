@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractproperty
 from functools import wraps
 
+import parse
 from pathlib2 import PurePosixPath
 
 from framework.os_access import exceptions
 from framework.os_access.path import FileSystemPath
-from framework.os_access.posix_shell import PosixShell
+from framework.os_access.posix_shell import Shell
 
 
 def _raising_on_exit_status(exit_status_to_error_cls):
@@ -37,7 +38,7 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
     and will live until those objects live.
     """
     __metaclass__ = ABCMeta
-    _shell = abstractproperty()  # type: PosixShell # PurePath's manipulations can preserve only the type.
+    _shell = abstractproperty()  # type: Shell # PurePath's manipulations can preserve only the type.
 
     @classmethod
     def specific_cls(cls, posix_shell):
@@ -48,13 +49,13 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def home(cls):
-        return cls(cls._shell.run_sh_script('echo ~').rstrip())
+        # Returning `echo ~` output doesn't work since tests may me run in environment with no
+        # `$HOME` env var, e.g. under `tox`, where `~` is not expanded by shell.
+        return cls('~').expanduser()
 
     @classmethod
     def tmp(cls):
-        temp_dir = cls('/tmp/func_tests')
-        temp_dir.mkdir(parents=True, exist_ok=True)
-        return temp_dir
+        return cls('/tmp/func_tests')
 
     def __repr__(self):
         return '<PosixShellPath {!s} on {!r}>'.format(self, self._shell)
@@ -83,12 +84,13 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         if not self.parts[0].startswith('~'):
             return self
         if self.parts[0] == '~':
-            return self.home().joinpath(*self.parts[1:])
-        user_name = self.parts[0][1:]
+            user_name = self._shell.command(['whoami']).run().rstrip('\n')
+        else:
+            user_name = self.parts[0][1:]
         output = self._shell.run_command(['getent', 'passwd', user_name])
         if not output:
             raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
-        user_home_dir = output.split(':')[6]
+        user_home_dir = output.split(':')[5]
         return self.__class__(user_home_dir, *self.parts[1:])
 
     @_raising_on_exit_status({2: exceptions.DoesNotExist, 3: exceptions.NotADir})
@@ -115,14 +117,14 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
                     ancestor="$(dirname "$ancestor")"
                 done
                 test ! -d "$ancestor" && >&2 echo "not a dir: $ancestor" && exit 2
-                test "$ancestor" = "$DIR" -a $EXIST_OK = true && exit 0 
+                test "$ancestor" = "$DIR" -a $EXIST_OK = true && exit 0
                 test "$ancestor" = "$DIR" && >&2 echo "dir exists: $DIR" && exit 3
                 if [ "$ancestor" = "$(dirname "$DIR")" ]; then
                     mkdir -v -- "$DIR"
                 else
                     if [ $PARENTS = true ]; then
                         mkdir -vp -- "$DIR"
-                    else 
+                    else
                         >&2 echo "does not exist: $(dirname "$DIR")"
                         exit 4
                     fi
@@ -197,6 +199,19 @@ class PosixShellPath(FileSystemPath, PurePosixPath):
         bytes_written = self.write_bytes(data)
         assert bytes_written == len(data)
         return len(text)
+
+    def size(self):
+        command = self._shell.command(['stat', '--printf=%s\\n%F', self])
+        try:
+            output = command.run()
+        except exceptions.exit_status_error_cls(1) as e:
+            if b'No such file or directory' not in e.stderr:
+                raise
+            raise exceptions.DoesNotExist("{} fails with {}".format(command, e.stderr))
+        size, file_type = parse.parse(u'{:d}\n{}', output.decode('ascii'))
+        if file_type != u'regular file':
+            raise exceptions.NotAFile("{} reports {}".format(command, output))
+        return size
 
     def copy_to(self, destination):
         self._shell.copy_posix_file_to(self, destination)

@@ -13,13 +13,32 @@ from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPor
 from framework.port_check import port_is_open
 from framework.vms.hypervisor import VMAlreadyExists, VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
-from framework.switched_logging import with_logger
-from framework.waiting import wait_for_true
+from framework.waiting import wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
 _DEFAULT_QUICK_RUN_TIMEOUT_SEC = 10
-_INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
+
+## This NIC is used for
+# - remote OS setup,
+# - working with remote filesystem,
+# - installing Mediaserver.
+#
+# Ports are forwarded to this NIC.
+_MANAGEMENT_NIC_INDEX = 1
+
+## This NIC is used for connections initiated from within VM, e.g. when tests runner is serving
+# data by HTTP and Mediaserver is downloading it. Such traffic goes through other NIC to make it
+# possible to limit it by means of VirtualBox.
+_HOST_CONNECTION_NIC_INDEX = 2
+
+## Others are used to combine VMs into internal networks. These are unplugged before every test.
+_INTERNAL_NIC_INDICES = [3, 4, 5, 6, 7, 8]
+
+## All NIC indices. Currently used only to setup MAC addresses of the newly cloned VM.
+# Theoretically, some NICs may not be used at all bur their indices should be listed here to get
+# non-random MAC address.
+_ALL_NIC_INDICES = [_MANAGEMENT_NIC_INDEX, _HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES
 
 
 class VirtualBoxError(Exception):
@@ -126,23 +145,6 @@ class _VirtualBoxVm(VmHardware):
                 break
 
     @staticmethod
-    def _parse_host_address(raw_dict):
-        try:
-            nat_network_1_value = raw_dict['natnet1']
-        except KeyError:
-            _logger.info("NIC 1 is not set to NAT.")
-            return None
-        if nat_network_1_value != 'nat':
-            nat_network = IPNetwork(nat_network_1_value)
-        else:
-            # See: https://www.virtualbox.org/manual/ch09.html#idm8375
-            nat_nic_index = 1
-            nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
-        host_address_from_vm = nat_network.ip + 2
-        _logger.debug("Host IP network: %s.", nat_network)
-        return host_address_from_vm
-
-    @staticmethod
     def _parse_macs(raw_dict):
         for nic_index in _INTERNAL_NIC_INDICES:
             try:
@@ -161,7 +163,7 @@ class _VirtualBoxVm(VmHardware):
             if nic_type == 'null':
                 yield nic_index
 
-    def __init__(self, virtual_box, name):
+    def __init__(self, virtual_box, name):  # type: (VirtualBox, str) -> None
         raw_output = virtual_box.manage(['showvminfo', name, '--machinereadable'])
         _logger.debug("Parse raw VM info of %s.", name)
         raw_dict = OrderedDict(_VmInfoParser(raw_output))
@@ -169,19 +171,13 @@ class _VirtualBoxVm(VmHardware):
         is_running = raw_dict['VMState'] == 'running'
         _logger.debug('VM %s: %s', name, 'running' if is_running else 'stopped')
         cls = self.__class__
-        host_address = cls._parse_host_address(raw_dict)
-        _logger.debug("VM %s: host IP address: %s.", name, host_address)
         self._port_forwarding = list(cls._parse_port_forwarding(raw_dict))
         _logger.debug("VM %s: forwarded ports:\n%s", name, pformat(self._port_forwarding))
-        if host_address is None:
-            assert not self._port_forwarding
-            ports_map = ReciprocalPortMap(OneWayPortMap.empty(), OneWayPortMap.empty())
-        else:
-            ports_map = ReciprocalPortMap(
-                OneWayPortMap.forwarding({
-                    (port.protocol, port.guest_port): port.host_port
-                    for port in self._port_forwarding}),
-                OneWayPortMap.direct(host_address))
+        ports_map = ReciprocalPortMap(
+            OneWayPortMap.forwarding({
+                (port.protocol, port.guest_port): port.host_port
+                for port in self._port_forwarding}),
+            OneWayPortMap.direct(virtual_box.runner_address))
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         try:
@@ -214,7 +210,7 @@ class _VirtualBoxVm(VmHardware):
 
     def setup_mac_addresses(self, make_mac):
         modify_command = ['modifyvm', self.name]
-        for nic_index in [1] + _INTERNAL_NIC_INDICES:
+        for nic_index in _ALL_NIC_INDICES:
             raw_mac = make_mac(nic_index=nic_index)
             mac = EUI(raw_mac, dialect=mac_bare)
             modify_command.append('--macaddress{}={}'.format(nic_index, mac))
@@ -264,7 +260,7 @@ class _VirtualBoxVm(VmHardware):
             if not already_on_ok:
                 raise
             return
-        wait_for_true(self.is_on, logger=_logger.getChild('wait'))
+        wait_for_truthy(self.is_on, logger=_logger.getChild('wait'))
 
     def power_off(self, already_off_ok=False):
         _logger.info('Powering off %s', self)
@@ -276,7 +272,7 @@ class _VirtualBoxVm(VmHardware):
             if not already_off_ok:
                 raise
             return
-        wait_for_true(self.is_off, logger=_logger.getChild('wait'))
+        wait_for_truthy(self.is_off, logger=_logger.getChild('wait'))
 
     def plug_internal(self, network_name):
         slot = self._find_vacant_nic()
@@ -294,6 +290,36 @@ class _VirtualBoxVm(VmHardware):
         for nic_index in self.macs.keys():
             self._manage_nic(nic_index, 'nic', 'null')
 
+    def limit_bandwidth(self, speed_limit_kbit):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > The limits for each group can be changed while the VM is running, with changes being
+        picked up immediately. The example below changes the limit for the group created in the
+        example above to 100 Kbit/s:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set Limit --limit 100k
+        ```
+
+        In `./configure-vm.sh`, each NIC gets its own bandwidth group, `network1`, `network2`...
+        """
+        for nic_index in [_HOST_CONNECTION_NIC_INDEX] + _INTERNAL_NIC_INDICES:
+            self._virtual_box.manage([
+                'bandwidthctl', self.name,
+                'set', 'network{}'.format(nic_index),
+                '--limit', '{}k'.format(speed_limit_kbit)])
+
+    def reset_bandwidth(self):
+        """See: https://www.virtualbox.org/manual/ch06.html#network_bandwidth_limit:
+
+        > It is also possible to disable shaping for all adapters assigned to a bandwidth group
+        while VM is running, by specifying the zero limit for the group. For example, for the
+        bandwidth group named "Limit" use:
+        ```{.sh}
+        VBoxManage bandwidthctl "VM name" set Limit --limit 0
+        ```
+        """
+        self.limit_bandwidth(0)
+
     def _manage_nic(self, nic_index, command, *arguments):
         if self._is_running:
             prefix = ['controlvm', self.name, command + str(nic_index)]
@@ -305,40 +331,59 @@ class _VirtualBoxVm(VmHardware):
         """Between each yield, try something to bring VM up."""
         # Normal operation.
         if not self._is_running:
-            _logger.debug("VM powered off. Power on.")
+            _logger.debug("Recover %r: powered off. Power on.", self)
             self.power_on()
-            _logger.debug("Allow %d sec.", power_on_timeout_sec)
+            _logger.debug("Recover %r: allow %d sec.", self, power_on_timeout_sec)
             yield power_on_timeout_sec
-            _logger.warning("Allow %d sec as it may be a first run.", power_on_timeout_sec)
+            _logger.warning("Recover %r: allow %d sec: first run?", self, power_on_timeout_sec)
             yield power_on_timeout_sec
         else:
-            _logger.debug("VM powered on. Expect response on first attempt.")
+            _logger.debug("Recover %r: powered on, expect response on first attempt.", self)
             yield 0
-        _logger.warning("Check port forwarding. Sometimes VirtualBox doesn't open ports.")
+        _logger.warning("Recover %r: VirtualBox might not open ports, check it.", self)
         for port in self._port_forwarding:
             if not port_is_open(port.protocol, '127.0.0.1', port.host_port):
                 self._manage_nic(1, 'natpf', 'delete', port.tag)
                 self._manage_nic(1, 'natpf', port.conf())
-        _logger.debug("Allow 10 sec to setup port forwarding.")
+        _logger.debug("Recover %r: allow 10 sec: setting up port forwarding.", self)
         yield 10
-        _logger.warning("It may be \"Can't allocate mbuf\" -- check logs.")
+        _logger.warning("Recover %r: got \"Can't allocate mbuf\" in logs?", self)
         self._manage_nic(1, 'nic', 'null')
         self._manage_nic(1, 'nic', 'nat')
-        _logger.debug("Allow 30 sec to setup network adapter.")
+        _logger.debug("Recover %r: allow 30 sec: setting up network adapter.", self)
         yield 30
-        _logger.warning("Reason unknown, try reboot.")
+        _logger.warning("Recover %r: reason unknown, try reboot.", self)
         self.power_off()
         self.power_on()
-        _logger.warning("Allow %d sec to boot.", power_on_timeout_sec)
+        _logger.warning("Recover %r: allow %d sec: booting.", self, power_on_timeout_sec)
         yield power_on_timeout_sec
-        raise VmUnresponsive("After number of recovery attempts, VM is not up.")
+        raise VmUnresponsive("Recover %r: couldn't recover.".format(self))
 
 
 class VirtualBox(Hypervisor):
     """Interface for VirtualBox as hypervisor."""
 
-    def __init__(self, host_os_access):
-        super(VirtualBox, self).__init__(host_os_access)
+    ## Network for management. Host, as it's seen from VMs, is the part of this network and its
+    # address, as seen from VMs, is in this network. Host has a special address in NAT network, it
+    # is `(net & mask) + 2`. See: https://www.virtualbox.org/manual/ch09.html#idm8375.
+    #
+    # Network address is set in `./configure-vm.sh`.
+    #
+    # For connections that are initiated from VM,
+    # other NIC is used to make it possible to control traffic by the means of VirtualBox.
+    _nat_subnet = IPNetwork('192.168.253.0/24')
+
+    def __init__(self, host_os_access, runner_address):
+        """Create VirtualBox hypervisor.
+        @param runner_address: Address of machine this process is running on as seen from machine
+            VirtualBox is working on. If it's the same machine, and the address of the machine is
+            referred to as a local loopback (127.0.0.1), the address has to be changed to the
+            address, by which VMs can access the machine. Otherwise, the address should be
+            accessible from VMs.
+        """
+        if runner_address.is_loopback():
+            runner_address = self.__class__._nat_subnet.ip + 2
+        super(VirtualBox, self).__init__(host_os_access, runner_address)
 
     def import_vm(self, vm_image_path, vm_name):
         self.manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)

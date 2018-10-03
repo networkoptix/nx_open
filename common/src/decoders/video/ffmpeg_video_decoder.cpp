@@ -231,7 +231,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-    NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
+    NX_VERBOSE(this, QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"));
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
@@ -400,7 +400,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         {
             if (!isImage) {
                 // try to decode in QT for still image
-                NX_LOG(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+                NX_WARNING(this, QLatin1String("decoder not found: m_codec = 0"));
                 return false;
             }
         }

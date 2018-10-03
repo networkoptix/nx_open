@@ -83,10 +83,10 @@ void MediaserverEndpointTesterBase::ping(
 
         if (auto connection = collector->connection.lock())
         {
-            NX_LOGX(lit("Peer %1.%2 succesfully pinged %3")
+            NX_DEBUG(this, lit("Peer %1.%2 succesfully pinged %3")
                 .arg(QString::fromUtf8(mediaserverData.systemId))
                 .arg(QString::fromUtf8(mediaserverData.serverId))
-                .arg(containerString(collector->endpoints)), cl_logDEBUG1);
+                .arg(containerString(collector->endpoints)));
 
             network::stun::Message response(network::stun::Header(
                 network::stun::MessageClass::successResponse, method,
@@ -147,8 +147,8 @@ void MediaserverEndpointTester::pingServer(
 
             if (!httpClient->hasRequestSucceeded())
             {
-                NX_LOGX(lit("Response from %1 has failed")
-                    .arg(address.toString()), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Response from %1 has failed")
+                    .arg(address.toString()));
                 return onPinged(std::move(address), false);
             }
 
@@ -156,8 +156,8 @@ void MediaserverEndpointTester::pingServer(
             const auto error = scanResponseForErrors(buffer, expectedId);
             if (!error.isEmpty())
             {
-                NX_LOGX(lit("Response from %1 has error: %2")
-                    .arg(address.toString()).arg(error), cl_logDEBUG1);
+                NX_DEBUG(this, lit("Response from %1 has error: %2")
+                    .arg(address.toString()).arg(error));
                 return onPinged(std::move(address), false);
             }
             onPinged(std::move(address), true);

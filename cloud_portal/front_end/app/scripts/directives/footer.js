@@ -18,13 +18,6 @@
             templateUrl: CONFIG.viewsDir + 'components/footer.html',
             link       : function (scope) {
                 scope.viewFooter = true;
-                scope.canViewHistory = false;
-                account.get().then(function (account) {
-                    user = account;
-                    if (user.permissions.indexOf('can_view_release') > -1) {
-                        scope.canViewHistory = true;
-                    }
-                });
 
                 $rootScope.$on('nx.layout.footer', function (evt, state) {
                     // An event to control visibility of the footer

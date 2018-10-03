@@ -4,10 +4,8 @@ Measure system synchronization time.
 """
 
 import datetime
-import logging
 from collections import namedtuple
 from contextlib import contextmanager
-from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
@@ -20,13 +18,16 @@ import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
+from framework.message_bus import message_bus_running
 from framework.merging import merge_systems
-from framework.utils import GrowingSleep
-from memory_usage_metrics import load_host_memory_usage
+from framework.context_logger import ContextLogger, context_logger
+from framework.utils import GrowingSleep, with_traceback
+from system_load_metrics import load_host_memory_usage
 
-pytest_plugins = ['fixtures.unpacked_mediaservers']
+pytest_plugins = ['system_load_metrics', 'fixtures.unpacked_mediaservers']
 
-_logger = logging.getLogger(__name__)
+_logger = ContextLogger(__name__)
+
 
 SET_RESOURCE_STATUS_CMD = '202'
 
@@ -41,11 +42,16 @@ def config(test_config):
         USERS_PER_SERVER=1,
         PROPERTIES_PER_CAMERA=5,
         MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
+        MESSAGE_BUS_TIMEOUT=datetime.timedelta(seconds=10),
+        MESSAGE_BUS_SERVER_COUNT=5,
         HOST_LIST=None,  # use vm servers by default
         )
 
 
 # resource creation  ================================================================================
+
+_create_test_data_logger = _logger.getChild('create_test_data')
+
 
 def create_resources_on_server_by_size(server, api_method, resource_generators, size):
     sequence = [(server, i) for i in range(size)]
@@ -67,7 +73,7 @@ def create_resources_on_server(server, api_method, resource_generators, sequence
         resources.append((server, resource_data))
     duration = utils.datetime_utc_now() - start_time
     requests = len(sequence)
-    _logger.info('%r ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
+    _create_test_data_logger.info('%s ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
         server, api_method, requests, duration, req_duration, duration / requests, req_duration / requests))
     return resources
 
@@ -78,19 +84,12 @@ def get_server_admin(server):
     return admins[0]
 
 
-def with_traceback(fn):
-    @wraps(fn)  # critical for VMFactory.map to work
-    def wrapper(*args, **kw):
-        try:
-            return fn(*args, **kw)
-        except Exception:
-            _logger.exception('Exception in %r:', fn)
-            raise
-    return wrapper
-
-
 @with_traceback
-def create_test_data_on_server((config, server, index)):
+@context_logger(_create_test_data_logger, 'framework.http_api')
+@context_logger(_create_test_data_logger, 'framework.mediaserver_api')
+def create_test_data_on_server(server_tuple):
+    config, server, index = server_tuple
+    _logger.info('Create test data on server %s:', server)
     resource_generators = dict(
         saveCamera=resource_test.SeedResourceWithParentGenerator(
             generator.generate_camera_data,
@@ -121,6 +120,7 @@ def create_test_data_on_server((config, server, index)):
     create_resources_on_server(server, 'saveLayout', resource_generators, users)
     create_resources_on_server(server, 'saveCameraUserAttributes', resource_generators, cameras)
     create_resources_on_server(server, 'setResourceParams', resource_generators, cameras)
+    _logger.info('Create test data on server %s: complete.', server)
 
 
 def create_test_data(config, servers):
@@ -203,6 +203,7 @@ def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, mes
 
 
 def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
+    _logger.info('Wait for method %r results are merged:', api_method)
     growing_delay = GrowingSleep()
     api_call_start_time = utils.datetime_utc_now()
     while True:
@@ -225,9 +226,11 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
 
         first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
         if not first_unsynced_server:
-            _logger.info('%s merge duration: %s' % (api_method,
-                                                    utils.datetime_utc_now() - api_call_start_time))
+            _logger.info(
+                'Wait for method %r results are merged: done, method merge duration: %s',
+                api_method, utils.datetime_utc_now() - api_call_start_time)
             return
+        _logger.info('Method %r is still different for %d servers.', api_method, len(env.all_server_list))
         if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
             _logger.info(
                 'Servers %s and %s still has unmatched results for method %r:',
@@ -240,18 +243,27 @@ def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
         growing_delay.sleep()
 
 
-def wait_for_data_merged(artifact_factory, merge_timeout, env):
-    api_methods_to_check = [
-        # 'getMediaServersEx',  # The only method to debug/check if servers are actually able to merge.
-        'ec2/getUsers',
-        'ec2/getStorages',
-        'ec2/getLayouts',
-        'ec2/getCamerasEx',
-        'ec2/getFullInfo',
-        'ec2/getTransactionLog',
-        ]
-    for api_method in api_methods_to_check:
-        wait_for_method_matched(artifact_factory, merge_timeout, env, api_method)
+def wait_until_no_transactions_from_servers(server_list, timeout):
+    _logger.info('Wait for message bus for %s:', server_list)
+    with message_bus_running(server_list) as bus:
+        bus.wait_until_no_transactions(timeout.total_seconds())
+    _logger.info('No more transactions from %s:', server_list)
+
+
+_merge_logger = _logger.getChild('merge')
+
+
+@context_logger(_merge_logger, 'framework.waiting')
+@context_logger(_merge_logger, 'framework.http_api')
+@context_logger(_merge_logger, 'framework.mediaserver_api')
+def wait_for_servers_synced(artifact_factory, config, env):
+    wait_until_no_transactions_from_servers(env.real_server_list[:1], config.MESSAGE_BUS_TIMEOUT)
+    real_server_count = len(env.real_server_list)
+    if real_server_count > config.MESSAGE_BUS_SERVER_COUNT:
+        server_list = [env.real_server_list[i]
+                           for i in range(1, real_server_count, real_server_count/config.MESSAGE_BUS_SERVER_COUNT)]
+        wait_until_no_transactions_from_servers(server_list, config.MESSAGE_BUS_TIMEOUT)
+    wait_for_method_matched(artifact_factory, config.MERGE_TIMEOUT, env, api_method='ec2/getTransactionLog')
 
 
 def collect_additional_metrics(metrics_saver, os_access_set, lws):
@@ -351,18 +363,29 @@ def env(request, unpacked_mediaserver_factory, config):
         yield request.getfixturevalue('vm_env')
 
 
-def test_scalability(artifact_factory, metrics_saver, config, env):
+_post_check_logger = _logger.getChild('post_check')
+
+@context_logger(_post_check_logger, 'framework.http_api')
+@context_logger(_post_check_logger, 'framework.mediaserver_api')
+def perform_post_checks(env):
+    _logger.info('Perform test post checks:')
+    if env.real_server_list[0].api.is_online():
+        settings = env.real_server_list[0].api.get_system_settings()  # log final settings
+        assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+    _logger.info('Perform test post checks: done.')
+
+
+def test_scalability(artifact_factory, metrics_saver, load_averge_collector, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        wait_for_data_merged(artifact_factory, config.MERGE_TIMEOUT, env)
+        with load_averge_collector():
+            wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
     finally:
-        if env.real_server_list[0].api.is_online():
-            settings = env.real_server_list[0].api.get_system_settings()  # log final settings
-            assert utils.str_to_bool(settings['autoDiscoveryEnabled']) is False
+        perform_post_checks(env)
 
     for server in env.real_server_list:
         assert not server.installation.list_core_dumps()

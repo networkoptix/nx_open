@@ -18,13 +18,15 @@
 #include <rest/server/rest_connection_processor.h>
 
 
-namespace aux {
+namespace {
+
 QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
 {
     QnStorageStatusReply reply;
     reply.status = storage->initOrUpdate();
     reply.storage.url  = storage->getUrl();
     reply.storage = QnStorageSpaceData(storage, false);
+    reply.storage.storageStatus = QnStorageManager::storageStatus(storage);
 
     QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
     if (fileStorage)
@@ -44,20 +46,31 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     return reply;
 }
 
-QnStorageResourcePtr getOrCreateStorage(QnCommonModule* commonModule, const QString& storageUrl)
+} // namespace
+
+QnStorageStatusRestHandler::QnStorageStatusRestHandler(QnMediaServerModule* serverModule):
+    nx::mediaserver::ServerModuleAware(serverModule)
 {
-    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
+}
+
+QnStorageResourcePtr QnStorageStatusRestHandler::getOrCreateStorage(
+    const QString& storageUrl) const
+{
+    QnStorageResourcePtr storage =
+        serverModule()->normalStorageManager()->getStorageByUrlExact(storageUrl);
     if (!storage)
-        storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
+        storage = serverModule()->backupStorageManager()->getStorageByUrlExact(storageUrl);
 
     if (!storage)
-        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule, storageUrl, false));
+    {
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(
+            serverModule()->commonModule(), storageUrl, false));
+    }
 
     if (storage)
         storage->setUrl(storageUrl);
 
     return storage;
-}
 }
 
 int QnStorageStatusRestHandler::executeGet(
@@ -69,12 +82,12 @@ int QnStorageStatusRestHandler::executeGet(
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
-    auto storage = aux::getOrCreateStorage(owner->commonModule(), storageUrl);
+    auto storage = getOrCreateStorage(storageUrl);
     if (!storage)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
-    result.setReply(aux::createReply(storage));
+    result.setReply(createReply(storage));
     return nx::network::http::StatusCode::ok;
 }

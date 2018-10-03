@@ -19,15 +19,15 @@ public:
 
     static const int MAX_STREAMS = 2;
 
-    QnDesktopCameraResource();
-    QnDesktopCameraResource(const QString &userName);
+    QnDesktopCameraResource(QnMediaServerModule* serverModule);
+    QnDesktopCameraResource(QnMediaServerModule* serverModule, const QString &userName);
     ~QnDesktopCameraResource();
 
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
 
-    virtual bool setRelayOutputState(const QString& outputID, bool activate,
+    virtual bool setOutputPortState(const QString& outputID, bool activate,
         unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

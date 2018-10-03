@@ -22,12 +22,14 @@ using namespace nx;
 //-------------------------------------------------------------------------------------------------
 // QnMultiserverEventsRestHandler::Private
 
-class QnMultiserverEventsRestHandler::Private
+class QnMultiserverEventsRestHandler::Private: public nx::mediaserver::ServerModuleAware
 {
     using MultiData = std::vector<vms::event::ActionDataList>;
 
 public:
-    Private(const QString& urlPath): urlPath(urlPath)
+    Private(QnMediaServerModule* serverModule, const QString& urlPath):
+        nx::mediaserver::ServerModuleAware(serverModule),
+        urlPath(urlPath)
     {
     }
 
@@ -66,7 +68,7 @@ public:
 private:
     void getEventsLocal(MultiData& outputData, RequestContext* context)
     {
-        vms::event::ActionDataList actions = qnServerDb->getActions(context->request().filter,
+        vms::event::ActionDataList actions = serverDb()->getActions(context->request().filter,
             context->request().order, context->request().limit);
 
         if (actions.empty())
@@ -91,7 +93,9 @@ private:
 
                 if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
                 {
-                    remoteData = QnUbjson::deserialized(msgBody, remoteData, &success);
+                    auto reply = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), &success);
+                    NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
+                    remoteData = reply.deserialized<vms::event::ActionDataList>(&success);
                     NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
                 }
 
@@ -129,8 +133,10 @@ private:
 //-------------------------------------------------------------------------------------------------
 // QnMultiserverEventsRestHandler
 
-QnMultiserverEventsRestHandler::QnMultiserverEventsRestHandler(const QString& path):
-    d(new Private(path))
+QnMultiserverEventsRestHandler::QnMultiserverEventsRestHandler(
+    QnMediaServerModule* serverModule, const QString& path)
+    :
+    d(new Private(serverModule, path))
 {
 }
 

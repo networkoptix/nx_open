@@ -71,18 +71,18 @@ boost::optional<Event> BytestreamFilter::createEvent(
 {
     using namespace nx::api;
 
-    auto eventTypeId = m_manifest.eventTypeByName(eventSource);
+    auto eventTypeId = m_manifest.eventTypeIdByName(eventSource);
     if (eventTypeId.isNull())
         return boost::none;
-    const auto eventDescriptor = m_manifest.eventDescriptorById(eventTypeId);
+    const auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(eventTypeId);
 
     Event event;
-    event.typeId = nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122());
+    event.typeId = eventTypeId;
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
     event.isActive = isEventActive(eventState);  //< Event start/stop.
     if (!event.isActive
-        && !eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+        && !eventTypeDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
     {
         return {};
     }

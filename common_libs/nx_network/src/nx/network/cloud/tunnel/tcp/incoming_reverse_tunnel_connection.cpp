@@ -62,7 +62,7 @@ void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
                 return handler(SystemError::notConnected, nullptr);
 
             m_acceptHandler = std::move(handler);
-            NX_LOGX(lm("Monitor sockets(%1) on accept").container(m_sockets), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Monitor sockets(%1) on accept").container(m_sockets));
             for (auto it = m_sockets.begin(); it != m_sockets.end(); ++it)
                 monitorSocket(it);
         });
@@ -77,8 +77,8 @@ void IncomingReverseTunnelConnection::stopWhileInAioThread()
 
 void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 {
-    NX_LOGX(lm("There are %1 connector(s) and %2 socket(s) against %3 pool size")
-        .args(m_connectors.size(), m_sockets.size(), m_expectedPoolSize), cl_logDEBUG1);
+    NX_DEBUG(this, lm("There are %1 connector(s) and %2 socket(s) against %3 pool size")
+        .args(m_connectors.size(), m_sockets.size(), m_expectedPoolSize));
 
     if (m_connectors.size() + m_sockets.size() >= m_expectedPoolSize)
         return;
@@ -91,15 +91,15 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
         m_connectors.end(),
         std::move(connector));
 
-    NX_LOGX(lm("Start connector(%1)").arg(*connectorIt), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Start connector(%1)").arg(*connectorIt));
     (*connectorIt)->connect(
         m_proxyServiceEndpoint,
         [this, connectorIt](SystemError::ErrorCode code)
         {
             auto connector = std::move(*connectorIt);
             m_connectors.erase(connectorIt);
-            NX_LOGX(lm("Connector(%1) event: %2").arg(connector)
-                .arg(SystemError::toString(code)), cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Connector(%1) event: %2").arg(connector)
+                .arg(SystemError::toString(code)));
 
             if (code != SystemError::noError)
             {
@@ -108,9 +108,9 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 
                 if (m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); }))
                 {
-                    NX_LOGX(lm("Sheduled retry in %1").arg(
+                    NX_VERBOSE(this, lm("Sheduled retry in %1").arg(
                         std::chrono::duration_cast<std::chrono::milliseconds>(
-                            *m_timer->timeToEvent())), cl_logDEBUG2);
+                            *m_timer->timeToEvent())));
                     return;
                 }
             }
@@ -129,7 +129,7 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 
             if (isExhausted())
             {
-                NX_LOGX(lm("Exhausted tunnel: %1").arg(SystemError::toString(code)), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Exhausted tunnel: %1").arg(SystemError::toString(code)));
                 utils::moveAndCallOptional(m_acceptHandler, code, nullptr);
             }
         });
@@ -146,15 +146,15 @@ void IncomingReverseTunnelConnection::saveConnection(
         if (value != m_keepAliveOptions)
         {
             m_keepAliveOptions = value;
-            NX_LOGX(lm("New keepAliveOptions=%1").arg(m_keepAliveOptions), cl_logDEBUG1);
+            NX_DEBUG(this, lm("New keepAliveOptions=%1").arg(m_keepAliveOptions));
 
             for (auto it = m_sockets.begin(); it != m_sockets.end(); )
             {
                 if (!(*it)->setKeepAlive(m_keepAliveOptions))
                 {
-                    NX_LOGX(lm("Could not set keepAliveOptions=%1 to existed socket(%2): %3")
+                    NX_DEBUG(this, lm("Could not set keepAliveOptions=%1 to existed socket(%2): %3")
                         .arg(m_keepAliveOptions).arg(*it)
-                        .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+                        .arg(SystemError::getLastOSErrorText()));
 
                     it = m_sockets.erase(it);
                 }
@@ -172,9 +172,9 @@ void IncomingReverseTunnelConnection::saveConnection(
 
     if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
     {
-        NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2): %3")
+        NX_DEBUG(this, lm("Could not set keepAliveOptions=%1 to new socket(%2): %3")
             .arg(m_keepAliveOptions).arg(socket)
-            .arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+            .arg(SystemError::getLastOSErrorText()));
 
         return spawnConnectorIfNeeded();
     }
@@ -182,8 +182,8 @@ void IncomingReverseTunnelConnection::saveConnection(
     const auto socketIt = m_sockets.insert(m_sockets.end(), std::move(socket));
     if (m_acceptHandler)
     {
-        NX_LOGX(lm("Monitor socket(%1) from connector(%2)")
-            .args(*socketIt).arg(connector), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Monitor socket(%1) from connector(%2)")
+            .args(*socketIt).arg(connector));
 
         monitorSocket(socketIt);
     }
@@ -199,8 +199,8 @@ void IncomingReverseTunnelConnection::monitorSocket(
 
             auto socket = std::move(*socketIt);
             m_sockets.erase(socketIt);
-            NX_LOGX(lm("Socket(%1) event: %2").arg(socket)
-                .arg(SystemError::toString(code)), cl_logDEBUG1);
+            NX_DEBUG(this, lm("Socket(%1) event: %2").arg(socket)
+                .arg(SystemError::toString(code)));
 
             spawnConnectorIfNeeded();
             if (code != SystemError::noError)

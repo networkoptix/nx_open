@@ -153,7 +153,7 @@ void SecuritySettingsWidget::loadDataToUi()
             if (sessionTimeoutMinutes % minutesInPeriod == 0)
             {
                 ui->limitSessionUnitsComboBox->setCurrentIndex(index);
-                ui->limitSessionValueSpinBox->setValue(sessionTimeoutMinutes % minutesInPeriod);
+                ui->limitSessionValueSpinBox->setValue(sessionTimeoutMinutes / minutesInPeriod);
                 break;
             }
         }
