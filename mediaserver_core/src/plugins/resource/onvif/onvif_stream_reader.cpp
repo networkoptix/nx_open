@@ -203,13 +203,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     //}
 
     {
-        QAuthenticator auth(m_onvifRes->getAuth());
-        MediaSoapWrapper soapWrapper(
-            m_onvifRes->onvifTimeouts(),
-            m_onvifRes->getMediaUrl().toStdString().c_str(),
-            auth.user(),
-            auth.password(),
-            m_onvifRes->getTimeDrift());
+        MediaSoapWrapper soapWrapper(m_onvifRes);
 
         result = fetchStreamUrl(soapWrapper, info.profileToken, isPrimary, outStreamUrl);
         if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
@@ -683,14 +677,10 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
 CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
     CameraInfoParams& info, onvifXsd__Profile* profile) const
 {
-    QAuthenticator auth = m_onvifRes->getAuth();
-    MediaSoapWrapper soapWrapper(
-        m_onvifRes->onvifTimeouts(),
-        m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(),
-        auth.password(), m_onvifRes->getTimeDrift());
-
     if (!profile)
         return CameraDiagnostics::NoErrorResult();
+
+    MediaSoapWrapper soapWrapper(m_onvifRes);
 
     bool vSourceMatched = profile && profile->VideoSourceConfiguration
         && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();

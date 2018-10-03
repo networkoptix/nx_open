@@ -366,24 +366,6 @@ int DeviceSoapWrapper::setSystemFactoryDefaultSoft(FactoryDefaultReq& request, F
 // ------------------------------------------------------------------------------------------------
 // MediaSoapWrapper
 // ------------------------------------------------------------------------------------------------
-MediaSoapWrapper::MediaSoapWrapper(
-    const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
-    :
-    SoapWrapper<MediaBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
-{
-}
-
-MediaSoapWrapper::MediaSoapWrapper(SoapParams soapParams) :
-    SoapWrapper<MediaBindingProxy>(std::move(soapParams))
-{
-}
-
-MediaSoapWrapper::~MediaSoapWrapper()
-{
-
-}
-
 int MediaSoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response)
 {
     beforeMethodInvocation<VideoOptionsReq>();
@@ -607,23 +589,6 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse& 
 // ------------------------------------------------------------------------------------------------
 // PtzSoapWrapper
 // ------------------------------------------------------------------------------------------------
-PtzSoapWrapper::PtzSoapWrapper(
-    const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
-    :
-    SoapWrapper<PTZBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
-{
-}
-
-PtzSoapWrapper::PtzSoapWrapper(SoapParams soapParams) :
-    SoapWrapper<PTZBindingProxy>(std::move(soapParams))
-{
-}
-
-PtzSoapWrapper::~PtzSoapWrapper()
-{
-}
-
 int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response)
 {
     beforeMethodInvocation<AbsoluteMoveReq>();
@@ -726,32 +691,20 @@ NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(SoapParams soap
 {
 }
 
-int NotificationProducerSoapWrapper::Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response)
+int NotificationProducerSoapWrapper::subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response)
 {
     return invokeMethod(&NotificationProducerBindingProxy::Subscribe, request, *response);
 }
 
 // ------------------------------------------------------------------------------------------------
-// CreatePullPointSoapWrapper
+// EventSoapWrapper
 // ------------------------------------------------------------------------------------------------
-CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(
-    const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
-    :
-    SoapWrapper<CreatePullPointBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
+int EventSoapWrapper::createPullPointSubscription(
+    _onvifEvents__CreatePullPointSubscription& request,
+    _onvifEvents__CreatePullPointSubscriptionResponse& response)
 {
+    return invokeMethod(&EventBindingProxy::CreatePullPointSubscription, &request, response);
 }
-
-CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(SoapParams soapParams) :
-    SoapWrapper<CreatePullPointBindingProxy>(std::move(soapParams))
-{
-}
-
-int CreatePullPointSoapWrapper::createPullPoint(_oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response)
-{
-    return invokeMethod(&CreatePullPointBindingProxy::CreatePullPoint, &request, response);
-}
-
 // ------------------------------------------------------------------------------------------------
 // CreatePullPointSoapWrapper
 // ------------------------------------------------------------------------------------------------
@@ -772,46 +725,9 @@ int PullPointSubscriptionWrapper::pullMessages(_onvifEvents__PullMessages& reque
 {
     return invokeMethod(&PullPointSubscriptionBindingProxy::PullMessages, &request, response);
 }
-
-// ------------------------------------------------------------------------------------------------
-// EventSoapWrapper
-// ------------------------------------------------------------------------------------------------
-EventSoapWrapper::EventSoapWrapper(
-    const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive)
-    :
-    SoapWrapper<EventBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
-{
-}
-
-EventSoapWrapper::EventSoapWrapper(SoapParams soapParams) :
-    SoapWrapper<EventBindingProxy>(std::move(soapParams))
-{
-}
-
-int EventSoapWrapper::createPullPointSubscription(
-    _onvifEvents__CreatePullPointSubscription& request,
-    _onvifEvents__CreatePullPointSubscriptionResponse& response)
-{
-    return invokeMethod(&EventBindingProxy::CreatePullPointSubscription, &request, response);
-}
-
 // ------------------------------------------------------------------------------------------------
 // SubscriptionManagerSoapWrapper
 // ------------------------------------------------------------------------------------------------
-SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(
-    const SoapTimeouts& timeouts,
-    const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive)
-    :
-    SoapWrapper<SubscriptionManagerBindingProxy>(timeouts, endpoint, login, passwd, timeDrift, tcpKeepAlive)
-{
-}
-
-SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(SoapParams soapParams) :
-    SoapWrapper<SubscriptionManagerBindingProxy>(std::move(soapParams))
-{
-}
-
 int SubscriptionManagerSoapWrapper::renew(_oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response)
 {
     return invokeMethod(&SubscriptionManagerBindingProxy::Renew, &request, response);
@@ -821,3 +737,4 @@ int SubscriptionManagerSoapWrapper::unsubscribe(_oasisWsnB2__Unsubscribe& reques
 {
     return invokeMethod(&SubscriptionManagerBindingProxy::Unsubscribe, &request, response);
 }
+// ------------------------------------------------------------------------------------------------

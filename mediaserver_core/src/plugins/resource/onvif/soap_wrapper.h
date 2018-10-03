@@ -27,11 +27,10 @@
 #include <onvif/soapSubscriptionManagerBindingProxy.h>
 #include <onvif/soapPullPointSubscriptionBindingProxy.h>
 
+// Instead of including onvif/soapStub.h we use forward declaration of needed classes:
 #include "soap_forward.h"
 
 class QnCommonModule;
-// Instead of including onvif/soapStub.h we use forward declaration of needed classes.
-//#include <onvif/soapStub.h>
 
 struct SoapTimeouts
 {
@@ -86,7 +85,7 @@ enum class OnvifWebService { Media, Media2, Ptz, Imaging, DeviceIO };
  */
 class BaseSoapWrapper
 {
-
+    // TODO: move members (that are independent of BindingProxy type) here from SoapWrapper.
 };
 
 template <class BindingProxyT>
@@ -111,6 +110,8 @@ public:
     SoapWrapper& operator=(const SoapWrapper&) = delete;
     SoapWrapper& operator=(SoapWrapper&&) = delete;
 
+    operator bool() const { return !m_endpointHolder.empty(); }
+
     BindingProxy& bindingProxy() { return m_bindingProxy; }
     const BindingProxy& bindingProxy() const { return m_bindingProxy; }
 
@@ -123,7 +124,7 @@ public:
     int timeDrift() const { return m_timeDrift; }
     void setLogin(const QString& login) { m_login = login; }
     void setPassword(const QString& password) { m_passwd = password; }
-
+    bool invoked() const { return m_invoked; }
     const QString getLastErrorDescription()
     {
         return SoapErrorHelper::fetchDescription(m_bindingProxy.soap_fault());
@@ -152,7 +153,7 @@ public:
     template<typename Request>
     void beforeMethodInvocation()
     {
-        using namespace nx::mediaserver_core::plugins;
+        //using namespace nx::mediaserver_core::plugins;
         if (m_invoked)
         {
             soap_destroy(m_bindingProxy.soap);
@@ -163,14 +164,14 @@ public:
             m_invoked = true;
         }
 
-        const auto namespaces = onvif::requestNamespaces<Request>();
+        const auto namespaces = nx::mediaserver_core::plugins::onvif::requestNamespaces<Request>();
         //########################################################
         if (namespaces != nullptr)
             soap_set_namespaces(m_bindingProxy.soap, namespaces);
 
         if (!m_login.isEmpty())
         {
-            onvif::soapWsseAddUsernameTokenDigest(
+            nx::mediaserver_core::plugins::onvif::soapWsseAddUsernameTokenDigest(
                 m_bindingProxy.soap,
                 NULL,
                 m_login.toUtf8().constData(),
@@ -179,7 +180,7 @@ public:
         }
     }
 
-//private:
+protected:
     const std::string m_endpointHolder;
     const char* const m_endpoint; //< points to m_endpointHolder data
     int m_timeDrift;
@@ -421,7 +422,7 @@ public:
     ~RequestWrapper()
     {
         NX_CRITICAL(responseHolderCount == 0);
-        if (m_wrapper.m_invoked)
+        if (m_wrapper.invoked())
         {
             soap_destroy(m_wrapper.soap());
             soap_end(m_wrapper.soap());
@@ -617,22 +618,16 @@ private:
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 {
 public:
-    MediaSoapWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint,
-        const QString& login,
-        const QString& passwd,
-        int timeDrift,
-        bool tcpKeepAlive = false);
-    MediaSoapWrapper(SoapParams soapParams);
-
-    template<class Resource>
-    explicit MediaSoapWrapper(const Resource& resource) :
-        MediaSoapWrapper(resource->makeSoapParams())
+    MediaSoapWrapper(SoapParams soapParams):
+        SoapWrapper<MediaBindingProxy>(std::move(soapParams))
     {
     }
 
-    virtual ~MediaSoapWrapper();
+    template<class Resource>
+    explicit MediaSoapWrapper(const Resource& resource, bool tcpKeepAlive = false):
+        SoapWrapper<MediaBindingProxy>(resource->makeSoapParams(OnvifWebService::Media, tcpKeepAlive))
+    {
+    }
 
     int getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response);
     int addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response);
@@ -674,21 +669,16 @@ public:
 class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 {
 public:
-    PtzSoapWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint,
-        const QString &login,
-        const QString &passwd,
-        int timeDrift,
-        bool tcpKeepAlive = false);
-    PtzSoapWrapper(SoapParams soapParams);
-
-    template<class Resource>
-    explicit PtzSoapWrapper(const Resource& resource) :
-        PtzSoapWrapper(resource->makeSoapParams())
+    PtzSoapWrapper(SoapParams soapParams):
+        SoapWrapper<PTZBindingProxy>(std::move(soapParams))
     {
     }
-    virtual ~PtzSoapWrapper();
+
+    template<class Resource>
+    explicit PtzSoapWrapper(const Resource& resource, bool tcpKeepAlive = false):
+        SoapWrapper<PTZBindingProxy>(resource->makeSoapParams(OnvifWebService::Ptz, tcpKeepAlive))
+    {
+    }
 
     int doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response);
     int doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodesResponse& response);
@@ -718,7 +708,7 @@ public:
     ImagingSoapWrapper(SoapParams soapParams);
 
     template<class Resource>
-    explicit ImagingSoapWrapper(const Resource& resource) :
+    explicit ImagingSoapWrapper(const Resource& resource):
         ImagingSoapWrapper(resource->makeSoapParams())
     {
     }
@@ -732,6 +722,10 @@ public:
     int getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response);
     int move(_onvifImg__Move &request, _onvifImg__MoveResponse &response);
 };
+// ------------------------------------------------------------------------------------------------
+// Onvif event notification - base notification
+// http://docs.oasis-open.org/wsn/wsn-ws_base_notification-1.3-spec-os.pdf
+// NotificationProducerBindingProxy, SubscriptionManagerBindingProxy.
 // ------------------------------------------------------------------------------------------------
 class NotificationProducerSoapWrapper: public SoapWrapper<NotificationProducerBindingProxy>
 {
@@ -751,28 +745,89 @@ public:
     {
     }
 
-    int Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response);
+    int subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response);
+
+    // NotificationProducerBindingProxy also implements GetCurrentMessage,
+    // but it is not currently used.
 };
 // ------------------------------------------------------------------------------------------------
+class SubscriptionManagerSoapWrapper : public SoapWrapper<SubscriptionManagerBindingProxy>
+{
+public:
+    SubscriptionManagerSoapWrapper(SoapParams soapParams) :
+        SoapWrapper<SubscriptionManagerBindingProxy>(std::move(soapParams))
+    {
+    }
+
+    template<class Resource>
+    explicit SubscriptionManagerSoapWrapper(const Resource& resource,
+        std::string endpoint, bool tcpKeepAlive = false)
+        :
+        SoapWrapper<SubscriptionManagerBindingProxy>(
+            resource->makeSoapParams(std::move(endpoint), tcpKeepAlive))
+    {
+    }
+
+    int renew(_oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response);
+    int unsubscribe(_oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response);
+};
+// ------------------------------------------------------------------------------------------------
+#if 0
+/** CreatePullPoint is used to create new PullPoint resource.
+ *  Specification for details:
+ *  http://docs.oasis-open.org/wsn/wsn-ws_base_notification-1.3-spec-os.pdf
+ *  Chapter 5. Pull-Style Notification. Section 5.2. Create PullPoint Interface.
+ *
+ *  CreatePullPoint interface currently is not used.
+ */
 class CreatePullPointSoapWrapper: public SoapWrapper<CreatePullPointBindingProxy>
 {
 public:
-    CreatePullPointSoapWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint,
-        const QString& login,
-        const QString& passwd,
-        int timeDrift,
-        bool tcpKeepAlive = false);
-
-    CreatePullPointSoapWrapper(SoapParams soapParams);
+    CreatePullPointSoapWrapper(SoapParams soapParams):
+        SoapWrapper<CreatePullPointBindingProxy>(std::move(soapParams))
+    {
+    }
 
     template<class Resource>
-    explicit CreatePullPointSoapWrapper(const Resource& resource) :
+    explicit CreatePullPointSoapWrapper(const Resource& resource):
         CreatePullPointSoapWrapper(resource->makeSoapParams())
     {
     }
-    int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
+
+    int createPullPoint(
+        _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response)
+    {
+        return invokeMethod(&CreatePullPointBindingProxy::CreatePullPoint, &request, response);
+    }
+};
+#endif
+// ------------------------------------------------------------------------------------------------
+// Onvif event notification - real-time Pull-Point
+// https://www.onvif.org/ver10/events/wsdl/event.wsdl:
+// EventBindingProxy, PullPointSubscriptionBindingProxy.
+// ------------------------------------------------------------------------------------------------
+class EventSoapWrapper : public SoapWrapper<EventBindingProxy>
+{
+public:
+    EventSoapWrapper(SoapParams soapParams) :
+        SoapWrapper<EventBindingProxy>(std::move(soapParams))
+    {
+    }
+
+    template<class Resource>
+    explicit EventSoapWrapper(const Resource& resource,
+        std::string endpoint, bool tcpKeepAlive = false)
+        :
+        SoapWrapper<EventBindingProxy>(
+            resource->makeSoapParams(std::move(endpoint), tcpKeepAlive))
+    {
+    }
+
+    int createPullPointSubscription(_onvifEvents__CreatePullPointSubscription& request,
+        _onvifEvents__CreatePullPointSubscriptionResponse& response);
+
+    // EventBindingProxy also implements GetEventProperties and GetServiceCapabilities,
+    // but they are not currently used.
 };
 // ------------------------------------------------------------------------------------------------
 class PullPointSubscriptionWrapper: public SoapWrapper<PullPointSubscriptionBindingProxy>
@@ -784,49 +839,15 @@ public:
     PullPointSubscriptionWrapper(SoapParams soapParams);
 
     template<class Resource>
-    explicit PullPointSubscriptionWrapper(const Resource& resource) :
+    explicit PullPointSubscriptionWrapper(const Resource& resource):
         PullPointSubscriptionWrapper(resource->makeSoapParams())
     {
     }
-    int pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response );
-};
-// ------------------------------------------------------------------------------------------------
-class EventSoapWrapper: public SoapWrapper<EventBindingProxy>
-{
-public:
-    EventSoapWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
-    EventSoapWrapper(SoapParams soapParams);
 
-    template<class Resource>
-    explicit EventSoapWrapper(const Resource& resource) :
-        EventSoapWrapper(resource->makeSoapParams())
-    {
-    }
+    int pullMessages(
+        _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response);
 
-    int createPullPointSubscription( _onvifEvents__CreatePullPointSubscription& request, _onvifEvents__CreatePullPointSubscriptionResponse& response );
-};
-// ------------------------------------------------------------------------------------------------
-class SubscriptionManagerSoapWrapper: public SoapWrapper<SubscriptionManagerBindingProxy>
-{
-public:
-    SubscriptionManagerSoapWrapper(
-        const SoapTimeouts& timeouts,
-        const std::string& endpoint,
-        const QString &login,
-        const QString &passwd,
-        int _timeDrift,
-        bool tcpKeepAlive = false);
-    SubscriptionManagerSoapWrapper(SoapParams soapParams);
-
-    template<class Resource>
-    explicit SubscriptionManagerSoapWrapper(const Resource& resource) :
-        SubscriptionManagerSoapWrapper(resource->makeSoapParams())
-    {
-    }
-
-    int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
-    int unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response );
+    // PullPointSubscriptionBindingProxy also implements
+    // Seek, SetSynchronizationPoint, Unsubscribe, but they are not currently used.
 };
 // ------------------------------------------------------------------------------------------------

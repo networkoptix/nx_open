@@ -1461,10 +1461,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoResourceOptions()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioResourceOptions()
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+    MediaSoapWrapper soapWrapper(this);
 
     if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
         setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
@@ -1768,14 +1765,12 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
 
 bool QnPlOnvifResource::fetchPtzInfo()
 {
-
-    if (getPtzUrl().isEmpty())
+    PtzSoapWrapper ptz(this);
+    if (!ptz)
+    {
+        // #TODO: log.
         return false;
-
-    QAuthenticator auth = getAuth();
-    PtzSoapWrapper ptz (onvifTimeouts(),
-        getPtzUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
-
+    }
     _onvifPtz__GetConfigurations request;
     _onvifPtz__GetConfigurationsResponse response;
     if (ptz.doGetConfigurations(request, response) == SOAP_OK
@@ -1879,20 +1874,20 @@ bool QnPlOnvifResource::registerNotificationConsumer()
 
     //determining local address, accessible by onvif device
     QUrl eventServiceURL(QString::fromStdString(m_eventCapabilities->XAddr));
-    QString localAddress;
 
     // TODO: #ak should read local address only once
-    std::unique_ptr<nx::network::AbstractStreamSocket> sock( nx::network::SocketFactory::createStreamSocket() );
-    if( !sock->connect(
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock(
+        nx::network::SocketFactory::createStreamSocket());
+    if(!sock->connect(
             eventServiceURL.host(), eventServiceURL.port(nx::network::http::DEFAULT_HTTP_PORT),
-            nx::network::deprecated::kDefaultConnectTimeout) )
+            nx::network::deprecated::kDefaultConnectTimeout))
     {
         NX_WARNING(this, lit("Failed to connect to %1:%2 to determine local address. %3")
             .arg(eventServiceURL.host()).arg(eventServiceURL.port())
             .arg(SystemError::getLastOSErrorText()));
         return false;
     }
-    localAddress = sock->getLocalAddress().address.toString();
+    QString localAddress = sock->getLocalAddress().address.toString();
 
     QAuthenticator auth = getAuth();
 
@@ -1926,7 +1921,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     //request.Filter = &topicFilter;
 
     _oasisWsnB2__SubscribeResponse response;
-    const int soapCallResult = soapWrapper.Subscribe(&request, &response);
+    const int soapCallResult = soapWrapper.subscribe(&request, &response);
 
     // TODO/IMPL: find out which is error and which is not.
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
@@ -2022,7 +2017,8 @@ void QnPlOnvifResource::scheduleRenewSubscriptionTimer(unsigned int timeoutSec)
     const std::chrono::seconds timeout(timeoutSec);
     NX_VERBOSE(this, lm("Schedule renew subscription in %1").arg(timeout));
     updateTimer(&m_renewSubscriptionTimerID, timeout,
-        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1));
+        [this](quint64 timerID) { this->onRenewSubscriptionTimer(timerID); });
+        //std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1));
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
@@ -2716,11 +2712,7 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxR
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source)
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
-
+    MediaSoapWrapper soapWrapper(this);
     SetVideoSrcConfigReq request;
     SetVideoSrcConfigResp response;
     request.Configuration = source;
@@ -2749,11 +2741,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoSourceToCamera(VideoSource
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEncoders)
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
+    MediaSoapWrapper soapWrapper(this);
     _onvifMedia__GetVideoSources request;
     _onvifMedia__GetVideoSourcesResponse response;
     int soapRes = soapWrapper.getVideoSources(request, response);
@@ -2827,11 +2815,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
 
 QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
+    MediaSoapWrapper soapWrapper(this);
     VideoSrcOptionsReq request;
     std::string token = configToken.toStdString();
     request.ConfigurationToken = &token;
@@ -2880,11 +2864,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
+    MediaSoapWrapper soapWrapper(this);
     VideoSrcConfigsReq request;
     VideoSrcConfigsResp response;
 
@@ -2947,11 +2927,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetAudioSource()
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
-
+    MediaSoapWrapper soapWrapper(this);
     AudioSrcConfigsReq request;
     AudioSrcConfigsResp response;
 
@@ -3098,6 +3074,13 @@ SoapParams QnPlOnvifResource::makeSoapParams(
     OnvifWebService onvifWebService, bool tcpKeepAlive) const
 {
     return SoapParams(onvifTimeouts(), m_serviceUrls.getUrl(onvifWebService).toStdString(),
+        getAuth(), m_timeDrift, tcpKeepAlive);
+}
+
+SoapParams QnPlOnvifResource::makeSoapParams(
+    std::string endpoint, bool tcpKeepAlive) const
+{
+    return SoapParams(onvifTimeouts(), std::move(endpoint),
         getAuth(), m_timeDrift, tcpKeepAlive);
 }
 
@@ -3268,15 +3251,10 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
         return;
     m_renewSubscriptionTimerID = 0;
 
-    QAuthenticator auth = getAuth();
-    SubscriptionManagerSoapWrapper soapWrapper(
-        onvifTimeouts(),
+    SubscriptionManagerSoapWrapper soapWrapper(this,
         m_onvifNotificationSubscriptionReference.isEmpty()
-            ? m_eventCapabilities->XAddr
-            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
+        ? m_eventCapabilities->XAddr
+        : m_onvifNotificationSubscriptionReference.toStdString());
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     char buf[256];
@@ -3303,13 +3281,32 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     const int soapCallResult = soapWrapper.renew(request, response);
     if (soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND)
     {
-        if (m_eventCapabilities && m_eventCapabilities->WSPullPointSupport)
+        if (m_eventCapabilities->WSPullPointSupport)
         {
-            // Ignoring renew error since it does not work on some cameras (on Vista, particularly).
+            /*
+               According to PullPoint Notification mechanism 3 types of requests are used via
+               onvifEvents::EventBindingProxy:
+               CreatePullPointSubscription, PullMessages and Unsubscribe.
+               Renew request is not supported and not needed.
+               (https://www.onvif.org/specs/core/ONVIF-Core-Spec-v210.pdf
+               section 9.2 Real-time Pull-Point Notification Interface).
+
+               But in practice some cameras need Renew request, so we periodically send it via
+               oasisWsnB2::SubscriptionManagerBindingProxy (EventBindingProxy doesn't have it).
+
+               So it is ok, if camera doesn't recognize such a request.
+               In case of SOAP_CLI_FAULT error we just stop Renew request sending.
+            */
             NX_VERBOSE(this, lit("Ignoring renew error on %1").arg(getUrl()));
+            if (soapCallResult == SOAP_CLI_FAULT)
+                return;
         }
         else
         {
+            /*
+                In Basic Notification mechanism Renew request must be understood by camera.
+                In case of error we unsubscribe, and try to subscribe again.
+            */
             NX_DEBUG(this, lit("Failed to renew subscription (endpoint %1). %2").
                 arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult));
             lk.unlock();
@@ -3322,7 +3319,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
             if (!registerNotificationConsumer())
             {
                 lk.relock();
-                scheduleRetrySubscriptionTimer();
+                scheduleRetrySubscriptionTimer(); //###### error???
             }
             return;
         }
@@ -3579,17 +3576,11 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {
-    QAuthenticator auth = getAuth();
-    EventSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        m_eventCapabilities->XAddr,
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
+    EventSoapWrapper soapWrapper(this, m_eventCapabilities->XAddr);
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _onvifEvents__CreatePullPointSubscription request;
-    std::string initialTerminationTime = "PT600S";
+    std::string initialTerminationTime = "PT60S"; //"PT600S"
     request.InitialTerminationTime = &initialTerminationTime;
     _onvifEvents__CreatePullPointSubscriptionResponse response;
     const int soapCallResult = soapWrapper.createPullPointSubscription(request, response);
@@ -3600,40 +3591,42 @@ bool QnPlOnvifResource::createPullPointSubscription()
         return false;
     }
 
-    NX_VERBOSE(this, lm("Successfuly created pool point to %1").arg(soapWrapper.endpoint()));
-    std::string subscriptionID;
+    NX_VERBOSE(this, lm("Successfully created pool point to %1").arg(soapWrapper.endpoint()));
+    if (response.SubscriptionReference.ReferenceParameters &&
+        response.SubscriptionReference.ReferenceParameters->__any)
     {
-        if (response.SubscriptionReference.ReferenceParameters &&
-            response.SubscriptionReference.ReferenceParameters->__any)
-        {
-            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-            QXmlSimpleReader reader;
-            SubscriptionReferenceParametersParseHandler handler;
-            reader.setContentHandler(&handler);
-            QBuffer srcDataBuffer;
-            srcDataBuffer.setData(
-                response.SubscriptionReference.ReferenceParameters->__any[0],
-                (int)strlen(response.SubscriptionReference.ReferenceParameters->__any[0]));
-            QXmlInputSource xmlSrc(&srcDataBuffer);
-            if (reader.parse(&xmlSrc))
-                m_onvifNotificationSubscriptionID = handler.subscriptionID;
-        }
-
-        if (response.SubscriptionReference.Address)
-            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference.Address);
+        // Parsing to retrieve subscriptionId. The example of parsed string (subscriptionId is 3):
+        // <dom0:SubscriptionId xmlns:dom0="http://www.cellinx.co.kr/event">3</dom0:SubscriptionId>
+        QXmlSimpleReader reader;
+        SubscriptionReferenceParametersParseHandler handler;
+        reader.setContentHandler(&handler);
+        QBuffer srcDataBuffer;
+        srcDataBuffer.setData(
+            response.SubscriptionReference.ReferenceParameters->__any[0],
+            (int)strlen(response.SubscriptionReference.ReferenceParameters->__any[0]));
+        QXmlInputSource xmlSrc(&srcDataBuffer);
+        if (reader.parse(&xmlSrc))
+            m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
-    //adding task to refresh subscription
-    unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
+    if (response.SubscriptionReference.Address)
+    {
+        m_onvifNotificationSubscriptionReference =
+            fromOnvifDiscoveredUrl(response.SubscriptionReference.Address);
+    }
 
     QnMutexLocker lk(&m_ioPortMutex);
 
     if (!m_inputMonitored)
         return true;
 
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true))
+    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).
+        value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true))
     {
-        // NOTE: Renewing session does not work on vista.
+        // Adding task to refresh subscription (does not work on Vista cameras).
+        // TODO: detailed explanation about SubscriptionManagerBindingProxy::Renew.
+        const unsigned int renewSubsciptionTimeoutSec =
+            response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
         scheduleRenewSubscriptionTimer(renewSubsciptionTimeoutSec);
     }
 
@@ -3648,15 +3641,10 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
 void QnPlOnvifResource::removePullPointSubscription()
 {
-    QAuthenticator auth = getAuth();
-    SubscriptionManagerSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        m_onvifNotificationSubscriptionReference.isEmpty()
-            ? m_eventCapabilities->XAddr
-            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
-        auth.user(),
-        auth.password(),
-        m_timeDrift);
+    SubscriptionManagerSoapWrapper soapWrapper(this,
+        !m_onvifNotificationSubscriptionReference.isEmpty()
+        ? m_onvifNotificationSubscriptionReference.toStdString()
+        : m_eventCapabilities->XAddr /*emergency option*/);
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _oasisWsnB2__Unsubscribe request;
@@ -3698,24 +3686,31 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     QnMutexLocker lk(&m_ioPortMutex);
 
     if (timerID != m_nextPullMessagesTimerID)
-        return; //not expected event. This can actually happen if we call
-                //startInputPortMonitoring, stopInputPortMonitoring, startInputPortMonitoring really quick
+    {
+        // This can actually happen, if we call
+        // startInputPortMonitoring, stopInputPortMonitoring, startInputPortMonitoring too quick.
+        // TODO: log.
+        return;
+    }
     m_nextPullMessagesTimerID = 0;
 
     if (!m_inputMonitored)
         return;
 
     if (m_asyncPullMessagesCallWrapper)
-        return; //previous request is still running, new timer will be added within completion handler
-
+    {
+        // Previous request is still running, new timer will be added within completion handler.
+        // TODO: log.
+        return;
+    }
     QAuthenticator auth = getAuth();
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
             onvifTimeouts(),
-            m_onvifNotificationSubscriptionReference.isEmpty()
-                ? m_eventCapabilities->XAddr
-                : m_onvifNotificationSubscriptionReference.toStdString(),
+            !m_onvifNotificationSubscriptionReference.isEmpty()
+                ? m_onvifNotificationSubscriptionReference.toStdString()
+                : m_eventCapabilities->XAddr, //< emergency option
             auth.user(),
             auth.password(),
             m_timeDrift));
@@ -3772,12 +3767,12 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
             std::move(soapWrapper),
             &PullPointSubscriptionWrapper::pullMessages,
             useHttpReader),
-        [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
+        [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr)
+        {
             for(void* pObj: memToFreeOnResponseDone)
                 ::free(pObj);
             delete ptr;
-        }
-   );
+        });
 
     NX_VERBOSE(this, lm("Pull messages from %1 with httpReader=%2").args(
         m_onvifNotificationSubscriptionReference, useHttpReader));
@@ -3785,11 +3780,14 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     using namespace std::placeholders;
     asyncPullMessagesCallWrapper->callAsync(
         request,
-        std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1));
+        std::bind(
+            &QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1));
+
     m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
 }
 
-void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
+void QnPlOnvifResource::onPullMessagesDone(
+    GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
     using namespace std::placeholders;
 
@@ -4344,9 +4342,7 @@ QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudio()
     if (auto result = initializeTwoWayAudioByResourceData())
         return result;
 
-    MediaSoapWrapper soapWrapper(onvifTimeouts(),
-        getMediaUrl().toStdString(),
-        getAuth().user(), getAuth().password(), m_timeDrift);
+    MediaSoapWrapper soapWrapper(this);
 
     //TODO: consider to move it to streamReader and change it to GetCompatibleAudioOutputConfigurations
     GetAudioOutputConfigurationsReq request;

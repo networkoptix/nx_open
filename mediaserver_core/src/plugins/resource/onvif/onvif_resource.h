@@ -94,12 +94,9 @@ class QnPlOnvifResource:
     using base_type = nx::mediaserver::resource::Camera;
 
 public:
-
-    typedef GSoapAsyncCallWrapper <
+    using GSoapAsyncPullMessagesCallWrapper = GSoapAsyncCallWrapper<
         PullPointSubscriptionWrapper,
-        _onvifEvents__PullMessages,
-        _onvifEvents__PullMessagesResponse
-    > GSoapAsyncPullMessagesCallWrapper;
+        _onvifEvents__PullMessages, _onvifEvents__PullMessagesResponse>;
 
     class RelayOutputInfo
     {
@@ -265,6 +262,7 @@ public:
     AUDIO_CODEC getAudioCodec() const;
 
     SoapParams makeSoapParams(OnvifWebService onvifWebService, bool tcpKeepAlive = false) const;
+    SoapParams makeSoapParams(std::string endpoint, bool tcpKeepAlive) const;
 
     virtual void setOnvifRequestsRecieveTimeout(int timeout);
     virtual void setOnvifRequestsSendTimeout(int timeout);

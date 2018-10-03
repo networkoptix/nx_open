@@ -290,16 +290,10 @@ boost::optional<ChannelCapabilities> HikvisionResource::channelCapabilities(
 
 bool HikvisionResource::findDefaultPtzProfileToken()
 {
-    std::unique_ptr<MediaSoapWrapper> soapWrapper(new MediaSoapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString(),
-        getAuth().user(),
-        getAuth().password(),
-        getTimeDrift()));
-
+    MediaSoapWrapper soapWrapper(this);
     ProfilesReq request;
     ProfilesResp response;
-    int soapRes = soapWrapper->getProfiles(request, response);
+    int soapRes = soapWrapper.getProfiles(request, response);
     if (soapRes != SOAP_OK)
     {
         NX_WARNING(this, lm("Can't read profile list from device %1").arg(getMediaUrl()));

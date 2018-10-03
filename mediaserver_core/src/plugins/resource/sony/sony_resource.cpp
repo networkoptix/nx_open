@@ -41,14 +41,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
 
-    QAuthenticator auth = getAuth();
-    QString login = auth.user();
-    QString password = auth.password();
-    std::string endpoint = getMediaUrl().toStdString();
-
-    MediaSoapWrapper soapWrapperGet(
-        onvifTimeouts(),
-        endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapperGet(this);
     VideoConfigReq confRequest;
     confRequest.ConfigurationToken = confToken;
     VideoConfigResp confResponse;
@@ -61,9 +54,7 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastErrorDescription());
     }
 
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        endpoint.c_str(), login, password, getTimeDrift());
+    MediaSoapWrapper soapWrapper(this);
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
     switch (capabilities.encoding)

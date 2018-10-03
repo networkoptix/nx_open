@@ -26,11 +26,7 @@ CameraDiagnostics::Result QnFlexWatchResource::initializeCameraDriver()
 
 CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
 {
-    QAuthenticator auth = getAuth();
-    MediaSoapWrapper soapWrapper(
-        onvifTimeouts(),
-        getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), getTimeDrift());
-
+    MediaSoapWrapper soapWrapper(this);
     VideoConfigsReq request;
     VideoConfigsResp response;
 
