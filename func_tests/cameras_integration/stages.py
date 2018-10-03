@@ -14,8 +14,6 @@ from datetime import datetime, timedelta
 import pytz
 from typing import Generator, List
 
-from mako.ext.pygmentplugin import syntax_highlight
-
 from framework.http_api import HttpError
 from . import stage
 from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams, \
