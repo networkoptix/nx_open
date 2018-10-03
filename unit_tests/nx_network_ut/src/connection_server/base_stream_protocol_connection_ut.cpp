@@ -121,8 +121,7 @@ using TestHttpConnection = nx::network::http::AsyncMessagePipeline;
  *   Http already has convenient infrastructure around it.
  */
 class BaseStreamProtocolConnection:
-    public ::testing::Test,
-    public StreamConnectionHolder<TestHttpConnection>
+    public ::testing::Test
 {
 public:
     BaseStreamProtocolConnection():
@@ -134,7 +133,6 @@ public:
         using namespace std::placeholders;
 
         m_connection = std::make_unique<TestHttpConnection>(
-            this,
             std::make_unique<AsyncChannelToStreamSocketAdapter>(&m_asyncChannel));
         m_connection->setMessageHandler(
             std::bind(&BaseStreamProtocolConnection::saveMessage, this, _1));
@@ -241,13 +239,6 @@ private:
     std::vector<HttpMessageTestData> m_messagesSent;
     nx::network::http::Message* m_prevMessageReceived = nullptr;
     QnMutex m_mutex;
-
-    virtual void closeConnection(
-        SystemError::ErrorCode /*closeReason*/,
-        TestHttpConnection* connection) override
-    {
-        ASSERT_EQ(m_connection.get(), connection);
-    }
 
     void sendMessages()
     {

@@ -22,7 +22,8 @@ public:
     GenericResourceTreeModelNode(
         QnResourceTreeModel* model,
         const IsAcceptableResourceCheckFunction& checkFunction,
-        NodeType nodeType);
+        NodeType nodeType,
+        bool useExtraSearchInformation = true);
 
     virtual ~GenericResourceTreeModelNode() override;
 
@@ -55,6 +56,7 @@ private:
     const IsAcceptableResourceCheckFunction m_isAcceptableCheck;
     NodeList m_items;
     RecorderHash m_recorders;
+    bool m_useExtraSearchInformation = true;
 };
 
 } // namespace desktop

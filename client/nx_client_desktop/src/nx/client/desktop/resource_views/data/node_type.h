@@ -11,7 +11,7 @@ namespace desktop {
  */
 enum class ResourceTreeNodeType
 {
-    // Single-occurrence nodes
+    // Single-occurrence nodes.
 
     // Root node for the tree (current system node).
     root,
@@ -23,16 +23,26 @@ enum class ResourceTreeNodeType
     separator,
     // Root node for servers for admin user.
     servers,
+    // Root node for filtered servers.
+    filteredServers,
     // Root node for cameras, i/o modules and statistics for non-admin user.
     userResources,
+    // Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes.
+    filteredCameras,
     // Root node for current user's layouts and shared layouts.
     layouts,
+    // Root node for filtered layouts.
+    filteredLayouts,
     // Root node for the layout tours.
     layoutTours,
+    // Root node for filtered videowalls.
+    filteredVideowalls,
     // Root node for web pages.
     webPages,
     // Root node for user resources.
     users,
+    // Root node for filtered users.
+    filteredUsers,
     // Root node for remote systems.
     otherSystems,
     // Root node for local resources.
@@ -40,21 +50,10 @@ enum class ResourceTreeNodeType
     // Root node for spacing between local resources header and resources.
     localSeparator,
 
-    // Root node for filtered servers
-    filteredServers,
-    // Root node for filtered cameras, i/o modules and other devices. Used for filtering purposes.
-    filteredCameras,
-    // Root node for filtered layouts
-    filteredLayouts,
-    // Root node for filtered users
-    filteredUsers,
-    // Root node for filtered videowalls
-    filteredVideowalls,
-
     // Root node for hidden resources.
     bastard,
 
-    // Per-user placeholder nodes
+    // Per-user placeholder nodes.
 
     // 'Users' node, displayed under roles.
     roleUsers,
@@ -67,7 +66,7 @@ enum class ResourceTreeNodeType
     // 'Layouts' node, displayed under users and roles with custom access.
     sharedLayouts,
 
-    // Repeating nodes
+    // Repeating nodes.
 
     // Custom role.
     role,

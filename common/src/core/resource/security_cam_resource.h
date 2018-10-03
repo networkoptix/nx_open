@@ -308,8 +308,13 @@ public:
     virtual int suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const;
     static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
+    /**
+     * All events emitted by analytics driver bound to the resource can be captured within
+     * this method.
+     * @return true if event has been captured, false otherwise.
+     */
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
+    virtual bool isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const;
 
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 

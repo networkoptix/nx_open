@@ -91,7 +91,7 @@ protected:
         ASSERT_FALSE(
             m_messageDispatcher.dispatchRequest(
                 nullptr,
-                prepareDummyMessage(method, path),
+                prepareDummyRequest(method, path),
                 nx::utils::stree::ResourceContainer(),
                 detail::OnRequestProcessedHandler()));
     }
@@ -112,7 +112,7 @@ protected:
         ASSERT_TRUE(
             m_messageDispatcher.dispatchRequest(
                 nullptr,
-                prepareDummyMessage(method, path),
+                prepareDummyRequest(method, path),
                 nx::utils::stree::ResourceContainer(),
                 detail::OnRequestProcessedHandler()));
     }
@@ -135,16 +135,16 @@ private:
             path, &m_dispatchedPathQueue);
     }
 
-    nx::network::http::Message prepareDummyMessage(
+    nx::network::http::Request prepareDummyRequest(
         const nx::network::http::StringType& method,
         const nx::network::http::StringType& path)
     {
-        nx::network::http::Message message(nx::network::http::MessageType::request);
-        message.request->requestLine.method = method;
-        message.request->requestLine.version = nx::network::http::http_1_1;
-        message.request->requestLine.url =
+        nx::network::http::Request request;
+        request.requestLine.method = method;
+        request.requestLine.version = nx::network::http::http_1_1;
+        request.requestLine.url =
             nx::utils::Url(QString("http://127.0.0.1:7001%1").arg(QString::fromUtf8(path)));
-        return message;
+        return request;
     }
 };
 

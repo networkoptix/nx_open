@@ -47,6 +47,6 @@ struct ConfigureSystemData: public PasswordData
     QString currentPassword; // required for password change only
 };
 
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)(currentPassword)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)(systemName)(currentPassword)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ConfigureSystemData), (json));
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ConfigureSystemData), (json)(eq));

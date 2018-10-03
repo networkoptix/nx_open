@@ -381,8 +381,11 @@ void ServerMessageBus::stop()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
-        dbTran.commit();
+        if (m_db->getTransaction())
+        {
+            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+            dbTran.commit();
+        }
     }
     base_type::stop();
 }

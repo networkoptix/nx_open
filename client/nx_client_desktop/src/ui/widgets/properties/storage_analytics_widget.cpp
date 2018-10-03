@@ -200,8 +200,7 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     refreshButton->setIcon(qnSkin->icon(lit("text_buttons/refresh.png")));
     refreshButton->resize(refreshButton->sizeHint());
 
-    auto anchor = new WidgetAnchor(refreshButton);
-    anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
+    anchorWidgetToParent(refreshButton, Qt::RightEdge | Qt::TopEdge);
 
     ui->tabWidget->tabBar()->setProperty(style::Properties::kTabShape,
         static_cast<int>(style::TabShape::Compact));

@@ -8,6 +8,7 @@
 #include <QPainter>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/literal.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
@@ -53,11 +54,10 @@ public:
 
         m_animated = false;
 
-        if (data->offline)
+        if (!m_owner->isStatusVisible())
         {
-            m_left->setText(tr("Skipped"));
-            m_left->setIcon(qnSkin->icon("text_buttons/skipped_disabled.png"));
-            m_left->setHidden(false);
+            m_left->setHidden(true);
+            progressHidden = true;
         }
         else if (data->skipped)
         {
@@ -95,8 +95,14 @@ public:
                     errorStyle = true;
                     break;
                 case StatusCode::idle:
+                    m_left->setHidden(true);
+                    progressHidden = true;
                     break;
                 case StatusCode::offline:
+                    // TODO: Some servers that are installing updates can also be offline. But it is different state
+                    m_left->setText(lit("–"));
+                    m_left->setIcon(QIcon());
+                    m_left->setHidden(false);
                     break;
                 case StatusCode::installing:
                     break;
@@ -114,6 +120,8 @@ public:
         else
             resetStyle(m_left);
 
+        m_left->setEnabled(!data->offline);
+
         if (progressHidden != m_progress->isHidden())
             m_progress->setHidden(progressHidden);
 
@@ -124,12 +132,6 @@ public:
     }
 
 protected:
-    void at_clicked()
-    {
-        if (m_owner && m_lastItem)
-            emit m_owner->updateItemCommand(m_lastItem);
-    }
-
     void at_changeAnimationFrame(int frame)
     {
         if (!m_animated)
@@ -156,14 +158,6 @@ ServerStatusItemDelegate::ServerStatusItemDelegate(QWidget* parent) :
         connect(m_updateAnimation.data(), &QMovie::finished, m_updateAnimation.data(), &QMovie::start);
 
     m_updateAnimation->start();
-    /*
-    const auto movie = qnSkin->newMovie("legacy/loading.gif", button);
-    connect(movie, &QMovie::frameChanged, button,
-    [button, movie](int frameNumber)
-    {
-    button->setIcon(movie->currentPixmap());
-    });
-    */
 }
 
 ServerStatusItemDelegate::~ServerStatusItemDelegate()
@@ -181,19 +175,23 @@ void ServerStatusItemDelegate::setStatusVisible(bool value)
     m_statusVisible = value;
 }
 
-QWidget* ServerStatusItemDelegate::createEditor(QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const
+bool ServerStatusItemDelegate::isStatusVisible() const
+{
+    return m_statusVisible;
+}
+
+QWidget* ServerStatusItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     return new ServerStatusWidget(this, parent);
 }
 
-void ServerStatusItemDelegate::setEditorData(QWidget* editor, const QModelIndex &index) const
+void ServerStatusItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
     ServerStatusWidget* statusWidget = dynamic_cast<ServerStatusWidget*>(editor);
     if (!statusWidget)
         return;
 
     auto itemData = index.data(UpdateItem::UpdateItemRole);
-    //UpdateItemPtr data = reinterpret_cast<UpdateItem*>(itemData.value<void*>());
     UpdateItemPtr data = itemData.value<UpdateItemPtr>();
     if (!data)
         return;

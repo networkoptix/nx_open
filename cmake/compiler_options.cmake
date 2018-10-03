@@ -24,8 +24,6 @@ add_definitions(
     -DENABLE_SSL
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
-    -DENABLE_SOFTWARE_MOTION_DETECTION
-
     -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
@@ -39,7 +37,6 @@ endif()
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
-        -DENABLE_SOFTWARE_MOTION_DETECTION
     )
 endif()
 

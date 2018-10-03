@@ -268,6 +268,9 @@ int Helper::handleAddUpload(const QString& fileName)
     if (errorCode != ResultCode::ok)
         return makeDownloaderError(errorCode);
 
+    QnJsonRestResult restResult;
+    restResult.setReply(errorCode);
+    QnFusionRestHandlerDetail::serialize(restResult, result, resultContentType, Qn::JsonFormat, false);
     return nx::network::http::StatusCode::ok;
 }
 

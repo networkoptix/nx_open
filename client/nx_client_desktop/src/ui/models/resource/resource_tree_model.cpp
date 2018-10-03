@@ -1,5 +1,7 @@
 #include "resource_tree_model.h"
 
+#include <ini.h>
+
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 #include <QtCore/QCoreApplication>
@@ -113,7 +115,11 @@ QList<ResourceTreeNodeType> rootNodeTypes()
 // -------------------------------------------------------------------------- //
 // QnResourceTreeModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
+QnResourceTreeModel::QnResourceTreeModel(
+    Scope scope,
+    bool useExtraSearchInformation,
+    QObject* parent)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_scope(scope),
@@ -123,7 +129,8 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (NodeType t: rootNodeTypes())
     {
-        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, false);
+        const auto node = QnResourceTreeModelNodeFactory::createNode(
+            t, this, false, useExtraSearchInformation);
         m_rootNodes[t] = node;
         if (node)
         {
@@ -462,7 +469,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (layout->isFile())
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }
@@ -483,7 +490,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
     {
         if (node->resourceFlags().testFlag(Qn::local))
         {
-            if (isLoggedIn)
+            if (isLoggedIn || ini().enableResourceFilteringByDefault)
                 return m_rootNodes[NodeType::localResources];
             return rootNode;
         }

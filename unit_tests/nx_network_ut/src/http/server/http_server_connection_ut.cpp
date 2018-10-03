@@ -9,6 +9,7 @@
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -302,8 +303,8 @@ class HttpServerConnectionRequestPipelining:
 public:
     ~HttpServerConnectionRequestPipelining()
     {
-        for (const auto& client: m_httpClients)
-            client->pleaseStopSync();
+        if (m_clientConnection)
+            m_clientConnection->pleaseStopSync();
 
         m_timer.pleaseStopSync();
     }
@@ -318,17 +319,30 @@ protected:
 
     void whenSendMultipleRequests()
     {
+        const auto requestUrl = prepareRequestUrl(kPipeliningTestPath);
+        if (!m_clientConnection)
+        {
+            auto connection = std::make_unique<TCPSocket>(AF_INET);
+            ASSERT_TRUE(connection->connect(url::getEndpoint(requestUrl), kNoTimeout))
+                << SystemError::getLastOSErrorText().toStdString();
+
+            m_clientConnection = std::make_unique<http::AsyncMessagePipeline>(
+                std::move(connection));
+            m_clientConnection->setMessageHandler(
+                [this](auto... args) { saveMessage(std::move(args)...); });
+            m_clientConnection->startReadingConnection();
+        }
+
         m_expectedResponseCount = 2;
         for (int i = 0; i < m_expectedResponseCount; ++i)
         {
-            m_httpClients.push_back(std::make_unique<AsyncClient>());
-            m_httpClients.back()->setResponseReadTimeout(kNoTimeout);
-            m_httpClients.back()->setMessageBodyReadTimeout(kNoTimeout);
-            m_httpClients.back()->addAdditionalHeader(
-                "Sequence", std::to_string(i).c_str());
-            m_httpClients.back()->doGet(
-                prepareRequestUrl(kPipeliningTestPath),
-                [this, client = m_httpClients.back().get()]() { saveResponse(client); });
+            http::Message message(http::MessageType::request);
+            message.request->requestLine.method = http::Method::get;
+            message.request->requestLine.version = http::http_1_1;
+            message.request->requestLine.url = requestUrl.path();
+            message.request->headers.emplace("Sequence", std::to_string(i).c_str());
+
+            m_clientConnection->sendMessage(std::move(message));
         }
     }
 
@@ -353,7 +367,7 @@ protected:
 private:
     nx::utils::SyncQueue<std::unique_ptr<Response>> m_responseQueue;
     int m_expectedResponseCount = 0;
-    std::vector<std::unique_ptr<AsyncClient>> m_httpClients;
+    std::unique_ptr<http::AsyncMessagePipeline> m_clientConnection;
     std::vector<nx::network::http::RequestProcessedHandler> m_postponedRequestCompletionHandlers;
     aio::Timer m_timer;
 
@@ -387,16 +401,14 @@ private:
             handler(StatusCode::ok);
     }
 
-    void saveResponse(AsyncClient* asyncClient)
+    void saveMessage(http::Message message)
     {
-        if (asyncClient->hasRequestSucceeded())
-            m_responseQueue.push(std::make_unique<Response>(*asyncClient->response()));
-        else
-            m_responseQueue.push(nullptr);
+        if (message.type == http::MessageType::response)
+            m_responseQueue.push(std::make_unique<Response>(*message.response));
     }
 };
 
-TEST_F(HttpServerConnectionRequestPipelining, DISABLED_response_order_matches_request_order)
+TEST_F(HttpServerConnectionRequestPipelining, response_order_matches_request_order)
 {
     givenServerThatReordersResponses();
     whenSendMultipleRequests();

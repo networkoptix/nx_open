@@ -44,6 +44,7 @@ template <typename T>
 void QnMediaServerResourceSearchers::registerSearcher(T* instance)
 {
     m_searchers.insert(std::type_index(typeid(T)), instance);
+    serverModule()->commonModule()->resourceDiscoveryManager()->addDeviceServer(instance);
 }
 
 QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnMediaServerModule* serverModule):
@@ -126,9 +127,6 @@ void QnMediaServerResourceSearchers::start()
         registerSearcher(new OnvifResourceSearcher(serverModule()));
     #endif //ENABLE_ONVIF
 #endif
-
-    for (auto searcher: m_searchers.values())
-        commonModule->resourceDiscoveryManager()->addDeviceServer(searcher);
 }
 
 QnMediaServerResourceSearchers::~QnMediaServerResourceSearchers()

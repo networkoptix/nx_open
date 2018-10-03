@@ -89,12 +89,14 @@ protected:
     void pushMetadataPacket(MetadataPacket* metadataPacket);
 
     /**
-     * Called when any of the seetings (param values) change.
+     * Called when any of the settings (param values) change.
      */
     virtual void settingsChanged() {}
 
     /**
      * Provides access to the Manager settings stored by the server for a particular Resource.
+     * ATTENTION: If settingsChanged() has not been called yet, it means that the manager has not
+     * received its settings from the server yet, and thus this method will yield empty values.
      * @return Param value, or an empty string if such param does not exist, having logged the
      * error.
      */

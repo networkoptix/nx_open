@@ -736,9 +736,9 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
     return true;
 }
 
-bool HanwhaResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
+bool HanwhaResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
 {
-    return base_type::doesEventComeFromAnalyticsDriver(eventType)
+    return base_type::isAnalyticsDriverEvent(eventType)
         || eventType == nx::vms::api::EventType::cameraInputEvent;
 }
 
@@ -1098,7 +1098,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
         const auto channelPrefix = kHanwhaChannelPropertyTemplate.arg(channel);
         for (const auto& entry: videoProfiles->response())
         {
-            if(!isPropertyBelongsToChannel(entry.first, channel))
+            const auto propertyChannel = extractPropertyChannel(entry.first);
+            if (propertyChannel != boost::none && *propertyChannel == channel)
                 continue;
 
             const bool isFixedProfile = entry.first.endsWith(kHanwhaIsFixedProfileProperty)
@@ -3472,12 +3473,13 @@ QString HanwhaResource::propertyByPrameterAndRole(
     return entry->second;
 }
 
-HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id) const
+boost::optional<HanwhaResource::HanwhaPortInfo> HanwhaResource::portInfoFromId(
+    const QString& id) const
 {
     HanwhaPortInfo result;
     auto split = id.split(L'.');
     if (split.size() != 2)
-        return result;
+        return boost::none;
 
     result.prefix = split[0];
     result.number = split[1];
@@ -3489,23 +3491,26 @@ HanwhaResource::HanwhaPortInfo HanwhaResource::portInfoFromId(const QString& id)
 bool HanwhaResource::setOutputPortStateInternal(const QString& outputId, bool activate)
 {
     const auto info = portInfoFromId(outputId);
+    if (info == boost::none)
+        return false;
+
     const auto state = activate ? lit("On") : lit("Off");
 
     HanwhaRequestHelper::Parameters parameters =
-        {{lit("%1.%2.State").arg(info.prefix).arg(info.number), state}};
+        {{lit("%1.%2.State").arg(info->prefix).arg(info->number), state}};
 
-    if (info.submenu == lit("alarmoutput"))
+    if (info->submenu == lit("alarmoutput"))
     {
         parameters.emplace(
             lit("%1.%2.ManualDuration")
-                .arg(info.prefix)
-                .arg(info.number),
+                .arg(info->prefix)
+                .arg(info->number),
             lit("Always"));
     }
 
     HanwhaRequestHelper helper(sharedContext());
     const auto response = helper.control(
-        lit("io/%1").arg(info.submenu),
+        lit("io/%1").arg(info->submenu),
         parameters);
 
     return response.isSuccessful();

@@ -118,7 +118,7 @@ CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamPa
     const auto profileNumber = m_hanwhaResource->profileByRole(role);
     if (!isCorrectProfile(profileNumber))
     {
-        return CameraDiagnostics::CameraPluginErrorResult(
+        return CameraDiagnostics::CameraInvalidParams(
             lit("Update profile: invalid profile number is given"));
     }
 

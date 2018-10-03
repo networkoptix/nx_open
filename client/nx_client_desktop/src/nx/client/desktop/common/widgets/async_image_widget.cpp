@@ -80,11 +80,11 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     m_placeholder->setAlignment(Qt::AlignCenter);
     m_placeholder->setContentsMargins(kMinIndicationMargins);
     m_placeholder->setHidden(true);
-    new WidgetAnchor(m_placeholder);
+    anchorWidgetToParent(m_placeholder);
 
     m_indicator->setContentsMargins(kMinIndicationMargins);
     m_indicator->setBorderRole(QPalette::Window);
-    new WidgetAnchor(m_indicator);
+    anchorWidgetToParent(m_indicator);
 }
 
 AsyncImageWidget::~AsyncImageWidget()

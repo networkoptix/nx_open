@@ -24,8 +24,7 @@ namespace detail {
 
 class NX_NETWORK_API ReverseConnection:
     public aio::BasicPollable,
-    public AbstractAcceptableReverseConnection,
-    public nx::network::http::StreamConnectionHolder
+    public AbstractAcceptableReverseConnection
 {
     using base_type = aio::BasicPollable;
 
@@ -36,6 +35,7 @@ public:
 
     virtual void connectToOriginator(
         ReverseConnectionCompletionHandler handler) override;
+    
     virtual void waitForOriginatorToStartUsingConnection(
         ReverseConnectionCompletionHandler handler) override;
 
@@ -54,9 +54,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::cloud::relay::api::BeginListeningResponse m_beginListeningResponse;
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        nx::network::http::AsyncMessagePipeline* connection) override;
+    void onConnectionClosed(SystemError::ErrorCode closeReason);
 
     void onConnectDone(
         nx::cloud::relay::api::ResultCode resultCode,

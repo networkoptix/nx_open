@@ -177,7 +177,9 @@ RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
     nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
-    BaseType(socketServer, std::move(sock)),
+    BaseType(
+        [socketServer](auto... args) { socketServer->closeConnection(args...); },
+        std::move(sock)),
     m_requestsToAnswer(nx::utils::random::number<int>(0, 3))
 {
 }

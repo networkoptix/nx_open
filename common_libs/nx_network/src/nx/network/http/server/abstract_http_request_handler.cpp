@@ -45,16 +45,14 @@ AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
 
 bool AbstractHttpRequestHandler::processRequest(
     nx::network::http::HttpServerConnection* const connection,
-    nx::network::http::Message&& requestMsg,
+    nx::network::http::Request request,
     nx::utils::stree::ResourceContainer&& authInfo,
     ResponseIsReadyHandler completionHandler)
 {
-    NX_ASSERT(requestMsg.type == nx::network::http::MessageType::request);
-
     // Creating response here to support pipelining.
     Message responseMsg(MessageType::response);
 
-    responseMsg.response->statusLine.version = requestMsg.request->requestLine.version;
+    responseMsg.response->statusLine.version = request.requestLine.version;
 
     m_responseMsg = std::move(responseMsg);
     m_completionHandler = std::move(completionHandler);
@@ -68,7 +66,7 @@ bool AbstractHttpRequestHandler::processRequest(
     processRequest(
         connection,
         std::move(authInfo),
-        std::move(std::move(*requestMsg.request)),
+        std::move(std::move(request)),
         m_responseMsg.response,
         std::move(httpRequestProcessedHandler));
     return true;

@@ -112,7 +112,8 @@ def one_licensed_mediaserver(one_mediaserver, required_licenses):
 
     server = licensing.ServerApi()
     for license in required_licenses:
-        one_mediaserver.api.generic.get('api/activateLicense', params=dict(key=server.generate(**license)))
+        one_mediaserver.api.generic.get(
+            'api/activateLicense', params=dict(key=server.generate(**license)))
 
     return one_mediaserver
 

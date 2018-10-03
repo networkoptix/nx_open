@@ -312,7 +312,7 @@ protected:
             duration_cast<milliseconds>(m_lastRequestedTimestamp),
             m_prevCursor->filter().timePeriod.startTime());
 
-        ASSERT_EQ(m_deviceId, m_prevCursor->filter().deviceId);
+        ASSERT_EQ(std::vector<QnUuid>{m_deviceId}, m_prevCursor->filter().deviceIds);
     }
 
     void thenPacketIsReadFromCursor()

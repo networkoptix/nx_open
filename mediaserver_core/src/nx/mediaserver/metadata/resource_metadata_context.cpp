@@ -50,7 +50,7 @@ void ManagerContext::putData(const QnAbstractDataPacketPtr& data)
 
 bool ManagerContext::processData(const QnAbstractDataPacketPtr& data)
 {
-    // Returning true means data has been processed.
+    // Returning true means the data has been processed.
 
     auto consumingManager = nxpt::ScopedRef<ConsumingCameraManager>(
         m_manager->queryInterface(IID_ConsumingCameraManager));

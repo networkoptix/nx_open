@@ -92,69 +92,6 @@ QString activationMessage(const QJsonObject& errorMessage)
 
 }
 
-CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
-    QnCommonModule* commonModule,
-    const QString& licenseKey,
-    bool infoMode,
-    QByteArray& response)
-{
-    // make check license request
-    QUrl url(QN_LICENSE_URL);
-    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
-
-    const auto runtimeData = commonModule->runtimeInfoManager()->items()
-        ->getItem(commonModule->moduleGUID()).data;
-
-    QUrlQuery params;
-    params.addQueryItem(kLicenseKey, licenseKey);
-    params.addQueryItem(kBox, runtimeData.box);
-    params.addQueryItem(kBrand, runtimeData.brand);
-    // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion());
-
-#ifdef Q_OS_LINUX
-    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
-    {
-        QString mac = Nx1::getMac();
-        QString serial = Nx1::getSerial();
-
-        if (!mac.isEmpty())
-            params.addQueryItem(kMac, mac);
-
-        if (!serial.isEmpty())
-            params.addQueryItem(kSerial, serial);
-    }
-#endif
-
-    QLocale locale;
-    params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
-
-    const QVector<QString> hardwareIds = commonModule->licensePool()->hardwareIds();
-    for (const QString& hwid: hardwareIds)
-    {
-        int version = LLUtil::hardwareIdVersion(hwid);
-
-        QString name;
-        if (version == 0)
-            name = kOldHwidArray;
-        else if (version == 1)
-            name = kHwidArray;
-        else
-            name = QString(QLatin1String("%1%2[]")).arg(kHwid).arg(version);
-
-        params.addQueryItem(name, hwid);
-    }
-
-    if (infoMode)
-        params.addQueryItem(kMode, kInfo);
-
-    QByteArray request = params.query(QUrl::FullyEncoded).toUtf8();
-    CLHttpStatus result = client.doPOST(url.path(), request);
-    if (result == CL_HTTP_SUCCESS)
-        client.readAll(response);
-    return result;
-}
-
 struct LicenseKey
 {
     QString licenseKey;
@@ -163,11 +100,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((LicenseKey), (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseKey, (json), (licenseKey))
 
 
-int QnActivateLicenseRestHandler::executePost(const QString& path, const QnRequestParams& params,
+int QnActivateLicenseRestHandler::executePost(const QString&, const QnRequestParams&,
     const QByteArray& body, QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
-    vms::api::DetailedLicenseData reply;
-
     LicenseKey licenseKeyStruct;
     if (!QJson::deserialize<LicenseKey>(body, &licenseKeyStruct))
     {
@@ -175,7 +110,30 @@ int QnActivateLicenseRestHandler::executePost(const QString& path, const QnReque
         return nx::network::http::StatusCode::ok;
     }
 
-    const QString licenseKey = licenseKeyStruct.licenseKey;
+    return activateLicense(licenseKeyStruct.licenseKey, result, owner);
+}
+
+
+// WARNING: Deprecated!
+int QnActivateLicenseRestHandler::executeGet(const QString&, const QnRequestParams& params,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+{
+    const QString licenseKey = params.value(kKey);
+    if (licenseKey.isEmpty())
+    {
+        result.setError(QnJsonRestResult::MissingParameter, "Parameter 'key' is missed");
+        return nx::network::http::StatusCode::ok;
+    }
+
+    return activateLicense(licenseKey, result, owner);
+}
+
+
+int QnActivateLicenseRestHandler::activateLicense(const QString licenseKey,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+{
+    vms::api::DetailedLicenseData reply;
+
     if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
     {
         result.setError(QnJsonRestResult::InvalidParameter,
@@ -238,4 +196,67 @@ int QnActivateLicenseRestHandler::executePost(const QString& path, const QnReque
     ec2::fromResourceToApi(license, reply);
     result.setReply(reply);
     return nx::network::http::StatusCode::ok;
+}
+
+CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
+    QnCommonModule* commonModule,
+    const QString& licenseKey,
+    bool infoMode,
+    QByteArray& response)
+{
+    // make check license request
+    QUrl url(QN_LICENSE_URL);
+    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
+
+    const auto runtimeData = commonModule->runtimeInfoManager()->items()
+        ->getItem(commonModule->moduleGUID()).data;
+
+    QUrlQuery params;
+    params.addQueryItem(kLicenseKey, licenseKey);
+    params.addQueryItem(kBox, runtimeData.box);
+    params.addQueryItem(kBrand, runtimeData.brand);
+    // TODO: #GDM replace with qnStaticCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion());
+
+#ifdef Q_OS_LINUX
+    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    {
+        QString mac = Nx1::getMac();
+        QString serial = Nx1::getSerial();
+
+        if (!mac.isEmpty())
+            params.addQueryItem(kMac, mac);
+
+        if (!serial.isEmpty())
+            params.addQueryItem(kSerial, serial);
+    }
+#endif
+
+    QLocale locale;
+    params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
+
+    const QVector<QString> hardwareIds = commonModule->licensePool()->hardwareIds();
+    for (const QString& hwid: hardwareIds)
+    {
+        int version = LLUtil::hardwareIdVersion(hwid);
+
+        QString name;
+        if (version == 0)
+            name = kOldHwidArray;
+        else if (version == 1)
+            name = kHwidArray;
+        else
+            name = QString(QLatin1String("%1%2[]")).arg(kHwid).arg(version);
+
+        params.addQueryItem(name, hwid);
+    }
+
+    if (infoMode)
+        params.addQueryItem(kMode, kInfo);
+
+    QByteArray request = params.query(QUrl::FullyEncoded).toUtf8();
+    CLHttpStatus result = client.doPOST(url.path(), request);
+    if (result == CL_HTTP_SUCCESS)
+        client.readAll(response);
+    return result;
 }

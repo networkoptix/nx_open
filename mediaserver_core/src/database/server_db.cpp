@@ -284,7 +284,8 @@ bool QnServerDb::open()
     const QString fileName = closeDirPath(eventsDBFilePath)
         + QString(lit("mserver.sqlite"));
 
-    addDatabase(fileName, "QnServerDb");
+    QString connectionName = "QnServerDb" + serverModule()->commonModule()->moduleGUID().toString();
+    addDatabase(fileName, connectionName);
     if (m_sdb.open())
     {
         if (!createDatabase()) // Create tables if DB is empty.
