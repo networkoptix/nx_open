@@ -29,14 +29,22 @@
         <button class="btn btn-default" ng-click="delete()">Déconnecter de mon compte</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             est en cours de fusion à ce système</div>
         <hr />
         <div class="merge-info-text">Selon la taille de la base de données, cela peut prendre plusieurs heures</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>Ce système est en cours de fusion à
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />

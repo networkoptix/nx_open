@@ -52,11 +52,11 @@ Privacy leads to the proper page
 
 Copyright leads to the proper site
     [tags]    C41547
-    Wait Until Element Is Visible    ${FOOTER COPYWRIGHT LINK}
-    Click Link    ${FOOTER COPYWRIGHT LINK}
+    Wait Until Element Is Visible    ${FOOTER COPYRIGHT LINK}
+    Click Link    ${FOOTER COPYRIGHT LINK}
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[2]
-    Location Should Be    ${COPYWRIGHT URL}
+    Location Should Be    ${COPYRIGHT URL}
 
 Change interface language
     [tags]    C41549

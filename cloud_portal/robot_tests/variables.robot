@@ -208,7 +208,7 @@ ${FOOTER KNOWN LIMITS LINK}          //footer//a[contains(text(),"${KNOWN LIMITA
 ${FOOTER SUPPORT LINK}               //footer//a[contains(text(),"${SUPPORT}")]
 ${FOOTER TERMS LINK}                 //footer//a[contains(text(),"${TERMS}")]
 ${FOOTER PRIVACY LINK}               //footer//a[contains(text(),"${PRIVACY}")]
-${FOOTER COPYWRIGHT LINK}            //footer//a[contains(text(),"${COPYWRIGHT TEXT}")]
+${FOOTER COPYRIGHT LINK}             //footer//a[contains(text(),"${COPYRIGHT TEXT}")]
 
 #Misc
 ${PAGE NOT FOUND}                     //h1[contains(text(), '${PAGE NOT FOUND TEXT}')]

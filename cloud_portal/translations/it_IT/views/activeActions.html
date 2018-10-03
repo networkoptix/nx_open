@@ -1,13 +1,13 @@
 <div class="container">
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             Il suo account è stato creato con successo
         </h1>
-        <h1 class="process-success" ng-if="activate.success">
+        <h1 class="process-success" ng-if="activate.success && !loading">
             <a class="btn btn-default" href="/login">Log In</a>
         </h1>
 
-        <h1 class="process-success" ng-if="!activate.success">
+        <h1 class="process-success" ng-if="!activate.success && !loading">
             L'account è già attivato o il codice di conferma non è corretto
         </h1>
     </div>

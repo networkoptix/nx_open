@@ -7,8 +7,8 @@
     "ABOUT URL"                :    "https://cloud-test.hdw.mx/content/about",
     "KNOWN LIMITATIONS URL"    :    "https://cloud-test.hdw.mx/content/faq",
     "TERMS URL"                :    "https://cloud-test.hdw.mx/content/eula",
-    "COPYWRIGHT URL"           :    "http://www.networkoptix.com/",
-    "COPYWRIGHT TEXT"          :    "© 2018 Network Optix",
+    "COPYRIGHT URL"            :    "http://www.networkoptix.com/",
+    "COPYRIGHT TEXT"           :    "© 2018 Network Optix",
     "THEME COLOR"              :    "#2FA2DB",
     "THEME COLOR RGB"          :    "rgba(47, 162, 219, 1)"
-}   
+}

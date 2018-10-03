@@ -29,14 +29,22 @@
         <button class="btn btn-default" ng-click="delete()">Hesabımdan çıkış yap</button>
     </div>
 </div>
-<div class="card card-default" ng-if="currentlyMerging">
+<div class="mt-3 card card-default" ng-if="currentlyMerging">
     <div class="card-body" ng-if="isMaster && system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div><strong>{{mergeTargetSystem.name}}</strong>
             bu sistem birleştirilir</div>
         <hr />
         <div class="merge-info-text">Veri tabanının boyutuna bağlı olarak birkaç saat sürebilir</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
+        <div class="float-left position-relative">
+            <placeholder class="preloader-small" preloader="true"></placeholder>
+        </div>
+        <br>
         <div>Bu sistem ile birleştiriliyor             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr />
         <div class="merge-info-text">
