@@ -512,7 +512,7 @@ class MediaserverApi(object):
         """Get user attributes for a specific camera"""
         result = self.generic.get('ec2/getCameraUserAttributesList', params=dict(
             cameraId=camera_id))
-        assert len(result) == 1
+        assert len(result) == 1, 'Items: {!r}'.format(i['cameraId'] for i in result)
         return result[0]
 
     def change_camera_user_attributes(self, camera_id, **kwargs):
