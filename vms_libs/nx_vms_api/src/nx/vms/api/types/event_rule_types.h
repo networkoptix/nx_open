@@ -109,6 +109,9 @@ enum EventType
     /** Analytics SDK. */
     analyticsSdkEvent = 13,
 
+    /** Plugin events. */
+    pluginEvent = 14,
+
     /** System health message. */
     systemHealthEvent = 500,
 
