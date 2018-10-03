@@ -8,13 +8,17 @@ namespace p2p {
 class Connection: public ConnectionBase, public QnCommonModuleAware
 {
 public:
+    using ValidateRemotePeerFunc =
+        nx::utils::MoveOnlyFunc<bool(const vms::api::PeerDataEx&)>;
+
     Connection(
         QnCommonModule* commonModule,
         const QnUuid& remoteId,
         const vms::api::PeerDataEx& localPeer,
         const nx::utils::Url& remotePeerUrl,
         std::unique_ptr<QObject> opaqueObject,
-        ConnectionLockGuard connectionLockGuard);
+        ConnectionLockGuard connectionLockGuard,
+        ValidateRemotePeerFunc validateRemotePeerFunc);
 
     Connection(
         QnCommonModule* commonModule,
@@ -31,17 +35,12 @@ public:
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
     virtual bool validateRemotePeerData(const vms::api::PeerDataEx& peer) const override;
 
-    /* Check remote peer identityTime and set local value if it greater.
-     * @return true if system identity time has been changed.
-     */
-    static bool checkAndSetSystemIdentityTime(
-        const vms::api::PeerDataEx& remotePeer, QnCommonModule* commonModule);
-
 protected:
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
 
 private:
     const Qn::UserAccessData m_userAccessData = Qn::kSystemAccess;
+    ValidateRemotePeerFunc m_validateRemotePeerFunc;
 };
 
 } // namespace p2p

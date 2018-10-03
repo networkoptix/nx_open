@@ -11,6 +11,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),
     SscAnalyticsEventType_Fields, (brief, true))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsDriverManifest, (json),
     SscAnalyticsDriverManifest_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AllowedPortNames, (json),
+    AllowedPorts_Fields, (brief, true))
 
 } // namespace ssc
 } // namespace metadata

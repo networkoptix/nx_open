@@ -27,7 +27,7 @@ public:
 
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
 
-    virtual bool setRelayOutputState(const QString& outputID, bool activate,
+    virtual bool setOutputPortState(const QString& outputID, bool activate,
         unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

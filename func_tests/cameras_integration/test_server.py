@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import oyaml as yaml
 import pytest
+from netaddr import IPNetwork
 from pathlib2 import Path
 
 from . import execution
@@ -27,11 +28,11 @@ def config(test_config):
 
 def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     one_licensed_mediaserver.os_access.networking.setup_network(
-        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
+        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), IPNetwork(config.CAMERAS_NETWORK))
 
     def save_result(name, data):
         file_path = artifacts_dir / name
-        file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4, sort_keys=True))
+        file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4))
         file_path.with_suffix('.yaml').write_bytes(
             yaml.safe_dump(data, default_flow_style=False, width=1000))
 
@@ -41,7 +42,7 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
 
     stand = execution.Stand(
         one_licensed_mediaserver,
-        yaml.load(expected_cameras.read_bytes()),
+        yaml.load(expected_cameras.read_bytes()) or {},
         config.STAGE_HARD_TIMEOUT)
     try:
         stand.run_all_stages(config.CAMERA_CYCLE_DELAY, config.SERVER_STAGE_DELAY)

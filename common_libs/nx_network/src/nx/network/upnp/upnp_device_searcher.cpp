@@ -29,16 +29,14 @@ int DeviceSearcherDefaultSettings::cacheTimeout() const
     return XML_DESCRIPTION_LIVE_TIME_MS;
 }
 
-static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
-
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE =
     nx::utils::AppInfo::organizationName() + "Server";
 
 DeviceSearcher::DeviceSearcher(
-    const AbstractDeviceSearcherSettings& settings,
+    std::unique_ptr<AbstractDeviceSearcherSettings> settings,
     unsigned int discoverTryTimeoutMS)
     :
-    m_settings(settings),
+    m_settings(std::move(settings)),
     m_discoverTryTimeoutMS(discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS),
     m_timerID(0),
     m_terminated(false),
@@ -52,16 +50,11 @@ DeviceSearcher::DeviceSearcher(
             std::chrono::milliseconds(m_discoverTryTimeoutMS));
     }
     m_cacheTimer.start();
-
-    NX_ASSERT(UPNPDeviceSearcherInstance == nullptr);
-    UPNPDeviceSearcherInstance = this;
 }
 
 DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
-
-    UPNPDeviceSearcherInstance = nullptr;
 }
 
 void DeviceSearcher::pleaseStop()
@@ -204,12 +197,7 @@ void DeviceSearcher::processDiscoveredDevices(SearchHandler* handlerToUse)
 
 int DeviceSearcher::cacheTimeout() const
 {
-    return m_settings.cacheTimeout();
-}
-
-DeviceSearcher* DeviceSearcher::instance()
-{
-    return UPNPDeviceSearcherInstance;
+    return m_settings->cacheTimeout();
 }
 
 void DeviceSearcher::onTimer(const quint64& /*timerID*/)
@@ -376,7 +364,7 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(const QnIn
     }
 
     if (oldSock)
-        oldSock->pleaseStopSync(true);
+        oldSock->pleaseStopSync();
     if (isReceiveSocketUpdated)
     {
         QnMutexLocker lock(&m_mutex);
@@ -522,7 +510,7 @@ const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescripti
     if (it == m_upnpDescCache.end())
         return nullptr;
 
-    if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout())
+    if(m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings->cacheTimeout())
     {
         //item has expired
         m_upnpDescCache.erase(it);

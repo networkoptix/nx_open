@@ -192,7 +192,7 @@ void registerCommands(CommandsFactory& factory, nx::SystemCommands* systemComman
                  return Result::invalidArg;
 
              std::stringstream commandStream;
-             commandStream << "dpkg -i " << debPath;
+             commandStream << "dpkg -i '" << debPath << "'";
              int result = ::system(commandStream.str().c_str());
              return result == 0 ? Result::ok : Result::execFailed;
          }, true)

@@ -29,9 +29,12 @@ class LocalConnectionFactory;
 class QnSimpleHttpConnectionListener;
 class Appserver2Process;
 
-class Appserver2Process: public QObject, public QnStoppable
+class Appserver2Process:
+    public QObject,
+    public QnStoppable
 {
     Q_OBJECT
+
 public:
     Appserver2Process(int argc, char **argv);
     virtual ~Appserver2Process() = default;
@@ -52,8 +55,10 @@ public:
     void connectTo(const Appserver2Process* dstServer);
 
     static void resetInstanceCounter();
+
 signals:
     void beforeStart();
+
 private:
     int m_argc;
     char** m_argv;
@@ -69,20 +74,28 @@ private:
 
     void updateRuntimeData();
     void registerHttpHandlers(ec2::LocalConnectionFactory* ec2ConnectionFactory);
-    QnMediaServerResourcePtr addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection, int tcpPort);
+    QnMediaServerResourcePtr addSelfServerResource(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        int tcpPort);
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class Appserver2Launcher:
-    public QObject, public nx::utils::test::ModuleLauncher<ec2::Appserver2Process>
+    public QObject,
+    public nx::utils::test::ModuleLauncher<ec2::Appserver2Process>
 {
     Q_OBJECT;
     using base_type = ModuleLauncher<ec2::Appserver2Process>;
+
 signals:
     void beforeStart();
+
 public:
     static std::unique_ptr<ec2::Appserver2Launcher> createAppserver(
         bool keepDbFile = false,
         quint16 baseTcpPort = 0);
+
 protected:
     virtual void beforeModuleStart() override
     {

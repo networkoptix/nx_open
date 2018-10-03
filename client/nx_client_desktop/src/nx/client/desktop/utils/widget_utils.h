@@ -11,6 +11,7 @@ class WidgetUtils
 {
 public:
     static void removeLayout(QLayout* layout);
+    static void setFlag(QWidget* widget, Qt::WindowFlags flags, bool value);
 
     /** Unlike QWidget::graphicsProxyWidget finds proxy recursively. */
     static QGraphicsProxyWidget* graphicsProxyWidget(const QWidget* widget);

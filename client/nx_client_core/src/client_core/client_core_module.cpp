@@ -56,6 +56,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
 
     m_qmlEngine = new QQmlEngine(this);
+    m_qmlEngine->setOutputWarningsToStandardError(true);
 
     registerResourceDataProviders();
 }

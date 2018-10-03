@@ -37,6 +37,9 @@ class TransactionLog:
 public:
     TransactionLog(dao::DataObjectType dataObjectType):
         BasePersistentDataTest(DbInitializationType::delayed),
+        m_protocolVersionRange(
+            nx::cdb::kMinSupportedProtocolVersion,
+            nx::cdb::kMaxSupportedProtocolVersion),
         m_peerId(QnUuid::createUuid())
     {
         dbConnectionOptions().maxConnectionCount = 100;
@@ -67,7 +70,7 @@ public:
         insertRandomSystem(getAccount(0));
 
         // Initializing system's transaction log.
-        const nx::String systemId = getSystem(0).id.c_str();
+        const std::string systemId = getSystem(0).id.c_str();
         const auto dbResult = executeUpdateQuerySync(
             std::bind(&data_sync_engine::TransactionLog::updateTimestampHiForSystem,
                 m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
@@ -96,8 +99,14 @@ protected:
         initializeTransactionLog();
     }
 
+    const ProtocolVersionRange& protocolVersionRange() const
+    {
+        return m_protocolVersionRange;
+    }
+
 private:
     TestOutgoingTransactionDispatcher m_outgoingTransactionDispatcher;
+    ProtocolVersionRange m_protocolVersionRange;
     std::unique_ptr<data_sync_engine::TransactionLog> m_transactionLog;
     const QnUuid m_peerId;
     data_sync_engine::dao::TransactionDataObjectFactory::Function m_factoryFuncBak;
@@ -106,9 +115,7 @@ private:
     {
         m_transactionLog = std::make_unique<data_sync_engine::TransactionLog>(
             m_peerId,
-            ProtocolVersionRange(
-                nx::cdb::kMinSupportedProtocolVersion,
-                nx::cdb::kMaxSupportedProtocolVersion),
+            m_protocolVersionRange,
             &persistentDbManager()->queryExecutor(),
             &m_outgoingTransactionDispatcher);
     }
@@ -173,10 +180,19 @@ protected:
             m_transactionData);
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
-        transactionLog()->saveLocalTransaction<nx::cdb::ec2::command::SaveUser>(
+
+        const auto transactionHash = 
+            nx::cdb::ec2::command::SaveUser::hash(transaction.params);
+        auto transactionSerializer = std::make_unique<
+            UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>>(
+                std::move(transaction),
+                protocolVersionRange().currentVersion());
+
+        transactionLog()->saveLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
-            std::move(transaction));
+            transactionHash,
+            std::move(transactionSerializer));
     }
 
     void assertIfTransactionIsNotPresent()
@@ -244,7 +260,8 @@ protected:
             <nx::cdb::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::SerializableTransaction<vms::api::UserData>(std::move(transaction)));
+                data_sync_engine::SerializableTransaction<nx::cdb::ec2::command::SaveUser>(
+                    std::move(transaction)));
         ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
@@ -344,9 +361,7 @@ private:
 
         transactionLog()->readTransactions(
             m_systemId.c_str(),
-            boost::none,
-            boost::none,
-            std::numeric_limits<int>::max(),
+            ReadCommandsFilter::kEmptyFilter,
             completionHandler);
 
         return transactionsReadPromise.get_future().get();
@@ -385,7 +400,7 @@ private:
             <nx::cdb::ec2::command::SaveUser>(
                 queryContext.get(),
                 m_systemId.c_str(),
-                data_sync_engine::UbjsonSerializedTransaction<vms::api::UserData>(
+                data_sync_engine::UbjsonSerializedTransaction<nx::cdb::ec2::command::SaveUser>(
                     std::move(transaction),
                     nx_ec::EC2_PROTO_VERSION));
         ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)

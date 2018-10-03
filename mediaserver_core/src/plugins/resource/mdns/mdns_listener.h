@@ -30,8 +30,6 @@ public:
     void registerConsumer(uintptr_t id);
     std::shared_ptr<const ConsumerData> getData(uintptr_t id);
 
-    static QnMdnsListener* instance();
-
     QStringList getLocalAddressList() const;
 
 private:

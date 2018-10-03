@@ -18,8 +18,7 @@ namespace nx {
 namespace hpm {
 
 class MediaServerEmulator:
-    public network::aio::BasicPollable,
-    public nx::network::server::StreamConnectionHolder<network::stun::MessagePipeline>
+    public network::aio::BasicPollable
 {
 public:
     enum class ActionToTake
@@ -107,9 +106,6 @@ private:
         std::unique_ptr<network::AbstractStreamSocket> acceptedSocket);
     void onMessageReceived(network::stun::Message message);
 
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        network::stun::MessagePipeline* connection) override;
     virtual void stopWhileInAioThread() override;
 
     MediaServerEmulator(const MediaServerEmulator&);

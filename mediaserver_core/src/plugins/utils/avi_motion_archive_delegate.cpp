@@ -1,5 +1,4 @@
 #include "avi_motion_archive_delegate.h"
-#if defined(ENABLE_SOFTWARE_MOTION_DETECTION)
 
 namespace nx {
 namespace mediaserver_core {
@@ -67,5 +66,3 @@ QnMetaDataV1Ptr AviMotionArchiveDelegate::analyzeMotion(const QnAbstractMediaDat
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
-#endif // defined(ENABLE_SOFTWARE_MOTION_DETECTION)

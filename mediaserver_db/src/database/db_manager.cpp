@@ -1881,6 +1881,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
+
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
         return ec2::migration::ptz::addRotationToPresets(m_sdb)
@@ -1896,6 +1897,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20180904_analytics_guid_to_string.sql")))
         return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith("/99_20180914_rename_preferred_preset_type.sql"))
+        return resyncIfNeeded(ResyncCameraAttributes);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

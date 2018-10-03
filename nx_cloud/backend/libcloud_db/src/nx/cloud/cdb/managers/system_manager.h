@@ -511,12 +511,12 @@ private:
     /** Processes saveUser transaction received from mediaserver. */
     nx::sql::DBResult processEc2SaveUser(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<nx::vms::api::UserData> data);
 
     nx::sql::DBResult processEc2RemoveUser(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<nx::vms::api::IdData> data);
 
     void removeVmsUserFromCache(
@@ -525,12 +525,12 @@ private:
 
     nx::sql::DBResult processSetResourceParam(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
 
     nx::sql::DBResult processRemoveResourceParam(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
 
     template<typename ExtensionFuncPtr, typename... Args>

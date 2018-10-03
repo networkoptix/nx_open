@@ -103,6 +103,7 @@ typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;
 class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;
 typedef QnSharedResourcePointerList<QnUserResource> QnUserResourceList;
+typedef QSet<QnUserResourcePtr> QnUserResourceSet;
 
 class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;

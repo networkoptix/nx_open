@@ -8,12 +8,8 @@ namespace nexus {
 
 WebSocketProxy::WebSocketProxy(QObject* parent): QObject(parent)
 {
-    auto executorThread = IoExecutor::instance()->getThread();
-    executorThread->start();
-
     m_socket = new QWebSocket();
     m_socket->setParent(this);
-    moveToThread(executorThread);
 }
 
 QWebSocket* WebSocketProxy::getSocket()

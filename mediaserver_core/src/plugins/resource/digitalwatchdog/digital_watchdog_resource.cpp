@@ -204,7 +204,7 @@ std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() cons
 
 bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
 {
-    if (m_appStopping)
+    if (commonModule()->isNeedToStop())
         return false;
 
     auto http = httpClient();
@@ -243,7 +243,7 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::initializeCameraDriver()
     bool unauth = false;
     if (!isDualStreamingEnabled(unauth) && unauth==false)
     {
-        if (m_appStopping)
+        if (commonModule()->isNeedToStop())
             return CameraDiagnostics::UnknownErrorResult();
 
         // The camera most likely is going to reset after enabling dual streaming
@@ -334,12 +334,12 @@ static const QString kCproPrimaryVideoCodec = lit("cproPrimaryVideoCodec");
 static const QString kCproSecondaryVideoCodec = lit("cproSecondaryVideoCodec");
 static const QStringList kCproParameters{kCproPrimaryVideoCodec, kCproSecondaryVideoCodec};
 
-void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
+void QnDigitalWatchdogResource::initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params)
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
     {
-        base_type::initAdvancedParametersProviders(params);
+        base_type::initAdvancedParametersProvidersUnderLock(params);
         return;
     }
 

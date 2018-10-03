@@ -5,23 +5,19 @@
 
 #include <nx/utils/log/assert.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 WidgetAnchor::WidgetAnchor(QWidget* widget):
     base_type(widget),
     m_widget(widget)
 {
+    NX_ASSERT(widget);
     if (!widget)
-    {
-        NX_ASSERT(false);
         return;
-    }
 
     widget->installEventFilter(this);
 
-    QWidget* parentWidget = widget->parentWidget();
+    const auto parentWidget = widget->parentWidget();
     if (parentWidget)
         parentWidget->installEventFilter(this);
 }
@@ -63,7 +59,7 @@ bool WidgetAnchor::eventFilter(QObject* object, QEvent* event)
 {
     if (object == m_widget)
     {
-        QWidget* parentWidget = m_widget->parentWidget();
+        const auto parentWidget = m_widget->parentWidget();
         switch (event->type())
         {
             case QEvent::Resize:
@@ -92,9 +88,8 @@ bool WidgetAnchor::eventFilter(QObject* object, QEvent* event)
     }
     else
     {
-        if (event->type() == QEvent::Resize &&
-           !m_widget.isNull() &&
-            object == m_widget->parentWidget())
+        if (event->type() == QEvent::Resize && !m_widget.isNull()
+            && object == m_widget->parentWidget())
         {
             updateGeometry();
         }
@@ -108,12 +103,12 @@ void WidgetAnchor::updateGeometry()
     if (!m_edges || !m_widget)
         return;
 
-    QWidget* parentWidget = m_widget->parentWidget();
+    const auto parentWidget = m_widget->parentWidget();
     if (!parentWidget)
         return;
 
     QRect geometry = m_widget->geometry();
-    QSize parentSize = parentWidget->size();
+    const auto parentSize = parentWidget->size();
 
     if (m_edges.testFlag(Qt::LeftEdge) && m_edges.testFlag(Qt::RightEdge))
     {
@@ -141,13 +136,28 @@ void WidgetAnchor::updateGeometry()
             geometry.moveBottom(parentSize.height() - m_margins.bottom() - 1);
     }
 
-    QSize minimumSize = m_widget->minimumSize();
+    const auto minimumSize = m_widget->minimumSize();
     geometry.setWidth(qMax(geometry.width(), minimumSize.width()));
     geometry.setHeight(qMax(geometry.height(), minimumSize.height()));
 
     m_widget->setGeometry(geometry);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+WidgetAnchor* anchorWidgetToParent(QWidget* widget, Qt::Edges edges, const QMargins& margins)
+{
+    NX_ASSERT(widget);
+    if (!widget)
+        return nullptr;
+
+    auto anchor = new WidgetAnchor(widget);
+    anchor->setEdges(edges);
+    anchor->setMargins(margins);
+    return anchor;
+}
+
+WidgetAnchor* anchorWidgetToParent(QWidget* widget, const QMargins& margins)
+{
+    return anchorWidgetToParent(widget, WidgetAnchor::kAllEdges, margins);
+}
+
+} // namespace nx::client::desktop

@@ -4,6 +4,7 @@
 #ifdef ENABLE_ARECONT
 
 #include "av_client_pull.h"
+#include "arecont_meta_reader.h"
 #include "../tools/simple_tftp_client.h"
 
 class QnAbstractMediaDataPacket;
@@ -28,23 +29,24 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
 
 protected:
-
     virtual QnAbstractMediaDataPtr getNextData();
+    virtual bool needMetadata() override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
 protected:
-
     int m_last_width;
     int m_last_height;
     int m_last_cam_width;
     int m_last_cam_height;
     bool m_last_resolution;
     unsigned int m_timeout;
-    bool m_black_white; // for dual sensor only 
+    bool m_black_white; // for dual sensor only
 
     QString m_model;
     CLSimpleTFTPClient* m_tftp_client;
     CameraDiagnostics::Result m_prevDataReadResult;
+
+    std::unique_ptr<ArecontMetaReader> m_metaReader;
 };
 
 #endif // ENABLE_ARECONT

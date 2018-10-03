@@ -9,13 +9,13 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 
-namespace Ui {
-    class TimeServerSelectionWidget;
-}
+namespace Ui { class TimeServerSelectionWidget; }
 
 class QnTimeServerSelectionModel;
 
-class QnTimeServerSelectionWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnTimeServerSelectionWidget:
+    public QnAbstractPreferencesWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 

@@ -127,7 +127,9 @@ int RemoteConnectionFactory::establishConnectionToRemoteServer(
     loginInfo.login = addr.userName();
     loginInfo.passwordHash = nx::network::http::calcHa1(
         loginInfo.login.toLower(), nx::network::AppInfo::realm(), addr.password());
-    loginInfo.clientInfo = clientInfo;
+    #ifdef ENABLE_EXTENDED_STATISTICS
+        loginInfo.clientInfo = clientInfo;
+    #endif
 
     {
         QnMutexLocker lk(&m_mutex);

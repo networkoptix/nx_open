@@ -331,7 +331,7 @@ CSndUList::~CSndUList()
     delete[] m_pHeap;
 }
 
-void CSndUList::insert(int64_t ts, CUDT* u)
+void CSndUList::insert(int64_t ts, std::shared_ptr<CUDT> u)
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
@@ -358,7 +358,7 @@ void CSndUList::insert(int64_t ts, CUDT* u)
     insert_(ts, u);
 }
 
-void CSndUList::update(CUDT* u, bool reschedule)
+void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 {
     std::lock_guard<std::mutex> listguard(m_ListLock);
 
@@ -376,7 +376,7 @@ void CSndUList::update(CUDT* u, bool reschedule)
             return;
         }
 
-        remove_(u);
+        remove_(u.get());
     }
 
     insert_(1, u);
@@ -395,8 +395,8 @@ int CSndUList::pop(sockaddr*& addr, CPacket& pkt)
     if (ts < m_pHeap[0]->m_llTimeStamp)
         return -1;
 
-    CUDT* u = m_pHeap[0]->m_pUDT;
-    remove_(u);
+    std::shared_ptr<CUDT> u = m_pHeap[0]->m_pUDT.lock();
+    remove_(u.get());
 
     if (!u->connected() || u->broken())
         return -1;
@@ -431,7 +431,7 @@ uint64_t CSndUList::getNextProcTime()
     return m_pHeap[0]->m_llTimeStamp;
 }
 
-void CSndUList::insert_(int64_t ts, CUDT* u)
+void CSndUList::insert_(int64_t ts, std::shared_ptr<CUDT> u)
 {
     CSNode* n = u->sNode();
 
@@ -613,7 +613,7 @@ CRcvUList::~CRcvUList()
 {
 }
 
-void CRcvUList::insert(CUDT* u)
+void CRcvUList::insert(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
     CTimer::rdtsc(n->m_llTimeStamp);
@@ -634,7 +634,7 @@ void CRcvUList::insert(CUDT* u)
     m_pLast = n;
 }
 
-void CRcvUList::remove(CUDT* u)
+void CRcvUList::remove(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
 
@@ -665,7 +665,7 @@ void CRcvUList::remove(CUDT* u)
     n->m_pNext = n->m_pPrev = NULL;
 }
 
-void CRcvUList::update(CUDT* u)
+void CRcvUList::update(std::shared_ptr<CUDT> u)
 {
     CRNode* n = u->rNode();
 
@@ -728,7 +728,7 @@ void CHash::init(int size)
     m_iHashSize = size;
 }
 
-CUDT* CHash::lookup(int32_t id)
+std::shared_ptr<CUDT> CHash::lookup(int32_t id)
 {
     // simple hash function (% hash table size); suitable for socket descriptors
     CBucket* b = m_pBucket[id % m_iHashSize];
@@ -743,7 +743,7 @@ CUDT* CHash::lookup(int32_t id)
     return NULL;
 }
 
-void CHash::insert(int32_t id, CUDT* u)
+void CHash::insert(int32_t id, std::shared_ptr<CUDT> u)
 {
     CBucket* b = m_pBucket[id % m_iHashSize];
 
@@ -781,25 +781,12 @@ void CHash::remove(int32_t id)
 
 
 //
-CRendezvousQueue::CRendezvousQueue():
-    m_lRendezvousID(),
-    m_RIDVectorLock()
+CRendezvousQueue::CRendezvousQueue()
 {
-#ifndef _WIN32
-    pthread_mutex_init(&m_RIDVectorLock, NULL);
-#else
-    m_RIDVectorLock = CreateMutex(NULL, false, NULL);
-#endif
 }
 
 CRendezvousQueue::~CRendezvousQueue()
 {
-#ifndef _WIN32
-    pthread_mutex_destroy(&m_RIDVectorLock);
-#else
-    CloseHandle(m_RIDVectorLock);
-#endif
-
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
         if (AF_INET == i->m_iIPversion)
@@ -811,9 +798,9 @@ CRendezvousQueue::~CRendezvousQueue()
     m_lRendezvousID.clear();
 }
 
-void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
+void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     CRL r;
     r.m_iID = id;
@@ -828,7 +815,7 @@ void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, CUDT* u, int ipv, const s
 
 void CRendezvousQueue::removeFromRQ(const UDTSOCKET& id)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
@@ -846,9 +833,9 @@ void CRendezvousQueue::removeFromRQ(const UDTSOCKET& id)
     }
 }
 
-CUDT* CRendezvousQueue::retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id)
+std::shared_ptr<CUDT> CRendezvousQueue::retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     // TODO: optimize search
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
@@ -868,7 +855,7 @@ void CRendezvousQueue::updateConnStatus()
     if (m_lRendezvousID.empty())
         return;
 
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
@@ -908,7 +895,6 @@ CRcvQueue::CRcvQueue():
     m_iPayloadSize(),
     m_bClosing(false),
     m_pRendezvousQueue(NULL),
-    m_vNewEntry(),
     m_mBuffer()
 {
 }
@@ -967,7 +953,6 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
 void CRcvQueue::worker()
 {
     sockaddr* addr = (AF_INET == m_UnitQueue.m_iIPversion) ? (sockaddr*) new sockaddr_in : (sockaddr*) new sockaddr_in6;
-    CUDT* u = NULL;
     int32_t id;
 
     while (!m_bClosing)
@@ -979,7 +964,7 @@ void CRcvQueue::worker()
         // check waiting list, if new socket, insert it to the list
         while (ifNewEntry())
         {
-            CUDT* ne = getNewEntry();
+            std::shared_ptr<CUDT> ne = getNewEntry();
             if (NULL != ne)
             {
                 m_pRcvUList->insert(ne);
@@ -1023,7 +1008,7 @@ void CRcvQueue::worker()
                 {
                     listener->processConnectionRequest(addr, unit->m_Packet);
                 }
-                else if (u = m_pRendezvousQueue->retrieveFromRQ(addr, id))
+                else if (auto u = m_pRendezvousQueue->retrieveFromRQ(addr, id))
                 {
                     // asynchronous connect: call connect here
                     // otherwise wait for the UDT socket to retrieve this packet
@@ -1039,7 +1024,7 @@ void CRcvQueue::worker()
                 packetVerifier.packetReceived(unit->m_Packet);
 #endif // DEBUG_RECORD_PACKET_HISTORY
 
-                if (NULL != (u = m_pHash->lookup(id)))
+                if (auto u = m_pHash->lookup(id))
                 {
                     if (CIPAddress::ipcmp(addr, u->peerAddr(), u->ipVersion()))
                     {
@@ -1055,7 +1040,7 @@ void CRcvQueue::worker()
                         }
                     }
                 }
-                else if (NULL != (u = m_pRendezvousQueue->retrieveFromRQ(addr, id)))
+                else if (auto u = m_pRendezvousQueue->retrieveFromRQ(addr, id))
                 {
                     if (!u->synRecving())
                         u->connect(unit->m_Packet);
@@ -1079,7 +1064,7 @@ void CRcvQueue::worker()
         uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
         while ((NULL != ul) && (ul->m_llTimeStamp < ctime))
         {
-            CUDT* u = ul->m_pUDT;
+            std::shared_ptr<CUDT> u = ul->m_pUDT.lock();
 
             if (u->connected() && !u->broken() && !u->isClosing())
             {
@@ -1170,7 +1155,7 @@ void CRcvQueue::removeListener(std::shared_ptr<ServerSideConnectionAcceptor> lis
         m_listener = nullptr;
 }
 
-void CRcvQueue::registerConnector(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
+void CRcvQueue::registerConnector(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl)
 {
     m_pRendezvousQueue->insertToRQ(id, u, ipv, addr, ttl);
 }
@@ -1194,7 +1179,7 @@ void CRcvQueue::removeConnector(const UDTSOCKET& id)
     }
 }
 
-void CRcvQueue::setNewEntry(CUDT* u)
+void CRcvQueue::setNewEntry(std::shared_ptr<CUDT> u)
 {
     std::lock_guard<std::mutex> lock(m_IDLock);
     m_vNewEntry.push_back(u);
@@ -1205,14 +1190,14 @@ bool CRcvQueue::ifNewEntry()
     return !(m_vNewEntry.empty());
 }
 
-CUDT* CRcvQueue::getNewEntry()
+std::shared_ptr<CUDT> CRcvQueue::getNewEntry()
 {
     std::lock_guard<std::mutex> lock(m_IDLock);
 
     if (m_vNewEntry.empty())
         return NULL;
 
-    CUDT* u = (CUDT*)*(m_vNewEntry.begin());
+    std::shared_ptr<CUDT> u = *m_vNewEntry.begin();
     m_vNewEntry.erase(m_vNewEntry.begin());
 
     return u;

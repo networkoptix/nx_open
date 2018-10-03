@@ -643,7 +643,7 @@ bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& vers
     if (!checkOnline())
         return false;
 
-    const auto result = restartClient(version);
+    const auto result = applauncher::api::restartClient(version);
     if (result == ResultType::ok)
         return true;
 

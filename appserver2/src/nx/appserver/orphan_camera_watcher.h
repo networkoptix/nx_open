@@ -25,7 +25,7 @@ public:
     void start();
     void update();
 
-    /** changeIntervalAsync just emits doChangeInterval, that restarts timer in timer's thread */
+    /** just emits doChangeInterval, that changes the interval in the timer's thread */
     void changeIntervalAsync(std::chrono::milliseconds interval);
 
 signals:

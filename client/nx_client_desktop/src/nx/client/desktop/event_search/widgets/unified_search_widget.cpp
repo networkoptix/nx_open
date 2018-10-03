@@ -77,7 +77,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     ui->placeholder->setParent(ui->ribbonContainer);
     ui->placeholder->hide();
-    new WidgetAnchor(ui->placeholder);
+    anchorWidgetToParent(ui->placeholder);
 
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);

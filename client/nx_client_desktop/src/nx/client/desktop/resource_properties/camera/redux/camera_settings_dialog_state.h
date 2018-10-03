@@ -5,6 +5,7 @@
 #include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
 #include <core/ptz/media_dewarping_params.h>
+#include <core/ptz/ptz_preset.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
@@ -18,9 +19,7 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 struct CameraSettingsDialogState
 {
@@ -171,9 +170,8 @@ struct CameraSettingsDialogState
         CombinedValue hasMotion;
         CombinedValue hasDualStreamingCapability;
         CombinedValue hasRemoteArchiveCapability;
-        CombinedValue hasPredefinedBitratePerGOP;
-        CombinedValue hasPtzPresets;
-        CombinedValue canDisableNativePtzPresets;
+        CombinedValue canSwitchPtzPresetTypes;
+        CombinedValue canForcePtzCapabilities;
         CombinedValue supportsMotionStreamOverride;
         CombinedValue hasCustomMediaPortCapability;
 
@@ -196,7 +194,9 @@ struct CameraSettingsDialogState
         UserEditableMultiple<bool> useBitratePerGOP;
         UserEditableMultiple<bool> primaryRecordingDisabled;
         UserEditableMultiple<bool> secondaryRecordingDisabled;
-        UserEditableMultiple<bool> nativePtzPresetsDisabled;
+        UserEditableMultiple<nx::core::ptz::PresetType> preferredPtzPresetType;
+        UserEditableMultiple<bool> forcedPtzPanTiltCapability;
+        UserEditableMultiple<bool> forcedPtzZoomCapability;
         UserEditableMultiple<vms::api::RtpTransportType> rtpTransportType;
         UserEditableMultiple<vms::api::MotionStreamType> motionStreamType;
         CombinedValue motionStreamOverridden; //< Read-only informational value.
@@ -222,7 +222,7 @@ struct CameraSettingsDialogState
         ScheduleCellParams brush;
 
         media::CameraStreamCapability mediaStreamCapability;
-        Qn::BitratePerGopType bitratePerGopType = Qn::BPG_None;
+        bool useBitratePerGop = false;
         QSize defaultStreamResolution;
 
         /** Some cameras do not allow to setup parameters (fps, quality). */
@@ -321,8 +321,16 @@ struct CameraSettingsDialogState
         return devicesDescription.isDtsBased == CombinedValue::None
             && devicesDescription.isWearable == CombinedValue::None;
     }
+
+    bool canSwitchPtzPresetTypes() const
+    {
+        return devicesDescription.canSwitchPtzPresetTypes != CombinedValue::None;
+    }
+
+    bool canForcePtzCapabilities() const
+    {
+        return devicesDescription.canForcePtzCapabilities == CombinedValue::All;
+    }
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

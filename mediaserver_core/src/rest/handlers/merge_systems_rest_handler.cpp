@@ -109,6 +109,6 @@ void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
         QnConnectionValidator::validateConnection(remoteModuleInformation);
 
     /* Connect to server if it is compatible */
-    if (connectionResult == Qn::SuccessConnectionResult && QnServerConnector::instance())
-        QnServerConnector::instance()->addConnection(module);
+    if (connectionResult == Qn::SuccessConnectionResult && serverModule()->serverConnector())
+        serverModule()->serverConnector()->addConnection(module);
 }

@@ -11,7 +11,7 @@ namespace data_sync_engine {
 namespace test {
 
 void TestOutgoingTransactionDispatcher::dispatchTransaction(
-    const nx::String& systemId,
+    const std::string& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     const auto delayMillis = nx::utils::random::number<int>(
@@ -48,8 +48,8 @@ void TestOutgoingTransactionDispatcher::assertIfTransactionsWereNotSentInAscendi
     int prevSequence = -1;
     for (const auto& transaction: m_outgoingTransactions)
     {
-        ASSERT_GT(transaction->transactionHeader().persistentInfo.sequence, prevSequence);
-        prevSequence = transaction->transactionHeader().persistentInfo.sequence;
+        ASSERT_GT(transaction->header().persistentInfo.sequence, prevSequence);
+        prevSequence = transaction->header().persistentInfo.sequence;
     }
 }
 
@@ -62,7 +62,7 @@ void TestOutgoingTransactionDispatcher::assertIfCouldNotFindTransactionWithHeade
         [&transactionHeader](
             const std::shared_ptr<const SerializableAbstractTransaction>& transactionSent)
         {
-            return transactionHeader == transactionSent->transactionHeader();
+            return transactionHeader == transactionSent->header();
         });
     ASSERT_TRUE(it != m_outgoingTransactions.cend());
 }

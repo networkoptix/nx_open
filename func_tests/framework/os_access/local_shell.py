@@ -169,6 +169,9 @@ class _LocalShell(posix_shell.Shell):
             kwargs['env'] = {name: str(value) for name, value in env.items()}
         return kwargs
 
+    def is_working(self):
+        return True
+
     @classmethod
     def command(cls, command, cwd=None, env=None, logger=None, set_eux=False):
         if not logger:

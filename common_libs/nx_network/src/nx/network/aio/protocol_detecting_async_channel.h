@@ -324,7 +324,6 @@ bool BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeMore
     switch (resultCode)
     {
         case ProtocolMatchResult::detected:
-            NX_ASSERT(descriptor);
             m_delegate = installProtocolHandler(
                 *descriptor,
                 std::move(m_dataSource),

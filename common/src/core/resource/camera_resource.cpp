@@ -54,15 +54,16 @@ QString QnVirtualCameraResource::getUniqueId() const
     return getPhysicalId();
 }
 
-QStringList QnVirtualCameraResource::searchFilters() const
+QStringList QnVirtualCameraResource::searchFilters(bool useExtraSearchInformation) const
 {
-    QStringList result = QnNetworkResource::searchFilters()
+    QStringList result = QnNetworkResource::searchFilters(useExtraSearchInformation)
         << getModel()
-        << getFirmware()
         << getVendor();
     const int logicalId = this->logicalId();
     if (logicalId > 0)
         result << QString::number(logicalId);
+    if (useExtraSearchInformation)
+        result << getFirmware();
     return result;
 }
 

@@ -286,11 +286,8 @@ QColor blendColor(QColor color, float opacity, QColor backgroundColor)
 
 void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText)
 {
-    const auto trasformRollback = nx::utils::makeScopeGuard(
-        [&painter, transform = painter.transform()]
-        {
-            painter.setTransform(transform);
-        });
+    // We should restore this transform at the exit.
+    const auto initialTransform = painter.transform();
 
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
     painter.setCompositionMode(QPainter::CompositionMode_Source);
@@ -358,6 +355,8 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
                 painter.drawPixmap(x*SQUARE_SIZE, y*SQUARE_SIZE, m_roundRectPixmap);
         }
     }
+
+    painter.setTransform(initialTransform);
 }
 
 void QnSignHelper::draw(QImage& img, bool drawText)

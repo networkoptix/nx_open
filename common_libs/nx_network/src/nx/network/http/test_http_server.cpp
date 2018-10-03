@@ -48,7 +48,7 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStopSync(false);
+    m_httpServer->pleaseStopSync();
     NX_INFO(this, "Stopped");
 }
 
@@ -137,17 +137,16 @@ bool TestHttpServer::registerContentProvider(
     return registerRequestProcessorFunc(
         httpPath,
         [contentProviderFactoryShared](
-            nx::network::http::HttpServerConnection* const /*connection*/,
-            nx::utils::stree::ResourceContainer /*authInfo*/,
-            nx::network::http::Request /*request*/,
-            nx::network::http::Response* const /*response*/,
+            nx::network::http::RequestContext /*requestContext*/,
             nx::network::http::RequestProcessedHandler completionHandler)
         {
             auto msgBody = (*contentProviderFactoryShared)();
             if (msgBody)
             {
                 completionHandler(
-                    nx::network::http::RequestResult(nx::network::http::StatusCode::ok, std::move(msgBody)));
+                    nx::network::http::RequestResult(
+                        nx::network::http::StatusCode::ok,
+                        std::move(msgBody)));
             }
             else
             {
@@ -178,7 +177,9 @@ RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
     nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
-    BaseType(socketServer, std::move(sock)),
+    BaseType(
+        [socketServer](auto... args) { socketServer->closeConnection(args...); },
+        std::move(sock)),
     m_requestsToAnswer(nx::utils::random::number<int>(0, 3))
 {
 }

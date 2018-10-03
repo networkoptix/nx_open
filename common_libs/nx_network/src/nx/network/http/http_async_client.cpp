@@ -335,9 +335,16 @@ void AsyncClient::doConnect(
 
 void AsyncClient::doRequest(
     nx::network::http::Method::ValueType method,
-    const nx::utils::Url& url)
+    const nx::utils::Url& urlOriginal)
 {
-    NX_ASSERT(!url.host().isEmpty());
+    nx::utils::Url url = urlOriginal;
+    if (url.host().isEmpty() && m_socket != nullptr)
+    {
+        url.setHost(m_socket->getForeignAddress().address.toString());
+        url.setPort(m_socket->getForeignAddress().port);
+    }
+
+    NX_ASSERT(!url.host().isEmpty() || m_socket != nullptr);
     NX_ASSERT(url.isValid());
 
     resetDataBeforeNewRequest();
@@ -1176,7 +1183,14 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 
-    m_contentLocationUrl = nx::utils::Url(QLatin1String(locationIter->second));
+    nx::utils::Url newUrl(locationIter->second);
+    if (newUrl.host().isEmpty())
+    {
+        newUrl.setHost(m_contentLocationUrl.host());
+        newUrl.setPort(m_contentLocationUrl.port());
+        newUrl.setScheme(m_contentLocationUrl.scheme());
+    }
+    m_contentLocationUrl = newUrl;
 
     const auto method = m_request.requestLine.method;
     composeRequest(method);

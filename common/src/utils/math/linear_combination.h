@@ -43,30 +43,30 @@ class TypedLinearCombinator;
 class LinearCombinator {
 public:
     /**
-     * \param type                      <tt>QMetaType::Type</tt> to get linear combinator for. 
+     * \param type                      <tt>QMetaType::Type</tt> to get linear combinator for.
      *                                  Pass zero to get a no-op combinator.
      * \returns                         Linear combinator for the given type, or NULL if none.
-     * 
+     *
      * \note                            This function is thread-safe.
      */
     static LinearCombinator *forType(int type);
 
     /**
      * \param combinator                Linear combinator to register.
-     * 
+     *
      * \note                            This function is thread-safe.
      */
     static void registerCombinator(LinearCombinator *combinator);
 
     /**
      * Constructor.
-     * 
+     *
      * \param type                      <tt>QMetaType::Type</tt> for this linear combinator.
      */
     LinearCombinator(int type);
 
     /**
-     * Virtual destructor. 
+     * Virtual destructor.
      */
     virtual ~LinearCombinator() {}
 

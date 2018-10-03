@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/ptz/basic_ptz_controller.h>
+#include <core/resource/json_resource_property.h>
 #include <plugins/utils/xml_request_helper.h>
 
 namespace nx {
@@ -50,10 +51,23 @@ private:
         const nx::core::ptz::Options& options,
         Qn::PtzCoordinateSpace space = Qn::DevicePtzCoordinateSpace) const;
 
+    void loadCapabilities(
+        const nx::plugins::utils::XmlRequestHelper::Result& capabilities);
+
+    std::optional<std::map<int, QString>> readCameraPresets() const;
+
 private:
+    mutable QnMutex m_mutex;
     mutable nx::plugins::utils::XmlRequestHelper m_client;
+
     std::optional<int> m_channel;
     Ptz::Capabilities m_capabilities = Ptz::NoPtzCapabilities;
+    QnPtzLimits m_limits;
+
+    int m_maxPresetNumber = 0;
+    bool m_isPresetNameSupported = false;
+    std::set<int> m_specialPresetNumbers;
+    mutable QnJsonResourceProperty<std::map<int /*idOnCamera*/, QnPtzPreset>> m_presetMappings;
 };
 
 } // namespace hikvision

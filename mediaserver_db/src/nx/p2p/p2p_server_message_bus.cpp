@@ -189,6 +189,8 @@ void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 void ServerMessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_restartPending)
+        return;
 
     m_miscData.update();
 
@@ -379,8 +381,11 @@ void ServerMessageBus::stop()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
-        dbTran.commit();
+        if (m_db->getTransaction())
+        {
+            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+            dbTran.commit();
+        }
     }
     base_type::stop();
 }
@@ -770,6 +775,26 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
         connection,
         payload,
         GotTransactionFuction());
+}
+
+bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer)
+{
+    if (m_restartPending)
+        return false;
+    if (remotePeer.identityTime > commonModule()->systemIdentityTime())
+    {
+        // Switch to the new systemIdentityTime. It allows to push restored from backup database data.
+        NX_INFO(typeid(Connection), lm("Remote peer %1 has database restore time greater then "
+            "current peer. Restarting and resync database with remote peer")
+            .arg(remotePeer.id.toString()));
+
+        m_restartPending = true;
+        dropConnections();
+        commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
+        return false;
+    }
+    return true;
+
 }
 
 } // namespace p2p

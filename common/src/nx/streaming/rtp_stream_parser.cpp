@@ -12,11 +12,6 @@ QnRtpVideoStreamParser::QnRtpVideoStreamParser()
     m_chunks.reserve(kDefaultChunkContainerSize);
 }
 
-void QnRtpStreamParser::setTimeHelper(nx::streaming::rtp::TimeHelper* timeHelper)
-{
-    m_timeHelper = timeHelper;
-}
-
 int QnRtpStreamParser::logicalChannelNum() const
 {
     return m_logicalChannelNum;

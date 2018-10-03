@@ -2,6 +2,7 @@
 
 #include <common/common_module.h>
 #include <nx_ec/ec_api_fwd.h>
+#include <platform/platform_abstraction.h>
 
 class QnMediaServerModule;
 
@@ -30,9 +31,11 @@ private:
 };
 
 QnStorageResourceList getUnmountedStorages(
+    QnPlatformAbstraction* platform,
     const QnStorageResourceList& allServerStorages,
     const nx::mediaserver::Settings* settings);
 bool isStorageUnmounted(
+    QnPlatformAbstraction* platform,
     const QnStorageResourcePtr& storage,
     const nx::mediaserver::Settings* settings);
 

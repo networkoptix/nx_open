@@ -107,6 +107,26 @@ static bool parseNameValue(const char* const s, std::string* outName, std::strin
     return true;
 }
 
+static std::string getEnv(const char* envVar)
+{
+    #if defined(_WIN32)
+        // MSVC gives a warning that getenv() is unsafe, thus, implementing it via "safe"
+        // MSVC-specific getenv_s().
+
+        std::string result;
+        result.resize(1024); //< Supporting longer environment variable values is not needed.
+        size_t size;
+        if (getenv_s(&size, &result[0], result.size(), envVar) != 0)
+            return "";
+        return std::string(result.c_str()); //< Strip trailing '\0', if any.
+    #else
+        const char* const value = getenv(envVar);
+        if (value == nullptr)
+            return "";
+        return value;
+    #endif
+}
+
 static std::string determineIniFilesDir()
 {
     #if defined(ANDROID) || defined(__ANDROID__)
@@ -131,23 +151,23 @@ static std::string determineIniFilesDir()
         #else
             #if defined(_WIN32)
                 static const char kPathSeparator = '\\';
-                static const char* const kEnvVar = "LOCALAPPDATA";
+                static const char* const kIniDirEnvVar = "LOCALAPPDATA";
                 static const std::string extraDir = "";
                 static const std::string defaultDir = ""; //< Current directory.
             #else
                 static const char kPathSeparator = '/';
-                static const char* const kEnvVar = "HOME";
+                static const char* const kIniDirEnvVar = "HOME";
                 static const std::string extraDir = std::string(".config") + kPathSeparator;
                 static const std::string defaultDir = "/etc/nx_ini/";
             #endif
 
-            const char* const env_NX_INI_DIR = getenv("NX_INI_DIR");
-            if (env_NX_INI_DIR != nullptr)
+            const std::string env_NX_INI_DIR = getEnv("NX_INI_DIR");
+            if (!env_NX_INI_DIR.empty())
                 return std::string(env_NX_INI_DIR) + kPathSeparator;
 
-            const char* const env = getenv(kEnvVar);
-            if (env != nullptr)
-                return std::string(env) + kPathSeparator + extraDir + "nx_ini" + kPathSeparator;
+            const std::string env = getEnv(kIniDirEnvVar);
+            if (!env.empty())
+                return std::string(env) + kPathSeparator + extraDir + "nx_ini" +kPathSeparator;
 
             return defaultDir;
         #endif

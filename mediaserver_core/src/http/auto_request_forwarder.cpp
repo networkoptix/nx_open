@@ -368,15 +368,15 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         return tsStr.toLongLong() / kUsPerMs;
     }
 
-    if (request.requestLine.version == nx_rtsp::rtsp_1_0)
+    if (request.requestLine.version == nx::network::rtsp::rtsp_1_0)
     {
         // Search for position in the headers.
-        auto rangeIter = request.headers.find(nx_rtsp::header::Range::NAME);
+        auto rangeIter = request.headers.find(nx::network::rtsp::header::Range::NAME);
         if (rangeIter != request.headers.end())
         {
             qint64 startTimestamp = 0;
             qint64 endTimestamp = 0;
-            if (nx_rtsp::parseRangeHeader(rangeIter->second, &startTimestamp, &endTimestamp))
+            if (nx::network::rtsp::parseRangeHeader(rangeIter->second, &startTimestamp, &endTimestamp))
                 return startTimestamp / kUsPerMs;
         }
     }

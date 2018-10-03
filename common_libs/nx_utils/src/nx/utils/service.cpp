@@ -107,6 +107,11 @@ int Service::exec()
     }
 }
 
+std::string Service::applicationDisplayName() const
+{
+    return m_applicationDisplayName.toStdString();
+}
+
 int Service::runMainLoop()
 {
     reportStartupResult(true);

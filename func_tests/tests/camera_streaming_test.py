@@ -1,11 +1,11 @@
 import datetime
 import json
 import logging
-import time
 
 import pytest
 
-from framework.waiting import wait_for_truthy
+from framework.installation.mediaserver import Mediaserver
+from framework.waiting import wait_for_equal, wait_for_truthy
 
 _logger = logging.getLogger(__name__)
 
@@ -13,43 +13,6 @@ _logger = logging.getLogger(__name__)
 EXPECTED_TRANSPORT_LIST = {'rtsp', 'hls', 'mjpeg', 'webm'}
 HISTORY_WAIT_TIMEOUT_SEC = 2*60
 CAMERA_DISCOVERY_WAIT_TIMEOUT = datetime.timedelta(seconds=60)
-
-
-def switch_to_server(camera_id, server):
-    server_guid = server.api.get_server_id()
-    server.api.generic.post('ec2/saveCamera', dict(id=camera_id, parentId=server_guid))
-    d = None
-    for d in server.api.generic.get('ec2/getCamerasEx'):
-        if d['id'] == camera_id:
-            break
-    if d is None:
-        pytest.fail('Camera %s is unknown for server %s' % (camera_id, server))
-    assert d['parentId'] == server_guid
-
-
-def wait_for_and_check_camera_history(camera_id, server_list, expected_servers_order):
-    t = time.time()
-    while True:
-        camera_history_responses = []
-        for server in server_list:
-            response = server.api.generic.get('ec2/cameraHistory', dict(
-                cameraId=camera_id, startTime=0, endTime='now'))
-            assert len(response) == 1, repr(response)  # must contain exactly one record for one camera_id
-            servers_order = [item['serverGuid'] for item in response[0]['items']]
-            _logger.debug('Received camera_id history servers order: %s', servers_order)
-            if servers_order == [server.api.get_server_id() for server in expected_servers_order]:
-                camera_history_responses.append(response)
-                continue
-            if time.time() - t > HISTORY_WAIT_TIMEOUT_SEC:
-                pytest.fail('Timed out while waiting for proper camera_id history (%s seconds)' % HISTORY_WAIT_TIMEOUT_SEC)
-        if len(camera_history_responses) >= len(server_list):
-            break
-        time.sleep(5)
-    assert len(camera_history_responses) == len(server_list)
-    for response in camera_history_responses[1:]:
-        assert response == camera_history_responses[0]  # All responses must be the same
-    ts_seq = [item['timestampMs'] for item in camera_history_responses[0][0]['items']]
-    assert ts_seq == sorted(ts_seq)  # timestamps must be in sorted order
 
 
 # https://networkoptix.atlassian.net/browse/TEST-181
@@ -79,19 +42,34 @@ def check_media_stream_transports(server):
 def test_camera_switching_should_be_represented_in_history(artifact_factory, two_merged_mediaservers, camera_pool, camera):
     for server in two_merged_mediaservers:
         server.installation.ini_config('test_camera').set('discoveryPort', str(camera_pool.discovery_port))
-    one, two = two_merged_mediaservers
+    one, two = two_merged_mediaservers  # type: (Mediaserver, Mediaserver)
 
     camera_id = wait_for_truthy(
         lambda: one.api.find_camera(camera.mac_addr) or two.api.find_camera(camera.mac_addr),
         description="Test Camera is discovered",
         timeout_sec=300)
-    switch_to_server(camera_id, one)
+    one.api.take_camera(camera_id)
+    _logger.info("Start recording to make camera appear in camera history.")
     with one.api.camera_recording(camera_id):
-        wait_for_and_check_camera_history(camera_id, [one, two], [one])
-        switch_to_server(camera_id, two)
-        wait_for_and_check_camera_history(camera_id, [one, two], [one, two])
-        switch_to_server(camera_id, one)
-        wait_for_and_check_camera_history(camera_id, [one, two], [one, two, one])
+        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=60)
+        wait_for_equal(two.api.camera(camera_id).server, one.api.get_server_id(), timeout_sec=5)
+        history = [one.api.get_server_id()]
+        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
+        wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
+        _logger.info("Switch camera to `two`.")
+        two.api.take_camera(camera_id)
+        wait_for_equal(one.api.camera(camera_id).server, two.api.get_server_id())
+        wait_for_equal(two.api.camera(camera_id).server, two.api.get_server_id())
+        history.append(two.api.get_server_id())
+        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
+        wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
+        _logger.info("Switch camera back to `one`.")
+        one.api.take_camera(camera_id)
+        wait_for_equal(one.api.camera(camera_id).server, one.api.get_server_id())
+        wait_for_equal(two.api.camera(camera_id).server, one.api.get_server_id())
+        history.append(one.api.get_server_id())
+        wait_for_equal(one.api.camera(camera_id).history, history, timeout_sec=60)
+        wait_for_equal(two.api.camera(camera_id).history, history, timeout_sec=5)
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
     stream_type = 'hls'

@@ -76,7 +76,7 @@ void QnNxRtpParser::writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr
     m_analyticsMetadataLogFile.flush();
 }
 
-bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const QnRtspStatistic&, bool& gotData)
+bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
 {
     gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)

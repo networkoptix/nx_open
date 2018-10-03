@@ -64,7 +64,7 @@ public:
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 
-    virtual void pleaseStopSync() {}
+    virtual void pleaseStopSync() override {}
 
     virtual bool bind(const nx::network::SocketAddress& localAddress) override
     {
@@ -198,11 +198,6 @@ public:
     virtual nx::network::Pollable* pollable()
     {
         return nullptr;
-    }
-
-    virtual void pleaseStopSync(bool checkForLocks = true) override
-    {
-        return;
     }
 
     virtual void post(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}

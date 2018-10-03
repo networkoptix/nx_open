@@ -26,7 +26,8 @@ public:
     WebSocketTransactionTransport(
         const ProtocolVersionRange& protocolVersionRange,
         TransactionLog* const transactionLog,
-        const nx::String& systemId,
+        const std::string& systemId,
+        const OutgoingCommandFilter& filter,
         const QnUuid& connectionId,
         std::unique_ptr<network::websocket::WebSocket> webSocket,
         vms::api::PeerDataEx localPeerData,
@@ -73,6 +74,7 @@ private:
     bool m_sendHandshakeDone = false;
     bool m_tranLogRequestInProgress = false;
     vms::api::TranState m_remoteSubscription; //< remote -> local subscription
+    const std::string m_systemId;
     QnUuid m_connectionGuid;
 };
 

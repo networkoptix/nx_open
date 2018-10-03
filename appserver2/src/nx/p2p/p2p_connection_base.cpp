@@ -179,7 +179,7 @@ void ConnectionBase::onHttpClientDone()
             using namespace std::placeholders;
             fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
             m_httpClient->doGet(
-                m_remotePeerUrl,
+                m_httpClient->url(),
                 std::bind(&ConnectionBase::onHttpClientDone, this));
         }
         else
@@ -267,7 +267,11 @@ void ConnectionBase::onHttpClientDone()
     socket->setNonBlockingMode(true);
 
     using namespace nx::network;
-    m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
+    m_webSocket.reset(new websocket::WebSocket(
+        std::move(socket),
+        remotePeer.dataFormat == Qn::JsonFormat
+            ? websocket::FrameType::text
+            : websocket::FrameType::binary));
     m_httpClient.reset();
     m_webSocket->setAliveTimeout(m_keepAliveTimeout);
     m_webSocket->start();
@@ -347,9 +351,13 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
 {
-    return isClient
-        ? MessageType::pushTransactionData
-        : (MessageType) buffer.at(kMessageOffset);
+    if (isClient)
+        return MessageType::pushTransactionData;
+
+    auto messageType = buffer.at(kMessageOffset);
+    return messageType < (qint8) MessageType::counter
+        ? (MessageType) messageType
+        : MessageType::unknown;
 }
 
 void ConnectionBase::sendMessage(const nx::Buffer& data)
@@ -416,7 +424,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
-        quint8 messageType = (quint8) getMessageType(m_dataToSend.front(), remotePeer().isClient());
+        quint8 messageType = (quint8)getMessageType(m_dataToSend.front(), remotePeer().isClient());
         m_sendCounters[messageType] += m_dataToSend.front().size();
 
         m_webSocket->sendAsync(

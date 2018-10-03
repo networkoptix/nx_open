@@ -24,7 +24,6 @@ using nx::network::UDPSocket;
 
 // -------------- QnMdnsListener ------------
 
-static QnMdnsListener* QnMdnsListener_instance = nullptr;
 const std::chrono::seconds QnMdnsListener::kRefreshTimeout(1);
 
 QnMdnsListener::QnMdnsListener()
@@ -34,14 +33,10 @@ QnMdnsListener::QnMdnsListener()
 {
     updateSocketList();
     readDataFromSocket();
-
-    NX_ASSERT(QnMdnsListener_instance == nullptr);
-    QnMdnsListener_instance = this;
 }
 
 QnMdnsListener::~QnMdnsListener()
 {
-    QnMdnsListener_instance = nullptr;
     deleteSocketList();
 }
 
@@ -187,13 +182,6 @@ void QnMdnsListener::deleteSocketList()
 QStringList QnMdnsListener::getLocalAddressList() const
 {
     return m_localAddressList;
-}
-
-
-
-QnMdnsListener* QnMdnsListener::instance()
-{
-    return QnMdnsListener_instance;
 }
 
 #endif // ENABLE_MDNS

@@ -31,12 +31,12 @@ public:
 
     virtual nx::sql::DBResult updateTimestampHiForSystem(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         quint64 newValue) override;
 
     virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
         nx::sql::QueryContext* queryContext,
-        const nx::String& systemId,
+        const std::string& systemId,
         const QString& peerId,
         const QString& dbInstanceId,
         std::int64_t minSequence,
@@ -46,7 +46,7 @@ public:
 private:
     struct TransactionSourceKey
     {
-        nx::String systemId;
+        std::string systemId;
         QString peerId;
         QString dbInstanceId;
 

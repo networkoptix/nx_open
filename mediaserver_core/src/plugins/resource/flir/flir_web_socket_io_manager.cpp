@@ -5,7 +5,6 @@
 #include <QtCore/QJsonArray>
 
 #include "flir_web_socket_io_manager.h"
-#include "flir_io_executor.h"
 #include "flir_nexus_common.h"
 #include "flir_parsing_utils.h"
 #include "flir_nexus_string_builder.h"
@@ -16,6 +15,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>
 #include <nx/network/http/http_client.h>
+#include "flir_resource_searcher.h"
+#include <media_server/media_server_module.h>
+#include <media_server/media_server_resource_searchers.h>
+#include "flir_fc_resource.h"
 
 namespace {
 using ErrorSignalType = void(QWebSocket::*)(QAbstractSocket::SocketError);
@@ -66,6 +69,21 @@ WebSocketIoManager::~WebSocketIoManager()
     terminate();
 }
 
+void WebSocketIoManager::createWebSocketProxy()
+{
+    auto flirResource = dynamic_cast<nx::plugins::flir::FcResource*>(m_resource);
+    if (!NX_ASSERT(flirResource))
+        return;
+    auto flirSearcher = flirResource->serverModule()->resourceSearchers()
+        ->searcher<QnFlirResourceSearcher>();
+    auto executorThread = flirSearcher->ioExecutor()->getThread();
+    m_controlProxy = new WebSocketProxy();
+    m_controlProxy->moveToThread(executorThread);
+    m_notificationProxy = new WebSocketProxy();
+    m_notificationProxy->moveToThread(executorThread);
+    executorThread->start();
+}
+
 bool WebSocketIoManager::startIOMonitoring()
 {
     QnMutexLocker lock(&m_mutex);
@@ -78,12 +96,8 @@ bool WebSocketIoManager::startIOMonitoring()
     QObject::disconnect();
     resetSocketProxiesUnsafe();
 
-    m_controlProxy = new WebSocketProxy();
-    m_notificationProxy = new WebSocketProxy();
-    
-    auto executorThread = IoExecutor::instance()->getThread();
-    executorThread->start();
-    
+    createWebSocketProxy();
+
     routeIOMonitoringInitializationUnsafe(InitState::initial);
 
     return m_monitoringIsInProgress;
@@ -135,7 +149,7 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     httpClient.setResponseReadTimeout(kSetOutputStateTimeout);
     httpClient.setMessageBodyReadTimeout(kSetOutputStateTimeout);
 
-    auto success = httpClient.doGet(url);    
+    auto success = httpClient.doGet(url);
     if (!success)
         return false;
 
@@ -258,7 +272,7 @@ void WebSocketIoManager::routeIOMonitoringInitializationUnsafe(InitState newStat
 void WebSocketIoManager::at_controlWebSocketConnected()
 {
     QnMutexLocker lock(&m_mutex);
-    
+
     auto message = lm("Control websocket has been connected. Device %1 %2 (%3)")
         .arg(m_resource->getVendor())
         .arg(m_resource->getModel())
@@ -343,7 +357,7 @@ void WebSocketIoManager::at_notificationWebSocketConnected()
         .arg(m_resource->getModel())
         .arg(m_resource->getUrl());
 
-    NX_VERBOSE(this, message);    
+    NX_VERBOSE(this, message);
 
     routeIOMonitoringInitializationUnsafe(InitState::subscribed);
 }
@@ -396,7 +410,7 @@ void WebSocketIoManager::connectWebsocketUnsafe(
     WebSocketProxy* proxy,
     std::chrono::milliseconds delay)
 {
-    auto doConnect = 
+    auto doConnect =
         [this, proxy, path] (nx::utils::TimerId timerId)
         {
             QnMutexLocker lock(&m_mutex);
@@ -702,8 +716,9 @@ void WebSocketIoManager::reinitMonitoringUnsafe()
 
     QObject::disconnect();
     resetSocketProxiesUnsafe();
-    m_controlProxy = new WebSocketProxy();
-    m_notificationProxy = new WebSocketProxy();
+
+    createWebSocketProxy();
+
     if (m_keepAliveTimerId)
         TimerManager::instance()->joinAndDeleteTimer(m_keepAliveTimerId);
 
@@ -732,7 +747,7 @@ int WebSocketIoManager::getGpioModuleIdByPortId(const QString& portId) const
         portId.startsWith(kDigitalInputPrefix),
         lm("Only digital outputs belong to device GPIO module. Given Id: %1")
             .arg(portId));
-    
+
     return 0;
 }
 

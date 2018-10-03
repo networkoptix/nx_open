@@ -805,7 +805,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     }
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    if (!parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData))
+    if (!parser->processData(data, 0, dataSize, gotData))
         return QnAbstractDataPacketPtr(); //< Report error to reopen connection.
     *parserPosition = parser->position();
     if (gotData) {

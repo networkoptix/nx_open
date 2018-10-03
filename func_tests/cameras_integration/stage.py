@@ -1,6 +1,6 @@
 import logging
 import timeit
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from typing import Callable, Generator, Optional
 
@@ -71,6 +71,7 @@ class Executor(object):
         self._rules = rules
         self._timeout = min(self.stage.timeout, hard_timeout) if hard_timeout else self.stage.timeout
         self._result = None  # type: Optional[Result]
+        self._start_time = None
         self._duration = None
 
     def steps(self, server):  # type: (Mediaserver) -> Generator[None]
@@ -78,13 +79,14 @@ class Executor(object):
             StopIteration means the stage execution is finished, see is_successful.
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
-        start_time = timeit.default_timer()
         self._result = Halt('Stage is not finished')
+        self._start_time = datetime.now()
+        start_time = timeit.default_timer()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
             _logger.debug(
                 'Stage "%s" for %s after %s status %s',
-                self.stage.name, self.camera_id, self._duration, self._result.report)
+                self.stage.name, self.camera_id, self._duration, self._result.details)
 
             if self._duration > self._timeout:
                 _logger.info(
@@ -96,25 +98,21 @@ class Executor(object):
 
         steps.close()
         _logger.info(
-            'Stage "%s" is finished in %s: %s',
-            self.stage.name, self._duration, self.report)
+            'Stage "%s" for %s is finished in %s: %s',
+            self.stage.name, self.camera_id, self._duration, self._result)
 
     @property
     def is_successful(self):
         return isinstance(self._result, Success)
 
     @property
-    def report(self):  # types: () -> dict
-        """:returns Current stage execution state, represented as serializable dictionary.
+    def details(self):  # types: () -> dict
+        """:returns Current stage execution state.
         """
         if not self._result:
             return {}
 
-        data = self._result.report
-        if self._duration:
-            data['duration'] = str(self._duration)
-
-        return data
+        return dict(start_time=self._start_time, duration=self._duration, **self._result.details)
 
     def _execute_next_step(self, stage_steps, start_time
                            ):  # type: (Generator[Result], float) -> bool

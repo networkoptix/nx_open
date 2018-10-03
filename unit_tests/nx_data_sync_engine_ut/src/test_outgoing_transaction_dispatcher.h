@@ -18,11 +18,11 @@ class TestOutgoingTransactionDispatcher:
 {
 public:
     typedef nx::utils::MoveOnlyFunc<
-        void(const nx::String&, const SerializableAbstractTransaction&)
+        void(const std::string&, const SerializableAbstractTransaction&)
     > OnNewTransactionHandler;
 
     virtual void dispatchTransaction(
-        const nx::String& systemId,
+        const std::string& systemId,
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     void setOnNewTransaction(OnNewTransactionHandler onNewTransactionHandler);
@@ -40,11 +40,11 @@ public:
     void assertIfNotAllTransactionsAreFound(const TransactionPtrContainer& container)
     {
         for (const auto& transactionPtr: container)
-            assertIfCouldNotFindTransactionWithHeader(transactionPtr->transactionHeader());
+            assertIfCouldNotFindTransactionWithHeader(transactionPtr->header());
     }
 
     void assertIfCouldNotFindTransactionWithHeader(
-        const CommandHeader& transactionHeader);
+        const CommandHeader& header);
 
 private:
     OnNewTransactionHandler m_onNewTransactionHandler;
