@@ -29,7 +29,10 @@ ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
 ${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
 ${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
-${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]
+
+${REMEMBER ME CHECKBOX VISIBLE}       //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]/..
+${REMEMBER ME CHECKBOX REAL}          //form[@name='loginForm']//input[@id='remember']
+
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
 ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
@@ -82,7 +85,10 @@ ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input
-${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+
+${TERMS AND CONDITIONS CHECKBOX VISIBLE}    //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+${TERMS AND CONDITIONS CHECKBOX REAL}       //form[@name= 'registerForm']//input[@ng-model='account.accept']
+
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
