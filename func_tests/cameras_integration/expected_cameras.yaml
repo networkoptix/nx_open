@@ -208,8 +208,8 @@ SERVER_STAGES:
 
   video_parameters:
     stream_urls:
-      "1": "tftp://192.168.200.7:69/h264?res=full;x0=0;y0=0;x1=1920;y1=1088;qp=24;doublescan=0;ssn=17032;iframe=1;"
-      "2": "tftp://192.168.200.7:69/h264?res=half;x0=0;y0=0;x1=1920;y1=1088;qp=33;doublescan=0;ssn=2026;iframe=1;"
+      "1": "tftp://192.168.200.7:69/h264?res=full;x0=0;y0=0;x1=1920;y1=1088;qp=24;doublescan=0;ssn=*;iframe=1;"
+      "2": "tftp://192.168.200.7:69/h264?res=half;x0=0;y0=0;x1=1920;y1=1088;qp=33;doublescan=0;ssn=*;iframe=1;"
 
   audio_parameters:
     # I am not sure if this one has got audio_parameters in. The doc is very sparse.
