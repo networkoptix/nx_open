@@ -1,72 +1,49 @@
 #pragma once
 
+#include <nx/data_sync_engine/command_descriptor.h>
+
 #include <transaction/transaction_descriptor.h>
 
 namespace nx::cdb::ec2::command {
 
-struct SaveUser
+struct SaveUser:
+    nx::data_sync_engine::command::BaseCommandDescriptor<
+        vms::api::UserData,
+        ::ec2::ApiCommand::saveUser>
 {
-    using Data = vms::api::UserData;
-    static constexpr int code = ::ec2::ApiCommand::saveUser;
     static constexpr char name[] = "saveUser";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct RemoveUser
+struct RemoveUser:
+    nx::data_sync_engine::command::BaseCommandDescriptor<
+        vms::api::IdData,
+        ::ec2::ApiCommand::removeUser>
 {
-    using Data = vms::api::IdData;
-    static constexpr int code = ::ec2::ApiCommand::removeUser;
     static constexpr char name[] = "removeUser";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct SetResourceParam
+struct SetResourceParam:
+    nx::data_sync_engine::command::BaseCommandDescriptor<
+        vms::api::ResourceParamWithRefData,
+        ::ec2::ApiCommand::setResourceParam>
 {
-    using Data = vms::api::ResourceParamWithRefData;
-    static constexpr int code = ::ec2::ApiCommand::setResourceParam;
     static constexpr char name[] = "setResourceParam";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct RemoveResourceParam
+struct RemoveResourceParam:
+    nx::data_sync_engine::command::BaseCommandDescriptor<
+        vms::api::ResourceParamWithRefData,
+        ::ec2::ApiCommand::removeResourceParam>
 {
-    using Data = vms::api::ResourceParamWithRefData;
-    static constexpr int code = ::ec2::ApiCommand::removeResourceParam;
     static constexpr char name[] = "removeResourceParam";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
-struct SaveSystemMergeHistoryRecord
+struct SaveSystemMergeHistoryRecord:
+    nx::data_sync_engine::command::BaseCommandDescriptor<
+        vms::api::SystemMergeHistoryRecord,
+        ::ec2::ApiCommand::saveSystemMergeHistoryRecord>
 {
-    using Data = vms::api::SystemMergeHistoryRecord;
-    static constexpr int code = ::ec2::ApiCommand::saveSystemMergeHistoryRecord;
     static constexpr char name[] = "saveSystemMergeHistoryRecord";
-
-    static nx::Buffer hash(const Data& data)
-    {
-        return ::ec2::transactionHash(
-            static_cast<::ec2::ApiCommand::Value>(code), data).toSimpleByteArray();
-    }
 };
 
 } // namespace nx::cdb::ec2::command

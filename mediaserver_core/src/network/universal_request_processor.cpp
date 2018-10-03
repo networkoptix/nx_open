@@ -246,7 +246,7 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
         else if (protocol == "RTSP")
         {
             if (settings->isVideoTrafficEncriptionForced())
-                return redicrectToScheme(nx_rtsp::kSecureUrlSchemeName);
+                return redicrectToScheme(nx::network::rtsp::kSecureUrlSchemeName);
         }
         else if (settings->isTrafficEncriptionForced())
         {

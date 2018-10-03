@@ -1,5 +1,6 @@
 """Classes and functions unrelated to specific VM hypervisor (VirtualBox, libvirt, etc...)"""
 from abc import ABCMeta, abstractmethod
+from contextlib import contextmanager
 from pprint import pformat
 
 
@@ -55,6 +56,14 @@ class VmHardware(object):
 
     @abstractmethod
     def unplug_all(self):
+        pass
+
+    @abstractmethod
+    def limit_bandwidth(self, speed_limit_kbit):
+        pass
+
+    @abstractmethod
+    def reset_bandwidth(self):
         pass
 
     @abstractmethod

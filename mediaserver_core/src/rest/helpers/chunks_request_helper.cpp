@@ -78,7 +78,7 @@ QnTimePeriodList QnChunksRequestHelper::loadAnalyticsTimePeriods(
 
     for (const auto& cameraResource: request.resList)
     {
-        filter.deviceId = cameraResource->getId();
+        filter.deviceIds = std::vector<QnUuid>{cameraResource->getId()};
 
         ++lookupsOngoing;
         serverModule()->analyticsEventsStorage()->lookupTimePeriods(

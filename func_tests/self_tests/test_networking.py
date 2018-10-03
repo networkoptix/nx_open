@@ -1,4 +1,5 @@
 import pytest
+from netaddr import IPNetwork
 
 
 @pytest.fixture
@@ -58,10 +59,10 @@ def test_ip_addresses(networking, macs):
 
     macs_iter = iter(macs.values())
     random_mac_1 = next(macs_iter)
-    networking.setup_ip(random_mac_1, '10.254.252.2', 28)
+    networking.setup_network(random_mac_1, IPNetwork('10.254.252.2/28'))
     assert len(networking.list_ips()) == 1
     random_mac_2 = next(macs_iter)
-    networking.setup_ip(random_mac_2, '10.254.252.18', 28)
+    networking.setup_network(random_mac_2, IPNetwork('10.254.252.18/28'))
     assert len(networking.list_ips()) == 2
 
     networking.remove_ips()

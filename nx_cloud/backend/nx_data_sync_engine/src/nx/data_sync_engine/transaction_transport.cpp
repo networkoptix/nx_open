@@ -18,34 +18,37 @@ constexpr static const int kMaxTransactionsPerIteration = 17;
 TransactionTransport::TransactionTransport(
     const ProtocolVersionRange& protocolVersionRange,
     nx::network::aio::AbstractAioThread* aioThread,
-    ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
+    std::shared_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState,
     TransactionLog* const transactionLog,
+    const OutgoingCommandFilter& filter,
     const ConnectionRequestAttributes& connectionRequestAttributes,
-    const nx::String& systemId,
+    const std::string& systemId,
     const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
     :
     m_protocolVersionRange(protocolVersionRange),
+    m_connectionGuardSharedState(connectionGuardSharedState),
     m_baseTransactionTransport(std::make_unique<::ec2::QnTransactionTransportBase>(
         QnUuid(), //< localSystemId. Not used here
         QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
         ::ec2::ConnectionLockGuard(
             localPeer.id,
-            connectionGuardSharedState,
+            connectionGuardSharedState.get(),
             connectionRequestAttributes.remotePeer.id,
             ::ec2::ConnectionLockGuard::Direction::Incoming),
         localPeer,
         connectionRequestAttributes.remotePeer,
         ::ec2::ConnectionType::incoming,
         request,
-        connectionRequestAttributes.contentEncoding,
+        connectionRequestAttributes.contentEncoding.c_str(),
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount)),
     m_transactionLogReader(std::make_unique<TransactionLogReader>(
         transactionLog,
-        systemId,
-        connectionRequestAttributes.remotePeer.dataFormat)),
+        systemId.c_str(),
+        connectionRequestAttributes.remotePeer.dataFormat,
+        filter)),
     m_systemId(systemId),
     m_connectionId(connectionRequestAttributes.connectionId),
     m_connectionOriginatorEndpoint(remotePeerEndpoint),
@@ -157,7 +160,7 @@ void TransactionTransport::sendTransaction(
     post(
         [this,
             serializedTransaction = std::move(serializedTransaction),
-            transactionHeader = transactionSerializer->transactionHeader()]()
+            transactionHeader = transactionSerializer->header()]()
         {
             // TODO: #ak checking transaction to send queue size
             //if (isReadyToSend(transaction.command) && queue size is too large)
@@ -242,10 +245,14 @@ void TransactionTransport::processSpecialTransaction(
 
     //starting transactions delivery
     using namespace std::placeholders;
+
+    ReadCommandsFilter filter;
+    filter.from = m_remotePeerTranState;
+    filter.to = m_tranStateToSynchronizeTo;
+    filter.maxTransactionsToReturn = kMaxTransactionsPerIteration;
+
     m_transactionLogReader->readTransactions(
-        m_remotePeerTranState,
-        m_tranStateToSynchronizeTo,
-        kMaxTransactionsPerIteration,
+        filter,
         std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 
     handler(ResultCode::ok);
@@ -415,9 +422,11 @@ void TransactionTransport::onTransactionsReadFromLog(
         //< Local state could be updated while we were synchronizing remote peer
         // Continuing reading transactions.
         m_transactionLogReader->readTransactions(
-            m_remotePeerTranState,
-            m_tranStateToSynchronizeTo,
-            kMaxTransactionsPerIteration,
+            ReadCommandsFilter{
+                m_remotePeerTranState,
+                m_tranStateToSynchronizeTo,
+                kMaxTransactionsPerIteration,
+                {}},
             std::bind(&TransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
         return;
     }
@@ -484,7 +493,7 @@ void TransactionTransport::sendTransaction(
         {
             auto serializedTransaction = QnUbjson::serialized(transaction);
             transactionSerializer =
-                std::make_unique<UbjsonSerializedTransaction<typename CommandDescriptor::Data>>(
+                std::make_unique<UbjsonSerializedTransaction<CommandDescriptor>>(
                     std::move(transaction),
                     std::move(serializedTransaction),
                     m_protocolVersionRange.currentVersion());

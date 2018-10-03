@@ -23,7 +23,8 @@
 namespace nx {
 namespace p2p {
 
-const QString MessageBus::kUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kDeprecatedUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kUrlPath(lit("/ec2/transactionBus"));
 const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;
@@ -97,8 +98,10 @@ MessageBus::~MessageBus()
 void MessageBus::dropConnections()
 {
     QnMutexLocker lock(&m_mutex);
-    m_connections.clear();
-    m_outgoingConnections.clear();
+    for (const auto& connection: m_connections)
+        connection->setState(Connection::State::Error);
+    for (const auto& connection: m_outgoingConnections)
+        connection->setState(Connection::State::Error);
     m_remoteUrls.clear();
     if (m_peers)
     {
@@ -261,7 +264,8 @@ void MessageBus::createOutgoingConnections(
                 localPeerEx(),
                 remoteConnection.url,
                 std::make_unique<ConnectionContext>(),
-                std::move(connectionLockGuard)));
+                std::move(connectionLockGuard),
+                [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);
@@ -1206,6 +1210,11 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
     NX_ASSERT(0, "Not implemented");
+}
+
+bool MessageBus::validateRemotePeerData(const vms::api::PeerDataEx& /*remotePeer*/)
+{
+    return true;
 }
 
 } // namespace p2p

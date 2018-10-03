@@ -59,12 +59,12 @@ public:
         NameColumn,
         VersionColumn,
         ProgressColumn,
-        StatusColumn,
         StorageSettingsColumn,
+        StatusMessageColumn,
         ColumnCount
     };
 
-    explicit ServerUpdatesModel(QObject* parent = 0);
+    explicit ServerUpdatesModel(QObject* parent = nullptr);
 
     QnServerUpdatesColors colors() const;
     void setColors(const QnServerUpdatesColors& colors);
@@ -96,6 +96,9 @@ public:
 
     // Get servers that are incompatible with new update system
     QSet<QnUuid> getLegacyServers() const;
+
+    // Clears internal state back to initial state
+    void clearState();
 
     // Called by rest api handler
     void setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);

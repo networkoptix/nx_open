@@ -1,9 +1,6 @@
-#ifndef __MOTION_ESTIMATION_H__
-#define __MOTION_ESTIMATION_H__
+#pragma once
 
 static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
-
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include <QtCore/QByteArray>
 #include <nx/utils/thread/mutex.h>
@@ -28,8 +25,6 @@ public:
     void setMotionMask(const QnMotionRegion& region);
     void setChannelNum(int value);
 
-#ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-
     // TODO: Refactor: Move decoding out of QnMotionEstimation. Originally, decoding was needed
     // only for the motion detection, but recently it started to be used for metadata plugins as
     // well, hence the new method decodeFrame() - to decode a frame only once, if it is needed both
@@ -48,8 +43,6 @@ public:
     bool analyzeFrame(
         const QnCompressedVideoDataPtr& frame,
         CLConstVideoDecoderOutputPtr* outVideoDecoderOutput = nullptr);
-
-#endif
 
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;
@@ -99,7 +92,3 @@ private:
     int m_scaleYStep;
     int m_channelNum;
 };
-
-#endif  //ENABLE_SOFTWARE_MOTION_DETECTION
-
-#endif // __MOTION_ESTIMATION_H__

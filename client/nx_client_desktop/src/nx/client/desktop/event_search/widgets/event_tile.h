@@ -4,6 +4,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
 #include <ui/customization/customized.h>
 
 #include <nx/client/desktop/common/utils/command_action.h>
@@ -16,9 +17,7 @@ class QnElidedLabel;
 
 namespace Ui { class EventTile; }
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class ImageProvider;
 class CloseButton;
@@ -96,6 +95,8 @@ public:
     bool footerEnabled() const;
     void setFooterEnabled(bool value);
 
+    void setResourceList(const QnResourceList& list); //< Doesn't store it, only generates text.
+
     enum class Mode
     {
         standard,
@@ -128,23 +129,9 @@ protected:
     virtual bool event(QEvent* event) override;
 
 private:
-    void handleHoverChanged(bool hovered);
-    void updateBackgroundRole(bool hovered);
-    void updatePalette();
-
-private:
-    QScopedPointer<Ui::EventTile> ui;
-    CloseButton* const m_closeButton = nullptr;
-    bool m_closeable = false;
-    CommandActionPtr m_action; //< Button action.
-    QnElidedLabel* const m_progressLabel = nullptr;
-    QTimer* m_autoCloseTimer = nullptr;
-    qreal m_progressValue = 0.0;
-    bool m_isRead = false;
-    bool m_footerEnabled = true;
-    Style m_style = Style::standard;
+    struct Private;
+    const QScopedPointer<Private> d;
+    const QScopedPointer<Ui::EventTile> ui;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

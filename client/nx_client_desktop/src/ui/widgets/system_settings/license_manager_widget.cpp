@@ -202,13 +202,13 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new WidgetAnchor(m_exportLicensesButton);
-    anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
-    static const int kButtonTopAdjustment = -4;
-    anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
     m_exportLicensesButton->setText(tr("Export"));
     m_exportLicensesButton->setFlat(true);
     m_exportLicensesButton->resize(m_exportLicensesButton->minimumSizeHint());
+
+    static const int kButtonTopAdjustment = -4;
+    anchorWidgetToParent(
+        m_exportLicensesButton, Qt::TopEdge | Qt::RightEdge, {0, kButtonTopAdjustment, 0, 0});
 
     SnappedScrollBar* tableScrollBar = new SnappedScrollBar(this);
     ui->gridLicenses->setVerticalScrollBar(tableScrollBar->proxyScrollBar());

@@ -91,11 +91,11 @@ private:
                 vms::event::ActionDataList remoteData;
                 bool success = false;
 
-                if (osErrorCode == SystemError::noError
-                    && statusCode == nx::network::http::StatusCode::ok)
+                if (osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
                 {
-                    remoteData =
-                        QnUbjson::deserialized<vms::event::ActionDataList>(msgBody, {}, &success);
+                    auto reply = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), &success);
+                    NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
+                    remoteData = reply.deserialized<vms::event::ActionDataList>(&success);
                     NX_ASSERT(success, Q_FUNC_INFO, "We should receive correct answer here");
                 }
 

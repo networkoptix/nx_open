@@ -1008,12 +1008,12 @@ void UdtStreamServerSocket::pleaseStop(
         });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void UdtStreamServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 void UdtStreamServerSocket::cancelIoInAioThread()
@@ -1044,6 +1044,7 @@ std::unique_ptr<AbstractStreamSocket> UdtStreamServerSocket::systemAccept()
         !acceptedSocket->setRecvTimeout(0) ||
         !acceptedSocket->setNonBlockingMode(false))
     {
+        detail::setLastSystemErrorCodeAppropriately();
         return nullptr;
     }
 

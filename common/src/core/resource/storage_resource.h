@@ -38,6 +38,9 @@ public:
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
 
+    void setStatusFlag(Qn::StorageStatuses status);
+    Qn::StorageStatuses statusFlag() const;
+
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
@@ -93,6 +96,7 @@ private:
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
     bool m_isBackup;
+    Qn::StorageStatuses m_status = Qn::StorageStatus::none;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

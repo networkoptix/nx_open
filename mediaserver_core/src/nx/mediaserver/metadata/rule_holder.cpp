@@ -155,7 +155,7 @@ bool RuleHolder::needToWatchRule(const event::RulePtr& rule) const
             if (!camera)
                 return false;
 
-            return camera->doesEventComeFromAnalyticsDriver(ruleEventType);
+            return camera->isAnalyticsDriverEvent(ruleEventType);
         });
 
     return isAnalyticsRule && !rule->isDisabled();
@@ -204,7 +204,7 @@ RuleHolder::ResourceEvents RuleHolder::calculateWatchedEvents() const
         const auto eventType = rule->eventType();
         for (const auto& camera: resourcePool->getResources<QnSecurityCamResource>())
         {
-            if (camera->doesEventComeFromAnalyticsDriver(eventType))
+            if (camera->isAnalyticsDriverEvent(eventType))
                 events[camera->getId()].insert(eventId);
         }
     }

@@ -321,11 +321,9 @@ void QnMjpegRtpParser::updateHeaderTables(const quint8* lumaTable, const quint8*
 
 //-------------------------------------------------------------------------------------------------
 
-QnMjpegRtpParser::QnMjpegRtpParser():
-    QnRtpVideoStreamParser(),
-    m_frequency(90000)
-    //m_frameData(CL_MEDIA_ALIGNMENT, 1024 * 64)
+QnMjpegRtpParser::QnMjpegRtpParser()
 {
+    QnRtpStreamParser::setFrequency(90000);
     memset(m_lumaTable, 0, sizeof(m_lumaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
     m_frameWidth = 0;
@@ -446,7 +444,7 @@ bool QnMjpegRtpParser::processRtpExtensions(const quint8* data, int size)
     return size == 0;
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, const QnRtspStatistic& statistics, bool& gotData)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bytesRead, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -654,15 +652,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         videoData->width = width * 8;
         videoData->height = height * 8;
 
-        if (m_timeHelper)
-        {
-            videoData->timestamp = m_timeHelper->getUsecTime(
-                ntohl(rtpHeader->timestamp), statistics, m_frequency);
-        }
-        else
-        {
-            videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-        }
+        videoData->timestamp = ntohl(rtpHeader->timestamp);
         gotData = true;
     }
     return true;

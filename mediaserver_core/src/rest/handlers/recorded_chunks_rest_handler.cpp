@@ -53,7 +53,7 @@ int QnRecordedChunksRestHandler::executeGet(
             result.append("<root>\n");
             result.append(errText);
             result.append("</root>\n");
-            return nx::network::http::StatusCode::invalidParameter;
+            return nx::network::http::StatusCode::unprocessableEntity;
         };
 
     if (!errStr.isEmpty())

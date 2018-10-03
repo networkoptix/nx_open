@@ -33,7 +33,7 @@ struct QnPtzData;
 struct QnPtzObject;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnPtzLimits)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzData)(QnPtzObject),
+    (QnPtzLimits)(QnPtzTourSpot)(QnPtzTour)(QnPtzData)(QnPtzObject),
     (json)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzAuxilaryTrait), (json)(lexical))

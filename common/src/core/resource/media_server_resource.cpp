@@ -144,9 +144,9 @@ QString QnMediaServerResource::getName() const
     return QnResource::getName();
 }
 
-QStringList QnMediaServerResource::searchFilters() const
+QStringList QnMediaServerResource::searchFilters(bool useExtraSearchInformation) const
 {
-    return base_type::searchFilters() << getUrl();
+    return base_type::searchFilters(useExtraSearchInformation) << getUrl();
 }
 
 void QnMediaServerResource::setName( const QString& name )
@@ -334,7 +334,7 @@ QString QnMediaServerResource::rtspUrl() const
 {
     const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     nx::network::url::Builder urlBuilder(getUrl());
-    urlBuilder.setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure));
+    urlBuilder.setScheme(nx::network::rtsp::urlSheme(isSslAllowed() && isSecure));
     return urlBuilder.toString();
 }
 

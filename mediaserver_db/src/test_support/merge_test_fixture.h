@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "peer_wrapper.h"
@@ -13,8 +14,8 @@ namespace test {
 class SystemMergeFixture
 {
 public:
-    SystemMergeFixture();
-    virtual ~SystemMergeFixture();
+    SystemMergeFixture(const std::string& baseDirectory);
+    virtual ~SystemMergeFixture() = default;
 
     void addSetting(const std::string& name, const std::string& value);
 
@@ -25,7 +26,12 @@ public:
     const PeerWrapper& peer(int index) const;
     PeerWrapper& peer(int index);
 
-    void mergeSystems();
+    QnRestResult::Error mergePeers(
+        PeerWrapper& what,
+        PeerWrapper& to,
+        std::vector<MergeAttributes::Attribute> attributes);
+
+    QnRestResult::Error mergeSystems();
 
     void waitUntilAllServersAreInterconnected();
     void waitUntilAllServersSynchronizedData();
@@ -37,7 +43,7 @@ public:
     std::vector<std::unique_ptr<PeerWrapper>> takeServers();
 
 private:
-    QString m_tmpDir;
+    const std::string m_baseDirectory;
     std::vector<std::unique_ptr<PeerWrapper>> m_servers;
     QnRestResult::Error m_prevResult = QnRestResult::Error::NoError;
     std::map<std::string, std::string> m_settings;

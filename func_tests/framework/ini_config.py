@@ -31,21 +31,26 @@ class IniConfig(object):
         return '<{}>'.format(self)
 
     def reload(self):
+        self._cached_settings = self._dict()
         try:
             data = self._path.read_text()
         except DoesNotExist:
             self._logger.info('Missing.')
-            self._cached_settings = self._dict()
         else:
             self._logger.info('Loaded:\n%s', data)
             # Config here is parsed by hand, because IniConfig from C++ doesn't
             # understand sections, which are always created by ConfigParser.
-            self._cached_settings = self._dict(
-                line.split(u'=', 1) for line in data.splitlines())
+            for line in data.splitlines():
+                key, value = line.split(u'=', 1)  # type: (str, str)
+                key = key.strip()
+                value = value.strip()
+                if value and value[0] == '"' and value[-1] == '"':
+                    value = value[1:-1]
+                self._cached_settings[key] = value
 
     def _write(self):
         data = u'\n'.join(
-            u'{}={}'.format(name, value)
+            u'{}="{}"'.format(name, value)
             for name, value in self._cached_settings.items())
         self._logger.info('Save:\n%s', data)
         self._path.parent.mkdir(exist_ok=True, parents=True)

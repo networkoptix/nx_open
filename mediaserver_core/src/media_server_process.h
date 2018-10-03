@@ -264,15 +264,10 @@ private:
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
-    std::unique_ptr<QnMdnsListener> m_mdnsListener;
-    std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
-    std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
     std::unique_ptr<TimeBasedNonceProvider> m_timeBasedNonceProvider;
     std::unique_ptr<CloudIntegrationManager> m_cloudIntegrationManager;
 
-    std::unique_ptr<QnResourceStatusWatcher> m_statusWatcher;
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
-    std::unique_ptr<QnServerConnector> m_serverConnector;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;

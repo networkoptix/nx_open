@@ -20,7 +20,7 @@ struct CameraBitrateCalculator
         QSize resolution,
         int fps,
         media::CameraStreamCapability streamCapability,
-        Qn::BitratePerGopType bitratePerGopType);
+        bool useBitratePerGop);
 
     static float roundKbpsToMbps(float kbps, int decimals = 1);
     static float roundMbpsToKbps(float mbps, int decimals = 1);

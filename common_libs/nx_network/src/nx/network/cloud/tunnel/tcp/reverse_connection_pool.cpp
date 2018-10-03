@@ -43,7 +43,7 @@ ReverseConnectionPool::ReverseConnectionPool(
 
 ReverseConnectionPool::~ReverseConnectionPool()
 {
-    pleaseStopSync(false);
+    pleaseStopSync();
 }
 
 void ReverseConnectionPool::bindToAioThread(aio::AbstractAioThread* aioThread)

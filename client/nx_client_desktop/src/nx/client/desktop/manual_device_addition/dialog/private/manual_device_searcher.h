@@ -34,7 +34,7 @@ public:
 
     virtual ~ManualDeviceSearcher() override;
 
-    QnManualResourceSearchStatus::State progress() const;
+    const QnManualResourceSearchStatus& status() const;
 
     QString initialError() const;
 
@@ -51,8 +51,10 @@ public:
     const QString& password() const;
 
 signals:
-    void progressChanged();
+    void statusChanged();
     void lastErrorTextChanged();
+    void devicesAdded(const QnManualResourceSearchList& devices);
+    void devicesRemoved(const QStringList& deviceIds);
 
 private:
     void init();
@@ -69,23 +71,20 @@ private:
         const QString& password,
         int port);
 
-    void setProgress(QnManualResourceSearchStatus::State value);
+    void abort();
+    void setStatus(const QnManualResourceSearchStatus& value);
     void setLastErrorText(const QString& text);
 
     void updateDevices(const QnManualResourceSearchList& devices);
 
-    void updateProgress();
+    void updateStatus();
     void handleProgressChanged();
-
-signals:
-    void devicesAdded(const QnManualResourceSearchList& devices);
-    void devicesRemoved(const QStringList& deviceIds);
 
 private:
     const QnMediaServerResourcePtr m_server;
     const QString m_login;
     const QString m_password;
-    QnManualResourceSearchStatus::State m_progress = QnManualResourceSearchStatus::Init;
+    QnManualResourceSearchStatus m_status = {QnManualResourceSearchStatus::Finished, 0, 0};
     QString m_lastErrorText;
 
     QTimer m_updateProgressTimer;

@@ -58,9 +58,9 @@ public:
         m_acceptor->dispatch(std::move(handler));
     }
 
-    virtual void pleaseStopSync(bool hz) override
+    virtual void pleaseStopSync() override
     {
-        m_acceptor->pleaseStopSync(hz);
+        m_acceptor->pleaseStopSync();
     }
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
@@ -283,7 +283,7 @@ protected:
 
         peerServer->registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpProxy::processHttpRequest, this, _3, _5, messageBody),
+            std::bind(&HttpProxy::processHttpRequest, this, _1, _2, messageBody),
             nx::network::http::Method::get);
         peerServer->server().start();
 
@@ -360,13 +360,13 @@ private:
     }
 
     void processHttpRequest(
-        nx::network::http::Request request,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler,
         const nx::Buffer& messageBody)
     {
         ++m_requestsServedByPeerCount;
 
-        m_requestOnTargetServerQueue.push(request);
+        m_requestOnTargetServerQueue.push(requestContext.request);
 
         network::http::RequestResult requestResult(network::http::StatusCode::ok);
         requestResult.dataSource =

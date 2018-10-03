@@ -74,7 +74,7 @@ public:
             return;
         }
 
-        UbjsonSerializedTransaction<typename CommandDescriptor::Data> serializableTransaction(
+        UbjsonSerializedTransaction<CommandDescriptor> serializableTransaction(
             std::move(transaction),
             std::move(dataSource->serializedTransaction),
             transportHeader.transactionFormatVersion);
@@ -101,7 +101,7 @@ public:
             return;
         }
 
-        SerializableTransaction<typename CommandDescriptor::Data> serializableTransaction(
+        SerializableTransaction<CommandDescriptor> serializableTransaction(
             std::move(transaction));
 
         this->processTransaction(
@@ -115,7 +115,7 @@ protected:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) = 0;
 
 private:
@@ -171,7 +171,7 @@ class SpecialCommandProcessor:
 
 public:
     typedef nx::utils::MoveOnlyFunc<void(
-        const nx::String& /*systemId*/,
+        const std::string& /*systemId*/,
         TransactionTransportHeader /*transportHeader*/,
         Command<typename CommandDescriptor::Data> /*data*/,
         TransactionProcessedHandler /*handler*/)> ProcessorFunc;
@@ -186,7 +186,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) override
     {
         const auto systemId = transportHeader.systemId;
@@ -211,7 +211,7 @@ public:
 
     using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction)>;
+            nx::sql::QueryContext*, std::string /*systemId*/, Ec2Transaction)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
@@ -229,7 +229,7 @@ private:
     struct TransactionContext
     {
         TransactionTransportHeader transportHeader;
-        SerializableTransaction<typename CommandDescriptor::Data> transaction;
+        SerializableTransaction<CommandDescriptor> transaction;
     };
 
     TransactionLog* const m_transactionLog;
@@ -238,7 +238,7 @@ private:
 
     virtual void processTransaction(
         TransactionTransportHeader transportHeader,
-        SerializableTransaction<typename CommandDescriptor::Data> transaction,
+        SerializableTransaction<CommandDescriptor> transaction,
         TransactionProcessedHandler handler) override
     {
         using namespace std::placeholders;
@@ -248,7 +248,7 @@ private:
             std::move(transportHeader),
             std::move(transaction)};
         m_transactionLog->startDbTransaction(
-            systemId,
+            systemId.c_str(),
             [this, transactionContext = std::move(transactionContext)](
                 nx::sql::QueryContext* queryContext) mutable
             {
@@ -274,7 +274,7 @@ private:
         auto dbResultCode =
             m_transactionLog->checkIfNeededAndSaveToLog<CommandDescriptor>(
                 queryContext,
-                transactionContext.transportHeader.systemId,
+                transactionContext.transportHeader.systemId.c_str(),
                 transactionContext.transaction);
 
         if (dbResultCode == nx::sql::DBResult::cancelled)
@@ -297,7 +297,7 @@ private:
 
         dbResultCode = m_processTranFunc(
             queryContext,
-            transactionContext.transportHeader.systemId,
+            transactionContext.transportHeader.systemId.c_str(),
             std::move(transactionContext.transaction.take()));
         if (dbResultCode != nx::sql::DBResult::ok)
         {

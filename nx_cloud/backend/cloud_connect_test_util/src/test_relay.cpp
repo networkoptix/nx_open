@@ -19,9 +19,10 @@ void printTestRelayOptions(std::ostream* outStream)
         "  --listening-peer-host-name={globally unique hostname}. Optional\n";
 }
 
-std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeer(
-    const nx::utils::Url& baseRelayUrl,
-    const std::string& listeningPeerName)
+std::tuple<nx::cloud::relay::api::ResultCode, std::unique_ptr<network::AbstractStreamSocket>>
+    openConnectionToThePeer(
+        const nx::utils::Url& baseRelayUrl,
+        const std::string& listeningPeerName)
 {
     using namespace nx::cloud::relay;
 
@@ -39,15 +40,9 @@ std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeer(
         {
             sessionDone.set_value(std::make_tuple(resultCode, response.sessionId));
         });
-    const auto sessionResult = sessionDone.get_future().get();
-    if (std::get<0>(sessionResult) != api::ResultCode::ok)
-    {
-        std::cerr << "Failed to create relay session: "
-            << api::toString(std::get<0>(sessionResult))
-            << std::endl;
-        return nullptr;
-    }
-    const auto sessionId = std::get<1>(sessionResult);
+    auto [sessionResultCode, sessionId] = sessionDone.get_future().get();
+    if (sessionResultCode != api::ResultCode::ok)
+        return std::make_tuple(sessionResultCode, nullptr);
 
     std::promise<std::tuple<
         api::ResultCode,
@@ -62,37 +57,42 @@ std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeer(
             connectionEstablished.set_value(
                 std::make_tuple(resultCode, std::move(connection)));
         });
-    auto [resultCode, connection] = connectionEstablished.get_future().get();
-    if (resultCode != api::ResultCode::ok)
-    {
-        std::cerr << "Failed to open connection to host "
-            << listeningPeerName << ": "
-            << api::toString(resultCode)
-            << std::endl;
-        return nullptr;
-    }
+    auto [connectionResultCode, connection] = 
+        connectionEstablished.get_future().get();
+    if (connectionResultCode != api::ResultCode::ok)
+        return std::make_tuple(connectionResultCode, nullptr);
 
-    return std::move(connection);
+    return std::make_tuple(api::ResultCode::ok, std::move(connection));
 }
 
 std::unique_ptr<network::AbstractStreamSocket> openConnectionToThePeerWithRetries(
     const nx::utils::Url& baseRelayUrl,
     const std::string& listeningPeerName)
 {
+    using namespace nx::cloud::relay;
+
     const auto maxTimeToWait = std::chrono::seconds(20);
 
     std::unique_ptr<network::AbstractStreamSocket> connection;
     nx::utils::ElapsedTimer timer;
     timer.restart();
+    nx::cloud::relay::api::ResultCode resultCode = 
+        nx::cloud::relay::api::ResultCode::ok;
     while (!timer.hasExpired(maxTimeToWait))
     {
-        connection = openConnectionToThePeer(
+        std::tie(resultCode, connection) = openConnectionToThePeer(
             baseRelayUrl,
             listeningPeerName);
         if (connection)
             break;
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    if (!connection)
+    {
+        std::cerr << "Failed to open connection to host "
+            << listeningPeerName << ": " << api::toString(resultCode) << std::endl;
     }
 
     return connection;

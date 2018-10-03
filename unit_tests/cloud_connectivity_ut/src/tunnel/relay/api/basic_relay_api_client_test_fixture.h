@@ -33,7 +33,7 @@ public:
         httpServer->registerRequestProcessorFunc(
             network::url::joinPath(baseUrlPath, kClientSessionConnectionsPath).c_str(),
             std::bind(&BasicRelayApiClientTestFixture::openClientTunnel, this,
-                _1, _2, _3, _4, _5));
+                _1, _2));
     }
 
     void setBeginListeningResponse(const BeginListeningResponse& response)
@@ -62,10 +62,7 @@ private:
     nx::utils::SyncQueue<std::unique_ptr<network::AbstractStreamSocket>> m_tunnelConnections;
 
     void openClientTunnel(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request /*request*/,
-        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestContext /*requestContext*/,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         completionHandler(network::http::StatusCode::switchingProtocols);

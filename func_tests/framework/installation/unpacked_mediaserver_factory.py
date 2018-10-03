@@ -96,13 +96,16 @@ class UnpackMediaserverInstallationGroups(object):
     def _allocate_servers_from_group(self, group, count, system_settings, server_config):
         installation_list = group.allocate_many(count)
         return [
-            self._make_server(installation, '{}-{:03d}'.format(group.name, index), system_settings, server_config)
+            self._make_server(installation, '{}-{:03d}'.format(group.name, index), system_settings, server_config, index)
             for index, installation in enumerate(installation_list)]
 
-    def _make_server(self, installation, server_name, system_settings, server_config):
+    def _make_server(self, installation, server_name, system_settings, server_config, index=0):
         installation.install(self._mediaserver_installer)
         installation.cleanup(self._ca.generate_key_and_cert())
         if server_config:
+            if 'serverGuid' in server_config:
+                # servers must have different guids; serverGuid is expected to be format string
+                server_config = dict(server_config, serverGuid=server_config['serverGuid'].format(index))
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
         try:
@@ -173,7 +176,7 @@ class UnpackedMediaserverFactory(object):
             name=host.name,
             posix_access=host.os_access,
             installer=self._mediaserver_installer,
-            root_dir=host.os_access.Path(host.dir),
+            root_dir=host.os_access.path_cls(host.dir),
             server_bind_address=host.server_bind_address,
             base_port=host.server_port_base,
             lws_port_base=host.lws_port_base,

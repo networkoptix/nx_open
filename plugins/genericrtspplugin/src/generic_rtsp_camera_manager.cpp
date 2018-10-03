@@ -38,7 +38,8 @@ GenericRTSPCameraManager::GenericRTSPCameraManager(const nxcip::CameraInfo& info
           nxcip::BaseCameraManager::audioCapability
         | nxcip::BaseCameraManager::shareIpCapability
         | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
-        | nxcip::BaseCameraManager::customMediaUrlCapability;
+        | nxcip::BaseCameraManager::customMediaUrlCapability
+        | nxcip::BaseCameraManager::cameraTimeCapability;
 }
 
 GenericRTSPCameraManager::~GenericRTSPCameraManager()

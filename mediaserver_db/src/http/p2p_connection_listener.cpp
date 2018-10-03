@@ -152,14 +152,15 @@ void ConnectionProcessor::run()
     if (commonModule()->isStandAloneMode())
     {
         NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
-        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "Media server is running in standalone mode");
         return;
     }
 
     vms::api::PeerDataEx remotePeer = deserializePeerData(d->request);
     if (!isPeerCompatible(remotePeer))
     {
-        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden, "Peer is not compatible");
         return;
     }
 
@@ -168,15 +169,15 @@ void ConnectionProcessor::run()
     auto messageBus = (connection->messageBus()->dynamicCast<ServerMessageBus*>());
     if (!messageBus)
     {
-        sendResponse(
-            nx::network::http::StatusCode::forbidden,
-            nx::network::http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "Media server is not is in P2p mode");
         return;
     }
 
-    if (Connection::checkAndSetSystemIdentityTime(remotePeer, commonModule))
+    if (!messageBus->validateRemotePeerData(remotePeer))
     {
-        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            "Media server is going to restart to replace its database");
         return;
     }
 
@@ -196,11 +197,14 @@ void ConnectionProcessor::run()
             Qn::EC2_CONNECT_STAGE_1,
             nx::network::http::StringType()));
 
-        sendResponse(
-            lockOK ? nx::network::http::StatusCode::noContent : nx::network::http::StatusCode::forbidden,
-            nx::network::http::StringType());
         if (!lockOK)
+        {
+            sendResponse(nx::network::http::StatusCode::forbidden,
+                lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
             return;
+        }
+        sendResponse(
+            nx::network::http::StatusCode::noContent, nx::network::http::StringType());
 
         // 2-nd stage
         if (!readRequest())
@@ -212,7 +216,8 @@ void ConnectionProcessor::run()
         remotePeer.id == commonModule->moduleGUID() || //< can't connect to itself
         isDisabledPeer(remotePeer)) //< allowed peers are strict
     {
-        sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
+        sendResponse(nx::network::http::StatusCode::forbidden,
+            lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
         return;
     }
 
@@ -220,7 +225,9 @@ void ConnectionProcessor::run()
     auto error = websocket::validateRequest(d->request, &d->response);
     if (error != websocket::Error::noError)
     {
-        NX_ERROR(this, lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error));
+        auto errorMessage = lm("Invalid WEB socket request. Validation failed. Error: %1").arg((int)error);
+        sendResponse(nx::network::http::StatusCode::forbidden, errorMessage.toUtf8());
+        NX_ERROR(this, errorMessage);
         d->socket->close();
         return;
     }
@@ -242,7 +249,11 @@ void ConnectionProcessor::run()
 
     d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(std::move(d->socket)));
+    WebSocketPtr webSocket(new websocket::WebSocket(
+        std::move(d->socket),
+        remotePeer.dataFormat == Qn::JsonFormat
+            ? websocket::FrameType::text
+            : websocket::FrameType::binary));
     if (keepAliveTimeout > std::chrono::milliseconds::zero())
         webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();

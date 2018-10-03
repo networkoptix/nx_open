@@ -7,17 +7,9 @@
 namespace ec2 {
 namespace test {
 
-SystemMergeFixture::SystemMergeFixture()
+SystemMergeFixture::SystemMergeFixture(const std::string& baseDirectory):
+    m_baseDirectory(baseDirectory)
 {
-    m_tmpDir = (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
-        ? QDir::homePath()
-        : nx::utils::TestOptions::temporaryDirectoryPath()) + "/merge_test.data";
-    QDir(m_tmpDir).removeRecursively();
-}
-
-SystemMergeFixture::~SystemMergeFixture()
-{
-    QDir(m_tmpDir).removeRecursively();
 }
 
 void SystemMergeFixture::addSetting(const std::string& name, const std::string& value)
@@ -30,7 +22,8 @@ bool SystemMergeFixture::initializeSingleServerSystems(int count)
     for (int i = 0; i < count; ++i)
     {
         m_servers.emplace_back(
-            std::make_unique<PeerWrapper>(lm("%1/peer_%2").args(m_tmpDir, m_servers.size())));
+            std::make_unique<PeerWrapper>(lm("%1/peer_%2")
+                .args(m_baseDirectory, m_servers.size())));
         for (const auto& nameAndValue: m_settings)
             m_servers.back()->addSetting(nameAndValue.first, nameAndValue.second);
         if (!m_servers.back()->startAndWaitUntilStarted() ||
@@ -58,16 +51,26 @@ PeerWrapper& SystemMergeFixture::peer(int index)
     return *m_servers[index];
 }
 
-void SystemMergeFixture::mergeSystems()
+QnRestResult::Error SystemMergeFixture::mergePeers(
+    PeerWrapper& what,
+    PeerWrapper& to,
+    std::vector<MergeAttributes::Attribute> attributes)
+{
+    m_prevResult = what.mergeTo(to, std::move(attributes));
+    return m_prevResult;
+}
+
+QnRestResult::Error SystemMergeFixture::mergeSystems()
 {
     m_prevResult = m_servers.back()->mergeTo(*m_servers.front());
+    return m_prevResult;
 }
 
 void SystemMergeFixture::waitUntilAllServersAreInterconnected()
 {
     for (;;)
     {
-        if (PeerWrapper::arePeersInterconnected(m_servers))
+        if (PeerWrapper::peersInterconnected(m_servers))
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -77,7 +80,7 @@ void SystemMergeFixture::waitUntilAllServersSynchronizedData()
 {
     for (;;)
     {
-        if (PeerWrapper::areAllPeersHaveSameTransactionLog(m_servers))
+        if (PeerWrapper::allPeersHaveSameTransactionLog(m_servers))
             break;
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));

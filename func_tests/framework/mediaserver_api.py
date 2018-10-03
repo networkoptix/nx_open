@@ -4,6 +4,7 @@ import timeit
 import uuid
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from uuid import UUID
 
 import pytz
 import requests
@@ -18,7 +19,7 @@ from framework import media_stream
 from framework.http_api import HttpApi, HttpClient, HttpError
 from framework.installation.installer import Version
 from framework.utils import RunningTime, bool_to_str, str_to_bool
-from framework.waiting import Wait, WaitTimeout, wait_for_truthy, wait_for_equal
+from framework.waiting import Wait, WaitTimeout, wait_for_equal, wait_for_truthy
 from .context_logger import ContextLogger, context_logger
 
 _logger = ContextLogger(__name__, 'mediaserver_api')
@@ -27,6 +28,7 @@ DEFAULT_API_USER = 'admin'
 INITIAL_API_PASSWORD = 'admin'
 DEFAULT_API_PASSWORD = 'qweasd123'
 MAX_CONTENT_LEN_TO_LOG = 1000
+DEFAULT_TAKE_REMOTE_SETTINGS = False
 
 
 class MediaserverApiRequestError(Exception):
@@ -178,6 +180,34 @@ class TimePeriod(object):
 
     def __ne__(self, other):
         return not self == other
+
+
+class _MediaserverCameraApi(object):
+    def __init__(self, generic_mediaserver_api, camera_id):
+        # type: (_GenericMediaserverApi, ...) -> None
+        self.camera_id = camera_id
+        self._generic = generic_mediaserver_api
+
+    def __repr__(self):
+        return '{}({!r}, {!r})'.format(self.__class__.__name__, self._generic, self.camera_id)
+
+    def history(self):
+        params = {'cameraId': self.camera_id, 'startTime': 0, 'endTime': 'now'}
+        response = self._generic.get('ec2/cameraHistory', params)
+        history_items = response[0]['items']
+        history_ids = [item['serverGuid'] for item in history_items]
+        timestamps = [float(item['timestampMs']) / 1000 for item in history_items]
+        assert timestamps == sorted(timestamps)
+        return history_ids
+
+    def server(self):
+        response = self._generic.get('ec2/getCamerasEx')
+        for camera_info in response:
+            if camera_info['id'] == self.camera_id:
+                owner_server_id = camera_info['parentId']
+                _logger.info("%r: camera is on server %r", self, owner_server_id)
+                return owner_server_id
+        return None
 
 
 class MediaserverApi(object):
@@ -556,7 +586,7 @@ class MediaserverApi(object):
             remote_api,  # type: MediaserverApi
             remote_address,  # type: IPAddress
             remote_port,
-            take_remote_settings=False,
+            take_remote_settings=DEFAULT_TAKE_REMOTE_SETTINGS,
             ):
         # When many servers are merged, there is server visible from others.
         # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -564,8 +594,12 @@ class MediaserverApi(object):
         logger.info("Merge %s to %s (takeRemoteSettings: %s):", self, remote_api, take_remote_settings)
         master_api, servant_api = (remote_api, self) if take_remote_settings else (self, remote_api)
         master_system_id = master_api.get_local_system_id()
+        if master_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(master_api))
         logger.debug("Settings from %r, system id %s.", master_api, master_system_id)
         servant_system_id = servant_api.get_local_system_id()
+        if servant_system_id == uuid.UUID(int=0):
+            raise RuntimeError("System is not set up on {}".format(servant_api))
         logger.debug("Other system id %s.", servant_system_id)
         if servant_system_id == master_system_id:
             raise AlreadyMerged(self, remote_api, master_system_id)
@@ -591,7 +625,6 @@ class MediaserverApi(object):
         wait_for_equal(servant_api.get_local_system_id, master_system_id, timeout_sec=30)
         all_ids = master_ids | servant_ids
         wait_for_equal(master_api.system_mediaserver_ids, all_ids, timeout_sec=30)
-        wait_for_truthy(master_api.system_mediaservers_all_online, timeout_sec=30)
         logger.info("Merge %s to %s (takeRemoteSettings: %s): complete.", self, remote_api, take_remote_settings)
 
     def find_camera(self, camera_mac):
@@ -599,6 +632,19 @@ class MediaserverApi(object):
             if EUI(camera_info['physicalId']) == EUI(camera_mac):
                 _logger.info("Camera %r is discovered by server %r as %r", camera_mac, self, camera_info['id'])
                 return camera_info['id']
+
+    def take_camera(self, camera_id):
+        server_guid = self.get_server_id()
+        self.generic.post('ec2/saveCamera', dict(id=camera_id, parentId=server_guid))
+        for d in self.generic.get('ec2/getCamerasEx'):
+            if d['id'] == camera_id:
+                break
+        else:
+            raise RuntimeError("Camera %s is unknown for server %s" % (camera_id, self))
+        assert d['parentId'] == server_guid
+
+    def camera(self, camera_id):
+        return _MediaserverCameraApi(self.generic, camera_id)
 
     def make_event_rule(
             self, event_type, event_state, action_type, event_resource_ids=[],

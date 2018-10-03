@@ -4,9 +4,6 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <core/resource/resource_media_layout.h>
-#include <nx/streaming/rtp/time_helper.h>
-
-class QnRtspStatistic;
 
 #pragma pack(push, 1)
 struct RtpHeader
@@ -72,21 +69,23 @@ public:
         quint8* rtpBufferBase,
         int bufferOffset,
         int bytesRead,
-        const QnRtspStatistic& statistics,
         bool& gotData) = 0;
-
-    // used for sync audio/video streams
-    void setTimeHelper(nx::streaming::rtp::TimeHelper* timeHelper);
 
     int logicalChannelNum() const;
     void setLogicalChannelNum(int value);
+    int getFrequency() { return m_frequency; };
 
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
 
 protected:
-    nx::streaming::rtp::TimeHelper* m_timeHelper = nullptr;
+    void setFrequency(int frequency) { m_frequency = frequency; }
+
+protected:
     int m_logicalChannelNum = 0;
+
+private:
+    int m_frequency = 0;
 };
 
 class QnRtpVideoStreamParser: public QnRtpStreamParser

@@ -126,21 +126,16 @@ public:
 
     static bool lessThanEndTimestamp(const QnAuditRecord *d1, const QnAuditRecord *d2)
     {
-        const bool leftIsUncompleteLoginSession =
+        const bool leftLoginSessionIsIncomplete =
             d1->rangeEndSec == 0 && d1->eventType == Qn::AR_Login;
-        const bool rightIsUncompleteLoginSession =
+        const bool rightLoginSessionIsIncomplete =
             d2->rangeEndSec == 0 && d2->eventType == Qn::AR_Login;
 
-        if (leftIsUncompleteLoginSession)
-        {
-            if (leftIsUncompleteLoginSession == rightIsUncompleteLoginSession)
-                return d1->createdTimeSec < d2->createdTimeSec; // Both sessions are uncompleted.
-            else
-                return true; // Uncompleted session is always "less" then completed
-        }
+        if (leftLoginSessionIsIncomplete != rightLoginSessionIsIncomplete)
+            return leftLoginSessionIsIncomplete;
 
-        return rightIsUncompleteLoginSession
-            ? false
+        return leftLoginSessionIsIncomplete
+            ? d1->createdTimeSec < d2->createdTimeSec
             : d1->rangeEndSec < d2->rangeEndSec;
     }
 
@@ -526,7 +521,7 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
         QString result;
         for (const auto& res : resourcePool()->getResourcesByIds(data->resources))
         {
-            result += res->toSearchString();
+            result += res->toSearchString(true);
             result += lit(" ");
         }
 

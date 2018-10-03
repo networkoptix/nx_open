@@ -145,7 +145,7 @@ private:
                 *requestData = QnUbjson::deserialized<RequestData>(
                     body, RequestData(), outSuccess);
                 if (!*outSuccess) //< Ubjson deserialization error.
-                    return nx::network::http::StatusCode::invalidParameter;
+                    return nx::network::http::StatusCode::badRequest;
                 break;
             }
 

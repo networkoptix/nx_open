@@ -26,16 +26,19 @@ public:
         m_committedData = m_initialData;
     }
 
-    ~TransactionLogCache()
-    {
-    }
-
 protected:
     TranId beginTran()
     {
         const auto tranId = m_cache.beginTran();
         m_rawData[tranId] = m_committedData;
         return tranId;
+    }
+
+    void givenCacheWithNonZeroTimestampSequence()
+    {
+        const auto tranId = cache().beginTran();
+        cache().updateTimestampSequence(tranId, 10);
+        cache().commit(tranId);
     }
 
     void beginMultipleTransactions()
@@ -127,32 +130,9 @@ protected:
         assertEqual(m_committedData, m_cache);
     }
 
-private:
-    struct CacheState
+    VmsTransactionLogCache& cache()
     {
-        std::uint64_t timestampSequence;
-
-        CacheState():
-            timestampSequence(0)
-        {
-        }
-    };
-
-    VmsTransactionLogCache m_cache;
-    const nx::String m_systemId;
-    const nx::String m_peerId;
-    const QnUuid m_dbId;
-    CacheState m_committedData;
-    CacheState m_initialData;
-    std::map<TranId, CacheState> m_rawData;
-    std::deque<TranId> m_startedTransactions;
-    std::set<int, std::greater<int>> m_transactionSequenceGenerated;
-
-    CacheState readState()
-    {
-        CacheState result;
-        result.timestampSequence = m_cache.committedTimestampSequence();
-        return result;
+        return m_cache;
     }
 
     CommandHeader prepareTransaction(TranId tranId)
@@ -170,6 +150,34 @@ private:
         return transactionHeader;
     }
 
+private:
+    struct CacheState
+    {
+        std::uint64_t timestampSequence;
+
+        CacheState():
+            timestampSequence(0)
+        {
+        }
+    };
+
+    VmsTransactionLogCache m_cache;
+    const std::string m_systemId;
+    const std::string m_peerId;
+    const QnUuid m_dbId;
+    CacheState m_committedData;
+    CacheState m_initialData;
+    std::map<TranId, CacheState> m_rawData;
+    std::deque<TranId> m_startedTransactions;
+    std::set<int, std::greater<int>> m_transactionSequenceGenerated;
+
+    CacheState readState()
+    {
+        CacheState result;
+        result.timestampSequence = m_cache.committedTimestampSequence();
+        return result;
+    }
+
     void generateTransaction(TranId tranId)
     {
         auto transactionHeader = prepareTransaction(tranId);
@@ -180,7 +188,10 @@ private:
         TranId tranId,
         CommandHeader transactionHeader)
     {
-        m_cache.insertOrReplaceTransaction(tranId, transactionHeader, m_peerId + m_systemId);
+        m_cache.insertOrReplaceTransaction(
+            tranId,
+            transactionHeader,
+            (m_peerId + m_systemId).c_str());
         m_transactionSequenceGenerated.insert(transactionHeader.persistentInfo.sequence);
     }
 
@@ -236,6 +247,25 @@ TEST_F(TransactionLogCache, timestamp_sequence_is_updated_by_external_transactio
 {
     saveTransactionWithGreaterTimestampSequence();
     assertGreaterSequenceIsApplied();
+}
+
+TEST_F(TransactionLogCache, timestamp_is_not_decreasing)
+{
+    givenCacheWithNonZeroTimestampSequence();
+
+    const auto tranId = beginTran();
+
+    const auto timestampBefore = cache().generateTransactionTimestamp(tranId);
+
+    // Saving external transaction with a lower sequence but greater ticks.
+    auto transaction = prepareTransaction(tranId);
+    transaction.persistentInfo.timestamp = timestampBefore;
+    --transaction.persistentInfo.timestamp.sequence;
+    ++transaction.persistentInfo.timestamp.ticks;
+    cache().insertOrReplaceTransaction(tranId, transaction, "tran-hash");
+
+    const auto timestampAfter = cache().generateTransactionTimestamp(tranId);
+    ASSERT_GT(timestampAfter, timestampBefore);
 }
 
 } // namespace test

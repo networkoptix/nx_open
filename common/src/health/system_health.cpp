@@ -58,6 +58,7 @@ bool isMessageLocked(MessageType message)
         case UsersEmailIsEmpty:
         case SystemIsReadOnly:
         case StoragesNotConfigured:
+        case NoInternetForTimeSync:
             return true;
         default:
             return false;

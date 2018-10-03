@@ -6,10 +6,11 @@ from contextlib2 import ExitStack
 
 from framework.context_logger import context_logger
 from framework.os_access.exceptions import AlreadyExists
+from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_access import PosixAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.registry import Registry
-from framework.vms.hypervisor import VMNotFound, VmNotReady
+from framework.vms.hypervisor import VMNotFound, VmHardware, VmNotReady
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.waiting import Wait, WaitTimeout, wait_for_truthy
 
@@ -23,8 +24,8 @@ class VM(object):
         self.type = type
         self.name = hardware.name  # TODO: Remove.
         self.port_map = hardware.port_map  # TODO: Remove.
-        self.hardware = hardware
-        self.os_access = os_access
+        self.hardware = hardware  # type: VmHardware
+        self.os_access = os_access  # type: OSAccess
 
 
 class UnknownOsFamily(Exception):
@@ -123,7 +124,7 @@ class VMType(object):
     @contextmanager
     def vm_ready(self, alias):
         """Get accessible, cleaned up add ready-to-use VM."""
-        with self.vm_allocated(alias) as vm:
+        with self.vm_allocated(alias) as vm:  # type: VM
             with ExitStack() as stack:
                 stack.enter_context(context_logger(_logger, 'framework.networking.linux'))
                 stack.enter_context(context_logger(_logger, 'framework.networking.windows'))
@@ -145,6 +146,8 @@ class VMType(object):
                 # Networking reset is quite lengthy operation.
                 # TODO: Consider unplug and reset only before network setup.
                 vm.os_access.networking.reset()
+                vm.os_access.cleanup_disk_space()
+                vm.hardware.reset_bandwidth()
                 yield vm
 
     def cleanup(self):

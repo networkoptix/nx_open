@@ -6,6 +6,7 @@
 #include "utils/common/synctime.h"
 #include "vmax480_stream_fetcher.h"
 #include "core/resource/network_resource.h"
+#include <common/common_module.h>
 
 static const QDate MAX_ARCHIVE_DATE(2200, 1, 1);
 
@@ -33,7 +34,8 @@ void QnVMax480ChunkReader::run()
 {
     //saveSysThreadID();
     bool registered = false;
-    while (!needToStop() && !registered && !QnResource::isStopping()) {
+    while (!needToStop() && !registered && !m_res->commonModule()->isNeedToStop())
+    {
         registered = m_streamFetcher->registerConsumer(this);
         if (!registered)
             msleep(200);
@@ -60,7 +62,7 @@ void QnVMax480ChunkReader::run()
         }
         */
 
-        if (m_waitingAnswer) 
+        if (m_waitingAnswer)
         {
             if (m_waitTimer.elapsed() > 1000*30) {
                 if (m_gotAllData) {
@@ -88,7 +90,7 @@ void QnVMax480ChunkReader::run()
         switch (m_state)
         {
         case State_Started:
-            if (m_streamFetcher->vmaxRequestRange()) 
+            if (m_streamFetcher->vmaxRequestRange())
             {
                 m_state = State_ReadDays;
                 m_waitTimer.restart();
@@ -109,7 +111,7 @@ void QnVMax480ChunkReader::run()
         case State_ReadTime:
             m_waitingAnswer = true;
             m_waitTimer.restart();
-            if (!m_daysToRequest.isEmpty()) 
+            if (!m_daysToRequest.isEmpty())
             {
                 if (!m_streamFetcher->vmaxRequestDayInfo(m_daysToRequest.dequeue()))
                     m_state = State_Started;
@@ -129,7 +131,7 @@ void QnVMax480ChunkReader::run()
             m_updateTimer.restart();
             m_state = State_UpdateData;
             break;
-            
+
         case State_UpdateData:
             m_gotAllData = true;
             if (m_updateTimer.elapsed() > 60*1000)
@@ -221,13 +223,13 @@ void QnVMax480ChunkReader::onGotDayInfo(int dayNum, const QByteArray& data)
     {
         QnTimePeriodList dayPeriods;
 
-        for (int hour = 0; hour < 25; ++hour) 
+        for (int hour = 0; hour < 25; ++hour)
         {
             for(int min = 0; min < 60; ++min)
             {
                 char recordType = *curPtr & 0x0f;
                 // I do not know how to handle 25-th hour
-                if (recordType && hour < 24) 
+                if (recordType && hour < 24)
                 {
                     QTime time(hour, min, 0);
                     QDateTime dt (date, time);

@@ -1,4 +1,4 @@
-#include "plugin.h"
+﻿#include "plugin.h"
 
 #include <QtCore/QString>
 #include <QtCore/QFile>
@@ -101,7 +101,6 @@ void Plugin::setLocale(const char* locale)
 
 CameraManager* Plugin::obtainCameraManager(const CameraInfo* cameraInfo, Error* outError)
 {
-    *outError = Error::noError;
     const auto vendor = QString(cameraInfo->vendor).toLower();
     if (vendor.startsWith(kVcaVendor))
         return new Manager(this, *cameraInfo, m_typedManifest);

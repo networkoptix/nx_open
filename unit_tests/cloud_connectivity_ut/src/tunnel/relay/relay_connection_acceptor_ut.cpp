@@ -63,7 +63,7 @@ protected:
         m_testHttpServer.registerRequestProcessorFunc(
             api::kServerIncomingConnectionsPath,
             std::bind(&RelayTest::processIncomingConnection, this,
-                _1, _2, _3, _4, _5));
+                _1, _2));
 
         ASSERT_TRUE(m_testHttpServer.bindAndListen());
 
@@ -105,22 +105,23 @@ private:
     std::optional<nx::cloud::relay::api::ClientFactory::Function> m_factoryFunctionBak;
 
     void processIncomingConnection(
-        nx::network::http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx::network::http::Request request,
-        nx::network::http::Response* const response,
+        nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
         using namespace std::placeholders;
 
         if (m_serverType != ServerType::happy)
         {
-            connection->closeConnection(SystemError::connectionReset);
+            requestContext.connection->closeConnection(SystemError::connectionReset);
             return;
         }
 
-        if (request.requestLine.method == nx::network::http::Method::post)
-            api::serializeToHeaders(&response->headers, m_beginListeningResponse);
+        if (requestContext.request.requestLine.method == nx::network::http::Method::post)
+        {
+            api::serializeToHeaders(
+                &requestContext.response->headers,
+                m_beginListeningResponse);
+        }
 
         nx::network::http::RequestResult requestResult(
             nx::network::http::StatusCode::switchingProtocols);

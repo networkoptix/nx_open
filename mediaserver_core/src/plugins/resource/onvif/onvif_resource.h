@@ -190,15 +190,10 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; }
 
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getRelayOutputList() const override;
-    //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QnIOPortDataList getInputPortList() const override;
-    //!Implementation of QnSecurityCamResource::setRelayOutputState
     /*!
         Actual request is performed asynchronously. This method only posts task to the queue
     */
-    virtual bool setRelayOutputState(
+    virtual bool setOutputPortState(
         const QString& ouputID,
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
@@ -262,6 +257,7 @@ public:
 
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(
+        QnCommonModule* commonModule,
         const SoapTimeouts& onvifTimeouts,
         const QString& onvifUrl,
         const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
@@ -345,7 +341,7 @@ protected:
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
-    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual void initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params);
     virtual QSet<QString> calculateSupportedAdvancedParameters() const;
     virtual void fetchAndSetAdvancedParameters();
 
@@ -382,6 +378,8 @@ protected:
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
 private:
+    QnIOPortDataList generateOutputPorts() const;
+
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
@@ -409,10 +407,8 @@ protected:
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    virtual bool startInputPortMonitoringAsync(
-        std::function<void(bool)>&& completionHandler) override;
-    virtual void stopInputPortMonitoringAsync() override;
-    virtual bool isInputPortMonitored() const override;
+    virtual void startInputPortStatesMonitoring() override;
+    virtual void stopInputPortStatesMonitoring() override;
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
@@ -592,7 +588,7 @@ private:
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    void setRelayOutputStateNonSafe(
+    void setOutputPortStateNonSafe(
         quint64 timerID,
         const QString& outputID,
         bool active,

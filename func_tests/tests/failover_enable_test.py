@@ -11,11 +11,14 @@ from operator import itemgetter
 
 import pytest
 from contextlib2 import ExitStack
+from netaddr import IPNetwork
 
 import server_api_data_generators as generator
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
+from framework.vms.bulk import many_allocated
+from framework.vms.networks import setup_flat_network
 from framework.waiting import wait_for_truthy
 
 CAMERA_SWITCHING_PERIOD_SEC = 4*60
@@ -39,29 +42,22 @@ def counter():
 
 
 @pytest.fixture()
-def layout():
-    return {
-        'networks':
-        {
-            '10.254.0.0/28':
-            {
-                'one': None,
-                'two': None,
-                'three': None
-            }
-        }
-    }
-
-
-@pytest.fixture()
-def three_mediaservers(mediaserver_allocation, network):
-    allocated_mediaservers = []
-    with ExitStack() as stack:
-        for name in ['one', 'two', 'three']:
-            mediaserver = stack.enter_context(mediaserver_allocation(network[name]))
-            mediaserver.start()
-            allocated_mediaservers.append(mediaserver)
-        yield allocated_mediaservers
+def three_mediaservers(vm_types, mediaserver_allocation, hypervisor):
+    machine_configurations = [
+        {'alias': 'one', 'type': 'linux'},
+        {'alias': 'two', 'type': 'linux'},
+        {'alias': 'three', 'type': 'linux'},
+        ]
+    with many_allocated(vm_types, machine_configurations) as machines:
+        machine_list = [machines[conf['alias']] for conf in machine_configurations]
+        setup_flat_network(machine_list, IPNetwork('10.254.0.0/28'), hypervisor)
+        allocated_mediaservers = []
+        with ExitStack() as stack:
+            for name in ['one', 'two', 'three']:
+                mediaserver = stack.enter_context(mediaserver_allocation(machines[name]))
+                mediaserver.start()
+                allocated_mediaservers.append(mediaserver)
+            yield allocated_mediaservers
 
 
 ServerRec = namedtuple('ServerRec', 'server camera_mac_set')

@@ -101,7 +101,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(camera);
     case Qn::ResourceSearchStringRole:
-        return camera->toSearchString();
+        return camera->toSearchString(true);
     default:
         break;
     }

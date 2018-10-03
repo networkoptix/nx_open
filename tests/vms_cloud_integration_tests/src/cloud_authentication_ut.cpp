@@ -67,7 +67,6 @@ protected:
         ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), nx::network::kNoTimeout));
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
         auto httpMsgPipeline = std::make_unique<nx::network::http::deprecated::AsyncMessagePipeline>(
-            nullptr,
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
 

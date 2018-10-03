@@ -37,7 +37,7 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
-    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const = 0;
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;
@@ -73,7 +73,7 @@ public:
     void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
 
 
-    bool canDisableNativePtzPresets() const;
+    bool canSwitchPtzPresetTypes() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
@@ -102,7 +102,6 @@ protected:
 private:
     mutable QString m_cachedLayout;
     mutable QnMutex m_layoutMutex;
-    mutable boost::optional<bool> m_hasVideo;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

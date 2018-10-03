@@ -27,6 +27,11 @@ QnWinDesktopResource::~QnWinDesktopResource()
     delete m_desktopDataProvider;
 }
 
+bool QnWinDesktopResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+{
+    return true;
+}
+
 QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal()
 {
     QnMutexLocker lock( &m_dpMutex );
@@ -97,7 +102,7 @@ QnConstResourceAudioLayoutPtr QnWinDesktopResource::getAudioLayout(const QnAbstr
     return m_desktopDataProvider->getAudioLayout();
 }
 
-QStringList QnWinDesktopResource::searchFilters() const
+QStringList QnWinDesktopResource::searchFilters(bool useExtraInformation) const
 {
     // Desktop cameras are not to be found by search
     return QStringList();

@@ -39,7 +39,8 @@ bool isAcceptableForModelLayout(
     const auto context = model->context();
     return model->scope() == QnResourceTreeModel::FullScope
         && context->resourceAccessProvider()->hasAccess(context->user(), resource)
-        && resource->hasFlags(Qn::layout);
+        && resource->flags().testFlag(Qn::layout)
+        && !resource->flags().testFlag(Qn::local);
 }
 
 bool isAcceptableForModelServer(
@@ -80,14 +81,15 @@ using namespace nx::client::desktop;
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
     NodeType nodeType,
     QnResourceTreeModel* model,
-    bool initialize)
+    bool initialize,
+    bool useExtraSearchInformation)
 {
     QnResourceTreeModelNodePtr result;
     switch (nodeType)
     {
         case NodeType::filteredCameras:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelCamera, nodeType));
+                model, isAcceptableForModelCamera, nodeType, useExtraSearchInformation));
             break;
 
         case NodeType::filteredLayouts:

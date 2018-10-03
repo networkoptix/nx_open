@@ -33,16 +33,14 @@ public:
      * Also, it is not recommended to call default implemntation with mutex locked.
      * It is a potential deadlock.
      */
-    virtual void pleaseStopSync(bool checkForLocks = true);
+    virtual void pleaseStopSync();
 
 protected:
     /**
      * Calls QnStoppableAsync::pleaseStop and waits for completion.
      * Also, contains some asserts.
      */
-    void pleaseStopSync(
-        const nx::network::aio::AIOService* aioService,
-        bool checkForLocks);
+    void pleaseStopSync(const nx::network::aio::AIOService* aioService);
 };
 
 } // namespace network

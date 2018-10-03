@@ -69,6 +69,7 @@ class PortMapperMocked:
 {
 public:
     PortMapperMocked(
+        DeviceSearcher* deviceSearcher,
         const HostAddress& internalIp,
         quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL);
     AsyncClientMock& clientMock();

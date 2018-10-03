@@ -45,11 +45,11 @@ static QByteArray extractWord(int index, const QByteArray& rawData)
 QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnMediaServerModule* serverModule):
     QnAbstractResourceSearcher(serverModule->commonModule()),
     QnAbstractNetworkResourceSearcher(serverModule->commonModule()),
-    SearchAutoHandler(kUpnpBasicDeviceType),
+    SearchAutoHandler(serverModule->upnpDeviceSearcher(), kUpnpBasicDeviceType),
     nx::mediaserver::ServerModuleAware(serverModule)
 {
     NX_DEBUG(this, "Constructed");
-    QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
+    serverModule->mdnsListener()->registerConsumer((std::uintptr_t) this);
 }
 
 QnPlISDResourceSearcher::~QnPlISDResourceSearcher()
@@ -136,7 +136,7 @@ QnResourceList QnPlISDResourceSearcher::findResources(void)
 	}
 
     QnResourceList mdnsResults;
-    auto consumerData = QnMdnsListener::instance()->getData((std::uintptr_t) this);
+    auto consumerData = serverModule()->mdnsListener()->getData((std::uintptr_t) this);
     consumerData->forEachEntry(
         [this, &mdnsResults, &upnpResults](
             const QString& remoteAddress,

@@ -9,7 +9,10 @@ namespace mediaserver {
 namespace fs {
 namespace media_paths {
 
-FilterConfig FilterConfig::createDefault(bool includeNonHdd, const nx::mediaserver::Settings* settings)
+FilterConfig FilterConfig::createDefault(
+    QnPlatformAbstraction* platform,
+    bool includeNonHdd,
+    const nx::mediaserver::Settings* settings)
 {
     FilterConfig result;
 
@@ -20,7 +23,7 @@ FilterConfig FilterConfig::createDefault(bool includeNonHdd, const nx::mediaserv
         : static_cast<bool>(settings->allowRemovableStorages());
     result.isNetworkDrivesAllowed = includeNonHdd;
 
-    result.partitions = ((QnPlatformMonitor *)qnPlatform->monitor())->totalPartitionSpaceInfo(
+    result.partitions = ((QnPlatformMonitor *)platform->monitor())->totalPartitionSpaceInfo(
         QnPlatformMonitor::LocalDiskPartition
         | QnPlatformMonitor::NetworkPartition
         | QnPlatformMonitor::RemovableDiskPartition);

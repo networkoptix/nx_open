@@ -4,13 +4,11 @@
 
 #include <common/common_module_aware.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/discovery/manager.h>
 
 class QnServerConnector:
     public QObject,
-    public Singleton<QnServerConnector>,
     public QnCommonModuleAware
 {
     Q_OBJECT

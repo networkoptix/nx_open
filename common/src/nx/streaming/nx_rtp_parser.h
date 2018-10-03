@@ -18,7 +18,7 @@ public:
     virtual ~QnNxRtpParser();
 
     virtual void setSdpInfo(QList<QByteArray> sdpInfo) override;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;
 
     qint64 position() const { return m_position; }
     QnConstMediaContextPtr mediaContext() const { return m_context; }
@@ -29,7 +29,7 @@ public:
     void setAudioEnabled(bool value);
 
 private:
-    void writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
+    void writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata);
 
 private:
     const QString m_debugSourceId;

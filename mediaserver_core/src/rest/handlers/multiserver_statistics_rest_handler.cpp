@@ -311,7 +311,7 @@ int SendStatisticsActionHandler::executePost(
 
     NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorrect json with metrics received!");
     if (!correctJson)
-        return nx::network::http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::unprocessableEntity;
 
     return sendStatisticsLocally(commonModule, body, request.statisticsServerUrl);
 }

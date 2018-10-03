@@ -7,9 +7,9 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter
 from framework.networking.windows import WindowsNetworking
+from framework.os_access import exceptions
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
-from framework.os_access.exceptions import AlreadyExists, CannotDownload, exit_status_error_cls
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.os_access_interface import OSAccess, Time
 from framework.os_access.smb_path import SMBPath
 from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
@@ -19,7 +19,7 @@ from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
 
 
-class WindowsTime(object):
+class WindowsTime(Time):
     def __init__(self, winrm):
         self.winrm = winrm
 
@@ -67,7 +67,7 @@ class WindowsAccess(OSAccess):
 
     def __init__(self, host_alias, port_map, macs, username, password):
         self.winrm = WinRM(port_map.remote.address, port_map.remote.tcp(5985), username, password)
-        Path = SMBPath.specific_cls(
+        path_cls = SMBPath.specific_cls(
             port_map.remote.address, port_map.remote.tcp(445),
             username, password)
 
@@ -75,9 +75,9 @@ class WindowsAccess(OSAccess):
             host_alias, port_map,
             WindowsNetworking(self.winrm, macs),
             WindowsTime(self.winrm),
-            WindowsTrafficCapture(Path.tmp() / 'NetworkTrafficCapture', self.winrm),
+            WindowsTrafficCapture(path_cls.tmp() / 'NetworkTrafficCapture', self.winrm),
             None,
-            Path,
+            path_cls,
             )
         self._username = username
 
@@ -119,7 +119,7 @@ class WindowsAccess(OSAccess):
         expected_exit_status = 0xFFFFFFFE  # ProcDump always exit with this.
         try:
             self.winrm.run_command(['procdump', '-accepteula', pid])  # Full dumps (`-ma`) are too big for pysmb.
-        except exit_status_error_cls(expected_exit_status):
+        except exceptions.exit_status_error_cls(expected_exit_status):
             pass
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
@@ -149,11 +149,25 @@ class WindowsAccess(OSAccess):
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
 
+    def free_disk_space_bytes(self):
+        disks = self.winrm.wmi_query('Win32_LogicalDisk', {}).enumerate()
+        disk_c, = (disk for disk in disks if disk['Name'] == 'C:')
+        return int(disk_c['FreeSpace'])
+
+    def _hold_disk_space(self, to_consume_bytes):
+        holder_path = self._disk_space_holder()
+        try:
+            self._disk_space_holder().unlink()
+        except exceptions.DoesNotExist:
+            pass
+        args = ['fsutil', 'file', 'createNew', holder_path, to_consume_bytes]
+        self.winrm.command(args).run()
+
     def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyExists(
+            raise exceptions.AlreadyExists(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
@@ -161,7 +175,7 @@ class WindowsAccess(OSAccess):
         try:
             self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url -TimeoutSec $timeoutSec', variables)
         except PowershellError as e:
-            raise CannotDownload(str(e))
+            raise exceptions.CannotDownload(str(e))
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):

@@ -9,7 +9,7 @@ from framework.os_access.local_shell import local_shell
 _logger = logging.getLogger(__name__)
 
 
-def _fps_avg(fps):
+def fps_avg(fps):
     try:
         fps_min, fps_max = fps
         fps_average = int((fps_min + fps_max) / 2)
@@ -24,19 +24,11 @@ def ffprobe_streams(stream_url):
         out = local_shell.run_sh_script(
             # language=Bash
             '''
-                ffprobe -show_format -show_streams -of json "$URL" &
-                pid=$!
-                for i in `seq 1 10`; do
-                    if ps aux | awk '{print $2}' | grep $pid >/dev/null 2>&1; then
-                        sleep 1
-                    else
-                        exit 0
-                    fi
-                done
-                kill -9 $pid
-                exit 1
+                ffprobe -show_format -show_streams -analyzeduration 3M -probesize 2e+07 -of json "$URL"
                 ''',
-            env={'URL': stream_url})
+            env={'URL': stream_url},
+            timeout_sec=10,
+            )
     except (AssertionError, Timeout, NonZeroExitStatus) as error:
         _logger.debug("FFprobe error: %s", str(error))
         return
@@ -92,7 +84,7 @@ def configure_video(api, camera_id, camera_advanced_params, profile, fps=None, *
     if fps:
         fps_param_id = _find_param_by_name_prefix(
             stream['params'], profile, 'fps', 'frame rate')['id']
-        new_cam_params[fps_param_id] = _fps_avg(fps)
+        new_cam_params[fps_param_id] = fps_avg(fps)
 
     api.set_camera_advanced_param(camera_id, **new_cam_params)
 

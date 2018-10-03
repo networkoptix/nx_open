@@ -43,7 +43,7 @@ def runner_address(hypervisor):
 
 @pytest.fixture(scope='session')
 def persistent_dir(slot, host_os_access):
-    dir = host_os_access.Path.home() / '.func_tests' / 'slot_{}'.format(slot)
+    dir = host_os_access.path_cls.home() / '.func_tests' / 'slot_{}'.format(slot)
     dir.mkdir(exist_ok=True, parents=True)
     return dir
 

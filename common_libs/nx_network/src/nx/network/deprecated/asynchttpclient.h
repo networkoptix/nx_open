@@ -53,7 +53,7 @@ public:
     virtual ~AsyncHttpClient();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -352,7 +352,7 @@ public:
         if (m_obj.use_count() == 1)
         {
             // pleaseStopSync should have already been called explicitly.
-            m_obj->pleaseStopSync(false);
+            m_obj->pleaseStopSync();
         }
         m_obj.reset();
     }

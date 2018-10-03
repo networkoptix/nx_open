@@ -119,7 +119,8 @@ void LocalConnectionFactory::shutdown()
 	pleaseStop();
 	join();
 
-    messageBus()->removeHandler(m_directConnection->notificationManager());
+    if (m_directConnection)
+        messageBus()->removeHandler(m_directConnection->notificationManager());
 }
 
 LocalConnectionFactory::~LocalConnectionFactory()
@@ -175,7 +176,9 @@ void LocalConnectionFactory::registerTransactionListener(
     else if (auto bus = m_bus->dynamicCast<nx::p2p::MessageBus*>())
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "*", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kDeprecatedUrlPath));
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::MessageBus::kUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
@@ -698,9 +701,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<ServerFootageData>(p, ApiCommand::addCameraHistoryItem);
 
     /**%apidoc GET /ec2/getCameraHistoryItems
-     * Read information about which server was hosting the camera at which period.
+     * Read information about which servers have archive for which camera.
      * This information is used for archive playback if camera has been moved from
      * one server to another.
+     * There is no detail information about archive time periods.
+     * To obtain detail information please use method ec2/recordedTimePeriods.
      * %param[default] format
      * %return List of camera history items in the requested format.
      * %// AbstractCameraManager::getCameraHistoryItems
