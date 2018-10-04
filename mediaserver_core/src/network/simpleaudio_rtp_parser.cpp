@@ -14,7 +14,7 @@ QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     QnRtpAudioStreamParser(),
     m_audioLayout( new QnRtspAudioLayout() )
 {
-    m_frequency = 8000;
+    QnRtpStreamParser::setFrequency(8000);
     m_channels = 1;
     m_codecId = AV_CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_S16;
@@ -41,7 +41,7 @@ void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split('/');
             if (params.size() > 1)
-                m_frequency = params[1].trimmed().toInt();
+                QnRtpStreamParser::setFrequency(params[1].trimmed().toInt());
             if (params.size() > 2)
                 m_channels = params[2].trimmed().toInt();
         }
@@ -60,18 +60,18 @@ void QnSimpleAudioRtpParser::setSdpInfo(QList<QByteArray> lines)
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
     av->channels = m_channels;
-    av->sample_rate = m_frequency;
+    av->sample_rate = QnRtpStreamParser::getFrequency();
     av->sample_fmt = m_sampleFormat;
     av->time_base.num = 1;
     av->bits_per_coded_sample = m_bits_per_coded_sample;
-    av->time_base.den = m_frequency;
+    av->time_base.den = QnRtpStreamParser::getFrequency();
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -99,13 +99,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
     audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
-    if (m_timeHelper) {
-        audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);
-        //qDebug() << "audio. adjusttime to " << (audioData->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000)/1000 << "ms";
-    }
-    else
-        audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-
+    audioData->timestamp = ntohl(rtpHeader->timestamp);
     audioData->m_data.write((const char*)curPtr, end - curPtr);
     m_audioData.push_back(audioData);
     gotData = true;

@@ -3,12 +3,15 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/singleton.h>
 #include <platform/core_platform_abstraction.h>
-
 #include <platform/images/platform_images.h>
 #include <platform/shortcuts/platform_shortcuts.h>
 
-class QnPlatformAbstraction: public QnCorePlatformAbstraction {
+class QnPlatformAbstraction:
+    public QnCorePlatformAbstraction,
+    public Singleton<QnPlatformAbstraction>
+{
     Q_OBJECT
     typedef QnCorePlatformAbstraction base_type;
 
@@ -30,6 +33,6 @@ private:
 };
 
 #undef  qnPlatform
-#define qnPlatform (static_cast<QnPlatformAbstraction *>(QnCorePlatformAbstraction::instance()))
+#define qnPlatform QnPlatformAbstraction::instance()
 
 #endif // CLIENT_PLATFORM_ABSTRACTION_H

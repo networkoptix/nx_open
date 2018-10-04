@@ -75,7 +75,7 @@ struct EventTile::Private
 
     void handleHoverChanged(bool hovered)
     {
-        const auto showCloseButton = hovered & closeable;
+        const auto showCloseButton = hovered && closeable;
         q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
         closeButton->setVisible(showCloseButton);
         updateBackgroundRole(hovered);
@@ -131,10 +131,11 @@ EventTile::EventTile(QWidget* parent):
     ui->setupUi(this);
     setAttribute(Qt::WA_Hover);
 
+    // Close button margins are fine-tuned in correspondence with UI-file.
+    static constexpr QMargins kCloseButtonMargins(0, 6, 2, 0);
+
     d->closeButton->setHidden(true);
-    auto anchor = new WidgetAnchor(d->closeButton);
-    anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
-    anchor->setMargins({0, 6, 2, 0}); //< Fine-tuned in correspondence with UI-file.
+    anchorWidgetToParent(d->closeButton, Qt::RightEdge | Qt::TopEdge, kCloseButtonMargins);
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
@@ -211,8 +212,7 @@ EventTile::EventTile(QWidget* parent):
     d->progressLabel->setForegroundRole(QPalette::Highlight);
 
     static constexpr int kProgressLabelShift = 8;
-    auto progressLabelAnchor = new WidgetAnchor(d->progressLabel);
-    progressLabelAnchor->setMargins(0, 0, 0, kProgressLabelShift);
+    anchorWidgetToParent(d->progressLabel, {0, 0, 0, kProgressLabelShift});
 
     ui->progressBar->setRange(0, kProgressBarResolution);
     ui->progressBar->setValue(0);

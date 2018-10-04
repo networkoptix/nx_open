@@ -65,7 +65,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     QSize resolution,
     int fps,
     media::CameraStreamCapability streamCapability,
-    Qn::BitratePerGopType bitratePerGopType)
+    bool useBitratePerGop)
 {
     if (streamCapability.defaultBitrateKbps > 0 && streamCapability.defaultFps > 0)
     {
@@ -79,7 +79,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
 
     auto result = suggestBitrateForQualityKbps(quality, resolution, fps);
 
-    if (bitratePerGopType != Qn::BPG_None && fps > 0)
+    if (useBitratePerGop && fps > 0)
         result = result * (kDefaultBitratePerGop / (float)fps);
 
     if (streamCapability.maxBitrateKbps > 0)

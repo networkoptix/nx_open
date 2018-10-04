@@ -13,7 +13,7 @@ class ErrorProcessor: public QObject
     Q_OBJECT
 
 public:
-    ErrorProcessor(QnMediaServerModule* serverModule);
+    ErrorProcessor();
 public slots:
     void onStreamReaderEvent(
         QnAbstractMediaStreamDataProvider* streamReader,

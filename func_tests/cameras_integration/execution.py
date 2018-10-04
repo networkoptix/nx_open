@@ -1,7 +1,8 @@
 import logging
 import time
 import timeit
-from datetime import timedelta
+from datetime import datetime, timedelta
+from collections import OrderedDict
 
 from typing import List
 
@@ -10,7 +11,20 @@ from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
 
-SERVER_STAGES_KEY = '-SERVER-'
+SERVER_STAGES_KEY = 'SERVER_STAGES'
+
+
+def report(status, start_time=None, duration=None, **details
+           ):  # types: (object, datetime, timedelta, dict) -> OrderedDict
+    if isinstance(status, bool):
+        status = 'success' if status else 'failure'
+    result = OrderedDict(status=str(status))
+    if start_time:
+        result['start_time'] = str(start_time)
+    if duration:
+        result['duration'] = str(duration)
+    result.update(**{key: value for key, value in details.items() if value})
+    return result
 
 
 class CameraStagesExecutor(object):
@@ -22,6 +36,7 @@ class CameraStagesExecutor(object):
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
+        self._start_time = None
         self._duration = None
         _logger.info('Camera %s is added with %s stage(s) and %s warning(s)',
                      camera_id, len(self._stage_executors), len(self._warnings))
@@ -41,18 +56,18 @@ class CameraStagesExecutor(object):
         return not self._warnings and all(r.is_successful for r in self._stage_executors)
 
     @property
-    def report(self):  # types: () -> dict
+    def report(self):  # types: () -> OrederdDict
         """ :returns Current camera stages execution state, represented as serializable dictionary.
         """
-        data = dict(
-            condition=('success' if self.is_successful else 'failure'),
-            duration=str(self._duration) if self._duration else None,
-            stages=[dict(_=e.stage.name, **e.report) for e in self._stage_executors if e.report],
-            warnings=self._warnings)
-
-        return {k: v for k, v in data.items() if v}
+        return report(
+            self.is_successful, self._start_time, self._duration,
+            warnings=self._warnings,
+            stages=OrderedDict(
+                (e.stage.name, report(**e.details)) for e in self._stage_executors if e.details
+            ))
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
+        self._start_time = datetime.now()
         start_time = timeit.default_timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
@@ -63,7 +78,7 @@ class CameraStagesExecutor(object):
                     yield
 
                 except StopIteration:
-                    _logger.info('%s stage result %s', self.camera_id, executors.report)
+                    _logger.info('%s stage result %s', self.camera_id, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
                         self._duration = timedelta(seconds=timeit.default_timer() - start_time)
@@ -94,6 +109,12 @@ class ServerStagesExecutor(object):
             self.name = name
             self.rules = rules
             self.result = checks.Halt('Is not executed')
+            self.start_time = datetime.now()
+            self.duration = None
+
+        @property
+        def details(self):
+            return dict(start_time=self.start_time, duration=self.duration, **self.result.details)
 
     def __init__(self, server, stage_rules={}):  # types: (Mediaserver, dict) -> None
         self.server = server
@@ -105,20 +126,22 @@ class ServerStagesExecutor(object):
         if not rules:
             return
 
-        running_stage = self.Stage(name, rules)
+        current_stage = self.Stage(name, rules)
         checker = checks.Checker()
+        start_time = timeit.default_timer()
         try:
-            for query, expected_values in running_stage.rules.items():
+            for query, expected_values in current_stage.rules.items():
                 actual_values = self.server.api.generic.get(query)
                 checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
 
         except Exception:
-            running_stage.result = checks.Failure(is_exception=True)
+            current_stage.result = checks.Failure(is_exception=True)
 
         else:
-            running_stage.result = checker.result()
+            current_stage.result = checker.result()
 
-        self.stages.append(running_stage)
+        current_stage.duration = timedelta(seconds=timeit.default_timer() - start_time)
+        self.stages.append(current_stage)
 
     @property
     def is_successful(self):
@@ -128,9 +151,13 @@ class ServerStagesExecutor(object):
     def report(self):  # types: () -> dict
         """:returns Current server stages execution state, represented as serializable dictionary.
         """
-        return dict(
-            condition=('success' if self.is_successful else 'failure'),
-            stages=[dict(_=s.name, **s.result.report) for s in self.stages])
+        core_dumps = self.server.installation.list_core_dumps()
+        return report(
+            self.is_successful and not core_dumps,
+            start_time=(self.stages[0].start_time if self.stages else None),
+            duration=sum((s.duration for s in self.stages), timedelta()),
+            crashes=[dump.name for dump in core_dumps],
+            stages=OrderedDict((s.name, report(**s.details)) for s in self.stages))
 
 
 class SpecificFeatures(object):
@@ -169,12 +196,16 @@ class Stand(object):
     def report(self):  # types: () -> dict
         """:returns All cameras stages execution state, represented as serializable dictionary.
         """
-        result = {camera.camera_id: camera.report for camera in self.camera_stages}
+        result = OrderedDict()
+        result[SERVER_STAGES_KEY] = self.server_stages.report
+        for camera in self.camera_stages:
+            result[camera.camera_id] = camera.report
+
         for camera_id, _ in self.all_cameras().items():
             if camera_id not in result:
-                result[camera_id] = dict(condition='failure', message='Unexpected camera on server')
+                result[camera_id] = report('unexpected', message='Unexpected camera on server')
 
-        result[SERVER_STAGES_KEY] = self.server_stages.report
+        _logger.debug('Report: %r', result)
         return result
 
     def all_cameras(self):

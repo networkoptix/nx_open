@@ -403,7 +403,7 @@ bool HanwhaPtzController::runAuxilaryCommand(
     {
         NX_WARNING(
             this,
-            lm("Running auxilary command - wrong PTZ type. "
+            lm("Running auxiliary command - wrong PTZ type. "
                 "Only operational PTZ is supported. Resource %1 (%2)")
                 .args(resource()->getName(), resource()->getId()));
     }
@@ -411,26 +411,24 @@ bool HanwhaPtzController::runAuxilaryCommand(
     if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, core::ptz::Type::operational))
         return false;
 
-    if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)
-    {
-        const auto focusMode = m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait))
-            ? lit("SimpleFocus")
-            : lit("AutoFocus");
+    if (trait.standardTrait() != Ptz::ManualAutoFocusPtzTrait)
+        return false;
 
-        HanwhaRequestHelper::Parameters parameters{
-            {lit("Mode"), focusMode},
-            {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
-        };
+    const auto focusMode = m_ptzTraits.contains(QnPtzAuxilaryTrait(kHanwhaSimpleFocusTrait))
+        ? lit("SimpleFocus")
+        : lit("AutoFocus");
 
-        HanwhaRequestHelper helper(
-            m_hanwhaResource->sharedContext(),
-            m_hanwhaResource->bypassChannel());
+    HanwhaRequestHelper::Parameters parameters{
+        {lit("Mode"), focusMode},
+        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())}
+    };
 
-        auto response = helper.control(lit("image/focus"), parameters);
-        return response.isSuccessful();
-    }
+    HanwhaRequestHelper helper(
+        m_hanwhaResource->sharedContext(),
+        m_hanwhaResource->bypassChannel());
 
-    return false;
+    auto response = helper.control(lit("image/focus"), parameters);
+    return response.isSuccessful();
 }
 
 QString HanwhaPtzController::channel() const

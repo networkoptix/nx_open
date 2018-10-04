@@ -1316,18 +1316,19 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedDeviceType.reset();
 }
 
-Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
+bool QnSecurityCamResource::useBitratePerGop() const
 {
+    auto result = getProperty(Qn::FORCE_BITRATE_PER_GOP);
+    if (!result.isEmpty())
+        return result.toInt() > 0;
+
     if (qnStaticCommon)
     {
         QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
         if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return Qn::BPG_Predefined;
-
-        if (getProperty(Qn::FORCE_BITRATE_PER_GOP).toInt() > 0)
-            return Qn::BPG_User;
+            return true;
     }
-    return Qn::BPG_None;
+    return false;
 }
 
 bool QnSecurityCamResource::isIOModule() const
@@ -1371,7 +1372,7 @@ bool QnSecurityCamResource::captureEvent(const nx::vms::event::AbstractEventPtr&
     return false;
 }
 
-bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const
+bool QnSecurityCamResource::isAnalyticsDriverEvent(nx::vms::api::EventType eventType) const
 {
     return eventType == nx::vms::api::EventType::analyticsSdkEvent;
 }
@@ -1379,6 +1380,62 @@ bool QnSecurityCamResource::doesEventComeFromAnalyticsDriver(nx::vms::api::Event
 Qn::StreamIndex QnSecurityCamResource::toStreamIndex(Qn::ConnectionRole role)
 {
     return role == Qn::CR_SecondaryLiveVideo ? Qn::StreamIndex::secondary : Qn::StreamIndex::primary;
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::preferredPtzPresetType() const
+{
+    auto userPreference = userPreferredPtzPresetType();
+    if (userPreference != nx::core::ptz::PresetType::automatic)
+        return userPreference;
+
+    return defaultPreferredPtzPresetType();
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kUserPreferredPtzPresetType),
+        nx::core::ptz::PresetType::automatic);
+}
+
+void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kUserPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
+nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
+{
+    return QnLexical::deserialized(
+        getProperty(Qn::kDefaultPreferredPtzPresetType),
+        nx::core::ptz::PresetType::automatic);
+}
+
+void QnSecurityCamResource::setDefaultPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
+{
+    setProperty(Qn::kDefaultPreferredPtzPresetType, QnLexical::serialized(presetType));
+}
+
+bool QnSecurityCamResource::isUserAllowedToModifyPtzCapabilities() const
+{
+    return QnLexical::deserialized(getProperty(Qn::kUserIsAllowedToOverridePtzCapabilities), false);
+}
+
+void QnSecurityCamResource::setIsUserAllowedToModifyPtzCapabilities(bool allowed)
+{
+    setProperty(
+        Qn::kUserIsAllowedToOverridePtzCapabilities,
+        QnLexical::serialized(allowed));
+}
+
+Ptz::Capabilities QnSecurityCamResource::ptzCapabilitiesAddedByUser() const
+{
+    return QnLexical::deserialized<Ptz::Capabilities>(
+        getProperty(Qn::kPtzCapabilitiesAddedByUser), Ptz::NoPtzCapabilities);
+}
+
+void QnSecurityCamResource::setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities)
+{
+    setProperty(Qn::kPtzCapabilitiesAddedByUser, QnLexical::serialized(capabilities));
 }
 
 int QnSecurityCamResource::suggestBitrateKbps(const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const
@@ -1406,7 +1463,7 @@ int QnSecurityCamResource::suggestBitrateForQualityKbps(Qn::StreamQuality qualit
         resolution,
         fps,
         streamCapability,
-        bitratePerGopType());
+        useBitratePerGop());
 }
 
 bool QnSecurityCamResource::setCameraCredentialsSync(

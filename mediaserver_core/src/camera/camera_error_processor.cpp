@@ -14,7 +14,7 @@
 
 namespace nx::mediaserver::camera {
 
-ErrorProcessor::ErrorProcessor(QnMediaServerModule* serverModule)
+ErrorProcessor::ErrorProcessor()
 {}
 
 /**
@@ -64,7 +64,9 @@ void ErrorProcessor::processStreamError(
     if (!ownerResource || !ownerResource->isInitialized())
         return;
 
-    auto videoCamera = streamReader->getOwner().dynamicCast<QnVideoCamera>();
+    auto owner = streamReader->getOwner();
+    NX_ASSERT(owner);
+    auto videoCamera = owner.dynamicCast<QnAbstractMediaServerVideoCamera>();
     NX_ASSERT(videoCamera);
     if (!videoCamera)
         return;

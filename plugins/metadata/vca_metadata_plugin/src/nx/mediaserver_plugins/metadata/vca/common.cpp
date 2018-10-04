@@ -7,9 +7,9 @@ namespace mediaserver_plugins {
 namespace metadata {
 namespace vca {
 
-bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
+bool operator==(const AnalyticsEventType& lhs, const AnalyticsEventType& rhs)
 {
-    return lh.id == rh.id;
+    return lhs.id == rhs.id;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsEventType, (json),

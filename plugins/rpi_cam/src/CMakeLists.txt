@@ -4,38 +4,36 @@ set(RPI_TARGET rpiplugin)
 
 project(${RPI_TARGET})
 
-# Path to NX PLUGIN SDK
-include_directories(
-    "../../../include"
-)
+SET(NX_PLUGIN_SDK_INCLUDE_DIRS ../../../include CACHE STRING "Path to nx plugin SDK headers")
+include_directories(${NX_PLUGIN_SDK_INCLUDE_DIRS})
 
-# Path to raspbery SDK - change it as needed
-include_directories(
-    "userland-master"
-    "userland-master/interface/vmcs_host/khronos"
-    "userland-master/host_applications/linux/libs/bcm_host/include"
-)
+SET(RASPBERRY_SDK_INCLUDE_DIRS
+    userland-master
+    userland-master/interface/vmcs_host/khronos
+    userland-master/host_applications/linux/libs/bcm_host/include
+    CACHE STRING "Path to Raspberry SDK headers")
+include_directories(${RASPBERRY_SDK_INCLUDE_DIRS})
 
 add_library(${RPI_TARGET} SHARED
-        "camera_manager.cpp"
-        "camera_manager.h"
-        "discovery_manager.cpp"
-        "discovery_manager.h"
-        "media_encoder.cpp"
-        "media_encoder.h"
-        "ref_counter.h"
-        "rpi_camera.cpp"
-        "rpi_camera.h"
-        "rpi_omx.cpp"
-        "rpi_omx.h"
-        "rpi_omx_broadcom.h"
-        "rpi_omx_print.cpp"
-        "rw_lock.h"
-        "stream_reader.cpp"
-        "stream_reader.h"
-        "timer.h"
-        "video_packet.cpp"
-        "video_packet.h"
+    camera_manager.cpp
+    camera_manager.h
+    discovery_manager.cpp
+    discovery_manager.h
+    media_encoder.cpp
+    media_encoder.h
+    ref_counter.h
+    rpi_camera.cpp
+    rpi_camera.h
+    rpi_omx.cpp
+    rpi_omx.h
+    rpi_omx_broadcom.h
+    rpi_omx_print.cpp
+    rw_lock.h
+    stream_reader.cpp
+    stream_reader.h
+    timer.h
+    video_packet.cpp
+    video_packet.h
 )
 
 set_target_properties(${RPI_TARGET} PROPERTIES

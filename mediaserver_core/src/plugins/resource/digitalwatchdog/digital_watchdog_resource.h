@@ -35,7 +35,7 @@ protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
-    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
+    virtual void initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params) override;
     virtual QSet<QString> calculateSupportedAdvancedParameters() const override;
     virtual void fetchAndSetAdvancedParameters() override;
 

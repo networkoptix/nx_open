@@ -100,14 +100,11 @@ std::unique_ptr<nx::network::UdtStreamSocket>
     return udtConnection;
 }
 
-void RendezvousConnectorWithVerification::closeConnection(
-    SystemError::ErrorCode closeReason,
-    stun::MessagePipeline* connection)
+void RendezvousConnectorWithVerification::onConnectionClosed(
+    SystemError::ErrorCode closeReason)
 {
-    NX_ASSERT(connection == m_requestPipeline.get());
-
     NX_VERBOSE(this, lm("cross-nat %1 error: %2")
-        .arg(connectSessionId()).arg(SystemError::toString(closeReason)));
+        .args(connectSessionId(), SystemError::toString(closeReason)));
     m_requestPipeline.reset();
 }
 
@@ -131,8 +128,10 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
 
     connection->bindToAioThread(getAioThread());
     m_requestPipeline = std::make_unique<stun::MessagePipeline>(
-        this,
         std::move(connection));
+    m_requestPipeline->setOnConnectionClosed(
+        [this](auto... args) { onConnectionClosed(args...); });
+
     m_requestPipeline->setMessageHandler(
         std::bind(&RendezvousConnectorWithVerification::onMessageReceived, this, _1));
     m_requestPipeline->startReadingConnection();

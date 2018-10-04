@@ -10,12 +10,9 @@
 namespace nx {
 namespace mediaserver_plugins {
 namespace metadata {
-namespace vca
-{
+namespace vca {
 
-/**
- * Description of the vca analytics event.
- */
+/** Description of the vca analytics event. */
 struct AnalyticsEventType: nx::api::Analytics::EventType
 {
     // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
@@ -32,7 +29,7 @@ struct AnalyticsDriverManifest: nx::api::AnalyticsDriverManifestBase
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsEventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(AnalyticsDriverManifest, (json))
 
-bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh);
+bool operator==(const AnalyticsEventType& lhs, const AnalyticsEventType& rhs);
 
 } // namespace vca
 } // namespace metadata

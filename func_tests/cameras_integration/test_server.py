@@ -32,7 +32,7 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
 
     def save_result(name, data):
         file_path = artifacts_dir / name
-        file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4, sort_keys=True))
+        file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4))
         file_path.with_suffix('.yaml').write_bytes(
             yaml.safe_dump(data, default_flow_style=False, width=1000))
 
@@ -42,7 +42,7 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
 
     stand = execution.Stand(
         one_licensed_mediaserver,
-        yaml.load(expected_cameras.read_bytes()),
+        yaml.load(expected_cameras.read_bytes()) or {},
         config.STAGE_HARD_TIMEOUT)
     try:
         stand.run_all_stages(config.CAMERA_CYCLE_DELAY, config.SERVER_STAGE_DELAY)

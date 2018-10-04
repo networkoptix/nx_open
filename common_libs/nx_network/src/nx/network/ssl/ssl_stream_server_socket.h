@@ -53,7 +53,7 @@ public:
     ~StreamServerSocket();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
+    virtual void pleaseStopSync() override;
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 

@@ -113,9 +113,9 @@ void TestConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     m_socket->pleaseStop(std::move(handler));
 }
 
-void TestConnection::pleaseStopSync(bool checkForLocks)
+void TestConnection::pleaseStopSync()
 {
-    m_socket->pleaseStopSync(checkForLocks);
+    m_socket->pleaseStopSync();
 }
 
 int TestConnection::id() const

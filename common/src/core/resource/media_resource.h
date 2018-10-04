@@ -73,7 +73,7 @@ public:
     void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
 
 
-    bool canDisableNativePtzPresets() const;
+    bool canSwitchPtzPresetTypes() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

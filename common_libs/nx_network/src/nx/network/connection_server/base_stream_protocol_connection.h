@@ -48,11 +48,12 @@ template<
 public:
     using MessageType = Message;
 
+    template<typename OnConnectionClosedHandler>
     BaseStreamProtocolConnection(
-        StreamConnectionHolder<CustomConnection>* connectionManager,
+        OnConnectionClosedHandler handler,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-        base_type(connectionManager, std::move(streamSocket)),
+        base_type(std::move(handler), std::move(streamSocket)),
         m_serializerState(SerializerState::done),
         m_creationTimestamp(std::chrono::steady_clock::now())
     {
@@ -399,34 +400,30 @@ private:
             if (watcher.objectDestroyed())
                 return; //< Connection has been removed by handler.
         }
-        this->connectionManager()->closeConnection(
-            errorCode,
-            static_cast<CustomConnection*>(this));
+        base_type::closeConnection(errorCode);
     }
 };
 
 /**
  * Inherits BaseStreamProtocolConnection and delegates processMessage to the functor
- * set with BaseStreamProtocolConnectionEmbeddable::setMessageHandler.
+ * set with StreamProtocolConnection::setMessageHandler.
  */
 template<
     class Message,
     class Parser,
     class Serializer
-> class BaseStreamProtocolConnectionEmbeddable:
+> class StreamProtocolConnection:
     public BaseStreamProtocolConnection<
-        BaseStreamProtocolConnectionEmbeddable<
-            Message,
-            Parser,
-            Serializer>,
+        StreamProtocolConnection<Message, Parser, Serializer>,
         Message,
         Parser,
         Serializer>
 {
-    using self_type = BaseStreamProtocolConnectionEmbeddable<
+    using self_type = StreamProtocolConnection<
         Message,
         Parser,
         Serializer>;
+    
     using base_type = BaseStreamProtocolConnection<
         self_type,
         Message,
@@ -434,12 +431,14 @@ template<
         Serializer>;
 
 public:
-    BaseStreamProtocolConnectionEmbeddable(
-        StreamConnectionHolder<self_type>* connectionManager,
+    using OnConnectionClosedHandler = 
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode /*closeReason*/)>;
+
+    StreamProtocolConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         base_type(
-            connectionManager,
+            [this](auto... args) { closeConnection(args...); },
             std::move(streamSocket))
     {
     }
@@ -467,6 +466,12 @@ public:
         m_messageEndHandler = std::forward<T>(handler);
     }
 
+    void setOnConnectionClosed(
+        OnConnectionClosedHandler handler)
+    {
+        m_onConnectionClosed = std::move(handler);
+    }
+
 protected:
     virtual void processMessage(Message msg) override
     {
@@ -490,6 +495,15 @@ private:
     std::function<void(Message)> m_messageHandler;
     std::function<void(nx::Buffer)> m_messageBodyHandler;
     std::function<void()> m_messageEndHandler;
+    OnConnectionClosedHandler m_onConnectionClosed;
+
+    void closeConnection(
+        SystemError::ErrorCode closeReason,
+        self_type* /*connection*/)
+    {
+        if (m_onConnectionClosed)
+            nx::utils::swapAndCall(m_onConnectionClosed, closeReason);
+    }
 };
 
 } // namespace server

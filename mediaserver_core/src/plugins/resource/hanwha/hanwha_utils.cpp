@@ -200,18 +200,18 @@ std::set<int> findProfilesToRemove(
     return result;
 };
 
-bool isPropertyBelongsToChannel(const QString& fullPropertyName, int channel)
+boost::optional<int> extractPropertyChannel(const QString& fullPropertyName)
 {
     const auto split = fullPropertyName.split(L'.', QString::SplitBehavior::SkipEmptyParts);
     if (split.size() < 2 || split[0].trimmed() != kHanwhaChannelProperty)
-        return false;
+        return boost::none;
 
     bool success = false;
     const auto propertyChannel = split[1].toInt(&success);
     if (!success)
-        return false;
+        return boost::none;
 
-    return propertyChannel == channel;
+    return propertyChannel;
 }
 
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType)

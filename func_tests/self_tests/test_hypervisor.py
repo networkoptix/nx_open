@@ -42,6 +42,14 @@ def test_find(hypervisor, dummy):
     assert isinstance(hypervisor.find_vm(dummy.name), VmHardware)
 
 
+def test_vm_not_found(hypervisor):
+    vm_name = 'non-existent-vm-name'
+    with pytest.raises(VMNotFound) as excinfo:
+        _ = hypervisor.find_vm(vm_name)
+    _logger.info('Exception: %s', excinfo.value)
+    assert vm_name in str(excinfo.value)
+
+
 def test_clone(template, clone_name):
     clone = template.clone(clone_name)
     _logger.debug("Clone:\n%s", pformat(clone))

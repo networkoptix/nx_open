@@ -14,7 +14,7 @@ namespace modbus
 {
 
 using ModbusProtocolConnection =
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::StreamProtocolConnection<
         ModbusMessage,
         ModbusMessageParser,
         ModbusMessageSerializer>;
@@ -23,7 +23,6 @@ using namespace nx::network;
 
 class QnModbusAsyncClient: 
     public QObject,
-    public network::server::StreamConnectionHolder<ModbusProtocolConnection>,
     public aio::BasicPollable
 {
     Q_OBJECT
@@ -60,11 +59,6 @@ public:
 
     QString getLastErrorString() const;
 
-    // Impl of StreamConnectionHolder::closeConnection
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override;
-    
     // Impl of BasicPollable::stopWhileInAioThread
     virtual void stopWhileInAioThread() override;
 
@@ -77,6 +71,8 @@ signals:
 private:
     void openConnection();
     void onConnectionDone(SystemError::ErrorCode errorCode);
+
+    void onConnectionClosed(SystemError::ErrorCode closeReason);
 
     void sendPendingMessage();
     void onMessage(ModbusMessage message);

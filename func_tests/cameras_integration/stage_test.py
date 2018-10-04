@@ -17,7 +17,7 @@ class FakeServer(object):
         class generic(object):
             class http(object):
                 @staticmethod
-                def url(*args, **kwargs):
+                def media_url(*args, **kwargs):
                     return 'http://127.0.0.1:7001/rtsp/' + _CAMERA_ID
 
         @staticmethod
@@ -63,11 +63,11 @@ def test_execution(temporary_results, is_success):
     with pytest.raises(StopIteration):
         steps.next()
 
-    assert is_success == executor.is_successful, executor.report
-    assert executor.report['duration'] > '0:00:00'
+    assert is_success == executor.is_successful, executor.details
+    assert executor.details['duration'] > timedelta()
     if not is_success:
-        for key, value in temporary_results[-1].report.items():
-            assert value == executor.report[key]
+        for key, value in temporary_results[-1].details.items():
+            assert value == executor.details[key]
 
 
 def test_execution_timeout():
@@ -76,7 +76,7 @@ def test_execution_timeout():
         pass
 
     assert not executor.is_successful
-    assert 'wait' == executor.report['message']
+    assert 'wait' == executor.details['message']
 
 
 def test_execution_exception():
@@ -85,4 +85,4 @@ def test_execution_exception():
         executor.steps(FakeServer).next()
 
     assert not executor.is_successful
-    assert 'AssertionError' in '\n'.join(executor.report['exception'])
+    assert 'AssertionError' in '\n'.join(executor.details['exception'])

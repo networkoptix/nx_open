@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=ofelia
-VERSION=1.6
+VERSION=1.8
 
 function stage()
 {

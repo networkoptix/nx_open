@@ -101,6 +101,8 @@ void QnIpLineEdit::focusOutEvent(QFocusEvent *event)
     auto fixedString = text();
     validator()->fixup(fixedString);
     setText(fixedString);
+
+    base_type::focusOutEvent(event);
 }
 
 void QnIpLineEdit::keyPressEvent(QKeyEvent *event){

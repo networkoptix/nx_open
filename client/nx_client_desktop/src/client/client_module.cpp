@@ -254,7 +254,7 @@ QnClientModule::~QnClientModule()
     if (auto longRunnablePool = QnLongRunnablePool::instance())
         longRunnablePool->stopAll();
 
-    QnResource::stopAsyncTasks();
+    m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
 
     m_networkProxyFactory = nullptr; // Object will be deleted by QNetworkProxyFactory
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);

@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "peer_wrapper.h"
@@ -24,6 +25,11 @@ public:
 
     const PeerWrapper& peer(int index) const;
     PeerWrapper& peer(int index);
+
+    QnRestResult::Error mergePeers(
+        PeerWrapper& what,
+        PeerWrapper& to,
+        std::vector<MergeAttributes::Attribute> attributes);
 
     QnRestResult::Error mergeSystems();
 

@@ -121,7 +121,7 @@ void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void CloudServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {
@@ -129,7 +129,7 @@ void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
     }
     else
     {
-        AbstractStreamServerSocket::pleaseStopSync(assertIfCalledUnderLock);
+        AbstractStreamServerSocket::pleaseStopSync();
     }
 }
 

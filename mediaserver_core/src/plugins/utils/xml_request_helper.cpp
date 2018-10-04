@@ -36,7 +36,6 @@ XmlRequestHelper::XmlRequestHelper(
     m_client(makeHttpClient(authenticator))
 {
     m_client->setAuthType(authType);
-    m_client->setIgnoreMutexAnalyzer(true);
 }
 
 XmlRequestHelper::Result::Result(

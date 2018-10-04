@@ -51,7 +51,7 @@ void AsyncHttpClient::initDelegate()
 
 AsyncHttpClient::~AsyncHttpClient()
 {
-    pleaseStopSync(false);
+    pleaseStopSync();
 }
 
 void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -59,9 +59,9 @@ void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
     m_delegate.pleaseStop(std::move(completionHandler));
 }
 
-void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
+void AsyncHttpClient::pleaseStopSync()
 {
-    m_delegate.pleaseStopSync(checkForLocks);
+    m_delegate.pleaseStopSync();
 }
 
 nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const

@@ -72,7 +72,7 @@ namespace ec2
             pleaseStopSync();
         }
 
-        void pleaseStopSync(bool checkForLocks = true)
+        void pleaseStopSync()
         {
             QnMutexLocker lk(&m_mutex);
             while (!m_runningHttpRequests.empty())
@@ -80,7 +80,7 @@ namespace ec2
                 nx::network::http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
                 m_runningHttpRequests.erase(m_runningHttpRequests.begin());
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
-                httpClient->pleaseStopSync(checkForLocks);
+                httpClient->pleaseStopSync();
                 //it is garanteed that no http event handler is running currently and no handler will be called
                 lk.relock();
             }

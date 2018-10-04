@@ -783,21 +783,10 @@ void CHash::remove(int32_t id)
 //
 CRendezvousQueue::CRendezvousQueue()
 {
-#ifndef _WIN32
-    pthread_mutex_init(&m_RIDVectorLock, NULL);
-#else
-    m_RIDVectorLock = CreateMutex(NULL, false, NULL);
-#endif
 }
 
 CRendezvousQueue::~CRendezvousQueue()
 {
-#ifndef _WIN32
-    pthread_mutex_destroy(&m_RIDVectorLock);
-#else
-    CloseHandle(m_RIDVectorLock);
-#endif
-
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
         if (AF_INET == i->m_iIPversion)
@@ -811,7 +800,7 @@ CRendezvousQueue::~CRendezvousQueue()
 
 void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, std::shared_ptr<CUDT> u, int ipv, const sockaddr* addr, uint64_t ttl)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     CRL r;
     r.m_iID = id;
@@ -826,7 +815,7 @@ void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, std::shared_ptr<CUDT> u, 
 
 void CRendezvousQueue::removeFromRQ(const UDTSOCKET& id)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {
@@ -846,7 +835,7 @@ void CRendezvousQueue::removeFromRQ(const UDTSOCKET& id)
 
 std::shared_ptr<CUDT> CRendezvousQueue::retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id)
 {
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     // TODO: optimize search
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
@@ -866,7 +855,7 @@ void CRendezvousQueue::updateConnStatus()
     if (m_lRendezvousID.empty())
         return;
 
-    CGuard vg(m_RIDVectorLock);
+    std::lock_guard<std::mutex> lock(m_RIDVectorLock);
 
     for (list<CRL>::iterator i = m_lRendezvousID.begin(); i != m_lRendezvousID.end(); ++i)
     {

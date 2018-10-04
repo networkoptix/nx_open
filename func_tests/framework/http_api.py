@@ -25,7 +25,7 @@ class HttpError(Exception):
 
     def __init__(self, server_name, url, status_code, reason, json=None):
         super(HttpError, self).__init__(
-            self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
+            '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
         self.status_code = status_code
         self.reason = reason
         self.json = json
@@ -118,11 +118,19 @@ class HttpApi(object):
         _logger.debug('GET %s, params: %s, timeout: %s sec', self.http.url(path), params_str, timeout)
         assert 'data' not in kwargs
         assert 'json' not in kwargs
-        return self.request('GET', path, params=params, timeout=timeout, **kwargs)
+        try:
+            return self.request('GET', path, params=params, timeout=timeout, **kwargs)
+        except HttpError as e:
+            _logger.debug('%s', e)
+            raise
 
     def post(self, path, data, timeout=None, **kwargs):
         data_str = json.dumps(data)
         if len(data_str) > 60:
             data_str = '\n' + json.dumps(data, indent=4)
         _logger.debug('POST %s, payload: %s, timeout: %s sec', self.http.url(path), data_str, timeout)
-        return self.request('POST', path, json=data, timeout=timeout, **kwargs)
+        try:
+            return self.request('POST', path, json=data, timeout=timeout, **kwargs)
+        except HttpError as e:
+            _logger.debug('%s', e)
+            raise

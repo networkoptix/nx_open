@@ -57,14 +57,14 @@ void QnNxRtpParser::setSdpInfo(QList<QByteArray>)
 
 }
 
-void QnNxRtpParser::writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr& metadata)
+void QnNxRtpParser::writeAnalyticsMetadataToLogFile(const QnAbstractMediaDataPtr& metadata)
 {
     nx::common::metadata::DetectionMetadataPacketPtr data =
         nx::common::metadata::fromMetadataPacket(
             std::dynamic_pointer_cast<QnCompressedMetadata>(metadata));
     if (!data)
     {
-        NX_ERROR(this) << "Unable to deserialize detection metadata.";
+        NX_ERROR(this) << "Unable to deserialize analytics metadata.";
         return;
     }
 
@@ -76,7 +76,7 @@ void QnNxRtpParser::writeDetectionMetadataToLogFile(const QnAbstractMediaDataPtr
     m_analyticsMetadataLogFile.flush();
 }
 
-bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const QnRtspStatistic&, bool& gotData)
+bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, bool& gotData)
 {
     gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)
@@ -258,7 +258,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             if (nxStreamingIni().analyticsMetadataLogFilePrefix[0]
                 && m_nextDataPacket->dataType == QnAbstractMediaData::GENERIC_METADATA)
             {
-                writeDetectionMetadataToLogFile(m_nextDataPacket);
+                writeAnalyticsMetadataToLogFile(m_nextDataPacket);
             }
         }
 
