@@ -33,6 +33,21 @@
     static const int MAX_REQUEST_SIZE = 1024*1024*256;
 #endif
 
+namespace {
+
+void copyAndReplaceHeader(
+    const nx::network::http::HttpHeaders* srcHeaders,
+    nx::network::http::HttpHeaders* dstHeaders,
+    const char* headerName)
+{
+    auto headerItr = srcHeaders->find(headerName);
+    if (headerItr == srcHeaders->end())
+        return;
+    nx::network::http::insertOrReplaceHeader(
+        dstHeaders, nx::network::http::HttpHeader(headerName, headerItr->second));
+}
+
+} // namespace
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
@@ -302,6 +317,9 @@ QByteArray QnTCPConnectionProcessor::createResponse(
     nx::network::http::insertOrReplaceHeader(
         &d->response.headers,
         nx::network::http::HttpHeader("Date", nx::network::http::formatDateTime(QDateTime::currentDateTime())) );
+
+    if (d->request.requestLine.url.scheme().startsWith("rtsp"))
+        copyAndReplaceHeader(&d->request.headers, &d->response.headers, "CSeq");
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
     nx::network::http::insertOrReplaceHeader( &d->response.headers, nx::network::http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
