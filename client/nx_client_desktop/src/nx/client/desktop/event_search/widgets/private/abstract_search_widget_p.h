@@ -2,6 +2,8 @@
 
 #include "../abstract_search_widget.h"
 
+#include <QtCore/QList>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
 #include <recording/time_period.h>
@@ -56,6 +58,9 @@ public:
     void requestFetch();
     void resetFilters();
 
+    void addDeviceDependentAction(
+        QAction* action, const QString& mixedString, const QString& cameraString);
+
 private:
     void setupModels();
     void setupRibbon();
@@ -81,6 +86,8 @@ private:
     void handleItemCountChanged();
     void handleFetchFinished();
 
+    void updateDeviceDependentActions();
+
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
@@ -98,6 +105,15 @@ private:
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
     QRectF m_selectedArea;
+
+    struct DeviceDependentAction
+    {
+        const QPointer<QAction> action;
+        const QString mixedString;
+        const QString cameraString;
+    };
+
+    QList<DeviceDependentAction> m_deviceDependentActions;
 };
 
 } // namespace nx::client::desktop

@@ -7,7 +7,9 @@
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+class QMenu;
 class QLabel;
+class QAction;
 class QToolButton;
 
 namespace nx::client::desktop {
@@ -88,6 +90,10 @@ protected:
     void requestFetch();
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
+
+    QMenu* createMenu();
+    void addDeviceDependentAction(
+        QAction* action, const QString& mixedString, const QString& cameraString);
 
 private:
     virtual QString placeholderText(bool constrained) const = 0;

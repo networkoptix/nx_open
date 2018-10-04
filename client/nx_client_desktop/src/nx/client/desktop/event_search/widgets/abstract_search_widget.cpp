@@ -1,9 +1,11 @@
 #include "abstract_search_widget.h"
 #include "private/abstract_search_widget_p.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+#include <QtWidgets/QMenu>
+
+#include <ui/style/helper.h>
+
+namespace nx::client::desktop {
 
 AbstractSearchWidget::AbstractSearchWidget(
     QnWorkbenchContext* context,
@@ -87,6 +89,18 @@ SelectableTextButton* AbstractSearchWidget::createCustomFilterButton()
     return d->createCustomFilterButton();
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+QMenu* AbstractSearchWidget::createMenu()
+{
+    auto result = new QMenu(this);
+    result->setProperty(style::Properties::kMenuAsDropdown, true);
+    result->setWindowFlags(result->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    return result;
+}
+
+void AbstractSearchWidget::addDeviceDependentAction(
+    QAction* action, const QString& mixedString, const QString& cameraString)
+{
+    d->addDeviceDependentAction(action, mixedString, cameraString);
+}
+
+} // namespace nx::client::desktop

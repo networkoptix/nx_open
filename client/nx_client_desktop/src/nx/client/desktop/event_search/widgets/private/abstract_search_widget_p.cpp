@@ -119,6 +119,8 @@ AbstractSearchWidget::Private::Private(
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
     m_fetchMoreOperation->setCallback([this]() { tryFetchMore(); });
+
+    updateDeviceDependentActions();
 }
 
 AbstractSearchWidget::Private::~Private()
@@ -155,9 +157,14 @@ void AbstractSearchWidget::Private::setupModels()
         [this](bool isOnline)
         {
             if (isOnline)
+            {
                 updateCurrentCameras();
+                updateDeviceDependentActions();
+            }
             else
+            {
                 q->resetFilters();
+            }
         });
 
     m_headIndicatorModel->setObjectName("head");
@@ -251,10 +258,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     ui->timeSelectionButton->setDeactivatable(true);
     ui->timeSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/rapid_review.png")));
 
-    auto timeMenu = new QMenu(q);
-    timeMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    timeMenu->setWindowFlags(timeMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
+    auto timeMenu = q->createMenu();
     auto addMenuAction =
         [this, timeMenu](const QString& title, Period period)
         {
@@ -274,11 +278,12 @@ void AbstractSearchWidget::Private::setupTimeSelection()
             return action;
         };
 
-    auto defaultAction = addMenuAction(tr("Any time"), Period::all);
     addMenuAction(tr("Last day"), Period::day);
     addMenuAction(tr("Last 7 days"), Period::week);
     addMenuAction(tr("Last 30 days"), Period::month);
     addMenuAction(tr("Selected on Timeline"), Period::selection);
+    timeMenu->addSeparator();
+    auto defaultAction = addMenuAction(tr("Any time"), Period::all);
 
     connect(ui->timeSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -320,12 +325,9 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     ui->cameraSelectionButton->setDeactivatable(true);
     ui->cameraSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/camera.png")));
 
-    auto cameraMenu = new QMenu(q);
-    cameraMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    cameraMenu->setWindowFlags(cameraMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
+    auto cameraMenu = q->createMenu();
     auto addMenuAction =
-        [this, cameraMenu](const QString& title, Cameras cameras)
+        [this, cameraMenu](const QString& title, Cameras cameras, bool deviceDependentTitle = false)
         {
             auto action = cameraMenu->addAction(title);
             connect(action, &QAction::triggered, this,
@@ -340,17 +342,29 @@ void AbstractSearchWidget::Private::setupCameraSelection()
                     setSelectedCameras(cameras);
                 });
 
+            if (deviceDependentTitle)
+            {
+                connect(action, &QAction::changed, this,
+                    [this, action, cameras]()
+                    {
+                        if (selectedCameras() == cameras)
+                            ui->cameraSelectionButton->setText(action->text());
+                    });
+            }
+
             return action;
         };
 
-    auto defaultAction = addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(), tr("All devices"), tr("All cameras")), Cameras::all);
+    addDeviceDependentAction(addMenuAction("<cameras on layout>", Cameras::layout, true),
+        tr("Devices on layout"), tr("Cameras on layout"));
 
-    addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
-        tr("Devices on layout"), tr("Cameras on layout")), Cameras::layout);
+    addDeviceDependentAction(addMenuAction("<current camera>", Cameras::current, true),
+        tr("Current device"), tr("Current camera"));
 
-    addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
-        tr("Current device"), tr("Current camera")), Cameras::current);
+    cameraMenu->addSeparator();
+
+    auto defaultAction = addMenuAction("<any camera>", Cameras::all, true);
+    addDeviceDependentAction(defaultAction, tr("Any device"), tr("Any camera"));
 
     connect(ui->cameraSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -643,6 +657,25 @@ void AbstractSearchWidget::Private::resetFilters()
     ui->timeSelectionButton->deactivate();
     ui->areaSelectionButton->deactivate();
     m_textFilterEdit->clear();
+}
+
+void AbstractSearchWidget::Private::addDeviceDependentAction(
+    QAction* action, const QString& mixedString, const QString& cameraString)
+{
+    NX_ASSERT(action);
+    m_deviceDependentActions.push_back({action, mixedString, cameraString});
+}
+
+void AbstractSearchWidget::Private::updateDeviceDependentActions()
+{
+    for (const auto& item: m_deviceDependentActions)
+    {
+        if (item.action)
+        {
+            item.action->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+                q->resourcePool(), item.mixedString, item.cameraString));
+        }
+    }
 }
 
 void AbstractSearchWidget::Private::setFetchDirection(AbstractSearchListModel::FetchDirection value)
