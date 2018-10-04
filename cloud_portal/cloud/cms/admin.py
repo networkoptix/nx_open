@@ -253,7 +253,9 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         return obj.version.product
 
     def save_model(self, request, obj, form, change):
+        # Save the review notes
         super(ProductCustomizationReviewAdmin, self).save_model(request, obj, form, change)
+        # handle the action the user chose in product.review
         review(request)
 
     def response_change(self, request, obj):
