@@ -124,13 +124,15 @@ int VmsGatewayProcess::serviceMain(
             &httpMessageDispatcher);
         m_relayEngine = &relayEngine;
 
+        HttpConnectTunnelPool httpConnectTunnelPool;
         nx::network::http::server::proxy::MessageBodyConverterFactory::instance().setUrlConverter(
             std::make_unique<UrlRewriter>());
         registerApiHandlers(
             settings,
             m_runTimeOptions,
             &relayEngine,
-            &httpMessageDispatcher);
+            &httpMessageDispatcher,
+            &httpConnectTunnelPool);
 
         if (settings.http().sslSupport)
         {
@@ -264,7 +266,8 @@ void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
     relaying::RelayEngine* relayEngine,
-    nx::network::http::server::rest::MessageDispatcher* const msgDispatcher)
+    nx::network::http::server::rest::MessageDispatcher* const msgDispatcher,
+    HttpConnectTunnelPool* httpConnectTunnelPool)
 {
     msgDispatcher->registerRequestProcessor<ProxyHandler>(
         nx::network::http::kAnyPath,
@@ -278,15 +281,27 @@ void VmsGatewayProcess::registerApiHandlers(
 
     if (settings.http().connectSupport)
     {
-        NX_CRITICAL(false, "Currently ConnectHandler has some issues:"
-            "please see implementation TODOs");
+        auto factoryFunc =
+            [&settings, httpConnectTunnelPool]() -> std::unique_ptr<ConnectHandler>
+            {
+                auto tunnelCreatedHandler =
+                    [httpConnectTunnelPool](std::unique_ptr<network::aio::AsyncChannelBridge> tunnel)
+                    {
+                        NX_VERBOSE(tunnel.get(), "Starting CONNECT tunnel.");
+                        tunnel->start(
+                            [httpConnectTunnelPool, tunnelPtr = tunnel.get()](SystemError::ErrorCode error)
+                            {
+                                NX_VERBOSE(tunnelPtr, "Closing CONNECT tunnel.");
+                                httpConnectTunnelPool->closeConnection(error, tunnelPtr);
+                            });
+                        httpConnectTunnelPool->saveConnection(std::move(tunnel));
+                    };
+                return std::make_unique<ConnectHandler>(settings, std::move(tunnelCreatedHandler));
+            };
 
         msgDispatcher->registerRequestProcessor<ConnectHandler>(
             nx::network::http::kAnyPath,
-            [&settings]() -> std::unique_ptr<ConnectHandler>
-            {
-                return std::make_unique<ConnectHandler>(settings);
-            },
+            std::move(factoryFunc),
             nx::network::http::StringType("CONNECT"));
     }
 

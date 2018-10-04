@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/network/socket_common.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/string.h>
 
@@ -377,9 +378,16 @@ bool RequestLine::parse(const ConstBufferRefType& data)
                         parsingState = psUrl;
                         break;
                     case psUrl:
-                        url.setUrl(QLatin1String(tokenStart, str - tokenStart));
+                    {
+                        const QString urlStr = QLatin1String(tokenStart, str - tokenStart);
+                        // Work-around to support <ip:port> request-URI. (RFC 2616, section-5.1.2.)
+                        if (!urlStr.contains('/') && urlStr.contains(':'))
+                            url.setAuthority(urlStr, QUrl::StrictMode);
+                        else
+                            url.setUrl(urlStr);
                         parsingState = psVersion;
                         break;
+                    }
                     case psVersion:
                         version.parse(data.mid(tokenStart - data.constData(), str - tokenStart));
                         parsingState = psDone;
