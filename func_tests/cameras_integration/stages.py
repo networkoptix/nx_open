@@ -9,9 +9,9 @@ Stop iteration = Failure, last error is returned.
 """
 
 import logging
+import timeit
 from datetime import datetime, timedelta
 
-import pytz
 from typing import Generator, List
 
 from framework.http_api import HttpError
@@ -69,7 +69,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=10))
+@_stage(timeout=timedelta(minutes=6))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     checker = Checker()
     # Checking if the camera is recording already
@@ -96,19 +96,14 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
                 if not configuration:
                     continue
 
-                epoch = pytz.utc.localize(datetime.utcfromtimestamp(0))
-                time_since_epoch = recorded_periods[-1].start - epoch
-                delay_ms = 100 # Just to be sure stream is configured.
-                archive_url = '{}?stream={}&pos={}'.format(
-                    run.media_url, {'primary': 0, 'secondary': 1}[profile],
-                    int(time_since_epoch.total_seconds() * 1000 + delay_ms))
-                _logger.info('Archive request url for stream {}: {}'.format(
-                    profile, archive_url))
-
+                start_time = timeit.default_timer()
                 while True:
-                    streams = ffprobe_streams(archive_url)
+                    time_shift = timedelta(seconds=timeit.default_timer() - start_time)
+                    streams = ffprobe_streams(run.media_url(
+                        profile, recorded_periods[-1].start + time_shift))
                     if not streams:
-                        yield Halt('FFprobe returned no valid stream info')
+                        yield Halt('FPS index {}: ffprobe did not find stream {}'.format(
+                            fps_index, profile))
                         continue
                     yield expect_values(
                         configuration, ffprobe_metadata(streams[0]), profile)
@@ -118,28 +113,26 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
         for profile, configurations in profiles.items():
-            stream_url = '{}?stream={}'.format(
-                run.media_url, {'primary': 0, 'secondary': 1}[profile])
             for index, configuration in enumerate(configurations):
                 configure_video(
                     run.server.api, run.id, run.data['cameraAdvancedParams'], profile,
                     **configuration
                     )
                 while True:
-                    streams = ffprobe_streams(stream_url)
+                    streams = ffprobe_streams(run.media_url(profile))
+                    profile_id = '{}[{}]'.format(profile, index)
                     if not streams:
-                        yield Halt('Video stream was not discovered by ffprobe.')
+                        yield Halt('Video stream {} was not discovered by ffprobe'.format(
+                            profile_id))
                         continue
 
-                    yield expect_values(
-                        configuration, ffprobe_metadata(streams[0]), '{}[{}]'.format(
-                            profile, index))
+                    yield expect_values(configuration, ffprobe_metadata(streams[0]), profile_id)
 
         while stream_urls:
             yield expect_values({'streamUrls': stream_urls}, run.data, syntax='*')
 
 
-@_stage(timeout=timedelta(minutes=3))
+@_stage(timeout=timedelta(minutes=6))
 def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
@@ -156,7 +149,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
             while True:
                 try:
-                    streams = ffprobe_streams(run.media_url)
+                    streams = ffprobe_streams(run.media_url())
                     if not streams:
                         yield Halt(
                             'No stream (neither audio nor video) was discovered by ffprobe.')
