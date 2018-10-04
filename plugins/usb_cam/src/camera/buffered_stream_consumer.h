@@ -15,13 +15,13 @@ namespace nx {
 namespace usb_cam {
 
 //--------------------------------------------------------------------------------------------------
-// Buffer
+// TimeStampedBuffer
 
 template<typename V>
-class Buffer
+class TimeStampedBuffer
 {
 public:
-    Buffer() = default;
+    TimeStampedBuffer() = default;
 
     bool empty() const
     {
@@ -42,32 +42,31 @@ public:
             m_buffer.clear();
     }
 
-    virtual void pushBack(uint64_t key, const V& item)
+    virtual void insert(uint64_t key, const V& item)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_buffer.emplace(key, item);
         m_wait.notify_all();
     }
 
+    /**
+     * Peek at the oldest item in the buffer
+     */
     V peekOldest(const std::chrono::milliseconds& timeOut)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock, 0 /*minimumBufferSize*/, timeOut))
-            return V();
-        if (m_buffer.empty())
+        if (!wait(lock, 0 /*minimumBufferSize*/, timeOut))
             return V();
         return m_buffer.begin()->second;
     }
 
     /**
-     * Pop from the front of the buffer
+     * Pop the oldest item off the buffer
      */
     virtual V popOldest(const std::chrono::milliseconds& timeOut)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock, 0 /*minimumBufferSize*/, timeOut))
-            return V();
-        if (m_buffer.empty())
+        if (!wait(lock, 0 /*minimumBufferSize*/, timeOut))
             return V();
         auto it = m_buffer.begin();
         auto v = it->second;
@@ -107,13 +106,7 @@ public:
     bool waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_wait.wait(lock,
-            [&]()
-            {
-                return m_buffer.empty()
-                    ? m_interrupted
-                    : timeSpanInternal() >= timeSpan;
-            });
+        m_wait.wait(lock, [&]() { return m_interrupted || timeSpanInternal() >= timeSpan; });
         return !interrupted();
     }
     
@@ -140,16 +133,17 @@ protected:
 
     /**
      * Wait for at most timeOut for the number of items in the buffer to be > minimumBufferSize.
-     *    Terminates early if interrupt() is called, returning false.
+     *    Terminates early if interrupt() is called, returning false. Also returns false if the wait
+     *    times out and the buffer size is not strictly larger than minimumBufferSize.
      * 
      * @params[in] lock - an std::unique lock that the condition_variable should wait on.
      * @param[in] minimumBufferSize - the minimum number of items that the buffer should contain for
      *    the wait condition to return true. Uses a strictly greater than comparison.
      * @params[in] timeOut - the maximum amount of time to wait (in milliseconds)
-     *     before terminating early. if 0 is passed, waits indefinitely or until interrupt()
+     *     before terminating early. If 0 is passed, waits indefinitely or until interrupt()
      *     is called.
-     * @return - true if the wait terminated due to satisfying mimumBufferSize, false if
-     *     the wait terminated due to calling interrupt().
+     * @return - true if the buffer size grows larger than minimum buffer size, false if interrupted
+     *    or time out.
      */
     bool wait(
         std::unique_lock<std::mutex>& lock,
@@ -165,12 +159,11 @@ protected:
         }
         else
         {
-            m_wait.wait(
+            m_wait.wait( 
                 lock,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
-
-        if(interrupted())
+        if (interrupted())
             return false;
         return m_buffer.size() > minimumBufferSize;
     }
@@ -219,7 +212,7 @@ public:
     std::vector<uint64_t> timestamps() const;
 
 private:
-    Buffer<std::shared_ptr<ffmpeg::Packet>> m_buffer;
+    TimeStampedBuffer<std::shared_ptr<ffmpeg::Packet>> m_buffer;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -252,7 +245,7 @@ public:
     std::vector<uint64_t> timestamps() const;
 
 private:
-    Buffer<std::shared_ptr<ffmpeg::Frame>> m_buffer;
+    TimeStampedBuffer<std::shared_ptr<ffmpeg::Frame>> m_buffer;
 };
 
 } //namespace usb_cam

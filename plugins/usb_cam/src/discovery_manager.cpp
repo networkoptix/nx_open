@@ -62,6 +62,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
         strncpy(cameras[i].modelName, devices[i].deviceName.c_str(), sizeof(cameras[i].modelName) - 1);
+        
         std::string url = utils::encodeCameraInfoUrl(localInterfaceIPAddr, devices[i].devicePath.c_str());
         strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
 

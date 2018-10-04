@@ -19,7 +19,7 @@ BufferedPacketConsumer::BufferedPacketConsumer(
 
 void BufferedPacketConsumer::givePacket(const std::shared_ptr<ffmpeg::Packet>& packet)
 {
-    m_buffer.pushBack(packet->timestamp(), packet);
+    m_buffer.insert(packet->timestamp(), packet);
 }
 
 void BufferedPacketConsumer::flush()
@@ -87,7 +87,7 @@ void BufferedVideoFrameConsumer::flush()
 
 void BufferedVideoFrameConsumer::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
-    m_buffer.pushBack(frame->timestamp(), frame);
+    m_buffer.insert(frame->timestamp(), frame);
 }
 
 std::shared_ptr<ffmpeg::Frame> BufferedVideoFrameConsumer::popOldest(

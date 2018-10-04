@@ -34,9 +34,6 @@ Packet::Packet(
     m_codecID(codecID),
     m_mediaType(mediaType),
     m_packetCount(packetCount),
-#ifdef _WIN32
-    m_parseNalUnitsVisited(false),
-#endif
     m_packet(av_packet_alloc())
 {
     if (m_packetCount)
@@ -132,7 +129,7 @@ bool Packet::keyPacket() const
     // in the case the packet was produced by an encoder, this will be set apporpriately
     if (m_packet->flags & AV_PKT_FLAG_KEY)
         return true;
-        
+
     parseNalUnits();
 #endif
     /**
