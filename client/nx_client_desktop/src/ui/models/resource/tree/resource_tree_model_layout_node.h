@@ -21,6 +21,9 @@ public:
 
     bool itemsLoaded() const;
 
+    // True if layout is encrypted and no password is known.
+    bool requiresPassword() const;
+
 protected:
     virtual QIcon calculateIcon() const override;
     virtual QnResourceTreeModelNodeManager* manager() const override;
@@ -28,8 +31,8 @@ protected:
 private:
     QnResourceAccessSubject getOwner() const;
 
-    void itemAdded(const QnLayoutItemData& item);
-    void itemRemoved(const QnLayoutItemData& item);
+    void addItem(const QnLayoutItemData& item);
+    void removeItem(const QnLayoutItemData& item);
 
     void updateItem(const QnUuid& item);
 
@@ -37,9 +40,12 @@ private:
 
     void updateLoadedState();
 
+    void handleLayoutChange();
+
 private:
     friend class QnResourceTreeModelLayoutNodeManager;
     ItemHash m_items;
     int m_loadedItems = 0;
     bool m_loaded = true;
+    bool m_requiresPassword = false; //< True for encrypted layout until no password is provided.
 };

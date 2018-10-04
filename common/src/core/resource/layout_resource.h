@@ -136,6 +136,9 @@ public:
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
     static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
 
+    /** Propagate password to child AviResource storages. Does not check anything. */
+    void usePasswordToOpen(const QString& password);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

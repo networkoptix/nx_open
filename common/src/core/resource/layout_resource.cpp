@@ -533,4 +533,18 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(QnResourcePool* resourcePo
             result << resource;
     }
     return result;
-};
+}
+
+void QnLayoutResource::usePasswordToOpen(const QString& password)
+{
+    NX_ASSERT(isFile());
+
+    auto items = layoutResources();
+
+    for(auto item: items)
+    {
+        if (auto aviItem = item.objectCast<QnAviResource>())
+            if (auto fileStorage = aviItem->getStorage().dynamicCast<QnLayoutFileStorageResource>())
+                fileStorage->usePasswordToOpen(password);
+    }
+}

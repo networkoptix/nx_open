@@ -241,6 +241,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     layoutFile.reset();
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
+
+    // Deal with encrypted layouts.
+    const auto fileInfo = nx::core::layout::identifyFile(filename);
+    if (!fileInfo.isValid)
+        return QnLayoutResourcePtr();
+    if (fileInfo.isCrypted)
+        layout->setData(Qn::LayoutEncryptionRole, true);
+
     nx::vms::api::LayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout))
     {
@@ -325,11 +333,6 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
 
         watermarkFile.reset();
     }
-
-    // Check if the layout is crypted.
-    const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
-    if (fileInfo.isCrypted)
-        layout->setData(Qn::LayoutEncryptionRole, true);
 
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());

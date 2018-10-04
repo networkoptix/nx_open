@@ -1,18 +1,13 @@
 #include "input_dialog.h"
 #include "ui_input_dialog.h"
 
-#include <ui/style/custom_style.h>
-
 QnInputDialog::QnInputDialog(QWidget *parent)
     : base_type(parent)
     , ui(new Ui::InputDialog())
 {
     ui->setupUi(this);
 
-    setWarningStyle(ui->errorLabel);
-
-    connect(ui->valueLineEdit, &QLineEdit::textChanged, this, &QnInputDialog::validateInput);
-    validateInput();
+    ui->valueLineEdit->setValidator(nx::client::desktop::defaultNonEmptyValidator(tr("Please enter a value.")));
 
     setResizeToContentsMode(Qt::Horizontal | Qt::Vertical);
 }
@@ -38,7 +33,11 @@ QString QnInputDialog::value() const
 void QnInputDialog::setValue(const QString &value)
 {
     ui->valueLineEdit->setText(value);
-    validateInput();
+}
+
+void QnInputDialog::setValidator(nx::client::desktop::TextValidateFunction validator)
+{
+    ui->valueLineEdit->setValidator(validator);
 }
 
 QString QnInputDialog::placeholderText() const
@@ -69,22 +68,8 @@ QDialogButtonBox::StandardButtons QnInputDialog::buttons() const
 void QnInputDialog::setButtons(QDialogButtonBox::StandardButtons buttons)
 {
     ui->buttonBox->setStandardButtons(buttons);
-    validateInput();
 }
 
-void QnInputDialog::validateInput()
-{
-    bool valid = !value().isEmpty();
-    for(QAbstractButton *button: ui->buttonBox->buttons())
-    {
-        QDialogButtonBox::ButtonRole role = ui->buttonBox->buttonRole(button);
-
-        if(role == QDialogButtonBox::AcceptRole || role == QDialogButtonBox::YesRole || role == QDialogButtonBox::ApplyRole)
-            button->setEnabled(valid);
-    }
-
-    ui->errorLabel->setVisible(false);
-}
 
 QString QnInputDialog::getText(QWidget* parent,
     const QString& title, const QString& label,
@@ -105,4 +90,12 @@ QString QnInputDialog::getText(QWidget* parent,
         return QString();
 
     return dialog.value();
+}
+
+void QnInputDialog::accept()
+{
+    if (!ui->valueLineEdit->validate())
+        return;
+
+    base_type::accept();
 }

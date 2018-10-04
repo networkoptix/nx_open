@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 #include <QtCore/QFile>
 
+#include <utils/crypt/crypto_functions.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -18,20 +19,15 @@ namespace utils {
 
 class CryptedFileStream : public QIODevice
 {
-public:
-    constexpr static size_t kKeySize = 32; //< Key size in bytes.
-    using Key = std::array<unsigned char, kKeySize>;
+    using Key = crypto_functions::Key;
 
+public:
     CryptedFileStream(const QString& fileName, const QString& password = QString());
     virtual ~CryptedFileStream();
 
     void setEnclosure(qint64 position, qint64 size);
 
     void setPassword(const QString& password);
-
-    // Static function for passsword checking.
-    static Key getPasswordHash(const QString& password);
-    static bool checkPassword(const QString& password, Key hash);
 
     virtual bool open(QIODevice::OpenMode openMode) override;
     virtual void close() override;

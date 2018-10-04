@@ -1182,7 +1182,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case NodeType::filteredLayouts:
-        case NodeType::layouts:
+        case NodeType::layouts: //< Overridden in QnResourceTreeModelLayoutNode.
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
         case NodeType::layoutTour:

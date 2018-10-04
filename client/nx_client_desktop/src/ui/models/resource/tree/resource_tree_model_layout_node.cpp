@@ -12,8 +12,11 @@
 #include <ui/models/resource/tree/resource_tree_model_layout_node_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_layout_password_management.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_context.h>
+
+using nx::client::desktop::ui::workbench::layout::needPassword;
 
 QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     QnResourceTreeModel* model,
@@ -48,8 +51,19 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    for (const auto& item: layout->getItems())
-        itemAdded(item);
+    m_requiresPassword = needPassword(layout);
+
+    if (m_requiresPassword)
+    {
+        // This is to capture password entering.
+        connect(layout, &QnLayoutResource::dataChanged,
+            this, &QnResourceTreeModelLayoutNode::handleLayoutChange);
+    }
+    else
+    {
+        for (const auto& item : layout->getItems()) //< Only add nodes if layout is not encrypted.
+            addItem(item);
+    }
 }
 
 void QnResourceTreeModelLayoutNode::deinitialize()
@@ -109,10 +123,12 @@ QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
     if (!resource())
         return QIcon();
 
-    return base_type::calculateIcon();
+    return m_requiresPassword
+        ? qnResIconCache->icon(QnResourceIconCache::EncryptedLayout)
+        : qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
 
-void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::addItem(const QnLayoutItemData& item)
 {
     NX_ASSERT(model());
     if (!model())
@@ -123,6 +139,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
         NodeType::layoutItem));
+
     node->initialize();
     node->setParent(toSharedPointer());
 
@@ -138,7 +155,7 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
     updateLoadedState();
 }
 
-void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::removeItem(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
     {
@@ -171,6 +188,11 @@ bool QnResourceTreeModelLayoutNode::itemsLoaded() const
     return m_loadedItems == m_items.size();
 }
 
+bool QnResourceTreeModelLayoutNode::requiresPassword() const
+{
+    return m_requiresPassword;
+}
+
 void QnResourceTreeModelLayoutNode::updateLoadedState()
 {
     NX_ASSERT(m_loadedItems >= 0 && m_loadedItems <= m_items.size());
@@ -187,4 +209,16 @@ void QnResourceTreeModelLayoutNode::updateLoadedState()
     auto layoutNodeManager = qobject_cast<QnResourceTreeModelLayoutNodeManager*>(manager());
     NX_ASSERT(layoutNodeManager);
     layoutNodeManager->loadedStateChanged(this, loaded);
+}
+
+void QnResourceTreeModelLayoutNode::handleLayoutChange()
+{
+    const auto layout = resource().dynamicCast<QnLayoutResource>();
+    if (m_requiresPassword && !needPassword(layout)) //< We now have a valid password in layout data!
+    {
+        m_requiresPassword = false;
+
+        for (const auto& item : layout->getItems()) // Now add child nodes that were hidden.
+            addItem(item);
+    }
 }

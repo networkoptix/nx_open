@@ -87,7 +87,7 @@ private:
     QScopedPointer<Private> d;
     QScopedPointer<::Ui::ExportSettingsDialog> ui;
     FileNameValidator isFileNameValid;
-    ExportPasswordWidget * m_passwordWidget;
+    ExportPasswordWidget* m_passwordWidget;
 };
 
 } // namespace desktop

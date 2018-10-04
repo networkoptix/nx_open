@@ -50,8 +50,9 @@ struct StreamIndex
 
 struct CryptoInfo
 {
-    std::array<unsigned char, kHashSize> passwordHash = {};
-    std::array<unsigned char, 256 - kHashSize> reserved = {};
+    Key passwordSalt = {};
+    Key passwordHash = {};
+    std::array<unsigned char, 256 - 2 * kHashSize> reserved = {};
 };
 #pragma pack(pop)
 
@@ -60,7 +61,8 @@ struct FileInfo
     bool isValid = false;
     int version = 1;
     bool isCrypted = false;
-    std::array<unsigned char, kHashSize> passwordHash = {};
+    Key passwordSalt = {};
+    Key passwordHash = {};
     qint64 offset = 0;
 };
 

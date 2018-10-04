@@ -17,7 +17,7 @@ class QnLayoutPlainStream;
 class QnTimePeriodList;
 
 /*
-* QnLayoutFileStorageResource uses for layout export
+* QnLayoutFileStorageResource is used for layout reading and export.
 */
 class QnLayoutFileStorageResource: public QnStorageResource
 {
@@ -40,7 +40,7 @@ public:
     // Whether the file is crypted or intended to be crypted.
     bool isCrypted() const;
     // Set new password if we intend to create a new layout file. Please call before `open`.
-    void usePasswordForExport(const QString& password);
+    void setPasswordForExport(const QString& password);
     // Set password for reading existing layout file.
     bool usePasswordToOpen(const QString& password);
 

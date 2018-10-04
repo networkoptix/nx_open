@@ -10,6 +10,7 @@
 
 #include <recording/time_period_list.h>
 #include <utils/common/util.h>
+#include <utils/crypt/crypto_functions.h>
 #include <utils/fs/file.h>
 #include <core/resource/avi/filetypesupport.h>
 
@@ -22,6 +23,8 @@ namespace {
 } // namespace
 
 using namespace nx::core::layout;
+using namespace nx::utils::crypto_functions;
+using nx::utils::CryptedFileStream;
 
 QnMutex QnLayoutFileStorageResource::m_storageSync;
 QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
@@ -51,13 +54,17 @@ bool QnLayoutFileStorageResource::isCrypted() const
     return m_info.isCrypted;
 }
 
-void QnLayoutFileStorageResource::usePasswordForExport(const QString& password)
+void QnLayoutFileStorageResource::setPasswordForExport(const QString& password)
 {
     NX_ASSERT(!password.isEmpty());
     NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
     m_info.isCrypted = true;
     m_index.magic = kIndexCryptedMagic;
     m_password = password;
+
+    // Create new salt and salted password hash.
+    m_cryptoInfo.passwordSalt = getRandomSalt();
+    m_cryptoInfo.passwordHash = getSaltedPasswordHash(m_password, m_cryptoInfo.passwordSalt);
 }
 
 bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
@@ -139,18 +146,18 @@ Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
         + QString::number(nx::utils::random::number<uint>());
 
     QDir dir(tmpDir);
-    if (dir.exists()) {
+    if (dir.exists())
+    {
         dir.remove(tmpDir);
         return Qn::StorageInit_Ok;
     }
-    else {
+    else
+    {
         if (dir.mkpath(tmpDir))
         {
             dir.rmdir(tmpDir);
             return Qn::StorageInit_Ok;
         }
-        else
-            return Qn::StorageInit_WrongPath;
     }
 
     return Qn::StorageInit_WrongPath;

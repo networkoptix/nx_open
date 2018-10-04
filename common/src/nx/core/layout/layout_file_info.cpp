@@ -58,6 +58,7 @@ FileInfo identifyFile(const QString& fileName, bool allowTemp)
                 throw std::exception();
 
             info.isCrypted = true;
+            info.passwordSalt = crypto.passwordSalt;
             info.passwordHash = crypto.passwordHash;
         }
         else if (index.magic != kIndexMagic)
@@ -74,7 +75,8 @@ FileInfo identifyFile(const QString& fileName, bool allowTemp)
 
 bool checkPassword(const QString& password, const FileInfo& fileInfo)
 {
-    return nx::utils::CryptedFileStream::checkPassword(password, fileInfo.passwordHash);
+    return nx::utils::crypto_functions::checkSaltedPassword(password,
+        fileInfo.passwordSalt, fileInfo.passwordHash);
 }
 
 } // namespace layout
