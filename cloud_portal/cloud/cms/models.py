@@ -201,8 +201,12 @@ class Product(models.Model):
             # TODO: need to update all static right here
 
     def version_id(self):
-        versions = ContentVersion.objects.filter(product=self)
-        return versions.latest('accepted_date').id if versions.exists() else 0
+        accepted_review = ProductCustomizationReview.objects. \
+            filter(customization__name=settings.CUSTOMIZATION,
+                   state=ProductCustomizationReview.REVIEW_STATES.accepted,
+                   version__product=self)
+
+        return accepted_review.latest('id').id if accepted_review.exists() else 0
 
 
 class Context(models.Model):
