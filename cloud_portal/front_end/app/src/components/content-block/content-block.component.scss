@@ -1,7 +1,6 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
-//nx-content-block {
 .card {
     box-shadow   : none;
     border-color : $light4;
@@ -36,7 +35,6 @@
         }
 
         &.section {
-            margin-left : 1rem;
             padding-top : 0;
         }
     }
@@ -61,8 +59,6 @@
         }
     }
 }
-
-//}
 
 
 

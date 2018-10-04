@@ -2,13 +2,7 @@
 @import '../../../../styles/custom/custom_palette';
 @import '../../../../styles/theme_variables';
 
-.list {
-    flex : 0 0;
-}
-
 .card {
-    width : 300px;
-
     &--header {
         background-color : $light2;
         padding          : 1rem;

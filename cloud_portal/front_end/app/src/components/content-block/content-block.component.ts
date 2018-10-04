@@ -17,11 +17,16 @@ import {
 })
 export class NxContentBlockComponent implements OnInit {
     @Input() title: string;
-    @Input() content: string;
+    @Input() content: any;
     @Input() type: string;
 
 
     ngOnInit() {
+        if (!this.content) {
+            this.content = {
+                sections: []
+            };
+        }
 
     }
 

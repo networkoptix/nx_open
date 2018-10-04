@@ -33,7 +33,7 @@ export class NxSandboxComponent {
         this.content = {
             main: 'Main content',
             sections: [
-                { header: 'section1', content: 'Some content' },
+                { header: 'section1', content: '<table></table>' },
                 { header: 'section2', content: 'Other content' }
             ]
         };

@@ -1,12 +1,12 @@
-<div class="container" >
-    <h1>MAIN PAGE</h1>
+<div class="" >
+    <h1 class="pl-3">MAIN PAGE</h1>
 
-    <div class="row">
-        <div class="col-3">
+    <div class="row m-0 p-3">
+        <div class="menu col-12 col-md-4 col-xl-3 col-xxxl-2" style="border: 1px solid gold">
             <nx-menu [content]="content" [elements]="elements"></nx-menu>
         </div>
 
-        <div class="col-9" style="border: 1px solid gold;">
+        <div class="outlet d-none d-md-block col-md-8 col-xl-7 col-xxxl-10" style="width: 100%; border: 1px solid gold;">
             <router-outlet></router-outlet>
         </div>
     </div>

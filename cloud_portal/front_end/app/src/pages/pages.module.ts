@@ -10,6 +10,8 @@ import { ServersDetailModule }       from './details/servers/servers.module';
 import { UsersDetailModule }         from './details/users/users.module';
 import { OtherDetailsModule }        from './details/others/others.module';
 
+import { RightMenuModule }        from './right-menu/right-menu.module';
+import { ContentModule }          from './content/content.module';
 import { IntegrationsModule }     from './integration/integrations.module';
 import { IntegrationsListModule } from './integration//list/list.module';
 
@@ -25,6 +27,8 @@ import { IntegrationsListModule } from './integration//list/list.module';
         OtherDetailsModule,
         IntegrationsModule,
         IntegrationsListModule,
+        ContentModule,
+        RightMenuModule,
     ],
     declarations   : [],
     entryComponents: [],
@@ -40,6 +44,8 @@ import { IntegrationsListModule } from './integration//list/list.module';
         OtherDetailsModule,
         IntegrationsModule,
         IntegrationsListModule,
+        ContentModule,
+        RightMenuModule,
     ]
 })
 export class PagesModule {

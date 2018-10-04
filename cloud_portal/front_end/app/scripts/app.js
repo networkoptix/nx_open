@@ -340,6 +340,12 @@ window.L = {};
                             .when('/integrations', {
                                 template: ''
                             })
+                            .when('/content', {
+                                template: ''
+                            })
+                            .when('/right', {
+                                template: ''
+                            })
                             // **** routes for detail views should state full path ****
                             .when('/main/:route', {
                                 template: ''

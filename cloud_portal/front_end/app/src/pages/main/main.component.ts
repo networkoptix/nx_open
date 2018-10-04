@@ -61,8 +61,8 @@ export class NxMainComponent implements OnInit, OnDestroy {
                     ]
                 },
                 {
-                    id: 'other',
-                    label: 'Other',
+                    id: 'monu-layout',
+                    label: 'Menu layout',
                     path: 'other',
                     target: 'secondary'
                 }]
