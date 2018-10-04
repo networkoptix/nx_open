@@ -3,6 +3,8 @@
 #include <QtCore/QThreadPool>
 
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
+#include <api/global_settings.h>
 
 #include "synctime.h"
 #include "api/app_server_connection.h"
@@ -114,6 +116,14 @@ void QnSyncTime::updateTime(qint64 newTime)
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
+
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
+    auto commonModule = appServerConnection->commonModule();
+    auto isTimeSyncEnabled = commonModule->globalSettings()->isTimeSynchronizationEnabled();
+
+    if(!isTimeSyncEnabled)
+        return localTime;
+
     QnMutexLocker lock( &m_mutex );
 
     if (
