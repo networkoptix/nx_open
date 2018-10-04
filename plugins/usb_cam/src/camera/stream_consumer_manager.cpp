@@ -22,7 +22,7 @@ void StreamConsumerManager::consumerFlush()
     }
 }
 
-size_t StreamConsumerManager::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+size_t StreamConsumerManager::addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     int index = consumerIndex(consumer);
     if (index >= m_consumers.size())
@@ -33,7 +33,7 @@ size_t StreamConsumerManager::addConsumer(const std::weak_ptr<StreamConsumer>& c
     return -1;
 }
 
-size_t StreamConsumerManager::removeConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+size_t StreamConsumerManager::removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     int index = consumerIndex(consumer);
     if (index < m_consumers.size())
@@ -44,7 +44,7 @@ size_t StreamConsumerManager::removeConsumer(const std::weak_ptr<StreamConsumer>
     return -1;
 }
 
-int StreamConsumerManager::consumerIndex(const std::weak_ptr<StreamConsumer>& consumer) const
+int StreamConsumerManager::consumerIndex(const std::weak_ptr<AbstractStreamConsumer>& consumer) const
 {
     int index = 0;
     for(const auto & c : m_consumers)
@@ -56,20 +56,20 @@ int StreamConsumerManager::consumerIndex(const std::weak_ptr<StreamConsumer>& co
     return index;
 }
 
-const std::vector<std::weak_ptr<StreamConsumer>>& StreamConsumerManager::consumers() const
+const std::vector<std::weak_ptr<AbstractStreamConsumer>>& StreamConsumerManager::consumers() const
 {
     return m_consumers;
 }
 
-std::weak_ptr<VideoConsumer> StreamConsumerManager::largestBitrate(int * outBitrate) const
+std::weak_ptr<AbstractVideoConsumer> StreamConsumerManager::largestBitrate(int * outBitrate) const
 {
     int largest = 0;
-    std::weak_ptr<VideoConsumer> videoConsumer;
+    std::weak_ptr<AbstractVideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
         {
-            if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
+            if (auto vc = std::dynamic_pointer_cast<AbstractVideoConsumer>(c))
             {
                 if (largest < vc->bitrate())
                 {
@@ -84,15 +84,15 @@ std::weak_ptr<VideoConsumer> StreamConsumerManager::largestBitrate(int * outBitr
     return videoConsumer;
 }
 
-std::weak_ptr<VideoConsumer> StreamConsumerManager::largestFps(float * outFps) const
+std::weak_ptr<AbstractVideoConsumer> StreamConsumerManager::largestFps(float * outFps) const
 {
     float largest = 0;
-    std::weak_ptr<VideoConsumer> videoConsumer;
+    std::weak_ptr<AbstractVideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
         {
-            if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
+            if (auto vc = std::dynamic_pointer_cast<AbstractVideoConsumer>(c))
             {
                 if (largest < vc->fps())
                 {
@@ -108,16 +108,16 @@ std::weak_ptr<VideoConsumer> StreamConsumerManager::largestFps(float * outFps) c
 }
 
 
-std::weak_ptr<VideoConsumer> StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) const
+std::weak_ptr<AbstractVideoConsumer> StreamConsumerManager::largestResolution(int * outWidth, int * outHeight) const
 {
     int largestWidth = 0;
     int largestHeight = 0;
-    std::weak_ptr<VideoConsumer> videoConsumer;
+    std::weak_ptr<AbstractVideoConsumer> videoConsumer;
     for (const auto & consumer : m_consumers)
     {
         if (auto c = consumer.lock())
         {
-            if (auto vc = std::dynamic_pointer_cast<VideoConsumer>(c))
+            if (auto vc = std::dynamic_pointer_cast<AbstractVideoConsumer>(c))
             {
                 int width;
                 int height;
@@ -138,7 +138,8 @@ std::weak_ptr<VideoConsumer> StreamConsumerManager::largestResolution(int * outW
     return videoConsumer;
 }
 
-/////////////////////////////////////// FrameConsumerManager ///////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// FrameConsumerManager
 
 void FrameConsumerManager::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame)
 {
@@ -146,29 +147,31 @@ void FrameConsumerManager::giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame
     {
         if(auto c = consumer.lock())
         {
-            if(auto frameConsumer = std::dynamic_pointer_cast<FrameConsumer>(c))
+            if(auto frameConsumer = std::dynamic_pointer_cast<AbstractFrameConsumer>(c))
                 frameConsumer->giveFrame(frame);
         }
     }
 }
 
-////////////////////////////////////// PacketConsumerManager ///////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// AbstractPacketConsumerManager
 
-size_t PacketConsumerManager::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+size_t PacketConsumerManager::addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     return addConsumer(consumer, false/*waitForKeyPacket*/);
 }
 
-size_t PacketConsumerManager::removeConsumer(const std::weak_ptr<StreamConsumer>& consumer)
+size_t PacketConsumerManager::removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer)
 {
     size_t index = StreamConsumerManager::removeConsumer(consumer);
     if (index != -1)
         m_waitForKeyPacket.erase(m_waitForKeyPacket.begin() + index);
+
     return index;
 }
 
 size_t PacketConsumerManager::addConsumer(
-    const std::weak_ptr<StreamConsumer>& consumer,
+    const std::weak_ptr<AbstractStreamConsumer>& consumer,
     bool waitForKeyPacket)
 {
     /* this addConsumer() call needs to be the parent's to avoid recursion*/
@@ -180,6 +183,7 @@ size_t PacketConsumerManager::addConsumer(
         else
             m_waitForKeyPacket.insert(m_waitForKeyPacket.begin() + index, waitForKeyPacket);
     }
+    
     return index;
 }
 
@@ -189,7 +193,7 @@ void PacketConsumerManager::givePacket(const std::shared_ptr<ffmpeg::Packet>& pa
     {
         if(auto c = m_consumers[i].lock())
         {
-            if(auto packetConsumer = std::dynamic_pointer_cast<PacketConsumer>(c))
+            if(auto packetConsumer = std::dynamic_pointer_cast<AbstractPacketConsumer>(c))
             {
                 if (m_waitForKeyPacket[i])
                 {

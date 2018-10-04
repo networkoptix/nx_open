@@ -17,7 +17,7 @@
 #include "codec_parameters.h"
 #include "timestamp_mapper.h"
 #include "stream_consumer_manager.h"
-#include "stream_consumer.h"
+#include "abstract_stream_consumer.h"
 
 namespace nxpl { class TimeProvider; }
 
@@ -26,7 +26,6 @@ namespace usb_cam {
 
 class Camera;
 
-//! Read a stream using ffmpeg from a camera input device
 class VideoStream
 {
 public:
@@ -53,12 +52,13 @@ public:
      * The amount of time it takes to produce a video frame based on actualFps().
      */
     std::chrono::milliseconds actualTimePerFrame() const;
+
     AVPixelFormat decoderPixelFormat() const;
 
-    void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
-    void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
-    void addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
-    void removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer);
+    void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+    void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+    void addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
+    void removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer);
 
     void updateFps();
     void updateBitrate();
@@ -89,15 +89,15 @@ private:
 
     /**
      * Some cameras crash the plugin if they are uninitialized while there are still packets and 
-     * frame allocated. These variables are given to allocated packets and frames tokeep track of 
-     * the amount of frames and packets still waiting to be consumed. /a uninitialize() blocks until
+     * frames allocated. These variables are given to allocated packets and frames to keep track of 
+     * the amount of frames and packets still waiting to be consumed. uninitialize() blocks until
      * both reach 0. All pointers to a packet or frame should be kept for as short as possible, 
      * assigning nullptr where possible to release decerement the count.
      */
     std::shared_ptr<std::atomic_int> m_packetCount;
     
     /**
-     * See /a m_packetCount
+     * See m_packetCount
      */
     std::shared_ptr<std::atomic_int> m_frameCount;
 

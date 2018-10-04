@@ -1,5 +1,7 @@
 #include "abstract_video_consumer.h"
 
+#include "video_stream.h"
+
 namespace nx {
 namespace usb_cam {
 
@@ -7,7 +9,7 @@ AbstractVideoConsumer::AbstractVideoConsumer(
     const std::weak_ptr<VideoStream>& streamReader,
     const CodecParameters& params)
     :
-    m_streamReader(streamReader),
+    m_videoStream(streamReader),
     m_params(params)
 {
 }
@@ -32,7 +34,7 @@ void AbstractVideoConsumer::setFps(float fps)
     if(m_params.fps != fps)
     {
         m_params.fps = fps;
-        if (auto streamReader = m_streamReader.lock())
+        if (auto streamReader = m_videoStream.lock())
             streamReader->updateFps();
     }
 }
@@ -42,7 +44,7 @@ void AbstractVideoConsumer::setResolution(int width, int height)
     if(m_params.width != width || m_params.height != height)
     {
         m_params.setResolution(width, height);
-        if (auto streamReader = m_streamReader.lock())
+        if (auto streamReader = m_videoStream.lock())
             streamReader->updateResolution();
     }
 }
@@ -52,7 +54,7 @@ void AbstractVideoConsumer::setBitrate(int bitrate)
     if(m_params.bitrate != bitrate)
     {
         m_params.bitrate = bitrate;
-        if (auto streamReader = m_streamReader.lock())
+        if (auto streamReader = m_videoStream.lock())
             streamReader->updateBitrate();
     }
 }

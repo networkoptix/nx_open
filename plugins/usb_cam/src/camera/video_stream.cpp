@@ -91,7 +91,7 @@ AVPixelFormat VideoStream::decoderPixelFormat() const
     return m_decoder ? m_decoder->pixelFormat() : AV_PIX_FMT_NONE;
 }
 
-void VideoStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager.addConsumer(consumer, true/*waitForKeyPacket*/);
@@ -99,14 +99,14 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consume
     m_wait.notify_all();
 }
 
-void VideoStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void VideoStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager.removeConsumer(consumer);
     updateUnlocked();
 }
 
-void VideoStream::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
+void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.addConsumer(consumer);
@@ -114,7 +114,7 @@ void VideoStream::addFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
     m_wait.notify_all();
 }
 
-void VideoStream::removeFrameConsumer(const std::weak_ptr<FrameConsumer>& consumer)
+void VideoStream::removeFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.removeConsumer(consumer);
@@ -442,8 +442,8 @@ float VideoStream::largestFps() const
 {
     float packetFps = 0;
     float frameFps = 0;
-    std::weak_ptr<VideoConsumer> packetConsumer;
-    std::weak_ptr<VideoConsumer> frameConsumer;
+    std::weak_ptr<AbstractVideoConsumer> packetConsumer;
+    std::weak_ptr<AbstractVideoConsumer> frameConsumer;
 
     packetConsumer = m_packetConsumerManager.largestFps(&packetFps);
     frameConsumer = m_frameConsumerManager.largestFps(&frameFps);
@@ -462,15 +462,15 @@ void VideoStream::largestResolution(int * outWidth, int * outHeight) const
 
     int packetWidth = 0;
     int packetHeight = 0;
-    std::weak_ptr<VideoConsumer> packetConsumer;
+    std::weak_ptr<AbstractVideoConsumer> packetConsumer;
     packetConsumer = m_packetConsumerManager.largestResolution(&packetWidth, &packetHeight);
 
     int frameWidth = 0;
     int frameHeight = 0;
-    std::weak_ptr<VideoConsumer> frameConsumer;
+    std::weak_ptr<AbstractVideoConsumer> frameConsumer;
     frameConsumer = m_frameConsumerManager.largestResolution(&frameWidth, &frameHeight);
 
-    std::weak_ptr<VideoConsumer> videoConsumer = packetConsumer;
+    std::weak_ptr<AbstractVideoConsumer> videoConsumer = packetConsumer;
     if (frameWidth * frameHeight > frameWidth * frameHeight)
         videoConsumer = frameConsumer.lock() ? frameConsumer : videoConsumer;
 
@@ -487,13 +487,13 @@ int VideoStream::largestBitrate() const
 
     int packetBitrate = 0;
     int frameBitrate = 0;
-    std::weak_ptr<VideoConsumer>packetConsumer;
-    std::weak_ptr<VideoConsumer>frameConsumer;
+    std::weak_ptr<AbstractVideoConsumer>packetConsumer;
+    std::weak_ptr<AbstractVideoConsumer>frameConsumer;
 
     packetConsumer = m_packetConsumerManager.largestBitrate(&packetBitrate);
     frameConsumer = m_frameConsumerManager.largestBitrate(&frameBitrate);
 
-    std::weak_ptr<VideoConsumer> videoConsumer = frameBitrate > packetBitrate 
+    std::weak_ptr<AbstractVideoConsumer> videoConsumer = frameBitrate > packetBitrate 
         ? frameConsumer
         : packetConsumer;
 

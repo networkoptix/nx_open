@@ -1,11 +1,13 @@
 #pragma once
 
+#include "abstract_stream_consumer.h"
 #include "abstract_video_consumer.h"
 
 #include <condition_variable>
+#include <mutex>
 #include <atomic>
 #include <chrono>
-#include <mutex>
+#include <vector>
 #include <deque>
 #include <map>
 
@@ -190,7 +192,7 @@ protected:
 class BufferedPacketConsumer
     :
     public AbstractVideoConsumer,
-    public PacketConsumer
+    public AbstractPacketConsumer
 {
 public:
     BufferedPacketConsumer(
@@ -226,7 +228,7 @@ private:
 class BufferedVideoFrameConsumer 
     :
     public AbstractVideoConsumer,
-    public FrameConsumer
+    public AbstractFrameConsumer
 {
 public:
     BufferedVideoFrameConsumer(

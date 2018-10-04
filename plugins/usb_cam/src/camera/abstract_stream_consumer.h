@@ -6,30 +6,22 @@
 namespace nx {
 namespace usb_cam {
 
-class StreamConsumer
+class AbstractStreamConsumer
 {
 public:
     virtual void flush() = 0;
 };
 
-class PacketConsumer : public StreamConsumer
+class AbstractPacketConsumer : public AbstractStreamConsumer
 {
 public:
     virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) = 0;
 };
 
-class FrameConsumer : public StreamConsumer
+class AbstractFrameConsumer : public AbstractStreamConsumer
 {
 public:
     virtual void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame) = 0;
-};
-
-class VideoConsumer
-{
-public:
-    virtual float fps() const = 0;
-    virtual void resolution(int *width, int *height) const = 0;
-    virtual int bitrate() const = 0;
 };
 
 } // namespace usb_cam

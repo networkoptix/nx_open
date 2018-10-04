@@ -56,14 +56,16 @@ AudioStream::AudioStreamPrivate::~AudioStreamPrivate()
     m_timeProvider->releaseRef();
 }
 
-void AudioStream::AudioStreamPrivate::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::AudioStreamPrivate::addPacketConsumer(
+    const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager->addConsumer(consumer, false);
     m_wait.notify_all();
 }
 
-void AudioStream::AudioStreamPrivate::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::AudioStreamPrivate::removePacketConsumer(
+    const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager->removeConsumer(consumer);
@@ -537,7 +539,7 @@ bool AudioStream::enabled() const
     return m_streamReader != nullptr;
 }
 
-void AudioStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->addPacketConsumer(consumer);
@@ -545,7 +547,7 @@ void AudioStream::addPacketConsumer(const std::weak_ptr<PacketConsumer>& consume
         m_packetConsumerManager->addConsumer(consumer);
 }
 
-void AudioStream::removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer)
+void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer)
 {
     if (m_streamReader)
         m_streamReader->removePacketConsumer(consumer);

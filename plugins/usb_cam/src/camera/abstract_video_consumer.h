@@ -1,32 +1,31 @@
 #pragma once
 
-#include "stream_consumer.h"
-
 #include <memory>
 
-#include "video_stream.h"
 #include "codec_parameters.h"
 
 namespace nx {
 namespace usb_cam {
 
-class AbstractVideoConsumer : public VideoConsumer
+class VideoStream;
+
+class AbstractVideoConsumer
 {
 public:
     AbstractVideoConsumer(
-        const std::weak_ptr<VideoStream>& streamReader,
+        const std::weak_ptr<VideoStream>& videoStream,
         const CodecParameters& params);
 
-    virtual float fps() const override;
-    virtual void resolution(int *width, int *height) const override;
-    virtual int bitrate() const override;
+    virtual float fps() const;
+    virtual void resolution(int *width, int *height) const;
+    virtual int bitrate() const;
 
     virtual void setFps(float fps);
     virtual void setResolution(int width, int height);
     virtual void setBitrate(int bitrate);
 
 protected:
-    std::weak_ptr<VideoStream> m_streamReader;
+    std::weak_ptr<VideoStream> m_videoStream;
     CodecParameters m_params;
 };
 

@@ -36,8 +36,8 @@ private:
             const std::shared_ptr<PacketConsumerManager>& packetConsumerManager);
         ~AudioStreamPrivate();
 
-        void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
-        void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
+        void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+        void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
         int sampleRate() const;
 
@@ -110,8 +110,8 @@ public:
     void setEnabled(bool enabled);
     bool enabled() const;
 
-    void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
-    void removePacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
+    void addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
+    void removePacketConsumer(const std::weak_ptr<AbstractPacketConsumer>& consumer);
 
     int sampleRate() const;
 
