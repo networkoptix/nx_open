@@ -3771,8 +3771,9 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
-    auto videoLayout = layoutStr.isEmpty() ? QnMediaResource::getVideoLayout(dataProvider)
-        : QnCustomResourceVideoLayout::fromString(layoutStr);
+    auto videoLayout = layoutStr.isEmpty()
+        ? QnMediaResource::getVideoLayout(dataProvider)
+        : QnConstResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(layoutStr));
 
     auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
     {
