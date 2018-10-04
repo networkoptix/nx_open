@@ -384,6 +384,118 @@
             "value": "",
             "description": "",
             "type": "text"
+          },
+          {
+            "name": "Logo",
+            "value": "",
+            "description": "Logo for integration",
+            "type": "image",
+            "optional": true
+          },
+          {
+            "name": "Tested software (VMS) versions",
+            "value": "",
+            "description": "Latest supported version",
+            "type": "text"
+          },
+          {
+            "name": "Supported OS and platforms",
+            "value": "",
+            "description": "",
+            "type": "select",
+            "meta": {
+              "multi": true,
+              "options": [
+                "ARM",
+                "Linux - x86",
+                "Linux - x64",
+                "MacOS",
+                "RPI",
+                "Windows - x86",
+                "Windows - x64"
+              ]
+            }
+          },
+          {
+            "name": "Version",
+            "value": "",
+            "description": "",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "Full functionality overview",
+            "value": "",
+            "description": "A description about what the integration does.",
+            "type": "html"
+          },
+          {
+            "name": "Version Changelog",
+            "value": "",
+            "description": "",
+            "type": "html",
+            "optional": true
+          },
+          {
+            "name": "Download links or Instructions",
+            "value": "",
+            "description": "",
+            "type": "html"
+          },
+          {
+            "name": "Installation Instructions",
+            "value": "",
+            "description": "",
+            "type": "html"
+          },
+          {
+            "name": "Screenshots",
+            "value": "",
+            "description": "",
+            "type": "image"
+          },
+          {
+            "name": "Useful Links",
+            "value": "",
+            "description": "",
+            "type": "text",
+            "optional": true
+          },
+          {
+            "name": "Additional Information",
+            "value": "",
+            "description": "",
+            "type": "html",
+            "optional": true
+          },
+          {
+            "name": "Tags",
+            "value": "",
+            "description": "",
+            "type": "text"
+          },
+          {
+            "name": "Type(Category)",
+            "value": "",
+            "description": "",
+            "type": "select",
+            "meta": {
+              "multi": true,
+              "options": [
+                "Access Control",
+                "Connector",
+                "Data Analytics",
+                "Drone",
+                "Health Monitor",
+                "Storage"
+              ]
+            }
+          },
+          {
+            "name": "Support Information",
+            "value": "",
+            "description": "",
+            "type": "html"
           }
         ]
       }
