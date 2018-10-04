@@ -3,6 +3,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/random.h>
+#include <test_support/utils.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -22,6 +24,7 @@ MediaServerLauncher::MediaServerLauncher(
         addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting("noMonitorStatistics", "1");
+
     m_serverGuid = QnUuid::createUuid();
     fillDefaultSettings();
 }
@@ -29,11 +32,11 @@ MediaServerLauncher::MediaServerLauncher(
 void MediaServerLauncher::fillDefaultSettings()
 {
     m_settings = {
-	{"serverGuid", m_serverGuid.toString()},
-	{"varDir", *m_workDirResource.getDirName()},
-	{"dataDir", *m_workDirResource.getDirName()},
-	{"systemName", QnUuid::createUuid().toString()},
-	{"port", QString::number(m_serverEndpoint.port)}
+    {"serverGuid", m_serverGuid.toString()},
+    {"varDir", *m_workDirResource.getDirName()},
+    {"dataDir", *m_workDirResource.getDirName()},
+    {"systemName", QnUuid::createUuid().toString()},
+    {"port", QString::number(m_serverEndpoint.port)}
     };
 }
 
@@ -121,6 +124,9 @@ bool MediaServerLauncher::start()
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
     if (result != std::future_status::ready)
         return false;
+
+    serverModule()->globalSettings()->setAutoDiscoveryEnabled(
+        nx::ut::cfg::configInstance().enableDiscovery);
 
     while (m_mediaServerProcess->getTcpPort() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
