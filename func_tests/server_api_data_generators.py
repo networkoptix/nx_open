@@ -234,8 +234,3 @@ def generate_resource_params_data(id, resource):
 def generate_resource_params_data_list(id, resource, list_size):
     return [generate_resource_params_data(id + i, resource)
             for i in range(list_size)]
-
-
-def generate_remove_resource_data(resource):
-    resource_id = get_resource_id(resource)
-    return dict(id=resource_id)

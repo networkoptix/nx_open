@@ -4,25 +4,34 @@ Measure system synchronization time.
 """
 
 import datetime
+import json
 from collections import namedtuple
 from contextlib import contextmanager
+import itertools
+from functools import partial
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 from netaddr import IPNetwork
 
 import framework.utils as utils
-import resource_synchronization_test as resource_test
-import server_api_data_generators as generator
-import transaction_log
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
 from framework.message_bus import message_bus_running
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
-from framework.utils import GrowingSleep, with_traceback
+from framework.utils import (
+    GrowingSleep,
+    make_threaded_async_calls,
+    MultiFunction,
+    single,
+    take_some,
+    with_traceback,
+    )
 from system_load_metrics import load_host_memory_usage
+import server_api_data_generators as generator
+import transaction_log
 
 pytest_plugins = ['system_load_metrics', 'fixtures.unpacked_mediaservers']
 
@@ -30,6 +39,7 @@ _logger = ContextLogger(__name__)
 
 
 SET_RESOURCE_STATUS_CMD = '202'
+CREATE_DATA_THREAD_NUMBER = 16
 
 
 @pytest.fixture()
@@ -53,82 +63,113 @@ def config(test_config):
 _create_test_data_logger = _logger.getChild('create_test_data')
 
 
-def create_resources_on_server_by_size(server, api_method, resource_generators, size):
-    sequence = [(server, i) for i in range(size)]
-    return create_resources_on_server(server, api_method, resource_generators, sequence)
-
-
-def create_resources_on_server(server, api_method, resource_generators, sequence):
-    data_generator = resource_generators[api_method]
-    sequence = sequence
-    resources = []
-    start_time = utils.datetime_utc_now()
-    req_duration = datetime.timedelta(0)
-    for v in sequence:
-        _, val = v
-        resource_data = data_generator.get(server, val)
-        req_start_time = utils.datetime_utc_now()
-        server.api.generic.post('ec2/' + api_method, resource_data)
-        req_duration += utils.datetime_utc_now() - req_start_time
-        resources.append((server, resource_data))
-    duration = utils.datetime_utc_now() - start_time
-    requests = len(sequence)
-    _create_test_data_logger.info('%s ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
-        server, api_method, requests, duration, req_duration, duration / requests, req_duration / requests))
-    return resources
-
-
 def get_server_admin(server):
     admins = [(server, u) for u in server.api.generic.get('ec2/getUsers') if u['isAdmin']]
     assert admins
     return admins[0]
 
 
-@with_traceback
-@context_logger(_create_test_data_logger, 'framework.http_api')
-@context_logger(_create_test_data_logger, 'framework.mediaserver_api')
-def create_test_data_on_server(server_tuple):
-    config, server, index = server_tuple
-    _logger.info('Create test data on server %s:', server)
-    resource_generators = dict(
-        saveCamera=resource_test.SeedResourceWithParentGenerator(
-            generator.generate_camera_data,
-            index * config.CAMERAS_PER_SERVER),
-        saveCameraUserAttributes=resource_test.ResourceGenerator(
-            generator.generate_camera_user_attributes_data),
-        setResourceParams=resource_test.SeedResourceList(
-            generator.generate_resource_params_data_list,
-            config.PROPERTIES_PER_CAMERA),
-        saveUser=resource_test.SeedResourceGenerator(
-            generator.generate_user_data,
-            index * config.USERS_PER_SERVER),
-        saveStorage=resource_test.SeedResourceWithParentGenerator(
-            generator.generate_storage_data,
-            index * config.STORAGES_PER_SERVER),
-        saveLayout=resource_test.LayoutGenerator(
-            index * (config.USERS_PER_SERVER + 1)))
-    servers_with_guids = [(server, server.api.get_server_id())]
-    users = create_resources_on_server_by_size(
-        server, 'saveUser', resource_generators, config.USERS_PER_SERVER)
-    users.append(get_server_admin(server))
-    cameras = create_resources_on_server(
-        server, 'saveCamera', resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
-    create_resources_on_server(
-        server, 'saveStorage', resource_generators, servers_with_guids * config.STORAGES_PER_SERVER)
-    layout_items_generator = resource_generators['saveLayout'].items_generator
-    layout_items_generator.set_resources(cameras)
-    create_resources_on_server(server, 'saveLayout', resource_generators, users)
-    create_resources_on_server(server, 'saveCameraUserAttributes', resource_generators, cameras)
-    create_resources_on_server(server, 'setResourceParams', resource_generators, cameras)
-    _logger.info('Create test data on server %s: complete.', server)
+make_async_calls = partial(make_threaded_async_calls, CREATE_DATA_THREAD_NUMBER)
 
 
-def create_test_data(config, servers):
-    server_tuples = [(config, server, i) for i, server in enumerate(servers)]
-    pool = ThreadPool(len(servers))
-    pool.map(create_test_data_on_server, server_tuples)
-    pool.close()
-    pool.join()
+MAX_LAYOUT_ITEMS = 10
+
+
+def offset_range(server_idx, count):
+    for idx in range(count):
+        yield (server_idx * count) + idx
+
+
+def offset_enumerate(server_idx, item_list):
+    for idx, item in enumerate(item_list):
+        yield ((server_idx * len(item_list)) + idx, item)
+
+
+def make_server_async_calls(config, layout_item_id_gen, server_idx, server):
+
+    server_id = server.api.get_server_id()
+    admin_user = single(user for user
+                          in server.api.generic.get('ec2/getUsers')
+                          if user['isAdmin'])
+    camera_list = [
+        generator.generate_camera_data(camera_id=idx + 1, parentId=server_id)
+        for idx in offset_range(server_idx, config.CAMERAS_PER_SERVER)]
+
+
+    def layout_item_generator(resource_list):
+        for idx in layout_item_id_gen:
+            resource = resource_list[idx % len(resource_list)]
+            yield generator.generate_layout_item(idx + 1, resource['id'])
+
+
+    layout_item_gen = layout_item_generator(resource_list=camera_list)
+
+
+    def make_layout_item_list(layout_idx):
+        # layouts have 0, 1, 2, .. MAX_LAYOUT_ITEMS-1 items count
+        count = layout_idx % MAX_LAYOUT_ITEMS
+        return list(take_some(layout_item_gen, count))
+
+
+    def camera_call_generator():
+        for idx, camera in offset_enumerate(server_idx, camera_list):
+            camera_user = generator.generate_camera_user_attributes_data(camera)
+            camera_param_list = generator.generate_resource_params_data_list(
+                idx + 1, camera, list_size=config.PROPERTIES_PER_CAMERA)
+            yield MultiFunction([
+                partial(server.api.generic.post, 'ec2/saveCamera', camera),
+                partial(server.api.generic.post, 'ec2/saveCameraUserAttributes', camera_user),
+                partial(server.api.generic.post, 'ec2/setResourceParams', camera_param_list),
+                ])
+
+
+    def other_call_generator():
+        for idx in offset_range(server_idx, config.STORAGES_PER_SERVER):
+            storage = generator.generate_storage_data(storage_id=idx + 1, parentId=server_id)
+            yield partial(server.api.generic.post, 'ec2/saveStorage', storage)
+
+        # 1 layout per user + 1 for admin
+        layout_idx_gen = itertools.count(server_idx * (config.USERS_PER_SERVER + 1))
+
+        for idx in offset_range(server_idx, config.USERS_PER_SERVER):
+            user = generator.generate_user_data(user_id=idx + 1)
+            layout_idx = next(layout_idx_gen)
+            user_layout = generator.generate_layout_data(
+                layout_id=layout_idx + 1,
+                parentId=user['id'],
+                items=make_layout_item_list(layout_idx),
+                )
+            yield MultiFunction([
+                partial(server.api.generic.post, 'ec2/saveUser', user),
+                partial(server.api.generic.post, 'ec2/saveLayout', user_layout),
+                ])
+
+        layout_idx = next(layout_idx_gen)
+        admin_layout = generator.generate_layout_data(
+            layout_id=layout_idx + 1,
+            parentId=admin_user['id'],
+            items=make_layout_item_list(layout_idx),
+            )
+        yield partial(server.api.generic.post, 'ec2/saveLayout', admin_layout)
+
+
+    return (camera_call_generator(), other_call_generator())
+
+
+def create_test_data(config, server_list):
+    layout_item_id_gen = itertools.count()  # global for all layout items
+
+    # layout calls depend on all cameras being created, so must be called strictly after them
+    camera_call_list = []
+    other_call_list = []
+    for server_idx, server in enumerate(server_list):
+        camera_calls, other_calls = make_server_async_calls(
+            config, layout_item_id_gen, server_idx, server)
+        camera_call_list += list(camera_calls)
+        other_call_list += list(other_calls)
+
+    make_async_calls(camera_call_list)
+    make_async_calls(other_call_list)
 
 
 # merge  ============================================================================================
@@ -287,6 +328,7 @@ system_settings = dict(
 
 server_config = dict(
     p2pMode=True,
+    serverGuid='8e25e200-0000-0000-0000-{:012d}',
     )
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
@@ -375,7 +417,13 @@ def perform_post_checks(env):
     _logger.info('Perform test post checks: done.')
 
 
-def test_scalability(artifact_factory, metrics_saver, load_averge_collector, config, env):
+def dump_full_info(artifacts_dir, env):
+    server = env.real_server_list[0]
+    full_info = server.api.generic.get('ec2/getFullInfo')
+    with artifacts_dir.joinpath('full-info.json').open('wb') as f:
+        json.dump(full_info, f, indent=2)
+
+def test_scalability(artifact_factory, artifacts_dir, metrics_saver, load_averge_collector, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
@@ -384,6 +432,7 @@ def test_scalability(artifact_factory, metrics_saver, load_averge_collector, con
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
+        dump_full_info(artifacts_dir, env)
     finally:
         perform_post_checks(env)
 
