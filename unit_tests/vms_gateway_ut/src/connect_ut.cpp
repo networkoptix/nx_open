@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr int kTimeoutMsec = 100;
+const constexpr int kTimeoutMsec = 1000;
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -88,8 +88,6 @@ TEST_F(VmsGatewayConnectTest, ConnectionClose)
     clientSocket->close();
     ASSERT_EQ(connectionFinishedFuture.wait_for(std::chrono::milliseconds(kTimeoutMsec)),
         std::future_status::ready);
-    ASSERT_EQ(server.statistics().onlineConnections, 0);
-
     clientSocket.reset();
 
     // Server closes connection.
