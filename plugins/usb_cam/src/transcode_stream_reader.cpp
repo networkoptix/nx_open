@@ -213,9 +213,9 @@ void TranscodeStreamReader::waitForTimeSpan(const std::chrono::milliseconds& tim
 
         if (allTimeStamps.empty() 
             || *allTimeStamps.rbegin() - *allTimeStamps.begin() < timeSpan.count())
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
         else
         {
             return;
@@ -255,7 +255,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     
     /* Audio enabled */
 
-    waitForTimeSpan(kStreamDelay);
+    waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame());
 
     if (interrupted())
         return nullptr;
@@ -322,7 +322,7 @@ int TranscodeStreamReader::initialize()
     }
 
     result = initializeScaledFrame(m_encoder.get());
-    if(result < 0)
+    if (result < 0)
     {
         NX_DEBUG(this) << m_camera->videoStream()->url() + ":" 
             << "scaled frame init error:" << ffmpeg::utils::errorToString(result);
@@ -398,19 +398,17 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     AVCodecContext* context = encoder->codecContext();
 
     context->mb_decision = FF_MB_DECISION_BITS;
-
-    /* don't use global header. the rpi cam doesn't stream properly with global. */
+    /** don't use global header. the rpi cam doesn't stream properly with global. */
     context->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
-
     context->global_quality = context->qmin * FF_QP2LAMBDA;
-
     context->gop_size = m_codecParams.fps;
 }
 
 void TranscodeStreamReader::maybeFlush()
 {
     float fps = m_camera->videoStream()->actualFps();
-    if (fps == 0) // should never happen
+    /** Should never happen */
+    if (fps == 0)
         fps = 30;
 
     /** theoretically this means over a second of video */

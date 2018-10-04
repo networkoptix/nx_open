@@ -30,8 +30,8 @@ const char * deviceType()
 #endif
 }
 
-int constexpr kRetryLimit = 10;
-std::chrono::milliseconds constexpr kOneSecond = std::chrono::milliseconds(1000);
+static constexpr int kRetryLimit = 10;
+static constexpr int kMsecInSec = 1000;
 
 } // namespace
 
@@ -78,6 +78,11 @@ float VideoStream::fps() const
 float VideoStream::actualFps() const
 {
     return m_actualFps > 0 ? m_actualFps.load() : m_codecParams.fps;
+}
+
+std::chrono::milliseconds VideoStream::actualTimePerFrame() const
+{
+    return std::chrono::milliseconds((int)(1.0f / actualFps() * kMsecInSec));
 }
 
 AVPixelFormat VideoStream::decoderPixelFormat() const
@@ -136,7 +141,7 @@ void VideoStream::updateResolution()
 
 void VideoStream::updateActualFps(uint64_t now)
 {
-    if(now - m_oneSecondAgo <= kOneSecond.count())
+    if(now - m_oneSecondAgo <= kMsecInSec)
     {
         ++m_updatingFps;
     }

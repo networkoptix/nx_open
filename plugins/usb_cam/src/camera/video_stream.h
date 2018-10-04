@@ -37,7 +37,22 @@ public:
     virtual ~VideoStream();
 
     std::string url() const;
+    
+    /**
+     * The target frames per second the video stream was opened with.
+     */
     float fps() const;
+    
+    /**
+     * The number of frames per second the video stream is actually producing, updated every second.
+     * Some camera hardware runs at a lower fps than it actually reports.
+     */
+    float actualFps() const;
+
+    /**
+     * The amount of time it takes to produce a video frame based on actualFps().
+     */
+    std::chrono::milliseconds actualTimePerFrame() const;
     AVPixelFormat decoderPixelFormat() const;
 
     void addPacketConsumer(const std::weak_ptr<PacketConsumer>& consumer);
@@ -48,8 +63,6 @@ public:
     void updateFps();
     void updateBitrate();
     void updateResolution();
-    
-    float actualFps() const;
 
 private:
     enum CameraState

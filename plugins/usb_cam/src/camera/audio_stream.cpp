@@ -485,15 +485,10 @@ void AudioStream::AudioStreamPrivate::run()
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
 {
-    float fps = 0;
-    if (auto cam = m_camera.lock())
-        fps = cam->videoStream()->actualFps();
-
-    /** should never happen */
-    if (fps == 0)
-        fps == kDefaultFps;
-
-    return std::chrono::milliseconds((int)(1.0f / fps * kMsecInSec));
+    if(auto cam = m_camera.lock())
+        return cam->videoStream()->actualTimePerFrame();
+    /** Should never happen */
+    return std::chrono::milliseconds(0);
 }
 
 
