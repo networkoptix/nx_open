@@ -360,8 +360,8 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
                 return;
 
             resource->setTypeId(rt);
-            resource->setName(firstResource->getName());
-            resource->setModel(firstResource->getName());
+            resource->setName(firstResource->getModel());
+            resource->setModel(firstResource->getModel());
             resource->setMAC(firstResource->getMAC());
             resource->setDefaultGroupName(physicalId);
             resource->setGroupId(physicalId);
