@@ -158,5 +158,5 @@ Check Last Name Outline
     Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
-Check Terms and Conditions
+Check Terms and Conditions Error
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS ERROR}
