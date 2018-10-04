@@ -92,6 +92,11 @@ void Server::loadSslCertificate()
         nx::network::ssl::Engine::loadCertificateFromFile(
             m_settings.https().certificatePath.c_str());
     }
+    else
+    {
+        nx::network::ssl::Engine::useCertificateAndPkey(
+            nx::network::ssl::Engine::makeCertificateAndKey("nxcloud/mediator", "US", "Nx"));
+    }
 }
 
 bool Server::launchHttpServerIfNeeded(

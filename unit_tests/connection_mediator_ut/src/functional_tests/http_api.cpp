@@ -17,17 +17,7 @@ class Https:
 protected:
     virtual void SetUp() override
     {
-        const auto certificateFilePath =
-            lm("%1/%2").args(testDataDir(), "mediator.cert").toStdString();
-
-        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
-            certificateFilePath.c_str(),
-            "mediator/https test", "US", "Nx"));
-
         addArg("--https/listenOn=127.0.0.1:0");
-        
-        addArg("-https/certificatePath");
-        addArg(certificateFilePath.c_str());
 
         ASSERT_TRUE(startAndWaitUntilStarted());
     }
