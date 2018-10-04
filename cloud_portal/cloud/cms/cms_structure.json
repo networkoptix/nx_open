@@ -380,7 +380,7 @@
         "translatable": false,
         "values": [
           {
-            "name": "integrationName",
+            "name": "name",
             "label": "Integration name",
             "value": "",
             "description": "",
@@ -475,7 +475,7 @@
         "translatable": false,
         "values": [
           {
-            "name": "functionalityOverview",
+            "name": "description",
             "label": "Full functionality overview",
             "value": "",
             "description": "A description about what the integration does.",
@@ -495,7 +495,7 @@
             "type": "html"
           },
           {
-            "name": "installation",
+            "name": "installationInstructions",
             "label": "Installation Instructions",
             "value": "",
             "description": "",
