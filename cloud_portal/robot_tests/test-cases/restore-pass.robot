@@ -133,7 +133,7 @@ displays password masked, shows password and changes eye icon when clicked
     Should Be Equal    '${input type}'    'password'
 
 should not allow to use one restore link twice
-    [tags]    email
+    [tags]    email    C42079
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
