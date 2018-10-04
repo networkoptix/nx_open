@@ -118,6 +118,35 @@ struct EventTile::Private
 
         q->setPalette(pal);
     }
+
+    void setResourceList(const QStringList& list, int andMore)
+    {
+        if (list.empty())
+        {
+            q->ui->resourceListLabel->hide();
+            q->ui->resourceListLabel->setText({});
+        }
+        else
+        {
+            QString text = lm("<b>%1</b>").arg(list.join("<br>"));
+
+            if (andMore > 0)
+            {
+                static constexpr int kQssFontWeightMultiplier = 8;
+
+                text += lm("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
+                    .args(
+                        q->palette().color(QPalette::WindowText).name(),
+                        kAndMoreFontPixelSize,
+                        kAndMoreFontWeight * kQssFontWeightMultiplier,
+                        kAndMoreTopMargin,
+                        tr("...and %n more", "", andMore));
+            }
+
+            q->ui->resourceListLabel->setText(text);
+            q->ui->resourceListLabel->show();
+        }
+    }
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -313,37 +342,13 @@ void EventTile::setResourceList(const QnResourceList& list)
     for (int i = 0; i < std::min(list.size(), kMaximumResourceListSize); ++i)
         items.push_back(list[i]->getName());
 
-    setResourceList(items);
+    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
 void EventTile::setResourceList(const QStringList& list)
 {
-    if (list.empty())
-    {
-        ui->resourceListLabel->hide();
-        ui->resourceListLabel->setText({});
-    }
-    else
-    {
-        QString text = lm("<b>%1</b>").arg(list.join("<br>"));
-
-        const int numExtra = list.size() - kMaximumResourceListSize;
-        if (numExtra > 0)
-        {
-            static constexpr int kQssFontWeightMultiplier = 8;
-
-            text += lm("<p style='color: %1; font-size: %2px; font-weight: %3; margin-top: %4'>%5</p>")
-                .args(
-                    palette().color(QPalette::WindowText).name(),
-                    kAndMoreFontPixelSize,
-                    kAndMoreFontWeight * kQssFontWeightMultiplier,
-                    kAndMoreTopMargin,
-                    tr("...and %n more", "", numExtra));
-        }
-
-        ui->resourceListLabel->setText(text);
-        ui->resourceListLabel->show();
-    }
+    QStringList items = list.mid(0, kMaximumResourceListSize);
+    d->setResourceList(items, qMax(list.size() - kMaximumResourceListSize, 0));
 }
 
 QString EventTile::footerText() const
