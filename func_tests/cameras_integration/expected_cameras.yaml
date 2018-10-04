@@ -559,7 +559,7 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
 
   # FIXME: There is a bug: no matter which FPS you set for recording, it's always 30.
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[[13, 17], [8, 12]]]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
   video_parameters:
@@ -597,7 +597,7 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[[13, 17], [8, 12]]]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
 
   video_parameters:
@@ -627,7 +627,7 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[[13, 17], [8, 12]]]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?
