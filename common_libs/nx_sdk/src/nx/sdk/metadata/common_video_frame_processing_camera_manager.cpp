@@ -75,7 +75,16 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
 
     if (!dataPacket)
     {
-        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: dataPacket is null.";
+        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: dataPacket is null; "
+            << "discarding the packet.";
+        return Error::unknownError;
+    }
+
+    if (dataPacket->timestampUsec() < 0)
+    {
+        NX_PRINT << __func__ << "() END -> unknownError: INTERNAL ERROR: "
+            << "dataPacket has invalid timestamp " << dataPacket->timestampUsec()
+            << "; discarding the packet.";
         return Error::unknownError;
     }
 
@@ -84,7 +93,7 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
         {
-            NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed";
+            NX_OUTPUT << __func__ << "() END -> unknownError: pushCompressedVideoFrame() failed.";
             return Error::unknownError;
         }
     }
@@ -93,32 +102,32 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
         {
-            NX_PRINT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed";
+            NX_PRINT << __func__ << "() END -> unknownError: pushUncompressedVideoFrame() failed.";
             return Error::unknownError;
         }
     }
     else
     {
-        NX_OUTPUT << __func__ << "() END -> noError: Unsupported frame supplied; ignored";
+        NX_OUTPUT << __func__ << "() END -> noError: Unsupported frame supplied; ignored.";
         return Error::noError;
     }
 
     std::vector<MetadataPacket*> metadataPackets;
     if (!pullMetadataPackets(&metadataPackets))
     {
-        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed";
+        NX_PRINT << __func__ << "() END -> unknownError: pullMetadataPackets() failed.";
         return Error::unknownError;
     }
 
     if (!metadataPackets.empty())
     {
         NX_OUTPUT << __func__ << "() Producing " << metadataPackets.size()
-            << " metadata packet(s)";
+            << " metadata packet(s).";
     }
 
     if (!m_handler)
     {
-        NX_PRINT << __func__ << "() END -> unknownError: setHandler() was not called";
+        NX_PRINT << __func__ << "() END -> unknownError: setHandler() was not called.";
         return Error::unknownError;
     }
 
@@ -126,12 +135,15 @@ Error CommonVideoFrameProcessingCameraManager::pushDataPacket(DataPacket* dataPa
     {
         if (metadataPacket)
         {
+            NX_KIT_ASSERT(metadataPacket->timestampUsec() >= 0);
+            if (metadataPacket->timestampUsec() == 0)
+                NX_OUTPUT << __func__ << "(): WARNING: Metadata packet has timestamp 0.";
             m_handler->handleMetadata(Error::noError, metadataPacket);
             metadataPacket->releaseRef();
         }
         else
         {
-            NX_OUTPUT << __func__ << "(): Null metadata packet found; ignored";
+            NX_OUTPUT << __func__ << "(): WARNING: Null metadata packet found; discarded.";
         }
     }
 
@@ -188,12 +200,12 @@ void CommonVideoFrameProcessingCameraManager::pushMetadataPacket(
 
     if (!m_handler)
     {
-        NX_PRINT << __func__
-            << "(): INTERNAL ERROR: setHandler() was not called; ignoring the packet";
+        NX_PRINT << __func__ << "(): "
+            << "INTERNAL ERROR: setHandler() was not called; ignoring the packet";
     }
     else
     {
-    m_handler->handleMetadata(Error::noError, metadataPacket);
+        m_handler->handleMetadata(Error::noError, metadataPacket);
     }
 
     metadataPacket->releaseRef();

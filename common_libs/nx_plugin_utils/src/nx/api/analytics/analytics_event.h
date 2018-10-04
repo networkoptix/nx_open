@@ -7,13 +7,13 @@
 namespace nx {
 namespace api {
 
-struct /*NX_PLUGIN_UTILS_API*/ Analytics
+struct NX_PLUGIN_UTILS_API Analytics
 {
     Q_GADGET
     Q_ENUMS(EventTypeFlag)
     Q_FLAGS(EventTypeFlags)
 
-  public:
+public:
     enum EventTypeFlag
     {
         noFlags = 0,
@@ -60,7 +60,7 @@ struct /*NX_PLUGIN_UTILS_API*/ Analytics
 Q_DECLARE_OPERATORS_FOR_FLAGS(Analytics::EventTypeFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Analytics::EventTypeFlag)
 
-bool /*NX_PLUGIN_UTILS_API*/ operator==(
+bool NX_PLUGIN_UTILS_API operator==(
     const Analytics::EventType& lh, const Analytics::EventType& rh);
 
 QN_FUSION_DECLARE_FUNCTIONS(Analytics::EventType, (json))

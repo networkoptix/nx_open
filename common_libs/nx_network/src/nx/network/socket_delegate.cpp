@@ -21,9 +21,9 @@ void StreamServerSocketDelegate::pleaseStop(nx::utils::MoveOnlyFunc<void()> hand
     m_target->pleaseStop(std::move(handler));
 }
 
-void StreamServerSocketDelegate::pleaseStopSync(bool assertIfCalledUnderLock)
+void StreamServerSocketDelegate::pleaseStopSync()
 {
-    m_target->pleaseStopSync(assertIfCalledUnderLock);
+    m_target->pleaseStopSync();
 }
 
 bool StreamServerSocketDelegate::listen(int backlog)

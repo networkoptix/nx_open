@@ -150,7 +150,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     const auto rwSettingsPath = arguments->rwConfigFilePath;
 
     Q_INIT_RESOURCE(mediaserver_core);
-    Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(mediaserver_db);
     nx::mediaserver::MetaTypes::initialize();
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
@@ -316,6 +316,8 @@ void QnMediaServerModule::stop()
     m_videoCameraPool->stop();
     m_serverConnector->stop();
     m_statusWatcher->stop();
+
+    m_upnpDeviceSearcher->pleaseStop();
 
     resourceDiscoveryManager()->stop();
 }

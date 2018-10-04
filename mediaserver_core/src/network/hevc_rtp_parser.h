@@ -12,7 +12,6 @@ namespace rtp {
 
 struct HevcContext
 {
-    int frequency = 90000;
     int rtpChannel = 0;
     int spropMaxDonDiff = 0;
     boost::optional<nx::Buffer> spropVps = boost::none;
@@ -40,6 +39,7 @@ class HevcParser: public QnRtpVideoStreamParser
     };
 
 public:
+    HevcParser();
 
     // Implementation of QnRtpStreamParser::processData
     virtual bool processData(

@@ -15,8 +15,7 @@ namespace nx::cloud::relay::test {
 template<typename RelayMethodTypeSet>
 class RelayMethodAcceptance:
     public ::testing::Test,
-    public BasicComponentTest,
-    public network::http::StreamConnectionHolder
+    public BasicComponentTest
 {
     using ClientSideApiClient = typename RelayMethodTypeSet::ClientSideApiClient;
     using ServerSideApiClient = typename RelayMethodTypeSet::ServerSideApiClient;
@@ -65,13 +64,6 @@ protected:
 
         m_serverSideApiClient = std::make_unique<ServerSideApiClient>(
             relay().basicUrl(), nullptr);
-    }
-
-    virtual void closeConnection(
-        SystemError::ErrorCode /*closeReason*/,
-        network::http::AsyncMessagePipeline* /*connection*/) override
-    {
-        // TODO
     }
 
     //---------------------------------------------------------------------------------------------
@@ -149,7 +141,6 @@ protected:
     void thenOpenTunnelNotificationIsSentThroughServerConnection()
     {
         auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
-            this,
             std::exchange(m_prevServerTunnelResult.connection, nullptr));
 
         std::promise<std::tuple<

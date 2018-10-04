@@ -243,12 +243,12 @@ void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-void MultipleServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void MultipleServerSocket::pleaseStopSync()
 {
     if (m_timer.isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 Pollable* MultipleServerSocket::pollable()
@@ -314,7 +314,7 @@ void MultipleServerSocket::stopWhileInAioThread()
     m_aggregateAcceptor.pleaseStopSync();
 
     NX_ASSERT(m_timer.isInSelfAioThread());
-    m_timer.pleaseStopSync(false);
+    m_timer.pleaseStopSync();
 }
 
 } // namespace network

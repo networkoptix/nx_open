@@ -349,7 +349,7 @@ void CloudStreamSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-void CloudStreamSocket::pleaseStopSync(bool /*checkForLocks*/)
+void CloudStreamSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {

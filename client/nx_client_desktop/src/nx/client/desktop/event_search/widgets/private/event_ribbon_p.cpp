@@ -73,15 +73,10 @@ EventRibbon::Private::Private(EventRibbon* q):
     setScrollBarRelevant(false);
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
-
-    auto scrollBarAnchor = new WidgetAnchor(m_scrollBar);
-    scrollBarAnchor->setEdges(Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
-
-    auto viewportAnchor = new WidgetAnchor(m_viewport);
-    viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
+    anchorWidgetToParent(m_scrollBar, Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
     const int mainPadding = q->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-    viewportAnchor->setMargins(mainPadding, 0, mainPadding * 2, 0);
+    anchorWidgetToParent(m_viewport, {mainPadding, 0, mainPadding * 2, 0});
 
     installEventHandler(m_viewport,
         {QEvent::Show, QEvent::Hide, QEvent::Resize, QEvent::LayoutRequest},
@@ -880,7 +875,7 @@ void EventRibbon::Private::highlightAppearance(EventTile* tile)
     animation->setEasingCurve(QEasingCurve::InCubic);
 
     auto curtain = new CustomPainted<QWidget>(tile);
-    new WidgetAnchor(curtain);
+    anchorWidgetToParent(curtain);
 
     curtain->setCustomPaintFunction(
         [animation, curtain, guard = QPointer<QVariantAnimation>(animation)]

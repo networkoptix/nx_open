@@ -928,8 +928,10 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     QnJsonRestResult* error)
 {
     Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
-    if (camResource)
-        mediaStreamEvent = camResource->checkForErrors();
+    std::multimap<QString, QString>::const_iterator startDatetimeIter =
+        requestParams.find(QLatin1String(StreamingParams::START_POS_PARAM_NAME));
+    if (camResource && startDatetimeIter == requestParams.end())
+        mediaStreamEvent = camResource->checkForErrors(); //< Check errors for LIVE only.
     if (mediaStreamEvent)
     {
         error->errorString = toString(mediaStreamEvent);

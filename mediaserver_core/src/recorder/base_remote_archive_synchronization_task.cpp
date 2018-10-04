@@ -8,6 +8,7 @@
 #include <nx/utils/log/assert.h>
 
 #include <utils/common/synctime.h>
+#include <core/resource/security_cam_resource.h>
 
 #include <nx/mediaserver/event/event_connector.h>
 

@@ -237,7 +237,7 @@ void AsyncClient::closeConnection(
 
     if (baseConnection)
     {
-        baseConnection->pleaseStopSync(false);
+        baseConnection->pleaseStopSync();
 
         // Reporting "connection closed" only if there was a connection to close.
         if (m_onConnectionClosedHandler)
@@ -421,8 +421,13 @@ void AsyncClient::initializeMessagePipeline(
     NX_ASSERT(!m_baseConnection);
     NX_INFO(this, lm("Connected to %1").arg(*m_endpoint));
 
-    m_baseConnection = std::make_unique<BaseConnectionType>(
-        this, std::move(connection));
+    m_baseConnection = std::make_unique<BaseConnectionType>(std::move(connection));
+    m_baseConnection->setOnConnectionClosed(
+        [this, connection = m_baseConnection.get()](
+            auto closeReason)
+        {
+            closeConnection(closeReason, connection);
+        });
     m_baseConnection->bindToAioThread(getAioThread());
     m_baseConnection->setMessageHandler(
         [this](Message message) { processMessage(std::move(message)); });

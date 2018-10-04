@@ -51,32 +51,6 @@ int ServerUpdatesModel::rowCount(const QModelIndex& parent) const
     return m_items.size();
 }
 
-QSet<QnUuid> ServerUpdatesModel::getAllServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_items)
-    {
-        if (!item->server)
-            continue;
-        result.insert(item->server->getId());
-    }
-    return result;
-}
-
-QSet<QnUuid> ServerUpdatesModel::getServersInState(StatusCode state) const
-{
-    QSet<QnUuid> result;
-    for (const auto& item: m_items)
-    {
-        if (!item->server)
-            continue;
-        if (item->state == state)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
-
 void ServerUpdatesModel::clearState()
 {
     for (auto& item: m_items)
@@ -97,33 +71,6 @@ UpdateItemPtr ServerUpdatesModel::findItemById(QnUuid id)
     return nullptr;
 }
 
-// Get servers that are offline right now
-QSet<QnUuid> ServerUpdatesModel::getOfflineServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_items)
-    {
-        if (!item->server)
-            continue;
-        if (item->offline)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-// Get servers that are incompatible with new update system
-QSet<QnUuid> ServerUpdatesModel::getLegacyServers() const
-{
-    QSet<QnUuid> result;
-    for (const auto& item : m_items)
-    {
-        if (!item->server)
-            continue;
-        if (item->onlyLegacyUpdate)
-            result.insert(item->server->getId());
-    }
-    return result;
-}
-
 UpdateItemPtr ServerUpdatesModel::findItemByRow(int row) const
 {
     if (row < 0 || row >= m_items.size())
@@ -140,6 +87,8 @@ void ServerUpdatesModel::setUpdateStatus(const std::map<QnUuid, nx::update::Stat
             item->progress = status.second.progress;
             item->statusMessage = status.second.message;
             item->state = status.second.code;
+            item->offline = (status.second.code == StatusCode::offline);
+
             QModelIndex idx = index(item->row, 0);
             emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
         }
@@ -192,20 +141,11 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                 return m_versionColors.latest;
             else
                 return m_versionColors.target;
-
-            //if (m_updatePlatforms.contains(item->server->getSystemInfo()))
-            //    return m_versionColors.target;
-
-            //if (m_updateTargets.contains(item->server->getId()))
-            //    return m_versionColors.target;
-            // TODO: This color is for the servers that can not be updated.
             return m_versionColors.error;
         }
-        else if (column == NameColumn)
+        else if (column == NameColumn && item->offline)
         {
-            if (item->offline)
-                return qApp->palette().color(QPalette::Button);
-                //return m_versionColors.error;
+            return qApp->palette().color(QPalette::Button);
         }
     }
 
@@ -218,9 +158,9 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
                 case NameColumn:
                     return QnResourceDisplayInfo(item->server).toString(qnSettings->extraInfoInTree());
                 case VersionColumn:
+                    if (item->offline)
+                        return QString("–");
                     return item->server->getVersion().toString(nx::utils::SoftwareVersion::FullFormat);
-                //case ProgressColumn:
-                //    return item->progress;
                 case StatusMessageColumn:
                     return item->statusMessage;
                 default:
@@ -401,13 +341,6 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
     QModelIndex idx = createIndex(item.row, 0);
 
     auto status = server->getStatus();
-    bool offline = status == Qn::ResourceStatus::Offline;
-    if (offline != item.offline)
-    {
-        item.offline = offline;
-        changed = true;
-    }
-
     // TODO: Right now 'Incompatible' means we should use legacy update system to deal with them
     bool incompatible = status == Qn::ResourceStatus::Incompatible;
     if (incompatible != item.onlyLegacyUpdate)
@@ -425,9 +358,6 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
         changed = true;
     }
 
-    bool isOurServer = !server->hasFlags(Qn::fake_server)
-        || helpers::serverBelongsToCurrentSystem(server);
-
     if (changed)
     {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
@@ -443,6 +373,11 @@ void ServerUpdatesModel::at_resourceChanged(const QnResourcePtr& resource)
 
     if (auto item = findItemById(server->getId()))
         updateServerData(server, *item);
+}
+
+const QList<UpdateItemPtr>& ServerUpdatesModel::getServerData() const
+{
+    return m_items;
 }
 
 nx::utils::SoftwareVersion ServerUpdatesModel::latestVersion() const

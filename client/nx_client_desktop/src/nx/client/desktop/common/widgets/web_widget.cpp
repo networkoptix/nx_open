@@ -18,20 +18,20 @@ WebWidget::WebWidget(QWidget* parent):
     m_webView(new QWebView(this))
 {
     NxUi::setupWebViewStyle(m_webView);
-    new WidgetAnchor(m_webView);
+    anchorWidgetToParent(m_webView);
 
     static constexpr int kDotRadius = 8;
     auto busyIndicator = new BusyIndicatorWidget(parent);
     busyIndicator->setHidden(true);
     busyIndicator->dots()->setDotRadius(kDotRadius);
     busyIndicator->dots()->setDotSpacing(kDotRadius * 2);
-    new WidgetAnchor(busyIndicator);
+    anchorWidgetToParent(busyIndicator);
 
     auto errorLabel = new QLabel(parent);
     errorLabel->setText(lit("<h1>%1</h1>").arg(tr("Failed to load page")));
     errorLabel->setAlignment(Qt::AlignCenter);
     errorLabel->setForegroundRole(QPalette::WindowText);
-    new WidgetAnchor(errorLabel);
+    anchorWidgetToParent(errorLabel);
 
     connect(m_webView, &QWebView::loadStarted, busyIndicator, &QWidget::show);
     connect(m_webView, &QWebView::loadFinished, busyIndicator, &QWidget::hide);

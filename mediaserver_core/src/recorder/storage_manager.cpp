@@ -2315,7 +2315,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
             totalNonSystemStoragesSpace += (*it)->getTotalSpace();
         else
         {
-            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::systemTooSmall);
+            (*it)->setStatusFlag((*it)->statusFlag() & ~Qn::StorageStatus::tooSmall);
             systemStorageItVec.push_back(it);
             systemStorageSpace += (*it)->getTotalSpace();
         }
@@ -2330,8 +2330,8 @@ QSet<QnStorageResourcePtr> QnStorageManager::getAllWritableStorages(
                 lm("[ApiStorageSpace, Writable storages] Removing system storage %1 out of candidates")
                     .args((*it)->getUrl()));
 
+            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::tooSmall);
             result.remove(*it);
-            (*it)->setStatusFlag((*it)->statusFlag() | Qn::StorageStatus::systemTooSmall);
         }
     }
 
@@ -3033,7 +3033,7 @@ Qn::StorageStatuses QnStorageManager::storageStatus(
 {
     Qn::StorageStatuses result =
         serverModule->normalStorageManager()->storageStatusInternal(storage);
-    if (result.testFlag(Qn::notUsed))
+    if (result.testFlag(Qn::none))
         result = serverModule->backupStorageManager()->storageStatusInternal(storage);
 
     return result;
@@ -3050,14 +3050,19 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         storageScanData = m_archiveRebuildInfo;
     }
 
-    Qn::StorageStatuses result;
-    if (!allStorages.contains(storage))
-    {
-        result = Qn::StorageStatus::notUsed;
-        return result;
-    }
+    Qn::StorageStatuses result = Qn::StorageStatus::none;
+    auto partitionType =
+        QnLexical::deserialized<QnPlatformMonitor::PartitionType>(storage->getStorageType());
+    if (partitionType == QnPlatformMonitor::RemovableDiskPartition)
+        result |= Qn::StorageStatus::removable;
 
-    result = Qn::StorageStatus::used;
+    if (storage->isSystem())
+        result |= Qn::StorageStatus::system;
+
+    if (!allStorages.contains(storage))
+        return result;
+
+    result |= Qn::StorageStatus::used;
     if (storage->getStatus() == Qn::Offline)
         return result | Qn::StorageStatus::beingChecked;
 
@@ -3066,3 +3071,4 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
 
     return result | storage->statusFlag();
 }
+

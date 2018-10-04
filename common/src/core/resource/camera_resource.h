@@ -35,7 +35,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    virtual QStringList searchFilters() const override;
+    virtual QStringList searchFilters(bool useExtraSearchInformation) const override;
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;

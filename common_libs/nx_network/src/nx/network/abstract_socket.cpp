@@ -81,12 +81,12 @@ void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> han
     post(
         [this, handler = std::move(handler)]()
         {
-            pleaseStopSync(false);
+            pleaseStopSync();
             handler();
         });
 }
 
-void AbstractCommunicatingSocket::pleaseStopSync(bool /*checkForLocks*/)
+void AbstractCommunicatingSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
     {

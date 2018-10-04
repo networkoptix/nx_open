@@ -546,7 +546,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             if (m_liveMaxLenReached && vd->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
                 m_liveBufferSize = qMin(maximumLiveBufferMkSecs(), m_liveBufferSize * 1.2);
             m_liveMaxLenReached = false;
-            //qDebug() << "zerro queueLen. set queue to=" << m_liveBufferSize;
+            NX_VERBOSE(this, lm("Increase live buffer size to %1 ms because of empty input buffer").arg(int(m_liveBufferSize * 1000)));
             m_delay.afterdelay();
             m_delay.addQuant(m_liveBufferSize /2); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
@@ -554,14 +554,14 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         else if (queueLen > m_forcedVideoBufferLength.count() + m_liveBufferSize)
         {
             m_liveMaxLenReached = true;
-            //if (!m_realTimeHurryUp)
-            //    qDebug() << "full queueLen. do fast play";
+            if (!m_realTimeHurryUp)
+                NX_VERBOSE(this, lm("Video queue overflow. Turn on no-delay mode"));
             m_realTimeHurryUp = true;
         }
         else if (m_realTimeHurryUp
             && queueLen <= m_forcedVideoBufferLength.count() + m_liveBufferSize / 2)
         {
-            //qDebug() << "half queueLen again. remove fast play";
+            NX_VERBOSE(this, lm("Half video buffer again. Turn of no-delay mode"));
             m_realTimeHurryUp = false;
             m_delay.afterdelay();
             m_delay.addQuant(-needToSleep);

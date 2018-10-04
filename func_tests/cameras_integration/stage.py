@@ -1,11 +1,13 @@
 import logging
 import timeit
-from datetime import timedelta
+from datetime import datetime, timedelta
 
+import pytz
 from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
 from framework.installation.mediaserver import Mediaserver
+from framework.mediaserver_api import MediaserverApiError, MediaserverApiRequestError
 from .checks import Failure, Halt, Result, Success
 
 _logger = logging.getLogger(__name__)
@@ -19,7 +21,17 @@ class Run(object):
         self.server = server
         self.id = camera_id
         self.data = None  # type: dict
-        self.media_url = server.api.generic.http.media_url(camera_id)
+
+    def media_url(self, profile='primary', position=None):
+        url = self.server.api.generic.http.media_url(self.id)
+        url += '?stream=' + {'primary': '0', 'secondary': '1'}[profile]
+        if position:
+            epoch = pytz.utc.localize(datetime.utcfromtimestamp(0))
+            time_since_epoch = position - epoch
+            url += '&pos=' + str(int(time_since_epoch.total_seconds() * 1000))
+
+        _logger.debug('Media URL: {}'.format(url))
+        return url
 
     def update_data(self):
         self.data = self.server.api.get_resource('CamerasEx', self.id)
@@ -54,8 +66,8 @@ class Stage(object):
             try:
                 run.update_data()
 
-            except AssertionError:
-                yield Failure('Unable to update camera data')
+            except (MediaserverApiError, MediaserverApiRequestError) as e:
+                yield Failure(str(e))
 
             else:
                 yield actions.next()
@@ -71,6 +83,7 @@ class Executor(object):
         self._rules = rules
         self._timeout = min(self.stage.timeout, hard_timeout) if hard_timeout else self.stage.timeout
         self._result = None  # type: Optional[Result]
+        self._start_time = None
         self._duration = None
 
     def steps(self, server):  # type: (Mediaserver) -> Generator[None]
@@ -78,13 +91,14 @@ class Executor(object):
             StopIteration means the stage execution is finished, see is_successful.
         """
         steps = self.stage.steps(server, self.camera_id, self._rules)
-        start_time = timeit.default_timer()
         self._result = Halt('Stage is not finished')
+        self._start_time = datetime.now()
+        start_time = timeit.default_timer()
         _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
         while not self._execute_next_step(steps, start_time):
             _logger.debug(
                 'Stage "%s" for %s after %s status %s',
-                self.stage.name, self.camera_id, self._duration, self._result.report)
+                self.stage.name, self.camera_id, self._duration, self._result.details)
 
             if self._duration > self._timeout:
                 _logger.info(
@@ -96,25 +110,21 @@ class Executor(object):
 
         steps.close()
         _logger.info(
-            'Stage "%s" is finished in %s: %s',
-            self.stage.name, self._duration, self.report)
+            'Stage "%s" for %s is finished in %s: %s',
+            self.stage.name, self.camera_id, self._duration, self._result)
 
     @property
     def is_successful(self):
         return isinstance(self._result, Success)
 
     @property
-    def report(self):  # types: () -> dict
-        """:returns Current stage execution state, represented as serializable dictionary.
+    def details(self):  # types: () -> dict
+        """:returns Current stage execution state.
         """
         if not self._result:
             return {}
 
-        data = self._result.report
-        if self._duration:
-            data['duration'] = str(self._duration)
-
-        return data
+        return dict(start_time=self._start_time, duration=self._duration, **self._result.details)
 
     def _execute_next_step(self, stage_steps, start_time
                            ):  # type: (Generator[Result], float) -> bool

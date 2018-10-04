@@ -30,6 +30,7 @@ namespace client {
 namespace desktop {
 
 class ServerUpdatesModel;
+class ServerStatusItemDelegate;
 
 struct UpdateItem;
 
@@ -62,8 +63,6 @@ public:
     virtual bool canDiscardChanges() const override;
 
     bool cancelUpdatesCheck();
-    bool canCancelUpdate() const;
-    bool isUpdating() const;
     bool isChecking() const;
 
     //void at_updateFinished(const QnUpdateResult& result);
@@ -86,43 +85,30 @@ protected:
     void pickSpecificBuild();
 
 private:
-
     using UpdateCheckMode = ServerUpdateTool::UpdateCheckMode;
-    /*
-    // UI Mode for picking the source of update.
-    enum class UpdateSourceMode
-    {
-        // Latest version from the update server.
-        LatestVersion,
-        // Specific build from the update server.
-        SpecificBuild,
-        // Manual update using local file.
-        LocalFile
-    };*/
 
     enum class WidgetUpdateState
     {
         // We have no information about remote state right now.
-        Initial,
+        initial,
         // We have obtained some state from the servers. We can do some actions now.
         // Next action depends on m_updateSourceMode, and whether the update
         // is available for picked update source.
-        Ready,
+        ready,
         // We have issued a command to remote servers to start downloading the updates.
-        RemoteDownloading,
-        // Download update package locally.
-        LocalDownloading,
+        downloading,
         // Pushing local update package to server(s).
-        Pushing,
+        pushing,
         // Some servers have downloaded update data and ready to install it.
-        ReadyInstall,
+        readyInstall,
         // Some servers are installing an update.
-        Installing,
+        installing,
     };
 
     static QString toString(UpdateCheckMode mode);
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
+    static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
     void setUpdateSourceMode(UpdateCheckMode mode);
 
@@ -153,7 +139,7 @@ private:
     void closePanelNotifications();
 
     // Advances UI FSM towards selected state.
-    void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});
+    void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
@@ -169,12 +155,18 @@ private:
     // Flag shows that we have an update.
     bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
+    bool m_showStorageSettings = false;
+
+    // It will enable additional column for server status
+    // and a label with internal widget states
+    bool m_showDebugData = false;
 
     UpdateCheckMode m_updateSourceMode = UpdateCheckMode::internet;
 
     std::shared_ptr<ServerUpdateTool> m_updatesTool;
-    std::unique_ptr<ServerUpdatesModel> m_updatesModel;
+    std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
+    std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
 
     // ServerUpdateTool promises this.
     std::future<ServerUpdateTool::UpdateContents> m_updateCheck;
@@ -186,8 +178,8 @@ private:
     nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
 
-    WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
-    WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
+    WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::initial;
+    WidgetUpdateState m_updateStateTarget = WidgetUpdateState::initial;
 
     // Selected changeset from 'specific build' mode.
     QString m_targetChangeset;
@@ -201,8 +193,9 @@ private:
 
     // Id of the progress notification at the right panel.
     QnUuid m_rightPanelDownloadProgress;
-    // TODO: We used this sets, when we commanded each server directly. So update state could diverge.
-    // Right now we do not need to track that much
+
+    // TODO: We used this sets when we commanded each server directly. So update state could diverge.
+    // Right now we do not need to track that much.
     // This sets are changed every time we are initiating some update action.
     // Set of servers that are currently active.
     QSet<QnUuid> m_serversActive;

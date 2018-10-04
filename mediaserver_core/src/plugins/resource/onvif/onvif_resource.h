@@ -341,7 +341,7 @@ protected:
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
-    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual void initAdvancedParametersProvidersUnderLock(QnCameraAdvancedParams &params);
     virtual QSet<QString> calculateSupportedAdvancedParameters() const;
     virtual void fetchAndSetAdvancedParameters();
 
@@ -610,7 +610,7 @@ private:
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
     mutable QnOnvifServiceUrls m_serviceUrls;
-    mutable QnResourceVideoLayoutPtr m_videoLayout;
+    mutable QnConstResourceVideoLayoutPtr m_videoLayout;
 
 protected:
     nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;

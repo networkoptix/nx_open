@@ -33,7 +33,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
         return static_cast<StoragePool>
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
-    static const QByteArray kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
+    static const std::string kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 
 } // namespace QnServer

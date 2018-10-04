@@ -34,7 +34,7 @@ HttpClient::~HttpClient()
 {
     pleaseStop();
     if (m_asyncHttpClient)
-        m_asyncHttpClient->pleaseStopSync(false);
+        m_asyncHttpClient->pleaseStopSync();
 }
 
 int HttpClient::totalRequestsSentViaCurrentConnection() const
@@ -276,11 +276,6 @@ void HttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
     m_expectOnlyBody = expectOnlyBody;
 }
 
-void HttpClient::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
-{
-    m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
-}
-
 const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
 {
     return m_asyncHttpClient->socket();
@@ -353,7 +348,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         // Have to re-establish connection if the previous message has not been read up to the end.
         if (m_asyncHttpClient)
         {
-            m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
+            m_asyncHttpClient->pleaseStopSync();
             m_asyncHttpClient.reset();
         }
         instantiateHttpClient();
@@ -414,7 +409,7 @@ void HttpClient::onResponseReceived()
                     .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
+        m_asyncHttpClient->pleaseStopSync();
     }
     m_cond.wakeAll();
 }
@@ -431,7 +426,7 @@ void HttpClient::onSomeMessageBodyAvailable()
                     .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
-        m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
+        m_asyncHttpClient->pleaseStopSync();
     }
     m_cond.wakeAll();
 }

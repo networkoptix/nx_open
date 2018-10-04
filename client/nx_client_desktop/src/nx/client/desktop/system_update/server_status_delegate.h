@@ -19,21 +19,18 @@ class ServerStatusItemDelegate : public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    explicit ServerStatusItemDelegate(QWidget *parent = 0);
+    explicit ServerStatusItemDelegate(QWidget* parent = 0);
     ~ServerStatusItemDelegate();
 
     QPixmap getCurrentAnimationFrame() const;
     void setStatusVisible(bool value);
-
-signals:
-    // Event is emitted when we click 'retry' or 'cancel'
-    void updateItemCommand(std::shared_ptr<UpdateItem> item) const;
+    bool isStatusVisible() const;
 
 protected:
     class ServerStatusWidget;
 
-    virtual QWidget* createEditor(QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const override;
-    void setEditorData(QWidget* editor, const QModelIndex &index) const override;
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    void setEditorData(QWidget* editor, const QModelIndex& index) const override;
 
 private:
     QScopedPointer<QMovie> m_updateAnimation;

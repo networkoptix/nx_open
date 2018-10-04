@@ -5,6 +5,7 @@
 
 #include <api/model/api_ioport_data.h>
 #include <common/common_globals.h>
+#include <core/ptz/ptz_preset.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/motion_window.h>
 
@@ -13,9 +14,7 @@
 class QnAspectRatio;
 struct QnMediaDewarpingParams;
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 class Rotation;
 struct WearableState;
@@ -71,7 +70,9 @@ public:
     void setUseBitratePerGOP(bool value);
     void setPrimaryRecordingDisabled(bool value);
     void setSecondaryRecordingDisabled(bool value);
-    void setNativePtzPresetsDisabled(bool value);
+    void setPreferredPtzPresetType(nx::core::ptz::PresetType value);
+    void setForcedPtzPanTiltCapability(bool value);
+    void setForcedPtzZoomCapability(bool value);
     void setRtpTransportType(vms::api::RtpTransportType value);
     void setCustomMediaPortUsed(bool value);
     void setTrustCameraTime(bool value);
@@ -92,6 +93,4 @@ private:
     QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

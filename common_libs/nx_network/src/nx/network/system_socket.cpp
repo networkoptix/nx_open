@@ -1482,12 +1482,12 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
         });
 }
 
-void TCPServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+void TCPServerSocket::pleaseStopSync()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
     else
-        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+        QnStoppableAsync::pleaseStopSync();
 }
 
 std::unique_ptr<AbstractStreamSocket> TCPServerSocket::accept()

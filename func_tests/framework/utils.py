@@ -7,6 +7,7 @@ import struct
 import time
 from contextlib import closing
 from datetime import datetime, timedelta
+from multiprocessing.dummy import Pool as ThreadPool
 
 import pytz
 from pylru import lrudecorator
@@ -165,3 +166,42 @@ def with_traceback(fn):
             _logger.exception('Exception in %r:', fn)
             raise
     return wrapper
+
+
+def take_some(iter, count):
+    for i in range(count):
+        yield next(iter)
+
+
+def single(iter):
+    l = list(iter)
+    assert len(l) == 1, 'Only single item is expected'
+    return l[0]
+
+
+def make_threaded_async_calls(thread_number, call_gen):
+    failures = []
+
+    def call(fn):
+        try:
+            fn()
+        except:
+            _logger.exception('Error calling %r:', fn)
+            failures.append(None)
+
+    pool = ThreadPool(thread_number)
+    # convert generator to list to avoid generator-from-thread issues and races
+    pool.map(call, list(call_gen))
+    pool.close()
+    pool.join()
+    assert not failures, 'There was %d errors while generated method calls, check for logs' % len(failures)
+
+
+class MultiFunction(object):
+
+    def __init__(self, fn_list):
+        self._fn_list = fn_list
+
+    def __call__(self):
+        for fn in self._fn_list:
+            fn()

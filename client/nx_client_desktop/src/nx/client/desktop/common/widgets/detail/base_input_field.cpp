@@ -77,6 +77,7 @@ public:
     const BaseInputField::AccessorPtr readOnlyAccessor;
     const BaseInputField::AccessorPtr placeholderAccessor;
     bool externalControls = false;
+    QColor hintColor;
 
 private:
     ValidationResult lastResult;
@@ -142,6 +143,9 @@ void BaseInputFieldPrivate::updateVisualStateDelayed()
 
             if (useWarningStyleForControl)
                 input->setPalette(palette);
+
+            if (hintColor.isValid())
+                setCustomStyle(&palette, hintColor);
 
             hint->setPalette(customHintText.isEmpty() ? palette : defaultPalette);
         };
@@ -465,6 +469,12 @@ void BaseInputField::clear()
 bool BaseInputField::isValid() const
 {
     return calculateValidationResult().state == QValidator::Acceptable;
+}
+
+void BaseInputField::setHintColor(const QColor& color)
+{
+    Q_D(BaseInputField);
+    d->hintColor = color;
 }
 
 QValidator::State BaseInputField::lastValidationResult() const

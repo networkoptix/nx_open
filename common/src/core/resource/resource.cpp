@@ -271,12 +271,12 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-QString QnResource::toSearchString() const
+QString QnResource::toSearchString(bool useExtraSearchInformation) const
 {
-    return searchFilters().join(L' ');
+    return searchFilters(useExtraSearchInformation).join(L' ');
 }
 
-QStringList QnResource::searchFilters() const
+QStringList QnResource::searchFilters(bool /*useExtraSearchInformation*/) const
 {
     return QStringList() << getId().toSimpleString() << getName();
 }
@@ -334,9 +334,7 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if (oldStatus != Qn::NotDefined && newStatus == Qn::Offline)
         commonModule()->metrics()->offlineStatus()++;
 
-#ifdef QN_RESOURCE_DEBUG
-    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
-#endif
+    NX_VERBOSE(this, "Change status. oldValue=%1,  new value=%2, name=%3, id=%4", oldStatus, newStatus, getName(), m_id);
 
     if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized)
     {
@@ -633,11 +631,11 @@ void QnResource::emitModificationSignals(const QSet<QByteArray>& modifiedFields)
 
 bool QnResource::init()
 {
-    if (commonModule()->isNeedToStop())
-        return false;
-
     {
         QnMutexLocker lock(&m_initMutex);
+        if (commonModule() && commonModule()->isNeedToStop())
+            return false;
+
         if (m_initialized)
             return true; /* Nothing to do. */
         if (m_initInProgress)
@@ -690,7 +688,8 @@ void QnResource::reinitAsync()
     setStatus(Qn::Offline);
     QnMutexLocker lock(&m_initAsyncMutex);
     m_lastInitTime = getUsecTimer();
-    resourcePool()->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
+    if (const auto pool = resourcePool())
+        pool->threadPool()->start(new InitAsyncTask(toSharedPointer(this)));
 }
 
 void QnResource::initAsync(bool optional)
@@ -708,10 +707,14 @@ void QnResource::initAsync(bool optional)
     if (hasFlags(Qn::foreigner))
         return; // removed to other server
 
+    auto resourcePool = this->resourcePool();
+    if (!resourcePool)
+        return;
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional)
     {
-        if (resourcePool()->threadPool()->tryStart(task))
+        if (resourcePool->threadPool()->tryStart(task))
             m_lastInitTime = t;
         else
             delete task;
@@ -719,7 +722,7 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        resourcePool()->threadPool()->start(task);
+        resourcePool->threadPool()->start(task);
     }
 }
 

@@ -20,8 +20,7 @@ namespace nx::network::http::tunneling::detail {
 
 template<typename ...ApplicationData>
 class GetPostTunnelServer:
-    public BasicCustomTunnelServer<ApplicationData...>,
-    public network::http::StreamConnectionHolder
+    public BasicCustomTunnelServer<ApplicationData...>
 {
     using base_type = BasicCustomTunnelServer<ApplicationData...>;
 
@@ -46,9 +45,9 @@ private:
     mutable QnMutex m_mutex;
     Tunnels m_tunnelsInProgress;
 
-    virtual void closeConnection(
+    void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
-        network::http::AsyncMessagePipeline* /*connection*/) override;
+        network::http::AsyncMessagePipeline* /*connection*/);
 
     virtual network::http::RequestResult processOpenTunnelRequest(
         const network::http::Request& request,
@@ -177,8 +176,12 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
     using namespace std::placeholders;
 
     auto httpPipe = std::make_unique<network::http::AsyncMessagePipeline>(
-        this,
         connection->takeSocket());
+    httpPipe->setOnConnectionClosed(
+        [this, connection = httpPipe.get()](auto closeReason)
+        {
+            this->closeConnection(closeReason, connection);
+        });
     auto httpPipePtr = httpPipe.get();
 
     QnMutexLocker lock(&m_mutex);

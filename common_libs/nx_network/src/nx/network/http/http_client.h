@@ -108,7 +108,6 @@ public:
 
     void setDisablePrecalculatedAuthorization(bool value);
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
-    void setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
 
@@ -151,7 +150,6 @@ private:
 
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;
-    bool m_ignoreMutexAnalyzer = false;
     std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
     void instantiateHttpClient();

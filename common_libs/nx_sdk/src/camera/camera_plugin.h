@@ -546,6 +546,7 @@ namespace nxcip
             needIFrameDetectionCapability       = 0x4000,      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
             relativeTimestampCapability         = 0x8000,      //!< camera provides relative timestamps. It need to align them to the current time.
             customMediaUrlCapability            = 0x10000,     //!< camera's media streams are editable and can be provided directly via setProperty API call.
+            cameraTimeCapability                = 0x20000,     //!< Camera sends absolute timestamps in media stream
         };
 
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)

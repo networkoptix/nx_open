@@ -213,8 +213,8 @@ nx::sql::DBResult SystemDataObject::fetchSystems(
         WHERE system.owner_account_id = account.id
         )sql";
 
-    QString sqlQueryStr = QString::fromLatin1(kSelectAllSystemsQuery);
-    QString filterStr;
+    std::string sqlQueryStr = kSelectAllSystemsQuery;
+    std::string filterStr;
     if (!filterFields.empty())
     {
         filterStr = nx::sql::joinFields(filterFields, " AND ");
@@ -223,12 +223,12 @@ nx::sql::DBResult SystemDataObject::fetchSystems(
 
     QSqlQuery readSystemsQuery(*queryContext->connection()->qtSqlConnection());
     readSystemsQuery.setForwardOnly(true);
-    readSystemsQuery.prepare(sqlQueryStr);
+    readSystemsQuery.prepare(sqlQueryStr.c_str());
     nx::sql::bindFields(&readSystemsQuery, filterFields);
     if (!readSystemsQuery.exec())
     {
-        NX_WARNING(this, lit("Failed to read system list with filter \"%1\" from DB. %2")
-            .arg(filterStr).arg(readSystemsQuery.lastError().text()));
+        NX_WARNING(this, lm("Failed to read system list with filter \"%1\" from DB. %2")
+            .args(filterStr, readSystemsQuery.lastError().text()));
         return nx::sql::DBResult::ioError;
     }
 
