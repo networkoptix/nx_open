@@ -429,7 +429,7 @@ def test_scalability(artifact_factory, artifacts_dir, metrics_saver, load_averge
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        with load_averge_collector():
+        with load_averge_collector(env.os_access_set):
             wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
