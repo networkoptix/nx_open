@@ -156,6 +156,8 @@ def make_server_async_calls(config, layout_item_id_gen, server_idx, server):
     return (camera_call_generator(), other_call_generator())
 
 
+@context_logger(_create_test_data_logger, 'framework.http_api')
+@context_logger(_create_test_data_logger, 'framework.mediaserver_api')
 def create_test_data(config, server_list):
     layout_item_id_gen = itertools.count()  # global for all layout items
 
