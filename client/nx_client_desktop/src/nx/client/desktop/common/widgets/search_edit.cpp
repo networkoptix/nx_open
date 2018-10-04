@@ -487,18 +487,6 @@ void SearchEdit::focusOutEvent(QFocusEvent* event)
 void SearchEdit::keyPressEvent(QKeyEvent* event)
 {
     d->lineEdit->event(event);
-    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-    {
-        const auto ctrlModifier = nx::utils::AppInfo::isMacOsX()
-            ? Qt::MetaModifier
-            : Qt::ControlModifier;
-        if (event->modifiers().testFlag(ctrlModifier))
-            emit ctrlEnterPressed();
-        else
-            emit enterPressed();
-
-        event->accept();
-    }
 }
 
 void SearchEdit::inputMethodEvent(QInputMethodEvent* event)
@@ -545,8 +533,23 @@ bool SearchEdit::event(QEvent* event)
 
     const auto keyEvent = static_cast<QKeyEvent*>(event);
     const bool result = d->lineEdit->event(event);
-    if (keyEvent->key() == Qt::Key_Escape)
-        keyEvent->accept();
+    const auto key = keyEvent->key();
+    switch(key)
+    {
+        case Qt::Key_Escape:
+            keyEvent->accept();
+            break;
+
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if (!keyEvent->modifiers())
+                emit enterPressed();
+            else if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                emit ctrlEnterPressed();
+            break;
+        default:
+            break;
+    }
 
     return result;
 }
