@@ -58,11 +58,18 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
         [this, updateChunksFilter](const QString& text)
         {
             auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model());
-            NX_ASSERT(analyticsModel);
-            if (!analyticsModel)
-                return;
-
+            NX_CRITICAL(analyticsModel);
             analyticsModel->setFilterText(text);
+            updateChunksFilter();
+            requestFetch();
+        });
+
+    connect(this, &AbstractSearchWidget::selectedAreaChanged,
+        [this, updateChunksFilter](const QRectF& area)
+        {
+            auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model());
+            NX_CRITICAL(analyticsModel);
+            analyticsModel->setFilterRect(area);
             updateChunksFilter();
             requestFetch();
         });

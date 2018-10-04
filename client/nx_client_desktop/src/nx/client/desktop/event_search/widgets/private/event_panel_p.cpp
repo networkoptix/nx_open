@@ -55,7 +55,7 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);
 
-    connect(m_tabs->tabBar(), &QTabBar::tabBarClicked, this,
+    connect(m_tabs->tabBar(), &QTabBar::tabBarDoubleClicked, this,
         [this](int index)
         {
             if (m_tabs->currentIndex() != index || !m_tabs->currentWidget())

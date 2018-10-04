@@ -26,6 +26,7 @@
 #include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
+#include <nx/utils/math/fuzzy.h>
 #include <nx/utils/pending_operation.h>
 
 namespace nx::client::desktop {
@@ -384,11 +385,36 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 
 void AbstractSearchWidget::Private::setupAreaSelection()
 {
-    ui->areaSelectionButton->setSelectable(false);
+    ui->areaSelectionButton->setSelectable(true);
     ui->areaSelectionButton->setDeactivatable(true);
+    ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
     ui->areaSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
 
-    // TODO: #vkutin Implement me!
+    connect(q, &AbstractSearchWidget::cameraSetChanged,
+        ui->areaSelectionButton, &SelectableTextButton::deactivate);
+
+    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this,
+        [this](SelectableTextButton::State state)
+        {
+            if (state == SelectableTextButton::State::selected)
+                ui->areaSelectionButton->setText(tr("Select some area on video"));
+            else if (state == SelectableTextButton::State::unselected)
+                ui->areaSelectionButton->setText(tr("In selected area"));
+            else
+                setSelectedArea({});
+        });
+
+    connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
+        [this](const QRectF& value)
+        {
+            if (value.isValid())
+                ui->areaSelectionButton->setState(SelectableTextButton::State::unselected);
+            else if (ui->areaSelectionButton->state() != SelectableTextButton::State::deactivated)
+                ui->areaSelectionButton->setState(SelectableTextButton::State::selected);
+        });
+
+    // TODO: #vkutin Implement unified area selector on QnMediaResourceWidget
+    // and add bi-directional connection with it here.
 }
 
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
@@ -503,6 +529,15 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     updateCurrentCameras();
 }
 
+void AbstractSearchWidget::Private::setSelectedArea(const QRectF& value)
+{
+    if (qFuzzyEquals(m_selectedArea, value))
+        return;
+
+    m_selectedArea = value;
+    emit q->selectedAreaChanged(m_selectedArea);
+}
+
 QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
 {
     return m_mainModel->cameraSet()->cameras();
@@ -515,7 +550,7 @@ QString AbstractSearchWidget::Private::textFilter() const
 
 QRectF AbstractSearchWidget::Private::selectedArea() const
 {
-    return QRectF(); //< TODO: FIXME: #vkutin Implement me!
+    return m_selectedArea;
 }
 
 void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
@@ -536,6 +571,8 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
 {
     if (!m_mainModel->isOnline())
         return;
+
+    ui->areaSelectionButton->setVisible(m_cameras == Cameras::current);
 
     switch (m_cameras)
     {

@@ -39,10 +39,7 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
         [this, updateTimelineBookmarks](const QString& text)
         {
             auto bookmarksModel = qobject_cast<BookmarkSearchListModel*>(model());
-            NX_ASSERT(bookmarksModel);
-            if (!bookmarksModel)
-                return;
-
+            NX_CRITICAL(bookmarksModel);
             bookmarksModel->setFilterText(text);
             updateTimelineBookmarks();
             requestFetch();

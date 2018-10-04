@@ -72,6 +72,8 @@ private:
     void updateCurrentCameras();
     void setSelectedCameras(Cameras value);
 
+    void setSelectedArea(const QRectF& value);
+
     void setFetchDirection(AbstractSearchListModel::FetchDirection value);
     void tryFetchMore();
 
@@ -95,6 +97,7 @@ private:
     Cameras m_cameras = Cameras::all;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
+    QRectF m_selectedArea;
 };
 
 } // namespace nx::client::desktop
