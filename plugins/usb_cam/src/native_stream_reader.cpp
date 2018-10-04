@@ -12,13 +12,6 @@
 namespace nx {
 namespace usb_cam {
 
-namespace {
-
-static constexpr int kMsecInSec = 1000;
-static constexpr uint64_t kStreamDelayMsec = 100;
-
-} // namespace
-
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
     const CodecParameters& codecParams,
@@ -94,7 +87,7 @@ void NativeStreamReader::ensureConsumerAdded()
 
 void NativeStreamReader::maybeFlush()
 {
-    if (m_avConsumer->timeSpan() > kMsecInSec)
+    if (m_avConsumer->timeSpan() > kBufferTimeSpanMax)
         m_avConsumer->flush();
 }
 
@@ -102,11 +95,11 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
     if (m_camera->audioEnabled())
     {
-        if (!m_avConsumer->waitForTimeSpan(kStreamDelayMsec))
+        if (!m_avConsumer->waitForTimeSpan(kStreamDelay))
             return nullptr;
     }
    
-    return m_avConsumer->popFront();
+    return m_avConsumer->popOldest();
 }
 
 } // namespace usb_cam

@@ -74,10 +74,15 @@ public:
     virtual void ensureConsumerAdded();
 
 protected:
+    static constexpr int kRetryLimit = 10;
+    static constexpr int kMsecInSec = 1000;
+    static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(300);
+    static constexpr std::chrono::milliseconds kBufferTimeSpanMax = std::chrono::milliseconds(1000);
+
     int m_encoderIndex;
     CodecParameters m_codecParams;
     std::shared_ptr<Camera> m_camera;
-    std::shared_ptr<BufferedAudioVideoPacketConsumer> m_avConsumer;
+    std::shared_ptr<BufferedPacketConsumer> m_avConsumer;
 
     CyclicAllocator m_allocator;
 

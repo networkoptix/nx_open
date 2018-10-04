@@ -61,7 +61,7 @@ private:
     std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
-    void waitForTimeSpan(uint64_t msec);
+    void waitForTimeSpan(const std::chrono::milliseconds& timeSpan);
     std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();

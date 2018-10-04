@@ -470,6 +470,7 @@ void AudioStream::AudioStreamPrivate::run()
             }
             continue;
         }
+
         /**
          *  If the encoder is aac, some packets are buffered and copied before delivering.
          *  In that case, this packet is nullptr.
@@ -486,13 +487,13 @@ std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() c
 {
     float fps = 0;
     if (auto cam = m_camera.lock())
-        fps = cam->videoStream()->fps();
+        fps = cam->videoStream()->actualFps();
 
     /** should never happen */
     if (fps == 0)
         fps == kDefaultFps;
 
-    return std::chrono::milliseconds((int)(1.0 / fps * kMsecInSec));
+    return std::chrono::milliseconds((int)(1.0f / fps * kMsecInSec));
 }
 
 

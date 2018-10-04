@@ -8,6 +8,8 @@ namespace utils {
 
 namespace {
 
+static constexpr int kMsecInSec = 1000;
+
 } // namespace 
 
 std::string decodeCameraInfoUrl(const char * url)
@@ -31,11 +33,6 @@ std::string decodeCameraInfoUrl(const char * url)
 std::string encodeCameraInfoUrl(const char * host, const char * cameraResource)
 {
     return std::string(host) + "/" + cameraResource;
-}
-
-float msecPerFrame(float fps)
-{
-    return 1.0 / fps * 1000;
 }
 
 } // namespace utils

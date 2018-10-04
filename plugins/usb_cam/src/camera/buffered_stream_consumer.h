@@ -3,6 +3,8 @@
 #include "abstract_video_consumer.h"
 
 #include <condition_variable>
+#include <atomic>
+#include <chrono>
 #include <mutex>
 #include <deque>
 #include <map>
@@ -10,17 +12,14 @@
 namespace nx {
 namespace usb_cam {
 
+//--------------------------------------------------------------------------------------------------
+// Buffer
 
-/////////////////////////////////////////// Map<K, V> /////////////////////////////////////////////
-
-template<typename K, typename V>
-class Map
+template<typename V>
+class Buffer
 {
 public:
-    Map():
-        m_interrupted(false)
-    {
-    }
+    Buffer() = default;
 
     bool empty() const
     {
@@ -41,27 +40,30 @@ public:
             m_buffer.clear();
     }
 
-    virtual void pushBack(const K& key, const V& item)
+    virtual void pushBack(uint64_t key, const V& item)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_buffer.insert(std::pair<K, V>(key, item));
+        m_buffer.emplace(key, item);
         m_wait.notify_all();
     }
 
-    V peekFront(uint64_t timeOutMsec = 0)
+    V peekOldest(const std::chrono::milliseconds& timeOut)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock, 0, timeOutMsec))
+        if (m_buffer.empty() && !wait(lock, 0 /*minimumBufferSize*/, timeOut))
             return V();
         if (m_buffer.empty())
             return V();
         return m_buffer.begin()->second;
     }
 
-    virtual V popFront(uint64_t timeOutMsec = 0)
+    /**
+     * Pop from the front of the buffer
+     */
+    virtual V popOldest(const std::chrono::milliseconds& timeOut)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        if (m_buffer.empty() && !wait(lock, 0, timeOutMsec))
+        if (m_buffer.empty() && !wait(lock, 0 /*minimumBufferSize*/, timeOut))
             return V();
         if (m_buffer.empty())
             return V();
@@ -71,12 +73,9 @@ public:
         return v;
     }
 
-    bool wait(size_t minimumBufferSize = 0, uint64_t timeOutMsec = 0)
-    {
-        std::unique_lock<std::mutex> lock(m_mutex);
-        return wait(lock, minimumBufferSize, timeOutMsec);
-    }
-
+    /**
+     * Interrupts the buffer if waiting for input.
+     */
     void interrupt()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -84,30 +83,82 @@ public:
         m_wait.notify_all();
     }  
 
-    std::vector<K> keys() const
+    std::vector<uint64_t> timestamps() const
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        std::vector<K> keys;
-        keys.reserve(m_buffer.size());
+        std::vector<uint64_t> timestamps;
+        timestamps.reserve(m_buffer.size());
         for (const auto & item : m_buffer)
-            keys.push_back(item.first);
-        return keys;
+            timestamps.push_back(item.first);
+        return timestamps;
+    }
+
+    /**
+     * Wait for the difference in timestamps between the oldest and newest items in buffer 
+     *    to be >= timeSpan. Terminates early if interrupt() is called, returning false.
+     * 
+     * @param[in] timeSpan - the amount of items in terms of their timestamps that the buffer should
+     *    contain.
+     * @return - true if the wait terminated due to satisfying the timespan condition, false if
+     *    the wait terminated due to calling interrupt().
+     */
+    bool waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_wait.wait(lock,
+            [&]()
+            {
+                return m_buffer.empty()
+                    ? m_interrupted
+                    : timeSpanInternal() >= timeSpan;
+            });
+        return !interrupted();
+    }
+    
+    std::chrono::milliseconds timeSpan() const
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return timeSpanInternal();
     }
 
 protected:
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
-    std::map<K, V> m_buffer;
-    bool m_interrupted;
+    std::map<uint64_t, V> m_buffer;
+    bool m_interrupted = false;
 
 protected:
-    bool wait(std::unique_lock<std::mutex>& lock, size_t minimumBufferSize = 0, uint64_t timeOutMsec = 0)
+    std::chrono::milliseconds timeSpanInternal() const
     {
-        if (timeOutMsec > 0)
+        return m_buffer.empty()
+            ? std::chrono::milliseconds(0)
+            : std::chrono::milliseconds(m_buffer.rbegin()->first - m_buffer.begin()->first);
+            // largest key minus smallest key
+    }
+
+    /**
+     * Wait for at most timeOut for the number of items in the buffer to be > minimumBufferSize.
+     *    Terminates early if interrupt() is called, returning false.
+     * 
+     * @params[in] lock - an std::unique lock that the condition_variable should wait on.
+     * @param[in] minimumBufferSize - the minimum number of items that the buffer should contain for
+     *    the wait condition to return true. Uses a strictly greater than comparison.
+     * @params[in] timeOut - the maximum amount of time to wait (in milliseconds)
+     *     before terminating early. if 0 is passed, waits indefinitely or until interrupt()
+     *     is called.
+     * @return - true if the wait terminated due to satisfying mimumBufferSize, false if
+     *     the wait terminated due to calling interrupt().
+     */
+    bool wait(
+        std::unique_lock<std::mutex>& lock,
+        size_t minimumBufferSize,
+        const std::chrono::milliseconds& timeOut)
+    {
+        if (timeOut.count() > 0)
         {
             m_wait.wait_for(
                 lock,
-                std::chrono::milliseconds(timeOutMsec),
+                timeOut,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
         else
@@ -116,7 +167,10 @@ protected:
                 lock,
                 [&](){ return m_interrupted || m_buffer.size() > minimumBufferSize; });
         }
-        return !(interrupted() || m_buffer.size() <= minimumBufferSize);
+
+        if(interrupted())
+            return false;
+        return m_buffer.size() > minimumBufferSize;
     }
 
     bool interrupted()
@@ -130,64 +184,47 @@ protected:
     }
 };
 
-////////////////////////////////////// BufferedPacketConsumer //////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// BufferedPacketConsumer
 
-class BufferedPacketConsumer 
-    :
-    public Map<uint64_t, std::shared_ptr<ffmpeg::Packet>>,
-    public PacketConsumer
-{
-    typedef std::pair<uint64_t, std::shared_ptr<ffmpeg::Packet>> PairType;
-public:
-    BufferedPacketConsumer();
-
-    virtual void pushBack(const uint64_t& timeStamp, const std::shared_ptr<ffmpeg::Packet>& packet) override;
-
-    virtual void flush() override;
-    virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) override;
-
-    bool waitForTimeSpan(uint64_t difference); 
-    uint64_t timeSpan() const;
-
-    int dropOldNonKeyPackets();
-    void dropUntilFirstKeyPacket();
-
-protected:
-    bool m_ignoreNonKeyPackets;
-};
-
-
-/////////////////////////////// BufferredAudioVideoPacketConsumer /////////////////////////////////
-
-class BufferedAudioVideoPacketConsumer
+class BufferedPacketConsumer
     :
     public AbstractVideoConsumer,
-    public BufferedPacketConsumer
+    public PacketConsumer
 {
 public:
-    BufferedAudioVideoPacketConsumer(
+    BufferedPacketConsumer(
         const std::weak_ptr<VideoStream>& streamReader,
         const CodecParameters& params);
 
-    virtual void pushBack(
-        const uint64_t& timeStamp, 
-        const std::shared_ptr<ffmpeg::Packet>& packet) override;
-    virtual std::shared_ptr<ffmpeg::Packet> popFront(uint64_t timeOut = 0) override;
+    void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet);
+    void flush();
+    
+    std::shared_ptr<ffmpeg::Packet> popOldest(
+        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
 
-    int videoCount() const;
-    int audioCount() const;
+    std::shared_ptr<ffmpeg::Packet> peekOldest(
+        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+
+    void interrupt();
+
+    bool waitForTimeSpan(const std::chrono::milliseconds& timeSpan);
+    std::chrono::milliseconds timeSpan() const;
+
+    size_t size() const;
+    bool empty() const;
+
+    std::vector<uint64_t> timestamps() const;
 
 private:
-    int m_videoCount;
-    int m_audioCount;
+    Buffer<std::shared_ptr<ffmpeg::Packet>> m_buffer;
 };
 
-
-/////////////////////////////////// BufferedVideoFrameConsumer /////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// BufferedVideoFrameConsumer
 
 class BufferedVideoFrameConsumer 
     :
-    public Map<uint64_t, std::shared_ptr<ffmpeg::Frame>>,
     public AbstractVideoConsumer,
     public FrameConsumer
 {
@@ -198,6 +235,22 @@ public:
 
     virtual void flush() override;
     virtual void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame) override;
+
+    std::shared_ptr<ffmpeg::Frame> popOldest(
+        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+
+    std::shared_ptr<ffmpeg::Frame> peekOldest(
+        const std::chrono::milliseconds& timeOut = std::chrono::milliseconds(0));
+
+    void interrupt();
+
+    size_t size() const;
+    bool empty() const;
+
+    std::vector<uint64_t> timestamps() const;
+
+private:
+    Buffer<std::shared_ptr<ffmpeg::Frame>> m_buffer;
 };
 
 } //namespace usb_cam

@@ -19,13 +19,6 @@ extern "C" {
 namespace nx {
 namespace usb_cam {
 
-namespace {
-
-int constexpr kRetryLimit = 10;
-std::chrono::milliseconds constexpr kMsecInSec = std::chrono::milliseconds(1000);
-
-} // namespace
-
 TranscodeStreamReader::TranscodeStreamReader(
     int encoderIndex,
     const CodecParameters& codecParams,
@@ -131,8 +124,8 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
 
     /**
      * The Mmal decoder can reorder frames, causing time stamps to be out of order. The h263 encoder
-     * throws an error if the frame that it encodes is earlier in time than the previous frame,
-     * so drop it to avoid this error.
+     * throws an error if the frame that it encodes equal to or earlier in time than the previous
+     * frame, so drop it to avoid this error.
      */
     if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
         return true;
@@ -144,6 +137,7 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
      * than the timestamp of the last transcoded frame, we should drop.
      */
     bool drop = now - m_timePerFrame < m_lastTimestamp;
+    
     if(!drop)
         m_lastTimestamp = now;
 
@@ -200,40 +194,38 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
     return result;
 }
 
-void TranscodeStreamReader::waitForTimeSpan(uint64_t msecDifference)
+void TranscodeStreamReader::waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
 {
     for (;;)
     {
         if (m_interrupted)
             return;
 
-        std::set<uint64_t> allKeys;
+        std::set<uint64_t> allTimeStamps;
         
-        auto videoKeys = m_videoFrameConsumer->keys();
-        for (const auto & k : videoKeys)
-            allKeys.insert(k);
+        auto videoTimeStamps = m_videoFrameConsumer->timestamps();
+        for (const auto & k : videoTimeStamps)
+            allTimeStamps.insert(k);
         
-        auto audioKeys = m_avConsumer->keys();
-        for (const auto & k : audioKeys)
-            allKeys.insert(k);
+        auto audioTimeStamps = m_avConsumer->timestamps();
+        for (const auto & k : audioTimeStamps)
+            allTimeStamps.insert(k);
 
-        if (allKeys.empty() || *allKeys.rbegin() - *allKeys.begin() < msecDifference)
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        if (allTimeStamps.empty() 
+            || *allTimeStamps.rbegin() - *allTimeStamps.begin() < timeSpan.count())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
         else
+        {
             return;
+        }
     }
 }
 
 std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxError)
 {
     *outNxError = nxcip::NX_NO_ERROR;
-
-    const auto otherError = 
-        [this, &outNxError]() -> std::shared_ptr<ffmpeg::Packet>
-        {
-            *outNxError = nxcip::NX_OTHER_ERROR;
-            return nullptr;
-        };
 
     const auto interrupted = 
         [this, &outNxError]() -> bool
@@ -247,11 +239,13 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             return false;
         };
 
+    /** Audio disabled */
+
     if (!m_camera->audioEnabled())
     {
         for (;;)
         {
-            auto videoFrame = m_videoFrameConsumer->popFront();
+            auto videoFrame = m_videoFrameConsumer->popOldest();
             if (interrupted())
                 return nullptr;
             if (!shouldDrop(videoFrame.get()))
@@ -259,16 +253,16 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         }
     }
     
-    // audio enabled
+    /* Audio enabled */
 
-    uint64_t msecPerFrame = utils::msecPerFrame(m_camera->videoStream()->actualFps());
-    waitForTimeSpan(msecPerFrame /*milliseconds difference*/);
+    waitForTimeSpan(kStreamDelay);
+
     if (interrupted())
         return nullptr;
 
     for (;;)
     {
-        auto videoFrame = m_videoFrameConsumer->popFront(1);
+        auto videoFrame = m_videoFrameConsumer->popOldest(std::chrono::milliseconds(1));
         if (interrupted())
             return nullptr;
         if (!shouldDrop(videoFrame.get()))
@@ -277,17 +271,18 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
                 m_avConsumer->givePacket(videoPacket);
         }
 
-        // release the reference so that internally m_frameCount will be decremented
-        // see /a VideoStream::m_frameCount
+        /** 
+         * Release the reference so that internally VideoStream::m_frameCount will be decremented.
+         */
         videoFrame = nullptr;
 
-        auto peeked = m_avConsumer->peekFront(1);
+        auto peeked = m_avConsumer->peekOldest(std::chrono::milliseconds(1));
         if (interrupted())
             return nullptr;
         if(!peeked)
             continue;
 
-        return m_avConsumer->popFront();
+        return m_avConsumer->popOldest();
     }
 }
 
@@ -417,11 +412,13 @@ void TranscodeStreamReader::maybeFlush()
     float fps = m_camera->videoStream()->actualFps();
     if (fps == 0) // should never happen
         fps = 30;
-    if (m_videoFrameConsumer->size() >= fps / 2)
+
+    /** theoretically this means over a second of video */
+    if (m_videoFrameConsumer->size() >= fps)
         m_videoFrameConsumer->flush();
 
-    /* half a second*/
-    if (m_avConsumer->timeSpan() > 500)
+    /** half a second*/
+    if (m_avConsumer->timeSpan() > kBufferTimeSpanMax)
         m_avConsumer->flush();
 }
 
@@ -466,7 +463,7 @@ int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)
 
 void TranscodeStreamReader::calculateTimePerFrame()
 {
-    m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec.count();
+    m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec;
 }
 
 } // namespace usb_cam
