@@ -32,6 +32,9 @@ public:
 private:
     QAction* addMenuAction(QMenu* menu, const QString& title, vms::api::EventType type,
         bool deviceDependentTitle = false);
+
+private:
+    QAction* m_serverEventsSubmenuAction = nullptr;
 };
 
 EventSearchWidget::Private::Private(EventSearchWidget* q):
@@ -77,7 +80,7 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
     q->addDeviceDependentAction(eventFilterMenu->addMenu(deviceIssuesMenu),
         tr("Device issues"), tr("Camera issues"));
 
-    eventFilterMenu->addMenu(serverEventsMenu);
+    m_serverEventsSubmenuAction = eventFilterMenu->addMenu(serverEventsMenu);
     eventFilterMenu->addSeparator();
 
     auto defaultAction = addMenuAction(
@@ -92,6 +95,20 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     defaultAction->trigger();
     m_typeSelectionButton->setMenu(eventFilterMenu);
+
+    // Disable server event selection when selected cameras differ from "Any camera".
+    QObject::connect(q, &AbstractSearchWidget::cameraSetChanged,
+        [this]()
+        {
+            const bool serverEventsVisible = this->q->selectedCameras() == Cameras::all;
+            m_serverEventsSubmenuAction->setEnabled(serverEventsVisible);
+
+            const bool isServerEvent = (vms::event::parentEvent(m_eventModel->selectedEventType())
+                == vms::api::EventType::anyServerEvent);
+
+            if (isServerEvent)
+                resetType();
+        });
 }
 
 void EventSearchWidget::Private::resetType()
