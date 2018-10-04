@@ -191,7 +191,7 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->tabWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+                { ui->stackedWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
         });
@@ -273,6 +273,10 @@ void DeviceAdditionDialog::handleTabClicked(int index)
         ui->startAddressEdit->setFocus();
         resetPageSize(ui->knownAddressPage);
         setHeightFromLayout(ui->subnetScanPage);
+        m_knownAddressCredentials.user = ui->loginEdit->text().trimmed();
+        m_knownAddressCredentials.password = ui->passwordEdit->text().trimmed();
+        ui->loginEdit->setText(m_subnetScanCredentials.user);
+        ui->passwordEdit->setText(m_subnetScanCredentials.password);
     }
     else
     {
@@ -281,6 +285,10 @@ void DeviceAdditionDialog::handleTabClicked(int index)
         ui->addressEdit->setFocus();
         resetPageSize(ui->subnetScanPage);
         setHeightFromLayout(ui->knownAddressPage);
+        m_subnetScanCredentials.user = ui->loginEdit->text().trimmed();
+        m_subnetScanCredentials.password = ui->passwordEdit->text().trimmed();
+        ui->loginEdit->setText(m_knownAddressCredentials.user);
+        ui->passwordEdit->setText(m_knownAddressCredentials.password);
     }
 }
 
