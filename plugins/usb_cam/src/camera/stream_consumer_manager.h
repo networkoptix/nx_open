@@ -19,7 +19,10 @@ class StreamConsumerManager
 public:
     bool empty() const;
     size_t size() const;
-    void consumerFlush();
+    /**
+     * Calls flush() on each AbstractStreamConsumer
+     */
+    void flush();
 
     virtual size_t addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
     virtual size_t removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);

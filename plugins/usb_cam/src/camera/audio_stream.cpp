@@ -132,7 +132,7 @@ int AudioStream::AudioStreamPrivate::initialize()
 
 void AudioStream::AudioStreamPrivate::uninitialize()
 {
-    m_packetConsumerManager->consumerFlush();
+    m_packetConsumerManager->flush();
     m_packetMergeBuffer.clear();
 
     while(*m_packetCount > 0)
@@ -507,10 +507,6 @@ AudioStream::AudioStream(
     m_packetConsumerManager(new PacketConsumerManager())
 {
     setEnabled(enabled);
-}
-
-AudioStream::~AudioStream()
-{
 }
 
 std::string AudioStream::url() const

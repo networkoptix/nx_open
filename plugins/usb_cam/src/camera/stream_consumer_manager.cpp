@@ -13,7 +13,7 @@ size_t StreamConsumerManager::size() const
     return m_consumers.size();
 }
 
-void StreamConsumerManager::consumerFlush()
+void StreamConsumerManager::flush()
 {
     for (auto & consumer: m_consumers)
     {
@@ -183,7 +183,7 @@ size_t PacketConsumerManager::addConsumer(
         else
             m_waitForKeyPacket.insert(m_waitForKeyPacket.begin() + index, waitForKeyPacket);
     }
-    
+
     return index;
 }
 

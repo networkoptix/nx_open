@@ -285,8 +285,8 @@ int VideoStream::initialize()
 
 void VideoStream::uninitialize()
 {
-    m_packetConsumerManager.consumerFlush();
-    m_frameConsumerManager.consumerFlush();
+    m_packetConsumerManager.flush();
+    m_frameConsumerManager.flush();
 
     while (*m_packetCount > 0 || *m_frameCount > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -573,7 +573,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
 
     //assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
-        resolutionList = cam->getResolutionList();
+        resolutionList = cam->resolutionList();
 
     // try to find an exact match first
     for (const auto & resolution : resolutionList)

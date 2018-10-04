@@ -87,7 +87,7 @@ int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
 
 int MediaEncoder::setFps(const float& fps, float* selectedFps)
 {
-    auto resolutionList = m_camera->getResolutionList();
+    auto resolutionList = m_camera->resolutionList();
     if (resolutionList.empty())
         return nxcip::NX_OTHER_ERROR;
 

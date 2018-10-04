@@ -55,7 +55,7 @@ public:
     // video
     AVPixelFormat pixelFormat() const;
     
-    //audio
+    // audio
     AVSampleFormat sampleFormat() const;
     int sampleRate() const;
     int frameSize() const;

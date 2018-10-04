@@ -25,7 +25,7 @@ NativeMediaEncoder::~NativeMediaEncoder()
 
 int NativeMediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
 {
-    auto list = m_camera->getResolutionList();
+    auto list = m_camera->resolutionList();
     if (list.empty())
     {
         *infoListCount = 0;

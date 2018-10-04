@@ -43,8 +43,11 @@ device::CompressionTypeDescriptorPtr getPriorityDescriptor(
 
 } // namespace 
 
+//--------------------------------------------------------------------------------------------------
+// Camera
 
-const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = {
+const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList = 
+{
     nxcip::AV_CODEC_ID_H263,
     nxcip::AV_CODEC_ID_H264,
     nxcip::AV_CODEC_ID_MJPEG
@@ -95,7 +98,7 @@ std::shared_ptr<VideoStream> Camera::videoStream()
     return m_videoStream;
 }
 
-std::vector<device::ResolutionData> Camera::getResolutionList() const
+std::vector<device::ResolutionData> Camera::resolutionList() const
 {
     return device::getResolutionList(url().c_str(), m_compressionTypeDescriptor);
 }
@@ -173,7 +176,7 @@ CodecParameters Camera::getDefaultVideoParameters()
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
     AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
 
-    auto resolutionList = getResolutionList();
+    auto resolutionList = this->resolutionList();
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::ResolutionData& a, const device::ResolutionData& b)
     {

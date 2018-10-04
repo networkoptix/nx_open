@@ -25,7 +25,7 @@ public:
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();
 
-    std::vector<device::ResolutionData> getResolutionList() const;
+    std::vector<device::ResolutionData> resolutionList() const;
 
     void setAudioEnabled(bool value);
     bool audioEnabled() const;
