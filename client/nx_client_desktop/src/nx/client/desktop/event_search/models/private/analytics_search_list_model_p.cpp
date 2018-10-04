@@ -331,8 +331,12 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
-    request.boundingBox = m_filterRect;
     request.freeText = m_filterText;
+
+    request.boundingBox = q->cameraSet()->type() == ManagedCameraSet::Type::single
+        ? m_filterRect
+        : QRectF();
+
     request.sortOrder = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
@@ -419,16 +423,14 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (newObjects.empty())
         return;
 
-    {
-        ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
+    ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 
-        for (const auto& newObject: newObjects)
-            m_objectIdToTimestamp[newObject.objectId] = startTime(newObject);
+    for (const auto& newObject: newObjects)
+        m_objectIdToTimestamp[newObject.objectId] = startTime(newObject);
 
-        m_data.insert(m_data.begin(),
-            std::make_move_iterator(newObjects.begin()),
-            std::make_move_iterator(newObjects.end()));
-    }
+    m_data.insert(m_data.begin(),
+        std::make_move_iterator(newObjects.begin()),
+        std::make_move_iterator(newObjects.end()));
 }
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()

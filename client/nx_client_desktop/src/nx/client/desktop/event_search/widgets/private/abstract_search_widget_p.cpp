@@ -8,6 +8,7 @@
 #include <QtWidgets/QScrollBar>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
@@ -218,8 +219,8 @@ void AbstractSearchWidget::Private::setupToolbar()
         [this]()
         {
             ui->togglePreviewsButton->setToolTip(ui->togglePreviewsButton->isChecked()
-                ? tr("Hide information")
-                : tr("Show information"));
+                ? tr("Hide thumbnails")
+                : tr("Show thumbnails"));
         };
 
     connect(ui->togglePreviewsButton, &QToolButton::toggled,
@@ -342,9 +343,14 @@ void AbstractSearchWidget::Private::setupCameraSelection()
             return action;
         };
 
-    auto defaultAction = addMenuAction(tr("All cameras"), Cameras::all);
-    addMenuAction(tr("Cameras on layout"), Cameras::layout);
-    addMenuAction(tr("Current camera"), Cameras::current);
+    auto defaultAction = addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(), tr("All devices"), tr("All cameras")), Cameras::all);
+
+    addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+        tr("Devices on layout"), tr("Cameras on layout")), Cameras::layout);
+
+    addMenuAction(QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+        tr("Current device"), tr("Current camera")), Cameras::current);
 
     connect(ui->cameraSelectionButton, &SelectableTextButton::stateChanged, this,
         [defaultAction](SelectableTextButton::State state)
@@ -387,11 +393,19 @@ void AbstractSearchWidget::Private::setupAreaSelection()
 {
     ui->areaSelectionButton->setSelectable(true);
     ui->areaSelectionButton->setDeactivatable(true);
+    ui->areaSelectionButton->setAccented(true);
     ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
     ui->areaSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
 
-    connect(q, &AbstractSearchWidget::cameraSetChanged,
-        ui->areaSelectionButton, &SelectableTextButton::deactivate);
+    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
+        [this]()
+        {
+            const auto cameras = q->cameras();
+            ui->areaSelectionButton->setEnabled(
+                cameras.size() == 1 && (*cameras.cbegin())->hasVideo());
+
+            ui->areaSelectionButton->deactivate();
+        });
 
     connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
