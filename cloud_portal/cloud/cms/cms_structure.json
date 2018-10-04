@@ -376,30 +376,66 @@
     "single_customization": false,
     "contexts": [
       {
-        "name": "Integration Information",
+        "name": "Information",
         "translatable": false,
-        "values":[
+        "values": [
           {
-            "name": "Integration Name",
+            "name": "integrationName",
+            "label": "Integration name",
             "value": "",
             "description": "",
             "type": "text"
           },
           {
-            "name": "Logo",
+            "name": "logo",
+            "label": "Logo",
             "value": "",
             "description": "Logo for integration",
             "type": "image",
             "optional": true
           },
           {
-            "name": "Tested software (VMS) versions",
+            "name": "testedVersions",
+            "label": "Tested software (VMS) versions",
             "value": "",
             "description": "Latest supported version",
+            "type": "select",
+            "meta": {
+              "multi": true,
+              "options": [
+                "4.0.0",
+                "3.2"
+              ]
+            }
+          },
+          {
+            "name": "tags",
+            "label": "Tags",
+            "value": "",
+            "description": "",
             "type": "text"
           },
           {
-            "name": "Supported OS and platforms",
+            "name": "type",
+            "label": "Type(Category)",
+            "value": "",
+            "description": "",
+            "type": "select",
+            "meta": {
+              "multi": true,
+              "options": [
+                "Access Control",
+                "Connector",
+                "Data Analytics",
+                "Drone",
+                "Health Monitor",
+                "Storage"
+              ]
+            }
+          },
+          {
+            "name": "platforms",
+            "label": "Supported OS and platforms",
             "value": "",
             "description": "",
             "type": "select",
@@ -417,82 +453,114 @@
             }
           },
           {
-            "name": "Version",
+            "name": "version",
+            "label": "Version",
             "value": "",
             "description": "",
             "type": "text",
             "optional": true
           },
           {
-            "name": "Full functionality overview",
-            "value": "",
-            "description": "A description about what the integration does.",
-            "type": "html"
-          },
-          {
-            "name": "Version Changelog",
+            "name": "changelog",
+            "label": "Version Changelog",
             "value": "",
             "description": "",
             "type": "html",
             "optional": true
-          },
+          }
+        ]
+      },
+      {
+        "name": "Overview",
+        "translatable": false,
+        "values": [
           {
-            "name": "Download links or Instructions",
+            "name": "functionalityOverview",
+            "label": "Full functionality overview",
+            "value": "",
+            "description": "A description about what the integration does.",
+            "type": "html"
+          }
+        ]
+      },
+      {
+        "name": "Instructions",
+        "translatable": false,
+        "values": [
+          {
+            "name": "downloadLinks",
+            "label": "Download links or Instructions",
             "value": "",
             "description": "",
             "type": "html"
           },
           {
-            "name": "Installation Instructions",
+            "name": "installation",
+            "label": "Installation Instructions",
             "value": "",
             "description": "",
             "type": "html"
-          },
+          }
+        ]
+      },
+      {
+        "name": "Screenshots",
+        "translatable": false,
+        "values": [
           {
-            "name": "Screenshots",
+            "name": "screenshot1",
+            "label": "Screenshot 1",
             "value": "",
             "description": "",
             "type": "image"
           },
           {
-            "name": "Useful Links",
+            "name": "screenshot2",
+            "label": "Screenshot 2",
+            "value": "",
+            "description": "",
+            "type": "image",
+            "optional": true
+          },
+          {
+            "name": "screenshot3",
+            "label": "Screenshot 3",
+            "value": "",
+            "description": "",
+            "type": "image",
+            "optional": true
+          }
+        ]
+      },
+      {
+        "name": "Additional Information",
+        "translatable": false,
+        "values": [
+          {
+            "name": "usefulLinks",
+            "label": "Useful Links",
             "value": "",
             "description": "",
             "type": "text",
             "optional": true
           },
           {
-            "name": "Additional Information",
+            "name": "additionalInformation",
+            "label": "Additional Information",
             "value": "",
             "description": "",
             "type": "html",
             "optional": true
-          },
+          }
+        ]
+      },
+      {
+        "name": "Support",
+        "translatable": false,
+        "values": [
           {
-            "name": "Tags",
-            "value": "",
-            "description": "",
-            "type": "text"
-          },
-          {
-            "name": "Type(Category)",
-            "value": "",
-            "description": "",
-            "type": "select",
-            "meta": {
-              "multi": true,
-              "options": [
-                "Access Control",
-                "Connector",
-                "Data Analytics",
-                "Drone",
-                "Health Monitor",
-                "Storage"
-              ]
-            }
-          },
-          {
-            "name": "Support Information",
+            "name": "supportInformation",
+            "label": "Support Information",
             "value": "",
             "description": "",
             "type": "html"
