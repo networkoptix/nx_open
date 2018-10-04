@@ -74,7 +74,7 @@ public:
 
     using RemoteStatus = std::map<QnUuid, nx::update::Status>;
     /**
-     * Tries to get status changes from the server
+     * Tries to get status changes from the server.
      * @param status storage for remote status
      * @returns true if there were some new data.
      * Consequent calls to this function will return false until new data arrives.
@@ -82,23 +82,23 @@ public:
     bool getServersStatusChanges(RemoteStatus& status);
 
     /**
-     * Asks mediaservers to start the update process
+     * Asks mediaservers to start the update process.
      * @param info - update manifest
      */
     void requestStartUpdate(const nx::update::Information& info);
 
     /**
-     * Asks mediaservers to stop the update process
+     * Asks mediaservers to stop the update process.
      * Client expects all mediaservers to return to nx::update::Status::Code::idle state.
      */
     void requestStopAction();
 
     /**
-     * Asks mediaservers to start installation process
+     * Asks mediaservers to start installation process.
      */
     void requestInstallAction(QSet<QnUuid> targets);
 
-    // State for uploading offline update package
+    // State for uploading offline update package.
     enum class OfflineUpdateState
     {
         initial,
@@ -183,20 +183,20 @@ public:
 
     OfflineUpdateState getUploaderState() const;
 
-    // Get information about current update
+    // Get information about current update.
     nx::update::Information getActiveUpdateInformation() const;
     bool haveActiveUpdate() const;
 
-    // Get current set of servers
+    // Get current set of servers.
     QSet<QnUuid> getAllServers() const;
 
-    // Get servers with specified update status
+    // Get servers with specified update status.
     QSet<QnUuid> getServersInState(nx::update::Status::Code status) const;
 
-    // Get servers that are offline right now
+    // Get servers that are offline right now.
     QSet<QnUuid> getOfflineServers() const;
 
-    // Get servers that are incompatible with new update system
+    // Get servers that are incompatible with new update system.
     QSet<QnUuid> getLegacyServers() const;
 
     std::shared_ptr<ServerUpdatesModel> getModel();
@@ -232,8 +232,8 @@ private:
 
     std::shared_ptr<QnZipExtractor> m_extractor;
 
-    // Container for remote state
-    // We keep temporary state updates here. Client will pull this data periodically
+    // Container for remote state.
+    // We keep temporary state updates here. Widget will pull this data periodically.
     RemoteStatus m_remoteUpdateStatus;
     bool m_checkingRemoteUpdateStatus = false;
     mutable std::recursive_mutex m_statusLock;
@@ -248,7 +248,7 @@ private:
     std::unique_ptr<UploadManager> m_uploadManager;
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
-    std::map<QString, nx::client::desktop::UploadState> m_uploadState;
+    std::map<QString, nx::client::desktop::UploadState> m_uploadStateById;
 
     // Current update manifest.
     nx::update::Information m_updateManifest;
