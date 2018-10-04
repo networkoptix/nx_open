@@ -20,6 +20,8 @@ def make_integrations_json(integrations, contexts=[]):
         contexts = Context.objects.filter(product_type__type=INTEGRATION)
 
     global_contexts = Context.objects.filter(product_type__type=CLOUD_PORTAL, is_global=True)
+    cloud_portal = Product.objects.filter(product_type__type=CLOUD_PORTAL,
+                                          customizations__name__in=[settings.CUSTOMIZATION])
 
     for integration in integrations:
         integration_dict = {}
@@ -33,7 +35,7 @@ def make_integrations_json(integrations, contexts=[]):
                                                                             version_id=current_version)
 
         for global_context in global_contexts:
-            process_context_structure(integration, global_context, integration_dict, None, current_version, False, False)
+            process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
 
         integrations_json.append(integration_dict)
 
