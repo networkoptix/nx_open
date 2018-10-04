@@ -26,8 +26,8 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
         nx::ut::cfg::configInstance().ftpUrl = parser->value("ftp-storage-url");
     if (parser->isSet("smb-storage-url"))
         nx::ut::cfg::configInstance().smbUrl = parser->value("smb-storage-url");
-    if (parser->isSet("enable-discovery"))
-        nx::ut::cfg::configInstance().enableDiscovery = true;
+
+    nx::ut::cfg::configInstance().enableDiscovery = parser->isSet("enable-discovery");
 
     return parser;
 }
