@@ -103,7 +103,7 @@ void HostSystemPasswordSynchronizer::setAdmin(QnUserResourcePtr admin)
 {
     syncLocalHostRootPasswordWithAdminIfNeeded(admin);
     Qn::directConnect(
-        admin.data(), &QnUserResource::cryptSha512HashChanged,
+        admin.data(), &QnUserResource::hashesChanged,
         this, &HostSystemPasswordSynchronizer::at_adminHashChanged);
 }
 
