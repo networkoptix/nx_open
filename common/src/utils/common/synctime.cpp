@@ -117,15 +117,17 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
 
-    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
-    auto commonModule = appServerConnection->commonModule();
-    auto isTimeSyncEnabled = commonModule->globalSettings()->isTimeSynchronizationEnabled();
+    auto appServerConnection = QnAppServerConnectionFactory::ec2Connection();
+    if (appServerConnection)
+    {
+        auto commonModule = appServerConnection->commonModule();
+        auto isTimeSyncEnabled = commonModule->globalSettings()->isTimeSynchronizationEnabled();
 
-    if(!isTimeSyncEnabled)
-        return localTime;
+        if (!isTimeSyncEnabled)
+            return localTime;
+    }
 
     QnMutexLocker lock( &m_mutex );
-
     if (
         (
             m_lastReceivedTime == 0
@@ -133,14 +135,15 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
         )
         && !m_syncTimeRequestIssued)
-    {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
-        if( appServerConnection )
         {
-            appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
-            m_syncTimeRequestIssued = true;
+            if( appServerConnection )
+            {
+                appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime(
+                    this,
+                    (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime);
+                m_syncTimeRequestIssued = true;
+            }
         }
-    }
     m_lastLocalTime = localTime;
 
     if (m_lastReceivedTime) {
