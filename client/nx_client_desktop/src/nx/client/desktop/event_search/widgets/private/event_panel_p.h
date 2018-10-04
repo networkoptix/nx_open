@@ -35,20 +35,17 @@ public:
     virtual ~Private() override;
 
 private:
-    void currentWorkbenchWidgetChanged(Qn::ItemRole role);
-
+    void rebuildTabs();
+    bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
-
-    void setupTabsSyncWithNavigator();
-
     void showContextMenu(const QPoint& pos);
+
+    void currentWorkbenchWidgetChanged(Qn::ItemRole role);
+    void setupTabsSyncWithNavigator();
 
     void at_motionSearchToggled(bool on);
     void at_bookmarksToggled(bool on);
-
     void at_specialModeToggled(bool on, QWidget* correspondingTab);
-
-    void at_motionSelectionChanged();
 
 private:
     EventPanel* const q;
