@@ -180,7 +180,7 @@ void GetPostTunnelServer<ApplicationData...>::openUpTunnel(
     httpPipe->setOnConnectionClosed(
         [this, connection = httpPipe.get()](auto closeReason)
         {
-            closeConnection(closeReason, connection);
+            this->closeConnection(closeReason, connection);
         });
     auto httpPipePtr = httpPipe.get();
 
