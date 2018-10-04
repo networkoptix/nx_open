@@ -629,6 +629,13 @@ void QnResourceBrowserWidget::setAvailableItemTypes(
     bool hasOpenInEntityItems,
     bool hasUnopenableItems)
 {
+    static const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
+    static const ShortcutHintWidget::DescriptionList kOpenInLayoutHints({
+        { QKeySequence(Qt::Key_Enter), tr("add to current layout") },
+        { QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout") } });
+    static const ShortcutHintWidget::DescriptionList kOpenEntitiesHint({
+        { QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all") } });
+
     const bool hasChanges =
         m_hasOpenInLayoutItems != hasOpenInLayoutItems
         || m_hasOpenInEntityItems != hasOpenInEntityItems
