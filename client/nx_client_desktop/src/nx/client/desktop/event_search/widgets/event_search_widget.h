@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include "abstract_search_widget.h"
 
 namespace nx::client::desktop {
@@ -13,7 +15,7 @@ class EventSearchWidget: public AbstractSearchWidget
 
 public:
     EventSearchWidget(QnWorkbenchContext* context, QWidget* parent = nullptr);
-    virtual ~EventSearchWidget() override = default;
+    virtual ~EventSearchWidget() override;
 
     virtual void resetFilters() override;
 
@@ -22,7 +24,8 @@ private:
     virtual QString itemCounterText(int count) const override;
 
 private:
-    SelectableTextButton* const m_typeSelectionButton;
+    class Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace nx::client::desktop
