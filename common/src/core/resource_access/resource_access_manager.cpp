@@ -27,6 +27,8 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
+#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -458,6 +460,12 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
 
     if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
         return Qn::ReadPermission | Qn::ExportPermission;
+
+    if (QnSharedResourcePointer<nx::vms::common::MetadataPluginInstanceResource> pir 
+        = target.dynamicCast<nx::vms::common::MetadataPluginInstanceResource>()
+    )
+        return Qn::NoPermissions;
+
 
     NX_ASSERT(false, "invalid resource type");
     return Qn::NoPermissions;

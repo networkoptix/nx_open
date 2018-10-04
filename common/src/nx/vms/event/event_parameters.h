@@ -42,7 +42,7 @@ struct EventParameters
     /** When did the event occur - in microseconds. */
     qint64 eventTimestampUsec;
 
-    /** Event source - id of a camera or a server. */
+    /** Event source - id of a camera or a server or a PIR. */
     QnUuid eventResourceId;
 
     /**

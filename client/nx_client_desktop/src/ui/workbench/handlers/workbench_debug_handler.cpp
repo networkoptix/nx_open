@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
 
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
@@ -223,6 +224,26 @@ public:
             {
                 runTilesTest();
                 close();
+            });
+
+        addButton("Generate PIRs", 
+            [this]() 
+            {
+                QnResourcePtr pir1(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir1->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CD}"));
+                pir1->setName("Plugin1");
+                
+                QnResourcePtr pir2(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir2->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CE}"));
+                pir2->setName("Plugin2");
+                
+                QnResourcePtr pir3(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir3->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CF}"));
+                pir3->setName("Plugin3");
+                
+                resourcePool()->addResource(pir1);
+                resourcePool()->addResource(pir2);
+                resourcePool()->addResource(pir3);
             });
 
         addButton(lit("Generate analytics manifests"),

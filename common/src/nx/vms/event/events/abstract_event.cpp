@@ -82,6 +82,7 @@ QList<EventType> childEvents(EventType eventType)
                 EventType::anyCameraEvent,
                 EventType::anyServerEvent,
                 EventType::analyticsSdkEvent,
+                EventType::pluginEvent,
                 EventType::userDefinedEvent
             };
 
@@ -106,6 +107,7 @@ QList<EventType> allEvents()
         EventType::backupFinishedEvent,
         EventType::softwareTriggerEvent,
         EventType::analyticsSdkEvent,
+        EventType::pluginEvent,
         EventType::userDefinedEvent
     };
 
@@ -171,6 +173,7 @@ bool requiresCameraResource(EventType eventType)
         case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
         case EventType::softwareTriggerEvent:
         case EventType::analyticsSdkEvent:
+        case EventType::pluginEvent:
             return true;
 
         default:
