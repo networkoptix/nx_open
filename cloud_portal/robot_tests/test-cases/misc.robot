@@ -30,3 +30,15 @@ The logo takes you to the home page when not logged in
     Open Browser and go to URL    ${url}/register
     Wait Until Element Is Visible    ${LOGO LINK}
     Click Link    ${LOGO LINK}
+    Location Should Be    ${url}/
+
+The logo takes you to the home page when not logged in
+    [tags]    C41540
+    Open Browser and go to URL    ${url}/register
+    Log In    ${EMAIL OWNER}    ${BASE PASSWORD}
+    Validate Log In
+    Go To    ${url}/${AUTO_TESTS SYSTEM ID}
+    Wait Until Element Is Visible    ${LOGO LINK}
+    Click Link    ${LOGO LINK}
+    Wait Until Element Is Visible    ${AUTO TESTS TITLE}
+    Location Should Be    ${url}/systems

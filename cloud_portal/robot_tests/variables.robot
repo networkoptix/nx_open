@@ -192,6 +192,7 @@ ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id='dropdownMenuButton']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
 ${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
