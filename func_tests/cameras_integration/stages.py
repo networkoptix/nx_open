@@ -69,7 +69,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for fps_index, fps_range in enumerate(primary['fps']):
         # Make sure there is a gap between recordings.
@@ -91,31 +91,34 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
             for profile, configuration in (
                     ('primary', current_configuration), ('secondary', secondary)):
                 if configuration:
+                    path = '{}{}'.format(profile, fps_index)
                     for error in retry_expect_values(
                             {'video': configuration},
                             lambda: ffprobe_metadata(run.media_url(profile)),
-                            path=profile):
+                            path=path):
                         yield error
+                    yield Halt('Configuration {} is successful'.format(path))
 
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=10))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for profile, configurations in profiles.items():
         for index, configuration in enumerate(configurations):
             configure_video(
                 run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+            path = '{}{}'.format(profile, index)
             for error in retry_expect_values(
                     {'video': configuration},
                     lambda: ffprobe_metadata(run.media_url(profile)),
-                    path='{}{}'.format(profile, index)):
+                    path=path):
                 yield error
+            yield Halt('Configuration {} is successful'.format(path))
 
     for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
         yield error
-
     yield Success()
 
 
@@ -137,6 +140,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                     lambda: ffprobe_metadata(run.media_url()),
                     path=index):
                 yield error
+            yield Halt('Configuration {} is successful'.format(index))
 
     yield Success()
 

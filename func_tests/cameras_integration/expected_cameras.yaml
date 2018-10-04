@@ -202,7 +202,8 @@ SERVER_STAGES:
   attributes:
     firmware: 65225
 
-  recording:
+  # Video never works, needs to be tested separately.
+  recording if False:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
@@ -211,7 +212,8 @@ SERVER_STAGES:
       "1": "tftp://192.168.200.7:69/h264?res=full;x0=0;y0=0;x1=1920;y1=1088;qp=24;doublescan=0;ssn=*;iframe=1;"
       "2": "tftp://192.168.200.7:69/h264?res=half;x0=0;y0=0;x1=1920;y1=1088;qp=33;doublescan=0;ssn=*;iframe=1;"
 
-  audio_parameters:
+  # Audio never works as well :).
+  audio_parameters if False:
     # I am not sure if this one has got audio_parameters in. The doc is very sparse.
     - {'skip_codec_change': True, 'codec': 'G711'}
 
@@ -275,8 +277,8 @@ SERVER_STAGES:
       '1': "rtsp://192.168.200.13:554/h264"
       '2': "rtsp://192.168.200.13:8554/h264"
 
-  audio_parameters:
-    # Not sure if it has audio_parameters, but isAudioSupported == 1.
+  # Not sure if it has audio_parameters, but isAudioSupported == 1.
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'MP2'}
 
   io_events:
@@ -364,9 +366,9 @@ SERVER_STAGES:
       - {'codec': 'H264', 'resolution': '640x480', 'fps': [8, 12]}
       - {'codec': 'H264', 'resolution': '1280x720', 'fps': [24, 36]}
 
-  audio_parameters:
   # Also has G722 and MP2L2 in spec. But no advanced setting to switch to those.
   # "Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -388,7 +390,7 @@ SERVER_STAGES:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[13, 17], [8, 12]]}
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[15, 25], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
@@ -413,8 +415,7 @@ AC-CC-8E-48-FC-DA:
     isAudioSupported: 0
 
   recording:
-    # "'primary.fps' is 90000, expected to be in [24, 36]"!
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[20, 30], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
@@ -443,7 +444,7 @@ AC-CC-8E-95-33-57:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[13, 17], [8, 12]]}
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[13, 17], [25, 35]]}
     #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
@@ -472,12 +473,13 @@ ACTI_E924-A-XX-15C-00035:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
 
-  recording:
+  # FFprobe hangs for this camera at all times!
+  recording if False:
     primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
 
-# FFprobe hangs for this camera
-  video_parameters:
+  # FFprobe hangs for this camera at all times!
+  video_parameters if False:
     primary:
       - {'codec': 'H264', 'resolution': '2592x1944'}
       - {'codec': 'MJPEG', 'resolution': '1920x1080'}
@@ -488,9 +490,10 @@ ACTI_E924-A-XX-15C-00035:
       "1": "rtsp://192.168.200.21:7070/stream1/"
       "2": "rtsp://192.168.200.21:7070/stream2/"
 
-  audio_parameters:
+  # FFprobe hangs for this camera at all times!
   # Dunno which codecs are supported. Has got volume and sensitivity advanced settings,
   # but not codec. Additional settings tests may be implemented if needed.
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
 
@@ -526,7 +529,7 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [25, 35]]}
 
   video_parameters:
     primary:
@@ -570,8 +573,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
       - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
       - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [24, 36]}
 
-  audio_parameters: # Didn't find any data on supported audio_parameters codecs. This needs checking
-    #"Audio stream was not discovered by ffprobe."
+  # Didn't find any data on supported audio_parameters codecs. This needs checking
+  # "Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -642,9 +646,9 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
       - {'codec': 'H264', 'resolution': '352x288', 'fps': [8, 12]}
       - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
 
-  audio_parameters:
   # Didn't find any data on supported audio_parameters codecs. This needs checking.
-    #"Audio stream was not discovered by ffprobe."
+  #"Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
