@@ -85,7 +85,7 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
                 return;
 
             Filter filter;
-            filter.deviceId = camera()->getId();
+            filter.deviceIds = {camera()->getId()};
             filter.boundingBox = m_filterRect;
             filter.freeText = m_filterText;
             this->q->navigator()->setAnalyticsFilter(filter);
@@ -333,7 +333,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         return false;
 
     Filter request;
-    request.deviceId = camera()->getId();
+    request.deviceIds = {camera()->getId()};
     request.timePeriod = period;
     request.maxObjectsToSelect = limit;
     request.boundingBox = m_filterRect;
