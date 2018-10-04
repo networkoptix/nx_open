@@ -12,14 +12,22 @@ from api.models import Account
 from ..models import *
 
 
-def accept_latest_draft(product, version_id, user):
-    unaccepted_version = ContentVersion.objects.filter(product=product, id=version_id, accepted_date=None)
-    if not unaccepted_version.exists():
+def update_draft_state(review_id, target_state, user):
+    review = ProductCustomizationReview.objects.filter(id=review_id, reviewed_by=None)
+    if not review.exists():
         return " is currently publishing or has already been published"
-    unaccepted_version = unaccepted_version.latest('created_date')
-    unaccepted_version.accepted_by = user
-    unaccepted_version.accepted_date = datetime.now()
-    unaccepted_version.save()
+
+    review = review.latest('id')
+
+    if not review.version.accepted_by:
+        review.version.accepted_by = user
+        review.version.accepted_date = datetime.now()
+        review.version.save()
+
+    review.reviewed_by = user
+    review.reviewed_date = datetime.now()
+    review.state = target_state
+    review.save()
     return None
 
 
@@ -198,8 +206,8 @@ def generate_preview(product, context=None, version_id=None, send_to_review=Fals
     return generate_preview_link(context)
 
 
-def publish_latest_version(product, version_id, user):
-    publish_errors = accept_latest_draft(product, version_id, user)
+def publish_latest_version(product, review_id, user):
+    publish_errors = update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.accepted, user)
     if not publish_errors:
         fill_content(product, preview=False, incremental=True)
     return publish_errors
@@ -210,7 +218,6 @@ def send_version_for_review(product, user):
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
-        # If a non cloud_portal product is untouched migrate the records otherwise just create a new version
         strip_version_from_records(old_version, product)
         old_version.delete()
 

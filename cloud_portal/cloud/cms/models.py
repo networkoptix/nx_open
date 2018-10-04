@@ -310,7 +310,18 @@ class DataStructure(models.Model):
         content_value = ""
         if not product:
             return self.default
-        content_record = DataRecord.objects.filter(product=product, data_structure=self)
+        rejected = ProductCustomizationReview.REVIEW_STATES.rejected
+        content_record = DataRecord.objects.filter(product=product,
+                                                   data_structure=self)
+
+        # Filter out rejected results.
+        if version_id:
+            product_customization = content_record.\
+                filter(version__productcustomizationreview__customization__name=settings.CUSTOMIZATION).\
+                exclude(version__productcustomizationreview__state=rejected)
+            # We need to support old records because if not cloud will fallback default values
+            if product_customization.exists():
+                content_record = product_customization
 
         # try to get translated content
         if self.translatable:
@@ -359,12 +370,8 @@ class UserGroupsToCustomizationPermissions(models.Model):
 class ContentVersion(models.Model):
 
     class Meta:
-        verbose_name = 'cloud revision'
-        verbose_name_plural = 'cloud revisions'
-        permissions = (
-            ("publish_version", "Can publish content to production"),
-            ("force_update", "Can forcibly update content"),
-        )
+        verbose_name = 'revision'
+        verbose_name_plural = 'revisions'
 
     # TODO: Remove this after release of 18.4 - Task: CLOUD-2299
     customization = models.ForeignKey(Customization, default=None, null=True)
@@ -406,6 +413,10 @@ class ProductCustomizationReview(models.Model):
     class Meta:
         verbose_name = 'product review'
         verbose_name_plural = 'product reviews'
+        permissions = (
+            ("publish_version", "Can publish content to production"),
+            ("force_update", "Can forcibly update content"),
+        )
 
     REVIEW_STATES = Choices((0, "pending", "Pending"), (1, "accepted", "Accepted"), (3, "rejected", "Rejected"))
     customization = models.ForeignKey(Customization)

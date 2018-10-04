@@ -155,9 +155,10 @@ def page_editor(request, context_id=None, language_code=None, product_id=None):
         context, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
 
         if 'SendReview' in request.POST and preview_link:
-            if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-                return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
-
+            review = ProductCustomizationReview.objects.get(version_id=ContentVersion.objects.latest('created_date').id,
+                                                            customization__name=settings.CUSTOMIZATION)
+            redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
+            return redirect(redirect_url)
 
     return render(request, 'context_editor.html',
                   {'context': context,
@@ -174,66 +175,67 @@ def page_editor(request, context_id=None, language_code=None, product_id=None):
 
 
 @require_http_methods(["POST"])
-@permission_required('cms.change_contentversion')
-def version_action(request, version_id=None):
-    preview_flag = ""
-    if not ContentVersion.objects.filter(id=version_id).exists():
-        defaults.bad_request("Version does not exist")
+@permission_required("cms.change_productcustomizationreview")
+def review(request):
+    review_id = request.POST['review_id'] if 'review_id' in request.POST else None
 
-    product = get_product_by_revision(version_id)
+    if not ProductCustomizationReview.objects.filter(id=review_id).exists():
+        return HttpResponseBadRequest("Version does not exist")
 
-    if "Preview" in request.POST:
-        modify_db.generate_preview(product, version_id=version_id, send_to_review=True)
-        preview_flag = "?preview"
+    product_review = ProductCustomizationReview.objects.get(id=review_id)
+    product = product_review.version.product
 
-    elif "Publish" in request.POST:
-        if not request.user.has_perm('cms.publish_version'):
-            raise PermissionDenied
-        publishing_errors = modify_db.publish_latest_version(product, version_id, request.user)
-        if publishing_errors:
-            messages.error(request, "Version {} {}".format(version_id, publishing_errors))
+    if 'force_update' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
+                                                                                                settings.CUSTOMIZATION,
+                                                                                                'cms.force_update'):
+        if product.product_type.can_preview:
+            filldata.init_skin(product)
+            messages.success(request, "Version {} was force updated ".format(product_review.version.id))
         else:
-            messages.success(request, "Version {} has been published".format(version_id))
+            messages.error(request, "You cannot force update this product")
 
-    elif "Force Update" in request.POST:
-        if not request.user.has_perm('cms.force_update'):
-            raise PermissionDenied
+    elif 'publish' in request.POST and UserGroupsToCustomizationPermissions.check_permission(request.user,
+                                                                                             settings.CUSTOMIZATION,
+                                                                                             'cms.publish_version'):
+        if product.product_type.can_preview:
+            publishing_errors = modify_db.publish_latest_version(product, review_id, request.user)
+            if publishing_errors:
+                messages.error(request, "Version {} {}".format(product_review.version.id, publishing_errors))
+            else:
+                messages.success(request, "Version {} has been published".format(product_review.version.id))
+        else:
+            modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.accepted, request.user)
+            messages.success(request, "Version {} has been accepted".format(product_review.version.id))
 
-        filldata.init_skin(product)
-        messages.success(request, "Version {} was force updated ".format(version_id))
+    elif 'reject' in request.POST:
+        modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.rejected, request.user)
+        messages.success(request, "Version {} has been rejected".format(product_review.version.id))
+
+    # In the future we will use this for doing special stuff
+    elif 'ask_question' in request.POST:
+        pass
 
     else:
-        return defaults.bad_request("File does not exist")
+        messages.error(request, "Invalid option selected")
 
-    return redirect(reverse('version', args=[version_id]) + preview_flag)
+    return
 
 
-@require_http_methods(["GET"])
-@permission_required('cms.change_contentversion')
-def version(request, version_id=None):
-    preview_link = ""
-    version_model = ContentVersion.objects.get(id=version_id)
-    contexts = modify_db.get_records_for_version(version_model)
-    #else happens when the user makes a revision without any changes
-    if contexts.values():
-        product = version_model.product
-        context = None
-        if 'preview' in request.GET:
-            if len(contexts) == 1:
-                context = Context.objects.get(name=contexts.keys()[0])
-            preview_link = modify_db.generate_preview_link(context)
+@require_http_methods(["POST"])
+@permission_required('cms.change_productcustomizationreview')
+def make_preview(request):
+    version_id = request.POST['version_id'] if 'version_id' in request.POST else None
+    context = Context.objects.get(id=request.POST['context_id'])
+    product = get_product_by_revision(version_id)
+    if product.product_type.can_preview:
+        redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
     else:
-        product = {'can_preview': False, 'name': ""}
-    return render(request, 'review_records.html', {'version': version_model,
-                                                   'contexts': contexts,
-                                                   'product': product,
-                                                   'preview_link': preview_link,
-                                                   'user': request.user,
-                                                   'has_permission': mysite.has_permission(request),
-                                                   'site_url': mysite.site_url,
-                                                   'site_header': admin.site.site_header,
-                                                   'site_title': admin.site.site_title
-                                                   })
+        review = ProductCustomizationReview.objects.get(version_id=version_id,
+                                                        customization__name=settings.CUSTOMIZATION)
+        redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
+        messages.error(request, "This product can not be previewed")
+
+    return HttpResponse(redirect_url)
 
 
 def response_attachment(data, filename, content_type):

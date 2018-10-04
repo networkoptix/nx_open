@@ -1,31 +1,14 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.html import format_html
-
-from datetime import datetime
 
 from cloud import settings
 from cms.forms import *
 from cms.controllers.modify_db import get_records_for_version
-
-
-class CloudFilter(SimpleListFilter):
-    title = 'Product'
-    parameter_name = 'product'
-
-    def lookups(self, request, model_admin):
-        products = Product.objects.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
-        if not request.user.is_superuser:
-            products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
-            return [(p.id, p.name) for p in products]
-        return [(p.id, p.__str__()) for p in products]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(product=self.value())
-        return queryset
+from cms.views.product import review
 
 
 class ProductFilter(SimpleListFilter):
@@ -33,7 +16,7 @@ class ProductFilter(SimpleListFilter):
     parameter_name = 'product'
 
     def lookups(self, request, model_admin):
-        products = Product.objects.exclude(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+        products = Product.objects.all()
         if not request.user.is_superuser:
             products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
             return [(p.id, p.name) for p in products]
@@ -188,7 +171,7 @@ admin.site.register(Customization, CustomizationAdmin)
 class DataRecordAdmin(CMSAdmin):
     list_display = ('product', 'language', 'context',
                     'data_structure', 'short_description', 'version')
-    list_filter = ('product', 'language', 'data_structure__context', 'data_structure')
+    list_filter = (ProductFilter, 'language', 'data_structure__context', 'data_structure')
     search_fields = ('data_structure__context__name', 'data_structure__name',
                      'data_structure__description', 'value', 'language__code')
     readonly_fields = ('created_by',)
@@ -198,33 +181,24 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(CMSAdmin):
-    list_display = ('content_version_actions', 'id', 'product',
-                    'created_date', 'created_by',
-                    'accepted_date', 'accepted_by', 'state')
+    list_display = ('id', 'product', 'created_date', 'created_by', 'state')
 
     list_display_links = ('id', )
-    list_filter = (CloudFilter,)
-    search_fields = ('accepted_by__email', 'created_by__email')
-    readonly_fields = ('created_by', 'accepted_by',)
+    list_filter = (ProductFilter,)
+    search_fields = ('created_by__email',)
+    readonly_fields = ('created_by',)
+    exclude = ('accepted_by', 'accepted_date')
 
     def changelist_view(self, request, extra_context=None):
         if not request.user.is_superuser:
             self.list_display_links = (None,)
         return super(ContentVersionAdmin, self).changelist_view(request, extra_context)
 
-    def content_version_actions(self, obj):
-        return format_html('<a class="btn btn-sm" href="{}">review</a>',
-                           reverse('version', args=[obj.id]))
-
     def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
-        qs = qs.filter(product__product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
         if not request.user.is_superuser:
             qs = qs.filter(product__customizations__name__in=[settings.CUSTOMIZATION])
         return qs
-
-    content_version_actions.short_description = "Admin Options"
-    content_version_actions.allow_tags = True
 
 
 admin.site.register(ContentVersion, ContentVersionAdmin)
@@ -251,7 +225,6 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         extra_context['contexts'] = get_records_for_version(version)
         extra_context['title'] = "Changes for {} - Version: {}".format(version.product.name, version.id)
         if request.user == version.product.created_by or request.user.is_superuser:
-            # extra_context['READONLY'] = True
             extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
             extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
         return super(ProductCustomizationReviewAdmin, self).change_view(
@@ -265,7 +238,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         return qs
 
     def get_readonly_fields(self, request, obj=None):
-        if request.user != obj.version.product.created_by:
+        if request.user != obj.version.product.created_by and obj.state != ProductCustomizationReview.REVIEW_STATES.rejected:
             return self.readonly_fields
         return list(set(list(self.readonly_fields) +
                         [field.name for field in obj._meta.fields] +
@@ -280,13 +253,11 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         return obj.version.product
 
     def save_model(self, request, obj, form, change):
-        # Once someone reviews the product we need to lock the version
-        if not obj.version.accepted_date:
-            obj.version.accepted_date = datetime.now()
-            obj.version.save()
-        obj.reviewed_by = request.user
-        obj.reviewed_date = datetime.now()
-        obj.save()
+        super(ProductCustomizationReviewAdmin, self).save_model(request, obj, form, change)
+        review(request)
+
+    def response_change(self, request, obj):
+        return redirect(reverse('admin:cms_productcustomizationreview_change', args=(obj.id,)))
 
 
 admin.site.register(ProductCustomizationReview, ProductCustomizationReviewAdmin)
