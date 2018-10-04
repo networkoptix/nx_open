@@ -1029,7 +1029,32 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    // AbstractEventRulesManager::save
+    /**%apidoc POST /ec2/saveEventRule
+     * Create or update event rule in event/actions rule list. Parameters should be passed
+	 * as a JSON object in POST message body with content type "application/json". 
+	 * Example of such object can be seen in the result of the corresponding GET function.
+     * %param eventType Event type to match the rule. Example of possible values can be seen in 
+	 *     the result of the corresponding GET function.
+     * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
+     * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.
+     * %param[opt] EventState Event state to match the rule.
+     *     %value inactive Prolonged event has finished.
+     *     %value active Prolonged event has started.
+     *     %value undefined Any state.
+     * %param actionType Action to execute if the rule matches. Example of possible values can be
+	 *     seen in the result of the corresponding GET function.
+     * %param[opt] actionResourceIds Resource list associated with the action. The action is executed
+     *     for each resource in the list.
+     * %param[opt] actionParams Additional parameters used in the action. It depends on the action type.
+     * %param[opt] aggregationPeriod Aggregation period in seconds. The action is not going to trigger
+     *     more often than the aggregation period.
+     * %param disabled Enable or disable the rule.
+     * %param[opt] comment Human-readable text. Not used on the server side.
+     * %param[opt] schedule Hex representation of the binary data. Each bit defines whether
+     *     the action should or should not be executed at some hour of week. Hour numbers
+	 *     start with 0. There are 24 * 7 = 168 bits.
+     * %param[opt] system Whether the rule can't be deleted by user. System rules can't be deleted.
+    */
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
     // AbstractEventRulesManager::deleteRule
