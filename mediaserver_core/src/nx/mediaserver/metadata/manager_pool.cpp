@@ -669,7 +669,8 @@ ManagerPool::loadManagerManifest(
     Error error = Error::noError;
 
     // "managerManifest" contains const char* representation of camera manifest.
-    // unique_ptr allows us to automatically ask manager to release it when memory is not needed more.
+    // unique_ptr allows us to automatically ask manager to release it when memory is not needed
+    // anymore.
     auto deleter = [manager](const char* ptr) { manager->freeManifest(ptr); };
     std::unique_ptr<const char, decltype(deleter)> managerManifest{
         manager->capabilitiesManifest(&error), deleter};

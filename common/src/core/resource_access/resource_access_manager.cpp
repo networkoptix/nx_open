@@ -18,6 +18,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 
@@ -27,7 +29,7 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
-#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -461,8 +463,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
     if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
         return Qn::ReadPermission | Qn::ExportPermission;
 
-    if (QnSharedResourcePointer<nx::vms::common::MetadataPluginInstanceResource> pir 
-        = target.dynamicCast<nx::vms::common::MetadataPluginInstanceResource>()
+    if (QnSharedResourcePointer<nx::vms::common::AnalyticsEngineResource> pir
+        = target.dynamicCast<nx::vms::common::AnalyticsEngineResource>()
     )
         return Qn::NoPermissions;
 

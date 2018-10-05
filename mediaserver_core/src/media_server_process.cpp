@@ -85,6 +85,7 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/network/socket.h>
 #include <nx/network/ssl/ssl_engine.h>
 #include <nx/network/udt/udt_socket.h>
@@ -2996,7 +2997,7 @@ void MediaServerProcess::updateGuidIfNeeded()
         }
     }
 
-    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged, 
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged,
         [this, serverGuid, hwidGuid]()
         {
             // Stop moving HwId to serverGuid as soon as first setup wizard is done.

@@ -9,7 +9,7 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/client/desktop/ui/event_rules/models/plugin_event_model.h>
-#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/help/help_topics.h>
@@ -118,7 +118,7 @@ void PluginEventWidget::paramsChanged()
 
 void PluginEventWidget::updatePluginEventTypesModel()
 {
-    const auto pirs = resourcePool()->getResources<nx::vms::common::MetadataPluginInstanceResource>();
+    const auto pirs = resourcePool()->getResources<nx::vms::common::AnalyticsEngineResource>();
     m_pluginEventModel->buildFromList(pirs);
     ui->pirComboBox->setEnabled(m_pluginEventModel->isValid());
     ui->pirComboBox->model()->sort(0);

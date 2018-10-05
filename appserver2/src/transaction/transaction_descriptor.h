@@ -47,6 +47,7 @@
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
+#include <nx/vms/api/data/analytics_data.h>
 
 class QnCommonModule;
 
@@ -68,6 +69,7 @@ class QnStoredFileNotificationManager;
 class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
+class AnalyticsNotificationManager;
 
 enum class RemotePeerAccess
 {
@@ -122,6 +124,7 @@ struct NotificationParams
     QnUpdatesNotificationManager* updatesNotificationManager;
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
+    AnalyticsNotificationManager* analyticsNotificationManager;
     NotificationSource source;
 };
 

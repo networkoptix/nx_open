@@ -296,6 +296,18 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, nx::vms::api::DiscoveryDataList)
 
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractAnalyticsManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER(
+            GetAnalyticsPlugins,
+            ec2::ErrorCode,
+            nx::vms::api::AnalyticsPluginDataList)
+
+        DEFINE_TWO_ARG_HANDLER(
+            GetAnalyticsEngines,
+            ec2::ErrorCode,
+            nx::vms::api::AnalyticsEngineDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnection
