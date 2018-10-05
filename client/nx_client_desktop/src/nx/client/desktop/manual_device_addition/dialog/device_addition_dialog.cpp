@@ -164,6 +164,7 @@ void DeviceAdditionDialog::initializeControls()
               "rtsp://example.com:554/video\n"
               "udp://239.250.5.5:1234"));
 
+    ui->widget->setFixedWidth(ui->addressLabelLayout->minimumSize().width());
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()
         {
