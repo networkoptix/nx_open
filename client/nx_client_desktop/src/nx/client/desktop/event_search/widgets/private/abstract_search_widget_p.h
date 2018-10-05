@@ -55,7 +55,7 @@ public:
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
 
-    void requestFetch();
+    void requestFetchIfNeeded();
     void resetFilters();
 
     void addDeviceDependentAction(

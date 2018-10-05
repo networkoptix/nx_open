@@ -93,6 +93,7 @@ signals:
     void camerasAboutToBeChanged(QPrivateSignal);
     void camerasChanged(QPrivateSignal);
     void isOnlineChanged(bool isOnline, QPrivateSignal);
+    void dataNeeded();
 
 protected:
     // These functions must be overridden in derived classes.

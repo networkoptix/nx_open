@@ -185,7 +185,6 @@ QAction* EventSearchWidget::Private::addMenuAction(QMenu* menu, const QString& t
                 : SelectableTextButton::State::unselected);
 
             m_eventModel->setSelectedEventType(type);
-            q->requestFetch();
         });
 
     if (dynamicTitle)

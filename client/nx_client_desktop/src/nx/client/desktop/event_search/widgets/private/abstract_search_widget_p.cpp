@@ -109,7 +109,7 @@ AbstractSearchWidget::Private::Private(
     setupCameraSelection();
     setupAreaSelection();
 
-    installEventHandler(q, QEvent::Show, q, &AbstractSearchWidget::requestFetch);
+    installEventHandler(q, QEvent::Show, this, &Private::requestFetchIfNeeded);
 
     installEventHandler(q, {QEvent::Show, QEvent::Hide}, this,
         [this, q]()
@@ -129,8 +129,8 @@ AbstractSearchWidget::Private::~Private()
 
 void AbstractSearchWidget::Private::setupModels()
 {
-    connect(m_mainModel.data(), &AbstractSearchListModel::camerasChanged,
-        q, &AbstractSearchWidget::requestFetch);
+    connect(m_mainModel.data(), &AbstractSearchListModel::dataNeeded,
+        this, &Private::requestFetchIfNeeded);
 
     connect(m_mainModel.data(), &QAbstractItemModel::modelReset,
         this, &Private::handleItemCountChanged);
@@ -191,7 +191,7 @@ void AbstractSearchWidget::Private::setupRibbon()
         colorTheme()->color("dark5"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
-        q, &AbstractSearchWidget::requestFetch, Qt::QueuedConnection);
+        this, &Private::requestFetchIfNeeded, Qt::QueuedConnection);
 
     connect(ui->ribbon, &EventRibbon::tileHovered, q, &AbstractSearchWidget::tileHovered);
 }
@@ -506,7 +506,6 @@ void AbstractSearchWidget::Private::updateCurrentTimePeriod()
 
     m_currentTimePeriod = newTimePeriod;
     m_mainModel->setRelevantTimePeriod(m_currentTimePeriod);
-    requestFetch();
 
     emit q->timePeriodChanged(m_currentTimePeriod);
 }
@@ -636,7 +635,7 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
     }
 }
 
-void AbstractSearchWidget::Private::requestFetch()
+void AbstractSearchWidget::Private::requestFetchIfNeeded()
 {
     if (!ui->ribbon->isVisible() || !model())
         return;

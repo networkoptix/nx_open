@@ -102,9 +102,6 @@ signals:
     void selectedAreaChanged(const QRectF& value);
 
 protected:
-    /** Requests more data to be fetched if needed. */
-    void requestFetch();
-
     /** Sets an icon for no data placeholder. */
     void setPlaceholderPixmap(const QPixmap& value);
 

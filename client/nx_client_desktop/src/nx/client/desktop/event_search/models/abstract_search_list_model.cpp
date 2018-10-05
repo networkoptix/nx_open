@@ -36,6 +36,7 @@ AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QO
             if (!m_isOnline)
                 m_cameraSet->setMultipleCameras({});
 
+            emit dataNeeded();
             emit isOnlineChanged(m_isOnline, {});
         };
 
@@ -139,6 +140,9 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
 
         if (!m_relevantTimePeriod.isInfinite())
             setLive(false);
+
+        if (canFetchMore())
+            emit dataNeeded();
     }
 }
 
@@ -286,6 +290,7 @@ void AbstractSearchListModel::clear()
     clearData();
 
     setLive(effectiveLiveSupported());
+    emit dataNeeded();
 }
 
 } // namespace nx::client::desktop

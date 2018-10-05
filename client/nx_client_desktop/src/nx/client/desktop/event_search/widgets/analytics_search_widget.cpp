@@ -61,7 +61,6 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
             NX_CRITICAL(analyticsModel);
             analyticsModel->setFilterText(text);
             updateChunksFilter();
-            requestFetch();
         });
 
     connect(this, &AbstractSearchWidget::selectedAreaChanged,
@@ -71,7 +70,6 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
             NX_CRITICAL(analyticsModel);
             analyticsModel->setFilterRect(area);
             updateChunksFilter();
-            requestFetch();
         });
 }
 

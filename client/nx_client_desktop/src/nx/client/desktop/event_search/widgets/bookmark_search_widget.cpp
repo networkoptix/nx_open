@@ -42,7 +42,6 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
             NX_CRITICAL(bookmarksModel);
             bookmarksModel->setFilterText(text);
             updateTimelineBookmarks();
-            requestFetch();
         });
 }
 
