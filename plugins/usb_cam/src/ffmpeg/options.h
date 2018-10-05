@@ -12,6 +12,7 @@ namespace ffmpeg {
 class Options
 {
 public:
+    Options() = default;
     ~Options();
     int setEntry(const char * key, const char * value, int flags = 0);
     int setEntry(const char * key, int64_t value, int flags = 0);

@@ -10,15 +10,9 @@
 namespace nx {
 namespace usb_cam {
 namespace device {
-
-/////////////////////////////////// AudioDiscoveryManagerPrivate ///////////////////////////////////
-
-AudioDiscoveryManagerPrivate::~AudioDiscoveryManagerPrivate()
-{
-    // required by gcc
-}
-
-////////////////////////////////////// AudioDiscoveryManager ///////////////////////////////////////
+    
+//--------------------------------------------------------------------------------------------------
+// AudioDiscoveryManager
 
 AudioDiscoveryManager::AudioDiscoveryManager()
 {

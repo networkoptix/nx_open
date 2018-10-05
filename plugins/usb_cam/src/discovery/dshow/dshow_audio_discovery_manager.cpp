@@ -39,13 +39,12 @@ void DShowAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, i
             {
                 mute = false;
                 audioTaken[device] = true;
-                /**
-                 * Duplicate audio devices in windows are prepended with an index, making them
-                 * unique. Therefore, it is safe to use the device name instead of its path. In
-                 * fact, the path requires further parsing before use by ffmpeg, as ffmpeg replaces
-                 * all ':' chars wtih '_' in audio alternative names. Oddly enough, it does not do
-                 * this for video.
-                 */
+                
+                 // Duplicate audio devices in windows are prepended with an index, making them
+                 // unique. Therefore, it is safe to use the device name instead of its path. In
+                 // fact, the path requires further parsing before use by ffmpeg, as ffmpeg replaces
+                 // all ':' chars wtih '_' in audio alternative names. Oddly enough, it does not do
+                 // this for video.
                 strncpy(
                     camera->auxiliaryData,
                     device->data.deviceName.c_str(),

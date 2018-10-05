@@ -34,7 +34,7 @@ public:
     virtual unsigned int cSeq() const override;
     virtual nxcip::Picture* getMotionData() const override;
 
-    /*!
+    /**
         \note Does keep contents of current buffer
     */
     void resizeBuffer(size_t bufSize);

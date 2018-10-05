@@ -15,7 +15,7 @@ public:
         int encoderIndex,
         const std::shared_ptr<Camera>& camera);
 
-    virtual ~NativeMediaEncoder();
+    virtual ~NativeMediaEncoder() = default;
 
     virtual int getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const override;
 

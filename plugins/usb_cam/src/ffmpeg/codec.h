@@ -52,10 +52,10 @@ public:
     const AVCodec * codec() const;
     AVCodecID codecId() const;
 
-    // video
+    // Video
     AVPixelFormat pixelFormat() const;
     
-    // audio
+    // Audio
     AVSampleFormat sampleFormat() const;
     int sampleRate() const;
     int frameSize() const;

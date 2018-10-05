@@ -29,9 +29,6 @@ public:
         nxcip::CameraInfo* cameraInfo ) override;
     virtual int fromUpnpData( const char* upnpXMLData, int upnpXMLDataSize, nxcip::CameraInfo* cameraInfo ) override;
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
-    /*!
-        Does nothing
-    */
     virtual int getReservedModelList( char** modelList, int* count ) override;
 
 private:

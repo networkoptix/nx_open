@@ -62,9 +62,8 @@ const std::vector<ResolutionData> kRaspberryPiResolutionList = {
     {480, 270, 5} 
 };
 
-/*!
- * convenience class for opening and closing devices represented by devicePath
- */
+
+// Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
 {
     DeviceInitializer(const char * devicePath):
@@ -305,7 +304,7 @@ std::vector<ResolutionData> getResolutionList(
             ++frameRateEnum.index;
         }
 
-        // there is only one resolution reported if this is true
+        // There is only one resolution reported if this is true
         if(frameSizeEnum.type != V4L2_FRMSIZE_TYPE_DISCRETE)
             break;
 
@@ -366,7 +365,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
             return ec.value;
     }
     
-    return kRpiBitrate; // not sure what else to do here
+    return kRpiBitrate;
 }
 
 } // namespace impl

@@ -14,19 +14,19 @@ namespace device {
 
 std::string getDeviceName(const char * devicePath);
 
-/*!
+/**
 * Get the list of devices on the system, with fields filled out.
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
 * @param[in] codecId - the codec whose resolution list is desired
 */
 std::vector<DeviceData> getDeviceList();
 
-/*!
+/**
 * Get a list of codecs supported by this device
 */
 std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char * devicePath);
 
-/*!
+/**
 * Get the list of supported resolutions for the device with the given path.
 * On Windows this corresponds to the device's L"DevicePath" field for COM.
 * On Linux, this corresponds to the devices's /dev/video* entry.
@@ -37,7 +37,7 @@ std::vector<ResolutionData> getResolutionList(
     const char * devicePath,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
-/*!
+/**
 * Set the bitrate for the device with the given \a devicePath.
 * On Windows this corresponds to the device's L"DevicePath" field for COM.
 * On Linux, this corresponds to the devices's /dev/video* entry.
@@ -49,7 +49,7 @@ void setBitrate(
     int bitrate,
     const device::CompressionTypeDescriptorPtr& targetCodecID);
 
-/*!
+/**
 * Get the maximum bitrate supported by the camera
 * @param[int] devicePath - the path to the device
 * * @param[in] targetCodecID - the target codec to get bitrate for

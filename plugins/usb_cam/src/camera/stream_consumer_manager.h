@@ -24,7 +24,20 @@ public:
      */
     void flush();
 
+    /**
+     * Add a consumer to the consumer manager.
+     * 
+     * @param[in] consumer - the consumer to add.
+     * @return - index the consumer was added at or -1 if it was already added.
+     */
     virtual size_t addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
+
+    /**
+     * Remove the givenconsumer from the consumer manager.
+     *
+     * @param[in] consumer - the consumer to remove.
+     * @return - the index the consumer was add before it was removed or -1 if it couldn't be found.
+     */
     virtual size_t removeConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer);
     int consumerIndex(const std::weak_ptr<AbstractStreamConsumer>& consumer) const;
     const std::vector<std::weak_ptr<AbstractStreamConsumer>>& consumers() const;

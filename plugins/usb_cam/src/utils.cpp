@@ -14,13 +14,12 @@ static constexpr int kMsecInSec = 1000;
 
 std::string decodeCameraInfoUrl(const char * url)
 {
-    /**
-     * Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
-     * where <camera-resource> is /dev/video* on Linux or the device-instance-id on Windows.
-     */
+
+    // Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
+    // where <camera-resource> is /dev/video* on Linux or the device-instance-id on Windows.
     std::string hostWithResource(url);
     
-    // find the second occurence of ":" in the url
+    // Find the second occurence of ":" in the url.
     int colon = hostWithResource.find(":", hostWithResource.find(":") + 1);
     if(colon == std::string::npos)
         return std::string();

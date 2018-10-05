@@ -173,9 +173,7 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
         return result;
 
 #ifdef WIN32
-    /**
-     * Attempt to avoid "real-time buffer too full" error messages in Windows
-     */
+    // Attempt to avoid "real-time buffer too full" error messages in Windows 
     inputFormat->setEntry("thread_queue_size", 2048);
     inputFormat->setEntry("threads", (int64_t) 0);
 #endif
@@ -336,7 +334,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
     for(;;)
     {
-        // need to drain the the resampler periodically to avoid increasing audio delay
+        // Need to drain the the resampler periodically to avoid increasing audio delay
         if(m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;

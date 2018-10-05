@@ -101,7 +101,6 @@ void StreamReader::setBitrate(int bitrate)
     m_streamReader->setBitrate(bitrate);
 }
 
-
 //--------------------------------------------------------------------------------------------------
 // StreamReaderPrivate
 

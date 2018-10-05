@@ -23,7 +23,7 @@ public:
         int encoderIndex,
         const std::shared_ptr<Camera>& camera);
 
-    virtual ~MediaEncoder();
+    virtual ~MediaEncoder() = default;
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
     virtual unsigned int addRef() override;

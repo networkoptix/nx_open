@@ -20,8 +20,7 @@ namespace usb_cam {
 
 static Plugin* webCameraPluginInstance = NULL;
 
-Plugin::Plugin()
-:
+Plugin::Plugin():
     m_refManager( this ),
     m_timeProvider(nullptr)
 {

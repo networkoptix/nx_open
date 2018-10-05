@@ -36,9 +36,8 @@ std::unique_ptr<ffmpeg::Codec> getDefaultAudioEncoder(int * outFfmpegError)
         ? 128000  // aac
         : 192000; // mp3 or other
 
-    /*!
-     * formula found at: https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio 
-     */
+    
+    // Formula found at: https://trac.ffmpeg.org/wiki/Encode/HighQualityAudio
     context->bit_rate = recommendedStereoBitrate * context->channels / 2;
 
     *outFfmpegError = 0;

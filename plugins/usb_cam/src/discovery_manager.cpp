@@ -17,7 +17,8 @@
 namespace nx {
 namespace usb_cam {
 
-DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
+DiscoveryManager::DiscoveryManager(
+    nxpt::CommonRefManager* const refManager,
     nxpl::TimeProvider *const timeProvider)
     :
     m_refManager(refManager),

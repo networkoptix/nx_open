@@ -174,7 +174,7 @@ size_t PacketConsumerManager::addConsumer(
     const std::weak_ptr<AbstractStreamConsumer>& consumer,
     bool waitForKeyPacket)
 {
-    /* this addConsumer() call needs to be the parent's to avoid recursion*/
+    // This addConsumer() call needs to be the parent's to avoid recursion
     size_t index = StreamConsumerManager::addConsumer(consumer);
     if (index != -1)
     {

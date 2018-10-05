@@ -9,7 +9,7 @@ namespace device {
 class AudioDiscoveryManagerPrivate
 {
 public:
-    virtual ~AudioDiscoveryManagerPrivate();
+    virtual ~AudioDiscoveryManagerPrivate() = default;
     virtual void fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const = 0;
 };
 

@@ -13,12 +13,13 @@ namespace device {
 
 namespace {
 
-    std::vector<std::string> kMotherBoardAudioList = {
-        "HDA Intel PCH"
-        // AMD? builtin audio card goes here
-    };
+std::vector<std::string> kMotherBoardAudioList = 
+{
+    "HDA Intel PCH"
+    // AMD? builtin audio card goes here
+};
 
-} //namespace
+} // namespace
 
 void AlsaAudioDiscoveryManager::fillCameraAuxData(nxcip::CameraInfo* cameras, int cameraCount) const
 {

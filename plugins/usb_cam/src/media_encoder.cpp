@@ -27,10 +27,6 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
 {
 }
 
-MediaEncoder::~MediaEncoder()
-{
-}
-
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
     if (memcmp(&interfaceID, &nxcip::IID_CameraMediaEncoder2,

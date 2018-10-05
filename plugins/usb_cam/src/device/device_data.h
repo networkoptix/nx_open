@@ -13,11 +13,11 @@ namespace device {
 
 struct ResolutionData
 {
-    // resolution
+    // Resolution
     int width;
     int height;
     
-    // maximum frames per second
+    // Maximum frames per second
     float fps;
 
     ResolutionData():

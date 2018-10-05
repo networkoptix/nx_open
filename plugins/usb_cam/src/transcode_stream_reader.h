@@ -71,6 +71,15 @@ private:
     int initializeScaledFrame(const ffmpeg::Codec* encoder);
     void setEncoderOptions(ffmpeg::Codec* encoder);
     void maybeFlush();
+    
+    /**
+     * Scale @param frame, modifying the preallocated @param outFrame whose size and format are
+     * expected to have already been set.
+     * 
+     * @param[in] frame - the input frame
+     * @params[out] outFrame - the output frame
+     * @return Ffmpeg error code, 0 on success negative value on failure
+     */
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
 };

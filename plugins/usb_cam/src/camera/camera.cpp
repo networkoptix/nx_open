@@ -53,10 +53,7 @@ const std::vector<nxcip::CompressionType> Camera::kVideoCodecPriorityList =
     nxcip::AV_CODEC_ID_MJPEG
 };
 
-Camera::Camera(
-    nxpl::TimeProvider* const timeProvider,
-    const nxcip::CameraInfo& info)
-    :
+Camera::Camera(nxpl::TimeProvider* const timeProvider, const nxcip::CameraInfo& info):
     m_timeProvider(timeProvider),
     m_info(info),
     m_audioEnabled(false),
@@ -65,7 +62,7 @@ Camera::Camera(
     auto codecList = device::getSupportedCodecs(url().c_str());
     m_compressionTypeDescriptor = getPriorityDescriptor(kVideoCodecPriorityList, codecList);
     
-    // if m_compressionTypeDescriptor is null, there probably is no camera plugged in.
+    // If m_compressionTypeDescriptor is null, there probably is no camera plugged in.
     if(m_compressionTypeDescriptor)
         m_defaultVideoParams = getDefaultVideoParameters();
     else
@@ -179,9 +176,9 @@ CodecParameters Camera::getDefaultVideoParameters()
     auto resolutionList = this->resolutionList();
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
         [](const device::ResolutionData& a, const device::ResolutionData& b)
-    {
-        return a.width * a.height < b.width * b.height;
-    });
+        {
+            return a.width * a.height < b.width * b.height;
+        });
 
     if (it != resolutionList.end())
     {
@@ -194,7 +191,7 @@ CodecParameters Camera::getDefaultVideoParameters()
             it->height);
     }
     
-    // should never reach here if m_compressionTypeDescriptor is valid
+    // Should never reach here if m_compressionTypeDescriptor is valid
     return CodecParameters(AV_CODEC_ID_NONE, 30, 5000000, 640, 640*9/16);
 }
 

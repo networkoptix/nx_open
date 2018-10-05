@@ -39,7 +39,7 @@ struct DShowInitializer{
         if (S_FALSE == m_result)
             CoUninitialize();
 
-        // todo figure out how to call Couninitialize() eventually if S_OK was returned
+        // TODO: figure out how to call Couninitialize() eventually if S_OK was returned
     }
 };
 

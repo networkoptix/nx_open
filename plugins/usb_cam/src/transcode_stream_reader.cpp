@@ -114,27 +114,23 @@ bool TranscodeStreamReader::shouldDrop(const ffmpeg::Frame * frame)
     if (!frame)
         return true;
 
-    /**
-     * If this stream's requested framerate is equal to the cameras' requested framerate,
-     * never drop.
-     */
+    
+    // If this stream's requested framerate is equal to the cameras' requested framerate,
+    // never drop.
     if(m_codecParams.fps >= m_camera->videoStream()->fps())
         return false;
 
-    /**
-     * The Mmal decoder can reorder frames, causing time stamps to be out of order. The h263 encoder
-     * throws an error if the frame that it encodes equal to or earlier in time than the previous
-     * frame, so drop it to avoid this error.
-     */
+    // The Mmal decoder can reorder frames, causing time stamps to be out of order. The h263 encoder
+    // throws an error if the frame that it encodes equal to or earlier in time than the previous
+    // frame, so drop it to avoid this error.
     if (m_lastVideoPts != AV_NOPTS_VALUE && frame->pts() <= m_lastVideoPts)
         return true;
 
     uint64_t now = m_camera->millisSinceEpoch();
 
-    /**
-     * If the time stamp of this frame minus the amount of time per video frame is lower
-     * than the timestamp of the last transcoded frame, we should drop.
-     */
+
+    // If the time stamp of this frame minus the amount of time per video frame is lower
+    // than the timestamp of the last transcoded frame, we should drop.
     bool drop = now - m_timePerFrame < m_lastTimestamp;
     
     if(!drop)
@@ -238,8 +234,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             return false;
         };
 
-    /** Audio disabled */
-
+    // Audio disabled
     if (!m_camera->audioEnabled())
     {
         for (;;)
@@ -252,8 +247,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         }
     }
     
-    /* Audio enabled */
-
+    // Audio enabled
     waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame());
 
     if (interrupted())
@@ -270,9 +264,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
                 m_avConsumer->givePacket(videoPacket);
         }
 
-        /** 
-         * Release the reference so that internally VideoStream::m_frameCount will be decremented.
-         */
+        // Release the reference so that internally VideoStream::m_frameCount will be decremented.
         videoFrame = nullptr;
 
         auto peeked = m_avConsumer->peekOldest(std::chrono::milliseconds(1));
@@ -397,7 +389,7 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
     AVCodecContext* context = encoder->codecContext();
 
     context->mb_decision = FF_MB_DECISION_BITS;
-    /** don't use global header. the rpi cam doesn't stream properly with global. */
+    // Don't use global header. the rpi cam doesn't stream properly with global.
     context->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
     context->global_quality = context->qmin * FF_QP2LAMBDA;
     context->gop_size = m_codecParams.fps;
@@ -406,11 +398,10 @@ void TranscodeStreamReader::setEncoderOptions(ffmpeg::Codec* encoder)
 void TranscodeStreamReader::maybeFlush()
 {
     float fps = m_camera->videoStream()->actualFps();
-    /** Should never happen */
-    if (fps == 0)
+    if (fps == 0) //< Should never happen.
         fps = 30;
 
-    /** theoretically this means over a second of video */
+    // Theoretically this means over a second of video.
     if (m_videoFrameConsumer->size() >= fps)
         m_videoFrameConsumer->flush();
 
@@ -419,10 +410,6 @@ void TranscodeStreamReader::maybeFlush()
         m_avConsumer->flush();
 }
 
-/*!
- * Scale @param frame, modifying the preallocated @param outFrame whose size and format are
- * expected to have already been set.
- */
 int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)
 {
     AVPixelFormat pixelFormat = frame->format != -1 
