@@ -41,7 +41,7 @@ public:
                 if (auto lock = sharedGuard->lock())
                 {
                     dispatch(
-                        [this, args = std::make_tuple(std::move(args)...),
+                        [args = std::make_tuple(std::move(args)...),
                             handler = std::move(handler)]() mutable
                         {
                             std::apply(handler, std::move(args));
