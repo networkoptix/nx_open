@@ -132,7 +132,7 @@ public static class PaxtonClient
             });
 
         m_process = desktop_client_api.Launcher.startClient(parameters);
-
+        Environment.Exit(0);
         return m_process != null ? OemDvrStatus.Succeeded : OemDvrStatus.FootagePlaybackFailed;
     }
 
