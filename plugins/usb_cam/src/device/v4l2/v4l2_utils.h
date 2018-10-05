@@ -46,7 +46,7 @@ std::vector<device::CompressionTypeDescriptorPtr> getSupportedCodecs(const char 
 * Get the list of supported resolutions for the device with the given path.
 * On Linux, this corresponds to the devices's /dev/video* entry.
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
-* @param[in] codecID - the codec whose resolution list is desired
+* @param[in] codecId - the codec whose resolution list is desired
 */
 std::vector<ResolutionData> getResolutionList(
     const char * devicePath,

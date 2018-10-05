@@ -324,7 +324,7 @@ std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int * outFfmpegError)
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
-        m_encoder->codecID(),
+        m_encoder->codecId(),
         AVMEDIA_TYPE_AUDIO,
         m_packetCount);
 
@@ -385,7 +385,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
 
     packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
-    if(m_encoder->codecID() == AV_CODEC_ID_PCM_S16LE)
+    if(m_encoder->codecId() == AV_CODEC_ID_PCM_S16LE)
         return packet;
 
     /** 
@@ -404,7 +404,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
         size += pkt->size();
 
     auto newPacket = std::make_shared<ffmpeg::Packet>(
-        packet->codecID(),
+        packet->codecId(),
         AVMEDIA_TYPE_AUDIO);
 
     *outFfmpegError = newPacket->newPacket(size);

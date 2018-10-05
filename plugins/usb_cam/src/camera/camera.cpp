@@ -16,12 +16,12 @@ size_t getPriorityCodecIndex(
     const std::vector<nxcip::CompressionType>& videoCodecPriorityList,
     const std::vector<device::CompressionTypeDescriptorPtr>& codecDescriptorList)
 {
-    for (const auto codecID : videoCodecPriorityList)
+    for (const auto codecId : videoCodecPriorityList)
     {
         size_t index = 0;
         for (const auto& descriptor : codecDescriptorList)
         {
-            if (codecID == descriptor->toNxCompressionType())
+            if (codecId == descriptor->toNxCompressionType())
                 return index;
             ++index;
         }

@@ -13,14 +13,14 @@ namespace usb_cam {
 
 struct CodecParameters
 {
-    AVCodecID codecID;
+    AVCodecID codecId;
     float fps;
     int bitrate;
     int width;
     int height;
 
     CodecParameters():
-        codecID(AV_CODEC_ID_NONE),
+        codecId(AV_CODEC_ID_NONE),
         fps(0),
         bitrate(0),
         width(0),
@@ -28,8 +28,8 @@ struct CodecParameters
     {
     }
 
-    CodecParameters(AVCodecID codecID, float fps, int bitrate, int width, int height):
-        codecID(codecID),
+    CodecParameters(AVCodecID codecId, float fps, int bitrate, int width, int height):
+        codecId(codecId),
         fps(fps),
         bitrate(bitrate),
         width(width),
@@ -51,7 +51,7 @@ struct CodecParameters
 
     std::string toString() const
     {
-        return std::string("codec: ") + ffmpeg::utils::codecIDToName(codecID) + 
+        return std::string("codec: ") + ffmpeg::utils::codecIDToName(codecId) + 
             ", res:" + std::to_string(width) + "x" + std::to_string(height) + 
             ", fps: " + std::to_string(fps) + 
             ", bitrate: " +  std::to_string(bitrate);

@@ -98,10 +98,10 @@ int Codec::encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGot
     return avcodec_encode_audio2(m_codecContext, outPacket, frame, outGotPacket);
 }
 
-int Codec::initializeEncoder(AVCodecID codecID)
+int Codec::initializeEncoder(AVCodecID codecId)
 {
     close();
-    m_codec = avcodec_find_encoder(codecID);
+    m_codec = avcodec_find_encoder(codecId);
     if (!m_codec)
         return AVERROR_ENCODER_NOT_FOUND;
 
@@ -126,10 +126,10 @@ int Codec::initializeEncoder(const char * codecName)
     return 0;
 }
 
-int Codec::initializeDecoder(AVCodecID codecID)
+int Codec::initializeDecoder(AVCodecID codecId)
 {
     close();
-    m_codec = avcodec_find_decoder(codecID);
+    m_codec = avcodec_find_decoder(codecId);
     if (!m_codec)
         return AVERROR_DECODER_NOT_FOUND;
 
@@ -214,7 +214,7 @@ const AVCodec * Codec::codec() const
     return m_codec;
 }
 
-AVCodecID Codec::codecID() const
+AVCodecID Codec::codecId() const
 {
     return m_codecContext->codec_id;
 }

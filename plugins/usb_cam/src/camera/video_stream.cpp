@@ -320,8 +320,8 @@ int VideoStream::initializeInputFormat()
 void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
     AVFormatContext * context = inputFormat->formatContext();
-    if (m_codecParams.codecID != AV_CODEC_ID_NONE)
-        context->video_codec_id = m_codecParams.codecID;
+    if (m_codecParams.codecId != AV_CODEC_ID_NONE)
+        context->video_codec_id = m_codecParams.codecId;
 
     context->flags |= AVFMT_FLAG_DISCARD_CORRUPT | AVFMT_FLAG_NOBUFFER;
 
@@ -359,7 +359,7 @@ int VideoStream::initializeDecoder()
 {
     auto decoder = std::make_unique<ffmpeg::Codec>();
     int result;
-    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecID == AV_CODEC_ID_H264)
+    if (nx::utils::AppInfo::isRaspberryPi() && m_codecParams.codecId == AV_CODEC_ID_H264)
     {
         result = decoder->initializeDecoder("h264_mmal");
     }
@@ -583,7 +583,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
             && resolution.fps == params.fps)
         {
             return CodecParameters(
-                m_codecParams.codecID, 
+                m_codecParams.codecId, 
                 params.fps,
                 m_codecParams.bitrate,
                 params.width,
@@ -601,7 +601,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
                 && resolution.fps >= params.fps)
             {
                 return CodecParameters(
-                    m_codecParams.codecID,
+                    m_codecParams.codecId,
                     resolution.fps,
                     m_codecParams.bitrate,
                     resolution.width,
@@ -617,7 +617,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
             && resolution.fps >= params.fps)
         {
             return CodecParameters(
-                m_codecParams.codecID,
+                m_codecParams.codecId,
                 resolution.fps,
                 m_codecParams.bitrate,
                 resolution.width,
@@ -633,9 +633,9 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
     if (m_codecParams.fps != codecParams.fps
         || m_codecParams.width * m_codecParams.height != codecParams.width * codecParams.height)
     {
-        AVCodecID codecID = m_codecParams.codecID;
+        AVCodecID codecId = m_codecParams.codecId;
         m_codecParams = codecParams;
-        m_codecParams.codecID = codecID;
+        m_codecParams.codecId = codecId;
         m_cameraState = csModified;
     }
 }

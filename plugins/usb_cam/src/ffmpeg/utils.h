@@ -16,7 +16,7 @@ namespace ffmpeg {
 namespace utils {
 
 std::string errorToString(int errorCode);
-std::string codecIDToName(AVCodecID codecID);
+std::string codecIDToName(AVCodecID codecId);
 AVCodecID codecNameToID(const char * codecName);
 
 AVPixelFormat suggestPixelFormat(const AVCodec* codec);
@@ -25,7 +25,7 @@ AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 nxcip::DataPacketType toNxDataPacketType(AVMediaType mediaType);
 AVMediaType toAVMediaType(nxcip::DataPacketType mediaType);
 
-nxcip::CompressionType toNxCompressionType(AVCodecID codecID);
+nxcip::CompressionType toNxCompressionType(AVCodecID codecId);
 AVCodecID toAVCodecID(nxcip::CompressionType compressionType);
 
 nxcip::AudioFormat::SampleType toNxSampleType(

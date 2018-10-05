@@ -17,7 +17,7 @@ std::string getDeviceName(const char * devicePath);
 /*!
 * Get the list of devices on the system, with fields filled out.
 * @param[in] getResolution - whether or not to fill each DeviceData with supported resolutions
-* @param[in] codecID - the codec whose resolution list is desired
+* @param[in] codecId - the codec whose resolution list is desired
 */
 std::vector<DeviceData> getDeviceList();
 

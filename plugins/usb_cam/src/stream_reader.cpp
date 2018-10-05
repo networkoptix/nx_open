@@ -30,7 +30,7 @@ StreamReader::StreamReader(
     :
     m_refManager(parentRefManager)
 {
-    if (codecParams.codecID == AV_CODEC_ID_NONE) // needs transcoding to a supported codec
+    if (codecParams.codecId == AV_CODEC_ID_NONE) // needs transcoding to a supported codec
         m_streamReader.reset(new TranscodeStreamReader(
         encoderIndex,
         codecParams,
@@ -167,7 +167,7 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
         &m_allocator,
         0,
         ffmpeg::utils::toNxDataPacketType(packet->mediaType()),
-        ffmpeg::utils::toNxCompressionType(packet->codecID()),
+        ffmpeg::utils::toNxCompressionType(packet->codecId()),
         packet->timestamp() * kUsecInMsec,
         keyPacket,
         0));

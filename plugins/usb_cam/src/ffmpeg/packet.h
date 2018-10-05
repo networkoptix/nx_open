@@ -15,7 +15,7 @@ class Packet
 {
 public:
     Packet(
-        AVCodecID codecID,
+        AVCodecID codecId,
         AVMediaType mediaType,
         const std::shared_ptr<std::atomic_int>& packetCount = nullptr);
     ~Packet();
@@ -32,7 +32,7 @@ public:
     void unreference();
     int newPacket(int size);
     
-    AVCodecID codecID() const;
+    AVCodecID codecId() const;
     AVMediaType mediaType() const;
 
     uint64_t timestamp() const;
@@ -41,7 +41,7 @@ public:
     bool keyPacket() const;
 
 private:
-    AVCodecID m_codecID;
+    AVCodecID m_codecId;
     AVMediaType m_mediaType;
     std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timestamp = 0;

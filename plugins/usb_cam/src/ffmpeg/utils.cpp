@@ -31,9 +31,9 @@ std::string errorToString(int errorCode)
     return errorBuffer;
 }
 
-std::string codecIDToName(AVCodecID codecID)
+std::string codecIDToName(AVCodecID codecId)
 {
-   return avcodec_get_name(codecID);
+   return avcodec_get_name(codecId);
 }
 
 AVCodecID codecNameToID(const char * codecName)
@@ -97,9 +97,9 @@ AVMediaType toAVMediaType(nxcip::DataPacketType mediaType)
     }
 }
 
-nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
+nxcip::CompressionType toNxCompressionType(AVCodecID codecId)
 {
-    switch (codecID)
+    switch (codecId)
     {
         case AV_CODEC_ID_MPEG2VIDEO:
             return nxcip::AV_CODEC_ID_MPEG2VIDEO;
@@ -141,9 +141,9 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
     }
 }
 
-AVCodecID toAVCodecID(nxcip::CompressionType codecID)
+AVCodecID toAVCodecID(nxcip::CompressionType codecId)
 {
-    switch (codecID)
+    switch (codecId)
     {
         case nxcip::AV_CODEC_ID_MPEG2VIDEO:
             return AV_CODEC_ID_MPEG2VIDEO;

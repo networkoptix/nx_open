@@ -33,10 +33,10 @@ public:
     int decodeAudio(AVFrame * outFrame, const AVPacket * packet, int * outGotFrame);
     int encodeAudio(const AVFrame * frame, AVPacket * outPacket, int * outGotPacket);
 
-    int initializeEncoder(AVCodecID codecID);
+    int initializeEncoder(AVCodecID codecId);
     int initializeEncoder(const char *codecName);
 
-    int initializeDecoder(AVCodecID codecID);
+    int initializeDecoder(AVCodecID codecId);
     int initializeDecoder(const AVCodecParameters *codecParameters);
     int initializeDecoder(const char *codecName);
 
@@ -50,7 +50,7 @@ public:
     const AVCodecContext * codecContext() const;
     AVCodecContext * codecContext();
     const AVCodec * codec() const;
-    AVCodecID codecID() const;
+    AVCodecID codecId() const;
 
     // video
     AVPixelFormat pixelFormat() const;

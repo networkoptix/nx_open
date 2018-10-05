@@ -164,7 +164,7 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::transcodeVideo(
     m_scaledFrame->frame()->pts = frame->pts();
     m_scaledFrame->frame()->pkt_pts = frame->packetPts();
 
-    auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecID(), AVMEDIA_TYPE_VIDEO);    
+    auto packet = std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_VIDEO);    
 
     result = encode(m_scaledFrame.get(), packet.get());
     if (result < 0)
@@ -347,10 +347,10 @@ int TranscodeStreamReader::openVideoEncoder()
     int result = 0;
     std::unique_ptr<ffmpeg::Codec> encoder;
     auto ffmpegCodecList = m_camera->ffmpegCodecPriorityList();
-    for (const auto & codecID : ffmpegCodecList)
+    for (const auto & codecId : ffmpegCodecList)
     {
         encoder = std::make_unique<ffmpeg::Codec>();
-        result = encoder->initializeEncoder(codecID);
+        result = encoder->initializeEncoder(codecId);
         if (result >= 0)
             break;
     }

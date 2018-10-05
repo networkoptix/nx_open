@@ -27,11 +27,11 @@ uint8_t firstDigit(uint8_t n)
 }
 
 Packet::Packet(
-    AVCodecID codecID,
+    AVCodecID codecId,
     AVMediaType mediaType,
     const std::shared_ptr<std::atomic_int>& packetCount)
     :
-    m_codecID(codecID),
+    m_codecId(codecId),
     m_mediaType(mediaType),
     m_packetCount(packetCount),
     m_packet(av_packet_alloc())
@@ -100,9 +100,9 @@ int Packet::newPacket(int size)
     return av_new_packet(m_packet, size);
 }
 
-AVCodecID Packet::codecID() const 
+AVCodecID Packet::codecId() const 
 {
-    return m_codecID; 
+    return m_codecId; 
 }
 
 AVMediaType Packet::mediaType() const
@@ -146,7 +146,7 @@ void Packet::parseNalUnits() const
 
     m_parseNalUnitsVisited = true;
 
-    if (m_codecID != AV_CODEC_ID_H264)
+    if (m_codecId != AV_CODEC_ID_H264)
         return;
 
     const uint8_t* buffer = data();
