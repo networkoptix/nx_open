@@ -6,10 +6,7 @@ namespace nx {
 namespace vms {
 namespace api {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-(UserDataEx),
-(eq)(ubjson)(json)(xml)(sql_record)(csv_record),
-_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((UserDataEx), (json), _Fields)
 
 } // namespace api
 } // namespace vms
