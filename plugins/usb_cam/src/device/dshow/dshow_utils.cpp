@@ -9,7 +9,8 @@ namespace impl {
 
 namespace {
 
-///////////////////////////////// DShowCompressionTypeDescriptor //////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// DShowCompressionTypeDescriptor
 
 class DShowCompressionTypeDescriptor : public AbstractCompressionTypeDescriptor{
 public:
@@ -59,8 +60,8 @@ BITMAPINFOHEADER *  DShowCompressionTypeDescriptor::videoInfoBitMapHeader() cons
 
 } // namespace
 
-
-///////////////////////////////////////////// public api //////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// public api
 
 std::string getDeviceName(const char * devicePath)
 {
@@ -217,8 +218,8 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
     return largest;
 }
 
-
-/////////////////////////////////////// api helper functions //////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// api helper functions
 
 // borrowed from https://msdn.microsoft.com/en-us/library/windows/desktop/dd375432(v=vs.85).aspx
 // Release the format block for a media type.
@@ -545,7 +546,8 @@ std::string getDevicePath(IMoniker *pMoniker)
     return toStdString(var.bstrVal);
 }
 
-////////////////////////////////////////////// Audio //////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// audio
 
 LONG getWaveInID(IMoniker * pMoniker)
 {

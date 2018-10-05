@@ -15,7 +15,7 @@ namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
 
-class InputFormat : public Options
+class InputFormat: public Options
 {
 public:
     InputFormat();

@@ -30,7 +30,6 @@ const char * ffmpegDeviceType()
 
 } // namespace
 
-
 //--------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
@@ -75,11 +74,6 @@ int AudioStream::AudioStreamPrivate::sampleRate() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_encoder ? m_encoder->codecContext()->sample_rate : 0;
-}
-
-int AudioStream::sampleRate() const
-{
-    return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrl() const
@@ -311,7 +305,10 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
     if(!m_resampleContext)
         return m_initCode;
 
-    return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
+    return swr_convert_frame(
+        m_resampleContext,
+        outFrame->frame(),
+        frame ? frame->frame() : nullptr);
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
@@ -426,6 +423,14 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     return newPacket;
 }
 
+std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
+{
+    if(auto cam = m_camera.lock())
+        return cam->videoStream()->actualTimePerFrame();
+    /** Should never happen */
+    return std::chrono::milliseconds(0);
+}
+
 void AudioStream::AudioStreamPrivate::start()
 {
     m_terminated = false;
@@ -487,15 +492,6 @@ void AudioStream::AudioStreamPrivate::run()
     }
 }
 
-std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
-{
-    if(auto cam = m_camera.lock())
-        return cam->videoStream()->actualTimePerFrame();
-    /** Should never happen */
-    return std::chrono::milliseconds(0);
-}
-
-
 //--------------------------------------------------------------------------------------------------
 // AudioStream
 
@@ -551,6 +547,11 @@ void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
         m_streamReader->removePacketConsumer(consumer);
     else
         m_packetConsumerManager->removeConsumer(consumer);
+}
+
+int AudioStream::sampleRate() const
+{
+    return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
 } //namespace usb_cam

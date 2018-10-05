@@ -55,7 +55,7 @@ private:
         int m_initCode = 0;
         int m_retries = 0;
 
-        bool m_terminated;
+        bool m_terminated = false;
         mutable std::mutex m_mutex;
         std::condition_variable m_wait;
         std::thread m_runThread;
@@ -95,11 +95,12 @@ private:
          * @return - all previously given packets, merged into one
          */
         std::shared_ptr<ffmpeg::Packet> mergePackets(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
+        
+        std::chrono::milliseconds timePerVideoFrame() const;
+
         void start();
         void stop();
         void run();
-
-        std::chrono::milliseconds timePerVideoFrame() const;
     };
 
 public:

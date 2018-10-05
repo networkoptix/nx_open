@@ -9,9 +9,7 @@
 namespace nx {
 namespace usb_cam {
 
-class DiscoveryManager
-:
-    public nxcip::CameraDiscoveryManager
+class DiscoveryManager: public nxcip::CameraDiscoveryManager
 {
 public:
     DiscoveryManager(nxpt::CommonRefManager* const refManager,

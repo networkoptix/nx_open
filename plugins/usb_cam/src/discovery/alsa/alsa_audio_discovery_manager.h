@@ -15,7 +15,7 @@ namespace device {
 #include <string>
 #include <vector>
 
-class AlsaAudioDiscoveryManager : public AudioDiscoveryManagerPrivate
+class AlsaAudioDiscoveryManager: public AudioDiscoveryManagerPrivate
 {
 private:
     enum IOType

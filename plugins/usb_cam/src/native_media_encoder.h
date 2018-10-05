@@ -7,9 +7,7 @@ namespace usb_cam {
 
 class CameraManager;
 
-class NativeMediaEncoder
-:
-    public MediaEncoder
+class NativeMediaEncoder: public MediaEncoder
 {
 public:
     NativeMediaEncoder(

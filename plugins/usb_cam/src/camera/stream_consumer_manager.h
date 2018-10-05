@@ -40,7 +40,7 @@ protected:
 //--------------------------------------------------------------------------------------------------
 // FrameConsumerManager
 
-class FrameConsumerManager : public StreamConsumerManager
+class FrameConsumerManager: public StreamConsumerManager
 {
 public:
     void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame);
@@ -49,7 +49,7 @@ public:
 //--------------------------------------------------------------------------------------------------
 // PacketConsumerManager
 
-class PacketConsumerManager : public StreamConsumerManager
+class PacketConsumerManager: public StreamConsumerManager
 {
 public:
     virtual size_t addConsumer(const std::weak_ptr<AbstractStreamConsumer>& consumer) override;

@@ -17,9 +17,7 @@ namespace usb_cam {
 
 class MediaEncoder;
 
-class CameraManager
-:
-    public nxcip::BaseCameraManager2
+class CameraManager: public nxcip::BaseCameraManager2
 {
 public:
     CameraManager(const nxcip::CameraInfo& info, nxpl::TimeProvider *const timeProvider);

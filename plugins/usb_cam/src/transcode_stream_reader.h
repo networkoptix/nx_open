@@ -15,8 +15,7 @@ namespace nx { namespace usb_cam { namespace ffmpeg { class Frame; } } }
 namespace nx {
 namespace usb_cam {
 
-//!Transfers or transcodes packets from USB webcameras and streams them
-class TranscodeStreamReader : public StreamReaderPrivate
+class TranscodeStreamReader: public StreamReaderPrivate
 {
 public:
     TranscodeStreamReader(

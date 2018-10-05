@@ -33,7 +33,6 @@ TranscodeStreamReader::TranscodeStreamReader(
     calculateTimePerFrame();
 }
 
-
 TranscodeStreamReader::~TranscodeStreamReader()
 {
     uninitialize();

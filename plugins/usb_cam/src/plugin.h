@@ -12,7 +12,7 @@ namespace usb_cam {
 class DiscoveryManager;
 
 //!Main plugin class. Hosts and initializes necessary internal data
-class Plugin : public nxpl::Plugin2
+class Plugin: public nxpl::Plugin2
 {
 public:
     Plugin();

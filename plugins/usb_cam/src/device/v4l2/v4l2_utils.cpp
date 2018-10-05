@@ -196,9 +196,8 @@ nxcip::CompressionType V4L2CompressionTypeDescriptor::toNxCompressionType() cons
     }
 }
 
-
-
-//////////////////////////////////////////// Public API ////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// public api
 
 std::string getDeviceName(const char * devicePath)
 {

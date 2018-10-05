@@ -15,9 +15,7 @@ namespace usb_cam {
 class CameraManager;
 class StreamReader;
 
-class MediaEncoder
-:
-    public nxcip::CameraMediaEncoder2
+class MediaEncoder: public nxcip::CameraMediaEncoder2
 {
 public:
      MediaEncoder(

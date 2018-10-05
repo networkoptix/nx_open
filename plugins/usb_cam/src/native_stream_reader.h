@@ -5,8 +5,7 @@
 namespace nx {
 namespace usb_cam {
 
-//!Transfers or transcodes packets from USB webcameras and streams them
-class NativeStreamReader : public StreamReaderPrivate
+class NativeStreamReader: public StreamReaderPrivate
 {
 public:
     NativeStreamReader(

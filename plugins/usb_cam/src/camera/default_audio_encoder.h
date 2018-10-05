@@ -8,8 +8,8 @@ namespace nx {
 namespace usb_cam {
 
 /**
- * Allocates a default audio encoder (AAC) used by the plugin setting the relevant fields, and calls
- * ffmpeg::Codec::initializeEncoder() on it. Using the encoder requires a call to 
+ * Allocates a default audio encoder (AAC) used by the plugin, setting the relevant fields, and
+ * calls ffmpeg::Codec::initializeEncoder() on it. Using the encoder requires a call to 
  * ffmpeg::Codec::open().
  * 
  * @params[out] outFFmpegError - the return value from the call to initializeEncoder():

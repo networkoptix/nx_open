@@ -182,8 +182,7 @@ protected:
 //--------------------------------------------------------------------------------------------------
 // BufferedPacketConsumer
 
-class BufferedPacketConsumer
-    :
+class BufferedPacketConsumer:
     public AbstractVideoConsumer,
     public AbstractPacketConsumer
 {
@@ -218,8 +217,7 @@ private:
 //--------------------------------------------------------------------------------------------------
 // BufferedVideoFrameConsumer
 
-class BufferedVideoFrameConsumer 
-    :
+class BufferedVideoFrameConsumer:
     public AbstractVideoConsumer,
     public AbstractFrameConsumer
 {

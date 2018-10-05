@@ -43,8 +43,8 @@ struct DShowInitializer{
     }
 };
 
-
-///////////////////////////////////////////// public api //////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// public api
 
 std::string getDeviceName(const char * devicePath);
 
@@ -60,8 +60,8 @@ void setBitrate(const char * devicePath, int bitrate, const CompressionTypeDescr
 
 int getMaxBitrate(const char * devicePath, const CompressionTypeDescriptorPtr& targetCodecID);
 
-
-/////////////////////////////////////// api helper functions //////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// api helper functions
 
 void freeMediaType(AM_MEDIA_TYPE& mediaType);
 void deleteMediaType(AM_MEDIA_TYPE *mediaType);
@@ -94,8 +94,8 @@ std::string toStdString(BSTR str);
 std::string getDeviceName(IMoniker *pMoniker);
 std::string getDevicePath(IMoniker *pMoniker);
 
-
-////////////////////////////////////////////// Audio //////////////////////////////////////////////
+//--------------------------------------------------------------------------------------------------
+// audio
 
 struct AudioDeviceDescriptor
 {

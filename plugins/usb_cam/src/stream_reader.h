@@ -26,7 +26,7 @@ namespace usb_cam {
 class StreamReaderPrivate;
 
 //! Transfers or transcodes packets from USB webcameras and streams them
-class StreamReader : public nxcip::StreamReader 
+class StreamReader: public nxcip::StreamReader 
 {
 public:
     StreamReader(

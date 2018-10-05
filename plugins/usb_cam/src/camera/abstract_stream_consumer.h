@@ -12,13 +12,13 @@ public:
     virtual void flush() = 0;
 };
 
-class AbstractPacketConsumer : public AbstractStreamConsumer
+class AbstractPacketConsumer: public AbstractStreamConsumer
 {
 public:
     virtual void givePacket(const std::shared_ptr<ffmpeg::Packet>& packet) = 0;
 };
 
-class AbstractFrameConsumer : public AbstractStreamConsumer
+class AbstractFrameConsumer: public AbstractStreamConsumer
 {
 public:
     virtual void giveFrame(const std::shared_ptr<ffmpeg::Frame>& frame) = 0;

@@ -10,7 +10,7 @@ namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
 
-class Codec : public Options
+class Codec: public Options
 {
 public:
     ~Codec();

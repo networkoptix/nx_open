@@ -9,7 +9,7 @@ namespace nx {
 namespace usb_cam {
 namespace device {
  
-class DShowAudioDiscoveryManager : public AudioDiscoveryManagerPrivate{
+class DShowAudioDiscoveryManager: public AudioDiscoveryManagerPrivate{
 public:
     virtual void fillCameraAuxData(nxcip::CameraInfo * cameras, int cameraCount) const override;
 };
