@@ -89,7 +89,7 @@ SelectableTextButton* AbstractSearchWidget::createCustomFilterButton()
     return d->createCustomFilterButton();
 }
 
-QMenu* AbstractSearchWidget::createMenu()
+QMenu* AbstractSearchWidget::createDropdownMenu()
 {
     auto result = new QMenu(this);
     result->setProperty(style::Properties::kMenuAsDropdown, true);

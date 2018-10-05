@@ -260,7 +260,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     ui->timeSelectionButton->setDeactivatable(true);
     ui->timeSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/rapid_review.png")));
 
-    auto timeMenu = q->createMenu();
+    auto timeMenu = q->createDropdownMenu();
     auto addMenuAction =
         [this, timeMenu](const QString& title, Period period)
         {
@@ -327,7 +327,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     ui->cameraSelectionButton->setDeactivatable(true);
     ui->cameraSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/camera.png")));
 
-    auto cameraMenu = q->createMenu();
+    auto cameraMenu = q->createDropdownMenu();
     auto addMenuAction =
         [this, cameraMenu](const QString& title, Cameras cameras, bool dynamicTitle = false)
         {

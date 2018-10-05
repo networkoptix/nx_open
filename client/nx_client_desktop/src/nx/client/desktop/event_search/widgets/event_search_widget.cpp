@@ -111,10 +111,10 @@ void EventSearchWidget::Private::setupTypeSelection()
     m_typeSelectionButton->setSelectable(false);
     m_typeSelectionButton->setDeactivatable(true);
 
-    auto eventFilterMenu = q->createMenu();
-    auto deviceIssuesMenu = q->createMenu();
-    auto serverEventsMenu = q->createMenu();
-    auto analyticsEventsMenu = q->createMenu();
+    auto eventFilterMenu = q->createDropdownMenu();
+    auto deviceIssuesMenu = q->createDropdownMenu();
+    auto serverEventsMenu = q->createDropdownMenu();
+    auto analyticsEventsMenu = q->createDropdownMenu();
 
     deviceIssuesMenu->setTitle("<device issues>");
     serverEventsMenu->setTitle(tr("Server events"));

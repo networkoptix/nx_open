@@ -18,6 +18,10 @@ class EventTile;
 class SelectableTextButton;
 class AbstractSearchListModel;
 
+/**
+ * Base class for Right Panel search tabs. Contains common filter setup controls,
+ * EventRibbon to display data and all mechanics to fetch data when needed.
+ */
 class AbstractSearchWidget:
     public QWidget,
     public QnWorkbenchContextAware
@@ -35,6 +39,7 @@ public:
 
     AbstractSearchListModel* model() const;
 
+    /** Relevant controls in the tab. Irrelevant controls are hidden. */
     enum class Control
     {
         cameraSelector = 0x01,
@@ -52,6 +57,7 @@ public:
     Controls relevantControls() const;
     void setRelevantControls(Controls value);
 
+    /** User-selectable relevant time period options. */
     enum class Period
     {
         all, //< All the time.
@@ -64,6 +70,7 @@ public:
     Period selectedPeriod() const;
     QnTimePeriod timePeriod() const;
 
+    /** User-selectable relevant camera set options. */
     enum class Cameras
     {
         all, //< All cameras.
@@ -77,26 +84,56 @@ public:
     QString textFilter() const;
     QRectF selectedArea() const;
 
+    /**
+     * Resets all filters to their default state.
+     * Derived classes that add their own filters must override this method.
+     */
     virtual void resetFilters();
 
 signals:
-    void tileHovered(const QModelIndex& index, const EventTile* tile); //< For external tooltip.
+    /** This signal is for displaying external tooltips. */
+    void tileHovered(const QModelIndex& index, const EventTile* tile);
+
+    /** This signal is sent when current camera selection type or actual camera set changes. */
+    void cameraSetChanged(const QnVirtualCameraResourceSet& value);
+
     void textFilterChanged(const QString& value);
     void timePeriodChanged(const QnTimePeriod& value);
-    void cameraSetChanged(const QnVirtualCameraResourceSet& value);
     void selectedAreaChanged(const QRectF& value);
 
 protected:
+    /** Requests more data to be fetched if needed. */
     void requestFetch();
+
+    /** Sets an icon for no data placeholder. */
     void setPlaceholderPixmap(const QPixmap& value);
+
+    /** Allows derived classes to create own filter buttons added to the end of the list. */
     SelectableTextButton* createCustomFilterButton();
 
-    QMenu* createMenu();
+    /** Creates a child menu with dropdown appearance. */
+    QMenu* createDropdownMenu();
+
+    /**
+     * Adds specified action to the list of device dependent actions.
+     * When connection state becomes "Ready" (initial resources are received) all device dependent
+     * action texts are updated to either mixedString or cameraString depending on device types
+     * present in the system.
+     */
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
 private:
+    /**
+     * Derived classes should override this method and return localized string for
+     * no data placeholder. When constrained is true it means there's no data matching
+     * search criteria, when constrained is false it means there's no data in the system at all.
+     */
     virtual QString placeholderText(bool constrained) const = 0;
+
+    /**
+     * Derived classes should override this method and return localized string for item counter.
+     */
     virtual QString itemCounterText(int count) const = 0;
 
 protected:
