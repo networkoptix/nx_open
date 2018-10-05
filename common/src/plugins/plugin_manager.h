@@ -12,7 +12,7 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <nx/plugins/settings.h>
 
 /**

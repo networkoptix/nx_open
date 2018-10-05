@@ -17,7 +17,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
@@ -46,7 +46,7 @@ static nx::vms::api::analytics::EventType analyticsEventType(
 
     const auto drivers = server->analyticsDrivers();
     const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [pluginId](const nx::vms::api::analytics::PluginManifest& manifest)
+        [pluginId](const nx::vms::api::analytics::EngineManifest& manifest)
         {
             return manifest.pluginId == pluginId;
         });

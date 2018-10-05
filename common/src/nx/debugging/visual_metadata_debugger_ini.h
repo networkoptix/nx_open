@@ -18,23 +18,23 @@ struct VisualMetadataDebuggerIni : public nx::kit::IniConfig
     // Manager pool debugger settings
     NX_INI_FLAG(
         0,
-        enableManagerPoolDebuggerInstance,
-        "Enable visual debugger for metadata manager pool (plugins input/output).");
+        enableAnalyticsManagerDebuggerInstance,
+        "Enable visual debugger for analytics Manager (plugins input/output).");
 
     NX_INI_STRING(
         "",
-        managerPoolDebugOutputDirectory,
-        "Directory for manager pool visual debugger instance ouput.");
+        analyticsManagerDebugOutputDirectory,
+        "Directory for analytics Manager visual debugger instance ouput.");
 
     NX_INI_INT(
         100,
-        managerPoolDebuggerFrameCacheSize,
-        "Frame cache size of manager pool visual metadata debugger.");
+        analyticsManagerDebuggerFrameCacheSize,
+        "Frame cache size of analytics Manager visual metadata debugger.");
 
     NX_INI_INT(
         100,
-        managerPoolDebuggerMetadataCacheSize,
-        "Metadata cache size of manager pool visual metadata debugger.");
+        analyticsManagerDebuggerMetadataCacheSize,
+        "Metadata cache size of analytics Manager visual metadata debugger.");
 
     // Archive stream reader debugger settings
     NX_INI_FLAG(

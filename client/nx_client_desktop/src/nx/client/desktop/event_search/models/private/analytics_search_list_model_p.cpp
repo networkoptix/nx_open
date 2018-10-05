@@ -750,7 +750,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 
 void AnalyticsSearchListModel::Private::executePluginAction(
     const QString& pluginId,
-    const nx::vms::api::analytics::PluginManifest::ObjectAction& action,
+    const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
     const analytics::storage::DetectedObject& object) const
 {
     const auto server = q->commonModule()->currentServer();

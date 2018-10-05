@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <plugins/plugin_tools.h>
 #include <nx/plugins/settings.h>
 
@@ -189,11 +189,11 @@ bool PluginManager::loadNxPlugin(
 
     auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
     if (entryProc == nullptr)
-        entryProc = (EntryProc) lib.resolve("createNxMetadataPlugin");
+        entryProc = (EntryProc) lib.resolve("createNxAnalyticsEngine");
     if (entryProc == nullptr)
     {
         NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: "
-            "Neither createNXPluginInstance nor createNxMetadataPlugin functions found")
+            "Neither createNXPluginInstance() nor createNxAnalyticsEngine() functions found")
             .arg(filename);
         lib.unload();
         return false;

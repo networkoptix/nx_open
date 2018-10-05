@@ -213,8 +213,8 @@ if(withMediaServer)
     add_subdirectory(nx_system_commands)
 
     if(withDistributions)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
-        add_subdirectory(nx_metadata_sdk)
+        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_analytics_sdk) into one like this.
+        add_subdirectory(nx_analytics_sdk)
     endif()
 
     if(withMediaDbUtil)

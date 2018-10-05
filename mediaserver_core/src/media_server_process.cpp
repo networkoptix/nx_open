@@ -258,7 +258,7 @@
 #include <rest/helper/p2p_statistics.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/analytics/manager.h>
 #include <nx/utils/platform/current_process.h>
 #include <rest/handlers/change_camera_password_rest_handler.h>
 #include <nx/mediaserver/fs/media_paths/media_paths.h>
@@ -2497,21 +2497,21 @@ void MediaServerProcess::registerRestHandlers(
         commonModule(), serverModule()->analyticsEventsStorage()));
 
     /**%apidoc GET /api/getAnalyticsActions
-     * Get analytics actions from all metadata plugins on the current server which are applicable
+     * Get analytics actions from all analytics plugins on the current server which are applicable
      *     to the specified metadata object type.
      * %param objectTypeId Id of an object type to which an action should be applicable.
      * %return JSON with an error code, error message and a JSON object in "reply" field:
      *     %param actions List of JSON objects, each describing a set of actions from a particular
-     *         metadata plugin.
+     *         analytics plugin.
      *     %param actions[].actionIds List of action ids (strings).
-     *     %param actions[].pluginId Id of a metadata plugin which offers the actions.
+     *     %param actions[].pluginId Id of a analytics plugin which offers the actions.
      */
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
-     * Execute analytics action from the particular metadata plugin on this server. The action is
+     * Execute analytics action from the particular analytics plugin on this server. The action is
      * applied to the specified metadata object.
-     * %param pluginId Id of a metadata plugin which offers the action.
+     * %param pluginId Id of an analytics plugin which offers the action.
      * %param actionId Id of an action to execute.
      * %param objectId Id of a metadata object to which the action is applied.
      * %param cameraId Id of a camera from which the action was triggered.
@@ -3393,7 +3393,7 @@ void MediaServerProcess::stopObjects()
     m_mserverResourceSearcher.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
-    serverModule()->metadataManagerPool()->stop(); //< Stop processing analytics events.
+    serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
 
     serverModule()->resourcePool()->threadPool()->waitForDone();
     commonModule()->resourcePool()->clear();
@@ -4075,7 +4075,7 @@ void MediaServerProcess::run()
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
-    serverModule->metadataManagerPool()->init();
+    serverModule->analyticsManager()->init();
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 
