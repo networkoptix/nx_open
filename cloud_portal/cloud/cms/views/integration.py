@@ -31,6 +31,8 @@ def make_integrations_json(integrations, contexts=[]):
         for context in contexts:
             for datastructure in context.datastructure_set.all():
                 ds_name = datastructure.name
+                if not datastructure.public:
+                    continue
                 integration_dict[ds_name] = datastructure.find_actual_value(product=integration,
                                                                             version_id=current_version)
 

@@ -201,6 +201,9 @@ class Product(models.Model):
             # TODO: need to update all static right here
 
     def version_id(self):
+        # I need this for local dev until cloud-portal gets updated to 18.4
+        # versions = ContentVersion.objects.filter(product=self)
+        # return versions.latest('accepted_date').id if versions.exists() else 0
         accepted_review = ProductCustomizationReview.objects. \
             filter(customization__name=settings.CUSTOMIZATION,
                    state=ProductCustomizationReview.REVIEW_STATES.accepted,
@@ -296,6 +299,7 @@ class DataStructure(models.Model):
     advanced = models.BooleanField(default=False)
     order = models.IntegerField(default=100000)
     optional = models.BooleanField(default=False)
+    public = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

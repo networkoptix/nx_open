@@ -506,7 +506,8 @@
             "label": "File",
             "value": "",
             "description": "",
-            "type": "file"
+            "type": "file",
+            "public": false
           }
         ]
       },
