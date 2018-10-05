@@ -183,6 +183,7 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/save_user_ex_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -2424,6 +2425,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
+    reg("ec2/saveUserEx", new QnSaveUserExRestHandler(serverModule()));
+
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
@@ -2996,7 +2999,7 @@ void MediaServerProcess::updateGuidIfNeeded()
         }
     }
 
-    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged, 
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged,
         [this, serverGuid, hwidGuid]()
         {
             // Stop moving HwId to serverGuid as soon as first setup wizard is done.

@@ -40,4 +40,5 @@ struct NX_VMS_API UserDataEx
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::vms::api::UserDataEx), (json))
+Q_DECLARE_METATYPE(nx::vms::api::UserDataEx)
+//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::vms::api::UserDataEx), (json))

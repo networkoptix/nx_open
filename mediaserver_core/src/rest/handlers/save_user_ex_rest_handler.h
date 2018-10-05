@@ -1,10 +1,10 @@
 #pragma once
 
-#include <rest/server/fusion_rest_handler.h>
+#include <rest/server/json_rest_handler.h>
 #include <nx/mediaserver/server_module_aware.h>
 
 class QnSaveUserExRestHandler :
-    public QnFusionRestHandler,
+    public QnJsonRestHandler,
     public nx::mediaserver::ServerModuleAware
 {
 public:
@@ -12,10 +12,8 @@ public:
 
     virtual int executePost(
         const QString& path,
-        const QnRequestParamList& params,
+        const QnRequestParams& params,
         const QByteArray& body,
-        const QByteArray& srcBodyContentType,
-        QByteArray& result,
-        QByteArray& resultContentType,
-        const QnRestConnectionProcessor* processor) override;
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner) override;
 };
