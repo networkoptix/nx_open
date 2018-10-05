@@ -106,6 +106,10 @@ public:
     static void setStunClientSettings(network::stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
+    using FetchMediatorEndpointsCompletionHandler =
+        nx::utils::MoveOnlyFunc<void(
+            nx::network::http::StatusCode::Value /*resultCode*/)>;
+
     mutable QnMutex m_mutex;
     const std::string m_cloudHost;
     std::optional<SystemCredentials> m_credentials;
@@ -121,14 +125,13 @@ private:
     std::optional<network::SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
     MediatorAvailabilityChangedHandler m_mediatorAvailabilityChangedHandler;
+    std::vector<FetchMediatorEndpointsCompletionHandler> m_fetchMediatorEndpointsHandlers;
 
     virtual void stopWhileInAioThread() override;
 
     void connectToMediatorAsync();
 
-    void fetchMediatorEndpoints(
-        nx::utils::MoveOnlyFunc<void(
-            nx::network::http::StatusCode::Value /*resultCode*/)> handler);
+    void fetchMediatorEndpoints(FetchMediatorEndpointsCompletionHandler handler);
 
     void initializeUrlFetcher();
 

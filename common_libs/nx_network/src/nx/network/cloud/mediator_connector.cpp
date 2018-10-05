@@ -194,8 +194,6 @@ void MediatorConnector::connectToMediatorAsync()
     fetchMediatorEndpoints(
         [this](nx::network::http::StatusCode::Value resultCode)
         {
-            m_mediatorUrlFetcher.reset();
-
             if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
             {
                 if (!isReady(*m_future))
@@ -215,16 +213,19 @@ void MediatorConnector::connectToMediatorAsync()
 }
 
 void MediatorConnector::fetchMediatorEndpoints(
-    nx::utils::MoveOnlyFunc<void(
-        nx::network::http::StatusCode::Value /*resultCode*/)> handler)
+    FetchMediatorEndpointsCompletionHandler handler)
 {
     NX_ASSERT(isInSelfAioThread());
 
-    if (!m_mediatorUrlFetcher)
-        initializeUrlFetcher();
+    m_fetchMediatorEndpointsHandlers.push_back(std::move(handler));
+    
+    if (m_mediatorUrlFetcher)
+        return; //< Operation has already been started.
+
+    initializeUrlFetcher();
 
     m_mediatorUrlFetcher->get(
-        [this, handler = std::move(handler)](
+        [this](
             nx::network::http::StatusCode::Value resultCode,
             nx::utils::Url tcpUrl,
             nx::utils::Url udpUrl)
@@ -246,7 +247,9 @@ void MediatorConnector::fetchMediatorEndpoints(
                     .arg((int)resultCode));
             }
 
-            handler(resultCode);
+            for (auto& handler: m_fetchMediatorEndpointsHandlers)
+                nx::utils::swapAndCall(handler, resultCode);
+            m_fetchMediatorEndpointsHandlers.clear();
         });
 }
 
