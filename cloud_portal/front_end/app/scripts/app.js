@@ -80,7 +80,8 @@ window.L = {};
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
                         previewPath: '',
                         viewsDirCommon: 'static/web_common/views/',
-                        trafficRelayHost: '{host}/gateway/{systemId}'
+                        trafficRelayHost: '{host}/gateway/{systemId}',
+                        publicDownloads: false
                     };
 
                 $.ajax({
@@ -88,7 +89,10 @@ window.L = {};
                     async: false,
                     dataType: 'json'
                 }).done(function(response){
-                    angular.extend(CONFIG, response);
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    appState.publicDownloads = response.publicDownloads;
+                    appState.publicReleases = response.publicReleases;
+                    angular.extend(CONFIG, appState);
                 });
 
                 $.ajax({
