@@ -59,7 +59,9 @@ public:
     virtual ~QnResourceSearchProxyModel() override;
 
     QnResourceSearchQuery query() const;
-    void setQuery(const QnResourceSearchQuery& query);
+
+    // Returns new root node index according to the query's allowed node.
+    QModelIndex setQuery(const QnResourceSearchQuery& query);
 
     enum class DefaultBehavior
     {
@@ -108,6 +110,7 @@ protected:
 private:
     bool m_invalidating = false;
     QnResourceSearchQuery m_query;
+    QModelIndex m_currentRootNode;
     DefaultBehavior m_defaultBehavior = DefaultBehavior::showAll;
 };
 

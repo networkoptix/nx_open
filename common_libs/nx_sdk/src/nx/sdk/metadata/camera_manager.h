@@ -40,12 +40,15 @@ class Plugin;
 
 /**
  * Interface used to control the process of fetching metadata from the resource.
+ *
+ * All methods are guaranteed to be called without overlappings, even if from different threads,
+ * thus, no synchronization is required for the implementation.
  */
 class CameraManager: public nxpl::PluginInterface
 {
 public:
     /**
-     * Start fetching metadata from the resource.
+     * Starts fetching metadata from the resource.
      * @param typeList List of types of events and objects as an array of C-style strings; null if
      *     the array is empty.
      * @param typeListSize Number of items in typeList array.
@@ -64,7 +67,7 @@ public:
     virtual Error setHandler(MetadataHandler* handler) = 0;
 
     /**
-     * Stops fetching metadata from the resource synchronously
+     * Stops fetching metadata from the resource.
      * @return noError in case of success, other value otherwise.
      */
     virtual Error stopFetchingMetadata() = 0;

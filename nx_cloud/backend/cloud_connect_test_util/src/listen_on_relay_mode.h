@@ -5,6 +5,8 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/argument_parser.h>
 
+#include "http_server.h"
+
 namespace nx {
 namespace cctu {
 
@@ -35,11 +37,7 @@ public:
     TestHttpServerOnProxy(const ListenOnRelaySettings& settings);
 
 private:
-    std::unique_ptr<nx::network::http::TestHttpServer> m_httpServer;
-
-    void httpRequestHandler(
-        nx::network::http::RequestContext requestContext,
-        nx::network::http::RequestProcessedHandler completionHandler);
+    std::unique_ptr<HttpServer> m_httpServer;
 };
 
 } // namespace cctu

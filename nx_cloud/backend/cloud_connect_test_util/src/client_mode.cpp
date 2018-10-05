@@ -306,6 +306,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
         const auto contentType =
             nx::network::http::getHeaderValue(client.response()->headers, "Content-Type");
         if (contentType == "application/json" ||
+            contentType == "text/plain" ||
             contentType == "text/xml")
         {
             outputStream = &std::cout;

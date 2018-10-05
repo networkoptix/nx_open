@@ -63,7 +63,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(mediaserver_db);
     return 0;
 }
 

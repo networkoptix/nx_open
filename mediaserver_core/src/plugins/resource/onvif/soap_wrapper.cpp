@@ -90,42 +90,42 @@ const RequestTraits<_onvifDeviceIO__GetDigitalInputs, _onvifDeviceIO__GetDigital
     = &DeviceIOBindingProxy::GetDigitalInputs;
     const char RequestTraits<_onvifDeviceIO__GetDigitalInputsResponse>::kFuncName[64] = "GetDigitalInputs";
  */
-#define DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
-    const RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
-        RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kRequestFunc = \
-        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+#define NX_DEFINE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
+    const RequestTraits<NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::RequestFunc \
+        RequestTraits<NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kRequestFunc = \
+        &NX_MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
     \
-    const char RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kFuncName[64] = \
+    const char RequestTraits<NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)>::kFuncName[64] = \
         #FUNCTION;
 
-#define DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, REQUEST, RESPONSE) \
+#define NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, FUNCTION, REQUEST, RESPONSE) \
     const RequestTraits<REQUEST, RESPONSE>::RequestFunc \
         RequestTraits<REQUEST, RESPONSE>::kRequestFunc = \
-        &MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
+        &NX_MAKE_BINDINGPROXY_LEXEME(WEBSERVICE)::FUNCTION; \
     \
     const char RequestTraits<REQUEST, RESPONSE>::kFuncName[64] = \
         #FUNCTION;
 
-DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
-DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
+NX_DEFINE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
+NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(DeviceIO, GetRelayOutputs, _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
+NX_DEFINE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
-DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
-DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
-DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
-DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
-DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
-DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
-DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
+NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
+NX_DEFINE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+NX_DEFINE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
+NX_DEFINE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
+NX_DEFINE_RESPONSE_TRAITS(Media, CreateProfile)
 
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurations,
+NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurations,
     onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurationOptions,
+NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, GetVideoEncoderConfigurationOptions,
     onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
-DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
+NX_DEFINE_RESPONSE_TRAITS_IRREGULAR(Media2, SetVideoEncoderConfiguration,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
-DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
-DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DEFINE_RESPONSE_TRAITS(Media2, GetProfiles)
+NX_DEFINE_RESPONSE_TRAITS(Media2, CreateProfile)
 // ------------------------------------------------------------------------------------------------
 // DeviceSoapWrapper
 // ------------------------------------------------------------------------------------------------

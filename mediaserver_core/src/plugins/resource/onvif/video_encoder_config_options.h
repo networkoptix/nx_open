@@ -12,10 +12,10 @@
 #include "soap_wrapper.h"
 
 /**
- Server understands only limited number of videocodecs.
- They are listed in UnderstandableVideoCodec enum.
- Values are used while sorting configurationOptions, so the order of codecs is meaningful.
- Desirable codec is the codec with the maximum value.
+ * Server understands only limited number of videocodecs.
+ * They are listed in UnderstandableVideoCodec enum.
+ * Values are used while sorting configurationOptions, so the order of codecs is meaningful.
+ * Desirable codec is the codec with the maximum value.
  */
 enum class UnderstandableVideoCodec
 {

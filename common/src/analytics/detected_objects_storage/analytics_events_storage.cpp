@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/sql/filter.h>
 #include <nx/sql/sql_cursor.h>
 #include <nx/utils/log/log.h>
 
@@ -235,12 +236,9 @@ void EventsStorage::prepareCursorQuery(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
-    QString sqlQueryFilterStr;
-    if (!sqlQueryFilter.empty())
-    {
-        sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
-    }
+    auto sqlQueryFilterStr = sqlQueryFilter.toString();
+    if (!sqlQueryFilterStr.empty())
+        sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
     // TODO: #ak Think over limit in the following query.
     query->prepare(lm(R"sql(
@@ -255,7 +253,7 @@ void EventsStorage::prepareCursorQuery(
         eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-    nx::sql::bindFields(query, sqlQueryFilter);
+    sqlQueryFilter.bindFields(query);
 }
 
 nx::sql::DBResult EventsStorage::selectObjects(
@@ -282,12 +280,9 @@ void EventsStorage::prepareLookupQuery(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
-    QString sqlQueryFilterStr;
-    if (!sqlQueryFilter.empty())
-    {
-        sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
-    }
+    auto sqlQueryFilterStr = sqlQueryFilter.toString();
+    if (!sqlQueryFilterStr.empty())
+        sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
     QString sqlLimitStr;
     if (filter.maxObjectsToSelect > 0)
@@ -354,26 +349,28 @@ void EventsStorage::prepareLookupQuery(
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
 #endif
-    nx::sql::bindFields(query, sqlQueryFilter);
+    sqlQueryFilter.bindFields(query);
 }
 
-nx::sql::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
+nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
     const Filter& filter,
     QString* eventsFilteredByFreeTextSubQuery)
 {
-    nx::sql::InnerJoinFilterFields sqlFilter;
-    if (!filter.deviceId.isNull())
+    nx::sql::Filter sqlFilter;
+
+    if (!filter.deviceIds.empty())
     {
-        nx::sql::SqlFilterFieldEqual filterField(
-            "device_guid", ":deviceId", QnSql::serialized_field(filter.deviceId));
-        sqlFilter.push_back(std::move(filterField));
+        auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+            "device_guid", ":deviceId");
+        for (const auto& deviceId: filter.deviceIds)
+            condition->addValue(QnSql::serialized_field(deviceId));
+        sqlFilter.addCondition(std::move(condition));
     }
 
     if (!filter.objectId.isNull())
     {
-        nx::sql::SqlFilterFieldEqual filterField(
-            "object_id", ":objectId", QnSql::serialized_field(filter.objectId));
-        sqlFilter.push_back(std::move(filterField));
+        sqlFilter.addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
+            "object_id", ":objectId", QnSql::serialized_field(filter.objectId)));
     }
 
     if (!filter.objectTypeId.empty())
@@ -390,7 +387,7 @@ nx::sql::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
         *eventsFilteredByFreeTextSubQuery = lm(R"sql(
             (SELECT rowid, *
              FROM event
-             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
+             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1*'))
         )sql").args(filter.freeText);
     }
     else
@@ -403,66 +400,68 @@ nx::sql::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
 
 void EventsStorage::addObjectTypeIdToFilter(
     const std::vector<QString>& objectTypeIds,
-    nx::sql::InnerJoinFilterFields* sqlFilter)
+    nx::sql::Filter* sqlFilter)
 {
-    // TODO: #ak Add support for every objectTypeId specified.
-
-    nx::sql::SqlFilterFieldEqual filterField(
-        "object_type_id", ":objectTypeId", QnSql::serialized_field(objectTypeIds.front()));
-    sqlFilter->push_back(std::move(filterField));
+    auto condition = std::make_unique<nx::sql::SqlFilterFieldAnyOf>(
+        "object_type_id", ":objectTypeId");
+    for (const auto& objectTypeId: objectTypeIds)
+        condition->addValue(QnSql::serialized_field(objectTypeId));
+    sqlFilter->addCondition(std::move(condition));
 }
 
 void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
-    nx::sql::InnerJoinFilterFields* sqlFilter)
+    nx::sql::Filter* sqlFilter)
 {
     using namespace std::chrono;
 
-    nx::sql::SqlFilterFieldGreaterOrEqual startTimeFilterField(
+    auto startTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "timestamp_usec_utc",
         ":startTimeUsec",
-        QnSql::serialized_field(duration_cast<microseconds>(timePeriod.startTime()).count()));
-    sqlFilter->push_back(std::move(startTimeFilterField));
+        QnSql::serialized_field(duration_cast<microseconds>(
+            timePeriod.startTime()).count()));
+    sqlFilter->addCondition(std::move(startTimeFilterField));
 
     if (timePeriod.durationMs != QnTimePeriod::infiniteDuration() &&
         timePeriod.startTimeMs + timePeriod.durationMs <
             duration_cast<milliseconds>(m_maxRecordedTimestamp).count())
     {
-        nx::sql::SqlFilterFieldLess endTimeFilterField(
+        auto endTimeFilterField = std::make_unique<nx::sql::SqlFilterFieldLess>(
             "timestamp_usec_utc",
             ":endTimeUsec",
-            QnSql::serialized_field(duration_cast<microseconds>(timePeriod.endTime()).count()));
-        sqlFilter->push_back(std::move(endTimeFilterField));
+            QnSql::serialized_field(duration_cast<microseconds>(
+                timePeriod.endTime()).count()));
+        sqlFilter->addCondition(std::move(endTimeFilterField));
     }
 }
 
 void EventsStorage::addBoundingBoxToFilter(
     const QRectF& boundingBox,
-    nx::sql::InnerJoinFilterFields* sqlFilter)
+    nx::sql::Filter* sqlFilter)
 {
-    nx::sql::SqlFilterFieldLessOrEqual topLeftXFilter(
+    auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_x",
         ":boxTopLeftX",
         QnSql::serialized_field(boundingBox.bottomRight().x()));
-    sqlFilter->push_back(std::move(topLeftXFilter));
+    sqlFilter->addCondition(std::move(topLeftXFilter));
 
-    nx::sql::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
+    auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_x",
         ":boxBottomRightX",
         QnSql::serialized_field(boundingBox.topLeft().x()));
-    sqlFilter->push_back(std::move(bottomRightXFilter));
+    sqlFilter->addCondition(std::move(bottomRightXFilter));
 
-    nx::sql::SqlFilterFieldLessOrEqual topLeftYFilter(
+    auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
         "box_top_left_y",
         ":boxTopLeftY",
         QnSql::serialized_field(boundingBox.bottomRight().y()));
-    sqlFilter->push_back(std::move(topLeftYFilter));
+    sqlFilter->addCondition(std::move(topLeftYFilter));
 
-    nx::sql::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
+    auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
         "box_bottom_right_y",
         ":boxBottomRightY",
         QnSql::serialized_field(boundingBox.topLeft().y()));
-    sqlFilter->push_back(std::move(bottomRightYFilter));
+    sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
 void EventsStorage::loadObjects(
@@ -622,12 +621,9 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
         prepareSqlFilterExpression(filter, &eventsFilteredByFreeTextSubQuery);
-    QString sqlQueryFilterStr;
-    if (!sqlQueryFilter.empty())
-    {
-        sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
-    }
+    auto sqlQueryFilterStr = sqlQueryFilter.toString();
+    if (!sqlQueryFilterStr.empty())
+        sqlQueryFilterStr = "WHERE " + sqlQueryFilterStr;
 
     // TODO: #ak Aggregate in query.
 
@@ -639,7 +635,7 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
         %2
         ORDER BY timestamp_usec_utc ASC
     )sql").args(eventsFilteredByFreeTextSubQuery, sqlQueryFilterStr));
-    nx::sql::bindFields(&query, sqlQueryFilter);
+    sqlQueryFilter.bindFields(&query);
 
     query.exec();
     loadTimePeriods(query, options, result);

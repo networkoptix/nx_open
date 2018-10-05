@@ -142,6 +142,7 @@ QString StringsHelper::eventName(EventType value, int count) const
         case EventType::licenseIssueEvent:    return tr("License Issue");
         case EventType::backupFinishedEvent:  return tr("Archive backup finished");
         case EventType::analyticsSdkEvent:    return tr("Analytics Event");
+        case EventType::pluginEvent:          return tr("Plugin Event");
 
         case EventType::anyServerEvent:       return tr("Any Server Issue");
         case EventType::anyEvent:             return tr("Any Event");

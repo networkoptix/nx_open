@@ -81,9 +81,11 @@ struct QnOnvifServiceUrls
     QString ptzServiceUrl;
     QString imagingServiceUrl;
     QString deviceioServiceUrl;
-    //QString anlyticsServiceUrl; //< currently not used
-    //QString eventsServiceUrl; //< currently not used, m_eventsCapabilities->XAddr used instead
-    //QString thermalServiceUrl; //< currently not used
+
+    // Currently not used, m_eventsCapabilities->XAddr used instead.
+    // TODO: fix it: use eventsServiceUrl.
+    //QString eventsServiceUrl;
+
     QString getUrl(OnvifWebService onvifWebService) const;
 };
 
@@ -98,22 +100,23 @@ public:
         PullPointSubscriptionWrapper,
         _onvifEvents__PullMessages, _onvifEvents__PullMessagesResponse>;
 
-    class RelayOutputInfo
+    struct RelayOutputInfo
     {
-    public:
         std::string token;
         bool isBistable = false;
-        // The time (in milliseconds) after which the relay returns to its idle state if it is in
+        // The time (in milliseconds) after which the relay returns to its idle state, if it is in
         // monostable mode; in bistable mode the value of the parameter shall be ignored.
-        LONG64 delayTime = 0;
+        LONG64 delayTimeMs = 0;
         bool activeByDefault = false;
 
         RelayOutputInfo() = default;
-        RelayOutputInfo(
-            std::string _token,
-            bool _isBistable,
-            LONG64 _delayTime,
-            bool _activeByDefault);
+        RelayOutputInfo(std::string _token, bool _isBistable,
+            LONG64 _delayTimeMs, bool _activeByDefault)
+            :
+            token(std::move(_token)), isBistable(_isBistable),
+            delayTimeMs(_delayTimeMs), activeByDefault(_activeByDefault)
+        {
+        }
     };
 
     struct RelayInputState
@@ -149,8 +152,8 @@ public:
 
         UnderstandableVideoCodec encoding = UnderstandableVideoCodec::NONE;
 
-        // profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
-        // or by Media2 (from onvifXsd__VideoEncodingProfiles)
+        // Profiles for h264 codec. May be read by Media1 (from onvifXsd__H264Profile)
+        // or by Media2 (from onvifXsd__VideoEncodingProfiles).
         QVector<onvifXsd__H264Profile> h264Profiles; //< filled for h264 codec
 
         // Profiles for h265 codec. May be read only by Media2.
@@ -457,8 +460,6 @@ protected:
     VideoOptionsLocal m_primaryStreamCapabilities;
     VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    VideoEncoderConfigOptionsList m_videoEncoderConfigOptionsList;
-
     virtual void startInputPortStatesMonitoring() override;
     virtual void stopInputPortStatesMonitoring() override;
 
@@ -639,7 +640,7 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
-    mutable QnResourceVideoLayoutPtr m_videoLayout;
+    mutable QnConstResourceVideoLayoutPtr m_videoLayout;
 public:
     mutable QnOnvifServiceUrls m_serviceUrls;
 
@@ -648,6 +649,8 @@ protected:
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
     QString m_audioOutputConfigurationToken;
+    VideoEncoderConfigOptionsList m_videoEncoderConfigOptionsList;
+
 };
 
 #endif //ENABLE_ONVIF

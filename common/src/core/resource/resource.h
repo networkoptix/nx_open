@@ -32,7 +32,6 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QString uniqueId READ getUniqueId CONSTANT)
     Q_PROPERTY(int logicalId READ logicalId WRITE setLogicalId NOTIFY logicalIdChanged)
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId NOTIFY parentIdChanged)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags NOTIFY flagsChanged)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
@@ -100,8 +99,8 @@ public:
     QnResourcePool *resourcePool() const;
     virtual void setResourcePool(QnResourcePool *resourcePool);
 
-    QString toSearchString() const;
-    virtual QStringList searchFilters() const;
+    QString toSearchString(bool useExtraSearchInformation = true) const;
+    virtual QStringList searchFilters(bool useExtraSearchInformation) const;
 
     template<class Resource>
     static QnSharedResourcePointer<Resource> toSharedPointer(const Resource *resource);

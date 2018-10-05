@@ -131,13 +131,15 @@ QString QnOnvifServiceUrls::getUrl(OnvifWebService onvifWebService) const
 {
     switch (onvifWebService)
     {
-        case OnvifWebService::Media: return mediaServiceUrl; break;
-        case OnvifWebService::Media2: return media2ServiceUrl; break;
-        case OnvifWebService::Ptz: return ptzServiceUrl; break;
-        case OnvifWebService::Imaging: return imagingServiceUrl; break;
-        case OnvifWebService::DeviceIO: return deviceioServiceUrl; break;
-        default: NX_ASSERT(0);
+        case OnvifWebService::Media: return mediaServiceUrl;
+        case OnvifWebService::Media2: return media2ServiceUrl;
+        case OnvifWebService::Ptz: return ptzServiceUrl;
+        case OnvifWebService::Imaging: return imagingServiceUrl;
+        case OnvifWebService::DeviceIO: return deviceioServiceUrl;
+
     }
+    NX_ASSERT(0, QString("Unknown value of OnvifWebService enum: %1")
+        .arg(static_cast<int>(onvifWebService)));
     return QString();
 }
 
@@ -374,19 +376,6 @@ static void updateTimer(nx::utils::TimerId* timerId, std::chrono::milliseconds t
 //
 // QnPlOnvifResource
 //
-
-QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
-    std::string _token,
-    bool _isBistable,
-    LONG64 _delayTime,
-    bool _activeByDefault)
-    :
-    token(std::move(_token)),
-    isBistable(_isBistable),
-    delayTime(_delayTime),
-    activeByDefault(_activeByDefault)
-{
-}
 
 QnPlOnvifResource::QnPlOnvifResource(QnMediaServerModule* serverModule):
     base_type(serverModule),
@@ -3952,7 +3941,7 @@ bool QnPlOnvifResource::setRelayOutputInfo(const RelayOutputInfo& relayOutputInf
     onvifXsd__RelayOutputSettings relayOutputSettings;
     relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode::Bistable : onvifXsd__RelayMode::Monostable;
 
-    relayOutputSettings.DelayTime = relayOutputInfo.delayTime;
+    relayOutputSettings.DelayTime = relayOutputInfo.delayTimeMs;
 
     relayOutputSettings.IdleState = relayOutputInfo.activeByDefault ? onvifXsd__RelayIdleState::closed : onvifXsd__RelayIdleState::open;
     setOutputSettingsRequest.Properties = &relayOutputSettings;
@@ -3984,28 +3973,25 @@ void QnPlOnvifResource::updateToChannel(int value)
 QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const
 {
-    if (m_videoLayout)
-        return m_videoLayout;
+    {
+        QnMutexLocker lock(&m_layoutMutex);
+        if (m_videoLayout)
+            return m_videoLayout;
+    }
 
     auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
-
-    if (!layoutStr.isEmpty())
-    {
-        m_videoLayout = QnResourceVideoLayoutPtr(
-            QnCustomResourceVideoLayout::fromString(layoutStr));
-    }
-    else
-    {
-        m_videoLayout = QnMediaResource::getVideoLayout(dataProvider)
-            .constCast<QnResourceVideoLayout>();
-    }
-
-    auto resourceId = getId();
+    auto videoLayout = layoutStr.isEmpty()
+        ? QnMediaResource::getVideoLayout(dataProvider)
+        : QnConstResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(layoutStr));
 
     auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
-    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
-    nonConstThis->saveParams();
+    {
+        QnMutexLocker lock(&m_layoutMutex);
+        m_videoLayout = videoLayout;
+        nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, videoLayout->toString());
+        nonConstThis->saveParams();
+    }
 
     return m_videoLayout;
 }
@@ -4046,14 +4032,14 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
 #endif
     if ((relayOutputInfo.isBistable != isBistableModeRequired) ||
 #ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-        (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) ||
+        (!isBistableModeRequired && relayOutputInfo.delayTimeMs != requiredDelayTime) ||
 #endif
         relayOutputInfo.activeByDefault)
     {
         //switching output to required mode
         relayOutputInfo.isBistable = isBistableModeRequired;
 #ifndef SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
-        relayOutputInfo.delayTime = requiredDelayTime;
+        relayOutputInfo.delayTimeMs = requiredDelayTime;
 #endif
         relayOutputInfo.activeByDefault = false;
         if (!setRelayOutputInfo(relayOutputInfo))

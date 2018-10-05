@@ -273,18 +273,18 @@ public:
 };
 */
 
-#define MAKE_BINDINGPROXY_LEXEME(WEBSERVICE) WEBSERVICE##BindingProxy
-#define MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION
-#define MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION##Response
+#define NX_MAKE_BINDINGPROXY_LEXEME(WEBSERVICE) WEBSERVICE##BindingProxy
+#define NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION
+#define NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION) _onvif##WEBSERVICE##__##FUNCTION##Response
 
-#define DECLARE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
+#define NX_DECLARE_RESPONSE_TRAITS(WEBSERVICE, FUNCTION) \
 template<> \
-class RequestTraits<MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)> \
+class RequestTraits<NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION), NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION)> \
 { \
 public: \
-    using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
-    using Request = MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION); \
-    using Response = MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION); \
+    using BindingProxy = NX_MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
+    using Request = NX_MAKE_REQUEST_LEXEME(WEBSERVICE, FUNCTION); \
+    using Response = NX_MAKE_RESPONSE_LEXEME(WEBSERVICE, FUNCTION); \
     static const OnvifWebService kOnvifWebService = OnvifWebService::WEBSERVICE; \
     using RequestFunc = \
         int (BindingProxy::*)( \
@@ -296,12 +296,12 @@ public: \
     static const char kFuncName[64]; \
 };
 
-#define DECLARE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, REQUEST, RESPONSE) \
+#define NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(WEBSERVICE, REQUEST, RESPONSE) \
 template<> \
 class RequestTraits<REQUEST, RESPONSE> \
 { \
 public: \
-    using BindingProxy = MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
+    using BindingProxy = NX_MAKE_BINDINGPROXY_LEXEME(WEBSERVICE); \
     using Request = REQUEST; \
     using Response = RESPONSE; \
     static const OnvifWebService kOnvifWebService = OnvifWebService::WEBSERVICE; \
@@ -315,27 +315,27 @@ public: \
     static const char kFuncName[64]; \
 };
 
-DECLARE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
-DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO,
+NX_DECLARE_RESPONSE_TRAITS(DeviceIO, GetDigitalInputs)
+NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(DeviceIO,
     _onvifDevice__GetRelayOutputs, _onvifDevice__GetRelayOutputsResponse)
-DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
+NX_DECLARE_RESPONSE_TRAITS(DeviceIO, SetRelayOutputSettings)
 
-DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
-DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
-DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
-DECLARE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
-DECLARE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
-DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
-DECLARE_RESPONSE_TRAITS(Media, CreateProfile)
+NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurations)
+NX_DECLARE_RESPONSE_TRAITS(Media, GetVideoEncoderConfigurationOptions)
+NX_DECLARE_RESPONSE_TRAITS(Media, SetVideoEncoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, GetAudioEncoderConfigurations)
+NX_DECLARE_RESPONSE_TRAITS(Media, SetAudioEncoderConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
+NX_DECLARE_RESPONSE_TRAITS(Media, CreateProfile)
 
-DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationsResponse)
-DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     onvifMedia2__GetConfiguration, _onvifMedia2__GetVideoEncoderConfigurationOptionsResponse)
-DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
+NX_DECLARE_RESPONSE_TRAITS_IRREGULAR(Media2,
     _onvifMedia2__SetVideoEncoderConfiguration, onvifMedia2__SetConfigurationResponse)
-DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
-DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
+NX_DECLARE_RESPONSE_TRAITS(Media2, GetProfiles)
+NX_DECLARE_RESPONSE_TRAITS(Media2, CreateProfile)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template<class RequestT, class ResponseT>
@@ -354,9 +354,10 @@ public:
     }
 
     ResponseHolder(const ResponseHolder&) = delete;
-    ResponseHolder(ResponseHolder&&) = delete;
     ResponseHolder& operator=(const ResponseHolder&) = delete;
-    ResponseHolder& operator=(ResponseHolder&&) = delete;
+
+    ResponseHolder(const ResponseHolder&&) = delete;
+    ResponseHolder& operator=(const ResponseHolder&&) = delete;
 
     ~ResponseHolder()
     {

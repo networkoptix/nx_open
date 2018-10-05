@@ -199,13 +199,25 @@ class _VirtualBoxVm(VmHardware):
         self._virtual_box.manage(['export', self.name, '-o', vm_image_path, '--options', 'nomacs'])
 
     def clone(self, clone_vm_name):  # type: (str) -> VmHardware
-        self._virtual_box.manage([
-            'clonevm', self.name,
-            '--snapshot', 'template',
-            '--name', clone_vm_name,
-            '--options', 'link',
-            '--register',
-            ])
+        """Clone VM and, if needed, create template from current state. VirtualBox can create
+        linked clone only from template.
+        """
+        snapshot_name = 'template'
+
+        def _try():
+            self._virtual_box.manage([
+                'clonevm', self.name,
+                '--snapshot', snapshot_name,
+                '--name', clone_vm_name,
+                '--options', 'link',
+                '--register',
+                ])
+        try:
+            _try()
+        except virtual_box_error_cls('VBOX_E_OBJECT_NOT_FOUND'):
+            self._virtual_box.manage(['snapshot', self.name, 'take', snapshot_name])
+            _try()
+
         return self.__class__(self._virtual_box, clone_vm_name)
 
     def setup_mac_addresses(self, make_mac):
@@ -420,7 +432,6 @@ class VirtualBox(Hypervisor):
     def import_vm(self, vm_image_path, vm_name):
         vm_import_file_path = self._get_file_path_for_import_vm(vm_image_path, timeout_sec=600)
         self.manage(['import', vm_import_file_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
-        self.manage(['snapshot', vm_name, 'take', 'template'])
         # Group is assigned only when imported: cloned VMs are created nearby.
         group = '/' + vm_name.rsplit('-', 1)[0]
         try:

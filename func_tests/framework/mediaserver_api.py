@@ -458,11 +458,17 @@ class MediaserverApi(object):
 
     @contextmanager
     def camera_audio_enabled(self, camera_id):
-        self.change_camera_user_attributes(camera_id, audioEnabled=True)
+        self.generic.post('ec2/saveCameraUserAttributes', {
+            'cameraId': camera_id,
+            'audioEnabled': True,
+            })
         try:
             yield
         finally:
-            self.change_camera_user_attributes(camera_id, audioEnabled=False)
+            self.generic.post('ec2/saveCameraUserAttributes', {
+                'cameraId': camera_id,
+                'audioEnabled': False,
+                })
 
     def rebuild_archive(self):
         self.generic.get('api/rebuildArchive', params=dict(mainPool=1, action='start'))
@@ -508,17 +514,6 @@ class MediaserverApi(object):
         # Although api/setCameraParam method is considered POST in doc, in the code it is GET
         self.generic.get('api/setCameraParam', params)
 
-    def get_camera_user_attributes(self, camera_id):  # type: (str) -> list
-        """Get user attributes for a specific camera"""
-        result = self.generic.get('ec2/getCameraUserAttributesList', params=dict(id=camera_id))
-        assert len(result) == 1
-        return result[0]
-
-    def change_camera_user_attributes(self, camera_id, **kwargs):
-        attributes = self.get_camera_user_attributes(camera_id)
-        attributes.update(kwargs)
-        self.generic.post('ec2/saveCameraUserAttributes', attributes)
-
     @classmethod
     def _parse_json_fields(cls, data):
         if isinstance(data, dict):
@@ -543,7 +538,8 @@ class MediaserverApi(object):
 
     def get_resource(self, path, id):
         resources = self.get_resources(path, params=dict(id=id))
-        assert len(resources) == 1
+        if len(resources) != 1:
+            raise MediaserverApiRequestError('Unable to get camera by id: {}'.format(id))
         return resources[0]
 
     def remove_resource(self, id):

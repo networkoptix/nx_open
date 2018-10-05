@@ -276,7 +276,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 bool QnWorkbenchContext::showEulaMessage(QString eulaPath) const
 {
     if (eulaPath.isEmpty())
-        eulaPath = lit(":/license.html");
+        eulaPath = ":/license.html";
 
     const bool acceptedEula =
         [this, eulaPath]() -> bool
