@@ -22,13 +22,13 @@ import { IntegrationsListModule } from './integration//list/list.module';
         DownloadModule,
         DownloadHistoryModule,
         NonSupportedBrowserModule,
-        ServersDetailModule,
-        UsersDetailModule,
-        OtherDetailsModule,
+        ServersDetailModule,    // TODO: Remove it after test
+        UsersDetailModule,      // TODO: Remove it after test
+        OtherDetailsModule,     // TODO: Remove it after test
         IntegrationsModule,
         IntegrationsListModule,
-        ContentModule,
-        RightMenuModule,
+        ContentModule,          // TODO: Remove it after test
+        RightMenuModule,        // TODO: Remove it after test
     ],
     declarations   : [],
     entryComponents: [],
@@ -39,13 +39,13 @@ import { IntegrationsListModule } from './integration//list/list.module';
         DownloadModule,
         DownloadHistoryModule,
         NonSupportedBrowserModule,
-        ServersDetailModule,
-        UsersDetailModule,
-        OtherDetailsModule,
+        ServersDetailModule,    // TODO: Remove it after test
+        UsersDetailModule,      // TODO: Remove it after test
+        OtherDetailsModule,     // TODO: Remove it after test
         IntegrationsModule,
         IntegrationsListModule,
-        ContentModule,
-        RightMenuModule,
+        ContentModule,          // TODO: Remove it after test
+        RightMenuModule,        // TODO: Remove it after test
     ]
 })
 export class PagesModule {

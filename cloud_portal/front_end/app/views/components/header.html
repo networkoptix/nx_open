@@ -17,18 +17,27 @@
                 </div>
 
                 <ul ng-if="!activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">
+
+                    <!-- TODO: Remove it after test -->
                     <li ng-class="{ 'active' :active.main }">
                         <a class="inset" ng-href="/main">Main</a>
                     </li>
+                    <!--  -->
+
                     <li ng-class="{ 'active' :active.integrations }">
                         <a class="inset" ng-href="/integrations">Integrations store</a>
                     </li>
+
+                    <!-- TODO: Remove it after test -->
                     <li ng-class="{ 'active' :active.content }">
                         <a class="inset" ng-href="/content">Content</a>
                     </li>
+                    <!--  -->
+                    <!-- TODO: Remove it after test -->
                     <li ng-class="{ 'active' :active.right }">
                         <a class="inset" ng-href="/right">Right menu</a>
                     </li>
+                    <!--  -->
                 </ul>
 
                 <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-sm-flex">

@@ -11,6 +11,8 @@ import { NxOtherDetailsComponent } from './others.component';
 import { TranslateModule }  from '@ngx-translate/core';
 import { ComponentsModule } from '../../../components/components.module';
 
+// TODO: Remove it after test
+
 @NgModule({
     imports: [
         CommonModule,

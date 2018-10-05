@@ -5,26 +5,6 @@
 @import 'custom/_custom_palette';
 @import '_theme_variables';
 
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-/* set the overriding variables */
-$grid-breakpoints : (
-        xs: 0,
-        sm: 576px,
-        md: 768px,
-        lg: 992px,
-        xl: 1200px,
-        xxl: 1440px,    // <- added
-        xxxl: 1600px    // <- added
-);
-$container-max-widths : (
-        sm: 540px,
-        md: 720px,
-        lg: 960px,
-        xl: 1140px,
-        xxl: 1380px,    // <- added
-        xxxl: 1540px    // <- added
-);
 @import '~bootstrap/scss/bootstrap';
 
 @import '_theme_override';
