@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "Cuenta no existe.",
     "CODE USED/INCORRECT": "Código de confirmación ya sea usado o está incorrecta",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "Acceso sin restricciones, incluyendo la habilidad de compartir",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Puede ver video en vivo y ver el archivo",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sólo puede ver vídeo en vivo",
     "SHARE PERMISSIONS HINT CUSTOM": "Use la aplicación de cliente %VMS_NAME% para configurar permisos personalizados",

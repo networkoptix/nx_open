@@ -31,7 +31,7 @@
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="emailReactivate" class="control-label">Електронна пошта</label>
+                    <label for="emailReactivate" class="control-label">Email</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"
@@ -65,11 +65,11 @@
     </div>
 
     <div ng-if="restoring">
-        <h1>Відновити пароль</h1>
+        <h1>Скидання пароля</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
                 <div class="col-md-4 justify-content-start justify-content-md-end">
-                    <label for="email" class="col-sm-4 control-label">Електронна пошта</label>
+                    <label for="email" class="col-sm-4 control-label">Email</label>
                 </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control" validate-email

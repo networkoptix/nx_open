@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "Hesap mevcut değil.",
     "CODE USED/INCORRECT": "Onay kodu zaten kullanılmış veya yanlış",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "Sınırsız erişim, paylaşma imkanı dahil",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Canlı video görüntüleyebilir ve arşive gözatabilir",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sadece canlı vidyo izleyebilir",
     "SHARE PERMISSIONS HINT CUSTOM": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın",

@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "Tài khoản không tồn tại.",
     "CODE USED/INCORRECT": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "Truy cập không giới hạn bao gồm khả năng chia sẻ",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Có thể xem video trực tuyến và duyệt qua kho lưu trữ",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Chỉ có thể xem video trực tiếp",
     "SHARE PERMISSIONS HINT CUSTOM": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh",

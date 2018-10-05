@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Cancelar",
-    "loginTitle": "Iniciar sesión a %PRODUCT_NAME%",
+    "loginTitle": "Inicie sesión en %PRODUCT_NAME%",
     "loginButton": "Inicia sesión",
     "logoutAuthorisedTitle": "Ya se ha conectado",
     "logoutAuthorisedContinueButton": "Continuar",
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
     "successRename": "Nombre del sistema guardado",
-    "confirmDisconnectTitle": "Desconectar el sistema de %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "¿Desconectar el Sistema de %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está a punto de desconectar este sistema de su cuenta. Usted no podrá acceder a este sistema. ¿Está seguro?",
     "confirmUnshareFromMeTitle": "Desconectar el Sistema?",

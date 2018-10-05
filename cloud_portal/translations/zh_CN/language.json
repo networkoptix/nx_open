@@ -167,7 +167,7 @@
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",
-    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME% 吗？",
+    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME%?",
     "confirmDisconnectAction": "断开连接",
     "confirmUnshareFromMe": "您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
     "confirmUnshareFromMeTitle": "断开系统吗？",
