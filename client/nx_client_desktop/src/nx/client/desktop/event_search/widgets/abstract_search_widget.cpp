@@ -74,11 +74,6 @@ void AbstractSearchWidget::resetFilters()
     d->resetFilters();
 }
 
-void AbstractSearchWidget::requestFetch()
-{
-    d->requestFetch();
-}
-
 void AbstractSearchWidget::setPlaceholderPixmap(const QPixmap& value)
 {
     d->setPlaceholderPixmap(value);
