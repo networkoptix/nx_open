@@ -67,7 +67,7 @@ installV4L2()
 
     if ! grep -q "bcm2835-v4l2" $modulePath 
     then
-        echo "bcm2835-v4l2" > $modulePath    # create a modprobe file to load the driver at boot
+        echo "bcm2835-v4l2" > $modulePath # create a modprobe file to load the driver at boot
     fi
 
     if ! lsmod | grep -q bcm2835_v4l2 # lsmod reports driver with an underscore
@@ -82,6 +82,10 @@ configureV4L2()
     local repeat_command="v4l2-ctl --set-ctrl repeat_sequence_header=1"
     local i_frame_command="v4l2-ctl --set-ctrl h264_i_frame_period=15"
 
+    # Commands need to be inserted before the exit 0 call at the end of /etc/rc.local, but it occurs
+    # twice: once at the end (the one we care about) and once in the comments in quotes at the top
+    # of the file. Replace the commented one with a unique string temporarily to make stream editing
+    # easier. If it doesn't exist in quotes then this won't change anything.
     sed -i "s/\"exit 0\"/\"e0\"/g" $file # replace "exit 0" (with quotes) with "e0" temporarily
 
     if ! grep -q "repeat_sequence_header" $file
@@ -94,7 +98,7 @@ configureV4L2()
         sed -i "s/exit 0/$i_frame_command # set I frame interval\n\nexit 0/" $file
     fi
 
-    sed -i "s/e0/exit 0/g" $file # replace "e0" with "exit 0" from earlier
+    sed -i "s/\"e0\"/\"exit 0\"/g" $file # replace "e0" with "exit 0" from earlier
 
     eval $repeat_command
     eval $i_frame_command  
