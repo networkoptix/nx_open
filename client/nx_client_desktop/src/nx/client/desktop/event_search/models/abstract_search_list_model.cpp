@@ -33,10 +33,17 @@ AbstractSearchListModel::AbstractSearchListModel(QnWorkbenchContext* context, QO
                 return;
 
             m_isOnline = isOnline;
-            if (!m_isOnline)
-                m_cameraSet->setMultipleCameras({});
 
-            emit dataNeeded();
+            if (m_isOnline)
+            {
+                emit dataNeeded();
+            }
+            else
+            {
+                m_cameraSet->setMultipleCameras({});
+                clear();
+            }
+
             emit isOnlineChanged(m_isOnline, {});
         };
 
@@ -290,7 +297,8 @@ void AbstractSearchListModel::clear()
     clearData();
 
     setLive(effectiveLiveSupported());
-    emit dataNeeded();
+    if (canFetchMore())
+        emit dataNeeded();
 }
 
 } // namespace nx::client::desktop
