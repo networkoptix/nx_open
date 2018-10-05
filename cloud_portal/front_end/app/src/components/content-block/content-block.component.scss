@@ -20,29 +20,9 @@
     &--body {
         padding : 1rem;
 
-        &-subheader {
-            height     : 2rem;
-            margin-top : .5rem;
-
-            h4 {
-                margin      : 0;
-                line-height : 2rem;
-            }
-        }
-
         & > div {
             margin-top : .5rem;
         }
-
-        &.section {
-            padding-top : 0;
-        }
-    }
-
-    &--separator {
-        margin        : 0 -1rem !important;
-        height        : 1px;
-        border-bottom : 1px solid $light3;
     }
 
     &.gray {
@@ -51,10 +31,6 @@
 
         .card--header {
             background-color    : $light4;
-            border-bottom-color : $light6;
-        }
-
-        .card--separator {
             border-bottom-color : $light6;
         }
     }

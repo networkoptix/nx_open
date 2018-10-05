@@ -1,6 +1,6 @@
 <div class="card hoverable"
      [ngClass]="class">
-    <div class="card--header">
+    <div class="card--header" #headerWrapper [hidden]="!haveHeader">
         <h3>
             <ng-content select="[card-header]"></ng-content>
         </h3>

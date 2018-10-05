@@ -1,6 +1,10 @@
 import {
-    Component, Input, OnInit
-} from '@angular/core';
+    AfterViewInit,
+    Component, ElementRef, Inject, Input, OnInit, Renderer2, ViewChild
+}                                  from '@angular/core';
+import { NgbActiveModal }          from '@ng-bootstrap/ng-bootstrap';
+import { DOCUMENT }                from '@angular/common';
+import { NxModalGenericComponent } from '../../dialogs/generic/generic.component';
 
 /* Usage
 <nx-content-block type?=['gray' | empty]>
@@ -27,19 +31,24 @@ import {
     templateUrl: 'content-block.component.html',
     styleUrls  : [ 'content-block.component.scss' ],
 })
-export class NxContentBlockComponent implements OnInit {
-    @Input() title: string;
-    @Input() content: any;
+export class NxContentBlockComponent implements OnInit, AfterViewInit {
     @Input('type') class: string;
 
+    haveHeader: boolean;
+    header: any;
 
-    ngOnInit() {
-        if (!this.content) {
-            this.content = {
-                sections: []
-            };
-        }
+    @ViewChild('headerWrapper') headerWrapper: ElementRef;
 
+    constructor() {
+        this.header = true;
     }
 
+    ngAfterViewInit() {
+        // this.headerWrapper.nativeElement.childNodes[0] -> H3 element
+        this.haveHeader = (this.headerWrapper.nativeElement.childNodes[0].childNodes.length > 0);
+    }
+
+    ngOnInit() {
+
+    }
 }
