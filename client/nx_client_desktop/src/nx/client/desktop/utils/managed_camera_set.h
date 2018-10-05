@@ -59,13 +59,13 @@ public:
 
 signals:
     /**
-     * These signals are sent when current set type or actual camera set is changed.
+     * These signals are sent when current selection type or actual camera set is changed.
      */
     void camerasAboutToBeChanged(QPrivateSignal);
     void camerasChanged(QPrivateSignal);
 
     /**
-     * These signals are sent when a camera is added or removed to the resource pool
+     * These signals are sent when a camera is added to or removed from the resource pool
      * and it affects currently maintained camera set.
      */
     void cameraAdded(const QnVirtualCameraResourcePtr& camera, QPrivateSignal);
