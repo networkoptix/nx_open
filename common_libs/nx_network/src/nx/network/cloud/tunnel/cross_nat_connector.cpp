@@ -42,7 +42,7 @@ SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 
 CrossNatConnector::CrossNatConnector(
     const AddressEntry& targetPeerAddress,
-    boost::optional<SocketAddress> mediatorUdpEndpoint)
+    std::optional<SocketAddress> mediatorUdpEndpoint)
     :
     m_targetPeerAddress(targetPeerAddress),
     m_connectSessionId(QnUuid::createUuid().toByteArray().toStdString()),

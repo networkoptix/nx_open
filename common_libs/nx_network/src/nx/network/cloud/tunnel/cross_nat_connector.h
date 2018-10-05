@@ -3,6 +3,7 @@
 #include <chrono>
 #include <map>
 #include <memory>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 
@@ -34,7 +35,7 @@ public:
      */
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
-        boost::optional<SocketAddress> mediatorUdpEndpoint = boost::none);
+        std::optional<SocketAddress> mediatorUdpEndpoint = std::nullopt);
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
@@ -61,9 +62,9 @@ private:
     ConnectCompletionHandler m_completionHandler;
     SocketAddress m_mediatorUdpEndpoint;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
-    boost::optional<QString> m_originatingHostAddressReplacement;
+    std::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;
-    boost::optional<std::chrono::milliseconds> m_connectTimeout;
+    std::optional<std::chrono::milliseconds> m_connectTimeout;
     nx::hpm::api::ConnectionResultRequest m_connectResultReport;
     std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
