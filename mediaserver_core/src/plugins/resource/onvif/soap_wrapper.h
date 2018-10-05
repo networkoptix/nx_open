@@ -356,15 +356,15 @@ public:
     ResponseHolder(const ResponseHolder&) = delete;
     ResponseHolder& operator=(const ResponseHolder&) = delete;
 
-    ResponseHolder(ResponseHolder&& other) :
+    ResponseHolder(ResponseHolder&& other): m_responseOwner(other.m_responseOwner)
     {
-        m_responseOwner = other.m_responseOwner;
         other.m_responseOwner = nullptr;
     }
     ResponseHolder& operator=(ResponseHolder&& other)
     {
         m_responseOwner = other.m_responseOwner;
         other.m_responseOwner = nullptr;
+        return *this;
     }
 
     ~ResponseHolder()
