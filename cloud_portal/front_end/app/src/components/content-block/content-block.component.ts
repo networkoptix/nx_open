@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 /* Usage
-<nx-content-block type="gray">
-    <div card-header type?=['gray' | empty]>
+<nx-content-block type?=['gray' | empty]>
+    <div card-header>
         TITLE
     </div>
     <div card-body>
