@@ -3,29 +3,38 @@
 
     <div class="row justify-content-center justify-content-xxxl-start m-0 p-3">
         <nx-content-block class="col-12 col-md-10 col-lg-8 col-xxxl-6">
-            <div card-header>
+            <nx-content-block-header>
                 Some data
-            </div>
-            <div card-body>
-                BODY
-            </div>
-        </nx-content-block>
-
-        <nx-content-block class="col-12 col-md-10 col-lg-8 col-xxxl-6">
-            <!--<div card-header>-->
-                <!--Info block-->
-            <!--</div>-->
-            <div card-body>
-                Block without header
+            </nx-content-block-header>
+            <div card-sections>
+                <nx-content-block-section>
+                    <div section-content>
+                        BODY
+                    </div>
+                </nx-content-block-section>
             </div>
         </nx-content-block>
 
         <nx-content-block class="col-12 col-md-10 col-lg-8 col-xxxl-6">
-            <div card-header>
+            <div card-sections>
+                <nx-content-block-section>
+                    <div section-content>
+                        Block without header
+                    </div>
+                </nx-content-block-section>
+            </div>
+        </nx-content-block>
+
+        <nx-content-block class="col-12 col-md-10 col-lg-8 col-xxxl-6">
+            <nx-content-block-header>
                 Other data
-            </div>
-            <div card-body>
-                BODY
+            </nx-content-block-header>
+            <div card-sections>
+                <nx-content-block-section>
+                    <div section-content>
+                        BODY
+                    </div>
+                </nx-content-block-section>
             </div>
         </nx-content-block>
     </div>

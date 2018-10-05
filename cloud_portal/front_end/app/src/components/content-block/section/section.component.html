@@ -1,10 +1,10 @@
-
-    <div class="card--body section">
-        <div class="card--separator"></div>
-        <div class="card--body-subheader">
-            <h3>
-                <ng-content select="[section-title]"></ng-content>
-            </h3>
-        </div>
+<div class="card--body section">
+    <div class="card--body-subheader" #subHeaderWrapper [hidden]="!haveSubheader">
+        <h3>
+            <ng-content select="[section-title]"></ng-content>
+        </h3>
+    </div>
+    <div [ngClass]="{'card--body-spacer' : !haveSubheader}">
         <ng-content select="[section-content]"></ng-content>
     </div>
+</div>

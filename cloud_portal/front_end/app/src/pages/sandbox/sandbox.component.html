@@ -4,25 +4,28 @@
     <div class="row">
         <div class="col-12 col-md-4">
             <nx-content-block>
-                <div card-header>
+                <nx-content-block-header>
                     TITLE
-                </div>
-                <div card-body>
-                    BODY
-                </div>
-
-                <div *ngFor="let section of sections" card-sections>
-                    <nx-content-block-section>
-                        <div section-title>
-                            {{section.title}}
-                        </div>
-                        <div section-content>
-                            {{section.content}}
-                        </div>
-                    </nx-content-block-section>
-                </div>
+                </nx-content-block-header>
 
                 <div card-sections>
+                    <nx-content-block-section>
+                        <div section-content>
+                            BODY
+                        </div>
+                    </nx-content-block-section>
+
+                    <div *ngFor="let section of sections" card-sections>
+                        <nx-content-block-section>
+                            <div section-title>
+                                {{section.title}}
+                            </div>
+                            <div section-content>
+                                {{section.content}}
+                            </div>
+                        </nx-content-block-section>
+                    </div>
+
                     <nx-content-block-section>
                         <div section-title>
                             Final section

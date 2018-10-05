@@ -4,25 +4,31 @@
     <div class="row m-0 p-3">
         <div class="row m-0 p-0 col-12 col-md-8 col-xl-7 col-xxxl-10">
             <div class="col-12 col-xxxl-6">
-                <nx-content-block
-                        title="Some data">
-                    <div card-header>
+                <nx-content-block>
+                    <nx-content-block-header>
                         Some data
-                    </div>
-                    <div card-body>
-                        BODY
+                    </nx-content-block-header>
+                    <div card-sections>
+                        <nx-content-block-section>
+                            <div section-content>
+                                BODY
+                            </div>
+                        </nx-content-block-section>
                     </div>
                 </nx-content-block>
             </div>
 
             <div class="col-12 col-xxxl-6">
-                <nx-content-block
-                        title="Info block">
-                    <div card-header>
+                <nx-content-block>
+                    <nx-content-block-header>
                         Some data
-                    </div>
-                    <div card-body>
-                        BODY
+                    </nx-content-block-header>
+                    <div card-sections>
+                        <nx-content-block-section>
+                            <div section-content>
+                                BODY
+                            </div>
+                        </nx-content-block-section>
                     </div>
                 </nx-content-block>
             </div>
@@ -36,23 +42,25 @@
 
         <div class="col-12 col-md-4 col-xl-3 col-xxxl-2">
             <nx-content-block>
-                <div card-header>
+                <nx-content-block-header>
                     Menu
-                </div>
-                <div card-body>
-                    <ul>
-                        <li>
-                            <a target="_blank" href="https://www.google.com">Google</a>
-                        </li>
-                        <li>
-                            <a target="_blank" href="https://www.yahoo.com">Yahoo</a>
-                        </li>
-                        <li>
-                            <a target="_blank" href="https://www.yandex.com">Yandex</a>
-                        </li>
-                    </ul>
-                </div>
+                </nx-content-block-header>
                 <div card-sections>
+                    <nx-content-block-section>
+                        <div section-content>
+                            <ul>
+                                <li>
+                                    <a target="_blank" href="https://www.google.com">Google</a>
+                                </li>
+                                <li>
+                                    <a target="_blank" href="https://www.yahoo.com">Yahoo</a>
+                                </li>
+                                <li>
+                                    <a target="_blank" href="https://www.yandex.com">Yandex</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nx-content-block-section>
                     <nx-content-block-section>
                         <div section-title>
                             Downloads
