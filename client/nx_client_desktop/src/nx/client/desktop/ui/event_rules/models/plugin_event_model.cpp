@@ -22,19 +22,18 @@ PluginEventModel::~PluginEventModel()
 {
 }
 
-void PluginEventModel::buildFromList(const QnPluginInstanceResourceList& pirs)
+void PluginEventModel::buildFromList(const MetadataPluginInstanceResourceList& pirs)
 {
     beginResetModel();
 
-    auto addItem = [this](
-        const QnUuid& id,
-        const QString& name)
-    {
-        auto item = new QStandardItem(name);
-        item->setData(qVariantFromValue(id), PluginIdRole);
-        appendRow(item);
-        return item;
-    };
+    auto addItem = 
+        [this](const QnUuid& id, const QString& name)
+        {
+            auto item = new QStandardItem(name);
+            item->setData(qVariantFromValue(id), PluginIdRole);
+            appendRow(item);
+            return item;
+        };
 
     using namespace nx::vms::event;
     clear();

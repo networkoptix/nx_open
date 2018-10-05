@@ -173,7 +173,7 @@ bool requiresCameraResource(EventType eventType)
         case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
         case EventType::softwareTriggerEvent:
         case EventType::analyticsSdkEvent:
-        case EventType::pluginEvent:
+        //case EventType::pluginEvent: //< Temporary disabled #spanasenko
             return true;
 
         default:

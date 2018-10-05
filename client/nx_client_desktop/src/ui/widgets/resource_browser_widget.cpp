@@ -100,11 +100,6 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 static const QSize kMaxThumbnailSize(224, 184);
 
 static const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
-static const ShortcutHintWidget::DescriptionList kOpenInLayoutHints({
-    {QKeySequence(Qt::Key_Enter), QnResourceBrowserWidget::tr("add to current layout")},
-    {QKeySequence(ctrlKey, Qt::Key_Enter), QnResourceBrowserWidget::tr("open all at a new layout")}});
-static const ShortcutHintWidget::DescriptionList kOpenEntitiesHint({
-    {QKeySequence(ctrlKey, Qt::Key_Enter), QnResourceBrowserWidget::tr("open all")}});
 
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {

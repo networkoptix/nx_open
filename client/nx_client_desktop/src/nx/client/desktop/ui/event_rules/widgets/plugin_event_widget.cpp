@@ -15,6 +15,8 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <nx/fusion/serialization/lexical.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -66,9 +68,13 @@ PluginEventWidget::~PluginEventWidget() {
 
 void PluginEventWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
-    setTabOrder(before, ui->captionEdit);
+    setTabOrder(before, ui->pirComboBox);
+    setTabOrder(ui->pirComboBox, ui->captionEdit);
     setTabOrder(ui->captionEdit, ui->descriptionEdit);
-    setTabOrder(ui->descriptionEdit, after);
+    setTabOrder(ui->descriptionEdit, ui->cbError);
+    setTabOrder(ui->cbError, ui->cbWarning);
+    setTabOrder(ui->cbWarning, ui->cbInfo);
+    setTabOrder(ui->cbInfo, after);
 }
 
 void PluginEventWidget::at_model_dataChanged(Fields fields)
@@ -90,10 +96,11 @@ void PluginEventWidget::at_model_dataChanged(Fields fields)
         if (ui->descriptionEdit->text() != description)
             ui->descriptionEdit->setText(description);
 
-        QString levels = model()->eventParams().inputPortId;
-        ui->cbError->setChecked(levels.contains('E'));
-        ui->cbWarning->setChecked(levels.contains('W'));
-        ui->cbInfo->setChecked(levels.contains('I'));
+        using namespace nx::vms::api;
+        EventLevels levels = QnLexical::deserialized<EventLevels>(model()->eventParams().inputPortId);
+        ui->cbError->setChecked(levels & ErrorEventLevel);
+        ui->cbWarning->setChecked(levels & WarningEventLevel);
+        ui->cbInfo->setChecked(levels & InfoEventLevel);
     }
 
     if (fields.testFlag(Field::eventResources) || fields.testFlag(Field::eventParams))
@@ -104,8 +111,8 @@ void PluginEventWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;
-    QScopedValueRollback<bool> guard(m_updating, true);
 
+    QScopedValueRollback<bool> guard(m_updating, true);
     model()->setEventParams(createEventParameters());
 }
 
@@ -149,11 +156,12 @@ nx::vms::event::EventParameters PluginEventWidget::createEventParameters()
     eventParams.caption = ui->captionEdit->text();
     eventParams.description = ui->descriptionEdit->text();
 
-    QString& levels = eventParams.inputPortId;
-    levels.clear();
-    if (ui->cbError->isChecked()) levels += "E";
-    if (ui->cbWarning->isChecked()) levels += "W";
-    if (ui->cbInfo->isChecked()) levels += "I";
+    using namespace nx::vms::api;
+    EventLevels levels = 0;
+    if (ui->cbError->isChecked()) levels |= ErrorEventLevel;
+    if (ui->cbWarning->isChecked()) levels |= WarningEventLevel;
+    if (ui->cbInfo->isChecked()) levels |= InfoEventLevel;
+    eventParams.inputPortId = QnLexical::serialized(levels);
 
     return eventParams;
 }

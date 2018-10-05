@@ -14,7 +14,7 @@ namespace common {
 class MetadataPluginInstanceResource;
 } // namespace common
 } // namespace vms
-typedef QnSharedResourcePointerList<vms::common::MetadataPluginInstanceResource> QnPluginInstanceResourceList;
+typedef QnSharedResourcePointerList<vms::common::MetadataPluginInstanceResource> MetadataPluginInstanceResourceList;
 
 namespace client {
 namespace desktop {
@@ -31,7 +31,7 @@ public:
     PluginEventModel(QObject* parent = nullptr);
     ~PluginEventModel();
 
-    void buildFromList(const QnPluginInstanceResourceList& pirs);
+    void buildFromList(const MetadataPluginInstanceResourceList& pirs);
 
     bool isValid() const;
 };
