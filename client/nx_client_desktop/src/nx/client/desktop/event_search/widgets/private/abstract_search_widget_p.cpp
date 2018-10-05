@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
@@ -119,8 +120,6 @@ AbstractSearchWidget::Private::Private(
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
     m_fetchMoreOperation->setCallback([this]() { tryFetchMore(); });
-
-    updateDeviceDependentActions();
 }
 
 AbstractSearchWidget::Private::~Private()
@@ -166,6 +165,9 @@ void AbstractSearchWidget::Private::setupModels()
                 q->resetFilters();
             }
         });
+
+    if (m_mainModel->isOnline())
+        executeLater([this]() { updateDeviceDependentActions(); }, this);
 
     m_headIndicatorModel->setObjectName("head");
     m_tailIndicatorModel->setObjectName("tail");
