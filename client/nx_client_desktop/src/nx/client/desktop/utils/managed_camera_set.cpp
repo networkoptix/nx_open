@@ -74,7 +74,7 @@ void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
     }
     else
     {
-        setCameras(Type::single, { camera });
+        setCameras(Type::single, {camera});
     }
 }
 
