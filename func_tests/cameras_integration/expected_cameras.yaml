@@ -253,7 +253,7 @@ DWC-MPA20M:
 
 
 # Needs a reboot every time. Camera is VERY BUGGY!
-DWC-MD421D:
+DWC-MD421D_1.1.1.8:
   discovery:
     physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
@@ -294,7 +294,7 @@ DWC-MD421D:
     outs: [{id: 't_RelayOut-0'}]
 
 
-DWC-MD421D:
+DWC-MD421D_1.1.2.0:
   discovery:
     physicalId: 00-1C-A6-01-27-1A
     vendor: Digital Watchdog
