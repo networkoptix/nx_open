@@ -14,7 +14,7 @@ ${DOWNLOAD LINK}                      //footer//a[@href="/download"]
 @{LANGUAGES LIST}                        en_US           en_GB           ru_RU               fr_FR         de_DE              es_ES         hu_HU             zh_CN     zh_TW    ja_JP       ko_KR       tr_TR          th_TH         nl_NL            he_IL      pl_PL         vi_VN
 @{LANGUAGES ACCOUNT TEXT LIST}           Account         Account         Учетная запись      Compte        Account            Cuenta        Fiók              帐户      帳號     アカウント      계정         Hesap         บัญชีผู้ใช้  Account         חשבון        Konto         Tài khoản
 @{LANGUAGES CREATE ACCOUNT TEXT LIST}    Create Account  Create Account  Зарегистрироваться  Créer compte  Account erstellen  Crear Cuenta  Fiók létrehozása  创建帐户  新建帳號  アカウント作成  계정 만들기  Hesap oluştur  สร้างบัญชี   Account aanmaken  צור חשבון   Utwórz konto  Tạo tài khoản
-@{USER TYPE LIST}    ${OWNER TEXT}    ${ADMIN TEXT}    ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT
+@{USER TYPE LIST}    ${OWNER TEXT}    ${ADMIN TEXT}    ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
 
 ${BACKDROP}                           //ngb-modal-window
 
@@ -29,7 +29,10 @@ ${LOG IN MODAL}                       //form[@name='loginForm']
 ${EMAIL INPUT}                        //form[@name='loginForm']//input[@id='login_email']
 ${PASSWORD INPUT}                     //form[@name='loginForm']//input[@id='login_password']
 ${LOG IN BUTTON}                      //form[@name='loginForm']//nx-process-button//button
-${REMEMBER ME CHECKBOX}               //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]
+
+${REMEMBER ME CHECKBOX VISIBLE}       //form[@name='loginForm']//input[@id='remember']/following-sibling::span[@class="checkmark"]/..
+${REMEMBER ME CHECKBOX REAL}          //form[@name='loginForm']//input[@id='remember']
+
 ${FORGOT PASSWORD}                    //form[@name='loginForm']//a[@href='/restore_password']
 ${LOG IN CLOSE BUTTON}                //button[@data-dismiss='modal']
 ${ACCOUNT NOT FOUND}                  //form[@name='loginForm']//label[contains(text(), '${ACCOUNT NOT FOUND TEXT}')]
@@ -43,6 +46,7 @@ ${YOU HAVE NO SYSTEMS}                //span[contains(text(),"${YOU HAVE NO SYST
 #Header
 ${ACCOUNT DROPDOWN}                   //header//nx-account-settings-select//button[@id='accountSettingsSelect']
 ${LOG OUT BUTTON}                     //li[contains(@class, 'collapse-first')]//a[contains(text(), "${LOG OUT BUTTON TEXT}")]
+${LOGO LINK}                          //header//a[@href='/']
 ${ACCOUNT SETTINGS BUTTON}            //li//a[@href = '/account/']
 ${CHANGE PASSWORD BUTTON DROPDOWN}    //li//a[@href = '/account/password/']
 ${RELEASE HISTORY BUTTON}             //a[@href="/downloads/history" and contains(text(), "${RELEASE HISTORY BUTTON TEXT}")]
@@ -53,6 +57,8 @@ ${AUTHORIZED BODY}                    //body[contains(@class, 'authorized')]
 ${ANONYMOUS BODY}                     //body[contains(@class,'anonymous')]
 ${CREATE ACCOUNT HEADER}              //header//a[@href='/register']
 ${CREATE ACCOUNT BODY}                //nx-app//a[@href='/register']
+
+${LOG IN BODY}                        //nx-app//a[@href='/login']
 
 #Forgot Password
 ${RESET PASSWORD FORM}                //form[@name='restorePasswordWithCode']
@@ -82,7 +88,10 @@ ${REGISTER LAST NAME INPUT}           //form[@name= 'registerForm']//input[@ng-m
 ${REGISTER EMAIL INPUT}               //form[@name= 'registerForm']//input[@ng-model='account.email']
 ${REGISTER EMAIL INPUT LOCKED}        //form[@name= 'registerForm']//input['readOnly' and @ng-if='lockEmail']
 ${REGISTER PASSWORD INPUT}            //form[@name= 'registerForm']//password-input[@ng-model='account.password']//input
-${TERMS AND CONDITIONS CHECKBOX}      //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+
+${TERMS AND CONDITIONS CHECKBOX VISIBLE}    //form[@name= 'registerForm']//input[@ng-model='account.accept']/following-sibling::span[@class="checkmark"]
+${TERMS AND CONDITIONS CHECKBOX REAL}       //form[@name= 'registerForm']//input[@ng-model='account.accept']
+
 ${CREATE ACCOUNT BUTTON}              //form[@name= 'registerForm']//button[contains(text(), "${CREATE ACCOUNT BUTTON TEXT}")]
 ${TERMS AND CONDITIONS LINK}          //form[@name= 'registerForm']//a[@href='/content/eula']
 ${TERMS AND CONDITIONS ERROR}         //form[@name= 'registerForm']//span[@ng-if='registerForm.accept.$dirty && registerForm.accept.$error.required' and contains(text(), "${TERMS AND CONDITIONS ERROR TEXT}")]
@@ -183,6 +192,7 @@ ${ACCOUNT FIRST NAME}                 //form[@name='accountForm']//input[@ng-mod
 ${ACCOUNT LAST NAME}                  //form[@name='accountForm']//input[@ng-model='account.last_name']
 ${ACCOUNT LANGUAGE DROPDOWN}          //form[@name='accountForm']//nx-language-select//button[@id='dropdownMenuButton']
 ${ACCOUNT SAVE}                       //form[@name='accountForm']//button[@ng-click='checkForm()']
+
 #Downloads
 ${DOWNLOADS HEADER}                   //h1["${DOWNLOADS HEADER TEXT}"]
 ${DOWNLOAD WINDOWS VMS LINK}                  //div[text()="Windows x64 - ${CLIENT ONLY TEXT}"]/../..
@@ -250,4 +260,3 @@ ${ENTER}                              \\13
 ${TAB}                                \\9
 ${SPACEBAR}                           \\32
 ${BACKSPACE}                          \\8
-

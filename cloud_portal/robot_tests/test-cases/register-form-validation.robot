@@ -108,7 +108,7 @@ Test Register Invalid
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
     Run Keyword Unless    "${checked}"=="True"    Check Terms and Conditions
-    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
 
 
 Register Form Validation
@@ -118,7 +118,7 @@ Register Form Validation
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword If    '''${password}'''!='''${EMPTY}'''     Check Password Badge    ${password}
-    Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
+    Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
     Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
 
@@ -158,5 +158,5 @@ Check Last Name Outline
     Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
-Check Terms and Conditions
+Check Terms and Conditions Error
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS ERROR}

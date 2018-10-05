@@ -133,7 +133,7 @@ displays password masked, shows password and changes eye icon when clicked
     Should Be Equal    '${input type}'    'password'
 
 should not allow to use one restore link twice
-    [tags]    email
+    [tags]    email    C42079
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
     Register    mark    hamill    ${email}    ${password}
@@ -213,10 +213,9 @@ should handle click I forgot my password link at restore password page
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${REMEMBER ME CHECKBOX}/..    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
+    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${REMEMBER ME CHECKBOX VISIBLE}    ${FORGOT PASSWORD}    ${LOG IN CLOSE BUTTON}
     Click Link    ${FORGOT PASSWORD}
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
-
 
 Check restore password email links, colors, cloud name, and open link in new tab
     [tags]    C26260

@@ -151,6 +151,7 @@ displays pencil and cross links for each user only on hover
     Remove User Permissions    ${random email}
 
 Edit permission works
+    [tags]    C41900
     ${random email}    Get Random Email    ${BASE EMAIL}
     Maximize Browser Window
     Log in to Auto Tests System    ${email}

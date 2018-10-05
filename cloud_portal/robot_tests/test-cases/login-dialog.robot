@@ -77,9 +77,9 @@ allows log in with existing email in uppercase
 allows log in with 'Remember Me checkmark' switched off
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX}/..   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
-    Click Element    ${REMEMBER ME CHECKBOX}/..
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}
+    Click Element    ${REMEMBER ME CHECKBOX VISIBLE}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
     Log In    ${email}    ${password}    None
     Validate Log In
 
@@ -186,12 +186,12 @@ should respond to Tab key
 should respond to Space key and toggle checkbox
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
     Click Link    ${LOG IN NAV BAR}
-    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX}
-    Set Focus To Element    ${REMEMBER ME CHECKBOX}/../input
-    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
-    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX}/../input
-    Press Key    ${REMEMBER ME CHECKBOX}/../input    ${SPACEBAR}
-    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX}/../input
+    Wait Until Element Is Visible    ${REMEMBER ME CHECKBOX VISIBLE}
+    Set Focus To Element    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Not Be Selected    ${REMEMBER ME CHECKBOX REAL}
+    Press Key    ${REMEMBER ME CHECKBOX REAL}    ${SPACEBAR}
+    Checkbox Should Be Selected    ${REMEMBER ME CHECKBOX REAL}
 
 handles two tabs, updates second tab state if logout is done on first
     Go To    ${url}/register
