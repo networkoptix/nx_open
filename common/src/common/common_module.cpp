@@ -135,8 +135,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_cloudMode = false;
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
-    m_httpClientPool = new nx::network::http::ClientPool(this);
-    m_sessionManager = new QnSessionManager(this);
+    m_httpClientPool.reset(new nx::network::http::ClientPool(this));
+    m_sessionManager.reset(new QnSessionManager(this));
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
@@ -521,7 +521,7 @@ QnAuditManager* QnCommonModule::auditManager() const
 
 nx::network::http::ClientPool* QnCommonModule::httpClientPool() const
 {
-    return m_httpClientPool;
+    return m_httpClientPool.data();
 }
 
 CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
