@@ -66,7 +66,7 @@ void ManagedCameraSet::setAllCameras()
 
 void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if (m_filter && !m_filter(camera))
+    if (camera->resourcePool() != m_resourcePool || (m_filter && !m_filter(camera)))
         setCameras(Type::single, {});
     else
         setCameras(Type::single, {camera});
@@ -74,21 +74,14 @@ void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
 
 void ManagedCameraSet::setMultipleCameras(const QnVirtualCameraResourceSet& cameras)
 {
-    if (m_filter)
+    QnVirtualCameraResourceSet filteredCameras;
+    for (const auto& camera: cameras)
     {
-        QnVirtualCameraResourceSet filteredCameras;
-        for (const auto& camera: cameras)
-        {
-            if (m_filter(camera))
-                filteredCameras.insert(camera);
-        }
+        if (camera->resourcePool() == m_resourcePool && (!m_filter || m_filter(camera)))
+            filteredCameras.insert(camera);
+    }
 
-        setCameras(Type::multiple, filteredCameras);
-    }
-    else
-    {
-        setCameras(Type::multiple, cameras);
-    }
+    setCameras(Type::multiple, filteredCameras);
 }
 
 void ManagedCameraSet::setCameras(Type type, const QnVirtualCameraResourceSet& cameras)
