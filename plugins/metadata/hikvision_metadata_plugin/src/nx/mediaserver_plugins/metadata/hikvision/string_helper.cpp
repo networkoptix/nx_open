@@ -13,7 +13,7 @@ namespace plugins {
 namespace hikvision {
 
 QString buildCaption(
-    const Hikvision::DriverManifest& manifest,
+    const Hikvision::PluginManifest& manifest,
     const HikvisionEvent& event)
 {
     const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
@@ -21,24 +21,24 @@ QString buildCaption(
 }
 
 QString buildDescription(
-    const Hikvision::DriverManifest& manifest,
+    const Hikvision::PluginManifest& manifest,
     const HikvisionEvent& event)
 {
-    using namespace nx::api;
+    using namespace nx::vms::api::analytics;
 
     const auto descriptor = manifest.eventTypeDescriptorById(event.typeId);
     auto description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
-    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    if (descriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
         auto stateStr = event.isActive ? descriptor.positiveState : descriptor.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
-    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::regionDependent))
+    if (descriptor.flags.testFlag(EventTypeFlag::regionDependent))
     {
         auto regionStr = descriptor.regionDescription.arg(event.region ? *event.region : 0);
         description = description.arg(regionStr);

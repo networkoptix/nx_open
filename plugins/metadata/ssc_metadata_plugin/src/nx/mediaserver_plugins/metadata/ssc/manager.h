@@ -25,13 +25,13 @@ public:
     Manager(
         Plugin* plugin,
         const nx::sdk::CameraInfo& cameraInfo,
-        const AnalyticsDriverManifest& typedManifest);
+        const PluginManifest& typedManifest);
 
     virtual ~Manager();
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    void sendEventPacket(const AnalyticsEventType& event) const;
+    void sendEventPacket(const EventType& event) const;
 
     virtual nx::sdk::Error startFetchingMetadata(
         const char* const* tpeList, int typeListSize) override;

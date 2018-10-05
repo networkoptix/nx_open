@@ -4,7 +4,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_event_metadata_packet.h>
@@ -23,7 +23,7 @@ namespace ssc {
 namespace {
 
 nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
-    const AnalyticsEventType& eventType, int logicalId)
+    const EventType& eventType, int logicalId)
 {
     using namespace std::chrono;
 
@@ -44,13 +44,13 @@ nx::sdk::metadata::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 
 Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
-    const AnalyticsDriverManifest& typedManifest)
+    const PluginManifest& typedManifest)
     :
     m_plugin(plugin),
     m_url(cameraInfo.url),
     m_cameraLogicalId(cameraInfo.logicalId)
 {
-    nx::api::AnalyticsDeviceManifest typedCameraManifest;
+    nx::vms::api::analytics::CameraManagerManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
         typedCameraManifest.supportedEventTypes.push_back(eventType.id);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
@@ -79,7 +79,7 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Manager::sendEventPacket(const AnalyticsEventType& event) const
+void Manager::sendEventPacket(const EventType& event) const
 {
     ++m_packetId;
     auto packet = createCommonEventMetadataPacket(event, m_cameraLogicalId);

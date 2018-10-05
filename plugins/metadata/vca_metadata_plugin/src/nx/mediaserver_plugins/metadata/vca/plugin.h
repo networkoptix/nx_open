@@ -42,14 +42,14 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {}
 
-    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
+    const EventType* eventTypeById(const QString& id) const noexcept;
 
     virtual void executeAction(
         nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
 
 private:
     QByteArray m_manifest;
-    AnalyticsDriverManifest m_typedManifest;
+    PluginManifest m_typedManifest;
 };
 
 } // namespace vca

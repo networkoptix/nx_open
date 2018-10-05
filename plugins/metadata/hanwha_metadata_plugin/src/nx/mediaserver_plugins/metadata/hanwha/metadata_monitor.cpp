@@ -26,7 +26,7 @@ static const seconds kResponseTimeout(10);
 } // namespace
 
 MetadataMonitor::MetadataMonitor(
-    const Hanwha::DriverManifest& manifest,
+    const Hanwha::PluginManifest& manifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth)
     :
@@ -52,7 +52,7 @@ void MetadataMonitor::startMonitoring()
 
 void MetadataMonitor::stopMonitoring()
 {
-    utils::promise<void> promise;
+    nx::utils::promise<void> promise;
     m_timer.post(
         [this, &promise]()
         {

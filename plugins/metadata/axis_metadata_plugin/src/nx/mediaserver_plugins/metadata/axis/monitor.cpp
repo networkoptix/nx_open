@@ -24,7 +24,7 @@ static const std::string kRuleNamePrefix("NX_RULE_");
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
 nx::sdk::metadata::CommonEvent* createCommonEvent(
-    const AnalyticsEventType& eventType, bool active)
+    const EventType& eventType, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(eventType.eventTypeIdExternal.toStdString());
@@ -36,7 +36,7 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
 }
 
 nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
-    const AnalyticsEventType& event, bool active)
+    const EventType& event, bool active)
 {
     using namespace std::chrono;
     auto packet = new nx::sdk::metadata::CommonEventsMetadataPacket();
@@ -135,7 +135,7 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress,
         const auto it = std::find_if(
             m_manager->events().outputEventTypes.cbegin(),
             m_manager->events().outputEventTypes.cend(),
-            [eventTypeList, i](const AnalyticsEventType& event)
+            [eventTypeList, i](const EventType& event)
             {
                 return event.eventTypeIdExternal == eventTypeList[i];
             });
@@ -212,7 +212,7 @@ nx::sdk::Error Monitor::startMonitoring(const char* const* typeList, int typeLis
     for (int i = 0; i < typeListSize; ++i)
     {
         const QString id = typeList[i];
-        const AnalyticsEventType* eventType = m_manager->eventTypeById(id);
+        const EventType* eventType = m_manager->eventTypeById(id);
         if (!eventType)
             NX_PRINT << "Unknown event type id = " << id.toStdString();
         else
@@ -272,7 +272,7 @@ std::chrono::milliseconds Monitor::timeTillCheck() const
     return result;
 }
 
-void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
+void Monitor::sendEventStartedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);
@@ -281,7 +281,7 @@ void Monitor::sendEventStartedPacket(const AnalyticsEventType& event) const
         << event.fullName().toStdString() << " sent to server";
 }
 
-void Monitor::sendEventStoppedPacket(const AnalyticsEventType& event) const
+void Monitor::sendEventStoppedPacket(const EventType& event) const
 {
     auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
     m_handler->handleMetadata(nx::sdk::Error::noError, packet);

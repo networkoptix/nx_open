@@ -5,10 +5,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx {
-namespace api {
+namespace nx::vms::api::analytics {
 
-struct NX_PLUGIN_UTILS_API TranslatableString
+struct NX_VMS_API TranslatableString
 {
     QString value;
     QMap<QString, QString> localization;
@@ -17,7 +16,6 @@ struct NX_PLUGIN_UTILS_API TranslatableString
 };
 #define TranslatableString_Fields (value)(localization)
 
-QN_FUSION_DECLARE_FUNCTIONS(TranslatableString, (json))
+QN_FUSION_DECLARE_FUNCTIONS(TranslatableString, (json), NX_VMS_API)
 
-} // namespace api
-} // namespace nx
+} // namespace nx::vms::api::analytics

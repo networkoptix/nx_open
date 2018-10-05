@@ -12,6 +12,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 namespace nx {
 namespace network {
@@ -23,7 +24,7 @@ class AsyncHttpClientPtr;
 } // namespace network
 } // namespace http
 
-namespace nx { namespace api { struct AnalyticsDriverManifest; } }
+namespace nx { namespace api { struct PluginManifest; } }
 
 class QnMediaServerResource:
     public QnResource,
@@ -113,8 +114,8 @@ public:
 
     nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
-    QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
-    void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);
+    QList<nx::vms::api::analytics::PluginManifest> analyticsDrivers() const;
+    void setAnalyticsDrivers(const QList<nx::vms::api::analytics::PluginManifest>& drivers);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
@@ -177,7 +178,7 @@ private:
     QString m_authKey;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
-    CachedValue<QList<nx::api::AnalyticsDriverManifest>> m_analyticsDriversCache;
+    CachedValue<QList<nx::vms::api::analytics::PluginManifest>> m_analyticsDriversCache;
 
     mutable QnResourcePtr m_firstCamera;
 

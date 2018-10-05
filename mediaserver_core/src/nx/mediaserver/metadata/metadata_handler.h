@@ -6,7 +6,7 @@
 #include <nx/sdk/metadata/camera_manager.h>
 #include <nx/vms/event/event_fwd.h>
 #include <plugins/plugin_tools.h>
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/sdk/metadata/objects_metadata_packet.h>
@@ -36,7 +36,7 @@ public:
 
     void setResource(const QnSecurityCamResourcePtr& resource);
 
-    void setManifest(const nx::api::AnalyticsDriverManifest& manifest);
+    void setManifest(const nx::vms::api::analytics::PluginManifest& manifest);
 
     void registerDataReceptor(QnAbstractDataReceptor* dataReceptor);
     void removeDataReceptor(QnAbstractDataReceptor* dataReceptor);
@@ -51,7 +51,7 @@ private:
 
     void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
     
-    nx::api::Analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
+    nx::vms::api::analytics::EventType eventTypeDescriptor(const QString& eventTypeId) const;
 
     void handleEventsPacket(
         nxpt::ScopedRef<nx::sdk::metadata::EventsMetadataPacket> packet);
@@ -65,7 +65,7 @@ private:
 
 private:
     QnSecurityCamResourcePtr m_resource;
-    nx::api::AnalyticsDriverManifest m_manifest;
+    nx::vms::api::analytics::PluginManifest m_manifest;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     QnAbstractDataReceptor* m_dataReceptor = nullptr;
     nx::debugging::AbstractVisualMetadataDebugger* m_visualDebugger = nullptr;

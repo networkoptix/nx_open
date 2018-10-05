@@ -2,7 +2,7 @@
 
 #include <rest/server/json_rest_handler.h>
 #include "nx/sdk/metadata/camera_manager.h"
-#include "nx/api/analytics/driver_manifest.h"
+#include "nx/vms/api/analytics/plugin_manifest.h"
 #include "api/model/analytics_actions.h"
 #include <nx/mediaserver/server_module_aware.h>
 

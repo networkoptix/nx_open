@@ -37,9 +37,9 @@ namespace dw_mtt {
 struct ElapsedEvent
 {
 public:
-    const AnalyticsEventType type;
+    const EventType type;
     nx::utils::ElapsedTimerThreadSafe timer;
-    ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
+    ElapsedEvent(const EventType& analyticsEventType): type(analyticsEventType){}
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
@@ -48,7 +48,7 @@ class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 public:
     Manager(Plugin* plugin,
         const nx::sdk::CameraInfo& cameraInfo,
-        const AnalyticsDriverManifest& typedManifest);
+        const PluginManifest& typedManifest);
 
     virtual ~Manager();
 
@@ -56,9 +56,9 @@ public:
 
     void treatAlarmPairs(const QList<AlarmPair>& alarmPairs);
 
-    void sendEventStartedPacket(const AnalyticsEventType& event) const;
+    void sendEventStartedPacket(const EventType& event) const;
 
-    void sendEventStoppedPacket(const AnalyticsEventType& event) const;
+    void sendEventStoppedPacket(const EventType& event) const;
 
     /** When some bytes received from notification server or when connection was broken/closed. */
     void onReceive(SystemError::ErrorCode, size_t);

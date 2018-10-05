@@ -49,7 +49,7 @@ public:
         nx::sdk::metadata::Action* action,
         nx::sdk::Error* outError) override;
 
-    const Hanwha::DriverManifest& driverManifest() const;
+    const Hanwha::PluginManifest& driverManifest() const;
 
     MetadataMonitor* monitor(
         const QString& sharedId,
@@ -70,7 +70,7 @@ private:
 
         SharedResources(
             const QString& sharedId,
-            const Hanwha::DriverManifest& driverManifest,
+            const Hanwha::PluginManifest& driverManifest,
             const nx::utils::Url &url,
             const QAuthenticator& auth);
 
@@ -92,7 +92,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
-    Hanwha::DriverManifest m_driverManifest;
+    Hanwha::PluginManifest m_driverManifest;
     QMap<QString, std::shared_ptr<SharedResources>> m_sharedResources;
 };
 

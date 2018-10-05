@@ -41,14 +41,14 @@ public:
 
     void setCameraInfo(const nx::sdk::CameraInfo& cameraInfo);
     void setDeviceManifest(const QByteArray& manifest);
-    void setDriverManifest(const Hanwha::DriverManifest& manifest);
+    void setDriverManifest(const Hanwha::PluginManifest& manifest);
 
     void setMonitor(MetadataMonitor* monitor);
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
 private:
-    Hanwha::DriverManifest m_driverManifest;
+    Hanwha::PluginManifest m_driverManifest;
     QByteArray m_deviceManifest;
 
     nx::utils::Url m_url;

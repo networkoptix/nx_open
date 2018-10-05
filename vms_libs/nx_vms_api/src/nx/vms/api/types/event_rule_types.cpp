@@ -17,3 +17,17 @@ QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (nx::vms::api::ActionType) \
     (nx::vms::api::EventState),
     (numeric)(debug))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::EventLevel, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, EventLevel,
+    (nx::vms::api::UndefinedEventLevel, "")
+    (nx::vms::api::InfoEventLevel, "info")
+    (nx::vms::api::WarningEventLevel, "warning")
+    (nx::vms::api::ErrorEventLevel, "error"))
+
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::EventLevels, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, EventLevels,
+    (nx::vms::api::UndefinedEventLevel, "")
+    (nx::vms::api::InfoEventLevel, "info")
+    (nx::vms::api::WarningEventLevel, "warning")
+    (nx::vms::api::ErrorEventLevel, "error"))

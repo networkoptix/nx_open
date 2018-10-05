@@ -33,9 +33,9 @@ namespace vca {
 struct ElapsedEvent
 {
 public:
-    const AnalyticsEventType type;
+    const EventType type;
     nx::utils::ElapsedTimerThreadSafe timer;
-    ElapsedEvent(const AnalyticsEventType& analyticsEventType): type(analyticsEventType){}
+    ElapsedEvent(const EventType& analyticsEventType): type(analyticsEventType){}
 };
 using ElapsedEvents = std::list<ElapsedEvent>;
 
@@ -44,7 +44,7 @@ class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 public:
     Manager(Plugin* plugin,
         const nx::sdk::CameraInfo& cameraInfo,
-        const AnalyticsDriverManifest& typedManifest);
+        const PluginManifest& typedManifest);
 
     virtual ~Manager();
 
@@ -67,9 +67,9 @@ public:
 
     std::chrono::milliseconds timeTillCheck() const;
 
-    void sendEventStartedPacket(const AnalyticsEventType& event) const;
+    void sendEventStartedPacket(const EventType& event) const;
 
-    void sendEventStoppedPacket(const AnalyticsEventType& event) const;
+    void sendEventStoppedPacket(const EventType& event) const;
 
     void onTimer();
 

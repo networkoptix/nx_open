@@ -387,7 +387,7 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         *eventsFilteredByFreeTextSubQuery = lm(R"sql(
             (SELECT rowid, *
              FROM event
-             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1'))
+             WHERE rowid IN (SELECT docid FROM event_properties WHERE content MATCH '%1*'))
         )sql").args(filter.freeText);
     }
     else

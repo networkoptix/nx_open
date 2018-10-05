@@ -6,7 +6,7 @@
 
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 #include <nx/fusion/serialization/json.h>
 
 #define NX_PRINT_PREFIX "[metadata::axis::Manager] "
@@ -19,7 +19,7 @@ namespace axis {
 
 Manager::Manager(
     const nx::sdk::CameraInfo& cameraInfo,
-    const AnalyticsDriverManifest& typedManifest)
+    const PluginManifest& typedManifest)
     :
     m_typedManifest(typedManifest),
     m_manifest(QJson::serialized(typedManifest)),
@@ -28,7 +28,7 @@ Manager::Manager(
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
 
-    nx::api::AnalyticsDeviceManifest deviceManifest;
+    nx::vms::api::analytics::CameraManagerManifest deviceManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)
         deviceManifest.supportedEventTypes.push_back(eventType.id);
     NX_PRINT << "Axis metadata manager created";
@@ -97,12 +97,12 @@ void Manager::freeManifest(const char* data)
     // released in Manager's destructor.
 }
 
-const AnalyticsEventType* Manager::eventTypeById(const QString& id) const noexcept
+const EventType* Manager::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
         m_typedManifest.outputEventTypes.cend(),
-        [&id](const AnalyticsEventType& eventType) { return eventType.id == id; });
+        [&id](const EventType& eventType) { return eventType.id == id; });
 
     if (it == m_typedManifest.outputEventTypes.cend())
         return nullptr;

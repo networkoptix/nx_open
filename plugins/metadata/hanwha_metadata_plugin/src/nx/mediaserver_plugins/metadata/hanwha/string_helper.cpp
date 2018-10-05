@@ -10,7 +10,7 @@ namespace metadata {
 namespace hanwha {
 
 QString StringHelper::buildCaption(
-    const Hanwha::DriverManifest& /*manifest*/,
+    const Hanwha::PluginManifest& /*manifest*/,
     const QString& /*eventTypeId*/,
     boost::optional<int> /*eventChannel*/,
     boost::optional<int> /*eventRegion*/,
@@ -21,28 +21,28 @@ QString StringHelper::buildCaption(
 }
 
 QString StringHelper::buildDescription(
-    const Hanwha::DriverManifest& manifest,
+    const Hanwha::PluginManifest& manifest,
     const QString& eventTypeId,
     boost::optional<int> /*eventChannel*/,
     boost::optional<int> eventRegion,
     Hanwha::EventItemType eventItemType,
     bool isActive)
 {
-    using namespace nx::api;
+    using namespace nx::vms::api::analytics;
 
     const auto& descriptor = manifest.eventTypeDescriptorById(eventTypeId);
     QString description = descriptor.description;
     if (description.isEmpty())
         return QString();
 
-    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    if (descriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
         auto stateStr = isActive ? descriptor.positiveState : descriptor.negativeState;
         if (!stateStr.isEmpty())
             description = description.arg(stateStr);
     }
 
-    if (descriptor.flags.testFlag(Analytics::EventTypeFlag::regionDependent))
+    if (descriptor.flags.testFlag(EventTypeFlag::regionDependent))
     {
         const auto& regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
         description = description.arg(regionStr);

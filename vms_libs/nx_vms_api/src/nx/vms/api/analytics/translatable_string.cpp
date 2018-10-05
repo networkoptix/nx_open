@@ -2,8 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx {
-namespace api {
+namespace nx::vms::api::analytics {
 
 QString TranslatableString::text(const QString& locale) const
 {
@@ -13,5 +12,4 @@ QString TranslatableString::text(const QString& locale) const
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TranslatableString, (json), TranslatableString_Fields,
     (brief, true))
 
-} // namespace api
-} // namespace nx
+} // namespace nx::vms::api::analytics

@@ -162,7 +162,7 @@ void Manager::setDeviceManifest(const QByteArray& manifest)
     m_deviceManifest = manifest;
 }
 
-void Manager::setDriverManifest(const Hanwha::DriverManifest& manifest)
+void Manager::setDriverManifest(const Hanwha::PluginManifest& manifest)
 {
     m_driverManifest = manifest;
 }

@@ -45,7 +45,7 @@ public:
     virtual const char* capabilitiesManifest(
         nx::sdk::Error* error) const override;
 
-    const Hikvision::DriverManifest& driverManifest() const;
+    const Hikvision::PluginManifest& driverManifest() const;
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
@@ -60,7 +60,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
-    Hikvision::DriverManifest m_driverManifest;
+    Hikvision::PluginManifest m_driverManifest;
 
     struct DeviceData
     {

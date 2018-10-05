@@ -29,8 +29,8 @@ static const std::chrono::seconds kLprRequestsTimeout(2);
 static const std::chrono::seconds kExpiredEventTimeout(5);
 
 HikvisionMetadataMonitor::HikvisionMetadataMonitor(
-    const Hikvision::DriverManifest& manifest,
-    const nx::api::AnalyticsDeviceManifest& deviceManifest,
+    const Hikvision::PluginManifest& manifest,
+    const nx::vms::api::analytics::CameraManagerManifest& deviceManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth,
     const std::vector<QString>& eventTypes)
@@ -244,7 +244,7 @@ void HikvisionMetadataMonitor::reopenLprConnection()
 
 bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent)
 {
-    using namespace nx::api;
+    using namespace nx::vms::api::analytics;
 
     std::vector<HikvisionEvent> result;
     if (!hikvisionEvent.typeId.isNull())
@@ -263,7 +263,7 @@ bool HikvisionMetadataMonitor::processEvent(const HikvisionEvent& hikvisionEvent
 
     auto eventTypeDescriptor = m_manifest.eventTypeDescriptorById(hikvisionEvent.typeId);
     using namespace nx::sdk::metadata;
-    if (eventTypeDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    if (eventTypeDescriptor.flags.testFlag(EventTypeFlag::stateDependent))
     {
         const QString key = getEventKey(hikvisionEvent);
         if (hikvisionEvent.isActive)

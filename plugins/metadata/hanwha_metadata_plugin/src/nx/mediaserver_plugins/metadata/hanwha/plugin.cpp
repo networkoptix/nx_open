@@ -9,7 +9,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
-#include <nx/api/analytics/device_manifest.h>
+#include <nx/vms/api/analytics/camera_manager_manifest.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/scope_guard.h>
 
@@ -58,7 +58,7 @@ using namespace nx::sdk::metadata;
 
 Plugin::SharedResources::SharedResources(
     const QString& sharedId,
-    const Hanwha::DriverManifest& driverManifest,
+    const Hanwha::PluginManifest& driverManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth)
     :
@@ -82,7 +82,7 @@ Plugin::Plugin()
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-    m_driverManifest = QJson::deserialized<Hanwha::DriverManifest>(m_manifest);
+    m_driverManifest = QJson::deserialized<Hanwha::PluginManifest>(m_manifest);
 }
 
 void* Plugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -162,7 +162,7 @@ CameraManager* Plugin::obtainCameraManager(
     if (!supportedEvents)
         return nullptr;
 
-    nx::api::AnalyticsDeviceManifest deviceManifest;
+    nx::vms::api::analytics::CameraManagerManifest deviceManifest;
     deviceManifest.supportedEventTypes = *supportedEvents;
 
     auto manager = new Manager(this);
@@ -258,7 +258,7 @@ boost::optional<QList<QString>> Plugin::eventTypeIdsFromParameters(
     return QList<QString>::fromSet(result);
 }
 
-const Hanwha::DriverManifest& Plugin::driverManifest() const
+const Hanwha::PluginManifest& Plugin::driverManifest() const
 {
     return m_driverManifest;
 }

@@ -5,6 +5,7 @@ nx_add_server_plugin(hanwha_metadata_plugin
         openssl
         nx_sdk
         nx_plugin_utils
+        nx_vms_api
         nx_network
         nx_utils
         nx_fusion

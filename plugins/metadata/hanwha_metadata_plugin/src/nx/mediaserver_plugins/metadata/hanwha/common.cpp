@@ -42,7 +42,7 @@ bool doesMatch(const QString& realEventName, const QString& internalEventName)
 
 } // namespace
 
-QString Hanwha::DriverManifest::eventTypeIdByName(const QString& eventName) const
+QString Hanwha::PluginManifest::eventTypeIdByName(const QString& eventName) const
 {
     QString result = m_eventTypeIdByInternalName.value(eventName);
     if (!result.isNull())
@@ -60,10 +60,10 @@ QString Hanwha::DriverManifest::eventTypeIdByName(const QString& eventName) cons
     return QString();
 }
 
-const Hanwha::EventTypeDescriptor& Hanwha::DriverManifest::eventTypeDescriptorById(
+const Hanwha::EventType& Hanwha::PluginManifest::eventTypeDescriptorById(
     const QString& id) const
 {
-    static const Hanwha::EventTypeDescriptor defaultEventTypeDescriptor{};
+    static const Hanwha::EventType defaultEventTypeDescriptor{};
 
     auto it = m_eventTypeDescriptorById.find(id);
     if (it != m_eventTypeDescriptorById.end())
@@ -81,10 +81,10 @@ const Hanwha::EventTypeDescriptor& Hanwha::DriverManifest::eventTypeDescriptorBy
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventTypeDescriptor,
-    (json), EventTypeDescriptor_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha::DriverManifest,
-    (json), DriverManifest_Fields)
+    nx::mediaserver_plugins::metadata::hanwha::Hanwha::EventType,
+    (json), HanwhaEventType_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::mediaserver_plugins::metadata::hanwha::Hanwha::PluginManifest,
+    (json), HanwhaPluginManifest_Fields)
 
 } // namespace hanwha
 } // namespace metadata

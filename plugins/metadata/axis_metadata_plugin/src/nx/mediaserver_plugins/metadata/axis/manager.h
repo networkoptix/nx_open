@@ -25,7 +25,7 @@ class Manager: public nxpt::CommonRefCounter<nx::sdk::metadata::CameraManager>
 {
 public:
     Manager(const nx::sdk::CameraInfo& cameraInfo,
-        const AnalyticsDriverManifest& typedManifest);
+        const PluginManifest& typedManifest);
 
     virtual ~Manager();
 
@@ -43,7 +43,7 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    const AnalyticsDriverManifest& events() const noexcept
+    const PluginManifest& events() const noexcept
     {
         return m_typedManifest;
     }
@@ -51,10 +51,10 @@ public:
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
 
     /** @return Null if not found. */
-    const AnalyticsEventType* eventTypeById(const QString& id) const noexcept;
+    const EventType* eventTypeById(const QString& id) const noexcept;
 
 private:
-    AnalyticsDriverManifest m_typedManifest;
+    PluginManifest m_typedManifest;
     QByteArray m_manifest;
     QUrl m_url;
     QAuthenticator m_auth;

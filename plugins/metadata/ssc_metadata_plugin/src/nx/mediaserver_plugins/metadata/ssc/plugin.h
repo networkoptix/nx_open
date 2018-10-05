@@ -61,9 +61,9 @@ private:
 
 private:
     QByteArray m_manifest;
-    AnalyticsDriverManifest m_typedManifest;
-    AnalyticsEventType cameraEventType;
-    AnalyticsEventType resetEventType;
+    PluginManifest m_typedManifest;
+    EventType cameraEventType;
+    EventType resetEventType;
 
     AllowedPortNames m_allowedPortNames;
     QList<QSerialPort*> m_serialPortList;

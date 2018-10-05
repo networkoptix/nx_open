@@ -17,8 +17,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
 
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/dialog.h>
@@ -40,8 +41,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <nx/api/analytics/driver_manifest.h>
-#include <nx/api/analytics/supported_events.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_writers.h>
@@ -226,6 +226,26 @@ public:
                 close();
             });
 
+        addButton("Generate PIRs", 
+            [this]() 
+            {
+                QnResourcePtr pir1(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir1->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CD}"));
+                pir1->setName("Plugin1");
+                
+                QnResourcePtr pir2(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir2->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CE}"));
+                pir2->setName("Plugin2");
+                
+                QnResourcePtr pir3(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                pir3->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CF}"));
+                pir3->setName("Plugin3");
+                
+                resourcePool()->addResource(pir1);
+                resourcePool()->addResource(pir2);
+                resourcePool()->addResource(pir3);
+            });
+
         addButton(lit("Generate analytics manifests"),
             [this]()
             {
@@ -237,13 +257,13 @@ public:
 
                 for (int i = 0; i < 5; ++i)
                 {
-                    nx::api::AnalyticsDriverManifest manifest;
+                    nx::vms::api::analytics::PluginManifest manifest;
                     manifest.pluginId = lit("nx.generatedDriver.%1").arg(i);
                     manifest.pluginName.value = lit("Plugin %1").arg(i);
                     manifest.pluginName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
                     for (int j = 0; j < 3; ++j)
                     {
-                        nx::api::Analytics::EventType eventType;
+                        nx::vms::api::analytics::EventType eventType;
                         eventType.id = "";
                         eventType.name.value = lit("Event %1").arg(j);
                         eventType.name.localization[lit("ru_RU")] = lit("Russian %1").arg(j);
@@ -262,26 +282,26 @@ public:
                 for (auto server: servers)
                 {
                     auto drivers = server->analyticsDrivers();
-                    drivers.push_back(nx::api::AnalyticsDriverManifest()); //< Some cameras will not have driver.
+                    drivers.push_back(nx::vms::api::analytics::PluginManifest()); //< Some cameras will not have driver.
 
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
                         const auto randomDriver = nx::utils::random::choice(drivers);
                         if (randomDriver.pluginId.isEmpty()) //< dummy driver
                         {
-                            camera->setAnalyticsSupportedEvents({});
+                            camera->setSupportedAnalyticsEventTypeIds({});
                         }
                         else
                         {
-                            nx::api::AnalyticsSupportedEvents supported;
+                            QnSecurityCamResource::AnalyticsEventTypeIds eventTypeIds;
                             std::transform(randomDriver.outputEventTypes.cbegin(),
                                 randomDriver.outputEventTypes.cend(),
-                                std::back_inserter(supported),
-                                [](const nx::api::Analytics::EventType& eventType)
+                                std::back_inserter(eventTypeIds),
+                                [](const nx::vms::api::analytics::EventType& eventType)
                                 {
                                     return eventType.id;
                                 });
-                            camera->setAnalyticsSupportedEvents(supported);
+                            camera->setSupportedAnalyticsEventTypeIds(eventTypeIds);
                         }
 
                         camera->saveParamsAsync();
@@ -294,7 +314,7 @@ public:
             {
                 for (auto camera: resourcePool()->getAllCameras({}))
                 {
-                    camera->setAnalyticsSupportedEvents({});
+                    camera->setSupportedAnalyticsEventTypeIds({});
                     camera->saveParamsAsync();
                 }
 
