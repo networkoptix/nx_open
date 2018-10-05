@@ -82,6 +82,20 @@ void EventSearchListModel::Private::setSelectedEventType(vms::api::EventType val
     q->clear();
 }
 
+QString EventSearchListModel::Private::selectedSubType() const
+{
+    return m_selectedSubType;
+}
+
+void EventSearchListModel::Private::setSelectedSubType(const QString& value)
+{
+    if (m_selectedSubType == value)
+        return;
+
+    m_selectedSubType = value;
+    q->clear();
+}
+
 int EventSearchListModel::Private::count() const
 {
     return int(m_data.size());
@@ -330,6 +344,7 @@ rest::Handle EventSearchListModel::Private::getEvents(
 
     request.filter.period = period;
     request.filter.eventType = m_selectedEventType;
+    request.filter.eventSubtype = m_selectedSubType;
     request.limit = limit;
     request.order = order;
 

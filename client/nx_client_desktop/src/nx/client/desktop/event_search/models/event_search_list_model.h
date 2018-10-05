@@ -17,6 +17,9 @@ public:
     vms::api::EventType selectedEventType() const;
     void setSelectedEventType(vms::api::EventType value);
 
+    QString selectedSubType() const;
+    void setSelectedSubType(const QString& value);
+
     virtual bool isConstrained() const override;
 
 private:

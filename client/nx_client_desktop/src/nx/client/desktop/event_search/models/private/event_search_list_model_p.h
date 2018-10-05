@@ -33,6 +33,9 @@ public:
     vms::api::EventType selectedEventType() const;
     void setSelectedEventType(vms::api::EventType value);
 
+    QString selectedSubType() const;
+    void setSelectedSubType(const QString& value);
+
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
@@ -67,6 +70,7 @@ private:
     const QScopedPointer<vms::event::StringsHelper> m_helper;
 
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
+    QString m_selectedSubType;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;

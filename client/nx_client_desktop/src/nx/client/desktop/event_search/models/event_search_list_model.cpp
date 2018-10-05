@@ -23,6 +23,16 @@ void EventSearchListModel::setSelectedEventType(vms::api::EventType value)
     d->setSelectedEventType(value);
 }
 
+QString EventSearchListModel::selectedSubType() const
+{
+    return d->selectedSubType();
+}
+
+void EventSearchListModel::setSelectedSubType(const QString& value)
+{
+    d->setSelectedSubType(value);
+}
+
 bool EventSearchListModel::isConstrained() const
 {
     return selectedEventType() != vms::api::undefinedEvent
