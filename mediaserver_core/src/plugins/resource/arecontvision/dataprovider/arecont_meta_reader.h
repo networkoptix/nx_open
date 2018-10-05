@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_ARECONT
+
 #include <chrono>
 #include <nx/network/http/http_async_client.h>
 #include <nx/streaming/media_data_packet.h>
@@ -45,3 +47,5 @@ private:
     nx::utils::ElapsedTimer m_lastMetaRequest;
     std::atomic<int> m_framesSinceLastMetaData = 0;
 };
+
+#endif // ENABLE_ARECONT
