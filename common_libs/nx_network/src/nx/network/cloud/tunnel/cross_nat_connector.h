@@ -4,17 +4,19 @@
 #include <map>
 #include <memory>
 #include <optional>
-#include <tuple>
-#include <type_traits>
 
+#include <nx/network/aio/async_operation_wrapper.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/mediator_client_connections.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
 #include <nx/utils/type_utils.h>
 #include <nx/utils/system_error.h>
+
+#include <nx/utils/async_operation_guard.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"
@@ -42,25 +44,32 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler) override;
+
     virtual QString getRemotePeerName() const override;
 
     SocketAddress localAddress() const;
+
     void replaceOriginatingHostAddress(const QString& address);
 
     static utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
 
 protected:
     virtual void stopWhileInAioThread() override;
+
     virtual void messageReceived(
         SocketAddress sourceAddress,
         stun::Message msg) override;
+
     virtual void ioFailure(SystemError::ErrorCode errorCode) override;
 
 private:
+    using MediatorUdpEndpointFetcher = aio::AsyncOperationWrapper<
+        decltype(&nx::hpm::api::AbstractMediatorConnector::fetchUdpEndpoint)>;
+
     const AddressEntry m_targetPeerAddress;
     const std::string m_connectSessionId;
     ConnectCompletionHandler m_completionHandler;
-    SocketAddress m_mediatorUdpEndpoint;
+    std::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
     std::optional<QString> m_originatingHostAddressReplacement;
     SocketAddress m_localAddress;
@@ -73,29 +82,42 @@ private:
     QString m_remotePeerFullName;
     std::unique_ptr<aio::Timer> m_timer;
     std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
+    MediatorUdpEndpointFetcher m_mediatorUdpEndpointFetcher;
 
     static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
 
-    void issueConnectRequestToMediator(
-        std::chrono::milliseconds timeout,
-        ConnectCompletionHandler handler);
+    void fetchMediatorUdpEndpoint();
+
+    void onFetchMediatorUdpEndpointCompletion(
+        http::StatusCode::Value resultCode,
+        SocketAddress mediatorUdpEndpoint);
+
+    void issueConnectRequestToMediator();
+
     void onConnectResponse(
         stun::TransportHeader stunTransportHeader,
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
+
     std::chrono::milliseconds calculateTimeLeftForConnect();
+
     void start(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::api::ConnectResponse response);
+
     void onConnectorFinished(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
+
     void onTimeout();
+
     void holePunchingDone(
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
+
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
+
     hpm::api::ConnectRequest prepareConnectRequest() const;
 };
 

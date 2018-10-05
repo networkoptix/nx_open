@@ -26,7 +26,19 @@ std::unique_ptr<hpm::api::MediatorServerTcpConnection>
     return std::move(m_serverConnection);
 }
 
-boost::optional<nx::network::SocketAddress> PredefinedMediatorConnector::udpEndpoint() const
+void PredefinedMediatorConnector::fetchUdpEndpoint(
+    nx::utils::MoveOnlyFunc<void(
+        http::StatusCode::Value /*resultCode*/,
+        SocketAddress /*endpoint*/)> handler)
+{
+    post(
+        [this, handler = std::move(handler)]() 
+        {
+            handler(http::StatusCode::ok, m_udpEndpoint);
+        });
+}
+
+std::optional<nx::network::SocketAddress> PredefinedMediatorConnector::udpEndpoint() const
 {
     return m_udpEndpoint;
 }
