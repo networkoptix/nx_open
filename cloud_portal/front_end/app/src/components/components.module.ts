@@ -10,6 +10,7 @@ import { NxCheckboxComponent }      from './checkbox/checkbox.component';
 import { NxRadioComponent }         from './radio/radio.component';
 import { MenuModule }               from './menu/menu.module';
 import { NxContentBlockComponent }  from './content-block/content-block.component';
+import { NxContentBlockSectionComponent }  from './content-block/section/section.component';
 
 @NgModule({
     imports        : [
@@ -24,6 +25,7 @@ import { NxContentBlockComponent }  from './content-block/content-block.componen
         NxCheckboxComponent,
         NxRadioComponent,
         NxContentBlockComponent,
+        NxContentBlockSectionComponent,
     ],
     entryComponents: [
         NxProcessButtonComponent,
@@ -31,6 +33,7 @@ import { NxContentBlockComponent }  from './content-block/content-block.componen
         NxCheckboxComponent,
         NxRadioComponent,
         NxContentBlockComponent,
+        NxContentBlockSectionComponent,
     ],
     providers      : [
         NxProcessButtonComponent,
@@ -38,6 +41,7 @@ import { NxContentBlockComponent }  from './content-block/content-block.componen
         NxCheckboxComponent,
         NxRadioComponent,
         NxContentBlockComponent,
+        NxContentBlockSectionComponent,
     ],
     exports        : [
         NxProcessButtonComponent,
@@ -45,6 +49,7 @@ import { NxContentBlockComponent }  from './content-block/content-block.componen
         NxCheckboxComponent,
         NxRadioComponent,
         NxContentBlockComponent,
+        NxContentBlockSectionComponent,
         MenuModule,
     ]
 })

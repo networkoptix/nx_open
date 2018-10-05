@@ -15,7 +15,7 @@ export class NxSandboxComponent {
     show: boolean;
     show5: boolean;
     edit: boolean;
-    content: any;
+    sections: any;
 
     submitted = false;
 
@@ -30,13 +30,10 @@ export class NxSandboxComponent {
         this.agree = false;
         this.edit = false;
 
-        this.content = {
-            main: 'Main content',
-            sections: [
-                { header: 'section1', content: '<table></table>' },
-                { header: 'section2', content: 'Other content' }
-            ]
-        };
+        this.sections = [
+            { title: 'section1', content: 'Some content' },
+            { title: 'section2', content: 'Other content' }
+        ];
 
     }
 

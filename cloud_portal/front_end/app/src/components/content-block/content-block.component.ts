@@ -3,22 +3,34 @@ import {
 } from '@angular/core';
 
 /* Usage
-<nx-content-block
-      title=[TITLE]
-      content=[CONTENT]
-      type=['gray' | empty]>
+<nx-content-block type="gray">
+    <div card-header type?=['gray' | empty]>
+        TITLE
+    </div>
+    <div card-body>
+        BODY
+    </div>
+
+    <!-- ngFor -->
+    <div section-title>
+        Section title
+    </div>
+    <div section-content>
+        SECTION
+    </div>
+    <!-- ngFor -->
 </nx-content-block>
 */
 
 @Component({
-    selector: 'nx-content-block',
+    selector   : 'nx-content-block',
     templateUrl: 'content-block.component.html',
-    styleUrls: ['content-block.component.scss'],
+    styleUrls  : [ 'content-block.component.scss' ],
 })
 export class NxContentBlockComponent implements OnInit {
     @Input() title: string;
     @Input() content: any;
-    @Input() type: string;
+    @Input('type') class: string;
 
 
     ngOnInit() {

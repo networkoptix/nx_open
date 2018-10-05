@@ -1,18 +1,14 @@
 <div class="card hoverable"
-     [ngClass]="type">
+     [ngClass]="class">
     <div class="card--header">
-        <h3 [innerHtml]="title"></h3>
-    </div>
-    <div class="card--body"
-         [innerHtml]="content.main">
+        <h3>
+            <ng-content select="[card-header]"></ng-content>
+        </h3>
     </div>
 
-    <div class="card--body section" *ngFor="let section of content.sections">
-        <div class="card--separator"></div>
-
-        <div class="card--body-subheader">
-            <h3 [innerHtml]="section.header"></h3>
-        </div>
-        <div [innerHtml]="section.content"></div>
+    <div class="card--body">
+        <ng-content select="[card-body]"></ng-content>
     </div>
+
+    <ng-content select="[card-sections]"></ng-content>
 </div>

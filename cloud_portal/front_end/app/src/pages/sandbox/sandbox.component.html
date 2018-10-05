@@ -3,23 +3,71 @@
 
     <div class="row">
         <div class="col-12 col-md-4">
-            <nx-content-block
-                    title="Test header"
-                    [content]="content">
+            <nx-content-block>
+                <div card-header>
+                    TITLE
+                </div>
+                <div card-body>
+                    BODY
+                </div>
+
+                <div *ngFor="let section of sections" card-sections>
+                    <nx-content-block-section>
+                        <div section-title>
+                            {{section.title}}
+                        </div>
+                        <div section-content>
+                            {{section.content}}
+                        </div>
+                    </nx-content-block-section>
+                </div>
+
+                <div card-sections>
+                    <nx-content-block-section>
+                        <div section-title>
+                            Final section
+                        </div>
+                        <div section-content>
+                            <div class="row">
+                                <div class="col-4">param #1:</div>
+                                <div class="col-8">test !@#$%</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">param #2:</div>
+                                <div class="col-8">1234</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">param #3:</div>
+                                <div class="col-8">56778</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4">param #4:</div>
+                                <div class="col-8">balblabla-... bla</div>
+                            </div>
+                        </div>
+                    </nx-content-block-section>
+                </div>
             </nx-content-block>
         </div>
 
         <div class="col-12 col-md-4">
-            <!--<nx-content-block-->
-                    <!--type="gray">-->
-                <!--<header>-->
-                    <!--HTML-->
-                <!--</header>-->
-                <!--<sub-comp title="...">-->
+            <nx-content-block type="gray">
+                <div card-header>
+                    TITLE
+                </div>
+                <div card-body>
+                    BODY
+                </div>
 
-                    <!--HTML-->
-                <!--</sub-comp>-->
-            <!--</nx-content-block>-->
+                <!-- ngFor -->
+                <div section-title>
+                    Section title
+                </div>
+                <div section-content>
+                    SECTION
+                </div>
+                <!-- ngFor -->
+            </nx-content-block>
         </div>
     </div>
 

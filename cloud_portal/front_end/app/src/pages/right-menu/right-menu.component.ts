@@ -8,16 +8,8 @@ import { Component, OnInit } from '@angular/core';
 
 export class NxRightMenuComponent implements OnInit {
 
-    private content: any;
-
     private setupDefaults() {
-        this.content = {
-            main    : 'Main content',
-            sections: [
-                { header: 'section1', content: '<table></table>' },
-                { header: 'section2', content: 'Other content' }
-            ]
-        };
+
     }
 
     constructor() {
