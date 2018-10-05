@@ -590,6 +590,7 @@ void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
 SelectableTextButton* AbstractSearchWidget::Private::createCustomFilterButton()
 {
     auto result = new nx::client::desktop::SelectableTextButton(ui->filters);
+    result->setFlat(true);
     result->setDeactivatable(true);
     result->setSelectable(false);
     ui->filtersLayout->addWidget(result, 0, Qt::AlignLeft);

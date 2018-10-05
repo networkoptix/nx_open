@@ -1,11 +1,14 @@
 #include "event_search_widget.h"
 
+#include <algorithm>
+
 #include <QtCore/QPointer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QVBoxLayout>
 
+#include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/style/helper.h>
@@ -13,7 +16,9 @@
 
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/event_search_list_model.h>
+#include <nx/utils/string.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/analytics_helper.h>
 #include <nx/vms/event/strings_helper.h>
 
 namespace nx::client::desktop {
@@ -45,6 +50,23 @@ private:
 
     QAction* m_analyticsEventsSubmenuAction = nullptr;
     QAction* m_analyticsEventsSingleAction = nullptr;
+
+    using EventDescriptorList = QList<nx::vms::event::AnalyticsHelper::EventTypeDescriptor>;
+    struct PluginInfo
+    {
+        QString name;
+        EventDescriptorList eventTypes;
+
+        bool operator<(const PluginInfo& other) const
+        {
+            if (name.isEmpty())
+                return false;
+
+            return other.name.isEmpty()
+                ? true
+                : utils::naturalStringCompare(name, other.name, Qt::CaseInsensitive) < 0;
+        }
+    };
 };
 
 EventSearchWidget::Private::Private(EventSearchWidget* q):
@@ -207,16 +229,80 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     auto analyticsMenu = m_analyticsEventsSubmenuAction->menu();
     NX_ASSERT(analyticsMenu);
 
+    const QString currentSelection = m_eventModel->selectedSubType();
+    bool currentSelectionStillAvailable = false;
+
     if (analyticsMenu)
     {
-        // TODO: #vkutin Finish this after plugin manifest naming refactor is complete.
+        using namespace nx::vms::event;
+
+        const auto allAnalyticsEvents =
+            AnalyticsHelper(q->commonModule()).systemSupportedAnalyticsEvents();
+
+        analyticsMenu->clear();
+
+        if (!allAnalyticsEvents.empty())
+        {
+            QList<PluginInfo> plugins;
+            QHash<QString, int> pluginIndexById;
+
+            const auto locale = qnRuntime->locale();
+
+            for (const auto& descriptor: allAnalyticsEvents)
+            {
+                int index = pluginIndexById.value(descriptor.pluginId, -1);
+                if (index < 0)
+                {
+                    index = plugins.size();
+                    pluginIndexById[descriptor.pluginId] = index;
+                    plugins.push_back({descriptor.pluginName.text(locale), {}});
+                }
+
+                plugins[index].eventTypes.push_back(descriptor);
+            }
+
+            std::sort(plugins.begin(), plugins.end());
+            plugins = { plugins[1] };
+            const bool severalPlugins = plugins.size() > 1;
+
+            QMenu* currentMenu = analyticsMenu;
+            for (const auto& plugin: plugins)
+            {
+                if (severalPlugins)
+                {
+                    currentMenu->setWindowFlags(
+                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+                    const auto pluginName = plugin.name.isEmpty()
+                        ? QString("<%1>").arg(tr("unnamed analytics plugin"))
+                        : plugin.name;
+
+                    currentMenu = analyticsMenu->addMenu(pluginName);
+                }
+
+                for (const auto eventType: plugin.eventTypes)
+                {
+                    addMenuAction(currentMenu, eventType.name.text(locale),
+                        EventType::analyticsSdkEvent, eventType.id);
+
+                    if (!currentSelectionStillAvailable && currentSelection == eventType.id)
+                        currentSelectionStillAvailable = true;
+                }
+            }
+
+            analyticsMenu->addSeparator();
+
+            addMenuAction(analyticsMenu, tr("Any analytics event"),
+                EventType::analyticsSdkEvent, {});
+        }
     }
 
     const bool hasAnalyticsMenu = analyticsMenu && !analyticsMenu->isEmpty();
     m_analyticsEventsSubmenuAction->setVisible(hasAnalyticsMenu);
     m_analyticsEventsSingleAction->setVisible(!hasAnalyticsMenu);
 
-    // TODO: #vkutin If currently selected subtype is no longer available, clear it.
+    if (!currentSelectionStillAvailable)
+        m_eventModel->setSelectedSubType({});
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -243,7 +329,7 @@ void EventSearchWidget::resetFilters()
 
 QString EventSearchWidget::placeholderText(bool constrained) const
 {
-    return constrained ? tr("No bookmarks") : tr("No events occured");
+    return constrained ? tr("No events") : tr("No events occured");
 }
 
 QString EventSearchWidget::itemCounterText(int count) const

@@ -426,6 +426,20 @@ namespace
         return CommonScrollBar;
     }
 
+    // A menu has dropdown style either if it has kMenuAsDropdown bool property set
+    // or it has a parent menu that has that property set.
+    bool menuHasDropdownStyle(const QMenu* menu)
+    {
+        if (!menu)
+            return false;
+
+        const QVariant menuAsDropdown = menu->property(Properties::kMenuAsDropdown);
+        if (menuAsDropdown.canConvert<bool>() && menuAsDropdown.toBool())
+            return true;
+
+        return menuHasDropdownStyle(qobject_cast<const QMenu*>(menu->parentWidget()));
+    }
+
     /*
      * Class to gain access to protected property QAbstractScrollArea::viewportMargins:
      */
@@ -2162,7 +2176,7 @@ void QnNxStyle::drawControl(
         {
             if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
-                bool asDropdown = widget && widget->property(Properties::kMenuAsDropdown).toBool();
+                const bool asDropdown = menuHasDropdownStyle(qobject_cast<const QMenu*>(widget));
                 if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
                 {
                     QnScopedPainterPenRollback penRollback(painter, menuItem->palette.color(QPalette::Midlight));
@@ -2235,7 +2249,6 @@ void QnNxStyle::drawControl(
 
                 if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
                 {
-                    NX_ASSERT(!asDropdown, Q_FUNC_INFO, "Not supported");
                     drawArrow(Right,
                               painter,
                               QRect(menuItem->rect.right() - Metrics::kMenuItemVPadding - Metrics::kArrowSize, menuItem->rect.top(),
@@ -3327,14 +3340,21 @@ QSize QnNxStyle::sizeFromContents(
 
         case CT_MenuItem:
         {
-            if (widget && widget->property(Properties::kMenuAsDropdown).toBool())
+            int submenuExtra = 0;
+            if (auto menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
             {
-                return QSize(
-                    qMax(size.width() + 2 * Metrics::kStandardPadding, Metrics::kMinimumButtonWidth),
+                if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
+                    submenuExtra = Metrics::kSubmenuArrowPadding + Metrics::kArrowSize;
+            }
+
+            if (menuHasDropdownStyle(qobject_cast<const QMenu*>(widget)))
+            {
+                const int width = size.width() + 2 * Metrics::kStandardPadding + submenuExtra;
+                return QSize(qMax(width, Metrics::kMinimumButtonWidth),
                     size.height() + 2 * Metrics::kMenuItemVPadding);
             }
 
-            return QSize(size.width() + 24 + 2 * Metrics::kMenuItemHPadding,
+            return QSize(size.width() + 24 + 2 * Metrics::kMenuItemHPadding + submenuExtra,
                 size.height() + 2 * Metrics::kMenuItemVPadding);
         }
 

@@ -8,6 +8,7 @@ namespace style
     const int Metrics::kMenuItemHPadding = 12;
     const int Metrics::kMenuItemVPadding = 5;
     const int Metrics::kMenuItemTextLeftPadding = 28;
+    const int Metrics::kSubmenuArrowPadding = 4;
     const int Metrics::kArrowSize = 8;
     const int Metrics::kCrossSize = 8;
     const int Metrics::kSpinButtonWidth = 16;
