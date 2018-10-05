@@ -329,7 +329,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 
     auto cameraMenu = q->createMenu();
     auto addMenuAction =
-        [this, cameraMenu](const QString& title, Cameras cameras, bool deviceDependentTitle = false)
+        [this, cameraMenu](const QString& title, Cameras cameras, bool dynamicTitle = false)
         {
             auto action = cameraMenu->addAction(title);
             connect(action, &QAction::triggered, this,
@@ -344,7 +344,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
                     setSelectedCameras(cameras);
                 });
 
-            if (deviceDependentTitle)
+            if (dynamicTitle)
             {
                 connect(action, &QAction::changed, this,
                     [this, action, cameras]()

@@ -31,7 +31,7 @@ public:
 
 private:
     QAction* addMenuAction(QMenu* menu, const QString& title, vms::api::EventType type,
-        bool deviceDependentTitle = false);
+        bool dynamicTitle = false);
 
 private:
     QAction* m_serverEventsSubmenuAction = nullptr;
@@ -67,8 +67,9 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
         addMenuAction(deviceIssuesMenu, helper.eventName(type), type);
 
     deviceIssuesMenu->addSeparator();
-    q->addDeviceDependentAction(addMenuAction(deviceIssuesMenu, "<any device issue>",
-        vms::api::EventType::anyCameraEvent), tr("Any device issue"), tr("Any camera issue"));
+    q->addDeviceDependentAction(
+        addMenuAction(deviceIssuesMenu, "<any device issue>", vms::api::EventType::anyCameraEvent),
+        tr("Any device issue"), tr("Any camera issue"));
 
     for (const auto type: vms::event::childEvents(vms::api::EventType::anyServerEvent))
         addMenuAction(serverEventsMenu, helper.eventName(type), type);
@@ -117,7 +118,7 @@ void EventSearchWidget::Private::resetType()
 }
 
 QAction* EventSearchWidget::Private::addMenuAction(
-    QMenu* menu, const QString& title, vms::api::EventType type, bool deviceDependentTitle)
+    QMenu* menu, const QString& title, vms::api::EventType type, bool dynamicTitle)
 {
     auto action = menu->addAction(title);
     QObject::connect(action, &QAction::triggered, q,
@@ -132,7 +133,7 @@ QAction* EventSearchWidget::Private::addMenuAction(
             q->requestFetch();
         });
 
-    if (deviceDependentTitle)
+    if (dynamicTitle)
     {
         QObject::connect(action, &QAction::changed, q,
             [this, action, type]()
