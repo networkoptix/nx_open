@@ -44,7 +44,7 @@ def ffprobe_streams(stream_url):
     return result.get('streams')
 
 
-def ffprobe_metadata(stream):
+def ffprobe_video_metadata(stream):
     fps = int(stream['r_frame_rate'].split('/')[0]) / int(stream['r_frame_rate'].split('/')[1])
     # When ffprobe discovers a corrupted stream, it returns fps == 90000.
     if fps >= 90000:
@@ -56,6 +56,25 @@ def ffprobe_metadata(stream):
         'fps': fps,
         }
     return metadata
+
+
+def ffprobe_audio_metadata(stream):
+    return {'codec': stream.get('codec_name').upper()}
+
+
+def ffprobe_metadata(stream_url):
+    streams = ffprobe_streams(stream_url)
+    if not streams:
+        return None
+
+    video, audio = None, None
+    for stream in streams:
+        if stream.get('codec_type') == 'video':
+            video = ffprobe_video_metadata(stream)
+        elif stream.get('codec_type') == 'audio':
+            audio = ffprobe_audio_metadata(stream)
+
+    return dict(video=video, audio=audio)
 
 
 def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):

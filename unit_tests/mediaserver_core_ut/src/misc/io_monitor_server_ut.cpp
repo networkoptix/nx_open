@@ -57,7 +57,7 @@ protected:
             {
                 expectData = m_data.front();
                 m_data.erase(m_data.begin());
-                NX_DEBUG(this, "Got data %1, %2 records left", expectData.timestamp, m_data.size());
+                NX_DEBUG(this, "Got data %1, expect data %2", receivedData.timestamp, expectData.timestamp);
             }
             if (expectData != receivedData)
             {

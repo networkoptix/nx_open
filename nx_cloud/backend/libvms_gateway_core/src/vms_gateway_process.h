@@ -11,6 +11,7 @@
 #include <nx/utils/service.h>
 
 #include <nx/cloud/relaying/relay_engine.h>
+#include <nx/network/aio/async_channel_bridge.h>
 
 #include "settings.h"
 #include "run_time_options.h"
@@ -31,7 +32,7 @@ class NX_VMS_GATEWAY_API VmsGatewayProcess:
 
 public:
     VmsGatewayProcess(int argc, char **argv);
-    ~VmsGatewayProcess();
+    ~VmsGatewayProcess() override;
 
     const std::vector<network::SocketAddress>& httpEndpoints() const;
     network::SocketAddress reverseConnectionServerHttpEndpoint() const;
@@ -46,6 +47,9 @@ protected:
     virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
 
 private:
+    using HttpConnectTunnelPool =
+        network::server::StreamServerConnectionHolder<network::aio::AsyncChannelBridge>;
+
     conf::RunTimeOptions m_runTimeOptions;
     std::vector<network::SocketAddress> m_httpEndpoints;
     nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
@@ -63,7 +67,8 @@ private:
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         relaying::RelayEngine* relayEngine,
-        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher);
+        nx::network::http::server::rest::MessageDispatcher* const msgDispatcher,
+            HttpConnectTunnelPool* httpConnectTunnelPool);
 };
 
 } // namespace gateway
