@@ -49,6 +49,11 @@ public:
     float actualFps() const;
 
     /**
+     * The amount of time it takes to produce a video frame at the target frame rate.
+     */
+    std::chrono::milliseconds timePerFrame() const;
+
+    /**
      * The amount of time it takes to produce a video frame based on actualFps().
      */
     std::chrono::milliseconds actualTimePerFrame() const;

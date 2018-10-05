@@ -98,7 +98,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
         if (!m_avConsumer->waitForTimeSpan(kStreamDelay))
             return nullptr;
     }
-   
+    
     return m_avConsumer->popOldest();
 }
 

@@ -51,7 +51,7 @@ struct CodecParameters
 
     std::string toString() const
     {
-        return std::string("codec: ") + ffmpeg::utils::codecIDToName(codecId) + 
+        return std::string("codec: ") + ffmpeg::utils::codecIdToName(codecId) + 
             ", res:" + std::to_string(width) + "x" + std::to_string(height) + 
             ", fps: " + std::to_string(fps) + 
             ", bitrate: " +  std::to_string(bitrate);

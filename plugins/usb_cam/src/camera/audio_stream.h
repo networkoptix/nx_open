@@ -68,9 +68,6 @@ private:
         
         std::vector<std::shared_ptr<ffmpeg::Packet>> m_packetMergeBuffer;
 
-        uint64_t m_lastTimeStamp = 0;
-        int64_t m_lastPts = 0;
-
     private:
         std::string ffmpegUrl() const;
         void waitForConsumers();
@@ -81,20 +78,23 @@ private:
         int initializeDecoder();
         int initializeEncoder();
         int initializeResampledFrame();
-        int initalizeResampleContext(const AVFrame * frame);
+        int initalizeResampleContext(const ffmpeg::Frame * frame);
         int decodeNextFrame(ffmpeg::Frame * outFrame);
         int resample(const ffmpeg::Frame * frame, ffmpeg::Frame * outFrame);
         std::chrono::milliseconds resampleDelay() const;
+        int encode(const ffmpeg::Frame *frame, ffmpeg::Packet * outPacket);
         std::shared_ptr<ffmpeg::Packet> nextPacket(int * outError);
 
         /**
          * Buffers the given packet to be merged later with packets given previously.
-         * If enough packets have been given, then it merges all packets returning the merged packet.
+         * If enough packets have been given, then it merges all packets, returning the merged 
+         * packet.
+         * 
          * @param[in] - the packet to buffer
          * @params[out] - outFfmpegError an error < 0 if one occured, 0 otherwise
          * @return - all previously given packets, merged into one
          */
-        std::shared_ptr<ffmpeg::Packet> mergeAllPackets(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
+        std::shared_ptr<ffmpeg::Packet> mergePackets(const std::shared_ptr<ffmpeg::Packet>& packet, int * outFfmpegError);
         void start();
         void stop();
         void run();

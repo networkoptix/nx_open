@@ -56,9 +56,29 @@ int64_t Frame::packetPts() const
     return m_frame->pkt_pts;
 }
 
+AVPixelFormat Frame::pixelFormat() const
+{
+    return (AVPixelFormat)m_frame->format;
+}
+
 int Frame::nbSamples() const
 {
     return m_frame->nb_samples;
+}
+
+AVSampleFormat Frame::sampleFormat() const
+{
+    return (AVSampleFormat)m_frame->format;
+}
+
+int Frame::sampleRate() const
+{
+    return m_frame->sample_rate;
+}
+
+uint64_t Frame::channelLayout() const
+{
+    return m_frame->channel_layout;
 }
 
 int Frame::getBuffer(AVPixelFormat format, int width, int height, int align)

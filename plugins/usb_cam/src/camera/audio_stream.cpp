@@ -18,7 +18,6 @@ namespace {
 
 static constexpr int kRetryLimit = 10;
 static constexpr int kMsecInSec = 1000;
-static constexpr float kDefaultFps = 30;
 
 const char * ffmpegDeviceType()
 {
@@ -250,7 +249,7 @@ int AudioStream::AudioStreamPrivate::initializeResampledFrame()
     return result;
 }
 
-int AudioStream::AudioStreamPrivate::initalizeResampleContext(const AVFrame * frame)
+int AudioStream::AudioStreamPrivate::initalizeResampleContext(const ffmpeg::Frame * frame)
 {
     AVCodecContext * encoder = m_encoder->codecContext();
 
@@ -259,10 +258,11 @@ int AudioStream::AudioStreamPrivate::initalizeResampleContext(const AVFrame * fr
         encoder->channel_layout,
         encoder->sample_fmt,
         encoder->sample_rate,
-        frame->channel_layout,
-        (AVSampleFormat)frame->format,
-        frame->sample_rate,
-        0, nullptr);
+        frame->channelLayout(),
+        (AVSampleFormat)frame->sampleFormat(),
+        frame->sampleRate(),
+        0,
+        nullptr);
 
     if (!m_resampleContext)
         return AVERROR(ENOMEM);
@@ -278,19 +278,19 @@ int AudioStream::AudioStreamPrivate::decodeNextFrame(ffmpeg::Frame * outFrame)
 {
     for(;;)
     {
-        int result = m_decoder->receiveFrame(outFrame->frame());
-        if (result == 0)
-            return result;
-        else if (result < 0 && result != AVERROR(EAGAIN))
-            return result;
-
         ffmpeg::Packet packet(m_inputFormat->audioCodecID(), AVMEDIA_TYPE_AUDIO);
-        result = m_inputFormat->readFrame(packet.packet());
+        int result = m_inputFormat->readFrame(packet.packet());
         if (result < 0)
             return result;
 
         result = m_decoder->sendPacket(packet.packet());
         if(result < 0 && result != AVERROR(EAGAIN))
+            return result;
+
+        result = m_decoder->receiveFrame(outFrame->frame());
+        if (result == 0)
+            return result;
+        else if (result < 0 && result != AVERROR(EAGAIN))
             return result;
     }
 }
@@ -299,7 +299,7 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
 {
     if(!m_resampleContext)
     {
-        m_initCode = initalizeResampleContext(frame->frame());
+        m_initCode = initalizeResampleContext(frame);
         if(m_initCode < 0)
         {
             if(auto cam = m_camera.lock())
@@ -321,6 +321,15 @@ std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
         : std::chrono::milliseconds(0);
 }
 
+int AudioStream::AudioStreamPrivate::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket)
+{
+    int result = m_encoder->sendFrame(frame->frame());
+    if (result < 0 && result != AVERROR(EAGAIN))
+        return result;
+
+    return m_encoder->receivePacket(outPacket->packet());
+}
+
 std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int * outFfmpegError)
 {
     auto packet = std::make_shared<ffmpeg::Packet>(
@@ -330,13 +339,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
     for(;;)
     {
-        *outFfmpegError = m_encoder->receivePacket(packet->packet());
-        if (*outFfmpegError == 0)
-            break;
-        else if (*outFfmpegError < 0 && *outFfmpegError != AVERROR(EAGAIN))
-            return nullptr;
-
-        // need to drain the the resampler to avoid increasing audio delay
+        // need to drain the the resampler periodically to avoid increasing audio delay
         if(m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;
@@ -362,22 +365,22 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
             m_resampledFrame->frame()->pkt_pts = m_decodedFrame->packetPts();
         }
 
-        *outFfmpegError = m_encoder->sendFrame(m_resampledFrame->frame());
-        if (*outFfmpegError < 0 && *outFfmpegError != AVERROR(EAGAIN))
-            return nullptr;
+        *outFfmpegError = encode(m_resampledFrame.get(), packet.get());
+        if (*outFfmpegError == 0)
+            break;
     }
     
     /**
     * AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets 
     * fixes the issue, but we don't want to lose any, so merge multiple packets.
     */
-    if (auto pkt = mergeAllPackets(packet, outFfmpegError))
+    if (auto pkt = mergePackets(packet, outFfmpegError))
         return pkt;
 
     return nullptr;
 }
 
-std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets(
+std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     const std::shared_ptr<ffmpeg::Packet>& packet,
     int * outFfmpegError)
 {
@@ -389,13 +392,12 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
         return packet;
 
     /** 
-     * Only merge if the timestamp difference is >= the amount of time it takes the video stream
-     * to produce a video frame
+     * Only merge if the timestamp difference is >= the amount of time it takes to produce a 
+     * video frame.
      */
     m_packetMergeBuffer.push_back(packet);
     if (packet->timestamp() - m_packetMergeBuffer[0]->timestamp() < timePerVideoFrame().count())
         return nullptr;
-
 
     /** Do the merge now */
 
@@ -417,8 +419,8 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergeAllPackets
         memcpy(data, pkt->data(), pkt->size());
         data += pkt->size();
     }
-
-    newPacket->setTimestamp(m_packetMergeBuffer[0]->timestamp());
+    
+    newPacket->setTimestamp(packet->timestamp());
     m_packetMergeBuffer.clear();
 
     return newPacket;

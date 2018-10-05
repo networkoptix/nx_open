@@ -92,7 +92,7 @@ CodecParameters TranscodeMediaEncoder::calculateSecondaryCodecParams(
     const auto& resolution = resolutionList[resolutionList.size() - 1];
     float aspectRatio = (float) resolution.width / resolution.height;
 
-    AVCodecID codecId = ffmpeg::utils::toAVCodecID(
+    AVCodecID codecId = ffmpeg::utils::toAVCodecId(
         m_camera->compressionTypeDescriptor()->toNxCompressionType());
 
     return CodecParameters(

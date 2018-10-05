@@ -167,14 +167,14 @@ std::vector<AVCodecID> Camera::ffmpegCodecPriorityList()
 {
     std::vector<AVCodecID> ffmpegCodecList;
     for (const auto & nxCodecID : kVideoCodecPriorityList)
-        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecID(nxCodecID));
+        ffmpegCodecList.push_back(ffmpeg::utils::toAVCodecId(nxCodecID));
     return ffmpegCodecList;
 }
 
 CodecParameters Camera::getDefaultVideoParameters()
 {
     nxcip::CompressionType nxCodecID = m_compressionTypeDescriptor->toNxCompressionType();
-    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecID(nxCodecID);
+    AVCodecID ffmpegCodecID = ffmpeg::utils::toAVCodecId(nxCodecID);
 
     auto resolutionList = this->resolutionList();
     auto it = std::max_element(resolutionList.begin(), resolutionList.end(),

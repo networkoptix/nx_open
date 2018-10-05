@@ -27,7 +27,15 @@ public:
     AVFrame * frame() const;
     int64_t pts() const;
     int64_t packetPts() const;
+    
+    // Video
+    AVPixelFormat pixelFormat() const;
+
+    // Audio
     int nbSamples() const;
+    AVSampleFormat sampleFormat() const;
+    int sampleRate() const;
+    uint64_t channelLayout() const;
 
     int getBuffer(AVPixelFormat format, int width, int height, int align = 32);
     int getBuffer(AVSampleFormat format, int nbSamples, uint64_t channelLayout, int align = 32);

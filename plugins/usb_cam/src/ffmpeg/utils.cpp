@@ -31,12 +31,12 @@ std::string errorToString(int errorCode)
     return errorBuffer;
 }
 
-std::string codecIDToName(AVCodecID codecId)
+std::string codecIdToName(AVCodecID codecId)
 {
    return avcodec_get_name(codecId);
 }
 
-AVCodecID codecNameToID(const char * codecName)
+AVCodecID codecNameToId(const char * codecName)
 {
     AVCodec* codec = avcodec_find_decoder_by_name(codecName);
     if(codec)
@@ -141,7 +141,7 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecId)
     }
 }
 
-AVCodecID toAVCodecID(nxcip::CompressionType codecId)
+AVCodecID toAVCodecId(nxcip::CompressionType codecId)
 {
     switch (codecId)
     {
@@ -232,37 +232,6 @@ nxcip::AudioFormat::SampleType toNxSampleType(
     }
 }
 
-void toFraction(float number, int * outNumerator, int * outDenominator)
-{
-    int wholeNumber = (int) number;
-    float decimal = number - wholeNumber;
-
-    if (!decimal)
-    {
-        *outNumerator = number;
-        *outDenominator = 1;
-        return;
-    }
-
-    //throwing away higher precision because it's not needed for this use case.
-    int num = decimal * 100;
-    int den = 100;
-
-    int gcd;
-    do
-    {
-        gcd = greatestCommonDenominator(num, den);
-        num /= gcd;
-        den /= gcd;
-    }while(gcd != 1);
-    
-    if(wholeNumber > 0)
-        num = den * wholeNumber + num;
-    
-    *outNumerator = num;
-    *outDenominator = den;
-}
-
 uint64_t suggestChannelLayout(const AVCodec *codec)
 {
     if (!codec->channel_layouts)
@@ -317,6 +286,37 @@ int suggestSampleRate(const AVCodec * codec)
     for(const int * sampleRate = codec->supported_samplerates; *sampleRate; ++sampleRate)
         largest = FFMAX(largest, *sampleRate);
     return largest;
+}
+
+void toFraction(float number, int * outNumerator, int * outDenominator)
+{
+    int wholeNumber = (int) number;
+    float decimal = number - wholeNumber;
+
+    if (!decimal)
+    {
+        *outNumerator = number;
+        *outDenominator = 1;
+        return;
+    }
+
+    //throwing away higher precision because it's not needed for this use case.
+    int num = decimal * 100;
+    int den = 100;
+
+    int gcd;
+    do
+    {
+        gcd = greatestCommonDenominator(num, den);
+        num /= gcd;
+        den /= gcd;
+    }while(gcd != 1);
+    
+    if(wholeNumber > 0)
+        num = den * wholeNumber + num;
+    
+    *outNumerator = num;
+    *outDenominator = den;
 }
 
 } // namespace utils

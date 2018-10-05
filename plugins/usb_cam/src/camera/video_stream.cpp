@@ -80,6 +80,11 @@ float VideoStream::actualFps() const
     return m_actualFps > 0 ? m_actualFps.load() : m_codecParams.fps;
 }
 
+std::chrono::milliseconds VideoStream::timePerFrame() const
+{
+    return std::chrono::milliseconds((int)(1.0f / fps() * kMsecInSec));
+}
+
 std::chrono::milliseconds VideoStream::actualTimePerFrame() const
 {
     return std::chrono::milliseconds((int)(1.0f / actualFps() * kMsecInSec));
