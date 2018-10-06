@@ -29,32 +29,32 @@ DeviceAgent::DeviceAgent(Engine* engine):
 
 std::string DeviceAgent::manifest()
 {
-    return R"json(
+    return 1+R"json(
+{
+    "supportedEventTypeIds": [
+        ")json" + kLineCrossingEventType + R"json(",
+        ")json" + kObjectInTheAreaEventType + R"json("
+    ],
+    "supportedObjectTypes": [
+        ")json" + kCarObjectType + R"json("
+    ],
+    "eventTypes": [
         {
-            "supportedEventTypeIds": [
-                ")json" + kLineCrossingEventType + R"json(",
-                ")json" + kObjectInTheAreaEventType + R"json("
-            ],
-            "supportedObjectTypes": [
-                ")json" + kCarObjectType + R"json("
-            ],
-            "eventTypes": [
-                {
-                    "id": ")json" + kLineCrossingEventType + R"json(",
-                    "name": {
-                        "value": "Line crossing"
-                    }
-                },
-                {
-                    "id": ")json" + kObjectInTheAreaEventType + R"json(",
-                    "name": {
-                        "value": "Object in the area"
-                    },
-                    "flags": "stateDependent|regionDependent"
-                }
-            ],
+            "id": ")json" + kLineCrossingEventType + R"json(",
+            "name": {
+                "value": "Line crossing"
+            }
+        },
+        {
+            "id": ")json" + kObjectInTheAreaEventType + R"json(",
+            "name": {
+                "value": "Object in the area"
+            },
+            "flags": "stateDependent|regionDependent"
         }
-    )json";
+    ],
+}
+)json";
 }
 
 void DeviceAgent::settingsChanged()

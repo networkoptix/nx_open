@@ -10,7 +10,7 @@ namespace tegra_video {
 class Engine: public nx::sdk::analytics::CommonEngine
 {
 public:
-    Engine();
+    Engine(nx::sdk::analytics::Plugin* plugin);
 
     virtual nx::sdk::analytics::DeviceAgent* obtainDeviceAgent(
         const nx::sdk::DeviceInfo* deviceInfo, nx::sdk::Error* outError) override;

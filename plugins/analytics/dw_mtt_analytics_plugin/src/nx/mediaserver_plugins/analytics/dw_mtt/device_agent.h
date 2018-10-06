@@ -52,6 +52,8 @@ public:
 
     virtual ~DeviceAgent();
 
+    virtual Engine* engine() const override { return m_engine; }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     void treatAlarmPairs(const QList<AlarmPair>& alarmPairs);
@@ -75,7 +77,7 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
     QDomDocument createDomFromRequest(const QByteArray& request);
 
@@ -89,9 +91,9 @@ public:
     QByteArray extractRequestFromBuffer();
 
 private:
+    Engine* const m_engine;
     nx::utils::Url m_url;
     QAuthenticator m_auth;
-    Engine* m_engine;
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;

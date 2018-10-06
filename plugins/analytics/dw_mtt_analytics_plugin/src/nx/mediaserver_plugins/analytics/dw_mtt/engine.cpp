@@ -18,7 +18,6 @@ namespace dw_mtt {
 
 namespace {
 
-static const char* const kEngineName = "DW MTT Analytics Plugin";
 static const QString kDwMttVendor("digitalwatchdog");
 // Just for information:
 // DW VCA camera's vendor string is "cap",
@@ -36,7 +35,7 @@ QString normalize(const QString& name)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     static const char* const kResourceName=":/dw_mtt/manifest.json";
     static const char* const kFileName = "plugins/dw_mtt/manifest.json";
@@ -62,27 +61,8 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_Engine)
     {
         addRef();
-        return static_cast<Plugin*>(this);
+        return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -91,20 +71,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Engine::name() const
-{
-    return kEngineName;
-}
-
 void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-}
-
-void Engine::setLocale(const char* /*locale*/)
 {
 }
 
@@ -137,10 +104,6 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
     return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }
 
-void Engine::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-}
-
 void Engine::executeAction(
     nx::sdk::analytics::Action* action, nx::sdk::Error* outError)
 {
@@ -153,9 +116,14 @@ void Engine::executeAction(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::dw_mtt::Engine();
+    return new nx::sdk::analytics::CommonPlugin("dw_mtt_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::dw_mtt::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

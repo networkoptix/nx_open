@@ -23,7 +23,6 @@ namespace hikvision {
 
 namespace {
 
-const char* kEngineName = "Hikvision Analytics Plugin";
 const QString kHikvisionTechwinVendor = lit("hikvision");
 static const std::chrono::seconds kCacheTimeout{60};
 
@@ -37,7 +36,7 @@ bool Engine::DeviceData::hasExpired() const
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     QFile file(":/hikvision/manifest.json");
     if (file.open(QFile::ReadOnly))
@@ -66,25 +65,6 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -93,29 +73,8 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Engine::name() const
-{
-    return kEngineName;
-}
-
 void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
-    // Do nothing.
-}
-
-void Engine::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-    // Do nothing.
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* pluginContainer)
-{
-    // Do nothing.
-}
-
-void Engine::setLocale(const char* locale)
-{
-    // Do nothing.
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -208,7 +167,6 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
 } // namespace hikvision
@@ -218,9 +176,14 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::hikvision::Engine();
+    return new nx::sdk::analytics::CommonPlugin("hikvision_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::hikvision::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

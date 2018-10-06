@@ -71,7 +71,7 @@ public:
 
     /**
      * @return List of available Engines; for each item, queryInterface() is called which increases
-     * the reference counter, thus, it is usually needed to release each Engine in the caller.
+     *     the reference counter, thus, it is usually needed to release each Engine in the caller.
      */
     EngineList availableEngines() const;
 
@@ -96,14 +96,11 @@ private:
         const QString& pluginLibName,
         const QString& filenameExtraSuffix = "");
 
-    void setDeviceAgentDeclaredSettings(
+    void setDeviceAgentSettings(
         nx::sdk::analytics::DeviceAgent* deviceAgent,
-        const QnSecurityCamResourcePtr& camera,
-        const QString& pluginLibName);
+        const QnSecurityCamResourcePtr& camera);
 
-    void setEngineDeclaredSettings(
-        nx::sdk::analytics::Engine* engine,
-        const QString& pluginLibName);
+    void setEngineSettings(nx::sdk::analytics::Engine* engine);
 
     void createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 

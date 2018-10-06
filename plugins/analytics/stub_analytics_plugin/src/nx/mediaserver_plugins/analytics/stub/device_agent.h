@@ -39,10 +39,7 @@ protected:
         std::vector<nx::sdk::analytics::MetadataPacket*>* metadataPackets) override;
 
 private:
-    virtual Engine* engine() const override
-    {
-        return dynamic_cast<Engine*>(CommonVideoFrameProcessingDeviceAgent::engine());
-    }
+    virtual Engine* engine() const override { return engineCasted<Engine>(); }
 
     nx::sdk::analytics::MetadataPacket* cookSomeEvents();
     nx::sdk::analytics::MetadataPacket* cookSomeObjects();

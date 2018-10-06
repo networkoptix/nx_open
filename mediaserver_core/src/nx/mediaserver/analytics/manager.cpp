@@ -31,6 +31,7 @@
 #include <mediaserver_ini.h>
 #include <plugins/plugins_ini.h>
 #include <nx/sdk/analytics/pixel_format.h>
+#include <nx/sdk/analytics/plugin.h>
 
 #include "video_data_receptor.h"
 #include "yuv420_uncompressed_video_frame.h"
@@ -186,11 +187,35 @@ void Manager::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 Manager::EngineList Manager::availableEngines() const
 {
     auto pluginManager = serverModule()->pluginManager();
-    NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
+    NX_ASSERT(pluginManager, "Cannot access PluginManager instance");
     if (!pluginManager)
         return EngineList();
 
-    return pluginManager->findNxPlugins<Engine>(IID_Engine);
+    const auto plugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
+        nx::sdk::analytics::IID_Plugin);
+    EngineList engines;
+    for (const auto& plugin: plugins)
+    {
+        Error error = Error::noError;
+        const auto engine = plugin->createEngine(&error);
+        if (!engine)
+        {
+            NX_ERROR(this, "Cannot create Engine for plugin %1: plugin returned null.",
+                plugin->name());
+            continue;
+        }
+        if (error != Error::noError)
+        {
+            NX_ERROR(this, "Cannot create Engine for plugin %1: plugin returned error %2.",
+                plugin->name(), error);
+            engine->releaseRef();
+            continue;
+        }
+        NX_VERBOSE(this, "Created Engine of %1", plugin->name());
+        engines.append(engine);
+    }
+    return engines;
+    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes. 
 }
 
 /** @return Empty settings if the file does not exist, or on error. */
@@ -290,24 +315,24 @@ static QString settingsFilename(
     return dir + pluginLibName + extraSuffix + lit(".json");
 }
 
-void Manager::setDeviceAgentDeclaredSettings(
+void Manager::setDeviceAgentSettings(
     DeviceAgent* deviceAgent,
-    const QnSecurityCamResourcePtr& camera,
-    const QString& pluginLibName)
+    const QnSecurityCamResourcePtr& camera)
 {
     // TODO: Stub. Implement storing the settings in the database.
     const auto settings = loadSettingsFromFile(lit("DeviceAgent"), settingsFilename(
         pluginsIni().analyticsDeviceAgentSettingsPath,
-        pluginLibName, lit("_device_agent_for_") + camera->getPhysicalId()));
-    deviceAgent->setDeclaredSettings(settings->array(), settings->size());
+        deviceAgent->engine()->plugin()->name(),
+        lit("_device_agent_for_") + camera->getPhysicalId()));
+    deviceAgent->setSettings(settings->array(), settings->size());
 }
 
-void Manager::setEngineDeclaredSettings(Engine* engine, const QString& pluginLibName)
+void Manager::setEngineSettings(Engine* engine)
 {
     // TODO: Stub. Implement storing the settings in the database.
     const auto settings = loadSettingsFromFile(lit("Engine"), settingsFilename(
-        pluginsIni().analyticsEngineSettingsPath, pluginLibName));
-    engine->setDeclaredSettings(settings->array(), settings->size());
+        pluginsIni().analyticsEngineSettingsPath, engine->plugin()->name()));
+    engine->setSettings(settings->array(), settings->size());
 }
 
 void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -329,12 +354,8 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
 
     for (Engine* const engine: availableEngines())
     {
-        const QString& pluginLibName = serverModule()->pluginManager()->pluginLibName(engine);
-
         // TODO: Consider assigning Engine settings earlier.
-        setEngineDeclaredSettings(engine, pluginLibName);
-
-        nxpt::ScopedRef<Engine> engineGuard(engine, /*increaseRef*/ false);
+        setEngineSettings(engine);
 
         nxpt::ScopedRef<DeviceAgent> deviceAgent(
             createDeviceAgent(camera, engine), /*increaseRef*/ false);
@@ -361,7 +382,7 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
             engineManifest = mergeEngineManifestToServer(*auxiliaryEngineManifest, server);
         }
 
-        setDeviceAgentDeclaredSettings(deviceAgent.get(), camera, pluginLibName);
+        setDeviceAgentSettings(deviceAgent.get(), camera);
 
         auto& context = m_contexts[camera->getId()];
         std::unique_ptr<MetadataHandler> handler(
@@ -386,29 +407,37 @@ DeviceAgent* Manager::createDeviceAgent(
     if (!camera || !engine)
         return nullptr;
 
-    NX_DEBUG(
-        this,
-        lm("Creating DeviceAgent for device %1 (%2).")
-            .args(camera->getUserDefinedName(), camera->getId()));
+    NX_DEBUG(this, lm("Creating DeviceAgent for device %1 (%2).")
+        .args(camera->getUserDefinedName(), camera->getId()));
 
     CameraInfo cameraInfo;
     bool success = cameraInfoFromResource(camera, &cameraInfo);
     if (!success)
     {
-        NX_WARNING(
-            this,
-            lm("Cannot create resource info from resource %1 (%2)")
-                .args(camera->getUserDefinedName(), camera->getId()));
+        NX_WARNING(this, lm("Cannot create resource info from resource %1 (%2)")
+            .args(camera->getUserDefinedName(), camera->getId()));
         return nullptr;
     }
 
-    NX_DEBUG(
-        this,
-        lm("Resource info for resource %1 (%2): %3")
+    NX_DEBUG(this, lm("Resource info for resource %1 (%2): %3")
         .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
 
     Error error = Error::noError;
-    return engine->obtainDeviceAgent(&cameraInfo, &error);
+    const auto deviceAgent = engine->obtainDeviceAgent(&cameraInfo, &error);
+    if (!deviceAgent)
+    {
+        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null.")
+            .args(camera->getUserDefinedName(), camera->getId()));
+        return nullptr;
+    }
+    if (error != Error::noError)
+    {
+        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned error %3.")
+            .args(camera->getUserDefinedName(), camera->getId()), error);
+        deviceAgent->releaseRef();
+        return nullptr;
+    }
+    return deviceAgent;
 }
 
 void Manager::releaseResourceDeviceAgentsUnsafe(const QnSecurityCamResourcePtr& camera)
@@ -578,31 +607,34 @@ boost::optional<nx::vms::api::analytics::EngineManifest> Manager::loadEngineMani
     const char* const manifestStr = engine->manifest(&error);
     if (error != Error::noError)
     {
-        NX_ERROR(this) << lm("Unable to receive Engine manifest for plugin \"%1\": %2.")
-            .args(engine->name(), error);
+        NX_ERROR(this, "Unable to receive Engine manifest for plugin \"%1\": %2.",
+            engine->plugin()->name(), error);
         return boost::none;
     }
     if (manifestStr == nullptr)
     {
-        NX_ERROR(this) << lm("Received null Engine manifest for plugin \"%1\".")
-            .arg(engine->name());
+        NX_ERROR(this, "Received null Engine manifest for plugin \"%1\".",
+            engine->plugin()->name());
         return boost::none;
     }
 
     if (pluginsIni().analyticsManifestOutputPath[0])
     {
         saveManifestToFile(
-            manifestStr, "Engine", serverModule()->pluginManager()->pluginLibName(engine));
+            manifestStr,
+            "Engine",
+            engine->plugin()->name());
     }
 
     auto engineManifest = deserializeManifest<nx::vms::api::analytics::EngineManifest>(manifestStr);
 
     if (!engineManifest)
     {
-        NX_ERROR(this) << lm(
-            "Cannot deserialize Engine manifest from plugin \"%1\"").arg(engine->name());
+        NX_ERROR(this, "Cannot deserialize Engine manifest from plugin \"%1\"",
+            engine->plugin()->name());
         return boost::none; //< Error already logged.
     }
+
     return engineManifest;
 }
 
@@ -689,7 +721,7 @@ Manager::loadDeviceAgentManifest(
     if (!deviceAgentManifest.get())
     {
         NX_ERROR(this) << lm("Received null DeviceAgent manifest for plugin \"%1\".")
-            .arg(engine->name());
+            .arg(engine->plugin()->name());
         return std::make_pair(boost::none, boost::none);
     }
 
@@ -698,7 +730,7 @@ Manager::loadDeviceAgentManifest(
         saveManifestToFile(
             deviceAgentManifest.get(),
             "DeviceAgent",
-            serverModule()->pluginManager()->pluginLibName(engine),
+            engine->plugin()->name(),
             lit("_device_agent"));
     }
 

@@ -25,11 +25,9 @@ namespace ssc {
 
 namespace {
 
-static const char* const kPluginName = "SSC metadata plugin";
-
 static const QString kSerialPortsIniFilename = "SerialPorts.ini";
 
-static const QByteArray defaultConfiguration = R"json(\
+static const QByteArray defaultConfiguration = 1+R"json(
 {
     "useAllPorts": false,
     "values":
@@ -117,7 +115,7 @@ bool isCorrectLogicalId(int cameraLogicalId)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     static const char* const kManifestResourceName = ":/ssc/manifest.json";
     static const char* const kManifestFilename = "plugins/ssc/manifest.json";
@@ -281,25 +279,6 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -308,20 +287,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Engine::name() const
-{
-    return kPluginName;
-}
-
 void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-}
-
-void Engine::setLocale(const char* /*locale*/)
 {
 }
 
@@ -414,9 +380,14 @@ const char* Engine::manifest(Error* error) const
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::ssc::Engine();
+    return new nx::sdk::analytics::CommonPlugin("ssc_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::ssc::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

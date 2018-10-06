@@ -173,16 +173,18 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
 } // namespace
 
-DeviceAgent::DeviceAgent(Engine* engine,
+DeviceAgent::DeviceAgent(
+    Engine* engine,
     const nx::sdk::DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
+    :
+    m_engine(engine)
 {
     m_reconnectTimer.bindToAioThread(m_stopEventTimer.getAioThread());
 
     m_url = deviceInfo.url;
     m_auth.setUser(deviceInfo.login);
     m_auth.setPassword(deviceInfo.password);
-    m_engine = engine;
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType: typedManifest.outputEventTypes)

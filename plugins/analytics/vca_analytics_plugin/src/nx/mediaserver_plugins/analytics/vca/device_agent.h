@@ -42,11 +42,14 @@ using ElapsedEvents = std::list<ElapsedEvent>;
 class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
 {
 public:
-    DeviceAgent(Engine* engine,
+    DeviceAgent(
+        Engine* engine,
         const nx::sdk::DeviceInfo& deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
+
+    virtual Engine* engine() const override { return m_engine; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -79,12 +82,13 @@ public:
 
     virtual void freeManifest(const char* data) override;
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {};
+    virtual void setSettings(const nxpl::Setting* settings, int count) override {};
 
 private:
+    Engine* const m_engine;
+
     QUrl m_url;
     QAuthenticator m_auth;
-    Engine* m_engine;
     QByteArray m_cameraManifest;
     ElapsedEvents m_eventsToCatch;
     QByteArray m_buffer;

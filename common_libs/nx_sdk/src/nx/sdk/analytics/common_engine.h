@@ -5,9 +5,8 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
-
-#include "engine.h"
-#include "objects_metadata_packet.h"
+#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/objects_metadata_packet.h>
 
 namespace nx {
 namespace sdk {
@@ -37,8 +36,7 @@ protected:
      * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
     CommonEngine(
-        const std::string& pluginName,
-        const std::string& libName,
+        Plugin* plugin,
         bool enableOutput,
         const std::string& printPrefix = "");
 
@@ -78,32 +76,37 @@ protected:
     {
     }
 
+    /**
+     * Intended to be called from a method of a derived class overriding plugin().
+     * @return Parent Plugin, casted to the specified type.
+     */
+    template<typename DerivedPlugin>
+    DerivedPlugin* pluginCasted()
+    {
+        const auto plugin= dynamic_cast<DerivedPlugin*>(m_plugin);
+        assetPluginCasted(plugin);
+        return plugin;
+    }
+
 public:
     virtual ~CommonEngine() override;
 
-    std::string libName() const { return m_libName; }
+    virtual Plugin* plugin() const override { return m_plugin; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-    virtual const char* name() const override;
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
-    virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
-    virtual void setLocale(const char* locale) override;
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
     virtual const char* manifest(Error* error) const override;
     virtual void executeAction(Action* action, Error* outError) override;
 
 private:
-    bool fillSettingsMap(
-        std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-        const std::string& outputCaption, int outputIndent = 0) const;
+    void assertPluginCasted(void* plugin) const;
 
 private:
-    const std::string m_pluginName;
-    const std::string m_libName;
+    Plugin* const m_plugin;
     std::map<std::string, std::string> m_settings;
     mutable std::string m_manifest; //< Cache the manifest to guarantee a lifetime for char*.
 };

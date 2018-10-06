@@ -25,7 +25,7 @@ namespace deepstream {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     if (strcmp(ini().debugDotFilesDir, "") == 0)
     {
@@ -50,87 +50,14 @@ Engine::Engine()
         std::to_string(gstreamerDebugLevel).c_str(), 1);
 
     gst_init(NULL, NULL);
-    NX_PRINT << " Created Engine: \"" << name() << "\"";
+    NX_PRINT << " Created Engine for " << plugin->name();
 
     if (m_objectClassDescritions.empty())
         m_objectClassDescritions = loadObjectClasses();
-}
 
-Engine::~Engine()
-{
-    NX_PRINT << " Destroyed Engine: \"" << name() << "\"";
-}
-
-void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
-{
-    if (interfaceId == nx::sdk::analytics::IID_Engine)
-    {
-        addRef();
-        return static_cast<nx::sdk::analytics::Engine*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_PluginInterface)
-    {
-        addRef();
-        return static_cast<nxpl::PluginInterface*>(this);
-    }
-    return nullptr;
-}
-
-void Engine::setDeclaredSettings(const nxpl::Setting *settings, int count)
-{
-    NX_OUTPUT << __func__ << " Received " << name() << " declared settings:";
-    NX_OUTPUT << "{";
-    for (int i = 0; i < count; ++i)
-    {
-        NX_OUTPUT << "    " << settings[i].name
-            << ": " << settings[i].value
-            << ((i < count - 1) ? "," : "");
-    }
-    NX_OUTPUT << "}";
-}
-
-const char* Engine::name() const
-{
-    return "DeepStream Analytics Plugin";
-}
-
-void Engine::setSettings(const nxpl::Setting* settings, int count)
-{
-    NX_OUTPUT << __func__ << " Received " << name() << " settings:";
-    NX_OUTPUT << "{";
-    for (int i = 0; i < count; ++i)
-    {
-        NX_OUTPUT << "    " << settings[i].name
-            << ": " << settings[i].value
-            << ((i < count - 1) ? "," : "");
-    }
-    NX_OUTPUT << "}";
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* pluginContainer)
-{
-    NX_OUTPUT << __func__ << " Setting plugin container";
+    NX_OUTPUT << __func__ << " Setting timeProvider";
     nxpt::ScopedRef<nxpl::TimeProvider> timeProvider(
-        pluginContainer->queryInterface(nxpl::IID_TimeProvider));
+        m_plugin->pluginContainer()->queryInterface(nxpl::IID_TimeProvider));
 
     if (timeProvider)
     {
@@ -140,10 +67,39 @@ void Engine::setPluginContainer(nxpl::PluginInterface* pluginContainer)
     }
 }
 
-void Engine::setLocale(const char* locale)
+Engine::~Engine()
 {
-    NX_OUTPUT << __func__ << " Setting locale to " << locale;
+    NX_PRINT << " Destroyed Engine for " << m_plugin->name();
 }
+
+void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
+{
+    if (interfaceId == nx::sdk::analytics::IID_Engine)
+    {
+        addRef();
+        return static_cast<nx::sdk::analytics::Engine*>(this);
+    }
+    if (interfaceId == nxpl::IID_PluginInterface)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return nullptr;
+}
+
+void Engine::setSettings(const nxpl::Setting *settings, int count)
+{
+    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
+    NX_OUTPUT << "{";
+    for (int i = 0; i < count; ++i)
+    {
+        NX_OUTPUT << "    " << settings[i].name
+            << ": " << settings[i].value
+            << ((i < count - 1) ? "," : "");
+    }
+    NX_OUTPUT << "}";
+}
+
 
 const char* Engine::manifest(Error* error) const
 {
@@ -152,7 +108,7 @@ const char* Engine::manifest(Error* error) const
     if (!m_manifest.empty())
         return m_manifest.c_str();
 
-    static const std::string kManifestPrefix = (R"json(
+    static const std::string kManifestPrefix = R"json(
         {
             "pluginId": "nx.deepstream",
             "pluginName": {
@@ -162,12 +118,12 @@ const char* Engine::manifest(Error* error) const
                 }
             },
             "outputObjectTypes": [
-        )json");
+        )json";
 
-    static const std::string kManifestPostfix = (R"json(
+    static const std::string kManifestPostfix = R"json(
             ],
             "capabilities": ""
-        })json");
+        })json";
 
     m_manifest = kManifestPrefix;
 
@@ -326,9 +282,14 @@ std::string Engine::buildManifestObectTypeString(const ObjectClassDescription& d
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::deepstream::Engine();
+    return new nx::sdk::analytics::CommonPlugin("deepstream_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::deepstream::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

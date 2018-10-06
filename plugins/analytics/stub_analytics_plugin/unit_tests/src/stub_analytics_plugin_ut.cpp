@@ -11,23 +11,42 @@
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/uncompressed_video_frame.h>
 #include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/plugin.h>
 
 extern "C" {
 
-nxpl::PluginInterface* createNxAnalyticsEngine();
+nxpl::PluginInterface* createNxAnalyticsPlugin();
 
 } // extern "C"
 
+static std::string trimString(const std::string& s)
+{
+    int start = 0;
+    while (start < (int) s.size() && s.at(start) <= ' ')
+        ++start;
+    int end = s.size() - 1;
+    while (end >= 0 && s.at(end) <= ' ')
+        --end;
+    if (end < start)
+        return "";
+    return s.substr(start, end - start + 1);
+}
+
 static const int noError = (int) nx::sdk::Error::noError;
 
-static void testEngineManifest(nx::sdk::analytics::Engine* plugin)
+static void testEngineManifest(nx::sdk::analytics::Engine* engine)
 {
     nx::sdk::Error error = nx::sdk::Error::noError;
-    const char* manifest = plugin->manifest(&error);
+    const char* manifest = engine->manifest(&error);
     ASSERT_TRUE(manifest != nullptr);
     ASSERT_EQ((int) nx::sdk::Error::noError, (int) error);
     ASSERT_TRUE(manifest[0] != '\0');
-    NX_PRINT << "Plugin manifest:\n" << manifest;
+    NX_PRINT << "Engine manifest:\n" << manifest;
+
+    const std::string trimmedEngineManifest = trimString(manifest);
+    ASSERT_EQ('{', trimmedEngineManifest.front());
+    ASSERT_EQ('}', trimmedEngineManifest.back());
 
     // This test assumes that the plugin consumes compressed frames - verify it in the manifest.
     ASSERT_EQ(std::string::npos, std::string(manifest).find("needUncompressedVideoFrames"));
@@ -41,6 +60,11 @@ static void testDeviceAgentManifest(nx::sdk::analytics::DeviceAgent* deviceAgent
     ASSERT_EQ(noError, (int) error);
     ASSERT_TRUE(manifest[0] != '\0');
     NX_PRINT << "DeviceAgent manifest:\n" << manifest;
+
+    const std::string trimmedDeviceAgentManifest = trimString(manifest);
+    ASSERT_EQ('{', trimmedDeviceAgentManifest.front());
+    ASSERT_EQ('}', trimmedDeviceAgentManifest.back());
+
     deviceAgent->freeManifest(manifest);
 }
 
@@ -51,9 +75,9 @@ static void testEngineSettings(nx::sdk::analytics::Engine* plugin)
         {"setting2", "value2"},
     };
 
-    plugin->setDeclaredSettings(nullptr, 0); //< Test assigning empty settings.
-    plugin->setDeclaredSettings(settings, 1); //< Test assigning a single setting.
-    plugin->setDeclaredSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    plugin->setSettings(nullptr, 0); //< Test assigning empty settings.
+    plugin->setSettings(settings, 1); //< Test assigning a single setting.
+    plugin->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
 }
 
 static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent)
@@ -63,9 +87,9 @@ static void testDeviceAgentSettings(nx::sdk::analytics::DeviceAgent* deviceAgent
         {"setting2", "value2"},
     };
 
-    deviceAgent->setDeclaredSettings(nullptr, 0); //< Test assigning empty settings.
-    deviceAgent->setDeclaredSettings(settings, 1); //< Test assigning a single setting.
-    deviceAgent->setDeclaredSettings(settings, sizeof(settings) / sizeof(settings[0]));
+    deviceAgent->setSettings(nullptr, 0); //< Test assigning empty settings.
+    deviceAgent->setSettings(settings, 1); //< Test assigning a single setting.
+    deviceAgent->setSettings(settings, sizeof(settings) / sizeof(settings[0]));
 }
 
 class Action: public nx::sdk::analytics::Action
@@ -226,22 +250,30 @@ private:
 
 TEST(stub_analytics_plugin, test)
 {
-    nxpl::PluginInterface* const engineObject = createNxAnalyticsEngine();
+    nx::sdk::Error error = nx::sdk::Error::noError;
 
-    // TODO: #mshevchenko: Use ScopedRef for all queryInterface() calls.
+    nxpl::PluginInterface* const pluginObject = createNxAnalyticsPlugin();
+    ASSERT_TRUE(pluginObject->queryInterface(nxpl::IID_Plugin3) != nullptr);
+    pluginObject->releaseRef();
 
-    ASSERT_TRUE(engineObject->queryInterface(nxpl::IID_Plugin3) != nullptr);
-    engineObject->releaseRef();
+    const auto plugin = static_cast<nx::sdk::analytics::Plugin*>(
+        pluginObject->queryInterface(nx::sdk::analytics::IID_Plugin));
+    ASSERT_TRUE(plugin != nullptr);
+
+    error = nx::sdk::Error::noError;
+    nxpl::PluginInterface* const engineObject = plugin->createEngine(&error);
+    ASSERT_EQ(noError, (int) error);
 
     const auto engine = static_cast<nx::sdk::analytics::Engine*>(
         engineObject->queryInterface(nx::sdk::analytics::IID_Engine));
     ASSERT_TRUE(engine != nullptr);
 
-    const std::string engineName = engine->name();
-    ASSERT_TRUE(!engineName.empty());
-    NX_PRINT << "Engine name: [" << engineName << "]";
+    ASSERT_EQ(plugin, engine->plugin());
 
-    nx::sdk::Error error = nx::sdk::Error::noError;
+    const std::string pluginName = engine->plugin()->name();
+    ASSERT_TRUE(!pluginName.empty());
+    NX_PRINT << "Plugin name: [" << pluginName << "]";
+    ASSERT_STREQ(pluginName, "stub_analytics_plugin");
 
     testEngineManifest(engine);
     testEngineSettings(engine);
@@ -276,6 +308,7 @@ TEST(stub_analytics_plugin, test)
 
     deviceAgent->releaseRef();
     engine->releaseRef();
+    plugin->releaseRef();
 }
 
 int main(int argc, const char* const argv[])

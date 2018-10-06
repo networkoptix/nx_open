@@ -4,30 +4,42 @@
 #define NX_DEBUG_ENABLE_OUTPUT (this->utils.enableOutput)
 #include <nx/kit/debug.h>
 
-#include <nx/sdk/analytics/common_engine.h>
 #include <nx/sdk/utils.h>
+#include <nx/sdk/analytics/common_engine.h>
+#include <nx/sdk/analytics/plugin.h>
 
 namespace nx {
 namespace sdk {
 namespace analytics {
 
-static std::string makePrintPrefix(Engine* engine)
+class PrintPrefixMaker
 {
-    std::string base;
-    if (const auto commonPlugin = dynamic_cast<CommonEngine*>(engine))
-        base = commonPlugin->libName();
-    else //< The plugin is not derived from CommonEngine.
-        base = engine->name();
+public:
+    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const Engine* engine)
+    {
+        NX_KIT_ASSERT(engine);
+        NX_KIT_ASSERT(engine->plugin());
+        NX_KIT_ASSERT(engine->plugin()->name());
 
-    return "[" + base + " DeviceAgent] ";
-}
+        if (!overridingPrintPrefix.empty())
+            return overridingPrintPrefix;
+        return std::string("[") + engine->plugin()->name() + " DeviceAgent] ";
+    }
+
+private:
+    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
+    struct
+    { 
+        const std::string printPrefix = "CommonVideoFrameProcessingDeviceAgent(): ";
+    } utils; 
+};
 
 CommonVideoFrameProcessingDeviceAgent::CommonVideoFrameProcessingDeviceAgent(
     Engine* engine,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    utils(enableOutput, !printPrefix.empty() ? printPrefix : makePrintPrefix(engine)),
+    utils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, engine)),
     m_engine(engine)
 {
     NX_PRINT << "Created " << this;
@@ -177,7 +189,7 @@ void CommonVideoFrameProcessingDeviceAgent::freeManifest(const char* data)
     delete[] data;
 }
 
-void CommonVideoFrameProcessingDeviceAgent::setDeclaredSettings(
+void CommonVideoFrameProcessingDeviceAgent::setSettings(
     const nxpl::Setting* settings, int count)
 {
     if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
@@ -215,6 +227,13 @@ void CommonVideoFrameProcessingDeviceAgent::pushMetadataPacket(
 std::string CommonVideoFrameProcessingDeviceAgent::getParamValue(const char* paramName)
 {
     return m_settings[paramName];
+}
+
+void CommonVideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
+{
+    NX_KIT_ASSERT(engine,
+        "CommonVideoFrameProcessingDeviceAgent " + nx::kit::debug::toString(this)
+        + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
 }
 
 } // namespace analytics

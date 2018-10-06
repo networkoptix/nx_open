@@ -22,14 +22,9 @@ namespace deepstream {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(
-    nx::mediaserver_plugins::analytics::deepstream::Engine* engine,
-    const std::string& id)
-    :
-    m_engine(engine)
-
+DeviceAgent::DeviceAgent(Engine* engine, const std::string& id): m_engine(engine)
 {
-    NX_OUTPUT << __func__ << "(\"" << m_engine->name() << "\") -> " << this;
+    NX_OUTPUT << __func__ << "(\"" << m_engine->plugin()->name() << "\") -> " << this;
 
     std::unique_ptr<BasePipelineBuilder> builder;
 
@@ -64,7 +59,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setDeclaredSettings(const nxpl::Setting *settings, int count)
+void DeviceAgent::setSettings(const nxpl::Setting *settings, int count)
 {
     NX_OUTPUT << __func__ << " Received DeviceAgent settings:";
     NX_OUTPUT << "{";

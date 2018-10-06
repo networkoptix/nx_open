@@ -36,7 +36,7 @@ public:
 static const nxpl::NX_GUID IID_DeviceAgent =
     {{0x48, 0x5a, 0x23, 0x51, 0x55, 0x73, 0x4f, 0xb5, 0xa9, 0x11, 0xe4, 0xfb, 0x22, 0x87, 0x79, 0x24}};
 
-class Engine;
+class Engine; //< Forward declaration for the parent object.
 
 /**
  * Interface used to control the process of fetching metadata from the resource.
@@ -47,6 +47,9 @@ class Engine;
 class DeviceAgent: public nxpl::PluginInterface
 {
 public:
+    /** @return Parent Engine. */
+    virtual Engine* engine() const = 0;
+
     /**
      * Starts fetching metadata from the resource.
      * @param typeList List of types of events and objects as an array of C-style strings; null if
@@ -113,7 +116,7 @@ public:
      * @param settings Values of settings declared in the manifest. The pointer is valid only
      *     during the call. If count is 0, the pointer is null.
      */
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) = 0;
+    virtual void setSettings(const nxpl::Setting* settings, int count) = 0;
 };
 
 } // namespace analytics

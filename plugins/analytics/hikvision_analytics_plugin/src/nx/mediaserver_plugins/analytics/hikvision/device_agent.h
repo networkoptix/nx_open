@@ -30,6 +30,8 @@ public:
 
     virtual ~DeviceAgent();
 
+    virtual Engine* engine() const override { return m_engine; }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
@@ -46,9 +48,11 @@ public:
     void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
-    void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    void setSettings(const nxpl::Setting* settings, int count) override;
 
 private:
+    Engine* const m_engine;
+
     Hikvision::EngineManifest m_engineManifest;
     QByteArray m_deviceAgentManifest;
 
@@ -60,7 +64,6 @@ private:
     QString m_sharedId;
     int m_channel = 0;
 
-    Engine* m_engine = nullptr;
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
     nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
 };

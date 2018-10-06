@@ -13,6 +13,7 @@
 
 #include "common.h"
 #include "monitor.h"
+#include "engine.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -25,10 +26,13 @@ class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent
 {
 public:
     DeviceAgent(
+        Engine* engine,
         const nx::sdk::DeviceInfo& deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
+
+    virtual Engine* engine() const override { return m_engine; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -49,12 +53,13 @@ public:
         return m_typedManifest;
     }
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
     /** @return Null if not found. */
     const EventType* eventTypeById(const QString& id) const noexcept;
 
 private:
+    Engine* const m_engine;
     EngineManifest m_typedManifest;
     QByteArray m_manifest;
     QUrl m_url;

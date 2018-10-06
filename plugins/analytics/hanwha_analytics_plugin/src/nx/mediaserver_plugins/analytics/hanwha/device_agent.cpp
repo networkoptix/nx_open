@@ -54,7 +54,7 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
     return Error::noError;
 }
 
-void DeviceAgent::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

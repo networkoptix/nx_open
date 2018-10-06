@@ -10,6 +10,8 @@
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/mediaserver_plugins/analytics/deepstream/pipeline_builder.h>
 
+#include "engine.h"
+
 namespace nx {
 namespace mediaserver_plugins {
 namespace analytics {
@@ -18,15 +20,15 @@ namespace deepstream {
 class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::ConsumingDeviceAgent>
 {
 public:
-    DeviceAgent(
-        nx::mediaserver_plugins::analytics::deepstream::Engine* engine,
-        const std::string& id);
+    DeviceAgent(Engine* engine, const std::string& id);
 
     virtual ~DeviceAgent();
 
+    virtual Engine* engine() const override { return m_engine; }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
     virtual nx::sdk::Error startFetchingMetadata(
         const char* const* typeList, int typeListSize) override;
@@ -44,7 +46,7 @@ public:
     virtual nx::sdk::Error pushDataPacket(nx::sdk::analytics::DataPacket* dataPacket) override;
 
 private:
-    nx::mediaserver_plugins::analytics::deepstream::Engine* const m_engine;
+    Engine* const m_engine;
     nx::sdk::analytics::MetadataHandler* m_metadataHandler;
     std::unique_ptr<nx::gstreamer::Pipeline> m_pipeline;
     mutable std::mutex m_mutex;

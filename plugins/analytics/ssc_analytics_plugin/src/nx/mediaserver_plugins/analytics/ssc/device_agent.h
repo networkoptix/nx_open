@@ -17,17 +17,17 @@ namespace mediaserver_plugins {
 namespace analytics {
 namespace ssc {
 
-class Engine;
-
 class DeviceAgent: public nxpt::CommonRefCounter<nx::sdk::analytics::DeviceAgent>
 {
 public:
     DeviceAgent(
-        Engine* plugin,
+        Engine* engine,
         const nx::sdk::DeviceInfo& deviceInfo,
         const EngineManifest& typedManifest);
 
     virtual ~DeviceAgent();
+
+    virtual Engine* engine() const override { return m_engine; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
@@ -44,10 +44,10 @@ public:
 
     virtual sdk::Error setMetadataHandler(nx::sdk::analytics::MetadataHandler* metadataHandler) override;
 
-    virtual void setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/) override {}
+    virtual void setSettings(const nxpl::Setting* /*settings*/, int /*count*/) override {}
 
 private:
-    Engine * const m_engine;
+    Engine* const m_engine;
     const QUrl m_url;
     const int m_cameraLogicalId;
     QByteArray m_deviceAgentManifest;

@@ -3,6 +3,8 @@
 #define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
+#include <nx/sdk/analytics/common_plugin.h>
+
 #include "device_agent.h"
 #include "stub_analytics_plugin_ini.h"
 
@@ -14,8 +16,7 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine():
-    CommonEngine("Stub Analytics Plugin", "stub_analytics_plugin", NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(Plugin* plugin): CommonEngine(plugin, NX_DEBUG_ENABLE_OUTPUT)
 {
     initCapabilities();
 }
@@ -50,43 +51,52 @@ void Engine::initCapabilities()
 
 std::string Engine::manifest() const
 {
-    return R"json(
+    return 1+R"json(
+{
+    "pluginId": "nx.stub",
+    "pluginName": {
+        "value": "Stub Analytics Plugin"
+    },
+    "eventTypes": [
         {
-            "pluginId": "nx.stub",
-            "pluginName": {
-                "value": ")json" + std::string(name()) + R"json("
+            "id": ")json" + kLineCrossingEventType + R"json(",
+            "name": {
+                "value": "Line crossing"
+            }
+        },
+        {
+            "id": ")json" + kObjectInTheAreaEventType + R"json(",
+            "name": {
+                "value": "Object in the area"
             },
-            "eventTypes": [
-                {
-                    "id": ")json" + kLineCrossingEventType + R"json(",
-                    "name": {
-                        "value": "Line crossing"
-                    }
-                },
-                {
-                    "id": ")json" + kObjectInTheAreaEventType + R"json(",
-                    "name": {
-                        "value": "Object in the area"
-                    },
-                    "flags": "stateDependent|regionDependent"
-                }
+            "flags": "stateDependent|regionDependent"
+        }
+    ],
+    "objectTypes": [
+        {
+            "id": ")json" + kCarObjectType+ R"json(",
+            "name": {
+                "value": "Car"
+            }
+        },
+        {
+            "id": ")json" + kHumanFaceObjectType+ R"json(",
+            "name": {
+                "value": "Human face"
+            }
+        }
+    ],
+    "capabilities": ")json" + m_capabilities + R"json(",
+    "objectActions": [
+        {
+            "id": "nx.stub.addToList",
+            "name": {
+                "value": "Add to list"
+            },
+            "supportedObjectTypeIds": [
+                ")json" + kCarObjectType+ R"json("
             ],
-            "objectTypes": [
-                {
-                    "id": ")json" + kCarObjectType+ R"json(",
-                    "name": {
-                        "value": "Car"
-                    }
-                },
-                {
-                    "id": ")json" + kHumanFaceObjectType+ R"json(",
-                    "name": {
-                        "value": "Human face"
-                    }
-                }
-            ],
-            "capabilities": ")json" + m_capabilities + R"json(",
-            "pluginSettings": {
+            "settings": {
                 "params": [
                     {
                         "id": "paramA",
@@ -101,96 +111,21 @@ std::string Engine::manifest() const
                         "name": "Param B",
                         "description": "Enumeration B"
                     }
-                ],
-                "groups": [
-                    {
-                        "id": "groupA",
-                        "name": "Group name",
-                        "params": [
-                            {
-                                "id": "groupA.paramA",
-                                "dataType": "String",
-                                "name": "Some string",
-                                "description": "Some string param in a group"
-                            }
-                        ],
-                        "groups": [
-                        ]
-                    }
                 ]
+            }
+        },
+        {
+            "id": "nx.stub.addPerson",
+            "name": {
+                "value": "Add person (URL-based)"
             },
-            "deviceAgentSettings": {
-                "params": [
-                    {
-                        "id": "paramA",
-                        "dataType": "Number",
-                        "name": "Param A",
-                        "description": "Number A"
-                    },
-                    {
-                        "id": "paramB",
-                        "dataType": "Enumeration",
-                        "range": "b1,b3",
-                        "name": "Param B",
-                        "description": "Enumeration B"
-                    }
-                ],
-                "groups": [
-                    {
-                        "id": "groupA",
-                        "name": "Group name",
-                        "params": [
-                            {
-                                "id": "groupA.paramA",
-                                "dataType": "String",
-                                "name": "Some string",
-                                "description": "Some string param in a group"
-                            }
-                        ],
-                        "groups": [
-                        ]
-                    }
-                ]
-            },
-            "objectActions": [
-                {
-                    "id": "nx.stub.addToList",
-                    "name": {
-                        "value": "Add to list"
-                    },
-                    "supportedObjectTypeIds": [
-                        ")json" + kCarObjectType+ R"json("
-                    ],
-                    "settings": {
-                        "params": [
-                            {
-                                "id": "paramA",
-                                "dataType": "Number",
-                                "name": "Param A",
-                                "description": "Number A"
-                            },
-                            {
-                                "id": "paramB",
-                                "dataType": "Enumeration",
-                                "range": "b1,b3",
-                                "name": "Param B",
-                                "description": "Enumeration B"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "id": "nx.stub.addPerson",
-                    "name": {
-                        "value": "Add person (URL-based)"
-                    },
-                    "supportedObjectTypeIds": [
-                        ")json" + kCarObjectType+ R"json("
-                    ]
-                }
+            "supportedObjectTypeIds": [
+                ")json" + kCarObjectType+ R"json("
             ]
         }
-    )json";
+    ]
+}
+)json";
 }
 
 void Engine::settingsChanged()
@@ -245,9 +180,13 @@ void Engine::executeAction(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::stub::Engine();
+    return new nx::sdk::analytics::CommonPlugin("stub_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::stub::Engine(plugin);
+        });
 }
 
 } // extern "C"

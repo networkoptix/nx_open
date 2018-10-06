@@ -10,6 +10,7 @@
 #include <plugins/plugin_container_api.h>
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/device_agent.h>
+#include <nx/sdk/analytics/common_plugin.h>
 
 #include <nx/mediaserver_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -21,20 +22,14 @@ namespace deepstream {
 class Engine: public nxpt::CommonRefCounter<nx::sdk::analytics::Engine>
 {
 public:
-    Engine();
+    Engine(nx::sdk::analytics::CommonPlugin* plugin);
     virtual ~Engine() override;
+
+    virtual nx::sdk::analytics::CommonPlugin* plugin() const override { return m_plugin; }
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
-
-    virtual const char* name() const override;
-
-    virtual void setSettings( const nxpl::Setting* settings, int count ) override;
-
-    virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
-
-    virtual void setLocale(const char* locale) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
     virtual const char* manifest(nx::sdk::Error* error) const override;
 
@@ -55,6 +50,7 @@ private:
     std::string buildManifestObectTypeString(const ObjectClassDescription& description) const;
 
 private:
+    nx::sdk::analytics::CommonPlugin* const m_plugin;
     mutable std::vector<ObjectClassDescription> m_objectClassDescritions;
     mutable std::string m_manifest;
     std::unique_ptr<

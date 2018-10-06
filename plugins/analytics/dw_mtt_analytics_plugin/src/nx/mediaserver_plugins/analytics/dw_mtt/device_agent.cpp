@@ -73,14 +73,16 @@ nx::sdk::analytics::CommonEventMetadataPacket* createCommonEventMetadataPacket(
 
 } // namespace
 
-DeviceAgent::DeviceAgent(Engine* engine,
+DeviceAgent::DeviceAgent(
+    Engine* engine,
     const nx::sdk::DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
+    :
+    m_engine(engine)
 {
     m_url = deviceInfo.url;
     m_auth.setUser(deviceInfo.login);
     m_auth.setPassword(deviceInfo.password);
-    m_engine = engine;
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
     for (const auto& eventType : typedManifest.outputEventTypes)
@@ -482,7 +484,7 @@ void DeviceAgent::freeManifest(const char* /*data*/)
     // Do nothing. Manifest string is stored in member-variable.
 }
 
-void DeviceAgent::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
 }
 

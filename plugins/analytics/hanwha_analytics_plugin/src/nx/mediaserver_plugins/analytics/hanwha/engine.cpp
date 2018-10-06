@@ -25,7 +25,6 @@ namespace hanwha {
 
 namespace {
 
-static const char* const kEngineName = "Hanwha Analytics Plugin";
 static const QString kSamsungTechwinVendor("samsung");
 static const QString kHanwhaTechwinVendor("hanwha");
 
@@ -77,7 +76,7 @@ void Engine::SharedResources::setResourceAccess(
     monitor->setResourceAccess(url, auth);
 }
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     QFile f(":/hanwha/manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -90,53 +89,14 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     if (interfaceId == IID_Engine)
     {
         addRef();
-        return static_cast<Plugin*>(this);
+        return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
     }
     return nullptr;
-}
-
-const char* Engine::name() const
-{
-    return kEngineName;
-}
-
-void Engine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-    // Do nothing.
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-    // Do nothing.
-}
-
-void Engine::setLocale(const char* /*locale*/)
-{
-    // Do nothing.
 }
 
 nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
@@ -181,14 +141,12 @@ const char* Engine::manifest(Error* error) const
     return m_manifest.constData();
 }
 
-void Engine::setDeclaredSettings(const nxpl::Setting* settings, int count)
+void Engine::setSettings(const nxpl::Setting* settings, int count)
 {
-    // Do nothing.
 }
 
 void Engine::executeAction(Action* action, Error* outError)
 {
-    // Do nothing.
 }
 
 boost::optional<QList<QString>> Engine::fetchSupportedEvents(
@@ -353,9 +311,14 @@ std::shared_ptr<Engine::SharedResources> Engine::sharedResources(
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::hanwha::Engine();
+    return new nx::sdk::analytics::CommonPlugin("hanwha_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::hanwha::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

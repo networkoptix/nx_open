@@ -18,9 +18,11 @@ namespace analytics {
 namespace axis {
 
 DeviceAgent::DeviceAgent(
+    Engine* engine,
     const nx::sdk::DeviceInfo& deviceInfo,
     const EngineManifest& typedManifest)
     :
+    m_engine(engine),
     m_typedManifest(typedManifest),
     m_manifest(QJson::serialized(typedManifest)),
     m_url(deviceInfo.url)
@@ -62,7 +64,7 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(
     return nx::sdk::Error::noError;
 }
 
-void DeviceAgent::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

@@ -18,7 +18,6 @@ namespace vca {
 
 namespace {
 
-static const char* const kPluginName = "VCA metadata plugin";
 static const QString kVcaVendor("cap");
 
 } // namespace
@@ -26,7 +25,7 @@ static const QString kVcaVendor("cap");
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     static const char* const kResourceName = ":/vca/manifest.json";
     static const char* const kFileName = "plugins/vca/manifest.json";
@@ -55,25 +54,6 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -82,20 +62,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Engine::name() const
-{
-    return kPluginName;
-}
-
 void Engine::setSettings(const nxpl::Setting* settings, int count)
-{
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* pluginContainer)
-{
-}
-
-void Engine::setLocale(const char* locale)
 {
 }
 
@@ -127,7 +94,6 @@ const EventType* Engine::eventTypeById(const QString& id) const noexcept
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 {
-    // Do nothing.
 }
 
 } // namespace vca
@@ -137,9 +103,14 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::mediaserver_plugins::analytics::vca::Engine();
+    return new nx::sdk::analytics::CommonPlugin("vca_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::vca::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

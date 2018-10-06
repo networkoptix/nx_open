@@ -6,21 +6,42 @@
 
 #include <nx/sdk/utils.h>
 
+#include "plugin.h"
+
 namespace nx {
 namespace sdk {
 namespace analytics {
 
+class PrintPrefixMaker
+{
+public:
+    std::string makePrintPrefix(const std::string& overridingPrintPrefix, const Plugin* plugin)
+    {
+        NX_KIT_ASSERT(plugin);
+        NX_KIT_ASSERT(plugin->name());
+
+        if (!overridingPrintPrefix.empty())
+            return overridingPrintPrefix;
+        return std::string("[") + plugin->name() + " Engine] ";
+    }
+
+private:
+    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
+    struct
+    { 
+        const std::string printPrefix = "CommonEngine(): ";
+    } utils; 
+};
+
 CommonEngine::CommonEngine(
-    const std::string& pluginName,
-    const std::string& libName,
+    Plugin* plugin,
     bool enableOutput,
     const std::string& printPrefix)
     :
-    utils(enableOutput, !printPrefix.empty() ? printPrefix : ("[" + libName + "] ")),
-    m_pluginName(pluginName),
-    m_libName(libName)
+    utils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, plugin)),
+    m_plugin(plugin)
 {
-    NX_PRINT << "Created " << this << ": \"" << m_pluginName << "\"";
+    NX_PRINT << "Created " << this << ": \"" << plugin->name() << "\"";
 }
 
 std::string CommonEngine::getParamValue(const char* paramName)
@@ -42,21 +63,6 @@ void* CommonEngine::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Engine*>(this);
     }
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -65,33 +71,12 @@ void* CommonEngine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* CommonEngine::name() const
-{
-    // NOTE: Because Engine implements Plugin (which is not ideal, and can be changed in future),
-    // its name() method should return the plugin name.
-    return m_pluginName.c_str();
-}
-
-void CommonEngine::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
-{
-    // Here roSettings are passed from Server. Currently, they are not used by metadata plugins,
-    // thus, do nothing.
-}
-
-void CommonEngine::setDeclaredSettings(const nxpl::Setting* settings, int count)
+void CommonEngine::setSettings(const nxpl::Setting* settings, int count)
 {
     if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
         return; //< The error is already logged.
 
     settingsChanged();
-}
-
-void CommonEngine::setPluginContainer(nxpl::PluginInterface* /*pluginContainer*/)
-{
-}
-
-void CommonEngine::setLocale(const char* /*locale*/)
-{
 }
 
 const char* CommonEngine::manifest(Error* /*error*/) const
@@ -144,6 +129,13 @@ void CommonEngine::executeAction(Action* action, Error* outError)
     const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
     const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
     action->handleResult(actionUrlPtr, messageToUserPtr);
+}
+
+void CommonEngine::assertPluginCasted(void* plugin) const
+{
+    NX_KIT_ASSERT(plugin,
+        "CommonEngine " + nx::kit::debug::toString(this)
+        + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());
 }
 
 } // namespace analytics

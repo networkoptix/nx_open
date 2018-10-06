@@ -44,7 +44,7 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setDeclaredSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }

@@ -25,6 +25,8 @@ public:
     DeviceAgent(Engine* engine);
     virtual ~DeviceAgent();
 
+    virtual Engine* engine() const override { return m_engine; }
+
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
     virtual nx::sdk::Error setMetadataHandler(
@@ -45,9 +47,11 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
 private:
+    Engine* const m_engine;
+
     Hanwha::EngineManifest m_engineManifest;
     QByteArray m_deviceAgentManifest;
 
@@ -59,7 +63,6 @@ private:
     QString m_sharedId;
     int m_channel = 0;
 
-    Engine* const m_engine;
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::analytics::MetadataHandler* m_metadataHandler = nullptr;
 };

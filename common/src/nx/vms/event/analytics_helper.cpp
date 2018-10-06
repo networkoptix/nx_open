@@ -62,18 +62,18 @@ class AnalyticsEventTypeWithRefStorage
 public:
     AnalyticsEventTypeWithRefStorage(QList<EventTypeDescriptor>* data): data(data) {}
 
-    void addUnique(const nx::vms::api::analytics::EngineManifest& manifest,
+    void addUnique(const nx::vms::api::analytics::EngineManifest& engineManifest,
         const nx::vms::api::analytics::EventType& eventType)
     {
-        AnalyticsEventTypeId id{manifest.pluginId, eventType.id};
+        AnalyticsEventTypeId id{engineManifest.pluginId, eventType.id};
         if (keys.contains(id))
             return;
 
         keys.insert(id);
-        EventTypeDescriptor ref(eventType);
-        ref.pluginId = manifest.pluginId;
-        ref.pluginName = manifest.pluginName;
-        data->push_back(ref);
+        EventTypeDescriptor descriptor(eventType);
+        descriptor.pluginId = engineManifest.pluginId;
+        descriptor.pluginName = engineManifest.pluginName;
+        data->push_back(descriptor);
     }
 
 private:

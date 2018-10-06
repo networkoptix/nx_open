@@ -23,7 +23,6 @@ namespace axis {
 
 namespace {
 
-const char* const kEngineName = "Axis analytics plugin";
 const QString kAxisVendor("axis");
 const QString kSoapPath("/vapix/services");
 
@@ -32,7 +31,7 @@ const QString kSoapPath("/vapix/services");
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine()
+Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
 {
     QFile f(":/axis/manifest.json");
     if (f.open(QFile::ReadOnly))
@@ -57,25 +56,6 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
         addRef();
         return static_cast<Engine*>(this);
     }
-
-    if (interfaceId == nxpl::IID_Plugin3)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin3*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin2)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin2*>(this);
-    }
-
-    if (interfaceId == nxpl::IID_Plugin)
-    {
-        addRef();
-        return static_cast<nxpl::Plugin*>(this);
-    }
-
     if (interfaceId == nxpl::IID_PluginInterface)
     {
         addRef();
@@ -84,24 +64,7 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-const char* Engine::name() const
-{
-    return kEngineName;
-}
-
 void Engine::setSettings(const nxpl::Setting* settings, int count)
-{
-}
-
-void Engine::setDeclaredSettings(const nxpl::Setting* settings, int count)
-{
-}
-
-void Engine::setPluginContainer(nxpl::PluginInterface* pluginContainer)
-{
-}
-
-void Engine::setLocale(const char* locale)
 {
 }
 
@@ -119,7 +82,7 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     if (events.outputEventTypes.empty())
         return nullptr;
 
-    return new DeviceAgent(*deviceInfo, events);
+    return new DeviceAgent(this, *deviceInfo, events);
 }
 
 const char* Engine::manifest(Error* error) const
@@ -172,9 +135,15 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 
 extern "C" {
 
-NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsEngine()
+NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
+
 {
-    return new nx::mediaserver_plugins::analytics::axis::Engine();
+    return new nx::sdk::analytics::CommonPlugin("axis_analytics_plugin",
+        [](nx::sdk::analytics::Plugin* plugin)
+        {
+            return new nx::mediaserver_plugins::analytics::axis::Engine(
+                dynamic_cast<nx::sdk::analytics::CommonPlugin*>(plugin));
+        });
 }
 
 } // extern "C"

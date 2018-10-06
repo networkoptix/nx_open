@@ -7,11 +7,11 @@
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
 
-#include "engine.h"
-#include "consuming_device_agent.h"
-#include "objects_metadata_packet.h"
-#include "compressed_video_packet.h"
-#include "uncompressed_video_frame.h"
+#include <nx/sdk/analytics/engine.h>
+#include <nx/sdk/analytics/consuming_device_agent.h>
+#include <nx/sdk/analytics/objects_metadata_packet.h>
+#include <nx/sdk/analytics/compressed_video_packet.h>
+#include <nx/sdk/analytics/uncompressed_video_frame.h>
 
 namespace nx {
 namespace sdk {
@@ -106,11 +106,18 @@ public:
     virtual ~CommonVideoFrameProcessingDeviceAgent() override;
 
     /**
-     * @return Parent Engine. The parent Engine is guaranteed to exist while any of its
-     * DeviceAgents exist, thus, this pointer is valid during the lifetime of this DeviceAgent.
-     * Override to perform dynamic_cast to the actual descendant class of the Engine.
+     * Intended to be called from a method of a derived class overriding engine().
+     * @return Parent Engine, casted to the specified type.
      */
-    virtual Engine* engine() const { return m_engine; }
+    template<typename DerivedEngine>
+    DerivedEngine* engineCasted() const
+    {
+        const auto engine = dynamic_cast<DerivedEngine*>(m_engine);
+        assertEngineCasted(engine);
+        return engine;
+    }
+
+    virtual Engine* engine() const override { return m_engine; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
@@ -123,7 +130,10 @@ public:
     virtual Error stopFetchingMetadata() override;
     virtual const char* manifest(Error* error) override;
     virtual void freeManifest(const char* data) override;
-    virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+
+private:
+    void assertEngineCasted(void* engine) const;
 
 private:
     Engine* const m_engine;
