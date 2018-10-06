@@ -6,8 +6,6 @@ urlpatterns = [
 
     url(r'edit/(?P<context_id>.+?)/(?P<language_code>.+?)/(?P<product_id>.+?)/', product.page_editor, name="page_editor"),
 
-    url(r'edit/(?P<context_id>.+?)/(?P<language_code>.+?)/', product.page_editor, name="page_editor"),
-
     url(r'edit/(?P<context_id>.+?)/', product.page_editor, name="page_editor"),
 
     url(r'preview/', product.make_preview, name="preview"),

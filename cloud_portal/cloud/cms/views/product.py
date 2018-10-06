@@ -140,8 +140,6 @@ def context_editor_action(request, product, context_id, language_code):
 def page_editor(request, context_id=None, language_code=None, product_id=None):
     if product_id:
         product = Product.objects.get(id=product_id)
-    else:
-        product = get_product_by_context(context_id)
 
     if request.method == "GET":
         context, language = get_context_and_language(request, context_id, language_code, product.default_language)
@@ -155,8 +153,7 @@ def page_editor(request, context_id=None, language_code=None, product_id=None):
         context, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
 
         if 'SendReview' in request.POST and preview_link:
-            review = ProductCustomizationReview.objects.get(version_id=ContentVersion.objects.latest('created_date').id,
-                                                            customization__name=settings.CUSTOMIZATION)
+            review = ProductCustomizationReview.objects.filter(version_id=ContentVersion.objects.latest('created_date')).first()
             redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
             return redirect(redirect_url)
 

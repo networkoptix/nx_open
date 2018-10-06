@@ -22,6 +22,10 @@ def make_integrations_json(integrations, contexts=[]):
     global_contexts = Context.objects.filter(product_type__type=CLOUD_PORTAL, is_global=True)
     cloud_portal = Product.objects.filter(product_type__type=CLOUD_PORTAL,
                                           customizations__name__in=[settings.CUSTOMIZATION])
+    if not cloud_portal.exists():
+        return []
+
+    cloud_portal = cloud_portal.first()
 
     for integration in integrations:
         integration_dict = {}

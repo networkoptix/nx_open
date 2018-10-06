@@ -16,10 +16,6 @@ def get_cloud_portal_product(customization=settings.CUSTOMIZATION):
                                product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
 
 
-def get_product_by_context(context_id):
-    return Product.objects.get(product_type__context__id=context_id, customizations__name__in=[settings.CUSTOMIZATION])
-
-
 def get_product_by_revision(version_id):
     return Product.objects.get(contentversion__in=[version_id])
 
@@ -209,7 +205,7 @@ class Product(models.Model):
                    state=ProductCustomizationReview.REVIEW_STATES.accepted,
                    version__product=self)
 
-        return accepted_review.latest('id').id if accepted_review.exists() else 0
+        return accepted_review.latest('id').version.id if accepted_review.exists() else 0
 
 
 class Context(models.Model):

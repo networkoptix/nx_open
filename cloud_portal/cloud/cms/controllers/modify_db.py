@@ -32,7 +32,7 @@ def update_draft_state(review_id, target_state, user):
 
 
 def notify_version_ready(product, version_id, exclude_user):
-    perm = Permission.objects.get(codename='publish_version')
+    perm = Permission.objects.filter(codename='publish_version')
     users = Account.objects.\
         filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).\
         filter(subscribe=True, customization__in=product.customizations.all()).\

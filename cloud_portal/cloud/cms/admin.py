@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.html import format_html
+from django.http.response import HttpResponse
 
 from cloud import settings
 from cms.forms import *
@@ -62,11 +63,12 @@ admin.site.register(ProductType, ProductTypeAdmin)
 
 
 class ProductAdmin(CMSAdmin):
-    list_display = ('product_actions', 'name', 'product_type', 'customizations_list')
+    list_display = ('product_settings', 'edit_product', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
     list_filter = ('product_type', )
     form = ProductForm
     change_form_template = 'cms/product_change_form.html'
+    change_list_template = 'cms/product_changelist.html'
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -86,16 +88,26 @@ class ProductAdmin(CMSAdmin):
             request, object_id, form_url, extra_context=extra_context,
         )
 
-    def product_actions(self, obj):
-        if not obj.product_type or obj.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
-            return format_html('<a class="btn btn-sm" href="{}">settings</a>',
-                               reverse('product_settings', args=[obj.id]))
-        context = Context.objects.get(product_type=obj.product_type)
-        return format_html('<a class="btn btn-sm" href="{}">edit information</a>',
-                           reverse('page_editor', args=[context.id, None, obj.id]))
+    def get_list_display(self, request):
+        if not request.user.is_superuser or True:
+            return self.list_display[1:]
+        return self.list_display
 
-    product_actions.short_description = ''
-    product_actions.allow_tags = True
+    def product_settings(self, obj):
+        if False and not obj.product_type.single_customization:
+            return format_html('')
+        return format_html('<a class="btn btn-sm" href="{}">Settings</a>',
+                           reverse('product_settings', args=[obj.id]))
+
+    product_settings.short_description = 'Product settings'
+    product_settings.allow_tags = True
+
+    def edit_product(self, obj):
+        return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit contexts</a>',
+                           reverse('admin:cms_context_changelist'), obj.id)
+
+    edit_product.short_description = 'Edit page'
+    edit_product.allow_tags = True
 
     def customizations_list(self, obj):
         return ", ".join(obj.customizations.values_list('name', flat=True))
@@ -111,19 +123,34 @@ class ContextAdmin(CMSAdmin):
     list_display_links = ('name',)
     search_fields = ('name', 'description', 'url')
 
+    change_list_template = "cms/context_changelist.html"
+
     def changelist_view(self, request, extra_context=None):
         if not request.user.is_superuser:
             self.list_display_links = (None,)
         else:
             self.list_filter = ('product_type', )
+
+        extra_context = extra_context or {}
+        if'product_id' in request.POST:
+            request.session['product_id'] = request.POST['product_id']
+            return HttpResponse(reverse('admin:cms_context_changelist'))
+
+        if 'product_id' in request.session:
+            extra_context['product_id'] = request.session['product_id']
+        else:
+            messages.error("No product was selected!")
+            return HttpResponse(reverse('admin:cms_product_changelist'), status=400)
+
         return super(ContextAdmin, self).changelist_view(request, extra_context)
 
     def context_actions(self, obj):
-        return format_html('<a class="btn btn-sm" href="{}">edit content</a>',
+        return format_html('<a class="btn btn-sm editor" href="{}">Edit content</a>',
                            reverse('page_editor', args=[obj.id]))
 
     def get_queryset(self, request):  # show only users for cloud_portal product type
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = qs.filter(product_type__product__in=[request.session['product_id']])
         if not request.user.is_superuser:
             qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
                 filter(hidden=False)  # only superuser sees hidden contexts
@@ -205,7 +232,7 @@ admin.site.register(ContentVersion, ContentVersionAdmin)
 
 
 class ProductCustomizationReviewAdmin(CMSAdmin):
-    list_display = ('product', 'version', 'reviewed_by', 'reviewed_date', 'state')
+    list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state')
     readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by',)
 
     list_filter = ('version__product__product_type', ProductFilter)

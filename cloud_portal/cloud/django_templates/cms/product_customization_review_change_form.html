@@ -19,6 +19,7 @@
                     <thead>
                         <tr>
                             {% if product.product_type.single_customization %}<td><strong>Customization</strong></td>{% endif %}
+                            <td><strong>Customization</strong></td>
                             <td><strong>Status</strong></td>
                             <td><strong>Last reviewed by</strong></td>
                             <td><strong>Last checked on</strong></td>
@@ -30,6 +31,7 @@
                         {% get_review_state review.state as state %}
                         <tr>
                             {% if product.product_type.single_customization %}<td> {{ review.customization }} </td>{% endif %}
+                            <td> {{ review.customization }}</td>
                             <td> {{ state }} </td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
