@@ -31,11 +31,17 @@ def make_integrations_json(integrations, contexts=[]):
             if current_version == 0:
                 continue
             for context in contexts:
+                # Make context json friendly
+                context_name = context.name
+                context_name = context_name[0].lower() + context_name[1:]
+                context_name = context_name.replace(' ', '')
+
+                integration_dict[context_name] = {}
                 for datastructure in context.datastructure_set.all():
                     ds_name = datastructure.name
                     if not datastructure.public:
                         continue
-                    integration_dict[ds_name] = datastructure.find_actual_value(product=integration,
+                    integration_dict[context_name][ds_name] = datastructure.find_actual_value(product=integration,
                                                                                 version_id=current_version)
 
             for global_context in global_contexts:
@@ -70,5 +76,4 @@ def get_integrations(request):
     if not integrations.exists():
         return api_success([])
 
-    information_context = Context.objects.get(name="Information", product_type__type=INTEGRATION)
-    return api_success(make_integrations_json(integrations, [information_context]))
+    return api_success(make_integrations_json(integrations))
