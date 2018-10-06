@@ -17,11 +17,11 @@ namespace api {
 namespace { static network::stun::AbstractAsyncClient::Settings s_stunClientSettings; }
 
 MediatorConnector::MediatorConnector(const std::string& cloudHost):
+    m_mediatorEndpointProvider(
+        std::make_unique<MediatorEndpointProvider>(cloudHost)),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
-            s_stunClientSettings.reconnectPolicy)),
-    m_mediatorEndpointProvider(
-        std::make_unique<MediatorEndpointProvider>(cloudHost))
+            s_stunClientSettings.reconnectPolicy))
 {
     // NOTE: Reconnect to mediator is handled by this class, not by STUN client.
 
