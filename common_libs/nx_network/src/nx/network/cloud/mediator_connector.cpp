@@ -279,6 +279,7 @@ DelayedConnectStunClient::DelayedConnectStunClient(
     base_type(std::move(stunClient)),
     m_endpointProvider(endpointProvider)
 {
+    m_endpointProvider->udpEndpoint();
 }
 
 void DelayedConnectStunClient::connect(
