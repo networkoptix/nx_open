@@ -641,7 +641,6 @@ protected:
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(m_mediator.stunTcpEndpoint()),
             m_mediator.stunUdpEndpoint());
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     void givenInitializedServerSocket()

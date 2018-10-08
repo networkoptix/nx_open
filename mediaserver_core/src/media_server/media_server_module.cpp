@@ -182,7 +182,6 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
             enforcedMediatorEndpoint,
             enforcedMediatorEndpoint);
     }
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));

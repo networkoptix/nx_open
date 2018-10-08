@@ -83,7 +83,6 @@ bool MediatorFunctionalTest::waitUntilStarted()
             nx::network::url::Builder()
                 .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunTcpEndpoint()),
             stunUdpEndpoint());
-        network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     return true;

@@ -79,7 +79,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         startMediator();
-        m_mediatorConnector->enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
         andNewMediatorEndpointIsAvailable();
@@ -87,7 +86,16 @@ protected:
 
     void givenPeerFailedToConnectToMediator()
     {
-        m_mediatorConnector->enable(true /*wait for completion*/);
+        std::promise<nx::network::http::StatusCode::Value> fetchMediatorEndpointCompleted;
+        m_mediatorConnector->fetchUdpEndpoint(
+            [&fetchMediatorEndpointCompleted](
+                nx::network::http::StatusCode::Value statusCode, nx::network::SocketAddress)
+            {
+                fetchMediatorEndpointCompleted.set_value(statusCode);
+            });
+
+        ASSERT_FALSE(nx::network::http::StatusCode::isSuccessCode(
+            fetchMediatorEndpointCompleted.get_future().get()));
     }
 
     void whenMediatorUrlEndpointIsChanged()
@@ -412,7 +420,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         whenStartMediator();
-        mediatorConnector().enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
     }
