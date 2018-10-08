@@ -18,10 +18,11 @@ class LiveAnalyticsReceiver:
 
 public:
     LiveAnalyticsReceiver(QObject* parent = nullptr);
+    LiveAnalyticsReceiver(const QnVirtualCameraResourcePtr& camera, QObject* parent = nullptr);
     virtual ~LiveAnalyticsReceiver() override;
 
-    QnSecurityCamResourcePtr camera() const;
-    void setCamera(const QnSecurityCamResourcePtr& value);
+    QnVirtualCameraResourcePtr camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr& value);
 
     QList<QnAbstractCompressedMetadataPtr> takeData();
 

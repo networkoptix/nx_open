@@ -68,7 +68,6 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     q(q),
     m_emitDataChanged(new utils::PendingOperation([this] { emitDataChangedIfNeeded(); },
         kDataChangedInterval.count(), this)),
-    m_metadataReceiver(new LiveAnalyticsReceiver(this)),
     m_metadataProcessingTimer(new QTimer())
 {
     m_emitDataChanged->setFlags(utils::PendingOperation::NoFlags);
@@ -77,22 +76,12 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     connect(m_metadataProcessingTimer.data(), &QTimer::timeout, this, &Private::processMetadata);
     m_metadataProcessingTimer->start();
 
-    connect(m_metadataReceiver.data(), &LiveAnalyticsReceiver::dataOverflow,
-        this, &Private::processMetadata);
+    connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
 }
 
 AnalyticsSearchListModel::Private::~Private()
 {
 }
-
-// TODO: FIXME:
-#if 0
-void AnalyticsSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
-{
-    base_type::setCamera(camera);
-    m_metadataReceiver->setCamera(camera);
-}
-#endif
 
 int AnalyticsSearchListModel::Private::count() const
 {
@@ -359,69 +348,102 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         request, false /*isLocal*/, internalCallback, thread());
 }
 
+void AnalyticsSearchListModel::Private::updateMetadataReceivers()
+{
+    auto cameras = q->cameras();
+    decltype(m_metadataReceivers) newMetadataReceivers;
+
+    // Preserve existing receivers that are still relevant.
+    for (auto& receiver: m_metadataReceivers)
+    {
+        if (cameras.remove(receiver->camera()))
+            newMetadataReceivers.emplace_back(receiver.release());
+    }
+
+    // Create new receivers if needed.
+    for (const auto& camera: cameras)
+        newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
+
+    m_metadataReceivers = std::move(newMetadataReceivers);
+}
+
 void AnalyticsSearchListModel::Private::processMetadata()
 {
-    auto packets = m_metadataReceiver->takeData();
-    if (!q->isLive() || packets.empty())
-        return;
-
-    NX_VERBOSE(this) << "Processing" << packets.size() << "live metadata packets";
-
-    QVector<DetectedObject> newObjects;
+    QList<DetectedObject> newObjects;
     QHash<QnUuid, int> newObjectIndices;
+    int newObjectSources = 0;
 
-    for (const auto& metadata: packets)
+    for (const auto& receiver: m_metadataReceivers)
     {
-        NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
-        const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
-        const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
-
-        if (!detectionMetadata || detectionMetadata->objects.empty())
+        auto packets = receiver->takeData();
+        if (!q->isLive() || packets.empty())
             continue;
 
-        ObjectPosition pos;
-        pos.deviceId = detectionMetadata->deviceId;
-        pos.timestampUsec = detectionMetadata->timestampUsec;
-        pos.durationUsec = detectionMetadata->durationUsec;
+        NX_VERBOSE(this) << "Processing" << packets.size() << "live metadata packets";
 
-        for (const auto& item: detectionMetadata->objects)
+        for (const auto& metadata: packets)
         {
-            pos.boundingBox = item.boundingBox;
+            NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
+            const auto compressedMetadata = std::dynamic_pointer_cast<QnCompressedMetadata>(metadata);
+            const auto detectionMetadata = common::metadata::fromMetadataPacket(compressedMetadata);
 
-            auto index = newObjectIndices.value(item.objectId, -1);
-            if (index >= 0)
+            if (!detectionMetadata || detectionMetadata->objects.empty())
+                continue;
+
+            ObjectPosition pos;
+            pos.deviceId = detectionMetadata->deviceId;
+            pos.timestampUsec = detectionMetadata->timestampUsec;
+            pos.durationUsec = detectionMetadata->durationUsec;
+
+            for (const auto& item: detectionMetadata->objects)
             {
-                pos.attributes = std::move(item.labels);
-                advanceObject(newObjects[index], std::move(pos), false);
-                continue;
+                pos.boundingBox = item.boundingBox;
+
+                auto index = newObjectIndices.value(item.objectId, -1);
+                if (index >= 0)
+                {
+                    pos.attributes = std::move(item.labels);
+                    advanceObject(newObjects[index], std::move(pos), false);
+                    continue;
+                }
+
+                index = indexOf(item.objectId);
+                if (index >= 0)
+                {
+                    pos.attributes = std::move(item.labels);
+                    advanceObject(m_data[index], std::move(pos));
+                    continue;
+                }
+
+                if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
+                    continue;
+
+                DetectedObject newObject;
+                newObject.objectId = item.objectId;
+                newObject.objectTypeId = item.objectTypeId;
+                newObject.attributes = std::move(item.labels);
+                newObject.track.push_back(pos);
+                newObject.firstAppearanceTimeUsec = pos.timestampUsec;
+                newObject.lastAppearanceTimeUsec = pos.timestampUsec;
+
+                newObjectIndices[item.objectId] = newObjects.size();
+                newObjects.push_back(std::move(newObject));
+                ++newObjectSources;
             }
-
-            index = indexOf(item.objectId);
-            if (index >= 0)
-            {
-                pos.attributes = std::move(item.labels);
-                advanceObject(m_data[index], std::move(pos));
-                continue;
-            }
-
-            if (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
-                continue;
-
-            DetectedObject newObject;
-            newObject.objectId = item.objectId;
-            newObject.objectTypeId = item.objectTypeId;
-            newObject.attributes = std::move(item.labels);
-            newObject.track.push_back(pos);
-            newObject.firstAppearanceTimeUsec = pos.timestampUsec;
-            newObject.lastAppearanceTimeUsec = pos.timestampUsec;
-
-            newObjectIndices[item.objectId] = newObjects.size();
-            newObjects.push_back(std::move(newObject));
         }
     }
 
     if (newObjects.empty())
         return;
+
+    if (newObjectSources > 1)
+    {
+        std::sort(newObjects.begin(), newObjects.end(),
+            [](const DetectedObject& left, const DetectedObject& right)
+            {
+                return left.firstAppearanceTimeUsec < right.firstAppearanceTimeUsec;
+            });
+    }
 
     ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 

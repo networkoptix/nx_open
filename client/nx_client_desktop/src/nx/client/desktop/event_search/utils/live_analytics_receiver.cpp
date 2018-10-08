@@ -17,7 +17,7 @@ namespace nx::client::desktop {
 
 namespace {
 
-static constexpr int kMaximumBufferLength = 5000;
+static constexpr int kMaximumBufferLength = 1000;
 
 } // namespace
 
@@ -32,8 +32,8 @@ public:
     Private(LiveAnalyticsReceiver* q): q(q) {}
     virtual ~Private() override { releaseArchiveReader(); }
 
-    QnSecurityCamResourcePtr camera() const { return m_camera; }
-    void setCamera(const QnSecurityCamResourcePtr& camera);
+    QnVirtualCameraResourcePtr camera() const { return m_camera; }
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     QList<QnAbstractCompressedMetadataPtr> takeData();
 
@@ -45,13 +45,13 @@ private:
 
 private:
     std::unique_ptr<QnArchiveStreamReader> m_reader;
-    QnSecurityCamResourcePtr m_camera;
+    QnVirtualCameraResourcePtr m_camera;
 
     mutable QnMutex m_mutex;
     QList<QnAbstractCompressedMetadataPtr> m_buffer;
 };
 
-void LiveAnalyticsReceiver::Private::setCamera(const QnSecurityCamResourcePtr& value)
+void LiveAnalyticsReceiver::Private::setCamera(const QnVirtualCameraResourcePtr& value)
 {
     if (m_camera == value)
         return;
@@ -125,16 +125,24 @@ LiveAnalyticsReceiver::LiveAnalyticsReceiver(QObject* parent):
 {
 }
 
+LiveAnalyticsReceiver::LiveAnalyticsReceiver(
+    const QnVirtualCameraResourcePtr& camera, QObject* parent)
+    :
+    LiveAnalyticsReceiver(parent)
+{
+    setCamera(camera);
+}
+
 LiveAnalyticsReceiver::~LiveAnalyticsReceiver()
 {
 }
 
-QnSecurityCamResourcePtr LiveAnalyticsReceiver::camera() const
+QnVirtualCameraResourcePtr LiveAnalyticsReceiver::camera() const
 {
     return d->camera();
 }
 
-void LiveAnalyticsReceiver::setCamera(const QnSecurityCamResourcePtr& value)
+void LiveAnalyticsReceiver::setCamera(const QnVirtualCameraResourcePtr& value)
 {
     d->setCamera(value);
 }

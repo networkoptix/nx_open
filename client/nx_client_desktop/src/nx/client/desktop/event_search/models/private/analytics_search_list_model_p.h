@@ -5,6 +5,8 @@
 #include <chrono>
 #include <deque>
 #include <limits>
+#include <memory>
+#include <vector>
 
 #include <QtCore/QSet>
 #include <QtCore/QHash>
@@ -56,6 +58,7 @@ protected:
     virtual bool hasAccessRights() const override;
 
 private:
+    void updateMetadataReceivers();
     void processMetadata();
 
     int indexOf(const QnUuid& objectId) const;
@@ -94,7 +97,8 @@ private:
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
-    const QScopedPointer<LiveAnalyticsReceiver> m_metadataReceiver;
+
+    std::vector<std::unique_ptr<LiveAnalyticsReceiver>> m_metadataReceivers;
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
 
     analytics::storage::LookupResult m_prefetch;
