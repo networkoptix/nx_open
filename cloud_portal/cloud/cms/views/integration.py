@@ -59,12 +59,9 @@ def make_integrations_json(integrations, contexts=[]):
 def get_integration(request, product_id=None):
     products = Product.objects.filter(product_type__type=INTEGRATION,
                                       customizations__name__in=[settings.CUSTOMIZATION])
-    try:
-        return api_success(make_integrations_json([products.get(id=product_id)]))
-    except ObjectDoesNotExist:
-        pass
 
-    raise APINotFoundException("Could not find integration", )
+    return api_success(make_integrations_json([products.get(id=product_id)]))
+
 
 
 @api_view(("GET", ))
