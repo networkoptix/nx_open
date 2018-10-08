@@ -375,7 +375,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
                 m_remoteModuleInformation.localSystemId,
                 m_remoteModuleInformation.systemName,
                 data.getKey,
-                data.postKey); nx::network::http::StatusCode::isSuccessCode(statusCode))
+                data.postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings));
@@ -390,7 +390,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
         if (auto statusCode = applyCurrentSettings(
                 data.url,
                 data.postKey,
-                data.mergeOneServer); nx::network::http::StatusCode::isSuccessCode(statusCode))
+                data.mergeOneServer); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
                 .arg(data.takeRemoteSettings));
@@ -570,7 +570,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         if (auto statusCode = executeRemoteConfigure(
                 data,
                 remoteUrl,
-                postKey); nx::network::http::StatusCode::isSuccessCode(statusCode))
+                postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             return statusCode;
         }
