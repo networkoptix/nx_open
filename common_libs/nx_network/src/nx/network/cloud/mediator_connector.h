@@ -160,7 +160,23 @@ public:
         void* client) override;
 
 private:
+    struct RequestContext
+    {
+        nx::network::stun::Message request;
+        RequestHandler handler;
+        void* client = nullptr;
+    };
+
     MediatorEndpointProvider* m_endpointProvider = nullptr;
+    bool m_urlKnown = false;
+    std::vector<RequestContext> m_postponedRequests;
+
+    void onFetchEndpointCompletion(
+        nx::network::http::StatusCode::Value resultCode);
+
+    void failPendingRequests(SystemError::ErrorCode resultCode);
+
+    void sendPendingRequests();
 };
 
 //-------------------------------------------------------------------------------------------------
