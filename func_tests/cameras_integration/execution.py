@@ -126,11 +126,16 @@ class ServerStagesExecutor(object):
         self.rules = stage_rules
         self.stages = []
 
-    def run(self, name):  # types: (name) -> None
+    def run(self, name, delay=None):  # types: (str, timedelta) -> None
         rules = self.rules.get(name)
         if not rules:
             return
 
+        if delay:
+            _logger.debug(self, 'Server stage %r delay %s', name, delay)
+            time.sleep(delay.seconds)
+
+        _logger.debug(self, 'Server stage %r', name)
         current_stage = self.Stage(name, rules)
         checker = checks.Checker()
         start_time = timeit.default_timer()
@@ -147,6 +152,7 @@ class ServerStagesExecutor(object):
 
         current_stage.duration = timedelta(seconds=timeit.default_timer() - start_time)
         self.stages.append(current_stage)
+        _logger.info(self, 'Server stage %r result %r', name, name, current_stage.result.details)
 
     @property
     def is_successful(self):
@@ -190,11 +196,17 @@ class Stand(object):
 
     def run_all_stages(self, camera_cycle_delay, server_stage_delay):
             # types: (timedelta, timedelta) -> None
+        _logger.info(
+            'Stand run with %s cameras and %s server stages',
+            len(self.camera_stages), len(self.server_stages.stages))
         self.server_stages.run('before')
         self._run_camera_stages(camera_cycle_delay)
         self.server_stages.run('after')
-        time.sleep(server_stage_delay.seconds)
-        self.server_stages.run('delayed')
+        self.server_stages.run('delayed', delay=server_stage_delay)
+        _logger.info(
+            'Stand run camera success rate %s/%s, server stages result: %s',
+            sum(1 if c.is_successful else 0 for c in self.camera_stages), len(self.camera_stages),
+            self.server_stages.is_successful)
 
     @property
     def is_successful(self):
