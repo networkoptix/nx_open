@@ -21,7 +21,7 @@ public:
     };
 
     PluginEventModel(QObject* parent = nullptr);
-    ~PluginEventModel();
+    virtual ~PluginEventModel() override;
 
     void buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines);
 

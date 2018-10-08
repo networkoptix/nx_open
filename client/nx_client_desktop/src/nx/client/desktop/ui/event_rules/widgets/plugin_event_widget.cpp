@@ -81,6 +81,7 @@ void PluginEventWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
+
     QScopedValueRollback<bool> guard(m_updating, true);
 
     if (fields.testFlag(Field::eventResources))

@@ -18,7 +18,7 @@ class PluginEventWidget: public QnAbstractBusinessParamsWidget
 
 public:
     explicit PluginEventWidget(QWidget* parent = nullptr);
-    ~PluginEventWidget();
+    virtual ~PluginEventWidget() override;
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 

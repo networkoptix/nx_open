@@ -29,8 +29,6 @@
 #include <nx/vms/api/data/videowall_data.h>
 #include <nx/vms/api/data/webpage_data.h>
 
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -467,7 +465,6 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
         = target.dynamicCast<nx::vms::common::AnalyticsEngineResource>()
     )
         return Qn::NoPermissions;
-
 
     NX_ASSERT(false, "invalid resource type");
     return Qn::NoPermissions;

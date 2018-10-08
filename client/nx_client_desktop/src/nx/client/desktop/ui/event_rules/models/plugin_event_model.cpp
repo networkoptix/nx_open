@@ -35,7 +35,6 @@ void PluginEventModel::buildFromList(const nx::vms::common::AnalyticsEngineResou
             return item;
         };
 
-    using namespace nx::vms::event;
     clear();
 
     for (const auto& engine: engines)
