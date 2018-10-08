@@ -170,9 +170,9 @@ int runUi(QtSingleGuiApplication* application)
     QSize maxFfmpegHevcResolution = maxFfmpegResolution;
 
     const bool forceSoftwareOnlyDecoderForIPhone =
-        #if defined (Q_OS_IOS)
-            ini().enableSoftwareOnlyDecodeForXSXRIPhones
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXS_XR
+        #if defined(Q_OS_IOS)
+            ini().forceSoftwareDecoderForIPhoneXs
+            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXS
             && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
         #else
             false;
@@ -191,9 +191,9 @@ int runUi(QtSingleGuiApplication* application)
             }
             else if (forceSoftwareOnlyDecoderForIPhone)
             {
-                static const auto kUhd4kMaxFrameSize = QSize(4096, 3072);
-                maxFfmpegResolution = kUhd4kMaxFrameSize;
-                maxFfmpegHevcResolution = kUhd4kMaxFrameSize;
+                static const QSize kDci4kResolution(4096, 2160);
+                maxFfmpegResolution = kDci4kResolution;
+                maxFfmpegHevcResolution = kDci4kResolution;
             }
             else
             {
