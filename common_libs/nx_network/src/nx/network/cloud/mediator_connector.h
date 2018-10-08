@@ -127,7 +127,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Add support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
+ * Adds support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
  * It implicitely fetches endpoint from MediatorEndpointProvider and 
  * calls AbstractAsyncClient::connect.
  */
