@@ -25,9 +25,6 @@ public:
 
     virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
 
-    virtual void setOnMediatorAvailabilityChanged(
-        hpm::api::MediatorAvailabilityChangedHandler handler) override;
-
 private:
     nx::network::SocketAddress m_udpEndpoint;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_serverConnection;

@@ -91,8 +91,6 @@ void MediatorConnector::mockupMediatorUrl(
     }   
 
     establishTcpConnectionToMediatorAsync();
-    if (m_mediatorAvailabilityChangedHandler)
-        m_mediatorAvailabilityChangedHandler(true);
 }
 
 void MediatorConnector::setSystemCredentials(std::optional<SystemCredentials> value)
@@ -145,12 +143,6 @@ std::optional<nx::network::SocketAddress> MediatorConnector::udpEndpoint() const
     return m_mediatorEndpointProvider->udpEndpoint();
 }
 
-void MediatorConnector::setOnMediatorAvailabilityChanged(
-    MediatorAvailabilityChangedHandler handler)
-{
-    m_mediatorAvailabilityChangedHandler.swap(handler);
-}
-
 void MediatorConnector::setStunClientSettings(
     network::stun::AbstractAsyncClient::Settings stunClientSettings)
 {
@@ -179,8 +171,6 @@ void MediatorConnector::connectToMediatorAsync()
             else
             {
                 establishTcpConnectionToMediatorAsync();
-                if (m_mediatorAvailabilityChangedHandler)
-                    m_mediatorAvailabilityChangedHandler(true);
             }
         });
 }
