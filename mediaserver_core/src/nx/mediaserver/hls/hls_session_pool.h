@@ -121,6 +121,7 @@ public:
         const QString m_id;
     };
 
+    SessionPool();
     virtual ~SessionPool();
 
     /**
