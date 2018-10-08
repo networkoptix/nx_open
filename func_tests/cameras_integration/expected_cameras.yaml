@@ -89,7 +89,7 @@ Hanwha_PNM-9020V:
     primary:
     - {'codec': 'H264', 'resolution': '4096x1800'}
     - {'codec': 'H265', 'resolution': '3584x1576'}
-    - {'codec': 'MJPEG', 'resolution': '3072x1352'}
+    # - {'codec': 'MJPEG', 'resolution': '3072x1352'} # 'video.resolution' is '1024x1352', expected '3072x1352'
     secondary:
     - {'codec': 'H264', 'resolution': '512x224', 'fps': [24, 36]}
     - {'codec': 'H265', 'resolution': '1024x452', 'fps': [8, 12]}
@@ -243,7 +243,8 @@ DWC-MPA20M:
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
-      - {'codec': 'H264', 'resolution': '960x720'}
+      #- {'codec': 'H264', 'resolution': '960x720'} # Causes FFmpeg to return None.
+      - {'codec': 'H264', 'resolution': '1280x720'}
     secondary:
       - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
       - {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
@@ -652,7 +653,7 @@ DWC-PVX16W:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[8, 12], [25, 35]]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[25, 35]]} # TODO: Add more FPS.
     #secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?
