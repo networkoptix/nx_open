@@ -199,6 +199,12 @@
             slowPollingTimeout: 5000,
             pollingTimeout: 1000,
             retriesForMergeCredentialsToApply: 15
+        },
+
+        metrics:{
+            hide:{
+                p2pCounters: true
+            }
         }
     };
 })();

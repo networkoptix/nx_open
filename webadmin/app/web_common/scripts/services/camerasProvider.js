@@ -209,6 +209,9 @@ angular.module('nxCommon')
 
         camerasProvider.prototype.reloadTree = function(){
             var self = this;
+            if(!self.storage.serverStates){
+                self.storage.serverStates = {};
+            }
             function serverSorter(server){
                 server.url = self.extractDomain(server.url);
                 server.collapsed = self.storage.serverStates[server.id];
@@ -258,19 +261,15 @@ angular.module('nxCommon')
                 }
             }
 
-            var deferred = $q.defer();
             if(this.treeRequest){
                 this.treeRequest.abort('reloadTree');
             }
             this.treeRequest = self.systemAPI.getMediaServersAndCameras();
-            this.treeRequest.then(function(data){
+            return this.treeRequest.then(function(data){
                 setServers(data.data.reply['ec2/getMediaServersEx']);
                 self.getCameras(data.data.reply['ec2/getCamerasEx']);
-                deferred.resolve(self.cameras);
-            }, function(error){
-                deferred.reject(error);
+                return self.cameras;
             });
-            return deferred.promise;
         };
 
         camerasProvider.prototype.requestResources = function() {

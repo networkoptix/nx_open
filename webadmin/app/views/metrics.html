@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th ng-repeat="(key, description) in columns">
+                        {{key}}
+                    </th>
+                </tr>
+                <tr>
+                    <th>Server</th>
+                    <th ng-repeat="(key, description) in columns">
+                        {{description}}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="server in mediaServers">
+                    <td>
+                        {{server.name}}
+                    </td>
+                    <td ng-repeat="(key, description) in columns">
+                        {{serverStats[server.id][key].value}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
