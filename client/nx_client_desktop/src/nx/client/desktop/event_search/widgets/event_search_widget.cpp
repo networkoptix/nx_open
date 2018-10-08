@@ -262,7 +262,6 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
             }
 
             std::sort(plugins.begin(), plugins.end());
-            plugins = { plugins[1] };
             const bool severalPlugins = plugins.size() > 1;
 
             QMenu* currentMenu = analyticsMenu;
