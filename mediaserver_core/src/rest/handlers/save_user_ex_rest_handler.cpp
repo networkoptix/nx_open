@@ -13,11 +13,8 @@ QnSaveUserExRestHandler::QnSaveUserExRestHandler(QnMediaServerModule* serverModu
     nx::mediaserver::ServerModuleAware(serverModule)
 {}
 
-int QnSaveUserExRestHandler::executePost(
-    const QString& /*path*/,
-    const QnRequestParams& /*params*/,
-    const QByteArray& body,
-    QnJsonRestResult& result,
+int QnSaveUserExRestHandler::executePost(const QString& /*path*/,
+    const QnRequestParams& /*params*/, const QByteArray& body, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     using namespace nx::vms::api;
