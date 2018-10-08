@@ -172,7 +172,7 @@ int runUi(QtSingleGuiApplication* application)
     const bool forceSoftwareOnlyDecoderForIPhone =
         #if defined(Q_OS_IOS)
             ini().forceSoftwareDecoderForIPhoneXs
-            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXS
+            && iosDeviceInformation().majorVersion == IosDeviceInformation::iPhoneXs
             && iosDeviceInformation().type == IosDeviceInformation::Type::iPhone;
         #else
             false;
