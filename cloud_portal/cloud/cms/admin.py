@@ -89,12 +89,12 @@ class ProductAdmin(CMSAdmin):
         )
 
     def get_list_display(self, request):
-        if not request.user.is_superuser or True:
+        if not request.user.is_superuser:
             return self.list_display[1:]
         return self.list_display
 
     def product_settings(self, obj):
-        if False and not obj.product_type.single_customization:
+        if obj.product_type and not obj.product_type.single_customization:
             return format_html('')
         return format_html('<a class="btn btn-sm" href="{}">Settings</a>',
                            reverse('product_settings', args=[obj.id]))
