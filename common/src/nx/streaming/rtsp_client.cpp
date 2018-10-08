@@ -156,10 +156,9 @@ void QnRtspIoDevice::processRtcpData()
                     qWarning() << "QnRtspIoDevice::processRtcpData(): setDestAddr() failed: " << SystemError::getLastOSErrorText();
                 }
             }
-            bool gotValue = false;
-            QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
-            if (gotValue)
-                m_statistic = stats;
+            nx::streaming::rtp::RtcpSenderReport senderReport;
+            if (senderReport.read(rtcpBuffer, bytesRead))
+                m_senderReport = senderReport;
             int outBufSize = nx::streaming::rtp::buildClientRtcpReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
@@ -1158,17 +1157,6 @@ bool QnRtspClient::sendTeardown()
     return sendRequestInternal(std::move(request));
 }
 
-QnRtspStatistic QnRtspClient::parseServerRTCPReport(
-    const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
-{
-    QnRtspStatistic stats;
-    *gotStatistics = false;
-    if (!stats.senderReport.read(srcBuffer, srcBufferSize))
-        return stats;
-    *gotStatistics = true;
-    return stats;
-}
-
 bool QnRtspClient::sendKeepAliveIfNeeded()
 {
     // send rtsp keep alive
@@ -1346,12 +1334,11 @@ bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)
     if (!ioDevice)
         return false;
 
-    bool gotValue = false;
-    QnRtspStatistic stats = parseServerRTCPReport(data + 4, size - 4, &gotValue);
-    if (gotValue)
+    nx::streaming::rtp::RtcpSenderReport senderReport;
+    if (senderReport.read(data + 4, size - 4))
     {
-        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.senderReport.ssrc)
-            ioDevice->setStatistic(stats);
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == senderReport.ssrc)
+            ioDevice->setSenderReport(senderReport);
     }
     return true;
 }
