@@ -105,19 +105,21 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 @_stage(timeout=timedelta(minutes=30))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
-    for profile, configurations in profiles.items():
-        for index, configuration in enumerate(configurations):
-            configure_video(
-                run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+    # Enable recording to keep video stream open during entire stage.
+    with run.server.api.camera_recording(run.data['id']):
+        for profile, configurations in profiles.items():
+            for index, configuration in enumerate(configurations):
+                configure_video(
+                    run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
 
-            path = '{}{}'.format(profile, index)
-            yield Halt('Configuration {} is applied to server'.format(path))
-            for error in retry_expect_values(
-                    {'video': configuration},
-                    lambda: ffprobe_metadata(run.media_url(profile)),
-                    path=path):
-                yield error
-            yield Halt('Configuration {} is successful'.format(path))
+                path = '{}{}'.format(profile, index)
+                yield Halt('Configuration {} is applied to server'.format(path))
+                for error in retry_expect_values(
+                        {'video': configuration},
+                        lambda: ffprobe_metadata(run.media_url(profile)),
+                        path=path):
+                    yield error
+                yield Halt('Configuration {} is successful'.format(path))
 
     for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
         yield error
@@ -129,21 +131,23 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
     """
-    with run.server.api.camera_audio_enabled(run.data['id']):
-        for index, configuration in enumerate(configurations):
-            if not configuration.get('skip_codec_change'):
-                configure_audio(
-                    run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
-            else:
-                del configuration["skip_codec_change"]
+    # Enable recording to keep video stream open during entire stage.
+    with run.server.api.camera_recording(run.data['id']):
+        with run.server.api.camera_audio_enabled(run.data['id']):
+            for index, configuration in enumerate(configurations):
+                if not configuration.get('skip_codec_change'):
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+                else:
+                    del configuration["skip_codec_change"]
 
-            yield Halt('Configuration {} is applied to server'.format(index))
-            for error in retry_expect_values(
-                    {'audio': configuration},
-                    lambda: ffprobe_metadata(run.media_url()),
-                    path=index):
-                yield error
-            yield Halt('Configuration {} is successful'.format(index))
+                yield Halt('Configuration {} is applied to server'.format(index))
+                for error in retry_expect_values(
+                        {'audio': configuration},
+                        lambda: ffprobe_metadata(run.media_url()),
+                        path=index):
+                    yield error
+                yield Halt('Configuration {} is successful'.format(index))
 
     yield Success()
 
