@@ -30,8 +30,8 @@ std::chrono::microseconds CameraTimeHelper::getCameraTimestamp(
     int frequency)
 {
     // onvif
-    if (onvifTime.has_value())
-        return onvifTime.value();
+    if (onvifTime)
+        return *onvifTime;
 
     // rtcp
     if (senderReport.ntpTimestamp > 0)
