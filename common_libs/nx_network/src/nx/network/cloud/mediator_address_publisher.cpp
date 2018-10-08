@@ -7,14 +7,18 @@ namespace network {
 namespace cloud {
 
 const std::chrono::milliseconds MediatorAddressPublisher::kDefaultRetryInterval =
-    std::chrono::minutes(10);
+    std::chrono::minutes(1);
+
+static constexpr auto kCheckCloudCredentialsAvailabilityPeriod = std::chrono::seconds(17);
 
 MediatorAddressPublisher::MediatorAddressPublisher(
-    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection)
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+    hpm::api::AbstractCloudSystemCredentialsProvider* cloudCredentialsProvider)
 :
     m_retryInterval(kDefaultRetryInterval),
     m_isRequestInProgress(false),
-    m_mediatorConnection(std::move(mediatorConnection))
+    m_mediatorConnection(std::move(mediatorConnection)),
+    m_cloudCredentialsProvider(cloudCredentialsProvider)
 {
     bindToAioThread(m_mediatorConnection->getAioThread());
 
@@ -27,26 +31,18 @@ MediatorAddressPublisher::MediatorAddressPublisher(
         });
 }
 
-MediatorAddressPublisher::~MediatorAddressPublisher()
-{
-    if (isInSelfAioThread())
-        stopWhileInAioThread();
-}
-
 void MediatorAddressPublisher::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    BaseType::bindToAioThread(aioThread);
+    base_type::bindToAioThread(aioThread);
+    
     m_mediatorConnection->bindToAioThread(aioThread);
+    if (m_retryTimer)
+        m_retryTimer->bindToAioThread(aioThread);
 }
 
 void MediatorAddressPublisher::setRetryInterval(std::chrono::milliseconds interval)
 {
     m_mediatorConnection->dispatch([this, interval](){ m_retryInterval = interval; });
-}
-
-void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    m_mediatorConnection->pleaseStop(std::move(handler));
 }
 
 void MediatorAddressPublisher::updateAddresses(
@@ -66,6 +62,8 @@ void MediatorAddressPublisher::updateAddresses(
 
 void MediatorAddressPublisher::publishAddressesIfNeeded()
 {
+    NX_ASSERT(isInSelfAioThread());
+
     if (m_publishedAddresses == m_serverAddresses)
     {
         NX_VERBOSE(this, lm("No need to publish addresses: they are already published. Reporting success..."));
@@ -79,9 +77,18 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
         return;
     }
 
+    m_isRequestInProgress = true;
+
+    if (m_cloudCredentialsProvider->getSystemCredentials()) //< Cloud credentials available.
+        registerAddressesOnMediator();
+    else
+        scheduleRetry(kCheckCloudCredentialsAvailabilityPeriod);
+}
+
+void MediatorAddressPublisher::registerAddressesOnMediator()
+{
     NX_VERBOSE(this, lm("Issuing bind request to mediator..."));
 
-    m_isRequestInProgress = true;
     m_mediatorConnection->bind(
         nx::hpm::api::BindRequest(m_serverAddresses),
         [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
@@ -96,9 +103,8 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
             if (resultCode != nx::hpm::api::ResultCode::ok)
             {
                 m_publishedAddresses.clear();
-                return m_mediatorConnection->start(
-                    m_retryInterval,
-                    [this](){ publishAddressesIfNeeded(); });
+                scheduleRetry(m_retryInterval);
+                return;
             }
 
             m_publishedAddresses = addresses;
@@ -106,9 +112,23 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
         });
 }
 
+void MediatorAddressPublisher::scheduleRetry(
+    std::chrono::milliseconds delay)
+{
+    m_retryTimer = std::make_unique<nx::network::aio::Timer>();
+    m_retryTimer->start(
+        delay,
+        [this]()
+        {
+            m_retryTimer.reset();
+            publishAddressesIfNeeded();
+        });
+}
+
 void MediatorAddressPublisher::stopWhileInAioThread()
 {
     m_mediatorConnection.reset();
+    m_retryTimer.reset();
 }
 
 void MediatorAddressPublisher::reportResultToTheCaller(hpm::api::ResultCode resultCode)
