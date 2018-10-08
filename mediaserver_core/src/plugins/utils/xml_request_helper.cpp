@@ -49,7 +49,8 @@ XmlRequestHelper::Result::Result(
 
 QString XmlRequestHelper::Result::path() const
 {
-    return containerString(m_path, ">.<", "<", ">", "root");
+    return containerString(m_path,
+        /*delimiter*/ ">.<", /*prefix*/ "<", /*suffix*/ ">", /*empty*/ "root");
 }
 
 static QStringList appendPath(QStringList list, QString path)

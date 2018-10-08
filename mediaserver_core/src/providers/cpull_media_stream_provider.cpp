@@ -75,14 +75,6 @@ void QnClientPullMediaStreamProvider::run()
         }
         checkTime(data);
 
-        if (const auto camera = getResource().dynamicCast<QnSecurityCamResource>())
-        {
-            const bool isLocalCamera = camera->flags().testFlag(Qn::local_live_cam);
-            const auto status = camera->getStatus();
-            if (isLocalCamera && (status == Qn::Unauthorized || status == Qn::Offline))
-                camera->setStatus(Qn::Online);
-        }
-
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
         if (videoData && needKeyData())

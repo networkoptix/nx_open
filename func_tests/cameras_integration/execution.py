@@ -3,8 +3,9 @@ import time
 import timeit
 from datetime import datetime, timedelta
 from collections import OrderedDict
+from fnmatch import fnmatch
 
-from typing import List
+from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
 from . import checks, stage, stages
@@ -30,16 +31,18 @@ def report(status, start_time=None, duration=None, **details
 class CameraStagesExecutor(object):
     """ Controls camera stages execution flow and provides report.
     """
-    def __init__(self, server, camera_id, stage_rules, stage_hard_timeout):
-        # type: (Mediaserver, str, dict, timedelta) -> None
-        self.camera_id = camera_id
+    def __init__(self, server, name, stage_rules, stage_hard_timeout):
+            # type: (Mediaserver, str, dict, timedelta) -> None
+        self.name = name
+        self.id = stage_rules.get('discovery', {}).get('physicalId')
         self._stage_executors = self._make_stage_executors(stage_rules, stage_hard_timeout)
         self._warnings = ['Unknown stage ' + name for name in stage_rules]
         self._all_stage_steps = self._make_all_stage_steps(server)
         self._start_time = None
         self._duration = None
-        _logger.info('Camera %s is added with %s stage(s) and %s warning(s)',
-                     camera_id, len(self._stage_executors), len(self._warnings))
+        _logger.info(
+            'Camera %s(%s) is added with %s stage(s) and %s warning(s)',
+            self.name, self.id, len(self._stage_executors), len(self._warnings))
 
     def execute(self):  # types: () -> bool
         """ :returns True if all stages are finished, False otherwise (retry is required).
@@ -78,15 +81,15 @@ class CameraStagesExecutor(object):
                     yield
 
                 except StopIteration:
-                    _logger.info('%s stage result %s', self.camera_id, executors.details)
+                    _logger.info('%s stage result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
                         self._duration = timedelta(seconds=timeit.default_timer() - start_time)
                         return
                     break
 
-    def _make_stage_executors(self, stage_rules, hard_timeout
-                              ):  # type: (dict, timedelta) -> List[stage.Executor]
+    def _make_stage_executors(self, stage_rules, hard_timeout):
+            # type: (dict, timedelta) -> List[stage.Executor]
         executors = []
         for current_stage in stages.LIST:
             try:
@@ -94,11 +97,13 @@ class CameraStagesExecutor(object):
 
             except KeyError:
                 if current_stage.is_essential:
-                    _logger.warning('Skip camera %s, essential stage "%s" is not configured',
-                                    self.camera_id, current_stage.name)
+                    _logger.warning(
+                        'Skip camera %s, essential stage "%s" is not configured',
+                        self.name, current_stage.name)
+                    stage_rules.clear()
                     return []
             else:
-                executors.append(stage.Executor(self.camera_id, current_stage, rules, hard_timeout))
+                executors.append(stage.Executor(self.id, current_stage, rules, hard_timeout))
 
         return executors
 
@@ -169,19 +174,22 @@ class SpecificFeatures(object):
 
 
 class Stand(object):
-    def __init__(self, server, config, stage_hard_timeout):
-        # type: (Mediaserver, dict, timedelta) -> None
+    def __init__(self, server, config, stage_hard_timeout=timedelta(hours=1), camera_filters=['*']):
+            # type: (Mediaserver, Dict[str, dict], timedelta, List[str]) -> None
         self.server = server
         self.server_information = server.api.generic.get('api/moduleInformation')
         self.server_features = server.installation.specific_features()
         self.server_stages = ServerStagesExecutor(server, self._stage_rules(
-            config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}))
-        self.camera_stages = [CameraStagesExecutor(
-            server, camera_id, self._stage_rules(config_rules), stage_hard_timeout)
-            for camera_id, config_rules in config.items()]
+            config.pop(SERVER_STAGES_KEY) if SERVER_STAGES_KEY in config else {}
+        ))
+        self.camera_stages = [
+            CameraStagesExecutor(server, name, self._stage_rules(config_rules), stage_hard_timeout)
+            for name, config_rules in config.items()
+            if any(fnmatch(name, f) for f in camera_filters)
+        ]
 
-    def run_all_stages(self, camera_cycle_delay, server_stage_delay
-                       ):  # types: (timedelta, timedelta) -> None
+    def run_all_stages(self, camera_cycle_delay, server_stage_delay):
+            # types: (timedelta, timedelta) -> None
         self.server_stages.run('before')
         self._run_camera_stages(camera_cycle_delay)
         self.server_stages.run('after')
@@ -199,17 +207,22 @@ class Stand(object):
         result = OrderedDict()
         result[SERVER_STAGES_KEY] = self.server_stages.report
         for camera in self.camera_stages:
-            result[camera.camera_id] = camera.report
+            result[camera.name] = camera.report
 
-        for camera_id, _ in self.all_cameras().items():
-            if camera_id not in result:
-                result[camera_id] = report('unexpected', message='Unexpected camera on server')
+        test_camera_ids = set(camera.id for camera in self.camera_stages)
+        for name, description in self.all_cameras(verbose=False).items():
+            if description['physicalId'] not in test_camera_ids:
+                result[name] = report(
+                    'unexpected', description=description, message='Unexpected camera on server')
 
         _logger.debug('Report: %r', result)
         return result
 
-    def all_cameras(self):
-        return {c['physicalId']: c for c in self.server.api.get_resources('CamerasEx')}
+    def all_cameras(self, verbose):
+        return {
+            '{vendor}_{model}_{physicalId}'.format(**description).replace(' ', '_'): description
+            for description in self.server.api.get_resources('CamerasEx' if verbose else 'Cameras')
+        }
 
     def _run_camera_stages(self, cycle_delay):  # types: (timedelta) -> None
         _logger.info('Run all stages')

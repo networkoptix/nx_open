@@ -1,3 +1,5 @@
+#include <future>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/address_resolver.h>
@@ -127,7 +129,7 @@ protected:
 
     void andNewMediatorEndpointIsAvailable()
     {
-        while (m_mediatorConnector->udpEndpoint()->toString() !=
+        while (getMediatorUdpEndpoint().toString() !=
             m_mediator->moduleInstance()->impl()->stunUdpEndpoints().front().toString())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -145,6 +147,20 @@ protected:
     api::MediatorConnector& mediatorConnector()
     {
         return *m_mediatorConnector;
+    }
+
+    nx::network::SocketAddress getMediatorUdpEndpoint()
+    {
+        std::promise<nx::network::SocketAddress> mediatorUdpEndpointPromise;
+        mediatorConnector().fetchUdpEndpoint(
+            [&mediatorUdpEndpointPromise](
+                auto /*resultCode*/,
+                nx::network::SocketAddress udpEndpoint)
+            {
+                mediatorUdpEndpointPromise.set_value(udpEndpoint);
+            });
+
+        return mediatorUdpEndpointPromise.get_future().get();
     }
 
 private:
@@ -404,7 +420,7 @@ protected:
 
         ASSERT_EQ(
             nx::network::url::getEndpoint(m_udpUrl),
-            *mediatorConnector().udpEndpoint());
+            getMediatorUdpEndpoint());
     }
 
 private:

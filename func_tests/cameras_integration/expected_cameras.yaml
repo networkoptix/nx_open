@@ -19,8 +19,9 @@ SERVER_STAGES:
       transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
 
 
-00-09-18-4E-55-3A:
+Hanwha_XNP-6120H:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-4E-55-3A
     vendor: Hanwha Techwin
     model: XNP-6120H
 
@@ -36,23 +37,23 @@ SERVER_STAGES:
     ptzCapabilities: 428825855
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [3, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [3, 10]}
 
   video_parameters:
     primary:
-    - {'codec': 'H264', 'resolution': '1920x1080'} 
-    - {'codec': 'H265', 'resolution': '1280x1024'} 
+    - {'codec': 'H264', 'resolution': '1920x1080'}
+    - {'codec': 'H265', 'resolution': '1280x1024'}
     - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
-    - {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]} 
-    - {'codec': 'H265', 'resolution': '320x240', 'fps': [55, 65]}
-    - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [25, 35]}
+    - {'codec': 'H264', 'resolution': '640x360', 'fps': [8, 12]}
+    - {'codec': 'H265', 'resolution': '320x240', 'fps': [13, 17]}
+    - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
     stream_urls:
       "1": "rtsp://192.168.200.8:554/profile7/media.smp"
       "2": "rtsp://192.168.200.8:554/profile9/media.smp"
 
-  audio_parameters if version > '4':
+  audio_parameters:
     - {'codec': 'AAC'}
     #- {'codec': 'G711'} # ffprobe gets MP2
     #- {'codec': 'G726'} # G711, but expected G726. Server bug?
@@ -67,8 +68,9 @@ SERVER_STAGES:
     - {point: '127-22-1', preset: '4:NxWitness4'}
 
 
-00-09-18-4F-74-4E:
+Hanwha_PNM-9020V:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-4F-74-4E
     vendor: Hanwha Techwin
     model: PNM-9020V
 
@@ -80,8 +82,8 @@ SERVER_STAGES:
     firmware: '1.01_161214'
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '4096x1800', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '512x224', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '4096x1800', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '512x224', 'fps': [5, 10]}
 
   video_parameters:
     primary:
@@ -89,13 +91,13 @@ SERVER_STAGES:
     - {'codec': 'H265', 'resolution': '3584x1576'}
     - {'codec': 'MJPEG', 'resolution': '3072x1352'}
     secondary:
-    - {'codec': 'H264', 'resolution': '512x224', 'fps': [25, 35]}
-    - {'codec': 'H265', 'resolution': '1024x452', 'fps': [17, 23]}
+    - {'codec': 'H264', 'resolution': '512x224', 'fps': [24, 36]}
+    - {'codec': 'H265', 'resolution': '1024x452', 'fps': [8, 12]}
     stream_urls:
       "1": "rtsp://192.168.200.12:554/profile4/media.smp"
       "2": "rtsp://192.168.200.12:554/profile5/media.smp"
 
-#  audio_parameters if version > '4':
+#  audio_parameters:
 #    - {'codec': 'AAC'}  # The camera has audio_parameters input, but ffprobe does not
     #- {'codec': 'G711'} # detect any sound. Need to connect a mic???
     #- {'codec': 'G726'}
@@ -105,8 +107,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
-00-09-18-51-67-55:
+Hanwha_SNP-6321:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-51-67-55
     vendor: Hanwha Techwin
     model: SNP-6321
 
@@ -122,16 +125,16 @@ SERVER_STAGES:
     ptzCapabilities: 428825855
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
     primary:
     - {'codec': 'H264', 'resolution': '1920x1080'}
     - {'codec': 'H264', 'resolution': '1280x1024'}
     secondary:
-    - {'codec': 'H264', 'resolution': '640x360', 'fps': [4, 8]}
-    - {'codec': 'MJPEG', 'resolution': '720x576', 'fps': [25, 35]}
+    - {'codec': 'H264', 'resolution': '640x360', 'fps': [8, 12]}
+    - {'codec': 'MJPEG', 'resolution': '720x576', 'fps': [24, 36]}
     stream_urls:
       "1": "rtsp://192.168.200.2:554/profile3/media.smp"
       "2": "rtsp://192.168.200.2:554/profile4/media.smp"
@@ -149,8 +152,9 @@ SERVER_STAGES:
     - {point: '279-22-1', preset: '2:NxWitness2'}
 
 
-00-16-6C-C5-31-21:
+Hanwha_XNB-6000:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-16-6C-C5-31-21
     vendor: Hanwha Techwin
     model: XNB-6000
 
@@ -166,8 +170,8 @@ SERVER_STAGES:
     ptzCapabilities: 428802056
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
     primary:
@@ -175,13 +179,13 @@ SERVER_STAGES:
       - {'codec': 'H265', 'resolution': '1280x1024'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x360', 'fps': [4, 8]}
-      - {'codec': 'H265', 'resolution': '800x600', 'fps': [35, 45]}
+      - {'codec': 'H264', 'resolution': '640x360', 'fps': [24, 36]}
+      - {'codec': 'H265', 'resolution': '800x600', 'fps': [8, 12]}
     stream_urls:
       "1": "rtsp://192.168.200.6:554/profile6/media.smp"
       "2": "rtsp://192.168.200.6:554/profile7/media.smp"
 
-  audio_parameters if version > '4':
+  audio_parameters:
     - {'codec': 'AAC'}
     #- {'codec': 'G711'} # MP2??
     #- {'codec': 'G726'} # codec' is 'G711', expected 'G726' server bug?
@@ -191,8 +195,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
-00-1A-07-0A-3A-88:
+Arecont-2245PM:
   discovery:
+    physicalId: 00-1A-07-0A-3A-88
     vendor: ArecontVision
     model: 2245PM
 
@@ -202,22 +207,25 @@ SERVER_STAGES:
   attributes:
     firmware: 65225
 
-  recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]} #primary.fps 9000!
-    secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
+  # Video never works, needs to be tested separately.
+  recording if False:
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '960x544', 'fps': [1, 10]}
 
   video_parameters:
     stream_urls:
-      "1": "tftp://192.168.200.7:69/h264?res=full;x0=0;y0=0;x1=1920;y1=1088;qp=24;doublescan=0;ssn=*;iframe=1;"
-      "2": "tftp://192.168.200.7:69/h264?res=half;x0=0;y0=0;x1=1920;y1=1088;qp=33;doublescan=0;ssn=*;iframe=1;"
+      "1": "tftp://192.168.200.7:69/h264?res=full;x0=0;y0=0;x1=1920;y1=1088;qp=*;doublescan=0;ssn=*;iframe=1;"
+      "2": "tftp://192.168.200.7:69/h264?res=half;x0=0;y0=0;x1=1920;y1=1088;qp=*;doublescan=0;ssn=*;iframe=1;"
 
-  audio_parameters if version > '4':
+  # Audio never works as well :).
+  audio_parameters if False:
     # I am not sure if this one has got audio_parameters in. The doc is very sparse.
     - {'skip_codec_change': True, 'codec': 'G711'}
 
 
-00-1C-A6-01-20-A4:
+DWC-MPA20M:
   discovery:
+    physicalId: 00-1C-A6-01-20-A4
     vendor: Digital Watchdog
     model: DWC-MPA20M
 
@@ -229,24 +237,25 @@ SERVER_STAGES:
     isAudioSupported: 0
 
   recording:
-    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'H264', 'resolution': '960x720'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
-      - {'codec': 'H264', 'resolution': '320x240', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
+      - {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
     stream_urls:
       '1': "rtsp://192.168.200.19:1554/h264"
       '2': "rtsp://192.168.200.19:8554/h264"
 
 
-00-1C-A6-01-21-97: # Needs a reboot
+# Needs a reboot every time. Camera is VERY BUGGY!
+DWC-MD421D_1.1.1.8:
   discovery:
+    physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
     model: DWC-MD421D
 
@@ -262,23 +271,22 @@ SERVER_STAGES:
     ptzCapabilities: 8405004
 
   recording:
-    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[10, 30], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [2, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [25, 35]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [2, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'H264', 'resolution': '960x720'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
-      - {'codec': 'H264', 'resolution': '320x240', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
+      - {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
     stream_urls:
       '1': "rtsp://192.168.200.13:554/h264"
       '2': "rtsp://192.168.200.13:8554/h264"
 
-  audio_parameters if version > '4':
-    # Not sure if it has audio_parameters, but isAudioSupported == 1.
+  # Not sure if it has audio_parameters, but isAudioSupported == 1.
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'MP2'}
 
   io_events:
@@ -286,8 +294,9 @@ SERVER_STAGES:
     outs: [{id: 't_RelayOut-0'}]
 
 
-00-1C-A6-01-27-1A:
+DWC-MD421D_1.1.2.0:
   discovery:
+    physicalId: 00-1C-A6-01-27-1A
     vendor: Digital Watchdog
     model: DWC-MD421D
 
@@ -303,23 +312,22 @@ SERVER_STAGES:
     ptzCapabilities: 8405004
 
   recording:
-    #'primary.resolution' is '640x352', expected '1920x1080'. primary is confused w. secondary?
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[12, 18], [5, 9]]}
-    secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'H264', 'resolution': '800x608'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
-      - {'codec': 'H264', 'resolution': '704x528', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
+      - {'codec': 'H264', 'resolution': '704x528', 'fps': [24, 36]}
     stream_urls:
       '1': "rtsp://192.168.200.14:554/h264"
       '2': "rtsp://192.168.200.14:8554/h264"
 
-  audio_parameters if version > '4':
-    # "'0.skip_codec_change' is None, expected True". Looks up for skip_codec... setting on a cam!
+  # FFmpeg is unable to discover any streams when audio is enabled.
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'MP2'}
 
   io_events:
@@ -327,8 +335,9 @@ SERVER_STAGES:
     outs: [{id: 't_RelayOut-0'}]
 
 
-00-50-1A-1A-11-F4:
+IqEye_A32N:
   discovery:
+    physicalId: 00-50-1A-1A-11-F4
     vendor: IqEye
     model: IQA32N
 
@@ -338,13 +347,14 @@ SERVER_STAGES:
   #attributes:
     # The cam is very unstable. i am still unable to retrieve stream URLs from it
 
-  recording:
-    #"FFprobe returned no valid stream info" in >10 mins. This cam is unpredictable.
-    primary: {'codec': 'MJPEG', 'resolution': '352x240', 'fps': [[0.1, 14.9], [15, 30]]}
+  # "FFprobe returned no valid stream info" in >10 mins. This cam is unpredictable.
+  recording if False:
+    primary: {'codec': 'MJPEG', 'resolution': '352x240', 'fps': [[13, 17], [8, 12]]}
 
 
-28-57-BE-B7-12-D1:
+Hikvision_DS-2CD2132F-IWS:
   discovery:
+    physicalId: 28-57-BE-B7-12-D1
     vendor: Hikvision
     model: DS-2CD2132F-IWS
 
@@ -357,20 +367,20 @@ SERVER_STAGES:
     isAudioSupported: 1
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[15, 25], [4, 14]]}
-    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [10, 20]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [10, 20]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '2048x1536'}
       - {'codec': 'H264', 'resolution': '1920x1080'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'H264', 'resolution': '1280x720', 'fps': [7, 13]}
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [8, 12]}
+      - {'codec': 'H264', 'resolution': '1280x720', 'fps': [24, 36]}
 
-  audio_parameters if version > '4':
   # Also has G722 and MP2L2 in spec. But no advanced setting to switch to those.
   # "Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -378,8 +388,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOut_0'}]
 
 
-4C-BD-8F-E2-1C-87:
+Hikvision_DS-2CD2342WD-I:
   discovery:
+    physicalId: 4C-BD-8F-E2-1C-87
     vendor: Hikvision
     model: DS-2CD2342WD-I
 
@@ -392,20 +403,21 @@ SERVER_STAGES:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[4, 14], [15, 30]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[15, 25], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '2688x1520'}
       - {'codec': 'H264', 'resolution': '1920x1080'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'H264', 'resolution': '352x240', 'fps': [7, 13]}
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [8, 12]}
+      - {'codec': 'H264', 'resolution': '352x240', 'fps': [24, 36]}
 
 
-AC-CC-8E-48-FC-DA:
+Axis_P1405E:
   discovery:
+    physicalId: AC-CC-8E-48-FC-DA
     vendor: Axis
     model: AXISP1405E
 
@@ -417,24 +429,24 @@ AC-CC-8E-48-FC-DA:
     isAudioSupported: 0
 
   recording:
-    # "'primary.fps' is 90000, expected to be in [25, 35]"!
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[25, 35], [10, 20]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[20, 30]]}  # TODO: Add more FPS.
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'MJPEG', 'resolution': '1280x800'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '800x450', 'fps': [7, 13]}
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [20, 30]}
+      - {'codec': 'MJPEG', 'resolution': '800x450', 'fps': [20, 30]} # TODO: Use different FPS.
     stream_urls:
       "1": "rtsp://192.168.200.11:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.11:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
 
-AC-CC-8E-95-33-57:
+Axis_M3046V:
   discovery:
+    physicalId: AC-CC-8E-95-33-57
     vendor: Axis
     model: AXISM3046V
 
@@ -447,23 +459,24 @@ AC-CC-8E-95-33-57:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[10, 20], [55, 65]]}
-    secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '2688x1520', 'fps': [[13, 17], [20, 30]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x360', 'fps': [5, 10]}
 
   video_parameters:
     primary:
-      - {'codec': 'H264', 'resolution': '2688x1520'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
+      - {'codec': 'H264', 'resolution': '2688x1520'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [7, 13]}
+      - {'codec': 'MJPEG', 'resolution': '1280x720', 'fps': [24, 36]}
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [8, 12]}
     stream_urls:
       "1": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessPrimary"
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
 
-ACTI_E924-A-XX-15C-00035:
+Acti_E924:
   discovery:
+    physicalId: ACTI_E924-A-XX-15C-00035
     vendor: ACTI
     name: ACTi-E924
     model: E924
@@ -476,30 +489,33 @@ ACTI_E924-A-XX-15C-00035:
     firmware: A1D-500-V6.08.30-AC
     isAudioSupported: 1
 
-  recording:
-    primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [[5, 10], [10, 20]]}
-    secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
+  # FFprobe hangs for this camera at all times!
+  recording if False:
+    primary: {'codec': 'H264', 'resolution': '2592x1944', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
 
-# FFprobe hangs for this camera
-  video_parameters:
+  # FFprobe hangs for this camera at all times!
+  video_parameters if False:
     primary:
       - {'codec': 'H264', 'resolution': '2592x1944'}
       - {'codec': 'MJPEG', 'resolution': '1920x1080'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x480', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [25, 35]}
+      - {'codec': 'H264', 'resolution': '640x480', 'fps': [8, 12]}
+      - {'codec': 'MJPEG', 'resolution': '800x600', 'fps': [24, 36]}
     stream_urls:
       "1": "rtsp://192.168.200.21:7070/stream1/"
       "2": "rtsp://192.168.200.21:7070/stream2/"
 
-  audio_parameters if version > '4':
+  # FFprobe hangs for this camera at all times!
   # Dunno which codecs are supported. Has got volume and sensitivity advanced settings,
   # but not codec. Additional settings tests may be implemented if needed.
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
 
-F0-7D-68-09-3E-BA:
+Dlink_DCS-3716:
   discovery:
+    physicalId: F0-7D-68-09-3E-BA
     vendor: Dlink
     model: DCS-3716
 
@@ -507,8 +523,8 @@ F0-7D-68-09-3E-BA:
     password: auto
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[1, 99]]}
-    secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
+    primary: {'codec': 'H264', 'resolution': '2048x1536', 'fps': [[20, 40]]}
+    #secondary: {'codec': 'H264', 'resolution': '480x360', 'fps': [0.5, 10]}
 
   video_parameters:
     stream_urls:
@@ -516,8 +532,9 @@ F0-7D-68-09-3E-BA:
       "2": "rtsp://192.168.200.15:554/live2.sdp"
 
 
-urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
+Vista_VK2-1080VR:
   discovery:
+    physicalId: urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea
     vendor: VISTA
     model: VK2-1080VRDIR37e
     mac: 00-07-D8-17-A4-EA
@@ -530,22 +547,23 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
     isAudioSupported: 0
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[5, 9], [10, 20]]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [25, 35]]}
 
   video_parameters:
-    primary:
-      - {'codec': 'H264', 'resolution': '1920x1080'}
-      - {'codec': 'H264', 'resolution': '1280x720'} # !resolution range is empty in all_cameras.json
-    secondary:
-      - {'codec': 'H264', 'resolution': '480x360', 'fps': [3, 9]} # !resolution range is empty in all_cameras.json
-      - {'codec': 'H264', 'resolution': '640x360', 'fps': [17, 23]} # fps range 1, 100 (sic!) in all_cameras.json
+#    primary:
+#      - {'codec': 'H264', 'resolution': '1920x1080'}
+#      - {'codec': 'H264', 'resolution': '1280x720'} # !resolution range is empty in all_cameras.json
+#    secondary:
+#      - {'codec': 'H264', 'resolution': '480x360', 'fps': [8, 12]} # !resolution range is empty in all_cameras.json
+#      - {'codec': 'H264', 'resolution': '640x360', 'fps': [24, 36]} # fps range 1, 100 (sic!) in all_cameras.json
     stream_urls:
       "1": "rtsp://192.168.200.16:554/1/stream1/Profile1"
       "2": "rtsp://192.168.200.16:554/1/stream3/Profile3"
 
 
-urn_uuid_32313262-3332-6666-3831-000df1212b32:
+DWC-MV421TIR:
   discovery:
+    physicalId: urn_uuid_32313262-3332-6666-3831-000df1212b32
     vendor: Digital Watchdog
     model: DWC-MV421TIR
     mac: 00-0D-F1-21-2B-32
@@ -563,19 +581,20 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
 
   # FIXME: There is a bug: no matter which FPS you set for recording, it's always 30.
   recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[20, 40]]}
-    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
+    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [5, 10]}
 
   video_parameters:
     primary:
       - {'codec': 'H264', 'resolution': '1920x1080'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
-      - {'codec': 'H264', 'resolution': '640x352', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
+      - {'codec': 'MJPEG', 'resolution': '320x240', 'fps': [24, 36]}
 
-  audio_parameters if version > '4': # Didn't find any data on supported audio_parameters codecs. This needs checking
-    #"Audio stream was not discovered by ffprobe."
+  # Didn't find any data on supported audio_parameters codecs. This needs checking
+  # "Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:
@@ -583,8 +602,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     outs: [{id: 'relay01'}]
 
 
-urn_uuid_32313534-3532-6666-3338-000df1215452:
+DWC-MV84WiAC6:
   discovery:
+    physicalId: urn_uuid_32313534-3532-6666-3338-000df1215452
     vendor: Digital Watchdog
     model: DWC-MV84WiAC6
     mac: 00-0D-F1-21-54-52
@@ -601,20 +621,21 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[20, 30], [12, 18]]}
-    secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[13, 17], [8, 12]]}
+    #secondary: {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
 
   video_parameters:
     primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
       - {'codec': 'H264', 'resolution': '2560x1440'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
-      - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '352x288', 'fps': [8, 12]}
+      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
 
 
-urn_uuid_32313563-6163-6665-6436-000df1215cac:
+DWC-PVX16W:
   discovery:
+    physicalId: urn_uuid_32313563-6163-6665-6436-000df1215cac
     vendor: Digital Watchdog
     model: DWC-PVX16W
     mac: 00-0D-F1-21-5C-AC
@@ -631,8 +652,8 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
     ptzCapabilities: 16388
 
   recording:
-    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[5, 15], [20, 35]]}
-    secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]}
+    primary: {'codec': 'H264', 'resolution': '2560x1440', 'fps': [[8, 12], [25, 35]]}
+    #secondary: {'codec': 'H264', 'resolution': '352x240', 'fps': [3, 8]}
     # Although in all_cameras.json range is "352x240,352x288, 640x480,704x480,704x576", 352x240
     # is applied when trying to use 352x288. Bug on the server or camera?
 
@@ -643,12 +664,12 @@ urn_uuid_32313563-6163-6665-6436-000df1215cac:
       - {'codec': 'H264', 'resolution': '2560x1440'}
       - {'codec': 'MJPEG', 'resolution': '1280x960'}
     secondary:
-      - {'codec': 'H264', 'resolution': '352x288', 'fps': [4, 8]}
-      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [17, 23]}
+      - {'codec': 'H264', 'resolution': '352x288', 'fps': [8, 12]}
+      - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
 
-  audio_parameters if version > '4':
   # Didn't find any data on supported audio_parameters codecs. This needs checking.
-    #"Audio stream was not discovered by ffprobe."
+  #"Audio stream was not discovered by ffprobe."
+  audio_parameters if False:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
   io_events:

@@ -512,7 +512,7 @@ void CloudServerSocket::onConnectionRequested(
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
     auto acceptors = TunnelAcceptorFactory::instance().create(
-        *m_mediatorConnector->udpEndpoint(),
+        m_mediatorConnector->udpEndpoint(),
         event);
     for (auto& acceptor: acceptors)
     {

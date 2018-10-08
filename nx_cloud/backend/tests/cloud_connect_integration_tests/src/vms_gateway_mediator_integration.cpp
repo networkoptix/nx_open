@@ -76,6 +76,7 @@ protected:
         // Specifying mediator port to gateway.
         const auto mediatorEndpointStr = m_mediatorTcpEndpoint.toStdString();
         m_vmsGateway.addArg("-general/mediatorEndpoint", mediatorEndpointStr.c_str());
+        m_vmsGateway.addArg("--cloudConnect/publicIpAddress=127.0.0.1");
 
         ASSERT_TRUE(m_vmsGateway.startAndWaitUntilStarted());
     }

@@ -194,10 +194,10 @@ public:
     {
     }
 
-    virtual boost::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override
+    virtual std::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override
     {
         if (m_cloudSystemId.empty())
-            return boost::none;
+            return std::nullopt;
 
         nx::hpm::api::SystemCredentials systemCredentials;
         systemCredentials.systemId = m_cloudSystemId.c_str();

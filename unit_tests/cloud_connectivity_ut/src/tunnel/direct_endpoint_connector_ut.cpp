@@ -1,3 +1,5 @@
+#include <optional>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
@@ -62,10 +64,10 @@ TEST_F(TcpTunnelConnector, failModuleInformation)
     const auto connectResult = doSimpleConnectTest(
         std::chrono::seconds(5),
         MediaServerEmulator::ActionToTake::proceedWithConnection,
-        boost::none,
+        std::nullopt,
         [](MediaServerEmulator* server)
         {
-            server->setServerIdForModuleInformation(boost::none);
+            server->setServerIdForModuleInformation(std::nullopt);
         });
 
     ASSERT_EQ(SystemError::connectionRefused, connectResult.errorCode);
@@ -87,14 +89,14 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
 
     struct TestData
     {
-        boost::optional<nx::String> token;
+        std::optional<nx::String> token;
         bool isCorrect;
     };
 
     const TestData testSystemIdArray[] = {
         {system1.id, true},
         {QnUuid::createUuid().toSimpleByteArray(), false},
-        {boost::none, false} };
+        {std::nullopt, false} };
 
     // Connecting to a specific server within a system,
     // but connected to another server of that system.
@@ -103,7 +105,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
     const TestData testPeerIdArray[] = {
         { peerId.toByteArray(), true },
         { QnUuid::createUuid().toByteArray(), false },
-        { boost::none, false } };
+        { std::nullopt, false } };
 
     for (size_t i = 0; i < sizeof(testSystemIdArray) / sizeof(*testSystemIdArray); ++i)
     {
@@ -123,7 +125,7 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
                 MediaServerEmulator::ActionToTake::proceedWithConnection,
                 system1,
                 server1,
-                boost::none,
+                std::nullopt,
                 &connectResult);
 
             if (systemIdTestContext.isCorrect && peerIdTestContext.isCorrect)

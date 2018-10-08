@@ -69,21 +69,18 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=15))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
-    checker = Checker()
-    # Checking if the camera is recording already
-    while not checker.expect_values(dict(status="Online"), run.data):
-        yield checker.result()
-
     for fps_index, fps_range in enumerate(primary['fps']):
+        # Make sure there is a gap between recordings.
+        for error in retry_expect_values(dict(status="Online"), lambda: run.data):
+            yield error
+
         current_configuration = primary.copy()
         current_configuration['fps'] = fps_range
         with run.server.api.camera_recording(run.data['id'], fps=fps_avg(fps_range)):
-            yield Halt('Trying to start recording')
-
-            while not checker.expect_values(dict(status="Recording"), run.data):
-                yield checker.result()
+            for error in retry_expect_values(dict(status="Recording"), lambda: run.data):
+                yield error
 
             while True:
                 recorded_periods = run.server.api.get_recorded_time_periods(run.data['id'])
@@ -93,43 +90,38 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 
             for profile, configuration in (
                     ('primary', current_configuration), ('secondary', secondary)):
-                if not configuration:
-                    continue
+                if configuration:
+                    path = '{}{}'.format(profile, fps_index)
+                    for error in retry_expect_values(
+                            {'video': configuration},
+                            lambda: ffprobe_metadata(run.media_url(profile)),
+                            path=path):
+                        yield error
+                    yield Halt('Configuration {} is successful'.format(path))
 
-                start_time = timeit.default_timer()
-                while True:
-                    time_shift = timedelta(seconds=timeit.default_timer() - start_time)
-                    streams = ffprobe_streams(run.media_url(
-                        profile, recorded_periods[-1].start + time_shift))
-                    if not streams:
-                        yield Halt('FPS index {}: ffprobe did not find stream {}'.format(
-                            fps_index, profile))
-                        continue
-                    yield expect_values(
-                        configuration, ffprobe_metadata(streams[0]), profile)
+    yield Success()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=25))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
-        for profile, configurations in profiles.items():
-            for index, configuration in enumerate(configurations):
-                configure_video(
-                    run.server.api, run.id, run.data['cameraAdvancedParams'], profile,
-                    **configuration
-                    )
-                while True:
-                    streams = ffprobe_streams(run.media_url(profile))
-                    profile_id = '{}[{}]'.format(profile, index)
-                    if not streams:
-                        yield Halt('Video stream {} was not discovered by ffprobe'.format(
-                            profile_id))
-                        continue
+    for profile, configurations in profiles.items():
+        for index, configuration in enumerate(configurations):
+            configure_video(
+                run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
 
-                    yield expect_values(configuration, ffprobe_metadata(streams[0]), profile_id)
+            path = '{}{}'.format(profile, index)
+            yield Halt('Configuration {} is applied to server'.format(path))
+            for error in retry_expect_values(
+                    {'video': configuration},
+                    lambda: ffprobe_metadata(run.media_url(profile)),
+                    path=path):
+                yield error
+            yield Halt('Configuration {} is successful'.format(path))
 
-        while stream_urls:
-            yield expect_values({'streamUrls': stream_urls}, run.data, syntax='*')
+    for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
+        yield error
+    yield Success()
 
 
 @_stage(timeout=timedelta(minutes=6))
@@ -138,7 +130,6 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
     corresponds to the expected one. Disable the audio in the end.
     """
     with run.server.api.camera_audio_enabled(run.data['id']):
-        # Changing the audio codec accordingly to config
         for index, configuration in enumerate(configurations):
             if not configuration.get('skip_codec_change'):
                 configure_audio(
@@ -146,22 +137,15 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             else:
                 del configuration["skip_codec_change"]
 
-            _logger.info('Check with ffprobe if the new audio codec corresponds to the config.')
-            while True:
-                try:
-                    streams = ffprobe_streams(run.media_url())
-                    if not streams:
-                        yield Halt(
-                            'No stream (neither audio nor video) was discovered by ffprobe.')
-                        continue
-                    audio_stream = streams[1]
-                except IndexError:
-                    yield Halt(
-                        'Audio stream was not discovered by ffprobe (video stream was found).')
-                    continue
+            yield Halt('Configuration {} is applied to server'.format(index))
+            for error in retry_expect_values(
+                    {'audio': configuration},
+                    lambda: ffprobe_metadata(run.media_url()),
+                    path=index):
+                yield error
+            yield Halt('Configuration {} is successful'.format(index))
 
-                yield expect_values(
-                    configuration, {'codec': audio_stream.get('codec_name').upper()}, index)
+    yield Success()
 
 
 @_stage()
@@ -202,7 +186,7 @@ def io_events(run, ins, outs):
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
 
 
-@_stage(timeout=timedelta(minutes=2))
+@_stage(timeout=timedelta(minutes=5))
 def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:
@@ -233,7 +217,8 @@ def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generato
                 for error in execute('AbsoluteDeviceMove', speed=100, **point):
                     yield error
 
-            yield Halt('Wait for move to {}'.format(point))
+            yield Halt('Wait for move to {} by {}'.format(
+                point, 'preset' if use_preset else 'point'))
             for error in execute('GetDevicePosition'):
                 yield error
 

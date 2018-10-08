@@ -137,10 +137,7 @@ Authenticator::Result Authenticator::tryAllMethods(
             connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::enabledChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::hashChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::passwordChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::cryptSha512HashChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::realmChanged, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::hashesChanged, this, removeKey, Qt::DirectConnection);
             connect(user.data(), &QnUserResource::sessionExpired, this, removeKey, Qt::DirectConnection);
         }
     }

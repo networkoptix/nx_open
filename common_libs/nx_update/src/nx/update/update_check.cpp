@@ -8,6 +8,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace update {
@@ -253,6 +254,9 @@ bool findPackage(
     nx::update::Package* outPackage)
 {
     if (updateInformation.cloudHost != cloudHost && boundToCloud)
+        return false;
+
+    if (updateInformation.version <= utils::AppInfo::applicationVersion())
         return false;
 
     for (const auto& package : updateInformation.packages)
