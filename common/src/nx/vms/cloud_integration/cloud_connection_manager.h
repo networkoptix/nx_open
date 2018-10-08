@@ -52,7 +52,7 @@ public:
     CloudConnectionManager(QnCommonModule* commonModule);
     ~CloudConnectionManager();
 
-    virtual boost::optional<nx::hpm::api::SystemCredentials>
+    virtual std::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
     virtual bool boundToCloud() const override;

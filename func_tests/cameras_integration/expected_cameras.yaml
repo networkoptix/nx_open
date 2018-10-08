@@ -19,8 +19,9 @@ SERVER_STAGES:
       transactions: {"errors": 0, "local": [1, 5], "success": [500, 600]}
 
 
-00-09-18-4E-55-3A:
+Hanwha_XNP-6120H:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-4E-55-3A
     vendor: Hanwha Techwin
     model: XNP-6120H
 
@@ -67,8 +68,9 @@ SERVER_STAGES:
     - {point: '127-22-1', preset: '4:NxWitness4'}
 
 
-00-09-18-4F-74-4E:
+Hanwha_PNM-9020V:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-4F-74-4E
     vendor: Hanwha Techwin
     model: PNM-9020V
 
@@ -105,8 +107,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
-00-09-18-51-67-55:
+Hanwha_SNP-6321:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-09-18-51-67-55
     vendor: Hanwha Techwin
     model: SNP-6321
 
@@ -149,8 +152,9 @@ SERVER_STAGES:
     - {point: '279-22-1', preset: '2:NxWitness2'}
 
 
-00-16-6C-C5-31-21:
+Hanwha_XNB-6000:
   discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+    physicalId: 00-16-6C-C5-31-21
     vendor: Hanwha Techwin
     model: XNB-6000
 
@@ -191,8 +195,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
-00-1A-07-0A-3A-88:
+Arecont-2245PM:
   discovery:
+    physicalId: 00-1A-07-0A-3A-88
     vendor: ArecontVision
     model: 2245PM
 
@@ -218,8 +223,9 @@ SERVER_STAGES:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
 
-00-1C-A6-01-20-A4:
+DWC-MPA20M:
   discovery:
+    physicalId: 00-1C-A6-01-20-A4
     vendor: Digital Watchdog
     model: DWC-MPA20M
 
@@ -247,8 +253,9 @@ SERVER_STAGES:
 
 
 # Needs a reboot every time. Camera is VERY BUGGY!
-00-1C-A6-01-21-97:
+DWC-MD421D_1.1.1.8:
   discovery:
+    physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
     model: DWC-MD421D
 
@@ -287,8 +294,9 @@ SERVER_STAGES:
     outs: [{id: 't_RelayOut-0'}]
 
 
-00-1C-A6-01-27-1A:
+DWC-MD421D_1.1.2.0:
   discovery:
+    physicalId: 00-1C-A6-01-27-1A
     vendor: Digital Watchdog
     model: DWC-MD421D
 
@@ -327,8 +335,9 @@ SERVER_STAGES:
     outs: [{id: 't_RelayOut-0'}]
 
 
-00-50-1A-1A-11-F4:
+IqEye_A32N:
   discovery:
+    physicalId: 00-50-1A-1A-11-F4
     vendor: IqEye
     model: IQA32N
 
@@ -343,8 +352,9 @@ SERVER_STAGES:
     primary: {'codec': 'MJPEG', 'resolution': '352x240', 'fps': [[13, 17], [8, 12]]}
 
 
-28-57-BE-B7-12-D1:
+Hikvision_DS-2CD2132F-IWS:
   discovery:
+    physicalId: 28-57-BE-B7-12-D1
     vendor: Hikvision
     model: DS-2CD2132F-IWS
 
@@ -378,8 +388,9 @@ SERVER_STAGES:
     outs: [{id: 'AlarmOut_0'}]
 
 
-4C-BD-8F-E2-1C-87:
+Hikvision_DS-2CD2342WD-I:
   discovery:
+    physicalId: 4C-BD-8F-E2-1C-87
     vendor: Hikvision
     model: DS-2CD2342WD-I
 
@@ -404,8 +415,9 @@ SERVER_STAGES:
       - {'codec': 'H264', 'resolution': '352x240', 'fps': [24, 36]}
 
 
-AC-CC-8E-48-FC-DA:
+Axis_P1405E:
   discovery:
+    physicalId: AC-CC-8E-48-FC-DA
     vendor: Axis
     model: AXISP1405E
 
@@ -432,8 +444,9 @@ AC-CC-8E-48-FC-DA:
       "2": "rtsp://192.168.200.11:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
 
-AC-CC-8E-95-33-57:
+Axis_M3046V:
   discovery:
+    physicalId: AC-CC-8E-95-33-57
     vendor: Axis
     model: AXISM3046V
 
@@ -461,8 +474,9 @@ AC-CC-8E-95-33-57:
       "2": "rtsp://192.168.200.10:554/axis-media/media.amp?streamprofile=hdwitnessSecondary"
 
 
-ACTI_E924-A-XX-15C-00035:
+Acti_E924:
   discovery:
+    physicalId: ACTI_E924-A-XX-15C-00035
     vendor: ACTI
     name: ACTi-E924
     model: E924
@@ -499,8 +513,9 @@ ACTI_E924-A-XX-15C-00035:
     - {'skip_codec_change': True, 'codec': 'G711'}
 
 
-F0-7D-68-09-3E-BA:
+Dlink_DCS-3716:
   discovery:
+    physicalId: F0-7D-68-09-3E-BA
     vendor: Dlink
     model: DCS-3716
 
@@ -517,8 +532,9 @@ F0-7D-68-09-3E-BA:
       "2": "rtsp://192.168.200.15:554/live2.sdp"
 
 
-urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
+Vista_VK2-1080VR:
   discovery:
+    physicalId: urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea
     vendor: VISTA
     model: VK2-1080VRDIR37e
     mac: 00-07-D8-17-A4-EA
@@ -545,8 +561,9 @@ urn_uuid_0007d817-0007-4d81-87a4-0007d817a4ea:
       "2": "rtsp://192.168.200.16:554/1/stream3/Profile3"
 
 
-urn_uuid_32313262-3332-6666-3831-000df1212b32:
+DWC-MV421TIR:
   discovery:
+    physicalId: urn_uuid_32313262-3332-6666-3831-000df1212b32
     vendor: Digital Watchdog
     model: DWC-MV421TIR
     mac: 00-0D-F1-21-2B-32
@@ -585,8 +602,9 @@ urn_uuid_32313262-3332-6666-3831-000df1212b32:
     outs: [{id: 'relay01'}]
 
 
-urn_uuid_32313534-3532-6666-3338-000df1215452:
+DWC-MV84WiAC6:
   discovery:
+    physicalId: urn_uuid_32313534-3532-6666-3338-000df1215452
     vendor: Digital Watchdog
     model: DWC-MV84WiAC6
     mac: 00-0D-F1-21-54-52
@@ -615,8 +633,9 @@ urn_uuid_32313534-3532-6666-3338-000df1215452:
       - {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
 
 
-urn_uuid_32313563-6163-6665-6436-000df1215cac:
+DWC-PVX16W:
   discovery:
+    physicalId: urn_uuid_32313563-6163-6665-6436-000df1215cac
     vendor: Digital Watchdog
     model: DWC-PVX16W
     mac: 00-0D-F1-21-5C-AC

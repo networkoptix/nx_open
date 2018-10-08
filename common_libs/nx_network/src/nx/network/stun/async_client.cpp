@@ -13,8 +13,6 @@ namespace stun {
 
 AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
-    m_useSsl(false),
-    m_state(State::disconnected),
     m_reconnectTimer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
     bindToAioThread(getAioThread());

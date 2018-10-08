@@ -39,7 +39,7 @@ public:
             connection->pleaseStopSync();
     }
 
-    virtual boost::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override
+    virtual std::optional<nx::hpm::api::SystemCredentials> getSystemCredentials() const override
     {
         nx::hpm::api::SystemCredentials systemCredentials;
         systemCredentials.systemId = m_system.id;

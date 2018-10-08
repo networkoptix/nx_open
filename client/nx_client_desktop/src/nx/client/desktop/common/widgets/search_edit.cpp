@@ -21,6 +21,7 @@
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/utils/app_info.h>
 #include <utils/math/color_transformations.h>
+#include <utils/common/event_processors.h>
 
 namespace {
 
@@ -236,6 +237,32 @@ SearchEdit::SearchEdit(QWidget* parent):
     setupMenuButton();
     updateTagButton();
     updatePalette();
+
+    installEventHandler(this, {QEvent::KeyPress, QEvent::ShortcutOverride}, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            const auto keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                {
+                    if (event->type() == QEvent::ShortcutOverride)
+                    {
+                        if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                            emit ctrlEnterPressed();
+                    }
+                    else if (!keyEvent->modifiers())
+                    {
+                        emit enterPressed();
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        });
+
 }
 
 SearchEdit::~SearchEdit()
@@ -533,23 +560,8 @@ bool SearchEdit::event(QEvent* event)
 
     const auto keyEvent = static_cast<QKeyEvent*>(event);
     const bool result = d->lineEdit->event(event);
-    const auto key = keyEvent->key();
-    switch(key)
-    {
-        case Qt::Key_Escape:
-            keyEvent->accept();
-            break;
-
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
-            if (!keyEvent->modifiers())
-                emit enterPressed();
-            else if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
-                emit ctrlEnterPressed();
-            break;
-        default:
-            break;
-    }
+    if (keyEvent->key() == Qt::Key_Escape)
+        keyEvent->accept();
 
     return result;
 }
