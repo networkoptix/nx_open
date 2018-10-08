@@ -1,12 +1,16 @@
-#ifndef __STORAGE_RESOURCE_H__
-#define __STORAGE_RESOURCE_H__
+#pragma once
 
 #include "abstract_storage_resource.h"
+
 #include <atomic>
+
+#include <utils/crypt/encryptable.h>
 
 class QnAbstractMediaStreamDataProvider;
 
-class QnStorageResource: public QnAbstractStorageResource
+class QnStorageResource:
+    public QnAbstractStorageResource,
+    public nx::utils::Encryptable
 {
     using base_type = QnAbstractStorageResource;
 
@@ -97,5 +101,3 @@ private:
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);
 Q_DECLARE_METATYPE(QnStorageResourceList);
-
-#endif // __ABSTRACT_STORAGE_RESOURCE_H__

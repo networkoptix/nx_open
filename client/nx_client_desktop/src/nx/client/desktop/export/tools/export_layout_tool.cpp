@@ -158,11 +158,8 @@ bool ExportLayoutTool::prepareStorage()
     const auto isExeFile = utils::AppInfo::isWindows()
         && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
 
-    if (isExeFile || d->actualFilename == m_layout->getUrl())
-    {
-        // can not override opened layout. save to tmp file, then rename
-        d->actualFilename += lit(".tmp");
-    }
+    // Save to tmp file, then rename.
+    d->actualFilename += lit(".tmp");
 
 #ifdef Q_OS_WIN
     if (isExeFile)
@@ -180,7 +177,7 @@ bool ExportLayoutTool::prepareStorage()
     auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule());
     fileStorage->setUrl(d->actualFilename);
     if (d->settings.encryption.on)
-        fileStorage->setPasswordForExport(d->settings.encryption.password);
+        fileStorage->setPasswordToWrite(d->settings.encryption.password);
     d->storage = QnStorageResourcePtr(fileStorage);
     return true;
 }

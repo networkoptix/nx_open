@@ -37,12 +37,16 @@ public:
 
     static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
-    // Whether the file is crypted or intended to be crypted.
-    bool isCrypted() const;
-    // Set new password if we intend to create a new layout file. Please call before `open`.
-    void setPasswordForExport(const QString& password);
-    // Set password for reading existing layout file.
-    bool usePasswordToOpen(const QString& password);
+    /** Returns true if the layout file is actually encrypted. */
+    virtual bool isEncrypted() const override;
+    /** Returns true if the layout file is encrypted and no valid password is provided. */
+    virtual bool requiresPassword() const override;
+    /** Attempts to set a password for opening existing layout file. */
+    virtual bool usePasswordToRead(const QString& password) override;
+    /** Sets a password for writing new layout. */
+    virtual void setPasswordToWrite(const QString& password) override;
+    /** Drops password. */
+    virtual void dropPassword() override;
 
     virtual void setUrl(const QString& value) override;
 

@@ -1,5 +1,9 @@
 #pragma once
 
+/**@file
+ * Special stream extension functions that are specific for layout storage.
+ * This class accompanies QIDevice stream. Ancestor for plain and crypto layout storage streams.
+ */
 class QnLayoutStreamSupport
 {
 public:

@@ -49,12 +49,17 @@ QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonM
     return new QnLayoutFileStorageResource(commonModule);
 }
 
-bool QnLayoutFileStorageResource::isCrypted() const
+bool QnLayoutFileStorageResource::isEncrypted() const
 {
     return m_info.isCrypted;
 }
 
-void QnLayoutFileStorageResource::setPasswordForExport(const QString& password)
+bool QnLayoutFileStorageResource::requiresPassword() const
+{
+    return m_info.isCrypted && m_password.isEmpty();
+}
+
+void QnLayoutFileStorageResource::setPasswordToWrite(const QString& password)
 {
     NX_ASSERT(!password.isEmpty());
     NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
@@ -67,7 +72,12 @@ void QnLayoutFileStorageResource::setPasswordForExport(const QString& password)
     m_cryptoInfo.passwordHash = getSaltedPasswordHash(m_password, m_cryptoInfo.passwordSalt);
 }
 
-bool QnLayoutFileStorageResource::usePasswordToOpen(const QString& password)
+void QnLayoutFileStorageResource::dropPassword()
+{
+    // TODO
+}
+
+bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
 {
     if (m_info.isCrypted && checkPassword(password, m_info))
     {
@@ -497,7 +507,7 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 
 bool QnLayoutFileStorageResource::shouldCrypt(const QString& streamName)
 {
-    if (!isCrypted())
+    if (!isEncrypted())
         return false;
 
     if (FileTypeSupport::isMovieFileExt(streamName) || FileTypeSupport::isImageFileExt(streamName))

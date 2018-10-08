@@ -5,12 +5,16 @@
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <utils/common/aspect_ratio.h>
+#include <utils/crypt/encryptable.h>
+
 #include "avi_archive_metadata.h"
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
 
-class QnAviResource : public QnAbstractArchiveResource
+class QnAviResource:
+    public QnAbstractArchiveResource,
+    public nx::utils::Encryptable
 {
     Q_OBJECT
         using base_type = QnAbstractArchiveResource;
@@ -62,6 +66,7 @@ private:
     qint64 m_timeZoneOffset;
     QnAspectRatio m_imageAspectRatio;
     boost::optional<QnAviArchiveMetadata> m_aviMetadata;
+    bool m_requiresPasword = false; // Encrypted and password is not provided.
     mutable boost::optional<bool> m_hasVideo;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
 };

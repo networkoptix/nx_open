@@ -22,8 +22,12 @@ FileInfo identifyFile(const QString& fileName, bool allowTemp)
     try
     {
         const QString extension = QFileInfo(fileName).suffix().toLower();
-        if (extension != "nov" && extension != "exe" && !(allowTemp && fileName.endsWith(".exe.tmp")))
+
+        if (!(extension == "nov" || extension == "exe"
+            || (allowTemp && (fileName.endsWith(".exe.tmp") || fileName.endsWith(".nov.tmp")))))
+        {
             throw std::exception();
+        }
 
         QFile file(fileName);
 
