@@ -174,17 +174,14 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     if (result < 0)
         return result;
     
+#ifdef WIN32
+    // Decrease audio latency by reducing audio buffer size
+    inputFormat->setEntry("audio_buffer_size", (int64_t)80); //< 80 milliseconds
+#endif
+
     result = inputFormat->open(ffmpegUrl().c_str());
     if (result < 0)
         return result;
-
-#ifdef WIN32
-    /**
-     * Attempt to avoid "real-time buffer too full" error messages in Windows
-     */
-    inputFormat->setEntry("thread_queue_size", 2048);
-    inputFormat->setEntry("threads", (int64_t) 0);
-#endif
 
     m_inputFormat = std::move(inputFormat);
     return 0;
