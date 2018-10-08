@@ -2431,10 +2431,12 @@ void MediaServerProcess::registerRestHandlers(
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).
-     *     The special value "latest", which is the default value, requires to retrieve the latest
-     *     thumbnail. The special value "now" requires to retrieve the thumbnail corresponding to
-     *     the current time.
+     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).<br/>
+     *     The special value "now" requires to retrieve the thumbnail only from the live stream.
+     *     <br/>The special value "latest", which is the default value, requires to retrieve
+     *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
+     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
+     *     stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.

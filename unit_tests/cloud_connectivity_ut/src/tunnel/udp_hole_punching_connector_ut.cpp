@@ -101,7 +101,7 @@ TEST_F(UdpTunnelConnector, timeout)
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
         MediaServerEmulator::ActionToTake::ignoreIndication,
-        boost::none);
+        std::nullopt);
 
     ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);

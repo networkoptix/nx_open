@@ -609,9 +609,6 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
             startupParams.enforceMediatorEndpoint);
     }
 
-    // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
-
     if (!startupParams.videoWallGuid.isNull())
     {
         commonModule->setVideowallGuid(startupParams.videoWallGuid);

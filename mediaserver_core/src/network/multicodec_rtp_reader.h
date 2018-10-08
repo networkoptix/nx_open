@@ -52,6 +52,7 @@ public:
 
     QnMulticodecRtpReader(
         const QnResourcePtr& resource,
+        const nx::streaming::rtp::TimeOffsetPtr& timeOffset,
         std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
     virtual ~QnMulticodecRtpReader();
 
@@ -124,6 +125,7 @@ private:
         ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; //< External reference; do not delete.
         std::shared_ptr<QnRtpStreamParser> parser;
+        std::optional<std::chrono::microseconds> onvifExtensionTimestamp;
         int rtcpChannelNumber = 0;
     };
 
@@ -141,7 +143,7 @@ private:
 
     void calcStreamUrl();
 
-    void updateRtcpStatistics(
+    void updateOnvifTime(
         int rtpBufferOffset,
         int rtpPacketSize,
         int track,

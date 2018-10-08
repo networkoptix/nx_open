@@ -1,13 +1,13 @@
 #pragma once
 
+#include <optional>
 #include <string>
-
-#include <boost/optional.hpp>
 
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/stun/async_client.h>
+#include <nx/network/stun/async_client_delegate.h>
 #include <nx/network/stun/async_client_with_http_tunneling.h>
 #include <nx/utils/std/future.h>
 
@@ -17,33 +17,50 @@
 
 namespace nx {
 
-namespace network { namespace cloud { class ConnectionMediatorUrlFetcher; } }
+namespace network::cloud { class ConnectionMediatorUrlFetcher; }
 
 namespace hpm {
 namespace api {
 
+class DelayedConnectStunClient;
+class MediatorEndpointProvider;
+
 using MediatorAvailabilityChangedHandler =
     nx::utils::MoveOnlyFunc<void(bool /*isMediatorAvailable*/)>;
 
-class NX_NETWORK_API AbstractMediatorConnector
+class NX_NETWORK_API AbstractMediatorConnector:
+    public network::aio::BasicPollable
 {
 public:
     virtual ~AbstractMediatorConnector() = default;
 
     /** Provides client related functionality. */
     virtual std::unique_ptr<MediatorClientTcpConnection> clientConnection() = 0;
+
     /** Provides server-related functionality. */
     virtual std::unique_ptr<MediatorServerTcpConnection> systemConnection() = 0;
-    virtual boost::optional<network::SocketAddress> udpEndpoint() const = 0;
-    //virtual bool isConnected() const = 0;
+
+    /**
+     * @param endpoint Defined only if resultCode is SystemError::noError.
+     */
+    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+        nx::network::http::StatusCode::Value /*resultCode*/,
+        nx::network::SocketAddress /*endpoint*/)> handler) = 0;
+
+    /**
+     * Provides endpoint without blocking.
+     */
+    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const = 0;
+
     virtual void setOnMediatorAvailabilityChanged(
         MediatorAvailabilityChangedHandler handler) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class NX_NETWORK_API MediatorConnector:
     public AbstractMediatorConnector,
-    public AbstractCloudSystemCredentialsProvider,
-    public network::aio::BasicPollable
+    public AbstractCloudSystemCredentialsProvider
 {
 public:
     MediatorConnector(const std::string& cloudHost);
@@ -58,7 +75,7 @@ public:
      * Has to be called to enable cloud functionality for application.
      * E.g., initiates mediator address resolving.
      */
-    void enable(bool waitComplete = false);
+    void enable(bool waitForCompletion = false);
 
     /** Provides client related functionality */
     virtual std::unique_ptr<MediatorClientTcpConnection> clientConnection() override;
@@ -70,6 +87,7 @@ public:
      * NOTE: Mediator url resolution will still happen by referring to specified address.
      */
     void mockupCloudModulesXmlUrl(const utils::Url &cloudModulesXmlUrl);
+    
     /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
@@ -78,11 +96,16 @@ public:
         const utils::Url& mediatorUrl,
         const network::SocketAddress stunUdpEndpoint);
 
-    void setSystemCredentials(boost::optional<SystemCredentials> value);
-    virtual boost::optional<SystemCredentials> getSystemCredentials() const override;
+    void setSystemCredentials(std::optional<SystemCredentials> value);
 
-    virtual boost::optional<network::SocketAddress> udpEndpoint() const override;
-    //virtual bool isConnected() const override;
+    virtual std::optional<SystemCredentials> getSystemCredentials() const override;
+
+    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+        nx::network::http::StatusCode::Value /*resultCode*/,
+        nx::network::SocketAddress /*endpoint*/)> handler) override;
+
+    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
+
     virtual void setOnMediatorAvailabilityChanged(
         MediatorAvailabilityChangedHandler handler) override;
 
@@ -90,27 +113,100 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    const std::string m_cloudHost;
-    boost::optional<SystemCredentials> m_credentials;
+    std::optional<SystemCredentials> m_credentials;
 
-    boost::optional<nx::utils::promise<bool>> m_promise;
-    boost::optional<nx::utils::future<bool>> m_future;
+    std::optional<nx::utils::promise<bool>> m_promise;
+    std::optional<nx::utils::future<bool>> m_future;
 
-    std::shared_ptr<network::stun::AsyncClientWithHttpTunneling> m_stunClient;
-    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
-    boost::optional<nx::utils::Url> m_cloudModulesXmlUrl;
-    boost::optional<nx::utils::Url> m_mediatorUrl;
-    boost::optional<nx::utils::Url> m_mockedUpMediatorUrl;
-    boost::optional<network::SocketAddress> m_mediatorUdpEndpoint;
+    std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
+    std::shared_ptr<DelayedConnectStunClient> m_stunClient;
+    std::optional<nx::utils::Url> m_mockedUpMediatorUrl;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
     MediatorAvailabilityChangedHandler m_mediatorAvailabilityChangedHandler;
 
     virtual void stopWhileInAioThread() override;
 
-    void fetchEndpoint();
-    void initializeUrlFetcher();
     void connectToMediatorAsync();
+
+    void establishTcpConnectionToMediatorAsync();
+
     void reconnectToMediator();
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Add support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
+ * It implicitely fetches endpoint from MediatorEndpointProvider and 
+ * calls AbstractAsyncClient::connect.
+ */
+class DelayedConnectStunClient:
+    public nx::network::stun::AsyncClientDelegate
+{
+    using base_type = nx::network::stun::AsyncClientDelegate;
+
+public:
+    DelayedConnectStunClient(
+        MediatorEndpointProvider* endpointProvider,
+        std::unique_ptr<nx::network::stun::AbstractAsyncClient> delegate);
+
+    virtual void connect(
+        const nx::utils::Url& url,
+        ConnectHandler handler) override;
+
+    virtual void sendRequest(
+        nx::network::stun::Message request,
+        RequestHandler handler,
+        void* client) override;
+
+private:
+    MediatorEndpointProvider* m_endpointProvider = nullptr;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+// TODO: #ak Merge this class with ConnectionMediatorUrlFetcher.
+class MediatorEndpointProvider:
+    public nx::network::aio::BasicPollable
+{
+public:
+    using base_type = nx::network::aio::BasicPollable;
+
+    using FetchMediatorEndpointsCompletionHandler =
+        nx::utils::MoveOnlyFunc<void(
+            nx::network::http::StatusCode::Value /*resultCode*/)>;
+
+    MediatorEndpointProvider(const std::string& cloudHost);
+
+    virtual void bindToAioThread(
+        network::aio::AbstractAioThread* aioThread) override;
+
+    void mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModulesXmlUrl);
+
+    void mockupMediatorUrl(
+        const nx::utils::Url& mediatorUrl,
+        const network::SocketAddress stunUdpEndpoint);
+
+    void fetchMediatorEndpoints(
+        FetchMediatorEndpointsCompletionHandler handler);
+
+    std::optional<nx::utils::Url> mediatorUrl() const;
+    
+    std::optional<network::SocketAddress> udpEndpoint() const;
+
+protected:
+    virtual void stopWhileInAioThread() override;
+
+private:
+    const std::string m_cloudHost;
+    mutable QnMutex m_mutex;
+    std::vector<FetchMediatorEndpointsCompletionHandler> m_fetchMediatorEndpointsHandlers;
+    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
+    std::optional<nx::utils::Url> m_cloudModulesXmlUrl;
+    std::optional<nx::utils::Url> m_mediatorUrl;
+    std::optional<network::SocketAddress> m_mediatorUdpEndpoint;
+
+    void initializeUrlFetcher();
 };
 
 } // namespace api

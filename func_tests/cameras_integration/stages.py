@@ -69,7 +69,7 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=10))
+@_stage(timeout=timedelta(minutes=15))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for fps_index, fps_range in enumerate(primary['fps']):
         # Make sure there is a gap between recordings.
@@ -102,14 +102,16 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=10))
+@_stage(timeout=timedelta(minutes=25))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for profile, configurations in profiles.items():
         for index, configuration in enumerate(configurations):
             configure_video(
                 run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+
             path = '{}{}'.format(profile, index)
+            yield Halt('Configuration {} is applied to server'.format(path))
             for error in retry_expect_values(
                     {'video': configuration},
                     lambda: ffprobe_metadata(run.media_url(profile)),
@@ -135,6 +137,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
             else:
                 del configuration["skip_codec_change"]
 
+            yield Halt('Configuration {} is applied to server'.format(index))
             for error in retry_expect_values(
                     {'audio': configuration},
                     lambda: ffprobe_metadata(run.media_url()),
@@ -183,7 +186,7 @@ def io_events(run, ins, outs):
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
 
 
-@_stage(timeout=timedelta(minutes=2))
+@_stage(timeout=timedelta(minutes=5))
 def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:
@@ -214,7 +217,8 @@ def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generato
                 for error in execute('AbsoluteDeviceMove', speed=100, **point):
                     yield error
 
-            yield Halt('Wait for move to {}'.format(point))
+            yield Halt('Wait for move to {} by {}'.format(
+                point, 'preset' if use_preset else 'point'))
             for error in execute('GetDevicePosition'):
                 yield error
 
