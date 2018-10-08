@@ -260,8 +260,10 @@ QnPlOnvifResource::VideoOptionsLocal::VideoOptionsLocal(const QString& id,
         govMax = options.govLengthRange->high;
     }
 
-    minQ = std::round(options.qualityRange.low);
-    maxQ = std::round(options.qualityRange.high);
+    /* They forgot to add round to std in arm! So we need a hack here.*/
+    using namespace std;
+    minQ = round(options.qualityRange.low);
+    maxQ = round(options.qualityRange.high);
 }
 
 int QnPlOnvifResource::VideoOptionsLocal::restrictFrameRate(
@@ -1661,12 +1663,6 @@ void QnPlOnvifResource::setPtzProfileToken(const QString& src)
 {
     QnMutexLocker lock(&m_mutex);
     m_ptzProfileToken = src;
-}
-
-int QnPlOnvifResource::round(float value)
-{
-    float floorVal = floorf(value);
-    return floorVal - value < 0.5? (int)value: (int)value + 1;
 }
 
 bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)

@@ -441,7 +441,6 @@ private:
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
 
-    int round(float value);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     void checkMaxFps(onvifXsd__VideoEncoderConfiguration* configuration);
 
