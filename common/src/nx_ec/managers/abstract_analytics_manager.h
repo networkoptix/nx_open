@@ -44,7 +44,7 @@ public:
     int getAnalyticsPlugins(TargetType* target, HandlerType handler)
     {
         return getAnalyticsPlugins(
-            std::static_pointer_cast<impl::GetAnaklyticsPluginsHandler>(
+            std::static_pointer_cast<impl::GetAnalyticsPluginsHandler>(
                 std::make_shared<impl::CustomGetAnalyticsPluginsHandler<TargetType, HandlerType>>(
                     target,
                     handler)));
