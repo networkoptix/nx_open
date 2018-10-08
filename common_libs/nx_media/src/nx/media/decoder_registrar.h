@@ -24,7 +24,7 @@ public:
         std::shared_ptr<AbstractResourceAllocator> allocator,
         const QMap<int, QSize>& maxFfmpegResolutions,
         bool isTranscodingEnabled,
-        bool enableHardwareDecoderonIPhone);
+        bool enableHardwareDecoderOnIPhone);
 };
 
 } // namespace media

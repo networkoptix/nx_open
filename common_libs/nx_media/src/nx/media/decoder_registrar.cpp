@@ -22,7 +22,7 @@ void DecoderRegistrar::registerDecoders(
     std::shared_ptr<AbstractResourceAllocator> allocator,
     const QMap<int, QSize>& maxFfmpegResolutions,
     bool isTranscodingEnabled,
-    bool enableHardwareDecoderonIPhone)
+    bool enableHardwareDecoderOnIPhone)
 {
     NX_ASSERT(allocator);
 
@@ -41,7 +41,7 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     #if defined(Q_OS_IOS)
-    if (enableHardwareDecoderonIPhone)
+    if (enableHardwareDecoderOnIPhone)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(allocator,
