@@ -201,6 +201,16 @@ namespace ec2
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
             void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const nx::vms::api::AccessRightsDataList&);
             void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const nx::vms::api::SystemMergeHistoryRecordList&);
+
+            void onGetAnalyticsPluginsDone(
+                int reqID,
+                const ec2::ErrorCode,
+                const nx::vms::api::AnalyticsPluginDataList&);
+
+            void onGetAnalyticsEnginesDone(
+                int reqID,
+                const ec2::ErrorCode,
+                const nx::vms::api::AnalyticsEngineDataList&);
         };
 
 
