@@ -46,7 +46,8 @@ void doExecutePost(
     PreprocessRequestFunc preprocessRequestFunc,
     int httpStatus,
     const QString& authName,
-    const QString& authPassword);
+    const QString& authPassword,
+    QByteArray* responseBody);
 
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
@@ -59,12 +60,13 @@ void executePost(
     PreprocessRequestFunc preprocessRequestFunc = nullptr,
     int httpStatus = nx::network::http::StatusCode::ok,
     const QString& authName = "admin",
-    const QString& authPassword = "admin")
+    const QString& authPassword = "admin",
+    QByteArray* responseBody = nullptr)
 {
     const QByteArray& request = QJson::serialized(requestData);
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus, authName,
-        authPassword));
+        authPassword, responseBody));
 }
 
 void doExecuteGet(

@@ -68,7 +68,7 @@ nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QStrin
 
 void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
     const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc,
-    int httpStatus, const QString &authName, const QString &authPassword)
+    int httpStatus, const QString &authName, const QString &authPassword, QByteArray* responseBody)
 {
     auto httpClient = createHttpClient(authName, authPassword);
     nx::utils::Url url = createUrl(launcher, urlStr);
@@ -86,6 +86,9 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
 
     ASSERT_TRUE(httpClient->response() != nullptr);
     ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
+
+    if (responseBody)
+        *responseBody = response;
 }
 
 void doExecuteGet(

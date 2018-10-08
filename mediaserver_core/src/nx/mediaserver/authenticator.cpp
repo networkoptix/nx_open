@@ -470,7 +470,6 @@ Qn::AuthResult Authenticator::tryHttpMethods(
     // Standard authentication
 
     Qn::AuthResult authResult = Qn::Auth_Forbidden;
-    bool isSaveUser = request.requestLine.url.toString().contains("saveUser");
     if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
     {
         if (usedAuthMethod)

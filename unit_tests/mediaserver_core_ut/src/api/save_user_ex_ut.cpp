@@ -39,7 +39,7 @@ protected:
         m_nonAdminUser.isCloud = false;
         m_nonAdminUser.isEnabled = true;
         m_nonAdminUser.isLdap = false;
-        m_nonAdminUser.name = "testUserName";
+        m_nonAdminUser.name = "test_user_name";
         m_nonAdminUser.password = "testUserPassword";
         m_nonAdminUser.permissions = GlobalPermission::accessAllMedia;
 
@@ -49,7 +49,7 @@ protected:
         m_adminUser.isCloud = false;
         m_adminUser.isEnabled = true;
         m_adminUser.isLdap = false;
-        m_adminUser.name = "testAdminUserName";
+        m_adminUser.name = "test_admin_user_name";
         m_adminUser.password = "testAdminPassword";
         m_adminUser.permissions = GlobalPermission::admin;
     }
@@ -79,8 +79,7 @@ protected:
     }
 
     void whenSaveUserExRequestIssued(const LauncherPtr& server, ApiAccess apiAccess,
-        UserCategory userCategory,
-        network::http::StatusCode::Value expectedResult = network::http::StatusCode::ok)
+        UserCategory userCategory)
     {
         vms::api::UserDataEx* userDataToSave = userCategory == UserCategory::regular
             ? &m_nonAdminUser : &m_adminUser;
@@ -88,8 +87,8 @@ protected:
         QString authName = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.name;
         QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.password;
 
-        NX_TEST_API_POST(server.get(), "/ec2/saveUserEx", *userDataToSave, nullptr, expectedResult,
-            authName, authPassword);
+        NX_TEST_API_POST(server.get(), "/ec2/saveUserEx", *userDataToSave, nullptr,
+            network::http::StatusCode::ok, authName, authPassword, &m_responseBuffer);
     }
 
     void thenUserShouldAppearInTheGetUsersResponse(const LauncherPtr& server,
@@ -122,9 +121,17 @@ protected:
             authName, authPassword);
     }
 
+    void thenResponseShouldContainForbiddenError()
+    {
+        QnJsonRestResult jsonRestResult;
+        ASSERT_TRUE(QJson::deserialize(m_responseBuffer, &jsonRestResult));
+        ASSERT_EQ(jsonRestResult.error, QnJsonRestResult::Error::Forbidden);
+    }
+
 private:
     vms::api::UserDataEx m_adminUser;
     vms::api::UserDataEx m_nonAdminUser;
+    Buffer m_responseBuffer;
 
     template<typename ResponseData>
     void issueGetRequest(MediaServerLauncher* launcher, const QString& path,
@@ -158,7 +165,6 @@ TEST_F(SaveUserEx, savedUserMustBeAbleToLogin)
     thenSavedUserShouldBeAuthorizedByServer(server, UserCategory::admin);
 }
 
-
 TEST_F(SaveUserEx, nonAdminAccessShouldFail)
 {
     auto server = givenServer();
@@ -167,8 +173,8 @@ TEST_F(SaveUserEx, nonAdminAccessShouldFail)
     whenSaveUserExRequestIssued(server, ApiAccess::admin, UserCategory::regular);
     thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::nonAdmin, UserCategory::admin,
-        network::http::StatusCode::forbidden);
+    whenSaveUserExRequestIssued(server, ApiAccess::nonAdmin, UserCategory::admin);
+    thenResponseShouldContainForbiddenError();
 }
 
 } // namespace test
