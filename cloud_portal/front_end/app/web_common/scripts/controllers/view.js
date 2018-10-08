@@ -448,27 +448,31 @@ angular.module('nxCommon').controller('ViewCtrl',
             // remove active camera record for this system (multiple media servers)
             for (var serverId in $scope.camerasProvider.cameras) {
                 if ($scope.camerasProvider.cameras.hasOwnProperty(serverId)) {
-                    delete $scope.storage.activeCameras[$scope.activeCamera.server.id];
+                    if ($scope.storage.activeCameras[serverId]) {
+                        delete $scope.storage.activeCameras[serverId];
+                    }
                 }
             }
 
+            // record actice camera again as only one camera should be selected per system
             $scope.storage.activeCameras[$scope.activeCamera.server.id] = $scope.activeCamera.id;
         }
 
         $scope.$watch('activeCamera', function(){
             if(!$scope.activeCamera) {
-                $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
-                return;
+                if (Object.keys($scope.camerasProvider.cameras).length !== 0) {
+                    $scope.activeCamera = $scope.camerasProvider.getFirstAvailableCamera();
+                } else {
+                    return;
+                }
             }
+
+            resetSystemActiveCamera();
 
             $scope.player = null;
             $scope.crashCount = 0;
             $scope.storage.cameraId  = $scope.activeCamera.id;
             $scope.storage.serverStates[$scope.activeCamera.server.id] = true; // media server status - expanded
-
-            if ($scope.activeCamera.id !== $scope.storage.activeCameras[$scope.activeCamera.server.id]) {
-                resetSystemActiveCamera();
-            }
 
             systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
