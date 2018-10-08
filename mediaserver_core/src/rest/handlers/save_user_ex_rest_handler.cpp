@@ -22,8 +22,7 @@ int QnSaveUserExRestHandler::executePost(
 {
     using namespace nx::vms::api;
 
-    if (!owner->resourceAccessManager()->hasGlobalPermission(
-            owner->accessRights(),
+    if (!owner->resourceAccessManager()->hasGlobalPermission(owner->accessRights(),
             GlobalPermission::adminPermissions))
     {
         result.setError(QnJsonRestResult::Forbidden);
@@ -38,7 +37,7 @@ int QnSaveUserExRestHandler::executePost(
     }
 
     UserData userData;
-    userData.id = userDataEx.id;
+    userData.id = userDataEx.id.isNull() ? QnUuid::createUuid() : userDataEx.id;
     userData.name = userDataEx.name;
     userData.permissions = userDataEx.permissions;
     userData.email = userDataEx.email;
@@ -48,9 +47,7 @@ int QnSaveUserExRestHandler::executePost(
     userData.userRoleId = userDataEx.userRoleId;
     userData.fullName = userDataEx.fullName;
 
-    const auto hashes = PasswordData::calculateHashes(
-        userDataEx.name,
-        userDataEx.password,
+    const auto hashes = PasswordData::calculateHashes(userDataEx.name, userDataEx.password,
         userDataEx.isLdap);
 
     userData.realm = hashes.realm;

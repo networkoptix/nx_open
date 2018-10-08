@@ -35,7 +35,6 @@ protected:
     {
         m_nonAdminUser.email = "test@test.com";
         m_nonAdminUser.fullName = "testUser";
-        m_nonAdminUser.id = QnUuid::createUuid();
         m_nonAdminUser.isCloud = false;
         m_nonAdminUser.isEnabled = true;
         m_nonAdminUser.isLdap = false;
@@ -45,7 +44,6 @@ protected:
 
         m_adminUser.email = "admin@test.com";
         m_adminUser.fullName = "testAdminUser";
-        m_adminUser.id = QnUuid::createUuid();
         m_adminUser.isCloud = false;
         m_adminUser.isEnabled = true;
         m_adminUser.isLdap = false;
@@ -67,15 +65,6 @@ protected:
         vms::api::ModuleInformation moduleInformation;
         issueGetRequest(server.get(), "api/moduleInformation", moduleInformation);
         ASSERT_FALSE(moduleInformation.id.isNull());
-    }
-
-    void whenServerIsConfigured(const LauncherPtr& server)
-    {
-        ConfigureSystemData configureData;
-        configureData.localSystemId = QnUuid::createUuid();
-        configureData.systemName = configureData.localSystemId.toString();
-
-        NX_TEST_API_POST(server.get(), "api/configure", configureData);
     }
 
     void whenSaveUserExRequestIssued(const LauncherPtr& server, ApiAccess apiAccess,
