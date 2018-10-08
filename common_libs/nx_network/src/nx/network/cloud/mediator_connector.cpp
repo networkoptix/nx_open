@@ -157,11 +157,6 @@ void MediatorConnector::setStunClientSettings(
     s_stunClientSettings = std::move(stunClientSettings);
 }
 
-static bool isReady(const nx::utils::future<bool>& f)
-{
-    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
-}
-
 void MediatorConnector::stopWhileInAioThread()
 {
     m_stunClient.reset();
