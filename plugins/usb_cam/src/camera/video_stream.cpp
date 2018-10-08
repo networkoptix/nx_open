@@ -336,28 +336,18 @@ void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& in
     if (m_codecParams.width * m_codecParams.height > 0)
         inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
 
-    // note: setting the bitrate only works for raspberry pi mmal camera
+    // Note: setting the bitrate only works for raspberry pi mmal camera
     if (m_codecParams.bitrate > 0)
     {
         if(auto cam = m_camera.lock())
         {
-            /**
-             * ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
-             */
+            // ffmpeg doesn't have an option for setting the bitrate on AVFormatContext.
             device::setBitrate(
                 m_url.c_str(),
                 m_codecParams.bitrate,
                 cam->compressionTypeDescriptor());
         }
     }
-
-#ifdef WIN32
-    /**
-     * Attempt to avoid "real-time buffer too full" error messages in Windows
-     */
-    inputFormat->setEntry("thread_queue_size", 5096);
-    inputFormat->setEntry("threads", (int64_t)0);
-#endif
 }
 
 int VideoStream::initializeDecoder()
@@ -385,11 +375,9 @@ int VideoStream::initializeDecoder()
     m_waitForKeyPacket = true;
     m_decoder = std::move(decoder);
 
-    /**
-     * Some cameras have infrequent I-frames. Initializing the decoder with the first packet read
-     * from the camera (presumably an I-frame) prevents numerous "non exisiting PPS 0 referenced"
-     * errors on some cameras.
-     */
+    // Some cameras have infrequent I-frames. Initializing the decoder with the first packet read
+    // from the camera (presumably an I-frame) prevents numerous "non exisiting PPS 0 referenced"
+    // errors on some cameras.
     ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
     if (m_inputFormat->readFrame(packet.packet()) == 0)
     {
@@ -455,7 +443,7 @@ float VideoStream::largestFps() const
 
     auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
     if (videoConsumer.expired())
-        return -1; //should never happen unless consumersEmpty() returns true
+        return -1; //< should never happen unless consumersEmpty() returns true
 
     return videoConsumer.lock()->fps();
 }
@@ -503,7 +491,7 @@ int VideoStream::largestBitrate() const
         : packetConsumer;
 
     if (videoConsumer.expired())
-        return -1; // should never happen
+        return -1; //< should never happen
 
     return videoConsumer.lock()->bitrate();
 }
@@ -550,12 +538,9 @@ void VideoStream::updateBitrateUnlocked()
 }
 
 void VideoStream::updateUnlocked()
-{
-    /**
-     * Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
-     * closestHardwareConfiguration(), which queries hardware, only gets called once.
-     */
-
+{   
+    // Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
+    // closestHardwareConfiguration(), which queries hardware, only gets called once
     CodecParameters newParams = m_codecParams;
     newParams.fps = largestFps();
 
@@ -576,11 +561,11 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
 {
     std::vector<device::ResolutionData>resolutionList;
 
-    //assumes list is in ascending resolution order
+    // Assumes list is in ascending resolution order
     if (auto cam = m_camera.lock())
         resolutionList = cam->resolutionList();
 
-    // try to find an exact match first
+    // Try to find an exact match first
     for (const auto & resolution : resolutionList)
     {
         if (resolution.width == params.width 
@@ -596,7 +581,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
         }
     }
 
-    // then a match with similar aspect ratio whose resolution and fps are higher than requested
+    // Then a match with similar aspect ratio whose resolution and fps are higher than requested
     float aspectRatio = (float) params.width / params.height;
     for (const auto & resolution : resolutionList)
     {
@@ -615,7 +600,7 @@ CodecParameters VideoStream::closestHardwareConfiguration(const CodecParameters&
         }
     }
 
-    //any resolution or fps higher than requested
+    // Any resolution or fps higher than requested
     for (const auto & resolution : resolutionList)
     {
         if (resolution.width * resolution.height >= params.width * params.height 

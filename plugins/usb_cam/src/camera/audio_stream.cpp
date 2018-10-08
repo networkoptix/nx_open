@@ -30,6 +30,7 @@ const char * ffmpegDeviceType()
 
 } // namespace
 
+
 //--------------------------------------------------------------------------------------------------
 // AudioStreamPrivate
 
@@ -74,6 +75,11 @@ int AudioStream::AudioStreamPrivate::sampleRate() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_encoder ? m_encoder->codecContext()->sample_rate : 0;
+}
+
+int AudioStream::sampleRate() const
+{
+    return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
 std::string AudioStream::AudioStreamPrivate::ffmpegUrl() const
@@ -168,15 +174,14 @@ int AudioStream::AudioStreamPrivate::initializeInputFormat()
     if (result < 0)
         return result;
     
+#ifdef WIN32
+    // Decrease audio latency by reducing audio buffer size
+    inputFormat->setEntry("audio_buffer_size", (int64_t)80); //< 80 milliseconds
+#endif
+
     result = inputFormat->open(ffmpegUrl().c_str());
     if (result < 0)
         return result;
-
-#ifdef WIN32
-    // Attempt to avoid "real-time buffer too full" error messages in Windows 
-    inputFormat->setEntry("thread_queue_size", 2048);
-    inputFormat->setEntry("threads", (int64_t) 0);
-#endif
 
     m_inputFormat = std::move(inputFormat);
     return 0;
@@ -303,10 +308,7 @@ int AudioStream::AudioStreamPrivate::resample(const ffmpeg::Frame * frame, ffmpe
     if(!m_resampleContext)
         return m_initCode;
 
-    return swr_convert_frame(
-        m_resampleContext,
-        outFrame->frame(),
-        frame ? frame->frame() : nullptr);
+    return swr_convert_frame(m_resampleContext, outFrame->frame(), frame ? frame->frame() : nullptr);
 }
 
 std::chrono::milliseconds AudioStream::AudioStreamPrivate::resampleDelay() const
@@ -334,7 +336,7 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
 
     for(;;)
     {
-        // Need to drain the the resampler periodically to avoid increasing audio delay
+        // need to drain the the resampler periodically to avoid increasing audio delay
         if(m_resampleContext && resampleDelay() > timePerVideoFrame())
         {
             m_resampledFrame->frame()->pts = AV_NOPTS_VALUE;
@@ -421,14 +423,6 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     return newPacket;
 }
 
-std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
-{
-    if(auto cam = m_camera.lock())
-        return cam->videoStream()->actualTimePerFrame();
-    /** Should never happen */
-    return std::chrono::milliseconds(0);
-}
-
 void AudioStream::AudioStreamPrivate::start()
 {
     m_terminated = false;
@@ -490,6 +484,15 @@ void AudioStream::AudioStreamPrivate::run()
     }
 }
 
+std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() const
+{
+    if(auto cam = m_camera.lock())
+        return cam->videoStream()->actualTimePerFrame();
+    /** Should never happen */
+    return std::chrono::milliseconds(0);
+}
+
+
 //--------------------------------------------------------------------------------------------------
 // AudioStream
 
@@ -545,11 +548,6 @@ void AudioStream::removePacketConsumer(const std::weak_ptr<AbstractPacketConsume
         m_streamReader->removePacketConsumer(consumer);
     else
         m_packetConsumerManager->removeConsumer(consumer);
-}
-
-int AudioStream::sampleRate() const
-{
-    return m_streamReader ? m_streamReader->sampleRate() : 0;
 }
 
 } //namespace usb_cam
