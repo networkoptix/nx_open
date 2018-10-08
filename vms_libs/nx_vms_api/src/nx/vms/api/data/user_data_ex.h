@@ -24,17 +24,8 @@ struct NX_VMS_API UserDataEx
     QString fullName;
 };
 
-#define UserDataEx_Fields \
-    (id) \
-    (name) \
-    (permissions) \
-    (email) \
-    (password) \
-    (isCloud) \
-    (isLdap) \
-    (isEnabled) \
-    (userRoleId) \
-    (fullName)
+#define UserDataEx_Fields (id)(name)(permissions)(email)(password)(isCloud)(isLdap)(isEnabled) \
+    (userRoleId)(fullName)
 
 } // namespace api
 } // namespace vms
