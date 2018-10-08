@@ -2,7 +2,8 @@
 
 '''Specialized differ for data returned by mediaserver methods'''
 
-# TODO: switch to 'yield' and 'yield from' when moved to python3
+# TODO: Methods of DataDiffer return lists.
+#       Switch them to generators, using 'yield' and 'yield from' when moved to python3.
 
 import argparse
 from collections import namedtuple
