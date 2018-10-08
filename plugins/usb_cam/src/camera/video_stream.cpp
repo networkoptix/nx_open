@@ -443,7 +443,7 @@ float VideoStream::largestFps() const
 
     auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
     if (videoConsumer.expired())
-        return -1; //< should never happen unless consumersEmpty() returns true
+        return -1; //< Should never happen unless consumersEmpty() returns true
 
     return videoConsumer.lock()->fps();
 }
@@ -491,7 +491,7 @@ int VideoStream::largestBitrate() const
         : packetConsumer;
 
     if (videoConsumer.expired())
-        return -1; //< should never happen
+        return -1; //< Should never happen
 
     return videoConsumer.lock()->bitrate();
 }

@@ -405,7 +405,6 @@ void TranscodeStreamReader::maybeFlush()
     if (m_videoFrameConsumer->size() >= fps)
         m_videoFrameConsumer->flush();
 
-    /** half a second*/
     if (m_avConsumer->timeSpan() > kBufferTimeSpanMax)
         m_avConsumer->flush();
 }

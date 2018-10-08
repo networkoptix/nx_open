@@ -135,11 +135,9 @@ AlsaAudioDiscoveryManager::getDevices() const
             free(cardName);
     }
 
-    /**
-     * We want builtin mother board audio devices at the back of the list because they are
-     * registered even with nothing plugged into them. Audio capture devices that are actually
-     * present should get priority.
-     */
+    // We want builtin mother board audio devices at the back of the list because they are
+    // registered even with nothing plugged into them. Audio capture devices that are actually
+    // present should get priority.
     for(const auto motherBoardDevice : motherBoardDevices)
         devices.push_back(motherBoardDevice);
 

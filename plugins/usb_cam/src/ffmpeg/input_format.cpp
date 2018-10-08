@@ -21,7 +21,7 @@ int InputFormat::initialize(const char * deviceType)
     m_inputFormat = av_find_input_format(deviceType); 
     if (!m_inputFormat)
     {
-        // there is no error code for format not found
+        // There is no error code for format not found
         return AVERROR_PROTOCOL_NOT_FOUND;
     }
 
@@ -40,9 +40,6 @@ int InputFormat::open(const char * url)
         url,
         m_inputFormat,
         &m_options);
-
-    //  if(m_formatContext && openCode >= 0)
-    //     av_dump_format(m_formatContext, 0, url, 0);
     
     return openCode;
 }

@@ -367,10 +367,9 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::nextPacket(int 
             break;
     }
     
-    /**
-    * AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets 
-    * fixes the issue, but we don't want to lose any, so merge multiple packets.
-    */
+    
+    // AAC audio encoder puts out too many packets, bogging down the fps. Providing less packets 
+    // fixes the issue, but we don't want to lose any, so merge multiple packets.
     if (auto pkt = mergePackets(packet, outFfmpegError))
         return pkt;
 
@@ -388,16 +387,13 @@ std::shared_ptr<ffmpeg::Packet> AudioStream::AudioStreamPrivate::mergePackets(
     if(m_encoder->codecId() == AV_CODEC_ID_PCM_S16LE)
         return packet;
 
-    /** 
-     * Only merge if the timestamp difference is >= the amount of time it takes to produce a 
-     * video frame.
-     */
+    // Only merge if the timestamp difference is >= the amount of time it takes to produce a 
+    // video frame.
     m_packetMergeBuffer.push_back(packet);
     if (packet->timestamp() - m_packetMergeBuffer[0]->timestamp() < timePerVideoFrame().count())
         return nullptr;
 
-    /** Do the merge now */
-
+    // Do the merge now
     int size = 0;
     for (const auto& pkt : m_packetMergeBuffer)
         size += pkt->size();
@@ -472,10 +468,9 @@ void AudioStream::AudioStreamPrivate::run()
             continue;
         }
 
-        /**
-         *  If the encoder is aac, some packets are buffered and copied before delivering.
-         *  In that case, this packet is nullptr.
-         */
+        
+        // If the encoder is AAC, some packets are buffered and copied before delivering.
+        // In that case, this packet is nullptr.
         if(!packet)
             continue;
 
@@ -488,9 +483,7 @@ std::chrono::milliseconds AudioStream::AudioStreamPrivate::timePerVideoFrame() c
 {
     if(auto cam = m_camera.lock())
         return cam->videoStream()->actualTimePerFrame();
-    /** Should never happen */
-    return std::chrono::milliseconds(0);
-}
+    return std::chrono::milliseconds(0);} //< Should never happen
 
 
 //--------------------------------------------------------------------------------------------------
