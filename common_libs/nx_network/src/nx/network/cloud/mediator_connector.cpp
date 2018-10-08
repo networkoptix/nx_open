@@ -279,15 +279,18 @@ DelayedConnectStunClient::DelayedConnectStunClient(
     base_type(std::move(stunClient)),
     m_endpointProvider(endpointProvider)
 {
-    m_endpointProvider->udpEndpoint();
 }
 
 void DelayedConnectStunClient::connect(
     const nx::utils::Url& url,
     ConnectHandler handler)
 {
-    // TODO
-    base_type::connect(url, std::move(handler));
+    dispatch(
+        [this, url, handler = std::move(handler)]() mutable
+        {
+            m_urlKnown = true;
+            base_type::connect(url, std::move(handler));
+        });
 }
 
 void DelayedConnectStunClient::sendRequest(
@@ -295,8 +298,61 @@ void DelayedConnectStunClient::sendRequest(
     RequestHandler handler,
     void* client)
 {
-    // TODO
-    base_type::sendRequest(std::move(request), std::move(handler), client);
+    dispatch(
+        [this, request = std::move(request),
+            handler = std::move(handler), client]() mutable
+        {
+            if (m_urlKnown)
+            {
+                base_type::sendRequest(std::move(request), std::move(handler), client);
+                return;
+            }
+
+            NX_ASSERT(m_endpointProvider->getAioThread() == getAioThread());
+
+            m_endpointProvider->fetchMediatorEndpoints(
+                [this](auto... args) { onFetchEndpointCompletion(std::move(args)...); });
+
+            m_postponedRequests.push_back(
+                {std::move(request), std::move(handler), client});
+        });
+}
+
+void DelayedConnectStunClient::onFetchEndpointCompletion(
+    nx::network::http::StatusCode::Value resultCode)
+{
+    if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+        return failPendingRequests(SystemError::hostUnreachable);
+
+    m_urlKnown = true;
+
+    const auto createStunTunnelUrl =
+        nx::network::url::Builder(*m_endpointProvider->mediatorUrl())
+            .appendPath(api::kStunOverHttpTunnelPath).toUrl();
+
+    base_type::connect(createStunTunnelUrl, [](auto... /*args*/) {});
+
+    sendPendingRequests();
+}
+
+void DelayedConnectStunClient::failPendingRequests(
+    SystemError::ErrorCode resultCode)
+{
+    auto postponedRequests = std::exchange(m_postponedRequests, {});
+    for (auto& requestContext: postponedRequests)
+        requestContext.handler(resultCode, nx::network::stun::Message());
+}
+
+void DelayedConnectStunClient::sendPendingRequests()
+{
+    auto postponedRequests = std::exchange(m_postponedRequests, {});
+    for (auto& requestContext: postponedRequests)
+    {
+        base_type::sendRequest(
+            std::move(requestContext.request),
+            std::move(requestContext.handler),
+            requestContext.client);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

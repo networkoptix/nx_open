@@ -46,7 +46,7 @@ struct CameraInfoParams
 
 QnOnvifStreamReader::QnOnvifStreamReader(const QnPlOnvifResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_multiCodec(res),
+    m_multiCodec(res, res->getTimeOffset()),
     m_onvifRes(res)
 {
 }

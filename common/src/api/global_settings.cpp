@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <nx/utils/log/log.h>
+
 #include <api/resource_property_adaptor.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -1045,6 +1047,9 @@ QnUuid QnGlobalSettings::localSystemId() const
 
 void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
 {
+    NX_DEBUG(this, lm("Changing local system from %1 to %2")
+        .args(m_localSystemIdAdaptor->value(), value));
+
     m_localSystemIdAdaptor->setValue(value.toString());
 }
 

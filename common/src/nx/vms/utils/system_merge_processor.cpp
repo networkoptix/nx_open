@@ -375,7 +375,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
                 m_remoteModuleInformation.localSystemId,
                 m_remoteModuleInformation.systemName,
                 data.getKey,
-                data.postKey); statusCode != nx::network::http::StatusCode::ok)
+                data.postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings));
@@ -390,7 +390,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
         if (auto statusCode = applyCurrentSettings(
                 data.url,
                 data.postKey,
-                data.mergeOneServer); statusCode != nx::network::http::StatusCode::ok)
+                data.mergeOneServer); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             NX_DEBUG(this, lit("takeRemoteSettings %1. Failed to apply current settings")
                 .arg(data.takeRemoteSettings));
@@ -557,7 +557,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
             return nx::network::http::StatusCode::internalServerError;
     }
 
-    // 1. update settings in remove database to ensure they have priority while merge
+    // 1. Updating settings in remote database to ensure they have priority while merging.
     {
         ConfigureSystemData data;
         data.localSystemId = systemId;
@@ -570,14 +570,14 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         if (auto statusCode = executeRemoteConfigure(
                 data,
                 remoteUrl,
-                postKey); statusCode != nx::network::http::StatusCode::ok)
+                postKey); !nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
             return statusCode;
         }
 
     }
 
-    // 2. update local data
+    // 2. Updating local data.
     ConfigureSystemData data;
     data.localSystemId = systemId;
     data.wholeSystem = true;
@@ -602,7 +602,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    // put current server info to a foreign system to allow authorization via server key
+    // Put current server info to a foreign system to allow authorization via server key.
     {
         QnMediaServerResourcePtr mServer =
             m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(

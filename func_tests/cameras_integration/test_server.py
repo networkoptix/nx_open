@@ -1,12 +1,12 @@
 import json
-from datetime import timedelta
+import logging
 
-import oyaml as yaml
 import pytest
-from netaddr import IPNetwork
-from pathlib2 import Path
+import oyaml as yaml
 
 from . import execution
+
+_logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope='session')
@@ -14,41 +14,27 @@ def one_vm_type():
     return 'linux'
 
 
-@pytest.fixture
-def config(test_config):
-    return test_config.with_defaults(
-        CAMERAS_INTERFACE='enp3s0',
-        CAMERAS_NETWORK='192.168.200.111/24',
-        EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
-        CAMERA_CYCLE_DELAY=timedelta(seconds=1),
-        SERVER_STAGE_DELAY=timedelta(minutes=1),
-        STAGE_HARD_TIMEOUT=timedelta(hours=1),
-        )
-
-
-def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
+def test_cameras(rct_options, one_vm, one_licensed_mediaserver, artifacts_dir):
     one_licensed_mediaserver.os_access.networking.setup_network(
-        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), IPNetwork(config.CAMERAS_NETWORK))
+        one_vm.hardware.plug_bridged(rct_options.interface), rct_options.network)
 
     def save_result(name, data):
         file_path = artifacts_dir / name
         file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4))
         file_path.with_suffix('.yaml').write_bytes(
             yaml.safe_dump(data, default_flow_style=False, width=1000))
-
-    expected_cameras = Path(config.EXPECTED_CAMERAS_FILE)
-    if not expected_cameras.is_absolute():
-        expected_cameras = Path(__file__).parent / expected_cameras
+        _logger.info('Save result: %s', file_path)
 
     stand = execution.Stand(
         one_licensed_mediaserver,
-        yaml.load(expected_cameras.read_bytes()) or {},
-        config.STAGE_HARD_TIMEOUT)
+        yaml.load(rct_options.expected_cameras.read_bytes()) or {},
+        stage_hard_timeout=rct_options.stage_hard_timeout,
+        camera_filters=rct_options.camera_filter)
     try:
-        stand.run_all_stages(config.CAMERA_CYCLE_DELAY, config.SERVER_STAGE_DELAY)
+        stand.run_all_stages(rct_options.camera_cycle_delay, rct_options.server_stage_delay)
     finally:
         save_result('module_information', stand.server_information)
-        save_result('all_cameras', stand.all_cameras())
+        save_result('all_cameras', stand.all_cameras(verbose=True))
         save_result('test_results', stand.report)
 
     assert stand.is_successful

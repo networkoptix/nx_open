@@ -203,6 +203,9 @@ private:
 
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> generateCloudModuleXml()
     {
+        if (!m_mediator)
+            return nullptr;
+
         return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             m_cloudModuleListGenerator.get(m_mediator.get()));
