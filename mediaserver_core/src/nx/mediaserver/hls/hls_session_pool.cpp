@@ -178,15 +178,6 @@ SessionPool::SessionContext::SessionContext(
 {
 }
 
-static SessionPool* SessionPool_instance = nullptr;
-
-SessionPool::SessionPool()
-{
-    //NX_ASSERT(SessionPool_instance == nullptr);
-    if (!SessionPool_instance)
-        SessionPool_instance = this;
-}
-
 SessionPool::~SessionPool()
 {
     while (!m_sessionByID.empty())
@@ -204,8 +195,6 @@ SessionPool::~SessionPool()
         delete sessionCtx.session;
         nx::utils::TimerManager::instance()->joinAndDeleteTimer(sessionCtx.removeTaskID);
     }
-
-    SessionPool_instance = nullptr;
 }
 
 bool SessionPool::add(Session* session, unsigned int keepAliveTimeoutMS)
