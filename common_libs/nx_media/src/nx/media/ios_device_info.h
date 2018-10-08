@@ -18,6 +18,7 @@ struct IosDeviceInformation
 
     enum Version
     {
+        iPhoneXS_XR = 11,
         iPhone6 = 7,
         iPadAir2 = 5,
     };
