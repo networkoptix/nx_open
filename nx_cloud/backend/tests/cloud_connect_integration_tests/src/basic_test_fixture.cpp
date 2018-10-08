@@ -181,7 +181,6 @@ void BasicTestFixture::SetUp()
             nx::network::url::Builder().setScheme("http")
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 }
 

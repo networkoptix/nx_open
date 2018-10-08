@@ -54,26 +54,6 @@ void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThre
     m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
-void MediatorConnector::enable(bool waitForCompletion)
-{
-    bool needToFetch = false;
-    {
-        QnMutexLocker lock(&m_mutex);
-        if (!m_promise)
-        {
-            needToFetch = true;
-            m_promise = nx::utils::promise< bool >();
-            m_future = m_promise->get_future();
-        }
-    }
-
-    if (needToFetch)
-        post([this]() { connectToMediatorAsync(); });
-
-    if (waitForCompletion)
-        m_future->wait();
-}
-
 std::unique_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
     return std::make_unique<MediatorClientTcpConnection>(m_stunClient);
@@ -97,16 +77,10 @@ void MediatorConnector::mockupMediatorUrl(
     {
         QnMutexLocker lock(&m_mutex);
         if (const auto currentMediatorUrl = m_mediatorEndpointProvider->mediatorUrl();
-            m_promise && currentMediatorUrl && mediatorUrl == *currentMediatorUrl)
+            currentMediatorUrl && mediatorUrl == *currentMediatorUrl)
         {
             return;
         }
-
-        NX_ASSERT(!m_promise, Q_FUNC_INFO,
-            "Address resolving is already in progress!");
-
-        m_promise = nx::utils::promise<bool>();
-        m_future = m_promise->get_future();
 
         NX_DEBUG(this, lm("Mediator address is mocked up: %1").arg(mediatorUrl));
 
@@ -116,10 +90,7 @@ void MediatorConnector::mockupMediatorUrl(
             stunUdpEndpoint);
     }   
 
-    m_promise->set_value(true);
     establishTcpConnectionToMediatorAsync();
-    if (m_mediatorAvailabilityChangedHandler)
-        m_mediatorAvailabilityChangedHandler(true);
 }
 
 void MediatorConnector::setSystemCredentials(std::optional<SystemCredentials> value)
@@ -172,21 +143,10 @@ std::optional<nx::network::SocketAddress> MediatorConnector::udpEndpoint() const
     return m_mediatorEndpointProvider->udpEndpoint();
 }
 
-void MediatorConnector::setOnMediatorAvailabilityChanged(
-    MediatorAvailabilityChangedHandler handler)
-{
-    m_mediatorAvailabilityChangedHandler.swap(handler);
-}
-
 void MediatorConnector::setStunClientSettings(
     network::stun::AbstractAsyncClient::Settings stunClientSettings)
 {
     s_stunClientSettings = std::move(stunClientSettings);
-}
-
-static bool isReady(const nx::utils::future<bool>& f)
-{
-    return f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
 
 void MediatorConnector::stopWhileInAioThread()
@@ -204,9 +164,6 @@ void MediatorConnector::connectToMediatorAsync()
         {
             if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
             {
-                if (!isReady(*m_future))
-                    m_promise->set_value(false);
-
                 // Retry after some delay.
                 m_fetchEndpointRetryTimer->scheduleNextTry(
                     [this]() { connectToMediatorAsync(); });
@@ -214,8 +171,6 @@ void MediatorConnector::connectToMediatorAsync()
             else
             {
                 establishTcpConnectionToMediatorAsync();
-                if (m_mediatorAvailabilityChangedHandler)
-                    m_mediatorAvailabilityChangedHandler(true);
             }
         });
 }
@@ -243,9 +198,6 @@ void MediatorConnector::establishTcpConnectionToMediatorAsync()
                     .args(createStunTunnelUrl, SystemError::toString(code)));
                 reconnectToMediator();
             }
-
-            if (!isReady(*m_future))
-                m_promise->set_value(code == SystemError::noError);
         });
 }
 

@@ -17,7 +17,7 @@ enum class TimePolicy
 
 struct TimeOffset
 {
-    std::chrono::microseconds get() { return std::chrono::microseconds(m_timeOffset.value()); }
+    std::chrono::microseconds get() { return std::chrono::microseconds(*m_timeOffset); }
     void reset(std::chrono::microseconds value) { m_timeOffset = value.count(); };
     bool hasValue() { return m_timeOffset.has_value(); }
 

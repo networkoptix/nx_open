@@ -177,7 +177,8 @@ bool MediaServerEmulator::start(bool listenToConnectRequests)
     auto client = m_mediatorConnector->systemConnection();
     client->bindToAioThread(getAioThread());
     m_mediatorAddressPublisher = std::make_unique<network::cloud::MediatorAddressPublisher>(
-        std::move(client));
+        std::move(client),
+        m_mediatorConnector.get());
 
     return true;
 }

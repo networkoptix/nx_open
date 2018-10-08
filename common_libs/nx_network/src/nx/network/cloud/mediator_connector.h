@@ -51,9 +51,6 @@ public:
      * Provides endpoint without blocking.
      */
     virtual std::optional<nx::network::SocketAddress> udpEndpoint() const = 0;
-
-    virtual void setOnMediatorAvailabilityChanged(
-        MediatorAvailabilityChangedHandler handler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -70,12 +67,6 @@ public:
     MediatorConnector& operator=(MediatorConnector&&) = delete;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
-
-    /**
-     * Has to be called to enable cloud functionality for application.
-     * E.g., initiates mediator address resolving.
-     */
-    void enable(bool waitForCompletion = false);
 
     /** Provides client related functionality */
     virtual std::unique_ptr<MediatorClientTcpConnection> clientConnection() override;
@@ -106,23 +97,16 @@ public:
 
     virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
 
-    virtual void setOnMediatorAvailabilityChanged(
-        MediatorAvailabilityChangedHandler handler) override;
-
     static void setStunClientSettings(network::stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
     mutable QnMutex m_mutex;
     std::optional<SystemCredentials> m_credentials;
 
-    std::optional<nx::utils::promise<bool>> m_promise;
-    std::optional<nx::utils::future<bool>> m_future;
-
     std::unique_ptr<MediatorEndpointProvider> m_mediatorEndpointProvider;
     std::shared_ptr<DelayedConnectStunClient> m_stunClient;
     std::optional<nx::utils::Url> m_mockedUpMediatorUrl;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
-    MediatorAvailabilityChangedHandler m_mediatorAvailabilityChangedHandler;
 
     virtual void stopWhileInAioThread() override;
 
@@ -136,7 +120,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Add support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
+ * Adds support for calling AbstractAsyncClient::sendRequest before AbstractAsyncClient::connect.
  * It implicitely fetches endpoint from MediatorEndpointProvider and 
  * calls AbstractAsyncClient::connect.
  */

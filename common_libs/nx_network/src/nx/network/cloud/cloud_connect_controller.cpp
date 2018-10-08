@@ -56,7 +56,9 @@ struct CloudConnectControllerImpl
         aioService(aioService),
         addressResolver(addressResolver),
         mediatorConnector(cloudHost.toStdString()),
-        addressPublisher(mediatorConnector.systemConnection()),
+        addressPublisher(
+            mediatorConnector.systemConnection(),
+            &mediatorConnector),
         tcpReversePool(
             aioService,
             outgoingTunnelPool,
