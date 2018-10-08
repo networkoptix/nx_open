@@ -231,7 +231,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
 {
     for (auto& track: m_tracks)
     {
-        if (track.parser) {
+        if (track.parser)
+        {
             QnAbstractMediaDataPtr result = track.parser->nextData();
             if (result) {
                 result->timestamp = m_timeHelper.getTime(

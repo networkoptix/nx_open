@@ -390,8 +390,8 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
     if (soapRes != SOAP_OK)
     {
         qWarning() << "QnDigitalWatchdogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
-            << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
-            << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
+            << soapWrapper.endpoint() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastErrorDescription() << ". Only base (base for DW) advanced settings will be available for this camera.";
 
         return QString();
     }
@@ -469,6 +469,10 @@ nx::mediaserver::resource::StreamCapabilityMap
 {
     using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
+    return onvifResult;
+
+    // We use onvif to detect and tune codecs
+#if 0
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
@@ -484,6 +488,7 @@ nx::mediaserver::resource::StreamCapabilityMap
         }
     }
     return result;
+#endif
 }
 
 CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
@@ -492,11 +497,15 @@ CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     const QnLiveStreamParams& streamParams)
 {
     auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
+    return result;
+
+#if 0
     if (!result)
         return result;
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
     return CameraDiagnostics::NoErrorResult();
+#endif
 }
 
 #endif //ENABLE_ONVIF

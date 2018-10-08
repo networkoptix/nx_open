@@ -77,7 +77,6 @@ public:
 
 signals:
     void packetLostDetected(quint32 prev, quint32 next);
-
 protected:
     void setFrequency(int frequency) { m_frequency = frequency; }
 

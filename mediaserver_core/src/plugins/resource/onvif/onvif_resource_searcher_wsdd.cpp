@@ -456,8 +456,8 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
         return QString();
     }
 
-    QString endpoint = QLatin1String(source->wsa__EndpointReference.Address);
-    QString messageId = QLatin1String(header->wsa__MessageID);
+    QString endpoint = QLatin1String(source->wsa5__EndpointReference.Address);
+    QString messageId = QLatin1String(header->wsa5__MessageID);
 
     int pos = endpoint.lastIndexOf(QLatin1Char('-'));
     if (pos == -1) {
@@ -508,7 +508,7 @@ QString OnvifResourceSearcherWsdd::getEndpointAddress(const T* source) const
         return QString();
     }
 
-    return QLatin1String(source->wsa__EndpointReference.Address);
+    return QLatin1String(source->wsa5__EndpointReference.Address);
 }
 
 template <class T>
@@ -574,19 +574,20 @@ QString OnvifResourceSearcherWsdd::extractScope(const T* source, const QString& 
     return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
 }
 
-void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const
+void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa5__EndpointReferenceType& endpoint) const
 {
-    //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
-    //So const_cast should be safety
+    // Strings PROBE_TYPE and WSA_ADDRESS should not be changed
+    // (possibly, char* instead of const char* is a gsoap bug
+    // So const_cast should be safety
 
     probe.Types = const_cast<char*>(PROBE_TYPE);
     probe.Scopes = NULL;
 
     endpoint.Address = const_cast<char*>(WSA_ADDRESS);
-    endpoint.PortType = NULL;
-    endpoint.ReferenceParameters = NULL;
-    endpoint.ReferenceProperties = NULL;
-    endpoint.ServiceName = NULL;
+
+    endpoint.ReferenceParameters = nullptr;
+    endpoint.Metadata = nullptr;
+
     endpoint.__size = 0;
     endpoint.__any = NULL;
     endpoint.__anyAttribute = NULL;
@@ -638,32 +639,32 @@ void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_EN
     qDebug() << "  Header: ";
     if (header) {
 
-        if (header->wsa__RelatesTo && header->wsa__RelatesTo->__item) {
-            qDebug() << "    Related to MessageID: " << header->wsa__RelatesTo->__item;
+        if (header->wsa5__RelatesTo && header->wsa5__RelatesTo->__item) {
+            qDebug() << "    Related to MessageID: " << header->wsa5__RelatesTo->__item;
         }
 
-        if (header->wsa__Action) {
-            qDebug() << "    Action: " << header->wsa__Action;
+        if (header->wsa5__Action) {
+            qDebug() << "    Action: " << header->wsa5__Action;
         }
 
-        if (header->wsa__To) {
-            qDebug() << "    To: " << header->wsa__To;
+        if (header->wsa5__To) {
+            qDebug() << "    To: " << header->wsa5__To;
         }
 
-        if (header->wsa__From && header->wsa__From->Address) {
-            qDebug() << "    From: " << header->wsa__From->Address;
+        if (header->wsa5__From && header->wsa5__From->Address) {
+            qDebug() << "    From: " << header->wsa5__From->Address;
         }
 
-        if (header->wsa__ReplyTo && header->wsa__ReplyTo->Address) {
-            qDebug() << "    ReplyTo: " << header->wsa__ReplyTo->Address;
+        if (header->wsa5__ReplyTo && header->wsa5__ReplyTo->Address) {
+            qDebug() << "    ReplyTo: " << header->wsa5__ReplyTo->Address;
         }
 
-        if (header->wsa__FaultTo && header->wsa__FaultTo->Address) {
-            qDebug() << "    FaultTo: " << header->wsa__FaultTo->Address;
+        if (header->wsa5__FaultTo && header->wsa5__FaultTo->Address) {
+            qDebug() << "    FaultTo: " << header->wsa5__FaultTo->Address;
         }
 
-        if (header->wsa__RelatesTo && header->wsa__RelatesTo->__item) {
-            qDebug() << "    FaultTo: " << header->wsa__RelatesTo->__item;
+        if (header->wsa5__RelatesTo && header->wsa5__RelatesTo->__item) {
+            qDebug() << "    FaultTo: " << header->wsa5__RelatesTo->__item;
         }
 
     } else {
@@ -681,8 +682,8 @@ void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_EN
             qDebug() << "    Types: " << source->Types;
         }
 
-        if (source->wsa__EndpointReference.Address) {
-            qDebug() << "    Address: " << source->wsa__EndpointReference.Address;
+        if (source->wsa5__EndpointReference.Address) {
+            qDebug() << "    Address: " << source->wsa5__EndpointReference.Address;
         }
 
         if (source->Scopes && source->Scopes->__item) {
@@ -738,7 +739,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     soapWsddProxy.soap->master = socket->handle();
 
     wsdd__ProbeType wsddProbe;
-    wsa__EndpointReferenceType replyTo;
+    wsa5__EndpointReferenceType replyTo;
     fillWsddStructs(wsddProbe, replyTo);
 
     char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
@@ -839,10 +840,21 @@ bool OnvifResourceSearcherWsdd::sendProbe( const nx::network::QnInterfaceAndAddr
     char* messageID = const_cast<char*>(soap_wsa_rand_uuid(ctx->soapWsddProxy.soap));
     //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
 
-    //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
-    //So const_cast should be safety
-    ctx->soapWsddProxy.soap_header(NULL, messageID, NULL, NULL, &ctx->replyTo, NULL,
-        const_cast<char*>(WSDD_ADDRESS), const_cast<char*>(WSDD_ACTION), NULL);
+    // Strings WSDD_ADDRESS and WSDD_ACTION should not be changed
+    // (possibly,  char* instead of const char* in soap_header declaration, is a gsoap bug)
+    // So const_cast should be safety
+    ctx->soapWsddProxy.soap_header(
+        messageID,
+        /*wsa5__RelatesTo*/ nullptr,
+        /*wsa5__From*/ nullptr,
+        &ctx->replyTo,
+        /*wsa5__FaultTo*/ nullptr,
+        /*wsa5__To*/ const_cast<char*>(WSDD_ADDRESS),
+        const_cast<char*>(WSDD_ACTION),
+        /*chan__ChannelInstance*/ nullptr,
+        /*wsdd__AppSequence*/ nullptr,
+        /*wsse__Security*/ nullptr,
+        /*subscriptionID*/ nullptr);
 
     QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
     int soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
