@@ -49,9 +49,9 @@ int QnSaveUserExRestHandler::executePost(
     userData.fullName = userDataEx.fullName;
 
     const auto hashes = PasswordData::calculateHashes(
-        userData.name,
         userDataEx.name,
-        userData.isLdap);
+        userDataEx.password,
+        userDataEx.isLdap);
 
     userData.realm = hashes.realm;
     userData.hash = hashes.passwordHash;

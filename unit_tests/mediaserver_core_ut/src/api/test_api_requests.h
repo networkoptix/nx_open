@@ -34,7 +34,9 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
 namespace api_requests_detail {
 
-std::unique_ptr<nx::network::http::HttpClient> createHttpClient();
+std::unique_ptr<nx::network::http::HttpClient> createHttpClient(const QString &authName = "admin",
+    const QString &authPassword = "admin");
+
 nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr);
 
 void doExecutePost(
@@ -42,7 +44,9 @@ void doExecutePost(
     const QString& urlStr,
     const QByteArray& request,
     PreprocessRequestFunc preprocessRequestFunc,
-    int httpStatus);
+    int httpStatus,
+    const QString& authName,
+    const QString& authPassword);
 
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
@@ -53,23 +57,30 @@ void executePost(
     const QString& urlStr,
     const RequestData& requestData,
     PreprocessRequestFunc preprocessRequestFunc = nullptr,
-    int httpStatus = nx::network::http::StatusCode::ok)
+    int httpStatus = nx::network::http::StatusCode::ok,
+    const QString& authName = "admin",
+    const QString& authPassword = "admin")
 {
     const QByteArray& request = QJson::serialized(requestData);
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
-        launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus));
+        launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus, authName,
+        authPassword));
 }
 
 void doExecuteGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
     nx::network::http::BufferType* outResponse,
-    int httpStatus);
+    int httpStatus,
+    const QString& authName,
+    const QString& authPassword);
 
 void doExecuteGet(
     const nx::utils::Url& url,
     nx::network::http::BufferType* outResponse,
-    int httpStatus);
+    int httpStatus,
+    const QString& authName = "admin",
+    const QString& authPassword = "admin");
 
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
@@ -79,10 +90,13 @@ void executeGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
     ResponseData* responseData = nullptr,
-    int httpStatus = nx::network::http::StatusCode::ok)
+    int httpStatus = nx::network::http::StatusCode::ok,
+    const QString& authName = "admin",
+    const QString& authPassword = "admin")
 {
     nx::network::http::BufferType response;
-    ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus));
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus, authName,
+        authPassword));
     if (responseData)
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }
@@ -91,7 +105,9 @@ void executeGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
     QJsonDocument* responseData,
-    int httpStatus = nx::network::http::StatusCode::ok);
+    int httpStatus = nx::network::http::StatusCode::ok,
+    const QString& authName = "admin",
+    const QString& authPassword = "admin");
 
 template<class ResponseData>
 void executeGet(

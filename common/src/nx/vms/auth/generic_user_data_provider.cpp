@@ -84,6 +84,7 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         responseHash.addData(ha2);
         const QByteArray calcResponse = responseHash.result().toHex();
 
+        bool isTestUser = res->getName() == "testAdminUserName";
         if (calcResponse != authorizationHeader.digest->params["response"])
         {
             NX_VERBOSE(this, lm("Wrong digest for %1").args(user));
