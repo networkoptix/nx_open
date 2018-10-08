@@ -226,7 +226,6 @@ SoapWrapper<BindingProxyT>::SoapWrapper(SoapParams soapParams):
     m_login(std::move(soapParams.login)),
     m_passwd(std::move(soapParams.passwd))
 {
-    NX_ASSERT(!m_endpointHolder.empty());
     if (soapParams.tcpKeepAlive)
     {
         soap_imode(m_bindingProxy.soap, SOAP_IO_KEEPALIVE);
