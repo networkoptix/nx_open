@@ -1,6 +1,10 @@
 <div class="card hoverable"
      [ngClass]="class">
 
-    <ng-content select="<nx-content-block-header>"></ng-content>
-    <ng-content select="[card-sections]"></ng-content>
+    <div class="card--header">
+        <h3>
+            <ng-content select="header"></ng-content>
+        </h3>
+    </div>
+    <ng-content></ng-content>
 </div>

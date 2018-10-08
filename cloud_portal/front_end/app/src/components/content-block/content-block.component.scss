@@ -5,6 +5,18 @@
     box-shadow   : none;
     border-color : $light4;
 
+    &--header {
+        height           : rem(48px);
+        background-color : $additional_light1;
+        padding          : 0 1rem;
+        border-bottom    : 1px solid $light3;
+
+        h3 {
+            margin      : 0;
+            line-height : rem(48px);
+        }
+    }
+
     &.gray {
         background-color : $light4;
         border           : none;
