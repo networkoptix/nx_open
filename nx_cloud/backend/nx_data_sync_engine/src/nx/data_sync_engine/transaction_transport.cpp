@@ -216,9 +216,9 @@ void TransactionTransport::startOutgoingChannel()
     transportHeader.vmsTransportHeader.processedPeers
         << m_baseTransactionTransport->localPeer().id;
 
-    sendTransaction<command::TranSyncRequest>(
-        std::move(requestTran),
-        std::move(transportHeader));
+    sendTransaction(
+        std::move(transportHeader),
+        makeSerializer<command::TranSyncRequest>(std::move(requestTran)));
 }
 
 void TransactionTransport::processSpecialTransaction(
@@ -239,9 +239,10 @@ void TransactionTransport::processSpecialTransaction(
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
     transportHeader.vmsTransportHeader.processedPeers.insert(
         m_baseTransactionTransport->localPeer().id);
-    sendTransaction<command::TranSyncResponse>(
-        std::move(tranSyncResponse),
-        std::move(transportHeader));
+
+    sendTransaction(
+        std::move(transportHeader),
+        makeSerializer<command::TranSyncResponse>(std::move(tranSyncResponse)));
 
     m_haveToSendSyncDone = true;
 
@@ -447,7 +448,6 @@ void TransactionTransport::enableOutputChannel()
     {
         m_haveToSendSyncDone = false;
 
-
         auto tranSyncDone = command::make<command::TranSyncDone>(
             m_baseTransactionTransport->localPeer().id);
         tranSyncDone.params.result = 0;
@@ -455,9 +455,10 @@ void TransactionTransport::enableOutputChannel()
         TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
         transportHeader.vmsTransportHeader.processedPeers.insert(
             m_baseTransactionTransport->localPeer().id);
-        sendTransaction<command::TranSyncDone>(
-            std::move(tranSyncDone),
-            std::move(transportHeader));
+
+        sendTransaction(
+            std::move(transportHeader),
+            makeSerializer<command::TranSyncDone>(std::move(tranSyncDone)));
     }
 }
 
@@ -478,46 +479,6 @@ void TransactionTransport::onInactivityTimeout()
     NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Inactivity timeout triggered")
         .args(m_systemId, m_connectionId));
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::Error);
-}
-
-template<typename CommandDescriptor>
-void TransactionTransport::sendTransaction(
-    Command<typename CommandDescriptor::Data> transaction,
-    TransactionTransportHeader transportHeader)
-{
-    NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Sending transaction %1 to %2").arg(transaction.command)
-        .arg(m_commonTransportHeaderOfRemoteTransaction));
-
-    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer;
-    switch (m_baseTransactionTransport->remotePeer().dataFormat)
-    {
-        case Qn::UbjsonFormat:
-        {
-            auto serializedTransaction = QnUbjson::serialized(transaction);
-            transactionSerializer =
-                std::make_unique<UbjsonSerializedTransaction<CommandDescriptor>>(
-                    std::move(transaction),
-                    std::move(serializedTransaction),
-                    m_protocolVersionRange.currentVersion());
-            break;
-        }
-
-        default:
-        {
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
-                lm("Cannot send transaction in unsupported format %1 to %2")
-                .arg(QnLexical::serialized(m_baseTransactionTransport->remotePeer().dataFormat))
-                .arg(m_commonTransportHeaderOfRemoteTransaction));
-
-            // TODO: #ak close connection
-            NX_ASSERT(false);
-            return;
-        }
-    }
-
-    sendTransaction(
-        std::move(transportHeader),
-        transactionSerializer);
 }
 
 } // namespace data_sync_engine

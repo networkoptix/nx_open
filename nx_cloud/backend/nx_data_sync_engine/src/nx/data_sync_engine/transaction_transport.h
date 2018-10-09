@@ -142,11 +142,6 @@ private:
 
     void restartInactivityTimer();
     void onInactivityTimeout();
-
-    template<typename CommandDescriptor>
-    void sendTransaction(
-        Command<typename CommandDescriptor::Data> transaction,
-        TransactionTransportHeader transportHeader);
 };
 
 } // namespace data_sync_engine
