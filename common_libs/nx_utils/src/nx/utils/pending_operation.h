@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
 
 #include <QtCore/QObject>
@@ -31,14 +32,20 @@ public:
 
     PendingOperation(QObject* parent = nullptr);
     PendingOperation(const Callback& callback, int intervalMs, QObject* parent = nullptr);
+    PendingOperation(const Callback& callback, std::chrono::milliseconds interval,
+        QObject* parent = nullptr);
 
     void requestOperation();
+    void fire(); //< Fire immediately, if requested or not.
 
     Flags flags() const;
     void setFlags(Flags flags);
 
     int intervalMs() const;
     void setIntervalMs(int value);
+
+    std::chrono::milliseconds interval() const;
+    void setInterval(std::chrono::milliseconds value);
 
     void setCallback(const Callback& callback);
 
