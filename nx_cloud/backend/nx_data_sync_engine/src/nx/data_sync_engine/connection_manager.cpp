@@ -19,6 +19,7 @@
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
 #include "websocket_transaction_transport.h"
+#include "transport/generic_transport.h"
 
 namespace nx {
 namespace data_sync_engine {
@@ -446,7 +447,7 @@ void ConnectionManager::processSpecialTransaction(
 
     // TODO: #ak Get rid of dynamic_cast.
     auto transactionTransport =
-        dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
+        dynamic_cast<transport::GenericTransport*>(connectionIter->connection.get());
 
     // NOTE: transactionTransport variable can safely be used within its own AIO thread.
     NX_ASSERT(transactionTransport->isInSelfAioThread());

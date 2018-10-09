@@ -3,13 +3,15 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx::data_sync_engine {
 
 class AbstractTransactionTransport;
 
-class AbstractTransactionTransportConnector
+class AbstractTransactionTransportConnector:
+    public network::aio::BasicPollable
 {
 public:
     using Handler = nx::utils::MoveOnlyFunc<void(

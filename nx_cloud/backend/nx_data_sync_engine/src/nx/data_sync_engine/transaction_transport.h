@@ -115,6 +115,7 @@ private:
     bool m_haveToSendSyncDone;
     bool m_closed;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
+    bool m_canSendCommands = false;
 
     int highestProtocolVersionCompatibleWithRemotePeer() const;
 

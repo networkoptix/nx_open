@@ -7,6 +7,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/vms/api/types/connection_types.h>
 
+#include "generic_transport.h"
 #include "../connection_manager.h"
 #include "../compatible_ec2_protocol_version.h"
 
@@ -79,8 +80,7 @@ void HttpTransportAcceptor::createConnection(
             connection->socket()->getForeignAddress(),
             connectionRequestAttributes.connectionId));
 
-    // newTransport MUST be ready to accept connections before sending response.
-    auto newTransport = std::make_unique<TransactionTransport>(
+    auto commandPipeline = std::make_unique<TransactionTransport>(
         m_protocolVersionRange,
         connection->getAioThread(),
         m_connectionGuardSharedState,
@@ -91,6 +91,9 @@ void HttpTransportAcceptor::createConnection(
         m_localPeerData,
         connection->socket()->getForeignAddress(),
         request);
+
+    auto newTransport = std::make_unique<GenericTransport>(
+        std::move(commandPipeline));
 
     ConnectionManager::ConnectionContext context{
         std::move(newTransport),
@@ -275,13 +278,16 @@ void HttpTransportAcceptor::startOutgoingChannel(
         connectionId,
         [connection](AbstractTransactionTransport* transportConnection)
         {
+            // TODO: #ak Get rid of type casts here.
+
             auto transactionTransport =
-                dynamic_cast<TransactionTransport*>(transportConnection);
+                dynamic_cast<GenericTransport*>(transportConnection);
             if (transactionTransport)
             {
-                transactionTransport->setOutgoingConnection(
-                    connection->takeSocket());
-                transactionTransport->startOutgoingChannel();
+                static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
+                    .setOutgoingConnection(connection->takeSocket());
+                static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
+                    .startOutgoingChannel();
             }
         });
 }
@@ -292,7 +298,7 @@ void HttpTransportAcceptor::postTransactionToTransport(
     bool* foundConnectionOfExpectedType)
 {
     auto transactionTransport =
-        dynamic_cast<TransactionTransport*>(transportConnection);
+        dynamic_cast<GenericTransport*>(transportConnection);
     if (!transactionTransport)
     {
         *foundConnectionOfExpectedType = false;
@@ -303,9 +309,10 @@ void HttpTransportAcceptor::postTransactionToTransport(
     transactionTransport->post(
         [transactionTransport, request = std::move(request)]() mutable
         {
-            transactionTransport->receivedTransaction(
-                std::move(request.headers),
-                std::move(request.messageBody));
+            static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
+                .receivedTransaction(
+                    std::move(request.headers),
+                    std::move(request.messageBody));
         });
 }
 

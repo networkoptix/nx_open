@@ -164,18 +164,15 @@ void TransactionTransport::sendTransaction(
             serializedTransaction = std::move(serializedTransaction),
             transactionHeader = transactionSerializer->header()]()
         {
-            // TODO: #ak checking transaction to send queue size
-            //if (isReadyToSend(transaction.command) && queue size is too large)
-            //    setWriteSync(false);
-
-            if (m_baseTransactionTransport->isReadyToSend(transactionHeader.command))
+            if (::ec2::ApiCommand::isSystem(transactionHeader.command) || m_canSendCommands)
             {
-                m_baseTransactionTransport->addDataToTheSendQueue(std::move(serializedTransaction));
+                m_baseTransactionTransport->addDataToTheSendQueue(
+                    std::move(serializedTransaction));
                 return;
             }
 
-            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing send transaction %1 to %2").arg(transactionHeader.command)
-                    .arg(m_commonTransportHeaderOfRemoteTransaction));
+            NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("Postponing send transaction %1 to %2")
+                .args(transactionHeader.command, m_commonTransportHeaderOfRemoteTransaction));
 
             //cannot send transaction right now: updating local transaction sequence
             const vms::api::PersistentIdData tranStateKey(
@@ -226,8 +223,6 @@ void TransactionTransport::processSpecialTransaction(
     Command<vms::api::SyncRequestData> data,
     TransactionProcessedHandler handler)
 {
-    m_baseTransactionTransport->setWriteSync(true);
-
     m_tranStateToSynchronizeTo = m_transactionLogReader->getCurrentState();
     m_remotePeerTranState = std::move(data.params.persistentState);
 
@@ -440,9 +435,10 @@ void TransactionTransport::onTransactionsReadFromLog(
 
 void TransactionTransport::enableOutputChannel()
 {
-    m_baseTransactionTransport->setWriteSync(true);
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1. Enabled output channel to the peer %2")
         .arg(m_systemId).arg(m_commonTransportHeaderOfRemoteTransaction));
+
+    m_canSendCommands = true;
 
     if (m_haveToSendSyncDone)
     {
