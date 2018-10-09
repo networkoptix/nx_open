@@ -124,7 +124,9 @@ class Checker(object):
 
             else:
                 if not isinstance(actual, dict):
-                    self.add_error('{} is {}, expected to be a dict', path, actual_type)
+                    self.add_error(
+                        '{} is {}, expected to be a {{{}}}', path, actual_type,
+                        ', '.join('{}: ...'.format(key) for key, value in expected.items()))
                 else:
                     self.expect_values(
                         expected_value, self._get_key_value(key, actual), full_path, syntax)

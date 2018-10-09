@@ -37,6 +37,8 @@ struct RtpHeader
     uint32_t ssrc;                   // synchronization source
     //quint32 csrc;                 // synchronization source
     //quint32 csrc[1];              // optional CSRC list
+
+    uint32_t payloadOffset() { return kSize + CSRCCount * 4; };
 };
 #pragma pack(pop)
 

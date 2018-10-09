@@ -183,6 +183,7 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/save_user_ex_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -2424,14 +2425,53 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/installUpdate", new QnInstallUpdateRestHandler(serverModule()));
     reg("ec2/cancelUpdate", new QnCancelUpdateRestHandler(serverModule()));
 
+    /**%apidoc POST /ec2/saveUserEx
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json".
+     * </p>
+     * %permissions Administrator.
+     * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
+     *     exists, omitted fields will not be changed.
+     * %param name User name.
+     * %param permissions Combination (via "|") of the following flags:
+     *     %value GlobalAdminPermission Admin, can edit other non-admins.
+     *     %value GlobalEditCamerasPermission Can edit camera settings.
+     *     %value GlobalControlVideoWallPermission Can control video walls.
+     *     %value GlobalViewArchivePermission Can view archives of available cameras.
+     *     %value GlobalExportPermission Can export archives of available cameras.
+     *     %value GlobalViewBookmarksPermission Can view bookmarks of available cameras.
+     *     %value GlobalManageBookmarksPermission Can modify bookmarks of available cameras.
+     *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
+     *         buttons.
+     *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
+     *     %value GlobalCustomUserPermission Flag: this user has custom permissions
+     * %param[opt] userRoleId User role unique id.
+     * %param email User's email.
+     * %param[opt] password User's password.
+     * %param[opt] isLdap Whether the user was imported from LDAP.
+     *     %value false Default value.
+     *     %value true
+     * %param[opt] isEnabled Whether the user is enabled.
+     *     %value false
+     *     %value true Default value.
+     * %param[opt] isCloud Whether the user is a cloud user, as opposed to a local one.
+     *     %value false Default value.
+     *     %value true
+     * %param fullName Full name of the user.
+     */
+    reg("ec2/saveUserEx", new QnSaveUserExRestHandler(serverModule()));
+
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
      *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).
-     *     The special value "latest", which is the default value, requires to retrieve the latest
-     *     thumbnail. The special value "now" requires to retrieve the thumbnail corresponding to
-     *     the current time.
+     * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).<br/>
+     *     The special value "now" requires to retrieve the thumbnail only from the live stream.
+     *     <br/>The special value "latest", which is the default value, requires to retrieve
+     *     thumbnail from the live stream if possible, otherwise the latest one from the archive.
+     *     <br/>Note: archive extraction can be quite slow operation depending place where it is
+     *     stored.
      * %param[opt]:integer rotate Image orientation. Can be 0, 90, 180 or 270 degrees. If the
      *     parameter is absent or equals -1, the image will be rotated as defined in the camera
      *     settings.
@@ -2996,7 +3036,7 @@ void MediaServerProcess::updateGuidIfNeeded()
         }
     }
 
-    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged, 
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::localSystemIdChanged,
         [this, serverGuid, hwidGuid]()
         {
             // Stop moving HwId to serverGuid as soon as first setup wizard is done.

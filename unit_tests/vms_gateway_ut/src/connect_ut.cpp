@@ -61,7 +61,10 @@ public:
         // Clean http options which can be left in socket buffer.
         while(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(),
             MSG_DONTWAIT) > 0);
-        ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::again);
+        ASSERT_TRUE(
+            SystemError::getLastOSErrorCode() == SystemError::again ||
+            SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+            << SystemError::getLastOSErrorCode();
     }
 
     network::test::RandomDataTcpServer server;

@@ -62,11 +62,6 @@ struct CloudConnectControllerImpl
             outgoingTunnelPool,
             mediatorConnector.clientConnection())
     {
-        mediatorConnector.setOnMediatorAvailabilityChanged(
-            [this](bool isMediatorAvailable)
-            {
-                this->addressResolver->setCloudResolveEnabled(isMediatorAvailable);
-            });
     }
 
     ~CloudConnectControllerImpl()
@@ -80,8 +75,6 @@ struct CloudConnectControllerImpl
         }
 
         cloudServicesStoppedPromise.get_future().wait();
-
-        addressResolver->setCloudResolveEnabled(false);
     }
 };
 

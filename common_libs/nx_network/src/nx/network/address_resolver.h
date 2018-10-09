@@ -96,9 +96,6 @@ public:
     /** @return true If endpoint is valid for socket connect. */
     bool isValidForConnect(const SocketAddress& endpoint) const;
 
-    void setCloudResolveEnabled(bool isEnabled);
-    bool isCloudResolveEnabled() const;
-
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {

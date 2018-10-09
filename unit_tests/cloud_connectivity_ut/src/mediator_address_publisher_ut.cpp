@@ -114,7 +114,7 @@ public:
         m_cloudCredentials.key = QnUuid::createUuid().toSimpleByteArray();
     }
 
-    virtual boost::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
+    virtual std::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
     {
         return m_cloudCredentials;
     }

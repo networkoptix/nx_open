@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
 
@@ -88,7 +89,7 @@ public:
 
     QnSessionManager* sessionManager() const
     {
-        return m_sessionManager;
+        return m_sessionManager.data();
     }
 
     QnResourcePool* resourcePool() const
@@ -291,7 +292,8 @@ private:
 private:
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
-    QnSessionManager* m_sessionManager = nullptr;
+    QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;
+    QScopedPointer<QnSessionManager> m_sessionManager;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
@@ -316,7 +318,6 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
-    nx::network::http::ClientPool* m_httpClientPool = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;

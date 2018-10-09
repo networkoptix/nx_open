@@ -1031,9 +1031,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     /**%apidoc POST /ec2/saveEventRule
      * Create or update event rule in event/actions rule list. Parameters should be passed
-	 * as a JSON object in POST message body with content type "application/json". 
+	 * as a JSON object in POST message body with content type "application/json".
 	 * Example of such object can be seen in the result of the corresponding GET function.
-     * %param eventType Event type to match the rule. Example of possible values can be seen in 
+     * %param eventType Event type to match the rule. Example of possible values can be seen in
 	 *     the result of the corresponding GET function.
      * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
      * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.

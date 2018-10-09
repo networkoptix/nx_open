@@ -52,6 +52,7 @@ Camera::Camera(QnMediaServerModule* serverModule):
 
     connect(this, &Camera::inputPortStateChanged, updateIoCache);
     connect(this, &Camera::outputPortStateChanged, updateIoCache);
+    m_timeOffset = std::make_shared<nx::streaming::rtp::TimeOffset>();
 }
 
 Camera::~Camera()

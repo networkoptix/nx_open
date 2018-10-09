@@ -46,10 +46,10 @@ protected:
             [](const QByteArray& data) {return data;}, expectedCode);
     }
 
-    LauncherPtr givenServer(int port)
+    LauncherPtr givenServer()
     {
         LauncherPtr result = std::unique_ptr<MediaServerLauncher>(
-            new MediaServerLauncher(/* tmpDir */ "", port));
+            new MediaServerLauncher(/* tmpDir */ ""));
 
         result->addSetting(QnServer::kNoInitStoragesOnStartup, "1");
         return result;
@@ -96,13 +96,13 @@ private:
 
 TEST_F(MergeSystems, SafeMode_From)
 {
-    auto server1 = givenServer(8901);
+    auto server1 = givenServer();
     whenServerLaunched(server1, SafeMode::off);
     whenServerIsConfigured(server1);
     whenServerStopped(server1);
     whenServerLaunched(server1, SafeMode::on);
 
-    auto server2 = givenServer(8902);
+    auto server2 = givenServer();
     whenServerLaunched(server2, SafeMode::off);
     whenServerIsConfigured(server2);
 
@@ -114,11 +114,11 @@ TEST_F(MergeSystems, SafeMode_From)
 
 TEST_F(MergeSystems, SafeMode_To)
 {
-    auto server1 = givenServer(8901);
+    auto server1 = givenServer();
     whenServerLaunched(server1, SafeMode::off);
     whenServerIsConfigured(server1);
 
-    auto server2 = givenServer(8902);
+    auto server2 = givenServer();
     whenServerLaunched(server2, SafeMode::off);
     whenServerIsConfigured(server2);
     whenServerStopped(server2);

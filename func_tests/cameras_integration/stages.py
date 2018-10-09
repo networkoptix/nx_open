@@ -102,7 +102,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=25))
+@_stage(timeout=timedelta(minutes=30))
 def video_parameters(run, stream_urls=None, **profiles
                      ):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for profile, configurations in profiles.items():
