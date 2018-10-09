@@ -46,7 +46,8 @@ class NoptixLibrary(object):
 
     def get_random_symbol_email(self, email):
         index = email.find('@')
-        email = email[:index] + "+!#$%'*-/=?^_`{|}~" + str(time.time()) + email[index:]
+        email = email[:index] + \
+            "+!#$%'*-/=?^_`{|}~" + str(time.time()) + email[index:]
         return email
 
     def wait_until_textfield_contains(self, locator, expected, timeout=10):
@@ -78,9 +79,8 @@ class NoptixLibrary(object):
                     return
             except:
                 not_found = "No element found with style " + expected
-            time.sleep(.2)  
+            time.sleep(.2)
         raise AssertionError(not_found)
-
 
     def check_online_or_offline(self, elements, offlineText):
         for element in elements:
@@ -148,7 +148,7 @@ class NoptixLibrary(object):
                 return
             elif re.search(url, found):
                 return
-        raise Exception(url+ " was not in the email.")
+        raise Exception(url + " was not in the email.")
 
     def get_os(self):
         plat = system()
@@ -161,23 +161,23 @@ class NoptixLibrary(object):
         else:
             raise Exception("Mismatched platform")
 
-
     def check_email_button(self, body, env, color):
-        pat = '(<a class="btn" href="{})(.[^>]*)(background-color: {};)'.format(env, color)
-        if re.search(pat, body)==None:
+        pat = '(<a class="btn" href="{})(.[^>]*)(background-color: {};)'.format(
+            env, color)
+        if re.search(pat, body) == None:
             raise Exception("Button background-color was not found.")
 
     def check_email_user_names(self, body, fName, lName):
         pat = '(<h1.*>).*({} {}</h1>)'.format(fName, lName)
-        if re.search(pat, body)==None:
+        if re.search(pat, body) == None:
             raise Exception("User name was not in the email.")
 
     def check_email_cloud_name(self, body, cloudName):
         pat = '(<p).*({}).*(</p>)'.format(cloudName)
-        if re.search(pat, body)==None:
+        if re.search(pat, body) == None:
             raise Exception("Cloud name was not in the email.")
 
     def check_for_blank_target(self, body, url):
         pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
-        if re.search(pat, body)==None:
+        if re.search(pat, body) == None:
             raise Exception("Button target was not 'blank'.")
