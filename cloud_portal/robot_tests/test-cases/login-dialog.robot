@@ -31,17 +31,6 @@ can be opened in anonymous state
     Click Link    ${LOG IN NAV BAR}
     Wait Until Element Is Visible    ${LOG IN MODAL}
 
-can be closed by clicking on background
-    Wait Until Element Is Visible    ${LOG IN NAV BAR}
-    Click Link    ${LOG IN NAV BAR}
-    Wait Until Elements Are Visible    ${LOG IN MODAL}    ${BACKDROP}    ${LOG IN BUTTON}    ${EMAIL INPUT}    ${PASSWORD INPUT}
-    # used instead of click because it's more generic and allows the dismissal of the dialog
-    # using "click element" would require the element to be on the top layer or it would throw an error
-    # I am clicking on the header here because it is the only thing I am sure will always be visible and not part of the modal
-    Mouse Down    //header
-    Mouse Up    //header
-    Wait Until Page Does Not Contain Element    ${LOG IN MODAL}
-
 can be closed by clicking on the X
     [tags]    C24212
     Wait Until Element Is Visible    ${LOG IN NAV BAR}
