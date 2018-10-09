@@ -25,11 +25,12 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     private build: any;
     private canViewRelease: boolean;
 
+    title: string;
     user: any;
     downloads: any;
     activeBuilds: any;
     downloadsData: any;
-    downloadTypes: any;
+    noteTypes: any;
     linkbase: any;
 
     location: Location;
@@ -51,15 +52,20 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
         this.location = location;
         this.canViewRelease = false;
-        this.downloadTypes = [];
+        this.noteTypes = [];
     }
 
     private getAvailableDownloadTypes(data) {
-        angular.forEach(data, (downloadType, name) => {
-            if (isArray(downloadType) && downloadType.length) {
-                this.downloadTypes.push(name);
+        angular.forEach(data, (noteType, name) => {
+            if (isArray(noteType) && noteType.length) {
+                this.noteTypes.push(name);
             }
         });
+
+        // re-order tabs
+        if (this.noteTypes.length) {
+            this.noteTypes.sort((a, b) => b > a);
+        }
     }
 
     private getData() {
@@ -74,12 +80,12 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
                     } else {
                         this.activeBuilds = [ result.data ];
-                        this.downloadTypes = [ result.data.type ];
+                        this.noteTypes = [ result.data.type ];
                         this.downloadsData = {};
                         this.downloadsData[ result.data.type ] = this.activeBuilds;
                     }
 
-                    this.titleService.setTitle(new TitleCasePipe().transform(this.downloadTypes[ 0 ])); // this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
+                    this.titleService.setTitle(new TitleCasePipe().transform(this.noteTypes[ 0 ])); // this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
 
                     setTimeout(() => {
                         if (this.tabs) {
@@ -97,6 +103,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
+        this.title = new TitleCasePipe().transform($event.nextId) + ' notes';
         this.activeBuilds = this.downloadsData[ $event.nextId ];
         this.titleService.setTitle(new TitleCasePipe().transform($event.nextId));
         this.locationProxy.path('/downloads/' + $event.nextId, false);
@@ -111,8 +118,10 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
             this.routeParam = this.routeParam || 'releases';
             if (isNumeric(this.routeParam)) {
                 this.build = this.routeParam;
+                this.title = new TitleCasePipe().transform(this.build) + ' notes';
             } else {
                 this.section = this.routeParam;
+                this.title = new TitleCasePipe().transform(this.section) + ' notes';
             }
 
             this.authorizationService
