@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/api/analytics/manifest_items.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx {
 namespace vms {
@@ -63,7 +63,7 @@ public:
     struct PluginActions
     {
         QString pluginId;
-        QList<nx::vms::api::analytics::PluginManifest::ObjectAction> actions;
+        QList<nx::vms::api::analytics::EngineManifest::ObjectAction> actions;
     };
 
     static QList<PluginActions> availableActions(

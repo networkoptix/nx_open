@@ -99,8 +99,6 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 
 static const QSize kMaxThumbnailSize(224, 184);
 
-static const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
-
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
     if (!item)

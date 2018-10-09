@@ -19,8 +19,7 @@
 #include <nx/client/desktop/camera/camera_fwd.h>
 #include <nx/client/desktop/event_search/models/private/abstract_async_search_list_model_p.h>
 #include <nx/client/desktop/event_search/utils/live_analytics_receiver.h>
-#include <nx/media/signaling_metadata_consumer.h>
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 class QnUuid;
 class QnMediaResourceWidget;
@@ -81,7 +80,7 @@ private:
     QnVirtualCameraResourcePtr camera(const analytics::storage::DetectedObject& object) const;
 
     void executePluginAction(const QString& pluginId,
-        const nx::vms::api::analytics::PluginManifest::ObjectAction& action,
+        const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
     struct PreviewParams

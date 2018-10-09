@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx {
 namespace client {
@@ -22,7 +22,7 @@ PluginEventModel::~PluginEventModel()
 {
 }
 
-void PluginEventModel::buildFromList(const MetadataPluginInstanceResourceList& pirs)
+void PluginEventModel::buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines)
 {
     beginResetModel();
 
@@ -35,12 +35,11 @@ void PluginEventModel::buildFromList(const MetadataPluginInstanceResourceList& p
             return item;
         };
 
-    using namespace nx::vms::event;
     clear();
 
-    for (const auto& plugin: pirs)
+    for (const auto& engine: engines)
     {
-        addItem(plugin->getId(), plugin->getName());
+        addItem(engine->getId(), engine->getName());
     }
 
     endResetModel();

@@ -41,6 +41,7 @@
 #include "data/user_role_data.h"
 #include "data/videowall_data.h"
 #include "data/webpage_data.h"
+#include "data/analytics_data.h"
 
 #include "types/access_rights_types.h"
 
@@ -144,6 +145,8 @@ void Metatypes::initialize()
     qRegisterMetaType<VideowallData>();
     qRegisterMetaType<VideowallControlMessageData>();
     qRegisterMetaType<WebPageData>();
+    qRegisterMetaType<AnalyticsPluginData>();
+    qRegisterMetaType<AnalyticsEngineData>();
 };
 
 } // namespace api

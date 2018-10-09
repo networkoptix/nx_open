@@ -48,6 +48,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
     NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
+    NX_INI_FLAG(0, enablePluginEvents, "Enable plugin events in Event Rules dialog.");
 };
 
 inline Ini& ini()

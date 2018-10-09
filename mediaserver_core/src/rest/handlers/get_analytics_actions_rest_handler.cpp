@@ -1,6 +1,5 @@
 #include "get_analytics_actions_rest_handler.h"
 
-#include <nx/mediaserver/metadata/manager_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
@@ -10,7 +9,7 @@
 #include "api/model/analytics_actions.h"
 #include "media_server/media_server_module.h"
 
-using nx::sdk::metadata::Plugin;
+using nx::sdk::analytics::Engine;
 
 QnGetAnalyticsActionsRestHandler::~QnGetAnalyticsActionsRestHandler()
 {

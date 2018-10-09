@@ -1312,6 +1312,25 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<IdData>(p, ApiCommand::removeWebPage);
 
+    // For analytics plugins and engines we provide only getters, since such resources
+    // can't be created or removed via REST API for now.
+
+    /**%apidoc GET /ec2/getAnalyticsPlugins
+     * Return list of analytics plugins
+     * %param[default] format
+     * %return List of analytics plugins in the requested format.
+     * %// AbstractAnalyticsManager::getAnalyticsPlugins
+     */
+    regGet<QnUuid, AnalyticsPluginDataList>(p, ApiCommand::getAnalyticsPlugins);
+
+    /**%apidoc GET /ec2/getAnalyticsEngines
+     * Return list of analytics engines
+     * %param[default] format
+     * %return List of analytics engines in the requested format.
+     * %// AbstractAnalyticsManager::getAnalyticsEngines
+     */
+    regGet<QnUuid, AnalyticsEngineDataList>(p, ApiCommand::getAnalyticsEngines);
+
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format

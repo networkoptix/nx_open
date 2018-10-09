@@ -117,11 +117,6 @@ NX_KIT_API std::ostream*& stream();
 //-------------------------------------------------------------------------------------------------
 // Assertions
 
-#define NX_KIT_ASSERT(...) \
-    NX_KIT_DEBUG_DETAIL_MSVC_EXPAND(NX_KIT_DEBUG_DETAIL_GET_3RD_ARG( \
-        __VA_ARGS__, NX_KIT_DEBUG_DETAIL_ASSERT2, NX_KIT_DEBUG_DETAIL_ASSERT1, \
-        /* Helps to generate a reasonable compiler error. */ args_required)(__VA_ARGS__))
-
 /**
  * If the condition is false, log the failure with NX_PRINT, and in debug build (i.e. NDEBUG is
  * not defined), crash the process to let a dump/core be generated.
@@ -129,6 +124,10 @@ NX_KIT_API std::ostream*& stream();
  * ATTENTION: Unlike std library assert(), the condition is checked even in Release build to log
  * the failure.
  */
+#define NX_KIT_ASSERT(...) \
+    NX_KIT_DEBUG_DETAIL_MSVC_EXPAND(NX_KIT_DEBUG_DETAIL_GET_3RD_ARG( \
+        __VA_ARGS__, NX_KIT_DEBUG_DETAIL_ASSERT2, NX_KIT_DEBUG_DETAIL_ASSERT1, \
+        /* Helps to generate a reasonable compiler error. */ args_required)(__VA_ARGS__))
 
 //-------------------------------------------------------------------------------------------------
 // Print info

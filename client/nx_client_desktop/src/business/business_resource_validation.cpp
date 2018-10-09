@@ -20,7 +20,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
 
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/event/analytics_helper.h>
 
 #include <utils/email/email.h>

@@ -11,7 +11,7 @@
 #include <nx/utils/log/log.h>
 
 #include <camera/camera_plugin.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <plugins/plugin_tools.h>
 #include <nx/plugins/settings.h>
 
@@ -187,14 +187,21 @@ bool PluginManager::loadNxPlugin(
 
     typedef nxpl::PluginInterface* (*EntryProc)();
 
+    // TODO: Find a better solution. Needed to chech that libName equals Plugin::name().
+    bool isAnalyticsPlugin = false;
+
     auto entryProc = (EntryProc) lib.resolve("createNXPluginInstance");
     if (entryProc == nullptr)
-        entryProc = (EntryProc) lib.resolve("createNxMetadataPlugin");
+    {
+        entryProc = (EntryProc) lib.resolve("createNxAnalyticsPlugin");
+        if (entryProc)
+            isAnalyticsPlugin = true;
+    }
     if (entryProc == nullptr)
     {
-        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: "
-            "Neither createNXPluginInstance nor createNxMetadataPlugin functions found")
-            .arg(filename);
+        NX_ERROR(this, "Failed to load Nx plugin [%1]: "
+            "Neither createNXPluginInstance() nor createNxAnalyticsPlugin() functions found",
+            filename);
         lib.unload();
         return false;
     }
@@ -202,19 +209,23 @@ bool PluginManager::loadNxPlugin(
     nxpl::PluginInterface* obj = entryProc();
     if (!obj)
     {
-        NX_ERROR(this) << lit("Failed to load Nx plugin [%1]: no PluginInterface function found")
-            .arg(filename);
+        NX_ERROR(this, "Failed to load Nx plugin [%1]: entry function returned null", filename);
         lib.unload();
         return false;
     }
 
-    NX_WARNING(this) << lit("Loaded Nx plugin [%1]").arg(filename);
+    NX_WARNING(this, "Loaded Nx plugin [%1]", filename);
     m_nxPlugins.push_back(obj);
-    m_libNameByNxPlugin.insert(obj, libName);
 
     if (auto pluginObj = nxpt::ScopedRef<nxpl::Plugin>(obj->queryInterface(nxpl::IID_Plugin)))
     {
-        // Report settings to the plugin.
+        if (pluginObj->name() != libName)
+        {
+            NX_WARNING(this, "Analytics plugin name [%1] does not equal library name [%2]",
+                pluginObj->name(), libName);
+        }
+
+        // Pass Mediaserver settings (aka "roSettings") to the plugin.
         if (!settingsHolder.isEmpty())
             pluginObj->setSettings(settingsHolder.array(), settingsHolder.size());
     }

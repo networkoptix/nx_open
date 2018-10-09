@@ -8,14 +8,6 @@
 #include <common/common_module_aware.h>
 
 namespace nx {
-
-namespace vms {
-namespace common {
-class MetadataPluginInstanceResource;
-} // namespace common
-} // namespace vms
-typedef QnSharedResourcePointerList<vms::common::MetadataPluginInstanceResource> MetadataPluginInstanceResourceList;
-
 namespace client {
 namespace desktop {
 namespace ui {
@@ -29,9 +21,9 @@ public:
     };
 
     PluginEventModel(QObject* parent = nullptr);
-    ~PluginEventModel();
+    virtual ~PluginEventModel() override;
 
-    void buildFromList(const MetadataPluginInstanceResourceList& pirs);
+    void buildFromList(const nx::vms::common::AnalyticsEngineResourceList& engines);
 
     bool isValid() const;
 };

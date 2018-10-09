@@ -17,9 +17,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <nx/vms/common/resource/metadata_plugin_instance_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
-#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/dialog.h>
@@ -40,8 +40,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
-
-#include <nx/vms/api/analytics/plugin_manifest.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_writers.h>
@@ -226,21 +224,21 @@ public:
                 close();
             });
 
-        addButton("Generate PIRs", 
-            [this]() 
+        addButton("Generate PIRs",
+            [this]()
             {
-                QnResourcePtr pir1(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+                QnResourcePtr pir1(new nx::vms::common::AnalyticsEngineResource(commonModule()));
                 pir1->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CD}"));
                 pir1->setName("Plugin1");
-                
-                QnResourcePtr pir2(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+
+                QnResourcePtr pir2(new nx::vms::common::AnalyticsEngineResource(commonModule()));
                 pir2->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CE}"));
                 pir2->setName("Plugin2");
-                
-                QnResourcePtr pir3(new nx::vms::common::MetadataPluginInstanceResource(commonModule()));
+
+                QnResourcePtr pir3(new nx::vms::common::AnalyticsEngineResource(commonModule()));
                 pir3->setId(QUuid("{F31E58E7-ABC5-4813-BA83-FDE0375A98CF}"));
                 pir3->setName("Plugin3");
-                
+
                 resourcePool()->addResource(pir1);
                 resourcePool()->addResource(pir2);
                 resourcePool()->addResource(pir3);
@@ -257,7 +255,7 @@ public:
 
                 for (int i = 0; i < 5; ++i)
                 {
-                    nx::vms::api::analytics::PluginManifest manifest;
+                    nx::vms::api::analytics::EngineManifest manifest;
                     manifest.pluginId = lit("nx.generatedDriver.%1").arg(i);
                     manifest.pluginName.value = lit("Plugin %1").arg(i);
                     manifest.pluginName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
@@ -282,7 +280,8 @@ public:
                 for (auto server: servers)
                 {
                     auto drivers = server->analyticsDrivers();
-                    drivers.push_back(nx::vms::api::analytics::PluginManifest()); //< Some cameras will not have driver.
+                    // Some devices will not have an Engine.
+                    drivers.push_back(nx::vms::api::analytics::EngineManifest());
 
                     for (auto camera: resourcePool()->getAllCameras(server, true))
                     {
