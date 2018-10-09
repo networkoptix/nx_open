@@ -346,6 +346,11 @@ class DataStructure(models.Model):
 
 
 class UserGroupsToCustomizationPermissions(models.Model):
+    class Meta:
+        permissions = (
+            ("can_view_pending", "Can view pending versions of integrations"),
+        )
+
     group = models.ForeignKey(Group)
     customization = models.ForeignKey(Customization)
 

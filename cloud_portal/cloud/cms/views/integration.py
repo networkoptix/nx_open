@@ -1,12 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.core.exceptions import ObjectDoesNotExist
 
 from cloud import settings
-from api.helpers.exceptions import APINotFoundException, api_success, handle_exceptions
+from api.helpers.exceptions import api_success, handle_exceptions
 
 from cms.controllers.filldata import process_context_structure
-from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType
+from cms.models import Context, Product, ProductCustomizationReview, ProductType, UserGroupsToCustomizationPermissions
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -80,7 +79,7 @@ def get_integrations(request):
     show_pending = False
 
     # Will change once we figure out permission
-    if request.user.is_superuser:
+    if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.can_view_pending'):
         show_pending = 'pending' in request.GET
 
     return api_success(make_integrations_json(integrations, show_pending=show_pending))
