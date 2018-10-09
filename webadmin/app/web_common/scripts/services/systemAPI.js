@@ -303,6 +303,10 @@ angular.module('nxCommon')
             var serverConnection = serverId?('/proxy/' + serverId):'';
             return $http.get(serverConnection + '/web/api/metrics');
         };
+        ServerConnection.prototype.getServerStatistics = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/api/statistics');
+        };
         /* End of Cameras and Servers */
 
         /* Formatting urls */

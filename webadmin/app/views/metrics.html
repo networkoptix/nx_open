@@ -4,13 +4,19 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th ng-repeat="(key, description) in columns">
+                    <th ng-repeat="(key, description) in statisticsColumns">
+                        {{key}}
+                    </th>
+                    <th ng-repeat="(key, description) in metricsColumns">
                         {{key}}
                     </th>
                 </tr>
                 <tr>
                     <th>Server</th>
-                    <th ng-repeat="(key, description) in columns">
+                    <th ng-repeat="(key, description) in statisticsColumns">
+                        {{description}}
+                    </th>
+                    <th ng-repeat="(key, description) in metricsColumns">
                         {{description}}
                     </th>
                 </tr>
@@ -20,8 +26,13 @@
                     <td>
                         {{server.name}}
                     </td>
-                    <td ng-repeat="(key, description) in columns">
-                        {{serverStats[server.id][key].value}}
+                    <td ng-repeat="(key, description) in statisticsColumns">
+                        <div ng-repeat="(name, value) in serversStatistics[server.id][key]">
+                            {{name}}: {{value}}%
+                        </div>
+                    </td>
+                    <td ng-repeat="(key, description) in metricsColumns">
+                        {{serversMetrics[server.id][key].value}}
                     </td>
                 </tr>
             </tbody>

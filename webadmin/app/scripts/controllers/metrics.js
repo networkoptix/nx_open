@@ -1,11 +1,11 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('MetricsCtrl', ['$scope', '$location', 'camerasProvider', 'systemAPI', '$q',
-    function ($scope, $location, camerasProvider, systemAPI, $q) {
+    .controller('MetricsCtrl', ['$scope', '$location', 'camerasProvider', 'systemAPI', '$q', '$poll',
+    function ($scope, $location, camerasProvider, systemAPI, $q, $poll) {
         $scope.config = Config;
 
-        $scope.serverStats = {};
+        $scope.serversMetrics = {};
         function updateCameras(){
             $scope.cameras = $scope.camerasProvider.cameras;
         }
@@ -79,27 +79,24 @@ angular.module('webadminApp')
             return values;
         }
 
-        function updateTableStructure(){
+        function updateMetricsTableStructure(){
             // here we turn retrieve columns from serverStat (flattened)
-            $scope.columns = {};
-            for(var serverId in $scope.serverStats){
-                var stats = $scope.serverStats[serverId];
+            $scope.metricsColumns = {};
+            for(var serverId in $scope.serversMetrics){
+                var stats = $scope.serversMetrics[serverId];
                 for(var key in stats){
-                    $scope.columns[key] = stats[key].description;
+                    $scope.metricsColumns[key] = stats[key].description;
                 }
             }
-            // TODO: later - check in config what metrics to show and in what order
+            // TODO: later - check in config what order do we need for columns
         }
 
         function updateMediaServers(){
-            console.log("updateMediaServers");
-
             $scope.mediaServers = $scope.camerasProvider.getMediaServers();
 
             function requestServerStats(server){
                 return systemAPI.getServerMetrics(server.id).then(function (data) {
-                    console.log('flattenMetrics', data.data.reply);
-                    $scope.serverStats[server.id] = flattenMetrics(data.data.reply);
+                    $scope.serversMetrics[server.id] = flattenMetrics(data.data.reply);
                 }, function (error) {
                     server.isNotAvailable = true;
                     // TODO: pass error information to the interface
@@ -114,27 +111,107 @@ angular.module('webadminApp')
                 }
                 requests.push(requestServerStats(server));
             }
-            $q.all(requests).then(function(){ // Then all requests are done - check if we should update table
-               updateTableStructure();
+            $q.all(requests).finally(function(){ // Then all requests are done - check if we should update table
+               updateMetricsTableStructure();
             });
         }
 
-        //1. start watching servers and cameras
+
+
+        function formatPercentValue(value){
+            var toreturn = value * 100; // Turn to percents
+            if(toreturn>10) { // 0.29405167545054756 - typical CPU/RAM usage
+                return toreturn.toFixed(0); // No need to have digits after decimal point
+            }
+            if(toreturn>1) { //0.02749664306640625 - low CPU/RAM usage
+                return toreturn.toFixed(1); // Only one digit after decimal point after
+            }
+            return toreturn.toFixed(2); // Two digits after decimal point for other cases
+        }
+        function groupStatistics(stats){
+            /*
+                    {
+                        "description": "CPU",
+                        "deviceFlags": 0,
+                        "deviceType": "StatisticsCPU",
+                        "value": 0.7379624936644704
+                    },
+                    {
+                        "description": "RAM", // This is name
+                        "deviceFlags": 0,
+                        "deviceType": "StatisticsRAM", // This is family - use as column
+                        "value": 0.29405167545054756 // This is value
+                    },
+
+                    output:
+                    {
+                        "StatisticsCPU":{
+                            "CPU":0.7379624936644704
+                        },
+                         "StatisticsRAM":{
+                            "RAM":0.29405167545054756
+                         }
+                    }
+                    * */
+            var statistics = {};
+            for(var i in stats){
+                var data = stats[i];
+                if(typeof(statistics[data.deviceType]) === 'undefined'){
+                    statistics[data.deviceType] = {};
+                }
+                statistics[data.deviceType][data.description] = formatPercentValue(data.value);
+            }
+            return statistics;
+        }
+
+        $scope.serversStatistics = {};
+        function updateStatisticsTableStructure(){
+        // here we turn retrieve columns from serverStat (flattened)
+            $scope.statisticsColumns = {};
+            for(var serverId in $scope.serversStatistics){
+                var stats = $scope.serversStatistics[serverId];
+                for(var group in stats){
+                    $scope.statisticsColumns[group] = group.replace('Statistics','');
+                }
+            }
+            // TODO: later - check in config what order do we need for columns
+        }
+        function updateStatistics() {
+            function requestServerStats(server){
+                return systemAPI.getServerStatistics(server.id).then(function(r){
+                    $scope.serversStatistics[server.id] = groupStatistics(r.data.reply.statistics);
+                });
+            }
+
+            var requests = []; // Array to track all metrics requests
+
+            for(var key in $scope.mediaServers) {
+                var server = $scope.mediaServers[key];
+                requests.push(requestServerStats(server));
+            }
+
+
+            return $q.all(requests).finally(function(){
+                // Here we build columns for statistics
+                updateStatisticsTableStructure();
+            });
+        }
+
+        // TODO: render cameras state
 
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
 
-
-
-        //2. build columns description
-        //3. build table to send to the template
-        //4. request getCameras, render their statistics
-        //5. Request metrics - CPU, RAM
         $scope.camerasProvider.reloadTree().then(function(){
             $scope.$watch('camerasProvider.cameras', updateCameras, true);
             $scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
-            $scope.camerasProvider.startPoll();
+            updateStatistics();
+
+            $scope.camerasProvider.startPoll(); // Watching servers and cameras
+            var liveMetricsPoll = $poll(updateStatistics, Config.metrics.liveMetricsUpdate); // Watching CPU, RAM, etc
+
             $scope.$on('$destroy', function( event ) {
                 $scope.camerasProvider.stopPoll();
+                $poll.cancel(liveMetricsPoll);
             });
         },function(error){
             console.error(error);

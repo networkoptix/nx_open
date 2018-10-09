@@ -204,7 +204,8 @@
         metrics:{
             hide:{
                 p2pCounters: true
-            }
+            },
+            liveMetricsUpdate: 10000 // Every 10 seconds
         }
     };
 })();
