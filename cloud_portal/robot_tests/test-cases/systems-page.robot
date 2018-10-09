@@ -73,6 +73,25 @@ should show the no systems connected message when you have no systems
     Validate Log In
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
+should show system name in header with no dropdown if user has only one system
+    [tags]    C41569
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Share To    ${EMAIL NOPERM}    ${VIEWER TEXT}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Wait Until Element Is Visible    ${SYSTEM NAME HEADER}
+    Log Out
+    Validate Log Out
+    Log In    ${EMAIL OWNER}    ${password}
+    Validate Log In
+    Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Remove User Permissions    ${EMAIL NOPERM}
+
 should show the system page instead of all systems when user only has one
     [tags]    C41878
     Log In    ${EMAIL OWNER}    ${password}
