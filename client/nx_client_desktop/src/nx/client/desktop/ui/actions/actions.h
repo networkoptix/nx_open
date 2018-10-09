@@ -949,6 +949,11 @@ enum IDType
     ExportBookmarkAction,
 
     /**
+     * Exports several selected bookmarks into a single layout.
+     */
+    ExportBookmarksAction,
+
+    /**
      * Bookmark selected range.
      */
     AddCameraBookmarkAction,

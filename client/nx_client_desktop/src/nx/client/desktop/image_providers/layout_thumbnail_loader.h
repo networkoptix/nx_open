@@ -43,7 +43,7 @@ public:
     void setItemBackgroundColor(const QColor& value);
     void setRequestRoundMethod(api::ImageRequest::RoundMethod roundMethod);
 
-    void setResourcePool(const QPointer<QnResourcePool>& pool);
+    void setResourcePool(QnResourcePool* pool);
 
     QColor fontColor() const;
     void setFontColor(const QColor& value);

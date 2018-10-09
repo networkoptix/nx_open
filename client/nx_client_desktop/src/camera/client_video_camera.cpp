@@ -131,7 +131,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     const QString& format,
     QnStorageResourcePtr storage,
     StreamRecorderRole role,
-    qint64 serverTimeZoneMs)
+    qint64 serverTimeZoneMs,
+    const QnTimePeriodList& playbackMask)
 {
     qint64 startTimeUs = timePeriod.startTimeMs * 1000ll;
     NX_ASSERT(timePeriod.durationMs > 0, Q_FUNC_INFO, "Invalid time period, possibly LIVE is exported");
@@ -155,11 +156,14 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             return;
         }
         archiveReader->setCycleMode(false);
+
+        // Can we have another role in exportMediaPeriodToFile method?
         if (role == StreamRecorderRole::fileExport)
         {
             archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
             // Additing filtering is required in case of.AVI export.
             archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            archiveReader->setPlaybackMask(playbackMask);
         }
 
         QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (archiveReader->getArchiveDelegate());

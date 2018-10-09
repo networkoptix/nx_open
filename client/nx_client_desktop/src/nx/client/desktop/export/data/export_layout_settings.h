@@ -6,6 +6,7 @@
 #include <recording/time_period.h>
 
 #include <nx/client/desktop/common/utils/filesystem.h>
+#include <core/resource/camera_bookmark.h>
 
 namespace nx {
 namespace client {
@@ -40,6 +41,7 @@ struct ExportLayoutSettings
     Mode mode = Mode::Export;   //< Export mode.
     bool readOnly = false;      //< Make exported layout read-only.
     nx::core::Watermark watermark;
+    QnCameraBookmarkList bookmarks; //< Export only selected bookmarks.
 };
 
 } // namespace desktop

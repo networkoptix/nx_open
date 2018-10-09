@@ -55,6 +55,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_openInNewTabAction      (new QAction(action(action::OpenInNewTabAction)->text(), this))
     , m_editBookmarkAction      (new QAction(action(action::EditCameraBookmarkAction)->text(), this))
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
+    , m_exportBookmarksAction   (new QAction(tr("Export Bookmarks..."), this))
     , m_removeBookmarksAction   (new QAction(action(action::RemoveBookmarksAction)->text(), this))
     , m_updatingParametersNow(false)
 
@@ -399,6 +400,8 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
     addActionToMenu(action::ExportBookmarkAction, m_exportBookmarkAction);
+    if (nx::client::desktop::ini().enableCaseExport)
+        addActionToMenu(action::ExportBookmarksAction, m_exportBookmarksAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
@@ -428,6 +431,12 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
             menu()->triggerIfPossible(action::ExportBookmarkAction, params);
         });
 
+    connect(m_exportBookmarksAction,  &QAction::triggered, this,
+        [this, params]
+        {
+            menu()->triggerIfPossible(action::ExportBookmarksAction, params);
+        });
+
     /* Execute popup menu: */
     newMenu->exec(QCursor::pos());
     newMenu->deleteLater();
@@ -436,5 +445,6 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     m_openInNewTabAction->disconnect(this);
     m_editBookmarkAction->disconnect(this);
     m_removeBookmarksAction->disconnect(this);
+    m_exportBookmarksAction->disconnect(this);
     m_exportBookmarkAction->disconnect(this);
 }

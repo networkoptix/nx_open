@@ -32,6 +32,7 @@ private:
 
     void handleExportVideoAction();
     void handleExportBookmarkAction();
+    void handleExportBookmarksAction();
 
     void startExportFromDialog(ExportSettingsDialog* dialog);
 

@@ -70,6 +70,41 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
 }
 
+QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource(pool->commonModule()));
+    layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
+
+    QSet<QnUuid> placedCameras;
+    QPoint currentPosition(0, 0);
+    for (const auto& bookmark: bookmarks)
+    {
+        if (placedCameras.contains(bookmark.cameraId))
+            continue;
+        placedCameras.insert(bookmark.cameraId);
+
+        if (const auto& camera = pool->getResourceById(bookmark.cameraId))
+        {
+            QnLayoutItemData item;
+            item.flags = 0x1;
+            // Layout data item flags are declared in client module. // TODO: #GDM move to api
+            item.uuid = QnUuid::createUuid();
+            item.combinedGeometry = QRect(currentPosition.x(), currentPosition.y(), 1, 1);
+            item.resource.id = camera->getId();
+
+            QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
+            if (!forcedRotation.isEmpty())
+                item.rotation = forcedRotation.toInt();
+
+            layout->addItem(item);
+
+            // FIXME: #GDM Use grid walker with expanding strategy
+            currentPosition.rx()++;
+        }
+    }
+    return layout;
+}
+
 } // namespace
 
 struct WorkbenchExportHandler::Private
@@ -209,6 +244,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
 
     connect(action(ui::action::ExportBookmarkAction), &QAction::triggered, this,
         &WorkbenchExportHandler::handleExportBookmarkAction);
+
+    connect(action(ui::action::ExportBookmarksAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::handleExportBookmarksAction);
 
     connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
@@ -356,6 +394,66 @@ void WorkbenchExportHandler::handleExportBookmarkAction()
 
     if (dialog->exec() == QDialog::Accepted)
         startExportFromDialog(dialog.data());
+}
+
+void WorkbenchExportHandler::handleExportBookmarksAction()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+    if (bookmarks.empty())
+        return;
+
+    // FIXME: #GDM Remove workaround.
+    // Bookmarks are sorted by time. More correct value is to sort and normalize time periods.
+    std::sort(bookmarks.begin(), bookmarks.end());
+
+    QnTimePeriodList periods;
+    for (const auto& bookmark: bookmarks)
+        periods.push_back(QnTimePeriod::fromInterval(bookmark.startTimeMs, bookmark.endTimeMs()));
+
+    const auto boundingPeriod = periods.boundingPeriod();
+
+    QScopedPointer<ExportSettingsDialog> dialog(
+        new ExportSettingsDialog(boundingPeriod, {}, d->fileNameValidator(), mainWindow()));
+    setWatermark(dialog.data()); //< This should go right after constructor.
+
+    static const QString reason =
+        tr("Several bookmarks can be exported as layout only.");
+    dialog->disableTab(ExportSettingsDialog::Mode::Media, reason);
+    dialog->setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
+
+    if (dialog->exec() != QDialog::Accepted)
+        return;
+
+    std::unique_ptr<AbstractExportTool> exportTool;
+    auto settings = dialog->exportLayoutSettings();
+    settings.bookmarks = bookmarks;
+    const auto exportProcessId = d->initExport(settings.filename);
+    exportTool.reset(new ExportLayoutTool(settings));
+
+     d->exportManager->startExport(exportProcessId, std::move(exportTool));
+
+    const auto info = d->exportManager->info(exportProcessId);
+
+    switch(info.status)
+    {
+        case ExportProcessStatus::initial:
+        case ExportProcessStatus::exporting:
+        case ExportProcessStatus::cancelling:
+            if (const auto dialog = d->runningExports.value(exportProcessId).progressDialog)
+                dialog->show();
+            // Fill dialog with initial values (export is already running).
+            exportProcessUpdated(info);
+            break;
+        case ExportProcessStatus::success:
+        case ExportProcessStatus::failure:
+            // Possibly export is finished already.
+            exportProcessFinished(info);
+            break;
+        default:
+            NX_ASSERT(false, "Should never get here in 'cancelled' state");
+            break;
+    }
 }
 
 void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
