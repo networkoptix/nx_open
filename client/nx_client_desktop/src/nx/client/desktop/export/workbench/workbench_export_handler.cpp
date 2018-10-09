@@ -666,6 +666,8 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
     layoutSettings.period = layout->getLocalRange();
     layoutSettings.readOnly = readOnly;
+    layoutSettings.encryption = {layout->data(Qn::LayoutEncryptionRole).toBool(),
+        layout->data(Qn::LayoutPasswordRole).toString()};
 
     std::unique_ptr<nx::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
