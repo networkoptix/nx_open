@@ -574,7 +574,6 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         {
             return statusCode;
         }
-
     }
 
     // 2. Updating local data.

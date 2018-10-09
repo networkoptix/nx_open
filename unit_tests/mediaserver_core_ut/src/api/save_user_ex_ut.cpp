@@ -11,8 +11,7 @@
 
 #include "test_api_requests.h"
 
-namespace nx {
-namespace test {
+namespace nx::test {
 
 class SaveUserEx: public ::testing::Test
 {
@@ -166,5 +165,4 @@ TEST_F(SaveUserEx, nonAdminAccessShouldFail)
     thenResponseShouldContainForbiddenError();
 }
 
-} // namespace test
-} // namespace nx
+} // namespace nx::test

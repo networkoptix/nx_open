@@ -55,7 +55,8 @@ int QnSaveUserExRestHandler::executePost(const QString& /*path*/,
     auto ec2Connection = serverModule()->commonModule()->ec2Connection();
     if (!ec2Connection)
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("No ec2 connection"));
+        result.setError(QnJsonRestResult::CantProcessRequest,
+            "Internal server error (no ec2 connection)");
         return nx::network::http::StatusCode::ok;
     }
 
