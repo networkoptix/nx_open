@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "ไม่มีบัญชีนี้อยู่",
     "CODE USED/INCORRECT": "ใช้รหัสยืนยันแล้วหรือไม่ถูกต้อง",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "การเข้าถึงที่ไม่ จำกัด รวมถึงความสามารถในการแบ่งปัน",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "สามารถดูวิดีโอสดและเรียกดูไฟล์ที่เก็บได้",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "สามารถดูวิดีโอสดได้เท่านั้น",
     "SHARE PERMISSIONS HINT CUSTOM": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %VMS_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง",

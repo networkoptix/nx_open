@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "Обліковий запис не існує.",
     "CODE USED/INCORRECT": "Код підтвердження вже використовується або невірний",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "Необмежений доступ, включаючи можливість керування спільним доступом",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Можна переглядати відео в реальному часі та переглядати архів",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Можна переглядати лише відео в реальному часі",
     "SHARE PERMISSIONS HINT CUSTOM": "Використовуйте додаток %VMS_NAME% для налаштування особливих повноважень",

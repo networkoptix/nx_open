@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+Bonjour {{message.userFullName}},
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) a partagé l'accès au système de gestion vidéo "{{message.system_name}}" avec vous.

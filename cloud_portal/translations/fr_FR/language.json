@@ -6,7 +6,7 @@
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Annuler",
-    "loginTitle": "Connexion à %PRODUCT_NAME%",
+    "loginTitle": "Connecter à %PRODUCT_NAME%",
     "loginButton": "Connexion",
     "logoutAuthorisedTitle": "Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton": "Continuer",

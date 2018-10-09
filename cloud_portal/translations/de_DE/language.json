@@ -32,7 +32,7 @@
     "view": "Kameras ansehen - ",
     "debug": "Debug",
     "login": "Anmelden -",
-    "download": "Download %VMS_NAME%",
+    "download": "%VMS_NAME% herunterladen",
     "downloadPlatform": "Download %VMS_NAME% für ",
     "pageNotFound": "Seite nicht gefunden"
   },
@@ -98,7 +98,7 @@
     },
     "custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME%-Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME% Clientanwendung"
     }
   },
   "errorCodes": {
@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Systemname",
     "confirmRenameAction": "Speichern",
     "successRename": "Systemname wurde gespeichert",
-    "confirmDisconnectTitle": "System von %PRODUCT_NAME% trennen?",
+    "confirmDisconnectTitle": "System getrennt von %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Trennen",
     "confirmUnshareFromMe": "Sie sind dabei dieses System von Ihrem Account zu trennen. Sie werden nicht mehr auf dieses System zugreifen können. Sind Sie sich sicher?",
     "confirmUnshareFromMeTitle": "System trennen?",
@@ -190,7 +190,7 @@
   },
   "downloads": {
     "noClientDetectedTitle": "Installieren Sie %VMS_NAME%, um Ihr System anzusehen",
-    "action": "Download %VMS_NAME%",
+    "action": "%VMS_NAME% herunterladen",
     "mobile": {
       "ios": {
         "link": "%IOS_APPLICATION_LINK%"
@@ -275,7 +275,7 @@
       "transcoding": "Umkodierung",
       "unknown": "Unbekannt",
       "copyToClipboard": "in zwischenablage kopieren",
-      "copyDefaultText": "kopieren",
+      "copyDefaultText": "Kopieren",
       "copyActiveText": "in die zwischenablage kopiert"
     },
     "systemOffline": "System offline",

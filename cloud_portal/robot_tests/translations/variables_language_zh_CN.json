@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "帐户不存在.",
     "CODE USED/INCORRECT": "确认代码已使用或不正确",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "不受限制地的访问包括共享的能力",
-    "SHARE PERMISSIONS HINT ADV VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "可以查看实时视频和浏览存档",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只能查看实时视频",
     "SHARE PERMISSIONS HINT CUSTOM": "使用 %VMS_NAME% 客户端应用程序可以设置自定义权限",

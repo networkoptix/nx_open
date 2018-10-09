@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+您好, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) 共用影像管理系統 {{message.system_name}} 給您.

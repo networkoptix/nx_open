@@ -167,7 +167,7 @@
     "confirmRenameTitle": "Tên hệ thống",
     "confirmRenameAction": "Tiết kiệm",
     "successRename": "Đã lưu tên hệ thống",
-    "confirmDisconnectTitle": "Ngắt kết nối Hệ thống từ %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Hệ thống đã ngắt kết nối từ %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Ngắt kết nối",
     "confirmUnshareFromMe": "Bạn sẽ ngắt kết nối Hệ thống này khỏi tài khoản của bạn. Bạn sẽ không thể truy cập Hệ thống này nữa. Bạn có chắc không?",
     "confirmUnshareFromMeTitle": "Ngắt kết nối hệ thống?",

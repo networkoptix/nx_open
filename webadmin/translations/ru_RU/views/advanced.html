@@ -117,7 +117,7 @@
     <h2>Настройки журнала</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} уровень журналирования</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Нет: Журнал отключён.</option>
@@ -183,7 +183,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Предупреждение!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска <b>всех</b> серверов в системе.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>

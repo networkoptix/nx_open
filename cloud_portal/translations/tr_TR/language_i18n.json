@@ -13,7 +13,7 @@
 	"Connect System you want to merge with this one to %PRODUCT_NAME% or merge locally using %VMS_NAME% Client.": "%PRODUCT_NAME% yada client kullanarak sistemleri birleştirmek için istediğiniz sistemi bağlayın.",
 	"Create account": "Hesap oluştur",
 	"Disconnect": "Bağlantıyı kes",
-	"Disconnect System from %PRODUCT_NAME%?": "Sistem %PRODUCT_NAME% den bağlantıyı kes?",
+	"Disconnect System from %PRODUCT_NAME%?": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
 	"Download": "İndir",
 	"Download %VMS_NAME%": "Download %VMS_NAME%",
 	"Download Chrome": "Download Chrome",
