@@ -19,7 +19,8 @@
  * 2) Shared layouts. They can be accessible to several users. ParentId is null.
  * 3) Service layouts. These can have server id or videowall id as parentId.
 */
-class QnLayoutResource: public QnResource,
+class QnLayoutResource:
+    public QnResource,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT

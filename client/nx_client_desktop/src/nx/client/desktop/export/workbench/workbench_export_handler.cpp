@@ -56,10 +56,11 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_layout_password_management.h>
 #include <ini.h>
 #include <api/global_settings.h>
 
-#include "nx/client/desktop/export/tools/export_media_validator.h"
+#include <nx/client/desktop/export/tools/export_media_validator.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -650,6 +651,12 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     NX_ASSERT(layout && layout->isFile());
     if (!layout || !layout->isFile())
         return;
+
+    if (layout->data(Qn::LayoutEncryptionRole).toBool())
+    {
+        if (!ui::workbench::layout::confirmPassword(layout, mainWindowWidget()))
+            return; //< Reconfirm the password from user and exit if it is invalid.
+    }
 
     const bool readOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
 

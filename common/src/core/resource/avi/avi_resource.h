@@ -78,7 +78,6 @@ private:
     qint64 m_timeZoneOffset;
     QnAspectRatio m_imageAspectRatio;
     boost::optional<QnAviArchiveMetadata> m_aviMetadata;
-    bool m_requiresPasword = false; // Encrypted and password is not provided.
     mutable boost::optional<bool> m_hasVideo;
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
 };
