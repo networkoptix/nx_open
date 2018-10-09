@@ -39,6 +39,8 @@ size_t StreamConsumerManager::removeConsumer(const std::weak_ptr<AbstractStreamC
     if (index < m_consumers.size())
     {
         m_consumers.erase(m_consumers.begin() + index);
+        if(auto c = consumer.lock())
+            c->flush();
         return index;
     }
     return -1;
@@ -166,7 +168,6 @@ size_t PacketConsumerManager::removeConsumer(const std::weak_ptr<AbstractStreamC
     size_t index = StreamConsumerManager::removeConsumer(consumer);
     if (index != -1)
         m_waitForKeyPacket.erase(m_waitForKeyPacket.begin() + index);
-
     return index;
 }
 

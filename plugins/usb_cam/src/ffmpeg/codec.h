@@ -60,7 +60,7 @@ public:
     int sampleRate() const;
     int frameSize() const;
 
-    void flush() const;
+    void flush();
 
 private:
     AVCodecContext *m_codecContext = nullptr;

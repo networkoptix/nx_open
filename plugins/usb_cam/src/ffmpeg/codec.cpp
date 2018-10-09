@@ -239,7 +239,7 @@ int Codec::frameSize() const
     return m_codecContext->frame_size;
 }
 
-void Codec::flush() const
+void Codec::flush()
 {
     if (!avcodec_is_open(m_codecContext))
         return;

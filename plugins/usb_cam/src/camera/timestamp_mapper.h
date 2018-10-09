@@ -34,7 +34,8 @@ public:
 
     void clear()
     {
-        m_timestamps.clear();
+        if (m_timestamps.size() > 0)
+            m_timestamps.clear();
     }
 
 private:

@@ -44,7 +44,6 @@ private:
     int m_initCode = 0;
 
     uint64_t m_lastVideoPts = 0;
-    uint64_t m_lastVideoTimestamp = 0;
     uint64_t m_lastTimestamp = 0;
     uint64_t m_timePerFrame = 0;
     std::shared_ptr<BufferedVideoFrameConsumer> m_videoFrameConsumer;

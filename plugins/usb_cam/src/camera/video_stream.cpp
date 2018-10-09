@@ -237,7 +237,6 @@ void VideoStream::run()
         }
 
         packet->setTimestamp(m_timeProvider->millisSinceEpoch());
-        m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
 
         auto frame = maybeDecode(packet.get());
 
@@ -293,6 +292,9 @@ void VideoStream::uninitialize()
     m_packetConsumerManager.flush();
     m_frameConsumerManager.flush();
 
+    // Some cameras segfault if they are unintialized while there are still packets and / or frames
+    // allocated. They own the memory being referred to be the packet, so the packet needs to go 
+    // be deallocated first.
     while (*m_packetCount > 0 || *m_frameCount > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
 
@@ -390,14 +392,11 @@ int VideoStream::initializeDecoder()
 
 std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
 {
-    bool shouldDecode;
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        shouldDecode = m_frameConsumerManager.size() > 0;
+        if (m_frameConsumerManager.empty())
+            return nullptr;
     }
-
-    if (!shouldDecode)
-        return nullptr;
 
     if (m_waitForKeyPacket)
     {
@@ -411,10 +410,16 @@ std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * p
     if (result < 0)
         return nullptr;
 
-    if(frame->pts() == AV_NOPTS_VALUE)
+    if (frame->pts() == AV_NOPTS_VALUE)
         frame->frame()->pts = frame->packetPts();
 
-    uint64_t nxTimestamp;
+    // Don't allow too many dangling timestamps.
+    if (m_timestamps.size() > 30)
+        m_timestamps.clear();
+
+    m_timestamps.addTimestamp(packet->pts(), packet->timestamp());
+
+    uint64_t nxTimestamp = 0;
     if (!m_timestamps.getNxTimestamp(frame->packetPts(), &nxTimestamp, true /*eraseEntry*/))
         nxTimestamp = m_timeProvider->millisSinceEpoch();
 
@@ -433,6 +438,9 @@ int VideoStream::decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame)
 
 float VideoStream::largestFps() const
 {
+    if(consumersEmpty())
+        return 0;
+
     float packetFps = 0;
     float frameFps = 0;
     std::weak_ptr<AbstractVideoConsumer> packetConsumer;
@@ -443,13 +451,16 @@ float VideoStream::largestFps() const
 
     auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
     if (videoConsumer.expired())
-        return -1; //< Should never happen unless consumersEmpty() returns true
+        return 0;
 
     return videoConsumer.lock()->fps();
 }
 
 void VideoStream::largestResolution(int * outWidth, int * outHeight) const
 {
+    *outWidth = 0;
+    *outHeight = 0;
+
     if(consumersEmpty())
         return;
 
@@ -476,7 +487,7 @@ void VideoStream::largestResolution(int * outWidth, int * outHeight) const
 int VideoStream::largestBitrate() const
 {
     if (consumersEmpty())
-        return -1;
+        return 0;
 
     int packetBitrate = 0;
     int frameBitrate = 0;
@@ -491,7 +502,7 @@ int VideoStream::largestBitrate() const
         : packetConsumer;
 
     if (videoConsumer.expired())
-        return -1; //< Should never happen
+        return 0; //< Should never happen
 
     return videoConsumer.lock()->bitrate();
 }
@@ -513,8 +524,8 @@ void VideoStream::updateResolutionUnlocked()
     if (consumersEmpty())
         return;
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
     CodecParameters newParams = m_codecParams;
     largestResolution(&width, &height);
     newParams.setResolution(width, height);
@@ -544,8 +555,8 @@ void VideoStream::updateUnlocked()
     CodecParameters newParams = m_codecParams;
     newParams.fps = largestFps();
 
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
     largestResolution(&width, &height);
     newParams.setResolution(width, height);
 
