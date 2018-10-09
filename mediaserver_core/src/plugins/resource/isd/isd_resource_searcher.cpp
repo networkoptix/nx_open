@@ -10,7 +10,6 @@
 #include "common/common_module.h"
 #include <utils/common/credentials.h>
 #include <plugins/resource/mdns/mdns_packet.h>
-#include <common/static_common_module.h>
 #include <nx/utils/log/log.h>
 
 using nx::common::utils::Credentials;

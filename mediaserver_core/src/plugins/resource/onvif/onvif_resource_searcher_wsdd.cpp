@@ -14,7 +14,6 @@
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"
-#include <common/static_common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 

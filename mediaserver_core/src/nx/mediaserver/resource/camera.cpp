@@ -1,7 +1,5 @@
 #include "camera.h"
 
-#include <common/static_common_module.h>
-
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -356,28 +354,25 @@ QSize Camera::closestResolution(
 
 CameraDiagnostics::Result Camera::initInternal()
 {
-    if (qnStaticCommon)
+    auto resData = resourceData();
+    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto credentials = getAuth();
+    auto status = getStatus();
+    if (timeoutSec > 0 &&
+        m_lastInitTime.isValid() &&
+        m_lastInitTime.elapsed() < timeoutSec * 1000 &&
+        status == Qn::Unauthorized &&
+        m_lastCredentials == credentials)
     {
-        auto resData = resourceData();
-        int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
-        auto credentials = getAuth();
-        auto status = getStatus();
-        if (timeoutSec > 0 &&
-            m_lastInitTime.isValid() &&
-            m_lastInitTime.elapsed() < timeoutSec * 1000 &&
-            status == Qn::Unauthorized &&
-            m_lastCredentials == credentials)
-        {
-            return CameraDiagnostics::NotAuthorisedResult(getUrl());
-        }
-
-        m_lastInitTime.restart();
-        m_lastCredentials = credentials;
-
-        m_mediaTraits = resData.value<nx::media::CameraTraits>(
-            Qn::kMediaTraits,
-            nx::media::CameraTraits());
+        return CameraDiagnostics::NotAuthorisedResult(getUrl());
     }
+
+    m_lastInitTime.restart();
+    m_lastCredentials = credentials;
+
+    m_mediaTraits = resData.value<nx::media::CameraTraits>(
+        Qn::kMediaTraits,
+        nx::media::CameraTraits());
 
     m_streamCapabilityAdvancedProviders.clear();
     m_defaultAdvancedParametersProvider = nullptr;

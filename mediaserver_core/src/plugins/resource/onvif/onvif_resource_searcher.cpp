@@ -19,7 +19,6 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include <common/static_common_module.h>
 #include "soap_wrapper.h"
 #include <onvif/soapStub.h>
 #include "gsoap_async_call_wrapper.h"

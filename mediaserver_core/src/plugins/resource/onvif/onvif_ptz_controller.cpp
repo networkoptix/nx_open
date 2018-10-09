@@ -14,7 +14,6 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
-#include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 #include <nx/utils/log/log_main.h>

@@ -10,7 +10,6 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
-#include <common/static_common_module.h>
 #include <plugins/utils/xml_request_helper.h>
 #include <nx/utils/log/log.h>
 #include <camera/camera_pool.h>

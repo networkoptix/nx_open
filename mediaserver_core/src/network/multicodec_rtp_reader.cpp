@@ -9,7 +9,6 @@
 #include <nx/vms/event/events/network_issue_event.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>

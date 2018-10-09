@@ -17,7 +17,6 @@
 #include <utils/media/nalUnits.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_data_structures.h>

@@ -11,7 +11,6 @@
 #include <common/common_module.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <utils/common/credentials.h>
-#include <common/static_common_module.h>
 
 extern QString getValueFromString(const QString& line);
 

@@ -39,7 +39,6 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {

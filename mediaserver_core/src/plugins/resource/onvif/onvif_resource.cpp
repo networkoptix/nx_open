@@ -53,7 +53,6 @@
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
-#include <common/static_common_module.h>
 #include <utils/media/av_codec_helper.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)

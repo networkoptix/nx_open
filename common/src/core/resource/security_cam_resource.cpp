@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -21,7 +20,6 @@
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
-#include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
@@ -1319,11 +1317,7 @@ bool QnSecurityCamResource::useBitratePerGop() const
     if (!result.isEmpty())
         return result.toInt() > 0;
 
-    if (qnStaticCommon)
-    {
-        if (resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return true;
-    }
+    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
     return false;
 }
 

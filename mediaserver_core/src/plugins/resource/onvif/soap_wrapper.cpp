@@ -15,7 +15,6 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
-#include <common/static_common_module.h>
 #include <media_server/media_server_module.h>
 
 using nx::common::utils::Credentials;

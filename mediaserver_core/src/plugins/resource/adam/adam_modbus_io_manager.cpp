@@ -8,7 +8,6 @@
 
 #include "adam_modbus_io_manager.h"
 #include <nx/utils/timer_manager.h>
-#include <common/static_common_module.h>
 
 using namespace nx_io_managment;
 

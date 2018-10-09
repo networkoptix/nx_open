@@ -18,7 +18,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
 #include "plugins/plugin_manager.h"
-#include <common/static_common_module.h>
 #include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );

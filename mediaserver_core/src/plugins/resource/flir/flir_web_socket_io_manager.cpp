@@ -10,7 +10,6 @@
 #include "flir_nexus_string_builder.h"
 
 #include <core/resource/camera_resource.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>

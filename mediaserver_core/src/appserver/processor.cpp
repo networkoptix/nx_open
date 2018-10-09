@@ -27,7 +27,6 @@
 #include <api/global_settings.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 

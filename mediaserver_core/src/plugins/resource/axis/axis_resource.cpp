@@ -27,7 +27,6 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <motion/motion_detection.h>
-#include <common/static_common_module.h>
 
 #include <algorithm>
 #include <utils/media/av_codec_helper.h>

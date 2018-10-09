@@ -9,7 +9,6 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/camera_resource.h>
-#include <common/static_common_module.h>
 
 namespace core_ptz = nx::core::ptz;
 

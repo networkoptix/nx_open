@@ -1,7 +1,6 @@
 #include "server_ptz_controller_pool.h"
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <core/resource/param.h>
 #include <core/resource/camera_resource.h>

@@ -14,7 +14,6 @@
 #include <boost/optional.hpp>
 #include <utils/camera/camera_diagnostics.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>

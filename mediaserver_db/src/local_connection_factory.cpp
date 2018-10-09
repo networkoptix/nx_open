@@ -4,8 +4,6 @@
 
 #include <api/global_settings.h>
 
-#include <common/static_common_module.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/address_resolver.h>
