@@ -118,7 +118,7 @@ AbstractSearchWidget::Private::Private(
         });
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
-    m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
+    m_fetchMoreOperation->setInterval(kQueuedFetchMoreDelay);
     m_fetchMoreOperation->setCallback([this]() { tryFetchMore(); });
 }
 
@@ -299,16 +299,27 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup timeline selection watcher.
 
-    auto applyTimePeriod = new utils::PendingOperation([this]() { updateCurrentTimePeriod(); },
-        kTimeSelectionDelay.count(), this);
-
+    auto applyTimePeriod = new utils::PendingOperation(this);
+    applyTimePeriod->setInterval(kTimeSelectionDelay);
     applyTimePeriod->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    applyTimePeriod->setCallback(
+        [this]()
+        {
+            if (m_period == Period::selection)
+                updateCurrentTimePeriod();
+        });
 
     connect(navigator(), &QnWorkbenchNavigator::timeSelectionChanged, this,
         [this, applyTimePeriod](const QnTimePeriod& selection)
         {
             m_timelineSelection = selection;
-            if (m_period == Period::selection)
+            if (m_period != Period::selection)
+                return;
+
+            // If selection was cleared, update immediately, otherwise update after small delay.
+            if (m_timelineSelection.isEmpty())
+                applyTimePeriod->fire();
+            else
                 applyTimePeriod->requestOperation();
         });
 
