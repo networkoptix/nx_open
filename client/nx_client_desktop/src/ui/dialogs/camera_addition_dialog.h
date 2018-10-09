@@ -36,7 +36,7 @@ public:
         Count
     };
 
-    explicit QnCameraAdditionDialog(QWidget *parent);
+    explicit QnCameraAdditionDialog(QWidget* parent);
     virtual ~QnCameraAdditionDialog();
 
     QnMediaServerResourcePtr server() const;
