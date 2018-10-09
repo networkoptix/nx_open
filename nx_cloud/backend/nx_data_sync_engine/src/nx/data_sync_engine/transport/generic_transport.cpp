@@ -42,6 +42,9 @@ GenericTransport::GenericTransport(
         connectionRequestAttributes.remotePeer.id;
     m_commonTransportHeaderOfRemoteTransaction.transactionFormatVersion =
         connectionRequestAttributes.remotePeerProtocolVersion;
+
+    m_commandPipeline->setOnConnectionClosed(
+        [this](auto... args) { processConnectionClosedEvent(std::move(args)...); });
 }
 
 GenericTransport::~GenericTransport()
@@ -66,10 +69,9 @@ network::SocketAddress GenericTransport::remoteSocketAddr() const
     return m_commandPipeline->remoteSocketAddr();
 }
 
-void GenericTransport::setOnConnectionClosed(
-    ConnectionClosedEventHandler handler)
+ConnectionClosedSubscription& GenericTransport::connectionClosedSubscription()
 {
-    m_commandPipeline->setOnConnectionClosed(std::move(handler));
+    return m_connectionClosedSubscription;
 }
 
 void GenericTransport::setOnGotTransaction(
@@ -123,7 +125,7 @@ void GenericTransport::sendTransaction(
         });
 }
 
-void GenericTransport::startOutgoingChannel()
+void GenericTransport::start()
 {
     NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
         lm("Starting outgoing transaction channel to %1")
@@ -135,8 +137,7 @@ void GenericTransport::startOutgoingChannel()
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
 
     TransactionTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
-    transportHeader.vmsTransportHeader.processedPeers
-        << m_remotePeer.id;
+    transportHeader.vmsTransportHeader.processedPeers << m_remotePeer.id;
     transportHeader.vmsTransportHeader.processedPeers << m_localPeer.id;
 
     sendTransaction(
@@ -208,6 +209,12 @@ void GenericTransport::stopWhileInAioThread()
 {
     m_commandPipeline.reset();
     m_transactionLogReader.reset();
+}
+
+void GenericTransport::processConnectionClosedEvent(
+    SystemError::ErrorCode closeReason)
+{
+    m_connectionClosedSubscription.notify(closeReason);
 }
 
 void GenericTransport::onTransactionsReadFromLog(

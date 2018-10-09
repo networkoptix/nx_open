@@ -241,7 +241,8 @@ void TransactionTransport::forwardStateChangedEvent(
     if (newState == ::ec2::QnTransactionTransportBase::Closed ||
         newState == ::ec2::QnTransactionTransportBase::Error)
     {
-        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this), lm("systemId %1, connection %2. Reporting connection closure")
+        NX_VERBOSE(QnLog::EC2_TRAN_LOG.join(this),
+            lm("systemId %1, connection %2. Reporting connection closure")
                 .args(m_systemId, m_connectionId));
 
         m_closed = true;

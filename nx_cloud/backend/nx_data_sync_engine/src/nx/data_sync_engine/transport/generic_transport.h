@@ -40,7 +40,7 @@ public:
 
     virtual network::SocketAddress remoteSocketAddr() const override;
 
-    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
+    virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
 
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
 
@@ -52,7 +52,7 @@ public:
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
-    void startOutgoingChannel();
+    virtual void start() override;
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
@@ -92,6 +92,9 @@ private:
     bool m_haveToSendSyncDone = false;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
     TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
+    ConnectionClosedSubscription m_connectionClosedSubscription;
+
+    void processConnectionClosedEvent(SystemError::ErrorCode closeReason);
 
     void onTransactionsReadFromLog(
         ResultCode resultCode,

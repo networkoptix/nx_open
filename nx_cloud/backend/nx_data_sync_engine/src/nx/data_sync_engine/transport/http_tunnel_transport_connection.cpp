@@ -29,10 +29,9 @@ network::SocketAddress HttpTunnelTransportConnection::remoteSocketAddr() const
     return m_remoteEndpoint;
 }
 
-void HttpTunnelTransportConnection::setOnConnectionClosed(
-    ConnectionClosedEventHandler handler)
+ConnectionClosedSubscription& HttpTunnelTransportConnection::connectionClosedSubscription()
 {
-    m_connectionClosedEventHandler = std::move(handler);
+    return m_connectionClosedSubscription;
 }
 
 void HttpTunnelTransportConnection::setOnGotTransaction(
@@ -59,7 +58,7 @@ void HttpTunnelTransportConnection::sendTransaction(
     // TODO
 }
 
-void HttpTunnelTransportConnection::startOutgoingChannel()
+void HttpTunnelTransportConnection::start()
 {
     // Sending local state.
 }

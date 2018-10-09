@@ -34,13 +34,14 @@ public:
         vms::api::PeerDataEx remotePeerData);
 
     virtual network::SocketAddress remoteSocketAddr() const override;
-    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
+    virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;
     virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+    virtual void start() override;
 
     virtual void fillAuthInfo(nx::network::http::AsyncClient* httpClient, bool authByKey) override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -67,7 +68,7 @@ private:
 private:
     const ProtocolVersionRange m_protocolVersionRange;
     TransactionTransportHeader m_commonTransactionHeader;
-    ConnectionClosedEventHandler m_connectionClosedEventHandler;
+    ConnectionClosedSubscription m_connectionClosedSubscription;
     GotTransactionEventHandler m_gotTransactionEventHandler;
     std::unique_ptr<TransactionLogReader> m_transactionLogReader;
 

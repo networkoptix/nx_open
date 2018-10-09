@@ -235,8 +235,10 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     if (!isOneMoreConnectionFromSystemAllowed(lock, context))
         return false;
 
-    context.connection->setOnConnectionClosed(
-        std::bind(&ConnectionManager::removeConnection, this, context.connectionId));
+    nx::utils::SubscriptionId subscriptionId;
+    context.connection->connectionClosedSubscription().subscribe(
+        std::bind(&ConnectionManager::removeConnection, this, context.connectionId),
+        &subscriptionId);
     context.connection->setOnGotTransaction(
         std::bind(
             &ConnectionManager::onGotTransaction, this,

@@ -95,8 +95,10 @@ void Connector::registerConnection(
     NX_DEBUG(this, lm("Connection %1 to %2 established successfully")
         .args(nodeContext.connectionId, url));
 
-    connection->setOnConnectionClosed(
-        [this, url](auto... args) { onConnectionClosed(url, args...); });
+    nx::utils::SubscriptionId connectionClosedSubscriptionId;
+    connection->connectionClosedSubscription().subscribe(
+        [this, url](auto... args) { onConnectionClosed(url, args...); },
+        &connectionClosedSubscriptionId);
 
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.connectionId = nodeContext.connectionId;

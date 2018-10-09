@@ -5,6 +5,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/subscription.h>
 
 #include "serialization/serializable_transaction.h"
 #include "transaction_transport_header.h"
@@ -12,7 +13,11 @@
 namespace nx {
 namespace data_sync_engine {
 
-using ConnectionClosedEventHandler = nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>;
+using ConnectionClosedSubscription =
+    nx::utils::Subscription<SystemError::ErrorCode>;
+
+using ConnectionClosedEventHandler =
+    typename ConnectionClosedSubscription::NotificationCallback;
 
 using GotTransactionEventHandler = nx::utils::MoveOnlyFunc<void(
     Qn::SerializationFormat,
@@ -56,7 +61,7 @@ class AbstractTransactionTransport:
 public:
     virtual network::SocketAddress remoteSocketAddr() const = 0;
 
-    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;
+    virtual ConnectionClosedSubscription& connectionClosedSubscription() = 0;
 
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) = 0;
 
@@ -67,6 +72,8 @@ public:
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) = 0;
+
+    virtual void start() = 0;
 };
 
 } // namespace data_sync_engine

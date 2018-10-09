@@ -175,18 +175,18 @@ network::SocketAddress WebSocketTransactionTransport::remoteSocketAddr() const
     return webSocket()->socket()->getForeignAddress();
 }
 
-void WebSocketTransactionTransport::setOnConnectionClosed(ConnectionClosedEventHandler handler)
+ConnectionClosedSubscription& WebSocketTransactionTransport::connectionClosedSubscription()
 {
-    m_connectionClosedEventHandler = std::move(handler);
+    return m_connectionClosedSubscription;
 }
 
 void WebSocketTransactionTransport::setState(State state)
 {
-    if (m_connectionClosedEventHandler && state == State::Error)
+    if (state == State::Error)
     {
         SystemError::ErrorCode errorCode = SystemError::noError;
         webSocket()->socket()->getLastError(&errorCode);
-        m_connectionClosedEventHandler(errorCode);
+        m_connectionClosedSubscription.notify(errorCode);
     }
     nx::p2p::ConnectionBase::setState(state);
 }
@@ -218,6 +218,10 @@ void WebSocketTransactionTransport::sendTransaction(
         remotePeer().dataFormat,
         highestProtocolVersionCompatibleWithRemotePeer());
     sendMessage(nx::p2p::MessageType::pushTransactionData, serializedTransaction);
+}
+
+void WebSocketTransactionTransport::start()
+{
 }
 
 int WebSocketTransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const

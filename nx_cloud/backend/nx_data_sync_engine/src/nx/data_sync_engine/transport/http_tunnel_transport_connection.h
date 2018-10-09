@@ -24,7 +24,7 @@ public:
 
     virtual network::SocketAddress remoteSocketAddr() const override;
 
-    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
+    virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
 
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
 
@@ -36,7 +36,7 @@ public:
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
-    void startOutgoingChannel();
+    virtual void start() override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -48,6 +48,7 @@ private:
     nx::network::server::FixedSizeMessagePipeline m_messagePipeline;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
+    ConnectionClosedSubscription m_connectionClosedSubscription;
 
     void processMessage(nx::network::server::FixedSizeMessage message);
 };
