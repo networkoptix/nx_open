@@ -14,9 +14,9 @@ ${url}         ${ENV}
 *** Keywords ***
 Check Systems Text
     [arguments]    ${user}
+    Sleep    1
     Log Out
     Validate Log Out
-    sleep    5
     Log In    ${user}    ${password}
     Validate Log In
     Wait Until Page Contains Element    ${AUTO TESTS USER}[text()='${TEST FIRST NAME} ${TEST LAST NAME}']
