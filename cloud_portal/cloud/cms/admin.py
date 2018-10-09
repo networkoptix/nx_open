@@ -76,7 +76,8 @@ class ProductAdmin(CMSAdmin):
         approved = ProductCustomizationReview.REVIEW_STATES.accepted
         product = Product.objects.get(id=object_id)
         product_customizations = ProductCustomizationReview.objects.filter(version__product=product)
-        for customization in product.customizations.all():
+
+        for customization in product.customizations.filter(name__in=request.user.customizations):
             approved_versions = product_customizations.filter(customization=customization, state=approved)
             if approved_versions.exists():
                 extra_context['current_versions'].append(approved_versions.latest('id'))
@@ -251,9 +252,14 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
         version = ProductCustomizationReview.objects.get(id=object_id).version
         extra_context['contexts'] = get_records_for_version(version)
         extra_context['title'] = "Changes for {} - Version: {}".format(version.product.name, version.id)
-        if request.user == version.product.created_by or request.user.is_superuser:
-            extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
+
+        extra_context['review_states'] = ProductCustomizationReview.REVIEW_STATES
+        extra_context['customization_reviews'] = version.productcustomizationreview_set.\
+            filter(customization__name__in=request.user.customizations)
+
+        if request.user == version.product.created_by:
             extra_context['customization_reviews'] = version.productcustomizationreview_set.all()
+
         return super(ProductCustomizationReviewAdmin, self).change_view(
             request, object_id, form_url, extra_context=extra_context,
         )
