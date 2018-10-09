@@ -224,9 +224,7 @@ bool QnAdamModbusIOManager::initializeIO()
 
     auto securityResource = dynamic_cast<QnSecurityCamResource*>(m_resource);
 
-    auto resourceData = qnStaticCommon->dataPool()->data(
-        securityResource->getVendor(),
-        securityResource->getModel());
+    auto resourceData = securityResource->resourceData();
 
     auto startInputCoil = resourceData.value<quint16>(kAdamStartInputCoilParamName);
     auto startOutputCoil = resourceData.value<quint16>(kAdamStartOutputCoilParamName);

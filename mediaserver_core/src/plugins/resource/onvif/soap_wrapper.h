@@ -614,10 +614,14 @@ public:
 private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
-    QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
+    QAuthenticator getDefaultPassword(
+        QnCommonModule* commonModule,
+        const QString& manufacturer, const QString& model) const;
     std::list<nx::common::utils::Credentials> getPossibleCredentials(
+        QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model) const;
     nx::common::utils::Credentials getForcedCredentials(
+        QnCommonModule* commonModule,
         const QString& manufacturer, const QString& model);
     void calcTimeDrift();
 

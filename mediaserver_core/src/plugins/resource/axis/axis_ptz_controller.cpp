@@ -108,7 +108,7 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr& resource):
 {
     updateState();
 
-    QnResourceData data = qnStaticCommon->dataPool()->data(resource);
+    QnResourceData data = resource->resourceData();
     m_maxDeviceSpeed = QVector3D(
         data.value<qreal>(lit("axisMaxPanSpeed"), 100),
         data.value<qreal>(lit("axisMaxTiltSpeed"), 100),

@@ -212,8 +212,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = qnStaticCommon
-            ->dataPool()
+        auto resData = commonModule()->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
         bool shouldAppearAsSingleChannel = resData.value<bool>(
@@ -241,26 +240,28 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();
 
-        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        auto resData = dataPool()->data(manufacturer, modelName);
         const auto manufacturerReplacement = resData.value<QString>(
             Qn::ONVIF_MANUFACTURER_REPLACEMENT);
 
         if (!manufacturerReplacement.isEmpty())
         {
             manufacturer = manufacturerReplacement;
-            resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+            resData = dataPool()->data(manufacturer, modelName);
         }
 
         if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
             return resList;
 
-        const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, modelName);
+        auto dataPool = commonModule()->dataPool();
+        const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(
+            dataPool, manufacturer, modelName);
         if (!forceOnvif)
         {
             if (NameHelper::instance().isSupported(modelName))
                 return resList;
 
-            if (OnvifResourceInformationFetcher::ignoreCamera(manufacturer, modelName))
+            if (OnvifResourceInformationFetcher::ignoreCamera(dataPool, manufacturer, modelName))
                 return resList;
 
             if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName)) {

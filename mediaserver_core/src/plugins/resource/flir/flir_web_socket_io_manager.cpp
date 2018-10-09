@@ -633,9 +633,7 @@ void WebSocketIoManager::checkAndNotifyIfNeeded(const Notification& notification
 
 void WebSocketIoManager::initIoPortStatesUnsafe()
 {
-    auto resData = qnStaticCommon->dataPool()->data(
-        m_resource->getVendor(),
-        m_resource->getModel());
+    auto resData = m_resource->resourceData();
 
     auto allPorts = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
 

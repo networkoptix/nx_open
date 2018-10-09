@@ -30,7 +30,7 @@ core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr&
     if (!camera)
         return core_ptz::RelativeContinuousMoveMapping();
 
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->resourceData();
 
     if (resourceData.contains(kRelativeMoveMapping))
     {
@@ -60,10 +60,7 @@ QnPtzMapperPtr mapper(const QnSecurityCamResourcePtr& camera)
         return QnPtzMapperPtr();
     }
 
-    return qnStaticCommon
-        ->dataPool()
-        ->data(camera)
-        .value<QnPtzMapperPtr>(lit("ptzMapper"));
+    return camera->resourceData().value<QnPtzMapperPtr>(lit("ptzMapper"));
 }
 
 } // namespace

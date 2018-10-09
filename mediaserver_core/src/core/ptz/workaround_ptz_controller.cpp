@@ -21,7 +21,7 @@ static const QString kConfigurationalPtzCapabilitiesOverride("configurationalPtz
 core_ptz::Override loadOverride(const QnVirtualCameraResourcePtr& camera)
 {
     core_ptz::Override ptzOverride;
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->resourceData();
     resourceData.value<core_ptz::Override>(core_ptz::Override::kPtzOverrideKey, &ptzOverride);
 
     const std::map<QString, std::optional<Ptz::Capabilities>*> overrides = {

@@ -845,7 +845,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
         !getFirmware().isEmpty()
@@ -1037,7 +1037,7 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
         return CameraDiagnostics::NoErrorResult();
     }
 
-    const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto resData = resourceData();
     const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
         HanwhaBypassSupportType::normal);

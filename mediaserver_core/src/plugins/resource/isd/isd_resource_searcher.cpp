@@ -102,7 +102,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
     else
     {
         QList<QnResourcePtr> resList;
-        auto resData = qnStaticCommon->dataPool()->data(manufacture(), lit("*"));
+        auto resData = dataPool()->data(manufacture(), lit("*"));
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -228,7 +228,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
         }
     }
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
@@ -282,7 +282,7 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString
     else if(vendorName.toLower().trimmed() == lit("digital watchdog") ||
         vendorName.toLower().trimmed() == lit("digitalwatchdog"))
     {
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data("DW", model);
+        QnResourceData resourceData = dataPool()->data("DW", model);
         if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
             return true;
     }
@@ -382,7 +382,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
         }
     }
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(manufacture(), name));
@@ -412,7 +412,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
     else
     {
-        auto resData = qnStaticCommon->dataPool()->data(manufacture(), name);
+        auto resData = dataPool()->data(manufacture(), name);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -459,7 +459,7 @@ bool QnPlISDResourceSearcher::processPacket(
     }
     else
     {
-        auto resData = qnStaticCommon->dataPool()->data(manufacture(), model);
+        auto resData = dataPool()->data(manufacture(), model);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -514,7 +514,7 @@ void QnPlISDResourceSearcher::createResource(
         }
     }
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
+    QnResourceData resourceData = dataPool()->data(devInfo.manufacturer, devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
     {
         NX_VERBOSE(this, lm("ONVIF is forced for vendor: %1, model: %2").args(

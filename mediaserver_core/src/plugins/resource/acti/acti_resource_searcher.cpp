@@ -175,7 +175,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
         return result;
     }
 
-    auto resourceData = qnStaticCommon->dataPool()->data(manufacture(), devInfo.info.modelName);
+    auto resourceData = dataPool()->data(manufacture(), devInfo.info.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return result;
 
@@ -369,7 +369,7 @@ void QnActiResourceSearcher::createResource(
         return;
 
     const bool isNx = isNxDevice(devInfo);
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    QnResourceData resourceData = dataPool()->data(manufacture(), devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
@@ -378,7 +378,7 @@ void QnActiResourceSearcher::createResource(
 
     if(isNx)
     {
-        resourceData = qnStaticCommon->dataPool()->data(NX_VENDOR, devInfo.modelName);
+        resourceData = dataPool()->data(NX_VENDOR, devInfo.modelName);
         auto name = resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME);
         auto model = resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME);
 

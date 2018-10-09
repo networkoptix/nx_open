@@ -123,9 +123,11 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     }
 }
 
-bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
+bool OnvifResourceInformationFetcher::ignoreCamera(
+    QnResourceDataPool* dataPool,
+    const QString& manufacturer, const QString& name)
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
+    QnResourceData resourceData = dataPool->data(manufacturer, name);
 
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
         return true;
@@ -147,11 +149,13 @@ bool OnvifResourceInformationFetcher::isModelSupported(const QString& manufactur
 }
 
 bool OnvifResourceInformationFetcher::needIgnoreCamera(
+    QnResourceDataPool* dataPool,
     const QString& host,
     const QString& manufacturer,
     const QString& model)
 {
-    const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(manufacturer, model);
+    const bool forceOnvif = QnPlOnvifResource::isCameraForcedToOnvif(
+        dataPool, manufacturer, model);
     if (forceOnvif)
         return false;
 
@@ -165,7 +169,7 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
             arg(model));
         return true;
     }
-    if (ignoreCamera(manufacturer, normilizedModel))
+    if (ignoreCamera(dataPool, manufacturer, normilizedModel))
     {
         NX_DEBUG(typeid(OnvifResourceInformationFetcher), lit("ignore ONVIF camera %1 (%2-%3) because it is in the special blocking list").
             arg(host).
@@ -188,7 +192,7 @@ void OnvifResourceInformationFetcher::findResources(
     }
 
     auto info = originalInfo;
-    m_hookChain.applyHooks(&info);
+    m_hookChain.applyHooks(serverModule()->commonModule()->dataPool(), &info);
 
     QString mac = info.mac;
     if (isMacAlreadyExists(info.uniqId, result) || isMacAlreadyExists(mac, result)) {
@@ -197,8 +201,8 @@ void OnvifResourceInformationFetcher::findResources(
 
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
-
-    if (needIgnoreCamera(QUrl(endpoint).host(), info.manufacturer, info.name))
+    auto dataPool = serverModule()->commonModule()->dataPool();
+    if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), info.manufacturer, info.name))
         return;
 
     QString manufacturer = info.manufacturer;
@@ -279,7 +283,8 @@ void OnvifResourceInformationFetcher::findResources(
         if (!extInfo.mac.isEmpty())
             mac = extInfo.mac;
 
-        if (needIgnoreCamera(QUrl(endpoint).host(), manufacturer, model))
+        auto dataPool = serverModule()->commonModule()->dataPool();
+        if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), manufacturer, model))
             return;
     }
 
@@ -295,7 +300,7 @@ void OnvifResourceInformationFetcher::findResources(
     else
         return;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(res->getVendor(), res->getModel());
+    QnResourceData resourceData = res->commonModule()->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -360,7 +365,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
-    auto resData = qnStaticCommon->dataPool()->data(manufacturer, model);
+    auto resData = serverModule()->commonModule()->dataPool()->data(manufacturer, model);
     auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;

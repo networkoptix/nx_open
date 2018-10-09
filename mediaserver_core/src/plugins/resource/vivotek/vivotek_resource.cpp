@@ -52,8 +52,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     if (!result)
         return result;
 
-    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
     if (hevcIsDisabled)
         return result;

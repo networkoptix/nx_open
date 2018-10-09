@@ -667,7 +667,7 @@ void QnMulticodecRtpReader::createTrackParsers()
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
                 if (secResource)
                 {
-                    auto resData = qnStaticCommon->dataPool()->data(secResource);
+                    auto resData = secResource->resourceData();
                     auto forceRtcpReports = resData.value<bool>(lit("forceRtcpReports"), false);
 
                     if (m_tracks[i].ioDevice)

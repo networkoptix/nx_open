@@ -538,7 +538,7 @@ bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, Q
 void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
-    auto resData = qnStaticCommon->dataPool()->data(MANUFACTURE, getModel());
+    auto resData = resourceData();
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 

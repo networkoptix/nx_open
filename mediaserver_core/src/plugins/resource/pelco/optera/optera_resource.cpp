@@ -53,8 +53,7 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
     if (m_videoLayout)
         return m_videoLayout;
 
-    auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
-    auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+    auto layoutStr = resourceData().value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
 
     if (!layoutStr.isEmpty())
     {

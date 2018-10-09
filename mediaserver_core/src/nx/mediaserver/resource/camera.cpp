@@ -358,7 +358,7 @@ CameraDiagnostics::Result Camera::initInternal()
 {
     if (qnStaticCommon)
     {
-        auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+        auto resData = resourceData();
         int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
         auto credentials = getAuth();
         auto status = getStatus();

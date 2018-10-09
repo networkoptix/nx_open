@@ -381,8 +381,7 @@ void HanwhaResourceSearcher::createResource(
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon
-        ->dataPool()
+    QnResourceData resourceData = commonModule()->dataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))

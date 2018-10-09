@@ -613,7 +613,7 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODEC c)
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     bool shouldAppearAsSingleChannel = resData.value<bool>(
         Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -828,7 +828,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializePtz(
 CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
     const CapabilitiesResp& onvifCapabilities)
 {
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const QnResourceData resourceData = this->resourceData();
     m_inputPortCount = 0;
     m_isRelayOutputInversed = resourceData.value(QString("relayOutputInversed"), false);
     m_fixWrongInputPortNumber = resourceData.value(QString("fixWrongInputPortNumber"), false);
@@ -935,7 +935,7 @@ int QnPlOnvifResource::suggestBitrateKbps(
 
 int QnPlOnvifResource::strictBitrate(int bitrate, Qn::ConnectionRole role) const
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
 
     QString availableBitratesParamName;
     QString bitrateBoundsParamName;
@@ -993,7 +993,7 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
 QSize QnPlOnvifResource::findSecondaryResolution(
     const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff)
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
 
     auto forcedSecondaryResolution = resData.value<QString>(
         Qn::FORCED_SECONDARY_STREAM_RESOLUTION_PARAM_NAME);
@@ -1725,7 +1725,7 @@ bool QnPlOnvifResource::fetchRelayInputInfo(const CapabilitiesResp& capabilities
         setCameraCapability(Qn::InputPortCapability, true);
     }
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     m_portAliases = resData.value<std::vector<QString>>(Qn::ONVIF_INPUT_PORT_ALIASES_PARAM_NAME);
 
     if (!m_portAliases.empty())
@@ -1786,7 +1786,7 @@ bool QnPlOnvifResource::setOutputPortState(
 boost::optional<onvifXsd__H264Profile> QnPlOnvifResource::getH264StreamProfile(
     const VideoOptionsLocal& videoOptionsLocal)
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
 
     auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
 
@@ -2042,8 +2042,7 @@ bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result&
 
 bool QnPlOnvifResource::trustMaxFPS()
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool result = resourceData.value<bool>(QString("trustMaxFPS"), false);
+    bool result = resourceData().value<bool>(QString("trustMaxFPS"), false);
     return result;
 }
 
@@ -2178,9 +2177,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     // Step 1. Get videoEncoderConfigurations and videoEncodersTokenList
     Media::VideoEncoderConfigurations videoEncoderConfigurations(this);
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     QnOnvifConfigDataPtr forcedOnvifParams =
-        resourceData.value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
+        resourceData().value<QnOnvifConfigDataPtr>(QString("forcedOnvifParams"));
     QStringList videoEncodersTokenList;
 
     if (forcedOnvifParams && forcedOnvifParams->videoEncoders.size() > getChannel())
@@ -2209,7 +2207,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     }
 
     // Step 2. Extract video encoder options for every token into optionsList.
-    const auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
+    const auto frameRateBounds = resourceData().value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
     QList<VideoOptionsLocal> optionsList;
     for(const QString& encoderToken: videoEncodersTokenList)
     {
@@ -2364,7 +2362,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming()
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
 
     bool forceSingleStream = resData.value<bool>(Qn::FORCE_SINGLE_STREAM_PARAM_NAME, false);
 
@@ -2567,7 +2565,7 @@ CameraDiagnostics::Result QnPlOnvifResource::updateResourceCapabilities()
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
 
     if (!m_videoSourceSize.isValid())
         return CameraDiagnostics::NoErrorResult();
@@ -3605,8 +3603,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if (!m_inputMonitored)
         return true;
 
-    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).
-        value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true))
+    if (resourceData().value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true))
     {
         // Adding task to refresh subscription (does not work on Vista cameras).
         // TODO: detailed explanation about SubscriptionManagerBindingProxy::Renew.
@@ -3742,7 +3739,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
     _onvifEvents__PullMessagesResponse response;
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     const bool useHttpReader = resData.value<bool>(
         Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
         false);
@@ -3975,7 +3972,7 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
             return m_videoLayout;
     }
 
-    auto resData = qnStaticCommon->dataPool()->data(getVendor(), getModel());
+    auto resData = resourceData();
     auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
     auto videoLayout = layoutStr.isEmpty()
         ? QnMediaResource::getVideoLayout(dataProvider)
@@ -4121,7 +4118,7 @@ CameraDiagnostics::Result QnPlOnvifResource::customStreamConfiguration(Qn::Conne
 
 double QnPlOnvifResource::getClosestAvailableFps(double desiredFps)
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     bool useEncodingInterval = resData.value<bool>(
         Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
 
@@ -4297,22 +4294,24 @@ void QnPlOnvifResource::fillFullUrlInfo(const CapabilitiesResp& response)
  * Some cameras provide model in a bit different way via native driver and ONVIF driver.
  * Try several variants to match json data.
  */
-bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const QString& model)
+bool QnPlOnvifResource::isCameraForcedToOnvif(
+    QnResourceDataPool* dataPool,
+    const QString& manufacturer, const QString& model)
 {
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, model);
+    QnResourceData resourceData = dataPool->data(manufacturer, model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 
     QString shortModel = model;
     shortModel.replace(QString(lit(" ")), QString());
     shortModel.replace(QString(lit("-")), QString());
-    resourceData = qnStaticCommon->dataPool()->data(manufacturer, shortModel);
+    resourceData = dataPool->data(manufacturer, shortModel);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 
     if (shortModel.startsWith(manufacturer))
         shortModel = shortModel.mid(manufacturer.length()).trimmed();
-    resourceData = qnStaticCommon->dataPool()->data(manufacturer, shortModel);
+    resourceData = dataPool->data(manufacturer, shortModel);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return true;
 
@@ -4365,8 +4364,7 @@ void QnPlOnvifResource::setAudioOutputConfigurationToken(const QString& value)
 QnAudioTransmitterPtr QnPlOnvifResource::initializeTwoWayAudioByResourceData()
 {
     QnAudioTransmitterPtr result;
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
+    TwoWayAudioParams params = resourceData().value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
     if (params.engine.toLower() == QString("onvif"))
     {
         result.reset(new nx::mediaserver_core::plugins::OnvifAudioTransmitter(this));
@@ -4427,7 +4425,7 @@ void QnPlOnvifResource::updateVideoEncoder(
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto resourceData = this->resourceData();
 
     bool useEncodingInterval = resourceData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
@@ -4529,7 +4527,7 @@ void QnPlOnvifResource::updateVideoEncoder2(
     const QnLiveStreamParams& streamParams)
 {
     QnLiveStreamParams params = streamParams;
-    const QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const QnResourceData resourceData = this->resourceData();
 
     bool useEncodingInterval = resourceData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
@@ -4577,8 +4575,7 @@ void QnPlOnvifResource::updateVideoEncoder2(
 
     if (capabilities.encoding == UnderstandableVideoCodec::H264)
     {
-        auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-        auto desiredH264Profile = resData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
+        auto desiredH264Profile = resourceData.value<QString>(Qn::DESIRED_H264_PROFILE_PARAM_NAME);
 
         if (!encoder.Profile)
         {

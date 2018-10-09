@@ -144,7 +144,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             if (rt.isNull())
                 continue;
 
-            QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+            QnResourceData resourceData = dataPool()->data(manufacture(), name);
             if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
                 continue; // model forced by ONVIF
 
@@ -219,7 +219,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const nx::utils::U
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

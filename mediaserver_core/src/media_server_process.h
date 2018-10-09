@@ -226,6 +226,7 @@ private:
     void updateRootPassword();
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
+    void loadResourceParamsData();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -260,7 +261,6 @@ private:
     std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
-    std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;

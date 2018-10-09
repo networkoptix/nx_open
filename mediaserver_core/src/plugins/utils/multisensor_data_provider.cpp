@@ -69,8 +69,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
 
     auto videoChannelMapping = getVideoChannelMapping();
 
-    auto resData = qnStaticCommon->dataPool()->data(
-        m_resource.dynamicCast<QnSecurityCamResource>());
+    auto resData = m_resource.dynamicCast<QnSecurityCamResource>()->resourceData();
 
     const bool configureEachSensor = resData.value<bool>(Qn::kConfigureAllStitchedSensors, false);
     bool configureSensor = true;
@@ -160,7 +159,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    auto resData = qnStaticCommon->dataPool()->data(
+    auto resData = m_resource->commonModule()->dataPool()->data(
         secRes->getVendor(),
         secRes->getModel());
 
