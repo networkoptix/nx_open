@@ -3250,6 +3250,12 @@ void MediaServerProcess::initStaticCommonModule()
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName());
 }
+
+void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback)
+{
+    m_setupModuleCallback = std::move(callback);
+}
+
 bool MediaServerProcess::setUpMediaServerResource(
     CloudIntegrationManager* cloudIntegrationManager,
     QnMediaServerModule* serverModule,
@@ -4235,6 +4241,8 @@ void MediaServerProcess::run()
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
     #endif
+    if (m_setupModuleCallback)
+        m_setupModuleCallback(serverModule.get());
 
     commonModule()->resourceDiscoveryManager()->setReady(true);
 

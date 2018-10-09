@@ -419,6 +419,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kNameVideoTrafficEncryptionForced, false, this);
 
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoDiscoveryEnabled, true, this);
+    m_autoDiscoveryResponseEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoDiscoveryResponseEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
     m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(
         kNameBackupQualities,
@@ -558,6 +559,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_useTextEmailFormatAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useTextEmailFormatChanged,           Qt::QueuedConnection);
     connect(m_useWindowsEmailLineFeedAdaptor,       &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::useWindowsEmailLineFeedChanged,      Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
+    connect(m_autoDiscoveryResponseEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
     connect(
@@ -605,6 +607,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_videoTrafficEncryptionForcedAdaptor
         << m_eventLogPeriodDaysAdaptor
         << m_autoDiscoveryEnabledAdaptor
+        << m_autoDiscoveryResponseEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
@@ -745,13 +748,24 @@ void QnGlobalSettings::setVideoTrafficEncryptionForced(bool value)
     m_videoTrafficEncryptionForcedAdaptor->setValue(value);
 }
 
-bool QnGlobalSettings::isAutoDiscoveryEnabled() const {
+bool QnGlobalSettings::isAutoDiscoveryEnabled() const
+{
     return m_autoDiscoveryEnabledAdaptor->value();
 }
 
 void QnGlobalSettings::setAutoDiscoveryEnabled(bool enabled)
 {
     m_autoDiscoveryEnabledAdaptor->setValue(enabled);
+}
+
+bool QnGlobalSettings::isAutoDiscoveryResponseEnabled() const
+{
+    return m_autoDiscoveryResponseEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setAutoDiscoveryResponseEnabled(bool enabled)
+{
+    m_autoDiscoveryResponseEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr& resource)

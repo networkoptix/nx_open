@@ -115,6 +115,8 @@ public:
 
     bool enableMultipleInstances() const { return m_enableMultipleInstances; }
     void initStaticCommonModule();
+    void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
+
 signals:
     void started();
 
@@ -271,4 +273,5 @@ private:
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
+    std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
 };
