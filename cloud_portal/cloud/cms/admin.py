@@ -19,7 +19,7 @@ class ProductFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         products = Product.objects.all()
         if not request.user.is_superuser:
-            products = products.filter(customizations__name__in=[settings.CUSTOMIZATION])
+            products = products.filter(customizations__name__in=request.user.customizations)
             return [(p.id, p.name) for p in products]
         return [(p.id, p.__str__()) for p in products]
 
@@ -224,7 +224,7 @@ class ContentVersionAdmin(CMSAdmin):
     def get_queryset(self, request):  # show only users for current cloud_portal product
         qs = super(ContentVersionAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         if not request.user.is_superuser:
-            qs = qs.filter(product__customizations__name__in=[settings.CUSTOMIZATION])
+            qs = qs.filter(product__customizations__name__in=request.user.customizations)
         return qs
 
 
@@ -261,7 +261,7 @@ class ProductCustomizationReviewAdmin(CMSAdmin):
     def get_queryset(self, request):
         qs = super(ProductCustomizationReviewAdmin, self).get_queryset(request)
         if not request.user.is_superuser:
-            qs = qs.filter(customization__name=settings.CUSTOMIZATION)
+            qs = qs.filter(customization__name__in=request.user.customizations)
         return qs
 
     def get_readonly_fields(self, request, obj=None):

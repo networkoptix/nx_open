@@ -314,18 +314,8 @@ class DataStructure(models.Model):
         content_value = ""
         if not product:
             return self.default
-        rejected = ProductCustomizationReview.REVIEW_STATES.rejected
-        content_record = DataRecord.objects.filter(product=product,
-                                                   data_structure=self)
-
-        # Filter out rejected results.
-        if version_id:
-            product_customization = content_record.\
-                filter(version__productcustomizationreview__customization__name=settings.CUSTOMIZATION).\
-                exclude(version__productcustomizationreview__state=rejected)
-            # We need to support old records because if not cloud will fallback default values
-            if product_customization.exists():
-                content_record = product_customization
+        content_record = DataRecord.objects.filter(product=product, data_structure=self). \
+            exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
 
         # try to get translated content
         if self.translatable:
@@ -341,7 +331,8 @@ class DataStructure(models.Model):
                 # which is not more than version_id
                 # filter only accepted content_records
                 content_record = content_record.filter(
-                    version_id__lte=version_id)
+                    version_id__lte=version_id,
+                    version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 

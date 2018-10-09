@@ -4,7 +4,7 @@ from django.utils.deprecation import CallableFalse, CallableTrue
 from django.utils.html import format_html
 
 from api.account_backend import AccountManager
-from cms.models import UserGroupsToCustomizationPermissions
+from cms.models import Customization, UserGroupsToCustomizationPermissions
 from cloud.settings import CUSTOMIZATION
 
 
@@ -60,6 +60,13 @@ class Account(PermissionsMixin):
         for group in self.groups.all():
             permissions.extend([permission.codename for permission in group.permissions.all()])
         return list(set(permissions))
+
+    @property
+    def customizations(self):
+        if self.is_superuser:
+            return Customization.objects.all().values_list('name')
+        return UserGroupsToCustomizationPermissions.objects\
+            .filter(group__id__in=self.groups.all()).values_list('customization__name', flat=True).distinct()
 
     def short_email(self):
         return format_html("<div class='truncate-email'><span>{}</span></div>", self.email)

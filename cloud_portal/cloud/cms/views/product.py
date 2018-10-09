@@ -228,7 +228,7 @@ def make_preview(request):
         redirect_url = modify_db.generate_preview(product, context, version_id=version_id, send_to_review=True)
     else:
         review = ProductCustomizationReview.objects.get(version_id=version_id,
-                                                        customization__name=settings.CUSTOMIZATION)
+                                                        customization=product.customizations.first())
         redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
         messages.error(request, "This product can not be previewed")
 
