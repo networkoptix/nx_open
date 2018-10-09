@@ -31,11 +31,13 @@
                     <td>
                         {{server.name}}
                     </td>
-                    <td>
+                    <td ng-class="{'text-danger':server.status!='Online'}">
                         {{server.status}}
                     </td>
                     <td ng-repeat="(key, description) in statisticsColumns">
-                        <div ng-repeat="(name, value) in serversStatistics[server.id][key]">
+                        <div ng-repeat="(name, value) in serversStatistics[server.id][key]"
+                            ng-class="{'text-danger': value>=Config.metrics.percentValues.danger,
+                                       'text-warning': value>=Config.metrics.percentValues.warning && value<Config.metrics.percentValues.danger}">
                             {{name}}: {{value}}%
                         </div>
                     </td>
@@ -67,10 +69,10 @@
                             {{camera.name}}
                         </a>
                     </td>
-                    <td>
+                    <td ng-class="{'text-danger':(camera.status!='Online' && camera.status!='Recording')}">
                         {{camera.status}}
                     </td>
-                    <td>
+                    <td ng-class="{'text-danger':camerasProvider.getServer(camera.parentId).status!='Online'}">
                         {{camerasProvider.getServer(camera.parentId).name}}
                         ({{camerasProvider.getServer(camera.parentId).status}})
                     </td>
