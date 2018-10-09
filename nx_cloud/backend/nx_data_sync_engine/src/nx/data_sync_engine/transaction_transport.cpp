@@ -67,6 +67,8 @@ TransactionTransport::TransactionTransport(
     m_commonTransportHeaderOfRemoteTransaction.endpoint = remotePeerEndpoint;
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender =
         connectionRequestAttributes.remotePeer.id;
+    m_commonTransportHeaderOfRemoteTransaction.transactionFormatVersion =
+        connectionRequestAttributes.remotePeerProtocolVersion;
 
     bindToAioThread(aioThread);
     m_baseTransactionTransport->setState(::ec2::QnTransactionTransportBase::ReadyForStreaming);
