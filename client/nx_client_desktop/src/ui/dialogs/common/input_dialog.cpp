@@ -70,6 +70,10 @@ void QnInputDialog::setButtons(QDialogButtonBox::StandardButtons buttons)
     ui->buttonBox->setStandardButtons(buttons);
 }
 
+void QnInputDialog::useForPassword()
+{
+    ui->valueLineEdit->useForPassword();
+}
 
 QString QnInputDialog::getText(QWidget* parent,
     const QString& title, const QString& label,

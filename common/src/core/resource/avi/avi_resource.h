@@ -60,6 +60,18 @@ public:
 
     virtual QnAspectRatio customAspectRatio() const override;
 
+    // All these functions actually propagate to m_storage if possible.
+    /** Returns true if the entity is actually encrypted. */
+    virtual bool isEncrypted() const override;
+    /** Returns true if the entity is encrypted and no valid password is provided. */
+    virtual bool requiresPassword() const override;
+    /** Attempts to set a password for opening existing entity. */
+    virtual bool usePasswordToRead(const QString& password) override;
+    /** Sets a password for writing new entity. */
+    virtual void setPasswordToWrite(const QString& password) override;
+    /** Drops password. */
+    virtual void dropPassword() override;
+
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];

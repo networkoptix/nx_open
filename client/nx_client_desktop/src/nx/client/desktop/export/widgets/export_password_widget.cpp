@@ -13,6 +13,7 @@ ExportPasswordWidget::ExportPasswordWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
+    ui->passwordEdit->useForPassword();
     ui->passwordEdit->setValidator(defaultPasswordValidator(false, tr("Please enter the password.")));
 
     ui->passwordSpacer->changeSize(
@@ -20,10 +21,10 @@ ExportPasswordWidget::ExportPasswordWidget(QWidget* parent):
             + style()->pixelMetric(QStyle::PM_CheckBoxLabelSpacing),
         10, QSizePolicy::Fixed);
 
-     auto encryptionStatusChanged = [this](bool on) { ui->passwordEdit->setVisible(on); };
-     connect(ui->cryptCheckBox, &QCheckBox::toggled,
-         this, encryptionStatusChanged);
-     encryptionStatusChanged(ui->cryptCheckBox->isChecked());
+    auto encryptionStatusChanged = [this](bool on) { ui->passwordEdit->setVisible(on); };
+    connect(ui->cryptCheckBox, &QCheckBox::toggled,
+        this, encryptionStatusChanged);
+    encryptionStatusChanged(ui->cryptCheckBox->isChecked());
 
     connect(ui->cryptCheckBox, &QCheckBox::clicked,
         this, &ExportPasswordWidget::emitDataChanged);

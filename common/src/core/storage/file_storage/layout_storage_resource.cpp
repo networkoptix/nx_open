@@ -74,7 +74,8 @@ void QnLayoutFileStorageResource::setPasswordToWrite(const QString& password)
 
 void QnLayoutFileStorageResource::dropPassword()
 {
-    // TODO
+    closeOpenedFiles(); //< Also saves state, but it is negligible.
+    m_password = QString();
 }
 
 bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)

@@ -204,3 +204,35 @@ QnAspectRatio QnAviResource::customAspectRatio() const
         ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
         : base_type::customAspectRatio();
 }
+
+bool QnAviResource::isEncrypted() const
+{
+    const auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    return fileStorage && fileStorage->isEncrypted();
+}
+
+bool QnAviResource::requiresPassword() const
+{
+    const auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    return fileStorage && fileStorage->requiresPassword();
+}
+
+bool QnAviResource::usePasswordToRead(const QString& password)
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    return fileStorage && fileStorage->usePasswordToRead(password);
+}
+
+void QnAviResource::setPasswordToWrite(const QString& password)
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        fileStorage->setPasswordToWrite(password);
+}
+
+void QnAviResource::dropPassword()
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        fileStorage->dropPassword();
+}

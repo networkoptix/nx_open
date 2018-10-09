@@ -43,6 +43,8 @@ public:
     QDialogButtonBox::StandardButtons buttons() const;
     void setButtons(QDialogButtonBox::StandardButtons buttons);
 
+    void useForPassword();
+
     static QString getText(QWidget* parent,
         const QString& title, const QString& label,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok | QDialogButtonBox::Cancel,

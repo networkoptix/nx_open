@@ -39,7 +39,7 @@ bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
     dialog->setButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     dialog->setWindowTitle(tr("Encrypted layout"));
     dialog->setCaption(tr("Please enter the password to open this layout:"));
-    dialog->setEchoMode(QLineEdit::Password);
+    dialog->useForPassword();
 
     const auto fileInfo = core::layout::identifyFile(layout->getUrl());
     dialog->setValidator(
