@@ -57,12 +57,15 @@
                     <th>Camera</th>
                     <th>State</th>
                     <th>Server</th>
+                    <th>Preview</th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="camera in cameras">
                     <td>
-                        {{camera.name}}
+                        <a ng-href="#/view/{{camera.id}}" target="_blank">
+                            {{camera.name}}
+                        </a>
                     </td>
                     <td>
                         {{camera.status}}
@@ -70,6 +73,17 @@
                     <td>
                         {{camerasProvider.getServer(camera.parentId).name}}
                         ({{camerasProvider.getServer(camera.parentId).status}})
+                    </td>
+
+                    <td>
+                        <div class="camera-preview-inline">
+                            <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
+                                    ng-src="{{camera.preview}}" error-loading='camera.errorLoading' loaded="camera.loaded" preview-image>
+                            <span ng-if="camera.status == 'Offline' || camera.status == 'Unauthorized'"
+                                 ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
+                            <span ng-if="camera.errorLoading && !(camera.status == 'Offline' || camera.status == 'Unauthorized')"
+                                  class='camera-preview-failed'></span>
+                        </div>
                     </td>
                 </tr>
             </tbody>

@@ -3,7 +3,7 @@
 angular.module('webadminApp')
     .controller('MetricsCtrl', ['$scope', '$location', 'camerasProvider', 'systemAPI', '$q', '$poll',
     function ($scope, $location, camerasProvider, systemAPI, $q, $poll) {
-        $scope.config = Config;
+        $scope.Config = Config;
         var showAll = $location.search().all;
 
         $scope.serversMetrics = {};
