@@ -22,7 +22,7 @@ void alc_deinit(void);
 #endif
 
 #include <utils/common/app_info.h>
-#include <utils/common/software_version.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace audio {
@@ -50,7 +50,7 @@ void fixVolumeLevel()
     if (!QnAppInfo::isIos())
         return;
 
-    if (QnSoftwareVersion(QSysInfo::productVersion()) < QnSoftwareVersion(11, 4))
+    if (nx::utils::SoftwareVersion(QSysInfo::productVersion()) < nx::utils::SoftwareVersion(11, 4))
         return;
 
     static constexpr int kTimesGain = 64;

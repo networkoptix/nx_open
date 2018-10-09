@@ -347,13 +347,6 @@ void ConnectionBase::sendMessage(MessageType messageType, const nx::Buffer& data
 
 MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
 {
-    return isClient
-        ? MessageType::pushTransactionData
-        : (MessageType) buffer.at(kMessageOffset);
-}
-
-MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClient) const
-{
     if (isClient)
         return MessageType::pushTransactionData;
 
