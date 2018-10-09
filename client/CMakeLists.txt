@@ -33,7 +33,3 @@ endif()
 if(withScreenChecker)
     add_subdirectory(screen_checker)
 endif()
-
-if(WINDOWS AND arch STREQUAL "x86")
-    add_subdirectory(paxton_plugin)
-endif()
