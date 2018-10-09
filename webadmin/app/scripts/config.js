@@ -203,7 +203,15 @@
 
         metrics:{
             hide:{
-                p2pCounters: true
+                p2pCounters: true,
+                transactions: true,
+                tcpConnections: true
+            },
+            statusOrder:{
+                Offline: 1,
+                Unauthorized: 2,
+                Recording: 8,
+                Online: 9
             },
             liveMetricsUpdate: 10000 // Every 10 seconds
         }

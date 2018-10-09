@@ -1,8 +1,12 @@
 <div class="container">
     <div class="row">
+        <h1>
+            Servers
+        </h1>
         <table class="table">
             <thead>
                 <tr>
+                    <th></th>
                     <th></th>
                     <th ng-repeat="(key, description) in statisticsColumns">
                         {{key}}
@@ -13,6 +17,7 @@
                 </tr>
                 <tr>
                     <th>Server</th>
+                    <th>State</th>
                     <th ng-repeat="(key, description) in statisticsColumns">
                         {{description}}
                     </th>
@@ -26,6 +31,9 @@
                     <td>
                         {{server.name}}
                     </td>
+                    <td>
+                        {{server.status}}
+                    </td>
                     <td ng-repeat="(key, description) in statisticsColumns">
                         <div ng-repeat="(name, value) in serversStatistics[server.id][key]">
                             {{name}}: {{value}}%
@@ -33,6 +41,35 @@
                     </td>
                     <td ng-repeat="(key, description) in metricsColumns">
                         {{serversMetrics[server.id][key].value}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <h1>
+            Cameras
+        </h1>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Camera</th>
+                    <th>State</th>
+                    <th>Server</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="camera in cameras">
+                    <td>
+                        {{camera.name}}
+                    </td>
+                    <td>
+                        {{camera.status}}
+                    </td>
+                    <td>
+                        {{camerasProvider.getServer(camera.parentId).name}}
+                        ({{camerasProvider.getServer(camera.parentId).status}})
                     </td>
                 </tr>
             </tbody>

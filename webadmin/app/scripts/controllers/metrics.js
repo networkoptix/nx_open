@@ -4,10 +4,18 @@ angular.module('webadminApp')
     .controller('MetricsCtrl', ['$scope', '$location', 'camerasProvider', 'systemAPI', '$q', '$poll',
     function ($scope, $location, camerasProvider, systemAPI, $q, $poll) {
         $scope.config = Config;
+        var showAll = $location.search().all;
 
         $scope.serversMetrics = {};
         function updateCameras(){
-            $scope.cameras = $scope.camerasProvider.cameras;
+            function cameraSorter(camera){
+                var sortCamera = Config.metrics.statusOrder[camera.status] || 0;
+                var server = $scope.camerasProvider.getServer(camera.parentId);
+                var sortServer = Config.metrics.statusOrder[server.status] || 0;
+                return sortCamera*10 + sortServer;
+            }
+            $scope.cameras = _.sortBy($scope.camerasProvider.camerasList, cameraSorter);
+            console.log($scope.cameras);
         }
 
         function flattenMetrics(metrics, group, groupDescription){
@@ -51,7 +59,7 @@ angular.module('webadminApp')
             var values = {};
 
             for(var key in metrics){
-                if(Config.metrics.hide[key]){ // Ignore
+                if(!showAll && Config.metrics.hide[key]){ // Ignore
                     continue;
                 }
                 var metric = metrics[key];
@@ -197,12 +205,11 @@ angular.module('webadminApp')
             });
         }
 
-        // TODO: render cameras state
 
         $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
 
         $scope.camerasProvider.reloadTree().then(function(){
-            $scope.$watch('camerasProvider.cameras', updateCameras, true);
+            $scope.$watch('camerasProvider.camerasList', updateCameras, true);
             $scope.$watch('camerasProvider.mediaServers', updateMediaServers, true);
             updateStatistics();
 

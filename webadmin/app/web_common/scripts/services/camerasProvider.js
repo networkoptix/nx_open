@@ -79,6 +79,7 @@ angular.module('nxCommon')
         camerasProvider.prototype.getCameras = function(camerasList) {
             var self = this;
             var cameras = camerasList;
+            this.camerasList = camerasList;
 
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
@@ -86,7 +87,7 @@ angular.module('nxCommon')
 
             var findIoConfigCapability = function(param){
                 return param.name === 'ioConfigCapability';
-            }
+            };
             
             function cameraFilter(camera){
                 // Filter desktop cameras here
