@@ -10,6 +10,8 @@
 #include "../transaction_log_reader.h"
 #include "../transaction_transport_header.h"
 
+namespace nx::data_sync_engine { class TransactionLog; }
+
 namespace nx::data_sync_engine::transport {
 
 /**
@@ -23,11 +25,16 @@ class GenericTransport:
     using base_type = AbstractTransactionTransport;
 
 public:
-    /*
-     * TODO: #ak Introduce another type for commandPipeline.
-     */
     GenericTransport(
-        std::unique_ptr<AbstractTransactionTransport> commandPipeline);
+        const ProtocolVersionRange& protocolVersionRange,
+        TransactionLog* const transactionLog,
+        const OutgoingCommandFilter& outgoingCommandFilter,
+        const std::string& systemId,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
+        const vms::api::PeerData& localPeer,
+        std::unique_ptr<AbstractCommandPipeline> commandPipeline);
+
+    virtual ~GenericTransport();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
@@ -45,6 +52,8 @@ public:
         TransactionTransportHeader transportHeader,
         const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
 
+    void startOutgoingChannel();
+
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
         Command<vms::api::SyncRequestData> data,
@@ -60,19 +69,36 @@ public:
         Command<vms::api::TranSyncDoneData> data,
         TransactionProcessedHandler handler);
 
-    AbstractTransactionTransport& commandPipeline();
+    AbstractCommandPipeline& commandPipeline();
 
 protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    std::unique_ptr<AbstractTransactionTransport> m_commandPipeline;
-    GotTransactionEventHandler m_commandHandler;
+    const ProtocolVersionRange m_protocolVersionRange;
+    const std::string m_systemId;
+    const vms::api::PeerData m_localPeer;
+    const vms::api::PeerData m_remotePeer;
+    std::unique_ptr<AbstractCommandPipeline> m_commandPipeline;
+    bool m_canSendCommands = false;
+    /**
+     * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
+     */
+    vms::api::TranState m_tranStateToSynchronizeTo;
+    /**
+     * Transaction state of remote peer. Transactions before this state have been sent to the peer.
+     */
+    vms::api::TranState m_remotePeerTranState;
+    bool m_haveToSendSyncDone = false;
+    std::unique_ptr<TransactionLogReader> m_transactionLogReader;
+    TransactionTransportHeader m_commonTransportHeaderOfRemoteTransaction;
 
-    void handleHandshakeCommands(
-        Qn::SerializationFormat serializationFormat,
-        const QByteArray& serializedData,
-        TransactionTransportHeader transportHeader);
+    void onTransactionsReadFromLog(
+        ResultCode resultCode,
+        std::vector<dao::TransactionLogRecord> serializedTransaction,
+        vms::api::TranState readedUpTo);
+
+    void enableOutputChannel();
 };
 
 } // namespace nx::data_sync_engine::transport

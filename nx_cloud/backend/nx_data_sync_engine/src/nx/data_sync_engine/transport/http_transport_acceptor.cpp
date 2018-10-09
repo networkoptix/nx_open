@@ -84,8 +84,6 @@ void HttpTransportAcceptor::createConnection(
         m_protocolVersionRange,
         connection->getAioThread(),
         m_connectionGuardSharedState,
-        m_transactionLog,
-        m_outgoingCommandFilter,
         connectionRequestAttributes,
         systemId,
         m_localPeerData,
@@ -93,6 +91,12 @@ void HttpTransportAcceptor::createConnection(
         request);
 
     auto newTransport = std::make_unique<GenericTransport>(
+        m_protocolVersionRange,
+        m_transactionLog,
+        m_outgoingCommandFilter,
+        systemId,
+        connectionRequestAttributes,
+        m_localPeerData,
         std::move(commandPipeline));
 
     ConnectionManager::ConnectionContext context{
@@ -286,8 +290,7 @@ void HttpTransportAcceptor::startOutgoingChannel(
             {
                 static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
                     .setOutgoingConnection(connection->takeSocket());
-                static_cast<TransactionTransport&>(transactionTransport->commandPipeline())
-                    .startOutgoingChannel();
+                transactionTransport->startOutgoingChannel();
             }
         });
 }
