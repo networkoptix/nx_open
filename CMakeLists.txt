@@ -157,20 +157,16 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia)
+        Multimedia
+        Qml
+)
 
 if(withDesktopClient OR withMobileClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Qml
-            Quick)
+    find_package(Qt5 COMPONENTS Quick)
 endif()
 
 if(withDesktopClient OR withNxTool)
-    find_package(Qt5
-        COMPONENTS
-            Widgets
-    )
+    find_package(Qt5 COMPONENTS Widgets)
 endif()
 
 set(QML_IMPORT_PATH
