@@ -2303,7 +2303,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
     NX_DEBUG(this, QString(lit("ONVIF debug: got %1 encoders for camera %2"))
         .arg(videoEncodersTokenList.size()).arg(getHostAddress()));
 
-    const bool dualStreamingAllowed = !optionsList.empty();
+    const bool dualStreamingAllowed = optionsList.size() >= 2;
 
     QnMutexLocker lock(&m_mutex);
     m_secondaryStreamCapabilities = VideoOptionsLocal();
