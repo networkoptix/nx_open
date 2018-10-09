@@ -31,6 +31,9 @@ class QnVirtualCameraResource : public QnSecurityCamResource
     using base_type = QnSecurityCamResource;
 
 public:
+    static QString kEnabledAnalyticsEnginesProperty;
+    static QString kDeviceAgentsSettingsValuesProperty;
+
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;

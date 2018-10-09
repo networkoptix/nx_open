@@ -43,6 +43,10 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } //anonymous namespace
 
+QString QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty("enabledAnalyticsEngines");
+QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
+    "deviceAgentsSettingsValuesProperty");
+
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_issueCounter(0),
