@@ -1164,7 +1164,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<UserData>(p, ApiCommand::saveUser);
+    regUpdate<UserDataEx>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1922,16 +1922,26 @@ ErrorCode LocalConnectionFactory::getSettings(
     return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
 }
 
-template<class InputDataType>
+template<class InputDataType, class ProcessedDataType>
 void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     GlobalPermission permission)
 {
-    restProcessorPool->registerHandler(
-        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-        new UpdateHttpHandler<InputDataType>(m_directConnection),
-        permission);
+    if constexpr (std::is_same<InputDataType, nx::vms::api::UserDataEx>::value)
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<nx::vms::api::UserDataEx, nx::vms::api::UserData>(m_directConnection),
+            permission);
+    }
+    else
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
+            permission);
+    }
 }
 
 template<class InputDataType, class CustomActionType>
