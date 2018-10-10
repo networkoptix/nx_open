@@ -36,7 +36,7 @@ public:
         QObject* parent = nullptr);
 
     void requestOperation();
-    void fire(); //< Fire immediately, if requested or not.
+    void fire(); //< Fire immediately, no matter if it was previously requested or not.
 
     Flags flags() const;
     void setFlags(Flags flags);
