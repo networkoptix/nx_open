@@ -631,6 +631,7 @@ ConditionWrapper syncIsForced();
 ConditionWrapper canExportLayout();
 
 ConditionWrapper canExportBookmark();
+ConditionWrapper canExportBookmarks();
 
 ConditionWrapper currentLayoutIsVideowallScreen();
 

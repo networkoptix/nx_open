@@ -46,6 +46,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ini.h>
 #include <api/global_settings.h>
+#include <nx/client/core/utils/grid_walker.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -74,34 +75,52 @@ QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, Q
 {
     QnLayoutResourcePtr layout(new QnLayoutResource(pool->commonModule()));
     layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
+    layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
 
+    // First we must count unique cameras to get the matrix size.
+    QnVirtualCameraResourceList cameras;
     QSet<QnUuid> placedCameras;
-    QPoint currentPosition(0, 0);
     for (const auto& bookmark: bookmarks)
     {
         if (placedCameras.contains(bookmark.cameraId))
             continue;
         placedCameras.insert(bookmark.cameraId);
 
-        if (const auto& camera = pool->getResourceById(bookmark.cameraId))
-        {
-            QnLayoutItemData item;
-            item.flags = 0x1;
-            // Layout data item flags are declared in client module. // TODO: #GDM move to api
-            item.uuid = QnUuid::createUuid();
-            item.combinedGeometry = QRect(currentPosition.x(), currentPosition.y(), 1, 1);
-            item.resource.id = camera->getId();
-
-            QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
-            if (!forcedRotation.isEmpty())
-                item.rotation = forcedRotation.toInt();
-
-            layout->addItem(item);
-
-            // FIXME: #GDM Use grid walker with expanding strategy
-            currentPosition.rx()++;
-        }
+        if (const auto& camera = pool->getResourceById<QnVirtualCameraResource>(bookmark.cameraId))
+            cameras.push_back(camera);
     }
+
+    const int camerasCount = cameras.size();
+    int matrixSize = std::ceil(std::sqrt(camerasCount));
+    NX_ASSERT(matrixSize * matrixSize >= camerasCount);
+    if (matrixSize * matrixSize < camerasCount)
+        matrixSize++;
+    NX_ASSERT(matrixSize * matrixSize >= camerasCount);
+
+    const QRect grid(0, 0, matrixSize, matrixSize);
+    core::GridWalker gridWalker(grid);
+
+    static const QSize kCellSize(1, 1);
+
+    for (const auto& camera: cameras)
+    {
+        gridWalker.next();
+
+        QnLayoutItemData item;
+        item.flags = 0x1;
+        // Layout data item flags are declared in client module. // TODO: #GDM move to api in 4.0.
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = camera->getId();
+        item.combinedGeometry = QRect(gridWalker.pos(), kCellSize);
+
+        QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty())
+            item.rotation = forcedRotation.toInt();
+
+        layout->addItem(item);
+    }
+
+
     return layout;
 }
 
@@ -403,6 +422,10 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     if (bookmarks.empty())
         return;
 
+    // Constructing layout before bookmarks are sorted to make sure cameras order will be the same
+    // as it was in the bookmarks dialog.
+    const auto layout = layoutFromBookmarks(bookmarks, resourcePool());
+
     // FIXME: #GDM Remove workaround.
     // Bookmarks are sorted by time. More correct value is to sort and normalize time periods.
     std::sort(bookmarks.begin(), bookmarks.end());
@@ -420,7 +443,7 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
     dialog->disableTab(ExportSettingsDialog::Mode::Media, reason);
-    dialog->setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
+    dialog->setLayout(layout);
 
     if (dialog->exec() != QDialog::Accepted)
         return;

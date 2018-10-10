@@ -226,7 +226,8 @@ TimePeriodType periodType(const QnTimePeriod& period)
 bool canExportPeriods(
     const QnResourceList& resources,
     const QnTimePeriod& period,
-    QnWorkbenchContext* context)
+    QnWorkbenchContext* context,
+    bool ignoreLoadedChunks = false)
 {
     const auto cameraManager = qnClientModule->cameraDataManager();
     const auto accessController = context->accessController();
@@ -250,10 +251,28 @@ bool canExportPeriods(
             if (isAviFile)
                 return true;
 
+            // We may not have loaded chunks when using Bookmarks export for camera, which was not
+            // opened yet. This is no important as bookmarks are automatically deleted when archive
+            // is not available for the given period.
+            if (ignoreLoadedChunks)
+                return true;
+
             // This condition can be checked in the bookmarks dialog when loader is not created.
             const auto loader = cameraManager->loader(media, true);
             return loader && loader->periods(Qn::RecordingContent).intersects(period);
         });
+}
+
+bool canExportBookmarkInternal(const QnCameraBookmark& bookmark, QnWorkbenchContext* context)
+{
+    const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
+    if (periodType(period) != NormalTimePeriod)
+        return false;
+
+    const QnResourceList resources{
+        context->resourcePool()->getResourceById(bookmark.cameraId)
+    };
+    return canExportPeriods(resources, period, context, /*ignoreLoadedChunks*/ true);
 }
 
 } // namespace
@@ -1810,15 +1829,26 @@ ConditionWrapper canExportBookmark()
                 return false;
 
             const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+            return canExportBookmarkInternal(bookmark, context);
+        });
+}
 
-            const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
-            if (periodType(period) != NormalTimePeriod)
+ConditionWrapper canExportBookmarks()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
                 return false;
 
-            const QnResourceList resources{
-                context->resourcePool()->getResourceById(bookmark.cameraId)
-            };
-            return canExportPeriods(resources, period, context);
+            const auto bookmarks =
+                parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+
+            return std::any_of(bookmarks.cbegin(), bookmarks.cend(),
+                [context](const QnCameraBookmark& bookmark)
+                {
+                    return canExportBookmarkInternal(bookmark, context);
+                });
         });
 }
 
