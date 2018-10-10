@@ -134,8 +134,8 @@ def run_options(request):
         vm_name_prefix = 'ft-%d-' % slot
         vm_port_base = BASE_SLOT_PORT + 1000*slot
     else:
-        vm_name_prefix = request.config.getoption('--vm-name-prefix'),
-        vm_port_base = request.config.getoption('--vm-port-base'),
+        vm_name_prefix = request.config.getoption('--vm-name-prefix')
+        vm_port_base = request.config.getoption('--vm-port-base')
 
     vm_host = request.config.getoption('--vm-host')
     if vm_host:
