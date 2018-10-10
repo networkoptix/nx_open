@@ -37,6 +37,9 @@ angular.module('nxCommon').controller('ViewCtrl',
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
+        $scope.showTimeline = !$location.search().nocontrols;
+        $scope.showCameraHeader = !$location.search().noheader;
+
         var castAlert = false;
         $scope.showWarning = function(){
             if(!castAlert){
@@ -533,7 +536,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             var $camerasPanel = $('.cameras-panel');
             var $placeholder = $(".webclient-placeholder .placeholder");
             var windowHeight = $window.height();
-            var headerHeight = $header.outerHeight();
+            var headerHeight = $header.outerHeight() || 0;
 
             var topAlertHeight = 0;
 

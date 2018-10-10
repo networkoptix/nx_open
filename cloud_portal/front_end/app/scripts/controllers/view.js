@@ -13,6 +13,12 @@
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
 
+                var isEmbeded = ($location.path().indexOf('/embed') === 0);
+                if (isEmbeded) {
+                    $rootScope.$emit('nx.layout.header', true);
+                    $rootScope.$emit('nx.layout.footer', true);
+                }
+
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
@@ -63,8 +69,9 @@
 
                 $scope.$on('$destroy', function (event) {
                     cancelSubscription();
-                    // Reset footer visibility state
+                    // Reset visibility state
                     $rootScope.$emit('nx.layout.footer', false);
+                    $rootScope.$emit('nx.layout.header', false);
                 });
             } ]);
 })();

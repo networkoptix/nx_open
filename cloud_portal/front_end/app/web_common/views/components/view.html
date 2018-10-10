@@ -30,10 +30,13 @@
         <td width="100%">
             <voice-control ng-if="voiceControls.showCommands" voice-controls="voiceControls"></voice-control>
             <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
-                <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
+                <div class="view-panel" ng-class="{'no-archive': !canViewArchive, 'no-controls' : !showTimeline}">
                     <div class="fullscreen-area" ng-class="{'fullscreen': isFullscreen}">
                         <div class="fullscreen-hoverarea">
-                            <div class="stick-to-top top-gradient" ng-class="{'hide-fullscreen': isFullscreen}">
+                            <div class="stick-to-top top-gradient"
+                                 ng-class="{'hide-fullscreen': isFullscreen}"
+                                 ng-if="showCameraHeader">
+
                                 <div class="webclient-panel webclient-bottom-border">
                                     <div class="float-right">
                                         <div class="video-title-buffer">&nbsp;</div>
@@ -129,7 +132,10 @@
                         </div>
                     </div>
 
-                    <div class="stick-to-bottom" ng-class="{invisible:!activeCamera}">
+                    <div class="stick-to-bottom"
+                         ng-class="{invisible:!activeCamera}"
+                         ng-if="showTimeline">
+
                         <timeline
                                 camera-status="activeCamera.status"
                                 can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"

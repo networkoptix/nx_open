@@ -226,6 +226,11 @@ window.L = {};
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
+                            .when('/embed/:systemId/view/:cameraId', {
+                                title      : lang.pageTitles.view,
+                                templateUrl: CONFIG.viewsDir + 'view.html',
+                                controller : 'ViewPageCtrl'
+                            })
                             .when('/activate', {
                                 title: lang.pageTitles.activate,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
