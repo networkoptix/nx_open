@@ -16,8 +16,7 @@ from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
-from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams, \
-    fps_avg
+from .camera_actions import configure_audio, configure_video, ffprobe_streams, fps_avg
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
 # Filled by _stage decorator.
@@ -72,35 +71,28 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
 @_stage(timeout=timedelta(minutes=15))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for fps_index, fps_range in enumerate(primary['fps']):
-        current_configuration = primary.copy()
-        current_configuration['fps'] = fps_range
+        selected = primary.copy()
+        selected['fps'] = fps_range
         with run.server.api.camera_recording(run.data['id'], fps=fps_avg(fps_range)):
             for error in retry_expect_values(dict(status="Recording"), lambda: run.data):
                 yield error
 
-            while True:
-                recorded_periods = run.server.api.get_recorded_time_periods(run.data['id'])
-                if recorded_periods:
-                    break
+            while not run.server.api.get_recorded_time_periods(run.data['id']):
                 yield Failure('No data is recorded')
 
-            for profile, configuration in (
-                    ('primary', current_configuration), ('secondary', secondary)):
+            for profile, configuration in (('primary', selected), ('secondary', secondary)):
                 if configuration:
-                    path = '{}[{}]'.format(profile, fps_index + 1)
-                    for error in retry_expect_values(
-                            {'video': configuration},
-                            lambda: ffprobe_metadata(run.media_url(profile)),
-                            path=path):
+                    for error in ffprobe_streams(
+                            {'video': configuration}, run.media_url(profile),
+                            '{}[{}]'.format(profile, fps_index + 1)):
                         yield error
-                    yield Halt('{} is successful, pass to next one'.format(path))
 
     yield Success()
 
 
 @_stage(timeout=timedelta(minutes=30))
-def video_parameters(run, stream_urls=None, **profiles
-                     ):  # type: (stage.Run, dict, dict) -> Generator[Result]
+def video_parameters(run, stream_urls=None, **profiles):
+        # type: (stage.Run, dict, dict) -> Generator[Result]
     # Enable recording to keep video stream open during entire stage.
     with run.server.api.camera_recording(run.data['id']):
         for profile, configurations in profiles.items():
@@ -108,14 +100,10 @@ def video_parameters(run, stream_urls=None, **profiles
                 configure_video(
                     run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
 
-                path = '{}[{}]'.format(profile, index + 1)
-                yield Halt('{} is configured'.format(path))
-                for error in retry_expect_values(
-                        {'video': configuration},
-                        lambda: ffprobe_metadata(run.media_url(profile)),
-                        path=path):
+                for error in ffprobe_streams(
+                        {'video': configuration}, run.media_url(profile),
+                        '{}[{}]'.format(profile, index + 1)):
                     yield error
-                yield Halt('{} is successful, pass to next one'.format(path))
 
     for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
         yield error
@@ -137,14 +125,9 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                 else:
                     del configuration["skip_codec_change"]
 
-                path = 'primary[{}]'.format(index + 1)
-                yield Halt('{} is configured'.format(path))
-                for error in retry_expect_values(
-                        {'audio': configuration},
-                        lambda: ffprobe_metadata(run.media_url()),
-                        path=path):
+                for error in ffprobe_streams(
+                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index + 1)):
                     yield error
-                yield Halt('{} is successful, pass to next one'.format(path))
 
     yield Success()
 
