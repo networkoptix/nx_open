@@ -23,10 +23,9 @@ BookmarkSearchWidget::BookmarkSearchWidget(QnWorkbenchContext* context, QWidget*
             if (!watcher)
                 return;
 
-            const auto cameras = this->cameras();
             const auto currentCamera = navigator()->currentResource()
                 .dynamicCast<QnVirtualCameraResource>();
-            const bool relevant = cameras.empty() || cameras.contains(currentCamera);
+            const bool relevant = currentCamera && cameras().contains(currentCamera);
             watcher->setTextFilter(relevant ? textFilter() : QString());
         };
 

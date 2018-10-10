@@ -27,11 +27,10 @@ AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidge
                 return;
             }
 
-            const auto cameras = this->cameras();
             const auto currentCamera = navigator()->currentResource()
                 .dynamicCast<QnVirtualCameraResource>();
 
-            const bool relevant = cameras.empty() || cameras.contains(currentCamera);
+            const bool relevant = currentCamera && cameras().contains(currentCamera);
             if (!relevant)
             {
                 navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
