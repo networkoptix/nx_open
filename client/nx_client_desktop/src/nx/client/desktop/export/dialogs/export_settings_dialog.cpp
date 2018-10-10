@@ -619,6 +619,11 @@ void ExportSettingsDialog::setMediaParams(
     }
 }
 
+void ExportSettingsDialog::setBookmarks(const QnCameraBookmarkList& bookmarks)
+{
+    d->setBookmarks(bookmarks);
+}
+
 void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 {
     const auto palette = ui->layoutPreviewWidget->palette();

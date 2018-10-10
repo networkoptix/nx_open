@@ -419,17 +419,12 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     if (bookmarks.empty())
         return;
 
-    // Constructing layout before bookmarks are sorted to make sure cameras order will be the same
-    // as it was in the bookmarks dialog.
-    const auto layout = layoutFromBookmarks(bookmarks, resourcePool());
-
-    // FIXME: #GDM Remove workaround.
-    // Bookmarks are sorted by time. More correct value is to sort and normalize time periods.
-    std::sort(bookmarks.begin(), bookmarks.end());
-
     QnTimePeriodList periods;
     for (const auto& bookmark: bookmarks)
-        periods.push_back(QnTimePeriod::fromInterval(bookmark.startTimeMs, bookmark.endTimeMs()));
+    {
+        periods.includeTimePeriod(QnTimePeriod::fromInterval(
+            bookmark.startTimeMs, bookmark.endTimeMs()));
+    }
 
     const auto boundingPeriod = periods.boundingPeriod();
 
@@ -440,40 +435,11 @@ void WorkbenchExportHandler::handleExportBookmarksAction()
     static const QString reason =
         tr("Several bookmarks can be exported as layout only.");
     dialog->disableTab(ExportSettingsDialog::Mode::Media, reason);
-    dialog->setLayout(layout);
+    dialog->setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
+    dialog->setBookmarks(bookmarks);
 
-    if (dialog->exec() != QDialog::Accepted)
-        return;
-
-    std::unique_ptr<AbstractExportTool> exportTool;
-    auto settings = dialog->exportLayoutSettings();
-    settings.bookmarks = bookmarks;
-    const auto exportProcessId = d->initExport(settings.filename);
-    exportTool.reset(new ExportLayoutTool(settings));
-
-     d->exportManager->startExport(exportProcessId, std::move(exportTool));
-
-    const auto info = d->exportManager->info(exportProcessId);
-
-    switch(info.status)
-    {
-        case ExportProcessStatus::initial:
-        case ExportProcessStatus::exporting:
-        case ExportProcessStatus::cancelling:
-            if (const auto dialog = d->runningExports.value(exportProcessId).progressDialog)
-                dialog->show();
-            // Fill dialog with initial values (export is already running).
-            exportProcessUpdated(info);
-            break;
-        case ExportProcessStatus::success:
-        case ExportProcessStatus::failure:
-            // Possibly export is finished already.
-            exportProcessFinished(info);
-            break;
-        default:
-            NX_ASSERT(false, "Should never get here in 'cancelled' state");
-            break;
-    }
+    if (dialog->exec() == QDialog::Accepted)
+        startExportFromDialog(dialog.data());
 }
 
 void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
@@ -543,7 +509,6 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
 
     switch(info.status)
     {
-
         case ExportProcessStatus::initial:
         case ExportProcessStatus::exporting:
         case ExportProcessStatus::cancelling:

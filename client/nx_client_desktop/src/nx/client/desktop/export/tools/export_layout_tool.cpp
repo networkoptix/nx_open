@@ -314,24 +314,24 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
             if (!loader)
                 continue;
 
-            // FIXME: #GDM Actually we must check the periods when exporting bookmarks also, but
-            // chunks are not loaded for cameras that are not on the layout.
             auto periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
             periods.encode(data);
         }
         else
         {
+            // We may not have loaded chunks when using Bookmarks export for camera, which was not
+            // opened yet. This is no important as bookmarks are automatically deleted when archive
+            // is not available for the given period.
             QnTimePeriodList periods;
             for (const auto& bookmark: d->settings.bookmarks)
             {
                 if (bookmark.cameraId == resource->toResourcePtr()->getId())
                 {
-                    periods.push_back(QnTimePeriod::fromInterval(
+                    periods.includeTimePeriod(QnTimePeriod::fromInterval(
                         bookmark.startTimeMs, bookmark.endTimeMs()));
                 }
             }
             NX_ASSERT(std::is_sorted(periods.cbegin(), periods.cend()));
-            // FIXME: #GDM Looks like we have some problems with overlapping periods here.
             periods.encode(data);
         }
 

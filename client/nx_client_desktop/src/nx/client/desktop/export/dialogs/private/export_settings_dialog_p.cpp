@@ -284,6 +284,11 @@ void ExportSettingsDialog::Private::setWatermark(const nx::core::Watermark& wate
     m_exportLayoutSettings.watermark = watermark;
 }
 
+void ExportSettingsDialog::Private::setBookmarks(const QnCameraBookmarkList& bookmarks)
+{
+    m_exportLayoutSettings.bookmarks = bookmarks;
+}
+
 void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& media, const nx::core::transcoding::Settings& settings)
 {
     // We land here once, when ExportSettingsDialog is constructed
