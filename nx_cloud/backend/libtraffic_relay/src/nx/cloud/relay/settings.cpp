@@ -210,7 +210,7 @@ void Settings::loadHttp()
 void Settings::loadEndpointList(
     const char* settingName,
     const char* defaultValue,
-    std::list<network::SocketAddress>* endpoints)
+    std::vector<network::SocketAddress>* endpoints)
 {
     const QStringList& endpointStrList = settings().value(
         settingName,
