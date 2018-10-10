@@ -72,6 +72,10 @@ public:
     /** Drops password. */
     virtual void dropPassword() override;
 
+signals:
+    /** Fired when password is set or dropped. */
+    void storageAccessChanged();
+
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];

@@ -40,8 +40,6 @@ private:
 
     void updateLoadedState();
 
-    void handleLayoutChange();
-
 private:
     friend class QnResourceTreeModelLayoutNodeManager;
     ItemHash m_items;

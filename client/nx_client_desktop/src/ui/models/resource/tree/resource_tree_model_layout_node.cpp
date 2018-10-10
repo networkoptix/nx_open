@@ -53,17 +53,8 @@ void QnResourceTreeModelLayoutNode::initialize()
 
     m_requiresPassword = needPassword(layout);
 
-    if (m_requiresPassword)
-    {
-        // This is to capture password entering.
-        connect(layout, &QnLayoutResource::dataChanged,
-            this, &QnResourceTreeModelLayoutNode::handleLayoutChange);
-    }
-    else
-    {
-        for (const auto& item : layout->getItems()) //< Only add nodes if layout is not encrypted.
-            addItem(item);
-    }
+    for (const auto& item : layout->getItems())
+        addItem(item);
 }
 
 void QnResourceTreeModelLayoutNode::deinitialize()
@@ -209,16 +200,4 @@ void QnResourceTreeModelLayoutNode::updateLoadedState()
     auto layoutNodeManager = qobject_cast<QnResourceTreeModelLayoutNodeManager*>(manager());
     NX_ASSERT(layoutNodeManager);
     layoutNodeManager->loadedStateChanged(this, loaded);
-}
-
-void QnResourceTreeModelLayoutNode::handleLayoutChange()
-{
-    const auto layout = resource().dynamicCast<QnLayoutResource>();
-    if (m_requiresPassword && !needPassword(layout)) //< We now have a valid password in layout data!
-    {
-        m_requiresPassword = false;
-
-        for (const auto& item : layout->getItems()) // Now add child nodes that were hidden.
-            addItem(item);
-    }
 }

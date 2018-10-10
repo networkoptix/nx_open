@@ -544,7 +544,6 @@ void QnLayoutResource::usePasswordToOpen(const QString& password)
     for(auto item: items)
     {
         if (auto aviItem = item.objectCast<QnAviResource>())
-            if (auto fileStorage = aviItem->getStorage().dynamicCast<QnLayoutFileStorageResource>())
-                fileStorage->usePasswordToRead(password);
+            aviItem->usePasswordToRead(password);
     }
 }

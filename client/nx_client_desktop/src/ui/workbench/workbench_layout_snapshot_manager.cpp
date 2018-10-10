@@ -19,7 +19,6 @@
 #include <ui/workbench/workbench_layout_snapshot_storage.h>
 #include <ui/workbench/workbench_layout_synchronizer.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/workbench_layout_password_management.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -95,10 +94,6 @@ bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layo
 
 bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
 {
-    // Disable saving of encrypted layouts which are not open yet.
-    if (nx::client::desktop::ui::workbench::layout::needPassword(layout))
-        return false;
-
     if (layout->hasFlags(Qn::local))
         return true;
 

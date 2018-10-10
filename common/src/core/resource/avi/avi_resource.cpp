@@ -220,7 +220,14 @@ bool QnAviResource::requiresPassword() const
 bool QnAviResource::usePasswordToRead(const QString& password)
 {
     auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
-    return fileStorage && fileStorage->usePasswordToRead(password);
+
+    if (!fileStorage || !fileStorage->requiresPassword())
+        return false;
+
+    const bool success = fileStorage->usePasswordToRead(password);
+    if (success)
+        emit storageAccessChanged();
+    return success;
 }
 
 void QnAviResource::setPasswordToWrite(const QString& password)
@@ -232,7 +239,11 @@ void QnAviResource::setPasswordToWrite(const QString& password)
 
 void QnAviResource::dropPassword()
 {
+    bool hadValidPassword = isEncrypted() && !requiresPassword();
     auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
     if (fileStorage)
         fileStorage->dropPassword();
+
+    if (hadValidPassword)
+        emit storageAccessChanged();
 }
