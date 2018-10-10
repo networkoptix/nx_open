@@ -1150,6 +1150,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
+     * %param[opt] password Plain text password. Note that if this argument is provided, digest, hash
+     *     and cryptSha512Hash values will be ignored if any.
      * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
      *     /api/gettime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
