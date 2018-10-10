@@ -26,7 +26,7 @@ _logger = logging.getLogger(__name__)
 _dumper_logger = _logger.getChild('dumper')
 
 
-TEST_SIZE = 10
+TEST_SIZE = 100
 THREAD_NUMBER = 8
 
 
