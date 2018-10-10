@@ -301,6 +301,7 @@ static bool gRestartFlag = false;
 
 namespace {
 
+static const std::chrono::seconds kResourceDataReadingTimeout(5);
 const QString YES = lit("yes");
 const QString NO = lit("no");
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
@@ -3940,6 +3941,7 @@ static QByteArray loadDataFromFile(const QString& fileName)
 static QByteArray loadDataFromUrl(nx::utils::Url url)
 {
     auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+    httpClient->setResponseReadTimeout(kResourceDataReadingTimeout);
     if (httpClient->doGet(url)
         && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
     {
