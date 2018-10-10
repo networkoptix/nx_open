@@ -63,7 +63,12 @@ void executePost(
     const QString& authPassword = "admin",
     QByteArray* responseBody = nullptr)
 {
-    const QByteArray& request = QJson::serialized(requestData);
+    QByteArray request;
+    if constexpr (std::is_same<QByteArray, RequestData>::value)
+        request = requestData;
+    else
+        request = QJson::serialized(requestData);
+
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus, authName,
         authPassword, responseBody));

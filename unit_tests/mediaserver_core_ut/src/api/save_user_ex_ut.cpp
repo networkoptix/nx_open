@@ -39,7 +39,8 @@ protected:
         m_nonAdminUser.password = "testUserPassword";
         m_nonAdminUser.permissions = GlobalPermission::accessAllMedia;
 
-        m_nonAdminUserSerialized = serializeAndCutOutUnusedFields(m_nonAdminUser);
+        m_nonAdminUserSerialized = partialSerialize(m_nonAdminUser);
+        NX_ASSERT(!m_nonAdminUserSerialized.contains("id"));
 
         m_adminUser.email = "admin@test.com";
         m_adminUser.fullName = "testAdminUser";
@@ -48,7 +49,7 @@ protected:
         m_adminUser.password = "testAdminPassword";
         m_adminUser.permissions = GlobalPermission::admin;
 
-        m_adminUserSerialized = serializeAndCutOutUnusedFields(m_adminUser);
+        m_adminUserSerialized = partialSerialize(m_adminUser);
     }
 
     LauncherPtr givenServer()
@@ -66,8 +67,9 @@ protected:
         ASSERT_FALSE(moduleInformation.id.isNull());
     }
 
-    void whenSaveUserExRequestIssued(const LauncherPtr& server, ApiAccess apiAccess,
-        UserCategory userCategory)
+    void whenSaveUserRequestIssued(const LauncherPtr& server, ApiAccess apiAccess,
+        UserCategory userCategory,
+        network::http::StatusCode::Value expectedCode)
     {
         QByteArray* userDataToSave = userCategory == UserCategory::regular
             ? &m_nonAdminUserSerialized : &m_adminUserSerialized;
@@ -76,7 +78,9 @@ protected:
         QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.password;
 
         NX_TEST_API_POST(server.get(), "/ec2/saveUser", *userDataToSave, nullptr,
-            network::http::StatusCode::ok, authName, authPassword, &m_responseBuffer);
+            expectedCode, authName, authPassword, &m_responseBuffer);
+
+        NX_VERBOSE(this, lm("/ex2/saveUser issued successfully, response: %1").args(m_responseBuffer));
     }
 
     void thenUserShouldAppearInTheGetUsersResponse(const LauncherPtr& server,
@@ -102,18 +106,13 @@ protected:
     {
         vms::api::UserDataList userDataList;
 
-        QString authName = userCategory == UserCategory::admin ? m_adminUser.name : m_nonAdminUser.name;
-        QString authPassword = userCategory == UserCategory::admin ? m_adminUser.password : m_nonAdminUser.password;
+        QString authName = userCategory == UserCategory::admin
+            ? m_adminUser.name : m_nonAdminUser.name;
+        QString authPassword = userCategory == UserCategory::admin
+            ? m_adminUser.password : m_nonAdminUser.password;
 
-        NX_TEST_API_GET(server.get(), "/ec2/getUsers", &userDataList, network::http::StatusCode::ok,
-            authName, authPassword);
-    }
-
-    void thenResponseShouldContainForbiddenError()
-    {
-        QnJsonRestResult jsonRestResult;
-        ASSERT_TRUE(QJson::deserialize(m_responseBuffer, &jsonRestResult));
-        ASSERT_EQ(jsonRestResult.error, QnJsonRestResult::Error::Forbidden);
+        NX_TEST_API_GET(server.get(), "/ec2/getUsers", &userDataList,
+            network::http::StatusCode::ok, authName, authPassword);
     }
 
 private:
@@ -132,22 +131,22 @@ private:
         responseData = jsonRestResult.deserialized<ResponseData>();
     }
 
-    QByteArray serializeAndCutOutUnusedFields(const vms::api::UserDataEx& userDataEx)
+    QByteArray partialSerialize(const vms::api::UserDataEx& userDataEx)
     {
         QByteArray buffer;
         QJson::serialize(userDataEx, &buffer);
 
         auto jsonObj = QJsonDocument::fromJson(buffer).object();
-        for (auto it = jsonObj.begin(); it != jsonObj.end(); ++it)
-        {
-            if (it.key() != "email" && it.key() != "fullName" && it.key() != "isEnabled"
-                && it.key() != "name" && it.key() != "password" && it.key() != "permissions")
-            {
-                it = jsonObj.erase(it);
-            }
-        }
+        QJsonObject newObj;
 
-        return QJsonDocument(jsonObj).toJson();
+        newObj["email"] = jsonObj["email"];
+        newObj["fullName"] = jsonObj["fullName"];
+        newObj["isEnabled"] = jsonObj["isEnabled"];
+        newObj["name"] = jsonObj["name"];
+        newObj["password"] = jsonObj["password"];
+        newObj["permissions"] = jsonObj["permissions"];
+
+        return QJsonDocument(newObj).toJson();
     }
 };
 
@@ -156,10 +155,12 @@ TEST_F(SaveUserEx, success)
     auto server = givenServer();
     whenServerLaunched(server);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::admin, UserCategory::regular);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::admin, UserCategory::admin);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::admin,
+        /*expectedResult*/ network::http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::admin);
 }
 
@@ -168,7 +169,8 @@ TEST_F(SaveUserEx, savedUserMustBeAbleToLogin)
     auto server = givenServer();
     whenServerLaunched(server);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::admin, UserCategory::admin);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::admin,
+        /*expectedResult*/ network::http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::admin);
     thenSavedUserShouldBeAuthorizedByServer(server, UserCategory::admin);
 }
@@ -178,11 +180,12 @@ TEST_F(SaveUserEx, nonAdminAccessShouldFail)
     auto server = givenServer();
     whenServerLaunched(server);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::admin, UserCategory::regular);
+    whenSaveUserRequestIssued(server, ApiAccess::admin, UserCategory::regular,
+        /*expectedResult*/ network::http::StatusCode::ok);
     thenUserShouldAppearInTheGetUsersResponse(server, UserCategory::regular);
 
-    whenSaveUserExRequestIssued(server, ApiAccess::nonAdmin, UserCategory::admin);
-    thenResponseShouldContainForbiddenError();
+    whenSaveUserRequestIssued(server, ApiAccess::nonAdmin, UserCategory::admin,
+        /*expectedResult*/ network::http::StatusCode::forbidden);
 }
 
 } // namespace nx::test
