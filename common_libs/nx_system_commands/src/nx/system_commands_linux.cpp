@@ -31,7 +31,14 @@
 
 namespace nx {
 
-const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
+#if defined (NX_CUSTOMIZATION_NAME)
+    #define STRINGIFY(v) #v
+    #define STRINGIFY2(v) STRINGIFY(v)
+    const char* const SystemCommands::kDomainSocket =
+        "/tmp/" STRINGIFY2(NX_CUSTOMIZATION_NAME) "_syscmd_socket3f64fa";
+#else
+    const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
+#endif
 
 namespace {
 
