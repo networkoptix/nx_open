@@ -72,10 +72,6 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
 @_stage(timeout=timedelta(minutes=15))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for fps_index, fps_range in enumerate(primary['fps']):
-        # Make sure there is a gap between recordings.
-        for error in retry_expect_values(dict(status="Online"), lambda: run.data):
-            yield error
-
         current_configuration = primary.copy()
         current_configuration['fps'] = fps_range
         with run.server.api.camera_recording(run.data['id'], fps=fps_avg(fps_range)):
@@ -91,13 +87,13 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
             for profile, configuration in (
                     ('primary', current_configuration), ('secondary', secondary)):
                 if configuration:
-                    path = '{}{}'.format(profile, fps_index)
+                    path = '{}[{}]'.format(profile, fps_index + 1)
                     for error in retry_expect_values(
                             {'video': configuration},
                             lambda: ffprobe_metadata(run.media_url(profile)),
                             path=path):
                         yield error
-                    yield Halt('Configuration {} is successful'.format(path))
+                    yield Halt('{} is successful, pass to next one'.format(path))
 
     yield Success()
 
@@ -112,14 +108,14 @@ def video_parameters(run, stream_urls=None, **profiles
                 configure_video(
                     run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
 
-                path = '{}{}'.format(profile, index)
-                yield Halt('Configuration {} is applied to server'.format(path))
+                path = '{}[{}]'.format(profile, index + 1)
+                yield Halt('{} is configured'.format(path))
                 for error in retry_expect_values(
                         {'video': configuration},
                         lambda: ffprobe_metadata(run.media_url(profile)),
                         path=path):
                     yield error
-                yield Halt('Configuration {} is successful'.format(path))
+                yield Halt('{} is successful, pass to next one'.format(path))
 
     for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
         yield error
@@ -141,13 +137,14 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                 else:
                     del configuration["skip_codec_change"]
 
-                yield Halt('Configuration {} is applied to server'.format(index))
+                path = 'primary[{}]'.format(index + 1)
+                yield Halt('{} is configured'.format(path))
                 for error in retry_expect_values(
                         {'audio': configuration},
                         lambda: ffprobe_metadata(run.media_url()),
-                        path=index):
+                        path=path):
                     yield error
-                yield Halt('Configuration {} is successful'.format(index))
+                yield Halt('{} is successful, pass to next one'.format(path))
 
     yield Success()
 
