@@ -67,7 +67,7 @@ void ManagedCameraSet::setAllCameras()
 
 void ManagedCameraSet::setSingleCamera(const QnVirtualCameraResourcePtr& camera)
 {
-    if ((m_resourcePool && camera->resourcePool() != m_resourcePool)
+    if (!camera || (m_resourcePool && camera->resourcePool() != m_resourcePool)
         || (m_filter && !m_filter(camera)))
     {
         setCameras(Type::single, {});
