@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
 /* Usage
 <nx-content-block type?=['gray' | empty]>
@@ -28,9 +28,15 @@ import { Component, Input, OnInit } from '@angular/core';
 export class NxContentBlockComponent implements OnInit {
     @Input('type') class: string;
 
+    haveHeader: boolean;
+
+    @ViewChild('headerWrapper') headerWrapper: ElementRef;
+
     constructor() {
+        this.haveHeader = true;
     }
 
     ngOnInit() {
+        this.haveHeader = (this.headerWrapper.nativeElement.childNodes[ 0 ].childNodes.length > 0);
     }
 }
