@@ -25,7 +25,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     private build: any;
     private canViewRelease: boolean;
 
-    title: string;
     user: any;
     downloads: any;
     activeBuilds: any;
@@ -103,7 +102,6 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     }
 
     public beforeChange($event: NgbTabChangeEvent) {
-        this.title = new TitleCasePipe().transform($event.nextId) + ' notes';
         this.activeBuilds = this.downloadsData[ $event.nextId ];
         this.titleService.setTitle(new TitleCasePipe().transform($event.nextId));
         this.locationProxy.path('/downloads/' + $event.nextId, false);
@@ -118,10 +116,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
             this.routeParam = this.routeParam || 'releases';
             if (isNumeric(this.routeParam)) {
                 this.build = this.routeParam;
-                this.title = new TitleCasePipe().transform(this.build) + ' notes';
             } else {
                 this.section = this.routeParam;
-                this.title = new TitleCasePipe().transform(this.section) + ' notes';
             }
 
             this.authorizationService
