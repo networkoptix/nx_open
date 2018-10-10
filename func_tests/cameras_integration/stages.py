@@ -84,7 +84,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
                 if configuration:
                     for error in ffprobe_streams(
                             {'video': configuration}, run.media_url(profile),
-                            '{}[{}]'.format(profile, fps_index + 1)):
+                            '{}[{}]'.format(profile, fps_index)):
                         yield error
 
     yield Success()
@@ -102,7 +102,7 @@ def video_parameters(run, stream_urls=None, **profiles):
 
                 for error in ffprobe_streams(
                         {'video': configuration}, run.media_url(profile),
-                        '{}[{}]'.format(profile, index + 1)):
+                        '{}[{}]'.format(profile, index)):
                     yield error
 
     for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
@@ -126,7 +126,7 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
                     del configuration["skip_codec_change"]
 
                 for error in ffprobe_streams(
-                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index + 1)):
+                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index)):
                     yield error
 
     yield Success()
