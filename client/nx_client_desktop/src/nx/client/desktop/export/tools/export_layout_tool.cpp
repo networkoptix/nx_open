@@ -305,17 +305,35 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
     }
 
     /* Chunks. */
-    for (const QnMediaResourcePtr &resource : d->resources)
+    for (const auto& resource: d->resources)
     {
+        QByteArray data;
+        if (d->settings.bookmarks.empty())
+        {
+            auto loader = qnClientModule->cameraDataManager()->loader(resource);
+            if (!loader)
+                continue;
+
+            auto periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
+            periods.encode(data);
+        }
+        else
+        {
+            // We may not have loaded chunks when using Bookmarks export for camera, which was not
+            // opened yet. This is no important as bookmarks are automatically deleted when archive
+            // is not available for the given period.
+            QnTimePeriodList periods;
+            for (const auto& bookmark: d->settings.bookmarks)
+            {
+                if (bookmark.cameraId == resource->toResourcePtr()->getId())
+                    periods.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
+            }
+            NX_ASSERT(std::is_sorted(periods.cbegin(), periods.cend()));
+            periods.encode(data);
+        }
+
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        auto loader = qnClientModule->cameraDataManager()->loader(resource);
-        if (!loader)
-            continue;
-        QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(d->settings.period);
-        QByteArray data;
-        periods.encode(data);
-
         if (!writeData(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), data))
             return false;
     }
@@ -494,12 +512,20 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     qint64 serverTimeZone = client::core::ServerTimeWatcher::utcOffset(resource, Qn::InvalidUtcOffset);
 
+    QnTimePeriodList playbackMask;
+    for (const auto& bookmark: d->settings.bookmarks)
+    {
+        if (bookmark.cameraId == resource->toResourcePtr()->getId())
+            playbackMask.push_back({bookmark.startTimeMs, bookmark.durationMs});
+    }
+
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
         lit("mkv"),
         d->storage,
         role,
-        serverTimeZone);
+        serverTimeZone,
+        playbackMask);
 
     return true;
 }

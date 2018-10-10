@@ -1793,6 +1793,12 @@
         },
         {
             "keys": [
+                "Dahua*|*"
+            ],
+            "trustToVideoSourceSize": false
+        },
+        {
+            "keys": [
                 "Pelco|NET5508*"
             ],
             "forcedOnvifParams": {
@@ -2859,7 +2865,9 @@
             "Geovision|GV-SV48000",
             "Hikvision|DS-2CD6924F*", "HIKVISION|DS-2CD6924F*",
             "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
-            "NVM3-A16|IP-Camera", "IPNC|NVM3-A16"
+            "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
+            "Hanwha|*", "Hanwha Techwin|*",
+            "Samsung|*", "Samsung Techwin|*"
             ],
             "canShareLicenseGroup": true
         },
