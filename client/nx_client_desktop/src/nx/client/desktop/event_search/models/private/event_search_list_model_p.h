@@ -66,7 +66,7 @@ private:
     static bool hasPreview(vms::api::EventType eventType);
 
 private:
-    EventSearchListModel* const q = nullptr;
+    EventSearchListModel* const q;
     const QScopedPointer<vms::event::StringsHelper> m_helper;
 
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;

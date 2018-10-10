@@ -49,6 +49,13 @@ milliseconds startTime(const DetectedObject& object)
     return duration_cast<milliseconds>(microseconds(object.firstAppearanceTimeUsec));
 }
 
+qint64 objectDurationUs(const DetectedObject& object)
+{
+    // TODO: #vkutin Is this duration formula good enough for us?
+    //   Or we need to add some "lastAppearanceDurationUsec"?
+    return object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+}
+
 static const auto lowerBoundPredicate =
     [](const DetectedObject& left, milliseconds right)
     {
@@ -106,7 +113,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap(lit("text_buttons/analytics.png")));
+            return QVariant::fromValue(qnSkin->pixmap("text_buttons/analytics.png"));
 
         case Qn::DescriptionTextRole:
             return description(object);
@@ -121,11 +128,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
             return previewParams(object).timestamp.count();
 
         case Qn::DurationRole:
-        {
-            using namespace std::chrono;
-            const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
-            return QVariant::fromValue(duration_cast<milliseconds>(microseconds(durationUs)).count());
-        }
+            return objectDurationUs(object);
 
         case Qn::HelpTopicIdRole:
             return Qn::Empty_Help;
@@ -527,12 +530,10 @@ QString AnalyticsSearchListModel::Private::description(
 
     const auto timeWatcher = q->context()->instance<nx::client::core::ServerTimeWatcher>();
     const auto start = timeWatcher->displayTime(startTime(object).count());
-    // TODO: #vkutin Is this duration formula good enough for us?
-    //   Or we need to add some "lastAppearanceDurationUsec"?
-    const auto durationUs = object.lastAppearanceTimeUsec - object.firstAppearanceTimeUsec;
+    const auto durationUs = objectDurationUs(object);
 
     using namespace std::chrono;
-    return lit("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4")
+    return QString("Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4")
         .arg(object.firstAppearanceTimeUsec)
         .arg(start.toString(Qt::RFC2822Date))
         .arg(durationUs)
@@ -550,15 +551,15 @@ QString AnalyticsSearchListModel::Private::attributes(
                 th { color: %1; font-weight: normal; text-align: left; }
             </style>)");
 
-    static const auto kTableTemplate = lit("<table cellpadding='0' cellspacing='0'>%1</table>");
-    static const auto kRowTemplate = lit("<tr><th>%1</th>")
-        + lit("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
-        + lit("<td>%2</td></tr>");
+    static const auto kTableTemplate = QString("<table cellpadding='0' cellspacing='0'>%1</table>");
+    static const auto kRowTemplate = QString("<tr><th>%1</th>")
+        + QString("<td width='%1'/>").arg(style::Metrics::kStandardPadding) //< Spacing.
+        + QString("<td>%2</td></tr>");
 
     QString rows;
     for (const auto& attribute: object.attributes)
     {
-        if (!attribute.name.startsWith(lit("nx.sys.")))
+        if (!attribute.name.startsWith("nx.sys."))
             rows += kRowTemplate.arg(attribute.name, attribute.value);
     }
 
@@ -685,7 +686,7 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
             return defaultValue;
         };
 
-    const QString previewTimestampStr = attribute(lit("nx.sys.preview.timestampUs"));
+    const QString previewTimestampStr = attribute("nx.sys.preview.timestampUs");
     if (!previewTimestampStr.isNull())
     {
         const qint64 previewTimestampUs = previewTimestampStr.toLongLong();
@@ -700,16 +701,16 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
         }
     }
 
-    result.boundingBox.setLeft(getRealAttribute(lit("nx.sys.preview.boundingBox.x"),
+    result.boundingBox.setLeft(getRealAttribute("nx.sys.preview.boundingBox.x",
         result.boundingBox.left()));
 
-    result.boundingBox.setTop(getRealAttribute(lit("nx.sys.preview.boundingBox.y"),
+    result.boundingBox.setTop(getRealAttribute("nx.sys.preview.boundingBox.y",
         result.boundingBox.top()));
 
-    result.boundingBox.setWidth(getRealAttribute(lit("nx.sys.preview.boundingBox.width"),
+    result.boundingBox.setWidth(getRealAttribute("nx.sys.preview.boundingBox.width",
         result.boundingBox.width()));
 
-    result.boundingBox.setHeight(getRealAttribute(lit("nx.sys.preview.boundingBox.height"),
+    result.boundingBox.setHeight(getRealAttribute("nx.sys.preview.boundingBox.height",
         result.boundingBox.height()));
 
     return result;

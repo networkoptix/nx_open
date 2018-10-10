@@ -59,7 +59,7 @@ private:
     static QColor color();
 
 private:
-    BookmarkSearchListModel* const q = nullptr;
+    BookmarkSearchListModel* const q;
     QString m_filterText;
     QnCameraBookmarkList m_prefetch;
     std::deque<QnCameraBookmark> m_data;

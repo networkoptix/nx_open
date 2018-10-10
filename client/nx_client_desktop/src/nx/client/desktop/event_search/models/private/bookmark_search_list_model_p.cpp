@@ -76,7 +76,7 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
         }
 
         case Qn::DurationRole:
-            return QVariant::fromValue(bookmark.durationMs.count());
+            return QVariant::fromValue(microseconds(bookmark.durationMs).count());
 
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
@@ -337,7 +337,7 @@ QPixmap BookmarkSearchListModel::Private::pixmap()
     {
         bookmarkColor = color;
         bookmarkPixmap = QnSkin::colorize(
-            qnSkin->pixmap(lit("buttons/acknowledge.png")), bookmarkColor);
+            qnSkin->pixmap("buttons/acknowledge.png"), bookmarkColor);
     }
 
     return bookmarkPixmap;

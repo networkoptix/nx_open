@@ -92,7 +92,7 @@ private:
     static PreviewParams previewParams(const analytics::storage::DetectedObject& object);
 
 private:
-    AnalyticsSearchListModel* const q = nullptr;
+    AnalyticsSearchListModel* const q;
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
