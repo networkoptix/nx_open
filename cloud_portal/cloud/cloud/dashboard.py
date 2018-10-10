@@ -30,15 +30,35 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
             _('Applications'),
-            exclude=('django.contrib.*',),
+            exclude=(
+                     'cms.models.ContextTemplate',
+                     'cms.models.DataRecord',
+                     'cms.models.DataStructure',
+                     'cms.models.ProductType',
+                     'cms.models.ContentVersion',
+                     'django_celery_results.*',
+                     'notifications.models.*',
+                     'rest_hooks.*',
+                     'zapier.models.*'
+                     ),
             deletable=False,
             collapsible=False,
         ))
 
         # append an app list module for "Administration"
         self.children.append(modules.AppList(
-            _('Administration'),
-            models=('django.contrib.*',),
+            _('Internal'),
+            models=(
+                    'cms.models.ContextTemplate',
+                    'cms.models.DataRecord',
+                    'cms.models.DataStructure',
+                    'cms.models.ProductType',
+                    'cms.models.ContentVersion',
+                    'django_celery_results.*',
+                    'notifications.models.*',
+                    'rest_hooks.*',
+                    'zapier.models.*'
+                    ),
             deletable=False,
             collapsible=False,
         ))

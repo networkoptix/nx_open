@@ -26,11 +26,31 @@ class CustomMenu(Menu):
             items.Bookmarks(),
             items.AppList(
                 _('Applications'),
-                exclude=('django.contrib.*',)
+                exclude=(
+                         'cms.models.ContextTemplate',
+                         'cms.models.DataRecord',
+                         'cms.models.DataStructure',
+                         'cms.models.ProductType',
+                         'cms.models.ContentVersion',
+                         'django_celery_results.*',
+                         'notifications.models.*',
+                         'rest_hooks.*',
+                         'zapier.models.*'
+                         )
             ),
             items.AppList(
-                _('Administration'),
-                models=('django.contrib.*',)
+                _('Internal'),
+                models=(
+                        'cms.models.ContextTemplate',
+                        'cms.models.DataRecord',
+                        'cms.models.DataStructure',
+                        'cms.models.ProductType',
+                        'cms.models.ContentVersion',
+                        'django_celery_results.*',
+                        'notifications.models.*',
+                        'rest_hooks.*',
+                        'zapier.models.*'
+                        )
             ),
             items.MenuItem('Help', '/static/help/cms/'),
         ]
