@@ -120,6 +120,7 @@ protected:
 
     /** Should be called during every successful fetch to update fetched time window. */
     void setFetchedTimeWindow(const QnTimePeriod& value);
+    void addToFetchedTimeWindow(const QnTimePeriod& period); //< Just a helper function.
 
     /** Should be called at the end of every fetch to emit fetchFinished signal. */
     void finishFetch(FetchResult result);

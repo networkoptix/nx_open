@@ -281,6 +281,13 @@ void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)
     m_fetchedTimeWindow = value;
 }
 
+void AbstractSearchListModel::addToFetchedTimeWindow(const QnTimePeriod& period)
+{
+    auto timeWindow = m_fetchedTimeWindow;
+    timeWindow.addPeriod(period);
+    setFetchedTimeWindow(timeWindow);
+}
+
 void AbstractSearchListModel::finishFetch(FetchResult result)
 {
     NX_VERBOSE(this) << "Finish fetch;" << QVariant::fromValue(result).toString();

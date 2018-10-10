@@ -26,9 +26,7 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
             if (!guard)
                 return;
 
-            auto timeWindow = q->fetchedTimeWindow();
-            timeWindow.addPeriod(fetchedPeriod);
-            q->setFetchedTimeWindow(timeWindow);
+            q->addToFetchedTimeWindow(fetchedPeriod);
 
             if (result == FetchResult::complete || result == FetchResult::incomplete)
                 commit(fetchedPeriod);

@@ -40,8 +40,8 @@ namespace {
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-static constexpr milliseconds kMetadataTimerInterval = 250ms;
-static constexpr milliseconds kDataChangedInterval = 250ms;
+static constexpr milliseconds kMetadataTimerInterval = 1000ms;
+static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 milliseconds startTime(const DetectedObject& object)
@@ -448,14 +448,27 @@ void AnalyticsSearchListModel::Private::processMetadata()
             });
     }
 
-    ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
+    auto periodToCommit = QnTimePeriod::fromInterval(
+        startTime(newObjects.front()), startTime(newObjects.back()));
 
-    for (const auto& newObject: newObjects)
-        m_objectIdToTimestamp[newObject.objectId] = startTime(newObject);
+    // TODO: #vkutin Clear if there is going to be a gap between live and archive.
+    // Think how to do it.
+    //if (???)
+    //{
+    //    periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
+    //    q->clear(); //< Otherwise there will be a gap between live and archive events.
+    //}
 
-    m_data.insert(m_data.begin(),
-        std::make_move_iterator(newObjects.begin()),
-        std::make_move_iterator(newObjects.end()));
+    q->addToFetchedTimeWindow(periodToCommit);
+
+    NX_VERBOSE(q) << "Live update commit";
+    commitInternal(periodToCommit, newObjects.rbegin(), newObjects.rend(), 0, true);
+
+    if (count() > q->maximumCount())
+    {
+        NX_VERBOSE(q) << "Truncating to maximum count";
+        truncateToMaximumCount();
+    }
 }
 
 void AnalyticsSearchListModel::Private::emitDataChangedIfNeeded()
