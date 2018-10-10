@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
 from api.forms import *
 from api.models import *
 # Register your models here.
@@ -97,7 +96,7 @@ class AccountLoginHistoryAdmin(admin.ModelAdmin):
 admin.site.unregister(Group)
 
 
-@admin.register(Group)
+@admin.register(ProxyGroup)
 class GroupAdmin(admin.ModelAdmin):
     # Use our custom form.
     form = GroupAdminForm

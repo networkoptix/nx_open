@@ -30,12 +30,12 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
             _('Applications'),
-            exclude=(
+            exclude=('cms.models.ContentVersion',
                      'cms.models.ContextTemplate',
                      'cms.models.DataRecord',
                      'cms.models.DataStructure',
                      'cms.models.ProductType',
-                     'cms.models.ContentVersion',
+                     'cms.models.UserGroupsToCustomizationPermissions',
                      'django_celery_results.*',
                      'notifications.models.*',
                      'rest_hooks.*',
@@ -48,12 +48,12 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Administration"
         self.children.append(modules.AppList(
             _('Internal'),
-            models=(
+            models=('cms.models.ContentVersion',
                     'cms.models.ContextTemplate',
                     'cms.models.DataRecord',
                     'cms.models.DataStructure',
                     'cms.models.ProductType',
-                    'cms.models.ContentVersion',
+                    'cms.models.UserGroupsToCustomizationPermissions',
                     'django_celery_results.*',
                     'notifications.models.*',
                     'rest_hooks.*',

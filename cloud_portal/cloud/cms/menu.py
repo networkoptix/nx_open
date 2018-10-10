@@ -26,12 +26,12 @@ class CustomMenu(Menu):
             items.Bookmarks(),
             items.AppList(
                 _('Applications'),
-                exclude=(
+                exclude=('cms.models.ContentVersion',
                          'cms.models.ContextTemplate',
                          'cms.models.DataRecord',
                          'cms.models.DataStructure',
                          'cms.models.ProductType',
-                         'cms.models.ContentVersion',
+                         'cms.models.UserGroupsToCustomizationPermissions',
                          'django_celery_results.*',
                          'notifications.models.*',
                          'rest_hooks.*',
@@ -40,12 +40,12 @@ class CustomMenu(Menu):
             ),
             items.AppList(
                 _('Internal'),
-                models=(
+                models=('cms.models.ContentVersion',
                         'cms.models.ContextTemplate',
                         'cms.models.DataRecord',
                         'cms.models.DataStructure',
                         'cms.models.ProductType',
-                        'cms.models.ContentVersion',
+                        'cms.models.UserGroupsToCustomizationPermissions',
                         'django_celery_results.*',
                         'notifications.models.*',
                         'rest_hooks.*',

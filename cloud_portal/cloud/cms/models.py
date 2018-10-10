@@ -347,6 +347,7 @@ class DataStructure(models.Model):
 
 class UserGroupsToCustomizationPermissions(models.Model):
     class Meta:
+        app_label="api"
         permissions = (
             ("can_view_pending", "Can view pending versions of integrations"),
         )
