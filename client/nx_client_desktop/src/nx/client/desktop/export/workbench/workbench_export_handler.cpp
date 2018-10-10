@@ -91,10 +91,7 @@ QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, Q
     }
 
     const int camerasCount = cameras.size();
-    int matrixSize = std::ceil(std::sqrt(camerasCount));
-    NX_ASSERT(matrixSize * matrixSize >= camerasCount);
-    if (matrixSize * matrixSize < camerasCount)
-        matrixSize++;
+    const int matrixSize = std::ceil(std::sqrt(camerasCount));
     NX_ASSERT(matrixSize * matrixSize >= camerasCount);
 
     const QRect grid(0, 0, matrixSize, matrixSize);
