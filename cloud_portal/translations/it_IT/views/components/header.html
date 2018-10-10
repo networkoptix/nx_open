@@ -42,7 +42,11 @@
                     </li>
 
                     <li ng-if="systemCounter && !singleSystem" class="collapse-second">
-                        <nx-systems [systems]="systems" [active-system]="activeSystem"></nx-systems>
+                        <nx-systems
+                                [endpoint]="active"
+                                [systems]="systems"
+                                [active-system]="activeSystem">
+                        </nx-systems>
                     </li>
 
                     <li class="vertical-bar"></li>

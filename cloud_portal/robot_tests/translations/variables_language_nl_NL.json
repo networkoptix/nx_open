@@ -28,7 +28,7 @@
     "ACCOUNT DOES NOT EXIST": "Dit account bestaat niet.",
     "CODE USED/INCORRECT": "Bevestigingscode is al gebruikt of niet correct",
     "SHARE PERMISSIONS HINT ADMINISTRATOR": "Onbeperkt toegang inclusief de mogelijkheid om te delen",
-    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Can view live video, browse the archive, control PTZ etc",
+    "SHARE PERMISSIONS HINT ADVANCED VIEWER": "Kan live video bekijken, bladeren in het archief, PTZ, enz. bedienen",
     "SHARE PERMISSIONS HINT VIEWER": "Kan live video bekijken en zoeken in het archief",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Kan alleen live video bekijken",
     "SHARE PERMISSIONS HINT CUSTOM": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen",
