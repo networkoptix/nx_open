@@ -33,10 +33,14 @@ struct UpdateItem
     int progress = -1;
     QString statusMessage;
 
+    // Flag for servers, that can be updated using legacy 3.2 system
     bool onlyLegacyUpdate = false;
     bool legacyUpdateUsed = false;
     bool offline = false;
     bool skipped = false;
+    bool installed = false;
+    bool changedProtocol = false;
+    bool installing = false;
     bool storeUpdates = true;
     // Row in the table
     int row = -1;
@@ -71,7 +75,10 @@ public:
 
     UpdateItemPtr findItemById(QnUuid id);
     UpdateItemPtr findItemByRow(int row) const;
-public:
+
+    // Overrides status for chosen mediaservers.
+    void setManualStatus(QSet<QnUuid> targets, nx::update::Status::Code status);
+
     // Overrides for QAbstractTableModel
     int columnCount(const QModelIndex& parent) const override;
     int rowCount(const QModelIndex& parent) const override;
@@ -80,10 +87,7 @@ public:
     // Need this to allow delegate to spawn editor
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
-public:
-    nx::utils::SoftwareVersion latestVersion() const;
-    void setUpdateTarget(const nx::utils::SoftwareVersion& version,
-        const QSet<nx::vms::api::SystemInformation>& selection);
+    void setUpdateTarget(const nx::utils::SoftwareVersion& version);
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
 
@@ -114,8 +118,8 @@ private:
 
 private:
     QList<UpdateItemPtr> m_items;
-    nx::utils::SoftwareVersion m_latestVersion;
-    QSet<nx::vms::api::SystemInformation> m_updatePlatforms;
+    // The version we want to update to
+    nx::utils::SoftwareVersion m_targetVersion;
     QnServerUpdatesColors m_versionColors;
 };
 

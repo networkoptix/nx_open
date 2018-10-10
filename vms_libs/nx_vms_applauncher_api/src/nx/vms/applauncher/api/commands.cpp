@@ -19,11 +19,12 @@ ResultType::Value sendCommandToApplauncher(
     int timeoutMs)
 {
     NamedPipeSocket sock;
-    SystemError::ErrorCode resultCode = sock.connectToServerSync(launcherPipeName());
+    QString pipeName = launcherPipeName();
+    SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName);
     if (resultCode != SystemError::noError)
     {
         NX_WARNING(kLogTag, lm("Failed to connect to local server %1. %2").args(
-            launcherPipeName(),
+            pipeName,
             SystemError::toString(resultCode)));
         return ResultType::connectError;
     }

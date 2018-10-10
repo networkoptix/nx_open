@@ -487,6 +487,7 @@ int Helper::makeInvalidParameterError(
 
 int Helper::makeFileError(const QString& fileName)
 {
+    NX_ERROR(this) << "makeFileError(" << fileName << ") - bad filename";
     return makeError(
         nx::network::http::StatusCode::badRequest,
         QnRestResult::CantProcessRequest,
@@ -498,6 +499,7 @@ int Helper::makeDownloaderError(ResultCode errorCode)
     QnJsonRestResult restResult;
     QString errorMessage = lit("DistributedFileDownloader returned error: %1").arg(
         QnLexical::serialized(errorCode));
+    NX_ERROR(this) << "makeDownloaderError(" << errorMessage << ")";
     restResult.setError(QnRestResult::CantProcessRequest, errorMessage);
     restResult.setReply(errorCode);
 

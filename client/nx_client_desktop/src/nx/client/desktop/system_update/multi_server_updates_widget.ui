@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
+    <width>862</width>
     <height>395</height>
    </rect>
   </property>
@@ -58,13 +58,13 @@
        <number>16</number>
       </property>
       <property name="topMargin">
-       <number>12</number>
+       <number>8</number>
       </property>
       <property name="rightMargin">
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>14</number>
+       <number>10</number>
       </property>
       <item>
        <widget class="QStackedWidget" name="titleStackedWidget">
@@ -176,7 +176,7 @@
       <item>
        <widget class="QStackedWidget" name="versionStackedWidget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="versionPage">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -345,7 +345,7 @@
       <item>
        <widget class="QStackedWidget" name="updateStackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="updateControlsPage">
          <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -464,6 +464,7 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="updateCompletionPage"/>
         <widget class="QWidget" name="updateProgressPage">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="leftMargin">

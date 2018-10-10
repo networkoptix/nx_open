@@ -55,7 +55,13 @@ public:
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
-            m_left->setIcon(qnSkin->icon("text_buttons/skipped_disabled.png"));
+            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+            m_left->setHidden(false);
+        }
+        else if (data->installed)
+        {
+            m_left->setText(tr("Installed"));
+            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
             m_left->setHidden(false);
         }
         else
@@ -98,7 +104,11 @@ public:
                     m_left->setHidden(false);
                     break;
                 case StatusCode::installing:
-                    progressHidden = false;
+                    // TODO: Make animation here
+                    m_left->setText(tr("Installing..."));
+                    m_left->setHidden(false);
+                    m_animated = true;
+                    progressHidden = true;
                     break;
                 default:
                     // In fact we should not be here. All the states should be handled accordingly
