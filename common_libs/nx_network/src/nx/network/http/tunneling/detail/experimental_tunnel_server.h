@@ -130,7 +130,7 @@ network::http::RequestResult
 
     RequestResult requestResult(StatusCode::ok);
 
-    const std::string tunnelId = requestContext.requestPathParams.back();
+    const std::string tunnelId = requestContext.requestPathParams.back().toStdString();
 
     prepareCreateDownTunnelResponse(requestContext.response);
 
@@ -187,6 +187,7 @@ void ExperimentalTunnelServer<ApplicationData...>::saveDownChannel(
         TunnelContext& tunnelContext = m_tunnelsInProgress[tunnelId];
         // TODO: #ak For a new tunnel start some expiration timer.
         tunnelContext.downChannel = connection->takeSocket();
+        tunnelContext.requestData = std::make_tuple(std::move(requestData)...);
     }
 
     reportTunnelIfReady(tunnelId);
