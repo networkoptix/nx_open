@@ -55,6 +55,12 @@ namespace
         else
             return lit("%1p").arg(size.height());
     }
+
+bool isSpecialTimeValue(qint64 value)
+{
+    return value == DATETIME_NOW || value == qint64(AV_NOPTS_VALUE);
+}
+
 }
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
@@ -321,7 +327,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
         m_server = getServerOnTime(m_position); // try to update server
         if (m_server == 0 || m_server->getStatus() == Qn::Offline)
         {
-            if (m_isMultiserverAllowed && m_globalMinArchiveTime == qint64(AV_NOPTS_VALUE))
+            if (m_isMultiserverAllowed && isSpecialTimeValue(m_globalMinArchiveTime))
                 checkMinTimeFromOtherServer(m_camera);
             return false;
         }
