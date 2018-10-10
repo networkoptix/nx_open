@@ -71,6 +71,11 @@ class BaseMediaserver(object):
             if not already_stopped_ok:
                 raise Exception("Already stopped")
 
+    def make_core_dump_if_running(self):
+        status = self.installation.service.status()
+        if status.is_running:
+            self.installation.os_access.make_core_dump(status.pid)
+
     def examine(self, stopped_ok=False):
         examination_logger = _logger.getChild('examination')
         examination_logger.info('Post-test check for %s', self)
