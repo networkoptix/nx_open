@@ -53,7 +53,7 @@ void GetPostTunnelClient::openDownChannel()
         std::bind(&GetPostTunnelClient::onDownChannelOpened, this));
     m_httpClient->doGet(
         m_tunnelUrl,
-        std::bind(&GetPostTunnelClient::cleanupFailedTunnel, this));
+        [this]() { cleanupFailedTunnel(); });
 }
 
 void GetPostTunnelClient::onDownChannelOpened()

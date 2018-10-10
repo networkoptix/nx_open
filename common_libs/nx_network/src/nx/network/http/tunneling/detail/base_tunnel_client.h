@@ -53,6 +53,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
     void cleanupFailedTunnel();
+    void cleanupFailedTunnel(AsyncClient* httpClient);
     void reportFailure(OpenTunnelResult result);
 
     bool resetConnectionAttributes();
