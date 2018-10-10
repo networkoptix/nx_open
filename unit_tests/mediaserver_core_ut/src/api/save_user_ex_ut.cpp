@@ -34,21 +34,21 @@ protected:
     {
         m_nonAdminUser.email = "test@test.com";
         m_nonAdminUser.fullName = "testUser";
-        m_nonAdminUser.isCloud = false;
         m_nonAdminUser.isEnabled = true;
-        m_nonAdminUser.isLdap = false;
         m_nonAdminUser.name = "test_user_name";
         m_nonAdminUser.password = "testUserPassword";
         m_nonAdminUser.permissions = GlobalPermission::accessAllMedia;
 
+        m_nonAdminUserSerialized = serializeAndCutOutUnusedFields(m_nonAdminUser);
+
         m_adminUser.email = "admin@test.com";
         m_adminUser.fullName = "testAdminUser";
-        m_adminUser.isCloud = false;
         m_adminUser.isEnabled = true;
-        m_adminUser.isLdap = false;
         m_adminUser.name = "test_admin_user_name";
         m_adminUser.password = "testAdminPassword";
         m_adminUser.permissions = GlobalPermission::admin;
+
+        m_adminUserSerialized = serializeAndCutOutUnusedFields(m_adminUser);
     }
 
     LauncherPtr givenServer()
@@ -69,13 +69,13 @@ protected:
     void whenSaveUserExRequestIssued(const LauncherPtr& server, ApiAccess apiAccess,
         UserCategory userCategory)
     {
-        vms::api::UserDataEx* userDataToSave = userCategory == UserCategory::regular
-            ? &m_nonAdminUser : &m_adminUser;
+        QByteArray* userDataToSave = userCategory == UserCategory::regular
+            ? &m_nonAdminUserSerialized : &m_adminUserSerialized;
 
         QString authName = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.name;
         QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.password;
 
-        NX_TEST_API_POST(server.get(), "/ec2/saveUserEx", *userDataToSave, nullptr,
+        NX_TEST_API_POST(server.get(), "/ec2/saveUser", *userDataToSave, nullptr,
             network::http::StatusCode::ok, authName, authPassword, &m_responseBuffer);
     }
 
@@ -118,7 +118,9 @@ protected:
 
 private:
     vms::api::UserDataEx m_adminUser;
+    QByteArray m_adminUserSerialized;
     vms::api::UserDataEx m_nonAdminUser;
+    QByteArray m_nonAdminUserSerialized;
     Buffer m_responseBuffer;
 
     template<typename ResponseData>
@@ -128,6 +130,24 @@ private:
         QnJsonRestResult jsonRestResult;
         NX_TEST_API_GET(launcher, path, &jsonRestResult);
         responseData = jsonRestResult.deserialized<ResponseData>();
+    }
+
+    QByteArray serializeAndCutOutUnusedFields(const vms::api::UserDataEx& userDataEx)
+    {
+        QByteArray buffer;
+        QJson::serialize(userDataEx, &buffer);
+
+        auto jsonObj = QJsonDocument::fromJson(buffer).object();
+        for (auto it = jsonObj.begin(); it != jsonObj.end(); ++it)
+        {
+            if (it.key() != "email" && it.key() != "fullName" && it.key() != "isEnabled"
+                && it.key() != "name" && it.key() != "password" && it.key() != "permissions")
+            {
+                it = jsonObj.erase(it);
+            }
+        }
+
+        return QJsonDocument(jsonObj).toJson();
     }
 };
 
