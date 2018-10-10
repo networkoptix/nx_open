@@ -28,10 +28,10 @@ public:
 
 private:
     const QnUuid m_peerId;
-    const ProtocolVersionRange& m_protocolVersionRange;
-    TransactionLog* m_transactionLog = nullptr;
-    ConnectionManager* m_connectionManager = nullptr;
-    const OutgoingCommandFilter& m_outgoingCommandFilter;
+    //const ProtocolVersionRange& m_protocolVersionRange;
+    //TransactionLog* m_transactionLog = nullptr;
+    //ConnectionManager* m_connectionManager = nullptr;
+    //const OutgoingCommandFilter& m_outgoingCommandFilter;
 
     nx::network::http::tunneling::Server<> m_tunnelingServer;
 
