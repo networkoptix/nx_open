@@ -278,6 +278,7 @@ public:
     }
     double getFPS() const;
     void setFps(double fps);
+    double getSar() const;
 
 
     SPSUnit()

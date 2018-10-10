@@ -6,6 +6,7 @@
 #include <QtCore/QString>
 
 #include "nx/streaming/video_data_packet.h"
+#include "utils/media/nalUnits.h"
 
 namespace nx {
 namespace media_utils {
@@ -24,6 +25,8 @@ void extractSpsPps(
     const QnConstCompressedVideoDataPtr& videoData,
     QSize* const newResolution,
     std::map<QString, QString>* const customStreamParams);
+
+bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps);
 
 } // namespace h264
 
