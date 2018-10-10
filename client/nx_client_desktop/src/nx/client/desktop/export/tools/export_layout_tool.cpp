@@ -516,7 +516,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
     for (const auto& bookmark: d->settings.bookmarks)
     {
         if (bookmark.cameraId == resource->toResourcePtr()->getId())
-            playbackMask.push_back({bookmark.startTimeMs, bookmark.durationMs});
+            playbackMask.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
     }
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
