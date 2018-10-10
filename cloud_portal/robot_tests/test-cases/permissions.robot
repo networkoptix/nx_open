@@ -150,6 +150,37 @@ displays pencil and cross links for each user only on hover
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Remove User Permissions    ${random email}
 
+admin cannot delete or edit self
+    [tags]    C41904
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+
+admin cannot delete other admins
+    Go To    ${url}/register
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Register    mark    harmill    ${random email}    ${password}
+    Activate    ${random email}
+    Log in to Auto Tests System    ${email}
+    Share To    ${random email}    Administrator
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${random email}
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Log Out
+    Validate Log Out
+    Log in to Auto Tests System    ${email}
+    Remove User Permissions    ${random email}
+
 Edit permission works
     [tags]    C41900
     ${random email}    Get Random Email    ${BASE EMAIL}
