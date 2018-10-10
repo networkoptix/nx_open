@@ -330,7 +330,7 @@ system_settings = dict(
 
 server_config = dict(
     p2pMode=True,
-    serverGuid='8e25e200-0000-0000-0000-{:012d}',
+    serverGuid='8e25e200-0000-0000-{group_idx:04d}-{server_idx:012d}',
     )
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
