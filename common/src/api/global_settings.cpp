@@ -1056,12 +1056,15 @@ void QnGlobalSettings::setUpnpPortMappingEnabled(bool value)
 
 QnUuid QnGlobalSettings::localSystemId() const
 {
+    NX_VERBOSE(this, lm("Providing local system id %1")
+        .args(m_localSystemIdAdaptor->value()));
+
     return QnUuid(m_localSystemIdAdaptor->value());
 }
 
 void QnGlobalSettings::setLocalSystemId(const QnUuid& value)
 {
-    NX_DEBUG(this, lm("Changing local system from %1 to %2")
+    NX_DEBUG(this, lm("Changing local system id from %1 to %2")
         .args(m_localSystemIdAdaptor->value(), value));
 
     m_localSystemIdAdaptor->setValue(value.toString());
