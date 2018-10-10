@@ -27,7 +27,7 @@ def ffprobe_streams(stream_url):
                 ffprobe -show_format -show_streams -analyzeduration 3M -probesize 2e+07 -of json "$URL"
                 ''',
             env={'URL': stream_url},
-            timeout_sec=10,
+            timeout_sec=30,
             )
     except (AssertionError, Timeout, NonZeroExitStatus) as error:
         _logger.debug("FFprobe error: %s", str(error))

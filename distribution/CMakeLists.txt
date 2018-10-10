@@ -1,3 +1,6 @@
+nx_configure_file(${customization_dir}/license.html
+    ${distribution_output_dir}/eula-${eulaVersion}.html)
+
 if(WINDOWS)
     add_subdirectory(wix)
 elseif(LINUX AND box STREQUAL "none") #< Desktop Linux.

@@ -205,7 +205,6 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
@@ -272,6 +271,8 @@
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <rest/handlers/metrics_rest_handler.h>
 #include <nx/mediaserver/event/event_connector.h>
+#include <nx/network/http/http_client.h>
+#include <core/resource_management/resource_data_pool.h>
 
 #if !defined(EDGE_SERVER) && !defined(__aarch64__)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -3211,6 +3212,12 @@ void MediaServerProcess::initStaticCommonModule()
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName());
 }
+
+void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback)
+{
+    m_setupModuleCallback = std::move(callback);
+}
+
 bool MediaServerProcess::setUpMediaServerResource(
     CloudIntegrationManager* cloudIntegrationManager,
     QnMediaServerModule* serverModule,
@@ -3385,8 +3392,6 @@ void MediaServerProcess::stopObjects()
         m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
-
-    m_hlsSessionPool.reset();
 
     // Remove all stream recorders.
     m_remoteArchiveSynchronizer.reset();
@@ -3924,6 +3929,92 @@ void MediaServerProcess::loadResourcesFromDatabase()
         moveHandlingCameras();
 }
 
+static QByteArray loadDataFromFile(const QString& fileName)
+{
+    QFile file(fileName);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return file.readAll();
+    return QByteArray();
+}
+
+static QByteArray loadDataFromUrl(nx::utils::Url url)
+{
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
+    if (httpClient->doGet(url)
+        && httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok)
+    {
+        const auto value = httpClient->fetchEntireMessageBody();
+        if (value)
+            return *value;
+    }
+    return QByteArray();
+}
+
+void MediaServerProcess::loadResourceParamsData()
+{
+    const std::array<const char*,2> kUrlsToLoadResourceData =
+    {
+        "http://updates.networkoptix.com/resource_data.json",
+        "http://beta.networkoptix.com/beta-builds/daily/resource_data.json"
+    };
+
+    auto manager = m_ec2Connection->getResourceManager(Qn::kSystemAccess);
+
+    using namespace nx::vms::api;
+    QString source;
+    ResourceParamWithRefData param;
+    param.name = Qn::kResourceDataParamName;
+    auto oldValue = serverModule()->commonModule()->propertyDictionary()->value(QnUuid(), param.name);
+    if (oldValue.isEmpty())
+    {
+        source = ":/resource_data.json";
+        param.value = loadDataFromFile(source); //< Default value.
+    }
+
+    for (const auto& url: kUrlsToLoadResourceData)
+    {
+        const auto internetValue = loadDataFromUrl(url);
+        if (!internetValue.isEmpty())
+        {
+            if (serverModule()->commonModule()->dataPool()->loadData(internetValue))
+            {
+                param.value = internetValue;
+                source = url;
+                break;
+            }
+            else
+            {
+                NX_WARNING(this, "Skip invalid resource_data.json from %1", internetValue);
+            }
+        }
+    }
+
+    if (!param.value.isEmpty() && oldValue != param.value)
+    {
+        NX_INFO(this, "Update system wide resource_data.json from %1", source);
+
+        // Update data in the database if there is no value or get update from the HTTP request.
+        ResourceParamWithRefDataList params;
+        params.push_back(param);
+        manager->saveSync(params);
+        m_serverMessageProcessor->resetPropertyList(params);
+    }
+
+    const auto externalResourceFileName =
+        QCoreApplication::applicationDirPath() + lit("/resource_data.json");
+    auto externalFile = loadDataFromFile(externalResourceFileName);
+    if (!externalFile.isEmpty())
+    {
+        // Update local data only without saving to DB if external static file is defined.
+        NX_INFO(this, "Update local resource_data.json from %1", externalResourceFileName);
+        param.value = externalFile;
+        ResourceParamWithRefDataList params;
+        params.push_back(param);
+        manager->saveSync(params);
+        m_serverMessageProcessor->resetPropertyList(params);
+    }
+}
+
 void MediaServerProcess::updateRootPassword()
 {
     // TODO: Root password for Nx1 should be updated in case of cloud owner.
@@ -4028,8 +4119,6 @@ void MediaServerProcess::run()
     if (needToStop())
         return;
 
-    m_hlsSessionPool = std::make_unique<nx::mediaserver::hls::SessionPool>();
-
     if (!initTcpListener(
         m_timeBasedNonceProvider.get(),
         &m_cloudIntegrationManager->cloudManagerGroup(),
@@ -4073,6 +4162,7 @@ void MediaServerProcess::run()
     initializeUpnpPortMapper();
 
     loadResourcesFromDatabase();
+    loadResourceParamsData();
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 
@@ -4113,6 +4203,8 @@ void MediaServerProcess::run()
         updateAllowCameraChangesIfNeeded();
         commonModule()->globalSettings()->synchronizeNowSync();
     #endif
+    if (m_setupModuleCallback)
+        m_setupModuleCallback(serverModule.get());
 
     commonModule()->resourceDiscoveryManager()->setReady(true);
 

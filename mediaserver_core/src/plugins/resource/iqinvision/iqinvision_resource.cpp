@@ -1,7 +1,6 @@
 #include <streaming/mjpeg_stream_reader.h>
 #include "iqinvision_resource.h"
 #include <streaming/rtp_stream_reader.h>
-#include <common/static_common_module.h>
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 

@@ -107,6 +107,13 @@ void MediaServerLauncher::run()
 bool MediaServerLauncher::start()
 {
     prepareToStart();
+    m_mediaServerProcess->setSetupModuleCallback(
+        [](QnMediaServerModule* server)
+        {
+            const auto enableDiscovery = nx::ut::cfg::configInstance().enableDiscovery;
+            server->globalSettings()->setAutoDiscoveryEnabled(enableDiscovery);
+            server->globalSettings()->setAutoDiscoveryResponseEnabled(enableDiscovery);
+        });
 
     nx::utils::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();
@@ -124,9 +131,6 @@ bool MediaServerLauncher::start()
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
     if (result != std::future_status::ready)
         return false;
-
-    serverModule()->globalSettings()->setAutoDiscoveryEnabled(
-        nx::ut::cfg::configInstance().enableDiscovery);
 
     while (m_mediaServerProcess->getTcpPort() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

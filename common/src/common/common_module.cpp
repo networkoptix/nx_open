@@ -48,6 +48,7 @@
 #include <audit/audit_manager.h>
 #include <api/http_client_pool.h>
 #include <core/resource_management/camera_driver_restriction_list.h>
+#include <core/resource_management/resource_data_pool.h>
 
 using namespace nx;
 
@@ -197,6 +198,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
         : nx::vms::api::ModuleInformation::nxMediaServerId();
     m_moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     m_moduleInformation.realm = nx::network::AppInfo::realm();
+
+    m_dataPool = instance<QnResourceDataPool>();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -527,4 +530,9 @@ nx::network::http::ClientPool* QnCommonModule::httpClientPool() const
 CameraDriverRestrictionList* QnCommonModule::cameraDriverRestrictionList() const
 {
     return m_cameraDriverRestrictionList;
+}
+
+QnResourceDataPool* QnCommonModule::dataPool() const
+{
+    return m_dataPool;
 }

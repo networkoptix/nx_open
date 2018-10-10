@@ -8,32 +8,50 @@ from pathlib2 import Path
 
 def pytest_addoption(parser):
     g = parser.getgroup('real camera test')
-    g.addoption('--rct-interface', default='enp3s0')
-    g.addoption('--rct-network', default='192.168.200.111/24')
-    g.addoption('--rct-expected-cameras', default='expected_cameras.yaml')
-    g.addoption('--rct-camera-cycle-delay', default=_time_delta_str(seconds=1))
-    g.addoption('--rct-server-stage-delay', default=_time_delta_str(minutes=1))
-    g.addoption('--rct-stage-hard-timeout', default=_time_delta_str(hours=1))
-    g.addoption('--rct-camera-filter', default='*')
+    g.addoption(
+        '--rct-interface', default='enp3s0', help='Network interface with cameras')
+    g.addoption(
+        '--rct-network', default='192.168.200.111/24', type=IPNetwork,
+        help='Network interface IP/mask')
+    g.addoption(
+        '--rct-expected-cameras', default='expected_cameras.yaml', type=_local_file,
+        help='Stage rules for cameras')
+    g.addoption(
+        '--rct-camera-cycle-delay', default='1s', type=_time_delta,
+        help='Delay between test cycles')
+    g.addoption(
+        '--rct-server-stage-delay', default='1m', type=_time_delta,
+        help='Delay before last server stage')
+    g.addoption(
+        '--rct-stage-hard-timeout', default='1h', type=_time_delta,
+        help='Limits stages delay')
+    g.addoption(
+        '--rct-camera-filter', default='*', type=lambda f: f.split(','),
+        help='Comma separated list of camera names, posix wildcards are supported')
+
+
+RctOptions = namedtuple(
+    'Options',
+    [
+        'interface',
+        'network',
+        'expected_cameras',
+        'camera_cycle_delay',
+        'server_stage_delay',
+        'stage_hard_timeout',
+        'camera_filter',
+    ]
+)
 
 
 @pytest.fixture()
 def rct_options(request):
-    options = dict(
-        interface=request.config.getoption('--rct-interface'),
-        network=IPNetwork(request.config.getoption('--rct-network')),
-        expected_cameras=_file_path(request.config.getoption('--rct-expected-cameras')),
-        camera_cycle_delay=_time_delta(request.config.getoption('--rct-camera-cycle-delay')),
-        server_stage_delay=_time_delta(request.config.getoption('--rct-server-stage-delay')),
-        stage_hard_timeout=_time_delta(request.config.getoption('--rct-stage-hard-timeout')),
-        camera_filter=request.config.getoption('--rct-camera-filter').split(','),
-    )
-
-    Options = namedtuple('Options', options.keys())
-    return Options(**options)
+    return RctOptions(**{
+        name: request.config.getoption('--rct-' + name.replace('_', '-'))
+        for name in RctOptions._fields})
 
 
-def _file_path(value):
+def _local_file(value):
     path = Path(value)
     if not path.is_absolute():
         path = Path(__file__).parent / path
@@ -41,9 +59,10 @@ def _file_path(value):
 
 
 def _time_delta(value):
-    # TODO: Add support for 'm' and 'h' suffixes.
+    if value.endswith('m'):
+        return timedelta(minutes=int(value[:-1]))
+    if value.endswith('h'):
+        return timedelta(hours=int(value[:-1]))
+    if value.endswith('s'):
+        value = value[:-1]
     return timedelta(seconds=int(value))
-
-
-def _time_delta_str(**values):
-    return str(int(timedelta(**values).total_seconds()))

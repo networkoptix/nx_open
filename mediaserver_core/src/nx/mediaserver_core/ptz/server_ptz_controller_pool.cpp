@@ -1,7 +1,6 @@
 #include "server_ptz_controller_pool.h"
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <core/resource/param.h>
 #include <core/resource/camera_resource.h>
@@ -30,7 +29,7 @@ core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr&
     if (!camera)
         return core_ptz::RelativeContinuousMoveMapping();
 
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->resourceData();
 
     if (resourceData.contains(kRelativeMoveMapping))
     {
@@ -60,10 +59,7 @@ QnPtzMapperPtr mapper(const QnSecurityCamResourcePtr& camera)
         return QnPtzMapperPtr();
     }
 
-    return qnStaticCommon
-        ->dataPool()
-        ->data(camera)
-        .value<QnPtzMapperPtr>(lit("ptzMapper"));
+    return camera->resourceData().value<QnPtzMapperPtr>(lit("ptzMapper"));
 }
 
 } // namespace

@@ -30,23 +30,6 @@ class SimpleNamespace:
         return self.__dict__ == other.__dict__
 
 
-class GrowingSleep(object):
-
-    _delay_levels = [10, 20, 30, 60]  # seconds
-    _calls_per_level = 10
-
-    def __init__(self):
-        self._level = 0
-        self._level_call_count = 0
-
-    def sleep(self):
-        time.sleep(self._delay_levels[self._level])
-        self._level_call_count += 1
-        if self._level_call_count >= self._calls_per_level and self._level < len(self._delay_levels) - 1:
-            self._level += 1
-            self._level_call_count = 0
-
-
 def is_list_inst(l, cls):
     if type(l) is not list:
         return False

@@ -9,7 +9,6 @@
 #include <nx/vms/event/events/network_issue_event.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>
@@ -231,7 +230,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
 {
     for (auto& track: m_tracks)
     {
-        if (track.parser) {
+        if (track.parser)
+        {
             QnAbstractMediaDataPtr result = track.parser->nextData();
             if (result) {
                 result->timestamp = m_timeHelper.getTime(
@@ -666,7 +666,7 @@ void QnMulticodecRtpReader::createTrackParsers()
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
                 if (secResource)
                 {
-                    auto resData = qnStaticCommon->dataPool()->data(secResource);
+                    auto resData = secResource->resourceData();
                     auto forceRtcpReports = resData.value<bool>(lit("forceRtcpReports"), false);
 
                     if (m_tracks[i].ioDevice)
