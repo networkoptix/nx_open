@@ -114,6 +114,10 @@ public static class PaxtonClient
          * Please note: auth should be the last to avoid parsing issues.
          */
         var camerasString = string.Join(":", footageRequest.DvrCameras.Select(x => x.CameraId));
+
+        // Paxton combines cameras to a single camera with ids joined via '|'. Don't know why.
+        camerasString = camerasString.Replace('|', ':');
+
         var timestamp = unixTimeMilliseconds(footageRequest.StartTimeUtc);
 
         var auth = Convert.ToBase64String(
@@ -132,6 +136,7 @@ public static class PaxtonClient
                 protocolVersion == 0 ? "" : $"--proto={protocolVersion}",
                 url
             });
+        m_logger.DebugFormat("Run applauncher with parameters: {0}", parameters);
 
         m_process = desktop_client_api.Launcher.startClient(parameters);
         Environment.Exit(0);
