@@ -197,7 +197,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-    // AbstractResourceManager::setResourceStatus
+    /**%apidoc[proprietary] POST /ec2/setResourceStatus
+     * Change a resource status.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission,
+     *     or a user who owns the resource in case the resource is a layout.
+     * %param id Unique id of the resource.
+     * %param status new resource status.
+     */
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
 
     /**%apidoc GET /ec2/getResourceParams
