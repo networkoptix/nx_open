@@ -35,6 +35,7 @@ export class ShareModalContent {
                 private genericModal: NxModalGenericComponent) {
 
         this.url = 'share';
+        this.accessRoles = [];
     }
 
     private getRoleDescription() {
@@ -74,8 +75,6 @@ export class ShareModalContent {
         if (!this.user.role) {
             this.user.role = this.system.findAccessRole(this.user);
         }
-
-        this.options = this.accessRoles;
     }
 
     formatUserName() {
@@ -129,8 +128,11 @@ export class ShareModalContent {
             this.buttonText = this.language.sharing.editShareConfirmButton;
         }
 
-        this.processAccessRoles();
-        this.accessDescription = this.getRoleDescription();
+        // give system's access role to update
+        setTimeout(() => {
+            this.processAccessRoles();
+            this.accessDescription = this.getRoleDescription();
+        }, 200);
 
         this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {

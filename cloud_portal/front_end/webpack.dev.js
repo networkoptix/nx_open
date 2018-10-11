@@ -43,6 +43,9 @@ module.exports = merge(common, {
             },
         ],
         https             : {
+            spdy: {
+                protocols: ['http/1.1']
+            },
             key : fs.readFileSync('ssl_keys/server.key').toString(),
             cert: fs.readFileSync('ssl_keys/server.crt').toString()
         },
