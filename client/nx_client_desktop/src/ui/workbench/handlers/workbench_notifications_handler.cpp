@@ -142,10 +142,11 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
     const nx::vms::event::AbstractActionPtr& action)
 {
-    const auto resources = action->getResources();
-    const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(resources);
-    NX_ASSERT(cameras.size() == 1);
-    if (cameras.empty())
+    const auto params = action->getParams();
+    const auto camera = resourcePool()->getResourceById(params.actionResourceId).dynamicCast<
+        QnVirtualCameraResource>();
+    NX_ASSERT(camera);
+    if (!camera)
         return;
 
     const auto currentLayout = workbench()->currentLayout();
@@ -153,11 +154,12 @@ void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
     if (!layoutResource)
         return;
 
+    const auto resources = action->getResources();
     const bool layoutIsAllowed = resources.contains(layoutResource->getId());
     if (!layoutIsAllowed)
         return;
 
-    auto items = currentLayout->items(cameras.front());
+    auto items = currentLayout->items(camera);
     if (items.empty())
         return;
 

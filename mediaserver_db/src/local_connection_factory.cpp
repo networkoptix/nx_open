@@ -197,7 +197,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-    // AbstractResourceManager::setResourceStatus
+    /**%apidoc[proprietary] POST /ec2/setResourceStatus
+     * Change a resource status.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission,
+     *     or a user who owns the resource in case the resource is a layout.
+     * %param id Unique id of the resource.
+     * %param status new resource status.
+     */
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
 
     /**%apidoc GET /ec2/getResourceParams
@@ -1166,7 +1177,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<UserDataEx>(p, ApiCommand::saveUser);
+    regUpdate<UserDataEx, UserData>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1930,20 +1941,10 @@ void LocalConnectionFactory::regUpdate(
     ApiCommand::Value cmd,
     GlobalPermission permission)
 {
-    if constexpr (std::is_same<InputDataType, nx::vms::api::UserDataEx>::value)
-    {
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<nx::vms::api::UserDataEx, nx::vms::api::UserData>(m_directConnection),
-            permission);
-    }
-    else
-    {
-        restProcessorPool->registerHandler(
-            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
-            permission);
-    }
+    restProcessorPool->registerHandler(
+        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+        new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
+        permission);
 }
 
 template<class InputDataType, class CustomActionType>
