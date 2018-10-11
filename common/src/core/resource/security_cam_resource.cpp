@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 
 #include <recording/time_period_list.h>
 #include "camera_user_attribute_pool.h"
@@ -21,7 +20,6 @@
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
-#include <common/static_common_module.h>
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
@@ -126,8 +124,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_cachedHasVideo(
         [this]()
         {
-            const auto data = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-            return !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+            return !resourceData().value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
         },
         &m_mutex)
 {
@@ -479,8 +476,7 @@ bool QnSecurityCamResource::isAnalogEncoder() const
     if (deviceType() == nx::core::resource::DeviceType::encoder)
         return true;
 
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(lit("analogEncoder"));
+    return resourceData().value<bool>(lit("analogEncoder"));
 }
 
 CombinedSensorsDescription QnSecurityCamResource::combinedSensorsDescription() const
@@ -508,8 +504,7 @@ bool QnSecurityCamResource::isSharingLicenseInGroup() const
     if (!QnLicense::licenseTypeInfo(licenseType()).allowedToShareChannel)
         return false; //< Don't allow sharing for encoders e.t.c
 
-    const auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    return resourceData.value<bool>(Qn::kCanShareLicenseGroup, false);
+    return resourceData().value<bool>(Qn::kCanShareLicenseGroup, false);
 }
 
 bool QnSecurityCamResource::isNvr() const
@@ -1322,12 +1317,7 @@ bool QnSecurityCamResource::useBitratePerGop() const
     if (!result.isEmpty())
         return result.toInt() > 0;
 
-    if (qnStaticCommon)
-    {
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-        if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
-            return true;
-    }
+    return resourceData().value<bool>(Qn::FORCE_BITRATE_PER_GOP);
     return false;
 }
 
@@ -1482,4 +1472,9 @@ Qn::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
     if (capabilities.testFlag(Qn::IsOldFirmwareCapability))
         return Qn::MediaStreamEvent::oldFirmware;
     return Qn::MediaStreamEvent::NoEvent;
+}
+
+QnResourceData QnSecurityCamResource::resourceData() const
+{
+    return commonModule()->dataPool()->data(toSharedPointer(this));
 }

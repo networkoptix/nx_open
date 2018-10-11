@@ -56,7 +56,7 @@ private:
         SystemError::ErrorCode systemErrorCode,
         std::size_t bytesTransferreded);
 
-    void cleanupFailedTunnel(Tunnels::iterator tunnelCtxIter);
+    void cleanUpFailedTunnel(Tunnels::iterator tunnelCtxIter);
 
     void reportSuccess(Tunnels::iterator tunnelCtxIter);
 };

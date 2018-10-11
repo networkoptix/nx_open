@@ -148,7 +148,8 @@ protected:
         m_publisher = std::make_unique<cloud::MediatorAddressPublisher>(
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient,
-                &m_cloudCredentialsProvider));
+                &m_cloudCredentialsProvider),
+            &m_cloudCredentialsProvider);
     }
 
     void whenIssuedBindRequest()

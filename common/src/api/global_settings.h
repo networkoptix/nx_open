@@ -69,6 +69,7 @@ const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
 
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
+const QString kNameAutoDiscoveryResponseEnabled(lit("autoDiscoveryResponseEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
 const QString kNameCrossdomainEnabled(lit("crossdomainEnabled"));
@@ -179,6 +180,9 @@ public:
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
+
+    bool isAutoDiscoveryResponseEnabled() const;
+    void setAutoDiscoveryResponseEnabled(bool enabled);
 
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings& settings);
@@ -421,6 +425,7 @@ private:
 
     QnResourcePropertyAdaptor<QString>* m_disabledVendorsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_autoDiscoveryEnabledAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_autoDiscoveryResponseEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_synchronizeTimeWithInternetAdaptor = nullptr;

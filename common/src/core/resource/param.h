@@ -128,4 +128,6 @@ namespace Qn
 
     // User
     static const QString USER_FULL_NAME = lit("fullUserName");
+
+    static const QString kResourceDataParamName = "resource_data.json";
 }

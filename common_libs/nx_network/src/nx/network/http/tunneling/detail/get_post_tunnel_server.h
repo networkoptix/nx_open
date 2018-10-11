@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
@@ -50,8 +51,7 @@ private:
         network::http::AsyncMessagePipeline* /*connection*/);
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+        const RequestContext& requestContext,
         ApplicationData... requestData) override;
 
     void closeAllTunnels();
@@ -61,7 +61,7 @@ private:
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/);
 
-    void prepareCreateDownTunnelResponse(
+    std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
         network::http::Response* response);
 
     void openUpTunnel(
@@ -114,23 +114,22 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
 template<typename ...ApplicationData>
 network::http::RequestResult
     GetPostTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+        const RequestContext& requestContext,
         ApplicationData... requestData)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Open GET/POST tunnel. Url %1")
-        .args(request.requestLine.url.path()));
+        .args(requestContext.request.requestLine.url.path()));
 
     network::http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
 
-    prepareCreateDownTunnelResponse(response);
+    requestResult.dataSource = prepareCreateDownTunnelResponse(requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...),
-            requestPath = request.requestLine.url.path().toStdString()](
+            requestPath = requestContext.request.requestLine.url.path().toStdString()](
                 network::http::HttpServerConnection* connection) mutable
         {
             auto allArgs = std::tuple_cat(
@@ -157,14 +156,15 @@ void GetPostTunnelServer<ApplicationData...>::closeAllTunnels()
 }
 
 template<typename ...ApplicationData>
-void GetPostTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
-    network::http::Response* response)
+std::unique_ptr<AbstractMsgBodySource>
+    GetPostTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
+        network::http::Response* response)
 {
-    response->headers.emplace("Content-Type", "application/octet-stream");
-    response->headers.emplace("Content-Length", "10000000000");
     response->headers.emplace("Cache-Control", "no-store");
     response->headers.emplace("Pragma", "no-cache");
-    response->headers.emplace("Connection", "close");
+    return std::make_unique<EmptyMessageBodySource>(
+        "application/octet-stream",
+        10000000000ULL);
 }
 
 template<typename ...ApplicationData>

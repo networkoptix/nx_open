@@ -601,7 +601,9 @@ class MediaserverApi(object):
             raise AlreadyMerged(self, remote_api, master_system_id)
         servant_ids = servant_api.system_mediaserver_ids()
         master_ids = master_api.system_mediaserver_ids()
-        assert not servant_ids & master_ids
+        assert not servant_ids & master_ids, (
+            'Unable to merge servers: they have common ids; master ids: %s, servant ids: %s'
+            % (master_ids, servant_ids))
         try:
             self.generic.post('api/mergeSystems', {
                 'url': 'http://{}:{}/'.format(remote_address, remote_port),

@@ -557,7 +557,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
             return nx::network::http::StatusCode::internalServerError;
     }
 
-    // 1. update settings in remove database to ensure they have priority while merge
+    // 1. Updating settings in remote database to ensure they have priority while merging.
     {
         ConfigureSystemData data;
         data.localSystemId = systemId;
@@ -574,10 +574,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         {
             return statusCode;
         }
-
     }
 
-    // 2. update local data
+    // 2. Updating local data.
     ConfigureSystemData data;
     data.localSystemId = systemId;
     data.wholeSystem = true;
@@ -602,7 +601,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::applyRemoteSettings(
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    // put current server info to a foreign system to allow authorization via server key
+    // Put current server info to a foreign system to allow authorization via server key.
     {
         QnMediaServerResourcePtr mServer =
             m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(

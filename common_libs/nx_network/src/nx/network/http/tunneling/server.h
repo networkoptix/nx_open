@@ -8,6 +8,7 @@
 #include "abstract_tunnel_authorizer.h"
 #include "detail/connection_upgrade_tunnel_server.h"
 #include "detail/get_post_tunnel_server.h"
+#include "detail/experimental_tunnel_server.h"
 #include "../http_types.h"
 #include "../server/rest/http_server_rest_message_dispatcher.h"
 
@@ -56,6 +57,7 @@ private:
     TunnelAuthorizer<ApplicationData...>* m_tunnelAuthorizer = nullptr;
     detail::GetPostTunnelServer<ApplicationData...> m_getPostTunnelServer;
     detail::ConnectionUpgradeTunnelServer<ApplicationData...> m_connectionUpgradeServer;
+    detail::ExperimentalTunnelServer<ApplicationData...> m_experimentalServer;
 
     void reportNewTunnel(
         std::unique_ptr<network::AbstractStreamSocket> /*connection*/,
@@ -72,12 +74,14 @@ Server<ApplicationData...>::Server(
     m_tunnelCreatedHandler(std::move(tunnelCreatedHandler)),
     m_tunnelAuthorizer(tunnelAuthorizer),
     m_getPostTunnelServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
-    m_connectionUpgradeServer([this](auto... args) { reportNewTunnel(std::move(args)...); })
+    m_connectionUpgradeServer([this](auto... args) { reportNewTunnel(std::move(args)...); }),
+    m_experimentalServer([this](auto... args) { reportNewTunnel(std::move(args)...); })
 {
     if (m_tunnelAuthorizer)
     {
         m_getPostTunnelServer.setTunnelAuthorizer(m_tunnelAuthorizer);
         m_connectionUpgradeServer.setTunnelAuthorizer(m_tunnelAuthorizer);
+        m_experimentalServer.setTunnelAuthorizer(m_tunnelAuthorizer);
     }
 }
 
@@ -88,6 +92,7 @@ void Server<ApplicationData...>::registerRequestHandlers(
 {
     m_getPostTunnelServer.registerRequestHandlers(basePath, messageDispatcher);
     m_connectionUpgradeServer.registerRequestHandlers(basePath, messageDispatcher);
+    m_experimentalServer.registerRequestHandlers(basePath, messageDispatcher);
 }
 
 template<typename ...ApplicationData>

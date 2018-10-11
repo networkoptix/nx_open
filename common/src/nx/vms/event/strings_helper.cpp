@@ -632,37 +632,35 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
     if (!server)
         return QString();
 
-    quint64 timeStampMs = timestampUsec / 1000;
-    QnMediaServerResourcePtr newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
+    auto timeStampMs = timestampUsec / 1000;
+    auto newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         server = newServer;
 
-    if (const auto& connection = camera->commonModule()->ec2Connection())
-    {
-        auto appServerUrl = connection->connectionInfo().ecUrl;
-        if (appServerUrl.host().isEmpty() || nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
-        {
-            appServerUrl = server->getApiUrl();
-            if (isPublic)
-            {
-                const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
-                if (!publicIP.isEmpty())
-                {
-                    QStringList parts = publicIP.split(L':');
-                    appServerUrl.setHost(parts[0]);
-                    if (parts.size() > 1)
-                        appServerUrl.setPort(parts[1].toInt());
-                }
-            }
-        }
+    const auto& connection = camera->commonModule()->ec2Connection();
+    if (!connection)
+        return QString();
 
-        QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
-        result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80))
-            .arg(camera->getId().toSimpleString()).arg(timeStampMs);
-        return result;
+    auto appServerUrl = connection->connectionInfo().ecUrl;
+    if (appServerUrl.host().isEmpty() ||
+        nx::network::resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+    {
+        appServerUrl = server->getApiUrl();
+        if (isPublic)
+        {
+            const auto publicIP = server->getProperty(Qn::PUBLIC_IP);
+            if (publicIP.isEmpty())
+                return QString();
+
+            QStringList parts = publicIP.split(L':');
+            appServerUrl.setHost(parts[0]);
+            if (parts.size() > 1)
+                appServerUrl.setPort(parts[1].toInt());
+        }
     }
 
-    return QString();
+    return QString("http://%1:%2/static/index.html#/view/%3?time=%4").arg(appServerUrl.host())
+        .arg(appServerUrl.port(80)).arg(camera->getId().toSimpleString()).arg(timeStampMs);
 }
 
 QString StringsHelper::toggleStateToString(EventState state) const

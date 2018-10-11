@@ -32,11 +32,11 @@ static void calc_nonce(struct soap* /*soap*/, char nonce[SOAP_WSSE_NONCELEN])
 /**
  * Calculates digest value SHA1(created, nonce, password)
  * @param soap context
- * @param[in] created string (XSD dateTime format)
- * @param[in] nonce value
- * @param[in] noncelen length of nonce value
- * @param[in] password string
- * @param[out] hash SHA1 digest
+ * @param[in] created - string (XSD dateTime format)
+ * @param[in] nonce - value
+ * @param[in] noncelen - length of nonce value
+ * @param[in] password - string
+ * @param[out] hash - SHA1 digest
  */
 static void calc_digest(
     struct soap *soap,
@@ -86,7 +86,13 @@ int soapWsseAddUsernameTokenDigest(
     soap_wsse_add_UsernameTokenText(soap, id, username, HABase64);
     /* populate the remainder of the password, nonce, and created */
     security->UsernameToken->Password->Type = (char*)wsse_PasswordDigestURI;
-    security->UsernameToken->Nonce = nonceBase64;
+
+    security->UsernameToken->Nonce = (struct wsse__EncodedString*)soap_malloc(soap, sizeof(struct wsse__EncodedString));
+    if (!security->UsernameToken->Nonce)
+        return soap->error = SOAP_EOM;
+    soap_default_wsse__EncodedString(soap, security->UsernameToken->Nonce);
+    security->UsernameToken->Nonce->__item = nonceBase64;
+
     security->UsernameToken->wsu__Created = soap_strdup(soap, created);
     return SOAP_OK;
 }

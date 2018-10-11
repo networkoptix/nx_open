@@ -16,8 +16,7 @@ from typing import Generator, List
 
 from framework.http_api import HttpError
 from . import stage
-from .camera_actions import configure_audio, configure_video, ffprobe_metadata, ffprobe_streams, \
-    fps_avg
+from .camera_actions import configure_audio, configure_video, ffprobe_streams, fps_avg
 from .checks import Checker, Failure, Halt, Result, Success, expect_values, retry_expect_values
 
 # Filled by _stage decorator.
@@ -38,7 +37,7 @@ def _stage(is_essential=False, timeout=timedelta(seconds=30)):
     return decorator
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=6))
+@_stage(is_essential=True, timeout=timedelta(minutes=3))
 def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
     if 'mac' not in kwargs:
         kwargs['mac'] = run.id
@@ -50,7 +49,7 @@ def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, run.data)
 
 
-@_stage(is_essential=True, timeout=timedelta(minutes=6))
+@_stage(is_essential=True, timeout=timedelta(minutes=2))
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
         run.server.api.set_camera_credentials(run.data['id'], login, password)
@@ -69,81 +68,67 @@ def attributes(self, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
         yield expect_values(kwargs, self.data)
 
 
-@_stage(timeout=timedelta(minutes=15))
+@_stage(timeout=timedelta(minutes=7))
 def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) -> Generator[Result]
     for fps_index, fps_range in enumerate(primary['fps']):
-        # Make sure there is a gap between recordings.
-        for error in retry_expect_values(dict(status="Online"), lambda: run.data):
-            yield error
-
-        current_configuration = primary.copy()
-        current_configuration['fps'] = fps_range
+        selected = primary.copy()
+        selected['fps'] = fps_range
         with run.server.api.camera_recording(run.data['id'], fps=fps_avg(fps_range)):
             for error in retry_expect_values(dict(status="Recording"), lambda: run.data):
                 yield error
 
-            while True:
-                recorded_periods = run.server.api.get_recorded_time_periods(run.data['id'])
-                if recorded_periods:
-                    break
+            while not run.server.api.get_recorded_time_periods(run.data['id']):
                 yield Failure('No data is recorded')
 
-            for profile, configuration in (
-                    ('primary', current_configuration), ('secondary', secondary)):
+            for profile, configuration in (('primary', selected), ('secondary', secondary)):
                 if configuration:
-                    path = '{}{}'.format(profile, fps_index)
-                    for error in retry_expect_values(
-                            {'video': configuration},
-                            lambda: ffprobe_metadata(run.media_url(profile)),
-                            path=path):
+                    for error in ffprobe_streams(
+                            {'video': configuration}, run.media_url(profile),
+                            '{}[{}]'.format(profile, fps_index)):
                         yield error
-                    yield Halt('Configuration {} is successful'.format(path))
 
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=30))
-def video_parameters(run, stream_urls=None, **profiles
-                     ):  # type: (stage.Run, dict, dict) -> Generator[Result]
-    for profile, configurations in profiles.items():
-        for index, configuration in enumerate(configurations):
-            configure_video(
-                run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
+@_stage(timeout=timedelta(minutes=7))
+def video_parameters(run, stream_urls=None, **profiles):
+        # type: (stage.Run, dict, dict) -> Generator[Result]
+    # Enable recording to keep video stream open during entire stage.
+    with run.server.api.camera_recording(run.data['id']):
+        for profile, configurations in profiles.items():
+            for index, configuration in enumerate(configurations):
+                configure_video(
+                    run.server.api, run.id, run.data['cameraAdvancedParams'], profile, **configuration)
 
-            path = '{}{}'.format(profile, index)
-            yield Halt('Configuration {} is applied to server'.format(path))
-            for error in retry_expect_values(
-                    {'video': configuration},
-                    lambda: ffprobe_metadata(run.media_url(profile)),
-                    path=path):
-                yield error
-            yield Halt('Configuration {} is successful'.format(path))
+                for error in ffprobe_streams(
+                        {'video': configuration}, run.media_url(profile),
+                        '{}[{}]'.format(profile, index)):
+                    yield error
 
-    for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
-        yield error
+    if stream_urls:
+        for error in retry_expect_values({'streamUrls': stream_urls}, lambda: run.data, syntax='*'):
+            yield error
     yield Success()
 
 
-@_stage(timeout=timedelta(minutes=6))
+@_stage(timeout=timedelta(minutes=1))
 def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Generator[Result]
     """Enable audio on the camera; change the audio codec; check if the audio codec
     corresponds to the expected one. Disable the audio in the end.
     """
-    with run.server.api.camera_audio_enabled(run.data['id']):
-        for index, configuration in enumerate(configurations):
-            if not configuration.get('skip_codec_change'):
-                configure_audio(
-                    run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
-            else:
-                del configuration["skip_codec_change"]
+    # Enable recording to keep video stream open during entire stage.
+    with run.server.api.camera_recording(run.data['id']):
+        with run.server.api.camera_audio_enabled(run.data['id']):
+            for index, configuration in enumerate(configurations):
+                if not configuration.get('skip_codec_change'):
+                    configure_audio(
+                        run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+                else:
+                    del configuration["skip_codec_change"]
 
-            yield Halt('Configuration {} is applied to server'.format(index))
-            for error in retry_expect_values(
-                    {'audio': configuration},
-                    lambda: ffprobe_metadata(run.media_url()),
-                    path=index):
-                yield error
-            yield Halt('Configuration {} is successful'.format(index))
+                for error in ffprobe_streams(
+                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index)):
+                    yield error
 
     yield Success()
 
@@ -186,7 +171,7 @@ def io_events(run, ins, outs):
 PTZ_CAPABILITY_FLAGS = {'presets': 0x10000, 'absolute': 0x40000070}
 
 
-@_stage(timeout=timedelta(minutes=5))
+@_stage()
 def ptz_positions(run, *positions):  # type: (stage.Run, List[dict]) -> Generator[Result]
     for name, flag in PTZ_CAPABILITY_FLAGS.items():
         if run.data['ptzCapabilities'] & flag == 0:

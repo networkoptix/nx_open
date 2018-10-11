@@ -43,12 +43,6 @@ std::optional<nx::network::SocketAddress> PredefinedMediatorConnector::udpEndpoi
     return m_udpEndpoint;
 }
 
-void PredefinedMediatorConnector::setOnMediatorAvailabilityChanged(
-    hpm::api::MediatorAvailabilityChangedHandler /*handler*/)
-{
-    // TODO
-}
-
 } // namespace test
 } // namespace cloud
 } // namespace network

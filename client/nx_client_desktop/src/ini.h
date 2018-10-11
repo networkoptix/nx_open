@@ -11,6 +11,7 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("desktop_client.ini") {}
 
     NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
+    NX_INI_FLAG(0, developerMode, "Developer mode");
     NX_INI_FLAG(0, ignoreBetaWarning, "Hide beta version warning");
     NX_INI_FLAG(0, enableEntropixEnhancer, "Enable Entropix image enhancement controls.");
     NX_INI_STRING("http://96.64.226.250:8888/image",
@@ -47,6 +48,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
     NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
     NX_INI_FLAG(0, enableWatermark, "Enable watermarks preview and setup.");
+    NX_INI_FLAG(0, enableCaseExport, "Enable case export.");
     NX_INI_FLAG(1, enableSessionTimeout, "Enable admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode, "Password preview activation mode: \"press\", \"hover\" or \"toggle\".");
 };

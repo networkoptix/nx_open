@@ -13,10 +13,10 @@ using SequenceExecutedCallback = std::function<void()>;
 class AbstractSequenceExecutor
 {
 public:
+    virtual ~AbstractSequenceExecutor() = default;
     virtual bool executeSequence(
         const CommandSequence& sequence,
         SequenceExecutedCallback sequenceExecutedCallback) = 0;
-    virtual ~AbstractSequenceExecutor() {}
 };
 
 } // namespace ptz

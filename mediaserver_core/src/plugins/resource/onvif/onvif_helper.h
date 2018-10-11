@@ -25,7 +25,7 @@ public:
     ~PasswordHelper() = default;
 
     static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
-    static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
+    static bool isConflict(const SOAP_ENV__Fault* faultInfo);
 
     const CredentialsList getCredentialsByManufacturer(const QString& mdnsPacketData) const;
 
@@ -37,8 +37,6 @@ private:
 
 class SoapErrorHelper
 {
-    SoapErrorHelper(){}
-
 public:
     static const QString fetchDescription(const SOAP_ENV__Fault* faultInfo);
 };
