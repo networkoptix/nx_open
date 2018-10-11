@@ -249,6 +249,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             auto systemUrl = nx::utils::Url::fromUserInput(systemId);
+            systemUrl.setScheme("https");
             NX_DEBUG(this, lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()));
 
             systemUrl.setUserName(auth.user);

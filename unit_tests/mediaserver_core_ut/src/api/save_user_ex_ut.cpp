@@ -39,17 +39,12 @@ protected:
         m_nonAdminUser.password = "testUserPassword";
         m_nonAdminUser.permissions = GlobalPermission::accessAllMedia;
 
-        m_nonAdminUserSerialized = partialSerialize(m_nonAdminUser);
-        NX_ASSERT(!m_nonAdminUserSerialized.contains("id"));
-
         m_adminUser.email = "admin@test.com";
         m_adminUser.fullName = "testAdminUser";
         m_adminUser.isEnabled = true;
         m_adminUser.name = "test_admin_user_name";
         m_adminUser.password = "testAdminPassword";
         m_adminUser.permissions = GlobalPermission::admin;
-
-        m_adminUserSerialized = partialSerialize(m_adminUser);
     }
 
     LauncherPtr givenServer()
@@ -71,8 +66,8 @@ protected:
         UserCategory userCategory,
         network::http::StatusCode::Value expectedCode)
     {
-        QByteArray* userDataToSave = userCategory == UserCategory::regular
-            ? &m_nonAdminUserSerialized : &m_adminUserSerialized;
+        auto* userDataToSave = userCategory == UserCategory::regular
+            ? &m_nonAdminUser : &m_adminUser;
 
         QString authName = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.name;
         QString authPassword = apiAccess == ApiAccess::admin ? "admin" : m_nonAdminUser.password;
@@ -117,9 +112,7 @@ protected:
 
 private:
     vms::api::UserDataEx m_adminUser;
-    QByteArray m_adminUserSerialized;
     vms::api::UserDataEx m_nonAdminUser;
-    QByteArray m_nonAdminUserSerialized;
     Buffer m_responseBuffer;
 
     template<typename ResponseData>
@@ -129,24 +122,6 @@ private:
         QnJsonRestResult jsonRestResult;
         NX_TEST_API_GET(launcher, path, &jsonRestResult);
         responseData = jsonRestResult.deserialized<ResponseData>();
-    }
-
-    QByteArray partialSerialize(const vms::api::UserDataEx& userDataEx)
-    {
-        QByteArray buffer;
-        QJson::serialize(userDataEx, &buffer);
-
-        auto jsonObj = QJsonDocument::fromJson(buffer).object();
-        QJsonObject newObj;
-
-        newObj["email"] = jsonObj["email"];
-        newObj["fullName"] = jsonObj["fullName"];
-        newObj["isEnabled"] = jsonObj["isEnabled"];
-        newObj["name"] = jsonObj["name"];
-        newObj["password"] = jsonObj["password"];
-        newObj["permissions"] = jsonObj["permissions"];
-
-        return QJsonDocument(newObj).toJson();
     }
 };
 

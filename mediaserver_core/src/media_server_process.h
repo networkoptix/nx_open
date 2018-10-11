@@ -170,7 +170,7 @@ private:
     void initializeUpnpPortMapper();
     nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
-    void initPublicIpDiscoveryUpdate();
+    void startPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(
         ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);

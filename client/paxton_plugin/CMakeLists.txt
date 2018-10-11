@@ -16,7 +16,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/../../cmake
 )
 
-set(RDEP_DIR "${PROJECT_SOURCE_DIR}/../../build_utils/python" CACHE PATH "Path to rdep scripts")
+set(rdep_dir "${PROJECT_SOURCE_DIR}/../../build_utils/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
 include(rdep)
 nx_rdep_configure()
@@ -27,15 +27,17 @@ include(CMakeDependentOption)
 include(utils)
 include(${customization_dir}/../default-values.cmake)
 include(${customization_dir}/customization.cmake)
+include(cloud_host)
 include(output_directories)
 include(distribution_names)
 include(option)
 include(windows_signing)
 
+set(minilauncher.binary.name "${product.name} Launcher.exe") # Cannot include properties.cmake.
 set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
 set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 
-set(ENV{PYTHONPATH} ${RDEP_DIR})
+set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py

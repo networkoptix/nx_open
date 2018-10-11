@@ -153,7 +153,8 @@ Hanwha_SNP-6321:
 
 
 Hanwha_XNB-6000:
-  discovery if customization in ('default', 'hanwha') and version >= '3.1.1':
+  # Temporarily removed from stand.
+  discovery if customization in ('default', 'hanwha') and version >= '3.1.1' and False:
     physicalId: 00-16-6C-C5-31-21
     vendor: Hanwha Techwin
     model: XNB-6000
@@ -196,7 +197,7 @@ Hanwha_XNB-6000:
 
 
 Arecont-2245PM:
-  discovery:
+  discovery if False: # Temporarily removed from stand.
     physicalId: 00-1A-07-0A-3A-88
     vendor: ArecontVision
     model: 2245PM
@@ -255,7 +256,7 @@ DWC-MPA20M:
 
 # Needs a reboot every time. Camera is VERY BUGGY!
 DWC-MD421D_1.1.1.8:
-  discovery:
+  discovery if False: # Camera needs firmware upgrade to v.1.1.2.x
     physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
     model: DWC-MD421D
@@ -337,7 +338,7 @@ DWC-MD421D_1.1.2.0:
 
 
 IqEye_A32N:
-  discovery:
+  discovery if False: # Temporarily removed from stand.
     physicalId: 00-50-1A-1A-11-F4
     vendor: IqEye
     model: IQA32N
@@ -417,7 +418,7 @@ Hikvision_DS-2CD2342WD-I:
 
 
 Axis_P1405E:
-  discovery:
+  discovery if False: # Temporarily removed from stand.
     physicalId: AC-CC-8E-48-FC-DA
     vendor: Axis
     model: AXISP1405E
@@ -476,7 +477,7 @@ Axis_M3046V:
 
 
 Acti_E924:
-  discovery:
+  discovery if False: # Temporarily removed from stand.
     physicalId: ACTI_E924-A-XX-15C-00035
     vendor: ACTI
     name: ACTi-E924
@@ -515,7 +516,7 @@ Acti_E924:
 
 
 Dlink_DCS-3716:
-  discovery:
+  discovery if False: # Temporarily removed from stand.
     physicalId: F0-7D-68-09-3E-BA
     vendor: Dlink
     model: DCS-3716
