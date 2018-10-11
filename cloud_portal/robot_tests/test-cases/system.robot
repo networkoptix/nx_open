@@ -95,12 +95,18 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Click Button    ${SHARE BUTTON MODAL}
     Check For Alert    ${NEW PERMISSIONS SAVED}
 
-has Share button and user list visible for admin and owner
+correct items are shown for owner
+    [tags]    C41560
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${USERS LIST}
-    Log Out
+#    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Elements Are Visible    //h2[.='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+
+correct items are shown for admin
+    [tags]    C41561
     Log in to Auto Tests System    ${EMAIL ADMIN}
-    Wait Until Element Is Visible    ${USERS LIST}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER NAME}    ${OWNER EMAIL}
+
 
 does not show Share button, Rename button, or user list to viewer, advanced viewer, live viewer
 #This allows the expected error to not run the close browser action
@@ -219,7 +225,7 @@ should open System page by link to user without permission and show alert (Syste
 
 should open System page by link not authorized user, and show alert if logs in and has no permission
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
-    Log In    ${EMAIL NOPERM}   ${password}    None
+    Log In    ${EMAIL NOPERM}    ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
 should display same user data as user provided during registration (stress to cyrillic)
