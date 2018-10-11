@@ -57,7 +57,7 @@ private:
 
     void closeAllTunnels();
 
-    void prepareCreateDownTunnelResponse(
+    std::unique_ptr<AbstractMsgBodySource> prepareCreateDownTunnelResponse(
         network::http::Response* response);
 
     void saveDownChannel(
@@ -132,7 +132,8 @@ network::http::RequestResult
 
     const std::string tunnelId = requestContext.requestPathParams.back().toStdString();
 
-    prepareCreateDownTunnelResponse(requestContext.response);
+    requestResult.dataSource =
+        prepareCreateDownTunnelResponse(requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...), tunnelId](
@@ -165,14 +166,15 @@ void ExperimentalTunnelServer<ApplicationData...>::closeAllTunnels()
 }
 
 template<typename ...ApplicationData>
-void ExperimentalTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
-    network::http::Response* response)
+std::unique_ptr<AbstractMsgBodySource>
+    ExperimentalTunnelServer<ApplicationData...>::prepareCreateDownTunnelResponse(
+        network::http::Response* response)
 {
-    response->headers.emplace("Content-Type", "application/octet-stream");
-    response->headers.emplace("Content-Length", "10000000000");
     response->headers.emplace("Cache-Control", "no-store");
     response->headers.emplace("Pragma", "no-cache");
-    response->headers.emplace("Connection", "close");
+    return std::make_unique<EmptyMessageBodySource>(
+        "application/octet-stream",
+        10000000000ULL);
 }
 
 template<typename ...ApplicationData>
