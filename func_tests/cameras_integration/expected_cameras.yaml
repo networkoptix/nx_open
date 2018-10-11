@@ -281,7 +281,7 @@ DWC-MD421D_1.1.1.8:
       - {'codec': 'H264', 'resolution': '960x544'}
     secondary:
       - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
-      - {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
+      #- {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
     stream_urls:
       '1': "rtsp://192.168.200.13:554/h264"
       '2': "rtsp://192.168.200.13:8554/h264"
@@ -629,8 +629,8 @@ DWC-MV84WiAC6:
     primary: # Exact supported fps/res values are not in the spec. Adjusting may be needed
       - {'codec': 'H264', 'resolution': '2560x1440'}
       #- {'codec': 'MJPEG', 'resolution': '1280x960'}
-    secondary:
-      - {'codec': 'H264', 'resolution': '352x288', 'fps': [8, 12]}
+    #secondary:
+      #- {'codec': 'H264', 'resolution': '352x288', 'fps': [8, 12]}
       #- {'codec': 'MJPEG', 'resolution': '640x480', 'fps': [24, 36]}
 
 
