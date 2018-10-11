@@ -179,8 +179,8 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
     const nx::vms::event::AbstractActionPtr& action)
 {
-    const auto params = action->getRuntimeParams();
-    const auto camera = resourcePool()->getResourceById(params.eventResourceId).dynamicCast<
+    const auto params = action->getParams();
+    const auto camera = resourcePool()->getResourceById(params.actionResourceId).dynamicCast<
         QnVirtualCameraResource>();
     NX_ASSERT(camera);
     if (!camera)
