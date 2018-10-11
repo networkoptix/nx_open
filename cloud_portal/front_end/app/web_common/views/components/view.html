@@ -44,8 +44,8 @@
                                                 <button class="cast-button" is="google-cast-button" id="castbutton"
                                                         ng-click="showWarning()"></button>
                                             </span>
-                                        <div class="btn-group video-settings-icon" ng-init="showSettings = false">
-                                            <span class="video-icon" ng-click="showSettings = !showSettings">
+                                        <div class="btn-group video-settings-icon">
+                                            <span class="video-icon" ng-click="toggleSettingsMenu()">
                                                 <span class="glyphicon glyphicon-cog"></span>
                                             </span>
                                             <ul class="dropdown-menu video-settings"
@@ -82,6 +82,15 @@
                                                             &nbsp;Voice Commands
                                                         </span>
                                                 </li>
+                                                <li class="video-settings-divider buffer" ></li>
+                                                <li class="video-settings-button"
+                                                    ng-if="!isEmbeded"
+                                                    ng-click="showEmbed();">
+                                                        <span>
+                                                            <span class="glyphicon glyphicon-bullhorn"></span>
+                                                            &nbsp;Embed
+                                                        </span>
+                                                </li>
                                             </ul>
                                         </div>
                                         <span ng-if="enableFullScreen && !isFullscreen" class="video-icon"
@@ -96,7 +105,10 @@
                                     <div class="hide-excess-text video-title">
                                             <span class="visible-xs" ng-click="showCamerasPanel()"
                                                   ng-class="{'back-button': !showCameraPanel}">
-                                                <span class="glyphicon glyphicon-arrow-left"></span>
+                                                <span
+                                                        class="glyphicon glyphicon-arrow-left"
+                                                        ng-if="showCamerasMenu">
+                                                </span>
                                             </span>
                                         <camera-status camera="activeCamera" type="'video'"></camera-status>
                                         <span class="caption-row video-name">

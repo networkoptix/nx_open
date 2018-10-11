@@ -21,12 +21,12 @@
                 scope.config = CONFIG;
                 scope.inline = typeof($location.search().inline) !== 'undefined';
 
-                scope.viewHeader = true;
+                scope.viewHeader = CONFIG.showHeaderAndFooter;
 
-                $rootScope.$on('nx.layout.header', function (evt, state) {
+                $rootScope.$on('nx.layout.header', function (event, opt) {
                     // An event to control visibility of the header
                     // ... i.e. when in view camera in embed
-                    scope.viewHeader = !state;
+                    scope.viewHeader = !opt.state;
                 });
 
                 if (scope.inline) {

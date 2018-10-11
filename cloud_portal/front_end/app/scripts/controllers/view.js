@@ -13,12 +13,6 @@
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
 
-                var isEmbeded = ($location.path().indexOf('/embed') === 0);
-                if (isEmbeded) {
-                    $rootScope.$emit('nx.layout.header', true);
-                    $rootScope.$emit('nx.layout.footer', true);
-                }
-
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
@@ -42,7 +36,7 @@
                             }
 
                             // Set footer visibility according to system status
-                            $rootScope.$emit('nx.layout.footer', $scope.currentSystem.isOnline);
+                            $rootScope.$emit('nx.layout.footer', {state: $scope.currentSystem.isOnline, loc: 'ViewPageCtrl - late'});
 
                         }, function () {
                             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
@@ -70,8 +64,8 @@
                 $scope.$on('$destroy', function (event) {
                     cancelSubscription();
                     // Reset visibility state
-                    $rootScope.$emit('nx.layout.footer', false);
-                    $rootScope.$emit('nx.layout.header', false);
+                    $rootScope.$emit('nx.layout.header', {state: false});
+                    $rootScope.$emit('nx.layout.footer', {state: false});
                 });
             } ]);
 })();
