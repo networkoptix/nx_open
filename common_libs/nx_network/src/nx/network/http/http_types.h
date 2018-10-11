@@ -269,6 +269,9 @@ class NX_NETWORK_API RequestLine
 {
 public:
     StringType method;
+
+    // FIXME: URL is not correct structure here, should use more general structure.
+    //        See: RFC 2616, section-5.1.2.
     nx::utils::Url url;
     MimeProtoVersion version;
 

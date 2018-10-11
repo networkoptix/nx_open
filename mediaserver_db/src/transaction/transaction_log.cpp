@@ -5,7 +5,6 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <database/db_manager.h>
 #include <transaction/transaction.h>
 #include <transaction/ubjson_transaction_serializer.h>

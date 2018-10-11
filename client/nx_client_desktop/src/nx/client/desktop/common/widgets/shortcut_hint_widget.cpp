@@ -2,6 +2,7 @@
 
 #include <QtGui/QFont>
 
+#include <nx/utils/app_info.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
@@ -23,7 +24,9 @@ QString keyToString(int key)
         case Qt::Key_Enter:
             return lit("Enter");
         case Qt::Key_Control:
-            return lit("Ctrl");
+            return nx::utils::AppInfo::isMacOsX()
+                ? QKeySequence(key).toString(QKeySequence::NativeText)
+                : lit("Ctrl");
         default:
             return QKeySequence(key).toString(QKeySequence::NativeText);
     }

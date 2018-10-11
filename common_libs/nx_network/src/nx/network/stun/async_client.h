@@ -99,8 +99,8 @@ private:
     mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     boost::optional<SocketAddress> m_resolvedEndpoint;
-    bool m_useSsl;
-    State m_state;
+    bool m_useSsl = false;
+    State m_state = State::disconnected;
 
     std::unique_ptr<nx::network::RetryTimer> m_reconnectTimer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;

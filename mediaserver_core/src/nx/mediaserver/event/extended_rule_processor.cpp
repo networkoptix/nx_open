@@ -1063,7 +1063,18 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 
         case EventType::cameraInputEvent:
         {
-            detailsMap[tpInputPort] = params.inputPortId;
+            // Try to use port name if possible, otherwise use port ID as is.
+            auto resource = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                params.eventResourceId);
+            NX_ASSERT(resource);
+            auto ports = resource->ioPortDescriptions();
+            auto portIt = std::find_if(ports.begin(), ports.end(),
+                [&](auto port) { return port.id == params.inputPortId; });
+
+            if (portIt != ports.end() && !portIt->inputName.isEmpty())
+                detailsMap[tpInputPort] = portIt->inputName;
+            else
+                detailsMap[tpInputPort] = params.inputPortId;
             break;
         }
 

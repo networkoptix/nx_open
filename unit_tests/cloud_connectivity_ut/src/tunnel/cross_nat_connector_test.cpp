@@ -46,7 +46,7 @@ hpm::MediatorFunctionalTest& TunnelConnector::mediator()
 TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     std::chrono::milliseconds connectTimeout,
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
+    std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
     std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig)
 {
     ConnectResult connectResult;
@@ -69,7 +69,7 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint)
+    std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint)
 {
     ConnectResult connectResult;
     doSimpleConnectTest(
@@ -133,7 +133,7 @@ void TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
+    std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
     ConnectResult* const connectResult)
 {
     //starting mediaserver emulator with specified host name

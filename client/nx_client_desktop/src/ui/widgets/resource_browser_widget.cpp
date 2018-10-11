@@ -42,7 +42,6 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <nx/utils/app_info.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -98,13 +97,6 @@ const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'
 const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span>, %2</center>");
 
 static const QSize kMaxThumbnailSize(224, 184);
-
-static const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
-static const ShortcutHintWidget::DescriptionList kOpenInLayoutHints({
-    {QKeySequence(Qt::Key_Enter), QnResourceBrowserWidget::tr("add to current layout")},
-    {QKeySequence(ctrlKey, Qt::Key_Enter), QnResourceBrowserWidget::tr("open all at a new layout")}});
-static const ShortcutHintWidget::DescriptionList kOpenEntitiesHint({
-    {QKeySequence(ctrlKey, Qt::Key_Enter), QnResourceBrowserWidget::tr("open all")}});
 
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
@@ -629,6 +621,12 @@ void QnResourceBrowserWidget::setAvailableItemTypes(
     bool hasOpenInEntityItems,
     bool hasUnopenableItems)
 {
+    static const ShortcutHintWidget::DescriptionList kOpenInLayoutHints({
+        { QKeySequence(Qt::Key_Enter), tr("add to current layout") },
+        { QKeySequence(Qt::Key_Control, Qt::Key_Enter), tr("open all at a new layout") } });
+    static const ShortcutHintWidget::DescriptionList kOpenEntitiesHint({
+        { QKeySequence(Qt::Key_Control, Qt::Key_Enter), tr("open all") } });
+
     const bool hasChanges =
         m_hasOpenInLayoutItems != hasOpenInLayoutItems
         || m_hasOpenInEntityItems != hasOpenInEntityItems

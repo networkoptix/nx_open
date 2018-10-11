@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/mediator_address_publisher.h>
@@ -68,9 +70,9 @@ public:
         std::function<ActionToTake(api::ResultCode)> handler);
 
     void setCloudSystemIdForModuleInformation(
-        boost::optional<nx::String> cloudSystemId);
+        std::optional<nx::String> cloudSystemId);
     void setServerIdForModuleInformation(
-        boost::optional<nx::String> serverId);
+        std::optional<nx::String> serverId);
 
     nx::hpm::api::ResultCode updateTcpAddresses(std::list<network::SocketAddress> addresses);
     hpm::api::MediatorConnector& mediatorConnector();
@@ -82,6 +84,7 @@ private:
     std::unique_ptr<nx::network::http::HttpStreamSocketServer> m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
+    nx::network::SocketAddress m_mediatorUdpEndpoint;
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
     std::unique_ptr<nx::hpm::api::MediatorServerUdpConnection> m_mediatorUdpClient;
     std::function<ActionToTake(nx::hpm::api::ConnectionRequestedEvent)>
@@ -94,8 +97,8 @@ private:
     ActionToTake m_action;
     const int m_cloudConnectionMethodMask;
     std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
-    boost::optional<nx::String> m_cloudSystemIdForModuleInformation;
-    boost::optional<nx::String> m_serverIdForModuleInformation;
+    std::optional<nx::String> m_cloudSystemIdForModuleInformation;
+    std::optional<nx::String> m_serverIdForModuleInformation;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);

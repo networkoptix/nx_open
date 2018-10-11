@@ -107,13 +107,10 @@ signals:
     void userRoleChanged(const QnUserResourcePtr& user);
     void enabledChanged(const QnUserResourcePtr& user);
 
-    void hashChanged(const QnResourcePtr& user);
-    void passwordChanged(const QnResourcePtr& user);
-    void digestChanged(const QnResourcePtr& user);
-    void cryptSha512HashChanged(const QnResourcePtr& user);
+    void hashesChanged(const QnResourcePtr& user);
+
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
-    void realmChanged(const QnResourcePtr& user);
     void sessionExpired(const QnResourcePtr& user);
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
@@ -127,7 +124,7 @@ private:
         T value,
         MiddlestepFunction middlestep = MiddlestepFunction());
 
-    void updateHash();
+    bool updateHash();
 private:
     QnUserType m_userType;
     QString m_password;

@@ -56,17 +56,14 @@ struct CloudConnectControllerImpl
         aioService(aioService),
         addressResolver(addressResolver),
         mediatorConnector(cloudHost.toStdString()),
-        addressPublisher(mediatorConnector.systemConnection()),
+        addressPublisher(
+            mediatorConnector.systemConnection(),
+            &mediatorConnector),
         tcpReversePool(
             aioService,
             outgoingTunnelPool,
             mediatorConnector.clientConnection())
     {
-        mediatorConnector.setOnMediatorAvailabilityChanged(
-            [this](bool isMediatorAvailable)
-            {
-                this->addressResolver->setCloudResolveEnabled(isMediatorAvailable);
-            });
     }
 
     ~CloudConnectControllerImpl()
@@ -80,8 +77,6 @@ struct CloudConnectControllerImpl
         }
 
         cloudServicesStoppedPromise.get_future().wait();
-
-        addressResolver->setCloudResolveEnabled(false);
     }
 };
 

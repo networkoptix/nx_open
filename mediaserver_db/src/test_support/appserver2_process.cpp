@@ -63,7 +63,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE(appserver2);
+    Q_INIT_RESOURCE(mediaserver_db);
     return 0;
 }
 
@@ -548,6 +548,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     settings->setSystemName(systemName);
     settings->setLocalSystemId(guidFromArbitraryData(systemName));
     settings->setAutoDiscoveryEnabled(false);
+    settings->setAutoDiscoveryResponseEnabled(false);
 
     //read server list
     nx::vms::api::MediaServerDataList mediaServerList;

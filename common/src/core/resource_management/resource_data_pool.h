@@ -29,7 +29,8 @@ public:
     QnResourceData data(const QnConstSecurityCamResourcePtr &camera) const;
     QnResourceData data(const QString& _vendor, const QString& model, const QString& firmware = QString()) const;
 
-    bool load(const QString &fileName);
+    bool loadFile(const QString &fileName);
+    bool loadData(const QByteArray& data);
 
 private:
     bool loadInternal(const QString &fileName);
@@ -40,7 +41,7 @@ private:
 
     /** Cache of the search results to avoid using too much regexps. */
     mutable QHash<QString, QnResourceData> m_cachedResultByKey;
-    mutable QnMutex m_cachedDataMtx;
+    mutable QnMutex m_mutex;
 };
 
 #endif // QN_RESOURCE_DATA_POOL_H

@@ -85,7 +85,6 @@ protected:
     void pickSpecificBuild();
 
 private:
-
     using UpdateCheckMode = ServerUpdateTool::UpdateCheckMode;
 
     enum class WidgetUpdateState
@@ -140,7 +139,7 @@ private:
     void closePanelNotifications();
 
     // Advances UI FSM towards selected state.
-    void moveTowardsState(WidgetUpdateState state, QSet<QnUuid> targets = {});
+    void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
 
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;

@@ -24,7 +24,7 @@ const size_t kPleaseStopRunCount(10);
 class DummyCloudSystemCredentialsProvider:
     public hpm::api::AbstractCloudSystemCredentialsProvider
 {
-    boost::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
+    std::optional<hpm::api::SystemCredentials> getSystemCredentials() const override
     {
         hpm::api::SystemCredentials c;
         c.serverId = String("SomeServerId");

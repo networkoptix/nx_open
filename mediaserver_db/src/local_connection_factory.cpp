@@ -4,8 +4,6 @@
 
 #include <api/global_settings.h>
 
-#include <common/static_common_module.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/address_resolver.h>
@@ -1029,7 +1027,32 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
 
     regGet<ApiTranLogFilter, ApiTransactionDataList>(p, ApiCommand::getTransactionLog);
 
-    // AbstractEventRulesManager::save
+    /**%apidoc POST /ec2/saveEventRule
+     * Create or update event rule in event/actions rule list. Parameters should be passed
+	 * as a JSON object in POST message body with content type "application/json".
+	 * Example of such object can be seen in the result of the corresponding GET function.
+     * %param eventType Event type to match the rule. Example of possible values can be seen in
+	 *     the result of the corresponding GET function.
+     * %param[opt] eventResourceIds List of resources to match. Any resource if the list is empty.
+     * %param[opt] eventCondition Additional text filter for event rule. Used for some event types.
+     * %param[opt] EventState Event state to match the rule.
+     *     %value inactive Prolonged event has finished.
+     *     %value active Prolonged event has started.
+     *     %value undefined Any state.
+     * %param actionType Action to execute if the rule matches. Example of possible values can be
+	 *     seen in the result of the corresponding GET function.
+     * %param[opt] actionResourceIds Resource list associated with the action. The action is executed
+     *     for each resource in the list.
+     * %param[opt] actionParams Additional parameters used in the action. It depends on the action type.
+     * %param[opt] aggregationPeriod Aggregation period in seconds. The action is not going to trigger
+     *     more often than the aggregation period.
+     * %param disabled Enable or disable the rule.
+     * %param[opt] comment Human-readable text. Not used on the server side.
+     * %param[opt] schedule Hex representation of the binary data. Each bit defines whether
+     *     the action should or should not be executed at some hour of week. Hour numbers
+	 *     start with 0. There are 24 * 7 = 168 bits.
+     * %param[opt] system Whether the rule can't be deleted by user. System rules can't be deleted.
+    */
     regUpdate<EventRuleData>(p, ApiCommand::saveEventRule);
 
     // AbstractEventRulesManager::deleteRule
@@ -1127,6 +1150,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
+     * %param[opt] password Plain text password. Note that if this argument is provided, digest, hash
+     *     and cryptSha512Hash values will be ignored if any.
      * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
      *     /api/gettime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
@@ -1141,7 +1166,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<UserData>(p, ApiCommand::saveUser);
+    regUpdate<UserDataEx>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1899,16 +1924,26 @@ ErrorCode LocalConnectionFactory::getSettings(
     return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
 }
 
-template<class InputDataType>
+template<class InputDataType, class ProcessedDataType>
 void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
     GlobalPermission permission)
 {
-    restProcessorPool->registerHandler(
-        lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-        new UpdateHttpHandler<InputDataType>(m_directConnection),
-        permission);
+    if constexpr (std::is_same<InputDataType, nx::vms::api::UserDataEx>::value)
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<nx::vms::api::UserDataEx, nx::vms::api::UserData>(m_directConnection),
+            permission);
+    }
+    else
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
+            permission);
+    }
 }
 
 template<class InputDataType, class CustomActionType>

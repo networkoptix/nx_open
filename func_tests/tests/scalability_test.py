@@ -4,32 +4,46 @@ Measure system synchronization time.
 """
 
 import datetime
+import json
 from collections import namedtuple
 from contextlib import contextmanager
-from multiprocessing.dummy import Pool as ThreadPool
+import itertools
+from functools import partial
 
 import pytest
 from netaddr import IPNetwork
 
 import framework.utils as utils
-import resource_synchronization_test as resource_test
-import server_api_data_generators as generator
-import transaction_log
-from framework.compare import compare_values
+from framework.data_differ import full_info_differ, transaction_log_differ
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.mediaserver_api import MediaserverApiRequestError
-from framework.message_bus import message_bus_running
+from framework.mediaserver_sync_wait import (
+    SyncWaitTimeout,
+    wait_for_api_path_match,
+    wait_until_no_transactions_from_servers,
+    )
 from framework.merging import merge_systems
 from framework.context_logger import ContextLogger, context_logger
-from framework.utils import GrowingSleep, with_traceback
+from framework.utils import (
+    make_threaded_async_calls,
+    MultiFunction,
+    single,
+    take_some,
+    with_traceback,
+    )
 from system_load_metrics import load_host_memory_usage
+import server_api_data_generators as generator
 
 pytest_plugins = ['system_load_metrics', 'fixtures.unpacked_mediaservers']
 
 _logger = ContextLogger(__name__)
+_create_test_data_logger = _logger.getChild('create_test_data')
+_post_check_logger = _logger.getChild('post_check')
+_dumper_logger = _logger.getChild('dumper')
 
 
 SET_RESOURCE_STATUS_CMD = '202'
+CREATE_DATA_THREAD_NUMBER = 16
 
 
 @pytest.fixture()
@@ -50,33 +64,6 @@ def config(test_config):
 
 # resource creation  ================================================================================
 
-_create_test_data_logger = _logger.getChild('create_test_data')
-
-
-def create_resources_on_server_by_size(server, api_method, resource_generators, size):
-    sequence = [(server, i) for i in range(size)]
-    return create_resources_on_server(server, api_method, resource_generators, sequence)
-
-
-def create_resources_on_server(server, api_method, resource_generators, sequence):
-    data_generator = resource_generators[api_method]
-    sequence = sequence
-    resources = []
-    start_time = utils.datetime_utc_now()
-    req_duration = datetime.timedelta(0)
-    for v in sequence:
-        _, val = v
-        resource_data = data_generator.get(server, val)
-        req_start_time = utils.datetime_utc_now()
-        server.api.generic.post('ec2/' + api_method, resource_data)
-        req_duration += utils.datetime_utc_now() - req_start_time
-        resources.append((server, resource_data))
-    duration = utils.datetime_utc_now() - start_time
-    requests = len(sequence)
-    _create_test_data_logger.info('%s ec2/%s: total requests=%d, total duration=%s (%s), avg request duration=%s (%s)' % (
-        server, api_method, requests, duration, req_duration, duration / requests, req_duration / requests))
-    return resources
-
 
 def get_server_admin(server):
     admins = [(server, u) for u in server.api.generic.get('ec2/getUsers') if u['isAdmin']]
@@ -84,187 +71,158 @@ def get_server_admin(server):
     return admins[0]
 
 
-@with_traceback
+make_async_calls = partial(make_threaded_async_calls, CREATE_DATA_THREAD_NUMBER)
+
+
+MAX_LAYOUT_ITEMS = 10
+
+
+def offset_range(server_idx, count):
+    for idx in range(count):
+        yield (server_idx * count) + idx
+
+
+def offset_enumerate(server_idx, item_list):
+    for idx, item in enumerate(item_list):
+        yield ((server_idx * len(item_list)) + idx, item)
+
+
+def make_server_async_calls(config, layout_item_id_gen, server_idx, server):
+
+    server_id = server.api.get_server_id()
+    admin_user = single(user for user
+                          in server.api.generic.get('ec2/getUsers')
+                          if user['isAdmin'])
+    camera_list = [
+        generator.generate_camera_data(camera_id=idx + 1, parentId=server_id)
+        for idx in offset_range(server_idx, config.CAMERAS_PER_SERVER)]
+
+
+    def layout_item_generator(resource_list):
+        for idx in layout_item_id_gen:
+            resource = resource_list[idx % len(resource_list)]
+            yield generator.generate_layout_item(idx + 1, resource['id'])
+
+
+    layout_item_gen = layout_item_generator(resource_list=camera_list)
+
+
+    def make_layout_item_list(layout_idx):
+        # layouts have 0, 1, 2, .. MAX_LAYOUT_ITEMS-1 items count
+        count = layout_idx % MAX_LAYOUT_ITEMS
+        return list(take_some(layout_item_gen, count))
+
+
+    def camera_call_generator():
+        for idx, camera in offset_enumerate(server_idx, camera_list):
+            camera_user = generator.generate_camera_user_attributes_data(camera)
+            camera_param_list = generator.generate_resource_params_data_list(
+                idx + 1, camera, list_size=config.PROPERTIES_PER_CAMERA)
+            yield MultiFunction([
+                partial(server.api.generic.post, 'ec2/saveCamera', camera),
+                partial(server.api.generic.post, 'ec2/saveCameraUserAttributes', camera_user),
+                partial(server.api.generic.post, 'ec2/setResourceParams', camera_param_list),
+                ])
+
+
+    def other_call_generator():
+        for idx in offset_range(server_idx, config.STORAGES_PER_SERVER):
+            storage = generator.generate_storage_data(storage_id=idx + 1, parentId=server_id)
+            yield partial(server.api.generic.post, 'ec2/saveStorage', storage)
+
+        # 1 layout per user + 1 for admin
+        layout_idx_gen = itertools.count(server_idx * (config.USERS_PER_SERVER + 1))
+
+        for idx in offset_range(server_idx, config.USERS_PER_SERVER):
+            user = generator.generate_user_data(user_id=idx + 1)
+            layout_idx = next(layout_idx_gen)
+            user_layout = generator.generate_layout_data(
+                layout_id=layout_idx + 1,
+                parentId=user['id'],
+                items=make_layout_item_list(layout_idx),
+                )
+            yield MultiFunction([
+                partial(server.api.generic.post, 'ec2/saveUser', user),
+                partial(server.api.generic.post, 'ec2/saveLayout', user_layout),
+                ])
+
+        layout_idx = next(layout_idx_gen)
+        admin_layout = generator.generate_layout_data(
+            layout_id=layout_idx + 1,
+            parentId=admin_user['id'],
+            items=make_layout_item_list(layout_idx),
+            )
+        yield partial(server.api.generic.post, 'ec2/saveLayout', admin_layout)
+
+
+    return (camera_call_generator(), other_call_generator())
+
+
 @context_logger(_create_test_data_logger, 'framework.http_api')
 @context_logger(_create_test_data_logger, 'framework.mediaserver_api')
-def create_test_data_on_server(server_tuple):
-    config, server, index = server_tuple
-    _logger.info('Create test data on server %s:', server)
-    resource_generators = dict(
-        saveCamera=resource_test.SeedResourceWithParentGenerator(
-            generator.generate_camera_data,
-            index * config.CAMERAS_PER_SERVER),
-        saveCameraUserAttributes=resource_test.ResourceGenerator(
-            generator.generate_camera_user_attributes_data),
-        setResourceParams=resource_test.SeedResourceList(
-            generator.generate_resource_params_data_list,
-            config.PROPERTIES_PER_CAMERA),
-        saveUser=resource_test.SeedResourceGenerator(
-            generator.generate_user_data,
-            index * config.USERS_PER_SERVER),
-        saveStorage=resource_test.SeedResourceWithParentGenerator(
-            generator.generate_storage_data,
-            index * config.STORAGES_PER_SERVER),
-        saveLayout=resource_test.LayoutGenerator(
-            index * (config.USERS_PER_SERVER + 1)))
-    servers_with_guids = [(server, server.api.get_server_id())]
-    users = create_resources_on_server_by_size(
-        server, 'saveUser', resource_generators, config.USERS_PER_SERVER)
-    users.append(get_server_admin(server))
-    cameras = create_resources_on_server(
-        server, 'saveCamera', resource_generators, servers_with_guids * config.CAMERAS_PER_SERVER)
-    create_resources_on_server(
-        server, 'saveStorage', resource_generators, servers_with_guids * config.STORAGES_PER_SERVER)
-    layout_items_generator = resource_generators['saveLayout'].items_generator
-    layout_items_generator.set_resources(cameras)
-    create_resources_on_server(server, 'saveLayout', resource_generators, users)
-    create_resources_on_server(server, 'saveCameraUserAttributes', resource_generators, cameras)
-    create_resources_on_server(server, 'setResourceParams', resource_generators, cameras)
-    _logger.info('Create test data on server %s: complete.', server)
+def create_test_data(config, server_list):
+    _logger.info('Create test data for %d servers:', len(server_list))
+    layout_item_id_gen = itertools.count()  # global for all layout items
 
+    # layout calls depend on all cameras being created, so must be called strictly after them
+    camera_call_list = []
+    other_call_list = []
+    for server_idx, server in enumerate(server_list):
+        camera_calls, other_calls = make_server_async_calls(
+            config, layout_item_id_gen, server_idx, server)
+        camera_call_list += list(camera_calls)
+        other_call_list += list(other_calls)
 
-def create_test_data(config, servers):
-    server_tuples = [(config, server, i) for i, server in enumerate(servers)]
-    pool = ThreadPool(len(servers))
-    pool.map(create_test_data_on_server, server_tuples)
-    pool.close()
-    pool.join()
+    make_async_calls(camera_call_list)
+    make_async_calls(other_call_list)
+    _logger.info('Create test data: done.')
 
 
 # merge  ============================================================================================
 
-def get_response(server, api_method):
-    try:
-        # TODO: Find out whether retries are needed.
-        # Formerly, request was retried 5 times regardless of error type.
-        # Retry will be reintroduced if server is forgiven for 4 failures.
-        return server.api.generic.get(api_method, timeout=120)
-    except MediaserverApiRequestError:
-        _logger.error("{} may have been deadlocked.", server)
-        status = server.service.status()
-        if status.is_running:
-            server.os_access.make_core_dump(status.pid)
-        raise
-
-
-def clean_transaction_log(json):
-    # We have to filter 'setResourceStatus' transactions due to VMS-5969
-    def is_not_set_resource_status(transaction):
-        return transaction.command != SET_RESOURCE_STATUS_CMD
-
-    return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
-
-
-def clean_full_info(json):
-    # We have to not check 'resStatusList' section due to VMS-5969
-    return {k: v for k, v in json.items() if k != 'resStatusList'}
-
-
-def clean_json(api_method, json):
-    cleaners = dict(
-        getFullInfo=clean_full_info,
-        getTransactionLog=clean_transaction_log,
-        )
-    cleaner = cleaners.get(api_method)
-    if json and cleaner:
-        return cleaner(json)
-    else:
-        return json
-
-
-def log_diffs(x, y):
-    lines = compare_values(x, y)
-    if lines:
-        for line in lines:
-            _logger.debug(line)
-    else:
-        _logger.warning('Strange, no diffs are found...')
-
-
-def save_json_artifact(artifact_factory, api_method, side_name, server, value):
-    part_list = ['result', api_method.replace('/', '-'), side_name]
-    artifact = artifact_factory(part_list, name='%s-%s' % (api_method, side_name))
-    file_path = artifact.save_as_json(value, encoder=transaction_log.TransactionJsonEncoder)
-    _logger.debug('results from %s from server %s %s is stored to %s', api_method, server.name, server, file_path)
-
-
-def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message):
-    full_message = 'Servers did not merge in %s: %s; currently waiting for method %r for %s' % (
-        merge_timeout, message, api_method, utils.datetime_utc_now() - api_call_start_time)
-    _logger.info(full_message)
+def make_core_dumps(env):
     _logger.info("Producing servers core dumps.")
     for server in [env.lws] + env.real_server_list:
         if not server:
             continue  # env.lws is None for full servers
-        status = server.service.status()
-        if status.is_running:
-            server.os_access.make_core_dump(status.pid)
-    pytest.fail(full_message)
+        server.make_core_dump_if_running()
 
 
-def wait_for_method_matched(artifact_factory, merge_timeout, env, api_method):
-    _logger.info('Wait for method %r results are merged:', api_method)
-    growing_delay = GrowingSleep()
-    api_call_start_time = utils.datetime_utc_now()
-    while True:
-        server0 = env.all_server_list[0]
-        expected_result_dirty = get_response(server0, api_method)
-        if expected_result_dirty is None:
-            if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
-                message = 'server %r has not responded' % server0
-                make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message)
-            continue
-        expected_result = clean_json(api_method, expected_result_dirty)
-
-        def check(server_list):
-            for server in server_list:
-                result = get_response(server, api_method)
-                result_cleaned = clean_json(api_method, result)
-                if result_cleaned != expected_result:
-                    return server, result_cleaned
-            return None, None
-
-        first_unsynced_server, unmatched_result = check(env.all_server_list[1:])
-        if not first_unsynced_server:
-            _logger.info(
-                'Wait for method %r results are merged: done, method merge duration: %s',
-                api_method, utils.datetime_utc_now() - api_call_start_time)
-            return
-        _logger.info('Method %r is still different for %d servers.', api_method, len(env.all_server_list))
-        if utils.datetime_utc_now() - env.merge_start_time >= merge_timeout:
-            _logger.info(
-                'Servers %s and %s still has unmatched results for method %r:',
-                server0, first_unsynced_server, api_method)
-            log_diffs(expected_result, unmatched_result)
-            save_json_artifact(artifact_factory, api_method, 'x', server0, expected_result)
-            save_json_artifact(artifact_factory, api_method, 'y', first_unsynced_server, unmatched_result)
-            message = 'Servers %s and %s returned different responses' % (server0, first_unsynced_server)
-            make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, message)
-        growing_delay.sleep()
+def api_path_getter(server, api_path):
+    try:
+        # TODO: Find out whether retries are needed.
+        # Formerly, request was retried 5 times regardless of error type.
+        # Retry will be reintroduced if server is forgiven for 4 failures.
+        return server.api.generic.get(api_path, timeout=120)
+    except MediaserverApiRequestError:
+        _logger.error("{} may have been deadlocked. Making core dump.", server)
+        server.make_core_dump_if_running()
+        raise
 
 
-def wait_until_no_transactions_from_servers(server_list, timeout):
-    _logger.info('Wait for message bus for %s:', server_list)
-    with message_bus_running(server_list) as bus:
-        bus.wait_until_no_transactions(timeout.total_seconds())
-    _logger.info('No more transactions from %s:', server_list)
-
-
-_merge_logger = _logger.getChild('merge')
-
-
-@context_logger(_merge_logger, 'framework.waiting')
-@context_logger(_merge_logger, 'framework.http_api')
-@context_logger(_merge_logger, 'framework.mediaserver_api')
 def wait_for_servers_synced(artifact_factory, config, env):
-    wait_until_no_transactions_from_servers(env.real_server_list[:1], config.MESSAGE_BUS_TIMEOUT)
+    wait_until_no_transactions_from_servers(
+        env.real_server_list[:1], config.MESSAGE_BUS_TIMEOUT.total_seconds())
     real_server_count = len(env.real_server_list)
     if real_server_count > config.MESSAGE_BUS_SERVER_COUNT:
         server_list = [env.real_server_list[i]
                            for i in range(1, real_server_count, real_server_count/config.MESSAGE_BUS_SERVER_COUNT)]
-        wait_until_no_transactions_from_servers(server_list, config.MESSAGE_BUS_TIMEOUT)
-    wait_for_method_matched(artifact_factory, config.MERGE_TIMEOUT, env, api_method='ec2/getTransactionLog')
+        wait_until_no_transactions_from_servers(server_list, config.MESSAGE_BUS_TIMEOUT.total_seconds())
 
+    def wait_for_match(api_path, differ):
+        wait_for_api_path_match(env.all_server_list, api_path, differ,
+                                config.MERGE_TIMEOUT.total_seconds(), api_path_getter)
+
+    try:
+        wait_for_match('ec2/getFullInfo', full_info_differ)
+        wait_for_match('ec2/getTransactionLog', transaction_log_differ)
+    except SyncWaitTimeout as e:
+        e.log_and_dump_results(artifact_factory)
+        make_core_dumps(env)
+        raise
+
+
+# ===================================================================================================
 
 def collect_additional_metrics(metrics_saver, os_access_set, lws):
     if lws:
@@ -287,6 +245,7 @@ system_settings = dict(
 
 server_config = dict(
     p2pMode=True,
+    serverGuid='8e25e200-0000-0000-{group_idx:04d}-{server_idx:012d}',
     )
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
@@ -363,8 +322,6 @@ def env(request, unpacked_mediaserver_factory, config):
         yield request.getfixturevalue('vm_env')
 
 
-_post_check_logger = _logger.getChild('post_check')
-
 @context_logger(_post_check_logger, 'framework.http_api')
 @context_logger(_post_check_logger, 'framework.mediaserver_api')
 def perform_post_checks(env):
@@ -375,15 +332,24 @@ def perform_post_checks(env):
     _logger.info('Perform test post checks: done.')
 
 
-def test_scalability(artifact_factory, metrics_saver, load_averge_collector, config, env):
+def dump_full_info(artifacts_dir, env):
+    server = env.real_server_list[0]
+    _logger.info('Making final dump for first server %s:', server)
+    with context_logger(_dumper_logger, 'framework.mediaserver_api'):
+        full_info = server.api.generic.get('ec2/getFullInfo')
+    with artifacts_dir.joinpath('full-info.json').open('wb') as f:
+        json.dump(full_info, f, indent=2)
+
+def test_scalability(artifact_factory, artifacts_dir, metrics_saver, load_averge_collector, config, env):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)
 
     try:
-        with load_averge_collector():
+        with load_averge_collector(env.os_access_set):
             wait_for_servers_synced(artifact_factory, config, env)
         merge_duration = utils.datetime_utc_now() - env.merge_start_time
         metrics_saver.save('merge_duration', merge_duration)
         collect_additional_metrics(metrics_saver, env.os_access_set, env.lws)
+        dump_full_info(artifacts_dir, env)
     finally:
         perform_post_checks(env)
 

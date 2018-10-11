@@ -810,6 +810,11 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Export Bookmark..."))
         .condition(condition::canExportBookmark());
 
+    factory(ExportBookmarksAction)
+        .flags(NoTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Bookmarks..."))
+        .condition(condition::canExportBookmarks());
+
     factory()
         .flags(Slider)
         .separator();

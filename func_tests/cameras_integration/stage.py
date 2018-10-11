@@ -1,7 +1,9 @@
 import logging
 import timeit
+import json
 from datetime import datetime, timedelta
 
+import pytz
 from typing import Callable, Generator, Optional
 
 from framework.http_api import HttpError
@@ -20,7 +22,17 @@ class Run(object):
         self.server = server
         self.id = camera_id
         self.data = None  # type: dict
-        self.media_url = server.api.generic.http.media_url(camera_id)
+
+    def media_url(self, profile='primary', position=None):
+        url = self.server.api.generic.http.media_url(self.id)
+        url += '?stream=' + {'primary': '0', 'secondary': '1'}[profile]
+        if position:
+            epoch = pytz.utc.localize(datetime.utcfromtimestamp(0))
+            time_since_epoch = position - epoch
+            url += '&pos=' + str(int(time_since_epoch.total_seconds() * 1000))
+
+        _logger.debug('Media URL: {}'.format(url))
+        return url
 
     def update_data(self):
         self.data = self.server.api.get_resource('CamerasEx', self.id)
@@ -55,8 +67,8 @@ class Stage(object):
             try:
                 run.update_data()
 
-            except (AssertionError, MediaserverApiError, MediaserverApiRequestError):
-                yield Failure(is_exception=True)
+            except (MediaserverApiError, MediaserverApiRequestError) as e:
+                yield Failure(str(e))
 
             else:
                 yield actions.next()
@@ -69,7 +81,7 @@ class Executor(object):
                  ):  # type: (str, Stage, dict, Optional[timedelta]) -> None
         self.camera_id = camera_id
         self.stage = stage
-        self._rules = rules
+        self._rules = json.loads(json.dumps(rules))  # Get rid of OrderdDicts
         self._timeout = min(self.stage.timeout, hard_timeout) if hard_timeout else self.stage.timeout
         self._result = None  # type: Optional[Result]
         self._start_time = None

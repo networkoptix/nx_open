@@ -14,6 +14,7 @@
 #include <nx/client/desktop/resource_views/views/fake_resource_list_view.h>
 #include <nx/client/desktop/common/widgets/password_preview_button.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 #include <core/resource/client_camera.h>
 #include <core/resource/media_server_resource.h>
@@ -60,7 +61,6 @@ FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
 
     return result;
 }
-
 
 using ResourceCallback = std::function<void (const QnResourcePtr& resource)>;
 using CameraCallback = std::function<void (const QnVirtualCameraResourcePtr& camera)>;
@@ -130,13 +130,8 @@ void DeviceAdditionDialog::initializeControls()
     connect(ui->addDevicesButton, &QPushButton::clicked,
         this, &DeviceAdditionDialog::handleAddDevicesClicked);
 
-    connect(ui->tabWidget, &QTabWidget::tabBarClicked,
-        this, &DeviceAdditionDialog::handleTabClicked);
-    connect(ui->tabWidget, &QTabWidget::currentChanged,
-        this, &DeviceAdditionDialog::handleSearchTypeChanged);
-
-    const auto tabWidgetSizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-    autoResizePagesToContents(ui->tabWidget, tabWidgetSizePolicy, true);
+    const auto stackedWidgetSizePolicy = QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+    autoResizePagesToContents(ui->stackedWidget, stackedWidgetSizePolicy, true);
     setTabShape(ui->tabWidget->tabBar(), style::TabShape::Compact);
 
     connect(&m_serversWatcher, &CurrentSystemServers::serverAdded,
@@ -159,6 +154,7 @@ void DeviceAdditionDialog::initializeControls()
 
     ui->addressEdit->setPlaceholderText(tr("IP / Hostname / RTSP link / UDP link"));
     ui->addressEdit->setExternalControls(ui->addressLabel, ui->addressHint);
+    ui->addressEdit->setHintColor(QPalette().color(QPalette::WindowText));
     ui->addressHint->setVisible(false);
     ui->explanationLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
     ui->explanationLabel->setToolTip(tr("Examples:")
@@ -168,6 +164,7 @@ void DeviceAdditionDialog::initializeControls()
               "rtsp://example.com:554/video\n"
               "udp://239.250.5.5:1234"));
 
+    ui->widget->setFixedWidth(ui->addressLabelLayout->minimumSize().width());
     installEventHandler(ui->serverChoosePanel, QEvent::PaletteChange, ui->serverChoosePanel,
         [this]()
         {
@@ -195,7 +192,7 @@ void DeviceAdditionDialog::initializeControls()
             static constexpr int kStartSearchPage = 0;
             const bool enabled = currentPageIndex == kStartSearchPage;
             const QList<QWidget*> widgets =
-                { ui->tabWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
+                { ui->stackedWidget, ui->searchResultsStackedWidget, ui->serverChoosePanel };
             for (const auto widget: widgets)
                 widget->setEnabled(enabled);
         });
@@ -207,11 +204,18 @@ void DeviceAdditionDialog::initializeControls()
     setAccentStyle(ui->searchButton);
     setAccentStyle(ui->addDevicesButton);
 
-    PasswordPreviewButton::createInline(ui->knownAddressPasswordEdit);
-    PasswordPreviewButton::createInline(ui->subnetScanPasswordEdit);
+    PasswordPreviewButton::createInline(ui->passwordEdit);
 
     updateResultsWidgetState();
 
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        ui->stackedWidget, &QStackedWidget::setCurrentIndex);
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        this, &DeviceAdditionDialog::handleSearchTypeChanged);
+    connect(ui->tabWidget, &QTabWidget::tabBarClicked,
+        this, &DeviceAdditionDialog::handleTabClicked);
+
+    ui->tabWidget->setCurrentIndex(0);
     handleTabClicked(ui->tabWidget->currentIndex());
 }
 
@@ -268,8 +272,12 @@ void DeviceAdditionDialog::handleTabClicked(int index)
     {
         ui->addressEdit->setValidator(TextValidateFunction(), true);
         ui->startAddressEdit->setFocus();
-        resetPageSize(ui->knownAddressesPage);
+        resetPageSize(ui->knownAddressPage);
         setHeightFromLayout(ui->subnetScanPage);
+        m_knownAddressCredentials.user = ui->loginEdit->text().trimmed();
+        m_knownAddressCredentials.password = ui->passwordEdit->text().trimmed();
+        ui->loginEdit->setText(m_subnetScanCredentials.user);
+        ui->passwordEdit->setText(m_subnetScanCredentials.password);
     }
     else
     {
@@ -277,7 +285,11 @@ void DeviceAdditionDialog::handleTabClicked(int index)
             defaultNonEmptyValidator(tr("Address field can't be empty")));
         ui->addressEdit->setFocus();
         resetPageSize(ui->subnetScanPage);
-        setHeightFromLayout(ui->knownAddressesPage);
+        setHeightFromLayout(ui->knownAddressPage);
+        m_subnetScanCredentials.user = ui->loginEdit->text().trimmed();
+        m_subnetScanCredentials.password = ui->passwordEdit->text().trimmed();
+        ui->loginEdit->setText(m_knownAddressCredentials.user);
+        ui->passwordEdit->setText(m_knownAddressCredentials.password);
     }
 }
 
@@ -372,20 +384,12 @@ int DeviceAdditionDialog::port() const
 
 QString DeviceAdditionDialog::password() const
 {
-    const auto passwordEdit = isKnownAddressPage(ui->tabWidget)
-        ? ui->knownAddressPasswordEdit
-        : ui->subnetScanPasswordEdit;
-
-    return passwordEdit->text().trimmed();
+    return ui->passwordEdit->text().trimmed();
 }
 
 QString DeviceAdditionDialog::login() const
 {
-    const auto loginEdit = isKnownAddressPage(ui->tabWidget)
-        ? ui->knownAddressLoginEdit
-        : ui->subnetScanLoginEdit;
-
-    return loginEdit->text().trimmed();
+    return ui->loginEdit->text().trimmed();
 }
 
 void DeviceAdditionDialog::handleStartSearchClicked()

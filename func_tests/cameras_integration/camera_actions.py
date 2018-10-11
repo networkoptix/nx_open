@@ -2,9 +2,11 @@
 
 import json
 import logging
+import subprocess
 
-from framework.os_access.exceptions import NonZeroExitStatus, Timeout
-from framework.os_access.local_shell import local_shell
+import timeit
+
+from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
 
@@ -19,43 +21,60 @@ def fps_avg(fps):
     return fps_average
 
 
-def ffprobe_streams(stream_url):
-    try:
-        out = local_shell.run_sh_script(
-            # language=Bash
-            '''
-                ffprobe -show_format -show_streams -analyzeduration 3M -probesize 2e+07 -of json "$URL"
-                ''',
-            env={'URL': stream_url},
-            timeout_sec=10,
-            )
-    except (AssertionError, Timeout, NonZeroExitStatus) as error:
-        _logger.debug("FFprobe error: %s", str(error))
+def _ffprobe_poll(expected_values, probe, stream_url, title):
+    start_time = timeit.default_timer()
+    while probe.poll() is None:
+        if timeit.default_timer() - start_time > 30:
+            yield Failure('{!r} ffprobe has timed out'.format(title))
+            return
+        yield Halt('{!r} ffprobe is in progress'.format(title))
+
+    stdout, stderr = probe.communicate()
+    if stdout:
+        _logger.debug('FFprobe(%s) stdout:\n%s', stream_url, stdout)
+    if stderr:
+        _logger.debug('FFprobe(%s) stderr:\n%s', stream_url, stderr)
+    if probe.returncode != 0:
+        yield Failure('{!r} ffprobe returned error code {}'.format(title, probe.returncode))
         return
 
-    try:
-        result = json.loads(out.decode('utf-8'))
-    except ValueError:
-        _logger.debug('FFprobe returned bad JSON')
+    streams = (json.loads(stdout.decode('utf-8')) or {}).get('streams')
+    if not streams:
+        yield Failure('{!r} ffprobe returned no streams'.format(title))
         return
-    if not result:
-        _logger.debug("FFprobe returned None")
-        return
-    return result.get('streams')
+
+    video, audio = None, None
+    for stream in streams:
+        if stream.get('codec_type') == 'video':
+            fps_count, fps_base = stream['r_frame_rate'].split('/')
+            video = {
+                'resolution': '{}x{}'.format(stream['width'], stream['height']),
+                'codec': stream['codec_name'].upper(),
+                'fps': float(fps_count) / float(fps_base),
+            }
+        elif stream.get('codec_type') == 'audio':
+            audio = {'codec': stream.get('codec_name').upper()}
+
+    yield expect_values(expected_values, dict(video=video, audio=audio), path=title)
 
 
-def ffprobe_metadata(stream):
-    fps = int(stream['r_frame_rate'].split('/')[0]) / int(stream['r_frame_rate'].split('/')[1])
-    # When ffprobe discovers a corrupted stream, it returns fps == 90000.
-    if fps >= 90000:
-        _logger.debug('FFprobe returned fps = {}. No/corrupted stream?'.format(fps))
-        return None
-    metadata = {
-        'resolution': '{}x{}'.format(stream['width'], stream['height']),
-        'codec': stream['codec_name'].upper(),
-        'fps': fps,
-        }
-    return metadata
+def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
+    frames = max(expected_values.get('video', {}).get('fps', [30]))
+    for _ in range(rerun_count):
+        options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
+        probe = subprocess.Popen(
+            ['ffprobe'] + options + [stream_url],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            for result in _ffprobe_poll(expected_values, probe, stream_url, title):
+                if isinstance(result, Success):
+                    return
+                yield result
+        finally:
+            try:
+                probe.kill()
+            except OSError:
+                pass
 
 
 def _find_param_by_name_prefix(all_params, parent_group, *name_prefixes):

@@ -95,15 +95,17 @@ def load_host_memory_usage(os_access):
 def load_averge_collector(metrics_saver):
 
     @contextmanager
-    def collector():
-        average_1min = []  # collected load average with 1 min interval for last 1 min each
+    def collector(os_access_set):
+        # collected load average with 1 min interval for last 1 min each
+        os_access_to_average = {os_access: [] for os_access in os_access_set}
 
         def read_load_average():
-            with open('/proc/loadavg') as f:
+            for os_access, average_1min in os_access_to_average.items():
                 # file contents looks like this:
                 # 53.29 66.66 43.77 1/1300 27563
                 # first number is load average for last minute - what we want
-                line = f.readline().rstrip()
+                loadavg_contents = os_access.path_cls('/proc/loadavg').read_text()
+                line = loadavg_contents.splitlines()[0].rstrip()
                 average = float(line.split()[0])
                 _logger.debug('Load average for last minute: %f (full /proc/loadavg line: %r)', average, line)
                 average_1min.append(average)
@@ -111,8 +113,10 @@ def load_averge_collector(metrics_saver):
         with ThreadedCall.periodic(read_load_average, sleep_between_sec=60):
             yield
 
-        if average_1min:
+        for os_access, average_1min in os_access_to_average.items():
+            if not average_1min:
+                continue
             load_average = sum(average_1min) / len(average_1min)
-            metrics_saver.save('cpu_load_average', load_average)
+            metrics_saver.save('cpu_load_average.{}'.format(os_access.alias), load_average)
 
     return collector

@@ -7,6 +7,7 @@ import struct
 import time
 from contextlib import closing
 from datetime import datetime, timedelta
+from multiprocessing.dummy import Pool as ThreadPool
 
 import pytz
 from pylru import lrudecorator
@@ -27,23 +28,6 @@ class SimpleNamespace:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
-
-class GrowingSleep(object):
-
-    _delay_levels = [10, 20, 30, 60]  # seconds
-    _calls_per_level = 10
-
-    def __init__(self):
-        self._level = 0
-        self._level_call_count = 0
-
-    def sleep(self):
-        time.sleep(self._delay_levels[self._level])
-        self._level_call_count += 1
-        if self._level_call_count >= self._calls_per_level and self._level < len(self._delay_levels) - 1:
-            self._level += 1
-            self._level_call_count = 0
 
 
 def is_list_inst(l, cls):
@@ -165,3 +149,42 @@ def with_traceback(fn):
             _logger.exception('Exception in %r:', fn)
             raise
     return wrapper
+
+
+def take_some(iter, count):
+    for i in range(count):
+        yield next(iter)
+
+
+def single(iter):
+    l = list(iter)
+    assert len(l) == 1, 'Only single item is expected'
+    return l[0]
+
+
+def make_threaded_async_calls(thread_number, call_gen):
+    failures = []
+
+    def call(fn):
+        try:
+            fn()
+        except:
+            _logger.exception('Error calling %r:', fn)
+            failures.append(None)
+
+    pool = ThreadPool(thread_number)
+    # convert generator to list to avoid generator-from-thread issues and races
+    pool.map(call, list(call_gen))
+    pool.close()
+    pool.join()
+    assert not failures, 'There was %d errors while generated method calls, check for logs' % len(failures)
+
+
+class MultiFunction(object):
+
+    def __init__(self, fn_list):
+        self._fn_list = fn_list
+
+    def __call__(self):
+        for fn in self._fn_list:
+            fn()

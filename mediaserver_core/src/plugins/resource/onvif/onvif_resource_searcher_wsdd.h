@@ -20,7 +20,7 @@ class UDPSocket;
 
 struct wsdd__ProbeMatchesType;
 struct wsdd__ProbeType;
-struct wsa__EndpointReferenceType;
+struct wsa5__EndpointReferenceType;
 struct SOAP_ENV__Header;
 
 typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
@@ -80,7 +80,7 @@ private:
     //void findHelloEndpoints(EndpointInfoHash& result) const;
     void findEndpoints(EndpointInfoHash& result);
     QStringList getAddrPrefixes(const QString& host) const;
-    void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;
+    void fillWsddStructs(wsdd__ProbeType& probe, wsa5__EndpointReferenceType& endpoint) const;
 
     //If iface is not null, the function will perform multicast search, otherwise - unicast
     //iface and camAddr MUST NOT be 0 at the same time
@@ -108,7 +108,7 @@ private:
         std::unique_ptr<nx::network::AbstractDatagramSocket> sock;
         wsddProxy soapWsddProxy;
         wsdd__ProbeType wsddProbe;
-        wsa__EndpointReferenceType replyTo;
+        wsa5__EndpointReferenceType replyTo;
 
         ProbeContext();
         ~ProbeContext();

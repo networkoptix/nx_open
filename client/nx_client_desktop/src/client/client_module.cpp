@@ -250,6 +250,8 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
 QnClientModule::~QnClientModule()
 {
+    m_clientCoreModule->commonModule()->resourceDiscoveryManager()->stop();
+
     // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
     if (auto longRunnablePool = QnLongRunnablePool::instance())
         longRunnablePool->stopAll();
@@ -606,9 +608,6 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
             startupParams.enforceMediatorEndpoint,
             startupParams.enforceMediatorEndpoint);
     }
-
-    // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     if (!startupParams.videoWallGuid.isNull())
     {

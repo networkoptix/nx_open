@@ -58,7 +58,10 @@ View::View(
         &controller->listeningPeerManager(),
         &model->listeningPeerPool()),
     m_clientConnectionTunnelingServer(&m_controller->connectSessionManager()),
-    m_authenticationManager(m_authRestrictionList)
+    m_authenticationManager(m_authRestrictionList),
+    m_multiAddressHttpServer(
+        &m_authenticationManager,
+        &m_httpMessageDispatcher)
 {
     registerApiHandlers();
     initializeProxy();
@@ -68,11 +71,7 @@ View::View(
 
 View::~View()
 {
-    m_multiAddressHttpServer->forEachListener(
-        [](nx::network::http::HttpStreamSocketServer* listener)
-        {
-            listener->pleaseStopSync();
-        });
+    m_multiAddressHttpServer.pleaseStopSync();
 }
 
 void View::registerStatisticsApiHandlers(
@@ -87,11 +86,11 @@ void View::registerStatisticsApiHandlers(
 
 void View::start()
 {
-    m_multiAddressHttpServer->forEachListener(
+    m_multiAddressHttpServer.forEachListener(
         &nx::network::http::HttpStreamSocketServer::setConnectionInactivityTimeout,
         m_settings.http().connectionInactivityTimeout);
 
-    if (!m_multiAddressHttpServer->listen(m_settings.http().tcpBacklogSize))
+    if (!m_multiAddressHttpServer.listen(m_settings.http().tcpBacklogSize))
     {
         throw std::system_error(
             SystemError::getLastOSErrorCode(),
@@ -103,17 +102,17 @@ void View::start()
 
 std::vector<network::SocketAddress> View::httpEndpoints() const
 {
-    return m_httpEndpoint;
+    return m_multiAddressHttpServer.endpoints();
 }
 
 std::vector<network::SocketAddress> View::httpsEndpoints() const
 {
-    return m_httpsEndpoint;
+    return m_multiAddressHttpServer.sslEndpoints();
 }
 
-const View::MultiHttpServer& View::httpServer() const
+const nx::network::http::server::MultiEndpointAcceptor& View::httpServer() const
 {
-    return *m_multiAddressHttpServer;
+    return m_multiAddressHttpServer;
 }
 
 void View::registerApiHandlers()
@@ -205,59 +204,13 @@ void View::startAcceptor()
         throw std::runtime_error("No HTTP address to listen");
     }
 
-    if (httpEndpoints.empty())
-    {
-        m_multiAddressHttpServer = startHttpsServer(httpsEndpoints);
-    }
-    else if (httpsEndpoints.empty())
-    {
-        m_multiAddressHttpServer = startHttpServer(httpEndpoints);
-    }
-    else
-    {
-        m_multiAddressHttpServer =
-            network::server::catMultiAddressServers(
-                startHttpServer(httpEndpoints),
-                startHttpsServer(httpsEndpoints));
-    }
-}
-
-std::unique_ptr<View::MultiHttpServer> View::startHttpServer(
-    const std::list<network::SocketAddress>& endpoints)
-{
-    auto server = startServer(endpoints, false);
-    m_httpEndpoint = server->endpoints();
-    return server;
-}
-
-std::unique_ptr<View::MultiHttpServer> View::startHttpsServer(
-    const std::list<network::SocketAddress>& endpoints)
-{
-    auto server = startServer(endpoints, true);
-    m_httpsEndpoint = server->endpoints();
-    return server;
-}
-
-std::unique_ptr<View::MultiHttpServer> View::startServer(
-    const std::list<network::SocketAddress>& endpoints,
-    bool sslMode)
-{
-    auto multiAddressHttpServer =
-        std::make_unique<MultiHttpServer>(
-            &m_authenticationManager,
-            &m_httpMessageDispatcher,
-            sslMode,
-            nx::network::NatTraversalSupport::disabled);
-
-    if (!multiAddressHttpServer->bind(endpoints))
+    if (!m_multiAddressHttpServer.bind(httpEndpoints, httpsEndpoints))
     {
         throw std::runtime_error(
-            lm("Cannot bind to address(es) %1. %2")
-                .container(endpoints)
-                .arg(SystemError::getLastOSErrorText()).toStdString());
+            lm("Cannot bind to address(es) %1, %2. %3")
+                .container(httpEndpoints).container(httpsEndpoints)
+                    .args(SystemError::getLastOSErrorText()).toStdString());
     }
-
-    return multiAddressHttpServer;
 }
 
 } // namespace relay
