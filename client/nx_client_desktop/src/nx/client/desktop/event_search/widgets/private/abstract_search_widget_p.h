@@ -3,6 +3,7 @@
 #include "../abstract_search_widget.h"
 
 #include <QtCore/QList>
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
@@ -105,6 +106,13 @@ private:
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
     QRectF m_selectedArea;
+
+    Period m_previousPeriod = Period::all;
+    QHash<Period, QAction*> m_timeSelectionActions;
+    friend uint qHash(Period source) { return uint(source); }
+
+    QHash<Cameras, QAction*> m_cameraSelectionActions;
+    friend uint qHash(Cameras source) { return uint(source); }
 
     struct DeviceDependentAction
     {

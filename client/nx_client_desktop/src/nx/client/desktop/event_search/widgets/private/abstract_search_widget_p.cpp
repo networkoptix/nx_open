@@ -7,6 +7,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
+#include <ini.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
@@ -28,6 +29,8 @@
 #include <nx/client/desktop/event_search/models/private/busy_indicator_model_p.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/client/desktop/utils/managed_camera_set.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/pending_operation.h>
 
@@ -258,7 +261,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 {
     ui->timeSelectionButton->setSelectable(false);
     ui->timeSelectionButton->setDeactivatable(true);
-    ui->timeSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/rapid_review.png")));
+    ui->timeSelectionButton->setIcon(qnSkin->icon("text_buttons/rapid_review.png"));
 
     auto timeMenu = q->createDropdownMenu();
     auto addMenuAction =
@@ -266,9 +269,9 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         {
             auto action = timeMenu->addAction(title);
             connect(action, &QAction::triggered, this,
-                [this, action, period]()
+                [this, period]()
                 {
-                    ui->timeSelectionButton->setText(action->text());
+                    ui->timeSelectionButton->setText(m_timeSelectionActions[period]->text());
                     ui->timeSelectionButton->setState(period == Period::all
                         ? SelectableTextButton::State::deactivated
                         : SelectableTextButton::State::unselected);
@@ -277,6 +280,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                     setSelectedPeriod(period);
                 });
 
+            m_timeSelectionActions[period] = action;
             return action;
         };
 
@@ -285,17 +289,20 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     addMenuAction(tr("Last 30 days"), Period::month);
     addMenuAction(tr("Selected on Timeline"), Period::selection);
     timeMenu->addSeparator();
-    auto defaultAction = addMenuAction(tr("Any time"), Period::all);
+    addMenuAction(tr("Any time"), Period::all);
 
     connect(ui->timeSelectionButton, &SelectableTextButton::stateChanged, this,
-        [defaultAction](SelectableTextButton::State state)
+        [this](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
-                defaultAction->trigger();
+                m_timeSelectionActions[Period::all]->trigger();
         });
 
-    defaultAction->trigger();
+    m_timeSelectionActions[Period::all]->trigger();
     ui->timeSelectionButton->setMenu(timeMenu);
+
+    m_timeSelectionActions[Period::selection]->setVisible(
+        !ini().automaticFilterByTimelineSelection);
 
     // Setup timeline selection watcher.
 
@@ -305,6 +312,22 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     applyTimePeriod->setCallback(
         [this]()
         {
+            if (ini().automaticFilterByTimelineSelection)
+            {
+                const bool selectionExists = !m_timelineSelection.isEmpty();
+                const bool selectionFilter = m_period == Period::selection;
+
+                if (selectionExists != selectionFilter)
+                {
+                    const auto action = selectionExists
+                        ? m_timeSelectionActions[Period::selection]
+                        : m_timeSelectionActions[m_previousPeriod];
+
+                    action->trigger();
+                    return;
+                }
+            }
+
             if (m_period == Period::selection)
                 updateCurrentTimePeriod();
         });
@@ -313,7 +336,8 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         [this, applyTimePeriod](const QnTimePeriod& selection)
         {
             m_timelineSelection = selection;
-            if (m_period != Period::selection)
+
+            if (m_period != Period::selection && !ini().automaticFilterByTimelineSelection)
                 return;
 
             // If selection was cleared, update immediately, otherwise update after small delay.
@@ -336,7 +360,7 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 {
     ui->cameraSelectionButton->setSelectable(false);
     ui->cameraSelectionButton->setDeactivatable(true);
-    ui->cameraSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/camera.png")));
+    ui->cameraSelectionButton->setIcon(qnSkin->icon("text_buttons/camera.png"));
 
     auto cameraMenu = q->createDropdownMenu();
     auto addMenuAction =
@@ -344,9 +368,9 @@ void AbstractSearchWidget::Private::setupCameraSelection()
         {
             auto action = cameraMenu->addAction(title);
             connect(action, &QAction::triggered, this,
-                [this, action, cameras]()
+                [this, cameras]()
                 {
-                    ui->cameraSelectionButton->setText(action->text());
+                    ui->cameraSelectionButton->setText(m_cameraSelectionActions[cameras]->text());
                     ui->cameraSelectionButton->setState(cameras == Cameras::all
                         ? SelectableTextButton::State::deactivated
                         : SelectableTextButton::State::unselected);
@@ -358,13 +382,17 @@ void AbstractSearchWidget::Private::setupCameraSelection()
             if (dynamicTitle)
             {
                 connect(action, &QAction::changed, this,
-                    [this, action, cameras]()
+                    [this, cameras]()
                     {
-                        if (selectedCameras() == cameras)
-                            ui->cameraSelectionButton->setText(action->text());
+                        if (selectedCameras() != cameras)
+                            return;
+
+                        ui->cameraSelectionButton->setText(
+                            m_cameraSelectionActions[cameras]->text());
                     });
             }
 
+            m_cameraSelectionActions[cameras] = action;
             return action;
         };
 
@@ -376,17 +404,17 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 
     cameraMenu->addSeparator();
 
-    auto defaultAction = addMenuAction("<any camera>", Cameras::all, true);
-    addDeviceDependentAction(defaultAction, tr("Any device"), tr("Any camera"));
+    addDeviceDependentAction(addMenuAction("<any camera>", Cameras::all, true),
+        tr("Any device"), tr("Any camera"));
 
     connect(ui->cameraSelectionButton, &SelectableTextButton::stateChanged, this,
-        [defaultAction](SelectableTextButton::State state)
+        [this](SelectableTextButton::State state)
         {
             if (state == SelectableTextButton::State::deactivated)
-                defaultAction->trigger();
+                m_cameraSelectionActions[Cameras::all]->trigger();
         });
 
-    defaultAction->trigger();
+    m_cameraSelectionActions[Cameras::all]->trigger();
     ui->cameraSelectionButton->setMenu(cameraMenu);
 
     updateCurrentCameras();
@@ -422,7 +450,7 @@ void AbstractSearchWidget::Private::setupAreaSelection()
     ui->areaSelectionButton->setDeactivatable(true);
     ui->areaSelectionButton->setAccented(true);
     ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
-    ui->areaSelectionButton->setIcon(qnSkin->icon(lit("text_buttons/area.png")));
+    ui->areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
 
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
         [this]()
@@ -495,6 +523,7 @@ void AbstractSearchWidget::Private::setSelectedPeriod(Period value)
     if (value == m_period)
         return;
 
+    m_previousPeriod = m_period;
     m_period = value;
     updateCurrentTimePeriod();
 
