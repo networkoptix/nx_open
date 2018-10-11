@@ -16,7 +16,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/../../cmake
 )
 
-set(RDEP_DIR "${PROJECT_SOURCE_DIR}/../../build_utils/python" CACHE PATH "Path to rdep scripts")
+set(rdep_dir "${PROJECT_SOURCE_DIR}/../../build_utils/python" CACHE PATH "Path to rdep scripts")
 include(find_python)
 include(rdep)
 nx_rdep_configure()
@@ -36,7 +36,7 @@ set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
 set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 set(paxtonPluginName "${display.product.name} Paxton Plugin")
 
-set(ENV{PYTHONPATH} ${RDEP_DIR})
+set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
