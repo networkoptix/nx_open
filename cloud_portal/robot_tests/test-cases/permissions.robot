@@ -43,7 +43,7 @@ Check Log In
 
 Check Special Hint
     [arguments]    ${type}
-        Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']
     Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${type}']/..
@@ -160,7 +160,8 @@ admin cannot delete or edit self
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
 
-admin cannot delete other admins
+admin cannot delete or edit other admins
+    [tags]    C41905
     Go To    ${url}/register
     ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
@@ -180,6 +181,18 @@ admin cannot delete other admins
     Validate Log Out
     Log in to Auto Tests System    ${email}
     Remove User Permissions    ${random email}
+
+admin cannot invite another admin
+    [tags]    C41905
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Sleep    2
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='Viewer']
+    Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='Administrator']
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE CANCEL}
 
 Edit permission works
     [tags]    C41900
@@ -222,6 +235,7 @@ Share with registered user - sends him notification
     #otherwise it may receive the notification in another language and fail the email subject comparison
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
+    Sleep    1
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${email}
