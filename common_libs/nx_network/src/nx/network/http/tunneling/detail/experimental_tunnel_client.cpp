@@ -67,7 +67,7 @@ void ExperimentalTunnelClient::initiateDownChannel()
 void ExperimentalTunnelClient::onDownChannelOpened()
 {
     if (!m_downChannelHttpClient->hasRequestSucceeded())
-        return cleanupFailedTunnel(m_downChannelHttpClient.get());
+        return cleanUpFailedTunnel(m_downChannelHttpClient.get());
 
     m_downChannel = m_downChannelHttpClient->takeSocket();
     m_openTunnelResponse = std::move(*m_downChannelHttpClient->response());
@@ -91,7 +91,7 @@ void ExperimentalTunnelClient::initiateUpChannel()
 void ExperimentalTunnelClient::onUpChannelOpened()
 {
     if (!m_upChannelHttpClient->hasRequestSucceeded())
-        return cleanupFailedTunnel(m_upChannelHttpClient.get());
+        return cleanUpFailedTunnel(m_upChannelHttpClient.get());
 
     m_upChannel = m_upChannelHttpClient->takeSocket();
     m_upChannelHttpClient.reset();
@@ -114,12 +114,12 @@ void ExperimentalTunnelClient::initiateChannel(
             { m_tunnelId }).c_str());
 
     httpClient->setOnResponseReceived(
-        [this, requestHandler = std::move(requestHandler)]() { requestHandler(); });
+        [requestHandler = std::move(requestHandler)]() { requestHandler(); });
 
     httpClient->doRequest(
         httpMethod,
         tunnelUrl,
-        [this, httpClient]() { cleanupFailedTunnel(httpClient); });
+        [this, httpClient]() { handleTunnelFailure(httpClient); });
 }
 
 const Response& ExperimentalTunnelClient::response() const
@@ -131,11 +131,23 @@ void ExperimentalTunnelClient::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    clear();
+}
+
+void ExperimentalTunnelClient::clear()
+{
     m_downChannelHttpClient.reset();
     m_upChannelHttpClient.reset();
 
     m_downChannel.reset();
     m_upChannel.reset();
+}
+
+void ExperimentalTunnelClient::handleTunnelFailure(AsyncClient* failedHttpClient)
+{
+    cleanUpFailedTunnel(failedHttpClient);
+
+    clear();
 }
 
 void ExperimentalTunnelClient::prepareOpenUpChannelRequest()

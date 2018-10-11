@@ -45,6 +45,8 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_downChannel;
     std::unique_ptr<AbstractStreamSocket> m_upChannel;
 
+    void clear();
+
     void initiateDownChannel();
     void onDownChannelOpened();
 
@@ -56,6 +58,8 @@ private:
         http::Method::ValueType httpMethod,
         const std::string& requestPath,
         std::function<void()> requestHandler);
+
+    void handleTunnelFailure(AsyncClient* failedHttpClient);
 
     void prepareOpenUpChannelRequest();
 

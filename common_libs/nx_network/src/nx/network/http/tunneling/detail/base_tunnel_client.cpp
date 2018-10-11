@@ -28,12 +28,12 @@ void BaseTunnelClient::stopWhileInAioThread()
     m_connection.reset();
 }
 
-void BaseTunnelClient::cleanupFailedTunnel()
+void BaseTunnelClient::cleanUpFailedTunnel()
 {
-    cleanupFailedTunnel(m_httpClient.get());
+    cleanUpFailedTunnel(m_httpClient.get());
 }
 
-void BaseTunnelClient::cleanupFailedTunnel(AsyncClient* httpClient)
+void BaseTunnelClient::cleanUpFailedTunnel(AsyncClient* httpClient)
 {
     OpenTunnelResult result;
     result.sysError = httpClient->lastSysErrorCode();
