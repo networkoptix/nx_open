@@ -35,4 +35,9 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();
 }
 
+bool AnalyticsSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
+{
+    return d->isCameraApplicable(camera);
+}
+
 } // namespace nx::client::desktop

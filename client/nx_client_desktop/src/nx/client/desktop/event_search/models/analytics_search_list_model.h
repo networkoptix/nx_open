@@ -23,6 +23,9 @@ public:
 
     virtual bool isConstrained() const override;
 
+protected:
+    virtual bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const override;
+
 private:
     class Private;
     Private* const d = nullptr;

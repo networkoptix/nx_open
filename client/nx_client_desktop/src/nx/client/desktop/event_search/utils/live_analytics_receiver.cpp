@@ -3,8 +3,6 @@
 #include <memory>
 #include <utility>
 
-#include <QtCore/QList>
-
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <core/resource/camera_resource.h>
 #include <utils/common/long_runable_cleanup.h>

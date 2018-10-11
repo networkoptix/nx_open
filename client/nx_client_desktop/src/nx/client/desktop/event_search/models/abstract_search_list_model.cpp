@@ -246,7 +246,9 @@ void AbstractSearchListModel::setLivePaused(bool value)
     if (m_livePaused == value)
         return;
 
+    NX_VERBOSE(this) << "Setting live" << (value ? "paused" : "unpaused");
     m_livePaused = value;
+
     emit livePausedChanged(m_livePaused, {});
 }
 

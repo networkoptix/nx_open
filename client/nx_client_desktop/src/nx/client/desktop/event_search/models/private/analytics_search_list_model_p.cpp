@@ -13,6 +13,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -84,6 +85,17 @@ AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
     m_metadataProcessingTimer->start();
 
     connect(q, &AbstractSearchListModel::camerasChanged, this, &Private::updateMetadataReceivers);
+
+    auto serverChangesListener = new QnResourceChangesListener(q);
+    serverChangesListener->connectToResources<QnVirtualCameraResource>(&QnResource::statusChanged,
+        [this](const QnResourcePtr& resource)
+        {
+            if (!this->q->isOnline())
+                return;
+
+            if (isCameraApplicable(resource.dynamicCast<QnVirtualCameraResource>()))
+                updateMetadataReceivers();
+        });
 }
 
 AnalyticsSearchListModel::Private::~Private()
@@ -202,6 +214,13 @@ void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
 
     this->truncateDataToTimePeriod(
         m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+}
+
+bool AnalyticsSearchListModel::Private::isCameraApplicable(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    // TODO: #vkutin Implement it when it's possible!
+    return !camera.isNull();
 }
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
@@ -353,37 +372,92 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
 void AnalyticsSearchListModel::Private::updateMetadataReceivers()
 {
-    auto cameras = q->cameras();
-    decltype(m_metadataReceivers) newMetadataReceivers;
-
-    // Preserve existing receivers that are still relevant.
-    for (auto& receiver: m_metadataReceivers)
+    if (m_liveReceptionActive)
     {
-        if (cameras.remove(receiver->camera()))
-            newMetadataReceivers.emplace_back(receiver.release());
+        auto cameras = q->cameras();
+        decltype(m_metadataReceivers) newMetadataReceivers;
+
+        const auto isOnline =
+            [](const QnVirtualCameraResourcePtr& camera)
+            {
+                const auto status = camera->getStatus();
+                return status == Qn::Online || status == Qn::Recording;
+            };
+
+        // Preserve existing receivers that are still relevant.
+        for (auto& receiver: m_metadataReceivers)
+        {
+            if (cameras.remove(receiver->camera()) && isOnline(receiver->camera()))
+                newMetadataReceivers.emplace_back(receiver.release());
+        }
+
+        // Create new receivers if needed.
+        for (const auto& camera: cameras)
+        {
+            if (isOnline(camera))
+            {
+                newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
+
+                connect(newMetadataReceivers.back().get(), &LiveAnalyticsReceiver::dataOverflow,
+                    this, &Private::processMetadata);
+            }
+        }
+
+        NX_VERBOSE(q) << "Ensured metadata receivers for"
+            << newMetadataReceivers.size() << "cameras";
+
+        m_metadataReceivers = std::move(newMetadataReceivers);
     }
+    else
+    {
+        m_metadataReceivers.clear();
+        NX_VERBOSE(q) << "Released all metadata receivers";
+    }
+}
 
-    // Create new receivers if needed.
-    for (const auto& camera: cameras)
-        newMetadataReceivers.emplace_back(new LiveAnalyticsReceiver(camera));
+void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
+{
+    if (m_liveReceptionActive == value)
+        return;
 
-    m_metadataReceivers = std::move(newMetadataReceivers);
+    NX_VERBOSE(q) << "Setting live reception" << (value? "active" : "inactive");
+    m_liveReceptionActive = value;
+    updateMetadataReceivers();
 }
 
 void AnalyticsSearchListModel::Private::processMetadata()
 {
-    QList<DetectedObject> newObjects;
-    QHash<QnUuid, int> newObjectIndices;
-    int newObjectSources = 0;
+    setLiveReceptionActive(q->isLive() && !q->livePaused() && q->isOnline());
+    if (!m_liveReceptionActive)
+        return;
+
+    QList<QList<QnAbstractCompressedMetadataPtr>> packetsBySource;
+    int totalPackets = 0;
 
     for (const auto& receiver: m_metadataReceivers)
     {
         auto packets = receiver->takeData();
-        if (!q->isLive() || packets.empty())
+        if (packets.empty())
             continue;
 
-        NX_VERBOSE(this) << "Processing" << packets.size() << "live metadata packets";
+        packetsBySource.push_back(packets);
+        totalPackets += packets.size();
+    }
 
+    if (totalPackets == 0)
+        return;
+
+    NX_VERBOSE(q) << "Processing" << totalPackets << "live metadata packets from"
+        << packetsBySource.size() << "sources";
+
+    QList<DetectedObject> newObjects;
+    QHash<QnUuid, int> newObjectIndices;
+
+    // TODO: FIXME: #vkutin Detect if there's a gap between loaded archive and live.
+    // Think what to do with it.
+
+    for (const auto& packets: packetsBySource)
+    {
         for (const auto& metadata: packets)
         {
             NX_ASSERT(metadata->metadataType == MetadataType::ObjectDetection);
@@ -431,7 +505,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
                 newObjectIndices[item.objectId] = newObjects.size();
                 newObjects.push_back(std::move(newObject));
-                ++newObjectSources;
             }
         }
     }
@@ -439,7 +512,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (newObjects.empty())
         return;
 
-    if (newObjectSources > 1)
+    if (packetsBySource.size() > 1)
     {
         std::sort(newObjects.begin(), newObjects.end(),
             [](const DetectedObject& left, const DetectedObject& right)
@@ -451,7 +524,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     auto periodToCommit = QnTimePeriod::fromInterval(
         startTime(newObjects.front()), startTime(newObjects.back()));
 
-    // TODO: #vkutin Clear if there is going to be a gap between live and archive.
+    // TODO: FIXME: #vkutin Clear if there is going to be a gap between live and archive?
     // Think how to do it.
     //if (???)
     //{

@@ -51,6 +51,8 @@ public:
     virtual void truncateToMaximumCount() override;
     virtual void truncateToRelevantTimePeriod() override;
 
+    bool isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const;
+
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
@@ -83,6 +85,8 @@ private:
         const nx::vms::api::analytics::EngineManifest::ObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
+    void setLiveReceptionActive(bool value);
+
     struct PreviewParams
     {
         std::chrono::microseconds timestamp = std::chrono::microseconds(0);
@@ -95,7 +99,9 @@ private:
     AnalyticsSearchListModel* const q;
     QRectF m_filterRect;
     QString m_filterText;
+
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
+    bool m_liveReceptionActive = false;
 
     std::vector<std::unique_ptr<LiveAnalyticsReceiver>> m_metadataReceivers;
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
