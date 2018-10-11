@@ -173,7 +173,7 @@ State fillBitrateFromFixedQuality(State state)
 
 QString settingsUrlPath(const Camera& camera)
 {
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->commonModule()->dataPool()->data(camera);
     if (!resourceData.value<bool>(lit("showUrl"), false))
         return QString();
 

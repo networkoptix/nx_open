@@ -69,8 +69,8 @@ class UnpackMediaserverInstallationGroups(object):
     def many_allocated_servers(self, count, system_settings, server_config=None):
         count_per_group = count // len(self._group_list)  # assuming it is divisible
         server_list_list = [
-            self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
-            for group in self._group_list]
+            self._allocate_servers_from_group(idx, group, count_per_group, system_settings, server_config)
+            for idx, group in enumerate(self._group_list)]
         server_list = flatten_list(server_list_list)
         try:
             yield server_list
@@ -93,19 +93,21 @@ class UnpackMediaserverInstallationGroups(object):
         finally:
             self._post_process_server(lws)
 
-    def _allocate_servers_from_group(self, group, count, system_settings, server_config):
+    def _allocate_servers_from_group(self, group_idx, group, count, system_settings, server_config):
         installation_list = group.allocate_many(count)
         return [
-            self._make_server(installation, '{}-{:03d}'.format(group.name, index), system_settings, server_config, index)
-            for index, installation in enumerate(installation_list)]
+            self._make_server(installation, '{}-{:03d}'.format(group.name, server_idx),
+                              system_settings, server_config, group_idx, server_idx)
+            for server_idx, installation in enumerate(installation_list)]
 
-    def _make_server(self, installation, server_name, system_settings, server_config, index=0):
+    def _make_server(self, installation, server_name, system_settings, server_config, group_idx=0, server_idx=0):
         installation.install(self._mediaserver_installer)
         installation.cleanup(self._ca.generate_key_and_cert())
         if server_config:
             if 'serverGuid' in server_config:
                 # servers must have different guids; serverGuid is expected to be format string
-                server_config = dict(server_config, serverGuid=server_config['serverGuid'].format(index))
+                server_guid = server_config['serverGuid'].format(group_idx=group_idx, server_idx=server_idx)
+                server_config = dict(server_config, serverGuid=server_guid)
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
         try:

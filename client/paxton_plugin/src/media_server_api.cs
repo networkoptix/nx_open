@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
+//using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace nx.media_server_api {
@@ -36,7 +36,7 @@ internal class Connection
         var sampleUri = makeUri("", "");
         credCache.Add(sampleUri, "Digest", new NetworkCredential(user, password));
 
-        m_client = new HttpClient( new HttpClientHandler { Credentials = credCache});
+        m_client = new WebClient {Credentials = credCache};
     }
 
     // Makes proper uri
@@ -58,29 +58,32 @@ internal class Connection
         return m_serializer.Deserialize<T>(reader);
     }
 
-    private async Task<string> sendGetRequestAsync(string path, string query = "")
+    private string sendGetRequest(string path, string query = "")
     {
         var uri = makeUri(path, query);
-        return await m_client.GetStringAsync(uri).ConfigureAwait(false);
+        var stream = m_client.OpenRead(uri);
+        if (stream == null)
+            return "";
+
+        var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 
-    public async Task<ModuleInformation> getModuleInformationAsync()
+    public ModuleInformation getModuleInformation()
     {
-        var responseData = await sendGetRequestAsync("api/moduleInformationAuthenticated")
-            .ConfigureAwait(false);
+        var responseData = sendGetRequest("api/moduleInformationAuthenticated");
         return fromJson<ModuleInformation>(responseData);
     }
 
-    public async Task<CameraDataEx[]> getCamerasExAsync()
+    public CameraDataEx[] getCamerasEx()
     {
-        var responseData = await sendGetRequestAsync("ec2/getCamerasEx")
-            .ConfigureAwait(false);
+        var responseData = sendGetRequest("ec2/getCamerasEx");
         return fromJson<CameraDataEx[]>(responseData);
     }
 
     private readonly string m_host;
     private readonly uint m_port;
-    private readonly HttpClient m_client;
+    private readonly WebClient m_client;
     private readonly JsonSerializer m_serializer = new JsonSerializer();
 }
 

@@ -33,7 +33,3 @@ endif()
 if(withScreenChecker)
     add_subdirectory(screen_checker)
 endif()
-
-if(withPaxtonPlugin)
-    add_subdirectory(paxton_plugin)
-endif()

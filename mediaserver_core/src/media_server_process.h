@@ -115,6 +115,8 @@ public:
 
     bool enableMultipleInstances() const { return m_enableMultipleInstances; }
     void initStaticCommonModule();
+    void setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback);
+
 signals:
     void started();
 
@@ -226,6 +228,7 @@ private:
     void updateRootPassword();
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);
+    void loadResourceParamsData();
 private:
     int m_argc = 0;
     char** m_argv = nullptr;
@@ -260,7 +263,6 @@ private:
     std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
-    std::unique_ptr<nx::mediaserver::hls::SessionPool> m_hlsSessionPool;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;
     std::unique_ptr<QnMServerResourceSearcher> m_mserverResourceSearcher;
     std::unique_ptr<QnAppserverResourceProcessor> m_serverResourceProcessor;
@@ -271,4 +273,5 @@ private:
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
     std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
+    std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
 };

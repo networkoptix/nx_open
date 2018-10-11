@@ -82,7 +82,10 @@ class Checker(object):
         return Failure(errors) if errors else Success()
 
     def expect_values(self, expected, actual, path='camera', syntax=None):
-        if isinstance(expected, dict):
+        if actual is None and expected is not None:
+            self.add_error('{} is not found, expected to be {}', path, expected)
+
+        elif isinstance(expected, dict):
             self.expect_dict(expected, actual, path, syntax)
 
         elif isinstance(expected, list):
@@ -124,7 +127,7 @@ class Checker(object):
 
             else:
                 if not isinstance(actual, dict):
-                    self.add_error('{} is {}, expected to be a dict', path, actual_type)
+                    self.add_error('{} is {}, expected to be {}', path, actual_type, expected)
                 else:
                     self.expect_values(
                         expected_value, self._get_key_value(key, actual), full_path, syntax)

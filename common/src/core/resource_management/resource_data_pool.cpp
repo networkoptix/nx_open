@@ -49,7 +49,9 @@ QnResourceDataPool::~QnResourceDataPool() {
     return;
 }
 
-QnResourceData QnResourceDataPool::data(const QString &key) const {
+QnResourceData QnResourceDataPool::data(const QString &key) const
+{
+    QnMutexLocker lock(&m_mutex);
     return m_dataByKey.value(key.toLower());
 }
 
@@ -72,38 +74,36 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
         keyList.append(vendorAndModelKey + lit("|") + firmware.toLower());
 
     QnResourceData result;
-
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& key: keyList)
     {
-        QnMutexLocker lock(&m_cachedDataMtx);
-
-        for (const auto& key: keyList)
+        if (!m_cachedResultByKey.contains(key))
         {
-            if (!m_cachedResultByKey.contains(key))
+            for (auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
             {
-                for (auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
-                {
-                    if (wildcardMatch(itr.key(), key))
-                        result.add(itr.value());
-                }
-                m_cachedResultByKey.insert(key, result);
+                if (wildcardMatch(itr.key(), key))
+                    result.add(itr.value());
             }
-            else
-            {
-                result.add(m_cachedResultByKey[key]);
-            }
+            m_cachedResultByKey.insert(key, result);
+        }
+        else
+        {
+            result.add(m_cachedResultByKey[key]);
         }
     }
-
     return result;
 }
 
-bool QnResourceDataPool::load(const QString &fileName) {
-    if(!QFile::exists(fileName)) {
+bool QnResourceDataPool::loadFile(const QString &fileName)
+{
+    if(!QFile::exists(fileName))
+    {
         qnWarning("File '%1' does not exist", fileName);
         return false;
     }
 
-    if(!loadInternal(fileName)) {
+    if(!loadInternal(fileName))
+    {
         qnWarning("Error while loading resource data from file '%1'.", fileName);
         return false;
     }
@@ -111,7 +111,8 @@ bool QnResourceDataPool::load(const QString &fileName) {
     return true;
 }
 
-bool QnResourceDataPool::loadInternal(const QString &fileName) {
+bool QnResourceDataPool::loadInternal(const QString &fileName)
+{
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
@@ -119,11 +120,13 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     qint64 size = file.size();
     if(size == 0 || size > 16 * 1024 * 1024)
         return false; /* File is larger than 16Mb => definitely not JSON we need. */
+    return loadData(file.readAll());
+}
 
-    QByteArray data = file.readAll();
+bool QnResourceDataPool::loadData(const QByteArray& data)
+{
     if(data.isEmpty())
         return false; /* Read error. */
-    file.close();
 
     QJsonObject map;
     if(!QJson::deserialize(data, &map))
@@ -137,6 +140,8 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
+    QnMutexLocker lock(&m_mutex);
+    m_cachedResultByKey.clear();
     for(const QnResourceDataPoolChunk &chunk: chunks)
         for(const QString &key: chunk.keys)
             m_dataByKey[key.toLower()].add(chunk.data);

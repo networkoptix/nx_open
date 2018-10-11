@@ -1,5 +1,6 @@
 import logging
 import timeit
+import json
 from datetime import datetime, timedelta
 
 import pytz
@@ -80,7 +81,7 @@ class Executor(object):
                  ):  # type: (str, Stage, dict, Optional[timedelta]) -> None
         self.camera_id = camera_id
         self.stage = stage
-        self._rules = rules
+        self._rules = json.loads(json.dumps(rules))  # Get rid of OrderdDicts
         self._timeout = min(self.stage.timeout, hard_timeout) if hard_timeout else self.stage.timeout
         self._result = None  # type: Optional[Result]
         self._start_time = None

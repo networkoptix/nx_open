@@ -51,8 +51,7 @@ private:
         network::http::AsyncMessagePipeline* /*connection*/);
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+        const RequestContext& requestContext,
         ApplicationData... requestData) override;
 
     void closeAllTunnels();
@@ -115,23 +114,22 @@ void GetPostTunnelServer<ApplicationData...>::registerRequestHandlers(
 template<typename ...ApplicationData>
 network::http::RequestResult
     GetPostTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+        const RequestContext& requestContext,
         ApplicationData... requestData)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Open GET/POST tunnel. Url %1")
-        .args(request.requestLine.url.path()));
+        .args(requestContext.request.requestLine.url.path()));
 
     network::http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
 
-    requestResult.dataSource = prepareCreateDownTunnelResponse(response);
+    requestResult.dataSource = prepareCreateDownTunnelResponse(requestContext.response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, requestData = std::make_tuple(std::move(requestData)...),
-            requestPath = request.requestLine.url.path().toStdString()](
+            requestPath = requestContext.request.requestLine.url.path().toStdString()](
                 network::http::HttpServerConnection* connection) mutable
         {
             auto allArgs = std::tuple_cat(

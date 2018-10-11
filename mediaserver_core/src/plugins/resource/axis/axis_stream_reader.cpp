@@ -28,7 +28,7 @@ QnAxisStreamReader::QnAxisStreamReader(
     const QnPlAxisResourcePtr& res)
     :
     CLServerPushStreamReader(res),
-    m_rtpStreamParser(res),
+    m_rtpStreamParser(res, res->getTimeOffset()),
     m_axisRes(res)
 {
 }

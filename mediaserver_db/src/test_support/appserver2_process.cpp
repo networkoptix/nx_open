@@ -548,6 +548,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     settings->setSystemName(systemName);
     settings->setLocalSystemId(guidFromArbitraryData(systemName));
     settings->setAutoDiscoveryEnabled(false);
+    settings->setAutoDiscoveryResponseEnabled(false);
 
     //read server list
     nx::vms::api::MediaServerDataList mediaServerList;

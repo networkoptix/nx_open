@@ -46,7 +46,6 @@ int main(int /*argc*/, char* /*argv*/[])
     QnLog::instance()->setLogLevel(cl_logDEBUG2);
 
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
-    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
         "cloud_connect_auto_test", QnUuid::createUuid());
 

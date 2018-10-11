@@ -96,19 +96,19 @@ void ClientOverHttpGetPostTunnel::openDownChannel(
         std::bind(&ClientOverHttpGetPostTunnel::onDownChannelOpened, this, tunnelCtxIter));
     (*tunnelCtxIter)->httpClient->doGet(
         tunnelUrl,
-        std::bind(&ClientOverHttpGetPostTunnel::cleanupFailedTunnel, this, tunnelCtxIter));
+        std::bind(&ClientOverHttpGetPostTunnel::cleanUpFailedTunnel, this, tunnelCtxIter));
 }
 
 void ClientOverHttpGetPostTunnel::onDownChannelOpened(
     Tunnels::iterator tunnelCtxIter)
 {
     if (!(*tunnelCtxIter)->httpClient->hasRequestSucceeded())
-        return cleanupFailedTunnel(tunnelCtxIter);
+        return cleanUpFailedTunnel(tunnelCtxIter);
 
     if (!(*tunnelCtxIter)->parseOpenDownChannelResponse(
             *(*tunnelCtxIter)->httpClient->response()))
     {
-        return cleanupFailedTunnel(tunnelCtxIter);
+        return cleanUpFailedTunnel(tunnelCtxIter);
     }
 
     (*tunnelCtxIter)->connection = (*tunnelCtxIter)->httpClient->takeSocket();
@@ -154,12 +154,12 @@ void ClientOverHttpGetPostTunnel::handleOpenUpTunnelResult(
     std::size_t /*bytesTransferreded*/)
 {
     if (systemErrorCode != SystemError::noError)
-        return cleanupFailedTunnel(tunnelCtxIter);
+        return cleanUpFailedTunnel(tunnelCtxIter);
 
     reportSuccess(tunnelCtxIter);
 }
 
-void ClientOverHttpGetPostTunnel::cleanupFailedTunnel(
+void ClientOverHttpGetPostTunnel::cleanUpFailedTunnel(
     Tunnels::iterator tunnelCtxIter)
 {
     auto tunnelContext = std::move(*tunnelCtxIter);

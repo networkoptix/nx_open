@@ -823,7 +823,6 @@ public:
     {
         m_acceptHandler = std::move(handler);
 
-
         this->dispatch(
             [this]()
             {

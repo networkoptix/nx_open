@@ -60,6 +60,7 @@
 #include <api/global_settings.h>
 
 #include "nx/client/desktop/export/tools/export_media_validator.h"
+#include <nx/client/core/utils/grid_walker.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -82,6 +83,56 @@ QnMediaResourceWidget* extractMediaWidget(QnWorkbenchDisplay* display,
         return dynamic_cast<QnMediaResourceWidget *>(display->widgets().front());
 
     return dynamic_cast<QnMediaResourceWidget *>(display->activeWidget());
+}
+
+QnLayoutResourcePtr layoutFromBookmarks(const QnCameraBookmarkList& bookmarks, QnResourcePool* pool)
+{
+    QnLayoutResourcePtr layout(new QnLayoutResource(pool->commonModule()));
+    layout->setName(WorkbenchExportHandler::tr("%n bookmarks", "", bookmarks.size()));
+    layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
+
+    // First we must count unique cameras to get the matrix size.
+    QnVirtualCameraResourceList cameras;
+    QSet<QnUuid> placedCameras;
+    for (const auto& bookmark: bookmarks)
+    {
+        if (placedCameras.contains(bookmark.cameraId))
+            continue;
+        placedCameras.insert(bookmark.cameraId);
+
+        if (const auto& camera = pool->getResourceById<QnVirtualCameraResource>(bookmark.cameraId))
+            cameras.push_back(camera);
+    }
+
+    const int camerasCount = cameras.size();
+    const int matrixSize = std::ceil(std::sqrt(camerasCount));
+    NX_ASSERT(matrixSize * matrixSize >= camerasCount);
+
+    const QRect grid(0, 0, matrixSize, matrixSize);
+    core::GridWalker gridWalker(grid);
+
+    static const QSize kCellSize(1, 1);
+
+    for (const auto& camera: cameras)
+    {
+        gridWalker.next();
+
+        QnLayoutItemData item;
+        item.flags = 0x1;
+        // Layout data item flags are declared in client module. // TODO: #GDM move to api in 4.0.
+        item.uuid = QnUuid::createUuid();
+        item.resource.id = camera->getId();
+        item.combinedGeometry = QRect(gridWalker.pos(), kCellSize);
+
+        QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
+        if (!forcedRotation.isEmpty())
+            item.rotation = forcedRotation.toInt();
+
+        layout->addItem(item);
+    }
+
+
+    return layout;
 }
 
 bool isBinaryExportSupported()
@@ -269,6 +320,9 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
             handleExportBookmarkAction(parameters);
         });
 
+    connect(action(ui::action::ExportBookmarksAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::handleExportBookmarksAction);
+
     connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
 
@@ -427,6 +481,32 @@ void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parame
 
     if (dialog.exec() != QDialog::Accepted)
         return;
+
+    auto context = prepareExportTool(dialog);
+    runExport(std::move(context));
+}
+
+void WorkbenchExportHandler::handleExportBookmarksAction()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+    if (bookmarks.empty())
+        return;
+
+    QnTimePeriodList periods;
+    for (const auto& bookmark: bookmarks)
+        periods.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
+
+    const auto boundingPeriod = periods.boundingPeriod();
+
+    ExportSettingsDialog dialog(boundingPeriod, {}, d->fileNameValidator(), mainWindowWidget());
+    setWatermark(&dialog); //< This should go right after constructor.
+
+    static const QString reason =
+        tr("Several bookmarks can be exported as layout only.");
+    dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
+    dialog.setLayout(layoutFromBookmarks(bookmarks, resourcePool()));
+    dialog.setBookmarks(bookmarks);
 
     auto context = prepareExportTool(dialog);
     runExport(std::move(context));

@@ -79,7 +79,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         startMediator();
-        m_mediatorConnector->enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
         andNewMediatorEndpointIsAvailable();
@@ -87,7 +86,16 @@ protected:
 
     void givenPeerFailedToConnectToMediator()
     {
-        m_mediatorConnector->enable(true /*wait for completion*/);
+        std::promise<nx::network::http::StatusCode::Value> fetchMediatorEndpointCompleted;
+        m_mediatorConnector->fetchUdpEndpoint(
+            [&fetchMediatorEndpointCompleted](
+                nx::network::http::StatusCode::Value statusCode, nx::network::SocketAddress)
+            {
+                fetchMediatorEndpointCompleted.set_value(statusCode);
+            });
+
+        ASSERT_FALSE(nx::network::http::StatusCode::isSuccessCode(
+            fetchMediatorEndpointCompleted.get_future().get()));
     }
 
     void whenMediatorUrlEndpointIsChanged()
@@ -203,6 +211,9 @@ private:
 
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> generateCloudModuleXml()
     {
+        if (!m_mediator)
+            return nullptr;
+
         return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             m_cloudModuleListGenerator.get(m_mediator.get()));
@@ -409,7 +420,6 @@ protected:
     void givenPeerConnectedToMediator()
     {
         whenStartMediator();
-        mediatorConnector().enable(true /*wait for completion*/);
 
         waitForPeerToRegisterOnMediator();
     }

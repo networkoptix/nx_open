@@ -9,6 +9,7 @@
 
 #include "get_post_tunnel_client.h"
 #include "connection_upgrade_tunnel_client.h"
+#include "experimental_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {
 
@@ -18,6 +19,7 @@ ClientFactory::ClientFactory():
 {
     registerClientType<GetPostTunnelClient>();
     registerClientType<ConnectionUpgradeTunnelClient>();
+    registerClientType<ExperimentalTunnelClient>();
 }
 
 void ClientFactory::clear()

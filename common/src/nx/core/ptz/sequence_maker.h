@@ -9,10 +9,10 @@ namespace ptz {
 class AbstractSequenceMaker
 {
 public:
+    virtual ~AbstractSequenceMaker() = default;
     virtual CommandSequence makeSequence(
         const Vector& relativeMove,
         const Options& options) const = 0;
-    virtual ~AbstractSequenceMaker() {}
 };
 
 } // namespace ptz

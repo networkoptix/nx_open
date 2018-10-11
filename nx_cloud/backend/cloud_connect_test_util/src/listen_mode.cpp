@@ -116,7 +116,6 @@ public:
             mediatorConnector->setSystemCredentials(
                 hpm::api::SystemCredentials(systemId, serverId, authKey));
 
-            mediatorConnector->enable(true);
             mediatorConnection = mediatorConnector->systemConnection();
         }
     };
@@ -314,6 +313,8 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     std::cout << "Server mode settigns: " << settings.toString() << std::endl;
 
+    CloudServerSocketGenerator cloudServerSocketGenerator;
+
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
     const auto guard = nx::utils::makeScopeGuard(
@@ -327,7 +328,6 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     auto localServerPtr = localServer.get();
     NX_CRITICAL(multiServerSocket->addSocket(std::move(localServer)));
 
-    CloudServerSocketGenerator cloudServerSocketGenerator;
     if (const auto address = args.get("forward-address"))
     {
         // TODO: uncoment when CLOUD-730 is fixed
