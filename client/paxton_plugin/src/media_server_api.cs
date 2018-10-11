@@ -37,6 +37,10 @@ internal class Connection
         credCache.Add(sampleUri, "Digest", new NetworkCredential(user, password));
 
         m_client = new WebClient {Credentials = credCache};
+
+        // Ignore invalid SSL certificates.
+        ServicePointManager.ServerCertificateValidationCallback =
+            (senderX, certificate, chain, sslPolicyErrors) => true;
     }
 
     // Makes proper uri
@@ -45,7 +49,7 @@ internal class Connection
         return new UriBuilder()
         {
             Port = (int)m_port,
-            Scheme = Uri.UriSchemeHttp,
+            Scheme = Uri.UriSchemeHttps,
             Host = m_host,
             Path = path,
             Query = query,
