@@ -2,16 +2,15 @@
 
 #include "v4l2_utils.h"
 
-#include <string>
-#include <errno.h>
-#include <dirent.h>
-#include <sys/stat.h>
 #include <cstring>
 #include <string>
 #include <algorithm>
-#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <stdlib.h>
 
 #include <nx/utils/app_info.h>
@@ -23,7 +22,10 @@ namespace impl {
 
 namespace {
 
-const std::vector<ResolutionData> kRaspberryPiResolutionList = {
+static const std::string kV4L2DevicePath = "/dev/v4l/by-id";
+
+const std::vector<ResolutionData> kRaspberryPiResolutionList = 
+{
     {1920, 1080, 30},
     {1920, 1080, 25},
     {1920, 1080, 20},
@@ -86,7 +88,6 @@ unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 std::string getDeviceName(int fileDescriptor);
 float toFrameRate(const v4l2_fract& frameInterval);
 
-
 bool isRpiMmal(const char * deviceName)
 {
     std::string lower(deviceName);
@@ -112,39 +113,34 @@ std::string getDeviceName(int fileDescriptor)
     struct v4l2_capability deviceCapability;
     if (ioctl(fileDescriptor, VIDIOC_QUERYCAP, &deviceCapability) == -1)
         return std::string();
-    return std::string(deviceCapability.card, deviceCapability.card + sizeof(deviceCapability.card));
+    return std::string(
+        deviceCapability.card,
+        deviceCapability.card + sizeof(deviceCapability.card));
 };
 
 std::vector<std::string> getDevicePaths()
 {
-    const auto isDeviceFile =
-        [](const char *path)
-        {
-            struct stat buffer;
-            stat(path, &buffer);
-            return S_ISCHR(buffer.st_mode);
-        };
+    std::vector<std::string> devices;
 
-    std::vector<std::string> deviceList;
-
-    std::string dev("/dev");
-    DIR *directory = opendir(dev.c_str());
+    DIR *directory = opendir(kV4L2DevicePath.c_str());
     if (!directory)
-        return deviceList;
+        return devices;
 
     struct dirent *directoryEntry;
     while ((directoryEntry = readdir(directory)) != NULL)
     {
-        if (!strstr(directoryEntry->d_name, "video"))
-            continue;
+        if(strcmp(directoryEntry->d_name, ".") == 0 
+            || strcmp(directoryEntry->d_name, "..") == 0)
+        {
+            continue;   
+        }
 
-        std::string devVideo = dev + "/" + directoryEntry->d_name;
-        if (isDeviceFile(devVideo.c_str()))
-            deviceList.push_back(devVideo);
+        std::string device = kV4L2DevicePath + "/" + directoryEntry->d_name;
+        devices.push_back(device);
     }
 
     closedir(directory);
-    return deviceList;
+    return devices;
 }
 
 float toFrameRate(const v4l2_fract& frameInterval)
@@ -157,9 +153,10 @@ float toFrameRate(const v4l2_fract& frameInterval)
 } // namespace
 
 
-V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor():
+V4L2CompressionTypeDescriptor::V4L2CompressionTypeDescriptor(const struct v4l2_fmtdesc& formatEnum):
     m_descriptor(new struct v4l2_fmtdesc({0}))
 {
+    memcpy(m_descriptor, &formatEnum, sizeof(formatEnum));
 }
 
 V4L2CompressionTypeDescriptor::~V4L2CompressionTypeDescriptor()
@@ -233,8 +230,7 @@ std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCode
 
     while (ioctl(initializer.fileDescriptor, VIDIOC_ENUM_FMT, &formatEnum) == 0)
     {
-        auto descriptor = std::make_shared<V4L2CompressionTypeDescriptor>();
-        memcpy(descriptor->descriptor(), &formatEnum, sizeof(formatEnum));
+        auto descriptor = std::make_shared<V4L2CompressionTypeDescriptor>(formatEnum);
         codecDescriptorList.push_back(std::move(descriptor));
         ++formatEnum.index;
     }

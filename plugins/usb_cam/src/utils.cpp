@@ -6,17 +6,10 @@ namespace nx {
 namespace usb_cam {
 namespace utils {
 
-namespace {
-
-static constexpr int kMsecInSec = 1000;
-
-} // namespace 
-
 std::string decodeCameraInfoUrl(const char * url)
 {
-
     // Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
-    // where <camera-resource> is /dev/video* on Linux or the device-instance-id on Windows.
+    // where <camera-resource> is /dev/v4l/by-id/* on Linux or the device-instance-id on Windows.
     std::string hostWithResource(url);
     
     // Find the second occurence of ":" in the url.

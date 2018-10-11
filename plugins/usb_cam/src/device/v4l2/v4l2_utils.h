@@ -17,7 +17,7 @@ namespace impl {
 class V4L2CompressionTypeDescriptor : public AbstractCompressionTypeDescriptor
 {
 public:
-    V4L2CompressionTypeDescriptor();
+    V4L2CompressionTypeDescriptor(const struct v4l2_fmtdesc& formatEnum);
     ~V4L2CompressionTypeDescriptor();
     struct v4l2_fmtdesc * descriptor();
     __u32 pixelFormat()const;

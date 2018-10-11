@@ -67,7 +67,9 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
         std::string url = utils::encodeCameraInfoUrl(localInterfaceIPAddr, devices[i].devicePath.c_str());
         strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
 
-        const QByteArray& uid = QCryptographicHash::hash(url.c_str(), QCryptographicHash::Md5).toHex();
+        const QByteArray& uid = QCryptographicHash::hash(
+            devices[i].devicePath.c_str(),
+            QCryptographicHash::Md5).toHex();
         strncpy(cameras[i].uid, uid.data(), sizeof(cameras[i].uid) - 1);
     }
 
