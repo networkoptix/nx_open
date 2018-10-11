@@ -117,7 +117,6 @@ public class OemMiniDriver: IOemDvrMiniDriver
                 m_logger.Error("Playback request without cameras.");
                 return OemDvrStatus.CameraListMissing;
             }
-            var cameraIds = pbInfo.DvrCameras.Select(x => x.CameraId);
             m_logger.InfoFormat("Playback function {0} at {1}, cameras:\n {2}",
                 pbInfo.PlaybackFunction,
                 pbInfo.StartTimeUtc,
