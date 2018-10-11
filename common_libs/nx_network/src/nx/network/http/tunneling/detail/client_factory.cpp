@@ -17,9 +17,9 @@ ClientFactory::ClientFactory():
     base_type(std::bind(&ClientFactory::defaultFactoryFunction, this,
         std::placeholders::_1))
 {
+    registerClientType<ExperimentalTunnelClient>();
     registerClientType<GetPostTunnelClient>();
     registerClientType<ConnectionUpgradeTunnelClient>();
-    registerClientType<ExperimentalTunnelClient>();
 }
 
 void ClientFactory::clear()
