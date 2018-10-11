@@ -55,6 +55,7 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_layout_password_management.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <nx/vms/utils/platform/autorun.h>
@@ -758,6 +759,38 @@ ActionVisibility SaveLayoutAsCondition::check(const QnResourceList& resources, Q
         return InvisibleAction;
 
     return EnabledAction;
+}
+
+ForgetLayoutPasswordCondition::ForgetLayoutPasswordCondition(bool isCurrent):
+    m_current(isCurrent)
+{
+}
+
+ActionVisibility ForgetLayoutPasswordCondition::check(
+    const QnResourceList& resources,
+    QnWorkbenchContext* context)
+{
+    QnLayoutResourcePtr layout;
+
+    if (m_current)
+    {
+        layout = context->workbench()->currentLayout()->resource();
+    }
+    else
+    {
+        if (resources.size() != 1)
+            return InvisibleAction;
+
+        layout = resources[0].dynamicCast<QnLayoutResource>();
+    }
+
+    if (!layout || !workbench::layout::isEncrypted(layout))
+        return InvisibleAction;
+
+    if (workbench::layout::requiresPassword(layout))
+        return DisabledAction;
+
+     return EnabledAction;
 }
 
 LayoutCountCondition::LayoutCountCondition(int minimalRequiredCount):

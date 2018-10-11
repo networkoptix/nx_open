@@ -535,15 +535,28 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(QnResourcePool* resourcePo
     return result;
 }
 
-void QnLayoutResource::usePasswordToOpen(const QString& password)
+void QnLayoutResource::usePasswordForRecordings(const QString& password)
 {
     NX_ASSERT(isFile());
 
     auto items = layoutResources();
 
-    for(auto item: items)
+    for(auto &item: items)
     {
         if (auto aviItem = item.objectCast<QnAviResource>())
             aviItem->usePasswordToRead(password);
+    }
+}
+
+void QnLayoutResource::forgetPasswordForRecordings()
+{
+    NX_ASSERT(isFile());
+
+    auto items = layoutResources();
+
+    for(auto &item: items)
+    {
+        if (auto aviItem = item.objectCast<QnAviResource>())
+            aviItem->forgetPassword();
     }
 }

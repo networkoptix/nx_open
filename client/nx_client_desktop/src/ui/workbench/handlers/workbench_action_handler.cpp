@@ -1194,10 +1194,10 @@ void ActionHandler::at_dropResourcesAction_triggered()
     if (layouts.size() == 1)
     {
         auto &layout = *layouts.begin();
-        if (layout::needPassword(layout))
+        if (layout::requiresPassword(layout))
         {
             layout::askAndSetPassword(layout, mainWindowWidget());
-            if (layout::needPassword(layout)) //< A correct password was not entered. Do not open.
+            if (layout::requiresPassword(layout)) //< A correct password was not entered. Do not open.
                 return;
         }
     }
@@ -1218,7 +1218,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
         workbench()->currentLayout()->resource()->locked() &&
         !resources.empty() &&
         layouts.empty() &&
-        videowalls.empty()) 
+        videowalls.empty())
     {
         QnGraphicsMessageBox::information(tr("Layout is locked and cannot be changed."));
         return;

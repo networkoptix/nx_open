@@ -47,6 +47,7 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_layout_password_management.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
@@ -145,6 +146,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
     connect(action(action::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
     connect(action(action::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
     connect(action(action::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
+    connect(action(action::ForgetLayoutPasswordAction),          &QAction::triggered, this, &LayoutsHandler::at_forgetLayoutPasswordAction_triggered);
 
     connect(action(action::RemoveLayoutItemAction), &QAction::triggered, this,
         &LayoutsHandler::at_removeLayoutItemAction_triggered);
@@ -208,6 +210,25 @@ void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractAct
         menu()->trigger(action::OpenInNewTabAction, layout);
     else
         NX_WARNING(this) << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
+}
+
+void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
+{
+    auto layout = menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>();
+    NX_ASSERT(layout && layout::isEncrypted(layout));
+
+    if (!layout || !layout::isEncrypted(layout) || layout::requiresPassword(layout))
+        return;
+
+    // This should be done before layout updates, because QnWorkbenchLayout overwrites
+    // all data in the layout.
+    if (auto workbenchLayout = QnWorkbenchLayout::instance(layout))
+    {
+        workbench()->removeLayout(workbenchLayout);
+        delete workbenchLayout;
+    }
+
+    layout::forgetPassword(layout);
 }
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)

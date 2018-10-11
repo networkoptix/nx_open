@@ -46,7 +46,7 @@ public:
     /** Sets a password for writing new layout. */
     virtual void setPasswordToWrite(const QString& password) override;
     /** Drops password. */
-    virtual void dropPassword() override;
+    virtual void forgetPassword() override;
 
     virtual void setUrl(const QString& value) override;
 

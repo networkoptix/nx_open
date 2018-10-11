@@ -16,8 +16,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_context.h>
 
-using nx::client::desktop::ui::workbench::layout::needPassword;
-
 QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource,
@@ -51,7 +49,7 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    m_requiresPassword = needPassword(layout);
+    m_isEncrypted = nx::client::desktop::ui::workbench::layout::isEncrypted(layout);
 
     for (const auto& item : layout->getItems())
         addItem(item);
@@ -114,7 +112,7 @@ QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
     if (!resource())
         return QIcon();
 
-    return m_requiresPassword
+    return m_isEncrypted
         ? qnResIconCache->icon(QnResourceIconCache::EncryptedLayout)
         : qnResIconCache->icon(QnResourceIconCache::Layouts);
 }
@@ -177,11 +175,6 @@ void QnResourceTreeModelLayoutNode::updateItemResource(
 bool QnResourceTreeModelLayoutNode::itemsLoaded() const
 {
     return m_loadedItems == m_items.size();
-}
-
-bool QnResourceTreeModelLayoutNode::requiresPassword() const
-{
-    return m_requiresPassword;
 }
 
 void QnResourceTreeModelLayoutNode::updateLoadedState()

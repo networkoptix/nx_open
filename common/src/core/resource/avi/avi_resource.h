@@ -70,7 +70,7 @@ public:
     /** Sets a password for writing new entity. */
     virtual void setPasswordToWrite(const QString& password) override;
     /** Drops password. */
-    virtual void dropPassword() override;
+    virtual void forgetPassword() override;
 
 signals:
     /** Fired when password is set or dropped. */

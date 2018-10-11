@@ -237,12 +237,12 @@ void QnAviResource::setPasswordToWrite(const QString& password)
         fileStorage->setPasswordToWrite(password);
 }
 
-void QnAviResource::dropPassword()
+void QnAviResource::forgetPassword()
 {
-    bool hadValidPassword = isEncrypted() && !requiresPassword();
+    const bool hadValidPassword = isEncrypted() && !requiresPassword();
     auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
     if (fileStorage)
-        fileStorage->dropPassword();
+        fileStorage->forgetPassword();
 
     if (hadValidPassword)
         emit storageAccessChanged();

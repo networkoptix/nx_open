@@ -58,10 +58,29 @@ QnInputDialog* createPasswordDialog(const QString message, QWidget* parent)
 
 } // namespace
 
-bool needPassword(const QnLayoutResourcePtr& layout)
+bool isEncrypted(const QnLayoutResourcePtr& layout)
+{
+    return layout->data(Qn::LayoutEncryptionRole).toBool();
+}
+
+bool requiresPassword(const QnLayoutResourcePtr& layout)
 {
     return layout->data(Qn::LayoutEncryptionRole).toBool()
         && layout->data(Qn::LayoutPasswordRole).toString().isEmpty();
+}
+
+void usePasswordToOpen(const QnLayoutResourcePtr& layout, const QString& password)
+{
+    NX_ASSERT(layout->data(Qn::LayoutEncryptionRole).toBool());
+    layout->setData(Qn::LayoutPasswordRole, password);
+    layout->usePasswordForRecordings(password);
+}
+
+void forgetPassword(const QnLayoutResourcePtr& layout)
+{
+    NX_ASSERT(layout->data(Qn::LayoutEncryptionRole).toBool());
+    layout->setData(Qn::LayoutPasswordRole, QVariant());
+    layout->forgetPasswordForRecordings();
 }
 
 bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
@@ -70,17 +89,13 @@ bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
         parent);
     dialog->setValidator(passwordValidator(layout));
 
-    const bool res = dialog->exec() == QDialog::Accepted;
-
-    const auto password = dialog->value().trimmed();
-
-    if (res)
+    if (dialog->exec() == QDialog::Accepted)
     {
-        layout->setData(Qn::LayoutPasswordRole, password);
-        layout->usePasswordToOpen(password);
+        usePasswordToOpen(layout, dialog->value().trimmed());
+        return true;
     }
 
-    return res;
+    return false;
 }
 
 bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent)

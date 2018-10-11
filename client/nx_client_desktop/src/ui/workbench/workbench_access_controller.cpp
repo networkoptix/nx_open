@@ -233,7 +233,7 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     // Deal with normal (non explicitly-authorized) files separately.
     if (layout->isFile())
     {
-        if(nx::client::desktop::ui::workbench::layout::needPassword(layout))
+        if(nx::client::desktop::ui::workbench::layout::requiresPassword(layout))
             return Qn::WriteNamePermission | Qn::ReadPermission;
 
         return (layout->locked() ? ~Qn::AddRemoveItemsPermission : Qn::AllPermissions)

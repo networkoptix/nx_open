@@ -72,7 +72,7 @@ void QnLayoutFileStorageResource::setPasswordToWrite(const QString& password)
     m_cryptoInfo.passwordHash = getSaltedPasswordHash(m_password, m_cryptoInfo.passwordSalt);
 }
 
-void QnLayoutFileStorageResource::dropPassword()
+void QnLayoutFileStorageResource::forgetPassword()
 {
     closeOpenedFiles(); //< Also saves state, but it is negligible.
     m_password = QString();

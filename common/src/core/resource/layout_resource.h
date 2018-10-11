@@ -9,6 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
+#include <utils/crypt/encryptable.h>
 #include <common/common_globals.h>
 
 /**
@@ -21,6 +22,7 @@
 */
 class QnLayoutResource:
     public QnResource,
+    public nx::utils::Encryptable,
     private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
 {
     Q_OBJECT
@@ -137,8 +139,16 @@ public:
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
     static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
 
-    /** Propagate password to child AviResource storages. Does not check anything. */
-    void usePasswordToOpen(const QString& password);
+    /**
+     * Propagate password to child AviResource storages.
+     * No checking because data roles are inaccessible here.
+     */
+    void usePasswordForRecordings(const QString& password);
+    /**
+     * Makes layout children to forget its password.
+     * Layout password is kept because it in data roles that are inaccessible here
+     */
+    void forgetPasswordForRecordings();
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
