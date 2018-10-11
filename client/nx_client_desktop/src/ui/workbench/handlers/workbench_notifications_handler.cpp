@@ -154,11 +154,12 @@ void QnWorkbenchNotificationsHandler::handleFullscreenCameraAction(
     if (!layoutResource)
         return;
 
+    const auto resources = action->getResources();
     const bool layoutIsAllowed = resources.contains(layoutResource->getId());
     if (!layoutIsAllowed)
         return;
 
-    auto items = currentLayout->items(cameras.front());
+    auto items = currentLayout->items(camera);
     if (items.empty())
         return;
 
