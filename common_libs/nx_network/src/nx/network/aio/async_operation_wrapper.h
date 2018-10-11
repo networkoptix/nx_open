@@ -12,6 +12,11 @@ namespace nx::network::aio {
 
 /**
  * Introduced to move any asynchronous operation to aio thread.
+ * That means:
+ * 1. Completion handler is called within aio thread
+ * 2. Operation can be safely cancelled using API of nx::network::aio::BasicPollable.
+ * Cancelled operation will still be running, but its completion is ignored
+ * and does not access freed memory.
  */
 template<typename Func>
 class AsyncOperationWrapper:
