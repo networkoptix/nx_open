@@ -1077,7 +1077,8 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
                 [&](auto port) { return port.id == params.inputPortId; });
 
             if (portIt != ports.end() && !portIt->inputName.isEmpty())
-                detailsMap[tpInputPort] = portIt->inputName;
+                detailsMap[tpInputPort] =
+                    QString("%1 (%2)").arg(params.inputPortId).arg(portIt->inputName);
             else
                 detailsMap[tpInputPort] = params.inputPortId;
             break;
