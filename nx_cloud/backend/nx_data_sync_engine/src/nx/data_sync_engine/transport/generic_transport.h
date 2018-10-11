@@ -6,6 +6,7 @@
 #include <nx/network/connection_server/fixed_size_message_pipeline.h>
 
 #include "../abstract_transaction_transport.h"
+#include "../compatible_ec2_protocol_version.h"
 #include "../transaction_processor.h"
 #include "../transaction_log_reader.h"
 #include "../transaction_transport_header.h"

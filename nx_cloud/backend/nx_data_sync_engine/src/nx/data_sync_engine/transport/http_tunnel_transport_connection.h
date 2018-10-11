@@ -10,33 +10,30 @@
 namespace nx::data_sync_engine::transport {
 
 class HttpTunnelTransportConnection:
-    public AbstractTransactionTransport
+    public AbstractCommandPipeline
 {
-    using base_type = AbstractTransactionTransport;
+    using base_type = AbstractCommandPipeline;
 
 public:
     HttpTunnelTransportConnection(
         const std::string& connectionId,
-        std::unique_ptr<network::AbstractStreamSocket> tunnelConnection,
-        int protocolVersion);
+        std::unique_ptr<network::AbstractStreamSocket> tunnelConnection);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
     virtual network::SocketAddress remotePeerEndpoint() const override;
 
-    virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
+    virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
 
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
 
     virtual QnUuid connectionGuid() const override;
 
-    virtual const TransactionTransportHeader& commonTransportHeaderOfRemoteTransaction() const override;
-
     virtual void sendTransaction(
         TransactionTransportHeader transportHeader,
-        const std::shared_ptr<const SerializableAbstractTransaction>& transactionSerializer) override;
+        const std::shared_ptr<const TransactionSerializer>& transactionSerializer) override;
 
-    virtual void start() override;
+    virtual void closeConnection() override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -44,11 +41,9 @@ protected:
 private:
     const std::string m_connectionId;
     const network::SocketAddress m_remoteEndpoint;
-    TransactionTransportHeader m_commonTransportHeader;
     nx::network::server::FixedSizeMessagePipeline m_messagePipeline;
     ConnectionClosedEventHandler m_connectionClosedEventHandler;
     GotTransactionEventHandler m_gotTransactionEventHandler;
-    ConnectionClosedSubscription m_connectionClosedSubscription;
 
     void processMessage(nx::network::server::FixedSizeMessage message);
 };

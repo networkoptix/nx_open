@@ -59,12 +59,12 @@ void HttpTunnelTransportConnector::processOpenTunnelResult(
         return nx::utils::swapAndCall(m_completionHandler, nullptr);
     }
 
-    auto connection = std::make_unique<HttpTunnelTransportConnection>(
-        m_connectionId,
-        std::move(result.connection),
-        0); // TODO: #ak Protocol version.
+    //auto connection = std::make_unique<HttpTunnelTransportConnection>(
+    //    m_connectionId,
+    //    std::move(result.connection),
+    //    0); // TODO: #ak Protocol version.
 
-    nx::utils::swapAndCall(m_completionHandler, std::move(connection));
+    nx::utils::swapAndCall(m_completionHandler, nullptr);
 }
 
 } // namespace nx::data_sync_engine::transport

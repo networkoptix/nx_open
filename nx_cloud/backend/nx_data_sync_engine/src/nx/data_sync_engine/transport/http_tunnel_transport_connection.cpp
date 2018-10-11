@@ -4,12 +4,10 @@ namespace nx::data_sync_engine::transport {
 
 HttpTunnelTransportConnection::HttpTunnelTransportConnection(
     const std::string& connectionId,
-    std::unique_ptr<network::AbstractStreamSocket> tunnelConnection,
-    int protocolVersion)
+    std::unique_ptr<network::AbstractStreamSocket> tunnelConnection)
     :
     m_connectionId(connectionId),
     m_remoteEndpoint(tunnelConnection->getForeignAddress()),
-    m_commonTransportHeader(protocolVersion),
     m_messagePipeline(std::move(tunnelConnection))
 {
     m_messagePipeline.setMessageHandler(
@@ -29,9 +27,10 @@ network::SocketAddress HttpTunnelTransportConnection::remotePeerEndpoint() const
     return m_remoteEndpoint;
 }
 
-ConnectionClosedSubscription& HttpTunnelTransportConnection::connectionClosedSubscription()
+void HttpTunnelTransportConnection::setOnConnectionClosed(
+    ConnectionClosedEventHandler handler)
 {
-    return m_connectionClosedSubscription;
+    m_connectionClosedEventHandler = std::move(handler);
 }
 
 void HttpTunnelTransportConnection::setOnGotTransaction(
@@ -45,20 +44,14 @@ QnUuid HttpTunnelTransportConnection::connectionGuid() const
     return QnUuid::fromStringSafe(m_connectionId);
 }
 
-const TransactionTransportHeader& 
-    HttpTunnelTransportConnection::commonTransportHeaderOfRemoteTransaction() const
-{
-    return m_commonTransportHeader;
-}
-
 void HttpTunnelTransportConnection::sendTransaction(
     TransactionTransportHeader /*transportHeader*/,
-    const std::shared_ptr<const SerializableAbstractTransaction>& /*transactionSerializer*/)
+    const std::shared_ptr<const TransactionSerializer>& /*transactionSerializer*/)
 {
     // TODO
 }
 
-void HttpTunnelTransportConnection::start()
+void HttpTunnelTransportConnection::closeConnection()
 {
     // Sending local state.
 }
