@@ -2831,10 +2831,10 @@ void MediaServerProcess::initPublicIpDiscovery()
         serverModule()->settings().publicIPServers().split(";", QString::SkipEmptyParts));
 
     int publicIPEnabled = serverModule()->settings().publicIPEnabled();
-    if (publicIPEnabled == 0) // Public IP disabled.
+    if (publicIPEnabled == 0) //< Public IP disabled.
         return;
 
-    if (publicIPEnabled > 1) // Public IP manually set.
+    if (publicIPEnabled > 1) //< Public IP manually set.
     {
         auto staticIp = serverModule()->settings().staticPublicIP();
         at_updatePublicAddress(QHostAddress(staticIp));
@@ -2843,7 +2843,7 @@ void MediaServerProcess::initPublicIpDiscovery()
 
     // Discover public IP.
     m_ipDiscovery->update();
-    m_ipDiscovery->waitForFinished(); // NOTE: Slows down server startup, should be avoided here.
+    m_ipDiscovery->waitForFinished(); //< NOTE: Slows down server startup, should be avoided here.
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 }
 
