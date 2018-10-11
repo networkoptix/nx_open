@@ -11,7 +11,7 @@
 # Description: root-tool
 ### END INIT INFO
 
-SERVICE=root-tool
+SERVICE=@deb.customization.company.name@-root-tool
 COMMAND=$1
 
 echo "Rather than invoking init scripts through /etc/init.d, use the service(8)" >&2
