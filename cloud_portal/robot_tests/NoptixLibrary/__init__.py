@@ -137,7 +137,7 @@ class NoptixLibrary(object):
 
     def check_file_exists(self, url):
         linkInfo = head(url)
-        if int(linkInfo.status_code) == 200 and int(linkInfo.headers['Content-Length']) > 1000:
+        if int(linkInfo.status_code) == 200: #and int(linkInfo.headers['Content-Length']) > 1000:
             return
         else:
             raise Exception("File does not appear to be available.")

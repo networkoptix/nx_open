@@ -144,7 +144,7 @@ ${OPEN IN NX BUTTON}                  //div[@process-loading='gettingSystem']//b
 ${OPEN IN NX BUTTON DISABLED}         //div[@process-loading='gettingSystem']//button[@ng-click='checkForm()' and @ng-disabled='buttonDisabled']
 ${DELETE USER MODAL}                  //div[@uib-modal-transclude]
 ${DELETE USER BUTTON}                 //button[contains(text(), '${DELETE USER BUTTON TEXT}')]
-${DELETE USER CANCEL BUTTON}          //button[@ng-click='cancel()' and contains(text(), "${DELETE USER CANCEL BUTTON TEXT}")]
+${DELETE USER CANCEL BUTTON}          //ngb-modal-window//button[contains(text(), "${DELETE USER CANCEL BUTTON TEXT}")]
 ${SYSTEM NAME OFFLINE}                //span[@ng-if='!system.isOnline']
 ${USERS LIST}                         //div[@process-loading='gettingSystemUsers']
 
