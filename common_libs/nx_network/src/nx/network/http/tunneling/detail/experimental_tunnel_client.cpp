@@ -143,11 +143,19 @@ void ExperimentalTunnelClient::clear()
     m_upChannel.reset();
 }
 
-void ExperimentalTunnelClient::handleTunnelFailure(AsyncClient* failedHttpClient)
+void ExperimentalTunnelClient::handleTunnelFailure(
+    AsyncClient* failedHttpClientPtr)
 {
-    cleanUpFailedTunnel(failedHttpClient);
+    // TODO: #ak Remove if and pass std::unique_ptr<AsyncClient> to this method.
+    std::unique_ptr<AsyncClient> failedHttpClient;
+    if (failedHttpClientPtr == m_downChannelHttpClient.get())
+        failedHttpClient = std::exchange(m_downChannelHttpClient, nullptr);
+    else
+        failedHttpClient = std::exchange(m_upChannelHttpClient, nullptr);
 
     clear();
+
+    cleanUpFailedTunnel(failedHttpClient.get());
 }
 
 void ExperimentalTunnelClient::prepareOpenUpChannelRequest()
