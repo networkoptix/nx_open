@@ -1062,17 +1062,23 @@ void QnMediaResourceWidget::setupHud()
 
     setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
 
+    // During the widget destruction the following scenario occurs: m_hudOverlay is destroyed, then
+    // triggers container resizes, and we've got a crash in updateTriggersMinHeight().
+    QPointer<QnViewportBoundWidget> content(m_hudOverlay->content());
+    QPointer<QnScrollableItemsWidget> triggersContainer(m_triggersContainer);
     const auto updateTriggersMinHeight =
-        [this]()
+        [content, triggersContainer]()
         {
-            // Calculate minimum height for downscaling no more than kMaxDownscaleFactor times.
+            if (!content || !triggersContainer)
+                return;
+
+            // Calculate minimum height for downscale no more than kMaxDownscaleFactor times.
             static const qreal kMaxDownscaleFactor = 2.0;
-            const auto content = m_hudOverlay->content();
             const qreal available = content->fixedSize().height() / content->sceneScale();
-            const qreal desired = m_triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
-            const qreal extra = content->size().height() - m_triggersContainer->size().height();
+            const qreal desired = triggersContainer->effectiveSizeHint(Qt::PreferredSize).height();
+            const qreal extra = content->size().height() - triggersContainer->size().height();
             const qreal min = qMin(desired, available * kMaxDownscaleFactor - extra);
-            m_triggersContainer->setMinimumHeight(min);
+            triggersContainer->setMinimumHeight(min);
         };
 
     connect(m_hudOverlay->content(), &QnViewportBoundWidget::scaleChanged,
