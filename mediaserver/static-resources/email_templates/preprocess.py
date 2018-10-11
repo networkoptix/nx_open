@@ -28,7 +28,7 @@ def main():
 
     containter_text_plain = open('container_plain.mustache.template').read()
 
-    files_to_process = sys.argv if len(sys.argv) > 1 else os.listdir(".")
+    files_to_process = sys.argv[1:] if len(sys.argv) > 1 else os.listdir(".")
     for file in files_to_process:
         handle_file(file, containter_text, containter_text_plain)
 

@@ -251,6 +251,10 @@ void SeamlessVideoDecoder::pushFrame(QVideoFramePtr decodedFrame, int decodedFra
     metadata.sar = sar;
     if (qFuzzyCompare(metadata.sar, 1.0))
         metadata.sar = nx::media::getDefaultSampleAspectRatio(decodedFrame->size());
+
+    if (d->videoDecoder->capabilities().testFlag(AbstractVideoDecoder::Capability::hardwareAccelerated))
+        metadata.flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+
     metadata.serialize(decodedFrame);
     d->queue.push_back(std::move(decodedFrame));
 }

@@ -2831,21 +2831,28 @@ void MediaServerProcess::initPublicIpDiscovery()
         serverModule()->settings().publicIPServers().split(";", QString::SkipEmptyParts));
 
     int publicIPEnabled = serverModule()->settings().publicIPEnabled();
-    if (publicIPEnabled == 0)
-        return; // disabled
-    else if (publicIPEnabled > 1)
+    if (publicIPEnabled == 0) //< Public IP disabled.
+        return;
+
+    if (publicIPEnabled > 1) //< Public IP manually set.
     {
         auto staticIp = serverModule()->settings().staticPublicIP();
-        at_updatePublicAddress(QHostAddress(staticIp)); // manually added
+        at_updatePublicAddress(QHostAddress(staticIp));
         return;
     }
+
+    // Discover public IP.
     m_ipDiscovery->update();
-    m_ipDiscovery->waitForFinished();
+    m_ipDiscovery->waitForFinished(); //< NOTE: Slows down server startup, should be avoided here.
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 }
 
-void MediaServerProcess::initPublicIpDiscoveryUpdate()
+void MediaServerProcess::startPublicIpDiscovery()
 {
+    // Should start periodic discovery only when public IP auto-discovery is enabled.
+    if (serverModule()->settings().publicIPEnabled() != 1)
+        return;
+
     m_updatePiblicIpTimer = std::make_unique<QTimer>();
     connect(m_updatePiblicIpTimer.get(), &QTimer::timeout,
         m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
@@ -4172,7 +4179,7 @@ void MediaServerProcess::run()
 
     at_runtimeInfoChanged(commonModule()->runtimeInfoManager()->localInfo());
 
-    initPublicIpDiscoveryUpdate();
+    startPublicIpDiscovery();
 
     saveServerInfo(m_mediaServer);
 
