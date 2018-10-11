@@ -256,7 +256,7 @@ DWC-MPA20M:
 
 # Needs a reboot every time. Camera is VERY BUGGY!
 DWC-MD421D_1.1.1.8:
-  discovery:
+  discovery if False: # Camera needs firmware upgrade to v.1.1.2.x
     physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
     model: DWC-MD421D
@@ -272,7 +272,7 @@ DWC-MD421D_1.1.1.8:
   attributes if features.advanced_lens_control:
     ptzCapabilities: 8405004
 
-  recording if False: # Camera needs firmware upgrade to v.1.1.2.x
+  recording:
     primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
     #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
 
