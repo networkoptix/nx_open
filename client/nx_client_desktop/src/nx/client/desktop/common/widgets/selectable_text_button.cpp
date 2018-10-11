@@ -384,7 +384,9 @@ void SelectableTextButton::paintEvent(QPaintEvent* /*event*/)
             NX_ASSERT(false, "Should never get here!");
     }
 
-    painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, effectiveText());
+    const auto fullText = effectiveText();
+    const auto elidedText = fontMetrics().elidedText(fullText, Qt::ElideRight, rect.width());
+    painter.drawText(rect, Qt::AlignLeft | Qt::AlignVCenter, elidedText);
 }
 
 } // namespace desktop

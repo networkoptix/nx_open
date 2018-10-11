@@ -111,6 +111,7 @@ private:
     QHash<Period, QAction*> m_timeSelectionActions;
     friend uint qHash(Period source) { return uint(source); }
 
+    QMetaObject::Connection m_currentCameraConnection;
     QHash<Cameras, QAction*> m_cameraSelectionActions;
     friend uint qHash(Cameras source) { return uint(source); }
 

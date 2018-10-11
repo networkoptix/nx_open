@@ -366,11 +366,30 @@ void AbstractSearchWidget::Private::setupCameraSelection()
     auto addMenuAction =
         [this, cameraMenu](const QString& title, Cameras cameras, bool dynamicTitle = false)
         {
+            const auto updateButtonText =
+                [this](Cameras cameras)
+                {
+                    const auto currentCameraName =
+                        [this]()
+                        {
+                            const auto camera = m_mainModel->cameraSet()->singleCamera();
+                            return camera
+                                ? camera->getName()
+                                : tr("none", "No currently selected camera");
+                        };
+
+                    const auto text = m_cameraSelectionActions[cameras]->text();
+
+                    ui->cameraSelectionButton->setText(cameras == Cameras::current
+                        ? QString::fromWCharArray(L"%1 \x2013 %2").arg(text, currentCameraName())
+                        : text);
+                };
+
             auto action = cameraMenu->addAction(title);
             connect(action, &QAction::triggered, this,
-                [this, cameras]()
+                [this, cameras, updateButtonText]()
                 {
-                    ui->cameraSelectionButton->setText(m_cameraSelectionActions[cameras]->text());
+                    updateButtonText(cameras);
                     ui->cameraSelectionButton->setState(cameras == Cameras::all
                         ? SelectableTextButton::State::deactivated
                         : SelectableTextButton::State::unselected);
@@ -382,13 +401,10 @@ void AbstractSearchWidget::Private::setupCameraSelection()
             if (dynamicTitle)
             {
                 connect(action, &QAction::changed, this,
-                    [this, cameras]()
+                    [this, cameras, updateButtonText]()
                     {
-                        if (selectedCameras() != cameras)
-                            return;
-
-                        ui->cameraSelectionButton->setText(
-                            m_cameraSelectionActions[cameras]->text());
+                        if (selectedCameras() == cameras)
+                            updateButtonText(cameras);
                     });
             }
 
@@ -442,6 +458,29 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 
     connect(workbench(), &QnWorkbench::currentLayoutItemsChanged,
         this, camerasUpdaterFor(Cameras::layout));
+
+    // Current camera name watchers.
+
+    connect(q, &AbstractSearchWidget::cameraSetChanged, this,
+        [this]()
+        {
+            disconnect(m_currentCameraConnection);
+
+            if (m_cameras != Cameras::current)
+                return;
+
+            const auto updateCurrentCameraName =
+                [this]() { m_cameraSelectionActions[Cameras::current]->trigger(); };
+
+            updateCurrentCameraName();
+
+            const auto camera = m_mainModel->cameraSet()->singleCamera();
+            if (!camera)
+                return;
+
+            m_currentCameraConnection = connect(camera.data(), &QnResource::nameChanged,
+                this, updateCurrentCameraName);
+        });
 }
 
 void AbstractSearchWidget::Private::setupAreaSelection()
