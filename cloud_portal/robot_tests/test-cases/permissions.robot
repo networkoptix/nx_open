@@ -208,7 +208,7 @@ Edit permission works
     Remove User Permissions    ${random email}
 
 Delete user works
-    [tags]    email
+    [tags]    email    C41903
     Go To    ${url}/register
     ${random email}    Get Random Email    ${BASE EMAIL}
     Register    mark    harmill    ${random email}    ${password}
@@ -223,6 +223,12 @@ Delete user works
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${email}
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
+    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
+    Wait Until Element Is Visible    ${DELETE USER CANCEL BUTTON}
+    Click Button    ${DELETE USER CANCEL BUTTON}
     Remove User Permissions    ${random email}
     Log Out
     Validate Log Out
