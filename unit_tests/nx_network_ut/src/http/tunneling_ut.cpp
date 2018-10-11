@@ -9,6 +9,7 @@
 #include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/experimental_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/ssl_tunnel_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -19,8 +20,9 @@ enum TunnelMethod
     getPost = 0x01,
     connectionUpgrade = 0x02,
     experimental = 0x04,
+    ssl = 0x08,
 
-    all = getPost | connectionUpgrade | experimental,
+    all = getPost | connectionUpgrade | experimental | ssl,
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
@@ -140,6 +142,9 @@ private:
 
         if (tunnelMethodMask & TunnelMethod::experimental)
             m_localFactory.registerClientType<detail::ExperimentalTunnelClient>();
+
+        if (tunnelMethodMask & TunnelMethod::ssl)
+            m_localFactory.registerClientType<detail::SslTunnelClient>();
     }
 
     void saveClientTunnel(OpenTunnelResult result)
@@ -217,5 +222,10 @@ INSTANTIATE_TEST_CASE_P(
     Experimental,
     HttpTunneling,
     ::testing::Values(TunnelMethod::experimental));
+
+INSTANTIATE_TEST_CASE_P(
+    Ssl,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::ssl));
 
 } // namespace nx::network::http::tunneling::test
