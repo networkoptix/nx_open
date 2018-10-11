@@ -116,7 +116,6 @@ copyBuildLibs()
             libvcos
             libvcsm
             libbcm_host
-            libopenh264
         )
     fi
 
