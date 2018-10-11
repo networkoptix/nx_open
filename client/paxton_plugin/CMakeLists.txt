@@ -27,11 +27,13 @@ include(CMakeDependentOption)
 include(utils)
 include(${customization_dir}/../default-values.cmake)
 include(${customization_dir}/customization.cmake)
+include(cloud_host)
 include(output_directories)
 include(distribution_names)
 include(option)
 include(windows_signing)
 
+set(minilauncher.binary.name "${product.name} Launcher.exe") # Cannot include properties.cmake.
 set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
 set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
 set(paxtonPluginName "${display.product.name} Paxton Plugin")
