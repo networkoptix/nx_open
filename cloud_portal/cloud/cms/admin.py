@@ -126,6 +126,11 @@ class ContextAdmin(CMSAdmin):
 
     change_list_template = "cms/context_changelist.html"
 
+    def get_model_perms(self, request):
+        if not request.user.is_superuser:
+            return {}
+        return super(ContextAdmin, self).get_model_perms(request)
+
     def changelist_view(self, request, extra_context=None):
         if not request.user.is_superuser:
             self.list_display_links = (None,)

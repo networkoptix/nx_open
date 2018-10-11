@@ -31,6 +31,7 @@ class CustomIndexDashboard(Dashboard):
         self.children.append(modules.AppList(
             _('Applications'),
             exclude=('cms.models.ContentVersion',
+                     'cms.models.Context',
                      'cms.models.ContextTemplate',
                      'cms.models.DataRecord',
                      'cms.models.DataStructure',
@@ -49,6 +50,7 @@ class CustomIndexDashboard(Dashboard):
         self.children.append(modules.AppList(
             _('Internal'),
             models=('cms.models.ContentVersion',
+                    'cms.models.Context',
                     'cms.models.ContextTemplate',
                     'cms.models.DataRecord',
                     'cms.models.DataStructure',
