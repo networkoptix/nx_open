@@ -30,7 +30,6 @@ const char * deviceType()
 #endif
 }
 
-static constexpr int kRetryLimit = 10;
 static constexpr int kMsecInSec = 1000;
 
 } // namespace
@@ -44,24 +43,14 @@ VideoStream::VideoStream(
     m_codecParams(codecParams),
     m_camera(camera),
     m_timeProvider(camera.lock()->timeProvider()),
-    m_cameraState(csOff),
-    m_waitForKeyPacket(true),
-    m_updatingFps(0),
-    m_actualFps(0),
-    m_oneSecondAgo(0),
     m_packetCount(std::make_shared<std::atomic_int>(0)),
-    m_frameCount(std::make_shared<std::atomic_int>(0)),
-    m_terminated(false),
-    m_retries(0),
-    m_initCode(0)
+    m_frameCount(std::make_shared<std::atomic_int>(0))
 {
-    start();
 }
 
 VideoStream::~VideoStream()
 {
     stop();
-    uninitialize();
     m_timeProvider->releaseRef();
 }
 
@@ -101,6 +90,7 @@ void VideoStream::addPacketConsumer(const std::weak_ptr<AbstractPacketConsumer>&
     std::lock_guard<std::mutex> lock(m_mutex);
     m_packetConsumerManager.addConsumer(consumer, true/*waitForKeyPacket*/);
     updateUnlocked();
+    tryStart();
     m_wait.notify_all();
 }
 
@@ -116,6 +106,7 @@ void VideoStream::addFrameConsumer(const std::weak_ptr<AbstractFrameConsumer>& c
     std::lock_guard<std::mutex> lock(m_mutex);
     m_frameConsumerManager.addConsumer(consumer);
     updateUnlocked();
+    tryStart();
     m_wait.notify_all();
 }
 
@@ -142,6 +133,16 @@ void VideoStream::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     updateResolutionUnlocked();
+}
+
+bool VideoStream::ioError() const
+{
+    return m_ioError;
+}
+
+bool VideoStream::pluggedIn() const
+{
+    return !device::getDeviceName(m_url.c_str()).empty();
 }
 
 void VideoStream::updateActualFps(uint64_t now)
@@ -173,7 +174,7 @@ bool VideoStream::consumersEmpty() const
     return m_packetConsumerManager.empty() && m_frameConsumerManager.empty();
 }
 
-void VideoStream::waitForConsumers()
+bool VideoStream::waitForConsumers()
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (consumersEmpty())
@@ -181,10 +182,23 @@ void VideoStream::waitForConsumers()
         uninitialize();
         m_wait.wait(lock, [&]() { return m_terminated || !consumersEmpty(); });
     }
+    return !m_terminated;
+}
+
+void VideoStream::tryStart()
+{
+    if (m_terminated)
+    {
+        if (pluggedIn()) 
+            start();
+    }
 }
 
 void VideoStream::start()
 {
+    if (m_videoThread.joinable())
+        m_videoThread.join();
+
     m_terminated = false;
     m_videoThread = std::thread(&VideoStream::run, this);
 }
@@ -201,41 +215,21 @@ void VideoStream::run()
 {
     while (!m_terminated)
     {
-        if (m_retries >= kRetryLimit)
-        {
-            NX_DEBUG(this) << m_url << "exceeded retry limit of " << kRetryLimit
-                << ". Error:" << ffmpeg::utils::errorToString(m_initCode);
-            return;
-        }
-
-        waitForConsumers();
-        if (m_terminated)
-            return;
+        if (!waitForConsumers())
+            continue;
 
         if (!ensureInitialized())
         {
-            ++m_retries;
-            continue;
+            NX_DEBUG(this) << m_url << "Unable to initialize VideoStream: " 
+                << ffmpeg::utils::errorToString(m_initCode);
+            break;   
         }
 
-        auto packet = std::make_shared<ffmpeg::Packet>(
-            m_inputFormat->videoCodecID(),
-            AVMEDIA_TYPE_VIDEO,
-            m_packetCount);
-
-        int result = m_inputFormat->readFrame(packet->packet());
-        if (result < 0)
-        {
-            // ENODEV is returned when the device is unplugged
-            m_terminated = result == AVERROR(ENODEV);
-            if(m_terminated)
-            {
-                if(auto cam = m_camera.lock())
-                    cam->setLastError(result);
-            }
+        auto packet = readFrame();
+        if (!packet)
             continue;
-        }
 
+        // Setting timestamp here because primary stream needs it even if there is no decoding.
         packet->setTimestamp(m_timeProvider->millisSinceEpoch());
 
         auto frame = maybeDecode(packet.get());
@@ -248,6 +242,8 @@ void VideoStream::run()
         if (frame)
             m_frameConsumerManager.giveFrame(frame);
     }
+
+    uninitialize();
 }
 
 bool VideoStream::ensureInitialized()
@@ -293,7 +289,7 @@ void VideoStream::uninitialize()
     m_frameConsumerManager.flush();
 
     // Some cameras segfault if they are unintialized while there are still packets and / or frames
-    // allocated. They own the memory being referred to be the packet, so the packet needs to go 
+    // allocated. They own the memory being referred to be the packet, so the packet needs to go
     // be deallocated first.
     while (*m_packetCount > 0 || *m_frameCount > 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -317,6 +313,7 @@ int VideoStream::initializeInputFormat()
     setInputFormatOptions(inputFormat);
 
     result = inputFormat->open(ffmpegUrl().c_str());
+    checkIoError(result);
     if (result < 0)
         return result;
 
@@ -365,7 +362,7 @@ int VideoStream::initializeDecoder()
         AVStream * stream = m_inputFormat->findStream(AVMEDIA_TYPE_VIDEO);
         result = stream
             ? decoder->initializeDecoder(stream->codecpar)
-            : AVERROR_DECODER_NOT_FOUND;
+            : AVERROR_DECODER_NOT_FOUND;//< Using as stream not found
     }
     if (result < 0)
         return result;
@@ -379,7 +376,7 @@ int VideoStream::initializeDecoder()
 
     // Some cameras have infrequent I-frames. Initializing the decoder with the first packet read
     // from the camera (presumably an I-frame) prevents numerous "non exisiting PPS 0 referenced"
-    // errors on some cameras.
+    // errors on some cameras with h264, on Windows in particular.
     ffmpeg::Packet packet(m_inputFormat->videoCodecID(), AVMEDIA_TYPE_VIDEO);
     if (m_inputFormat->readFrame(packet.packet()) == 0)
     {
@@ -388,6 +385,27 @@ int VideoStream::initializeDecoder()
     }
 
     return 0;
+}
+
+std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
+{
+    auto packet = std::make_shared<ffmpeg::Packet>(
+        m_inputFormat->videoCodecID(),
+        AVMEDIA_TYPE_VIDEO,
+        m_packetCount);
+
+    int result = m_inputFormat->readFrame(packet->packet());
+    if (result < 0)
+    {
+        if (checkIoError(result))
+        {
+            m_terminated = true;
+            if(auto cam = m_camera.lock())
+                cam->setLastError(result);
+        }
+        return nullptr;
+    }
+    return packet;
 }
 
 std::shared_ptr<ffmpeg::Frame> VideoStream::maybeDecode(const ffmpeg::Packet * packet)
@@ -639,6 +657,13 @@ void VideoStream::setCodecParameters(const CodecParameters& codecParams)
         m_codecParams.codecId = codecId;
         m_cameraState = csModified;
     }
+}
+
+bool VideoStream::checkIoError(int ffmpegError)
+{
+    // TODO: find out if this is the error code on windows
+    m_ioError = ffmpegError == AVERROR(ENODEV);
+    return m_ioError;
 }
 
 } // namespace usb_cam

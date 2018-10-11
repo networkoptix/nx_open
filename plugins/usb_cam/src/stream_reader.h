@@ -77,6 +77,7 @@ protected:
     static constexpr int kMsecInSec = 1000;
     static constexpr std::chrono::milliseconds kStreamDelay = std::chrono::milliseconds(300);
     static constexpr std::chrono::milliseconds kBufferTimeSpanMax = std::chrono::milliseconds(1000);
+    static constexpr std::chrono::milliseconds kWaitTimeOut = std::chrono::milliseconds(1000);
 
     int m_encoderIndex;
     CodecParameters m_codecParams;
@@ -90,6 +91,7 @@ protected:
 
 protected:
     std::unique_ptr<ILPMediaPacket> toNxPacket(const ffmpeg::Packet *packet);
+    virtual void removeConsumer();
 };
 
 } // namespace usb_cam

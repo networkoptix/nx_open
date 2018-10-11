@@ -69,6 +69,16 @@ public:
     void updateBitrate();
     void updateResolution();
 
+    /**
+     *  return internal io error code, set if readFrame fails with such code.
+     */
+    bool ioError() const;
+
+    /**
+     * Queries hardware for the camera name to determine if the camera is plugged in.
+     */
+    bool pluggedIn() const;
+
 private:
     enum CameraState
     {
@@ -82,15 +92,15 @@ private:
     std::weak_ptr<Camera> m_camera;
     nxpl::TimeProvider * const m_timeProvider;
 
-    CameraState m_cameraState;
+    CameraState m_cameraState = csOff;
 
     std::unique_ptr<ffmpeg::InputFormat> m_inputFormat;
     std::unique_ptr<ffmpeg::Codec> m_decoder;
-    bool m_waitForKeyPacket;
+    bool m_waitForKeyPacket = true;
 
-    std::atomic_int m_updatingFps;
-    std::atomic_int m_actualFps;
-    uint64_t m_oneSecondAgo;
+    std::atomic_int m_updatingFps = 0;
+    std::atomic_int m_actualFps = 0;
+    uint64_t m_oneSecondAgo = 0;
 
     /**
      * Some cameras crash the plugin if they are uninitialized while there are still packets and 
@@ -114,15 +124,16 @@ private:
     std::thread m_videoThread;
     std::condition_variable m_wait;
     mutable std::mutex m_mutex;
-    bool m_terminated;
-    int m_retries;
-    int m_initCode;
+    std::atomic_bool m_terminated = true;
+    std::atomic_bool m_ioError = false;
+    int m_initCode = 0;
 
 private:
     void updateActualFps(uint64_t now);
     std::string ffmpegUrl() const;
     bool consumersEmpty() const;
-    void waitForConsumers();
+    bool waitForConsumers();
+    void tryStart();
     void start();
     void stop();
     void run();
@@ -132,6 +143,7 @@ private:
     int initializeInputFormat();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
     int initializeDecoder();
+    std::shared_ptr<ffmpeg::Packet> readFrame();
     std::shared_ptr<ffmpeg::Frame> maybeDecode(const ffmpeg::Packet * packet);
     int decode(const ffmpeg::Packet * packet, ffmpeg::Frame * frame);
 
@@ -144,6 +156,8 @@ private:
     void updateUnlocked();
     CodecParameters closestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);
+
+    bool checkIoError(int ffmpegError);
 };
 
 } // namespace usb_cam

@@ -36,15 +36,16 @@ TranscodeStreamReader::TranscodeStreamReader(
 TranscodeStreamReader::~TranscodeStreamReader()
 {
     uninitialize();
-    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     m_videoFrameConsumer->interrupt();
+    // Avoid virtual removeConsumer()
+    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
 }   
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-   if (m_retries >= kRetryLimit)
+    if (m_retries >= kRetryLimit)
         return nxcip::NX_NO_DATA;
 
     if (!ensureInitialized())
@@ -60,10 +61,16 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     auto packet = nextPacket(&outNxError);
 
     if(outNxError != nxcip::NX_NO_ERROR)
+    {
+        removeConsumer();
         return outNxError;
+    }
 
     if(!packet)
+    {
+        removeConsumer();
         return nxcip::NX_OTHER_ERROR;
+    }
 
     *lpPacket = toNxPacket(packet.get()).release();
 
@@ -72,8 +79,8 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void TranscodeStreamReader::interrupt()
 {
+    // Note: StreamReaderPrivate::interrupt calls removeConsumer(), which is overriden here.
     StreamReaderPrivate::interrupt();
-    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
     m_videoFrameConsumer->interrupt();
     m_videoFrameConsumer->flush();
 }
@@ -187,12 +194,15 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame* frame, ffmpeg::Packet * o
     return result;
 }
 
-void TranscodeStreamReader::waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
+bool TranscodeStreamReader::waitForTimeSpan(
+    const std::chrono::milliseconds& timeSpan,
+    const std::chrono::milliseconds& timeOut)
 {
+    uint64_t waitStart = m_camera->millisSinceEpoch();
     for (;;)
     {
         if (m_interrupted)
-            return;
+            return false;
 
         std::set<uint64_t> allTimeStamps;
         
@@ -208,10 +218,12 @@ void TranscodeStreamReader::waitForTimeSpan(const std::chrono::milliseconds& tim
             || *allTimeStamps.rbegin() - *allTimeStamps.begin() < timeSpan.count())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if (m_camera->millisSinceEpoch() - waitStart >= timeOut.count())
+                return false;
         }
         else
         {
-            return;
+            return true;
         }
     }
 }
@@ -232,13 +244,24 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
             return false;
         };
 
+    const auto ioError =
+        [this, &outNxError]() -> bool
+        {
+            if (m_camera->videoStream()->ioError())
+            {
+                *outNxError = nxcip::NX_IO_ERROR;
+                return true;
+            }
+            return false;
+        };
+
     // Audio disabled
     if (!m_camera->audioEnabled())
     {
         for (;;)
         {
-            auto videoFrame = m_videoFrameConsumer->popOldest();
-            if (interrupted())
+            auto videoFrame = m_videoFrameConsumer->popOldest(kWaitTimeOut);
+            if (interrupted() || ioError())
                 return nullptr;
             if (!shouldDrop(videoFrame.get()))
                 return transcodeVideo(videoFrame.get(), outNxError);
@@ -246,15 +269,16 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     }
     
     // Audio enabled
-    waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame());
-
-    if (interrupted())
-        return nullptr;
+    if (!waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeOut)
+    {
+        if (interrupted() || ioError())
+            return nullptr;
+    }
 
     for (;;)
     {
         auto videoFrame = m_videoFrameConsumer->popOldest(std::chrono::milliseconds(1));
-        if (interrupted())
+        if (interrupted() || ioError())
             return nullptr;
         if (!shouldDrop(videoFrame.get()))
         {
@@ -266,12 +290,17 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
         videoFrame = nullptr;
 
         auto peeked = m_avConsumer->peekOldest(std::chrono::milliseconds(1));
-        if (interrupted())
+        if (interrupted() || ioError())
             return nullptr;
+
         if(!peeked)
             continue;
 
-        return m_avConsumer->popOldest();
+        auto popped =  m_avConsumer->popOldest(kWaitTimeOut);
+        if (interrupted() || ioError())
+            return nullptr;
+        
+        return popped;
     }
 }
 
@@ -445,6 +474,12 @@ int TranscodeStreamReader::scale(const AVFrame * frame, AVFrame* outFrame)
 void TranscodeStreamReader::calculateTimePerFrame()
 {
     m_timePerFrame = 1.0 / m_codecParams.fps * kMsecInSec;
+}
+
+void TranscodeStreamReader::removeConsumer()
+{
+    StreamReaderPrivate::removeConsumer();
+    m_camera->videoStream()->removeFrameConsumer(m_videoFrameConsumer);
 }
 
 } // namespace usb_cam

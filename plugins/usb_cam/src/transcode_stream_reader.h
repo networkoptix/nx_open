@@ -59,7 +59,9 @@ private:
     std::shared_ptr<ffmpeg::Packet> transcodeVideo(const ffmpeg::Frame * frame, int * outNxError);
     int encode(const ffmpeg::Frame* frame, ffmpeg::Packet * outPacket);
 
-    void waitForTimeSpan(const std::chrono::milliseconds& timeSpan);
+    bool waitForTimeSpan(
+    const std::chrono::milliseconds& timeSpan,
+    const std::chrono::milliseconds& timeOut);
     std::shared_ptr<ffmpeg::Packet> nextPacket(int * outNxError);
 
     bool ensureInitialized();
@@ -81,6 +83,8 @@ private:
      */
     int scale(const AVFrame * frame, AVFrame* outFrame);
     void calculateTimePerFrame();
+
+    void removeConsumer() override;
 };
 
 } // namespace usb_cam

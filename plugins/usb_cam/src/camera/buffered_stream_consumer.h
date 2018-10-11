@@ -98,16 +98,25 @@ public:
      * Wait for the difference in timestamps between the oldest and newest items in buffer 
      *    to be >= timeSpan. Terminates early if interrupt() is called, returning false.
      * 
-     * @param[in] timeSpan - the amount of items in terms of their timestamps that the buffer should
+     * @param[in] timeSpan - The amount of items in terms of their timestamps that the buffer should
      *    contain.
+     * @param[in] timeOut - The maximum amount of time to wait for the time span condition before
+     *    terminating early
      * @return - true if the wait terminated due to satisfying the timespan condition, false if
      *    the wait terminated due to calling interrupt().
      */
-    bool waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
+    bool waitForTimeSpan(
+        const std::chrono::milliseconds& timeSpan,
+        const std::chrono::milliseconds& timeOut)
     {
         std::unique_lock<std::mutex> lock(m_mutex);
-        m_wait.wait(lock, [&]() { return m_interrupted || timeSpanInternal() >= timeSpan; });
-        return !interrupted();
+        m_wait.wait_for(
+            lock,
+            timeOut,
+            [&]() { return m_interrupted || timeSpanInternal() >= timeSpan; });
+        if (interrupted() || timeSpanInternal() < timeSpan)
+            return false;
+        return true;// < Timespan condition was satisfied
     }
     
     std::chrono::milliseconds timeSpan() const
@@ -202,7 +211,9 @@ public:
 
     void interrupt();
 
-    bool waitForTimeSpan(const std::chrono::milliseconds& timeSpan);
+    bool waitForTimeSpan(
+        const std::chrono::milliseconds& timeSpan,
+        const std::chrono::milliseconds& timeOut);
     std::chrono::milliseconds timeSpan() const;
 
     size_t size() const;

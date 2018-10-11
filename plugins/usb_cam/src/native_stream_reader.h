@@ -25,6 +25,7 @@ private:
     void ensureConsumerAdded() override;
     void maybeFlush();
     std::shared_ptr<ffmpeg::Packet> nextPacket();
+    virtual void removeConsumer() override;
 };
 
 } // namespace usb_cam

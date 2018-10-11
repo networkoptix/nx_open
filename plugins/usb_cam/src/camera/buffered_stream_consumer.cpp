@@ -44,9 +44,11 @@ void BufferedPacketConsumer::interrupt()
     m_buffer.interrupt();
 }
 
-bool BufferedPacketConsumer::waitForTimeSpan(const std::chrono::milliseconds& timeSpan)
+bool BufferedPacketConsumer::waitForTimeSpan(
+    const std::chrono::milliseconds& timeSpan,
+    const std::chrono::milliseconds& timeOut)
 {
-    return m_buffer.waitForTimeSpan(timeSpan);
+    return m_buffer.waitForTimeSpan(timeSpan, timeOut);
 }
 
 std::chrono::milliseconds BufferedPacketConsumer::timeSpan() const

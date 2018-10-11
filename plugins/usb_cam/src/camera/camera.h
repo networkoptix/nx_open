@@ -21,6 +21,7 @@ public:
     Camera(
         nxpl::TimeProvider * const timeProvider,
         const nxcip::CameraInfo& info);
+    virtual ~Camera() = default;
 
     std::shared_ptr<AudioStream> audioStream();
     std::shared_ptr<VideoStream> videoStream();

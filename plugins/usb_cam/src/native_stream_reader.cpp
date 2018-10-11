@@ -26,8 +26,8 @@ NativeStreamReader::NativeStreamReader(
 
 NativeStreamReader::~NativeStreamReader()
 {
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
     m_avConsumer->interrupt();
+    m_camera->videoStream()->removePacketConsumer(m_avConsumer);  //< Avoid virtual removeConsumer()
 }
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
@@ -38,14 +38,22 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     maybeFlush();
     
     auto packet = nextPacket();
-    if (m_interrupted)
-    {
-        m_interrupted = false;
-        return nxcip::NX_INTERRUPTED;
-    }
 
     if(!packet)
+    {
+        removeConsumer();
+
+        if (m_interrupted)
+        {
+            m_interrupted = false;
+            return nxcip::NX_INTERRUPTED;
+        }
+
+        if(m_camera->videoStream()->ioError())
+            return nxcip::NX_IO_ERROR;
+        
         return nxcip::NX_OTHER_ERROR;
+    }
 
     *lpPacket = toNxPacket(packet.get()).release();
 
@@ -54,8 +62,8 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::interrupt()
 {
+    // Note: StreamReaderPrivate::interrupt calls removeConsumer(), which this class overrides.
     StreamReaderPrivate::interrupt();
-    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
 }
 
 void NativeStreamReader::setFps(float fps)
@@ -95,11 +103,34 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
 {
     if (m_camera->audioEnabled())
     {
-        if (!m_avConsumer->waitForTimeSpan(kStreamDelay))
-            return nullptr;
+        for(;;)
+        {
+            if (!m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeOut))
+            {
+                if (m_interrupted || m_camera->videoStream()->ioError())
+                    return nullptr;
+            }            
+            break;
+        }
     }
-    
-    return m_avConsumer->popOldest();
+
+    for(;;)
+    {
+        auto popped = m_avConsumer->popOldest(kWaitTimeOut);
+        if (!popped)
+        {
+            if (m_interrupted || m_camera->videoStream()->ioError())
+                return nullptr;
+            continue;
+        }
+        return popped;
+    }
+}
+
+void NativeStreamReader::removeConsumer()
+{
+    StreamReaderPrivate::removeConsumer();
+    m_camera->videoStream()->removePacketConsumer(m_avConsumer);
 }
 
 } // namespace usb_cam

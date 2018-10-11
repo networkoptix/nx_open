@@ -21,11 +21,14 @@ NativeMediaEncoder::NativeMediaEncoder(
 
 int NativeMediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     auto list = m_camera->resolutionList();
     if (list.empty())
     {
         *infoListCount = 0;
-        return nxcip::NX_OTHER_ERROR;
+        return nxcip::NX_IO_ERROR;
     }
 
     fillResolutionList(list, infoList, infoListCount);

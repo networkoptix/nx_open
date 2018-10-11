@@ -120,18 +120,16 @@ StreamReaderPrivate::StreamReaderPrivate(
 
 StreamReaderPrivate::~StreamReaderPrivate()
 {
-    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
     m_avConsumer->interrupt();
+    m_camera->audioStream()->removePacketConsumer(m_avConsumer); //< Avoid virtual removeConsumer()
 }
 
 void StreamReaderPrivate::interrupt()
 {
-    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
     m_avConsumer->interrupt();
     m_avConsumer->flush();
 
     m_interrupted = true;
-    m_consumerAdded = false;
 }
 
 void StreamReaderPrivate::setFps(float fps)
@@ -176,6 +174,12 @@ std::unique_ptr<ILPMediaPacket> StreamReaderPrivate::toNxPacket(const ffmpeg::Pa
         memcpy(nxPacket->data(), packet->data(), packet->size());
 
     return nxPacket;
+}
+
+void StreamReaderPrivate::removeConsumer()
+{
+    m_camera->audioStream()->removePacketConsumer(m_avConsumer);
+    m_consumerAdded = false;
 }
 
 } // namespace usb_cam

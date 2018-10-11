@@ -61,6 +61,9 @@ unsigned int MediaEncoder::releaseRef()
 
 int MediaEncoder::getMediaUrl(char* urlBuf) const
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     //strncpy(urlBuf, m_camera->info().url, nxcip::MAX_TEXT_LEN - 1);
     strcpy(urlBuf, m_camera->info().url);
     return nxcip::NX_NO_ERROR;
@@ -68,6 +71,9 @@ int MediaEncoder::getMediaUrl(char* urlBuf) const
 
 int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 {
+    if(!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     std::string url = m_camera->url();
     *maxBitrate = device::getMaxBitrate(url.c_str(), m_camera->compressionTypeDescriptor()) / 1000;
     return nxcip::NX_NO_ERROR;
@@ -75,6 +81,9 @@ int MediaEncoder::getMaxBitrate(int* maxBitrate) const
 
 int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     m_codecParams.setResolution(resolution.width, resolution.height);
     if (m_streamReader)
         m_streamReader->setResolution(resolution);
@@ -83,6 +92,9 @@ int MediaEncoder::setResolution(const nxcip::Resolution& resolution)
 
 int MediaEncoder::setFps(const float& fps, float* selectedFps)
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     auto resolutionList = m_camera->resolutionList();
     if (resolutionList.empty())
         return nxcip::NX_OTHER_ERROR;
@@ -116,6 +128,9 @@ int MediaEncoder::setFps(const float& fps, float* selectedFps)
 
 int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     // the plugin uses bits per second internally, so convert to that first
     int bitrate = bitrateKbps * 1000;
     m_codecParams.bitrate = bitrate;
@@ -126,6 +141,9 @@ int MediaEncoder::setBitrate(int bitrateKbps, int* selectedBitrateKbps)
 }
 int MediaEncoder::getAudioFormat(nxcip::AudioFormat* audioFormat) const
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     int ffmpegError = 0;
     std::unique_ptr<ffmpeg::Codec> encoder = getDefaultAudioEncoder(&ffmpegError);
     if (ffmpegError < 0)

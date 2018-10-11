@@ -28,11 +28,14 @@ TranscodeMediaEncoder::TranscodeMediaEncoder(
 
 int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, int* infoListCount) const
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     auto list = m_camera->resolutionList();
     if (list.empty())
     {
         *infoListCount = 0;
-        return nxcip::NX_OTHER_ERROR;
+        return nxcip::NX_IO_ERROR;
     }
 
     fillResolutionList(list, infoList, infoListCount);
@@ -48,15 +51,20 @@ int TranscodeMediaEncoder::getResolutionList(nxcip::ResolutionInfo* infoList, in
     infoList[index].maxFps = secondary.fps;
 
     *infoListCount = index + 1;
+    
     return nxcip::NX_NO_ERROR;
 }
 
 int TranscodeMediaEncoder::setFps(const float& fps, float* selectedFps)
 {
+    if (!m_camera->videoStream()->pluggedIn())
+        return nxcip::NX_IO_ERROR;
+
     m_codecParams.fps = fps;
     if (m_streamReader)
         m_streamReader->setFps(fps);
     *selectedFps = fps;
+
     return nxcip::NX_NO_ERROR;
 }
 
