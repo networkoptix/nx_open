@@ -3,14 +3,19 @@
 angular.module('nxCommon').controller('ViewCtrl',
             ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords', 'chromeCast', '$q',
               'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI', 'voiceControl',
+                'dialogs',
+
     function ($scope, $rootScope, $location, $routeParams, cameraRecords, chromeCast, $q,
-              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI, voiceControl,
+              dialogs) {
 
         var channels = {
             Auto: 'lo',
             High: 'hi',
             Low: 'lo'
         };
+
+        $scope.showSettings = false;
 
         if($scope.system){ // Use system from outer scope (directive)
             systemAPI = $scope.system;
@@ -36,6 +41,13 @@ angular.module('nxCommon').controller('ViewCtrl',
         if(!$routeParams.cameraId && $scope.storage.cameraId){
             systemAPI.setCameraPath($scope.storage.cameraId);
         }
+
+        $scope.isEmbeded = ($location.path().indexOf('/embed') === 0);
+        $scope.showTimeline = !$location.search().nocontrols;
+        $scope.showCameraHeader = !$location.search().noheader;
+        $scope.showCamerasMenu = !$location.search().nocameras;
+
+
 
         var castAlert = false;
         $scope.showWarning = function(){
@@ -174,6 +186,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         function findRotation(param) {
             return param.name === 'rotation';
         }
+
+        $scope.toggleSettingsMenu = function () {
+            $scope.showSettings = !$scope.showSettings;
+        };
 
         $scope.updateCamera = function (position) {
             var oldTimePosition = null;
@@ -372,6 +388,11 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.voiceControls.showCommands = !$scope.voiceControls.showCommands;
         };
 
+        $scope.showEmbed = function () {
+            $scope.showSettings = false;
+            dialogs.embed({})
+        };
+
         $scope.selectResolution = function(resolution){
             /*if(resolution === 'auto' || resolution === 'Auto' || resolution === 'AUTO'){
                 resolution = '320p'; //TODO: detect better resolution here
@@ -533,7 +554,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             var $camerasPanel = $('.cameras-panel');
             var $placeholder = $(".webclient-placeholder .placeholder");
             var windowHeight = $window.height();
-            var headerHeight = $header.outerHeight();
+            var headerHeight = $header.outerHeight() || 0;
 
             var topAlertHeight = 0;
 

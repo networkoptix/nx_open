@@ -5,9 +5,9 @@
         .module('nxCommon')
         .directive('cameraPanel', CameraPanel);
 
-    CameraPanel.$inject = [ '$localStorage', '$timeout', '$filter' ];
+    CameraPanel.$inject = [ '$localStorage', '$timeout', '$location' ];
 
-    function CameraPanel($localStorage, $timeout, $filter) {
+    function CameraPanel($localStorage, $timeout, $location) {
 
         return {
             restrict   : 'E',
@@ -22,6 +22,8 @@
                 scope.Config = Config;
                 scope.storage = $localStorage;
                 scope.inputPlaceholder = L.common.searchCamPlaceholder;
+
+                scope.showCamerasMenu = !$location.search().nocameras;
 
                 scope.selectCamera = function (activeCamera) {
                     if (scope.activeCamera && (scope.activeCamera.id === activeCamera)) {

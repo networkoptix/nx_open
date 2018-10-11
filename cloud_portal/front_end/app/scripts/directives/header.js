@@ -7,10 +7,10 @@
         .directive('nxHeader', NxHeader);
 
     NxHeader.$inject = [ 'NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService' ];
+        'systemsProvider', 'configService', '$rootScope' ];
 
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, configService) {
+                      systemsProvider, configService, $rootScope) {
 
         const CONFIG = configService.config;
 
@@ -19,7 +19,15 @@
             templateUrl: CONFIG.viewsDir + 'components/header.html',
             link       : function (scope) {
                 scope.config = CONFIG;
-                scope.inline = typeof($location.search().inline) != 'undefined';
+                scope.inline = typeof($location.search().inline) !== 'undefined';
+
+                scope.viewHeader = CONFIG.showHeaderAndFooter;
+
+                $rootScope.$on('nx.layout.header', function (event, opt) {
+                    // An event to control visibility of the header
+                    // ... i.e. when in view camera in embed
+                    scope.viewHeader = !opt.state;
+                });
 
                 if (scope.inline) {
                     $('body').addClass('inline-portal');
@@ -35,7 +43,7 @@
                 scope.systemsProvider = systemsProvider;
                 scope.$watch('systemsProvider.systems', function () {
                     scope.systems = scope.systemsProvider.systems;
-                    scope.singleSystem = (scope.systems.length == 1);
+                    scope.singleSystem = (scope.systems.length === 1);
                     scope.systemCounter = scope.systems.length;
 
                     updateActiveSystem();
@@ -44,10 +52,7 @@
 
                 function isActive(val) {
                     var currentPath = $location.path();
-                    if (currentPath.indexOf(val) < 0) { // no match
-                        return false;
-                    }
-                    return true;
+                    return currentPath.indexOf(val) >= 0;
                 }
 
                 scope.active = {};
@@ -65,7 +70,7 @@
                     }
 
                     scope.activeSystem = _.find(scope.systems, function (system) {
-                        return $route.current.params.systemId == system.id;
+                        return $route.current.params.systemId === system.id;
                     });
                     if (scope.singleSystem) { // Special case for a single system - it always active
                         scope.activeSystem = scope.systems[ 0 ];

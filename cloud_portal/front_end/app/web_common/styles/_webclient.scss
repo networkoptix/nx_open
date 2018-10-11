@@ -627,6 +627,10 @@ table.webclient-window>tbody>tr>td{
     padding-bottom: 40px !important;
   }
 
+    &.no-controls {
+        padding-bottom : 0 !important;
+    }
+
   .stick-to-top{
     position:absolute;
     width:100%;
