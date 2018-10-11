@@ -29,6 +29,28 @@ public class OemMiniDriver: IOemDvrMiniDriver
 
     private static readonly ILog m_logger = LogFactory.configure();
 
+    private static void handleException(Exception e)
+    {
+        m_logger.Error(e);
+        if (e.GetType() == typeof(System.Net.WebException))
+        {
+            MessageBox.Show(
+                "Server is not available",
+                "Network Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        else
+        {
+            MessageBox.Show(
+                "Unknown error has occurred",
+                "System Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+        Environment.Exit(0);
+    }
+
     /// <summary>
     /// Return the string you would expect to see in the Net2 OEM supplier list, that identifies
     ///     your system.
@@ -85,10 +107,9 @@ public class OemMiniDriver: IOemDvrMiniDriver
         }
         catch (Exception e)
         {
-            m_logger.Error(e);
+            m_logger.Error("Could not list cameras.");
+            handleException(e);
         }
-
-        m_logger.Error("Could not list cameras.");
         return OemDvrStatus.FailedToListCameras;
     }
 
@@ -140,9 +161,8 @@ public class OemMiniDriver: IOemDvrMiniDriver
         }
         catch (Exception e)
         {
-            m_logger.Error(e);
+            handleException(e);
         }
-
         return OemDvrStatus.FootagePlaybackFailed;
     }
 
