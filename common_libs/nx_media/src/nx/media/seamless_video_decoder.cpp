@@ -59,12 +59,11 @@ public:
     // Store metadata from compressed frame.
     void pushMetadata(const QnConstCompressedVideoDataPtr& frame);
 
-    // Restore metadata for decoded frame.
-    void popMetadata(const QVideoFramePtr& frame, int decodedFrameNum);
-
     const FrameMetadata findMetadata(int frameNum);
     void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
+
+    void updateSar(const QnConstCompressedVideoDataPtr& frame);
 
 public:
     std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
@@ -74,6 +73,8 @@ public:
 
     /** Relative frame number (frameNumber value when the decoder was created). */
     int decoderFrameOffset;
+
+    double sar = 1.0;
 
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
@@ -102,19 +103,6 @@ void SeamlessVideoDecoderPrivate::pushMetadata(const QnConstCompressedVideoDataP
     FrameMetadata metadata(frame);
     metadata.frameNum = frameNumber++;
     metadataQueue.push_back(std::move(metadata));
-}
-
-void SeamlessVideoDecoderPrivate::popMetadata(const QVideoFramePtr& frame, int decodedFrameNum)
-{
-    FrameMetadata metadata = findMetadata(decoderFrameNumToLocalNum(decodedFrameNum));
-    const double sar = videoDecoder->getSampleAspectRatio();
-    // some decoders doesn't fill sar in spite of it isn't 1.0
-    metadata.sar = qFuzzyCompare(sar, 1.0)
-        ? nx::media::getDefaultSampleAspectRatio(frame->size())
-        : sar;
-    if (videoDecoder->capabilities().testFlag(AbstractVideoDecoder::Capability::hardwareAccelerated))
-        metadata.flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
-    metadata.serialize(frame);
 }
 
 const FrameMetadata SeamlessVideoDecoderPrivate::findMetadata(int frameNum)
@@ -197,8 +185,8 @@ bool SeamlessVideoDecoder::decode(
                     QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
                     break; //< decoder's buffer is flushed
-                d->popMetadata(decodedFrame, decodedFrameNum);
-                d->queue.push_back(std::move(decodedFrame));
+
+                pushFrame(decodedFrame, decodedFrameNum, d->sar);
             }
         }
 
@@ -224,10 +212,7 @@ bool SeamlessVideoDecoder::decode(
         QVideoFramePtr decodedFrame;
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
         if (decodedFrame)
-        {
-            d->popMetadata(decodedFrame, decodedFrameNum);
-            d->queue.push_back(std::move(decodedFrame));
-        }
+            pushFrame(decodedFrame, decodedFrameNum, d->sar);
     }
 
     if (d->queue.empty())
@@ -239,6 +224,21 @@ bool SeamlessVideoDecoder::decode(
     *result = std::move(d->queue.front());
     d->queue.pop_front();
     return true;
+}
+
+void SeamlessVideoDecoder::pushFrame(QVideoFramePtr decodedFrame, int decodedFrameNum, double sar)
+{
+    Q_D(SeamlessVideoDecoder);
+    FrameMetadata metadata = d->findMetadata(d->decoderFrameNumToLocalNum(decodedFrameNum));
+    metadata.sar = sar;
+    if (qFuzzyCompare(metadata.sar, 1.0))
+        metadata.sar = nx::media::getDefaultSampleAspectRatio(decodedFrame->size());
+
+    if (d->videoDecoder->capabilities().testFlag(AbstractVideoDecoder::Capability::hardwareAccelerated))
+        metadata.flags |= QnAbstractMediaData::MediaFlags_HWDecodingUsed;
+
+    metadata.serialize(decodedFrame);
+    d->queue.push_back(std::move(decodedFrame));
 }
 
 int SeamlessVideoDecoder::currentFrameNumber() const
