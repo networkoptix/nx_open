@@ -33,7 +33,7 @@ public:
         vms::api::PeerDataEx localPeerData,
         vms::api::PeerDataEx remotePeerData);
 
-    virtual network::SocketAddress remoteSocketAddr() const override;
+    virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual ConnectionClosedSubscription& connectionClosedSubscription() override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;

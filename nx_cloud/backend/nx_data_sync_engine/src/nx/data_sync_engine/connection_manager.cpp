@@ -152,7 +152,7 @@ std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
     {
         result.push_back({
             it->fullPeerName.systemId,
-            it->connection->remoteSocketAddr(),
+            it->connection->remotePeerEndpoint(),
             it->userAgent});
     }
 

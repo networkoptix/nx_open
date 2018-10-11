@@ -38,7 +38,7 @@ class AbstractCommandPipeline:
     public nx::network::aio::BasicPollable
 {
 public:
-    virtual network::SocketAddress remoteSocketAddr() const = 0;
+    virtual network::SocketAddress remotePeerEndpoint() const = 0;
 
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) = 0;
 
@@ -59,7 +59,7 @@ class AbstractTransactionTransport:
     public nx::network::aio::BasicPollable
 {
 public:
-    virtual network::SocketAddress remoteSocketAddr() const = 0;
+    virtual network::SocketAddress remotePeerEndpoint() const = 0;
 
     virtual ConnectionClosedSubscription& connectionClosedSubscription() = 0;
 

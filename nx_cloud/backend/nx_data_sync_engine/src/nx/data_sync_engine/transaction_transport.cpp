@@ -97,7 +97,7 @@ void TransactionTransport::stopWhileInAioThread()
     m_inactivityTimer.reset();
 }
 
-network::SocketAddress TransactionTransport::remoteSocketAddr() const
+network::SocketAddress TransactionTransport::remotePeerEndpoint() const
 {
     return m_connectionOriginatorEndpoint;
 }

@@ -50,7 +50,7 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    virtual network::SocketAddress remoteSocketAddr() const override;
+    virtual network::SocketAddress remotePeerEndpoint() const override;
     virtual void setOnConnectionClosed(ConnectionClosedEventHandler handler) override;
     virtual void setOnGotTransaction(GotTransactionEventHandler handler) override;
     virtual QnUuid connectionGuid() const override;

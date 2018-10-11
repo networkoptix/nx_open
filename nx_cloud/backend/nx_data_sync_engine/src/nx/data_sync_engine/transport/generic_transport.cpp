@@ -37,7 +37,7 @@ GenericTransport::GenericTransport(
     m_commonTransportHeaderOfRemoteTransaction.peerId =
         connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString();
     m_commonTransportHeaderOfRemoteTransaction.endpoint =
-        m_commandPipeline->remoteSocketAddr();
+        m_commandPipeline->remotePeerEndpoint();
     m_commonTransportHeaderOfRemoteTransaction.vmsTransportHeader.sender =
         connectionRequestAttributes.remotePeer.id;
     m_commonTransportHeaderOfRemoteTransaction.transactionFormatVersion =
@@ -64,9 +64,9 @@ void GenericTransport::bindToAioThread(
         m_transactionLogReader->bindToAioThread(aioThread);
 }
 
-network::SocketAddress GenericTransport::remoteSocketAddr() const
+network::SocketAddress GenericTransport::remotePeerEndpoint() const
 {
-    return m_commandPipeline->remoteSocketAddr();
+    return m_commandPipeline->remotePeerEndpoint();
 }
 
 ConnectionClosedSubscription& GenericTransport::connectionClosedSubscription()
