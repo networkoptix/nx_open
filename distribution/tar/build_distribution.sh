@@ -577,6 +577,7 @@ createUpdateZip() # file.tar.gz
     ln -s "$TAR_GZ_FILE" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/update.json" "$ZIP_DIR/"
     cp -r "$CURRENT_BUILD_DIR/install.sh" "$ZIP_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/nx_rpi_cam_setup.sh" "$ZIP_DIR/"
 
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip
 }
