@@ -31,11 +31,13 @@
 
 namespace nx {
 
-#if defined (NX_CUSTOMIZATION_NAME)
-    #define STRINGIFY(v) #v
-    #define STRINGIFY2(v) STRINGIFY(v)
+#if defined(NX_CUSTOMIZATION_NAME)
+    #define STRINGIFY2(v) #v
+    #define STRINGIFY(v) STRINGIFY2(v)
     const char* const SystemCommands::kDomainSocket =
-        "/tmp/" STRINGIFY2(NX_CUSTOMIZATION_NAME) "_syscmd_socket3f64fa";
+        "/tmp/" STRINGIFY(NX_CUSTOMIZATION_NAME) "_syscmd_socket3f64fa";
+    #undef STRINGIFY
+    #undef STRINGIFY2
 #else
     const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 #endif
