@@ -131,8 +131,10 @@
             align-items     : center;
 
             a {
-                width  : rem(50px);
-                height : 2rem;
+                width       : fit-content;
+                height      : 2rem;
+                padding     : 0 8px;
+                line-height : 2rem;
             }
         }
 

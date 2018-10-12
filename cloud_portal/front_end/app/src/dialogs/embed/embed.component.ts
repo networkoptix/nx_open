@@ -16,18 +16,25 @@ export class EmbedModalContent {
     @Input() disconnect;
     @Input() closable;
 
+    auth: any;
     params: any;
     embedUrl: string;
 
     constructor(private activeModal: NgbActiveModal,
                 private renderer: Renderer2,
                 private location: Location,
+                @Inject('configService') private configService: any,
                 @Inject(DOCUMENT) private document: any) {
 
         this.params = {
             nocameras : false,
             noheader  : false,
             nocontrols: false,
+        };
+
+        this.auth = {
+          email: '',
+          password: ''
         };
     }
 
