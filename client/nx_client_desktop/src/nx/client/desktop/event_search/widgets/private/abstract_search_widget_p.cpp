@@ -278,6 +278,9 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
                     ui->timeSelectionButton->setAccented(period == Period::selection);
                     setSelectedPeriod(period);
+
+                    if (ini().automaticFilterByTimelineSelection && period != Period::selection)
+                        navigator()->clearTimeSelection();
                 });
 
             m_timeSelectionActions[period] = action;

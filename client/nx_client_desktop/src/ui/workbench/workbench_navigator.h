@@ -149,6 +149,8 @@ public:
 
     QnCameraDataManager* cameraDataManager() const;
 
+    void clearTimeSelection();
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();

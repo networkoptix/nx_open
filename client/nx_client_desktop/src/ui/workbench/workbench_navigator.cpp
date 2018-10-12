@@ -2272,6 +2272,12 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr& resourc
     }
 }
 
+void QnWorkbenchNavigator::clearTimeSelection()
+{
+    if (m_timeSlider)
+        m_timeSlider->setSelectionValid(false);
+}
+
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(milliseconds value)
 {
     if (!m_currentWidget)
