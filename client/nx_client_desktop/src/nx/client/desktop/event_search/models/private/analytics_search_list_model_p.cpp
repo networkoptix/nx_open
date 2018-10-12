@@ -336,8 +336,8 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(qint64 earliestTimeToComm
 
         for (auto iter = m_prefetch.begin(); iter != end; ++iter)
         {
-            if (!m_objectIdToTimestampUs.contains(iter->objectId)) //< Just to be safe.
-                m_objectIdToTimestampUs[iter->objectId] = iter->firstAppearanceTimeUsec;
+            if (!m_objectIdToTimestampUs.contains(iter->objectAppearanceId)) //< Just to be safe.
+                m_objectIdToTimestampUs[iter->objectAppearanceId] = iter->firstAppearanceTimeUsec;
         }
 
         m_data.insert(m_data.end(),
@@ -361,7 +361,8 @@ void AnalyticsSearchListModel::Private::clipToSelectedTimePeriod()
     refreshUpdateTimer();
 
     const auto cleanupFunction =
-        [this](const DetectedObject& object) { m_objectIdToTimestampUs.remove(object.objectId); };
+        [this](const DetectedObject& object)
+            { m_objectIdToTimestampUs.remove(object.objectAppearanceId); };
 
     // Explicit specialization is required for gcc 4.6.
     clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicateMs)>(
@@ -428,7 +429,7 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
 
     for (auto iter = overlapBegin; iter != data.end(); ++iter)
     {
-        const auto index = indexOf(iter->objectId);
+        const auto index = indexOf(iter->objectAppearanceId);
         if (index < 0)
         {
             if (iter->firstAppearanceTimeUsec != latestTimeUs)
@@ -465,7 +466,7 @@ void AnalyticsSearchListModel::Private::addNewlyReceivedObjects(
             if (iter->firstAppearanceTimeUsec == 0) //< Skip if marked.
                 continue;
 
-            m_objectIdToTimestampUs[iter->objectId] = iter->firstAppearanceTimeUsec;
+            m_objectIdToTimestampUs[iter->objectAppearanceId] = iter->firstAppearanceTimeUsec;
             m_data.push_front(std::move(*iter));
         }
 
@@ -555,7 +556,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 continue;
 
             DetectedObject newObject;
-            newObject.objectId = item.objectId;
+            newObject.objectAppearanceId = item.objectId;
             newObject.objectTypeId = item.objectTypeId;
             newObject.attributes = std::move(item.labels);
             newObject.track.push_back(pos);
@@ -574,7 +575,10 @@ void AnalyticsSearchListModel::Private::processMetadata()
         ScopedInsertRows insertRows(q, 0, int(newObjects.size()) - 1);
 
         for (const auto& newObject: newObjects)
-            m_objectIdToTimestampUs[newObject.objectId] = newObject.firstAppearanceTimeUsec;
+        {
+            m_objectIdToTimestampUs[newObject.objectAppearanceId] =
+                newObject.firstAppearanceTimeUsec;
+        }
 
         m_data.insert(m_data.begin(),
             std::make_move_iterator(newObjects.begin()),
@@ -592,7 +596,7 @@ void AnalyticsSearchListModel::Private::constrainLength()
     ScopedRemoveRows removeRows(q, kMaximumItemCount, int(m_data.size()) - 1);
 
     for (auto iter = m_data.cbegin() + kMaximumItemCount; iter != m_data.cend(); ++iter)
-        m_objectIdToTimestampUs.remove(iter->objectId);
+        m_objectIdToTimestampUs.remove(iter->objectAppearanceId);
 
     m_data.resize(kMaximumItemCount);
 }
@@ -639,7 +643,7 @@ void AnalyticsSearchListModel::Private::advanceObject(DetectedObject& object,
     }
 
     object.lastAppearanceTimeUsec = position.timestampUsec;
-    m_dataChangedObjectIds.insert(object.objectId);
+    m_dataChangedObjectIds.insert(object.objectAppearanceId);
 
     if (emitDataChanged)
         m_emitDataChanged->requestOperation();
@@ -656,7 +660,8 @@ int AnalyticsSearchListModel::Private::indexOf(const QnUuid& objectId) const
         std::upper_bound(m_data.cbegin(), m_data.cend(), timeUs, upperBoundPredicateUs));
 
     const auto iter = std::find_if(range.first, range.second,
-        [&objectId](const DetectedObject& item) { return item.objectId == objectId; });
+        [&objectId](const DetectedObject& item)
+            { return item.objectAppearanceId == objectId; });
 
     return iter != range.second ? int(std::distance(m_data.cbegin(), iter)) : -1;
 }
@@ -678,7 +683,7 @@ QString AnalyticsSearchListModel::Private::description(
         .arg(object.firstAppearanceTimeUsec)
         .arg(start.toString(Qt::RFC2822Date))
         .arg(duration_cast<milliseconds>(microseconds(durationUs)).count())
-        .arg(object.objectId.toSimpleString());
+        .arg(object.objectAppearanceId.toSimpleString());
 }
 
 QString AnalyticsSearchListModel::Private::attributes(
@@ -783,7 +788,7 @@ void AnalyticsSearchListModel::Private::executePluginAction(
     AnalyticsAction actionData;
     actionData.pluginId = pluginId;
     actionData.actionId = action.id;
-    actionData.objectId = object.objectId;
+    actionData.objectId = object.objectAppearanceId;
 
     server->restConnection()->executeAnalyticsAction(actionData, resultCallback, thread());
 }

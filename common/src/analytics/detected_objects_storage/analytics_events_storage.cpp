@@ -188,7 +188,7 @@ std::int64_t EventsStorage::insertEvent(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_guid, object_type_id, object_id, attributes,
             box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectId, :attributes,
+        VALUES(:timestampUsec, :durationUsec, :deviceId, :objectTypeId, :objectAppearanceId, :attributes,
             :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
     )sql"));
     insertEventQuery.bindValue(lit(":timestampUsec"), packet.timestampUsec);
@@ -198,7 +198,7 @@ std::int64_t EventsStorage::insertEvent(
         lit(":objectTypeId"),
         QnSql::serialized_field(detectedObject.objectTypeId));
     insertEventQuery.bindValue(
-        lit(":objectId"),
+        lit(":objectAppearanceId"),
         QnSql::serialized_field(detectedObject.objectId));
     insertEventQuery.bindValue(lit(":attributes"), QJson::serialized(detectedObject.labels));
 
@@ -367,10 +367,10 @@ nx::sql::Filter EventsStorage::prepareSqlFilterExpression(
         sqlFilter.addCondition(std::move(condition));
     }
 
-    if (!filter.objectId.isNull())
+    if (!filter.objectAppearanceId.isNull())
     {
         sqlFilter.addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
-            "object_id", ":objectId", QnSql::serialized_field(filter.objectId)));
+            "object_id", ":objectAppearanceId", QnSql::serialized_field(filter.objectAppearanceId)));
     }
 
     if (!filter.objectTypeId.empty())
@@ -483,7 +483,7 @@ void EventsStorage::loadObjects(
         loadObject(&selectEventsQuery, &detectedObject);
 
         auto [objContextIter, objContextInserted] = objectIdToPosition.emplace(
-            detectedObject.objectId,
+            detectedObject.objectAppearanceId,
             ObjectLoadingContext{result->size(), false});
         if (objContextInserted)
         {
@@ -526,7 +526,7 @@ void EventsStorage::loadObject(
     sql::SqlQuery* selectEventsQuery,
     DetectedObject* object)
 {
-    object->objectId = QnSql::deserialized_field<QnUuid>(
+    object->objectAppearanceId = QnSql::deserialized_field<QnUuid>(
         selectEventsQuery->value(lit("object_id")));
     object->objectTypeId = QnSql::deserialized_field<QString>(
         selectEventsQuery->value(lit("object_type_id")));
@@ -598,12 +598,14 @@ void EventsStorage::queryTrackInfo(
     trackInfoQuery.prepare(QString::fromLatin1(R"sql(
         SELECT min(timestamp_usec_utc), max(timestamp_usec_utc)
         FROM event
-        WHERE object_id = :objectId
+        WHERE object_id = :objectAppearanceId
     )sql"));
 
     for (auto& object: *result)
     {
-        trackInfoQuery.bindValue(lit(":objectId"), QnSql::serialized_field(object.objectId));
+        trackInfoQuery.bindValue(
+            ":objectAppearanceId",
+            QnSql::serialized_field(object.objectAppearanceId));
         trackInfoQuery.exec();
         if (!trackInfoQuery.next())
             continue;
