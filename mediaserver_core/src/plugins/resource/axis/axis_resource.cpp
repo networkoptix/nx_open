@@ -27,7 +27,6 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <motion/motion_detection.h>
-#include <common/static_common_module.h>
 
 #include <algorithm>
 #include <utils/media/av_codec_helper.h>
@@ -1540,7 +1539,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
         return;
     }
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
                 Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
 

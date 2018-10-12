@@ -44,12 +44,16 @@ public static class PaxtonClient
             connectionInfo.Password);
     }
 
+    private static long unixTimeMilliseconds(DateTime value)
+    {
+        // Starting from .Net 4.6 we can use `new DateTimeOffset(value).ToUnixTimeMilliseconds()`
+        var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (long) (value.ToUniversalTime() - epoch).TotalMilliseconds;
+    }
+
     public static OemDvrStatus testConnection(OemDvrConnection connectionInfo)
 	{
-        var moduleInformation = createConnection(connectionInfo)
-            .getModuleInformationAsync()
-            .GetAwaiter()
-            .GetResult();
+        var moduleInformation = createConnection(connectionInfo).getModuleInformation();
 
         m_logger.InfoFormat("Server found: {0}, protocol version: {1}",
             moduleInformation.reply.customization,
@@ -63,10 +67,7 @@ public static class PaxtonClient
 
     public static IEnumerable<OemDvrCamera> requestCameras(OemDvrConnection connectionInfo)
     {
-        var cameras = createConnection(connectionInfo)
-            .getCamerasExAsync()
-            .GetAwaiter()
-            .GetResult();
+        var cameras = createConnection(connectionInfo).getCamerasEx();
 
         if (cameras == null)
             yield break;
@@ -113,7 +114,12 @@ public static class PaxtonClient
          * Please note: auth should be the last to avoid parsing issues.
          */
         var camerasString = string.Join(":", footageRequest.DvrCameras.Select(x => x.CameraId));
-        var timestamp = new DateTimeOffset(footageRequest.StartTimeUtc).ToUnixTimeMilliseconds();
+
+        // Paxton combines cameras to a single camera with ids joined via '|'. Don't know why.
+        camerasString = camerasString.Replace('|', ':');
+
+        var timestamp = unixTimeMilliseconds(footageRequest.StartTimeUtc);
+
         var auth = Convert.ToBase64String(
             Encoding.UTF8.GetBytes($"{connectionInfo.UserId}:{connectionInfo.Password}"));
         var url = $"{AppInfo.uriProtocol}://" +
@@ -130,9 +136,10 @@ public static class PaxtonClient
                 protocolVersion == 0 ? "" : $"--proto={protocolVersion}",
                 url
             });
+        m_logger.DebugFormat("Run applauncher with parameters: {0}", parameters);
 
         m_process = desktop_client_api.Launcher.startClient(parameters);
-
+        Environment.Exit(0);
         return m_process != null ? OemDvrStatus.Succeeded : OemDvrStatus.FootagePlaybackFailed;
     }
 

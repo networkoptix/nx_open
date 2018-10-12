@@ -14,7 +14,6 @@
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"
-#include <common/static_common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 
@@ -476,8 +475,8 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
     {
         QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
         QString manufacturer = getManufacturer(source, name);
-
-        const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
+        auto dataPool = m_onvifFetcher->serverModule()->commonModule()->dataPool();
+        const QnResourceData resourceData = dataPool->data(manufacturer, name);
         ObtainMacFromMulticast obtainMacFromMulticast = ObtainMacFromMulticast::Auto;
         resourceData.value(OBTAIN_MAC_FROM_MULTICAST_PARAM_NAME, &obtainMacFromMulticast);
 

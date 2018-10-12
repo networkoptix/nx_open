@@ -283,6 +283,8 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
 
+    m_hlsSessionPool = store(new nx::mediaserver::hls::SessionPool());
+
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
@@ -614,4 +616,9 @@ QnMdnsListener* QnMediaServerModule::mdnsListener() const
 nx::network::upnp::DeviceSearcher* QnMediaServerModule::upnpDeviceSearcher() const
 {
     return m_upnpDeviceSearcher.get();
+}
+
+nx::mediaserver::hls::SessionPool* QnMediaServerModule::hlsSessionPool() const
+{
+    return m_hlsSessionPool;
 }

@@ -502,8 +502,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             MediaQuality currentQuality = m_currentQuality[media->channelNumber];
             MediaQuality prefferredQuality = preferredLiveStreamQuality(media->channelNumber);
 
-            // Switching quality only if the current frame is a key frame.
-            if (prefferredQuality != m_currentQuality[media->channelNumber] && isKeyFrame)
+            // Switching quality only if the current frame is a key frame for video stream.
+            if (prefferredQuality != m_currentQuality[media->channelNumber] && (isKeyFrame || !isVideo))
                 m_currentQuality[media->channelNumber] = prefferredQuality;
 
             const bool isCurrentQualityLow =

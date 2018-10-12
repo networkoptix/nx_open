@@ -14,6 +14,6 @@ nx_add_server_plugin(ssc_metadata_plugin OPTIONAL
 add_definitions(-DNX_PRINT_TO_LOG)
 
 # Project is under discussion
-if(withDistributions AND customization STREQUAL "default" AND WINDOWS)
+if(withDistributions AND customization STREQUAL "ionetworks" AND WINDOWS)
     add_subdirectory(distribution)
 endif()

@@ -115,7 +115,7 @@ private:
         nx::vms::api::ResourceParamDataList* const outData,
         const Qn::UserAccessData&);
 
-    template<class InputDataType>
+    template<class InputDataType, class ProcessedDataType = InputDataType>
     void regUpdate(QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd,
         GlobalPermission permission = GlobalPermission::none);
 

@@ -28,16 +28,20 @@ void BaseTunnelClient::stopWhileInAioThread()
     m_connection.reset();
 }
 
-void BaseTunnelClient::cleanupFailedTunnel()
+void BaseTunnelClient::cleanUpFailedTunnel()
+{
+    cleanUpFailedTunnel(m_httpClient.get());
+}
+
+void BaseTunnelClient::cleanUpFailedTunnel(AsyncClient* httpClient)
 {
     OpenTunnelResult result;
-    result.sysError = m_httpClient->lastSysErrorCode();
-    if (m_httpClient->response())
+    result.sysError = httpClient->lastSysErrorCode();
+    if (httpClient->response())
     {
         result.httpStatus =
-            (StatusCode::Value) m_httpClient->response()->statusLine.statusCode;
+            (StatusCode::Value) httpClient->response()->statusLine.statusCode;
     }
-    m_httpClient.reset();
 
     reportFailure(std::move(result));
 }

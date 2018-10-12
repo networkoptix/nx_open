@@ -14,7 +14,6 @@
 #include <boost/optional.hpp>
 #include <utils/camera/camera_diagnostics.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <onvif/soapMediaBindingProxy.h>
 #include <nx/utils/log/log.h>
@@ -102,8 +101,7 @@ QnAbstractStreamDataProvider* HikvisionResource::createLiveDataProvider()
 
 QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 {
-    const auto& resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    if (resourceData.value<bool>(lit("useOnvifPtz"), false))
+    if (resourceData().value<bool>(lit("useOnvifPtz"), false))
         return QnPlOnvifResource::createPtzControllerInternal();
 
     const auto isapi = m_integrationProtocols.find(Protocol::isapi);
@@ -116,8 +114,7 @@ QnAbstractPtzController* HikvisionResource::createPtzControllerInternal() const
 CameraDiagnostics::Result HikvisionResource::initializeMedia(
     const CapabilitiesResp& onvifCapabilities)
 {
-    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
     if (!hevcIsDisabled && m_integrationProtocols[Protocol::isapi].enabled)
     {

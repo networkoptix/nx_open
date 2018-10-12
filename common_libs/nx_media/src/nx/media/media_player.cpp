@@ -538,9 +538,10 @@ void PlayerPrivate::presentNextFrame()
 
     gotDataTimer.restart();
 
-    updateCurrentResolution(videoFrameToRender->size());
-
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+
+    if (metadata.videoChannel == videoSurfaces.firstKey())
+        updateCurrentResolution(videoFrameToRender->size());
 
     auto videoSurface = videoSurfaces.value(metadata.videoChannel);
 

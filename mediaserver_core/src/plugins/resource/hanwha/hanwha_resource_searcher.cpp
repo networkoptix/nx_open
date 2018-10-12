@@ -3,7 +3,6 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -381,8 +380,7 @@ void HanwhaResourceSearcher::createResource(
     if (rt.isNull())
         return;
 
-    QnResourceData resourceData = qnStaticCommon
-        ->dataPool()
+    QnResourceData resourceData = commonModule()->dataPool()
         ->data(devInfo.manufacturer, devInfo.modelName);
 
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))

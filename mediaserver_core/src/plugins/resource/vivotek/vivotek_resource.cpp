@@ -9,7 +9,6 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/media/av_codec_helper.h>
 
@@ -52,8 +51,7 @@ CameraDiagnostics::Result VivotekResource::initializeMedia(const CapabilitiesRes
     if (!result)
         return result;
 
-    auto resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    bool hevcIsDisabled = resourceData.value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
+    bool hevcIsDisabled = resourceData().value<bool>(Qn::DISABLE_HEVC_PARAMETER_NAME, false);
 
     if (hevcIsDisabled)
         return result;

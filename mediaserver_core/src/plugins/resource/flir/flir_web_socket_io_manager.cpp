@@ -10,7 +10,6 @@
 #include "flir_nexus_string_builder.h"
 
 #include <core/resource/camera_resource.h>
-#include <common/static_common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>
@@ -633,9 +632,7 @@ void WebSocketIoManager::checkAndNotifyIfNeeded(const Notification& notification
 
 void WebSocketIoManager::initIoPortStatesUnsafe()
 {
-    auto resData = qnStaticCommon->dataPool()->data(
-        m_resource->getVendor(),
-        m_resource->getModel());
+    auto resData = m_resource->resourceData();
 
     auto allPorts = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
 

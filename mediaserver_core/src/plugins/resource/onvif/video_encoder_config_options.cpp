@@ -239,7 +239,7 @@ VideoEncoderConfigOptions::VideoEncoderConfigOptions(
         if (govStringList.size() >= 2)
         {
             govLengthRange =
-                Range(govStringList.front().toInt(), govStringList.back().toInt());
+                Range<int>(govStringList.front().toInt(), govStringList.back().toInt());
         }
     }
 

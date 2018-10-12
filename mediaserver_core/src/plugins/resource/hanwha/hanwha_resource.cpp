@@ -39,7 +39,6 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -845,7 +844,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
         !getFirmware().isEmpty()
@@ -1037,7 +1036,7 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
         return CameraDiagnostics::NoErrorResult();
     }
 
-    const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto resData = resourceData();
     const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
         HanwhaBypassSupportType::normal);

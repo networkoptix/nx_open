@@ -4,8 +4,6 @@
 
 #include <api/global_settings.h>
 
-#include <common/static_common_module.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/address_resolver.h>
@@ -199,7 +197,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regGet<std::nullptr_t, ResourceTypeDataList>(p, ApiCommand::getResourceTypes);
 
-    // AbstractResourceManager::setResourceStatus
+    /**%apidoc[proprietary] POST /ec2/setResourceStatus
+     * Change a resource status.
+     * <p>
+     * Parameters should be passed as a JSON object in POST message body with
+     * content type "application/json". Example of such object can be seen in
+     * the result of the corresponding GET function.
+     * </p>
+     * %permissions Administrator, or a custom user with "Edit camera settings" permission,
+     *     or a user who owns the resource in case the resource is a layout.
+     * %param id Unique id of the resource.
+     * %param status new resource status.
+     */
     regUpdate<ResourceStatusData>(p, ApiCommand::setResourceStatus);
 
     /**%apidoc GET /ec2/getResourceParams
@@ -1152,6 +1161,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
+     * %param[opt] password Plain text password. Note that if this argument is provided, digest, hash
+     *     and cryptSha512Hash values will be ignored if any.
      * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
      *     /api/gettime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
@@ -1166,7 +1177,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param fullName Full name of the user.
      * %// AbstractUserManager::save
      */
-    regUpdate<UserData>(p, ApiCommand::saveUser);
+    regUpdate<UserDataEx, UserData>(p, ApiCommand::saveUser);
 
     /**%apidoc:arrayParams POST /ec2/saveUsers
     * Saves the list of users. Only local and LDAP users are supported. Cloud users won't be saved.
@@ -1924,7 +1935,7 @@ ErrorCode LocalConnectionFactory::getSettings(
     return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
 }
 
-template<class InputDataType>
+template<class InputDataType, class ProcessedDataType>
 void LocalConnectionFactory::regUpdate(
     QnRestProcessorPool* const restProcessorPool,
     ApiCommand::Value cmd,
@@ -1932,7 +1943,7 @@ void LocalConnectionFactory::regUpdate(
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-        new UpdateHttpHandler<InputDataType>(m_directConnection),
+        new UpdateHttpHandler<InputDataType, ProcessedDataType>(m_directConnection),
         permission);
 }
 

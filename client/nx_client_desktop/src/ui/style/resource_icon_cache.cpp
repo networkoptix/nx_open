@@ -122,7 +122,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
     m_cache.insert(LayoutTour,              loadIcon(lit("tree/layout_tour.png")));
     m_cache.insert(LayoutTours,             loadIcon(lit("tree/layout_tours.png")));
-    m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
+    m_cache.insert(Camera,                  loadIcon(lit("tree/camera.svg")));
     m_cache.insert(WearableCamera,          loadIcon(lit("tree/wearable_camera.png")));
     m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
     m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));

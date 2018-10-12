@@ -209,6 +209,12 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
         return false;
     }
 
+    if (m_options.responseEnabled && !m_options.responseEnabled())
+    {
+        NX_VERBOSE(this, lm("Reveal request is ignored from (%1)").arg(remoteEndpoint));
+        return true;
+    }
+
     //TODO #ak RevealResponse class is excess here. Should send/receive nx::vms::api::ModuleInformation
     {
         QnMutexLocker lock(&m_moduleInfoMutex);

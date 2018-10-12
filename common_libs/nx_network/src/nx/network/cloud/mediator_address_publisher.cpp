@@ -79,7 +79,7 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
 
     m_isRequestInProgress = true;
 
-    if (m_cloudCredentialsProvider->getSystemCredentials()) //< Cloud credentials available.
+    if (m_cloudCredentialsProvider->getSystemCredentials())
         registerAddressesOnMediator();
     else
         scheduleRetry(kCheckCloudCredentialsAvailabilityPeriod);

@@ -14,7 +14,6 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/assert.h>
-#include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 #include <nx/utils/log/log_main.h>
@@ -69,9 +68,9 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     SpeedLimits defaultLimits(-QnAbstractPtzController::MaxPtzSpeed, QnAbstractPtzController::MaxPtzSpeed);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
-    QnResourceData data = qnStaticCommon->dataPool()->data(resource);
-    m_stopBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
-    m_speedBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzSpeedBroken"), false);
+    const QnResourceData data = resource->resourceData();
+    m_stopBroken = data.value<bool>(lit("onvifPtzStopBroken"), false);
+    m_speedBroken = data.value<bool>(lit("onvifPtzSpeedBroken"), false);
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"), false);
     bool focusEnabled = data.value<bool>(lit("onvifPtzFocusEnabled"), false);
     bool nativePresetsAreEnabled = data.value<bool>(lit("onvifPtzPresetsEnabled"), false);

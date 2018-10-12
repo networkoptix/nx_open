@@ -335,7 +335,9 @@ public:
     QSize findSecondaryResolution(
         const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
-    static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
+    static bool isCameraForcedToOnvif(
+        QnResourceDataPool* dataPool,
+        const QString& manufacturer, const QString& model);
 
     VideoOptionsLocal primaryVideoCapabilities() const;
     VideoOptionsLocal secondaryVideoCapabilities() const;

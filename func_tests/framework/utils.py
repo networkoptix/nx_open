@@ -1,15 +1,18 @@
 import calendar
 from functools import wraps
+import inspect
 import itertools
 import logging
 import socket
 import struct
+import threading
 import time
 from contextlib import closing
 from datetime import datetime, timedelta
 from multiprocessing.dummy import Pool as ThreadPool
 
 import pytz
+import tzlocal
 from pylru import lrudecorator
 from pytz import utc
 
@@ -28,23 +31,6 @@ class SimpleNamespace:
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
-
-
-class GrowingSleep(object):
-
-    _delay_levels = [10, 20, 30, 60]  # seconds
-    _calls_per_level = 10
-
-    def __init__(self):
-        self._level = 0
-        self._level_call_count = 0
-
-    def sleep(self):
-        time.sleep(self._delay_levels[self._level])
-        self._level_call_count += 1
-        if self._level_call_count >= self._calls_per_level and self._level < len(self._delay_levels) - 1:
-            self._level += 1
-            self._level_call_count = 0
 
 
 def is_list_inst(l, cls):
@@ -95,6 +81,10 @@ def datetime_utc_from_timestamp(timestamp):
 
 def datetime_utc_now():
     return datetime.utcnow().replace(tzinfo=pytz.utc)
+
+
+def datetime_local_now():
+    return datetime.now(tz=tzlocal.get_localzone())
 
 
 def datetime_to_str(date_time):
@@ -173,6 +163,12 @@ def take_some(iter, count):
         yield next(iter)
 
 
+def imerge(*iterators):
+    for value_tuple in itertools.izip(*iterators):
+        for value in value_tuple:
+            yield value
+
+
 def single(iter):
     l = list(iter)
     assert len(l) == 1, 'Only single item is expected'
@@ -205,3 +201,37 @@ class MultiFunction(object):
     def __call__(self):
         for fn in self._fn_list:
             fn()
+
+
+class FunctionWithDescription(object):
+
+    def __init__(self, fn, description):
+        self._fn = fn
+        self.description = description
+
+    def __call__(self, *args, **kw):
+        return self._fn(args, **kw)
+
+
+# based on: https://anandology.com/blog/using-iterators-and-generators/
+class ThreadSafeIterator:
+
+    def __init__(self, it):
+        assert inspect.isgenerator(it), repr(it)
+        self._it = it
+        self._lock = threading.Lock()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        with self._lock:
+            return next(self._it)
+
+
+def threadsafe_generator(generator_fn):
+
+    def safe_generator_fn(*args, **kw):
+        return ThreadSafeIterator(generator_fn(*args, **kw))
+
+    return safe_generator_fn

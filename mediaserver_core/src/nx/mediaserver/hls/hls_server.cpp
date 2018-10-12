@@ -474,9 +474,9 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         : SessionPool::generateUniqueID();
 
     //session search and add MUST be atomic
-    SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionID);
+    SessionPool::ScopedSessionIDLock lk(serverModule()->hlsSessionPool(), sessionID);
 
-    Session* session = SessionPool::instance()->find(sessionID);
+    Session* session = serverModule()->hlsSessionPool()->find(sessionID);
     if (!session)
     {
         std::multimap<QString, QString>::const_iterator hiQualityIter = requestParams.find(StreamingParams::HI_QUALITY_PARAM_NAME);
@@ -527,7 +527,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         {
             return result;
         }
-        if (!SessionPool::instance()->add(session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS))
+        if (!serverModule()->hlsSessionPool()->add(session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS))
         {
             NX_ASSERT(false);
         }
@@ -786,8 +786,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         requestParams.find(StreamingParams::SESSION_ID_PARAM_NAME);
     if (sessionIDIter != requestParams.end())
     {
-        SessionPool::ScopedSessionIDLock lk(SessionPool::instance(), sessionIDIter->second);
-        Session* hlsSession = SessionPool::instance()->find(sessionIDIter->second);
+        SessionPool::ScopedSessionIDLock lk(serverModule()->hlsSessionPool(), sessionIDIter->second);
+        Session* hlsSession = serverModule()->hlsSessionPool()->find(sessionIDIter->second);
         if (hlsSession)
         {
             requestIsAPartOfHlsSession = true;

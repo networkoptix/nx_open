@@ -601,7 +601,9 @@ class MediaserverApi(object):
             raise AlreadyMerged(self, remote_api, master_system_id)
         servant_ids = servant_api.system_mediaserver_ids()
         master_ids = master_api.system_mediaserver_ids()
-        assert not servant_ids & master_ids
+        assert not servant_ids & master_ids, (
+            'Unable to merge servers: they have common ids; master ids: %s, servant ids: %s'
+            % (master_ids, servant_ids))
         try:
             self.generic.post('api/mergeSystems', {
                 'url': 'http://{}:{}/'.format(remote_address, remote_port),
@@ -641,6 +643,13 @@ class MediaserverApi(object):
 
     def camera(self, camera_id):
         return _MediaserverCameraApi(self.generic, camera_id)
+
+    @property
+    def camera_list(self):
+        result = []
+        for camera_info in self.generic.get('ec2/getCameras'):
+            result.append(_MediaserverCameraApi(self.generic, camera_info['id']))
+        return result
 
     def make_event_rule(
             self, event_type, event_state, action_type, event_resource_ids=[],

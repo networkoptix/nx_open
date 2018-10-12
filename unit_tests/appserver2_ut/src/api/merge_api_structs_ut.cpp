@@ -175,7 +175,7 @@ private:
     const UpdateCallback m_updateCallback;
 };
 
-typedef UpdateHttpHandler<ApiMockData, MockConnection> TestUpdateHttpHandler;
+typedef UpdateHttpHandler<ApiMockData, ApiMockData, MockConnection> TestUpdateHttpHandler;
 
 static const ApiCommand::Value kMockApiCommand = (ApiCommand::Value) 1; //< Any existing command.
 
