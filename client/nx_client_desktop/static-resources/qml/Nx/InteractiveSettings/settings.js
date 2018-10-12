@@ -13,7 +13,7 @@ function _createItemsRecursively(parent, model, depth)
     if (item)
     {
         if (item.valueChanged)
-            item.valueChanged.connect(settingsView.valuesChanged)
+            item.valueChanged.connect(settingsView.triggerValuesEdited)
 
         if (item.childrenItem && model.items)
         {
@@ -30,7 +30,6 @@ function createItems(parent, model)
     // Clone the model because we are going to modify it.
     var modelCopy = JSON.parse(JSON.stringify(model))
     modelCopy.type = "Settings"
-    modelCopy.name = "__settings__"
 
     var item = _createItemsRecursively(parent, modelCopy, 0)
     item.parent = parent
@@ -41,9 +40,6 @@ function createItems(parent, model)
 
 function _processItemsRecursively(item, f)
 {
-    if (!item.name)
-        return
-
     if (item.hasOwnProperty("value"))
         f(item)
 
@@ -68,7 +64,12 @@ function setValues(rootItem, values)
     _processItemsRecursively(rootItem,
         function(item)
         {
-            if (values.hasOwnProperty(item.name))
-                item.value = values[item.name]
+            if (item.hasOwnProperty("value"))
+            {
+                if (values.hasOwnProperty(item.name))
+                    item.value = values[item.name]
+                else
+                    item.value = item.defaultValue
+            }
         })
 }

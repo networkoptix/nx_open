@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <ui/style/skin.h>
 #include <api/global_settings.h>
@@ -77,6 +78,8 @@ QString baseToString(QnResourceIconCache::Key base)
         QN_STRINGIFY(IOModule);
         QN_STRINGIFY(WebPage);
         QN_STRINGIFY(WebPages);
+        QN_STRINGIFY(AnalyticsEngine);
+        QN_STRINGIFY(AnalyticsEngines);
         default:
             return QString::number(base);
     };
@@ -139,6 +142,8 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(OtherSystems,            loadIcon(lit("tree/other_systems.png")));
     m_cache.insert(WebPage,                 loadIcon(lit("tree/webpage.png")));
     m_cache.insert(WebPages,                loadIcon(lit("tree/webpages.png")));
+    m_cache.insert(AnalyticsEngine,         loadIcon(lit("tree/server.png")));
+    m_cache.insert(AnalyticsEngines,        loadIcon(lit("tree/servers.png")));
     m_cache.insert(C2P,                     loadIcon(lit("tree/c2p.png")));
 
     m_cache.insert(Media | Offline,         loadIcon(lit("tree/media_offline.png")));
@@ -160,6 +165,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(IOModule | Offline,      loadIcon(lit("tree/io_offline.png")));
     m_cache.insert(IOModule | Unauthorized, loadIcon(lit("tree/io_unauthorized.png")));
     m_cache.insert(WebPage | Offline,       loadIcon(lit("tree/webpage_offline.png")));
+    m_cache.insert(AnalyticsEngine | Offline, loadIcon(lit("tree/server_offline.png")));
 
     /* Read-only server that is auto-discovered. */
     m_cache.insert(Server | Incompatible | ReadOnly,    loadIcon(lit("tree/server_incompatible_disabled.png")));
@@ -269,6 +275,8 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         key = User;
     else if (flags.testFlag(Qn::videowall))
         key = VideoWall;
+    else if (const auto engine = resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>())
+        key = AnalyticsEngine;
     else if (flags.testFlag(Qn::web_page))
     {
         key = WebPage;

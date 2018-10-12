@@ -480,6 +480,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recordingHint = {};
     state.recordingAlert = {};
     state.motionAlert = {};
+    state.analytics.enabledEngines = {};
+    state.analytics.settingsValuesByEngineId = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -597,6 +599,11 @@ State CameraSettingsDialogStateReducer::loadCameras(
             &state.singleCameraProperties.maxFpsWithoutMotion,
             nullptr,
             false);
+
+        state.analytics.enabledEngines.setBase(firstCamera->enabledAnalyticsEngines());
+        const auto& values = firstCamera->deviceAgentSettingsValues();
+        for (auto it = values.begin(); it != values.end(); ++it)
+            state.analytics.settingsValuesByEngineId[it.key()].setBase(it.value());
     }
 
     state.recording.enabled = {};
@@ -1304,6 +1311,42 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
 
     state.isDefaultExpertSettings = true;
     return state;
+}
+
+State CameraSettingsDialogStateReducer::setAnalyticsEngines(
+    State state, const QList<AnalyticsEngineInfo>& value)
+{
+    state.analytics.engines = value;
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
+    State state, const QSet<QnUuid>& value)
+{
+    state.analytics.enabledEngines.setUser(value);
+    state.hasChanges = true;
+    return state;
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
+    State state, const QnUuid& engineId, const QVariantMap& values)
+{
+    if (!std::any_of(
+        state.analytics.engines.begin(),
+        state.analytics.engines.end(),
+        [engineId](const auto& engine) { return engine.id == engineId; }))
+    {
+        return std::make_pair(false, std::move(state));
+    }
+
+    auto& storedValues = state.analytics.settingsValuesByEngineId[engineId];
+    if (storedValues.get() == values)
+        return std::make_pair(false, std::move(state));
+
+    storedValues.setUser(values);
+    state.hasChanges = true;
+
+    return std::make_pair(true, std::move(state));
 }
 
 State CameraSettingsDialogStateReducer::setWearableMotionDetectionEnabled(State state, bool value)

@@ -123,6 +123,7 @@ static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
         ResourceTreeNodeType::layoutTours,
         ResourceTreeNodeType::filteredVideowalls,
         ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::analyticsEngines,
         ResourceTreeNodeType::filteredUsers,
         ResourceTreeNodeType::localResources
     });

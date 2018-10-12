@@ -8,6 +8,7 @@ Item
     id: settingsView
 
     signal valuesChanged()
+    signal valuesEdited()
 
     property Item contentItem: null
 
@@ -43,5 +44,14 @@ Item
     {
         if (_valuesChangedEnabled)
             valuesChanged()
+    }
+
+    function triggerValuesEdited()
+    {
+        if (!_valuesChangedEnabled)
+            return
+
+        valuesEdited()
+        valuesChanged()
     }
 }

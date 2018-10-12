@@ -142,6 +142,11 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Nod
     case NodeType::layoutTours:
         setNameInternal(tr("Showreels"));
         break;
+    case NodeType::analyticsEngines:
+    case NodeType::filteredAnalyticsEngines:
+        setNameInternal(tr("Analytics Engines"));
+        m_state = Invalid;
+        break;
     case NodeType::recorder:
         m_state = Invalid;
         break;
@@ -513,6 +518,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case NodeType::sharedLayouts:
         case NodeType::webPages:
         case NodeType::roleUsers:
+        case NodeType::analyticsEngines:
         case NodeType::sharedResource:
         case NodeType::role:
         case NodeType::layoutTour:
@@ -1180,6 +1186,9 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
 
         case NodeType::webPages:
             return qnResIconCache->icon(QnResourceIconCache::WebPages);
+
+        case NodeType::analyticsEngines:
+            return qnResIconCache->icon(QnResourceIconCache::AnalyticsEngines);
 
         case NodeType::filteredVideowalls:
             return qnResIconCache->icon(QnResourceIconCache::VideoWall); //< Fix me: change to videowallS icon

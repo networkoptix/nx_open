@@ -33,6 +33,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 #include <api/global_settings.h>
 
@@ -60,6 +62,7 @@
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using namespace nx::vms::common;
 
 #define DEBUG_RESOURCE_TREE_MODEL
 #ifdef DEBUG_RESOURCE_TREE_MODEL
@@ -101,6 +104,7 @@ QList<ResourceTreeNodeType> rootNodeTypes()
             << ResourceTreeNodeType::layouts
             << ResourceTreeNodeType::layoutTours
             << ResourceTreeNodeType::webPages
+            << ResourceTreeNodeType::analyticsEngines
             << ResourceTreeNodeType::localResources
             << ResourceTreeNodeType::localSeparator
             << ResourceTreeNodeType::otherSystems
@@ -377,6 +381,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case NodeType::layouts:
     case NodeType::layoutTours:
     case NodeType::webPages:
+    case NodeType::analyticsEngines:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -509,6 +514,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
         return parentNode;
     }
+
+    if (const auto engine = node->resource().dynamicCast<AnalyticsEngineResource>())
+        return m_rootNodes[NodeType::analyticsEngines];
 
     NX_ASSERT(false, "Should never get here.");
     return bastardNode;

@@ -76,6 +76,15 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+    QSet<QnUuid> enabledAnalyticsEngines() const;
+    void setEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
+
+    QHash<QnUuid, QVariantMap> deviceAgentSettingsValues() const;
+    void setDeviceAgentSettingsValues(const QHash<QnUuid, QVariantMap>& settingsValues);
+
+    QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
+    void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
 

@@ -38,6 +38,7 @@
 #include <utils/common/scoped_timer.h>
 
 using namespace nx::core::access;
+using namespace nx::vms::common;
 
 QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= nullptr*/) :
     base_type(parent),
@@ -461,10 +462,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
     if (QnAbstractArchiveResourcePtr archive = target.dynamicCast<QnAbstractArchiveResource>())
         return Qn::ReadPermission | Qn::ExportPermission;
 
-    if (QnSharedResourcePointer<nx::vms::common::AnalyticsEngineResource> pir
-        = target.dynamicCast<nx::vms::common::AnalyticsEngineResource>()
-    )
-        return Qn::NoPermissions;
+    if (const auto plugin = target.dynamicCast<AnalyticsPluginResource>())
+        return Qn::ReadPermission;
+
+    if (const auto engine = target.dynamicCast<AnalyticsEngineResource>())
+        return Qn::ReadPermission;
 
     NX_ASSERT(false, "invalid resource type");
     return Qn::NoPermissions;
