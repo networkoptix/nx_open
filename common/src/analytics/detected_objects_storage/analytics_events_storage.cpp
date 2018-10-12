@@ -295,9 +295,6 @@ void EventsStorage::prepareLookupQuery(
     // selected by filter less objects than requested filter.maxObjectsToSelect would be returned.
     constexpr int kMaxFilterEventsResultSize = 100000;
 
-#define QUERY_VERSION 1
-
-#if QUERY_VERSION == 1
     query->prepare(lm(R"sql(
         WITH filtered_events AS
         (SELECT timestamp_usec_utc, duration_usec, device_guid,
@@ -323,32 +320,7 @@ void EventsStorage::prepareLookupQuery(
         kMaxFilterEventsResultSize,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-#elif QUERY_VERSION == 0
-    query->prepare(lm(R"sql(
-        WITH filtered_events AS
-        (SELECT timestamp_usec_utc, object_id
-         FROM %1
-         %2
-         ORDER BY timestamp_usec_utc DESC
-         LIMIT %3)
-        SELECT timestamp_usec_utc, duration_usec, device_guid,
-            object_type_id, e.object_id, attributes,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y
-        FROM event e,
-            (SELECT object_id, MIN(timestamp_usec_utc) AS min_timestamp_usec_utc
-             FROM filtered_events
-             GROUP BY object_id
-             ORDER BY MIN(timestamp_usec_utc) DESC
-             %4) objects
-        WHERE e.timestamp_usec_utc=objects.min_timestamp_usec_utc AND e.object_id=objects.object_id
-        ORDER BY e.timestamp_usec_utc %5
-    )sql").args(
-        eventsFilteredByFreeTextSubQuery,
-        sqlQueryFilterStr,
-        kMaxFilterEventsResultSize,
-        sqlLimitStr,
-        filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-#endif
+    
     sqlQueryFilter.bindFields(query);
 }
 
