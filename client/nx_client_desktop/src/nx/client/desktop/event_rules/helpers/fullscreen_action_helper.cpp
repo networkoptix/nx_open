@@ -86,7 +86,13 @@ QIcon FullscreenActionHelper::cameraIcon(const QnBusinessRuleViewModel* model)
 
     const auto camera = getCameraInternal(model);
     if (camera)
-        return selectedIcon(qnResIconCache->icon(camera));
+    {
+        if (cameraExistOnLayouts(model))
+            return selectedIcon(qnResIconCache->icon(camera));
+        else
+            return selectedIcon(qnResIconCache->icon(
+                QnResourceIconCache::Camera | QnResourceIconCache::Incompatible));
+    }
 
     return invalidIcon();
 }
@@ -135,7 +141,7 @@ QString FullscreenActionHelper::tableCellText(const QnBusinessRuleViewModel* mod
 
 QIcon FullscreenActionHelper::tableCellIcon(const QnBusinessRuleViewModel* model)
 {
-    if (!isLayoutValid(model))
+    if (!isLayoutValid(model) || !isCameraValid(model))
         return invalidIcon();
 
     return cameraIcon(model);
