@@ -123,7 +123,6 @@ class ContextAdmin(CMSAdmin):
     list_display_links = ('name',)
     search_fields = ('name', 'description', 'url')
 
-    change_list_template = "cms/context_changelist.html"
     change_form_template = "cms/context_change_form.html"
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -163,11 +162,9 @@ class ContextAdmin(CMSAdmin):
             request.session['product_id'] = request.POST['product_id']
             return HttpResponse(reverse('admin:cms_context_changelist'))
 
-        if 'product_id' in request.session:
-            extra_context['product_id'] = request.session['product_id']
-        else:
-            messages.error("No product was selected!")
-            return HttpResponse(reverse('admin:cms_product_changelist'), status=400)
+        if 'product_id' not in request.session:
+            messages.error(request, "No product was selected!")
+            return redirect(reverse('admin:cms_product_changelist'))
 
         return super(ContextAdmin, self).changelist_view(request, extra_context)
 

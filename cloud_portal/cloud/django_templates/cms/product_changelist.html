@@ -5,9 +5,11 @@
     {{ block.super }}
     <script>
         $(function () {
+            // Get all of the product buttons and override default behavior when clicked
             var products = $('.product');
             var csrf = $('input[name=csrfmiddlewaretoken]')[0];
             for (var i = 0; i < products.length; ++i) {
+                // When the button is clicked make a post request to set the product id in session
                 $(products[i]).click(function (event) {
                     event.preventDefault();
                     // Post request to get pages for product
@@ -16,6 +18,7 @@
                         'product_id': $(this).attr('value')
                     });
 
+                    // Open the url that is returned
                     posting.done(function (data) {
                         window.open(data, '_self');
                     });
