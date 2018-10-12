@@ -58,10 +58,8 @@ void executeButtonMenu(ToolButton* invoker, QMenu* menu, const QPoint& offset = 
     if (!menu || !invoker)
         return;
 
-    QRect invokerGeometry(QnHiDpiWorkarounds::safeMapToGlobal(invoker, QPoint()),
-        invoker->size());
-
-    menu->setProperty(style::Properties::kMenuNoMouseReplayRect, invokerGeometry);
+    menu->setProperty(style::Properties::kMenuNoMouseReplayArea,
+        QVariant::fromValue(QPointer<QWidget>(invoker)));
 
     QnHiDpiWorkarounds::showMenu(menu,
         QnHiDpiWorkarounds::safeMapToGlobal(invoker,

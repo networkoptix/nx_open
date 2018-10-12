@@ -87,7 +87,7 @@ namespace style
     const char* Properties::kTabBarIndent = "_qn_tabBarIndent";
     const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
     const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
-    const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
+    const char* Properties::kMenuNoMouseReplayArea = "_qn_menuNoMouseReplayArea";
     const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
     const char* Properties::kGroupBoxContentTopMargin = "_qn_groupBoxContentTopMargin";
 

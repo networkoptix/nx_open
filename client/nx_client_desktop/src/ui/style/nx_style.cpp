@@ -42,6 +42,7 @@
 #include <ui/common/indents.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/calendar_widget.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/property_backup.h>
@@ -426,6 +427,26 @@ namespace
         return CommonScrollBar;
     }
 
+    QRect getNoReplayRect(const QMenu* menu)
+    {
+        const auto noReplayArea = menu->property(Properties::kMenuNoMouseReplayArea);
+        if (!noReplayArea.isValid())
+            return {};
+
+        if (noReplayArea.canConvert<QRect>())
+            return noReplayArea.value<QRect>();
+
+        if (noReplayArea.canConvert<QPointer<QWidget>>())
+        {
+            const auto widget = noReplayArea.value<QPointer<QWidget>>();
+            return widget
+                ? QRect(QnHiDpiWorkarounds::safeMapToGlobal(widget, QPoint()), widget->size())
+                : QRect();
+        }
+
+        return QRect();
+    }
+
     // A menu has dropdown style either if it has kMenuAsDropdown bool property set
     // or it has a parent menu that has that property set.
     bool menuHasDropdownStyle(const QMenu* menu)
@@ -571,9 +592,30 @@ QnNxStyle::QnNxStyle() :
     //QTBUG: Qt is supposed to handle this, but currently it seems broken.
     if (kForceMenuMouseReplay)
     {
-        installEventHandler(qApp, QEvent::MouseButtonPress, this,
+        installEventHandler(qApp, {QEvent::MouseButtonPress, QEvent::ActionAdded}, this,
             [this](QObject* watched, QEvent* event)
             {
+                if (event->type() == QEvent::ActionAdded)
+                {
+                    // Hook into QPushButton::setMenu.
+                    if (auto button = qobject_cast<QPushButton*>(watched))
+                    {
+                        if (button->menu())
+                        {
+                            button->menu()->setProperty(Properties::kMenuNoMouseReplayArea,
+                                QVariant::fromValue(QPointer<QWidget>(button)));
+                        }
+                    }
+
+                    return;
+                }
+
+                if (event->type() != QEvent::MouseButtonPress)
+                {
+                    NX_ASSERT(false, "Should never get here");
+                    return;
+                }
+
                 if (!event->spontaneous())
                     return;
 
@@ -589,7 +631,9 @@ QnNxStyle::QnNxStyle() :
 
                 /* If menu was invoked by a click on some area we most probably want to
                  * prevent re-invoking menu if it was closed by click in the same area: */
-                QRect noReplayRect = activeMenu->property(Properties::kMenuNoMouseReplayRect).value<QRect>();
+                QRect noReplayRect = getNoReplayRect(activeMenu);
+                qDebug() << "NO REPLAY RECT:" << noReplayRect;
+
                 if (noReplayRect.isValid() && noReplayRect.contains(globalPos))
                     return;
 
@@ -598,6 +642,8 @@ QnNxStyle::QnNxStyle() :
                     return;
 
                 auto localPos = window->mapFromGlobal(globalPos);
+
+                activeMenu->setAttribute(Qt::WA_NoMouseReplay);
 
                 qApp->postEvent(window, new QMouseEvent(QEvent::MouseButtonPress,
                     localPos, globalPos, mouseEvent->button(),
