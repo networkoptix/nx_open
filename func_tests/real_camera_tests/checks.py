@@ -1,28 +1,42 @@
 import traceback
 from fnmatch import fnmatch
 
+from typing import Optional
+
 
 class Result(object):
     @property
+    def status(self):
+        return type(self).__name__.lower()
+
+    @property
     def details(self):
-        return {key: value for key, value in self.__dict__.items() if value}
+        return dict(status=self.status, **self._field_values())
+
+    def __repr__(self):
+        return '{}({})'.format(
+            type(self).__name__,
+            ', '.join(['{}={!r}'.format(k, v) for k, v in self._field_values().items()]))
+
+    def _field_values(self):
+        return {k: v for k, v in self.__dict__.items() if v}
 
 
 class Success(Result):
-    def __init__(self):
-        self.status = 'success'
+    pass
 
 
 class Failure(Result):
-    def __init__(self, errors=[], is_exception=False):
-        self.status = 'failure'
-        assert errors or is_exception
-        self.errors = errors if isinstance(errors, list) else [errors]
-        self.exception = traceback.format_exc().strip().splitlines() if is_exception else None
-
-    def __repr__(self):
-        return '<{} errors={}, exception={}>'.format(
-            type(self).__name__, len(self.errors), bool(self.exception))
+    def __init__(self, errors=None, exception=None, is_exception=False):
+            # types: (Optional[list], Optional[list], bool) -> None
+        if not errors and not exception and not is_exception:
+            raise ValueError('No error description is provided')
+        if exception and is_exception:
+            raise ValueError('Exception is initialized twice')
+        self.errors = errors if isinstance(errors, list) else \
+            ([errors] if errors else [])
+        self.exception = traceback.format_exc().strip().splitlines() \
+            if is_exception else (exception or [])
 
     def append_errors(self, *errors):
         result = Failure(self.errors + list(errors))
@@ -32,11 +46,7 @@ class Failure(Result):
 
 class Halt(Result):
     def __init__(self, message):  # types: (str) -> None
-        self.status = 'halt'
         self.message = message
-
-    def __repr__(self):
-        return '{}({!r})'.format(type(self).__name__, self.message)
 
 
 def expect_values(expected, actual, *args, **kwargs):
@@ -88,7 +98,7 @@ class Checker(object):
 
     def expect_values(self, expected, actual, path='camera', syntax=None):
         if actual is None and expected is not None:
-            self.add_error('{} is not found, expected to be {}', path, expected)
+            self.add_error('{} is not found, expected {}', path, expected)
 
         elif isinstance(expected, dict):
             self.expect_dict(expected, actual, path, syntax)
@@ -96,7 +106,7 @@ class Checker(object):
         elif isinstance(expected, list):
             low, high = expected
             if not low <= actual <= high:
-                self.add_error('{} is {}, expected to be in {}', path, actual, expected)
+                self.add_error('{} is {}, expected range {}', path, actual, expected)
 
         elif not _compare(expected, actual, syntax):
             self.add_error('{} is {}, expected {}', path, actual, expected)
@@ -117,7 +127,7 @@ class Checker(object):
 
             if equal_position and (not dot_position or equal_position < dot_position):
                 if not isinstance(actual, list):
-                    self.add_error('{} is {}, expected to be a list', path, actual_type)
+                    self.add_error('{} is {}, expected a list', path, actual_type)
                     continue
 
                 item = self._search_item(*key.split('=', 1), items=actual, syntax=syntax)
@@ -132,7 +142,7 @@ class Checker(object):
 
             else:
                 if not isinstance(actual, dict):
-                    self.add_error('{} is {}, expected to be {}', path, actual_type, expected)
+                    self.add_error('{} is {}, expected {}', path, actual_type, expected)
                 else:
                     self.expect_values(
                         expected_value, self._get_key_value(key, actual), full_path, syntax)

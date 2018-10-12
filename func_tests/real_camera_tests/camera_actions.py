@@ -72,7 +72,7 @@ def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
                     return
                 elif isinstance(result, Halt) and last_failure:
                     # In case of halt keep last error messages.
-                    yield last_failure.append_errors(result.message)
+                    yield last_failure.append_errors('retry:', result.message)
                 elif isinstance(result, Failure):
                     last_failure = result
                     yield result

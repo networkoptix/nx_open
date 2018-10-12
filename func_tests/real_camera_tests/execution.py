@@ -8,6 +8,7 @@ from fnmatch import fnmatch
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
+from framework.utils import datetime_utc_now
 from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
@@ -70,7 +71,7 @@ class CameraStagesExecutor(object):
             ))
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
-        self._start_time = datetime.now()
+        self._start_time = datetime_utc_now()
         start_time = timeit.default_timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
@@ -81,7 +82,7 @@ class CameraStagesExecutor(object):
                     yield
 
                 except StopIteration:
-                    _logger.info('%s stage result %s', self.name, executors.details)
+                    _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
                         self._duration = timedelta(seconds=timeit.default_timer() - start_time)
@@ -103,7 +104,8 @@ class CameraStagesExecutor(object):
                     stage_rules.clear()
                     return []
             else:
-                executors.append(stage.Executor(self.id, current_stage, rules, hard_timeout))
+                executors.append(stage.Executor(
+                    self.name, self.id, current_stage, rules, hard_timeout))
 
         return executors
 
@@ -114,7 +116,7 @@ class ServerStagesExecutor(object):
             self.name = name
             self.rules = rules
             self.result = checks.Halt('Is not executed')
-            self.start_time = datetime.now()
+            self.start_time = datetime_utc_now()
             self.duration = None
 
         @property
@@ -152,7 +154,7 @@ class ServerStagesExecutor(object):
 
         current_stage.duration = timedelta(seconds=timeit.default_timer() - start_time)
         self.stages.append(current_stage)
-        _logger.info(self, 'Server stage %r result %r', name, name, current_stage.result.details)
+        _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 
     @property
     def is_successful(self):
@@ -245,7 +247,7 @@ class Stand(object):
                     cameras_left += 1
 
             if not cameras_left:
-                _logger.info('Stages execution is finished')
+                _logger.info('All camera stages execution is finished')
                 return
 
             _logger.debug('Wait for cycle delay %s, %s cameras left', cycle_delay, cameras_left)

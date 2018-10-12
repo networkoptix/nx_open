@@ -17,11 +17,27 @@ _logger = logging.getLogger(__name__)
 class Run(object):
     """ Stage execution object, keeps runtime data related to specific stage run on specific camera.
     """
-    def __init__(self, stage, server, camera_id):  # type: (Stage, Mediaserver, str) -> None
+    def __init__(self, stage, server, name, id):
+            # type: (Stage, Mediaserver, str, str) -> None
         self.stage = stage
         self.server = server
-        self.id = camera_id
-        self.data = None  # type: dict
+        self.name = name
+        self.id = id
+        self._uuid = None  # type: str
+        self._data = None  # type: dict
+
+    @property
+    def uuid(self):
+        self._uuid = self._uuid or (self.data or {}).get('id')
+        return self._uuid
+
+    @property
+    def data(self):
+        try:
+            self._data = self._data or self.server.api.get_resource('CamerasEx', self.id)
+        except (MediaserverApiError, MediaserverApiRequestError):
+            self._data = None
+        return self._data
 
     def media_url(self, profile='primary', position=None):
         url = self.server.api.generic.http.media_url(self.id)
@@ -31,11 +47,11 @@ class Run(object):
             time_since_epoch = position - epoch
             url += '&pos=' + str(int(time_since_epoch.total_seconds() * 1000))
 
-        _logger.debug('Media URL: {}'.format(url))
+        _logger.debug('{} media URL: {}'.format(self.name, url))
         return url
 
-    def update_data(self):
-        self.data = self.server.api.get_resource('CamerasEx', self.id)
+    def clear_cache(self):
+        self._data = None
 
 
 class Stage(object):
@@ -49,13 +65,13 @@ class Stage(object):
         self._actions = actions
         assert callable(actions), type(actions)
 
-    def steps(self, server, camera_id, rules
-              ):  # type: (Mediaserver, str, dict) -> Generator[Result]
+    def steps(self, server, camera_name, camera_id, rules):
+            # type: (Mediaserver, str, dict) -> Generator[Result]
         """ Yields intermediate states:
             - Error - retry is expected in some time if timeout is not expired.
             - Success - stage is successfully finished.
         """
-        run = Run(self, server, camera_id)
+        run = Run(self, server, camera_name, camera_id)
         if isinstance(rules, list):
             actions = self._actions(run, *rules)
         elif isinstance(rules, dict):
@@ -64,21 +80,16 @@ class Stage(object):
             raise TypeError('Unsupported rules type: {}'.format(type(rules)))
 
         while True:
-            try:
-                run.update_data()
-
-            except (MediaserverApiError, MediaserverApiRequestError) as e:
-                yield Failure(str(e))
-
-            else:
-                yield actions.next()
+            run.clear_cache()
+            yield actions.next()
 
 
 class Executor(object):
     """ Stage executor for a single camera, executes stage steps and keeps resulting data.
     """
-    def __init__(self, camera_id, stage, rules, hard_timeout=None
-                 ):  # type: (str, Stage, dict, Optional[timedelta]) -> None
+    def __init__(self, camera_name, camera_id, stage, rules, hard_timeout=None):
+            # type: (str, str, Stage, dict, Optional[timedelta]) -> None
+        self.camera_name = camera_name
         self.camera_id = camera_id
         self.stage = stage
         self._rules = json.loads(json.dumps(rules))  # Get rid of OrderdDicts
@@ -91,20 +102,20 @@ class Executor(object):
         """ Yields when runner needs some time to wait before stage retry.
             StopIteration means the stage execution is finished, see is_successful.
         """
-        steps = self.stage.steps(server, self.camera_id, self._rules)
+        steps = self.stage.steps(server, self.camera_name, self.camera_id, self._rules)
         self._result = Halt('Stage is not finished')
         self._start_time = datetime.now()
         start_time = timeit.default_timer()
-        _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_id)
+        _logger.info('Stage "%s" is started for %s', self.stage.name, self.camera_name)
         while not self._execute_next_step(steps, start_time):
             _logger.debug(
-                'Stage "%s" for %s after %s status %s',
-                self.stage.name, self.camera_id, self._duration, self._result.details)
+                'Stage "%s" for %s after %s: %s',
+                self.stage.name, self.camera_name, self._duration, self._result)
 
             if self._duration > self._timeout:
                 _logger.info(
                     'Stage "%s" for %s timed out in %s',
-                    self.stage.name, self.camera_id, self._duration)
+                    self.stage.name, self.camera_name, self._duration)
                 break
 
             yield
@@ -112,7 +123,7 @@ class Executor(object):
         steps.close()
         _logger.info(
             'Stage "%s" for %s is finished in %s: %s',
-            self.stage.name, self.camera_id, self._duration, self._result)
+            self.stage.name, self.camera_name, self._duration, self._result)
 
     @property
     def is_successful(self):

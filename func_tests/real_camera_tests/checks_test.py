@@ -1,6 +1,6 @@
 import pytest
 
-from cameras_integration.checks import Failure, Halt, Success, expect_values
+from .checks import Failure, Halt, Success, expect_values
 
 
 def _exception_failure(**kwargs):
@@ -45,13 +45,13 @@ def test_expect_values_success(expected, actual):
     ({'hello': 'world'}, {'hello': 'worldX'},
         ["'camera.hello' is 'worldX', expected 'world'"]),
     ({'hello': 'world'}, {'helloX': 'worldX'},
-        ["'camera.hello' is None, expected 'world'"]),
+        ["'camera.hello' is not found, expected 'world'"]),
     ({'top.mid.bottom': 777}, {'top': {'mid': {'bottom': 888}}},
         ["'camera.top.mid.bottom' is 888, expected 777"]),
     ({'top.mid.bottom': 777}, {'top': {'mid': 2}},
-        ["'camera.top.mid' is 'int', expected to be a dict"]),
+        ["'camera.top.mid' is 'int', expected {'bottom': 777}"]),
     ({'number1': [5, 10], 'number2': 6}, {'number1': 3, 'number2': 3},
-        ["'camera.number1' is 3, expected to be in [5, 10]",
+        ["'camera.number1' is 3, expected range [5, 10]",
          "'camera.number2' is 3, expected 6"]),
     ({'encoderIndex': 'primary', 'codec': 'MJPEG'}, {'encoderIndex': 2, 'codec': 28},
         ["'camera.codec' is 'H264', expected 'MJPEG'",
@@ -59,7 +59,7 @@ def test_expect_values_success(expected, actual):
     ({'id=b': {'v': 3}}, [{'id': 'a', 'v': 1}, {'id': 'b', 'v': 2}],
         ["'camera[id=b].v' is 2, expected 3"]),
     ({'id=b': {'v': 3}}, {'id': 'a', 'v': 1},
-        ["'camera' is 'dict', expected to be a list"]),
+        ["'camera' is 'dict', expected a list"]),
     ({'path.id=a': {'v': 7}}, {'path': [{'id': 'a', 'v': 6}]},
         ["'camera.path[id=a].v' is 6, expected 7"]),
     ({'id=x.y': {'v': 7}}, [{'id': 'x.z', 'v': 5}, {'id': 'x.y', 'v': 6}],
