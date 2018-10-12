@@ -128,7 +128,9 @@ class ContextAdmin(CMSAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         if request.method == "POST" and 'product_id' in request.POST:
-            extra_context['preview_link'] = page_editor(request)
+            extra_context['preview_link'] = page_editor(request).url
+            if 'SendReview' in request.POST:
+                return redirect(extra_context['preview_link'])
 
         extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
         extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
