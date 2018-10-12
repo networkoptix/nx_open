@@ -24,7 +24,8 @@ void initialize(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    std::shared_ptr<Logger> logger)
+    std::shared_ptr<Logger> logger,
+    bool writeInitInformation)
 {
     if (!logger)
         logger = mainLogger();
@@ -56,12 +57,8 @@ void initialize(
         }
     }
 
-    const boost::optional<QString> filePath = logger->filePath();
-    static std::set<QString> initializedFilePaths;
-    if (filePath && initializedFilePaths.find(*filePath) == initializedFilePaths.end())
+    if (writeInitInformation)
     {
-        initializedFilePaths.insert(*filePath);
-
         const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
         write(QByteArray(80, '='));
         write(lm("%1 started, version: %2, revision: %3").args(
@@ -70,6 +67,7 @@ void initialize(
         if (!binaryPath.isEmpty())
             write(lm("Binary path: %1").arg(binaryPath));
 
+        const boost::optional<QString> filePath = logger->filePath();
         write(lm("Log level: %1, file size: %2, backup count: %3, file: %4").args(
             toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
             settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));

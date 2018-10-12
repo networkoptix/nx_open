@@ -13,7 +13,8 @@ void NX_UTILS_API initialize(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath = QString(),
-    std::shared_ptr<Logger> logger = nullptr);
+    std::shared_ptr<Logger> logger = nullptr,
+    bool writeInitInformation = true);
 
 void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 
