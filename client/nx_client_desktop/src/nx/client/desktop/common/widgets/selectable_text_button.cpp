@@ -240,11 +240,6 @@ void SelectableTextButton::setDeactivationToolTip(const QString& value)
 
 QSize SelectableTextButton::sizeHint() const
 {
-    return minimumSizeHint();
-}
-
-QSize SelectableTextButton::minimumSizeHint() const
-{
     const auto textSize = QFontMetrics(font()).size(0, effectiveText());
     const auto iconSize = QnSkin::maximumSize(effectiveIcon());
 
@@ -260,6 +255,11 @@ QSize SelectableTextButton::minimumSizeHint() const
     return QSize(
         textSize.width() + extraWidth,
         qMax(kMinimumHeight, qMax(textSize.height(), iconSize.height()) + 2));
+}
+
+QSize SelectableTextButton::minimumSizeHint() const
+{
+    return QSize(style::Metrics::kMinimumButtonWidth, kMinimumHeight);
 }
 
 bool SelectableTextButton::event(QEvent* event)
