@@ -6,6 +6,7 @@ if(withDesktopClient)
     find_package(Qt5
         COMPONENTS
             OpenGL
+            Svg
             QuickWidgets
             WebKit
             WebKitWidgets)
