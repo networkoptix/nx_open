@@ -24,6 +24,11 @@ class Failure(Result):
         return '<{} errors={}, exception={}>'.format(
             type(self).__name__, len(self.errors), bool(self.exception))
 
+    def append_errors(self, *errors):
+        result = Failure(self.errors + list(errors))
+        result.exception = self.exception
+        return result
+
 
 class Halt(Result):
     def __init__(self, message):  # types: (str) -> None

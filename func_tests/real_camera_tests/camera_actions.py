@@ -25,7 +25,7 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
     start_time = timeit.default_timer()
     while probe.poll() is None:
         if timeit.default_timer() - start_time > 30:
-            yield Failure('{!r} ffprobe has timed out'.format(title))
+            yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))
 
@@ -35,12 +35,12 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
     if stderr:
         _logger.debug('FFprobe(%s) stderr:\n%s', stream_url, stderr)
     if probe.returncode != 0:
-        yield Failure('{!r} ffprobe returned error code {}'.format(title, probe.returncode))
+        yield Halt('{!r} ffprobe returned error code {}'.format(title, probe.returncode))
         return
 
     streams = (json.loads(stdout.decode('utf-8')) or {}).get('streams')
     if not streams:
-        yield Failure('{!r} ffprobe returned no streams'.format(title))
+        yield Halt('{!r} ffprobe returned no streams'.format(title))
         return
 
     video, audio = None, None
@@ -60,6 +60,7 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
 
 def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
     frames = max(expected_values.get('video', {}).get('fps', [30]))
+    last_failure = None
     for _ in range(rerun_count):
         options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
         probe = subprocess.Popen(
@@ -69,7 +70,14 @@ def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
             for result in _ffprobe_poll(expected_values, probe, stream_url, title):
                 if isinstance(result, Success):
                     return
-                yield result
+                elif isinstance(result, Halt) and last_failure:
+                    # In case of halt keep last error messages.
+                    yield last_failure.append_errors(result.message)
+                elif isinstance(result, Failure):
+                    last_failure = result
+                    yield result
+                else:
+                    yield result
         finally:
             try:
                 probe.kill()
