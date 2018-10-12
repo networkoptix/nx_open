@@ -270,6 +270,9 @@ bool SelectableTextButton::event(QEvent* event)
         case QEvent::MouseButtonRelease:
         case QEvent::Shortcut:
         case QEvent::KeyPress:
+            if (menu())
+                return base_type::event(event);
+            [[fallthrough]];
         case QEvent::Enter:
         case QEvent::Leave:
         {
