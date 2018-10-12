@@ -81,7 +81,8 @@ window.L = {};
                         previewPath: '',
                         viewsDirCommon: 'static/web_common/views/',
                         trafficRelayHost: '{host}/gateway/{systemId}',
-                        publicDownloads: false
+                        publicDownloads: false,
+                        showHeaderAndFooter: true
                     };
 
                 $.ajax({
@@ -225,6 +226,16 @@ window.L = {};
                                 title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
+                            })
+                            .when('/embed/:systemId/view/:cameraId', {
+                                title      : lang.pageTitles.view,
+                                templateUrl: CONFIG.viewsDir + 'view.html',
+                                controller : 'ViewPageCtrl',
+                                resolve: {
+                                    cleanSlate: [function () {
+                                        CONFIG.showHeaderAndFooter = false;
+                                    }]
+                                }
                             })
                             .when('/activate', {
                                 title: lang.pageTitles.activate,

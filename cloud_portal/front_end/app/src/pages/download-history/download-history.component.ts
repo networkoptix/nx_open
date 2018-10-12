@@ -29,7 +29,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
     downloads: any;
     activeBuilds: any;
     downloadsData: any;
-    downloadTypes: any;
+    noteTypes: any;
     linkbase: any;
 
     location: Location;
@@ -51,15 +51,20 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
         this.location = location;
         this.canViewRelease = false;
-        this.downloadTypes = [];
+        this.noteTypes = [];
     }
 
     private getAvailableDownloadTypes(data) {
-        angular.forEach(data, (downloadType, name) => {
-            if (isArray(downloadType) && downloadType.length) {
-                this.downloadTypes.push(name);
+        angular.forEach(data, (noteType, name) => {
+            if (isArray(noteType) && noteType.length) {
+                this.noteTypes.push(name);
             }
         });
+
+        // re-order tabs
+        if (this.noteTypes.length) {
+            this.noteTypes.sort((a, b) => b > a);
+        }
     }
 
     private getData() {
@@ -74,12 +79,12 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
 
                     } else {
                         this.activeBuilds = [ result.data ];
-                        this.downloadTypes = [ result.data.type ];
+                        this.noteTypes = [ result.data.type ];
                         this.downloadsData = {};
                         this.downloadsData[ result.data.type ] = this.activeBuilds;
                     }
 
-                    this.titleService.setTitle(new TitleCasePipe().transform(this.downloadTypes[ 0 ])); // this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
+                    this.titleService.setTitle(new TitleCasePipe().transform(this.noteTypes[ 0 ])); // this.downloadTypes[ 0 ][ 0 ].toUpperCase() + this.downloadTypes[ 0 ].substr(1).toLowerCase());
 
                     setTimeout(() => {
                         if (this.tabs) {
@@ -119,7 +124,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                 .requireLogin()
                 .then(result => {
                     if (!result) {
-                        this.document.location.href = this.configService.config.redirectUnauthorised;
+                        this.location.go('404');
                         return;
                     }
 
@@ -131,7 +136,7 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy {
                                 if (this.canViewRelease) {
                                     this.getData();
                                 } else {
-                                    this.document.location.href = this.configService.config.redirectUnauthorised;
+                                    this.location.go('404');
                                     return;
                                 }
                             });

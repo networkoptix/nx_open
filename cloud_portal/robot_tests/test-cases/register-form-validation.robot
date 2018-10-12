@@ -66,7 +66,7 @@ Smiley Password ☠☿☂⊗⅓∠∩λ℘웃♞⊀☻★      mark        hamil
     [tags]    C41860
 Glyph Password 您都可以享受源源不絕的好禮及優惠    mark        hamill      ${valid email}            ${GLYPH TEXT}               True
     [tags]    C41860
-TM Password qweasdzxc123®™       mark        hamill      ${valid email}            ${TM TEXT}                  True
+TM Password qweasdzxc123®™                mark        hamill      ${valid email}            ${TM TEXT}                  True
     [tags]    C41860
 Leading Space Password                    mark        hamill      ${valid email}            ${SPACE}${BASE PASSWORD}    True
     [tags]    C41860
@@ -107,9 +107,7 @@ Test Register Invalid
     Run Keyword Unless    "${email}"=="${valid email}"    Check Email Outline    ${email}
     Run Keyword Unless    "${first}"=="mark"    Check First Name Outline    ${first}
     Run Keyword Unless    "${last}"=="hamill"    Check Last Name Outline    ${last}
-    Run Keyword Unless    "${checked}"=="True"    Check Terms and Conditions
-    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
-
+    Run Keyword Unless    "${checked}"=="True"    Check Terms and Conditions Error
 
 Register Form Validation
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}
@@ -118,7 +116,7 @@ Register Form Validation
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
     Run Keyword If    '''${password}'''!='''${EMPTY}'''     Check Password Badge    ${password}
-    Run Keyword Unless    "${checked}"=="False"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
+    Run Keyword If    "${checked}"=="True"    Click Element    ${TERMS AND CONDITIONS CHECKBOX REAL}
     Sleep    .1    #On Ubuntu it was going too fast
     click button    ${CREATE ACCOUNT BUTTON}
 

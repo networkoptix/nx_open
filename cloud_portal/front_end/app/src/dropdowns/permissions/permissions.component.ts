@@ -1,10 +1,13 @@
-import { Component, OnInit, Inject, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
-import { TranslateService }                                                          from "@ngx-translate/core";
+import {
+    Component, OnInit, Inject, ViewEncapsulation,
+    Input, Output, EventEmitter, SimpleChanges
+}                           from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'nx-permissions-select',
-    templateUrl: 'permissions.component.html',
-    styleUrls: ['permissions.component.scss'],
+    selector     : 'nx-permissions-select',
+    templateUrl  : 'permissions.component.html',
+    styleUrls    : [ 'permissions.component.scss' ],
     encapsulation: ViewEncapsulation.None,
 })
 
@@ -24,16 +27,22 @@ export class NxPermissionsDropdown implements OnInit {
         this.show = false;
 
         translate.get('Please select...')
-                 .subscribe((res: string) => {
-                     this.message = res;
-                 });
+            .subscribe((res: string) => {
+                this.message = res;
+            });
     }
 
     // TODO: Bind ngModel to the component and eliminate EventEmitter
 
     ngOnInit(): void {
-        const role = this.roles.filter(x => x.name === this.selected.name)[0];
-        this.selection = role.optionLabel || this.message;
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.roles) {
+            this.roles = changes.roles.currentValue;
+            const role = this.roles.filter(x => x.name === this.selected.name)[ 0 ];
+            this.selection = (role) ? role.optionLabel || this.message : '';
+        }
     }
 
     changePermission(role) {

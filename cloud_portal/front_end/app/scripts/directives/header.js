@@ -7,10 +7,10 @@
         .directive('nxHeader', NxHeader);
 
     NxHeader.$inject = [ 'NxDialogsService', 'cloudApi', 'account', '$location', '$route',
-        'systemsProvider', 'configService' ];
+        'systemsProvider', 'configService', '$rootScope' ];
 
     function NxHeader(NxDialogsService, cloudApi, account, $location, $route,
-                      systemsProvider, configService) {
+                      systemsProvider, configService, $rootScope) {
 
         const CONFIG = configService.config;
 
@@ -20,6 +20,14 @@
             link       : function (scope) {
                 scope.config = CONFIG;
                 scope.inline = typeof($location.search().inline) !== 'undefined';
+
+                scope.viewHeader = CONFIG.showHeaderAndFooter;
+
+                $rootScope.$on('nx.layout.header', function (event, opt) {
+                    // An event to control visibility of the header
+                    // ... i.e. when in view camera in embed
+                    scope.viewHeader = !opt.state;
+                });
 
                 if (scope.inline) {
                     $('body').addClass('inline-portal');

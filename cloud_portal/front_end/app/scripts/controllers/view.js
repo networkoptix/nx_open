@@ -36,7 +36,7 @@
                             }
 
                             // Set footer visibility according to system status
-                            $rootScope.$emit('nx.layout.footer', $scope.currentSystem.isOnline);
+                            $rootScope.$emit('nx.layout.footer', {state: $scope.currentSystem.isOnline, loc: 'ViewPageCtrl - late'});
 
                         }, function () {
                             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
@@ -63,8 +63,9 @@
 
                 $scope.$on('$destroy', function (event) {
                     cancelSubscription();
-                    // Reset footer visibility state
-                    $rootScope.$emit('nx.layout.footer', false);
+                    // Reset visibility state
+                    $rootScope.$emit('nx.layout.header', {state: false});
+                    $rootScope.$emit('nx.layout.footer', {state: false});
                 });
             } ]);
 })();

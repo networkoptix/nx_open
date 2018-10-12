@@ -124,6 +124,20 @@
             padding          : .5rem 0 0;
         }
 
+        .clipboard-block {
+            display         : flex;
+            flex-direction  : row;
+            justify-content : space-between;
+            align-items     : center;
+
+            a {
+                width       : fit-content;
+                height      : 2rem;
+                padding     : 0 8px;
+                line-height : 2rem;
+            }
+        }
+
         p:last-of-type {
             margin-bottom : 0;
         }
