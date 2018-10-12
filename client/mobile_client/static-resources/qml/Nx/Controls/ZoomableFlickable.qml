@@ -436,7 +436,7 @@ Item
             {
                 id: clickFilterTimer
 
-                interval: 200
+                interval: 300
 
                 onTriggered: rootItem.clicked()
             }
@@ -444,7 +444,7 @@ Item
             Timer
             {
                 id: doubleClickFilter
-                interval: 200
+                interval: 300
             }
 
             onWheel:

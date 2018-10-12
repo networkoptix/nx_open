@@ -238,7 +238,7 @@ PageBase
     {
         id: video
 
-        y: -header.height
+        y: toolBar.visible ? -header.height : 0
         x: -mainWindow.leftPadding
         width: mainWindow.width
         height: mainWindow.height
