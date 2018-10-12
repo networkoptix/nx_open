@@ -10,7 +10,27 @@
 
     <div class="modal-body">
         <p class="warning-label" translate>Please make sure this system has one public user as credentials will be publicly visible.</p>
-        <p translate>Choose which properties should be visible to customers</p>
+
+        <p translate>Specify credentials for this system:</p>
+
+        <div class="form-group">
+            <label for="login_email" translate>Email</label>
+            <input type="email" class="form-control"
+                   id="login_email" name="login_email" #login_email="ngModel"
+                   [(ngModel)]="auth.email"
+                   pattern="{{ configService.config.emailRegex }}" maxlength="255"
+                   required nxFocusMe>
+        </div>
+        <div class="form-group">
+            <label for="login_password" translate>Password</label>
+            <input type="password" class="form-control"
+                   name="login_password" id="login_password" #login_password="ngModel"
+                   [(ngModel)]="auth.password"
+                   maxlength="255"
+                   required>
+        </div>
+
+        <p translate>Choose which properties should be visible to customers:</p>
 
         <div class="form-group">
             <nx-checkbox
@@ -39,9 +59,7 @@
 
         <p class="clipboard-block">
             <input readonly class="form-control" [value]="getEmbedUrl()" id="embedUrl">
-            <a href (click)="copyToClipboard()" >
-                <span class="glyphicon glyphicon-copy"></span>
-            </a>
+            <a href (click)="copyToClipboard()">Copy</a>
         </p>
     </div>
     <div class="modal-footer">
