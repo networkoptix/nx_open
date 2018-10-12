@@ -274,6 +274,7 @@ def parse_stamp(stamp):
 
 
 class Pacer(object):
+    '''Ensure calls from multiple threads issued at required rate'''
 
     def __init__(self, required_rate):
         assert required_rate, repr(required_rate)  # must not be zero
@@ -336,6 +337,7 @@ def transactions_generated(call_generator, rate):
         % (rate, pacer.stale_time))
 
 
+# post transactions and measure their propagation time
 def run_transactions(metrics_saver, config, env):
     transaction_gen = transaction_generator(env.all_server_list)
     transaction_rate = config.TRANSACTIONS_PER_SERVER_RATE * len(env.all_server_list)
