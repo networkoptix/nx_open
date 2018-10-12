@@ -4,6 +4,8 @@
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <set>
+
 #include "log_main.h"
 
 namespace {
@@ -54,21 +56,27 @@ void initialize(
         }
     }
 
-    const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
-    write(QByteArray(80, '='));
-    write(lm("%1 started, version: %2, revision: %3").args(
-        applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
+    const boost::optional<QString> filePath = logger->filePath();
+    static std::set<QString> initializedFilePaths;
+    if (filePath && initializedFilePaths.find(*filePath) == initializedFilePaths.end())
+    {
+        initializedFilePaths.insert(*filePath);
 
-    if (!binaryPath.isEmpty())
-        write(lm("Binary path: %1").arg(binaryPath));
+        const auto write = [&](const Message& message) { logger->log(Level::always, "START", message); };
+        write(QByteArray(80, '='));
+        write(lm("%1 started, version: %2, revision: %3").args(
+            applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
 
-    const auto filePath = logger->filePath();
-    write(lm("Log level: %1, file size: %2, backup count: %3, file: %4").args(
-        toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
-        settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+        if (!binaryPath.isEmpty())
+            write(lm("Binary path: %1").arg(binaryPath));
 
-    if (!settings.exceptionFilers.empty())
-        write(lm("Filters: %1").container(settings.exceptionFilers));
+        write(lm("Log level: %1, file size: %2, backup count: %3, file: %4").args(
+            toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
+            settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
+
+        if (!settings.exceptionFilers.empty())
+            write(lm("Filters: %1").container(settings.exceptionFilers));
+    }
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
