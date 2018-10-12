@@ -9,7 +9,7 @@ from django.http.response import HttpResponse
 from cloud import settings
 from cms.forms import *
 from cms.controllers.modify_db import get_records_for_version
-from cms.views.product import review
+from cms.views.product import page_editor, review
 
 
 class ProductFilter(SimpleListFilter):
@@ -118,13 +118,34 @@ admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(CMSAdmin):
-    list_display = ('context_actions', 'name', 'description',
-                    'url', 'translatable', 'is_global')
+    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
 
     list_display_links = ('name',)
     search_fields = ('name', 'description', 'url')
 
     change_list_template = "cms/context_changelist.html"
+    change_form_template = "cms/context_change_form.html"
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        if request.method == "POST" and 'product_id' in request.POST:
+            extra_context['preview_link'] = page_editor(request)
+
+        extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
+        extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+
+        if 'admin_language' in request.session:
+            extra_context['language_code'] = request.session['admin_language']
+        extra_context['product_id'] = request.session['product_id']
+
+        form = CustomContextForm(initial={'language': extra_context['language_code'], 'context': object_id})
+        form.add_fields(Product.objects.get(id=request.session['product_id']),
+                        Context.objects.get(id=object_id),
+                        Language.objects.get(code=request.session['language']),
+                        request.user)
+        extra_context['custom_form'] = form
+
+        return super(ContextAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def get_model_perms(self, request):
         if not request.user.is_superuser:
@@ -135,7 +156,7 @@ class ContextAdmin(CMSAdmin):
         if not request.user.is_superuser:
             self.list_display_links = (None,)
         else:
-            self.list_filter = ('product_type', )
+            self.list_filter = ('product_type',)
 
         extra_context = extra_context or {}
         if'product_id' in request.POST:
@@ -150,10 +171,6 @@ class ContextAdmin(CMSAdmin):
 
         return super(ContextAdmin, self).changelist_view(request, extra_context)
 
-    def context_actions(self, obj):
-        return format_html('<a class="btn btn-sm editor" href="{}">Edit content</a>',
-                           reverse('page_editor', args=[obj.id]))
-
     def get_queryset(self, request):  # show only users for cloud_portal product type
         qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         qs = qs.filter(product_type__product__in=[request.session['product_id']])
@@ -162,11 +179,16 @@ class ContextAdmin(CMSAdmin):
                 filter(hidden=False)  # only superuser sees hidden contexts
         return qs
 
-    context_actions.short_description = 'Admin Options'
-    context_actions.allow_tags = True
-
 
 admin.site.register(Context, ContextAdmin)
+
+
+class ContextProxyAdmin(CMSAdmin):
+    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
+    list_filter = (ProductFilter,)
+
+
+admin.site.register(ContextProxy, ContextProxyAdmin)
 
 
 class ContextTemplateAdmin(CMSAdmin):

@@ -83,13 +83,8 @@
                                 <div class="show-html">{{ record|safe }}</div>
                             {% endif %}
                             {% if product.product_type.single_customization %}
-                                <a
-                                {% if language %}
-                                    href="{% url 'page_editor' data_structure.context.id language.code %}"
-                                {% else %}
-                                    href="{% url 'page_editor' data_structure.context.id %}"
-                                {% endif %}
-                                    target="_blank">(edit)</a>
+                                <a href="{% url 'admin:cms_context_change' data_structure.context.id %}"
+                                   target="_blank">(edit)</a>
                             {% endif %}
                         </li>
                         {% endwith %}

@@ -68,7 +68,7 @@ def save_unrevisioned_records(product, context, language, data_structures,
             to the default value.
             
             This will create a new record making images/files behave like the other data structure types
-            Places to touch are here, cms/forms.py, and cms/templates/context_editor.html
+            Places to touch are here and cms/forms.py
         """
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:

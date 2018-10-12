@@ -47,22 +47,6 @@ def get_context_and_language(request, context_id, language_code, default_languag
     return context, language
 
 
-# This builds the custom 'edit page' form
-def initialize_form(product, context, language, user):
-    form_initialization = {'language': language.code}
-
-    if context:
-        form_initialization['context'] = context.id
-
-    form = CustomContextForm(
-        initial=form_initialization)
-
-    if context:
-        form.add_fields(product, context, language, user)
-
-    return form
-
-
 # If there are any errors they will be added to the django messages that show up in the response
 def add_upload_error_messages(request, errors):
     for error in errors:
@@ -127,48 +111,30 @@ def context_editor_action(request, product, context_id, language_code):
         else:
             messages.success(request, saved_msg)
             preview_link = modify_db.generate_preview_link(context)
+            print preview_link
 
-    # The form is made here so that all of the changes to fields are sent with the new form
-    form = initialize_form(product, context, language, request.user)
-
-    return context, language, form, preview_link
+    return preview_link
 
 
 # Create your views here.
 @require_http_methods(["GET", "POST"])
 @permission_required('cms.edit_content')
-def page_editor(request, context_id=None, language_code=None, product_id=None):
-    if product_id:
-        product = Product.objects.get(id=product_id)
+def page_editor(request):
+    product = Product.objects.get(id=request.POST['product_id'])
+    context_id = request.POST['context_id']
+    language_code = request.POST['language']
 
-    if request.method == "GET":
-        context, language = get_context_and_language(request, context_id, language_code, product.default_language)
-        form = initialize_form(product, context, language, request.user)
-        preview_link = ""
+    if not request.user.has_perm('cms.edit_content'):
+        raise PermissionDenied
 
-    else:
-        if not request.user.has_perm('cms.edit_content'):
-            raise PermissionDenied
+    preview_link = context_editor_action(request, product, context_id, language_code)
 
-        context, language, form, preview_link = context_editor_action(request, product, context_id, language_code)
+    if 'SendReview' in request.POST and preview_link:
+        review = ProductCustomizationReview.objects.filter(version_id=ContentVersion.objects.latest('created_date')).first()
+        redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
+        return redirect(redirect_url)
 
-        if 'SendReview' in request.POST and preview_link:
-            review = ProductCustomizationReview.objects.filter(version_id=ContentVersion.objects.latest('created_date')).first()
-            redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
-            return redirect(redirect_url)
-
-    return render(request, 'context_editor.html',
-                  {'context': context,
-                   'form': form,
-                   'product': product,
-                   'language': language,
-                   'preview_link': preview_link,
-                   'user': request.user,
-                   'has_permission': mysite.has_permission(request),
-                   'site_url': mysite.site_url,
-                   'site_header': admin.site.site_header,
-                   'site_title': admin.site.site_title,
-                   'title': 'Edit %s for %s' % (context.name, product.name)})
+    return preview_link
 
 
 @require_http_methods(["POST"])
@@ -288,7 +254,7 @@ def product_settings(request, product_id):
     else:
         form = ProductSettingsForm()
 
-    return render(request, 'product_settings.html',
+    return render(request, 'cms/product_settings.html',
                   {'product': product,
                    'form': form,
 

@@ -246,6 +246,13 @@ class Context(models.Model):
         return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
 
 
+class ContextProxy(Context):
+    class Meta:
+        proxy = True
+        verbose_name = "Admin Page"
+        verbose_name_plural = "Admin Pages"
+
+
 class ContextTemplate(models.Model):
     class Meta:
         unique_together = ('context', 'language', 'skin')
