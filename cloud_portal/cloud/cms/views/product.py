@@ -122,7 +122,7 @@ def context_editor_action(request, product, context_id, language_code):
 def page_editor(request):
     product = Product.objects.get(id=request.POST['product_id'])
     context_id = request.POST['context_id']
-    language_code = request.POST['language']
+    language_code = request.POST['language'] if 'language' in request.POST else None
 
     if not request.user.has_perm('cms.edit_content'):
         raise PermissionDenied
@@ -170,13 +170,15 @@ def review(request):
             modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.accepted, request.user)
             messages.success(request, "Version {} has been accepted".format(product_review.version.id))
 
-    elif 'reject' in request.POST:
-        modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.rejected, request.user)
-        messages.success(request, "Version {} has been rejected".format(product_review.version.id))
+    elif any(action in request.POST for action in ['reject', 'ask_question']):
+        if 'reject' in request.POST:
+            modify_db.update_draft_state(review_id, ProductCustomizationReview.REVIEW_STATES.rejected, request.user)
+            messages.success(request, "Version {} has been rejected".format(product_review.version.id))
+            product_review = ProductCustomizationReview.objects.get(id=review_id)
 
-    # In the future we will use this for doing special stuff
-    elif 'ask_question' in request.POST:
-        pass
+        message = "\n{}: {}\n".format(request.user.email, request.POST['addedNote'])
+        product_review.notes += message
+        product_review.save()
 
     else:
         messages.error(request, "Invalid option selected")

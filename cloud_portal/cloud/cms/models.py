@@ -434,7 +434,7 @@ class ProductCustomizationReview(models.Model):
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion)
     state = models.IntegerField(choices=REVIEW_STATES, default=REVIEW_STATES.pending)
-    notes = models.TextField()
+    notes = models.TextField(default="", blank=True)
     reviewed_date = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,

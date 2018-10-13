@@ -260,7 +260,7 @@ admin.site.register(ContentVersion, ContentVersionAdmin)
 
 class ProductCustomizationReviewAdmin(CMSAdmin):
     list_display = ('product', 'version', 'customization', 'reviewed_by', 'reviewed_date', 'state')
-    readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by',)
+    readonly_fields = ('customization', 'version', 'reviewed_date', 'reviewed_by', 'notes',)
 
     list_filter = ('version__product__product_type', ProductFilter)
 
