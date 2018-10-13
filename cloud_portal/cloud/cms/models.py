@@ -317,12 +317,14 @@ class DataStructure(models.Model):
                 return index
         return 0
 
-    def find_actual_value(self, product=None, language=None, version_id=None):
+    def find_actual_value(self, product=None, language=None, version_id=None, draft=False):
         content_value = ""
         if not product:
             return self.default
-        content_record = DataRecord.objects.filter(product=product, data_structure=self). \
-            exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
+        content_record = DataRecord.objects.filter(product=product, data_structure=self)
+        if draft:
+            content_record = content_record.\
+                exclude(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.rejected)
 
         # try to get translated content
         if self.translatable:
@@ -337,9 +339,10 @@ class DataStructure(models.Model):
             else:  # Here find a datarecord with version_id
                 # which is not more than version_id
                 # filter only accepted content_records
-                content_record = content_record.filter(
-                    version_id__lte=version_id,
-                    version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
+                content_record = content_record.filter(version_id__lte=version_id)
+                if draft:
+                    content_record = content_record.\
+                        filter(version__productcustomizationreview__state=ProductCustomizationReview.REVIEW_STATES.accepted)
                 if content_record.exists():
                     content_value = content_record.latest('version_id').value
 

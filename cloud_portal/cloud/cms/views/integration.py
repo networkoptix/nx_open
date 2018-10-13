@@ -44,7 +44,8 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                     if not datastructure.public:
                         continue
                     integration_dict[context_name][ds_name] = datastructure.find_actual_value(product=integration,
-                                                                                              version_id=current_version)
+                                                                                              version_id=current_version,
+                                                                                              draft=show_pending)
 
             for global_context in global_contexts:
                 process_context_structure(cloud_portal, global_context, integration_dict, None, current_version, False, False)
