@@ -195,39 +195,47 @@ TEST(HostAddress, isIpAddress)
 
 //-------------------------------------------------------------------------------------------------
 
-namespace {
-
-static void testSocketAddress(const char* init, const char* host, int port)
+class SocketAddress:
+    public ::testing::Test
 {
-    const auto addr = SocketAddress(QString(init));
-    ASSERT_EQ(addr.address.toString(), QString(host));
-    ASSERT_EQ(addr.port, port);
-    ASSERT_EQ(addr.toString(), QString(init));
+protected:
+    void assertEndpointIsParsedAsExpected(
+        const char* endpointString, const char* host, int port)
+    {
+        const auto addr = network::SocketAddress(endpointString);
+        ASSERT_EQ(host, addr.address.toString());
+        ASSERT_EQ(port, addr.port);
+        ASSERT_EQ(endpointString, addr.toString());
 
-    SocketAddress other(HostAddress(host), port);
-    ASSERT_EQ(addr.toString(), other.toString());
-    ASSERT_EQ(addr, other);
+        network::SocketAddress other(HostAddress(host), port);
+        ASSERT_EQ(addr.toString(), other.toString());
+        ASSERT_EQ(addr, other);
 
-    QUrl url(QString("http://%1/path").arg(init));
-    ASSERT_EQ(addr.address.toString(), url.host());
-    ASSERT_EQ(addr.port, url.port(0));
+        QUrl url(QString("http://%1/path").arg(endpointString));
+        ASSERT_EQ(addr.address.toString(), url.host());
+        ASSERT_EQ(addr.port, url.port(0));
+    }
+};
+
+TEST_F(SocketAddress, endpoint_with_hostname)
+{
+    assertEndpointIsParsedAsExpected("ya.ru", "ya.ru", 0);
+    assertEndpointIsParsedAsExpected("ya.ru:80", "ya.ru", 80);
 }
 
-} // namespace
-
-TEST(SocketAddress, Base)
+TEST_F(SocketAddress, endpoint_with_ipv4)
 {
-    testSocketAddress("ya.ru", "ya.ru", 0);
-    testSocketAddress("ya.ru:80", "ya.ru", 80);
+    assertEndpointIsParsedAsExpected("12.34.56.78", "12.34.56.78", 0);
+    assertEndpointIsParsedAsExpected("12.34.56.78:123", "12.34.56.78", 123);
+}
 
-    testSocketAddress("12.34.56.78", "12.34.56.78", 0);
-    testSocketAddress("12.34.56.78:123", "12.34.56.78", 123);
+TEST_F(SocketAddress, endpoint_with_ipv6)
+{
+    assertEndpointIsParsedAsExpected("[2001:db8:0:2::1]", "2001:db8:0:2::1", 0);
+    assertEndpointIsParsedAsExpected("[2001:db8:0:2::1]:23", "2001:db8:0:2::1", 23);
 
-    testSocketAddress("[2001:db8:0:2::1]", "2001:db8:0:2::1", 0);
-    testSocketAddress("[2001:db8:0:2::1]:23", "2001:db8:0:2::1", 23);
-
-    testSocketAddress("[::ffff:12.34.56.78]", "::ffff:12.34.56.78", 0);
-    testSocketAddress("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
+    assertEndpointIsParsedAsExpected("[::ffff:12.34.56.78]", "::ffff:12.34.56.78", 0);
+    assertEndpointIsParsedAsExpected("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
 }
 
 } // namespace test
