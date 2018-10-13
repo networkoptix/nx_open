@@ -147,7 +147,14 @@
                         <h4 class="modal-title" id="myModalLabel">Add Comment to notes</h4>
                     </div>
                     <div class="modal-body">
-                        <input name="addedNote" required>
+                        <div class="form-row">
+                            <div>
+                                <label for="id_add">Note</label>
+                                <div id="add">
+                                    <input id="id_add" style="width:100%" name="addedNote" type="text" required>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
