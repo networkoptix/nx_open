@@ -644,6 +644,13 @@ class MediaserverApi(object):
     def camera(self, camera_id):
         return _MediaserverCameraApi(self.generic, camera_id)
 
+    @property
+    def camera_list(self):
+        result = []
+        for camera_info in self.generic.get('ec2/getCameras'):
+            result.append(_MediaserverCameraApi(self.generic, camera_info['id']))
+        return result
+
     def make_event_rule(
             self, event_type, event_state, action_type, event_resource_ids=[],
             event_condition_resource='', action_resource_ids=[]):

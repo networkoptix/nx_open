@@ -37,6 +37,7 @@ loggers:
   framework.mediaserver_api.setup: {level: INFO}
   framework.mediaserver_api.setup.wait: {level: WARNING}
   framework.mediaserver_api.merge: {level: INFO}
+  framework.message_bus: {level: INFO}
   framework.message_bus.thread: {level: WARNING}
   framework.mediaserver_sync_wait.sync.mediaserver_api: {level: INFO}
   framework.mediaserver_sync_wait.wait: {level: WARNING}
@@ -53,6 +54,7 @@ loggers:
   resource_synchronization_test.dumper.mediaserver_api: {level: INFO}
   scalability_test.create_test_data: {level: INFO}
   scalability_test.merge: {level: INFO}
+  scalability_test.stamp: {level: INFO}
   scalability_test.dumper: {level: INFO}
   scalability_test.post_check: {level: INFO}
 

@@ -52,7 +52,7 @@ def discovery(run, **kwargs):  # type: (stage.Run, dict) -> Generator[Result]
 @_stage(is_essential=True, timeout=timedelta(minutes=2))
 def authorization(run, password, login=None):  # type: (stage.Run, str, str) -> Generator[Result]
     if password != 'auto':
-        run.server.api.set_camera_credentials(run.data['id'], login, password)
+        run.server.api.set_camera_credentials(run.uuid, login, password)
         yield Halt('Try to set credentials')
 
     checker = Checker()
@@ -73,11 +73,11 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
     for fps_index, fps_range in enumerate(primary['fps']):
         selected = primary.copy()
         selected['fps'] = fps_range
-        with run.server.api.camera_recording(run.data['id'], fps=fps_avg(fps_range)):
+        with run.server.api.camera_recording(run.uuid, fps=fps_avg(fps_range)):
             for error in retry_expect_values(dict(status="Recording"), lambda: run.data):
                 yield error
 
-            while not run.server.api.get_recorded_time_periods(run.data['id']):
+            while not run.server.api.get_recorded_time_periods(run.uuid):
                 yield Failure('No data is recorded')
 
             for profile, configuration in (('primary', selected), ('secondary', secondary)):
@@ -94,7 +94,7 @@ def recording(run, primary, secondary=None):  # type: (stage.Run, dict, dict) ->
 def video_parameters(run, stream_urls=None, **profiles):
         # type: (stage.Run, dict, dict) -> Generator[Result]
     # Enable recording to keep video stream open during entire stage.
-    with run.server.api.camera_recording(run.data['id']):
+    with run.server.api.camera_recording(run.uuid):
         for profile, configurations in profiles.items():
             for index, configuration in enumerate(configurations):
                 configure_video(
@@ -117,8 +117,8 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
     corresponds to the expected one. Disable the audio in the end.
     """
     # Enable recording to keep video stream open during entire stage.
-    with run.server.api.camera_recording(run.data['id']):
-        with run.server.api.camera_audio_enabled(run.data['id']):
+    with run.server.api.camera_recording(run.uuid):
+        with run.server.api.camera_audio_enabled(run.uuid):
             for index, configuration in enumerate(configurations):
                 if not configuration.get('skip_codec_change'):
                     configure_audio(
@@ -146,12 +146,11 @@ def io_events(run, ins, outs):
     while not checker.expect_values(expected_ports, run.data['ioSettings'], 'io'):
         yield checker.result()
 
-    camera_uuid = run.data['id']  # Event rules work with UUIDs only, physicalId will not work.
     run.server.api.make_event_rule(
-        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[camera_uuid])
+        'cameraInputEvent', 'Active', 'diagnosticsAction', event_resource_ids=[run.uuid])
     run.server.api.make_event_rule(
         'userDefinedEvent', 'Undefined', 'cameraOutputAction',
-        event_condition_resource=run.id, action_resource_ids=[camera_uuid])
+        event_condition_resource=run.id, action_resource_ids=[run.uuid])
 
     run.server.api.create_event(source=run.id)
     for port in ins:
@@ -159,7 +158,7 @@ def io_events(run, ins, outs):
             continue
 
         while True:
-            events = run.server.api.get_events(camera_uuid, 'cameraInputEvent')
+            events = run.server.api.get_events(run.uuid, 'cameraInputEvent')
             if events:
                 yield expect_values({'eventParams.inputPortId': port['id']}, events[-1], 'event')
             else:

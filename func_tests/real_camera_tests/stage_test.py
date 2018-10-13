@@ -3,8 +3,8 @@ from datetime import timedelta
 
 import pytest
 
-from cameras_integration.checks import Failure, Halt, Success
-from cameras_integration.stage import Executor, Stage
+from .checks import Failure, Halt, Success
+from .stage import Executor, Stage
 
 _CAMERA_ID = 'TEST_CAMERA'
 _CAMERA_DATA = {'id': _CAMERA_ID, 'name': 'camera_name'}
@@ -55,7 +55,9 @@ def make_stage(temporary_results=None, is_success=False, sleep_s=None):
     ([Halt('Wait for it'), Failure('Something went wrong')], False),
 ])
 def test_execution(temporary_results, is_success):
-    executor = Executor(_CAMERA_ID, make_stage(temporary_results, is_success), _STAGE_RULES)
+    executor = Executor(
+        _CAMERA_ID, _CAMERA_ID, make_stage(temporary_results, is_success), _STAGE_RULES)
+
     steps = executor.steps(FakeServer)
     for _ in temporary_results:
         steps.next()
@@ -71,7 +73,9 @@ def test_execution(temporary_results, is_success):
 
 
 def test_execution_timeout():
-    executor = Executor(_CAMERA_ID, make_stage([Halt('wait')] * 100, sleep_s=0.1), _STAGE_RULES)
+    executor = Executor(
+        _CAMERA_ID, _CAMERA_ID, make_stage([Halt('wait')] * 100, sleep_s=0.1), _STAGE_RULES)
+
     for _ in executor.steps(FakeServer):
         pass
 
@@ -80,7 +84,7 @@ def test_execution_timeout():
 
 
 def test_execution_exception():
-    executor = Executor(_CAMERA_ID, make_stage(), dict(wrong='rules'))
+    executor = Executor(_CAMERA_ID, _CAMERA_ID, make_stage(), dict(wrong='rules'))
     with pytest.raises(StopIteration):
         executor.steps(FakeServer).next()
 

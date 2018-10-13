@@ -571,6 +571,20 @@ bool QnAviArchiveDelegate::findStreams()
                 m_firstDts = m_formatContext->streams[m_firstVideoIndex]->first_dts;
             if (m_firstDts == qint64(AV_NOPTS_VALUE))
                 m_firstDts = 0;
+
+            if (m_durationUs == AV_NOPTS_VALUE && !m_fastStreamFind)
+            {
+                av_seek_frame(m_formatContext, /*stream_index*/ -1,
+                    std::numeric_limits<qint64>::max(), AVSEEK_FLAG_ANY);
+                const auto videoStream = m_formatContext->streams[m_firstVideoIndex];
+                if (videoStream->cur_dts != AV_NOPTS_VALUE)
+                {
+                    const auto dtsRange = videoStream->cur_dts - m_firstDts;
+                    const static AVRational r{1, 1000000};
+                    m_durationUs = av_rescale_q(dtsRange, videoStream->time_base, r);
+                }
+                av_seek_frame(m_formatContext, /*stream_index*/ -1, 0, AVSEEK_FLAG_ANY);
+            }
         }
         else {
             close();

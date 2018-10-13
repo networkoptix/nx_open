@@ -93,12 +93,12 @@ public:
     {
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            if (!m_moduleInstance)
-                return;
-            m_moduleInstance->pleaseStop();
+            if (m_moduleInstance)
+                m_moduleInstance->pleaseStop();
         }
 
-        m_moduleProcessThread.join();
+        if (m_moduleProcessThread.joinable())
+            m_moduleProcessThread.join();
         m_moduleInstance.reset();
     }
 
