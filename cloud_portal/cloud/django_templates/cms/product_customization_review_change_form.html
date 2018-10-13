@@ -27,8 +27,9 @@
                             {% if product.product_type.single_customization %}<td><strong>Customization</strong></td>{% endif %}
                             <td><strong>Customization</strong></td>
                             <td><strong>Status</strong></td>
-                            <td><strong>Last reviewed by</strong></td>
-                            <td><strong>Last checked on</strong></td>
+                            <td><strong>Reviewed by</strong></td>
+                            <td><strong>Reviewed on</strong></td>
+                            <td><strong>Review Notes</strong></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,9 +38,10 @@
                         <tr>
                             {% if product.product_type.single_customization %}<td> {{ review.customization }} </td>{% endif %}
                             <td> {{ review.customization }}</td>
-                            <td> {{ state }} </td>
+                            <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
                             <td> {{ review.reviewed_by }}</td>
                             <td> {{ review.reviewed_date }}</td>
+                            <td> {{ review.notes|linebreaks }} </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -103,6 +105,7 @@
         {% endif %}
         <h2>Review</h2>
     </div>
+    <h1 style="text-align: center">Review for {{ original.customization }}</h1>
     <form target="" enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <input name="version_id" value="{{ version.id }}" hidden/>
