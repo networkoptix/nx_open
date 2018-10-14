@@ -20,9 +20,14 @@
 
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/plugins/settings.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/debugging/visual_metadata_debugger_factory.h>
@@ -47,6 +52,8 @@ namespace analytics {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::debugging;
+using namespace nx::vms::common;
+
 using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 Manager::Manager(QnMediaServerModule* serverModule):
@@ -71,7 +78,7 @@ void Manager::stop()
     disconnect(this);
     m_thread->quit();
     m_thread->wait();
-    m_contexts.clear();
+    m_deviceAnalyticsContexts.clear();
 }
 
 void Manager::init()
@@ -96,80 +103,110 @@ void Manager::init()
 void Manager::initExistingResources()
 {
     const auto mediaServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
+    const auto devices = resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
+    for (const auto& device: devices)
+        at_deviceAdded(device);
+}
 
-    const auto cameras = resourcePool()->getAllCameras(
-        mediaServer,
-        /*ignoreDesktopCamera*/ true);
+std::shared_ptr<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
+{
+    auto contextItr = m_deviceAnalyticsContexts.find(deviceId);
+    if (contextItr == m_deviceAnalyticsContexts.cend())
+        return nullptr;
 
-    for (const auto& camera: cameras)
-        at_resourceAdded(camera);
+    return contextItr->second;
+}
+
+std::shared_ptr<DeviceAnalyticsContext> Manager::context(
+    const QnVirtualCameraResourcePtr& device) const
+{
+    return context(device->getId());
+}
+
+bool Manager::isLocalDevice(const QnVirtualCameraResourcePtr& device) const
+{
+    return device->getParentId() == moduleGUID();
 }
 
 void Manager::at_resourceAdded(const QnResourcePtr& resource)
 {
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (!camera)
+    auto analyticsEngine = resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+    if (analyticsEngine)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Analytics engine %1 (%2) has been added.")
+                .args(analyticsEngine->getName(), analyticsEngine->getId()));
+
+        at_engineAdded(analyticsEngine);
         return;
+    }
+
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Resource %1 (%2) is neither analytics engine nor device. Skipping.")
+                .args(resource->getName(), resource->getId()));
+        return;
+    }
 
     NX_VERBOSE(
         this,
-        lm("Resource %1 (%2) has been added.")
+        lm("Device %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
-    connect(
-        resource, &QnResource::statusChanged,
-        this, &Manager::handleResourceChanges);
-
-    connect(
-        resource, &QnResource::parentIdChanged,
-        this, &Manager::handleResourceChanges);
-
-    connect(
-        resource, &QnResource::urlChanged,
-        this, &Manager::handleResourceChanges);
-
-    connect(
-        camera, &QnSecurityCamResource::logicalIdChanged,
-        this, &Manager::handleResourceChanges);
-
-    connect(
-        resource, &QnResource::propertyChanged,
-        this, &Manager::at_propertyChanged);
-
-    handleResourceChanges(resource);
-}
-
-void Manager::at_propertyChanged(const QnResourcePtr& resource, const QString& name)
-{
-    if (name == Qn::CAMERA_CREDENTIALS_PARAM_NAME)
-    {
-        NX_DEBUG(
-            this,
-            lm("Credentials have been changed for resource %1 (%2)")
-                .args(resource->getName(), resource->getId()));
-
-        handleResourceChanges(resource);
-    }
+    at_deviceAdded(device);
 }
 
 void Manager::at_resourceRemoved(const QnResourcePtr& resource)
 {
+    if (!resource)
+    {
+        NX_VERBOSE(this, "Receieved null resource");
+        return;
+    }
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been removed.")
             .args(resource->getName(), resource->getId()));
 
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (!camera)
-        return;
+    resource->disconnect(this);
 
-    camera->disconnect(this);
-    QnMutexLocker lock(&m_contextMutex);
-    m_contexts.erase(resource->getId());
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (device)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Device %1 (%2) has been removed")
+                .args(device->getUserDefinedName(), device->getId()));
+        at_deviceRemoved(device);
+        return;
+    }
+
+    auto engine = resource.dynamicCast<nx::mediaserver::resource::AnalyticsEngineResource>();
+    if (!engine)
+    {
+        NX_VERBOSE(
+            this,
+            lm("Resource %1 (%2) is neither analytics engine nor device. Skipping.")
+                .args(resource->getName(), resource->getId()));
+        return;
+    }
+
+    NX_VERBOSE(
+        this,
+        lm("Engine %1 (%2) has been removed.")
+            .args(engine->getName(), engine->getId()));
+
+    at_engineRemoved(engine);
 }
 
 void Manager::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 {
+#if 0
     NX_VERBOSE(
         this,
         lm("Rules have been updated. Affected resources: %1").arg(affectedResources));
@@ -178,165 +215,221 @@ void Manager::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
     {
         auto resource = resourcePool()->getResourceById(resourceId);
         if (!resource)
-            releaseResourceDeviceAgentsUnsafe(resourceId);
+            releaseDeviceAgentsUnsafe(resourceId);
         else
             handleResourceChanges(resource);
     }
+#endif
 }
 
-Manager::EngineList Manager::availableEngines() const
+void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 {
-    auto pluginManager = serverModule()->pluginManager();
-    NX_ASSERT(pluginManager, "Cannot access PluginManager instance");
-    if (!pluginManager)
-        return EngineList();
-
-    const auto plugins = pluginManager->findNxPlugins<nx::sdk::analytics::Plugin>(
-        nx::sdk::analytics::IID_Plugin);
-    EngineList engines;
-    for (const auto& plugin: plugins)
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
     {
-        Error error = Error::noError;
-        const auto engine = plugin->createEngine(&error);
-        if (!engine)
-        {
-            NX_ERROR(this, "Cannot create Engine for plugin %1: plugin returned null.",
-                plugin->name());
-            continue;
-        }
-        if (error != Error::noError)
-        {
-            NX_ERROR(this, "Cannot create Engine for plugin %1: plugin returned error %2.",
-                plugin->name(), error);
-            engine->releaseRef();
-            continue;
-        }
-        NX_VERBOSE(this, "Created Engine of %1", plugin->name());
-        engines.append(engine);
-    }
-    return engines;
-    // TODO: Rewrite; the above implementation does not care about Plugin and Engine lifetimes. 
-}
-
-/** @return Empty settings if the file does not exist, or on error. */
-std::unique_ptr<const nx::plugins::SettingsHolder> Manager::loadSettingsFromFile(
-    const QString& fileDescription, const QString& filename)
-{
-    using nx::utils::log::Level;
-    auto log = //< Can be used to return empty settings: return log(...)
-        [&](Level level, const QString& message)
-        {
-            NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
-                .args(fileDescription, message, filename);
-            return std::make_unique<const nx::plugins::SettingsHolder>();
-        };
-
-    if (!QFileInfo::exists(filename))
-        return log(Level::info, lit("File does not exist"));
-
-    log(Level::info, lit("Loading from file"));
-
-    QFile f(filename);
-    if (!f.open(QFile::ReadOnly))
-        return log(Level::error, lit("Unable to open file"));
-
-    const QString& settingsJson = f.readAll();
-    if (settingsJson.isEmpty())
-        return log(Level::error, lit("Unable to read from file"));
-
-    auto settings = std::make_unique<const nx::plugins::SettingsHolder>(settingsJson);
-    if (!settings->isValid())
-        return log(Level::error, lit("Invalid JSON in file"));
-
-    return settings;
-}
-
-/** @return Dir ending with "/", intended to receive manifest files. */
-static QString manifestFileDir()
-{
-    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(pluginsIni().analyticsManifestOutputPath));
-
-    if (QFileInfo(dir).isRelative())
-    {
-        dir.insert(0,
-            // NOTE: QDir::cleanPath() removes trailing '/'.
-            QDir::cleanPath(QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())) + lit("/"));
+        NX_WARNING(this, "Resource is not a device.");
+        return;
     }
 
-    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
-        dir.append('/');
-
-    return dir;
+    at_deviceParentIdChanged(device);
 }
 
-/**
- * Intended for debug. On error, just log the error message.
- */
-void Manager::saveManifestToFile(
-    const char* const manifest,
-    const QString& fileDescription,
-    const QString& pluginLibName,
-    const QString& filenameExtraSuffix)
+void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName)
 {
-    const QString dir = manifestFileDir();
-    const QString filename = dir + pluginLibName + filenameExtraSuffix + lit("_manifest.json");
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
+    {
+        NX_WARNING(this, "Resource is not a device.");
+        return;
+    }
 
-    using nx::utils::log::Level;
-    auto log = //< Can be used to return after logging: return log(...).
-        [&](Level level, const QString& message)
+    at_devicePropertyChanged(device, propertyName);
+}
+
+void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
+{
+    connect(
+        device, &QnResource::parentIdChanged,
+        this, &Manager::at_resourceParentIdChanged);
+
+    if (isLocalDevice(device))
+        handleDeviceArrivalToServer(device);
+}
+
+void Manager::at_deviceRemoved(const QnVirtualCameraResourcePtr& device)
+{
+    handleDeviceRemovalFromServer(device);
+}
+
+void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
+{
+    if (isLocalDevice(device))
+    {
+        NX_VERBOSE(this, lm("Device %1 (%2) has been moved to the current server"));
+        handleDeviceArrivalToServer(device);
+    }
+    else
+    {
+        NX_VERBOSE(this, lm("Device %1 (%2) has been moved to another server"));
+        handleDeviceRemovalFromServer(device);
+    }
+}
+
+void Manager::at_devicePropertyChanged(
+    const QnVirtualCameraResourcePtr& device,
+    const QString& propertyName)
+{
+    if (propertyName == QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty)
+    {
+        auto analyticsContext = context(device);
+        if (!analyticsContext)
         {
-            NX_UTILS_LOG(level, this) << lm("Metadata %1 manifest: %2: [%3]")
-                .args(fileDescription, message, filename);
-        };
+            NX_DEBUG(this, lm("Can't find analytics context for device %1 (%2)")
+                .args(device->getUserDefinedName(), device->getId()));
+        }
 
-    log(Level::info, lit("Saving to file"));
-
-    if (!nx::utils::file_system::ensureDir(dir))
-        return log(Level::error, lit("Unable to create directory for file"));
-
-    QFile f(filename);
-    if (!f.open(QFile::WriteOnly))
-        return log(Level::error, lit("Unable to (re)create file"));
-
-    const qint64 len = (qint64) strlen(manifest);
-    if (f.write(manifest, len) != len)
-        return log(Level::error, lit("Unable to write to file"));
+        analyticsContext->setEnabledAnalyticsEngines(device->enabledAnalyticsEngineResources());
+    }
 }
 
-/** If path is empty, the path to ini_config .ini files is used. */
-static QString settingsFilename(
-    const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
+void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device)
 {
-    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
-        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
-    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
-        dir.append('/');
-    return dir + pluginLibName + extraSuffix + lit(".json");
+    connect(
+        device, &QnResource::propertyChanged,
+        this, &Manager::at_resourcePropertyChanged);
+
+    auto context = std::make_shared<DeviceAnalyticsContext>(serverModule(), device);
+    context->setEnabledAnalyticsEngines(device->enabledAnalyticsEngineResources());
+    context->setMetadataSink(metadataSink(device));
+    context->setMediaSource(mediaSource(device));
+    m_deviceAnalyticsContexts.emplace(device->getId(), context);
 }
 
-void Manager::setDeviceAgentSettings(
-    DeviceAgent* deviceAgent,
-    const QnSecurityCamResourcePtr& camera)
+void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device)
 {
-    // TODO: Stub. Implement storing the settings in the database.
-    const auto settings = loadSettingsFromFile(lit("DeviceAgent"), settingsFilename(
-        pluginsIni().analyticsDeviceAgentSettingsPath,
-        deviceAgent->engine()->plugin()->name(),
-        lit("_device_agent_for_") + camera->getPhysicalId()));
-    deviceAgent->setSettings(settings->array(), settings->size());
+    m_deviceAnalyticsContexts.erase(device->getId());
 }
 
-void Manager::setEngineSettings(Engine* engine)
+void Manager::at_engineAdded(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
 {
-    // TODO: Stub. Implement storing the settings in the database.
-    const auto settings = loadSettingsFromFile(lit("Engine"), settingsFilename(
-        pluginsIni().analyticsEngineSettingsPath, engine->plugin()->name()));
-    engine->setSettings(settings->array(), settings->size());
+    // Do nothing actually.
 }
 
-void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr& camera)
+void Manager::at_engineRemoved(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
 {
+    NX_VERBOSE(
+        this,
+        lm("Engine %1 (%2) has been removed.").args(engine->getName(), engine->getId()));
+
+    engine->disconnect(this);
+    for (auto& entry: m_deviceAnalyticsContexts)
+    {
+        auto& context = entry.second;
+        context->removeEngine(engine);
+    }
+}
+
+
+void Manager::registerMetadataSink(
+    const QnResourcePtr& resource,
+    QWeakPointer<QnAbstractDataReceptor> metadataSink)
+{
+    m_metadataSinks[resource->getId()] = metadataSink;
+    auto analyticsContext = context(resource);
+    if (analyticsContext)
+        analyticsContext->setMetadataSink(metadataSink);
+}
+
+QWeakPointer<VideoDataReceptor> Manager::registerMediaSource(const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_contextMutex);
+    auto& context = m_contexts[id];
+
+    // Collect pixel formats required by at least one DeviceAgent.
+    VideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
+    bool needsCompressedFrames = false;
+    for (auto& deviceAgentContext : m_contexts[id].deviceAgentContexts())
+    {
+        nxpt::ScopedRef<ConsumingDeviceAgent> consumingDeviceAgent(
+            deviceAgentContext->deviceAgent()->queryInterface(IID_ConsumingDeviceAgent));
+        if (!consumingDeviceAgent)
+            continue;
+
+        const boost::optional<PixelFormat> pixelFormat =
+            pixelFormatFromEngineManifest(deviceAgentContext->engineManifest());
+        if (!pixelFormat)
+            needsCompressedFrames = true;
+        else
+            neededUncompressedPixelFormats.insert(pixelFormat.get());
+    }
+
+    auto videoDataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
+        [this, id](
+            const QnConstCompressedVideoDataPtr& compressedFrame,
+            const CLConstVideoDecoderOutputPtr& uncompressedFrame)
+        {
+            if (!NX_ASSERT(compressedFrame))
+                return;
+            putVideoFrame(id, compressedFrame, uncompressedFrame);
+        },
+        needsCompressedFrames,
+        neededUncompressedPixelFormats));
+
+    context.setVideoDataReceptor(videoDataReceptor);
+    return videoDataReceptor.toWeakRef();
+
+
+
+
+
+
+
+    // TODO: #dmishin implement.
+    m_mediaSources[resourceId];
+    return nullptr;
+}
+
+
+QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
+    const QnVirtualCameraResourcePtr& device) const
+{
+    return metadataSink(device->getId());
+}
+
+QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceId) const
+{
+    auto itr = m_metadataSinks.find(deviceId);
+    if (itr == m_metadataSinks.cend())
+        return nullptr;
+
+    return itr->second;
+}
+
+QWeakPointer<VideoDataReceptor> Manager::mediaSource(const QnVirtualCameraResourcePtr& device) const
+{
+    return mediaSource(device->getId());
+}
+
+QWeakPointer<VideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
+{
+    auto itr = m_mediaSources.find(deviceId);
+    if (itr == m_mediaSources.cend())
+        return nullptr;
+
+    return itr->second;
+}
+
+
+// -----------------------------------------------------------------------------------------------
+// OLD UGLY CODE BELOW
+// -----------------------------------------------------------------------------------------------
+
+#if 0
+
+void Manager::createDeviceAgentsForResourceUnsafe(const QnVirtualCameraResourcePtr& camera)
+{
+
+
     if (ini().enablePersistentAnalyticsDeviceAgent)
     {
         const auto itr = m_contexts.find(camera->getId());
@@ -346,6 +439,8 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
                 return;
         }
     }
+
+
     QnMediaServerResourcePtr server = resourcePool()
         ->getResourceById<QnMediaServerResource>(moduleGUID());
     NX_ASSERT(server, lm("Can not obtain current server resource."));
@@ -354,8 +449,11 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
 
     for (Engine* const engine: availableEngines())
     {
+
+
         // TODO: Consider assigning Engine settings earlier.
         setEngineSettings(engine);
+
 
         nxpt::ScopedRef<DeviceAgent> deviceAgent(
             createDeviceAgent(camera, engine), /*increaseRef*/ false);
@@ -400,7 +498,7 @@ void Manager::createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr
 }
 
 DeviceAgent* Manager::createDeviceAgent(
-    const QnSecurityCamResourcePtr& camera,
+    const QnVirtualCameraResourcePtr& camera,
     Engine* engine) const
 {
     NX_ASSERT(camera && engine);
@@ -440,12 +538,12 @@ DeviceAgent* Manager::createDeviceAgent(
     return deviceAgent;
 }
 
-void Manager::releaseResourceDeviceAgentsUnsafe(const QnSecurityCamResourcePtr& camera)
+void Manager::releaseDeviceAgentsUnsafe(const QnVirtualCameraResourcePtr& camera)
 {
-    releaseResourceDeviceAgentsUnsafe(camera->getId());
+    releaseDeviceAgentsUnsafe(camera->getId());
 }
 
-void Manager::releaseResourceDeviceAgentsUnsafe(const QnUuid& cameraId)
+void Manager::releaseDeviceAgentsUnsafe(const QnUuid& cameraId)
 {
     if (ini().enablePersistentAnalyticsDeviceAgent)
         return;
@@ -459,7 +557,7 @@ MetadataHandler* Manager::createMetadataHandler(
     const QnResourcePtr& resource,
     const nx::vms::api::analytics::EngineManifest& manifest)
 {
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
     {
         NX_ERROR(
@@ -487,34 +585,40 @@ void Manager::handleResourceChanges(const QnResourcePtr& resource)
         lm("Handling resource changes for device %1 (%2)")
             .args(resource->getName(), resource->getId()));
 
-    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
         return;
 
-    {
-        NX_DEBUG(
-            this,
-            lm("Creating DeviceAgents for device %1 (%2).")
-                .args(camera->getUserDefinedName(), camera->getId()));
+    NX_DEBUG(
+        this,
+        lm("Creating DeviceAgents for device %1 (%2).")
+            .args(camera->getUserDefinedName(), camera->getId()));
 
-    }
-    auto resourceId = camera->getId();
     QnMutexLocker lock(&m_contextMutex);
-    auto& context = m_contexts[resourceId];
-    if (isCameraAlive(camera))
-    {
-        if (!context.areDeviceAgentContextsInitialized())
-            createDeviceAgentsForResourceUnsafe(camera);
-        auto events = serverModule()->analyticsEventRuleWatcher()->watchedEventsForResource(resourceId);
-        fetchMetadataForResourceUnsafe(resourceId, context, events);
-    }
+    if (isDeviceAlive(camera))
+        updateOnlineDeviceUnsafe(camera);
     else
-    {
-        releaseResourceDeviceAgentsUnsafe(camera);
-    }
+        updateOfflineDeviceUnsafe(camera);
 }
 
-bool Manager::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
+void Manager::updateOnlineDeviceUnsafe(const QnVirtualCameraResourcePtr& device)
+{
+    auto deviceId = device->getId();
+    auto& context = m_contexts[deviceId];
+
+    if (!context.areDeviceAgentContextsInitialized())
+        createDeviceAgentsForResourceUnsafe(device);
+
+    auto events = serverModule()->analyticsEventRuleWatcher()->watchedEventsForResource(deviceId);
+    startFetchingMetadataForDeviceUnsafe(deviceId, context, events);
+}
+
+void Manager::updateOfflineDeviceUnsafe(const QnVirtualCameraResourcePtr& device)
+{
+    releaseDeviceAgentsUnsafe(device);
+}
+
+bool Manager::isDeviceAlive(const QnVirtualCameraResourcePtr& camera) const
 {
     if (!camera)
         return false;
@@ -538,7 +642,7 @@ bool Manager::isCameraAlive(const QnSecurityCamResourcePtr& camera) const
     return camera->getStatus() >= Qn::Online;
 }
 
-void Manager::fetchMetadataForResourceUnsafe(
+void Manager::startFetchingMetadataForDeviceUnsafe(
     const QnUuid& resourceId,
     ResourceAnalyticsContext& context,
     const QSet<QString>& eventTypeIds)
@@ -563,7 +667,7 @@ void Manager::fetchMetadataForResourceUnsafe(
         }
         else
         {
-            NX_DEBUG(this, lm("Statopping metadata fetching for resource %1").args(resourceId));
+            NX_DEBUG(this, lm("Stopping metadata fetching for resource %1").args(resourceId));
             if (deviceEngineContext->deviceAgent()->stopFetchingMetadata() != Error::noError)
             {
                 NX_WARNING(this, lm("Failed to stop fetching metadata from Engine %1")
@@ -597,6 +701,50 @@ static uint qHash(const nx::vms::api::analytics::EventType& eventType) // noexce
 {
     return qHash(eventType.id);
 }
+
+
+
+// TODO: #mshevchenko: Rename to addDataFromDeviceAgentManifestToCameraResource().
+void Manager::addManifestToCamera(
+    const nx::vms::api::analytics::DeviceAgentManifest& manifest,
+    const QnVirtualCameraResourcePtr& camera)
+{
+    camera->setSupportedAnalyticsEventTypeIds(manifest.supportedEventTypes);
+    camera->saveParams();
+}
+
+
+
+
+
+
+
+void Manager::updateDeviceAnalytics(const QnVirtualCameraResourcePtr& device)
+{
+    NX_ASSERT(device);
+    if (!device)
+        return;
+
+    NX_VERBOSE(
+        this,
+        lm("Updating analytics state for device %1 (%2)")
+            .args(device->getName(), device->getId()));
+
+    QnMutexLocker lock(&m_contextMutex);
+    if (isDeviceAlive(device))
+        updateOnlineDeviceUnsafe(device);
+    else
+        updateOfflineDeviceUnsafe(device);
+}
+
+
+
+
+
+
+//--------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------
 
 boost::optional<nx::vms::api::analytics::EngineManifest> Manager::loadEngineManifest(
     Engine* engine)
@@ -645,9 +793,9 @@ void Manager::assignEngineManifestToServer(
     auto existingManifests = server->analyticsDrivers();
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::vms::api::analytics::EngineManifest& m)
-        {
-            return m.pluginId == manifest.pluginId;
-        });
+    {
+        return m.pluginId == manifest.pluginId;
+    });
 
     if (it == existingManifests.cend())
         existingManifests.push_back(manifest);
@@ -666,9 +814,9 @@ nx::vms::api::analytics::EngineManifest Manager::mergeEngineManifestToServer(
     auto existingManifests = server->analyticsDrivers();
     auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
         [&manifest](const nx::vms::api::analytics::EngineManifest& m)
-        {
-            return m.pluginId == manifest.pluginId;
-        });
+    {
+        return m.pluginId == manifest.pluginId;
+    });
 
     if (it == existingManifests.cend())
     {
@@ -688,148 +836,6 @@ nx::vms::api::analytics::EngineManifest Manager::mergeEngineManifestToServer(
     return *result;
 }
 
-std::pair<
-    boost::optional<nx::vms::api::analytics::DeviceAgentManifest>,
-    boost::optional<nx::vms::api::analytics::EngineManifest>
->
-Manager::loadDeviceAgentManifest(
-    const Engine* engine,
-    DeviceAgent* deviceAgent,
-    const QnSecurityCamResourcePtr& camera)
-{
-    NX_ASSERT(deviceAgent);
-    NX_ASSERT(camera);
-
-    Error error = Error::noError;
-
-    // "deviceAgentManifest" contains const char* representation of the manifest.
-    // unique_ptr allows us to automatically ask the DeviceAgent to release it when the memory is
-    // not needed anymore.
-    auto deleter = [deviceAgent](const char* ptr) { deviceAgent->freeManifest(ptr); };
-    std::unique_ptr<const char, decltype(deleter)> deviceAgentManifest{
-        deviceAgent->manifest(&error), deleter};
-
-    if (error != Error::noError)
-    {
-        NX_ERROR(
-            this,
-            lm("Can not fetch manifest for resource %1 (%2), plugin returned error.")
-            .args(camera->getUserDefinedName(), camera->getId()));
-        return std::make_pair(boost::none, boost::none);
-    }
-
-    if (!deviceAgentManifest.get())
-    {
-        NX_ERROR(this) << lm("Received null DeviceAgent manifest for plugin \"%1\".")
-            .arg(engine->plugin()->name());
-        return std::make_pair(boost::none, boost::none);
-    }
-
-    if (pluginsIni().analyticsManifestOutputPath[0])
-    {
-        saveManifestToFile(
-            deviceAgentManifest.get(),
-            "DeviceAgent",
-            engine->plugin()->name(),
-            lit("_device_agent"));
-    }
-
-    // TODO: Rewrite.
-    // DeviceAgent::manifest() can return data in two json formats: either
-    // DeviceAgentManifest or EngineManifest.
-    // First we try AnalyticsDeviceManifest.
-    auto deviceManifest = deserializeManifest<nx::vms::api::analytics::DeviceAgentManifest>(
-        deviceAgentManifest.get());
-
-    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
-        return std::make_pair(deviceManifest, boost::none);
-
-    // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
-    // EngineManifest.
-    auto driverManifest = deserializeManifest<nx::vms::api::analytics::EngineManifest>(
-        deviceAgentManifest.get());
-
-    if (driverManifest && driverManifest->outputEventTypes.size())
-    {
-        deviceManifest = nx::vms::api::analytics::DeviceAgentManifest();
-        std::transform(
-            driverManifest->outputEventTypes.cbegin(),
-            driverManifest->outputEventTypes.cend(),
-            std::back_inserter(deviceManifest->supportedEventTypes),
-            [](const nx::vms::api::analytics::EventType& eventType) { return eventType.id; });
-        return std::make_pair(deviceManifest, driverManifest);
-    }
-
-    // If manifest format is invalid.
-    NX_ERROR(
-        this,
-        lm("Can not deserialize manifest for resource %1 (%2)")
-        .args(camera->getUserDefinedName(), camera->getId()));
-    return std::make_pair(boost::none, boost::none);
-}
-
-// TODO: #mshevchenko: Rename to addDataFromDeviceAgentManifestToCameraResource().
-void Manager::addManifestToCamera(
-    const nx::vms::api::analytics::DeviceAgentManifest& manifest,
-    const QnSecurityCamResourcePtr& camera)
-{
-    camera->setSupportedAnalyticsEventTypeIds(manifest.supportedEventTypes);
-    camera->saveParams();
-}
-
-bool Manager::cameraInfoFromResource(
-    const QnSecurityCamResourcePtr& camera,
-    CameraInfo* outCameraInfo) const
-{
-    NX_ASSERT(camera);
-    NX_ASSERT(outCameraInfo);
-
-    strncpy(
-        outCameraInfo->vendor,
-        camera->getVendor().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->model,
-        camera->getModel().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->firmware,
-        camera->getFirmware().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->uid,
-        camera->getId().toByteArray().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->sharedId,
-        camera->getSharedId().toStdString().c_str(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->url,
-        camera->getUrl().toUtf8().data(),
-        CameraInfo::kTextParameterMaxLength);
-
-    auto auth = camera->getAuth();
-    strncpy(
-        outCameraInfo->login,
-        auth.user().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    strncpy(
-        outCameraInfo->password,
-        auth.password().toUtf8().data(),
-        CameraInfo::kStringParameterMaxLength);
-
-    outCameraInfo->channel = camera->getChannel();
-    outCameraInfo->logicalId = camera->logicalId();
-
-    return true;
-}
 
 void Manager::issueMissingUncompressedFrameWarningOnce()
 {
@@ -991,26 +997,78 @@ void Manager::registerDataReceptor(
     context.setMetadataDataReceptor(dataReceptor);
 }
 
+
+
+/-----------------------------------------------------------------------------------------------
+
+
+/** @return Empty settings if the file does not exist, or on error. */
+std::unique_ptr<const nx::plugins::SettingsHolder> Manager::loadSettingsFromFile(
+    const QString& fileDescription, const QString& filename)
+{
+    using nx::utils::log::Level;
+    auto log = //< Can be used to return empty settings: return log(...)
+        [&](Level level, const QString& message)
+    {
+        NX_UTILS_LOG(level, this) << lm("Metadata %1 settings: %2: [%3]")
+            .args(fileDescription, message, filename);
+        return std::make_unique<const nx::plugins::SettingsHolder>();
+    };
+
+    if (!QFileInfo::exists(filename))
+        return log(Level::info, lit("File does not exist"));
+
+    log(Level::info, lit("Loading from file"));
+
+    QFile f(filename);
+    if (!f.open(QFile::ReadOnly))
+        return log(Level::error, lit("Unable to open file"));
+
+    const QString& settingsJson = f.readAll();
+    if (settingsJson.isEmpty())
+        return log(Level::error, lit("Unable to read from file"));
+
+    auto settings = std::make_unique<const nx::plugins::SettingsHolder>(settingsJson);
+    if (!settings->isValid())
+        return log(Level::error, lit("Invalid JSON in file"));
+
+    return settings;
+}
+
+/** If path is empty, the path to ini_config .ini files is used. */
+static QString settingsFilename(
+    const char* const path, const QString& pluginLibName, const QString& extraSuffix = "")
+{
+    QString dir = QDir::cleanPath( //< Normalize to use forward slashes, as required by QFile.
+        QString::fromUtf8(path[0] ? path : nx::kit::IniConfig::iniFilesDir()));
+    if (!dir.isEmpty() && dir.at(dir.size() - 1) != '/')
+        dir.append('/');
+    return dir + pluginLibName + extraSuffix + lit(".json");
+}
+
+void Manager::setDeviceAgentSettings(
+    DeviceAgent* deviceAgent,
+    const QnVirtualCameraResourcePtr& camera)
+{
+    // TODO: Stub. Implement storing the settings in the database.
+    const auto settings = loadSettingsFromFile(lit("DeviceAgent"), settingsFilename(
+        pluginsIni().analyticsDeviceAgentSettingsPath,
+        deviceAgent->engine()->plugin()->name(),
+        lit("_device_agent_for_") + camera->getPhysicalId()));
+    deviceAgent->setSettings(settings->array(), settings->size());
+}
+
+void Manager::setEngineSettings(Engine* engine)
+{
+    // TODO: Stub. Implement storing the settings in the database.
+    const auto settings = loadSettingsFromFile(lit("Engine"), settingsFilename(
+        pluginsIni().analyticsEngineSettingsPath, engine->plugin()->name()));
+    engine->setSettings(settings->array(), settings->size());
+}
+
+#endif
+
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
 
-namespace nx {
-namespace sdk {
-
-QString toString(const nx::sdk::CameraInfo& cameraInfo)
-{
-    return lm(
-        "Vendor: %1, Model: %2, Firmware: %3, UID: %4, Shared ID: %5, URL: %6, Channel: %7")
-        .args(
-            cameraInfo.vendor,
-            cameraInfo.model,
-            cameraInfo.firmware,
-            cameraInfo.uid,
-            cameraInfo.sharedId,
-            cameraInfo.url,
-            cameraInfo.channel).toQString();
-}
-
-} // namespace sdk
-} // namespace nx

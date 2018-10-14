@@ -54,6 +54,8 @@
 #include <nx/mediaserver/root_fs.h>
 #include <nx/mediaserver/server_update_manager.h>
 
+#include <nx/mediaserver/analytics/sdk_object_pool.h>
+
 #include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
@@ -283,6 +285,7 @@ QnMediaServerModule::QnMediaServerModule(const nx::mediaserver::CmdLineArguments
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
+    m_sdkObjectPool = store(new nx::mediaserver::analytics::SdkObjectPool(this));
 
     // Translations must be installed from the main application thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
@@ -422,6 +425,11 @@ nx::mediaserver::analytics::EventRuleWatcher* QnMediaServerModule::analyticsEven
     return m_analyticsEventRuleWatcher;
 }
 
+nx::mediaserver::analytics::SdkObjectPool* QnMediaServerModule::sdkObjectPool() const
+{
+    return m_sdkObjectPool;
+}
+
 nx::mediaserver::resource::SharedContextPool* QnMediaServerModule::sharedContextPool() const
 {
     return m_sharedContextPool;
@@ -488,12 +496,12 @@ QnStorageManager* QnMediaServerModule::backupStorageManager() const
     return m_context->backupStorageManager.get();
 }
 
-event::EventConnector* QnMediaServerModule::eventConnector() const
+nx::mediaserver::event::EventConnector* QnMediaServerModule::eventConnector() const
 {
     return m_eventConnector;
 }
 
-event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
+nx::mediaserver::event::ExtendedRuleProcessor* QnMediaServerModule::eventRuleProcessor() const
 {
     return m_eventRuleProcessor;
 }

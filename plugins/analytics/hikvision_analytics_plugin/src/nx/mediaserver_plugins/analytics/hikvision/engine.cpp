@@ -174,11 +174,27 @@ void Engine::executeAction(Action* /*action*/, Error* /*outError*/)
 } // namespace mediaserver_plugins
 } // namespace nx
 
+namespace {
+
+static const std::string kPluginName = "Hikvision analytics plugin";
+static const std::string kPluginManifest = R"json(
+{
+    "id": "nx.hikvision",
+    "name": ")json" + kPluginName + R"json(",
+    "version": "1.0.0",
+    "engineSettingsModel": "",
+    "deviceAgentSettingsModel": ""
+})json";
+
+} // namespace
+
 extern "C" {
 
 NX_PLUGIN_API nxpl::PluginInterface* createNxAnalyticsPlugin()
 {
-    return new nx::sdk::analytics::CommonPlugin("hikvision_analytics_plugin",
+    return new nx::sdk::analytics::CommonPlugin(
+        kPluginName,
+        kPluginManifest,
         [](nx::sdk::analytics::Plugin* plugin)
         {
             return new nx::mediaserver_plugins::analytics::hikvision::Engine(

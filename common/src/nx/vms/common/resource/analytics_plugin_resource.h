@@ -1,8 +1,12 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QJsonObject>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 namespace nx::vms::common {
 
@@ -15,10 +19,19 @@ public:
     static QString kEngineSettingsModelProperty;
 
     AnalyticsPluginResource(QnCommonModule* commonModule = nullptr);
-    virtual ~AnalyticsPluginResource() override;
+    virtual ~AnalyticsPluginResource() override = default;
+
+    api::analytics::PluginManifest manifest() const;
+    void setManifest(const api::analytics::PluginManifest& manifest);
 
     QJsonObject deviceAgentSettingsModel() const;
+    void setDeviceAgentSettingsModel(QJsonObject model);
+
     QJsonObject engineSettingsModel() const;
+    void setEngineSettingsModel(QJsonObject model);
+
+    AnalyticsEngineResourceList engines() const;
+    bool hasDefaultEngine() const;
 };
 
 } // namespace nx::vms::common

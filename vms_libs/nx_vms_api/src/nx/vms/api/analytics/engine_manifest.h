@@ -41,8 +41,8 @@ public: //< Required for Qt MOC run.
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
-    QString pluginId;
-    TranslatableString pluginName;
+    QString pluginId; //< TODO: Remove.
+    TranslatableString pluginName; //< TODO: Remove.
     Capabilities capabilities;
 
     QList<EventType> outputEventTypes; //< TODO: Rename to eventTypes.

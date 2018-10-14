@@ -26,6 +26,20 @@ static const nxpl::NX_GUID IID_Plugin =
 class Plugin: public nxpl::Plugin3
 {
 public:
+
+    /**
+     * Provides null terminated UTF-8 string containing a JSON manifest.
+     * @param outError Status of the operation; is set to noError before this call.
+     * @return Pointer to a C-style string which must be valid while this Plugin object exists.
+     */
+    virtual const char* manifest(nx::sdk::Error* outError) const = 0;
+
+    /**
+    * Tells Plugin that the memory previously returned by manifest() pointed to
+    * by data is no longer needed and may be disposed.
+    */
+    virtual void freeManifest(const char* data) = 0;
+
     /**
      * Creates a new instance of analytics::Engine.
      * @param outError Status of the operation; is set to noError before this call.
@@ -35,7 +49,7 @@ public:
     virtual Engine* createEngine(Error* outError) = 0;
 
     /**
-     * Name of the plugin dynamic library, without "lib" prefix and without extension. 
+     * Name of the plugin dynamic library, without "lib" prefix and without extension.
      */
     virtual const char* name() const override = 0;
 };

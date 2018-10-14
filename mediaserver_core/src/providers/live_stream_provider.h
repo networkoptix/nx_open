@@ -14,7 +14,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/mediaserver/analytics/video_data_receptor.h>
+#include <nx/mediaserver/analytics/abstract_video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
@@ -102,7 +102,7 @@ private:
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 
-    nx::mediaserver::analytics::VideoDataReceptorPtr
+    nx::mediaserver::analytics::AbstractVideoDataReceptorPtr
         getVideoDataReceptorForMetadataPluginsIfNeeded(
             const QnCompressedVideoDataPtr& compressedFrame,
             bool* outNeedUncompressedFrame);
@@ -134,7 +134,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::mediaserver::analytics::VideoDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::mediaserver::analytics::AbstractVideoDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

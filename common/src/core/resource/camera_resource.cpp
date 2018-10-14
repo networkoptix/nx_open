@@ -13,6 +13,8 @@
 #include <common/common_module.h>
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_data_structures.h>
 #include <nx_ec/ec_api.h>
@@ -46,6 +48,78 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 QString QnVirtualCameraResource::kEnabledAnalyticsEnginesProperty("enabledAnalyticsEngines");
 QString QnVirtualCameraResource::kDeviceAgentsSettingsValuesProperty(
     "deviceAgentsSettingsValuesProperty");
+
+QString QnVirtualCameraResource::kDeviceAgentManifestsProperty("deviceAgentManifests");
+
+#if 0
+void QnVirtualCameraResource::setEnabledAnalayticsEngines(const std::set<QnUuid>& engines)
+{
+    setProperty(
+        kEnabledAnalyticsEnginesProperty,
+        QString::fromUtf8(QJson::serialized(engines)));
+}
+
+void QnVirtualCameraResource::setIsAnalyticsEngineEnabled(const QnUuid& engineId, bool isEnabled)
+{
+    auto enabledEngines = QJson::deserialized<std::set<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toLatin1());
+
+    if (isEnabled)
+        enabledEngines.insert(engineId);
+    else
+        enabledEngines.erase(engineId);
+
+    setProperty(kEnabledAnalyticsEnginesProperty,
+        QString::fromUtf8(QJson::serialized(enabledEngines)));
+}
+
+void QnVirtualCameraResource::setIsAnalyticsEngineEnabled(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine,
+    bool isEnabled)
+{
+    setIsAnalyticsEngineEnabled(engine->getId(), isEnabled);
+}
+
+bool QnVirtualCameraResource::isAnalyticsEngineEnabled(
+    const nx::vms::common::AnalyticsEngineResourcePtr& engine) const
+{
+    return isAnalyticsEngineEnabled(engine->getId());
+}
+
+bool QnVirtualCameraResource::isAnalyticsEngineEnabled(const QnUuid& engineId) const
+{
+    auto enabledEngines = QJson::deserialized<std::set<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toLatin1());
+
+    return enabledEngines.find(engineId) != enabledEngines.cend();
+}
+
+nx::vms::common::AnalyticsEngineResourceList
+    QnVirtualCameraResource::enabledAnalyticsEngines() const
+{
+    using namespace nx::vms::common;
+    auto enabledEngines = QJson::deserialized<std::set<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toLatin1());
+
+    AnalyticsEngineResourceList result;
+    if (enabledEngines.empty())
+        return AnalyticsEngineResourceList();
+
+    auto common = commonModule();
+    if (!common)
+    {
+        NX_ASSERT(false, "Can't access common module");
+        return AnalyticsEngineResourceList();
+    }
+
+    return common->resourcePool()
+        ->getResources<nx::vms::common::AnalyticsEngineResource>(
+            [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
+            {
+                return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
+            });
+}
+#endif
 
 QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -493,6 +567,32 @@ QnAdvancedStreamParams QnVirtualCameraResource::advancedLiveStreamParams() const
     return QnAdvancedStreamParams();
 }
 
+const nx::vms::common::AnalyticsEngineResourceList
+    QnVirtualCameraResource::enabledAnalyticsEngineResources() const
+{
+    using namespace nx::vms::common;
+    auto enabledEngines = QJson::deserialized<std::set<QnUuid>>(
+        getProperty(kEnabledAnalyticsEnginesProperty).toLatin1());
+
+    AnalyticsEngineResourceList result;
+    if (enabledEngines.empty())
+        return AnalyticsEngineResourceList();
+
+    auto common = commonModule();
+    if (!common)
+    {
+        NX_ASSERT(false, "Can't access common module");
+        return AnalyticsEngineResourceList();
+    }
+
+    return common->resourcePool()
+        ->getResources<nx::vms::common::AnalyticsEngineResource>(
+            [&enabledEngines](const AnalyticsEngineResourcePtr& engineResource)
+    {
+        return enabledEngines.find(engineResource->getId()) != enabledEngines.cend();
+    });
+}
+
 QSet<QnUuid> QnVirtualCameraResource::enabledAnalyticsEngines() const
 {
     return QJson::deserialized<QSet<QnUuid>>(
@@ -536,4 +636,40 @@ void QnVirtualCameraResource::setDeviceAgentSettingsValues(
     auto settingsValuesByEngineId = deviceAgentSettingsValues();
     settingsValuesByEngineId[engineId] = settingsValues;
     setDeviceAgentSettingsValues(settingsValuesByEngineId);
+}
+
+std::optional<nx::vms::api::analytics::DeviceAgentManifest>
+    QnVirtualCameraResource::deviceAgentManifest(const QnUuid& engineId)
+{
+    using namespace nx::vms::api::analytics;
+    auto manifestsStr = getProperty(kDeviceAgentManifestsProperty);
+
+    bool success = false;
+    auto manifests = QJson::deserialized<std::map<QnUuid, DeviceAgentManifest>>(
+        manifestsStr.toUtf8(), std::map<QnUuid, DeviceAgentManifest>(), &success);
+
+    if (!success)
+        return std::nullopt;
+
+    auto itr = manifests.find(engineId);
+    if (itr == manifests.cend())
+        return std::nullopt;
+
+    return itr->second;
+}
+
+void QnVirtualCameraResource::setDeviceAgentManifest(
+    const QnUuid& engineId,
+    const nx::vms::api::analytics::DeviceAgentManifest& manifest)
+{
+    using namespace nx::vms::api::analytics;
+    auto manifestsStr = getProperty(kDeviceAgentManifestsProperty);
+
+    auto manifests = QJson::deserialized<std::map<QnUuid, DeviceAgentManifest>>(
+        manifestsStr.toUtf8(), std::map<QnUuid, DeviceAgentManifest>());
+
+    manifests[engineId] = manifest;
+    setProperty(
+        kDeviceAgentManifestsProperty,
+        QString::fromUtf8(QJson::serialized(manifests)));
 }

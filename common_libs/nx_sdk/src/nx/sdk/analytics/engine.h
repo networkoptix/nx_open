@@ -36,7 +36,7 @@ public:
 
     /**
      * Creates, or returns already existing, DeviceAgent for the given device. There must be only
-     * one instance of the DeviceAgent created by the particular instance of Engine per device at 
+     * one instance of the DeviceAgent created by the particular instance of Engine per device at
      * any given time. It means that if we pass DeviceInfo objects with the same UID multiple
      * times to the same Engine, then the pointer to exactly the same object must be returned.
      * Also, multiple devices must not share the same DeviceAgent.
@@ -54,6 +54,12 @@ public:
      * @return Pointer to a C-style string which must be valid while this Engine object exists.
      */
     virtual const char* manifest(Error* outError) const = 0;
+
+    /**
+    * Tells Engine that the memory previously returned by manifest() pointed to
+    * by data is no longer needed and may be disposed.
+    */
+    virtual void freeManifest(const char* data) = 0;
 
     /**
      * Called before other methods. Server provides the set of settings stored in its database for

@@ -29,6 +29,8 @@
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/plugins/settings.h>
 
+#include <nx/mediaserver/analytics/device_analytics_context.h>
+
 class QnMediaServerModule;
 class QnCompressedVideoData;
 
@@ -48,12 +50,15 @@ class Manager final:
 public:
     Manager(QnMediaServerModule* serverModule);
     ~Manager();
+
     void init();
     void stop();
     void at_resourceAdded(const QnResourcePtr& resource);
-    void at_propertyChanged(const QnResourcePtr& resource, const QString& name);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
+
+    void at_resourceParentIdChanged(const QnResourcePtr& resource);
+    void at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
 
     /**
      * @return An object that will receive the data from a video data provider.
@@ -70,12 +75,6 @@ public:
     using EngineList = QList<nx::sdk::analytics::Engine*>;
 
     /**
-     * @return List of available Engines; for each item, queryInterface() is called which increases
-     *     the reference counter, thus, it is usually needed to release each Engine in the caller.
-     */
-    EngineList availableEngines() const;
-
-    /**
      * @return Deserialized Engine manifest, or none on error.
      */
     boost::optional<nx::vms::api::analytics::EngineManifest> loadEngineManifest(
@@ -90,37 +89,33 @@ private:
     std::unique_ptr<const nx::plugins::SettingsHolder> loadSettingsFromFile(
         const QString& fileDescription, const QString& filename);
 
-    void saveManifestToFile(
-        const char* manifest,
-        const QString& fileDescription,
-        const QString& pluginLibName,
-        const QString& filenameExtraSuffix = "");
-
     void setDeviceAgentSettings(
         nx::sdk::analytics::DeviceAgent* deviceAgent,
-        const QnSecurityCamResourcePtr& camera);
+        const QnVirtualCameraResourcePtr& camera);
 
     void setEngineSettings(nx::sdk::analytics::Engine* engine);
 
-    void createDeviceAgentsForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
+    void createDeviceAgentsForResourceUnsafe(const QnVirtualCameraResourcePtr& camera);
 
     nx::sdk::analytics::DeviceAgent* createDeviceAgent(
-        const QnSecurityCamResourcePtr& camera,
+        const QnVirtualCameraResourcePtr& camera,
         nx::sdk::analytics::Engine* engine) const;
 
-    void releaseResourceDeviceAgentsUnsafe(const QnSecurityCamResourcePtr& camera);
+    void releaseDeviceAgentsUnsafe(const QnVirtualCameraResourcePtr& camera);
 
-    void releaseResourceDeviceAgentsUnsafe(const QnUuid& resourceId);
+    void releaseDeviceAgentsUnsafe(const QnUuid& resourceId);
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
         const nx::vms::api::analytics::EngineManifest& manifest);
 
     void handleResourceChanges(const QnResourcePtr& resource);
+    void updateOnlineDeviceUnsafe(const QnVirtualCameraResourcePtr& device);
+    void updateOfflineDeviceUnsafe(const QnVirtualCameraResourcePtr& device);
 
-    bool isCameraAlive(const QnSecurityCamResourcePtr& camera) const;
+    bool isDeviceAlive(const QnVirtualCameraResourcePtr& camera) const;
 
-    void fetchMetadataForResourceUnsafe(
+    void startFetchingMetadataForDeviceUnsafe(
         const QnUuid& resourceId,
         ResourceAnalyticsContext& context,
         const QSet<QString>& eventTypeIds);
@@ -151,22 +146,9 @@ private:
         const nx::vms::api::analytics::EngineManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
-    std::pair<
-        boost::optional<nx::vms::api::analytics::DeviceAgentManifest>,
-        boost::optional<nx::vms::api::analytics::EngineManifest>
-    >
-    loadDeviceAgentManifest(
-        const nx::sdk::analytics::Engine* engine,
-        nx::sdk::analytics::DeviceAgent* deviceAgent,
-        const QnSecurityCamResourcePtr& camera);
-
     void addManifestToCamera(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest,
-        const QnSecurityCamResourcePtr& camera);
-
-    bool cameraInfoFromResource(
-        const QnSecurityCamResourcePtr& camera,
-        nx::sdk::CameraInfo* outCameraInfo) const;
+        const QnVirtualCameraResourcePtr& camera);
 
     void putVideoFrame(
         const QnUuid& id,
@@ -178,22 +160,54 @@ private:
 
     void issueMissingUncompressedFrameWarningOnce();
 
+    void updateDeviceAnalytics(const QnVirtualCameraResourcePtr& device);
+
+
+
+
+    std::shared_ptr<DeviceAnalyticsContext> context(const QnUuid& deviceId) const;
+    std::shared_ptr<DeviceAnalyticsContext> context(const QnVirtualCameraResourcePtr& device) const;
+
+    bool isLocalDevice(const QnVirtualCameraResourcePtr& device) const;
+
+    void at_deviceAdded(const QnVirtualCameraResourcePtr& device);
+    void at_deviceRemoved(const QnVirtualCameraResourcePtr& device);
+    void at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device);
+    void at_devicePropertyChanged(
+        const QnVirtualCameraResourcePtr& device,
+        const QString& propertyName);
+
+    void handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device);
+    void handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device);
+
+    void at_engineAdded(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+    void at_engineRemoved(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+
+    void registerMetadataSink(
+        const QnResourcePtr& device,
+        QWeakPointer<QnAbstractDataReceptor> metadataSink);
+
+    QWeakPointer<VideoDataReceptor> registerMediaSource(const QnUuid& deviceId);
+
+    QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnVirtualCameraResourcePtr& device) const;
+    QWeakPointer<QnAbstractDataReceptor> metadataSink(const QnUuid& device) const;
+    QWeakPointer<VideoDataReceptor> mediaSource(const QnVirtualCameraResourcePtr& device) const;
+    QWeakPointer<VideoDataReceptor> mediaSource(const QnUuid& device) const;
+
 private:
     ResourceAnalyticsContextMap m_contexts;
     QnMutex m_contextMutex;
     bool m_uncompressedFrameWarningIssued = false;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
     QThread* m_thread;
+
+
+    std::map<QnUuid, std::shared_ptr<DeviceAnalyticsContext>> m_deviceAnalyticsContexts;
+    std::map<QnUuid, QWeakPointer<QnAbstractDataReceptor>> m_metadataSinks;
+    std::map<QnUuid, QSharedPointer<VideoDataReceptor>> m_mediaSources;
 };
 
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
 
-namespace nx {
-namespace sdk {
-
-QString toString(const nx::sdk::CameraInfo& cameraInfo);
-
-} // namespace sdk
-} // namespace nx

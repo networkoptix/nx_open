@@ -32,7 +32,7 @@
 #include <nx/mediaserver/resource/camera.h>
 
 using nx::mediaserver::analytics::VideoDataReceptor;
-using nx::mediaserver::analytics::VideoDataReceptorPtr;
+using nx::mediaserver::analytics::AbstractVideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -381,7 +381,7 @@ void QnLiveStreamProvider::onStreamReopen()
  * @return Stored m_videoDataReceptor, if it exists and sending the frame to metadata plugins is
  *     needed; null otherwise.
  */
-VideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPluginsIfNeeded(
+AbstractVideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetadataPluginsIfNeeded(
     const QnCompressedVideoDataPtr& compressedFrame,
     bool* outNeedUncompressedFrame)
 {

@@ -52,25 +52,12 @@ class QnResourceStatusWatcher;
 namespace nx::vms::common::p2p::downloader { class Downloader; }
 
 namespace nx {
-namespace mediaserver { class CmdLineArguments; }
-namespace mediaserver::event {
-class ExtendedRuleProcessor;
-class EventConnector;
-class EventMessageBus;
-} // namespace mediaserver::event
 
-namespace analytics {
-namespace storage {
-class AbstractEventsStorage;
-} // namespace storage
-} // namespace analytics
-
-namespace time_sync {
-class TimeSyncManager;
-} // namespace time_sync
+class CommonUpdateManager;
 
 namespace mediaserver {
 
+class CmdLineArguments;
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootFileSystem;
@@ -78,21 +65,20 @@ class Settings;
 class ServerTimeSyncManager;
 class ServerUpdateManager;
 
-namespace resource {
+namespace analytics {class SdkObjectPool; } // namespace analytics
+namespace resource { class SharedContextPool; } // namespace resource
+namespace camera { class ErrorProcessor; } // namespace camera
 
-class SharedContextPool;
-
-} // namespace resource
-
-namespace camera {
-
-class ErrorProcessor;
-
-} // namespace camera
+namespace event {
+class ExtendedRuleProcessor;
+class EventConnector;
+class EventMessageBus;
+} // namespace event
 
 } // namespace mediaserver
 
-class CommonUpdateManager;
+namespace analytics::storage { class AbstractEventsStorage; } // namespace analytics::storage
+namespace time_sync { class TimeSyncManager; } // namespace time_sync
 
 } // namespace nx
 
@@ -129,6 +115,8 @@ public:
     PluginManager* pluginManager() const;
     nx::mediaserver::analytics::Manager* analyticsManager() const;
     nx::mediaserver::analytics::EventRuleWatcher* analyticsEventRuleWatcher() const;
+    nx::mediaserver::analytics::SdkObjectPool* sdkObjectPool() const;
+
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
@@ -225,4 +213,5 @@ private:
     std::unique_ptr<QnMdnsListener> m_mdnsListener;
     std::unique_ptr<nx::network::upnp::DeviceSearcher> m_upnpDeviceSearcher;
     std::unique_ptr<QnMediaServerResourceSearchers> m_resourceSearchers;
+    nx::mediaserver::analytics::SdkObjectPool* m_sdkObjectPool;
 };

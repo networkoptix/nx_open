@@ -2,15 +2,14 @@
 
 #include <set>
 
-#include <nx/streaming/video_data_packet.h>
 #include <utils/media/frame_info.h>
-#include "nx/sdk/analytics/uncompressed_video_frame.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/sdk/analytics/uncompressed_video_frame.h>
+#include <nx/mediaserver/analytics/abstract_video_data_receptor.h>
 
-namespace nx {
-namespace mediaserver {
-namespace analytics {
+namespace nx::mediaserver::analytics {
 
-class VideoDataReceptor
+class VideoDataReceptor: public AbstractVideoDataReceptor
 {
 public:
     using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
@@ -37,32 +36,17 @@ public:
     {
     }
 
-    bool needsCompressedFrames() const { return m_needsCompressedFrames; }
+    virtual bool needsCompressedFrames() const override;
 
-    NeededUncompressedPixelFormats neededUncompressedPixelFormats() const
-    {
-        return m_neededUncompressedPixelFormats;
-    }
+    NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
 
-    /**
-     * Call the callback for a video frame.
-     * @param compressedFrame Not null.
-     * @param uncompressedFrame Can be null if uncompressed frame will not be needed.
-     */
-    void putFrame(
+    virtual void putFrame(
         const QnConstCompressedVideoDataPtr& compressedFrame,
-        const CLConstVideoDecoderOutputPtr& uncompressedFrame)
-    {
-        m_callback(compressedFrame, uncompressedFrame);
-    }
+        const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
 
 private:
-    Callback m_callback;
     const bool m_needsCompressedFrames;
     const NeededUncompressedPixelFormats m_neededUncompressedPixelFormats;
 };
-using VideoDataReceptorPtr = QSharedPointer<VideoDataReceptor>;
 
-} // namespace analytics
-} // namespace mediaserver
-} // namespace nx
+} // namespace nx::mediaserver::analytics

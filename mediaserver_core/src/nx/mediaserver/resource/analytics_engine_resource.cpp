@@ -1,0 +1,97 @@
+#include "analytics_engine_resource.h"
+
+#include <nx/sdk/analytics/plugin.h>
+
+#include <media_server/media_server_module.h>
+
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/sdk_support/pointers.h>
+#include <nx/mediaserver/analytics/sdk_object_pool.h>
+
+#include <nx/vms/api/analytics/engine_manifest.h>
+
+namespace nx::mediaserver::resource {
+
+namespace analytics_sdk = nx::sdk::analytics;
+namespace analytics_api = nx::vms::api::analytics;
+
+namespace {
+
+using PluginPtr = sdk_support::SharedPtr<analytics_sdk::Plugin>;
+using EnginePtr = sdk_support::SharedPtr<analytics_sdk::Engine>;
+
+PluginPtr getSdkPlugin(const QnUuid& pluginId, QnMediaServerModule* serverModule)
+{
+    if (!serverModule)
+    {
+        NX_ASSERT(false, "Can't access server module");
+        return PluginPtr();
+    }
+
+    auto sdkObjectPool = serverModule->sdkObjectPool();
+    if (!sdkObjectPool)
+    {
+        NX_ASSERT(false, "Can't access SDK object pool");
+        return PluginPtr();
+    }
+
+    return sdkObjectPool->plugin(pluginId);
+}
+
+EnginePtr getSdkEngine(const QnUuid& engineId, QnMediaServerModule* serverModule)
+{
+    if (!serverModule)
+    {
+        NX_ASSERT(false, "Can't access server module");
+        return EnginePtr();
+    }
+
+    auto sdkObjectPool = serverModule->sdkObjectPool();
+    if (!sdkObjectPool)
+    {
+        NX_ASSERT(false, "Can't access SDK object pool");
+        return EnginePtr();
+    }
+
+    return sdkObjectPool->engine(engineId);
+}
+
+} // namespace
+
+AnalyticsEngineResource::AnalyticsEngineResource(QnMediaServerModule* serverModule):
+    base_type(),
+    ServerModuleAware(serverModule)
+{
+}
+
+EnginePtr AnalyticsEngineResource::sdkEngine() const
+{
+    return getSdkEngine(getId(), serverModule());
+}
+
+CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
+{
+    // TODO: #dmishin implement
+    NX_DEBUG(this, lm("Initializing analytics engine resource %1 (%2)")
+        .args(getName(), getId()));
+
+    auto sdkObjectPool = sdk_support::getSdkObjectPool(serverModule());
+    if (!sdkObjectPool)
+        return CameraDiagnostics::InternalServerErrorResult("Can't access SDK object pool");
+
+    auto settings = QJsonObject::fromVariantMap(settingsValues());
+    auto engine = sdkObjectPool->instantiateEngine(getId(), settings);
+
+    if (!engine)
+        return CameraDiagnostics::PluginErrorResult("Can't instantiate an analytics engine");
+
+    const auto manifest = sdk_support::manifest<analytics_api::EngineManifest>(engine);
+    if (!manifest)
+        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
+
+    setManifest(*manifest);
+    saveParams();
+    return CameraDiagnostics::NoErrorResult();
+}
+
+} // nx::mediaserver::resource

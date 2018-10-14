@@ -66,10 +66,12 @@ enum Value
     badMediaStream,
     noMediaStream,
     cameraInitializationInProgress,
-    cameraPluginError,
+    pluginError,
     liveVideoIsNotSupportedError,
     tooManyOpenedConnections,
     cameraOldFirmwareError,
+    pluginIsUnavailable,
+    internalServerError,
     unknown
 };
 
@@ -339,15 +341,10 @@ public:
     }
 };
 
-class CameraPluginErrorResult: public Result
+class PluginErrorResult: public Result
 {
 public:
-    CameraPluginErrorResult(
-        const QString& errorMessage)
-        :
-        Result(ErrorCode::cameraPluginError, errorMessage)
-    {
-    }
+    PluginErrorResult(const QString& errorMessage): Result(ErrorCode::pluginError, errorMessage) {}
 };
 
 class TooManyOpenedConnectionsResult: public Result
@@ -358,6 +355,21 @@ public:
         Result(ErrorCode::tooManyOpenedConnections)
     {
     }
+};
+
+class PluginIsUnavailableResult: public Result
+{
+public:
+    PluginIsUnavailableResult(): Result(ErrorCode::pluginIsUnavailable) {}
+};
+
+class InternalServerErrorResult: public Result
+{
+public:
+    InternalServerErrorResult(const QString& errorMessage):
+        Result(ErrorCode::internalServerError, errorMessage)
+    {
+    };
 };
 
 } // namespace CameraDiagnostics

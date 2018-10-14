@@ -26,10 +26,16 @@ public:
     using CreateEngine = std::function<Engine*(Plugin* plugin)>;
 
     /**
-     * @param pluginName Full plugin name in English, capitalized as a header.
-     * @param libName Short plugin name: small_letters_and_underscores, as in the library filename.
+     * @param pluginManifest Plugin manifest to be returned from the manifest method.
+     * @param createEngine Functor for engine creation.
      */
-    CommonPlugin(std::string libName, CreateEngine createEngine);
+    CommonPlugin(
+        // TODO: Actually we can figure out the plugin name from the manifest,
+        // But since there is no JSON support in our helpers let's pass it as an additional
+        // parameter. Probably we need to add some JSON helpers to the SDK.
+        std::string pluginName,
+        std::string pluginManifest,
+        CreateEngine createEngine);
 
     virtual ~CommonPlugin() override;
 
@@ -41,17 +47,22 @@ public:
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    /** @return libName. */
     virtual const char* name() const override;
 
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
     virtual void setLocale(const char* locale) override;
 
-    virtual Engine* createEngine(Error* outError);
+    virtual const char* manifest(nx::sdk::Error* outError) const override;
+
+    virtual void freeManifest(const char* data) override;
+
+    virtual Engine* createEngine(Error* outError) override;
 
 private:
-    const std::string m_libName;
+    const std::string m_name;
+    const std::string m_manifest;
+
     CreateEngine m_createEngine;
     nxpl::PluginInterface* m_pluginContainer;
 };

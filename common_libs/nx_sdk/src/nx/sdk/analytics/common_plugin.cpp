@@ -10,15 +10,21 @@ namespace analytics {
 
 using namespace nx::sdk;
 
-CommonPlugin::CommonPlugin(std::string libName, CreateEngine createEngine):
-    m_libName(std::move(libName)), m_createEngine(createEngine)
+CommonPlugin::CommonPlugin(
+    std::string pluginName,
+    std::string pluginManifest,
+    CreateEngine createEngine)
+    :
+    m_name(std::move(pluginName)),
+    m_manifest(std::move(pluginManifest)),
+    m_createEngine(std::move(createEngine))
 {
-    NX_PRINT << "Created " << m_libName << "[" << this << "]";
+    NX_PRINT << "Created " << m_name << "[" << this << "]";
 }
 
 CommonPlugin::~CommonPlugin()
 {
-    NX_PRINT << "Destroyed " << m_libName << "[" << this << "]";
+    NX_PRINT << "Destroyed " << m_name << "[" << this << "]";
 }
 
 void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -53,7 +59,7 @@ void* CommonPlugin::queryInterface(const nxpl::NX_GUID& interfaceId)
 
 const char* CommonPlugin::name() const
 {
-    return m_libName.c_str();
+    return m_name.c_str();
 }
 
 void CommonPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
@@ -71,12 +77,22 @@ void CommonPlugin::setLocale(const char* /*locale*/)
 {
 }
 
+const char* CommonPlugin::manifest(nx::sdk::Error* outError) const
+{
+    return m_manifest.c_str();
+}
+
+void CommonPlugin::freeManifest(const char* data)
+{
+    // Do nothing.
+}
+
 Engine* CommonPlugin::createEngine(Error* outError)
 {
     Engine* engine = m_createEngine(this);
     if (!engine)
     {
-        NX_PRINT << "ERROR: " << m_libName << ": createEngine() failed";
+        NX_PRINT << "ERROR: " << m_name << ": createEngine() failed";
         *outError = Error::unknownError;
         return nullptr;
     }

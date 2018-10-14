@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <set>
 
 #include <QtCore/QMetaType>
 #include <QtCore/QElapsedTimer>
@@ -14,6 +15,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/utils/url.h>
+
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 
 class CameraMediaStreams;
 class CameraBitrates;
@@ -33,7 +36,9 @@ class QnVirtualCameraResource : public QnSecurityCamResource
 public:
     static QString kEnabledAnalyticsEnginesProperty;
     static QString kDeviceAgentsSettingsValuesProperty;
+    static QString kDeviceAgentManifestsProperty;
 
+public:
     QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
@@ -76,6 +81,7 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+    const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
     QSet<QnUuid> enabledAnalyticsEngines() const;
     void setEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
@@ -84,6 +90,13 @@ public:
 
     QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
     void setDeviceAgentSettingsValues(const QnUuid& engineId, const QVariantMap& settingsValues);
+
+    std::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest(
+        const QnUuid& engineId);
+
+    void setDeviceAgentManifest(
+        const QnUuid& engineId,
+        const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);

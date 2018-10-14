@@ -100,6 +100,8 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
     virtual const char* manifest(Error* error) const override;
+    void freeManifest(const char* data) override;
+
     virtual void executeAction(Action* action, Error* outError) override;
 
 private:

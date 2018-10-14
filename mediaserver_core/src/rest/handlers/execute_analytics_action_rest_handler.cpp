@@ -6,6 +6,10 @@
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
 #include <nx/mediaserver/analytics/manager.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/sdk_support/utils.h>
+#include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/plugins/settings.h>
 
@@ -22,6 +26,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
+    using namespace nx::mediaserver;
     bool success = false;
     const auto actionData =
         QJson::deserialized<AnalyticsAction>(body, AnalyticsAction(), &success);
@@ -46,19 +51,22 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    auto analyticsManager = serverModule()->analyticsManager();
-    for (auto& engine: analyticsManager->availableEngines())
+    const auto engines = resourcePool()->getResources<resource::AnalyticsEngineResource>();
+    for (auto& engine: engines)
     {
-        nxpt::ScopedRef<nx::sdk::analytics::Engine> engineGuard(engine, /*increaseRef*/ false);
-
-        const auto manifest = analyticsManager->loadEngineManifest(engine);
+        auto sdkEngine = engine->sdkEngine();
+        auto manifest = sdk_support::manifest<nx::vms::api::analytics::EngineManifest>(sdkEngine);
         if (!manifest)
-            continue; //< The error is already logged.
+        {
+            NX_WARNING(this, lm("Can't obtain engine manifest, engine %1 (%2)")
+                .args(engine->getName(), engine->getId()));
+            continue;
+        }
 
-        if (manifest.get().pluginId == actionData.pluginId)
+        if (manifest->pluginId == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(&actionResult, engine, actionData);
+            QString errorMessage = executeAction(&actionResult, sdkEngine.get(), actionData);
 
             if (!errorMessage.isEmpty())
             {

@@ -29,6 +29,13 @@ signals:
 
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType) override;
+
+    virtual nx::vms::common::AnalyticsPluginResourcePtr
+        createAnalyticsPluginResource(const QnResourceParams& params) override;
+
+    virtual nx::vms::common::AnalyticsEngineResourcePtr
+        createAnalyticsEngineResource(const QnResourceParams& params) override;
+
 private:
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
@@ -42,6 +49,7 @@ private:
     void sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources);
 private:
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
+    QnMediaServerModule* m_serverModule = nullptr;
     QMap<QString, int> m_resourceDiscoveryCounter;
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_disconnectSended;

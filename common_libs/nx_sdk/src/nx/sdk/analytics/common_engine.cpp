@@ -28,9 +28,9 @@ public:
 private:
     /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
     struct
-    { 
+    {
         const std::string printPrefix = "CommonEngine(): ";
-    } utils; 
+    } utils;
 };
 
 CommonEngine::CommonEngine(
@@ -81,8 +81,14 @@ void CommonEngine::setSettings(const nxpl::Setting* settings, int count)
 
 const char* CommonEngine::manifest(Error* /*error*/) const
 {
-    m_manifest = manifest();
+    if (m_manifest.empty())
+        m_manifest = manifest();
     return m_manifest.c_str();
+}
+
+void CommonEngine::freeManifest(const char* data)
+{
+    m_manifest.clear();
 }
 
 void CommonEngine::executeAction(Action* action, Error* outError)

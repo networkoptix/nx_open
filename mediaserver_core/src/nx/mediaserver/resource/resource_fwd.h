@@ -57,6 +57,12 @@ namespace resource {
 class Camera;
 using CameraPtr = QnSharedResourcePointer<Camera>;
 
+class AnalyticsPluginResource;
+using AnalyticsPluginResourcePtr = QnSharedResourcePointer<AnalyticsPluginResource>;
+
+class AnalyticsEngineResource;
+using AnalyticsEngineResourcePtr = QnSharedResourcePointer<AnalyticsEngineResource>;
+
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx

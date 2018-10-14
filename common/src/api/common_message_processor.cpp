@@ -417,6 +417,32 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         this->layoutTourManager(),
         &QnLayoutTourManager::removeTour,
         connectionType);
+
+    const auto analyticsManager = connection->getAnalyticsNotificationManager();
+    connect(
+        analyticsManager,
+        &ec2::AbstractAnalyticsNotificationManager::analyticsPluginAddedOrUpdated,
+        this,
+        on_resourceUpdated);
+
+    connect(
+        analyticsManager,
+        &ec2::AbstractAnalyticsNotificationManager::analyticsPluginRemoved,
+        this,
+        &QnCommonMessageProcessor::on_resourceRemoved,
+        connectionType);
+
+    connect(
+        analyticsManager,
+        &ec2::AbstractAnalyticsNotificationManager::analyticsEngineAddedOrUpdated,
+        this,
+        on_resourceUpdated);
+    connect(
+        analyticsManager,
+        &ec2::AbstractAnalyticsNotificationManager::analyticsEngineRemoved,
+        this,
+        &QnCommonMessageProcessor::on_resourceRemoved,
+        connectionType);
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)
@@ -967,22 +993,48 @@ void QnCommonMessageProcessor::updateResource(
     const nx::vms::api::AnalyticsPluginData& analyticsPluginData,
     ec2::NotificationSource source)
 {
-    using namespace nx::vms::common;
-    AnalyticsPluginResourcePtr analyticsPluginResource(
-        new AnalyticsPluginResource(commonModule()));
-    ec2::fromApiToResource(analyticsPluginData, analyticsPluginResource);
-    updateResource(analyticsPluginResource, source);
+    const QnResourceParams parameters(
+        analyticsPluginData.id,
+        /* url */ QString(),
+        /* vendor */ QString());
+
+    nx::vms::common::AnalyticsPluginResourcePtr pluginResource = getResourceFactory()
+        ->createResource(
+            nx::vms::api::AnalyticsPluginData::kResourceTypeId,
+            parameters).dynamicCast<nx::vms::common::AnalyticsPluginResource>();
+
+    if (!pluginResource)
+    {
+        NX_ASSERT(false, "Unable to create plugin resource.");
+        return;
+    }
+
+    ec2::fromApiToResource(analyticsPluginData, pluginResource);
+    updateResource(pluginResource, source);
 }
 
 void QnCommonMessageProcessor::updateResource(
     const nx::vms::api::AnalyticsEngineData& analyticsEngineData,
     ec2::NotificationSource source)
 {
-    using namespace nx::vms::common;
-    AnalyticsEngineResourcePtr analyticsEngineResource(
-        new AnalyticsEngineResource(commonModule()));
-    ec2::fromApiToResource(analyticsEngineData, analyticsEngineResource);
-    updateResource(analyticsEngineResource, source);
+    const QnResourceParams parameters(
+        analyticsEngineData.id,
+        /* url */ QString(),
+        /* vendor */ QString());
+
+    nx::vms::common::AnalyticsEngineResourcePtr engineResource = getResourceFactory()
+        ->createResource(
+            nx::vms::api::AnalyticsEngineData::kResourceTypeId,
+            parameters).dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+
+    if (!engineResource)
+    {
+        NX_ASSERT(false, "Unable to create engine resource.");
+        return;
+    }
+
+    ec2::fromApiToResource(analyticsEngineData, engineResource);
+    updateResource(engineResource, source);
 }
 
 void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::NotificationSource source)
