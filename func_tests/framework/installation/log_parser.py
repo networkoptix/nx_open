@@ -9,7 +9,7 @@ _split_re = re.compile(
         ^ (?P<ts> \d{4}-\d{2}-\d{2} \s+ \d{2}:\d{2}:\d{2}.\d{3} )
         \x20+ (?P<thread>\d{1,6})
         \x20+ (?P<level>ALWAYS|ERROR|WARNING|INFO|DEBUG|VERBOSE)
-        \x20 (?P<tag> .+?)
+        \x20 (?P<tag> .*?)
         :\x20
         ''',
     re.MULTILINE | re.VERBOSE)
@@ -54,8 +54,11 @@ def parse_mediaserver_logs_test():
         b'2018-10-13 19:23:26.753   6090   DEBUG MediaServerProcess: Storage new candidates:\n'
         b'                url: /opt/networkoptix/mediaserver/var/data, ...\n'
         b'2018-10-13 19:23:26.756   6090   DEBUG MediaServerProcess: QnStorageResourceList ...\n'
+        b'2018-10-14 11:16:43.819  13523   DEBUG : Applying SQL update :/mserver_updates/01...\n'
+        b'2018-10-14 11:16:43.819  13523   DEBUG : Applying SQL update :/mserver_updates/02...\n'
         b'\n')
     result = list(parse_mediaserver_logs(sample))
+    assert len(result) == 5
     assert result[0]['levelname'] == 'DEBUG'
     assert result[0]['name'] == 'MediaServerProcess'
     assert result[0]['message'] == 'Creating ...'
