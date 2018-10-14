@@ -1,7 +1,6 @@
 import datetime
 import logging
 import re
-import textwrap
 
 _ts_format = '%Y-%m-%d %H:%M:%S.%f'
 _split_re = re.compile(
