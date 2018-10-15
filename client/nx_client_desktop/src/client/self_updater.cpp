@@ -46,8 +46,13 @@ bool runMinilaucherInternal(const QStringList& args)
 {
     const QString minilauncherPath = qApp->applicationDirPath() + L'/'
         + QnClientAppInfo::minilauncherBinaryName();
-    if (QFileInfo::exists(minilauncherPath)
-        && QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
+
+    if (!QFileInfo::exists(minilauncherPath))
+    {
+        NX_ERROR(typeid(SelfUpdater), lm("Can not start Minilauncher: file %1 does not exist.").arg(minilauncherPath));
+        return false;
+    }
+    else if (QProcess::startDetached(minilauncherPath, args)) /*< arguments are MUST here */
     {
         NX_INFO(typeid(SelfUpdater),
             lit("Minilauncher process started successfully."));

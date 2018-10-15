@@ -31,12 +31,16 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
 });
 
 static constexpr QSize kBaseIconSize(20, 20);
-static const QByteArray kBaseColor("#A5B7C0");
 
 class IconBuilder
 {
 public:
-    void addSvg(const QByteArray& data,  QIcon::Mode mode, QIcon::State state)
+    IconBuilder(bool isHiDpi):
+        m_isHiDpi(isHiDpi)
+    {
+    }
+
+    void addSvg(const QByteArray& data, QIcon::Mode mode, QIcon::State state)
     {
         QSvgRenderer renderer;
         if (!renderer.load(data))
@@ -45,15 +49,13 @@ public:
             return;
         }
 
-        QPixmap basePixmap(kBaseIconSize);
-        basePixmap.fill(Qt::transparent);
-        { QPainter p(&basePixmap); renderer.render(&p); }
-        add(basePixmap, mode, state);
+        const QSize size = m_isHiDpi ? kBaseIconSize * 2 : kBaseIconSize;
 
-        QPixmap hidpiPixmap(kBaseIconSize * 2);
-        hidpiPixmap.fill(Qt::transparent);
-        { QPainter p(&hidpiPixmap); renderer.render(&p); }
-        add(hidpiPixmap, mode, state);
+        QPixmap pixmap(size);
+        pixmap.fill(Qt::transparent);
+        QPainter p(&pixmap);
+        renderer.render(&p);
+        add(pixmap, mode, state);
     }
 
     void add(const QPixmap& pixmap, QIcon::State state)
@@ -82,6 +84,7 @@ public:
     }
 
 private:
+    const bool m_isHiDpi;
     // Storing as map to be able overwrite default values. Allowing to handle different sizes.
     using pixmap_key = std::tuple<QIcon::Mode, QIcon::State, int>;
     using container_type = std::map<pixmap_key, QPixmap>;
@@ -235,7 +238,7 @@ QIcon QnNoptixIconLoader::loadPixmapIconInternal(
     const QnIcon::SuffixesList* suffixes)
 {
     /* Create normal icon. */
-    IconBuilder builder;
+    IconBuilder builder(skin->isHiDpi());
     const auto basePixmap = skin->pixmap(name, false);
     builder.add(basePixmap, QnIcon::Normal, QnIcon::Off);
     loadCustomIcons(skin, &builder, basePixmap, name, checkedName, suffixes);
@@ -259,7 +262,7 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
 
     const QByteArray baseData = source.readAll();
 
-    IconBuilder builder;
+    IconBuilder builder(skin->isHiDpi());
     builder.addSvg(baseData, QnIcon::Normal, QnIcon::Off);
 
     auto color =
@@ -270,7 +273,7 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
     const QByteArray primaryColor = color("light10");
     const QByteArray secondaryColor = color("light4");
 
-    auto replaced =
+    auto colorized =
         [&](const QString& primary, const QString& secondary)
         {
             QByteArray result = baseData;
@@ -280,10 +283,10 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
             return result;
         };
 
-    builder.addSvg(replaced("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
-    builder.addSvg(replaced("light4", "light1"), QnIcon::Selected, QnIcon::Off);
-    builder.addSvg(replaced("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
-    builder.addSvg(replaced("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
+    builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
+    builder.addSvg(colorized("light4", "light1"), QnIcon::Selected, QnIcon::Off);
+    builder.addSvg(colorized("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
+    builder.addSvg(colorized("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
 
     //loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
 

@@ -10,6 +10,8 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/app_info.h>
 
+#include <common/static_common_module.h>
+
 namespace nx {
 namespace update {
 
@@ -141,20 +143,35 @@ static InformationError parseAndExtractInformation(
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    if (!QJson::deserialize(topLevelObject, "version", &result->version)
-        || !QJson::deserialize(topLevelObject, "cloudHost", &result->cloudHost)
-        || !QJson::deserialize(topLevelObject, "eulaVersion", &result->eulaVersion)
-        || !QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
-    {
+    auto packagesError = parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
+    if (packagesError != InformationError::noError)
+        return packagesError;
+
+    if (!QJson::deserialize(topLevelObject, "version", &result->version))
         return InformationError::jsonError;
+
+    if (!QJson::deserialize(topLevelObject, "cloudHost", &result->cloudHost))
+    {
+        NX_WARNING(typeid(Information), "no cloudHost at %1", baseUpdateUrl);
     }
 
-    return parsePackages(topLevelObject, baseUpdateUrl, publicationKey, result);
+    if (!QJson::deserialize(topLevelObject, "eulaVersion", &result->eulaVersion))
+    {
+        NX_WARNING(typeid(Information)) << "no eulaVersion at" << baseUpdateUrl;
+    }
+
+    if(!QJson::deserialize(topLevelObject, "eulaLink", &result->eulaLink))
+    {
+        NX_WARNING(typeid(Information)) << "no eulaLink at" << baseUpdateUrl;
+    }
+
+    return InformationError::noError;
 }
 
 static InformationError fillUpdateInformation(
     nx::network::http::AsyncClient* httpClient,
-    const QString& publicationKey,
+    QString publicationKey,
+    nx::vms::api::SoftwareVersion currentVersion,
     Information* result,
     QList<AlternativeServerData>* alternativeServers)
 {
@@ -173,6 +190,17 @@ static InformationError fillUpdateInformation(
     if (error != InformationError::noError)
         return error;
 
+    if (publicationKey == "latest")
+    {
+        // Extracting latest version from
+        QString version = currentVersion.toString(nx::vms::api::SoftwareVersion::MinorFormat);
+        auto it = customizationInfo.releases.find(version);
+        if (it == customizationInfo.releases.end())
+            return InformationError::noNewVersion;
+        publicationKey = it.value().build();
+        NX_INFO(typeid(Information)) << "fillUpdateInformation will use build" << publicationKey;
+    }
+
     auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
     error = makeHttpRequest(httpClient, baseUpdateUrl + "/packages.json");
 
@@ -189,6 +217,7 @@ static InformationError fillUpdateInformation(
 Information updateInformationImpl(
     const QString& url,
     const QString& publicationKey,
+    nx::vms::api::SoftwareVersion currentVersion,
     InformationError* error,
     bool checkAlternativeServers)
 {
@@ -206,14 +235,19 @@ Information updateInformationImpl(
     }
 
     QList<AlternativeServerData> alternativeServers;
-    localError = fillUpdateInformation(&httpClient, publicationKey, &result, &alternativeServers);
+    localError = fillUpdateInformation(
+        &httpClient,
+        publicationKey,
+        currentVersion,
+        &result, &alternativeServers);
+
     if (localError != InformationError::noError && checkAlternativeServers)
     {
         for (const auto& alternativeServer: alternativeServers)
         {
             result = updateInformationImpl(
                 alternativeServer.url,
-                publicationKey,
+                publicationKey, currentVersion,
                 &localError,
                 /*checkAlternativeServers*/ false);
 
@@ -235,7 +269,8 @@ Information updateInformation(
     const QString& publicationKey,
     InformationError* error)
 {
-    return updateInformationImpl(url, publicationKey, error, /*checkAlternativeServers*/ true);
+    auto version = qnStaticCommon->engineVersion();
+    return updateInformationImpl(url, publicationKey, version, error, /*checkAlternativeServers*/ true);
 }
 
 Information updateInformation(const QString& /*zipFileName*/, InformationError* /*error*/)

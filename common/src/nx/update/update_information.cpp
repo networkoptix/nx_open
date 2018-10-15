@@ -22,7 +22,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::brokenPackageError, "local update package is corrupted")
     (nx::update::InformationError::missingPackageError, "missing files in the update package")
     (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
-    (nx::update::InformationError::notFoundError, "not found"))
+    (nx::update::InformationError::incompatibleVersion, "incompatible version")
+    (nx::update::InformationError::notFoundError, "not found")
+    (nx::update::InformationError::noNewVersion, "no new version"))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)

@@ -11,6 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <network/system_helpers.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include "server_updates_model.h"
 
@@ -137,7 +138,7 @@ QVariant ServerUpdatesModel::data(const QModelIndex& index, int role) const
             if (item->offline)
                 return qApp->palette().color(QPalette::Button);
 
-            if (m_latestVersion <= item->server->getVersion())
+            if (m_targetVersion.isNull() ||  m_targetVersion <= item->server->getVersion())
                 return m_versionColors.latest;
             else
                 return m_versionColors.target;
@@ -193,6 +194,21 @@ Qt::ItemFlags ServerUpdatesModel::flags(const QModelIndex& index) const
     if (index.column() == StorageSettingsColumn)
         return Qt::ItemIsUserCheckable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     return base_type::flags(index);
+}
+
+void ServerUpdatesModel::setManualStatus(QSet<QnUuid> targets, StatusCode status)
+{
+    for (const auto& uid: targets)
+    {
+        if (auto item = findItemById(uid))
+        {
+            item->state = status;
+            if (status == StatusCode::installing)
+                item->installing = true;
+            QModelIndex idx = index(item->row, 0);
+            emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
+        }
+    }
 }
 
 void ServerUpdatesModel::addItemForServer(QnMediaServerResourcePtr server)
@@ -340,6 +356,9 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
 
     QModelIndex idx = createIndex(item.row, 0);
 
+    // TODO: This function checks too much serious things for a model.
+    // Maybe part of it should be moved to ServerUpdateTool.
+
     auto status = server->getStatus();
     // TODO: Right now 'Incompatible' means we should use legacy update system to deal with them
     bool incompatible = status == Qn::ResourceStatus::Incompatible;
@@ -355,6 +374,22 @@ void ServerUpdatesModel::updateServerData(QnMediaServerResourcePtr server, Updat
     if (version < newUpdateSupportVersion && !item.onlyLegacyUpdate)
     {
         item.onlyLegacyUpdate = true;
+        changed = true;
+    }
+
+    bool installed = (version == m_targetVersion);
+    if (installed != item.installed)
+    {
+        item.installed = true;
+        item.installing = false;
+        changed = true;
+    }
+
+    auto moduleInfo = server->getModuleInformation();
+    bool changedProtocol = moduleInfo.protoVersion != nx_ec::EC2_PROTO_VERSION;
+    if (item.changedProtocol !=  changedProtocol)
+    {
+        item.changedProtocol = changedProtocol;
         changed = true;
     }
 
@@ -380,16 +415,9 @@ const QList<UpdateItemPtr>& ServerUpdatesModel::getServerData() const
     return m_items;
 }
 
-nx::utils::SoftwareVersion ServerUpdatesModel::latestVersion() const
+void ServerUpdatesModel::setUpdateTarget(const nx::utils::SoftwareVersion& version)
 {
-    return m_latestVersion;
-}
-
-void ServerUpdatesModel::setUpdateTarget(const nx::utils::SoftwareVersion& version,
-    const QSet<nx::vms::api::SystemInformation>& selection)
-{
-    m_latestVersion = version;
-    m_updatePlatforms = selection;
+    m_targetVersion = version;
     updateVersionColumn();
 }
 
