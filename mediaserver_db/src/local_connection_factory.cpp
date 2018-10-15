@@ -1128,11 +1128,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
-     * %param[opt] parentId Should be empty.
      * %param name User name.
-     * %param[opt] url Should be empty.
-     * %param[proprietary] typeId Should have fixed value.
-     *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
      * %param[proprietary] isAdmin Indended for internal use; keep the value when saving
      *     a previously received object, use false when creating a new one.
      *     %value false
