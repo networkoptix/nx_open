@@ -35,13 +35,11 @@ int InputFormat::initialize(const char * deviceType)
 int InputFormat::open(const char * url)
 {
     m_url = url;
-    int openCode = avformat_open_input(
+    return avformat_open_input(
         &m_formatContext,
         url,
         m_inputFormat,
         &m_options);
-    
-    return openCode;
 }
 
 void InputFormat::close()
@@ -50,19 +48,14 @@ void InputFormat::close()
         avformat_close_input(&m_formatContext);
 }
 
+void InputFormat::dumpFormat(int streamIndex, int isOutput) const
+{
+    av_dump_format(m_formatContext, streamIndex, m_url.c_str(), isOutput);
+}
+
 int InputFormat::readFrame(AVPacket * outPacket)
 {
     return av_read_frame(m_formatContext, outPacket);
-}
-
-int InputFormat::setFps(float fps)
-{
-    return setEntry("framerate", std::to_string(fps).c_str());
-}
-
-int InputFormat::setResolution(int width, int height)
-{
-    return setEntry("video_size", (std::to_string(width) + "x" + std::to_string(height)).c_str());
 }
 
 AVCodecID InputFormat::videoCodecID() const
@@ -117,6 +110,16 @@ AVStream * InputFormat::findStream(AVMediaType type, int * streamIndex) const
         }
     }
     return nullptr;
+}
+
+int InputFormat::setFps(float fps)
+{
+    return setEntry("framerate", std::to_string(fps).c_str());
+}
+
+int InputFormat::setResolution(int width, int height)
+{
+    return setEntry("video_size", (std::to_string(width) + "x" + std::to_string(height)).c_str());
 }
 
 void InputFormat::resolution(int * width, int * height) const

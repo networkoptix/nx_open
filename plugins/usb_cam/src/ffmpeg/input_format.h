@@ -25,10 +25,10 @@ public:
     int open(const char * url);
     void close();
 
+    void dumpFormat(int streamIndex = 0, int isOutput = 0) const;
+
     int readFrame(AVPacket * packet);
 
-    int setFps(float fps);
-    int setResolution(int width, int height);
     AVCodecID videoCodecID() const;
     AVCodecID audioCodecID() const;
 
@@ -41,6 +41,8 @@ public:
     AVStream * stream(int index) const;
     AVStream * findStream(AVMediaType type, int *streamIndex = nullptr) const;
 
+    int setFps(float fps);
+    int setResolution(int width, int height);
     void resolution(int * width, int * height) const;
 
 private:
