@@ -460,18 +460,12 @@ float VideoStream::largestFps() const
         return 0;
 
     float packetFps = 0;
+    m_packetConsumerManager.largestFps(&packetFps);
+
     float frameFps = 0;
-    std::weak_ptr<AbstractVideoConsumer> packetConsumer;
-    std::weak_ptr<AbstractVideoConsumer> frameConsumer;
+    m_frameConsumerManager.largestFps(&frameFps);
 
-    packetConsumer = m_packetConsumerManager.largestFps(&packetFps);
-    frameConsumer = m_frameConsumerManager.largestFps(&frameFps);
-
-    auto videoConsumer = frameFps > packetFps ? frameConsumer : packetConsumer;
-    if (videoConsumer.expired())
-        return 0;
-
-    return videoConsumer.lock()->fps();
+    return frameFps > packetFps ? frameFps : packetFps;
 }
 
 void VideoStream::largestResolution(int * outWidth, int * outHeight) const
@@ -482,24 +476,24 @@ void VideoStream::largestResolution(int * outWidth, int * outHeight) const
     if(consumersEmpty())
         return;
 
-    int packetWidth = 0;
-    int packetHeight = 0;
-    std::weak_ptr<AbstractVideoConsumer> packetConsumer;
-    packetConsumer = m_packetConsumerManager.largestResolution(&packetWidth, &packetHeight);
+    int packetConsumerWidth = 0;
+    int packetConsumerHeight = 0;
+    m_packetConsumerManager.largestResolution(&packetConsumerWidth, &packetConsumerHeight);
 
-    int frameWidth = 0;
-    int frameHeight = 0;
-    std::weak_ptr<AbstractVideoConsumer> frameConsumer;
-    frameConsumer = m_frameConsumerManager.largestResolution(&frameWidth, &frameHeight);
+    int frameConsumerWidth = 0;
+    int frameConsumerHeight = 0;
+    m_frameConsumerManager.largestResolution(&frameConsumerWidth, &frameConsumerHeight);
 
-    std::weak_ptr<AbstractVideoConsumer> videoConsumer = packetConsumer;
-    if (frameWidth * frameHeight > frameWidth * frameHeight)
-        videoConsumer = frameConsumer.lock() ? frameConsumer : videoConsumer;
-
-    if (videoConsumer.expired())
-        return;
-
-    videoConsumer.lock()->resolution(outWidth, outHeight);
+    if(frameConsumerWidth * frameConsumerHeight > packetConsumerWidth * packetConsumerHeight)
+    {
+        *outWidth = frameConsumerWidth;
+        *outHeight = frameConsumerHeight;
+    }
+    else
+    {
+        *outWidth = packetConsumerWidth;
+        *outHeight = packetConsumerHeight;
+    }
 }
 
 int VideoStream::largestBitrate() const
@@ -508,21 +502,12 @@ int VideoStream::largestBitrate() const
         return 0;
 
     int packetBitrate = 0;
+    m_packetConsumerManager.largestBitrate(&packetBitrate);
+
     int frameBitrate = 0;
-    std::weak_ptr<AbstractVideoConsumer>packetConsumer;
-    std::weak_ptr<AbstractVideoConsumer>frameConsumer;
+    m_frameConsumerManager.largestBitrate(&frameBitrate);
 
-    packetConsumer = m_packetConsumerManager.largestBitrate(&packetBitrate);
-    frameConsumer = m_frameConsumerManager.largestBitrate(&frameBitrate);
-
-    std::weak_ptr<AbstractVideoConsumer> videoConsumer = frameBitrate > packetBitrate 
-        ? frameConsumer
-        : packetConsumer;
-
-    if (videoConsumer.expired())
-        return 0; //< Should never happen
-
-    return videoConsumer.lock()->bitrate();
+    return frameBitrate > packetBitrate ? frameBitrate : packetBitrate;
 }
 
 void VideoStream::updateFpsUnlocked()
@@ -568,6 +553,9 @@ void VideoStream::updateBitrateUnlocked()
 
 void VideoStream::updateUnlocked()
 {   
+    if(consumersEmpty())
+        return;
+
     // Could call updateFpsUnlocked() and updateResolutionUnlcoked() here, but this way
     // closestHardwareConfiguration(), which queries hardware, only gets called once
     CodecParameters newParams = m_codecParams;
