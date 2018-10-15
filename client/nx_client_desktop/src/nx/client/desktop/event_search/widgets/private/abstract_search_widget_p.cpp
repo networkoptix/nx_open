@@ -118,6 +118,7 @@ AbstractSearchWidget::Private::Private(
         [this, q]()
         {
             m_mainModel->setLivePaused(!q->isVisible());
+            updateRibbonLiveMode();
         });
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
@@ -147,7 +148,7 @@ void AbstractSearchWidget::Private::setupModels()
     connect(m_mainModel.data(), &AbstractSearchListModel::liveChanged, this,
         [this](bool isLive)
         {
-            ui->ribbon->setLive(isLive);
+            updateRibbonLiveMode();
             if (isLive)
                 m_headIndicatorModel->setVisible(false);
         });
@@ -768,6 +769,12 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
                 q->resourcePool(), item.mixedString, item.cameraString));
         }
     }
+}
+
+void AbstractSearchWidget::Private::updateRibbonLiveMode()
+{
+    if ((m_mainModel->isLive() || m_mainModel->rowCount() == 0) && !m_mainModel->livePaused())
+        ui->ribbon->setLive(true);
 }
 
 void AbstractSearchWidget::Private::setFetchDirection(AbstractSearchListModel::FetchDirection value)

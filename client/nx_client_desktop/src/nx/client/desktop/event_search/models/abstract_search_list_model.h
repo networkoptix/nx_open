@@ -130,8 +130,8 @@ protected:
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime(); //< Time period of interest.
-    int m_maximumCount = 1000; //< Maximum item count.
-    int m_fetchBatchSize = 100; //< Item count acquired by one fetch.
+    int m_maximumCount = 500; //< Maximum item count.
+    int m_fetchBatchSize = 150; //< Item count acquired by one fetch.
     bool m_liveSupported = false; //< Whether underlying data store can be updated in live.
     bool m_live = false; //< Live mode enabled state.
     bool m_livePaused = false; //< Live mode paused state.

@@ -91,6 +91,8 @@ private:
 
     void updateDeviceDependentActions();
 
+    void updateRibbonLiveMode();
+
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;

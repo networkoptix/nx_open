@@ -420,14 +420,23 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
     if (m_liveReceptionActive == value)
         return;
 
-    NX_VERBOSE(q) << "Setting live reception" << (value? "active" : "inactive");
+    NX_VERBOSE(q) << "Setting live reception" << (value ? "active" : "inactive");
     m_liveReceptionActive = value;
+
     updateMetadataReceivers();
 }
 
 void AnalyticsSearchListModel::Private::processMetadata()
 {
-    setLiveReceptionActive(q->isLive() && !q->livePaused() && q->isOnline());
+    // Don't start receiving live data until first archive fetch is finished.
+    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || canFetch()))
+        return;
+
+    if (q->livePaused())
+        q->setLive(false);
+
+    setLiveReceptionActive(q->isLive() && q->isOnline());
+
     if (!m_liveReceptionActive)
         return;
 
@@ -452,9 +461,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     QList<DetectedObject> newObjects;
     QHash<QnUuid, int> newObjectIndices;
-
-    // TODO: FIXME: #vkutin Detect if there's a gap between loaded archive and live.
-    // Think what to do with it.
 
     for (const auto& packets: packetsBySource)
     {
@@ -523,14 +529,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     auto periodToCommit = QnTimePeriod::fromInterval(
         startTime(newObjects.front()), startTime(newObjects.back()));
-
-    // TODO: FIXME: #vkutin Clear if there is going to be a gap between live and archive?
-    // Think how to do it.
-    //if (???)
-    //{
-    //    periodToCommit.truncateFront(periodToCommit.startTimeMs + 1);
-    //    q->clear(); //< Otherwise there will be a gap between live and archive events.
-    //}
 
     q->addToFetchedTimeWindow(periodToCommit);
 
