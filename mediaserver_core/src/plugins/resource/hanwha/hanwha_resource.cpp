@@ -3769,7 +3769,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported))
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && isAudioEnabled())
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)
@@ -3839,4 +3839,3 @@ Ptz::Capabilities HanwhaResource::ptzCapabilities(nx::core::ptz::Type ptzType) c
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx
-
