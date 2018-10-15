@@ -27,6 +27,8 @@ DeviceAgent::DeviceAgent(Engine* engine):
     CommonVideoFrameProcessingDeviceAgent(engine, NX_DEBUG_ENABLE_OUTPUT),
     m_objectId{{0xB5,0x29,0x4F,0x25,0x4F,0xE6,0x46,0x47,0xB8,0xD1,0xA0,0x72,0x9F,0x70,0xF2,0xD1}}
 {
+    // TODO: #vkutin #mshevchenko Replace with true UUID generation when possible.
+    *reinterpret_cast<void**>(m_objectId.bytes + sizeof(m_objectId) - sizeof(void*)) = this;
 }
 
 std::string DeviceAgent::manifest()
