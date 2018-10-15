@@ -30,6 +30,6 @@ public:
 
 };
 
-using AbstractVideoDataReceptorPtr = QSharedPointer<VideoDataReceptor>;
+using AbstractVideoDataReceptorPtr = QSharedPointer<AbstractVideoDataReceptor>;
 
 } // namespace nx::mediaserver::analytics

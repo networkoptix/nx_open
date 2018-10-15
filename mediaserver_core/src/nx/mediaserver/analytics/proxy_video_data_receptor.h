@@ -6,7 +6,24 @@ namespace nx::mediaserver::analytics {
 
 class ProxyVideoDataReceptor: public AbstractVideoDataReceptor
 {
+public:
+    ProxyVideoDataReceptor(AbstractVideoDataReceptorPtr receptor);
+
+    void setProxiedReceptor(AbstractVideoDataReceptorPtr receptor);
+
+    virtual bool needsCompressedFrames() const override;
+    virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
+
+    virtual void putFrame(
+        const QnConstCompressedVideoDataPtr& compressedFrame,
+        const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
+
+private:
+    mutable QnMutex m_mutex;
+    AbstractVideoDataReceptorPtr m_proxiedReceptor;
 
 };
+
+using ProxyVideoDataReceptorPtr = QSharedPointer<ProxyVideoDataReceptor>;
 
 } // namespace nx::mediaserver::analytics

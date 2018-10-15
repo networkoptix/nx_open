@@ -16,7 +16,7 @@ class UniquePtr
 public:
     UniquePtr() = default;
     UniquePtr(RefCountable* refCountable):
-        m_ptr(refCountable, [](RefCountable* ptr) { ptr->releaseRef(); })
+        m_ptr(refCountable, [](nxpl::PluginInterface* ptr) { ptr->releaseRef(); })
     {
     }
     UniquePtr(UniquePtr&& other): m_ptr(std::move(other.m_ptr)) {}

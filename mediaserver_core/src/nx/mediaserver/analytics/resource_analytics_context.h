@@ -1,5 +1,7 @@
 #pragma once
 
+#if 0
+
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
@@ -80,7 +82,7 @@ public:
     ResourceAnalyticsContext();
     ~ResourceAnalyticsContext();
     friend class Manager;
-    
+
 private:
     /**
      * Registers a DeviceAgent. Takes ownership of deviceAgent and metadataHandler.
@@ -116,3 +118,5 @@ private:
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
+
+#endif

@@ -1,3 +1,5 @@
+#if 0
+
 #include "resource_analytics_context.h"
 
 #include <nx/utils/log/log.h>
@@ -154,3 +156,5 @@ bool ResourceAnalyticsContext::areDeviceAgentContextsInitialized() const
 } // namespace analytics
 } // namespace mediaserver
 } // namespace nx
+
+#endif

@@ -31,7 +31,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/resource/camera.h>
 
-using nx::mediaserver::analytics::VideoDataReceptor;
 using nx::mediaserver::analytics::AbstractVideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
@@ -114,7 +113,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        serverModule()->analyticsManager()->registerDataReceptor(
+        serverModule()->analyticsManager()->registerMetadataSink(
             getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
@@ -147,7 +146,7 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
     if (role == roleForAnalytics && serverModule())
     {
-        m_videoDataReceptor = serverModule()->analyticsManager()->createVideoDataReceptor(
+        m_videoDataReceptor = serverModule()->analyticsManager()->registerMediaSource(
             m_cameraRes->getId());
     }
 }
@@ -385,7 +384,7 @@ AbstractVideoDataReceptorPtr QnLiveStreamProvider::getVideoDataReceptorForMetada
     const QnCompressedVideoDataPtr& compressedFrame,
     bool* outNeedUncompressedFrame)
 {
-    VideoDataReceptorPtr videoDataReceptor;
+    AbstractVideoDataReceptorPtr videoDataReceptor;
     if (ini().enableMetadataProcessing)
     {
         const bool needToAnalyzeFrame = !ini().analyzeKeyFramesOnly

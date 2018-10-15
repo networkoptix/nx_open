@@ -22,7 +22,6 @@ AnalyticsPluginResource::AnalyticsPluginResource(QnMediaServerModule* serverModu
 
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
-    // TODO: #dmishin implement.
     NX_DEBUG(this, lm("Initializing analytics plugin resource %1 (%2)")
         .args(getName(), getId()));
 

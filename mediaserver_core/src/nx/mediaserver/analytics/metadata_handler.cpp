@@ -149,8 +149,8 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
     if (data.timestampUsec <= 0)
         NX_WARNING(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUsec);
 
-    if (m_dataReceptor && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
-        m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
+    if (m_metadataSink && data.timestampUsec >= 0) //< Warn about 0 but still accept it.
+        m_metadataSink->putData(nx::common::metadata::toMetadataPacket(data));
 
     if (m_visualDebugger)
         m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
@@ -213,14 +213,14 @@ void MetadataHandler::setManifest(const nx::vms::api::analytics::EngineManifest&
     m_manifest = manifest;
 }
 
-void MetadataHandler::registerDataReceptor(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::setMetadataSink(QnAbstractDataReceptor* dataReceptor)
 {
-    m_dataReceptor = dataReceptor;
+    m_metadataSink = dataReceptor;
 }
 
-void MetadataHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
+void MetadataHandler::removeMetadataSink(QnAbstractDataReceptor* dataReceptor)
 {
-    m_dataReceptor = nullptr;
+    m_metadataSink = nullptr;
 }
 
 void MetadataHandler::setVisualDebugger(

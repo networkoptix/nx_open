@@ -71,7 +71,6 @@ EnginePtr AnalyticsEngineResource::sdkEngine() const
 
 CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 {
-    // TODO: #dmishin implement
     NX_DEBUG(this, lm("Initializing analytics engine resource %1 (%2)")
         .args(getName(), getId()));
 

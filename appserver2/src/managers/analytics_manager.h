@@ -67,7 +67,7 @@ int AnalyticsManager<QueryProcessorType>::getAnalyticsPlugins(
 
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
         nx::vms::api::AnalyticsPluginDataList, decltype(queryDoneHandler)>(
-            ApiCommand::getAnalyticsPlugins, //< TODO: #dmishin replace when command is declared.
+            ApiCommand::getAnalyticsPlugins,
             QnUuid(),
             queryDoneHandler);
 
@@ -135,7 +135,7 @@ int AnalyticsManager<QueryProcessorType>::removeAnalyticsPlugin(
 {
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-        ApiCommand::removeAnalyticsPlugin, //< TODO: #dmishin replace with an actual command
+        ApiCommand::removeAnalyticsPlugin,
         nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
         {

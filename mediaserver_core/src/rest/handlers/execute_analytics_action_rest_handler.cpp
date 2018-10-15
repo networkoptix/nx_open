@@ -12,6 +12,7 @@
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/plugins/settings.h>
+#include <plugins/plugin_tools.h>
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):

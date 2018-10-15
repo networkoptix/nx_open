@@ -12,9 +12,13 @@
 
 #include <plugins/plugins_ini.h>
 
+#include <nx/sdk/analytics/pixel_format.h>
+
 namespace nx::mediaserver::sdk_support {
 
 namespace {
+
+nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
 /** @return Dir ending with "/", intended to receive manifest files. */
 static QString manifestFileDir()
@@ -159,6 +163,56 @@ void saveManifestToFile(
     const qint64 len = (qint64)strlen(manifest);
     if (f.write(manifest, len) != len)
         return log(Level::error, lit("Unable to write to file"));
+}
+
+std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
+    pixelFormatFromEngineManifest(const nx::vms::api::analytics::EngineManifest& manifest)
+{
+    using PixelFormat = nx::sdk::analytics::UncompressedVideoFrame::PixelFormat;
+    using Capability = nx::vms::api::analytics::EngineManifest::Capability;
+
+    int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
+    PixelFormat pixelFormat = PixelFormat::yuv420;
+
+    // To assert that all pixel formats are tested.
+    auto pixelFormats = nx::sdk::analytics::getAllPixelFormats();
+
+    auto checkCapability =
+        [&](Capability value, PixelFormat correspondingPixelFormat)
+        {
+            if (manifest.capabilities.testFlag(value))
+            {
+                ++uncompressedFrameCapabilityCount;
+                pixelFormat = correspondingPixelFormat;
+            }
+
+            // Delete the pixel format which has been tested.
+            auto it = std::find(pixelFormats.begin(), pixelFormats.end(), correspondingPixelFormat);
+            NX_ASSERT(it != pixelFormats.end());
+            pixelFormats.erase(it);
+        };
+
+    checkCapability(Capability::needUncompressedVideoFrames_yuv420, PixelFormat::yuv420);
+    checkCapability(Capability::needUncompressedVideoFrames_argb, PixelFormat::argb);
+    checkCapability(Capability::needUncompressedVideoFrames_abgr, PixelFormat::abgr);
+    checkCapability(Capability::needUncompressedVideoFrames_rgba, PixelFormat::rgba);
+    checkCapability(Capability::needUncompressedVideoFrames_bgra, PixelFormat::bgra);
+    checkCapability(Capability::needUncompressedVideoFrames_rgb, PixelFormat::rgb);
+    checkCapability(Capability::needUncompressedVideoFrames_bgr, PixelFormat::bgr);
+
+    NX_ASSERT(pixelFormats.empty());
+
+    NX_ASSERT(uncompressedFrameCapabilityCount >= 0);
+    if (uncompressedFrameCapabilityCount > 1)
+    {
+        NX_ERROR(kLogTag) << lm(
+            "More than one needUncompressedVideoFrames_... capability found"
+            "in Engine manifest of analytics plugin \"%1\"").arg(manifest.pluginId);
+    }
+    if (uncompressedFrameCapabilityCount != 1)
+        return std::nullopt;
+
+    return pixelFormat;
 }
 
 } // namespace nx::mediaserver::sdk_support

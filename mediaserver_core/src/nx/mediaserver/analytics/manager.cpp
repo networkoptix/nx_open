@@ -38,7 +38,6 @@
 #include <nx/sdk/analytics/pixel_format.h>
 #include <nx/sdk/analytics/plugin.h>
 
-#include "video_data_receptor.h"
 #include "yuv420_uncompressed_video_frame.h"
 #include "generic_uncompressed_video_frame.h"
 #include "wrapping_compressed_video_packet.h"
@@ -58,9 +57,9 @@ using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 Manager::Manager(QnMediaServerModule* serverModule):
     nx::mediaserver::ServerModuleAware(serverModule),
+    m_thread(new QThread(this)),
     m_visualMetadataDebugger(
-        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager)),
-    m_thread(new QThread(this))
+        VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::analyticsManager))
 {
     m_thread->setObjectName(lit("AnalyticsManager"));
     moveToThread(m_thread);
@@ -108,7 +107,7 @@ void Manager::initExistingResources()
         at_deviceAdded(device);
 }
 
-std::shared_ptr<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
+QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
 {
     auto contextItr = m_deviceAnalyticsContexts.find(deviceId);
     if (contextItr == m_deviceAnalyticsContexts.cend())
@@ -117,7 +116,7 @@ std::shared_ptr<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId)
     return contextItr->second;
 }
 
-std::shared_ptr<DeviceAnalyticsContext> Manager::context(
+QSharedPointer<DeviceAnalyticsContext> Manager::context(
     const QnVirtualCameraResourcePtr& device) const
 {
     return context(device->getId());
@@ -298,10 +297,13 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
         device, &QnResource::propertyChanged,
         this, &Manager::at_resourcePropertyChanged);
 
-    auto context = std::make_shared<DeviceAnalyticsContext>(serverModule(), device);
+    auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
     context->setEnabledAnalyticsEngines(device->enabledAnalyticsEngineResources());
     context->setMetadataSink(metadataSink(device));
-    context->setMediaSource(mediaSource(device));
+
+    if (auto source = mediaSource(device).toStrongRef())
+        source->setProxiedReceptor(context);
+
     m_deviceAnalyticsContexts.emplace(device->getId(), context);
 }
 
@@ -334,61 +336,31 @@ void Manager::registerMetadataSink(
     const QnResourcePtr& resource,
     QWeakPointer<QnAbstractDataReceptor> metadataSink)
 {
+    auto device = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!device)
+    {
+        NX_ERROR(this, "Can't register metadata sink for resource %1 (%2)",
+            resource->getName(), resource->getId());
+        return;
+    }
+
     m_metadataSinks[resource->getId()] = metadataSink;
-    auto analyticsContext = context(resource);
+    auto analyticsContext = context(device);
     if (analyticsContext)
         analyticsContext->setMetadataSink(metadataSink);
 }
 
-QWeakPointer<VideoDataReceptor> Manager::registerMediaSource(const QnUuid& resourceId)
+QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUuid& resourceId)
 {
-    QnMutexLocker lock(&m_contextMutex);
-    auto& context = m_contexts[id];
+    auto proxySource = QSharedPointer<ProxyVideoDataReceptor>::create(nullptr);
+    auto& analyticsContext = context(resourceId);
 
-    // Collect pixel formats required by at least one DeviceAgent.
-    VideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
-    bool needsCompressedFrames = false;
-    for (auto& deviceAgentContext : m_contexts[id].deviceAgentContexts())
-    {
-        nxpt::ScopedRef<ConsumingDeviceAgent> consumingDeviceAgent(
-            deviceAgentContext->deviceAgent()->queryInterface(IID_ConsumingDeviceAgent));
-        if (!consumingDeviceAgent)
-            continue;
+    if (analyticsContext)
+        proxySource->setProxiedReceptor(analyticsContext);
 
-        const boost::optional<PixelFormat> pixelFormat =
-            pixelFormatFromEngineManifest(deviceAgentContext->engineManifest());
-        if (!pixelFormat)
-            needsCompressedFrames = true;
-        else
-            neededUncompressedPixelFormats.insert(pixelFormat.get());
-    }
-
-    auto videoDataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
-        [this, id](
-            const QnConstCompressedVideoDataPtr& compressedFrame,
-            const CLConstVideoDecoderOutputPtr& uncompressedFrame)
-        {
-            if (!NX_ASSERT(compressedFrame))
-                return;
-            putVideoFrame(id, compressedFrame, uncompressedFrame);
-        },
-        needsCompressedFrames,
-        neededUncompressedPixelFormats));
-
-    context.setVideoDataReceptor(videoDataReceptor);
-    return videoDataReceptor.toWeakRef();
-
-
-
-
-
-
-
-    // TODO: #dmishin implement.
-    m_mediaSources[resourceId];
-    return nullptr;
+    m_mediaSources[resourceId] = proxySource;
+    return proxySource;
 }
-
 
 QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(
     const QnVirtualCameraResourcePtr& device) const
@@ -405,12 +377,13 @@ QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(const QnUuid& deviceI
     return itr->second;
 }
 
-QWeakPointer<VideoDataReceptor> Manager::mediaSource(const QnVirtualCameraResourcePtr& device) const
+QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(
+    const QnVirtualCameraResourcePtr& device) const
 {
     return mediaSource(device->getId());
 }
 
-QWeakPointer<VideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
+QWeakPointer<ProxyVideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) const
 {
     auto itr = m_mediaSources.find(deviceId);
     if (itr == m_mediaSources.cend())
@@ -419,588 +392,7 @@ QWeakPointer<VideoDataReceptor> Manager::mediaSource(const QnUuid& deviceId) con
     return itr->second;
 }
 
-
-// -----------------------------------------------------------------------------------------------
-// OLD UGLY CODE BELOW
-// -----------------------------------------------------------------------------------------------
-
 #if 0
-
-void Manager::createDeviceAgentsForResourceUnsafe(const QnVirtualCameraResourcePtr& camera)
-{
-
-
-    if (ini().enablePersistentAnalyticsDeviceAgent)
-    {
-        const auto itr = m_contexts.find(camera->getId());
-        if (itr != m_contexts.cend())
-        {
-            if (!itr->second.deviceAgentContexts().empty())
-                return;
-        }
-    }
-
-
-    QnMediaServerResourcePtr server = resourcePool()
-        ->getResourceById<QnMediaServerResource>(moduleGUID());
-    NX_ASSERT(server, lm("Can not obtain current server resource."));
-    if (!server)
-        return;
-
-    for (Engine* const engine: availableEngines())
-    {
-
-
-        // TODO: Consider assigning Engine settings earlier.
-        setEngineSettings(engine);
-
-
-        nxpt::ScopedRef<DeviceAgent> deviceAgent(
-            createDeviceAgent(camera, engine), /*increaseRef*/ false);
-        if (!deviceAgent)
-            continue;
-        boost::optional<nx::vms::api::analytics::EngineManifest> engineManifest =
-            loadEngineManifest(engine);
-        if (!engineManifest)
-            continue; //< The error is already logged.
-        assignEngineManifestToServer(*engineManifest, server);
-
-        boost::optional<nx::vms::api::analytics::DeviceAgentManifest> deviceAgentManifest;
-        boost::optional<nx::vms::api::analytics::EngineManifest> auxiliaryEngineManifest;
-        std::tie(deviceAgentManifest, auxiliaryEngineManifest) =
-            loadDeviceAgentManifest(engine, deviceAgent.get(), camera);
-        if (deviceAgentManifest)
-        {
-            // TODO: Fix: Camera property should receive a union of data from all plugins.
-            addManifestToCamera(*deviceAgentManifest, camera);
-        }
-        if (auxiliaryEngineManifest)
-        {
-            auxiliaryEngineManifest->pluginId = engineManifest->pluginId;
-            engineManifest = mergeEngineManifestToServer(*auxiliaryEngineManifest, server);
-        }
-
-        setDeviceAgentSettings(deviceAgent.get(), camera);
-
-        auto& context = m_contexts[camera->getId()];
-        std::unique_ptr<MetadataHandler> handler(
-            createMetadataHandler(camera, *engineManifest));
-
-        if (auto consumingDeviceAgent = nxpt::ScopedRef<DeviceAgent>(
-            deviceAgent->queryInterface(IID_DeviceAgent)))
-        {
-            handler->registerDataReceptor(&context);
-            handler->setVisualDebugger(m_visualMetadataDebugger.get());
-        }
-
-        context.addDeviceAgent(std::move(deviceAgent), std::move(handler), *engineManifest);
-    }
-}
-
-DeviceAgent* Manager::createDeviceAgent(
-    const QnVirtualCameraResourcePtr& camera,
-    Engine* engine) const
-{
-    NX_ASSERT(camera && engine);
-    if (!camera || !engine)
-        return nullptr;
-
-    NX_DEBUG(this, lm("Creating DeviceAgent for device %1 (%2).")
-        .args(camera->getUserDefinedName(), camera->getId()));
-
-    CameraInfo cameraInfo;
-    bool success = cameraInfoFromResource(camera, &cameraInfo);
-    if (!success)
-    {
-        NX_WARNING(this, lm("Cannot create resource info from resource %1 (%2)")
-            .args(camera->getUserDefinedName(), camera->getId()));
-        return nullptr;
-    }
-
-    NX_DEBUG(this, lm("Resource info for resource %1 (%2): %3")
-        .args(camera->getUserDefinedName(), camera->getId(), cameraInfo));
-
-    Error error = Error::noError;
-    const auto deviceAgent = engine->obtainDeviceAgent(&cameraInfo, &error);
-    if (!deviceAgent)
-    {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned null.")
-            .args(camera->getUserDefinedName(), camera->getId()));
-        return nullptr;
-    }
-    if (error != Error::noError)
-    {
-        NX_ERROR(this, lm("Cannot obtain DeviceAgent %1 (%2), plugin returned error %3.")
-            .args(camera->getUserDefinedName(), camera->getId()), error);
-        deviceAgent->releaseRef();
-        return nullptr;
-    }
-    return deviceAgent;
-}
-
-void Manager::releaseDeviceAgentsUnsafe(const QnVirtualCameraResourcePtr& camera)
-{
-    releaseDeviceAgentsUnsafe(camera->getId());
-}
-
-void Manager::releaseDeviceAgentsUnsafe(const QnUuid& cameraId)
-{
-    if (ini().enablePersistentAnalyticsDeviceAgent)
-        return;
-
-    auto& context = m_contexts[cameraId];
-    context.clearDeviceAgentContexts();
-    context.setDeviceAgentContextsInitialized(false);
-}
-
-MetadataHandler* Manager::createMetadataHandler(
-    const QnResourcePtr& resource,
-    const nx::vms::api::analytics::EngineManifest& manifest)
-{
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-    {
-        NX_ERROR(
-            this,
-            lm("Resource %1 (%2) is not an instance of SecurityCameResource")
-                .args(resource->getName(), resource->getId()));
-        return nullptr;
-    }
-
-    auto handler = new MetadataHandler(serverModule());
-    handler->setResource(camera);
-    handler->setManifest(manifest);
-
-    return handler;
-}
-
-void Manager::handleResourceChanges(const QnResourcePtr& resource)
-{
-    NX_ASSERT(resource);
-    if (!resource)
-        return;
-
-    NX_VERBOSE(
-        this,
-        lm("Handling resource changes for device %1 (%2)")
-            .args(resource->getName(), resource->getId()));
-
-    auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!camera)
-        return;
-
-    NX_DEBUG(
-        this,
-        lm("Creating DeviceAgents for device %1 (%2).")
-            .args(camera->getUserDefinedName(), camera->getId()));
-
-    QnMutexLocker lock(&m_contextMutex);
-    if (isDeviceAlive(camera))
-        updateOnlineDeviceUnsafe(camera);
-    else
-        updateOfflineDeviceUnsafe(camera);
-}
-
-void Manager::updateOnlineDeviceUnsafe(const QnVirtualCameraResourcePtr& device)
-{
-    auto deviceId = device->getId();
-    auto& context = m_contexts[deviceId];
-
-    if (!context.areDeviceAgentContextsInitialized())
-        createDeviceAgentsForResourceUnsafe(device);
-
-    auto events = serverModule()->analyticsEventRuleWatcher()->watchedEventsForResource(deviceId);
-    startFetchingMetadataForDeviceUnsafe(deviceId, context, events);
-}
-
-void Manager::updateOfflineDeviceUnsafe(const QnVirtualCameraResourcePtr& device)
-{
-    releaseDeviceAgentsUnsafe(device);
-}
-
-bool Manager::isDeviceAlive(const QnVirtualCameraResourcePtr& camera) const
-{
-    if (!camera)
-        return false;
-
-    const auto flags = camera->flags();
-
-    NX_VERBOSE(
-        this,
-        lm("Determining if metadata can be fetched from resource: "
-            "is foreign resource: %1, "
-            "is desktop camera: %2, "
-            "is resource status ok: %3")
-            .args(
-                flags.testFlag(Qn::foreigner),
-                flags.testFlag(Qn::desktop_camera),
-                (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording)));
-
-    if (flags.testFlag(Qn::foreigner) || flags.testFlag(Qn::desktop_camera))
-        return false;
-
-    return camera->getStatus() >= Qn::Online;
-}
-
-void Manager::startFetchingMetadataForDeviceUnsafe(
-    const QnUuid& resourceId,
-    ResourceAnalyticsContext& context,
-    const QSet<QString>& eventTypeIds)
-{
-    for (auto& deviceEngineContext: context.deviceAgentContexts())
-    {
-        if (eventTypeIds.empty() && !deviceEngineContext->isStreamConsumer())
-        {
-            NX_DEBUG(
-                this,
-                lm("Event list is empty, stopping metadata fetching for resource %1.")
-                    .arg(resourceId));
-
-            // Stop the thread to guarantee there is no 2 simultaneous calls.
-            deviceEngineContext->stop();
-
-            if (deviceEngineContext->deviceAgent()->stopFetchingMetadata() != Error::noError)
-            {
-                NX_WARNING(this, lm("Failed to stop fetching metadata from Engine %1")
-                    .arg(deviceEngineContext->engineManifest().pluginName.value));
-            }
-        }
-        else
-        {
-            NX_DEBUG(this, lm("Stopping metadata fetching for resource %1").args(resourceId));
-            if (deviceEngineContext->deviceAgent()->stopFetchingMetadata() != Error::noError)
-            {
-                NX_WARNING(this, lm("Failed to stop fetching metadata from Engine %1")
-                    .arg(deviceEngineContext->engineManifest().pluginName.value));
-            }
-
-            NX_DEBUG(this, lm("Starting metadata fetching for resource %1. Event list is %2")
-                .args(resourceId, eventTypeIds));
-
-            std::vector<std::string> eventTypeList;
-            std::vector<const char*> eventTypePtrs;
-            for (const auto& eventTypeId: eventTypeIds)
-            {
-                eventTypeList.push_back(eventTypeId.toStdString());
-                eventTypePtrs.push_back(eventTypeList.back().c_str());
-            }
-            const auto result = deviceEngineContext->deviceAgent()->startFetchingMetadata(
-                eventTypePtrs.empty() ? nullptr : &eventTypePtrs.front(),
-                (int) eventTypePtrs.size());
-
-            if (result != Error::noError)
-            {
-                NX_WARNING(this, lm("Failed to stop fetching metadata from Engine %1")
-                    .arg(deviceEngineContext->engineManifest().pluginName.value));
-            }
-        }
-    }
-}
-
-static uint qHash(const nx::vms::api::analytics::EventType& eventType) // noexcept
-{
-    return qHash(eventType.id);
-}
-
-
-
-// TODO: #mshevchenko: Rename to addDataFromDeviceAgentManifestToCameraResource().
-void Manager::addManifestToCamera(
-    const nx::vms::api::analytics::DeviceAgentManifest& manifest,
-    const QnVirtualCameraResourcePtr& camera)
-{
-    camera->setSupportedAnalyticsEventTypeIds(manifest.supportedEventTypes);
-    camera->saveParams();
-}
-
-
-
-
-
-
-
-void Manager::updateDeviceAnalytics(const QnVirtualCameraResourcePtr& device)
-{
-    NX_ASSERT(device);
-    if (!device)
-        return;
-
-    NX_VERBOSE(
-        this,
-        lm("Updating analytics state for device %1 (%2)")
-            .args(device->getName(), device->getId()));
-
-    QnMutexLocker lock(&m_contextMutex);
-    if (isDeviceAlive(device))
-        updateOnlineDeviceUnsafe(device);
-    else
-        updateOfflineDeviceUnsafe(device);
-}
-
-
-
-
-
-
-//--------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------
-
-boost::optional<nx::vms::api::analytics::EngineManifest> Manager::loadEngineManifest(
-    Engine* engine)
-{
-    Error error = Error::noError;
-    // TODO: #mshevchenko: Consider a dedicated mechanism for localization.
-
-    const char* const manifestStr = engine->manifest(&error);
-    if (error != Error::noError)
-    {
-        NX_ERROR(this, "Unable to receive Engine manifest for plugin \"%1\": %2.",
-            engine->plugin()->name(), error);
-        return boost::none;
-    }
-    if (manifestStr == nullptr)
-    {
-        NX_ERROR(this, "Received null Engine manifest for plugin \"%1\".",
-            engine->plugin()->name());
-        return boost::none;
-    }
-
-    if (pluginsIni().analyticsManifestOutputPath[0])
-    {
-        saveManifestToFile(
-            manifestStr,
-            "Engine",
-            engine->plugin()->name());
-    }
-
-    auto engineManifest = deserializeManifest<nx::vms::api::analytics::EngineManifest>(manifestStr);
-
-    if (!engineManifest)
-    {
-        NX_ERROR(this, "Cannot deserialize Engine manifest from plugin \"%1\"",
-            engine->plugin()->name());
-        return boost::none; //< Error already logged.
-    }
-
-    return engineManifest;
-}
-
-void Manager::assignEngineManifestToServer(
-    const nx::vms::api::analytics::EngineManifest& manifest,
-    const QnMediaServerResourcePtr& server)
-{
-    auto existingManifests = server->analyticsDrivers();
-    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
-        [&manifest](const nx::vms::api::analytics::EngineManifest& m)
-    {
-        return m.pluginId == manifest.pluginId;
-    });
-
-    if (it == existingManifests.cend())
-        existingManifests.push_back(manifest);
-    else
-        *it = manifest;
-
-    server->setAnalyticsDrivers(existingManifests);
-    server->saveParams();
-}
-
-nx::vms::api::analytics::EngineManifest Manager::mergeEngineManifestToServer(
-    const nx::vms::api::analytics::EngineManifest& manifest,
-    const QnMediaServerResourcePtr& server)
-{
-    nx::vms::api::analytics::EngineManifest* result = nullptr;
-    auto existingManifests = server->analyticsDrivers();
-    auto it = std::find_if(existingManifests.begin(), existingManifests.end(),
-        [&manifest](const nx::vms::api::analytics::EngineManifest& m)
-    {
-        return m.pluginId == manifest.pluginId;
-    });
-
-    if (it == existingManifests.cend())
-    {
-        existingManifests.push_back(manifest);
-        result = &existingManifests.back();
-    }
-    else
-    {
-        it->outputEventTypes = it->outputEventTypes.toSet().
-            unite(manifest.outputEventTypes.toSet()).toList();
-        result = &*it;
-    }
-
-    server->setAnalyticsDrivers(existingManifests);
-    server->saveParams();
-    NX_ASSERT(result);
-    return *result;
-}
-
-
-void Manager::issueMissingUncompressedFrameWarningOnce()
-{
-    auto logLevel = nx::utils::log::Level::verbose;
-    if (!m_uncompressedFrameWarningIssued)
-    {
-        m_uncompressedFrameWarningIssued = true;
-        logLevel = nx::utils::log::Level::warning;
-    }
-    NX_UTILS_LOG(logLevel, this, "Uncompressed frame requested but not received.");
-}
-
-void Manager::putVideoFrame(
-    const QnUuid& id,
-    const QnConstCompressedVideoDataPtr& compressedFrame,
-    const CLConstVideoDecoderOutputPtr& uncompressedFrame)
-{
-    if (!NX_ASSERT(compressedFrame))
-        return;
-
-    NX_VERBOSE(this, "putVideoFrame(\"%1\", compressedFrame, %2)", id,
-        uncompressedFrame ? "uncompressedFrame" : "/*uncompressedFrame*/ nullptr");
-
-    if (uncompressedFrame)
-        m_visualMetadataDebugger->push(uncompressedFrame);
-    else
-        m_visualMetadataDebugger->push(compressedFrame);
-
-    FrameConverter frameConverter(
-        [&]() { return compressedFrame; },
-        [&, this]()
-        {
-            if (!uncompressedFrame)
-                issueMissingUncompressedFrameWarningOnce();
-            return uncompressedFrame;
-        });
-
-    QnMutexLocker lock(&m_contextMutex);
-    for (auto& deviceAgentContexts: m_contexts[id].deviceAgentContexts())
-    {
-        if (!deviceAgentContexts->isStreamConsumer())
-            continue;
-
-        if (DataPacket* const dataPacket = frameConverter.getDataPacket(
-            pixelFormatFromEngineManifest(deviceAgentContexts->engineManifest())))
-        {
-            if (deviceAgentContexts->canAcceptData()
-                && NX_ASSERT(dataPacket->timestampUsec() >= 0))
-            {
-                deviceAgentContexts->putData(std::make_shared<DataPacketAdapter>(dataPacket));
-            }
-            else
-            {
-                NX_INFO(this, "Skipped video frame for %1 from camera %2: queue overflow.",
-                    deviceAgentContexts->engineManifest().pluginName.value, id);
-            }
-        }
-        else
-        {
-            NX_VERBOSE(this, "Video frame not sent to DeviceAgent: see the log above.");
-        }
-    }
-}
-
-boost::optional<PixelFormat> Manager::pixelFormatFromEngineManifest(
-    const nx::vms::api::analytics::EngineManifest& manifest)
-{
-    using Capability = nx::vms::api::analytics::EngineManifest::Capability;
-
-    int uncompressedFrameCapabilityCount = 0; //< To check there is 0 or 1 of such capabilities.
-    PixelFormat pixelFormat = PixelFormat::yuv420;
-    auto pixelFormats = getAllPixelFormats(); //< To assert that all pixel formats are tested.
-
-    auto checkCapability =
-        [&](Capability value, PixelFormat correspondingPixelFormat)
-        {
-            if (manifest.capabilities.testFlag(value))
-            {
-                ++uncompressedFrameCapabilityCount;
-                pixelFormat = correspondingPixelFormat;
-            }
-
-            // Delete the pixel format which has been tested.
-            auto it = std::find(pixelFormats.begin(), pixelFormats.end(), correspondingPixelFormat);
-            NX_ASSERT(it != pixelFormats.end());
-            pixelFormats.erase(it);
-        };
-
-    checkCapability(Capability::needUncompressedVideoFrames_yuv420, PixelFormat::yuv420);
-    checkCapability(Capability::needUncompressedVideoFrames_argb, PixelFormat::argb);
-    checkCapability(Capability::needUncompressedVideoFrames_abgr, PixelFormat::abgr);
-    checkCapability(Capability::needUncompressedVideoFrames_rgba, PixelFormat::rgba);
-    checkCapability(Capability::needUncompressedVideoFrames_bgra, PixelFormat::bgra);
-    checkCapability(Capability::needUncompressedVideoFrames_rgb, PixelFormat::rgb);
-    checkCapability(Capability::needUncompressedVideoFrames_bgr, PixelFormat::bgr);
-
-    NX_ASSERT(pixelFormats.empty());
-
-    NX_ASSERT(uncompressedFrameCapabilityCount >= 0);
-    if (uncompressedFrameCapabilityCount > 1)
-    {
-        NX_ERROR(this) << lm(
-            "More than one needUncompressedVideoFrames_... capability found"
-            "in Engine manifest of analytics plugin \"%1\"").arg(manifest.pluginId);
-    }
-    if (uncompressedFrameCapabilityCount != 1)
-        return boost::optional<PixelFormat>{};
-
-    return boost::optional<PixelFormat>(pixelFormat);
-}
-
-QWeakPointer<VideoDataReceptor> Manager::createVideoDataReceptor(const QnUuid& id)
-{
-    QnMutexLocker lock(&m_contextMutex);
-    auto& context = m_contexts[id];
-
-    // Collect pixel formats required by at least one DeviceAgent.
-    VideoDataReceptor::NeededUncompressedPixelFormats neededUncompressedPixelFormats;
-    bool needsCompressedFrames = false;
-    for (auto& deviceAgentContext: m_contexts[id].deviceAgentContexts())
-    {
-        nxpt::ScopedRef<ConsumingDeviceAgent> consumingDeviceAgent(
-            deviceAgentContext->deviceAgent()->queryInterface(IID_ConsumingDeviceAgent));
-        if (!consumingDeviceAgent)
-            continue;
-
-        const boost::optional<PixelFormat> pixelFormat =
-            pixelFormatFromEngineManifest(deviceAgentContext->engineManifest());
-        if (!pixelFormat)
-            needsCompressedFrames = true;
-        else
-            neededUncompressedPixelFormats.insert(pixelFormat.get());
-    }
-
-    auto videoDataReceptor = VideoDataReceptorPtr(new VideoDataReceptor(
-        [this, id](
-            const QnConstCompressedVideoDataPtr& compressedFrame,
-            const CLConstVideoDecoderOutputPtr& uncompressedFrame)
-        {
-            if (!NX_ASSERT(compressedFrame))
-                return;
-            putVideoFrame(id, compressedFrame, uncompressedFrame);
-        },
-        needsCompressedFrames,
-        neededUncompressedPixelFormats));
-
-    context.setVideoDataReceptor(videoDataReceptor);
-    return videoDataReceptor.toWeakRef();
-}
-
-void Manager::registerDataReceptor(
-    const QnResourcePtr& resource,
-    QWeakPointer<QnAbstractDataReceptor> dataReceptor)
-{
-    QnMutexLocker lock(&m_contextMutex);
-    const auto& id = resource->getId();
-
-    auto& context = m_contexts[id];
-    context.setMetadataDataReceptor(dataReceptor);
-}
-
-
-
-/-----------------------------------------------------------------------------------------------
-
 
 /** @return Empty settings if the file does not exist, or on error. */
 std::unique_ptr<const nx::plugins::SettingsHolder> Manager::loadSettingsFromFile(

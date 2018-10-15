@@ -8,6 +8,9 @@
 #include <nx/utils/log/log_level.h>
 
 #include <nx/sdk/common.h>
+#include <nx/sdk/analytics/uncompressed_video_frame.h>
+
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/plugins/settings.h>
 
@@ -49,6 +52,12 @@ std::optional<ManifestType> manifest(const SdkObjectPtr& sdkObject)
     return manifest<ManifestType>(manifestStr.get());
 }
 
+template<typename Interface, typename SdkObject>
+Interface* queryInterface(SdkObject sdkObject, const nxpl::NX_GUID& guid)
+{
+    return static_cast<Interface*>(sdkObject->queryInterface(guid));
+}
+
 analytics::SdkObjectPool* getSdkObjectPool(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(
@@ -63,5 +72,8 @@ void saveManifestToFile(
     const QString& fileDescription,
     const QString& pluginLibName,
     const QString& filenameExtraSuffix);
+
+std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
+    pixelFormatFromEngineManifest(const nx::vms::api::analytics::EngineManifest& manifest);
 
 } // namespace nx::mediaserver::sdk_support

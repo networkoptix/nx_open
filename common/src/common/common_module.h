@@ -338,7 +338,6 @@ private:
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
 
-    // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;
     std::atomic<bool> m_needToStop{false};
