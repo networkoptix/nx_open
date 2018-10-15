@@ -173,7 +173,7 @@ TEST(HostAddress, isIpAddress)
 
 #if 0 // TODO: #ak CLOUD-1124
 
-TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitely)
+TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitly)
 {
     HostAddress hostAddress("127.0.0.1");
 
@@ -181,7 +181,7 @@ TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitely)
     ASSERT_EQ(htonl(INADDR_LOOPBACK), hostAddress.ipV4()->s_addr);
 
     // In IPv6-only network every ipv4 address string MUST be resolved.
-    // So, it cannot be converted to an IP address implicitely.
+    // So, it cannot be converted to an IP address implicitly.
     ASSERT_FALSE(hostAddress.isIpAddress());
     ASSERT_NE(HostAddress::localhost, hostAddress);
     ASSERT_FALSE(static_cast<bool>(hostAddress.ipV6().first));
