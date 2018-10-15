@@ -270,8 +270,9 @@ QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const
 
 bool AbstractSearchListModel::isCameraApplicable(const QnVirtualCameraResourcePtr& camera) const
 {
-    return camera && accessController()->hasPermissions(camera,
-        Qn::ReadPermission | Qn::ViewContentPermission);
+    return camera && !camera->flags().testFlag(Qn::desktop_camera)
+        && accessController()->hasPermissions(camera,
+            Qn::ReadPermission | Qn::ViewContentPermission);
 }
 
 void AbstractSearchListModel::setFetchedTimeWindow(const QnTimePeriod& value)

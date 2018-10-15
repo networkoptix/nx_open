@@ -29,6 +29,11 @@ AbstractSearchListModel* AbstractSearchWidget::model() const
     return d->model();
 }
 
+void AbstractSearchWidget::goToLive()
+{
+    d->goToLive();
+}
+
 AbstractSearchWidget::Controls AbstractSearchWidget::relevantControls() const
 {
     return d->relevantControls();

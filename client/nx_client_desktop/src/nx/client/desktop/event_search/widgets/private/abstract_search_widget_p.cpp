@@ -533,6 +533,14 @@ AbstractSearchListModel* AbstractSearchWidget::Private::model() const
     return m_mainModel.data();
 }
 
+void AbstractSearchWidget::Private::goToLive()
+{
+    if (m_mainModel->liveSupported())
+        m_mainModel->setLive(true);
+
+    ui->ribbon->scrollBar()->setValue(0);
+}
+
 AbstractSearchWidget::Controls AbstractSearchWidget::Private::relevantControls() const
 {
     Controls result;

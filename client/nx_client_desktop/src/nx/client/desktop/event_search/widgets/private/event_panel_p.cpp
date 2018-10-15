@@ -58,12 +58,11 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_tabs->tabBar(), &QTabBar::tabBarDoubleClicked, this,
         [this](int index)
         {
-            if (m_tabs->currentIndex() != index || !m_tabs->currentWidget())
+            if (m_tabs->currentIndex() != index)
                 return;
 
-            // TODO: #vkutin Replace with some setLive(true).
-            if (auto ribbon = m_tabs->currentWidget()->findChild<EventRibbon*>())
-                ribbon->scrollBar()->setValue(0);
+            if (auto tab = qobject_cast<AbstractSearchWidget*>(m_tabs->currentWidget()))
+                tab->goToLive();
         });
 
     connect(q->accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,

@@ -41,6 +41,8 @@ public:
 
     AbstractSearchListModel* model() const;
 
+    void goToLive();
+
     Controls relevantControls() const;
     void setRelevantControls(Controls value);
 

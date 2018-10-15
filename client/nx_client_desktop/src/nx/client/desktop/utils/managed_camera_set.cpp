@@ -4,6 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::client::desktop {
 
@@ -123,6 +124,8 @@ void ManagedCameraSet::removeCamera(const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera || !m_cameras.contains(camera))
         return;
+
+    NX_VERBOSE(this) << "Camera removed from the pool:" << camera->getName();
 
     emit camerasAboutToBeChanged({});
 

@@ -39,6 +39,9 @@ public:
 
     AbstractSearchListModel* model() const;
 
+    /** Rewind to live. Discards loaded archive if neccessary. */
+    virtual void goToLive();
+
     /** Relevant controls in the tab. Irrelevant controls are hidden. */
     enum class Control
     {
