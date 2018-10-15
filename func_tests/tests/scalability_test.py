@@ -245,22 +245,61 @@ def wait_for_servers_synced(artifact_factory, config, env):
 
 # transactions ======================================================================================
 
+
+class CameraInfo(object):
+
+    def __init__(self, camera_id, status=False):
+        self.id = camera_id
+        self.status = status
+
+    @property
+    def status_str(self):
+        if self.status:
+            return 'Online'
+        else:
+            return 'Offline'
+
+
 @threadsafe_generator
-def transaction_generator(server_list):
+def transaction_generator(config, server_list):
 
     def server_generator(server):
-        camera_list = server.api.camera_list
+        server_id = server.api.get_server_id()
+        camera_list = [CameraInfo(d['id'])
+                       for d in server.api.generic.get('ec2/getCameras')
+                       if d['parentId'] == server_id]
+        for i, camera in enumerate(camera_list):
+            camera.status = bool(i % 2)
+
         for idx in itertools.count():
+
+            # change every camera status
+            for camera_idx, camera in enumerate(camera_list):
+                camera.status = not camera.status
+                description = 'to %s: status for #%d %s: %s' % (
+                    server.name, camera_idx, camera.id, camera.status_str)
+                params = dict(
+                    id=camera.id,
+                    status=camera.status_str,
+                    )
+                yield FunctionWithDescription(
+                    partial(server.api.generic.post, 'ec2/setResourceStatus', params),
+                    description,
+                    )
+
+            # set timestamp for one of cameras
+            camera_idx = idx % len(camera_list)
+            camera = camera_list[camera_idx]
             iso_datetime = datetime_local_now().isoformat()
+            value = '{}.{:02}.{}'.format(server.name, camera_idx, iso_datetime)
             param_list = [dict(
-                resourceId=camera.camera_id,
+                resourceId=camera.id,
                 name='scalability-stamp',
-                value='{}.{:02}.{}'.format(server.name, camera_idx, iso_datetime),
-                )
-                for camera_idx, camera in enumerate(camera_list)]
+                value=value,
+                )]
             yield FunctionWithDescription(
                 partial(server.api.generic.post, 'ec2/setResourceParams', param_list),
-                'to %s: %s' % (server.name, iso_datetime),
+                'to %s: stamp for #%d %s: %s' % (server.name, camera_idx, camera.id, value),
                 )
 
     return imerge(*(server_generator(server) for server in server_list))
@@ -338,7 +377,7 @@ def transactions_generated(metrics_saver, call_generator, rate, duration):
     def issue_transaction():
         fn = next(call_generator)
         with pacer.pace_call():
-            _post_stamp_logger.info('Post stamp %s', fn.description)
+            _post_stamp_logger.info('Post %s', fn.description)
             with ExitStack() as stack:
                 stack.enter_context(context_logger(_post_stamp_logger, 'framework.http_api'))
                 stack.enter_context(context_logger(_post_stamp_logger, 'framework.mediaserver_api'))
@@ -381,7 +420,7 @@ def transactions_generated(metrics_saver, call_generator, rate, duration):
 
 # post transactions and measure their propagation time
 def run_transactions(metrics_saver, load_averge_collector, config, env):
-    transaction_gen = transaction_generator(env.all_server_list)
+    transaction_gen = transaction_generator(config, env.all_server_list)
     transaction_rate = config.TRANSACTIONS_PER_SERVER_RATE * len(env.all_server_list)
     with ExitStack() as stack:
         stack.enter_context(transactions_generated(
