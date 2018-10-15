@@ -13,6 +13,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_history.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/nettools.h> /* For resolveAddress. */
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
@@ -659,8 +660,16 @@ QString StringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool
         }
     }
 
-    return QString("http://%1:%2/static/index.html#/view/%3?time=%4").arg(appServerUrl.host())
-        .arg(appServerUrl.port(80)).arg(camera->getId().toSimpleString()).arg(timeStampMs);
+    utils::Url url = network::url::Builder()
+        .setScheme(network::http::urlSheme(server->isSslAllowed()))
+        .setHost(appServerUrl.host())
+        .setPort(appServerUrl.port(80))
+        .setPath("/static/index.html")
+        .setFragment("/view/" + camera->getId().toSimpleString())
+        .setQuery(QString("time=%1").arg(timeStampMs));
+
+    NX_ASSERT(url.isValid());
+    return url.toString();
 }
 
 QString StringsHelper::toggleStateToString(EventState state) const
