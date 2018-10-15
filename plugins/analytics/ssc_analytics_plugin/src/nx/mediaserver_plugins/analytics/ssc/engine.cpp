@@ -27,7 +27,7 @@ namespace {
 
 static const QString kSerialPortsIniFilename = "SerialPorts.ini";
 
-static const QByteArray defaultConfiguration = 1+R"json(
+static const QByteArray defaultConfiguration = /*suppress newline*/1 + R"json(
 {
     "useAllPorts": false,
     "values":

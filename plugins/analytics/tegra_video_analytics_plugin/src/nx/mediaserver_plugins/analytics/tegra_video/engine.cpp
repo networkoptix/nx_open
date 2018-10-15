@@ -29,7 +29,7 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
 
 std::string Engine::manifest() const
 {
-    return 1+R"json(
+    return /*suppress newline*/1 + R"json(
 {
     "pluginId": "nx.tegraVideo",
     "pluginName": {

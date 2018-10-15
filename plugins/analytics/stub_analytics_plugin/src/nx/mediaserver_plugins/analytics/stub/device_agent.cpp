@@ -29,7 +29,7 @@ DeviceAgent::DeviceAgent(Engine* engine):
 
 std::string DeviceAgent::manifest()
 {
-    return 1+R"json(
+    return /*suppress newline*/1 + R"json(
 {
     "supportedEventTypeIds": [
         ")json" + kLineCrossingEventType + R"json(",
