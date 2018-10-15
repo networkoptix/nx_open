@@ -19,44 +19,52 @@ QnLayoutCryptoStream::~QnLayoutCryptoStream()
 
 bool QnLayoutCryptoStream::open(QIODevice::OpenMode openMode)
 {
-    // TODO: Add error-checking.
-    QnMutexLocker lock(&m_mutex);
-    close();
-    if (openMode & QIODevice::WriteOnly)
+    // Avoid deadlock if storage is accessed from another thread
+    QnMutexLocker storageLock(&m_storageResource.streamMutex());
     {
-        if (!m_storageResource.findOrAddStream(m_streamName))
+        // TODO: Add error-checking.
+        QnMutexLocker lock(&m_mutex);
+        close();
+        if (openMode & QIODevice::WriteOnly)
+        {
+            if (!m_storageResource.findOrAddStream(m_streamName))
+                return false;
+        }
+
+        QnLayoutFileStorageResource::Stream enclosure = m_storageResource.findStream(m_streamName);
+        if (!enclosure)
             return false;
+
+        setEnclosure(enclosure.position, enclosure.size); //< Setting crypto stream boundaries.
+        if (!CryptedFileStream::open(openMode))
+            return false;
+
+        m_storageResource.registerFile(this);
+        return true;
     }
-
-    QnLayoutFileStorageResource::Stream enclosure  = m_storageResource.findStream(m_streamName);
-    if (!enclosure)
-        return false;
-
-    setEnclosure(enclosure.position, enclosure.size); //< Setting crypto stream boundaries.
-    if (!CryptedFileStream::open(openMode))
-        return false;
-
-    m_storageResource.registerFile(this);
-    return true;
 }
 
 void QnLayoutCryptoStream::close()
 {
-    QnMutexLocker lock(&m_mutex);
+    // Avoid deadlock if storage is accessed from another thread
+    QnMutexLocker storageLock(&m_storageResource.streamMutex());
+    {
+        QnMutexLocker lock(&m_mutex);
 
-    const auto openMode = m_openMode;
-    const bool wasWriting = isWriting();
-    const qint64 totalSize = grossSize();
+        const auto openMode = m_openMode;
+        const bool wasWriting = isWriting();
+        const qint64 totalSize = grossSize();
 
-    CryptedFileStream::close(); //< Will change m_openMode. Unconditionally closes underlying file.
+        CryptedFileStream::close(); //< Will change m_openMode. Unconditionally closes underlying file.
 
-    if (openMode == NotOpen)
-        return;
+        if (openMode == NotOpen)
+            return;
 
-    if (wasWriting) // This definetly requires refactoring (VMS-11578).
-        m_storageResource.finalizeWrittenStream(m_enclosure.position + totalSize);
+        if (wasWriting) // This definitely requires refactoring (VMS-11578).
+            m_storageResource.finalizeWrittenStream(m_enclosure.position + totalSize);
 
-    m_storageResource.unregisterFile(this);
+        m_storageResource.unregisterFile(this);
+    }
 }
 
 void QnLayoutCryptoStream::lockFile()

@@ -24,6 +24,8 @@ private: //< These functions do nothing and should be overwritten as public, at 
     virtual void setPasswordToWrite(const QString& password) {}
     /** Drops password. */
     virtual void forgetPassword() {}
+    /** Returns password */
+    virtual QString password() { return {}; }
 };
 
 } // namespace utils

@@ -30,6 +30,7 @@
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
+#include <ini.h>
 
 namespace nx {
 namespace client {
@@ -564,6 +565,9 @@ void ExportSettingsDialog::updateWidgetsState()
             button->setState(SelectableTextButton::State::unselected);
         }
     }
+
+    if (!ini().enableEncryptedLayouts) //< Remove this before release.
+        m_passwordWidget->setVisible(false);
 }
 
 void ExportSettingsDialog::setMediaParams(

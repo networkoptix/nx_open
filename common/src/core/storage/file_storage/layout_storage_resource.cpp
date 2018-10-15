@@ -33,9 +33,16 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource(QnCommonModule* commonM
     base_type(commonModule),
     m_fileSync(QnMutex::Recursive)
 {
-    qDebug() << "QnLayoutFileStorageResource::QnLayoutFileStorageResource" << getUrl();
     QnMutexLocker lock(&m_storageSync);
     m_allStorages.insert(this);
+}
+
+QnLayoutFileStorageResource::QnLayoutFileStorageResource(
+    QnCommonModule* commonModule,
+    const QString& url)
+    : QnLayoutFileStorageResource(commonModule)
+{
+    QnLayoutFileStorageResource::setUrl(getFileName(url));
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
@@ -44,9 +51,9 @@ QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
     m_allStorages.remove(this);
 }
 
-QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
+QnStorageResource* QnLayoutFileStorageResource::instance(QnCommonModule* commonModule, const QString& url)
 {
-    return new QnLayoutFileStorageResource(commonModule);
+    return new QnLayoutFileStorageResource(commonModule, url);
 }
 
 bool QnLayoutFileStorageResource::isEncrypted() const
@@ -57,6 +64,16 @@ bool QnLayoutFileStorageResource::isEncrypted() const
 bool QnLayoutFileStorageResource::requiresPassword() const
 {
     return m_info.isCrypted && m_password.isEmpty();
+}
+
+bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
+{
+    if (m_info.isCrypted && checkPassword(password, m_info))
+    {
+        m_password = password;
+        return true;
+    }
+    return false;
 }
 
 void QnLayoutFileStorageResource::setPasswordToWrite(const QString& password)
@@ -78,19 +95,13 @@ void QnLayoutFileStorageResource::forgetPassword()
     m_password = QString();
 }
 
-bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
+QString QnLayoutFileStorageResource::password()
 {
-    if (m_info.isCrypted && checkPassword(password, m_info))
-    {
-        m_password = password;
-        return true;
-    }
-    return false;
+    return m_password;
 }
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
-    qDebug() << "QnLayoutFileStorageResource::setUrl" << value;
     NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
 
     setId(QnUuid::createUuid());
@@ -101,12 +112,17 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    qDebug() << "QnLayoutFileStorageResource::open" << getUrl() << url;
+    QnMutexLocker lock(&m_fileSync);
+
+    if (m_lockedOpenings) //< This is used when renaming or removing layout files.
+        return false;
+
     // Set Url if it does not exist yet.
     if (getUrl().isEmpty())
     {
+        NX_ASSERT(false, "Now url should be set before open."); //< Also we may lose password if we get here.
         NX_ASSERT(url.startsWith(kLayoutProtocol));
-        setUrl(url.left(url.indexOf(L'?')).remove(kLayoutProtocol));
+        setUrl(getFileName(url));
     }
 
 #ifdef _DEBUG
@@ -234,7 +250,10 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
         if (storageUrl == newName || storageUrl == oldName)
+        {
+            storage->lockOpenings();
             storage->closeOpenedFiles();
+        }
     }
 
     bool rez = true;
@@ -255,11 +274,13 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         if (storageUrl == newName)
         {
             storage->setUrl(newName); // update binary offsetvalue
+            storage->unlockOpenings();
             storage->restoreOpenedFiles();
         }
         else if (storageUrl == oldName)
         {
             storage->setUrl(newName);
+            storage->unlockOpenings();
             storage->restoreOpenedFiles();
         }
     }
@@ -492,12 +513,11 @@ void QnLayoutFileStorageResource::closeOpenedFiles()
         file->storeStateAndClose();
         file->unlockFile();
     }
-    m_index.entryCount = 0;
 }
 
 void QnLayoutFileStorageResource::restoreOpenedFiles()
 {
-    QnMutexLocker lock( &m_fileSync );
+    QnMutexLocker lock(&m_fileSync);
     for (auto file : m_cachedOpenedFiles)
     {
         file->lockFile();
@@ -522,6 +542,23 @@ QString QnLayoutFileStorageResource::stripName(const QString& fileName)
     return fileName.mid(fileName.lastIndexOf(L'?') + 1);
 }
 
+QString QnLayoutFileStorageResource::getFileName(const QString& url)
+{
+    return url.left(url.indexOf(L'?')).remove(kLayoutProtocol);
+}
+
+void QnLayoutFileStorageResource::lockOpenings()
+{
+    QnMutexLocker lock(&m_fileSync);
+    m_lockedOpenings = true;
+}
+
+void QnLayoutFileStorageResource::unlockOpenings()
+{
+    QnMutexLocker lock(&m_fileSync);
+    m_lockedOpenings = false;
+}
+
 // The one who requests to remove this function will become a permanent maintainer of this class.
 void QnLayoutFileStorageResource::dumpStructure()
 {
@@ -543,4 +580,9 @@ void QnLayoutFileStorageResource::dumpStructure()
             << "adjusted:" << hex << m_index.entries[i + 1].offset - m_index.entries[i].offset -
             strlen(actualFileName.data()) - 1;
     }
+}
+
+QnMutex& QnLayoutFileStorageResource::streamMutex()
+{
+    return m_fileSync;
 }

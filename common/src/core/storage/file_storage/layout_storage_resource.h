@@ -33,9 +33,11 @@ public:
     };
 
     QnLayoutFileStorageResource(QnCommonModule* commonModule);
+    QnLayoutFileStorageResource(QnCommonModule* commonModule, const QString& url);
+
     virtual ~QnLayoutFileStorageResource();
 
-    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
+    static QnStorageResource* instance(QnCommonModule* commonModule, const QString& url);
 
     /** Returns true if the layout file is actually encrypted. */
     virtual bool isEncrypted() const override;
@@ -47,6 +49,8 @@ public:
     virtual void setPasswordToWrite(const QString& password) override;
     /** Drops password. */
     virtual void forgetPassword() override;
+    /** Returns password */
+    virtual QString password() override;
 
     virtual void setUrl(const QString& value) override;
 
@@ -91,6 +95,8 @@ public:
 
     void dumpStructure();
 
+    QnMutex& streamMutex(); // This is used to prevent deadlock when using stream objects.
+
 private:
     bool readIndexHeader();
     bool writeIndexHeader();
@@ -104,6 +110,10 @@ private:
     bool shouldCrypt(const QString& streamName);
 
     static QString stripName(const QString& fileName); //< Returns part after '?'.
+    static QString getFileName(const QString& url); //< Strips protocol and parameters after '?'.
+
+    void lockOpenings(); //< Used when renaming or deleting to disable extra opens.
+    void unlockOpenings();
 
 private:
     StreamIndex m_index;
@@ -117,6 +127,7 @@ private:
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
 
     nx::core::layout::FileInfo m_info;
+    bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file. 
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;

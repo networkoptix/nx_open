@@ -218,6 +218,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     const QnLayoutResourcePtr& layout) const
 {
+    using namespace nx::client::desktop::ui::workbench;
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
@@ -226,21 +227,25 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
         : Qn::AllPermissions;
 
     // Some layouts are created with predefined permissions which are never changed.
-    QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
-    if (permissions.isValid() && permissions.canConvert<int>())
-        return (static_cast<Qn::Permissions>(permissions.toInt()) & readOnly) | Qn::ReadPermission;
+    QVariant presetPermissions = layout->data().value(Qn::LayoutPermissionsRole);
+    if (presetPermissions.isValid() && presetPermissions.canConvert<int>())
+        return (static_cast<Qn::Permissions>(presetPermissions.toInt()) & readOnly) | Qn::ReadPermission;
 
     // Deal with normal (non explicitly-authorized) files separately.
     if (layout->isFile())
     {
-        if(nx::client::desktop::ui::workbench::layout::requiresPassword(layout))
+        if(layout::requiresPassword(layout))
             return Qn::WriteNamePermission | Qn::ReadPermission;
 
-        return (layout->locked() ? ~Qn::AddRemoveItemsPermission : Qn::AllPermissions)
-            & (Qn::ReadWriteSavePermission
-                | Qn::AddRemoveItemsPermission
-                | Qn::EditLayoutSettingsPermission
-                | Qn::WriteNamePermission);
+        auto permissions = Qn::ReadWriteSavePermission
+            | Qn::AddRemoveItemsPermission
+            | Qn::EditLayoutSettingsPermission
+            | Qn::WriteNamePermission;
+
+        if (layout->locked() || layout::isEncrypted(layout))
+            permissions &= ~Qn::AddRemoveItemsPermission;
+
+        return permissions;
     }
 
     const auto loggedIn =  !m_user

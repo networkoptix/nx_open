@@ -247,3 +247,12 @@ void QnAviResource::forgetPassword()
     if (hadValidPassword)
         emit storageAccessChanged();
 }
+
+QString QnAviResource::password()
+{
+    auto fileStorage = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    if (fileStorage)
+        return fileStorage->password();
+
+    return {};
+}

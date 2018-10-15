@@ -71,6 +71,8 @@ public:
     virtual void setPasswordToWrite(const QString& password) override;
     /** Drops password. */
     virtual void forgetPassword() override;
+    /** Returns password. */
+    virtual QString password() override;
 
 signals:
     /** Fired when password is set or dropped. */

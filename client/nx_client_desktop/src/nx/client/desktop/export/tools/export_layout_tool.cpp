@@ -174,8 +174,9 @@ bool ExportLayoutTool::prepareStorage()
         QFile::remove(d->actualFilename);
     }
 
-    auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule());
-    fileStorage->setUrl(d->actualFilename);
+    auto fileStorage = new QnLayoutFileStorageResource(d->settings.layout->commonModule(),
+        d->actualFilename);
+
     if (d->settings.encryption.on)
         fileStorage->setPasswordToWrite(d->settings.encryption.password);
     d->storage = QnStorageResourcePtr(fileStorage);

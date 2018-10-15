@@ -54,42 +54,48 @@ qint64 QnLayoutPlainStream::writeData(const char* data, qint64 maxSize)
 
 bool QnLayoutPlainStream::open(QIODevice::OpenMode openMode)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_openMode = openMode;
-    if (openMode & QIODevice::WriteOnly)
+    QnMutexLocker storageLock(&m_storageResource.streamMutex());
     {
-        if (!m_storageResource.findOrAddStream(m_fileName))
+        QnMutexLocker lock(&m_mutex);
+        m_openMode = openMode;
+        if (openMode & QIODevice::WriteOnly)
+        {
+            if (!m_storageResource.findOrAddStream(m_fileName))
+                return false;
+
+            openMode |= QIODevice::ReadOnly;
+        }
+        m_file.setFileName(m_storageResource.getUrl());
+        if (!m_file.open(openMode))
             return false;
+        auto stream = m_storageResource.findStream(m_fileName);
+        if (!stream)
+            return false;
+        m_fileOffset = stream.position;
+        m_fileSize = stream.size;
 
-        openMode |= QIODevice::ReadOnly;
+        QIODevice::open(openMode);
+        seek(0);
+        m_storageResource.registerFile(this);
+        return true;
     }
-    m_file.setFileName(m_storageResource.getUrl());
-    if (!m_file.open(openMode))
-        return false;
-    auto stream = m_storageResource.findStream(m_fileName);
-    if (!stream)
-        return false;
-    m_fileOffset = stream.position;
-    m_fileSize = stream.size;
-
-    QIODevice::open(openMode);
-    seek(0);
-    m_storageResource.registerFile(this);
-    return true;
 }
 
 void QnLayoutPlainStream::close()
 {
-    QnMutexLocker lock(&m_mutex);
+    QnMutexLocker storageLock(&m_storageResource.streamMutex());
+    {
+        QnMutexLocker lock(&m_mutex);
 
-    m_file.close();
-    if (m_openMode & QIODevice::WriteOnly)
-        m_storageResource.finalizeWrittenStream(m_fileOffset + m_fileSize);
+        m_file.close();
+        if (m_openMode & QIODevice::WriteOnly)
+            m_storageResource.finalizeWrittenStream(m_fileOffset + m_fileSize);
 
-    m_openMode = NotOpen;
-    QIODevice::close();
+        m_openMode = NotOpen;
+        QIODevice::close();
 
-    m_storageResource.unregisterFile(this);
+        m_storageResource.unregisterFile(this);
+    }
 }
 
 void QnLayoutPlainStream::lockFile()
