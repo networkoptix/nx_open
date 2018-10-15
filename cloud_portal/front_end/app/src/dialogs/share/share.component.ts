@@ -67,23 +67,25 @@ export class ShareModalContent {
     doShare() {
         this.user.role = this.selectedPermission;
 
-        if (!this.user.role.permissions) {
-            this.user.role.permissions = this.accessRoles.filter((role) => {
-                if (this.user.role.name === role.name) {
-                    return role;
-                }
-            })[0].permissions;
-        }
-
         return this.system.saveUser(this.user, this.user.role);
     }
 
     ngOnInit() {
         this.title = (!this.user) ? this.language.sharing.shareTitle : this.language.sharing.editShareTitle;
         this.buttonText = this.language.sharing.shareConfirmButton;
-        this.isNewShare = !this.user;
+        this.isNewShare = false;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
+        if (!this.user) {
+            this.isNewShare = true;
+            this.user = {
+                email    : '',
+                isEnabled: true,
+                role     : {
+                    name       : 'Viewer',
+                    permissions: 'GlobalAccessAllMediaPermission|GlobalExportPermission|GlobalViewArchivePermission|GlobalViewBookmarksPermission'
+                }
+            };
+        }
 
         if (!this.user.role) {
             this.user.role = this.system.findAccessRole(this.user);
