@@ -273,7 +273,7 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
     const QByteArray primaryColor = color("light10");
     const QByteArray secondaryColor = color("light4");
 
-    auto replaced =
+    auto colorized =
         [&](const QString& primary, const QString& secondary)
         {
             QByteArray result = baseData;
@@ -283,10 +283,10 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
             return result;
         };
 
-    builder.addSvg(replaced("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
-    builder.addSvg(replaced("light4", "light1"), QnIcon::Selected, QnIcon::Off);
-    builder.addSvg(replaced("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
-    builder.addSvg(replaced("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
+    builder.addSvg(colorized("dark14", "dark17"), QnIcon::Disabled, QnIcon::Off);
+    builder.addSvg(colorized("light4", "light1"), QnIcon::Selected, QnIcon::Off);
+    builder.addSvg(colorized("brand_core", "brand_l2"), QnIcon::Active, QnIcon::Off);
+    builder.addSvg(colorized("red_l2", "red_l3"), QnIcon::Error, QnIcon::Off);
 
     //loadCustomIcons(skin, &builder, basePath, name, checkedName, suffixes);
 
