@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2 } from '@angular/core';
-import { NgbModal, NgbActiveModal, NgbModalRef }                          from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                                 from '@angular/forms';
-import { NxModalGenericComponent }                                        from '../generic/generic.component';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2, SimpleChanges, OnChanges } from '@angular/core';
+import { NgbModal, NgbActiveModal, NgbModalRef }                                                    from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                                                           from '@angular/forms';
+import { NxModalGenericComponent }                                                                  from '../generic/generic.component';
 
 @Component({
     selector: 'nx-modal-share-content',
@@ -51,30 +51,9 @@ export class ShareModalContent {
         return this.language.accessRoles.customRole.description;
     }
 
-    setPermission(role: string) {
-        this.selectedPermission = this.accessRoles.filter((accessRole) => {
-            if (accessRole.name === role) {
-                return role;
-            }
-        })[0];
-
+    setPermission(role: any) {
+        this.selectedPermission = role;
         this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
-    }
-
-    processAccessRoles() {
-        const roles = this.system.accessRoles || this.configService.config.accessRoles.predefinedRoles;
-        this.accessRoles = roles.filter((role) => {
-            if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
-                role.optionLabel = this.language.accessRoles[role.name].label || role.name;
-                return role;
-            }
-
-            return false;
-        });
-
-        if (!this.user.role) {
-            this.user.role = this.system.findAccessRole(this.user);
-        }
     }
 
     formatUserName() {
@@ -105,7 +84,12 @@ export class ShareModalContent {
         this.isNewShare = !this.user;
 
         this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
+
+        if (!this.user.role) {
+            this.user.role = this.system.findAccessRole(this.user);
+        }
         this.selectedPermission = this.user.role;
+        this.accessDescription = this.getRoleDescription();
 
         if (!this.isNewShare) {
             this.account
@@ -127,12 +111,6 @@ export class ShareModalContent {
 
             this.buttonText = this.language.sharing.editShareConfirmButton;
         }
-
-        // give system's access role to update
-        setTimeout(() => {
-            this.processAccessRoles();
-            this.accessDescription = this.getRoleDescription();
-        }, 200);
 
         this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {
