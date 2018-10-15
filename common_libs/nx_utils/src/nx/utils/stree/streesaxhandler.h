@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <stack>
+#include <tuple>
 
 #include <QtXml/QXmlDefaultHandler>
 
@@ -58,6 +59,15 @@ private:
         skippingNode
     };
 
+    enum class ResultCode
+    {
+        ok,
+        missingAttribute,
+        unknownResource,
+        unknownNodeType,
+        other,
+    };
+
     std::stack<AbstractNode*> m_nodes;
     mutable QString m_errorDescription;
     State m_state;
@@ -65,9 +75,18 @@ private:
     std::unique_ptr<AbstractNode> m_root;
     const ResourceNameSet& m_resourceNameSet;
 
-    std::unique_ptr<AbstractNode> createNode( const QString& nodeName, const QXmlAttributes& atts ) const;
-    template<typename T> std::unique_ptr<AbstractNode> createConditionNode( MatchType::Value matchType, int matchResID ) const;
-    std::unique_ptr<AbstractNode> createConditionNodeForStringRes( MatchType::Value matchType, int matchResID ) const;
+    std::tuple<std::unique_ptr<AbstractNode>, ResultCode> createNode(
+        const QString& nodeName,
+        const QXmlAttributes& atts) const;
+
+    template<typename T>
+    std::unique_ptr<AbstractNode> createConditionNode(
+        MatchType::Value matchType,
+        int matchResID) const;
+
+    std::unique_ptr<AbstractNode> createConditionNodeForStringRes(
+        MatchType::Value matchType,
+        int matchResID) const;
 };
 
 } // namespace stree

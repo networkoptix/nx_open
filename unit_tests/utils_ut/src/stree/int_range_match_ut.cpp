@@ -1,81 +1,30 @@
-/**********************************************************
-* Aug 18, 2016
-* akolesnikov
-***********************************************************/
-
 #include <cstring>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "test_fixture.h"
 
-#include <QtCore/QBuffer>
-
-#include <nx/utils/stree/stree_manager.h>
-
-
-namespace nx {
-namespace utils {
-namespace stree {
+namespace nx::utils::stree::test {
 
 using ::nx::utils::stree::AbstractNode;
 using ::nx::utils::stree::ResourceContainer;
 using ::nx::utils::stree::ResourceNameSet;
 using ::nx::utils::stree::StreeManager;
 
-class StreeTest
-:
-    public ::testing::Test
-{
-public:
-    enum Attributes
-    {
-        intAttr = 1,
-        strAttr,
-        outAttr,
-    };
-
-    StreeTest()
-    {
-        m_nameSet.registerResource(intAttr, "intAttr", QVariant::Int);
-        m_nameSet.registerResource(strAttr, "strAttr", QVariant::String);
-        m_nameSet.registerResource(outAttr, "outAttr", QVariant::String);
-    }
-
-protected:
-    bool prepareTree(const char* xmlDataStr)
-    {
-        auto xmlData = QByteArray::fromRawData(xmlDataStr, std::strlen(xmlDataStr));
-        QBuffer xmlDataSource(&xmlData);
-        m_streeRoot = StreeManager::loadStree(&xmlDataSource, m_nameSet);
-        return m_streeRoot != nullptr;
-    }
-
-    const std::unique_ptr<AbstractNode>& streeRoot() const
-    {
-        return m_streeRoot;
-    }
-
-private:
-    ResourceNameSet m_nameSet;
-    std::unique_ptr<AbstractNode> m_streeRoot;
-};
-
-class StreeRangeMatch
-:
-    public StreeTest
+class StreeRangeMatch:
+    public StreeFixture
 {
 protected:
     std::string getOutAttr(std::string strAttrVal)
     {
         ResourceContainer intputData;
-        intputData.put(StreeTest::strAttr, QString::fromStdString(strAttrVal));
+        intputData.put(Attributes::strAttr, QString::fromStdString(strAttrVal));
         return getOutAttr(intputData);
     }
         
     std::string getOutAttr(int intAttrVal)
     {
         ResourceContainer intputData;
-        intputData.put(StreeTest::intAttr, intAttrVal);
+        intputData.put(Attributes::intAttr, intAttrVal);
         return getOutAttr(intputData);
     }
 
@@ -83,11 +32,13 @@ protected:
     {
         ResourceContainer outputData;
         streeRoot()->get(::nx::utils::stree::MultiSourceResourceReader(intputData, outputData), &outputData);
-        if (auto outVal = outputData.get<std::string>(StreeTest::outAttr))
+        if (auto outVal = outputData.get<std::string>(Attributes::outAttr))
             return *outVal;
         return std::string();
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 TEST_F(StreeRangeMatch, intValue)
 {
@@ -152,6 +103,4 @@ TEST_F(StreeRangeMatch, strValue)
     ASSERT_EQ("default", getOutAttr("ff"));
 }
 
-}   // namespace stree
-}   // namespace utils
-}   // namespace nx
+} // namespace nx::utils::stree::test
