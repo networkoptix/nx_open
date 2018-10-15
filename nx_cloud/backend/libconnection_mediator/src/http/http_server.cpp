@@ -116,8 +116,10 @@ bool Server::launchHttpServerIfNeeded(
             settings.https().endpoints))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
-            .arg(SystemError::toString(osErrorCode)), cl_logERROR);
+        NX_ERROR(this, lm("Failed to bind HTTP server to address(-es) %1, %2. %3")
+            .container(settings.http().addrToListenList)
+            .container(settings.https().endpoints)
+            .args(SystemError::toString(osErrorCode)));
         return false;
     }
 
@@ -125,6 +127,7 @@ bool Server::launchHttpServerIfNeeded(
         [&settings](nx::network::http::HttpStreamSocketServer* server)
         {
             server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
+            server->setConnectionInactivityTimeout(settings.http().connectionInactivityTimeout);
         });
 
     m_discoveryHttpServer = std::make_unique<nx::cloud::discovery::HttpServer>(
