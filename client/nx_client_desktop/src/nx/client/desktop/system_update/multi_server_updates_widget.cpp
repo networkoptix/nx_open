@@ -1668,6 +1668,7 @@ QString MultiServerUpdatesWidget::toString(ClientUpdateTool::State state)
         case ClientUpdateTool::State::applauncherError:
             return "applauncherError";
     }
+    return QString();
 }
 
 } // namespace nx::client::desktop
