@@ -10,6 +10,9 @@ Force Tags        System
 ${email}           ${EMAIL OWNER}
 ${password}        ${BASE PASSWORD}
 ${url}             ${ENV}
+${DELETE USER BUTTON ADMIN}               //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
+${EDIT USER BUTTON ADMIN}                 //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+${ADMIN USER IN LIST}                     //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
 ${share dialogue}
 
 *** Keywords ***
@@ -152,12 +155,12 @@ displays pencil and cross links for each user only on hover
 admin cannot delete or edit self
     [tags]    C41904
     Log in to Auto Tests System    ${EMAIL ADMIN}
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
-    Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
-    Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
-    Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL ADMIN}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
+    Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
+    Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
+    Wait Until Element Is Visible    ${ADMIN USER IN LIST}
+    Mouse Over    ${ADMIN USER IN LIST}
+    Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
+    Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
 
 admin cannot delete or edit other admins
     [tags]    C41905
