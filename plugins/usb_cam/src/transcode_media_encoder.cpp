@@ -71,15 +71,13 @@ int TranscodeMediaEncoder::setFps(const float& fps, float* selectedFps)
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
     if (!m_streamReader)
-    {
-        std::unique_ptr<StreamReaderPrivate> transcoder = std::make_unique<TranscodeStreamReader>(
-            m_encoderIndex,
-            m_codecParams,
-            m_camera);
-        
+    {        
         m_streamReader.reset(new StreamReader(
             &m_refManager,
-            std::move(transcoder)));
+            m_encoderIndex,
+            m_codecParams,
+            m_camera,
+            true /*forceTranscoding*/));
     }
 
     m_streamReader->addRef();

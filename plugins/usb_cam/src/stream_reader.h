@@ -32,11 +32,10 @@ public:
         nxpt::CommonRefManager* const parentRefManager,
         int encoderIndex,
         const CodecParameters& codecParams,
-        const std::shared_ptr<Camera>& camera);
+        const std::shared_ptr<Camera>& camera,
+        bool forceTranscoding);
 
-    StreamReader(
-        nxpt::CommonRefManager* const parentRefManager,
-        std::unique_ptr<StreamReaderPrivate> streamReader);
+    virtual ~StreamReader() = default;
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
     virtual unsigned int addRef() override;

@@ -25,11 +25,13 @@ StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderIndex,
     const CodecParameters& codecParams,
-    const std::shared_ptr<Camera>& camera)
+    const std::shared_ptr<Camera>& camera,
+    bool forceTranscoding)
     :
     m_refManager(parentRefManager)
 {
-    if (codecParams.codecId == AV_CODEC_ID_NONE) // needs transcoding to a supported codec
+    // needs transcoding to a supported codec
+    if (forceTranscoding || codecParams.codecId == AV_CODEC_ID_NONE)
         m_streamReader.reset(new TranscodeStreamReader(
         encoderIndex,
         codecParams,
@@ -39,15 +41,6 @@ StreamReader::StreamReader(
         encoderIndex,
         codecParams,
         camera));
-}
-
-StreamReader::StreamReader(
-    nxpt::CommonRefManager* const parentRefManager,
-    std::unique_ptr<StreamReaderPrivate> streamReader)
-    :
-    m_refManager(parentRefManager),
-    m_streamReader(std::move(streamReader))
-{
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )

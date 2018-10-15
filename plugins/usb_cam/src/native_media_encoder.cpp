@@ -43,7 +43,8 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
             &m_refManager,
             m_encoderIndex,
             m_codecParams,
-            m_camera));
+            m_camera,
+            false /*forceTranscoding*/));
     }
 
     m_streamReader->addRef();
