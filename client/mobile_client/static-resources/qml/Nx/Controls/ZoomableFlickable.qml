@@ -28,10 +28,16 @@ Item
     property real allowedTopMargin: 0
     property real allowedBottomMargin: 0
 
+    property bool allowCompositeEvents: true
+
     readonly property alias flickable: flick
     readonly property real contentScale: Geometry.scaleFactor(
         Qt.size(width, height), Qt.size(contentWidth, contentHeight))
 
+    signal pressed(int mouseX, int mouseY)
+    signal released()
+    signal positionChanged(int mouseX, int mouseY)
+    signal cancelled()
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
 
@@ -63,7 +69,10 @@ Item
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
 
-        interactive: !mouseArea.doubleTapScaleMode
+        interactive:
+            !mouseArea.doubleTapScaleMode
+            && (mouseArea.doubleTapDownPos ? false : true)
+            && rootItem.allowCompositeEvents
 
         Item
         {
@@ -356,12 +365,6 @@ Item
 
             propagateComposedEvents: true
 
-            onDoubleTapDownPosChanged:
-            {
-                // doubleTapDownPos can be "undefined".
-                flick.interactive = doubleTapDownPos ? false : true
-            }
-
             onDoubleTapScaleModeChanged:
             {
                 if (doubleTapScaleMode)
@@ -377,6 +380,8 @@ Item
 
             onPositionChanged:
             {
+                rootItem.positionChanged(mouse.x, mouse.y)
+
                 if (!doubleTapDownPos)
                     return
 
@@ -388,7 +393,8 @@ Item
                 {
                     var minDoubleTapStartLength = 15
                     if (currentVector.length() > minDoubleTapStartLength)
-                        doubleTapScaleMode = true
+                        doubleTapScaleMode = rootItem.allowCompositeEvents
+
                 }
 
                 if (!doubleTapScaleMode)
@@ -403,7 +409,7 @@ Item
             onDoubleClicked:
             {
                 clickFilterTimer.stop()
-                doubleClickFilter.restart();
+                doubleClickFilterTimer.restart();
 
                 var mousePosition = Qt.point(mouseX, mouseY)
                 if (rootItem.doubleTapStartCheckFuncion
@@ -413,20 +419,26 @@ Item
                 }
             }
 
+            onPressed: rootItem.pressed(mouse.x, mouse.y)
+
             onCanceled:
             {
+                rootItem.cancelled()
+
                 doubleTapScaleMode = false
                 doubleTapDownPos = undefined
             }
 
             onReleased:
             {
+                rootItem.released()
+
                 doubleTapScaleMode = false
                 doubleTapDownPos = undefined
-                if (!doubleClickFilter.running)
+                if (!doubleClickFilterTimer.running)
                     return
 
-                doubleClickFilter.stop()
+                doubleClickFilterTimer.stop()
                 rootItem.doubleClicked(mouse.x, mouse.y)
             }
 
@@ -443,7 +455,7 @@ Item
 
             Timer
             {
-                id: doubleClickFilter
+                id: doubleClickFilterTimer
                 interval: 300
             }
 

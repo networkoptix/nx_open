@@ -28,6 +28,7 @@ ZoomableFlickable
         onResourceIdChanged: to1xScale()
     }
 
+    allowCompositeEvents: !motionSearchController.drawingRoi
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
@@ -157,6 +158,26 @@ ZoomableFlickable
         height: contentHeight
 
         onSourceSizeChanged: fitToBounds()
+
+        MotionController
+        {
+            id: motionSearchController
+
+            anchors.fill: parent
+            parent: content.videoOutput
+            Connections
+            {
+                target: zf
+
+                onPressed: motionSearchController.handlePressed(
+                    zf.mapToItem(motionSearchController, mouseX, mouseY))
+                onReleased: motionSearchController.handleReleased()
+                onPositionChanged: motionSearchController.handlePositionChanged(
+                    zf.mapToItem(motionSearchController, mouseX, mouseY))
+                onCancelled: motionSearchController.handleCancelled()
+                onDoubleClicked: motionSearchController.handleCancelled()
+            }
+        }
     }
 
     onWidthChanged: fitToBounds()
