@@ -268,9 +268,11 @@ std::shared_ptr<ffmpeg::Packet> TranscodeStreamReader::nextPacket(int * outNxErr
     }
     
     // Audio enabled
-    if (!waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeOut)
+    for(;;)
     {
-        if (interrupted() || ioError())
+        if (waitForTimeSpan(m_camera->videoStream()->actualTimePerFrame(), kWaitTimeOut))
+            break;
+        else if (interrupted() || ioError())
             return nullptr;
     }
 

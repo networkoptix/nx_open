@@ -1,7 +1,5 @@
 #include "native_stream_reader.h"
 
-#include <memory>
-
 #include <nx/utils/log/log.h>
 
 #include "ffmpeg/codec.h"
@@ -104,13 +102,12 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
     {
         for(;;)
         {
-            if (!m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeOut))
-            {
-                if (m_interrupted || m_camera->videoStream()->ioError())
+            // the time span keeps audio and video timestamps monotonic
+            if (m_avConsumer->waitForTimeSpan(kStreamDelay, kWaitTimeOut))
+                break;
+            else if (m_interrupted || m_camera->videoStream()->ioError())
                     return nullptr;
             }            
-            break;
-        }
     }
 
     for(;;)
