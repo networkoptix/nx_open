@@ -50,4 +50,46 @@ TEST_F(Https, mediator_accepts_https)
     assertRequestOverHttpsWorks();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class Http:
+    public MediatorFunctionalTest
+{
+public:
+    Http()
+    {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        addArg("--http/connectionInactivityTimeout=1ms");
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    void establishTcpConnection()
+    {
+        m_connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_connection->connect(httpEndpoint(), network::kNoTimeout));
+    }
+
+    void assertConnectionIsClosedByMediator()
+    {
+        std::array<char, 64> readBuffer;
+        ASSERT_EQ(0, m_connection->recv(readBuffer.data(), readBuffer.size()));
+    }
+
+private:
+    std::unique_ptr<network::AbstractStreamSocket> m_connection;
+};
+
+TEST_F(Http, connection_is_closed_by_inactivity_timer)
+{
+    establishTcpConnection();
+    assertConnectionIsClosedByMediator();
+}
+
 } // namespace nx::hpm::test
