@@ -257,12 +257,12 @@ DWC-MPA20M:
 
 # Needs a reboot every time. Camera is VERY BUGGY!
 DWC-MD421D_1.1.1.8:
-  discovery if False: # Camera needs firmware upgrade to v.1.1.2.x
+  discovery:
     physicalId: 00-1C-A6-01-21-97
     vendor: Digital Watchdog
     model: DWC-MD421D
 
-  authorization:
+  authorization if False: # Camera needs firmware upgrade to v.1.1.2.x
     password: auto
 
   attributes:

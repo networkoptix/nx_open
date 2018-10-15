@@ -1,7 +1,7 @@
 import logging
 import time
 import timeit
-from datetime import datetime, timedelta
+from datetime import timedelta
 from collections import OrderedDict
 from fnmatch import fnmatch
 

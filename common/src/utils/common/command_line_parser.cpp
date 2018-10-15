@@ -213,7 +213,7 @@ bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *error
             }
             else
             {
-                value = argument;
+                value = arguments[pos];
             }
         }
 

@@ -146,9 +146,9 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showInfoButton->setIcon(qnSkin->icon(
-        "text_buttons/text.png"));
+        "text_buttons/text.png", "text_buttons/text_selected.png"));
     ui->showPreviewsButton->setIcon(qnSkin->icon(
-        "text_buttons/image.png"));
+        "text_buttons/image.png", "text_buttons/image_selected.png"));
 
     const auto updateInformationToolTip =
         [this]()
