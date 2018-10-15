@@ -63,7 +63,6 @@
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
 #include <ui/workbench/handlers/workbench_text_overlays_handler.h>
-#include <nx/client/desktop/analytics/analytics_action_handler.h>
 #include <nx/client/desktop/radass/radass_action_handler.h>
 #include <ui/workbench/handlers/workbench_wearable_handler.h>
 #include <ui/workbench/handlers/startup_actions_handler.h>
@@ -254,7 +253,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchWearableHandler>();
     context->instance<workbench::LayoutToursHandler>();
     context->instance<RadassActionHandler>();
-    context->instance<AnalyticsActionHandler>();
     context->instance<StartupActionsHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
