@@ -1128,7 +1128,11 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %permissions Administrator.
      * %param[opt] id User unique id. Can be omitted when creating a new object. If such object
      *     exists, omitted fields will not be changed.
+     * %param[proprietary] parentId Should be empty.
      * %param name User name.
+     * %param[proprietary] url Should be empty.
+     * %param[proprietary] typeId Should have fixed value.
+     *     %value {774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}
      * %param[proprietary] isAdmin Indended for internal use; keep the value when saving
      *     a previously received object, use false when creating a new one.
      *     %value false
@@ -1147,19 +1151,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
      * %param[opt] userRoleId User role unique id.
      * %param email User's email.
-     * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
+     * %param[proprietary] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
      *     based on UTF-8 password as follows:
      *     <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
-     * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
+     * %param[proprietary] hash User's password hash. When modifying an existing user, supply empty string.
      *     When creating a new user, calculate the value based on UTF-8 password as follows:
      *     <code>salt = rand_hex();
      *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
-     * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
+     * %param[proprietary] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
-     * %param[opt] password Plain text password. Note that if this argument is provided, digest, hash
-     *     and cryptSha512Hash values will be ignored if any.
-     * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
+     * %param[opt] password User's password
+     * %param[proprietary] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
      *     /api/gettime.
      * %param[opt] isLdap Whether the user was imported from LDAP.
      *     %value false
