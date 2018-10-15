@@ -1,12 +1,5 @@
 #include "discovery_manager.h"
 
-#ifdef _POSIX_C_SOURCE
-#include <unistd.h>
-#endif
-#include <cstdio>
-
-#include <nx/network/http/http_client.h>
-
 #include "device/utils.h"
 #include "camera_manager.h"
 #include "plugin.h"
@@ -58,6 +51,7 @@ void DiscoveryManager::getVendorName(char* buf) const
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
     std::vector<device::DeviceData> devices = device::getDeviceList();
+    
     int i;
     for (i = 0; i < devices.size() && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {

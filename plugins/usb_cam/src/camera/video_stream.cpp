@@ -21,12 +21,8 @@ const char * deviceType()
     return
 #ifdef _WIN32
         "dshow";
-#elif __linux__
-        "v4l2";
-#elif __APPLE__
-        "avfoundation";
 #else
-        "";
+        "v4l2";
 #endif
 }
 

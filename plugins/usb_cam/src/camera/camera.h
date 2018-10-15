@@ -42,6 +42,9 @@ public:
 
     const device::CompressionTypeDescriptorPtr& compressionTypeDescriptor() const;
 
+    /**
+     * Return the url used by ffmpeg to open the video stream
+     */
     std::string url() const;
     CodecParameters defaultVideoParameters() const;
 

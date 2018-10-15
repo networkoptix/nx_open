@@ -41,11 +41,11 @@ public:
     bool keyPacket() const;
 
 private:
-    AVCodecID m_codecId;
-    AVMediaType m_mediaType;
+    AVCodecID m_codecId = AV_CODEC_ID_NONE;
+    AVMediaType m_mediaType = AVMEDIA_TYPE_UNKNOWN;
     std::shared_ptr<std::atomic_int> m_packetCount;
     uint64_t m_timestamp = 0;
-    AVPacket* m_packet;
+    AVPacket* m_packet = nullptr;
 
 #ifdef _WIN32
 private:

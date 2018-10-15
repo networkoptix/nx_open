@@ -70,7 +70,7 @@ public:
     void updateResolution();
 
     /**
-     *  return internal io error code, set if readFrame fails with such code.
+     *  Return internal io error code, set if readFrame fails with such code.
      */
     bool ioError() const;
 

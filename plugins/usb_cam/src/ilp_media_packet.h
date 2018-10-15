@@ -34,23 +34,20 @@ public:
     virtual unsigned int cSeq() const override;
     virtual nxcip::Picture* getMotionData() const override;
 
-    /**
-        \note Does keep contents of current buffer
-    */
     void resizeBuffer(size_t bufSize);
     void* data();
 
 private:
     nxpt::CommonRefManager m_refManager;
     CyclicAllocator* const m_allocator;
-    const int m_channelNumber;
-    nxcip::DataPacketType m_dataType;
-    nxcip::CompressionType m_compressionType;
-    nxcip::UsecUTCTimestamp m_timestamp;
-    unsigned int m_flags;
-    unsigned int m_cSeq;
-    void* m_buffer;
-    size_t m_bufSize;
+    const int m_channelNumber = 0;
+    nxcip::DataPacketType m_dataType = nxcip::DataPacketType::dptEmpty;
+    nxcip::CompressionType m_compressionType = nxcip::AV_CODEC_ID_NONE;
+    nxcip::UsecUTCTimestamp m_timestamp = 0;
+    unsigned int m_flags = 0;
+    unsigned int m_cSeq = 0;
+    void* m_buffer = nullptr;
+    size_t m_bufSize = 0;
 };
 
 } // namespace usb_cam
