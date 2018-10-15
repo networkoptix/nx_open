@@ -16,6 +16,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 #include "acti_resource_searcher.h"
@@ -29,7 +30,7 @@ const QString QnActiResource::ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME(lit("a
 
 namespace {
 
-const int TCP_TIMEOUT = 8000;
+const int TCP_TIMEOUT = 8000; //< TODO: Check if there is some common value (in config, etc).
 const int DEFAULT_RTSP_PORT = 7070;
 int actiEventPort = 0;
 int DEFAULT_AVAIL_BITRATE_KBPS[] = { 28, 56, 128, 256, 384, 500, 750, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000 };
@@ -171,13 +172,19 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
     return value.mid(pos1, value.length()-pos1-pos2);
 }
 
-QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData, QString* const localAddress) const
+QByteArray QnActiResource::makeActiRequest(
+    const QString& group,
+    const QString& command,
+    CLHttpStatus& status,
+    bool keepAllData,
+    QString* const localAddress) const
 {
     QByteArray result;
-    status = makeActiRequest( getUrl(), getAuth(), group, command, keepAllData, &result, localAddress );
+    status = makeActiRequest(getUrl(), getAuth(), group, command, keepAllData, &result, localAddress);
     return result;
 }
 
+// NOTE: Not all groups (aka CGI programs) maybe supported by current implementation of request.
 CLHttpStatus QnActiResource::makeActiRequest(
     const QUrl& url,
     const QAuthenticator& auth,
@@ -185,18 +192,35 @@ CLHttpStatus QnActiResource::makeActiRequest(
     const QString& command,
     bool keepAllData,
     QByteArray* const msgBody,
-    QString* const localAddress )
+    QString* const localAddress)
 {
-    CLSimpleHTTPClient client(url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
-    QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
-    CLHttpStatus status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
+    const nx::utils::log::Tag logTag = typeid(QnActiResource);
+
+    CLSimpleHTTPClient client(url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT),
+        TCP_TIMEOUT, auth);
+    // NOTE: should check here for correct connection? Or just try GET further...?
+
+    QString request = nx::network::url::Builder()
+        .setPath("cgi-bin/cmd/")
+        .appendPath(group)
+        .setQuery(command)
+        .toString();
+
+    NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", request);
+    CLHttpStatus status = client.doGET(request);
     if (status == CL_HTTP_SUCCESS) {
-        if( localAddress )
+        if (localAddress)
             *localAddress = client.localAddress();
         msgBody->clear();
         client.readAll(*msgBody);
-        if (msgBody->startsWith("ERROR: bad account"))
+
+        // API of camera returns 200 HTTP code on errors, so trying to parse payload here.
+        if (msgBody->startsWith("ERROR: bad account."))
             return CL_HTTP_AUTH_REQUIRED;
+        if (msgBody->startsWith("ERROR: missing USER/PWD."))
+            return CL_HTTP_AUTH_REQUIRED;
+        if (msgBody->startsWith("ERROR:"))  //< NOTE: should be handled somehow?
+            NX_WARNING(logTag, "makeActiRequest: Unhandled error in response: '%1'.", *msgBody);
     }
 
     if (!keepAllData)
@@ -332,7 +356,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
             const auto minSupportedVersion = rtspAudio[i][1];
             if (version < minSupportedVersion)
             {
-                NX_WARNING(this,
+                NX_INFO(this,
                     lm("RTSP audio is not supported for camera %1. "
                        "Camera firmware %2, platform %3, minimal firmware %4")
                     .args(getPhysicalId(), version, platform, minSupportedVersion));
@@ -342,7 +366,7 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
         }
     }
 
-    NX_WARNING(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
+    NX_INFO(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
         .args(getPhysicalId(), version, platform));
     return false;
 }
@@ -826,14 +850,14 @@ void QnActiResource::stopInputPortStatesMonitoring()
     m_inputMonitored = false;
 
     QAuthenticator auth = getAuth();
-    nx::utils::Url url = getUrl();
+    nx::utils::Url url = getUrl(); // TODO: check if possible to refactor
     url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
     url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
     nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done,
         ec2::DummyHandler::instance(), [httpClient](nx::network::http::AsyncHttpClientPtr) mutable {
-            httpClient->disconnect( nullptr, (const char*)nullptr );
+            httpClient->disconnect(nullptr, (const char*)nullptr);
             httpClient.reset();
         },
         Qt::DirectConnection );
@@ -1133,16 +1157,15 @@ boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSyste
     const QString& key) const
 {
     auto modifiedKey = key;
-
     if (report.contains(modifiedKey))
         return report.value(modifiedKey);
 
     modifiedKey.replace(' ', '_');
-
     if (report.contains(modifiedKey))
         return report.value(modifiedKey);
 
     modifiedKey.replace('_', ' ');
+    if (report.contains(modifiedKey))
         return report.value(modifiedKey);
 
     return boost::none;

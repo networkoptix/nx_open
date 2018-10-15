@@ -37,7 +37,7 @@ public:
     static const int MAX_STREAMS = 2;
 
     QnActiResource(QnMediaServerModule* serverModule);
-    ~QnActiResource();
+    ~QnActiResource() override;
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
@@ -47,17 +47,14 @@ public:
     QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
+    // Sets the distance between I frames.
+    virtual void setIframeDistance(int frames, int timems) override;
 
     virtual bool hasDualStreamingInternal() const override;
     virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
-    /*!
-        \param localAddress If not NULL, filled with local ip address, used to connect to camera
-    */
-    QByteArray makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData = false, QString* const localAddress = NULL) const;
     int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
     QString formatBitrateString(int bitrateKbps) const;
@@ -72,7 +69,17 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    virtual void onTimer( const quint64& timerID );
+    virtual void onTimer( const quint64& timerID ) override;
+
+    /*!
+        \param localAddress If not NULL, filled with local ip address, used to connect to camera
+    */
+    QByteArray makeActiRequest(
+        const QString& group,
+        const QString& command,
+        CLHttpStatus& status,
+        bool keepAllData = false,
+        QString* const localAddress = nullptr) const;
 
     static CLHttpStatus makeActiRequest(
         const QUrl& url,
@@ -81,7 +88,7 @@ public:
         const QString& command,
         bool keepAllData,
         QByteArray* const msgBody,
-        QString* const localAddress = nullptr );
+        QString* const localAddress = nullptr);
 
     static QByteArray unquoteStr(const QByteArray& value);
     static ActiSystemInfo parseSystemInfo(const QByteArray& report);
