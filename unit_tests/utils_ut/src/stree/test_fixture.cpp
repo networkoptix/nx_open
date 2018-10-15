@@ -1,5 +1,7 @@
 #include "test_fixture.h"
 
+#include <cstring>
+
 #include <QtCore/QBuffer>
 
 namespace nx::utils::stree::test {
