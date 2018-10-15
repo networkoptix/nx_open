@@ -10,7 +10,6 @@
 #include "device/utils.h"
 #include "camera_manager.h"
 #include "plugin.h"
-#include "utils.h"
 
 #include "discovery/audio_discovery_manager.h"
 
@@ -64,13 +63,10 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     {
         strncpy(cameras[i].modelName, devices[i].deviceName.c_str(), sizeof(cameras[i].modelName) - 1);
         
-        std::string url = utils::encodeCameraInfoUrl(localInterfaceIPAddr, devices[i].devicePath.c_str());
+        std::string url = std::string(localInterfaceIPAddr) + "/" + devices[i].devicePath;
         strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
 
-        const QByteArray& uid = QCryptographicHash::hash(
-            devices[i].devicePath.c_str(),
-            QCryptographicHash::Md5).toHex();
-        strncpy(cameras[i].uid, uid.data(), sizeof(cameras[i].uid) - 1);
+        strncpy(cameras[i].uid, devices[i].devicePath.c_str(), sizeof(cameras[i].uid) - 1);
     }
 
     device::AudioDiscoveryManager audioDiscovery;

@@ -4,8 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "../device/utils.h"
-#include "utils.h"
+#include "device/utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -152,7 +151,7 @@ const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() 
 
 std::string Camera::url() const
 {
-    return utils::decodeCameraInfoUrl(m_info.url);
+    return m_info.uid;
 }
 
 CodecParameters Camera::defaultVideoParameters() const

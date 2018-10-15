@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "utils.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/packet.h"

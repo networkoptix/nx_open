@@ -11,7 +11,6 @@
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
 #include "stream_reader.h"
-#include "utils.h"
 
 namespace nx {
 namespace usb_cam {

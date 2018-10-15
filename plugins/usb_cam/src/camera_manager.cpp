@@ -8,7 +8,6 @@
 
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
-#include "utils.h"
 #include "ffmpeg/utils.h"
 #include "device/utils.h"
 
