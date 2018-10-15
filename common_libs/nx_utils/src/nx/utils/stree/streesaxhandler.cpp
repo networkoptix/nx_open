@@ -64,7 +64,8 @@ bool SaxHandler::startElement( const QString& /*namespaceURI*/, const QString& /
     }
 
     auto [newNode, resultCode] = createNode(qName, atts);
-    if (resultCode == ResultCode::unknownResource)
+    if ((m_flags & ParseFlag::ignoreUnknownResources) > 0 &&
+        resultCode == ResultCode::unknownResource)
     {
         m_state = skippingNode;
         m_inlineLevel = 1;
@@ -130,6 +131,11 @@ bool SaxHandler::fatalError( const QXmlParseException& exception )
     m_errorDescription = lit("Fatal parse error. line %1, col %2, parser message: %3").
         arg(exception.lineNumber()).arg(exception.columnNumber()).arg(exception.message());
     return false;
+}
+
+void SaxHandler::setFlags(int flags)
+{
+    m_flags = flags;
 }
 
 const std::unique_ptr<AbstractNode>& SaxHandler::root() const

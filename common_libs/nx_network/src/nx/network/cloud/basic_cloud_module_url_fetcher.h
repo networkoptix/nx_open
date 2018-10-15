@@ -15,6 +15,7 @@
 #include <nx/utils/stree/resourcenameset.h>
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/stree/stree_manager.h>
+#include <nx/utils/stree/streesaxhandler.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "cloud_modules_xml_sax_handler.h"
@@ -231,7 +232,10 @@ private:
         QByteArray xmlData = client->fetchMessageBodyBuffer();
         QBuffer xmlDataSource(&xmlData);
         std::unique_ptr<nx::utils::stree::AbstractNode> stree =
-            nx::utils::stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
+            nx::utils::stree::StreeManager::loadStree(
+                &xmlDataSource,
+                m_nameset,
+                nx::utils::stree::ParseFlag::ignoreUnknownResources);
         if (!stree)
         {
             resultCode = nx_http::StatusCode::serviceUnavailable;

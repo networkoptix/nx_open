@@ -53,7 +53,7 @@ TEST_F(StreeRangeMatch, intValue)
         "    </condition>\n"
         "</sequence>\n";
 
-    ASSERT_TRUE(prepareTree(testXmlData));
+    ASSERT_TRUE(prepareTree(testXmlData, 0));
 
     ASSERT_EQ("first", getOutAttr(0));
     ASSERT_EQ("first", getOutAttr(9));
@@ -83,7 +83,7 @@ TEST_F(StreeRangeMatch, strValue)
         "    </condition>\n"
         "</sequence>\n";
 
-    ASSERT_TRUE(prepareTree(testXmlData));
+    ASSERT_TRUE(prepareTree(testXmlData, 0));
 
     ASSERT_EQ("default", getOutAttr("a0"));
 

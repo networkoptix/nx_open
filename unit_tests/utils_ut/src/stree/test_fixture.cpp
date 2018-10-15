@@ -11,11 +11,16 @@ StreeFixture::StreeFixture()
     m_nameSet.registerResource(outAttr, "outAttr", QVariant::String);
 }
 
-bool StreeFixture::prepareTree(const char* xmlDataStr)
+bool StreeFixture::prepareTree(
+    const char* xmlDataStr,
+    int parseFlags)
 {
     auto xmlData = QByteArray::fromRawData(xmlDataStr, std::strlen(xmlDataStr));
     QBuffer xmlDataSource(&xmlData);
-    m_streeRoot = StreeManager::loadStree(&xmlDataSource, m_nameSet);
+    m_streeRoot = StreeManager::loadStree(
+        &xmlDataSource,
+        m_nameSet,
+        parseFlags);
     return m_streeRoot != nullptr;
 }
 

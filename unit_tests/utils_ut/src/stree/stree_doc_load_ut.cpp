@@ -1,5 +1,7 @@
 #include "test_fixture.h"
 
+#include <nx/utils/stree/streesaxhandler.h>
+
 namespace nx::utils::stree::test {
 
 class StreeDocLoad:
@@ -23,7 +25,7 @@ protected:
                 "</condition>\n"
             "</sequence>\n";
 
-        ASSERT_TRUE(prepareTree(document));
+        ASSERT_TRUE(prepareTree(document, ParseFlag::ignoreUnknownResources));
     }
 
     void assertDocumentDataIsAvailable()

@@ -20,7 +20,7 @@ public:
     StreeFixture();
 
 protected:
-    bool prepareTree(const char* xmlDataStr);
+    bool prepareTree(const char* xmlDataStr, int parseFlags);
     const std::unique_ptr<AbstractNode>& streeRoot() const;
 
 private:

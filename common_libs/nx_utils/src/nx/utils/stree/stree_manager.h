@@ -29,7 +29,8 @@ public:
 
     static std::unique_ptr<nx::utils::stree::AbstractNode> loadStree(
         QIODevice* const dataSource,
-        const nx::utils::stree::ResourceNameSet& resourceNameSet);
+        const nx::utils::stree::ResourceNameSet& resourceNameSet,
+        int parseFlags = 0);
 
 private:
     std::unique_ptr<nx::utils::stree::AbstractNode> m_stree;

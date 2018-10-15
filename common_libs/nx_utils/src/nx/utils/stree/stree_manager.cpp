@@ -37,9 +37,11 @@ const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
 
 std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(
     QIODevice* const dataSource,
-    const nx::utils::stree::ResourceNameSet& resourceNameSet)
+    const nx::utils::stree::ResourceNameSet& resourceNameSet,
+    int parseFlags)
 {
     nx::utils::stree::SaxHandler xmlHandler(resourceNameSet);
+    xmlHandler.setFlags(parseFlags);
 
     QXmlSimpleReader reader;
     reader.setContentHandler(&xmlHandler);

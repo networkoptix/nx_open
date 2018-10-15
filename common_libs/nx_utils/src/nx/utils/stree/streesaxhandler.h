@@ -30,6 +30,10 @@ namespace MatchType
     NX_UTILS_API Value fromString( const QString& str );
 };
 
+enum ParseFlag
+{
+    ignoreUnknownResources = 0x01,
+};
 
 class NX_UTILS_API SaxHandler
 :
@@ -47,6 +51,7 @@ public:
     virtual bool error( const QXmlParseException& exception );
     virtual bool fatalError( const QXmlParseException& exception );
 
+    void setFlags(int flags);
     //!Returns root of tree, created during parsing xml
     const std::unique_ptr<AbstractNode>& root() const;
     //!Releases ownership of tree, created during parsing
@@ -74,6 +79,7 @@ private:
     int m_inlineLevel;
     std::unique_ptr<AbstractNode> m_root;
     const ResourceNameSet& m_resourceNameSet;
+    int m_flags = 0;
 
     std::tuple<std::unique_ptr<AbstractNode>, ResultCode> createNode(
         const QString& nodeName,
