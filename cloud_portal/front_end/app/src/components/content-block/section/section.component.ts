@@ -3,7 +3,16 @@ import {
 } from '@angular/core';
 
 /* Usage
+<nx-content-block-section>
+    <header>
+        Section title
+    </header>
+    Section body
+</nx-content-block-section>
 
+<nx-content-block-section>
+    SECTION without header
+</nx-content-block-section>
 */
 
 @Component({

@@ -2,20 +2,24 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
 /* Usage
 <nx-content-block type?=['gray' | empty]>
-    <div card-header>
+    <header>
         TITLE
-    </div>
-    <div card-body>
+    </header>
+    <nx-content-block-section>
         BODY
-    </div>
+    </nx-content-block-section>
 
     <!-- ngFor -->
-    <div section-title>
-        Section title
-    </div>
-    <div section-content>
-        SECTION
-    </div>
+    <nx-content-block-section>
+        <header>
+            Section title
+        </header>
+        Section body
+    </nx-content-block-section>
+
+    <nx-content-block-section>
+        SECTION without header
+    </nx-content-block-section>
     <!-- ngFor -->
 </nx-content-block>
 */
