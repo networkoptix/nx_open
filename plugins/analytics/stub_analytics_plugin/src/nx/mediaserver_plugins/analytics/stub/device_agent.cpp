@@ -27,6 +27,12 @@ DeviceAgent::DeviceAgent(Engine* engine):
 {
 }
 
+/**
+ * DeviceAgent manifest may declare eventTypes and objectTypes similarly to how an Engine declares
+ * them - semantically the set from the Engine manifest is joined with the set from the DeviceAgent
+ * manifest. Also this manifest may declare supportedEventTypeIds and supportedObjectTypeIds lists
+ * which are treated as white-list filters for the respective set.
+ */
 std::string DeviceAgent::manifest()
 {
     return /*suppress newline*/1 + R"json(
@@ -35,7 +41,7 @@ std::string DeviceAgent::manifest()
         ")json" + kLineCrossingEventType + R"json(",
         ")json" + kObjectInTheAreaEventType + R"json("
     ],
-    "supportedObjectTypes": [
+    "supportedObjectTypeIds": [
         ")json" + kCarObjectType + R"json("
     ],
     "eventTypes": [

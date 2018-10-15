@@ -38,7 +38,7 @@ std::string Engine::manifest() const
             "ru_RU": "TegraVideo analytics engine Plugin (stub for Russian text)"
         }
     },
-    "outputEventTypes": [
+    "eventTypes": [
         {
             "id": "nx.tegraVideo.humanEnteredTheArea",
             "name": {
@@ -58,7 +58,7 @@ std::string Engine::manifest() const
             }
         }
     ],
-    "outputObjectTypes": [
+    "objectTypes": [
         {
             "id": "nx.tegraVideo.car",
             "name": {

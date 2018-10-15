@@ -45,8 +45,8 @@ public: //< Required for Qt MOC run.
     TranslatableString pluginName;
     Capabilities capabilities;
 
-    QList<EventType> outputEventTypes; //< TODO: Rename to eventTypes.
-    QList<ObjectType> outputObjectTypes; //< TODO: Rename to objectTypes.
+    QList<EventType> eventTypes;
+    QList<ObjectType> objectTypes;
     QList<Group> groups;
 
     QList<ObjectAction> objectActions;
@@ -55,7 +55,7 @@ public: //< Required for Qt MOC run.
 };
 #define EngineManifest_Fields \
     (pluginId)(pluginName)(capabilities) \
-    (outputEventTypes)(outputObjectTypes)(objectActions)(groups)
+    (eventTypes)(objectTypes)(objectActions)(groups)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json), NX_VMS_API)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EngineManifest::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::Capability)

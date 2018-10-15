@@ -353,7 +353,7 @@ public:
                         eventType.id = "";
                         eventType.name.value = lit("Event %1").arg(j);
                         eventType.name.localization[lit("ru_RU")] = lit("Russian %1").arg(j);
-                        manifest.outputEventTypes.push_back(eventType);
+                        manifest.eventTypes.push_back(eventType);
                     }
 
                     auto server = servers[serverIndex];
@@ -381,8 +381,8 @@ public:
                         else
                         {
                             QnSecurityCamResource::AnalyticsEventTypeIds eventTypeIds;
-                            std::transform(randomDriver.outputEventTypes.cbegin(),
-                                randomDriver.outputEventTypes.cend(),
+                            std::transform(randomDriver.eventTypes.cbegin(),
+                                randomDriver.eventTypes.cend(),
                                 std::back_inserter(eventTypeIds),
                                 [](const nx::vms::api::analytics::EventType& eventType)
                                 {

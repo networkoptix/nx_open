@@ -78,7 +78,7 @@ std::string DeviceAgent::manifest()
 {
     return R"manifest(
         {
-             "supportedObjectTypes": [
+             "supportedObjectTypeIds": [
                 "{58AE392F-8516-4B27-AEE1-311139B5A37A}",
                 "{3778A599-FB60-47E9-8EC6-A9949E8E0AE7}"
             ]

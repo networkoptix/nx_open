@@ -149,10 +149,10 @@ Engine::Engine(CommonPlugin* plugin): m_plugin(plugin)
     f.close();
     m_typedManifest = QJson::deserialized<EngineManifest>(m_manifest);
 
-    int eventCount = m_typedManifest.outputEventTypes.size();
+    int eventCount = m_typedManifest.eventTypes.size();
     NX_PRINT << "Found "<< eventCount << " event(s) in the loaded manifest";
 
-    for (const auto& eventType: m_typedManifest.outputEventTypes)
+    for (const auto& eventType: m_typedManifest.eventTypes)
     {
         if (eventType.internalName == kCameraSpecifyCommandInternalName)
             cameraEventType = eventType;

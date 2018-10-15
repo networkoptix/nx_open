@@ -134,13 +134,13 @@ void Monitor::addRules(const nx::network::SocketAddress& localAddress,
     for (int i = 0; i < eventTypeListSize; ++i)
     {
         const auto it = std::find_if(
-            m_deviceAgent->events().outputEventTypes.cbegin(),
-            m_deviceAgent->events().outputEventTypes.cend(),
+            m_deviceAgent->events().eventTypes.cbegin(),
+            m_deviceAgent->events().eventTypes.cend(),
             [eventTypeList, i](const EventType& event)
             {
                 return event.eventTypeIdExternal == eventTypeList[i];
             });
-        if (it != m_deviceAgent->events().outputEventTypes.cend())
+        if (it != m_deviceAgent->events().eventTypes.cend())
         {
             static int globalCounter = 0;
 

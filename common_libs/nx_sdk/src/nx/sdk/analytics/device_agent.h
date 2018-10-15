@@ -77,30 +77,7 @@ public:
 
     /**
      * Provides a 0-terminated UTF-8 string containing the JSON manifest.
-     * @return Pointer to a C-style string which MUST be valid untill freeManifest() is invoked.
-     * JSON manifest may have one of the two schemas. First contains only event type ids, e.g.:
-     * {
-     *     "supportedEventTypes":
-     *     [
-     *         "nx.lineCrossing",
-     *         "nx.faceDetected",
-     *     ]
-     * }
-     *
-     * The second contains ids and descriptions, e.g.:
-     * {
-     *     "outputEventTypes":
-     *     [
-     *         {
-     *             "id": "nx.lineCrossing",
-     *             "name": { "value": "Line crossed", "localization": {} }
-     *         },
-     *         {
-     *             "id": "nx.faceDetected",
-     *             "name": { "value": "Face detected", "localization": {} }
-     *         }
-     *     ]
-     * }
+     * @return Pointer to a C-style string which MUST be valid until freeManifest() is invoked.
      */
     virtual const char* manifest(Error* error) = 0;
 

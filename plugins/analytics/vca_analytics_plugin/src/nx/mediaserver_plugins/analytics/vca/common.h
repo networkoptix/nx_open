@@ -22,9 +22,9 @@ struct EventType: nx::vms::api::analytics::EventType
 
 struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
 {
-    QList<EventType> outputEventTypes;
+    QList<EventType> eventTypes;
 };
-#define VcaEngineManifest_Fields EngineManifestBase_Fields (outputEventTypes)
+#define VcaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))

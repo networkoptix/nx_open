@@ -85,11 +85,11 @@ const char* Engine::manifest(Error* error) const
 const EventType* Engine::eventTypeById(const QString& id) const noexcept
 {
     const auto it = std::find_if(
-        m_typedManifest.outputEventTypes.cbegin(),
-        m_typedManifest.outputEventTypes.cend(),
+        m_typedManifest.eventTypes.cbegin(),
+        m_typedManifest.eventTypes.cend(),
         [&id](const EventType& eventType) { return eventType.id == id; });
 
-    return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
+    return (it != m_typedManifest.eventTypes.cend()) ? &(*it) : nullptr;
 }
 
 void Engine::executeAction(Action* /*action*/, Error* /*outError*/)

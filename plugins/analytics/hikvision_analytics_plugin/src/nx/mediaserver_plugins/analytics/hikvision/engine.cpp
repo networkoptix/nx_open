@@ -88,12 +88,12 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
     if (!vendor.startsWith(kHikvisionTechwinVendor))
         return nullptr;
 
-    auto supportedEvents = fetchSupportedEvents(*deviceInfo);
-    if (!supportedEvents)
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
+    if (!supportedEventTypeIds)
         return nullptr;
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypes = *supportedEvents;
+    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     auto deviceAgent = new DeviceAgent(this);
     deviceAgent->setDeviceInfo(*deviceInfo);
@@ -133,12 +133,12 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     return result;
 }
 
-boost::optional<QList<QString>> Engine::fetchSupportedEvents(
+boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const DeviceInfo& deviceInfo)
 {
     auto& data = m_cachedDeviceData[deviceInfo.sharedId];
     if (!data.hasExpired())
-        return data.supportedEventTypes;
+        return data.supportedEventTypeIds;
 
     nx::utils::Url url(deviceInfo.url);
     url.setPath("/ISAPI/Event/triggersCap");
@@ -156,8 +156,8 @@ boost::optional<QList<QString>> Engine::fetchSupportedEvents(
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
         arg(deviceInfo.url).arg(buffer));
 
-    data.supportedEventTypes = parseSupportedEvents(buffer);
-    return data.supportedEventTypes;
+    data.supportedEventTypeIds = parseSupportedEvents(buffer);
+    return data.supportedEventTypeIds;
 }
 
 const Hikvision::EngineManifest& Engine::engineManifest() const

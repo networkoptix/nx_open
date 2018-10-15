@@ -51,8 +51,8 @@ DeviceAgent::DeviceAgent(Engine* plugin,
     m_cameraLogicalId(deviceInfo.logicalId)
 {
     nx::vms::api::analytics::DeviceAgentManifest typedDeviceAgentManifest;
-    for (const auto& eventType: typedManifest.outputEventTypes)
-        typedDeviceAgentManifest.supportedEventTypes.push_back(eventType.id);
+    for (const auto& eventType: typedManifest.eventTypes)
+        typedDeviceAgentManifest.supportedEventTypeIds.push_back(eventType.id);
     m_deviceAgentManifest = QJson::serialized(typedDeviceAgentManifest);
 
     NX_URL_PRINT << "SSC DeviceAgent created for device " << deviceInfo.model;

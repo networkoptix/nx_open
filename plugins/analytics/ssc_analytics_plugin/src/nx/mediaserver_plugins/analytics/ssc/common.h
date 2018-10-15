@@ -23,9 +23,9 @@ struct EventType: nx::vms::api::analytics::EventType
 struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
 {
     QString serialPortName; //< Proprietary.
-    QList<EventType> outputEventTypes;
+    QList<EventType> eventTypes;
 };
-#define SscEngineManifest_Fields EngineManifestBase_Fields (serialPortName)(outputEventTypes)
+#define SscEngineManifest_Fields EngineManifestBase_Fields (serialPortName)(eventTypes)
 
 struct AllowedPortNames
 {

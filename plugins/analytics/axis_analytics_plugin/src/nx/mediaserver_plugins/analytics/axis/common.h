@@ -33,7 +33,7 @@ struct EventType: nx::vms::api::analytics::EventType
 
 /**
   * The algorithm of building of the valid event type list:
-  * The final list is a union of two lists. The 1st is outputEventTypes white list.
+  * The final list is a union of two lists. The 1st is eventTypes white list.
   * The 2nd is based on camera supported events. It is constructed in 3 steps:
   *  a) plugin asks the camera about all supported events;
   *  b) they are filtered with allowedTopics filter (only events with the allowed topics remain);
@@ -43,10 +43,10 @@ struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifest
 {
     QStringList allowedTopics; //< Prorietary. Topic filter.
     QStringList forbiddenDescriptions; //< Proprietary. Black list.
-    QList<EventType> outputEventTypes; //< Extends the inherited field. White list.
+    QList<EventType> eventTypes; //< Extends the inherited field. White list.
 };
 #define AxisEngineManifest_Fields EngineManifestBase_Fields \
-    (allowedTopics)(forbiddenDescriptions)(outputEventTypes)
+    (allowedTopics)(forbiddenDescriptions)(eventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))

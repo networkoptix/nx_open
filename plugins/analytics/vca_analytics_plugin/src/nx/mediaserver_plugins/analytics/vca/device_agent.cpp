@@ -187,8 +187,8 @@ DeviceAgent::DeviceAgent(
     m_auth.setPassword(deviceInfo.password);
 
     nx::vms::api::analytics::DeviceAgentManifest typedCameraManifest;
-    for (const auto& eventType: typedManifest.outputEventTypes)
-        typedCameraManifest.supportedEventTypes.push_back(eventType.id);
+    for (const auto& eventType: typedManifest.eventTypes)
+        typedCameraManifest.supportedEventTypeIds.push_back(eventType.id);
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
     static const int kBufferCapacity = 4096;
