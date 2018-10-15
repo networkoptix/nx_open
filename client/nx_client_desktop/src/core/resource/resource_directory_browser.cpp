@@ -226,7 +226,6 @@ int QnResourceDirectoryBrowser::findResources(const QString& directory, const Re
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    qDebug() << "QnResourceDirectoryBrowser::layoutFromFile" << filename;
     const QString layoutUrl = fixSeparators(filename);
     NX_ASSERT(layoutUrl == filename);
 
