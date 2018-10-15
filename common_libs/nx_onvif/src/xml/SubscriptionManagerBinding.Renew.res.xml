@@ -70,9 +70,9 @@
   <!-- __onvifEvents_smb__Renew(..., _oasisWsnB2__RenewResponse &oasisWsnB2__RenewResponse) -->
   <oasisWsnB2:RenewResponse>
    <!-- time_t TerminationTime -->
-   <oasisWsnB2:TerminationTime>2018-08-21T18:08:14Z</oasisWsnB2:TerminationTime>
+   <oasisWsnB2:TerminationTime>2018-10-15T11:33:31Z</oasisWsnB2:TerminationTime>
    <!-- time_t *CurrentTime -->
-   <oasisWsnB2:CurrentTime>2018-08-21T18:08:14Z</oasisWsnB2:CurrentTime>
+   <oasisWsnB2:CurrentTime>2018-10-15T11:33:31Z</oasisWsnB2:CurrentTime>
    <!-- std::vector<struct soap_dom_element> __any -->
    <!-- a repetition of 0 or more of the following -->
 

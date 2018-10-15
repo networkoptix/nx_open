@@ -70,7 +70,7 @@
   <!-- __onvifSearch__EndSearch(..., _onvifSearch__EndSearchResponse &onvifSearch__EndSearchResponse) -->
   <onvifSearch:EndSearchResponse>
    <!-- time_t Endpoint -->
-   <onvifSearch:Endpoint>2018-08-21T18:08:17Z</onvifSearch:Endpoint>
+   <onvifSearch:Endpoint>2018-10-15T11:33:35Z</onvifSearch:Endpoint>
   </onvifSearch:EndSearchResponse>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
