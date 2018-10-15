@@ -107,6 +107,9 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         case vms::event::showTextOverlayAction:
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::execHttpRequestAction:
+        case vms::event::acknowledgeAction:
+        case vms::event::fullscreenCameraAction:
+        case vms::event::exitFullscreenAction:
             return QnMediaServerResourcePtr(); //< Don't transfer to other server, execute here.
 
         default:
