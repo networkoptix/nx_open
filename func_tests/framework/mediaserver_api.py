@@ -645,7 +645,7 @@ class MediaserverApi(object):
         return _MediaserverCameraApi(self.generic, camera_id)
 
     @property
-    def camera_list(self):
+    def all_cameras(self):
         result = []
         for camera_info in self.generic.get('ec2/getCameras'):
             result.append(_MediaserverCameraApi(self.generic, camera_info['id']))

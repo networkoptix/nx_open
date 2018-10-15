@@ -147,13 +147,15 @@ def get_internet_time(address='time.rfc868server.com', port=37):
     return RunningTime(remote_as_datetime, request_duration)
 
 
-def with_traceback(fn):
+def with_traceback(fn, exception_event=None):
     @wraps(fn)  # critical for VMFactory.map to work
     def wrapper(*args, **kw):
         try:
             return fn(*args, **kw)
         except Exception:
             _logger.exception('Exception in %r:', fn)
+            if exception_event:
+                exception_event.set()
             raise
     return wrapper
 

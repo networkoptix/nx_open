@@ -12,12 +12,12 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <utils/common/id.h>
-#include <nx/vms/api/data/software_version.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/common_update_manager.h>
 #include <update/updates_common.h>
 
 #include "server_update_tool.h"
+#include "client_update_tool.h"
 
 struct QnLowFreeSpaceWarning;
 
@@ -65,28 +65,24 @@ public:
     bool cancelUpdatesCheck();
     bool isChecking() const;
 
-    //void at_updateFinished(const QnUpdateResult& result);
-    //void at_selfUpdateFinished(const QnUpdateResult& result);
-
-    void at_clientDownloadFinished();
-
-    void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
-
 protected:
-    // Callback for timer events
+    // This one is called by timer periodically.
     void at_updateCurrentState();
 
+    void at_clientDownloadFinished();
+    void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     void at_startUpdateAction();
     bool at_cancelCurrentAction();
-    void hideStatusColumns(bool value);
 
+    void hideStatusColumns(bool value);
     void clearUpdateInfo();
     void pickLocalFile();
     void pickSpecificBuild();
 
 private:
-    using UpdateCheckMode = ServerUpdateTool::UpdateCheckMode;
 
+    // General state for a widget.
+    // It extends update state from the servers, uploader and client update.
     enum class WidgetUpdateState
     {
         // We have no information about remote state right now.
@@ -103,14 +99,17 @@ private:
         readyInstall,
         // Some servers are installing an update.
         installing,
+        // Installation process is complete.
+        complete,
     };
 
-    static QString toString(UpdateCheckMode mode);
+    static QString toString(UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
     static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
+    static QString toString(ClientUpdateTool::State state);
 
-    void setUpdateSourceMode(UpdateCheckMode mode);
+    void setUpdateSourceMode(UpdateSourceType mode);
 
     void initDropdownActions();
     void initDownloadActions();
@@ -121,18 +120,16 @@ private:
 
     // UI synhronization. This functions are ment to be called from loadDataToUi.
     // Do not call them from anywhere else.
-    void syncUpdateSource();
+    void syncUpdateCheck();
     void syncRemoteUpdateState();
-
-    static bool restartClient(const nx::utils::SoftwareVersion& version);
 
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
     bool processRemoteChanges(bool force = false);
     // Part of processRemoteChanges FSM processor.
     void processRemoteInitialState();
-    void processRemoteDownloading(const ServerUpdateTool::RemoteStatus& remoteStatus);
-    void processRemoteInstalling(const ServerUpdateTool::RemoteStatus& remoteStatus);
+    void processRemoteDownloading();
+    void processRemoteInstalling();
 
     bool processUploaderChanges(bool force = false);
 
@@ -141,6 +138,7 @@ private:
     // Advances UI FSM towards selected state.
     void setTargetState(WidgetUpdateState state, QSet<QnUuid> targets = {});
 
+    void completeInstallation(bool clientUpdated);
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
 
@@ -151,7 +149,6 @@ private:
     // UI control flags. We run loadDataToUI periodically and check for this flags.
     bool m_updateLocalStateChanged = true;
     bool m_updateRemoteStateChanged = true;
-    bool m_latestVersionChanged = true;
     // Flag shows that we have an update.
     bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
@@ -161,28 +158,28 @@ private:
     // and a label with internal widget states
     bool m_showDebugData = false;
 
-    UpdateCheckMode m_updateSourceMode = UpdateCheckMode::internet;
+    UpdateSourceType m_updateSourceMode = UpdateSourceType::internet;
 
-    std::shared_ptr<ServerUpdateTool> m_updatesTool;
+    std::unique_ptr<ServerUpdateTool> m_serverUpdateTool;
+    std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
     std::unique_ptr<ServerStatusItemDelegate> m_statusItemDelegate;
 
     // ServerUpdateTool promises this.
-    std::future<ServerUpdateTool::UpdateContents> m_updateCheck;
+    std::future<UpdateContents> m_updateCheck;
 
-    // TODO: We could move it inside serverUpdateTool
-    ServerUpdateTool::UpdateContents m_updateInfo;
+    UpdateContents m_updateInfo;
     QString m_updateCheckError;
     // We get this version either from internet, or zip package.
     nx::utils::SoftwareVersion m_availableVersion;
     nx::utils::SoftwareVersion m_targetVersion;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::initial;
-    WidgetUpdateState m_updateStateTarget = WidgetUpdateState::initial;
 
     // Selected changeset from 'specific build' mode.
     QString m_targetChangeset;
+
     // Watchdog timer for the case when update has taken too long.
     std::unique_ptr<QTimer> m_longUpdateWarningTimer = nullptr;
 
@@ -194,8 +191,6 @@ private:
     // Id of the progress notification at the right panel.
     QnUuid m_rightPanelDownloadProgress;
 
-    // TODO: We used this sets when we commanded each server directly. So update state could diverge.
-    // Right now we do not need to track that much.
     // This sets are changed every time we are initiating some update action.
     // Set of servers that are currently active.
     QSet<QnUuid> m_serversActive;

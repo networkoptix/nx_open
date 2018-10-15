@@ -31,7 +31,7 @@ class SetResourceParamCommand(TransactionCommand):
     _Param = namedtuple('SetResourceParamCommand_Param', 'name resourceId value')
 
     def __init__(self, name, data):
-        self.name = name
+        super(SetResourceParamCommand, self).__init__(name, data)
         params = data['tran']['params']
         self.param = self._Param(
             name=params['name'],
@@ -52,7 +52,7 @@ class Transaction(object):
 
     def __init__(self, mediaserver_alias, command):
         self.mediaserver_alias = mediaserver_alias
-        self.command = command  # Type: TransactionCommand
+        self.command = command  # type: TransactionCommand
 
     def __str__(self):
         return 'Transaction from %s: %s' % (self.mediaserver_alias, self.command)
@@ -72,11 +72,8 @@ class _MessageBusQueue(object):
             _logger.debug('Timed out waiting for transactions from message buses: timeout=%d sec', timeout_sec)
             return None
 
-    def has_transactions(self, timeout_sec):
-        return self.get_transaction(timeout_sec) is not None
-
     def wait_until_no_transactions(self, timeout_sec):
-        while self.has_transactions(timeout_sec):
+        while self.get_transaction(timeout_sec) is not None:
             pass
         _logger.info('Message bus: No transactions in %d sec.', timeout_sec)
 

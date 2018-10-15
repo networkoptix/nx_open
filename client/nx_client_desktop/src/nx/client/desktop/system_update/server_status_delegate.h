@@ -12,7 +12,7 @@ struct UpdateItem;
 
 // Fancy delegate to show status of updating server.
 // It creates a complex widget to display state of each server.
-class ServerStatusItemDelegate : public QStyledItemDelegate
+class ServerStatusItemDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 

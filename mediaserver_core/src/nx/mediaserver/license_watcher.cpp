@@ -64,18 +64,29 @@ QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
 LicenseWatcher::LicenseWatcher(QnCommonModule* commonModule):
     base_type(commonModule)
 {
-    connect(&m_timer, &QTimer::timeout, this, &LicenseWatcher::startUpdate);
 }
 
 LicenseWatcher::~LicenseWatcher()
 {
-    stopHttpClient();
+    utils::promise<void> promise;
+    m_timer.pleaseStop(
+        [this, &promise]()
+        {
+            m_httpClient.reset();
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
 }
 
 void LicenseWatcher::start()
 {
-    startUpdate();
-    m_timer.start(kCheckInterval.count());
+    m_timer.start(kCheckInterval,
+        [this]()
+        {
+            startUpdate();
+            start();
+        });
 }
 
 void LicenseWatcher::startUpdate()
@@ -84,9 +95,10 @@ void LicenseWatcher::startUpdate()
     if (data.licenses.empty())
         return; //< Nothing to update.
 
-    stopHttpClient();
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_httpClient->bindToAioThread(m_timer.getAioThread());
 
+    // Use own server so query gets redirected to a server with internet.
     auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
         return;
@@ -104,12 +116,14 @@ void LicenseWatcher::startUpdate()
             serializationFormatToHttpContentType(Qn::JsonFormat),
             std::move(requestBody)));
 
+    // Object guard is required so we could cancel async operation if it's scheduled when watcher
+    // is destroyed.
     QPointer<QObject> objectGuard(this);
     m_httpClient->doPost(kLicenseServerUrl,
         [this, objectGuard]()
         {
             NX_ASSERT(objectGuard, "Destructor must wait for m_httpClient stop.");
-            const auto scopeGuard = nx::utils::makeScopeGuard([this](){ stopHttpClient(); });
+            const auto scopeGuard = nx::utils::makeScopeGuard([this](){ m_httpClient.reset(); });
 
             nx::network::http::AsyncClient::State state = m_httpClient->state();
             if (state == nx::network::http::AsyncClient::State::sFailed)
@@ -182,18 +196,6 @@ void LicenseWatcher::processResponse(QByteArray responseData)
     auto error = licenseManager->addLicensesSync(updatedLicenses);
     if (error != ec2::ErrorCode::ok)
         NX_WARNING(this, lm("Can't update licenses into the database. DB error %1").arg(error));
-}
-
-void LicenseWatcher::stopHttpClient()
-{
-    decltype(m_httpClient) httpClient;
-    {
-        QnMutexLocker lock(&m_mutex);
-        std::swap(m_httpClient, httpClient);
-    }
-
-    if (httpClient)
-        httpClient->pleaseStopSync();
 }
 
 ServerLicenseInfo LicenseWatcher::licenseData() const

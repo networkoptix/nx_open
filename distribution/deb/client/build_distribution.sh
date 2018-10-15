@@ -184,6 +184,7 @@ copyQtLibs()
         Concurrent
         Network
         Sql
+        Svg
         PrintSupport
     )
     if [ "$ARCH" == "arm" ]

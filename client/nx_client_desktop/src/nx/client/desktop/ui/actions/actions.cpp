@@ -9,7 +9,6 @@
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
-#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -370,12 +369,6 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
-
-    factory(StartAnalyticsAction)
-        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Start Analytics..."))
-        .childFactory(new AnalyticsActionFactory(manager))
-        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)
