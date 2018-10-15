@@ -105,7 +105,8 @@ QnLongRunnable::QnLongRunnable(bool isTrackedByPool)
         }
         else
         {
-            NX_LOGX("QnLongRunnablePool instance does not exist, lifetime of this runnable will not be tracked.", cl_logWARNING);
+            NX_INFO(this, "QnLongRunnablePool instance does not exist, "
+                "lifetime of this runnable will not be tracked.");
         }
     }
 
