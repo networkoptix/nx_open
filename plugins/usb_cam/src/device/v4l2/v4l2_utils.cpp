@@ -336,7 +336,7 @@ void setBitrate(
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
     static constexpr int kRpiBitrate = 10000000;
-
+#if 0
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
         return kRpiBitrate;
@@ -360,7 +360,7 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
         if (ioctl(initializer.fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs))
             return ec.value;
     }
-    
+#endif
     return kRpiBitrate;
 }
 
