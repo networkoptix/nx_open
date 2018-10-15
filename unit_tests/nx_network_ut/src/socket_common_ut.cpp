@@ -200,20 +200,32 @@ class SocketAddress:
 {
 protected:
     void assertEndpointIsParsedAsExpected(
-        const char* endpointString, const char* host, int port)
+        const network::SocketAddress& endpoint,
+        const QString& expectedEndpointString,
+        const char* host,
+        int port)
     {
-        const auto addr = network::SocketAddress(endpointString);
-        ASSERT_EQ(host, addr.address.toString());
-        ASSERT_EQ(port, addr.port);
-        ASSERT_EQ(endpointString, addr.toString());
+        ASSERT_EQ(host, endpoint.address.toString());
+        ASSERT_EQ(port, endpoint.port);
+        ASSERT_EQ(expectedEndpointString, endpoint.toString());
 
         network::SocketAddress other(HostAddress(host), port);
-        ASSERT_EQ(addr.toString(), other.toString());
-        ASSERT_EQ(addr, other);
+        ASSERT_EQ(endpoint.toString(), other.toString());
+        ASSERT_EQ(endpoint, other);
 
-        QUrl url(QString("http://%1/path").arg(endpointString));
-        ASSERT_EQ(addr.address.toString(), url.host());
-        ASSERT_EQ(addr.port, url.port(0));
+        QUrl url(QString("http://%1/path").arg(expectedEndpointString));
+        ASSERT_EQ(endpoint.address.toString(), url.host());
+        ASSERT_EQ(endpoint.port, url.port(0));
+    }
+
+    void assertEndpointIsParsedAsExpected(
+        const QString& endpointString, const char* host, int port)
+    {
+        assertEndpointIsParsedAsExpected(
+            network::SocketAddress(endpointString),
+            endpointString,
+            host,
+            port);
     }
 };
 
@@ -231,8 +243,20 @@ TEST_F(SocketAddress, endpoint_with_ipv4)
 
 TEST_F(SocketAddress, endpoint_with_ipv6)
 {
+    assertEndpointIsParsedAsExpected(
+        network::SocketAddress("2001:db8:0:2::1"),
+        "[2001:db8:0:2::1]",
+        "2001:db8:0:2::1",
+        0);
+
     assertEndpointIsParsedAsExpected("[2001:db8:0:2::1]", "2001:db8:0:2::1", 0);
     assertEndpointIsParsedAsExpected("[2001:db8:0:2::1]:23", "2001:db8:0:2::1", 23);
+
+    assertEndpointIsParsedAsExpected(
+        network::SocketAddress("::ffff:12.34.56.78"),
+        "[::ffff:12.34.56.78]",
+        "::ffff:12.34.56.78",
+        0);
 
     assertEndpointIsParsedAsExpected("[::ffff:12.34.56.78]", "::ffff:12.34.56.78", 0);
     assertEndpointIsParsedAsExpected("[::ffff:12.34.56.78]:777", "::ffff:12.34.56.78", 777);
