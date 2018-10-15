@@ -28,12 +28,11 @@ public:
 private:
     void startUpdate();
     void processResponse(QByteArray responseData);
-    void stopHttpClient();
     ServerLicenseInfo licenseData() const;
 
 private:
-    QTimer m_timer;
     QnMutex m_mutex;
+    nx::network::aio::Timer m_timer;
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
 };
 
