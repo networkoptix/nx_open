@@ -225,9 +225,6 @@ void VideoStream::run()
         if (!packet)
             continue;
 
-        // Setting timestamp here because primary stream needs it even if there is no decoding.
-        packet->setTimestamp(m_timeProvider->millisSinceEpoch());
-
         auto frame = maybeDecode(packet.get());
 
         uint64_t now = m_timeProvider->millisSinceEpoch();
@@ -401,6 +398,10 @@ std::shared_ptr<ffmpeg::Packet> VideoStream::readFrame()
         }
         return nullptr;
     }
+
+    // Setting timestamp here because primary stream needs it even if there is no decoding.
+    packet->setTimestamp(m_timeProvider->millisSinceEpoch());
+
     return packet;
 }
 
