@@ -65,7 +65,6 @@ public:
     bool cancelUpdatesCheck();
     bool isChecking() const;
 
-
 protected:
     // This one is called by timer periodically.
     void at_updateCurrentState();

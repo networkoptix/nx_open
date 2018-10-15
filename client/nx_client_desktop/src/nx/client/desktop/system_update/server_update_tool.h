@@ -123,7 +123,7 @@ public:
 
     // Check if update info contains all the packages necessary to update the system.
     // @param contents - current update contents.
-    bool verifyUpdateManifest(UpdateContents& contentse) const;
+    bool verifyUpdateManifest(UpdateContents& contents) const;
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);
@@ -225,11 +225,13 @@ private:
     std::set<QString> m_completedUploads;
     std::map<QString, nx::client::desktop::UploadState> m_uploadStateById;
 
-    // Current update manifest.
+    // Current update manifest. We get it from mediaservers, or overriding it by calling
+    // requestStartUpdate(...) method.
     nx::update::Information m_updateManifest;
 
     std::future<UpdateContents> m_updateCheck;
 
+    // Path to a remote folder with update packages.
     QString m_uploadDestination;
     // Cached path to file with offline updates.
     QString m_localUpdateFile;

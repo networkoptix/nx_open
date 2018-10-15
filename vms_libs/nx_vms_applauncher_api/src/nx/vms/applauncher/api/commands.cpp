@@ -19,7 +19,7 @@ ResultType::Value sendCommandToApplauncher(
     int timeoutMs)
 {
     NamedPipeSocket sock;
-    QString pipeName = launcherPipeName();
+    const QString pipeName = launcherPipeName();
     SystemError::ErrorCode resultCode = sock.connectToServerSync(pipeName);
     if (resultCode != SystemError::noError)
     {

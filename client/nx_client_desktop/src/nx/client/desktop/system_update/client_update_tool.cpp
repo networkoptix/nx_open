@@ -32,6 +32,17 @@ public:
 
 } // namespace nx::vms::common::p2p::downloader
 
+/*
+ * Client update consists of the following actions:
+ * 1. Download client package. It can be omitted for offline update package.
+ * 2. Unpack client package.
+ * 3. Verify unpacked contents.
+ * 4. Install it. applauncher does it.
+ *
+ * Applauncher deals with stages 2-4.
+ */
+
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -55,12 +66,12 @@ ClientUpdateTool::~ClientUpdateTool()
 
 void ClientUpdateTool::setState(State newState)
 {
-    if (m_state != newState)
-    {
-        m_state = newState;
-        m_stateChanged = true;
-    }
-    m_lastError = "";
+    if (m_state == newState)
+        return;
+
+    m_state = newState;
+    m_stateChanged = true;
+    m_lastError = QString();
 }
 
 void ClientUpdateTool::setError(QString error)
@@ -85,13 +96,11 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
     {
         // Expecting that file is stored at:
         QString path = contents.storageDir.filePath(m_clientPackage.file);
-        //unpackUpdate(path);
         m_updateFile = path;
         setState(State::readyInstall);
     }
     else
     {
-        // TODO: We already have a URL to client update. We should download and install it directly.
         FileInformation info;
         info.md5 = QByteArray::fromHex(m_clientPackage.md5.toLatin1());
         info.size = m_clientPackage.size;
@@ -114,23 +123,16 @@ void ClientUpdateTool::downloadUpdate(const UpdateContents& contents)
                 setState(State::readyInstall);
                 break;
             default:
-                // TODO: Some sort of an error here
-                {
-                    QString error = vms::common::p2p::downloader::toString(code);
-                    NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
-                        << info.name << error;
-                    setError(error);
-                    break;
-                }
+            // Some sort of an error here.
+            {
+                QString error = vms::common::p2p::downloader::toString(code);
+                NX_VERBOSE(this) << "requestStartUpdate() - failed to add client package "
+                    << info.name << error;
+                setError(error);
+                break;
+            }
         }
     }
-    /*
-     * Client update consists of:
-     * 1. Download client package
-     * 2. Unpack client package
-     * 3. Verify unpacked contents
-     * 4. Install it.
-     */
 }
 
 void ClientUpdateTool::at_downloaderStatusChanged(const FileInformation& fileInformation)
@@ -169,31 +171,6 @@ void ClientUpdateTool::at_downloaderStatusChanged(const FileInformation& fileInf
     }
 }
 
-#ifdef TO_BE_REMOVED
-void ClientUpdateTool::unpackUpdate(QString packagePath)
-{
-    NX_INFO(this) << "unpackUpdate" + packagePath;
-
-    m_updateFile = packagePath;
-
-    if (m_extractor)
-    {
-        // TODO: Why do we have an extractor instance?
-        disconnect(m_extractor.get(), &QnZipExtractor::finished, this, &ClientUpdateTool::at_extractFilesFinished);
-    }
-
-    // Clean up existing folder for updates.
-    m_outputDir.removeRecursively();
-    if (!m_outputDir.exists())
-        m_outputDir.mkpath(".");
-
-    m_extractor = std::make_shared<QnZipExtractor>(packagePath, m_outputDir.path());
-    connect(m_extractor.get(), &QnZipExtractor::finished, this, &ClientUpdateTool::at_extractFilesFinished);
-    setState(State::unpacking);
-    m_extractor->start();
-}
-#endif
-
 void ClientUpdateTool::at_extractFilesFinished(int code)
 {
     if (code != QnZipExtractor::Ok)
@@ -221,7 +198,6 @@ bool ClientUpdateTool::isDownloadComplete() const
 
 bool ClientUpdateTool::installUpdate()
 {
-
     /* Try to run applauncher if it is not running. */
     if (!applauncher::api::checkOnline())
     {
@@ -319,14 +295,13 @@ bool ClientUpdateTool::isInstallComplete() const
 
 bool ClientUpdateTool::restartClient()
 {
-    using namespace applauncher::api;
-
     /* Try to run applauncher if it is not running. */
     if (!applauncher::api::checkOnline())
         return false;
 
-    const auto result = applauncher::api::restartClient(m_updateVersion);
-    if (result == ResultType::ok)
+    using Result = applauncher::api::ResultType::Value;
+    Result result = applauncher::api::restartClient(m_updateVersion);
+    if (result == Result::ok)
         return true;
 
     static const int kMaxTries = 5;
@@ -334,7 +309,7 @@ bool ClientUpdateTool::restartClient()
     {
         QThread::msleep(100);
         qApp->processEvents();
-        if (applauncher::api::restartClient(m_updateVersion) == ResultType::ok)
+        if (applauncher::api::restartClient(m_updateVersion) == Result::ok)
             return true;
     }
     return false;
@@ -342,20 +317,16 @@ bool ClientUpdateTool::restartClient()
 
 void ClientUpdateTool::resetState()
 {
-    // TODO: Cancel download if there is any.
-    // TODO: Reset current update info.
     switch (m_state)
     {
         case State::downloading:
-            // TODO: Cancel it
+            m_downloader->deleteFile(m_clientPackage.file, false);
             break;
-        //case State::unpacking:
-        //    break;
         case State::readyInstall:
             break;
         case State::initial:
         default:
-            // Nothing to do here
+            // Nothing to do here.
             break;
     }
 
@@ -364,6 +335,7 @@ void ClientUpdateTool::resetState()
     m_updateFile = "";
     m_progress = 0;
     m_updateVersion = nx::utils::SoftwareVersion();
+    m_clientPackage = nx::update::Package();
 }
 
 ClientUpdateTool::State ClientUpdateTool::getState() const

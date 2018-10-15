@@ -12,18 +12,16 @@
 
 #include "update_contents.h"
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 /**
  * A tool to deal with client updates.
- * Widget sets UpdateContents to it and waits until
- * it is downloaded and installed.
+ * Widget sets UpdateContents to it and waits until package is downloaded and installed.
  * ClientUpdateTool uses p2p downloader to get update package.
  */
-class ClientUpdateTool: public Connective<QObject>,
-        public QnConnectionContextAware
+class ClientUpdateTool:
+    public Connective<QObject>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -114,15 +112,9 @@ protected:
     bool m_stateChanged = false;
     nx::utils::SoftwareVersion m_updateVersion;
 
-
     // Full path to update package.
     QString m_updateFile;
-
-    // TODO: Actually, we do not need extractor. Applauncher deals with it.
-    //std::shared_ptr<QnZipExtractor> m_extractor;
     QString m_lastError;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop

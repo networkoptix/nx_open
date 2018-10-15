@@ -61,9 +61,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
         safeModeWatcher->addControlledWidget(updatesWidget,
             QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 
-        connect(commonModule(), &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
-            setPageEnabled(UpdatesPage, !readOnly);
-        });
+        connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
+            [this](bool readOnly)
+            {
+                setPageEnabled(UpdatesPage, !readOnly);
+            });
         setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
     }
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));

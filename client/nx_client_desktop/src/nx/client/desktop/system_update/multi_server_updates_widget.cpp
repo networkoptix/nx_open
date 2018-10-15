@@ -806,7 +806,8 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
         /*
          * TODO: We should deal with starting client update.
          * There are two distinct situations:
-         *  1. This is 'other' client, that have found that an update process is running.
+         *  1. This is the client, that has initiated update process.
+         *  2. This is 'other' client, that have found that an update process is running.
          *  It should download an update package using p2p downloader
          */
         m_clientUpdateTool->downloadUpdate(updateInfo);
@@ -844,8 +845,11 @@ void MultiServerUpdatesWidget::processRemoteInitialState()
         }
         else
         {
-            NX_ASSERT(false);
-            // #dkargin: Should not be here.
+            // We can reach here when we reconnect to the server with complete updates.
+            NX_VERBOSE(this)
+                << "processRemoteInitialState() - no servers in downloading/installing/downloaded/installed state."
+                << "Update process seems to be stalled or complete. Ignoring this internal state.";
+            setTargetState(WidgetUpdateState::ready, {});
         }
     }
     else
@@ -1063,8 +1067,8 @@ void MultiServerUpdatesWidget::completeInstallation(bool clientUpdated)
         }
         else
         {
-            qApp->exit(0);
             applauncher::api::scheduleProcessKill(QCoreApplication::applicationPid(), kProcessTerminateTimeoutMs);
+            qApp->exit(0);
         }
     }
 
