@@ -420,7 +420,8 @@ void NX_NETWORK_API downloadFileAsync(
 SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
     const nx::utils::Url& url,
     int* const statusCode,
-    nx::network::http::BufferType* const msgBody);
+    nx::network::http::BufferType* const msgBody,
+    AsyncHttpClient::Timeouts timeouts = AsyncHttpClient::Timeouts());
 
 using DownloadCompletionHandlerEx = std::function<void(SystemError::ErrorCode, int /*statusCode*/,
     nx::network::http::StringType /*content type*/, nx::network::http::BufferType /*message body*/,

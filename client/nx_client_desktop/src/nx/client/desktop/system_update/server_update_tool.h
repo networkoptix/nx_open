@@ -11,9 +11,6 @@
 #include <nx/update/update_check.h>
 #include <nx/update/update_information.h>
 
-#include <update/updates_common.h>
-#include <update/update_process.h>
-
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/system_information.h>
 
@@ -21,6 +18,8 @@
 #include <api/server_rest_connection.h>
 #include <utils/update/zip_utils.h>
 #include <nx/client/desktop/utils/upload_state.h>
+
+#include "update_contents.h"
 
 namespace nx {
 namespace client {
@@ -44,8 +43,7 @@ using FileInformation = vms::common::p2p::downloader::FileInformation;
  */
 class ServerUpdateTool:
         public Connective<QObject>,
-        public QnConnectionContextAware,
-        public std::enable_shared_from_this<ServerUpdateTool>
+        public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -114,55 +112,18 @@ public:
         error,
     };
 
-    enum class UpdateCheckMode
-    {
-        // Got update info from the internet.
-        internet,
-        // Got update info from the internet for specific build.
-        internetSpecific,
-        // Got update info from offline update package.
-        file,
-        // Got update info from mediaserver swarm.
-        mediaservers,
-    };
-
-    /**
-     * Wraps up update info and summary for its verification.
-     */
-    struct UpdateContents
-    {
-        UpdateCheckMode mode = UpdateCheckMode::internet;
-        QString source;
-
-        // A set of servers without proper update file.
-        QSet<QnMediaServerResourcePtr> missingUpdate;
-        // A set of servers that can not accept update version.
-        QSet<QnMediaServerResourcePtr> invalidVersion;
-
-        QString eulaPath;
-
-        // A folder with offline update packages.
-        QDir storageDir;
-        // A list of files to be uploaded.
-        QStringList filesToUpload;
-        // Information for the clent update.
-        nx::update::Package clientPackage;
-
-        nx::update::Information info;
-        nx::update::InformationError error = nx::update::InformationError::noError;
-
-        // Check if we can apply this update.
-        bool isValid() const;
-    };
-
     std::future<UpdateContents> checkLatestUpdate();
     std::future<UpdateContents> checkSpecificChangeset(QString build, QString password);
     std::future<UpdateContents> checkUpdateFromFile(QString file);
 
+    // It is used to obtain future to update check that was started
+    // inside loadInternalState method
+    // TODO: move all state restoration logic to widget.
     std::future<UpdateContents> getUpdateCheck();
+
     // Check if update info contains all the packages necessary to update the system.
     // @param contents - current update contents.
-    bool verifyUpdateManifest(UpdateContents& contents) const;
+    bool verifyUpdateManifest(UpdateContents& contentse) const;
 
     // Start uploading local update packages to the server(s).
     bool startUpload(const UpdateContents& contents);
@@ -172,19 +133,22 @@ public:
     {
         int current = 0;
         int max = 0;
+        // This flags help UI to pick proper caption for a progress.
+        bool downloadingClient = false;
+        bool downloadingServers = false;
+        bool uploading = false;
+        bool installingServers = false;
+        bool installingClient = false;
     };
 
     // Calculates a progress for uploading files to the server.
     ProgressInfo calculateUploadProgress();
-    // Calculates a progress for remote downloading.
-    ProgressInfo calculateRemoteDownloadProgress();
-    // Calculates a progress for remote downloading.
-    ProgressInfo calculateInstallProgress();
 
     OfflineUpdateState getUploaderState() const;
 
-    // Get information about current update.
-    nx::update::Information getActiveUpdateInformation() const;
+    // Get information about current update from mediaservers.
+    UpdateContents getRemoteUpdateContents() const;
+
     bool haveActiveUpdate() const;
 
     // Get current set of servers.
@@ -196,8 +160,17 @@ public:
     // Get servers that are offline right now.
     QSet<QnUuid> getOfflineServers() const;
 
-    // Get servers that are incompatible with new update system.
+    // Get servers that are incompatible with the new update system.
     QSet<QnUuid> getLegacyServers() const;
+
+    // Get servers that have completed installation process.
+    QSet<QnUuid> getServersCompleteInstall() const;
+
+    // Get servers, which are installing updates for too long.
+    QSet<QnUuid> getServersWithStalledUpdate() const;
+
+    // Get servers with updated protocol.
+    QSet<QnUuid> getServersWithChangedProtocol() const;
 
     std::shared_ptr<ServerUpdatesModel> getModel();
 
@@ -211,6 +184,8 @@ private:
     void at_uploadWorkerState(QnUuid serverId, const nx::client::desktop::UploadState& state);
     // Called by QnZipExtractor when the offline update package is unpacked.
     void at_extractFilesFinished(int code);
+
+    void at_pingTimerTimeout();
 
     // Wrapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
@@ -241,7 +216,7 @@ private:
     // Servers we do work with.
     std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 
-    // Explicit connections to resource pool events
+    // Explicit connections to resource pool events.
     QMetaObject::Connection m_onAddedResource, m_onRemovedResource, m_onUpdatedResource;
 
     // For pushing update package to the server swarm. Will be replaced by a p2p::Downloader.
@@ -259,16 +234,17 @@ private:
     // Cached path to file with offline updates.
     QString m_localUpdateFile;
     QDir m_outputDir;
-    QString m_changeset;
 
     QSet<rest::Handle> m_activeRequests;
     QSet<rest::Handle> m_skippedRequests;
 
-    std::unique_ptr<Downloader> m_downloader;
-    // Downloader needs this strange thing.
-    std::unique_ptr<vms::common::p2p::downloader::AbstractPeerManagerFactory> m_peerManagerFactory;
-
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
+
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock>;
+    // Time at which install command was issued.
+    TimePoint m_timeStartedInstall;
+    bool m_protoProblemDetected = false;
 };
 
 } // namespace desktop

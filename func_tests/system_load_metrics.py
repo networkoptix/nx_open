@@ -95,7 +95,7 @@ def load_host_memory_usage(os_access):
 def load_averge_collector(metrics_saver):
 
     @contextmanager
-    def collector(os_access_set):
+    def collector(os_access_set, metric_name):
         # collected load average with 1 min interval for last 1 min each
         os_access_to_average = {os_access: [] for os_access in os_access_set}
 
@@ -117,6 +117,6 @@ def load_averge_collector(metrics_saver):
             if not average_1min:
                 continue
             load_average = sum(average_1min) / len(average_1min)
-            metrics_saver.save('cpu_load_average.{}'.format(os_access.alias), load_average)
+            metrics_saver.save('cpu_load_average.{}.{}'.format(metric_name, os_access.alias), load_average)
 
     return collector

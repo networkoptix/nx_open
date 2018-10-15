@@ -462,13 +462,37 @@ struct ModifyResourceAccess
     ModifyResourceAccess(bool isRemove): isRemove(isRemove) {}
 
     template<typename Param>
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+        const Param& param)
     {
+        NX_VERBOSE(this,
+            lm("Got modify resource request. Is system access: %1, Data type: %2," \
+                " Data contents: %3").args(hasSystemAccess(accessData), typeid(param).name(),
+                    QJson::serialized(param)));
+
         if (hasSystemAccess(accessData))
             return true;
+
         const auto& resPool = commonModule->resourcePool();
-        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+        auto userResource = resPool->getResourceById(accessData.userId)
+            .dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
+
+        if constexpr (std::is_same<Param, nx::vms::api::UserData>::value)
+        {
+            if (!target) //< new user
+            {
+                auto allUsers = resPool->getResources<QnUserResource>();
+                auto hasUserWithSameName = std::any_of(allUsers.cbegin(), allUsers.cend(),
+                    [&param](const auto& resPtr) { return resPtr->getName() == param.name; });
+                if (hasUserWithSameName)
+                {
+                    NX_DEBUG(this, lm("Won't save user '%1' because of the name duplication")
+                        .args(param.name));
+                    return false;
+                }
+            }
+        }
 
         bool result = false;
         if (isRemove)

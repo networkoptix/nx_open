@@ -26,8 +26,20 @@ private:
     void loadIconInternal(
         const QString& key,
         const QString& name,
-        const QString& checkedName = QString(),
-        const QnIcon::SuffixesList* suffixes = nullptr);
+        const QString& checkedName,
+        const QnIcon::SuffixesList* suffixes);
+
+    static QIcon loadPixmapIconInternal(
+        QnSkin* skin,
+        const QString& name,
+        const QString& checkedName,
+        const QnIcon::SuffixesList* suffixes);
+
+    static QIcon loadSvgIconInternal(
+        QnSkin* skin,
+        const QString& name,
+        const QString& checkedName,
+        const QnIcon::SuffixesList* suffixes);
 
 private:
     QHash<QString, QIcon> m_iconByKey;
