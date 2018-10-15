@@ -14,34 +14,40 @@
 #include <nx/client/desktop/layout_templates/layout_template.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
 #include <nx/utils/random.h>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
-AnalyticsActionHandler::AnalyticsActionHandler(QObject* parent):
-    base_type(parent),
+class AnalyticsActionHandler::Private: public QObject, public QnWorkbenchContextAware
+{
+public:
+    Private(QObject* parent);
+
+    void startAnalytics();
+    void cleanupControllers();
+
+private:
+    using ControllerPtr = QSharedPointer<WorkbenchAnalyticsController>;
+    QList<ControllerPtr> m_controllers;
+};
+
+AnalyticsActionHandler::Private::Private(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
     if (ini().enableAnalytics)
     {
-        connect(action(ui::action::StartAnalyticsAction), &QAction::triggered, this,
-            &AnalyticsActionHandler::startAnalytics);
+        connect(action(ui::action::StartAnalyticsAction), &QAction::triggered,
+            this, &Private::startAnalytics);
     }
 
-    connect(workbench(), &QnWorkbench::layoutsChanged, this,
-        &AnalyticsActionHandler::cleanupControllers);
+    connect(workbench(), &QnWorkbench::layoutsChanged, this, &Private::cleanupControllers);
 }
 
-AnalyticsActionHandler::~AnalyticsActionHandler()
-{
-}
-
-void AnalyticsActionHandler::startAnalytics()
+void AnalyticsActionHandler::Private::startAnalytics()
 {
     auto parameters = menu()->currentParameters(sender());
     const auto resource = parameters.resource();
@@ -81,7 +87,7 @@ void AnalyticsActionHandler::startAnalytics()
     menu()->trigger(ui::action::OpenInNewTabAction, controller->layout());
 }
 
-void AnalyticsActionHandler::cleanupControllers()
+void AnalyticsActionHandler::Private::cleanupControllers()
 {
     QSet<QnLayoutResourcePtr> usedLayouts;
     for (auto layout: workbench()->layouts())
@@ -97,6 +103,12 @@ void AnalyticsActionHandler::cleanupControllers()
     }
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+AnalyticsActionHandler::AnalyticsActionHandler(QObject* parent):
+    QObject(parent),
+    d(new Private(this))
+{
+}
+
+AnalyticsActionHandler::~AnalyticsActionHandler() = default;
+
+} // namespace nx::client::desktop

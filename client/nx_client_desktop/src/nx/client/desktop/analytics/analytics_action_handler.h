@@ -1,36 +1,20 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QObject>
 
-#include <ui/workbench/workbench_context_aware.h>
+namespace nx::client::desktop {
 
-#include <utils/common/connective.h>
-
-namespace nx {
-namespace client {
-namespace desktop {
-
-class WorkbenchAnalyticsController;
-
-class AnalyticsActionHandler:
-    public Connective<QObject>,
-    public QnWorkbenchContextAware
+class AnalyticsActionHandler: public QObject
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+
 public:
     explicit AnalyticsActionHandler(QObject* parent = nullptr);
     virtual ~AnalyticsActionHandler() override;
 
 private:
-    void startAnalytics();
-    void cleanupControllers();
-
-private:
-    using ControllerPtr = QSharedPointer<WorkbenchAnalyticsController>;
-    QList<ControllerPtr> m_controllers;
+    class Private;
+    const QScopedPointer<Private> d;
 };
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
