@@ -48,6 +48,14 @@ public:
     MediatorFunctionalTest(int flags = allFlags);
     ~MediatorFunctionalTest();
 
+    /**
+     * Use it to make restart reliable.
+     * Without using proxy mediator is not able to automatically 
+     * attach to the same port after restart.
+     * false by default.
+     */
+    void setUseProxy(bool value);
+
     virtual bool waitUntilStarted() override;
 
     network::SocketAddress stunUdpEndpoint() const;
@@ -93,9 +101,14 @@ private:
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     network::SocketAddress m_stunUdpEndpoint;
+    network::SocketAddress m_stunTcpEndpoint;
+    network::SocketAddress m_httpEndpoint;
     TcpProxyContext m_httpProxy;
     TcpProxyContext m_stunProxy;
     bool m_tcpPortsAllocated = false;
+    bool m_useProxy = false;
+
+    int m_startCount = 0;
 
     bool startProxy();
     bool allocateTcpPorts();

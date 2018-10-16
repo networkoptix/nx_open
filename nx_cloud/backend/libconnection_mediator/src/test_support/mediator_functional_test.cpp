@@ -59,19 +59,39 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
 
     if (m_factoryFuncToRestore)
     {
-        AbstractCloudDataProviderFactory::setFactoryFunc(std::move(*m_factoryFuncToRestore));
+        AbstractCloudDataProviderFactory::setFactoryFunc(
+            std::move(*m_factoryFuncToRestore));
         m_factoryFuncToRestore.reset();
     }
 }
 
+void MediatorFunctionalTest::setUseProxy(bool value)
+{
+    m_useProxy = value;
+}
+
 bool MediatorFunctionalTest::waitUntilStarted()
 {
+    ++m_startCount;
+
+    NX_ASSERT(m_startCount == 1 || m_useProxy);
+
     if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
         return false;
 
     // Proxy is needed to be able to restart mediator while preserving same ports.
-    if (!startProxy())
-        return false;
+    if (m_useProxy)
+    {
+        if (!startProxy())
+            return false;
+        m_httpEndpoint = m_httpProxy.endpoint;
+        m_stunTcpEndpoint = m_stunProxy.endpoint;
+    }
+    else
+    {
+        m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
+        m_httpEndpoint = moduleInstance()->impl()->httpEndpoints().front();
+    }
 
     m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
@@ -95,12 +115,12 @@ network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 
 network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 {
-    return m_stunProxy.endpoint;
+    return m_stunTcpEndpoint;
 }
 
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    return m_httpProxy.endpoint;
+    return m_httpEndpoint;
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
