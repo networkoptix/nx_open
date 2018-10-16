@@ -93,8 +93,9 @@ export class ShareModalContent {
                 email    : '',
                 isEnabled: true,
                 role     : {
-                    name       : predefinedRole.name,
-                    permissions: predefinedRole.permissions
+                    name       : this.configService.config.accessRoles.default,
+                    permissions: ''     // permissions will be updated within permissions component as it depends
+                                        // on system's accessRoles
                 }
             };
         }
@@ -102,8 +103,6 @@ export class ShareModalContent {
         if (!this.user.role) {
             this.user.role = this.system.findAccessRole(this.user);
         }
-        this.selectedPermission = this.user.role;
-        this.accessDescription = this.getRoleDescription();
 
         if (!this.isNewShare) {
             this.account
