@@ -399,6 +399,7 @@ void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode res
         case api::ResultCode::accountBlocked:
             setStatus(QnCloudStatusWatcher::LoggedOut,
                 QnCloudStatusWatcher::UserTemporaryLockedOut);
+            break;
         default:
             setStatus(QnCloudStatusWatcher::Offline,
                 QnCloudStatusWatcher::UnknownError);
