@@ -102,12 +102,13 @@ ng-include{
 }
 
 .timeline{
-  position:relative;
-  height:100%;
-  -webkit-touch-callout: none;
-  user-select: none;
-  background-color: $additional_light2;
-  text-transform: uppercase;
+    position              : relative;
+    height                : 100%;
+    -webkit-touch-callout : none;
+    user-select           : none;
+    background-color      : $additional_light2;
+    text-transform        : uppercase;
+    z-index               : 9;
 
   div{
       .shadows-off{
@@ -250,20 +251,20 @@ ng-include{
   &:hover{
     background-color: $additional_light3;
     border-left: 1px solid $light6;
-    border-right: 1px solid $light5; 
+    border-right: 1px solid $light5;
   }
 
   &.active:hover{
     background-color: $light4;
     border-left: 1px solid $light7;
-    border-right: 1px solid $light6; 
+    border-right: 1px solid $light6;
   }
 
   &.active, &:active,
   &.active:active {
     background-color: $light5;
     border-left: 1px solid $light8;
-    border-right: 1px solid $light7; 
+    border-right: 1px solid $light7;
   }
 }
 
@@ -298,5 +299,5 @@ ng-include{
       top: 4px;
       left: 6px;
     }
-  }  
+  }
 }
