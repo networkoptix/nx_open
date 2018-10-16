@@ -7,7 +7,7 @@
 #include <camera/camera_plugin_types.h>
 #include "camera/camera_plugin.h"
 
-#include "../device_data.h"
+#include "device/device_data.h"
 
 namespace nx {
 namespace usb_cam {

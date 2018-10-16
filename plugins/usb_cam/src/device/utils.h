@@ -11,7 +11,9 @@ namespace nx {
 namespace usb_cam {
 namespace device {
 
-
+/**
+ * Get the gui friendly name of the device
+ */
 std::string getDeviceName(const char * devicePath);
 
 /**

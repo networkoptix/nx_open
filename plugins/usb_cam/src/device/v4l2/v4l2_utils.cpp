@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include <nx/utils/app_info.h>
+#include "device/rpi/rpi_utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -23,47 +23,6 @@ namespace impl {
 namespace {
 
 static const std::string kV4L2DevicePath = "/dev/v4l/by-id";
-
-const std::vector<ResolutionData> kRaspberryPiResolutionList = 
-{
-    {1920, 1080, 30},
-    {1920, 1080, 25},
-    {1920, 1080, 20},
-    {1920, 1080, 15},
-    {1920, 1080, 10},
-    {1920, 1080, 5},
-    {1280, 720, 30},
-    {1280, 720, 25},
-    {1280, 720, 20},
-    {1280, 720, 15},
-    {1280, 720, 10},
-    {1280, 720, 5},
-    {800, 600, 30},
-    {800, 600, 25},
-    {800, 600, 20},
-    {800, 600, 15},
-    {800, 600, 10},
-    {800, 600, 5},
-    {640, 480, 30},
-    {640, 480, 25},
-    {640, 480, 20},
-    {640, 480, 15},
-    {640, 480, 10},
-    {640, 480, 5},
-    {640, 360, 30},
-    {640, 360, 25},
-    {640, 360, 20},
-    {640, 360, 15},
-    {640, 360, 10},
-    {640, 360, 5},
-    {480, 270, 30},
-    {480, 270, 25},
-    {480, 270, 20},
-    {480, 270, 15},
-    {480, 270, 10},
-    {480, 270, 5} 
-};
-
 
 // Convenience class for opening and closing devices represented by devicePath
 struct DeviceInitializer
@@ -79,21 +38,13 @@ struct DeviceInitializer
             close(fileDescriptor);
     }
 
-    int fileDescriptor;
+    int fileDescriptor = -1;
 };
 
-bool isRpiMmal(const char * deviceName);
 std::vector<std::string> getDevicePaths();
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
 std::string getDeviceName(int fileDescriptor);
 float toFrameRate(const v4l2_fract& frameInterval);
-
-bool isRpiMmal(const char * deviceName)
-{
-    std::string lower(deviceName);
-    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return nx::utils::AppInfo::isRaspberryPi() && lower.find("mmal") != std::string::npos;
-}
 
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID)
 {
@@ -203,7 +154,10 @@ std::string getDeviceName(const char * devicePath)
 
 std::vector<DeviceData> getDeviceList()
 {
-    std::vector<std::string> devicePaths = getDevicePaths();
+    std::vector<std::string> devicePaths = rpi::isRpi() 
+        ? rpi::getRpiDevicePaths()
+        : getDevicePaths();
+
     std::vector<DeviceData> deviceList;
     if (devicePaths.empty())
         return deviceList;
@@ -220,7 +174,8 @@ std::vector<DeviceData> getDeviceList()
     return deviceList;
 }
 
-std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(const char * devicePath)
+std::vector<std::shared_ptr<AbstractCompressionTypeDescriptor>> getSupportedCodecs(
+    const char * devicePath)
 {
     DeviceInitializer initializer(devicePath);
 
@@ -260,9 +215,6 @@ std::vector<ResolutionData> getResolutionList(
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
         return {};
-
-    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
-        return kRaspberryPiResolutionList;
 
     auto descriptor = 
         std::dynamic_pointer_cast<const V4L2CompressionTypeDescriptor>(targetCodecID);
@@ -315,9 +267,6 @@ void setBitrate(
     int bitrate,
     const device::CompressionTypeDescriptorPtr& /*targetCodecID*/)
 {
-    if (!isRpiMmal(getDeviceName(devicePath).c_str()))
-        return;
-
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
         return;
@@ -335,14 +284,9 @@ void setBitrate(
 
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
-    static constexpr int kRpiBitrate = 10000000;
-#if 0
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
-        return kRpiBitrate;
-
-    if(isRpiMmal(getDeviceName(initializer.fileDescriptor).c_str()))
-        return kRpiBitrate;
+        return 0;
 
     struct v4l2_ext_controls ecs = {0};
     struct v4l2_ext_control ec = {0};
@@ -360,8 +304,8 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
         if (ioctl(initializer.fileDescriptor, VIDIOC_G_EXT_CTRLS, &ecs))
             return ec.value;
     }
-#endif
-    return kRpiBitrate;
+
+    return 0;
 }
 
 } // namespace impl

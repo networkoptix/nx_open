@@ -107,7 +107,7 @@ std::shared_ptr<ffmpeg::Packet> NativeStreamReader::nextPacket()
                 break;
             else if (m_interrupted || m_camera->videoStream()->ioError())
                     return nullptr;
-            }            
+        }            
     }
 
     for(;;)
