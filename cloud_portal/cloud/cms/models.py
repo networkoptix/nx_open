@@ -210,8 +210,8 @@ class Product(models.Model):
 
 class Context(models.Model):
     class Meta:
-        verbose_name = 'page'
-        verbose_name_plural = 'pages'
+        verbose_name = 'admin page'
+        verbose_name_plural = 'admin pages'
         permissions = (
             ("edit_content", "Can edit content and send for review"),
         )
@@ -249,8 +249,8 @@ class Context(models.Model):
 class ContextProxy(Context):
     class Meta:
         proxy = True
-        verbose_name = "Admin Page"
-        verbose_name_plural = "Admin Pages"
+        verbose_name = "page"
+        verbose_name_plural = "pages"
 
 
 class ContextTemplate(models.Model):

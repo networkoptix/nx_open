@@ -105,7 +105,7 @@ class ProductAdmin(CMSAdmin):
 
     def edit_product(self, obj):
         return format_html('<a class="btn btn-sm product" href="{}" value="{}">Edit contexts</a>',
-                           reverse('admin:cms_context_changelist'), obj.id)
+                           reverse('admin:cms_contextproxy_changelist'), obj.id)
 
     edit_product.short_description = 'Edit page'
     edit_product.allow_tags = True
@@ -117,7 +117,7 @@ class ProductAdmin(CMSAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
-class ContextAdmin(CMSAdmin):
+class ContextProxyAdmin(CMSAdmin):
     list_display = ('name', 'description', 'url', 'translatable', 'is_global')
 
     list_display_links = ('name',)
@@ -146,32 +146,27 @@ class ContextAdmin(CMSAdmin):
                         request.user)
         extra_context['custom_form'] = form
 
-        return super(ContextAdmin, self).change_view(request, object_id, form_url, extra_context)
+        return super(ContextProxyAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def get_model_perms(self, request):
         if not request.user.is_superuser:
             return {}
-        return super(ContextAdmin, self).get_model_perms(request)
+        return super(ContextProxyAdmin, self).get_model_perms(request)
 
     def changelist_view(self, request, extra_context=None):
-        if not request.user.is_superuser:
-            self.list_display_links = (None,)
-        else:
-            self.list_filter = ('product_type',)
-
         extra_context = extra_context or {}
         if'product_id' in request.POST:
             request.session['product_id'] = request.POST['product_id']
-            return HttpResponse(reverse('admin:cms_context_changelist'))
+            return HttpResponse(reverse('admin:cms_contextproxy_changelist'))
 
         if 'product_id' not in request.session:
             messages.error(request, "No product was selected!")
             return redirect(reverse('admin:cms_product_changelist'))
 
-        return super(ContextAdmin, self).changelist_view(request, extra_context)
+        return super(ContextProxyAdmin, self).changelist_view(request, extra_context)
 
     def get_queryset(self, request):  # show only users for cloud_portal product type
-        qs = super(ContextAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
+        qs = super(ContextProxyAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         qs = qs.filter(product_type__product__in=[request.session['product_id']])
         if not request.user.is_superuser:
             qs = qs.filter(product_type__type=ProductType.PRODUCT_TYPES.cloud_portal).\
@@ -179,15 +174,15 @@ class ContextAdmin(CMSAdmin):
         return qs
 
 
-admin.site.register(Context, ContextAdmin)
-
-
-class ContextProxyAdmin(CMSAdmin):
-    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
-    list_filter = (ProductFilter,)
-
-
 admin.site.register(ContextProxy, ContextProxyAdmin)
+
+
+class ContextAdmin(CMSAdmin):
+    list_display = ('name', 'description', 'url', 'translatable', 'is_global')
+    list_filter = ('product_type',)
+
+
+admin.site.register(Context, ContextAdmin)
 
 
 class ContextTemplateAdmin(CMSAdmin):
