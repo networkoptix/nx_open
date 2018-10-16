@@ -13,6 +13,7 @@ except ImportError:
 from django.utils.translation import ugettext_lazy as _
 
 from admin_tools.menu import items, Menu
+from cloud import settings
 
 
 class CustomMenu(Menu):
@@ -26,35 +27,11 @@ class CustomMenu(Menu):
             items.Bookmarks(),
             items.AppList(
                 _('Applications'),
-                exclude=('cms.models.ContentVersion',
-                         'cms.models.Context',
-                         'cms.models.ContextProxy',
-                         'cms.models.ContextTemplate',
-                         'cms.models.DataRecord',
-                         'cms.models.DataStructure',
-                         'cms.models.ProductType',
-                         'cms.models.UserGroupsToCustomizationPermissions',
-                         'django_celery_results.*',
-                         'notifications.models.*',
-                         'rest_hooks.*',
-                         'zapier.models.*'
-                         )
+                exclude=settings.ADMIN_DASHBOARD
             ),
             items.AppList(
                 _('Internal'),
-                models=('cms.models.ContentVersion',
-                        'cms.models.Context',
-                        'cms.models.ContextProxy',
-                        'cms.models.ContextTemplate',
-                        'cms.models.DataRecord',
-                        'cms.models.DataStructure',
-                        'cms.models.ProductType',
-                        'cms.models.UserGroupsToCustomizationPermissions',
-                        'django_celery_results.*',
-                        'notifications.models.*',
-                        'rest_hooks.*',
-                        'zapier.models.*'
-                        )
+                models=settings.ADMIN_DASHBOARD
             ),
             items.MenuItem('Help', '/static/help/cms/'),
         ]

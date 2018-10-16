@@ -104,6 +104,19 @@ if LOCAL_ENVIRONMENT:
 
 ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
 ADMIN_TOOLS_MENU = 'cms.menu.CustomMenu'
+ADMIN_DASHBOARD = ('cms.models.ContentVersion',
+                   'cms.models.Context',
+                   'cms.models.ContextProxy',
+                   'cms.models.ContextTemplate',
+                   'cms.models.DataRecord',
+                   'cms.models.DataStructure',
+                   'cms.models.ProductType',
+                   'cms.models.UserGroupsToCustomizationPermissions',
+                   'django_celery_results.*',
+                   'notifications.models.*',
+                   'rest_hooks.*',
+                   'zapier.models.*'
+                   )
 
 TEMPLATES = [
     {

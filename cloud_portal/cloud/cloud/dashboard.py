@@ -19,6 +19,8 @@ except ImportError:
 from admin_tools.dashboard import modules, Dashboard
 from admin_tools.utils import get_admin_site_name
 
+from cloud import settings
+
 
 class CustomIndexDashboard(Dashboard):
     """
@@ -30,19 +32,7 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
             _('Applications'),
-            exclude=('cms.models.ContentVersion',
-                     'cms.models.Context',
-                     'cms.models.ContextProxy',
-                     'cms.models.ContextTemplate',
-                     'cms.models.DataRecord',
-                     'cms.models.DataStructure',
-                     'cms.models.ProductType',
-                     'cms.models.UserGroupsToCustomizationPermissions',
-                     'django_celery_results.*',
-                     'notifications.models.*',
-                     'rest_hooks.*',
-                     'zapier.models.*'
-                     ),
+            exclude=settings.ADMIN_DASHBOARD,
             deletable=False,
             collapsible=False,
         ))
@@ -50,19 +40,7 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Administration"
         self.children.append(modules.AppList(
             _('Internal'),
-            models=('cms.models.ContentVersion',
-                    'cms.models.Context',
-                    'cms.models.ContextProxy',
-                    'cms.models.ContextTemplate',
-                    'cms.models.DataRecord',
-                    'cms.models.DataStructure',
-                    'cms.models.ProductType',
-                    'cms.models.UserGroupsToCustomizationPermissions',
-                    'django_celery_results.*',
-                    'notifications.models.*',
-                    'rest_hooks.*',
-                    'zapier.models.*'
-                    ),
+            models=settings.ADMIN_DASHBOARD,
             deletable=False,
             collapsible=False,
         ))
