@@ -1,5 +1,4 @@
-#ifndef QN_LONG_RUNNABLE_H
-#define QN_LONG_RUNNABLE_H
+#pragma once
 
 #include <atomic>
 
@@ -12,18 +11,19 @@
 #include "semaphore.h"
 #include "stoppable.h"
 
-class QnLongRunnablePoolPrivate;
+namespace nx {
+namespace utils {
 
-class NX_UTILS_API QnLongRunnable:
+class NX_UTILS_API Thread:
     public QThread,
-    public QnStoppable,  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
+    public QnStoppable,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 
 public:
-    QnLongRunnable( bool isTrackedByPool = true );
-    virtual ~QnLongRunnable();
+    Thread();
+    virtual ~Thread();
 
     bool needToStop() const;
 
@@ -34,46 +34,78 @@ public:
 
     void smartSleep(int ms);
 
-    //!Returns thread id, corresponding to this object
-    /*!
-        This id is remembered in QnLongRunnable::initSystemThreadId
-    */
+    /**
+     * @return Thread id, corresponding to this object.
+     * This id is remembered in Thread::initSystemThreadId.
+     */
     uintptr_t systemThreadId() const;
 
-    //!Returns thread id of current thread. On unix uses gettid function instead of pthread_self. It allows to find thread in gdb
+    /**
+     * @return Thread id of current thread. 
+     * On unix uses gettid function instead of pthread_self.
+     * It allows to find thread in gdb.
+     */
     static uintptr_t currentThreadSystemId();
+
 signals:
     void paused();
+
 public slots:
     virtual void start(Priority priority = InheritPriority);
-    //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
     virtual void stop();
 
 protected:
     void initSystemThreadId();
 
-private slots:
-    void at_started();
-    void at_finished();
+protected slots:
+    virtual void at_started();
+    virtual void at_finished();
 
 protected:
     std::atomic<bool> m_needStop = false;
     std::atomic<bool> m_onPause = false;
     QnSemaphore m_semaphore;
     uintptr_t m_systemThreadId = 0;
-    QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     #if defined(_DEBUG)
         const std::type_info* m_type = nullptr;
     #endif
 };
 
+} // namespace utils
+} // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+
+class QnLongRunnablePoolPrivate;
+
+class NX_UTILS_API QnLongRunnable:
+    public nx::utils::Thread
+{
+    using base_type = nx::utils::Thread;
+
+    Q_OBJECT
+
+public:
+    QnLongRunnable(bool isTrackedByPool = true);
+    ~QnLongRunnable();
+
+protected slots:
+    virtual void at_started() override;
+    virtual void at_finished() override;
+
+private:
+    QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_UTILS_API QnLongRunnablePool:
     public QObject,
     public Singleton<QnLongRunnablePool>
 {
     Q_OBJECT
+
 public:
     QnLongRunnablePool(QObject *parent = NULL);
     virtual ~QnLongRunnablePool();
@@ -94,5 +126,3 @@ private:
     friend class QnLongRunnable;
     QSharedPointer<QnLongRunnablePoolPrivate> d;
 };
-
-#endif // QN_LONG_RUNNABLE_H
