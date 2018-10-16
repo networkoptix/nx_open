@@ -4,6 +4,8 @@
 #include "camera_manager.h"
 #include "plugin.h"
 
+#include <QCryptographicHash>
+
 #include "discovery/audio_discovery_manager.h"
 
 namespace nx {
@@ -65,7 +67,10 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
             ? devices[i].devicePath : 
             devices[i].devicePath.substr(lastIndexOf + 1);
 
-        strncpy(cameras[i].uid, uid.c_str(), sizeof(cameras[i].uid) - 1);
+        const QByteArray& uidHash = QCryptographicHash::hash(
+            uid.c_str(),
+            QCryptographicHash::Md5).toHex();
+        strncpy(cameras[i].uid, uidHash.constData(), sizeof(cameras[i].uid) - 1);
     }
 
     device::AudioDiscoveryManager audioDiscovery;
