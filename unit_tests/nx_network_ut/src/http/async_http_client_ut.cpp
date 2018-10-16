@@ -25,7 +25,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/thread.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include "repeating_buffer_sender.h"
@@ -1145,7 +1145,7 @@ TEST_F(AsyncHttpClientReusingConnection, server_closes_connection_with_random_de
 //-------------------------------------------------------------------------------------------------
 
 class TestTcpServer:
-    public QnLongRunnable
+    public nx::utils::Thread
 {
 public:
     TestTcpServer(std::vector<QByteArray> dataToSend):
