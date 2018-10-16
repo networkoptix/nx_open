@@ -219,6 +219,7 @@ def pick_some_servers(server_list, required_count):
     if server_count <= required_count:
         return server_list
     else:
+        assert server_count % required_count == 0  # this requirement will simplify this function
         return [server_list[i] for i in range(0, server_count, server_count/required_count)]
 
 
