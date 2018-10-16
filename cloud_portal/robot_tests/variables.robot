@@ -138,6 +138,7 @@ ${SYSTEM NAME IS REQUIRED}            //form[@name='renameForm']//span[@class='i
 
 ${OWNER NAME}                         //h3[contains(@class,"user-name") and text()="${TEST FIRST NAME} ${TEST LAST NAME}"]
 ${OWNER EMAIL}                        //a[@ng-href="mailto:${EMAIL OWNER}"]
+${YOUR PERMISSIONS}                   //ng-include[@src="$root.C.viewsDir + 'components/system-card.html'"]//p[contains(text(), "${YOUR PERMISSIONS TEXT}")]
 
 ${DISCONNECT FROM MY ACCOUNT}         //button[@ng-click='delete()']
 ${SHARE BUTTON SYSTEMS}               //div[@process-loading='gettingSystem']//button[@ng-click='share()']
