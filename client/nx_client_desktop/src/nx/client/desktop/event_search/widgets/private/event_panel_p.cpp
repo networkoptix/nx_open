@@ -200,7 +200,7 @@ void EventPanel::Private::setupTabSyncWithNavigator()
         this, &Private::updateCurrentWidgetMotionSearch);
 
     connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
-        this, Private::handleCurrentMediaWidgetChanged, Qt::QueuedConnection);
+        this, &Private::handleCurrentMediaWidgetChanged, Qt::QueuedConnection);
 
     connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
         [this](bool on) { setTabEnforced(m_bookmarksTab, on); });
@@ -227,7 +227,7 @@ void EventPanel::Private::handleCurrentMediaWidgetChanged()
     }
 
     connect(m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled,
-        this, Private::handleWidgetMotionSearchChanged);
+        this, &Private::handleWidgetMotionSearchChanged);
 
     // If Right Panel is in current camera motion search mode,
     // enable Motion Search for newly selected media widget.
