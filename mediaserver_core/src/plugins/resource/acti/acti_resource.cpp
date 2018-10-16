@@ -833,32 +833,48 @@ void QnActiResource::startInputPortStatesMonitoring()
 
 void QnActiResource::stopInputPortStatesMonitoring()
 {
-    if( actiEventPort == 0 )
-        return;   //no http listener is present
+    if (actiEventPort == 0)
+        return;   //< No http listener is present.
 
-        //unregistering events
+    // Unregistering events.
     QString registerEventRequestStr;
-    for( int i = 1; i <= m_inputCount; ++i )
+    for (int i = 1; i <= m_inputCount; ++i)
     {
-        if( !registerEventRequestStr.isEmpty() )
-            registerEventRequestStr += QLatin1String("&");
+        if (!registerEventRequestStr.isEmpty())
+            registerEventRequestStr += "&";
         registerEventRequestStr += lit("EVENT_CONFIG=%1,0,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
     }
     m_inputMonitored = false;
 
     QAuthenticator auth = getAuth();
-    nx::utils::Url url = getUrl(); // TODO: check if possible to refactor
-    url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
-    url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
+    nx::utils::Url url = getUrl();
+    url.setPath(QString(kApiRequestPath) + "encoder");
+    url.setQuery(registerEventRequestStr);
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
+    NX_VERBOSE(this, "stopInputPortStatesMonitoring: request '%1'.",
+        url.toString(QUrl::RemoveUserInfo));
+
     nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
-    //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
-    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done,
-        ec2::DummyHandler::instance(), [httpClient](nx::network::http::AsyncHttpClientPtr) mutable {
-            httpClient->disconnect(nullptr, (const char*)nullptr);
+    httpClient->setAuthType(nx::network::http::AuthType::authDigest);
+    httpClient->doGet(url,
+        [httpClient](nx::network::http::AsyncHttpClientPtr) mutable
+        {
+            if (httpClient->failed())
+            {
+                NX_INFO(typeid(QnActiResource),
+                    "stopInputPortStatesMonitoring: transport error %1.",
+                    httpClient->lastSysErrorCode());
+            }
+
+            const auto httpCode = httpClient->response()->statusLine.statusCode;
+            if (httpCode != nx::network::http::StatusCode::ok)
+                NX_WARNING(typeid(QnActiResource), "stopInputPortStatesMonitoring: HTTP error %1.",
+                    httpCode);
+
+            // Just ignore, if success.
             httpClient.reset();
-        },
-        Qt::DirectConnection );
-    httpClient->doGet( url );
+        });
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
