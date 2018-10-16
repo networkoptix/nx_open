@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QThread>
 
 #include <nx/utils/safe_direct_connection.h>
