@@ -20,17 +20,17 @@ std::vector<std::string> getRpiDevicePaths();
 /**
  * Return the resolution list for the rpi integrated camera.
  */
-std::vector<device::ResolutionData> mmalResolutionList();
+std::vector<device::ResolutionData> getMmalResolutionList();
 
 /**
  * Return the maximum bitrate of the rpi integrated camera.
  */
-int mmalMaxBitrate();
+int getMmalMaxBitrate();
 
 /**
  * Returns true if the device is the rpi and the name of the camera contains "mmal".
  */
-bool isMmal(const std::string& deviceName);
+bool isMmalCamera(const std::string& deviceName);
 
 /**
  * Returns true if the plugin is running on the rpi.

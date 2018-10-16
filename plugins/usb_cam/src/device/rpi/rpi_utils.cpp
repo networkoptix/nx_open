@@ -94,21 +94,19 @@ std::vector<std::string> getRpiDevicePaths()
     return devicePaths;
 }
 
-int mmalMaxBitrate()
+int getMmalMaxBitrate()
 {
     return kMmalMaxBitrate;
 }
 
-std::vector<device::ResolutionData> mmalResolutionList()
+std::vector<device::ResolutionData> getMmalResolutionList()
 {
     return kMmalResolutionList;
 }
 
-bool isMmal(const std::string& deviceName)
+bool isMmalCamera(const std::string& deviceName)
 {
-    std::string lower(deviceName);
-    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-    return isRpi() && lower.find("mmal") != std::string::npos;
+    return deviceName.find("mmal") != std::string::npos;
 }
 
 bool isRpi()

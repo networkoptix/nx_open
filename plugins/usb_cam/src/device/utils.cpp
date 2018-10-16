@@ -33,8 +33,8 @@ std::vector<ResolutionData> getResolutionList(
     if (!targetCodecID)
         return {};
 
-    if(rpi::isMmal(getDeviceName(devicePath)))
-        return rpi::mmalResolutionList();
+    if(rpi::isMmalCamera(getDeviceName(devicePath)))
+        return rpi::getMmalResolutionList();
 
     auto list = impl::getResolutionList(devicePath, targetCodecID);
     std::sort(list.begin(), list.end(),
@@ -47,7 +47,7 @@ std::vector<ResolutionData> getResolutionList(
 
 void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
-    if(targetCodecID && rpi::isMmal(getDeviceName(devicePath)))
+    if(targetCodecID && rpi::isMmalCamera(getDeviceName(devicePath)))
         impl::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
@@ -55,8 +55,8 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 {
     if(!targetCodecID)
         return 0;
-    if(rpi::isMmal(getDeviceName(devicePath)))
-        return rpi::mmalMaxBitrate();
+    if(rpi::isMmalCamera(getDeviceName(devicePath)))
+        return rpi::getMmalMaxBitrate();
 
     // usb_cameras don't support setting their bitrate. only the rpi mmal camera does.
 #if 0    
