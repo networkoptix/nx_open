@@ -63,7 +63,7 @@ bool SaxHandler::startElement(
         return true;
     }
 
-    auto [newNode, resultCode] = createNode(qName, atts);
+    auto[newNode, resultCode] = createNode(qName, atts);
     if ((m_flags & ParseFlag::ignoreUnknownResources) > 0 &&
         resultCode == ResultCode::unknownResource)
     {
@@ -81,9 +81,9 @@ bool SaxHandler::startElement(
     {
         m_root = std::move(newNode);
     }
+    else if (!m_nodes.top()->addChild(
         valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)),
         std::move(newNode)))
-        std::move(newNode) ) )
     {
         m_state = skippingNode;
         m_inlineLevel = 1;
