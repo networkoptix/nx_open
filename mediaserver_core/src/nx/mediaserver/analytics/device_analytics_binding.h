@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QVariant>
 
 #include <core/resource/resource_fwd.h>
@@ -44,6 +46,10 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
+    bool startAnalyticsUnsafe(const QVariantMap& settings);
+    void stopAnalyticsUnsafe();
+
+private:
     sdk_support::SharedPtr<DeviceAgent> createDeviceAgent();
     std::shared_ptr<MetadataHandler> createMetadataHandler();
     std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadManifest(
@@ -52,6 +58,7 @@ private:
     void updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 private:
+    mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
     nx::mediaserver::resource::AnalyticsEngineResourcePtr m_engine;
 
@@ -60,8 +67,8 @@ private:
     QnAbstractDataReceptorPtr m_metadataSink;
 
     QVariantMap m_currentSettings;
-    bool m_started{false};
-    bool m_isStreamConsumer{false};
+    std::atomic<bool> m_started{false};
+    std::atomic<bool>m_isStreamConsumer{false};
 };
 
 } // namespace nx::mediaserver::analytics

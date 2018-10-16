@@ -46,6 +46,26 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
 
 bool DeviceAnalyticsBinding::startAnalytics(const QVariantMap& settings)
 {
+    QnMutexLocker lock(&m_mutex);
+    startAnalyticsUnsafe(settings);
+}
+
+void DeviceAnalyticsBinding::stopAnalytics()
+{
+    QnMutexLocker lock(&m_mutex);
+    stopAnalyticsUnsafe();
+}
+
+bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
+{
+    QnMutexLocker lock(&m_mutex);
+    stopAnalyticsUnsafe();
+    m_sdkDeviceAgent.reset();
+    return startAnalyticsUnsafe(settings);
+}
+
+bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
+{
     if (!m_sdkDeviceAgent)
     {
         m_sdkDeviceAgent = createDeviceAgent();
@@ -83,23 +103,17 @@ bool DeviceAnalyticsBinding::startAnalytics(const QVariantMap& settings)
     return m_started;
 }
 
-void DeviceAnalyticsBinding::stopAnalytics()
+void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
 {
+    m_started = false;
     if (!m_sdkDeviceAgent)
         return;
-    m_started = false;
     m_sdkDeviceAgent->stopFetchingMetadata();
-}
-
-bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
-{
-    stopAnalytics();
-    m_sdkDeviceAgent.reset();
-    return startAnalytics(settings);
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
 {
+    QnMutexLocker lock(&m_mutex);
     m_metadataSink = std::move(metadataSink);
     if (m_metadataHandler)
         m_metadataHandler->setMetadataSink(m_metadataSink.get());
@@ -112,6 +126,7 @@ bool DeviceAnalyticsBinding::isStreamConsumer() const
 
 std::optional<EngineManifest> DeviceAnalyticsBinding::engineManifest() const
 {
+    QnMutexLocker lock(&m_mutex);
     if (!m_engine)
     {
         NX_ASSERT(this, lm("Can't access engine"));
@@ -270,6 +285,7 @@ void DeviceAnalyticsBinding::updateDeviceWithManifest(
 
 void DeviceAnalyticsBinding::putData(const QnAbstractDataPacketPtr& data)
 {
+    QnMutexLocker lock(&m_mutex);
     if (!isRunning())
         start();
 
