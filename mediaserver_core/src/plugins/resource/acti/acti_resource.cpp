@@ -51,6 +51,8 @@ const QString kActiEncoderCapabilitiesParamName = lit("encoder_cap");
 const QString kTwoAudioParamName = lit("factory default type");
 const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
 
+const char* kApiRequestPath = "/cgi-bin/cmd/";
+
 } // namespace
 
 QnActiResource::QnActiResource(QnMediaServerModule* serverModule):
@@ -90,32 +92,27 @@ QnActiResource::~QnActiResource()
     }
 }
 
-void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
+void QnActiResource::checkIfOnlineAsync(std::function<void(bool)> completionHandler)
 {
-    nx::utils::Url apiUrl;
-    apiUrl.setScheme( lit("http") );
-    apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
-
     QAuthenticator auth = getAuth();
-
-    apiUrl.setUserName( auth.user() );
-    apiUrl.setPassword( auth.password() );
-    apiUrl.setPath( lit("/cgi-bin/system") );
-    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(auth.user()).arg(auth.password()) );
+    nx::utils::Url apiUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(getHostAddress())
+        .setPort(QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT))
+        .setUserName(auth.user())
+        .setPassword(auth.password())
+        .setPath(kApiRequestPath).appendPath("system")
+        .setQuery("SYSTEM_INFO");
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
         (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
         nx::network::http::HttpHeaders /*httpHeaders*/) mutable
     {
-        if( osErrorCode != SystemError::noError ||
-            statusCode != nx::network::http::StatusCode::ok )
-        {
+        if (osErrorCode != SystemError::noError || statusCode != nx::network::http::StatusCode::ok)
             return completionHandler( false );
-        }
 
-        if( msgBody.startsWith("ERROR: bad account") )
+        if (msgBody.startsWith("ERROR:"))
             return completionHandler( false );
 
         auto report = QnActiResource::parseSystemInfo( msgBody );
@@ -124,9 +121,9 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
         completionHandler(mac == resourceMac);
     };
 
+    NX_VERBOSE(this, "checkIfOnlineAsync: request '%1'.", apiUrl.toString(QUrl::RemoveUserInfo));
     nx::network::http::downloadFileAsync(
-        apiUrl,
-        requestCompletionFunc );
+        apiUrl, requestCompletionFunc, {}, nx::network::http::AuthType::authDigest);
 }
 
 void QnActiResource::setEventPort(int eventPort) {
@@ -201,7 +198,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
     // NOTE: should check here for correct connection? Or just try GET further...?
 
     QString request = nx::network::url::Builder()
-        .setPath("cgi-bin/cmd/")
+        .setPath(kApiRequestPath)
         .appendPath(group)
         .setQuery(command)
         .toString();
