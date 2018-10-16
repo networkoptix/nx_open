@@ -41,14 +41,14 @@ struct
 
 #define LOG_INFO(fmt, ...) \
     do { \
-        if (config.logLevel >= LogLevel::config) \
-            fprintf(stdout, fmt "\n", __VA_ARGS__); \
+        if (config.logLevel >= LogLevel::info) \
+            fprintf(stdout, fmt "\n" , ##__VA_ARGS__); \
     } while (0)
 
 #define LOG_VERBOSE(fmt, ...) \
     do { \
         if (config.logLevel >= LogLevel::verbose) \
-            fprintf(stdout, fmt "\n", __VA_ARGS__); \
+            fprintf(stdout, fmt "\n" , ##__VA_ARGS__); \
     } while (0)
 
 class WebsocketConnectionsPool;
@@ -78,20 +78,34 @@ public:
 
         LOG_VERBOSE("Connecting to %s", url.constData());
         m_httpClient.doGet(url,
-            [self = shared_from_this()]()
+            [self = shared_from_this(), this]()
             {
+                if (m_stopped)
+                    return;
+
+                if (self->m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
+                    || !m_httpClient.response())
+                {
+                    LOG_INFO("Http client failed to connect to host");
+                    stopInAioThread();
+                    return;
+                }
+
+                const int statusCode = m_httpClient.response()->statusLine.statusCode;
+                LOG_VERBOSE("Http client status code: %d", statusCode);
+
+                if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
+                {
+                    LOG_INFO("Http client got invalid response code %d", statusCode);
+                    stopInAioThread();
+                    return;
+                }
             });
     }
 
     void stop()
     {
-        m_aioThread->post(nullptr,
-            [this]()
-            {
-                m_stopped = true;
-                m_readyPromise.set_value();
-            });
-        m_stopped = true;
+        m_aioThread->post(nullptr, [this]() { stopInAioThread(); });
     }
 
     void waitForDone()
@@ -106,6 +120,12 @@ private:
     bool m_stopped = false;
     nx::utils::promise<void> m_readyPromise;
     nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
+
+    void stopInAioThread()
+    {
+        m_stopped = true;
+        m_readyPromise.set_value();
+    }
 };
 
 
