@@ -35,7 +35,6 @@ from framework.utils import (
     imerge,
     make_threaded_async_calls,
     single,
-    take_some,
     str_to_bool,
     threadsafe_generator,
     with_traceback,
@@ -125,7 +124,7 @@ def make_server_async_calls(config, layout_item_id_gen, server_idx, server):
     def make_layout_item_list(layout_idx):
         # layouts have 0, 1, 2, .. MAX_LAYOUT_ITEMS-1 items count
         count = layout_idx % MAX_LAYOUT_ITEMS
-        return list(take_some(layout_item_gen, count))
+        return list(itertools.islice(layout_item_gen, count))
 
 
     def camera_call_generator():
