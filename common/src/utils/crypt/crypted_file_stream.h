@@ -8,8 +8,7 @@
 #include <utils/crypt/crypto_functions.h>
 #include <nx/utils/thread/mutex.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 /**
  * Class that represents a crypted stream in a file.
@@ -116,5 +115,4 @@ protected:
     void decryptBlock();
 };
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 /**
  * Class that is a concept base for encryptable entities. Default realization is private.
@@ -28,5 +27,4 @@ private: //< These functions do nothing and should be overwritten as public, at 
     virtual QString password() { return {}; }
 };
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

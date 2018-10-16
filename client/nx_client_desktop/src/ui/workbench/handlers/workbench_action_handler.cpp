@@ -137,7 +137,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
-#include <ui/workbench/workbench_layout_password_management.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>    // TODO: #GDM dependencies
 

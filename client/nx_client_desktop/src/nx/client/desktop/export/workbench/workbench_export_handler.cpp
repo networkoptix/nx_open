@@ -56,11 +56,12 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_password_management.h>
 #include <ini.h>
 #include <api/global_settings.h>
 
 #include <nx/client/desktop/export/tools/export_media_validator.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>

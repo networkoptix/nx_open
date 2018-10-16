@@ -44,7 +44,7 @@ static void writeTestFile(const QString& name)
 
 TEST(LayoutFileInfo, Basic)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     writeTestFile(fileName);
 

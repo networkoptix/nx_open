@@ -8,8 +8,7 @@
 
 using namespace nx::utils::crypto_functions;
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 static const Key IV { //< Actually makes little sense because first 8 bytes of IV are overwritten with block index.
     0xf1, 0x8a, 0xdb, 0x71, 0x8b, 0x86, 0xb, 0x7c, 0xf1, 0xa6, 0xb8, 0xff, 0x81, 0x81, 0x64, 0x66,
@@ -370,5 +369,4 @@ void CryptedFileStream::decryptBlock()
     NX_ASSERT(result && (cryptLen == 0)); //< No extra bytes should be written to decrypted buffer.
 }
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

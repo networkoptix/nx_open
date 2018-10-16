@@ -26,7 +26,7 @@ static void writeTestFile(const QString& name)
 
 TEST(CryptedFileStream, Basic)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     nx::utils::CryptedFileStream stream2("NonExistent.bin", nullptr);
     ASSERT_FALSE(stream2.open(QIODevice::ReadOnly));
@@ -50,7 +50,7 @@ TEST(CryptedFileStream, Basic)
 
 TEST(CryptedFileStream, AppendAndReopen)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     writeTestFile(fileName);
 
@@ -84,7 +84,7 @@ TEST(CryptedFileStream, AppendAndReopen)
 
 TEST(CryptedFileStream, SeekAndPos)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     writeTestFile(fileName);
 
@@ -112,7 +112,7 @@ TEST(CryptedFileStream, SeekAndPos)
 
 TEST(CryptedFileStream, EmbeddedMode)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     QFile File(fileName);
     File.open(QIODevice::WriteOnly);

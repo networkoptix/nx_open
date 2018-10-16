@@ -5,9 +5,7 @@
 // This module is currently used for CryptedFileStream and Encrypted Layouts.
 // Some arbitrary constants are used to generate keys and hashes from passwords.
 
-namespace nx {
-namespace utils {
-namespace crypto_functions {
+namespace nx::utils::crypto_functions {
 
 constexpr static size_t kKeySize = 32;
 
@@ -31,6 +29,4 @@ bool checkSaltedPassword(const QString& password, Key salt, Key hash);
 // Get salt. Probably not cryptographically random.
 Key getRandomSalt();
 
-} // namespace crypto_functions
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::crypto_functions 

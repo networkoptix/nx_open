@@ -7,9 +7,7 @@
 // provides basic info about .nov and .exe layout files,
 // and checks protected layout file passwords.
 
-namespace nx {
-namespace core {
-namespace layout {
+namespace nx::core::layout {
 
 struct FileInfo;
 
@@ -66,7 +64,5 @@ struct FileInfo
     qint64 offset = 0;
 };
 
-} // namespace layout
-} // namespace core
-} // namespace nx
+} // namespace nx::core::layout
 

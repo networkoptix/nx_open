@@ -20,7 +20,7 @@
 #include <nx/streaming/abstract_archive_resource.h>
 
 #include <utils/common/checked_cast.h>
-#include <ui/workbench/workbench_layout_password_management.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 
 QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) :
     QObject(parent)

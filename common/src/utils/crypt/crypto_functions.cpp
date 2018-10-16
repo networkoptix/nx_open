@@ -3,9 +3,7 @@
 #include <random>
 #include <openssl/evp.h>
 
-namespace nx {
-namespace utils {
-namespace crypto_functions {
+namespace nx::utils::crypto_functions {
 
 const Key kHashSalt {
     0x89, 0x1e, 0xed, 0x37, 0xb9, 0x5f, 0xcc, 0x9f, 0xd0, 0x3b, 0x29, 0x7e, 0x59, 0x6d, 0xed, 0xe,
@@ -91,6 +89,4 @@ Key getRandomSalt()
     return key;
 }
 
-} // namespace crypto_functions
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::crypto_functions

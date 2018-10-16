@@ -5,9 +5,7 @@
 
 #include <utils/crypt/crypted_file_stream.h>
 
-namespace nx {
-namespace core {
-namespace layout {
+namespace nx::core::layout {
 
 bool isLayoutExtension(const QString& fileName)
 {
@@ -83,6 +81,4 @@ bool checkPassword(const QString& password, const FileInfo& fileInfo)
         fileInfo.passwordSalt, fileInfo.passwordHash);
 }
 
-} // namespace layout
-} // namespace core
-} // namespace nx
+} // namespace nx::core::layout
