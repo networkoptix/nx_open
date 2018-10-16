@@ -20,6 +20,9 @@ public:
     virtual int getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const override;
 
     virtual nxcip::StreamReader* getLiveStreamReader() override;
+
+private:
+    bool shouldStreamTranscode() const;
 };
 
 } // namespace nx 

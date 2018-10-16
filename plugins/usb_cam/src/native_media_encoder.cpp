@@ -44,13 +44,18 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
             m_encoderIndex,
             m_codecParams,
             m_camera,
-            false /*forceTranscoding*/));
+            shouldStreamTranscode()));
     }
 
     m_streamReader->addRef();
     return m_streamReader.get();
 }
 
+bool NativeMediaEncoder::shouldStreamTranscode() const
+{
+    return m_codecParams.codecId == AV_CODEC_ID_NONE
+        ||  m_codecParams.codecId == AV_CODEC_ID_MJPEG;
+}
 
 } // namespace nx
 } // namespace usb_cam
