@@ -246,6 +246,7 @@ class Context(models.Model):
         return next((context_template.first().template for context_template in contexts if context_template.exists()), None)
 
 
+# TODO: CLOUD-2388 Remove proxy model
 class ContextProxy(Context):
     class Meta:
         proxy = True

@@ -61,7 +61,7 @@ class ProductTypeAdmin(CMSAdmin):
 
 admin.site.register(ProductType, ProductTypeAdmin)
 
-
+# TODO: CLOUD-2388  Add additional views to here link -> http://patrick.arminio.info/additional-admin-views/
 class ProductAdmin(CMSAdmin):
     list_display = ('product_settings', 'edit_product', 'name', 'product_type', 'customizations_list', )
     list_display_links = ('name',)
@@ -117,6 +117,7 @@ class ProductAdmin(CMSAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
+# TODO: CLOUD-2388  Remove this context admin. The product should use this logic for an additional view of the product
 class ContextProxyAdmin(CMSAdmin):
     list_display = ('name', 'description', 'url', 'translatable', 'is_global')
 
