@@ -12,7 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/thread.h>
 #include <nx/utils/system_error.h>
 
 #include "resolve/abstract_resolver.h"
@@ -24,7 +24,7 @@ namespace network {
 class PredefinedHostResolver;
 
 class NX_NETWORK_API DnsResolver:
-    public QnLongRunnable
+    public nx::utils::Thread
 {
 public:
     typedef void* RequestId;
