@@ -103,4 +103,24 @@ void AbstractSearchWidget::addDeviceDependentAction(
     d->addDeviceDependentAction(action, mixedString, cameraString);
 }
 
+AbstractSearchWidget::Period AbstractSearchWidget::previousPeriod() const
+{
+    return d->previousPeriod();
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::previousCameras() const
+{
+    return d->previousCameras();
+}
+
+QAction* AbstractSearchWidget::timeSelectionAction(Period period) const
+{
+    return d->timeSelectionAction(period);
+}
+
+QAction* AbstractSearchWidget::cameraSelectionAction(Cameras cameras) const
+{
+    return d->cameraSelectionAction(cameras);
+}
+
 } // namespace nx::client::desktop

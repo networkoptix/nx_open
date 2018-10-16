@@ -123,6 +123,18 @@ protected:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
+    /** Previously selected time period type. */
+    Period previousPeriod() const;
+
+    /** Previously selected camera set type. */
+    Cameras previousCameras() const;
+
+    /** An action to select specified time period type. */
+    QAction* timeSelectionAction(Period period) const;
+
+    /** An action to select specified camera set type. */
+    QAction* cameraSelectionAction(Cameras cameras) const;
+
 private:
     /**
      * Derived classes should override this method and return localized string for
@@ -136,7 +148,7 @@ private:
      */
     virtual QString itemCounterText(int count) const = 0;
 
-protected:
+private:
     class Private;
     const QScopedPointer<Private> d;
 };

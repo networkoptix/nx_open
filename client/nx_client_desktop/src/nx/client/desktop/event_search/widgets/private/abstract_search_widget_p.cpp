@@ -645,6 +645,7 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     if (value == m_cameras)
         return;
 
+    m_previousCameras = m_cameras;
     m_cameras = value;
     updateCurrentCameras();
 }
@@ -769,6 +770,26 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
                 q->resourcePool(), item.mixedString, item.cameraString));
         }
     }
+}
+
+AbstractSearchWidget::Period AbstractSearchWidget::Private::previousPeriod() const
+{
+    return m_previousPeriod;
+}
+
+AbstractSearchWidget::Cameras AbstractSearchWidget::Private::previousCameras() const
+{
+    return m_previousCameras;
+}
+
+QAction* AbstractSearchWidget::Private::timeSelectionAction(Period period) const
+{
+    return m_timeSelectionActions.value(period);
+}
+
+QAction* AbstractSearchWidget::Private::cameraSelectionAction(Cameras cameras) const
+{
+    return m_cameraSelectionActions.value(cameras);
 }
 
 void AbstractSearchWidget::Private::updateRibbonLiveMode()

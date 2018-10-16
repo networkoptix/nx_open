@@ -64,6 +64,12 @@ public:
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
 
+    Period previousPeriod() const;
+    Cameras previousCameras() const;
+
+    QAction* timeSelectionAction(Period period) const;
+    QAction* cameraSelectionAction(Cameras cameras) const;
+
 private:
     void setupModels();
     void setupRibbon();
@@ -116,6 +122,7 @@ private:
     friend uint qHash(Period source) { return uint(source); }
 
     QMetaObject::Connection m_currentCameraConnection;
+    Cameras m_previousCameras = Cameras::all;
     QHash<Cameras, QAction*> m_cameraSelectionActions;
     friend uint qHash(Cameras source) { return uint(source); }
 

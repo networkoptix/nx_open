@@ -13,7 +13,6 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 
 #include <nx/client/desktop/common/widgets/animated_tab_widget.h>
@@ -84,10 +83,7 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
 
-    connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
-        this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
-
-    setupTabsSyncWithNavigator();
+    setupTabSyncWithNavigator();
 }
 
 EventPanel::Private::~Private()
@@ -97,6 +93,8 @@ EventPanel::Private::~Private()
 void EventPanel::Private::rebuildTabs()
 {
     m_tabs->clear();
+    m_previousTab = nullptr;
+    m_lastTab = nullptr;
 
     const auto updateTab =
         [this](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
@@ -176,51 +174,15 @@ void EventPanel::Private::showContextMenu(const QPoint& pos)
     contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
-void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
+void EventPanel::Private::setupTabSyncWithNavigator()
 {
-    // TODO: FIXME: #vkutin Rewrite this code properly.
-
-    if (role != Qn::CentralRole)
-        return;
-
-    m_mediaWidgetConnections.reset();
-
-    m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(
-        this->q->context()->display()->widget(Qn::CentralRole));
-
-    const auto camera = m_currentMediaWidget
-        ? m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>()
-        : QnVirtualCameraResourcePtr();
-
-    if (!camera)
-        return;
-
-    m_mediaWidgetConnections.reset(new QnDisconnectHelper());
-
-    *m_mediaWidgetConnections << connect(m_currentMediaWidget.data(),
-        &QnMediaResourceWidget::motionSearchModeEnabled, this, &Private::at_motionSearchToggled);
-
-    at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
-}
-
-void EventPanel::Private::setupTabsSyncWithNavigator()
-{
-    // TODO: FIXME: #vkutin Adapt for multi-camera mode.
-
     connect(m_tabs, &QTabWidget::currentChanged, this,
         [this](int index)
         {
             q->context()->action(ui::action::BookmarksModeAction)->setChecked(
                 m_tabs->currentWidget() == m_bookmarksTab);
 
-            if (m_currentMediaWidget)
-            {
-                QnResourceWidgetList widgets({m_currentMediaWidget});
-                if (m_tabs->currentWidget() == m_motionTab)
-                    q->menu()->trigger(ui::action::StartSmartSearchAction, widgets);
-                else
-                    q->menu()->trigger(ui::action::StopSmartSearchAction, widgets);
-            }
+            updateCurrentWidgetMotionSearch();
 
             auto extraContent = Qn::RecordingContent;
             if (m_tabs->currentWidget() == m_motionTab)
@@ -230,39 +192,94 @@ void EventPanel::Private::setupTabsSyncWithNavigator()
 
             q->navigator()->setSelectedExtraContent(extraContent);
 
-            m_previousTabIndex = m_lastTabIndex;
-            m_lastTabIndex = index;
+            m_previousTab = m_lastTab;
+            m_lastTab = m_tabs->currentWidget();
         });
 
-    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled,
-        this, &Private::at_bookmarksToggled);
+    connect(m_motionTab, &AbstractSearchWidget::cameraSetChanged,
+        this, &Private::updateCurrentWidgetMotionSearch);
+
+    connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, Private::handleCurrentMediaWidgetChanged, Qt::QueuedConnection);
+
+    connect(q->context()->action(ui::action::BookmarksModeAction), &QAction::toggled, this,
+        [this](bool on) { setTabEnforced(m_bookmarksTab, on); });
 }
 
-void EventPanel::Private::at_motionSearchToggled(bool on)
+void EventPanel::Private::handleCurrentMediaWidgetChanged()
 {
-    at_specialModeToggled(on, m_motionTab);
+    // Turn Motion Search off for previously selected media widget.
+    if (m_currentMediaWidget)
+    {
+        // Order of the next two lines of code is important.
+        m_currentMediaWidget->disconnect(this);
+        setCurrentWidgetMotionSearch(false);
+    }
+
+    m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(q->navigator()->currentWidget());
+    if (!m_currentMediaWidget)
+        return;
+
+    if (!q->navigator()->currentResource().dynamicCast<QnVirtualCameraResource>())
+    {
+        m_currentMediaWidget = nullptr;
+        return;
+    }
+
+    connect(m_currentMediaWidget.data(), &QnMediaResourceWidget::motionSearchModeEnabled,
+        this, Private::handleWidgetMotionSearchChanged);
+
+    // If Right Panel is in current camera motion search mode,
+    // enable Motion Search for newly selected media widget.
+    if (singleCameraMotionSearch())
+        updateCurrentWidgetMotionSearch();
+    // Otherwise, if Motion Search is activated for newly selected media widget,
+    // switch Right Panel into current camera motion search mode.
+    else if (m_currentMediaWidget->isMotionSearchModeEnabled())
+        handleWidgetMotionSearchChanged(true);
 }
 
-void EventPanel::Private::at_bookmarksToggled(bool on)
+void EventPanel::Private::handleWidgetMotionSearchChanged(bool on)
 {
-    at_specialModeToggled(on, m_bookmarksTab);
+    if (on && m_tabs->currentWidget() == m_motionTab)
+        m_previousTab = m_motionTab;
+
+    m_motionTab->setCurrentMotionSearchEnabled(on);
+    setTabEnforced(m_motionTab, on);
 }
 
-void EventPanel::Private::at_specialModeToggled(bool on, QWidget* correspondingTab)
+void EventPanel::Private::setTabEnforced(QWidget* tab, bool enforced)
 {
-    const auto index = m_tabs->indexOf(correspondingTab);
+    const auto index = m_tabs->indexOf(tab);
     if (index < 0)
         return;
 
-    if (on)
+    if (enforced)
     {
         m_tabs->setCurrentIndex(index);
     }
     else
     {
-        if (m_tabs->currentWidget() == correspondingTab)
-            m_tabs->setCurrentIndex(m_previousTabIndex);
+        if (m_tabs->currentWidget() == tab)
+            m_tabs->setCurrentWidget(m_previousTab);
     }
+}
+
+void EventPanel::Private::setCurrentWidgetMotionSearch(bool value)
+{
+    if (m_currentMediaWidget && m_currentMediaWidget->isMotionSearchModeEnabled() != value)
+        m_currentMediaWidget->setMotionSearchModeEnabled(value);
+}
+
+void EventPanel::Private::updateCurrentWidgetMotionSearch()
+{
+    setCurrentWidgetMotionSearch(singleCameraMotionSearch());
+}
+
+bool EventPanel::Private::singleCameraMotionSearch() const
+{
+    return m_tabs->currentWidget() == m_motionTab
+        && m_motionTab->selectedCameras() == AbstractSearchWidget::Cameras::current;
 }
 
 } // namespace nx::client::desktop

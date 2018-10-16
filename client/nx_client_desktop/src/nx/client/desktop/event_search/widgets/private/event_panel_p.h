@@ -5,8 +5,6 @@
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
-#include <nx/utils/disconnect_helper.h>
-
 class QTabWidget;
 class QStackedWidget;
 class QnMediaResourceWidget;
@@ -39,13 +37,14 @@ private:
     bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
     void showContextMenu(const QPoint& pos);
+    void setupTabSyncWithNavigator();
+    void setTabEnforced(QWidget* tab, bool enforced);
+    void setCurrentWidgetMotionSearch(bool value);
+    void updateCurrentWidgetMotionSearch();
+    bool singleCameraMotionSearch() const;
 
-    void currentWorkbenchWidgetChanged(Qn::ItemRole role);
-    void setupTabsSyncWithNavigator();
-
-    void at_motionSearchToggled(bool on);
-    void at_bookmarksToggled(bool on);
-    void at_specialModeToggled(bool on, QWidget* correspondingTab);
+    void handleCurrentMediaWidgetChanged();
+    void handleWidgetMotionSearchChanged(bool on);
 
 private:
     EventPanel* const q;
@@ -60,10 +59,9 @@ private:
     AnalyticsSearchWidget* const m_analyticsTab;
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
-    QScopedPointer<QnDisconnectHelper> m_mediaWidgetConnections;
 
-    int m_previousTabIndex = 0;
-    int m_lastTabIndex = 0;
+    QWidget* m_previousTab = nullptr;
+    QWidget* m_lastTab = nullptr;
 };
 
 } // namespace nx::client::desktop
