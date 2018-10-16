@@ -15,6 +15,7 @@ class AnalyticsPluginResource: public QnResource
     using base_type = QnResource;
 
 public:
+    static QString kPluginManifestProperty;
     static QString kDeviceAgentSettingsModelProperty;
     static QString kEngineSettingsModelProperty;
 

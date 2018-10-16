@@ -13,6 +13,7 @@ class AnalyticsEngineResource: public QnResource
 
 public:
     static QString kSettingsValuesProperty;
+    static QString kEngineManifestProperty;
 
     AnalyticsEngineResource(QnCommonModule* commonModule = nullptr);
     virtual ~AnalyticsEngineResource() override;

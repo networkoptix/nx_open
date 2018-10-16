@@ -7,26 +7,33 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
 
 namespace nx::vms::common {
 
+using namespace nx::vms::api::analytics;
+
 QString AnalyticsPluginResource::kDeviceAgentSettingsModelProperty("deviceAgentSettingsModel");
 QString AnalyticsPluginResource::kEngineSettingsModelProperty("engineSettingsModel");
+QString AnalyticsPluginResource::kPluginManifestProperty("pluginManifest");
 
 AnalyticsPluginResource::AnalyticsPluginResource(QnCommonModule* commonModule):
     base_type(commonModule)
 {
 }
 
-api::analytics::PluginManifest AnalyticsPluginResource::manifest() const
+PluginManifest AnalyticsPluginResource::manifest() const
 {
-    // TODO: #dmishin implement.
-    return api::analytics::PluginManifest();
+    return QJson::deserialized(getProperty(kPluginManifestProperty).toUtf8(), PluginManifest());
 }
 
-void AnalyticsPluginResource::setManifest(const api::analytics::PluginManifest& manifest)
+void AnalyticsPluginResource::setManifest(const PluginManifest& manifest)
 {
-    // TODO: #dmishin implement.
+    setProperty(kPluginManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
+
+    // Set settings models separately since client uses those properties.
+    setEngineSettingsModel(manifest.engineSettingsModel);
+    setDeviceAgentSettingsModel(manifest.deviceAgentSettingsModel);
 }
 
 QJsonObject AnalyticsPluginResource::deviceAgentSettingsModel() const

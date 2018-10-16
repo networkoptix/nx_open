@@ -7,9 +7,14 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/vms/api/analytics/engine_manifest.h>
+
 namespace nx::vms::common {
 
+using namespace nx::vms::api::analytics;
+
 QString AnalyticsEngineResource::kSettingsValuesProperty("settingsValues");
+QString AnalyticsEngineResource::kEngineManifestProperty("engineManifest");
 
 AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
     base_type(commonModule)
@@ -18,15 +23,14 @@ AnalyticsEngineResource::AnalyticsEngineResource(QnCommonModule* commonModule):
 
 AnalyticsEngineResource::~AnalyticsEngineResource() = default;
 
-api::analytics::EngineManifest AnalyticsEngineResource::manifest() const
+EngineManifest AnalyticsEngineResource::manifest() const
 {
-    return api::analytics::EngineManifest();
-    // TODO: #dmishin implement
+    return QJson::deserialized(getProperty(kEngineManifestProperty).toUtf8(), EngineManifest());
 }
 
 void AnalyticsEngineResource::setManifest(const api::analytics::EngineManifest& manifest)
 {
-    // TODO: #dmishin implement
+    setProperty(kEngineManifestProperty, QString::fromUtf8(QJson::serialized(manifest)));
 }
 
 QVariantMap AnalyticsEngineResource::settingsValues() const
