@@ -375,7 +375,7 @@ void AnalyticsSearchListModel::Private::updateMetadataReceivers()
     if (m_liveReceptionActive)
     {
         auto cameras = q->cameras();
-        decltype(m_metadataReceivers) newMetadataReceivers;
+        MetadataReceiverList newMetadataReceivers;
 
         const auto isOnline =
             [](const QnVirtualCameraResourcePtr& camera)

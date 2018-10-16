@@ -103,7 +103,8 @@ private:
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     bool m_liveReceptionActive = false;
 
-    std::vector<std::unique_ptr<LiveAnalyticsReceiver>> m_metadataReceivers;
+    using MetadataReceiverList = std::vector<std::unique_ptr<LiveAnalyticsReceiver>>;
+    MetadataReceiverList m_metadataReceivers;
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
 
     analytics::storage::LookupResult m_prefetch;
