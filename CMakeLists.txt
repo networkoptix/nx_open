@@ -229,6 +229,10 @@ endif()
 #add_subdirectory(_dw_vca_controller)
 #add_subdirectory(_dw_mtt_controller)
 
+if(withWebsocketUtility)
+    add_subdirectory(websocket_utility)
+endif()
+
 if(withTestCamera)
     add_subdirectory(testcamera)
 endif()
