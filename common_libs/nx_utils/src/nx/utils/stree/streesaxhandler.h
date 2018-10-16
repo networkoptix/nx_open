@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <stack>
+#include <tuple>
 
 #include <QtXml/QXmlDefaultHandler>
 
@@ -29,7 +30,13 @@ namespace MatchType
     NX_UTILS_API Value fromString(const QString& str);
 } // namespace MatchType
 
-class NX_UTILS_API SaxHandler:
+enum ParseFlag
+{
+    ignoreUnknownResources = 0x01,
+};
+
+class NX_UTILS_API SaxHandler
+:
     public QXmlDefaultHandler
 {
 public:
@@ -51,9 +58,8 @@ public:
     virtual bool error(const QXmlParseException& exception);
     virtual bool fatalError(const QXmlParseException& exception);
 
-    /**
-     * @return Root of tree, created during parsing xml.
-     */
+    void setFlags(int flags);
+    //!Returns root of tree, created during parsing xml
     const std::unique_ptr<AbstractNode>& root() const;
     /**
      * Releases ownership of the tree, created during parsing.
@@ -67,16 +73,35 @@ private:
         skippingNode
     };
 
+    enum class ResultCode
+    {
+        ok,
+        missingAttribute,
+        unknownResource,
+        unknownNodeType,
+        other,
+    };
+
     std::stack<AbstractNode*> m_nodes;
     mutable QString m_errorDescription;
     State m_state;
     int m_inlineLevel;
     std::unique_ptr<AbstractNode> m_root;
     const ResourceNameSet& m_resourceNameSet;
+    int m_flags = 0;
 
-    std::unique_ptr<AbstractNode> createNode(const QString& nodeName, const QXmlAttributes& atts) const;
-    template<typename T> std::unique_ptr<AbstractNode> createConditionNode(MatchType::Value matchType, int matchResID) const;
-    std::unique_ptr<AbstractNode> createConditionNodeForStringRes(MatchType::Value matchType, int matchResID) const;
+    std::tuple<std::unique_ptr<AbstractNode>, ResultCode> createNode(
+        const QString& nodeName,
+        const QXmlAttributes& atts) const;
+
+    template<typename T>
+    std::unique_ptr<AbstractNode> createConditionNode(
+        MatchType::Value matchType,
+        int matchResID) const;
+
+    std::unique_ptr<AbstractNode> createConditionNodeForStringRes(
+        MatchType::Value matchType,
+        int matchResID) const;
 };
 
 } // namespace stree

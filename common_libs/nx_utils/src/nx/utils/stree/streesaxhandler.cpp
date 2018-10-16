@@ -63,7 +63,15 @@ bool SaxHandler::startElement(
         return true;
     }
 
-    std::unique_ptr<AbstractNode> newNode(createNode(qName, atts));
+    auto [newNode, resultCode] = createNode(qName, atts);
+    if ((m_flags & ParseFlag::ignoreUnknownResources) > 0 &&
+        resultCode == ResultCode::unknownResource)
+    {
+        m_state = skippingNode;
+        m_inlineLevel = 1;
+        return true;
+    }
+
     if (!newNode.get())
         return false;
     auto newNodePtr = newNode.get();
@@ -73,9 +81,9 @@ bool SaxHandler::startElement(
     {
         m_root = std::move(newNode);
     }
-    else if (!m_nodes.top()->addChild(
         valuePos == -1 ? QVariant() : QVariant(atts.value(valuePos)),
         std::move(newNode)))
+        std::move(newNode) ) )
     {
         m_state = skippingNode;
         m_inlineLevel = 1;
@@ -128,6 +136,11 @@ bool SaxHandler::fatalError(const QXmlParseException& exception)
     return false;
 }
 
+void SaxHandler::setFlags(int flags)
+{
+    m_flags = flags;
+}
+
 const std::unique_ptr<AbstractNode>& SaxHandler::root() const
 {
     return m_root;
@@ -138,9 +151,9 @@ std::unique_ptr<AbstractNode> SaxHandler::releaseTree()
     return std::move(m_root);
 }
 
-std::unique_ptr<AbstractNode> SaxHandler::createNode(
+std::tuple<std::unique_ptr<AbstractNode>, SaxHandler::ResultCode> SaxHandler::createNode(
     const QString& nodeName,
-    const QXmlAttributes& atts) const
+    const QXmlAttributes& atts ) const
 {
     if (nodeName == "condition")
     {
@@ -149,7 +162,7 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
         if (resNamePos == -1)
         {
             m_errorDescription = "No required attribute \"resName\" in ConditionNode";
-            return NULL;
+            return {nullptr, ResultCode::missingAttribute};
         }
         const QString& resName = atts.value(resNamePos);
         const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName(resName);
@@ -157,7 +170,7 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
         {
             m_errorDescription =
                 QString("Unknown resource %1 found as \"resName\" attribute of ConditionNode").arg(resName);
-            return NULL;
+            return {nullptr, ResultCode::unknownResource};
         }
 
         MatchType::Value matchType = MatchType::equal;
@@ -169,35 +182,41 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
             if (matchType == MatchType::unknown)
             {
                 m_errorDescription = QString("ConditionNode does not support match type %1").arg(matchTypeStr);
-                return NULL;
+                return {nullptr, ResultCode::other};
             }
         }
 
         switch (res.type)
         {
             case QVariant::Int:
-                return createConditionNode<int>(matchType, res.id);
+                return {createConditionNode<int>(matchType, res.id), ResultCode::ok};
+            
             case QVariant::UInt:
-                return createConditionNode<unsigned int>(matchType, res.id);
+                return {createConditionNode<unsigned int>(matchType, res.id), ResultCode::ok};
+            
             case QVariant::ULongLong:
-                return createConditionNode<qulonglong>(matchType, res.id);
+                return {createConditionNode<qulonglong>(matchType, res.id), ResultCode::ok};
+
             case QVariant::Double:
-                return createConditionNode<double>(matchType, res.id);
+                return {createConditionNode<double>(matchType, res.id), ResultCode::ok};
+
             case QVariant::String:
-                return createConditionNodeForStringRes(matchType, res.id);
+                return {createConditionNodeForStringRes(matchType, res.id), ResultCode::ok};
+
             case QVariant::Bool:
-                return createConditionNode<bool>(matchType, res.id);
+                return {createConditionNode<bool>(matchType, res.id), ResultCode::ok};
+
             default:
                 m_errorDescription =
                     lm("ConditionNode currently does not support resource of type %1 "
                         "(resource name %2). Only %3 types are supported")
                         .arg(res.type).arg(resName).arg("int, double, string");
-                return NULL;
+                return {nullptr, ResultCode::other};
         }
     }
     else if (nodeName == "sequence")
     {
-        return std::make_unique<SequenceNode>();
+        return {std::make_unique<SequenceNode>(), ResultCode::ok};
     }
     else if (nodeName == "set")
     {
@@ -205,14 +224,14 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
         if (resNamePos == -1)
         {
             m_errorDescription = QString("No required attribute \"resName\" in SetNode");
-            return NULL;
+            return {nullptr, ResultCode::missingAttribute};
         }
         const QString& resName = atts.value(resNamePos);
         int resValuePos = atts.index("resValue");
         if (resValuePos == -1)
         {
             m_errorDescription = "No required attribute \"resValue\" in SetNode";
-            return NULL;
+            return {nullptr, ResultCode::missingAttribute};
         }
 
         const ResourceNameSet::ResourceDescription& res = m_resourceNameSet.findResourceByName(resName);
@@ -221,7 +240,7 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
             m_errorDescription =
                 QString("Unknown resource %1 found as \"resName\" attribute of SetNode")
                     .arg(resName);
-            return NULL;
+            return {nullptr, ResultCode::unknownResource};
         }
 
         //converting value to appropriate type
@@ -232,13 +251,13 @@ std::unique_ptr<AbstractNode> SaxHandler::createNode(
             m_errorDescription =
                 QString("Could not convert value %1 of resource %2 to type %3")
                     .arg(resValueStr).arg(resName).arg(res.type);
-            return NULL;
+            return {nullptr, ResultCode::other};
         }
 
-        return std::make_unique<SetNode>(res.id, resValue);
+        return {std::make_unique<SetNode>( res.id, resValue ), ResultCode::ok};
     }
 
-    return NULL;
+    return {nullptr, ResultCode::unknownNodeType};
 }
 
 template<typename ResValueType>

@@ -557,22 +557,29 @@ bool QnOnvifPtzController::getPosition(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_WARNING(
-            this,
-            lm("Getting current position - wrong PTZ type. "
-                "Only operational PTZ is supported. Resource %1 (%2)")
+        NX_WARNING(this,
+            lm("Getting current position. "
+                "Wrong PTZ type. Only operational PTZ is supported. Resource %1 (%2)")
                 .args(resource()->getName(), resource()->getId()));
-
         return false;
     }
 
-    if(space != Qn::DevicePtzCoordinateSpace)
+    if (space != Qn::DevicePtzCoordinateSpace)
+    {
+        NX_WARNING(this,
+            lm("Getting current position. "
+                "Wrong PTZ type. Only DevicePtzCoordinateSpace is supported. Resource %1 (%2)")
+            .args(resource()->getName(), resource()->getId()));
         return false;
+    }
 
     PtzSoapWrapper ptz(m_resource);
     if (!ptz)
     {
-        // #TODO: log.
+        NX_WARNING(this,
+            lm("Getting current position. "
+                "PtzUrl is empty. Resource %1 (%2)")
+            .args(m_resource->getName(), m_resource->getId()));
         return false;
     }
     ptz.soap()->float_format = m_floatFormat;
@@ -583,22 +590,53 @@ bool QnOnvifPtzController::getPosition(
 
     _onvifPtz__GetStatusResponse response;
     if (ptz.doGetStatus(request, response) != SOAP_OK) {
-        qnWarning("Execution of PTZ status command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastErrorDescription());
+        NX_WARNING(this, lm("Execution of PTZ status command for resource '%1' has failed with error %2.")
+            .args(m_resource->getName(), ptz.getLastErrorDescription()));
         return false;
     }
 
     *outPosition = nx::core::ptz::Vector();
 
-    if (response.PTZStatus && response.PTZStatus->Position) {
-        if(response.PTZStatus->Position->PanTilt) {
+    if (response.PTZStatus && response.PTZStatus->Position)
+    {
+        if(response.PTZStatus->Position->PanTilt)
+        {
             outPosition->pan = response.PTZStatus->Position->PanTilt->x;
             outPosition->tilt = response.PTZStatus->Position->PanTilt->y;
+            if ((outPosition->pan == 0.0) && (outPosition->tilt == 0.0))
+            {
+                NX_WARNING(this,
+                    lm("Getting current position. "
+                        "Zero values of Pan and Tilt are received. Resource %1 (%2).")
+                    .args(resource()->getName(), resource()->getId()));
+            }
         }
-        if(response.PTZStatus->Position->Zoom) {
+        else
+        {
+            NX_WARNING(this,
+                lm("Getting current position. "
+                    "Pan and Tilt are absent in response. Resource %1 (%2).")
+                .args(resource()->getName(), resource()->getId()));
+        }
+        if(response.PTZStatus->Position->Zoom)
+        {
             outPosition->zoom = response.PTZStatus->Position->Zoom->x;
+            if (outPosition->zoom == 0.0)
+            {
+                NX_WARNING(this,
+                    lm("Getting current position. "
+                        "Zero value of Zoom is received. Resource %1 (%2).")
+                    .args(resource()->getName(), resource()->getId()));
+            }
+        }
+        else
+        {
+            NX_WARNING(this,
+                lm("Getting current position. "
+                    "Zoom is absent in response. Resource %1 (%2).")
+                .args(resource()->getName(), resource()->getId()));
         }
     }
-
     return true;
 }
 
