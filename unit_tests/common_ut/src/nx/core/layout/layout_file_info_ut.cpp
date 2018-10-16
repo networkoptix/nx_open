@@ -3,13 +3,16 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <utils/crypt/crypted_file_stream.h>
 
+#include <nx/utils/test_support/test_options.h>
+
 using namespace nx::core::layout;
+using nx::utils::TestOptions;
 
 static const char* dummyName = "DeleteMe.exe";
 
 static const char* thePassword = "helloworld";
 
-static void writeTestFile(const char* name)
+static void writeTestFile(const QString& name)
 {
     QFile file(name);
     ASSERT_TRUE(file.open(QFile::WriteOnly));
@@ -24,7 +27,9 @@ static void writeTestFile(const char* name)
     file.write((char *) &index, sizeof(StreamIndex));
 
     CryptoInfo crypto;
-    crypto.passwordHash = nx::utils::CryptedFileStream::getPasswordHash(thePassword);
+    crypto.passwordSalt = nx::utils::crypto_functions::getRandomSalt();
+    crypto.passwordHash =
+        nx::utils::crypto_functions::getSaltedPasswordHash(thePassword, crypto.passwordSalt);
     file.write((char *) &crypto, sizeof(CryptoInfo));
 
     for (int i = 0; i < 10000; i++)
@@ -39,9 +44,11 @@ static void writeTestFile(const char* name)
 
 TEST(LayoutFileInfo, Basic)
 {
-    writeTestFile(dummyName);
+    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
 
-    FileInfo fileInfo = identifyFile(dummyName);
+    writeTestFile(fileName);
+
+    FileInfo fileInfo = identifyFile(fileName);
 
     ASSERT_TRUE(fileInfo.isValid);
     ASSERT_TRUE(fileInfo.isCrypted);

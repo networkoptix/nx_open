@@ -49,7 +49,7 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    m_isEncrypted = nx::client::desktop::ui::workbench::layout::isEncrypted(layout);
+    m_isEncrypted = nx::client::desktop::layout::isEncrypted(layout);
 
     for (const auto& item : layout->getItems())
         addItem(item);

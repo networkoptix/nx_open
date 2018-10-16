@@ -14,8 +14,6 @@ class QString;
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace workbench {
 namespace layout {
 
 /** Returns true if layout is encrypted. */
@@ -40,8 +38,6 @@ bool askAndSetPassword(const QnLayoutResourcePtr& layout, QWidget* parent);
 bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent);
 
 } // namespace layout
-} // namespace workbench
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

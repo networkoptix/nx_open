@@ -85,7 +85,7 @@ private:
 private:
     class Private;
     QScopedPointer<Private> d;
-    QScopedPointer<::Ui::ExportSettingsDialog> ui;
+    QScopedPointer<Ui::ExportSettingsDialog> ui;
     FileNameValidator isFileNameValid;
     ExportPasswordWidget* m_passwordWidget;
 };

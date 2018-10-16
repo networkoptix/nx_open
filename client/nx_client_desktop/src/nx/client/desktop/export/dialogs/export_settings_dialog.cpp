@@ -669,7 +669,7 @@ void ExportSettingsDialog::accept()
         return;
 
     if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName())
-            && !m_passwordWidget->validate())
+            && (ini().enableEncryptedLayouts && !m_passwordWidget->validate()))
     {
         return;
     }

@@ -1193,7 +1193,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
     if (layouts.size() == 1)
     {
-        auto &layout = *layouts.begin();
+        auto &layout = layouts.first();
         if (layout::requiresPassword(layout))
         {
             layout::askAndSetPassword(layout, mainWindowWidget());

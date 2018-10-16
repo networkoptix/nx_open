@@ -23,8 +23,6 @@ QString tr(const char* sourceText, const char* disambiguation = 0)
 namespace nx {
 namespace client {
 namespace desktop {
-namespace ui {
-namespace workbench {
 namespace layout {
 
 namespace {
@@ -107,8 +105,6 @@ bool confirmPassword(const QnLayoutResourcePtr& layout, QWidget* parent)
 }
 
 } // namespace layout
-} // namespace workbench
-} // namespace ui
 } // namespace desktop
 } // namespace client
 } // namespace nx

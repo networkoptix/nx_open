@@ -541,7 +541,7 @@ void QnLayoutResource::usePasswordForRecordings(const QString& password)
 
     auto items = layoutResources();
 
-    for(auto &item: items)
+    for (auto item: items)
     {
         if (auto aviItem = item.objectCast<QnAviResource>())
             aviItem->usePasswordToRead(password);

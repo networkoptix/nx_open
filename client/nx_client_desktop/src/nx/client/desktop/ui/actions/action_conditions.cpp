@@ -784,11 +784,8 @@ ActionVisibility ForgetLayoutPasswordCondition::check(
         layout = resources[0].dynamicCast<QnLayoutResource>();
     }
 
-    if (!layout || !workbench::layout::isEncrypted(layout))
+    if (!layout || !layout::isEncrypted(layout) || layout::requiresPassword(layout))
         return InvisibleAction;
-
-    if (workbench::layout::requiresPassword(layout))
-        return DisabledAction;
 
      return EnabledAction;
 }

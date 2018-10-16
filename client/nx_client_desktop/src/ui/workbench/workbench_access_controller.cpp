@@ -218,7 +218,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
 Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
     const QnLayoutResourcePtr& layout) const
 {
-    using namespace nx::client::desktop::ui::workbench;
+    using namespace nx::client::desktop;
     NX_ASSERT(layout);
 
     // TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
@@ -248,7 +248,7 @@ Qn::Permissions QnWorkbenchAccessController::calculateLayoutPermissions(
         return permissions;
     }
 
-    const auto loggedIn =  !m_user
+    const auto loggedIn = !m_user
         ? ~(Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission)
         : Qn::AllPermissions;
 

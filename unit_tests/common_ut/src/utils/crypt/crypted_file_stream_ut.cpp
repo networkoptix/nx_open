@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <utils/crypt/crypted_file_stream.h>
 
+#include <nx/utils/test_support/test_options.h>
+
 static const int bufferSize = 9000;
 static char buffer[bufferSize];
 
@@ -8,7 +10,9 @@ static const char* dummyName = "DeleteMe.bin";
 
 static const char* thePassword = "helloworld";
 
-static void writeTestFile(const char* name)
+using nx::utils::TestOptions;
+
+static void writeTestFile(const QString& name)
 {
     nx::utils::CryptedFileStream stream(name, thePassword);
     ASSERT_TRUE(stream.open(QIODevice::WriteOnly));
@@ -22,15 +26,17 @@ static void writeTestFile(const char* name)
 
 TEST(CryptedFileStream, Basic)
 {
+    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+
     nx::utils::CryptedFileStream stream2("NonExistent.bin", nullptr);
     ASSERT_FALSE(stream2.open(QIODevice::ReadOnly));
 
-    writeTestFile(dummyName);
+    writeTestFile(fileName);
 
-    nx::utils::CryptedFileStream stream4(dummyName, "Bad Password");
+    nx::utils::CryptedFileStream stream4(fileName, "Bad Password");
     ASSERT_FALSE(stream4.open(QIODevice::ReadOnly));
 
-    nx::utils::CryptedFileStream stream1(dummyName, thePassword);
+    nx::utils::CryptedFileStream stream1(fileName, thePassword);
     ASSERT_TRUE(stream1.open(QIODevice::ReadOnly));
 
     char buffer1[bufferSize];
@@ -44,16 +50,18 @@ TEST(CryptedFileStream, Basic)
 
 TEST(CryptedFileStream, AppendAndReopen)
 {
-    writeTestFile(dummyName);
+    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+
+    writeTestFile(fileName);
 
     // Appending copy once again.
-    nx::utils::CryptedFileStream stream(dummyName, thePassword);
+    nx::utils::CryptedFileStream stream(fileName, thePassword);
     ASSERT_TRUE(stream.open(QIODevice::Append | QIODevice::WriteOnly));
     ASSERT_EQ(stream.write(buffer, bufferSize), bufferSize);
     stream.close();
 
     // Checking what is inside.
-    nx::utils::CryptedFileStream stream1(dummyName, thePassword);
+    nx::utils::CryptedFileStream stream1(fileName, thePassword);
     ASSERT_TRUE(stream1.open(QIODevice::ReadOnly));
 
     const int doubleBufferSize = bufferSize * 2;
@@ -76,9 +84,11 @@ TEST(CryptedFileStream, AppendAndReopen)
 
 TEST(CryptedFileStream, SeekAndPos)
 {
-    writeTestFile(dummyName);
+    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
 
-    nx::utils::CryptedFileStream stream1(dummyName, thePassword);
+    writeTestFile(fileName);
+
+    nx::utils::CryptedFileStream stream1(fileName, thePassword);
     ASSERT_TRUE(stream1.open(QIODevice::ReadOnly));
 
     const int posBufferSize = 3000;
@@ -102,14 +112,16 @@ TEST(CryptedFileStream, SeekAndPos)
 
 TEST(CryptedFileStream, EmbeddedMode)
 {
-    QFile File(dummyName);
+    const auto fileName = TestOptions::temporaryDirectoryPath () + dummyName;
+
+    QFile File(fileName);
     File.open(QIODevice::WriteOnly);
     for (int i = 0; i < 5; i++)
         File.write(buffer, bufferSize);
     File.close();
 
     // Write embedded stream.
-    nx::utils::CryptedFileStream stream(dummyName, thePassword);
+    nx::utils::CryptedFileStream stream(fileName, thePassword);
     stream.setEnclosure(1000, 0);
     ASSERT_TRUE(stream.open(QIODevice::WriteOnly));
     ASSERT_EQ(stream.write(buffer, bufferSize), bufferSize);
@@ -117,7 +129,7 @@ TEST(CryptedFileStream, EmbeddedMode)
     stream.close();
 
     // Read embedded stream.
-    nx::utils::CryptedFileStream stream1(dummyName, thePassword);
+    nx::utils::CryptedFileStream stream1(fileName, thePassword);
     stream1.setEnclosure(1000, grossSize);
     ASSERT_TRUE(stream1.open(QIODevice::ReadOnly));
     char buffer1[bufferSize];

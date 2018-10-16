@@ -654,7 +654,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
 
     if (layout->data(Qn::LayoutEncryptionRole).toBool())
     {
-        if (!ui::workbench::layout::confirmPassword(layout, mainWindowWidget()))
+        if (!layout::confirmPassword(layout, mainWindowWidget()))
             return; //< Reconfirm the password from user and exit if it is invalid.
     }
 

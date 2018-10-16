@@ -3,9 +3,7 @@
 
 #include <QtWidgets/QStyle>
 
-namespace nx {
-namespace client {
-namespace desktop {
+namespace nx::client::desktop {
 
 ExportPasswordWidget::ExportPasswordWidget(QWidget* parent):
     QWidget(parent),
@@ -56,6 +54,4 @@ void ExportPasswordWidget::emitDataChanged()
     emit dataChanged(data);
 }
 
-} // namespace desktop
-} // namespace client
-} // namespace nx
+} // namespace nx::client::desktop
