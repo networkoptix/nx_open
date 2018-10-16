@@ -1,6 +1,11 @@
-#include <string>
 #include <functional>
+#include <memory>
+#include <mutex>
+#include <stdio.h>
 
+#include <signal.h>
+
+#include <nx/network/aio/timer.h>
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/http_async_client.h>
@@ -15,24 +20,174 @@ enum class Role
     client
 };
 
-struct Config
+enum LogLevel
 {
-    Role role;
-    std::string protocolName;
+    info,
+    verbose
 };
 
-WebSocketPtr establishConnection(const std::string& url)
+struct
+{
+    Role role;
+    nx::Buffer protocolName;
+    nx::Buffer url;
+    nx::Buffer userName;
+    nx::Buffer userPassword;
+    nx::Buffer serverAddress;
+    int serverPort;
+    aio::AbstractAioThread* aioThread = nullptr;
+    LogLevel logLevel;
+} config;
+
+#define LOG_INFO(fmt, ...) \
+    do { \
+        if (config.logLevel >= LogLevel::config) \
+            fprintf(stdout, fmt "\n", __VA_ARGS__); \
+    } while (0)
+
+#define LOG_VERBOSE(fmt, ...) \
+    do { \
+        if (config.logLevel >= LogLevel::verbose) \
+            fprintf(stdout, fmt "\n", __VA_ARGS__); \
+    } while (0)
+
+class WebsocketConnectionsPool;
+static WebsocketConnectionsPool* websocketConnectionsPoolInstance;
+
+static void startAccepting()
 {
 }
 
-void startListening(const SocketAddress& address,
-    nx::utils::MoveOnlyFunc<void(WebSocketPtr)> onAccept)
+class WebsocketConnection;
+using WebsocketConnectionPtr = std::shared_ptr<WebsocketConnection>;
+
+class WebsocketConnection: public std::enable_shared_from_this<WebsocketConnection>
 {
+public:
+    WebsocketConnection(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
+    {
+        m_httpClient.bindToAioThread(aioThread);
+    }
+
+    using CompletionHandler = nx::utils::MoveOnlyFunc<void(const WebsocketConnectionPtr&)>;
+    void connectAsync(const nx::Buffer& url, const nx::Buffer& protocol,
+        CompletionHandler onConnect)
+    {
+        http::HttpHeaders websocketHeaders;
+        websocket::addClientHeaders(&websocketHeaders, protocol);
+
+        LOG_VERBOSE("Connecting to %s", url.constData());
+        m_httpClient.doGet(url,
+            [self = shared_from_this()]()
+            {
+            });
+    }
+
+    void stop()
+    {
+        m_aioThread->post(nullptr,
+            [this]()
+            {
+                m_stopped = true;
+                m_readyPromise.set_value();
+            });
+        m_stopped = true;
+    }
+
+    void waitForDone()
+    {
+        m_readyFuture.wait();
+    }
+
+private:
+    http::AsyncClient m_httpClient;
+    WebSocketPtr m_websocket;
+    aio::AbstractAioThread* m_aioThread = nullptr;
+    bool m_stopped = false;
+    nx::utils::promise<void> m_readyPromise;
+    nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
+};
+
+
+class WebsocketConnectionsPool
+{
+public:
+    void addConnection(const WebsocketConnectionPtr websocketConnection)
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_stopped)
+        {
+            websocketConnection->stop();
+            return;
+        }
+
+        m_connections.insert(websocketConnection);
+    }
+
+    void stopAll()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_stopped)
+            return;
+
+        m_stopped = true;
+        for (const auto& connection: m_connections)
+            connection->stop();
+    }
+
+    void waitAll()
+    {
+        for (const auto& connection: m_connections)
+            connection->waitForDone();
+    }
+
+private:
+    std::mutex m_mutex;
+    bool m_stopped = false;
+    std::set<WebsocketConnectionPtr> m_connections;
+};
+
+static void onConnect(WebsocketConnectionPtr websocketConnection)
+{
+}
+
+static void connectAndListen()
+{
+    auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread);
+    websocketConnectionsPoolInstance->addConnection(websocketConnection);
+    websocketConnection->connectAsync(config.url, config.protocolName, onConnect);
+}
+
+void prepareConfig(int argc, const char* argv[])
+{
+    config.protocolName = "nxp2p";
+    config.url = "ws://127.0.0.1:7001/ec2/transactionBus";
 }
 
 int main(int argc, const char *argv[])
 {
+    prepareConfig(argc, argv);
+    aio::Timer timer;
+    config.aioThread = timer.getAioThread();
 
+    setvbuf(stdout, nullptr, _IONBF, 0);
+
+    WebsocketConnectionsPool websocketConnectionsPool;
+    websocketConnectionsPoolInstance = &websocketConnectionsPool;
+
+    switch (config.role)
+    {
+        case Role::server:
+            startAccepting();
+            break;
+        case Role::client:
+            connectAndListen();
+            break;
+    }
+
+    websocketConnectionsPool.waitAll();
+
+    return 0;
     //nx::utils::promise<void> readyPromise;
     //auto readyFuture = readyPromise.get_future();
 
