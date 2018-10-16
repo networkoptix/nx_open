@@ -432,6 +432,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || canFetch()))
         return;
 
+    // Completely stop metadata reception if paused.
     if (q->livePaused())
         q->setLive(false);
 
@@ -439,6 +440,8 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     if (!m_liveReceptionActive)
         return;
+
+    // Fetch all metadata packets from receiver buffers.
 
     QList<QList<QnAbstractCompressedMetadataPtr>> packetsBySource;
     int totalPackets = 0;
@@ -455,6 +458,8 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     if (totalPackets == 0)
         return;
+
+    // Process all metadata packets.
 
     NX_VERBOSE(q) << "Processing" << totalPackets << "live metadata packets from"
         << packetsBySource.size() << "sources";
