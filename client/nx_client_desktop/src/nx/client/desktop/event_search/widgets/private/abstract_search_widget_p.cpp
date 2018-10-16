@@ -815,12 +815,13 @@ void AbstractSearchWidget::Private::handleFetchFinished()
     const auto indicator = relevantIndicatorModel();
     indicator->setVisible(m_mainModel->canFetchMore());
     indicator->setActive(false);
+    handleItemCountChanged();
 }
 
 void AbstractSearchWidget::Private::handleItemCountChanged()
 {
     const auto itemCount = m_mainModel->rowCount();
-    const bool placeholderVisible = itemCount == 0;
+    const bool placeholderVisible = itemCount == 0 && !m_mainModel->canFetchMore();
     if (placeholderVisible)
         ui->placeholderText->setText(q->placeholderText(m_mainModel->isConstrained()));
 
