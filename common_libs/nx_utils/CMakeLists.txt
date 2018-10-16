@@ -27,7 +27,8 @@ set(mocableFiles
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/safe_direct_connection.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/uuid.h
     ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/url.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/long_runnable.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nx/utils/thread/thread.h)
 
 nx_add_qt_mocables(nx_utils ${mocableFiles}
     INCLUDE_DIRS
