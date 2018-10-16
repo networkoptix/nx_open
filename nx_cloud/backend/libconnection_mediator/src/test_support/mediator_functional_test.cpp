@@ -103,11 +103,6 @@ network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
     return m_httpProxy.endpoint;
 }
 
-void MediatorFunctionalTest::setPreserveEndpointsDuringRestart(bool value)
-{
-    m_preserveEndpointsDuringRestart = value;
-}
-
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
@@ -219,9 +214,6 @@ std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
 
 void MediatorFunctionalTest::beforeModuleCreation()
 {
-    if (!m_preserveEndpointsDuringRestart)
-        return;
-
     for (auto it = args().begin(); it != args().end(); )
     {
         if (strcmp((*it), "-stun/udpAddrToListenList") == 0)
@@ -247,7 +239,7 @@ void MediatorFunctionalTest::afterModuleDestruction()
 
 bool MediatorFunctionalTest::startProxy()
 {
-    if (!m_tcpPortsAllocated || !m_preserveEndpointsDuringRestart)
+    if (!m_tcpPortsAllocated)
     {
         if (!allocateTcpPorts())
             return false;

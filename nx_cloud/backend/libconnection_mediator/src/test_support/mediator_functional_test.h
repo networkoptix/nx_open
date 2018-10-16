@@ -54,11 +54,6 @@ public:
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
 
-    /**
-     * True by default.
-     */
-    void setPreserveEndpointsDuringRestart(bool value);
-
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
@@ -98,7 +93,6 @@ private:
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
     network::SocketAddress m_stunUdpEndpoint;
-    bool m_preserveEndpointsDuringRestart = true;
     TcpProxyContext m_httpProxy;
     TcpProxyContext m_stunProxy;
     bool m_tcpPortsAllocated = false;
