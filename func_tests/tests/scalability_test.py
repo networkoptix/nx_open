@@ -35,7 +35,6 @@ from framework.utils import (
     imerge,
     make_threaded_async_calls,
     single,
-    take_some,
     str_to_bool,
     threadsafe_generator,
     with_traceback,
@@ -125,7 +124,7 @@ def make_server_async_calls(config, layout_item_id_gen, server_idx, server):
     def make_layout_item_list(layout_idx):
         # layouts have 0, 1, 2, .. MAX_LAYOUT_ITEMS-1 items count
         count = layout_idx % MAX_LAYOUT_ITEMS
-        return list(take_some(layout_item_gen, count))
+        return list(itertools.islice(layout_item_gen, count))
 
 
     def camera_call_generator():
@@ -220,7 +219,7 @@ def pick_some_servers(server_list, required_count):
     if server_count <= required_count:
         return server_list
     else:
-        return [server_list[i] for i in range(0, server_count, server_count/required_count)]
+        return server_list[::server_count / required_count]
 
 
 def wait_for_servers_synced(artifact_factory, config, env):
@@ -268,6 +267,10 @@ def transaction_generator(config, server_list):
         camera_list = [CameraInfo(d['id'])
                        for d in server.api.generic.get('ec2/getCameras')
                        if d['parentId'] == server_id]
+        if not camera_list:
+            # This may happen if we use lightweight servers and this is full one.
+            # Full server does not has it's own cameras in this case.
+            return
         for i, camera in enumerate(camera_list):
             camera.status = bool(i % 2)
 
