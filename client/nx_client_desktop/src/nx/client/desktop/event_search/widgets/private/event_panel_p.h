@@ -24,6 +24,9 @@ class BookmarkSearchWidget;
 class EventSearchWidget;
 class AnalyticsSearchWidget;
 
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private
+
 class EventPanel::Private: public QObject
 {
     Q_OBJECT
@@ -32,19 +35,16 @@ public:
     Private(EventPanel* q);
     virtual ~Private() override;
 
+signals:
+    void currentMediaWidgetAboutToBeChanged(QPrivateSignal);
+    void currentMediaWidgetChanged(QPrivateSignal);
+
 private:
     void rebuildTabs();
     bool systemHasAnalytics() const;
     void updateUnreadCounter(int count, QnNotificationLevel::Value importance);
     void showContextMenu(const QPoint& pos);
-    void setupTabSyncWithNavigator();
-    void setTabEnforced(QWidget* tab, bool enforced);
-    void setCurrentWidgetMotionSearch(bool value);
-    void updateCurrentWidgetMotionSearch();
-    bool singleCameraMotionSearch() const;
-
     void handleCurrentMediaWidgetChanged();
-    void handleWidgetMotionSearchChanged(bool on);
 
 private:
     EventPanel* const q;
@@ -60,7 +60,65 @@ private:
 
     QPointer<QnMediaResourceWidget> m_currentMediaWidget;
 
-    QWidget* m_previousTab = nullptr;
+    class MotionSearchSynchronizer;
+    const QScopedPointer<MotionSearchSynchronizer> m_motionSearchSynchronizer;
+
+    class BookmarkSearchSynchronizer;
+    const QScopedPointer<BookmarkSearchSynchronizer> m_bookmarkSearchSynchronizer;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::MotionSearchSynchronizer
+
+class EventPanel::Private::MotionSearchSynchronizer: public QObject
+{
+public:
+    MotionSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentWidgetAboutToBeChanged();
+    void handleCurrentWidgetChanged();
+
+    void updateState();
+    void syncWidgetWithPanel();
+    void syncPanelWithWidget();
+
+    enum class State
+    {
+        irrelevant, //< Other than Motion tab is selected.
+        unsyncedMotion, //< Motion tab and other than current camera mode are selected.
+        syncedMotion //< Motion tab and current camera mode are selected.
+    };
+
+    State calculateState() const;
+
+    void setCurrentWidgetMotionSearch(bool value);
+    QnMediaResourceWidget* widget() const;
+
+private:
+    EventPanel::Private* const m_main;
+    State m_state;
+    bool m_updating = false;
+    QWidget* m_revertTab = nullptr;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::BookmarkSearchSynchronizer
+
+class EventPanel::Private::BookmarkSearchSynchronizer: public QObject
+{
+public:
+    BookmarkSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentTabChanged();
+    void setBookmarksTabActive(bool value);
+
+private:
+    EventPanel::Private* const m_main;
+    QWidget* m_revertTab = nullptr;
     QWidget* m_lastTab = nullptr;
 };
 
