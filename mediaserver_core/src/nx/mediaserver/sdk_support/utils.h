@@ -12,6 +12,10 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 
+#include <nx/mediaserver/resource/resource_fwd.h>
+#include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/resource/analytics_engine_resource.h>
+
 #include <nx/plugins/settings.h>
 
 class QnMediaServerModule;
@@ -75,5 +79,8 @@ void saveManifestToFile(
 
 std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
     pixelFormatFromEngineManifest(const nx::vms::api::analytics::EngineManifest& manifest);
+
+resource::AnalyticsEngineResourceList toServerEngineList(
+    const nx::vms::common::AnalyticsEngineResourceList engineList);
 
 } // namespace nx::mediaserver::sdk_support

@@ -13,6 +13,7 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/sdk/analytics/pixel_format.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 namespace nx::mediaserver::sdk_support {
 
@@ -213,6 +214,20 @@ std::optional<nx::sdk::analytics::UncompressedVideoFrame::PixelFormat>
         return std::nullopt;
 
     return pixelFormat;
+}
+
+resource::AnalyticsEngineResourceList toServerEngineList(
+    const nx::vms::common::AnalyticsEngineResourceList engineList)
+{
+    resource::AnalyticsEngineResourceList result;
+    for (const auto& engine: engineList)
+    {
+        auto serverEngine = engine.dynamicCast<resource::AnalyticsEngineResource>();
+        if (serverEngine)
+            result.push_back(serverEngine);
+    }
+
+    return result;
 }
 
 } // namespace nx::mediaserver::sdk_support

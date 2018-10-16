@@ -7,8 +7,6 @@
 #include <map>
 #include <memory>
 
-#include "resource_analytics_context.h"
-
 #include <utils/common/connective.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <core/resource/resource_fwd.h>
@@ -20,9 +18,11 @@
 
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+
 #include <nx/mediaserver/analytics/device_analytics_context.h>
 #include <nx/mediaserver/analytics/proxy_video_data_receptor.h>
 
+#include <nx/mediaserver/resource/resource_fwd.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/analytics/rule_holder.h>
 
@@ -84,8 +84,13 @@ private:
     void handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& device);
     void handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& device);
 
-    void at_engineAdded(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
-    void at_engineRemoved(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+    void at_engineAdded(const resource::AnalyticsEngineResourcePtr& engine);
+    void at_engineRemoved(const resource::AnalyticsEngineResourcePtr& engine);
+    void at_enginePropertyChanged(
+        const resource::AnalyticsEngineResourcePtr& engine,
+        const QString& propertyName);
+
+    void updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine);
 
     QWeakPointer<QnAbstractDataReceptor> metadataSink(
         const QnVirtualCameraResourcePtr& device) const;

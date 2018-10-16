@@ -33,13 +33,13 @@ bool DeviceAnalyticsContext::isEngineAlreadyBound(
 }
 
 bool DeviceAnalyticsContext::isEngineAlreadyBound(
-    const nx::vms::common::AnalyticsEngineResourcePtr& engine) const
+    const resource::AnalyticsEngineResourcePtr& engine) const
 {
     return isEngineAlreadyBound(engine->getId());
 }
 
 void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
-    const nx::vms::common::AnalyticsEngineResourceList& engines)
+    const resource::AnalyticsEngineResourceList& engines)
 {
     std::set<QnUuid> engineIds;
     for (const auto& engine: engines)
@@ -59,8 +59,7 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
         if (isEngineAlreadyBound(engine))
             continue;
 
-        auto serverEngine = engine.dynamicCast<resource::AnalyticsEngineResource>();
-        auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, serverEngine);
+        auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, engine);
         binding->setMetadataSink(m_metadataSink);
         m_bindings.emplace(engine->getId(), binding);
     }
@@ -68,22 +67,15 @@ void DeviceAnalyticsContext::setEnabledAnalyticsEngines(
     updateSupportedFrameTypes();
 }
 
-void DeviceAnalyticsContext::addEngine(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+void DeviceAnalyticsContext::addEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
-    auto serverEngine = engine.dynamicCast<resource::AnalyticsEngineResource>();
-    if (!serverEngine)
-    {
-        NX_WARNING(this, lm("Engine is not an instance of server analytics engine, skipping."));
-        return;
-    }
-
-    auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, serverEngine);
+    auto binding = std::make_shared<DeviceAnalyticsBinding>(m_device, engine);
     binding->setMetadataSink(m_metadataSink);
     m_bindings.emplace(engine->getId(), binding);
     updateSupportedFrameTypes();
 }
 
-void DeviceAnalyticsContext::removeEngine(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourcePtr& engine)
 {
     m_bindings.erase(engine->getId());
     updateSupportedFrameTypes();

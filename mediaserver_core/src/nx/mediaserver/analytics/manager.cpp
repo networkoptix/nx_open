@@ -22,6 +22,7 @@
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
+#include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/plugins/settings.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
@@ -129,7 +130,7 @@ bool Manager::isLocalDevice(const QnVirtualCameraResourcePtr& device) const
 
 void Manager::at_resourceAdded(const QnResourcePtr& resource)
 {
-    auto analyticsEngine = resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>();
+    auto analyticsEngine = resource.dynamicCast<resource::AnalyticsEngineResource>();
     if (analyticsEngine)
     {
         NX_VERBOSE(
@@ -236,13 +237,20 @@ void Manager::at_resourceParentIdChanged(const QnResourcePtr& resource)
 void Manager::at_resourcePropertyChanged(const QnResourcePtr& resource, const QString& propertyName)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!device)
+    if (device)
     {
-        NX_WARNING(this, "Resource is not a device.");
+        at_devicePropertyChanged(device, propertyName);
         return;
     }
 
-    at_devicePropertyChanged(device, propertyName);
+    auto engine = resource.dynamicCast<resource::AnalyticsEngineResource>();
+    if (!engine)
+    {
+        NX_WARNING(this, "Resource is not a device or engine");
+        return;
+    }
+
+    at_enginePropertyChanged(engine, propertyName);
 }
 
 void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
@@ -287,7 +295,8 @@ void Manager::at_devicePropertyChanged(
                 .args(device->getUserDefinedName(), device->getId()));
         }
 
-        analyticsContext->setEnabledAnalyticsEngines(device->enabledAnalyticsEngineResources());
+        analyticsContext->setEnabledAnalyticsEngines(
+            sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
     }
 }
 
@@ -298,7 +307,8 @@ void Manager::handleDeviceArrivalToServer(const QnVirtualCameraResourcePtr& devi
         this, &Manager::at_resourcePropertyChanged);
 
     auto context = QSharedPointer<DeviceAnalyticsContext>::create(serverModule(), device);
-    context->setEnabledAnalyticsEngines(device->enabledAnalyticsEngineResources());
+    context->setEnabledAnalyticsEngines(
+        sdk_support::toServerEngineList(device->enabledAnalyticsEngineResources()));
     context->setMetadataSink(metadataSink(device));
 
     if (auto source = mediaSource(device).toStrongRef())
@@ -312,12 +322,14 @@ void Manager::handleDeviceRemovalFromServer(const QnVirtualCameraResourcePtr& de
     m_deviceAnalyticsContexts.erase(device->getId());
 }
 
-void Manager::at_engineAdded(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+void Manager::at_engineAdded(const resource::AnalyticsEngineResourcePtr& engine)
 {
-    // Do nothing actually.
+    connect(
+        engine, &QnResource::propertyChanged,
+        this, &Manager::at_resourcePropertyChanged);
 }
 
-void Manager::at_engineRemoved(const nx::vms::common::AnalyticsEngineResourcePtr& engine)
+void Manager::at_engineRemoved(const resource::AnalyticsEngineResourcePtr& engine)
 {
     NX_VERBOSE(
         this,
@@ -331,6 +343,37 @@ void Manager::at_engineRemoved(const nx::vms::common::AnalyticsEngineResourcePtr
     }
 }
 
+void Manager::at_enginePropertyChanged(
+    const resource::AnalyticsEngineResourcePtr& engine,
+    const QString& propertyName)
+{
+    if (!engine)
+    {
+        NX_WARNING(this, "Got empty analytics engine resource, skipping");
+        return;
+    }
+
+    if (propertyName == nx::vms::common::AnalyticsEngineResource::kSettingsValuesProperty)
+        updateEngineSettings(engine);
+}
+
+void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& engine)
+{
+    auto sdkEngine = engine->sdkEngine();
+    if (!sdkEngine)
+    {
+        NX_ERROR(this, "Can't access underlying SDK analytics engine object for %1 (%2)",
+            engine->getName(), engine->getId());
+        return;
+    }
+
+    NX_DEBUG(this, "Updating engine %1 (%2) with settings",
+        engine->getName(), engine->getId());
+
+    auto settings = engine->settingsValues();
+    auto settingsHolder = sdk_support::toSettingsHolder(settings);
+    sdkEngine->setSettings(settingsHolder->array(), settingsHolder->size());
+}
 
 void Manager::registerMetadataSink(
     const QnResourcePtr& resource,

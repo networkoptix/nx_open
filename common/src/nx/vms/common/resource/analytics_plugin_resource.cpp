@@ -9,6 +9,8 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx::vms::common {
 
 using namespace nx::vms::api::analytics;

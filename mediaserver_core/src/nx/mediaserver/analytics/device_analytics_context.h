@@ -4,6 +4,7 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
@@ -28,9 +29,9 @@ public:
         const QnVirtualCameraResourcePtr& device);
 
     void setEnabledAnalyticsEngines(
-        const nx::vms::common::AnalyticsEngineResourceList& engines);
-    void addEngine(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
-    void removeEngine(const nx::vms::common::AnalyticsEngineResourcePtr& engine);
+        const resource::AnalyticsEngineResourceList& engines);
+    void addEngine(const resource::AnalyticsEngineResourcePtr& engine);
+    void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
 
@@ -46,11 +47,12 @@ private:
 
 private:
     void subscribeToDeviceChanges();
+
     bool isDeviceAlive() const;
     void updateSupportedFrameTypes();
 
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
-    bool isEngineAlreadyBound(const nx::vms::common::AnalyticsEngineResourcePtr& engine) const;
+    bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
     void issueMissingUncompressedFrameWarningOnce();
 
