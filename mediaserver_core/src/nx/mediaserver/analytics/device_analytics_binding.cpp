@@ -47,7 +47,7 @@ DeviceAnalyticsBinding::~DeviceAnalyticsBinding()
 bool DeviceAnalyticsBinding::startAnalytics(const QVariantMap& settings)
 {
     QnMutexLocker lock(&m_mutex);
-    startAnalyticsUnsafe(settings);
+    return startAnalyticsUnsafe(settings);
 }
 
 void DeviceAnalyticsBinding::stopAnalytics()

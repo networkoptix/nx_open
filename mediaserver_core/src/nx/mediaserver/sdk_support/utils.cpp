@@ -5,7 +5,7 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <media_server/media_server_module.h>3
+#include <media_server/media_server_module.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
