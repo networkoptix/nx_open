@@ -12,7 +12,7 @@
 #include <ui/models/resource/tree/resource_tree_model_layout_node_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_password_management.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_context.h>
 

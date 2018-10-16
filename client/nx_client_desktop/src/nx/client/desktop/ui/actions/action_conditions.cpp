@@ -55,7 +55,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_layout_password_management.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <nx/vms/utils/platform/autorun.h>
@@ -64,6 +63,8 @@
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <nx/client/desktop/resource_views/data/node_type.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -759,35 +760,6 @@ ActionVisibility SaveLayoutAsCondition::check(const QnResourceList& resources, Q
         return InvisibleAction;
 
     return EnabledAction;
-}
-
-ForgetLayoutPasswordCondition::ForgetLayoutPasswordCondition(bool isCurrent):
-    m_current(isCurrent)
-{
-}
-
-ActionVisibility ForgetLayoutPasswordCondition::check(
-    const QnResourceList& resources,
-    QnWorkbenchContext* context)
-{
-    QnLayoutResourcePtr layout;
-
-    if (m_current)
-    {
-        layout = context->workbench()->currentLayout()->resource();
-    }
-    else
-    {
-        if (resources.size() != 1)
-            return InvisibleAction;
-
-        layout = resources[0].dynamicCast<QnLayoutResource>();
-    }
-
-    if (!layout || !layout::isEncrypted(layout) || layout::requiresPassword(layout))
-        return InvisibleAction;
-
-     return EnabledAction;
 }
 
 LayoutCountCondition::LayoutCountCondition(int minimalRequiredCount):
@@ -1921,6 +1893,17 @@ ConditionWrapper currentLayoutIsVideowallScreen()
         {
             const auto layout = context->workbench()->currentLayout();
             return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
+        });
+}
+
+ConditionWrapper canForgetPassword()
+{
+    using namespace nx::client::desktop;
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+            return layout && layout::isEncrypted(layout) && !layout::requiresPassword(layout);
         });
 }
 

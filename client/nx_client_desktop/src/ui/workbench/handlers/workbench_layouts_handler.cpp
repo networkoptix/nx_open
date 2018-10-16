@@ -47,12 +47,13 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_layout_password_management.h>
 #include <ui/workbench/handlers/workbench_videowall_handler.h>  // TODO: #GDM dependencies
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
+#include <nx/client/desktop/resources/layout_password_management.h>
+
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
@@ -214,6 +215,8 @@ void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractAct
 
 void LayoutsHandler::at_forgetLayoutPasswordAction_triggered()
 {
+    using namespace nx::client::desktop;
+
     auto layout = menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>();
     NX_ASSERT(layout && layout::isEncrypted(layout));
 

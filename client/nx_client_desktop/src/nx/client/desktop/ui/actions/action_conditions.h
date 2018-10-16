@@ -250,19 +250,6 @@ private:
 };
 
 /**
-* Condition for forgetting layout password.
-*/
-class ForgetLayoutPasswordCondition: public Condition
-{
-public:
-    ForgetLayoutPasswordCondition(bool isCurrent);
-    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-
-private:
-    bool m_current;
-};
-
-/**
  * Condition based on the count of layouts that are currently open.
  */
 class LayoutCountCondition: public Condition
@@ -657,6 +644,8 @@ ConditionWrapper wearableCameraUploadEnabled();
 ConditionWrapper canCancelWearableCameraUpload();
 
 ConditionWrapper currentLayoutIsVideowallScreen();
+
+ConditionWrapper canForgetPassword();
 
 } // namespace condition
 

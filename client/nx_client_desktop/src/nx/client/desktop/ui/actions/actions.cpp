@@ -988,10 +988,7 @@ void initialize(Manager* manager, Action* root)
     factory(ForgetLayoutPasswordAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(ContextMenu::tr("Forget password"))
-        .condition(
-            ConditionWrapper(new ForgetLayoutPasswordCondition(false))
-            && !condition::isLayoutTourReviewMode()
-        );
+        .condition(condition::canForgetPassword() && !condition::isLayoutTourReviewMode());
 
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
