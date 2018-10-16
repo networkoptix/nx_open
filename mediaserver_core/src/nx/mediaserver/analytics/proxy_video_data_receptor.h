@@ -7,9 +7,10 @@ namespace nx::mediaserver::analytics {
 class ProxyVideoDataReceptor: public AbstractVideoDataReceptor
 {
 public:
-    ProxyVideoDataReceptor(AbstractVideoDataReceptorPtr receptor);
+    ProxyVideoDataReceptor() = default;
+    ProxyVideoDataReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor);
 
-    void setProxiedReceptor(AbstractVideoDataReceptorPtr receptor);
+    void setProxiedReceptor(QWeakPointer<AbstractVideoDataReceptor> receptor);
 
     virtual bool needsCompressedFrames() const override;
     virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
@@ -20,7 +21,7 @@ public:
 
 private:
     mutable QnMutex m_mutex;
-    AbstractVideoDataReceptorPtr m_proxiedReceptor;
+    QWeakPointer<AbstractVideoDataReceptor> m_proxiedReceptor;
 
 };
 

@@ -395,7 +395,7 @@ void Manager::registerMetadataSink(
 
 QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUuid& resourceId)
 {
-    auto proxySource = QSharedPointer<ProxyVideoDataReceptor>::create(nullptr);
+    auto proxySource = QSharedPointer<ProxyVideoDataReceptor>::create();
     auto& analyticsContext = context(resourceId);
 
     if (analyticsContext)
