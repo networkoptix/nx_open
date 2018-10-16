@@ -3084,7 +3084,7 @@ void MediaServerProcess::initializeLogging()
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }),
-        false);
+        /*do not write log header*/ false);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));

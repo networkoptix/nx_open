@@ -11,7 +11,9 @@ NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
 
 NX_UTILS_API bool setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
-NX_UTILS_API bool addLogger(std::unique_ptr<AbstractLogger> logger);
+NX_UTILS_API bool addLogger(
+    std::unique_ptr<AbstractLogger> logger,
+    bool writeLogHeader = true);
 
 /** Every setMainLogger and addLogger calls will fail until unlockConfiguration is called. */
 NX_UTILS_API void lockConfiguration();
