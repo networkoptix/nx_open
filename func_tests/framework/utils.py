@@ -160,15 +160,11 @@ def with_traceback(fn, exception_event=None):
     return wrapper
 
 
-def take_some(iter, count):
-    for i in range(count):
-        yield next(iter)
-
-
 def imerge(*iterators):
-    for value_tuple in itertools.izip(*iterators):
+    for value_tuple in itertools.izip_longest(*iterators):
         for value in value_tuple:
-            yield value
+            if value is not None:
+                yield value
 
 
 def single(iter):
