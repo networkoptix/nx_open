@@ -46,7 +46,7 @@ public:
         nx::sdk::analytics::Action* action, nx::sdk::Error* outError) override;
 
 private:
-    boost::optional<QList<QString>> fetchSupportedEvents(const nx::sdk::DeviceInfo& deviceInfo);
+    boost::optional<QList<QString>> fetchSupportedEventTypeIds(const nx::sdk::DeviceInfo& deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
 
 private:
@@ -60,7 +60,7 @@ private:
     {
         bool hasExpired() const;
 
-        QList<QString> supportedEventTypes;
+        QList<QString> supportedEventTypeIds;
         nx::utils::ElapsedTimer timeout;
     };
 

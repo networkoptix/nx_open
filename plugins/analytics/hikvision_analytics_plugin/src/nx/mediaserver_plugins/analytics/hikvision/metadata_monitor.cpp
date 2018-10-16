@@ -117,11 +117,10 @@ void HikvisionMetadataMonitor::initMonitorUnsafe()
 {
     initEventMonitor();
 
-    std::array<const char*, 3> lprEventTypes = { "BlackList", "WhiteList", "otherlist" };
-    for (const auto& eventName: lprEventTypes)
+    for (const auto& eventTypeInternalName: { "BlackList", "WhiteList", "otherlist" })
     {
-        auto lprEventTypeDescriptor = m_manifest.eventTypeDescriptorByInternalName(eventName);
-        if (m_deviceManifest.supportedEventTypes.contains(lprEventTypeDescriptor.id))
+        if (m_deviceManifest.supportedEventTypeIds.contains(
+            m_manifest.eventTypeDescriptorByInternalName(eventTypeInternalName).id))
         {
             initLprMonitor();
             break;

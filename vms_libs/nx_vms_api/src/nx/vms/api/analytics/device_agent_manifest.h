@@ -8,16 +8,16 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API DeviceAgentManifest
 {
-    QList<QString> supportedEventTypes; //< TODO: Rename (including db) to supportedEventTypeIds.
-    QList<QString> supportedObjectTypes; //< TODO: Rename (including db) to supportedObjectTypeIds.
+    QList<QString> supportedEventTypeIds;
+    QList<QString> supportedObjectTypeIds;
 
-    QList<EventType> outputEventTypes; //< TODO: Rename (including db) to eventTypes.
-    QList<ObjectType> outputObjectTypes; //< TODO: Rename (including db) to objectTypes.
+    QList<EventType> eventTypes;
+    QList<ObjectType> objectTypes;
     QList<Group> groups;
 };
 
 #define DeviceAgentManifest_Fields \
-    (supportedEventTypes)(supportedObjectTypes)(outputEventTypes)(outputObjectTypes)(groups)
+    (supportedEventTypeIds)(supportedObjectTypeIds)(eventTypes)(objectTypes)(groups)
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentManifest, (json), NX_VMS_API)
 

@@ -118,12 +118,12 @@ nx::sdk::analytics::DeviceAgent* Engine::obtainDeviceAgent(
                 m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId));
         });
 
-    auto supportedEvents = fetchSupportedEvents(*deviceInfo);
-    if (!supportedEvents)
+    auto supportedEventTypeIds = fetchSupportedEventTypeIds(*deviceInfo);
+    if (!supportedEventTypeIds)
         return nullptr;
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypes = *supportedEvents;
+    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
     auto deviceAgent = new DeviceAgent(this);
     deviceAgent->setDeviceInfo(*deviceInfo);
@@ -149,7 +149,7 @@ void Engine::executeAction(Action* action, Error* outError)
 {
 }
 
-boost::optional<QList<QString>> Engine::fetchSupportedEvents(
+boost::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
     const DeviceInfo& deviceInfo)
 {
     using namespace nx::mediaserver_core::plugins;

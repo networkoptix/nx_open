@@ -26,12 +26,12 @@ struct EventType: nx::vms::api::analytics::EventType
 struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
 {
     QList<QString> supportedCameraModels; //< Proprietary. Camera models supported by this plugin.
-    QList<EventType> outputEventTypes;
+    QList<EventType> eventTypes;
     
     bool supportsModel(const QString& model) const noexcept;
 };
 #define DwMttEngineManifest_Fields EngineManifestBase_Fields \
-    (supportedCameraModels)(outputEventTypes)
+    (supportedCameraModels)(eventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))

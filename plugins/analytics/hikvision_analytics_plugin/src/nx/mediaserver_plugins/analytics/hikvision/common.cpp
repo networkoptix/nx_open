@@ -18,7 +18,7 @@ QString Hikvision::EngineManifest::eventTypeByInternalName(const QString& value)
     if (!result.isNull())
         return result;
 
-    for (const auto& eventTypeDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: eventTypes)
     {
         const auto possibleInternalNames = eventTypeDescriptor.internalName.toLower().split(L',');
         for (const auto& name: possibleInternalNames)
@@ -41,7 +41,7 @@ const Hikvision::EventType& Hikvision::EngineManifest::eventTypeDescriptorById(
     auto it = m_eventTypeDescriptorById.find(id);
     if (it != m_eventTypeDescriptorById.end())
         return it.value();
-    for (const auto& eventTypeDescriptor: outputEventTypes)
+    for (const auto& eventTypeDescriptor: eventTypes)
     {
         if (eventTypeDescriptor.id == id)
         {

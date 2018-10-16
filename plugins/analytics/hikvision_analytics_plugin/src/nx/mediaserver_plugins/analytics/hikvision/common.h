@@ -40,7 +40,7 @@ public:
 
     struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
     {
-        QList<EventType> outputEventTypes;
+        QList<EventType> eventTypes;
 
         QString eventTypeByInternalName(const QString& internalEventName) const;
         const Hikvision::EventType& eventTypeDescriptorById(const QString& id) const;
@@ -53,7 +53,7 @@ public:
         static QMap<QString, EventType> m_eventTypeDescriptorById;
 
     };
-    #define HikvisionEngineManifest_Fields EngineManifestBase_Fields (outputEventTypes)
+    #define HikvisionEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
 };
 
 struct HikvisionEvent

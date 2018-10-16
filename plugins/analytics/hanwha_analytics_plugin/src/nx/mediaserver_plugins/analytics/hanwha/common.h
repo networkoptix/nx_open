@@ -50,7 +50,7 @@ public:
 
     struct EngineManifest: nx::mediaserver_plugins::utils::analytics::EngineManifestBase
     {
-        QList<EventType> outputEventTypes;
+        QList<EventType> eventTypes;
 
         QString eventTypeIdByName(const QString& eventName) const;
         const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
@@ -60,7 +60,7 @@ public:
         mutable QMap<QString, EventType> m_eventTypeDescriptorById;
 
     };
-    #define HanwhaEngineManifest_Fields EngineManifestBase_Fields (outputEventTypes)
+    #define HanwhaEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Hanwha::EventItemType)
 

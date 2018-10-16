@@ -55,7 +55,7 @@ static nx::vms::api::analytics::EventType analyticsEventType(
     if (driver == drivers.cend())
         return {};
 
-    const auto types = driver->outputEventTypes;
+    const auto types = driver->eventTypes;
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
         [eventTypeId](const nx::vms::api::analytics::EventType eventType)
         {

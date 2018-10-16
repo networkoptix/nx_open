@@ -72,7 +72,7 @@ private:
     };
 
 private:
-    boost::optional<QList<QString>> fetchSupportedEvents(
+    boost::optional<QList<QString>> fetchSupportedEventTypeIds(
         const nx::sdk::DeviceInfo& deviceInfo);
 
     boost::optional<QList<QString>> eventTypeIdsFromParameters(
