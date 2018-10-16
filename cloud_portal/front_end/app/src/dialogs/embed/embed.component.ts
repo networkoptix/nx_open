@@ -40,7 +40,7 @@ export class EmbedModalContent {
 
     ngOnInit() {
         // Cannot use A6 router at this moment - AJS is leading the parade
-        this.embedUrl = window.location.href.replace('systems', 'embed');
+        this.embedUrl = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
     }
 
     copyToClipboard(): boolean {
