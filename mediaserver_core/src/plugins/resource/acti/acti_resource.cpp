@@ -846,35 +846,10 @@ void QnActiResource::stopInputPortStatesMonitoring()
     }
     m_inputMonitored = false;
 
-    QAuthenticator auth = getAuth();
-    nx::utils::Url url = getUrl();
-    url.setPath(QString(kApiRequestPath) + "encoder");
-    url.setQuery(registerEventRequestStr);
-    url.setUserName(auth.user());
-    url.setPassword(auth.password());
-    NX_VERBOSE(this, "stopInputPortStatesMonitoring: request '%1'.",
-        url.toString(QUrl::RemoveUserInfo));
-
-    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->setAuthType(nx::network::http::AuthType::authDigest);
-    httpClient->doGet(url,
-        [httpClient](nx::network::http::AsyncHttpClientPtr) mutable
-        {
-            if (httpClient->failed())
-            {
-                NX_INFO(typeid(QnActiResource),
-                    "stopInputPortStatesMonitoring: transport error %1.",
-                    httpClient->lastSysErrorCode());
-            }
-
-            const auto httpCode = httpClient->response()->statusLine.statusCode;
-            if (httpCode != nx::network::http::StatusCode::ok)
-                NX_WARNING(typeid(QnActiResource), "stopInputPortStatesMonitoring: HTTP error %1.",
-                    httpCode);
-
-            // Just ignore, if success.
-            httpClient.reset();
-        });
+    CLHttpStatus status;
+    makeActiRequest("encoder", registerEventRequestStr, status);
+    if (status != CL_HTTP_SUCCESS)
+        NX_INFO(this, "stopInputPortStatesMonitoring: Unable to stop, HTTP error '%1'.", status);
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
