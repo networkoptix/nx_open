@@ -100,7 +100,7 @@ def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
     if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release') \
-            or not Customization.objects.get(name=customization).public_release_history:
+            and not Customization.objects.get(name=customization).public_release_history:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
