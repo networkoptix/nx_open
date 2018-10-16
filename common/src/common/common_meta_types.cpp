@@ -50,6 +50,9 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/webpage_resource.h>
 
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
@@ -156,6 +159,9 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnVideoWallResourceList>();
     qRegisterMetaType<QnWebPageResourcePtr>();
     qRegisterMetaType<QnWebPageResourceList>();
+
+    qRegisterMetaType<nx::vms::common::AnalyticsPluginResourcePtr>();
+    qRegisterMetaType<nx::vms::common::AnalyticsEngineResourcePtr>();
 
     qRegisterMetaType<QnResourceAccessSubject>();
 

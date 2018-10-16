@@ -15,6 +15,7 @@
 #include "user_role_data.h"
 #include "videowall_data.h"
 #include "webpage_data.h"
+#include "analytics_data.h"
 
 #include <nx/fusion/model_functions.h>
 

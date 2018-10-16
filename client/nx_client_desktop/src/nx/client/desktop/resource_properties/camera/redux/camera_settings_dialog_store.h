@@ -20,6 +20,7 @@ class Rotation;
 struct WearableState;
 struct ScheduleCellParams;
 struct CameraSettingsDialogState;
+struct AnalyticsEngineInfo;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -81,6 +82,16 @@ public:
     void setLogicalId(int value);
     void generateLogicalId();
     void resetExpertSettings();
+
+    Q_INVOKABLE QVariantList analyticsEngines() const;
+    void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
+    Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
+    void setEnabledAnalyticsEngines(const QSet<QnUuid>& value);
+    Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
+    Q_INVOKABLE QVariantMap deviceAgentSettingsValues(const QnUuid& engineId) const;
+    Q_INVOKABLE void setDeviceAgentSettingsValues(
+        const QnUuid& engineId, const QVariantMap& values);
+
     void setWearableMotionDetectionEnabled(bool value);
     void setWearableMotionSensitivity(int value);
     void setCredentials(const std::optional<QString>& login, const std::optional<QString>& password);

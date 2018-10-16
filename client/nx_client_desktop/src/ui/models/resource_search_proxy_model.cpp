@@ -145,6 +145,7 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(
             NodeType::layoutTours,
             NodeType::filteredVideowalls,
             NodeType::webPages,
+            NodeType::analyticsEngines,
             NodeType::filteredUsers,
             NodeType::localResources});
 

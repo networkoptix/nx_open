@@ -5,7 +5,6 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/event/event_fwd.h>
-#include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/core/resource/device_type.h>
@@ -242,8 +241,9 @@ public:
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
-    nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    using AnalyticsEventTypeIds = QList<QString>;
+    AnalyticsEventTypeIds supportedAnalyticsEventTypeIds() const;
+    virtual void setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -421,7 +421,7 @@ private:
     CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-    CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
+    CachedValue<AnalyticsEventTypeIds> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
     CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
     CachedValue<bool> m_cachedHasVideo;

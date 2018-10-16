@@ -27,7 +27,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/vms/event/events/events.h>
-#include <nx/sdk/metadata/plugin.h>
+#include <nx/sdk/analytics/engine.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 
@@ -327,7 +327,7 @@ static const QString kHanwhaVideoSourceStateOn = lit("On");
 static const int kHanwhaInvalidInputValue = 604;
 
 // Taken from Hanwha metadata plugin manifest.json.
-static const QString kHanwhaInputPortEventId = "nx.hanwha.inputPort";
+static const QString kHanwhaInputPortEventTypeId = "nx.hanwha.inputPort";
 
 static const std::map<QString, std::map<Qn::ConnectionRole, QString>> kStreamProperties = {
     {kEncodingTypeProperty,
@@ -723,7 +723,7 @@ bool HanwhaResource::captureEvent(const nx::vms::event::AbstractEventPtr& event)
         return false;
 
     const auto parameters = analyticsEvent->getRuntimeParams();
-    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventId)
+    if (parameters.getAnalyticsEventTypeId() != kHanwhaInputPortEventTypeId)
         return false;
 
     emit inputPortStateChanged(
@@ -3611,16 +3611,16 @@ QnAbstractArchiveDelegate* HanwhaResource::createArchiveDelegate()
     return nullptr;
 }
 
-void HanwhaResource::setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList)
+void HanwhaResource::setSupportedAnalyticsEventTypeIds(const AnalyticsEventTypeIds& eventTypeIds)
 {
-    nx::api::AnalyticsSupportedEvents externalEvents;
-    for (const auto& event: eventsList)
+    AnalyticsEventTypeIds externalEvents;
+    for (const auto& eventTypeId: eventTypeIds)
     {
-        if (event != kHanwhaInputPortEventId)
-            externalEvents.push_back(event);
+        if (eventTypeId != kHanwhaInputPortEventTypeId)
+            externalEvents.push_back(eventTypeId);
     }
 
-    base_type::setAnalyticsSupportedEvents(externalEvents);
+    base_type::setSupportedAnalyticsEventTypeIds(externalEvents);
 }
 
 QnTimePeriodList HanwhaResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)

@@ -129,3 +129,16 @@ typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
 class QnWebPageResource;
 typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
 typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
+
+namespace nx::vms::common {
+
+class AnalyticsPluginResource;
+using AnalyticsPluginResourcePtr = QnSharedResourcePointer<AnalyticsPluginResource>;
+using AnalyticsPluginResourceList = QnSharedResourcePointerList<AnalyticsPluginResource>;
+
+class AnalyticsEngineResource;
+using AnalyticsEngineResourcePtr = QnSharedResourcePointer<AnalyticsEngineResource>;
+using AnalyticsEngineResourceList =
+    QnSharedResourcePointerList<AnalyticsEngineResource>;
+
+} // namespace nx::vms::common
