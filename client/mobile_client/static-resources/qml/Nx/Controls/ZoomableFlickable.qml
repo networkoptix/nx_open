@@ -40,6 +40,7 @@ Item
     signal cancelled()
     signal clicked()
     signal doubleClicked(int mouseX, int mouseY)
+    signal movementEnded()
 
     property var doubleTapStartCheckFuncion
 
@@ -68,6 +69,8 @@ Item
 
         flickableDirection: Flickable.HorizontalAndVerticalFlick
         boundsBehavior: allowOvershoot ? Flickable.DragOverBounds : Flickable.StopAtBounds
+
+        onMovementEnded: rootItem.movementEnded()
 
         interactive:
             !mouseArea.doubleTapScaleMode
@@ -213,6 +216,7 @@ Item
                 flick.animating = false
 
                 bindMargins()
+                rootItem.movementEnded()
             }
         }
 
@@ -275,10 +279,13 @@ Item
                 property: "contentY"
                 duration: boundsAnimation.duration
             }
+
             onStopped:
             {
                 flick.animating = false
                 flick.bindMargins()
+
+                rootItem.movementEnded()
             }
         }
 
@@ -360,6 +367,7 @@ Item
 
             property var doubleTapDownPos: undefined
             property bool doubleTapScaleMode: false
+            property point downPos
 
             anchors.fill: parent
 
@@ -408,7 +416,7 @@ Item
 
             onDoubleClicked:
             {
-                clickFilterTimer.stop()
+                delayedClickTimer.stop()
                 doubleClickFilterTimer.restart();
 
                 var mousePosition = Qt.point(mouseX, mouseY)
@@ -419,10 +427,16 @@ Item
                 }
             }
 
-            onPressed: rootItem.pressed(mouse.x, mouse.y)
+            onPressed:
+            {
+                downPos = Qt.point(mouse.x, mouse.y)
+                rootItem.pressed(mouse.x, mouse.y)
+                clickFilterTimer.restart()
+            }
 
             onCanceled:
             {
+                delayedClickTimer.stop()
                 rootItem.cancelled()
 
                 doubleTapScaleMode = false
@@ -431,8 +445,19 @@ Item
 
             onReleased:
             {
-                rootItem.released()
+                if (clickFilterTimer.running
+                    && !doubleClickFilterTimer.running
+                    && downPos.x == mouse.x && downPos.y == mouse.y)
+                {
 
+                    delayedClickTimer.restart()
+                }
+                else
+                {
+                    delayedClickTimer.stop()
+                }
+
+                rootItem.released()
                 doubleTapScaleMode = false
                 doubleTapDownPos = undefined
                 if (!doubleClickFilterTimer.running)
@@ -442,15 +467,20 @@ Item
                 rootItem.doubleClicked(mouse.x, mouse.y)
             }
 
-            onClicked: clickFilterTimer.restart()
+            onClicked: mouse.accepted = true
+
+            Timer
+            {
+                id: delayedClickTimer
+
+                interval: 300
+                onTriggered: rootItem.clicked()
+            }
 
             Timer
             {
                 id: clickFilterTimer
-
-                interval: 300
-
-                onTriggered: rootItem.clicked()
+                interval: 400
             }
 
             Timer

@@ -161,6 +161,19 @@ PageBase
 
         controls:
         [
+            Button
+            {
+                text: qsTr("Area")
+                icon.source: lp("/images/close.png")
+                visible: video.sourceComponent == scalableVideoComponent
+                    && video.item.motionSearchController.hasCustomRoi
+                onClicked:
+                {
+                    if (video.sourceComponent == scalableVideoComponent)
+                        video.item.motionSearchController.clearCustomRoi()
+                }
+            },
+
             IconButton
             {
                 icon.source: lp("/images/more_vert.png")

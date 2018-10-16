@@ -11,6 +11,7 @@ ZoomableFlickable
 
     property alias mediaPlayer: content.mediaPlayer
     property alias resourceHelper: content.resourceHelper
+    property alias motionSearchController: motionSearchController
 
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
@@ -165,6 +166,8 @@ ZoomableFlickable
 
             anchors.fill: parent
             parent: content.videoOutput
+            viewport: zf
+
             Connections
             {
                 target: zf
@@ -176,6 +179,8 @@ ZoomableFlickable
                     zf.mapToItem(motionSearchController, mouseX, mouseY))
                 onCancelled: motionSearchController.handleCancelled()
                 onDoubleClicked: motionSearchController.handleCancelled()
+
+                onMovementEnded: motionSearchController.updateDefaultRoi()
             }
         }
     }

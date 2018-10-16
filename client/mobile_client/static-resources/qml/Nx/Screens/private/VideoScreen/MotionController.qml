@@ -5,18 +5,61 @@ Item
     id: controller
 
     property bool motionSearchMode: false
+    property Item viewport: null
+
+    readonly property bool hasCustomRoi:
+        d.customFirstRelativePoint && d.customSecondRelativePoint ? true : false
 
     readonly property bool drawingRoi:
     {
-        return d.initialRelative && d.nearPositions(d.initialRelative, d.firstRelative)
-            ? true
-            : false
+        if (d.customInitialRelativePoint
+            && d.nearPositions(d.customInitialRelativePoint, d.customFirstRelativePoint))
+        {
+            return true
+        }
+        return false
+    }
+
+    function clearCustomRoi()
+    {
+        d.customFirstRelativePoint = undefined
+        d.customSecondRelativePoint = undefined
+        updateDefaultRoi()
+    }
+
+    function updateDefaultRoi()
+    {
+        if (!viewport)
+            return
+
+        if (controller.hasCustomRoi)
+        {
+            d.defaultTopLeftRelative = undefined
+            d.defaultBottomRightRelative = undefined
+            return
+        }
+
+        var topLeft = viewport.mapToItem(controller, 0, 0)
+        var bottomRight = viewport.mapToItem(controller, viewport.width, viewport.height)
+
+        if (topLeft.x < 0)
+            topLeft.x = 0
+        if (topLeft.y < 0)
+            topLeft.y = 0
+        if (bottomRight.x >= controller.width)
+            bottomRight.x = controller.width - 1
+        if (bottomRight.y >= controller.height)
+            bottomRight.y = controller.height - 1
+
+        d.defaultTopLeftRelative = d.toRelative(topLeft)
+        d.defaultBottomRightRelative = d.toRelative(bottomRight)
     }
 
     function handleLongPressed()
     {
-        d.firstRelative = d.initialRelative
-        d.secondRelative = d.initialRelative
+        d.customFirstRelativePoint = d.customInitialRelativePoint
+        d.customSecondRelativePoint = d.customInitialRelativePoint
+        updateDefaultRoi()
     }
 
     function handlePressed(pos)
@@ -25,43 +68,46 @@ Item
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
         pressFilterTimer.restart()
-        d.initialRelative = d.toRelative(pos)
+        d.customInitialRelativePoint = d.toRelative(pos)
         pressAndHoldTimer.restart()
     }
 
     function handleReleased()
     {
+        d.customInitialRelativePoint = undefined
         pressAndHoldTimer.stop()
-        d.initialRelative = undefined
     }
 
     function handleCancelled()
     {
         pressAndHoldTimer.stop()
-        d.initialRelative = undefined
+        d.customInitialRelativePoint = undefined
     }
 
     function handlePositionChanged(pos)
     {
         if (drawingRoi)
-            d.secondRelative = d.toRelative(pos)
+            d.customSecondRelativePoint = d.toRelative(pos)
         else
             handleCancelled()
     }
+
+    Component.onCompleted: updateDefaultRoi()
 
     // Test control. Represents simple preloder for the first point
     Rectangle
     {
         id: tapPreloader
 
-        x: d.initial.x - width / 2
-        y: d.initial.y - height / 2
+        readonly property vector2d center: d.fromRelative(d.customInitialRelativePoint)
+        x: center.x - width / 2
+        y: center.y - height / 2
 
         border.width: 2
         border.color: "red"
         radius: width / 2
         color: "transparent"
-        visible: d.initialRelative ? true : false
+        visible: d.customInitialRelativePoint ? true : false
         height: width
         width: visible ? 50 : 0
         Behavior on width
@@ -78,20 +124,25 @@ Item
     Rectangle
     {
         id: roiRectangle
-        border.width: 2
+        border.width: 5
         border.color: "yellow"
         color: singlePoint ? "red" : "transparent"
 
-        visible: d.firstRelative && d.secondRelative ? true : false
+        property vector2d first: d.fromRelative(controller.hasCustomRoi
+            ? d.customFirstRelativePoint
+            : d.defaultTopLeftRelative)
+        property vector2d second: d.fromRelative(controller.hasCustomRoi
+            ? d.customSecondRelativePoint
+            : d.defaultBottomRightRelative)
 
-        x: visible ? getCoordinate(d.first.x, d.second.x, width) : 0
-        y: visible ? getCoordinate(d.first.y, d.second.y, height) : 0
+        x: getCoordinate(first.x, second.x, width)
+        y: getCoordinate(first.y, second.y, height)
 
-        width: visible ? getLength(d.first.x, d.second.x) : 0
-        height: visible ? getLength(d.first.y, d.second.y) : 0
+        width: getLength(first.x, second.x)
+        height: getLength(first.y, second.y)
 
         readonly property bool singlePoint:
-            visible && d.nearPositions(d.firstRelative, d.secondRelative)
+            d.nearPositions(d.customFirstRelativePoint, d.customSecondRelativePoint)
 
         function getCoordinate(firstValue, secondValue, length)
         {
@@ -108,7 +159,7 @@ Item
     {
         id: pressAndHoldTimer
 
-        interval: 600
+        interval: 800
         onTriggered: controller.handleLongPressed()
     }
 
@@ -122,13 +173,12 @@ Item
     {
         id: d
 
-        property var initialRelative
-        property var firstRelative
-        property var secondRelative
+        property var customInitialRelativePoint
+        property var customFirstRelativePoint
+        property var customSecondRelativePoint
 
-        property vector2d initial: fromRelative(initialRelative)
-        property vector2d first: fromRelative(firstRelative)
-        property vector2d second: fromRelative(secondRelative)
+        property var defaultTopLeftRelative
+        property var defaultBottomRightRelative
 
         function toRelative(absolute)
         {
@@ -144,7 +194,7 @@ Item
 
         function nearPositions(first, second)
         {
-            return first && second && first.minus(second).length() < 0.005
+            return first && second && first.minus(second).length() < 0.005 ? true : false
         }
     }
 }
