@@ -279,7 +279,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto tunnelAcceptorFactoryFuncBak =
         TunnelAcceptorFactory::instance().setCustomFunc(
             [&addressManager](
-                const nx::network::SocketAddress& /*mediatorUdpEndpoint*/,
+                const std::optional<nx::network::SocketAddress>& /*mediatorUdpEndpoint*/,
                 hpm::api::ConnectionRequestedEvent)
             {
                 std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
@@ -371,7 +371,7 @@ protected:
         m_tunnelAcceptorFactoryFuncBak =
             TunnelAcceptorFactory::instance().setCustomFunc(
                 [this](
-                    const nx::network::SocketAddress& /*mediatorUdpEndpoint*/,
+                    const std::optional<nx::network::SocketAddress>& /*mediatorUdpEndpoint*/,
                     hpm::api::ConnectionRequestedEvent event)
                 {
                     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
@@ -641,7 +641,6 @@ protected:
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(m_mediator.stunTcpEndpoint()),
             m_mediator.stunUdpEndpoint());
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     void givenInitializedServerSocket()

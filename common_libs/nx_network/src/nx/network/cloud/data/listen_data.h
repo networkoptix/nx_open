@@ -1,8 +1,7 @@
 #pragma once
 
+#include <optional>
 #include <vector>
-
-#include <boost/optional.hpp>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/cloud_connect_version.h>
@@ -45,7 +44,7 @@ public:
      * This field left for compatibility between internal 3.1 builds.
      * TODO: #ak Remove in 3.2.
      */
-    boost::optional<nx::String> trafficRelayUrl;
+    std::optional<nx::String> trafficRelayUrl;
     std::vector<nx::String> trafficRelayUrls;
 
     ListenResponse();

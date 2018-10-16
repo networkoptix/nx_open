@@ -35,7 +35,7 @@ struct ACS_VideoHeader
 
 PlDlinkStreamReader::PlDlinkStreamReader(const QnPlDlinkResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_rtpReader(res),
+    m_rtpReader(res, res->getTimeOffset()),
     m_dlinkRes(res)
 {
 

@@ -27,7 +27,6 @@
 #include <api/global_settings.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
@@ -70,7 +69,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList& resour
         // but now (new version) camera NOT in resource pool!
 
         QString urlStr = camera->getUrl();
-        const QnResourceData resourceData = qnStaticCommon->dataPool()->data(camera);
+        const QnResourceData resourceData = camera->resourceData();
         if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 

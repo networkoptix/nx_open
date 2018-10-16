@@ -12,13 +12,6 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
-namespace
-{
-    const int kDefaultWidth = 400;
-    const int kCellMargin = 4;
-} // namespace
-
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -62,7 +55,13 @@ public:
         else if (data->skipped)
         {
             m_left->setText(tr("Skipped"));
-            m_left->setIcon(qnSkin->icon("text_buttons/skipped_disabled.png"));
+            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
+            m_left->setHidden(false);
+        }
+        else if (data->installed)
+        {
+            m_left->setText(tr("Installed"));
+            m_left->setIcon(qnSkin->icon("text_buttons/ok.png"));
             m_left->setHidden(false);
         }
         else
@@ -100,16 +99,21 @@ public:
                     break;
                 case StatusCode::offline:
                     // TODO: Some servers that are installing updates can also be offline. But it is different state
-                    m_left->setText(lit("–"));
+                    m_left->setText("–");
                     m_left->setIcon(QIcon());
                     m_left->setHidden(false);
                     break;
                 case StatusCode::installing:
+                    // TODO: Make animation here
+                    m_left->setText(tr("Installing..."));
+                    m_left->setHidden(false);
+                    m_animated = true;
+                    progressHidden = true;
                     break;
                 default:
                     // In fact we should not be here. All the states should be handled accordingly
                     m_left->setHidden(false);
-                    m_left->setText(lit("Unhandled state: ") + data->statusMessage);
+                    m_left->setText(QString("Unhandled state: ") + data->statusMessage);
                     errorStyle = true;
                     break;
             }
@@ -132,7 +136,7 @@ public:
     }
 
 protected:
-    void at_changeAnimationFrame(int frame)
+    void at_changeAnimationFrame(int /*frame*/)
     {
         if (!m_animated)
             return;
@@ -180,7 +184,7 @@ bool ServerStatusItemDelegate::isStatusVisible() const
     return m_statusVisible;
 }
 
-QWidget* ServerStatusItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget* ServerStatusItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
 {
     return new ServerStatusWidget(this, parent);
 }

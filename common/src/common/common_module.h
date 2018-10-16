@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
 
@@ -35,6 +36,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 class QnAuditManager;
 class CameraDriverRestrictionList;
+class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
@@ -88,7 +90,7 @@ public:
 
     QnSessionManager* sessionManager() const
     {
-        return m_sessionManager;
+        return m_sessionManager.data();
     }
 
     QnResourcePool* resourcePool() const
@@ -276,6 +278,8 @@ public:
     /** instanceCounter used for unit test purpose only */
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
+
+    QnResourceDataPool* dataPool() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -291,7 +295,8 @@ private:
 private:
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
-    QnSessionManager* m_sessionManager = nullptr;
+    QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;
+    QScopedPointer<QnSessionManager> m_sessionManager;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
@@ -316,7 +321,6 @@ private:
     bool m_lowPriorityAdminPassword = false;
     QDateTime m_startupTime;
 
-    nx::network::http::ClientPool* m_httpClientPool = nullptr;
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
@@ -336,6 +340,7 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
+    QnResourceDataPool* m_dataPool = nullptr;
 
     // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;

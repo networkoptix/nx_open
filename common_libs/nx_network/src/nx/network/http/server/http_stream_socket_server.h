@@ -45,7 +45,8 @@ private:
 };
 
 class NX_NETWORK_API StreamConnectionHolder:
-    public nx::network::server::StreamConnectionHolder<nx::network::http::AsyncMessagePipeline>
+    public nx::network::server::StreamConnectionHolder<
+        nx::network::http::AsyncMessagePipeline>
 {
 };
 

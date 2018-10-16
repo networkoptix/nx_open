@@ -39,7 +39,6 @@
 
 #include <media_server/media_server_module.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <common/static_common_module.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -845,7 +844,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
     if (!result)
         return result;
 
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = resourceData();
     auto minFirmwareVersion = resData.value<QString>(lit("minimalFirmwareVersion"));
     if (!minFirmwareVersion.isEmpty() &&
         !getFirmware().isEmpty()
@@ -1037,7 +1036,7 @@ CameraDiagnostics::Result HanwhaResource::initBypass()
         return CameraDiagnostics::NoErrorResult();
     }
 
-    const auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    const auto resData = resourceData();
     const auto bypassOverride = resData.value<HanwhaBypassSupportType>(
         kHanwhaBypassOverrideParameterName,
         HanwhaBypassSupportType::normal);
@@ -2886,7 +2885,7 @@ bool HanwhaResource::addFrameRateRanges(
 
 bool HanwhaResource::addResolutionRanges(
     QnCameraAdvancedParameter* inOutParameter,
-    const HanwhaAdavancedParameterInfo & info) const
+    const HanwhaAdavancedParameterInfo& info) const
 {
     const auto codecs = m_codecInfo.codecs(getChannel());
     const auto streamPrefix =
@@ -2912,7 +2911,7 @@ bool HanwhaResource::addResolutionRanges(
         }
 
         if (!resolutionRangeString.isEmpty())
-            resolutionRangeString = resolutionRangeString.left(resolutionRangeString.size() - 1);
+            resolutionRangeString.chop(1);
 
         QnCameraAdvancedParameterDependency dependency;
         dependency.type = QnCameraAdvancedParameterDependency::DependencyType::range;

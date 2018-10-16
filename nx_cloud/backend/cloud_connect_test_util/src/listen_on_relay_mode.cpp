@@ -5,6 +5,8 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/scope_guard.h>
 
+#include "utils.h"
+
 namespace nx {
 namespace cctu {
 
@@ -17,16 +19,7 @@ static void runServer(const ListenOnRelaySettings& settings)
     std::cout << "Listening as " << settings.listeningPeerHostName()
         << " on relay " << settings.baseRelayUrl().toStdString() << std::endl;
 
-    std::cout << std::endl << "Type \"exit\" to close the application" << std::endl;
-    for (;;)
-    {
-        std::string command;
-        std::getline(std::cin, command);
-        if (command == "exit")
-            return;
-        else
-            std::cout << "Unknown command: " << command << std::endl;
-    }
+    waitForExitCommand();
 }
 
 } // namespace
@@ -78,6 +71,8 @@ int runInListenOnRelayMode(const nx::utils::ArgumentParser& args)
     return 0;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 TestHttpServerOnProxy::TestHttpServerOnProxy(
     const ListenOnRelaySettings& settings)
 {
@@ -88,31 +83,7 @@ TestHttpServerOnProxy::TestHttpServerOnProxy(
 
     auto acceptor =
         std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(url);
-    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(
-        std::move(acceptor));
-    m_httpServer->registerRequestProcessorFunc(
-        nx::network::http::kAnyPath,
-        std::bind(&TestHttpServerOnProxy::httpRequestHandler, this, _1, _2));
-    m_httpServer->server().start();
-}
-
-void TestHttpServerOnProxy::httpRequestHandler(
-    nx::network::http::RequestContext requestContext,
-    nx::network::http::RequestProcessedHandler completionHandler)
-{
-    auto responseMessage = std::make_unique<nx::network::http::BufferSource>(
-        "text/plain",
-        lm("Hello from %1 %2\r\n")
-        .args(requestContext.request.requestLine.method, 
-            requestContext.request.requestLine.url.path()).toUtf8());
-
-    std::cout << requestContext.request.requestLine.method.toStdString() << " "
-        << requestContext.request.requestLine.url.path().toStdString()
-        << std::endl;
-
-    completionHandler(nx::network::http::RequestResult(
-        nx::network::http::StatusCode::ok,
-        std::move(responseMessage)));
+    m_httpServer = std::make_unique<HttpServer>(std::move(acceptor));
 }
 
 } // namespace cctu

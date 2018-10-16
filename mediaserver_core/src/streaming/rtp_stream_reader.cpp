@@ -12,7 +12,7 @@ QnRtpStreamReader::QnRtpStreamReader(
     const QString& request)
     :
     CLServerPushStreamReader(res),
-    m_rtpReader(res),
+    m_rtpReader(res, res->getTimeOffset()),
     m_request(request),
     m_rtpTransport(RtpTransport::_auto),
     m_camera(res)

@@ -33,6 +33,11 @@ std::vector<network::SocketAddress> MediatorProcess::httpEndpoints() const
     return m_view->httpServer().endpoints();
 }
 
+std::vector<network::SocketAddress> MediatorProcess::httpsEndpoints() const
+{
+    return m_view->httpServer().sslEndpoints();
+}
+
 std::vector<network::SocketAddress> MediatorProcess::stunUdpEndpoints() const
 {
     return m_view->stunServer().udpEndpoints();

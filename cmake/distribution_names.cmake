@@ -47,7 +47,7 @@ function(set_distribution_names)
     set(server_update_distribution_name
         "${prefix}-server_update-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(paxton_plugin_distribution_name
-        "${prefix}-paxton_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
+        "${prefix}-paxton_plugin_${dotNetFramework}-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(cdb_distribution_name
         "${prefix}-cdb-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(hpm_distribution_name

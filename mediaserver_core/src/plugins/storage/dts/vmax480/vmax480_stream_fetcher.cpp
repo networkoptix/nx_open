@@ -39,7 +39,7 @@ VMaxStreamFetcher::VMaxStreamFetcher(QnResource* dev, bool isLive):
     m_lastConnectTimeUsec(0),
     m_needStop(false)
 {
-    m_res = dynamic_cast<QnNetworkResource*>(dev);
+    m_vmaxResource = dev->toSharedPointer().dynamicCast<QnPlVmax480Resource>();
     initPacketTime();
 }
 
@@ -143,10 +143,14 @@ int VMaxStreamFetcher::getCurrentChannelMask() const
 
 bool VMaxStreamFetcher::vmaxConnect()
 {
-    auto vmaxResource = dynamic_cast<QnPlVmax480Resource*>(m_res);
-    QnVMax480Server* vmax480Server =
-        vmaxResource->serverModule()->findInstance<QnVMax480Server>();
+    auto resource = m_vmaxResource.toStrongRef();
+    if (!resource)
+        return false;
 
+    QnVMax480Server* vmax480Server =
+        resource->serverModule()->findInstance<QnVMax480Server>();
+    if (!vmax480Server)
+        return false;
 
     vmaxDisconnect();
 
@@ -176,9 +180,9 @@ bool VMaxStreamFetcher::vmaxConnect()
 
         if (m_vmaxConnection) {
             m_vmaxConnection->vMaxConnect(
-                m_res->getUrl(),
+                resource->getUrl(),
                 getCurrentChannelMask(),
-                m_res->getAuth(),
+                resource->getAuth(),
                 m_isLive);
             return true;
         }
@@ -206,16 +210,23 @@ void VMaxStreamFetcher::vmaxDisconnect()
         m_vMaxProxy = 0;
     }
 
-    auto vmaxResource = dynamic_cast<QnPlVmax480Resource*>(m_res);
-    auto vmax480Server = vmaxResource->serverModule()->instance<QnVMax480Server>();
-    vmax480Server->unregisterProvider(this);
+    if (const auto resource = m_vmaxResource.toStrongRef())
+    {
+        if (auto vmax480Server = resource->serverModule()->findInstance<QnVMax480Server>())
+            vmax480Server->unregisterProvider(this);
+    }
+
     m_lastSeekPos = AV_NOPTS_VALUE;
     m_eofReached = false;
 }
 
 void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDateTime)
 {
-    dynamic_cast<QnPlVmax480Resource*>(m_res)->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
+    auto resource = m_vmaxResource.toStrongRef();
+    if (!resource)
+        return;
+
+    resource->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
 
     QnMutexLocker lock( &m_mutex );
     for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())

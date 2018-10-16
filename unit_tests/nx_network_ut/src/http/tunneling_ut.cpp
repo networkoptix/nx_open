@@ -8,6 +8,8 @@
 #include <nx/network/http/tunneling/detail/client_factory.h>
 #include <nx/network/http/tunneling/detail/connection_upgrade_tunnel_client.h>
 #include <nx/network/http/tunneling/detail/get_post_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/experimental_tunnel_client.h>
+#include <nx/network/http/tunneling/detail/ssl_tunnel_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -15,9 +17,12 @@ namespace nx::network::http::tunneling::test {
 
 enum TunnelMethod
 {
-    getPost = 1,
-    connectionUpgrade = 2,
-    all = getPost | connectionUpgrade,
+    getPost = 0x01,
+    connectionUpgrade = 0x02,
+    experimental = 0x04,
+    ssl = 0x08,
+
+    all = getPost | connectionUpgrade | experimental | ssl,
 };
 
 static constexpr char kBasePath[] = "/HttpTunnelingTest";
@@ -84,7 +89,7 @@ protected:
 
         thenServerTunnelSucceded();
 
-        exchangeSomeData();
+        assertDataExchangeWorksThroughTheTunnel();
     }
 
     void thenClientTunnelSucceeded()
@@ -134,6 +139,12 @@ private:
         
         if (tunnelMethodMask & TunnelMethod::connectionUpgrade)
             m_localFactory.registerClientType<detail::ConnectionUpgradeTunnelClient>();
+
+        if (tunnelMethodMask & TunnelMethod::experimental)
+            m_localFactory.registerClientType<detail::ExperimentalTunnelClient>();
+
+        if (tunnelMethodMask & TunnelMethod::ssl)
+            m_localFactory.registerClientType<detail::SslTunnelClient>();
     }
 
     void saveClientTunnel(OpenTunnelResult result)
@@ -146,7 +157,7 @@ private:
         m_serverTunnels.push(std::move(connection));
     }
 
-    void exchangeSomeData()
+    void assertDataExchangeWorksThroughTheTunnel()
     {
         ASSERT_TRUE(m_prevServerTunnelConnection->setNonBlockingMode(false));
         ASSERT_TRUE(m_prevClientTunnelResult.connection->setNonBlockingMode(false));
@@ -206,5 +217,15 @@ INSTANTIATE_TEST_CASE_P(
     ConnectionUpgrade,
     HttpTunneling,
     ::testing::Values(TunnelMethod::connectionUpgrade));
+
+INSTANTIATE_TEST_CASE_P(
+    Experimental,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::experimental));
+
+INSTANTIATE_TEST_CASE_P(
+    Ssl,
+    HttpTunneling,
+    ::testing::Values(TunnelMethod::ssl));
 
 } // namespace nx::network::http::tunneling::test

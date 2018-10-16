@@ -18,10 +18,6 @@ Information NX_UPDATE_API updateInformation(
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
 
-Information NX_UPDATE_API updateInformation(
-    const QString& zipFileName,
-    InformationError* error = nullptr);
-
 bool findPackage(
     const vms::api::SystemInformation& systemInformation,
     const nx::update::Information& updateInformation,

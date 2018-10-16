@@ -54,7 +54,7 @@ void ConnectionUpgradeTunnelClient::processOpenTunnelResponse()
     if (!m_httpClient->hasRequestSucceeded() || 
         m_httpClient->response()->statusLine.statusCode != StatusCode::switchingProtocols)
     {
-        return cleanupFailedTunnel();
+        return cleanUpFailedTunnel();
     }
 
     m_connection = m_httpClient->takeSocket();

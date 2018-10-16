@@ -36,7 +36,6 @@ protected:
         SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             url::Builder().setScheme("stun").setEndpoint(m_mediator.stunTcpEndpoint()),
             m_mediator.stunUdpEndpoint());
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     std::unique_ptr<AbstractStreamServerSocket> cloudServerSocket(

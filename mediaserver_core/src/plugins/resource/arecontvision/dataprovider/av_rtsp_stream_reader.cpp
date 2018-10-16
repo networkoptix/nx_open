@@ -15,7 +15,7 @@ QnArecontRtspStreamReader::QnArecontRtspStreamReader(
     const QnPlAreconVisionResourcePtr& res)
     :
     parent_type(res),
-    m_rtpStreamParser(res)
+    m_rtpStreamParser(res, res->getTimeOffset())
 {
     m_metaReader = std::make_unique<ArecontMetaReader>(
         res->getVideoLayout(0)->channelCount(),

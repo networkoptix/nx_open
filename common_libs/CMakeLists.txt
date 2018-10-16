@@ -27,4 +27,5 @@ endif()
 
 if(withMediaServer)
     add_subdirectory(nx_onvif)
+    add_subdirectory(nx_system_commands)
 endif()

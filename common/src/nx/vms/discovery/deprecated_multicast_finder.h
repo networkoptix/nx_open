@@ -43,6 +43,7 @@ public:
     {
         bool listenAndRespond = false;
         size_t multicastCount = 0;
+        std::function<bool()> responseEnabled;
 
         static const size_t kUnlimited;
     };

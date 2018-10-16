@@ -1,3 +1,4 @@
+from collections import namedtuple
 import json
 import pprint
 import sys
@@ -16,11 +17,42 @@ from .utils import with_traceback
 _logger = logging.getLogger(__name__)
 
 
+class TransactionCommand(object):
+
+    def __init__(self, name, data):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+
+class SetResourceParamCommand(TransactionCommand):
+
+    _Param = namedtuple('SetResourceParamCommand_Param', 'name resourceId value')
+
+    def __init__(self, name, data):
+        super(SetResourceParamCommand, self).__init__(name, data)
+        params = data['tran']['params']
+        self.param = self._Param(
+            name=params['name'],
+            resourceId=params['resourceId'],
+            value=params['value'],
+            )
+
+    def __str__(self):
+        return '%s: %s.%s = %r' % (self.name, self.param.name, self.param.resourceId, self.param.value)
+
+
+command_name_to_class = dict(
+    setResourceParam=SetResourceParamCommand,
+    )
+
+
 class Transaction(object):
 
     def __init__(self, mediaserver_alias, command):
         self.mediaserver_alias = mediaserver_alias
-        self.command = command
+        self.command = command  # type: TransactionCommand
 
     def __str__(self):
         return 'Transaction from %s: %s' % (self.mediaserver_alias, self.command)
@@ -40,11 +72,8 @@ class _MessageBusQueue(object):
             _logger.debug('Timed out waiting for transactions from message buses: timeout=%d sec', timeout_sec)
             return None
 
-    def has_transactions(self, timeout_sec):
-        return self.get_transaction(timeout_sec) is not None
-
     def wait_until_no_transactions(self, timeout_sec):
-        while self.has_transactions(timeout_sec):
+        while self.get_transaction(timeout_sec) is not None:
             pass
         _logger.info('Message bus: No transactions in %d sec.', timeout_sec)
 
@@ -60,7 +89,10 @@ def _bus_thread_running(server_alias, ws, queue, stop_flag):
                 data = ws.recv()
                 json_data = json.loads(data)
                 logger.debug('Received:\n%s', pprint.pformat(json_data))
-                transaction = Transaction(server_alias, command=json_data['tran']['command'])
+                command_name = json_data['tran']['command']
+                command_class = command_name_to_class.get(command_name, TransactionCommand)
+                command = command_class(command_name, json_data)
+                transaction = Transaction(server_alias, command)
                 logger.info('Received: %s', transaction)
                 queue.put(transaction)
             except websocket.WebSocketTimeoutException as x:

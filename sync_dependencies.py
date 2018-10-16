@@ -193,7 +193,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/nx_sdk-1.7.1")
         sync("any/nx_storage_sdk-1.7.1")
         sync("sigar")
-        sync("any/apidoctool-2.0", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
         if not sync("any/server-external", optional=True):
             sync("any/server-external-" + release_version)
 
