@@ -53,8 +53,12 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 
 bool NativeMediaEncoder::shouldStreamTranscode() const
 {
+#if 1
     return m_codecParams.codecId == AV_CODEC_ID_NONE
         ||  m_codecParams.codecId == AV_CODEC_ID_MJPEG;
+#else
+    return m_codecParams.codecId == AV_CODEC_ID_NONE;
+#endif
 }
 
 } // namespace nx

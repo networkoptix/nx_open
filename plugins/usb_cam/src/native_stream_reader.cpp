@@ -33,7 +33,7 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     ensureConsumerAdded();
     maybeFlush();
-    
+
     auto packet = nextPacket();
 
     if(!packet)
@@ -59,7 +59,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::interrupt()
 {
-    // Note: StreamReaderPrivate::interrupt calls removeConsumer(), which this class overrides.
     StreamReaderPrivate::interrupt();
 }
 
@@ -79,7 +78,6 @@ void NativeStreamReader::setBitrate(int bitrate)
     StreamReaderPrivate::setBitrate(bitrate);
     m_avConsumer->setBitrate(bitrate);
 }
-
 
 void NativeStreamReader::ensureConsumerAdded()
 {

@@ -138,13 +138,13 @@ bool Packet::keyPacket() const
 #ifdef _WIN32
 void Packet::parseNalUnits() const
 {
+    if (m_codecId != AV_CODEC_ID_H264)
+        return;
+
     if (m_parseNalUnitsVisited)
         return;
 
     m_parseNalUnitsVisited = true;
-
-    if (m_codecId != AV_CODEC_ID_H264)
-        return;
 
     const uint8_t* buffer = data();
     const uint8_t* bufStart = buffer;

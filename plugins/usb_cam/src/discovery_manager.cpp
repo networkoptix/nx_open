@@ -93,7 +93,10 @@ int DiscoveryManager::fromMDNSData(
     return nxcip::NX_NO_ERROR;
 }
 
-int DiscoveryManager::fromUpnpData(const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/)
+int DiscoveryManager::fromUpnpData(
+    const char* /*upnpXMLData*/,
+    int /*upnpXMLDataSize*/,
+    nxcip::CameraInfo* /*cameraInfo*/)
 {
     return nxcip::NX_NO_ERROR;
 }

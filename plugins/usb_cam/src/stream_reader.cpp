@@ -31,7 +31,7 @@ StreamReader::StreamReader(
     m_refManager(parentRefManager)
 {
     // needs transcoding to a supported codec
-    if (forceTranscoding || codecParams.codecId == AV_CODEC_ID_NONE)
+    if (forceTranscoding)
         m_streamReader.reset(new TranscodeStreamReader(
         encoderIndex,
         codecParams,
