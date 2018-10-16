@@ -16,6 +16,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
 #include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
@@ -35,8 +36,7 @@ static constexpr size_t kMaxBindRetryCount = 10;
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     utils::test::TestWithTemporaryDirectory("hpm", QString()),
-    m_testFlags(flags),
-    m_httpPort(0)
+    m_testFlags(flags)
 {
     if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobals::cloud().reinitialize();
@@ -69,13 +69,11 @@ bool MediatorFunctionalTest::waitUntilStarted()
     if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
         return false;
 
-    m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
-    m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
-
-    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
-    if (httpEndpoints.empty())
+    // Proxy is needed to be able to restart mediator while preserving same ports.
+    if (!startProxy())
         return false;
-    m_httpPort = httpEndpoints.front().port;
+
+    m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
@@ -97,14 +95,12 @@ network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 
 network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 {
-    return network::SocketAddress(
-        network::HostAddress::localhost,
-        moduleInstance()->impl()->stunTcpEndpoints().front().port);
+    return m_stunProxy.endpoint;
 }
 
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
+    return m_httpProxy.endpoint;
 }
 
 void MediatorFunctionalTest::setPreserveEndpointsDuringRestart(bool value)
@@ -228,8 +224,7 @@ void MediatorFunctionalTest::beforeModuleCreation()
 
     for (auto it = args().begin(); it != args().end(); )
     {
-        if (strcmp((*it), "-stun/addrToListenList") == 0 ||
-            strcmp((*it), "-http/addrToListenList") == 0)
+        if (strcmp((*it), "-stun/udpAddrToListenList") == 0)
         {
             free(*it);
             it = args().erase(it);
@@ -242,18 +237,54 @@ void MediatorFunctionalTest::beforeModuleCreation()
         }
     }
 
-    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddressV4;
-    if (m_httpPort != 0)
-        httpEndpoint.port = m_httpPort;
-
-    addArg("-stun/addrToListenList", m_stunTcpEndpoint.toStdString().c_str());
     addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint.toStdString().c_str());
-    addArg("-http/addrToListenList", httpEndpoint.toStdString().c_str());
 }
 
 void MediatorFunctionalTest::afterModuleDestruction()
 {
     //clearArgs();
+}
+
+bool MediatorFunctionalTest::startProxy()
+{
+    if (!m_tcpPortsAllocated || !m_preserveEndpointsDuringRestart)
+    {
+        if (!allocateTcpPorts())
+            return false;
+        m_tcpPortsAllocated = true;
+    }
+
+    m_httpProxy.server->setProxyDestination(
+        moduleInstance()->impl()->httpEndpoints().front());
+    m_stunProxy.server->setProxyDestination(
+        moduleInstance()->impl()->stunTcpEndpoints().front());
+
+    return true;
+}
+
+bool MediatorFunctionalTest::allocateTcpPorts()
+{
+    auto proxyToInitialize = {&m_httpProxy, &m_stunProxy};
+
+    for (auto proxy: proxyToInitialize)
+    {
+        auto serverSocket = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+        if (!serverSocket->setNonBlockingMode(true))
+            return false;
+        if (!serverSocket->bind(nx::network::SocketAddress::anyPrivateAddressV4))
+            return false;
+        if (!serverSocket->listen())
+            return false;
+
+        proxy->server = std::make_unique<nx::network::StreamProxy>();
+        proxy->endpoint = serverSocket->getLocalAddress();
+        proxy->server->startProxy(
+            std::make_unique<nx::network::StreamServerSocketToAcceptorWrapper>(
+                std::move(serverSocket)),
+            nx::network::SocketAddress());
+    }
+
+    return true;
 }
 
 } // namespace hpm

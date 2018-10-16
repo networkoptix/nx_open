@@ -8,6 +8,7 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/stream_proxy.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -86,13 +87,24 @@ protected:
     virtual void afterModuleDestruction() override;
 
 private:
+    struct TcpProxyContext
+    {
+        std::unique_ptr<nx::network::StreamProxy> server;
+        nx::network::SocketAddress endpoint;
+    };
+
     const int m_testFlags;
     int m_httpPort;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    network::SocketAddress m_stunTcpEndpoint;
     network::SocketAddress m_stunUdpEndpoint;
     bool m_preserveEndpointsDuringRestart = true;
+    TcpProxyContext m_httpProxy;
+    TcpProxyContext m_stunProxy;
+    bool m_tcpPortsAllocated = false;
+
+    bool startProxy();
+    bool allocateTcpPorts();
 };
 
 } // namespace hpm
