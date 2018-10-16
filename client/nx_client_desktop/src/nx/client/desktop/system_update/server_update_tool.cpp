@@ -388,7 +388,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         QnUuid serverId = server->getId();
         for (auto path: contents.filesToUpload)
         {
-            auto callback = [tool=QPointer(this), serverId](const UploadState& state)
+            auto callback = [tool=QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
             {
                 if (tool)
                     tool->at_uploadWorkerState(serverId, state);
@@ -793,7 +793,7 @@ void ServerUpdateTool::requestRemoteUpdateState()
     {
         using UpdateStatusAll = std::vector<nx::update::Status>;
 
-        auto callback = [tool=QPointer(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
+        auto callback = [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const UpdateStatusAll& response)
             {
                 if (tool)
                     tool->at_updateStatusResponse(success, handle, response);
@@ -808,7 +808,7 @@ void ServerUpdateTool::requestRemoteUpdateState()
 
         // Requesting remote update info.
         handle = connection->getUpdateInfo(
-            [tool=QPointer(this)](bool success, rest::Handle handle, const nx::update::Information& response)
+            [tool=QPointer<ServerUpdateTool>(this)](bool success, rest::Handle handle, const nx::update::Information& response)
             {
                 if (!tool)
                     return;
