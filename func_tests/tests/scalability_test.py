@@ -268,6 +268,10 @@ def transaction_generator(config, server_list):
         camera_list = [CameraInfo(d['id'])
                        for d in server.api.generic.get('ec2/getCameras')
                        if d['parentId'] == server_id]
+        if not camera_list:
+            # This may happen if we use lightweight servers and this is full one.
+            # Full server does not has it's own cameras in this case.
+            return
         for i, camera in enumerate(camera_list):
             camera.status = bool(i % 2)
 
