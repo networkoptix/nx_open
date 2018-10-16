@@ -19,7 +19,7 @@ About page is correctly displayed
     Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
     Click Link    ${FOOTER ABOUT LINK}
-    Location Should Be    ${ABOUT URL}
+    Location Should Be    ${ENV}${ABOUT URL}
     Wait Until Elements Are Visible    ${ABOUT CLOUD NAME}    ${CREATE ACCOUNT BODY}    ${FOOTER ABOUT LINK}
     Wait Until Element Has Style    ${CREATE ACCOUNT BODY}    background-color    ${THEME COLOR RGB}
 
@@ -27,7 +27,7 @@ Known limitations". Support link is clickable and lead to the proper site
     [tags]    C41543
     Wait Until Element Is Visible    ${FOOTER KNOWN LIMITS LINK}
     Click Link    ${FOOTER KNOWN LIMITS LINK}
-    Location Should Be    ${KNOWN LIMITATIONS URL}
+    Location Should Be    ${ENV}${KNOWN LIMITATIONS URL}
 
 Support leads to the proper support site
     [tags]    C41544
@@ -41,7 +41,7 @@ Terms leads to the proper EULA site
     [tags]    C41545
     Wait Until Element Is Visible    ${FOOTER TERMS LINK}
     Click Link    ${FOOTER TERMS LINK}
-    Location Should Be    ${TERMS URL}
+    Location Should Be    ${ENV}${TERMS URL}
 
 Privacy leads to the proper page
     [tags]    C41546
