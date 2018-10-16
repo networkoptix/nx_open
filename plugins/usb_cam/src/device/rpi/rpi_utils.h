@@ -1,7 +1,5 @@
 #include <string>
 
-#include <nx/utils/app_info.h>
-
 #include "device/device_data.h"
 
 namespace nx {
@@ -28,7 +26,7 @@ std::vector<device::ResolutionData> getMmalResolutionList();
 int getMmalMaxBitrate();
 
 /**
- * Returns true if the device is the rpi and the name of the camera contains "mmal".
+ * Returns true if the mediaserver is running on the rpi and the name of the camera contains "mmal".
  */
 bool isMmalCamera(const std::string& deviceName);
 
