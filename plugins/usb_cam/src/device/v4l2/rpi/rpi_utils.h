@@ -1,3 +1,6 @@
+#ifdef __linux__
+#pragma once
+
 #include <string>
 
 #include "device/device_data.h"
@@ -39,3 +42,5 @@ bool isRpi();
 } // namespace device
 } // namespace usb_cam
 } // namespace nx
+
+#endif

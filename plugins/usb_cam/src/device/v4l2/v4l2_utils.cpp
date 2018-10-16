@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "device/rpi/rpi_utils.h"
+#include "rpi/rpi_utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -212,6 +212,10 @@ std::vector<ResolutionData> getResolutionList(
             }
         };
 
+
+    if (rpi::isMmalCamera(getDeviceName(devicePath)))
+        return rpi::getMmalResolutionList();
+
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
         return {};
@@ -267,6 +271,9 @@ void setBitrate(
     int bitrate,
     const device::CompressionTypeDescriptorPtr& /*targetCodecID*/)
 {
+    if (!rpi::isMmalCamera(getDeviceName(devicePath)))
+        return;
+
     DeviceInitializer initializer(devicePath);
     if (initializer.fileDescriptor == -1)
         return;
@@ -284,6 +291,9 @@ void setBitrate(
 
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& /*tagetCodecID*/)
 {
+    if (rpi::isMmalCamera(getDeviceName(devicePath)))
+        return rpi::getMmalMaxBitrate();
+
     DeviceInitializer initializer(devicePath);
     if(initializer.fileDescriptor == -1)
         return 0;

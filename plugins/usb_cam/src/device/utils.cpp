@@ -1,11 +1,12 @@
+#include "utils.h"
+
+#include <algorithm>
+
 #ifdef _WIN32
 #include "dshow/dshow_utils.h"
 #elif __linux__
 #include "v4l2/v4l2_utils.h"
 #endif
-
-#include "utils.h"
-#include "rpi/rpi_utils.h"
 
 namespace nx {
 namespace usb_cam {
@@ -33,9 +34,6 @@ std::vector<ResolutionData> getResolutionList(
     if (!targetCodecID)
         return {};
 
-    if(rpi::isMmalCamera(getDeviceName(devicePath)))
-        return rpi::getMmalResolutionList();
-
     auto list = impl::getResolutionList(devicePath, targetCodecID);
     std::sort(list.begin(), list.end(),
         [](const ResolutionData& a, const ResolutionData& b)
@@ -47,7 +45,7 @@ std::vector<ResolutionData> getResolutionList(
 
 void setBitrate(const char * devicePath, int bitrate, const device::CompressionTypeDescriptorPtr& targetCodecID)
 {
-    if(targetCodecID && rpi::isMmalCamera(getDeviceName(devicePath)))
+    if(targetCodecID)
         impl::setBitrate(devicePath, bitrate, targetCodecID);
 }
 
@@ -55,15 +53,8 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
 {
     if(!targetCodecID)
         return 0;
-    if(rpi::isMmalCamera(getDeviceName(devicePath)))
-        return rpi::getMmalMaxBitrate();
 
-    // usb_cameras don't support setting their bitrate. only the rpi mmal camera does.
-#if 0    
     return impl::getMaxBitrate(devicePath, targetCodecID);
-#else
-    return 0;
-#endif
 }
 
 } // namespace device

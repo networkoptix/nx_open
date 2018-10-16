@@ -194,6 +194,7 @@ void setBitrate(const char * devicePath, int bitrate, const device::CompressionT
 
 int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescriptorPtr& targetCodec)
 {
+#if 0
     DShowInitializer init;
     IMoniker * pMoniker = NULL;
     HRESULT result = findDevice(CLSID_VideoInputDeviceCategory, devicePath, &pMoniker);
@@ -216,6 +217,9 @@ int getMaxBitrate(const char * devicePath, const device::CompressionTypeDescript
     }
 
     return largest;
+#else
+    return 0;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
