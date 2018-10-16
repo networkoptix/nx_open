@@ -60,7 +60,12 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
         std::string url = std::string(localInterfaceIPAddr) + "/" + devices[i].devicePath;
         strncpy(cameras[i].url, url.c_str(), sizeof(cameras[i].url) - 1);
 
-        strncpy(cameras[i].uid, devices[i].devicePath.c_str(), sizeof(cameras[i].uid) - 1);
+        size_t lastIndexOf = devices[i].devicePath.find_last_of("/");
+        std::string uid = lastIndexOf == std::string::npos 
+            ? devices[i].devicePath : 
+            devices[i].devicePath.substr(lastIndexOf + 1);
+
+        strncpy(cameras[i].uid, uid.c_str(), sizeof(cameras[i].uid) - 1);
     }
 
     device::AudioDiscoveryManager audioDiscovery;

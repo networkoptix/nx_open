@@ -151,7 +151,18 @@ const device::CompressionTypeDescriptorPtr& Camera::compressionTypeDescriptor() 
 
 std::string Camera::url() const
 {
-    return m_info.uid;
+    // Expected to be of the form: <protocol>://<ip>:<port>/<camera-resource>, 
+    // where <camera-resource> is /dev/v4l/by-id/* on Linux or the device-instance-id on Windows.
+
+    std::string url = m_info.url;
+    // Find the second occurence of ":" in the url.
+    int colon = url.find(":", url.find(":") + 1);
+    if(colon == std::string::npos)
+        return std::string();
+
+    url = url.substr(colon);
+    
+    return url.substr(url.find("/") + 1);
 }
 
 CodecParameters Camera::defaultVideoParameters() const
