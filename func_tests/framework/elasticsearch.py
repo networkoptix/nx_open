@@ -59,6 +59,8 @@ _encoder = json.JSONEncoder(default=_json_default)
 class _ElasticsearchClient(object):
     def __init__(self, addr):
         self.addr = addr
+        now = datetime.datetime.now(tz=tzlocal.get_localzone())
+        self.run_data = {'run': {'started_at': now, 'id': uuid.uuid1()}}
 
     @classmethod
     def from_str(cls, addr_str):
@@ -80,13 +82,13 @@ class _ElasticsearchClient(object):
         bare = _encoder.encode(data).encode('ascii')
         return str(len(bare)).encode('ascii') + b'\r\n' + bare + b'\r\n'
 
-    @staticmethod
-    def _make_payload(static_data, items_iter):
+    def _make_payload(self, static_data, items_iter):
         payload = bytearray()
         for item in items_iter:
             payload.extend(b'{"index":{}}\n')
             data = item.copy()
             data.update(static_data)
+            data.update(self.run_data)
             payload.extend(_encoder.encode(data))
             payload.extend(b'\n')
         return payload
@@ -126,10 +128,6 @@ class _ElasticsearchLoggingHandler(logging.Handler):
         self._tz = tzlocal.get_localzone()
 
         self._static = {
-            'run': {
-                'started_at': datetime.datetime.now(tz=self._tz),
-                'id': uuid.uuid1(),
-                },
             'app': app,
             'system': {
                 'hostname': socket.gethostname(),
@@ -138,6 +136,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
                 'python': platform.python_version(),
                 },
             }
+        self._static.update(client.run_data)
 
         self._sock = client.connected_socket()
         self._index = index
