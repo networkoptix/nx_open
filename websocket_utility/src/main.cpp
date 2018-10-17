@@ -2,6 +2,7 @@
 #include <memory>
 #include <mutex>
 #include <stdio.h>
+#include <thread>
 
 #include <signal.h>
 
@@ -69,14 +70,18 @@ public:
         m_httpClient.bindToAioThread(aioThread);
     }
 
-    void startReading(const nx::Buffer& url, const nx::Buffer& protocol)
+    void startReading()
     {
         http::HttpHeaders websocketHeaders;
-        websocket::addClientHeaders(&websocketHeaders, protocol);
+        websocket::addClientHeaders(&websocketHeaders, config.protocolName);
 
-        LOG_VERBOSE("Connecting to %s", url.constData());
-        m_httpClient.doGet(url,
-            [self = shared_from_this(), this, url]()
+        LOG_VERBOSE("Connecting to %s", config.url.constData());
+
+        m_httpClient.setUserName(config.userName);
+        m_httpClient.setUserPassword(config.userPassword);
+        m_httpClient.addRequestHeaders(websocketHeaders);
+        m_httpClient.doGet(config.url,
+            [self = shared_from_this(), this]()
             {
                 if (m_stopped)
                 {
@@ -102,7 +107,8 @@ public:
                     return;
                 }
 
-                LOG_VERBOSE("onConnect: HTTP client connected successfully to the %s", url.constData());
+                LOG_VERBOSE("onConnect: HTTP client connected successfully to the %s",
+                    config.url.constData());
 
                 auto validationError = websocket::validateResponse(m_httpClient.request(),
                     *m_httpClient.response());
@@ -183,7 +189,6 @@ private:
     }
 };
 
-
 class WebsocketConnectionsPool
 {
 public:
@@ -226,25 +231,43 @@ static void connectAndListen()
 {
     auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread);
     websocketConnectionsPoolInstance->addConnection(websocketConnection);
-    websocketConnection->startReading(config.url, config.protocolName);
+    websocketConnection->startReading();
 }
 
 void prepareConfig(int argc, const char* argv[])
 {
     config.protocolName = "nxp2p";
     config.url = "ws://127.0.0.1:7001/ec2/transactionBus";
+    config.userName = "admin";
+    config.userPassword = "admin";
+    config.role = Role::client;
+    config.logLevel = verbose;
 }
+
+#if defined(_WIN32)
+BOOL ctrlHandler(DWORD fdwCtrlType)
+{
+    websocketConnectionsPoolInstance->stopAll();
+    return true;
+}
+#endif // _WIN32
 
 int main(int argc, const char *argv[])
 {
+    WebsocketConnectionsPool websocketConnectionsPool;
+    websocketConnectionsPoolInstance = &websocketConnectionsPool;
+
+    #if defined(_WIN32)
+        if (!SetConsoleCtrlHandler(ctrlHandler, true))
+            return -1;
+    #endif
+
+    auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
     prepareConfig(argc, argv);
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
 
     setvbuf(stdout, nullptr, _IONBF, 0);
-
-    WebsocketConnectionsPool websocketConnectionsPool;
-    websocketConnectionsPoolInstance = &websocketConnectionsPool;
 
     switch (config.role)
     {
