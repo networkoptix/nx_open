@@ -418,7 +418,7 @@ def transactions_generated(metrics_saver, call_generator, rate, duration):
         if stale_sum / duration.total_seconds() > STALE_LIMIT_RATIO:
             _logger.warning(
                 'Servers was unable to process transactions at required rate (%s/sec):' % rate
-                + ' stalled for %s seconds' % pacer.stale_time)
+                + ' stalled for %s seconds' % stale_sum)
 
 
 # post transactions and measure their propagation time
