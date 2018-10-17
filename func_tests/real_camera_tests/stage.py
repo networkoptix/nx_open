@@ -58,8 +58,8 @@ class Run(object):
 class Stage(object):
     """ Stage description object, allows to start execution process for a specific camera.
     """
-    def __init__(self, name, actions, is_essential, timeout
-                 ):  # type: (str, Callable[[Run], Result], bool, timedelta) -> None
+    def __init__(self, name, actions, is_essential, timeout):
+            # type: (str, Callable[[Run], Result], bool, timedelta) -> None
         self.name = name
         self.is_essential = is_essential
         self.timeout = timeout
@@ -139,8 +139,8 @@ class Executor(object):
 
         return dict(start_time=self._start_time, duration=self._duration, **self._result.details)
 
-    def _execute_next_step(self, stage_steps, start_time
-                           ):  # type: (Generator[Result], float) -> bool
+    def _execute_next_step(self, stage_steps, start_time):
+            # type: (Generator[Result], float) -> bool
         """ :returns True if stage is finished, False otherwise.
         """
         try:
@@ -153,7 +153,7 @@ class Executor(object):
             return True
 
         except Exception:
-            self._result = Failure(is_exception=True)
+            self._result = Failure.from_current_exception()
             return True
 
         finally:

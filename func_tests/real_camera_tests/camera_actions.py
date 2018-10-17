@@ -61,7 +61,7 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
 def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
     frames = max(expected_values.get('video', {}).get('fps', [30]))
     last_failure = None
-    for _ in range(rerun_count):
+    for run_number in range(rerun_count):
         options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
         probe = subprocess.Popen(
             ['ffprobe'] + options + [stream_url],
@@ -71,8 +71,8 @@ def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
                 if isinstance(result, Success):
                     return
                 elif isinstance(result, Halt) and last_failure:
-                    # In case of halt keep last error messages.
-                    yield last_failure.append_errors('retry:', result.message)
+                    yield last_failure.with_more_errors(
+                        'retry {}:'.format(run_number), result.message)
                 elif isinstance(result, Failure):
                     last_failure = result
                     yield result

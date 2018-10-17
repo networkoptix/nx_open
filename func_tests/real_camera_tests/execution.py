@@ -147,7 +147,7 @@ class ServerStagesExecutor(object):
                 checker.expect_values(expected_values, actual_values, '<{}>'.format(query))
 
         except Exception:
-            current_stage.result = checks.Failure(is_exception=True)
+            current_stage.result = checks.Failure.from_current_exception()
 
         else:
             current_stage.result = checker.result()
