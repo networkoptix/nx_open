@@ -62,7 +62,7 @@
     },
     "Advanced Viewer": {
       "label": "Перегляд і налаштування",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Може дивитися живе відео, архів, управляти PTZ і т. Д"
     },
     "Administrator": {
       "label": "Адміністратор",
@@ -177,7 +177,7 @@
     "confirmUnshareAction": "Видалити",
     "successDisconnected": "Система успішно відключена від %PRODUCT_NAME%",
     "successDeleted": "Система {{systemName}} успішно видалена з вашого облікового запису",
-    "successMerge": "System {{systemName}} has been merged with {{systemName}}",
+    "successMerge": "Система {{systemName}} була об’єднана з {{systemName}}",
     "permissionsRemoved": "{{email}} був позбавлений повноважень"
   },
   "account": {
@@ -279,7 +279,7 @@
       "copyActiveText": "скопійовано до буфера обміну"
     },
     "systemOffline": "Система знаходиться поза мережею",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "НЕМАЄ КАМЕР",
     "cameraStates": {
       "offline": "Поза мережею",
       "error": "Помилка",

@@ -121,11 +121,11 @@
 
 
                     <div>
-                        <h3>Traffic encryption</h3>
+                        <h3>傳輸加密</h3>
                         <form novalidate name="trafficSettingsForm" class="form-horizontal" role="form" >
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> Force Traffic Encryption
+                                    <input type="checkbox" ng-model="trafficSettings.trafficEncryptionForced"> 強制傳輸加密
                                 </label>
                             </div>
                             <div class="checkbox">
@@ -134,7 +134,7 @@
                                            ng-disabled="!trafficSettings.trafficEncryptionForced"
                                            ng-model="trafficSettings.videoTrafficEncryptionForced"
                                            ng-checked="checkTrafficEncryption()">
-                                    Force Video Traffic Encryption
+                                    強制影片傳輸加密
                                 </label>
                             </div>
                             <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">儲存</button>
