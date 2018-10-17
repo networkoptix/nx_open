@@ -749,7 +749,8 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
         auto handleTimePeriodsUpdated =
             [this]()
             {
-                d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
+                d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods(Qn::RecordingContent);
+                d->timePeriods[Qn::MotionContent] = d->chunkProvider->timePeriods(Qn::MotionContent);
                 update();
             };
 

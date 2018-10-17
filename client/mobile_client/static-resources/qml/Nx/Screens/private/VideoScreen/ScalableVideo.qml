@@ -29,7 +29,7 @@ ZoomableFlickable
         onResourceIdChanged: to1xScale()
     }
 
-    allowCompositeEvents: !motionSearchController.drawingRoi
+    allowCompositeEvents: !motionSearchController.drawingCustomRoi
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:

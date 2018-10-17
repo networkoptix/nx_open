@@ -165,12 +165,17 @@ PageBase
             {
                 text: qsTr("Area")
                 icon.source: lp("/images/close.png")
-                visible: video.sourceComponent == scalableVideoComponent
-                    && video.item.motionSearchController.hasCustomRoi
+
+                property Item motionController: video.sourceComponent == scalableVideoComponent
+                    ? video.item.motionSearchController
+                    : null
+
+                visible: motionController && motionController.customRoiExists
+
                 onClicked:
                 {
-                    if (video.sourceComponent == scalableVideoComponent)
-                        video.item.motionSearchController.clearCustomRoi()
+                    if (motionController)
+                        motionController.clearCustomRoi()
                 }
             },
 
@@ -281,6 +286,7 @@ PageBase
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
+            motionSearchController.cameraRotation: videoScreenController.resourceHelper.customRotation
         }
     }
 
@@ -548,6 +554,20 @@ PageBase
                     camerasModel.nextResourceId(videoScreen.resourceId)
                         || camerasModel.nextResourceId(""))
             }
+
+            motionFilter: video.sourceComponent == scalableVideoComponent
+                ? video.item.motionSearchController.motionFilter
+                : ""
+
+            motionSearchMode:
+                video.sourceComponent == scalableVideoComponent
+                && video.item.motionSearchController.motionSearchMode
+
+            onMotionSearchModeChanged:
+            {
+                if (video.sourceComponent == scalableVideoComponent)
+                    video.item.motionSearchController.motionSearchMode = motionSearchMode
+            }
         }
     }
 
@@ -651,6 +671,7 @@ PageBase
 
     function switchToCamera(id)
     {
+        videoNavigation.motionSearchMode = false
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
         if (videoScreenController.mediaPlayer.liveMode)

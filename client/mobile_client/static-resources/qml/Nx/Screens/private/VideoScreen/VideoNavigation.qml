@@ -21,6 +21,9 @@ Item
     property bool canViewArchive: true
     property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
 
+    property alias motionSearchMode: motionSearchModeButton.checked
+    property alias motionFilter: cameraChunkProvider.motionFilter
+
     signal ptzButtonClicked()
     signal switchToNextCamera()
     signal switchToPreviousCamera()
@@ -107,6 +110,7 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
+
         resourceId: videoScreenController.resourceId
 
         onLoadingChanged:
@@ -428,6 +432,17 @@ Item
                     calendarPanel.date = timeline.positionDate
                     calendarPanel.open()
                 }
+            }
+
+            Button
+            {
+                id: motionSearchModeButton
+
+                text: checked ? "-" : "+"
+                checked: false
+                checkable: true
+                anchors.left:  calendarButton.right
+                anchors.verticalCenter: parent.verticalCenter
             }
 
             Row
