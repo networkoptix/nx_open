@@ -406,6 +406,12 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
+    if (!isStarted())
+    {
+        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
+        return;
+    }
+
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,

@@ -422,6 +422,8 @@ public:
         const P2pConnectionPtr& connection,
         const vms::api::PersistentIdData& to,
         int sequence);
+
+    bool isStarted() const { return m_started; }
 protected:
     std::unique_ptr<BidirectionRoutingInfo> m_peers;
     PeerNumberInfo m_localShortPeerInfo; //< Short numbers created by current peer
@@ -463,6 +465,7 @@ private:
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
     std::set<vms::api::PeerData> m_lastAlivePeers;
+    std::atomic<bool> m_started{false};
 };
 
 } // namespace p2p
