@@ -183,28 +183,32 @@ class _ElasticsearchLoggingHandler(logging.Handler):
             queue.popleft()
 
     def emit(self, record):
-        if record.name == _logger.name:
-            return
-        data = {
-            field: record.__dict__[field]
-            for field in record.__dict__
-            # Args frequently cause errors on indexing. Some other fields are redundant.
-            if field not in ('args', 'msg', 'created', 'msec', 'asctime')}
-        data['ts'] = datetime.datetime.fromtimestamp(record.created, tz=self._tz),
-        data.update(self._static)
-        payload = _json_encoder.encode(data).encode('ascii')
-        # In HTTP 1.1 Connection: keep-alive is the default.
-        request = bytearray()
-        request.extend('POST {}/_doc HTTP/1.1\r\n'.format(self._index).encode('ascii'))
-        request.extend('Content-Type: application/json\r\n'.encode('ascii'))
-        request.extend('Content-Length: {}\r\n'.format(len(payload)).encode('ascii'))
-        request.extend(b'\r\n')
-        request.extend(payload)
-        self._sent_count += 1
-        self._response_processor.send([request])
-        # Sending must be the single call and must be called last, so all this method can be
-        # interpreted as a whole critical section under GIL.
-        self._sock.send(request)
+        # noinspection PyBroadException
+        try:
+            if record.name == _logger.name:
+                return
+            data = {
+                field: record.__dict__[field]
+                for field in record.__dict__
+                # Args frequently cause errors on indexing. Some other fields are redundant.
+                if field not in ('args', 'msg', 'created', 'msec', 'asctime')}
+            data['ts'] = datetime.datetime.fromtimestamp(record.created, tz=self._tz),
+            data.update(self._static)
+            payload = _json_encoder.encode(data).encode('ascii')
+            # In HTTP 1.1 Connection: keep-alive is the default.
+            request = bytearray()
+            request.extend('POST {}/_doc HTTP/1.1\r\n'.format(self._index).encode('ascii'))
+            request.extend('Content-Type: application/json\r\n'.encode('ascii'))
+            request.extend('Content-Length: {}\r\n'.format(len(payload)).encode('ascii'))
+            request.extend(b'\r\n')
+            request.extend(payload)
+            self._sent_count += 1
+            self._response_processor.send([request])
+            # Sending must be the single call and must be called last, so all this method can be
+            # interpreted as a whole critical section under GIL.
+            self._sock.send(request)
+        except Exception:
+            self.handleError(record)
 
     def close(self):
         _logger.debug("Ask to close connection.")
