@@ -68,7 +68,7 @@ class _ElasticsearchClient(object):
         port = int(port_str)
         return cls((hostname, port))
 
-    def connected_socket(self):
+    def open_connection(self):
         s = socket.socket()
         # TCP buffer is used as queue. If there is a room for queue, `send` returns immediately.
         # Otherwise, the call blocks, and this is an intended behavior.
@@ -94,7 +94,7 @@ class _ElasticsearchClient(object):
         return payload
 
     def bulk_upload(self, index, static_data, items_iter):
-        with contextlib.closing(self.connected_socket()) as s:
+        with contextlib.closing(self.open_connection()) as s:
             _logger.info("Bulk upload to index %s with data: %r.", index, static_data)
             data = self._make_payload(static_data, items_iter)
             header_template = (
@@ -138,7 +138,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
             }
         self._static.update(client.run_data)
 
-        self._sock = client.connected_socket()
+        self._sock = client.open_connection()
         self._index = index
 
         self._response_processor = self._process_responses_stream()
