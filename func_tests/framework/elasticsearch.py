@@ -64,6 +64,14 @@ _json_encoder = json.JSONEncoder(default=_json_default)
 
 
 class _ElasticsearchClient(object):
+    """Client knows the address of Elasticsearch and stores run id and run start time, which are
+    intended to be added in all records sent via this client, whether via logging handler or
+    bulk upload mechanism.
+
+    Elasticsearch index is no part of this client as index is different for different types of
+    data.
+    """
+
     def __init__(self, addr):
         self.addr = addr
         now = datetime.datetime.now(tz=tzlocal.get_localzone())
@@ -125,6 +133,15 @@ class _ElasticsearchClient(object):
 
 
 class _ElasticsearchLoggingHandler(logging.Handler):
+    """Python logging handler that sends records to Elasticsearch every time record is emitted.
+
+    It uses Elasticsearch Index HTTP API with HTTP pipelining. Each time new record is sent,
+    handler checks for responses that are already received and process them. All blocking calls
+    either don't actually block or block for a negligible amount of time (in contrast to requests
+    lin which waits for response when request is made). Therefore, no threads are needed here.
+
+    Thread-safety is provided by locks in `logging.Handler`.
+    """
     def __init__(self, client, index, app):
         super(_ElasticsearchLoggingHandler, self).__init__()
 
