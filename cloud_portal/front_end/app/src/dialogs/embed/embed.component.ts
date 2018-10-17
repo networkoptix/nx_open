@@ -1,6 +1,7 @@
 import {
     Component, Inject, OnInit, Input,
-    ViewEncapsulation, Renderer2
+    ViewEncapsulation, Renderer2,
+    ChangeDetectorRef, ViewChild
 }                                                from '@angular/core';
 import { DOCUMENT, Location }                    from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -20,6 +21,8 @@ export class EmbedModalContent {
     params: any;
     embedUrl: string;
 
+    @ViewChild('embedForm') embedForm;
+
     constructor(private activeModal: NgbActiveModal,
                 private renderer: Renderer2,
                 private location: Location,
@@ -33,38 +36,37 @@ export class EmbedModalContent {
         };
 
         this.auth = {
-          email: '',
-          password: ''
+            email   : '',
+            password: ''
         };
     }
 
     ngOnInit() {
+        this.createEmbedUrl(this.params);
+    }
+
+    ngAfterViewInit() {
+        this.embedForm.form.valueChanges.subscribe((changes) => {
+            this.createEmbedUrl(changes);
+        });
+    }
+
+    createEmbedUrl(params): void {
         // Cannot use A6 router at this moment - AJS is leading the parade
         this.embedUrl = window.location.href.replace('systems', 'embed').split('?')[ 0 ];
-    }
-
-    copyToClipboard(): boolean {
-        this.renderer.selectRootElement('#embedUrl').select();
-
-        /* Copy the text inside the text field */
-        this.document.execCommand('copy');
-
-        return false;
-    }
-
-    getEmbedUrl(): string {
         let uri = '';
 
-        for (const paramsKey in this.params) {
-            if (this.params.hasOwnProperty(paramsKey)) {
-                if (!this.params[ paramsKey ]) {
+        for (const paramsKey in params) {
+            if (params.hasOwnProperty(paramsKey)) {
+                // filter checkboxes in form
+                if (this.params[ paramsKey ] !== undefined && !params[ paramsKey ]) {
                     uri += (uri === '') ? '?' : '&';
                     uri += paramsKey;
                 }
             }
         }
 
-        return this.embedUrl + uri;
+        this.embedUrl += uri;
     }
 
     close() {

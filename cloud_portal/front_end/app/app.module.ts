@@ -49,7 +49,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
 }
 
 @NgModule({
-    imports: [
+    imports        : [
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
@@ -74,27 +74,27 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
 
         TranslateModule.forRoot({
             loader: {
-                provide: TranslateLoader,
+                provide   : TranslateLoader,
                 useFactory: (createTranslateLoader),
-                deps: [HttpClient]
+                deps      : [ HttpClient ]
             }
         }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
-        RouterModule.forRoot([], {initialNavigation: true})
+        RouterModule.forRoot([], { initialNavigation: true })
     ],
     entryComponents: [],
-    providers: [
+    providers      : [
         NgbModal,
         Location,
         CookieService,
-        {provide: LocationStrategy, useClass: PathLocationStrategy},
-        {provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy},
+        { provide: LocationStrategy, useClass: PathLocationStrategy },
+        { provide: UrlHandlingStrategy, useClass: HybridUrlHandlingStrategy },
     ],
-    declarations: [
+    declarations   : [
         AppComponent
     ],
-    bootstrap: [AppComponent]
+    bootstrap      : [ AppComponent ]
 })
 
 export class AppModule {
