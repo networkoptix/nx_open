@@ -458,7 +458,8 @@ class DataRecord(models.Model):
         settings.AUTH_USER_MODEL, null=True,
         blank=True, related_name='created_%(class)s')
 
-    value = models.TextField()
+    value = models.TextField(default='', blank=True)
+    file = models.FileField(upload_to='', default=None, blank=True)
 
     def __str__(self):
         return self.value
