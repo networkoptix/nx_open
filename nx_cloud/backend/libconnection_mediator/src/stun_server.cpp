@@ -20,9 +20,7 @@ StunServer::StunServer(
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
-        nx::network::NatTraversalSupport::disabled)),
-    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::UdpServer>>(
-        &m_stunMessageDispatcher))
+        nx::network::NatTraversalSupport::disabled))
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
@@ -39,7 +37,7 @@ void StunServer::listen()
                 .arg(containerString(m_tcpEndpoints)).toStdString());
     }
 
-    if (!m_udpStunServer->listen())
+    if (m_udpStunServer && !m_udpStunServer->listen())
     {
         throw std::runtime_error(
             lm("Error listening on UDP addresses %1")
@@ -53,7 +51,9 @@ void StunServer::listen()
 void StunServer::stopAcceptingNewRequests()
 {
     m_tcpStunServer->pleaseStopSync();
-    m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
+
+    if (m_udpStunServer)
+        m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
 const std::vector<network::SocketAddress>& StunServer::udpEndpoints() const
@@ -87,14 +87,14 @@ bool StunServer::bind()
 {
     if (m_settings.stun().addrToListenList.empty())
     {
-        NX_LOGX("No STUN address to listen", cl_logALWAYS);
+        NX_ALWAYS(this, "No STUN address to listen");
         return false;
     }
 
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
-        NX_LOGX(lit("Cannot bind to TCP endpoint(s): %1")
-            .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
+        NX_ERROR(this, lm("Cannot bind to TCP endpoint(s): %1")
+            .args(containerString(m_settings.stun().addrToListenList)));
         return false;
     }
 
@@ -107,14 +107,21 @@ bool StunServer::bind()
 
     m_tcpEndpoints = m_tcpStunServer->endpoints();
 
-    if (!m_udpStunServer->bind(m_settings.stun().udpAddrToListenList))
+    if (!m_settings.stun().udpAddrToListenList.empty())
     {
-        NX_LOGX(lit("Cannot bind to UDP endpoint(s): %1")
-            .arg(containerString(m_settings.stun().udpAddrToListenList)), cl_logERROR);
-        return false;
-    }
+        m_udpStunServer =
+            std::make_unique<nx::network::server::MultiAddressServer<network::stun::UdpServer>>(
+                &m_stunMessageDispatcher);
 
-    m_udpEndpoints = m_udpStunServer->endpoints();
+        if (!m_udpStunServer->bind(m_settings.stun().udpAddrToListenList))
+        {
+            NX_ERROR(this, lm("Cannot bind to UDP endpoint(s): %1")
+                .args(containerString(m_settings.stun().udpAddrToListenList)));
+            return false;
+        }
+
+        m_udpEndpoints = m_udpStunServer->endpoints();
+    }
 
     return true;
 }

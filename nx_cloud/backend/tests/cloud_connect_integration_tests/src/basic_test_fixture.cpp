@@ -79,6 +79,8 @@ BasicTestFixture::BasicTestFixture(
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
+    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
+    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 }
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
@@ -158,8 +160,6 @@ void BasicTestFixture::SetUp()
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());
-    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
-    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());

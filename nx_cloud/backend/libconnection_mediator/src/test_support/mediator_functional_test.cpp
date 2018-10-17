@@ -35,8 +35,7 @@ static constexpr size_t kMaxBindRetryCount = 10;
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     utils::test::TestWithTemporaryDirectory("hpm", QString()),
-    m_testFlags(flags),
-    m_httpPort(0)
+    m_testFlags(flags)
 {
     if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobals::cloud().reinitialize();
@@ -70,12 +69,12 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
 
     m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
-    m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
+    if (!moduleInstance()->impl()->stunUdpEndpoints().empty())
+        m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
-    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
-    if (httpEndpoints.empty())
+    if (moduleInstance()->impl()->httpEndpoints().empty())
         return false;
-    m_httpPort = httpEndpoints.front().port;
+    m_httpEndpoint = moduleInstance()->impl()->httpEndpoints().front();
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
@@ -91,6 +90,9 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
 network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 {
+    if (moduleInstance()->impl()->stunUdpEndpoints().empty())
+        return network::SocketAddress();
+
     return network::SocketAddress(
         network::HostAddress::localhost,
         moduleInstance()->impl()->stunUdpEndpoints().front().port);
@@ -105,7 +107,9 @@ network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
 
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
+    return network::SocketAddress(
+        network::HostAddress::localhost,
+        moduleInstance()->impl()->httpEndpoints().front().port);
 }
 
 void MediatorFunctionalTest::setPreserveEndpointsDuringRestart(bool value)
@@ -227,29 +231,23 @@ void MediatorFunctionalTest::beforeModuleCreation()
     if (!m_preserveEndpointsDuringRestart)
         return;
 
-    for (auto it = args().begin(); it != args().end(); )
+    if (m_stunTcpEndpoint)
     {
-        if (strcmp((*it), "-stun/addrToListenList") == 0 ||
-            strcmp((*it), "-http/addrToListenList") == 0)
-        {
-            free(*it);
-            it = args().erase(it);
-            free(*it);
-            it = args().erase(it); //< Value.
-        }
-        else
-        {
-            ++it;
-        }
+        removeArgByName("stun/addrToListenList");
+        addArg("-stun/addrToListenList", m_stunTcpEndpoint->toStdString().c_str());
     }
 
-    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddressV4;
-    if (m_httpPort != 0)
-        httpEndpoint.port = m_httpPort;
+    if (m_stunUdpEndpoint)
+    {
+        removeArgByName("stun/udpAddrToListenList");
+        addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint->toStdString().c_str());
+    }
 
-    addArg("-stun/addrToListenList", m_stunTcpEndpoint.toStdString().c_str());
-    addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint.toStdString().c_str());
-    addArg("-http/addrToListenList", httpEndpoint.toStdString().c_str());
+    if (m_httpEndpoint)
+    {
+        removeArgByName("http/addrToListenList");
+        addArg("-http/addrToListenList", m_httpEndpoint->toStdString().c_str());
+    }
 }
 
 void MediatorFunctionalTest::afterModuleDestruction()
