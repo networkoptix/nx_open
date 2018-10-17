@@ -1,4 +1,4 @@
-<form #disconnectForm="ngForm" name="embedForm" novalidate>
+<form #embedForm="ngForm" name="embedForm" novalidate>
     <div class="modal-header">
         <h1 class="modal-title" translate>Embed</h1>
         <button type="button" class="close"
@@ -9,7 +9,8 @@
     </div>
 
     <div class="modal-body">
-        <p class="warning-label" translate>Please make sure this system has one public user as credentials will be publicly visible.</p>
+        <p class="warning-label" translate>Please make sure this system has one public user as credentials will be
+            publicly visible.</p>
 
         <p translate>Specify credentials for this system:</p>
 
@@ -40,7 +41,7 @@
             </nx-checkbox>
             <label for="nocameras" translate>Cameras menu</label>
 
-            <br />
+            <br/>
             <nx-checkbox
                     name="noheader"
                     compId="noheader"
@@ -57,10 +58,14 @@
             <label for="nocontrols" translate>Camera controls</label>
         </div>
 
-        <p class="clipboard-block">
-            <input readonly class="form-control" [value]="getEmbedUrl()" id="embedUrl">
-            <a href (click)="copyToClipboard()">Copy</a>
-        </p>
+        <div class="clipboard-block">
+            <div>
+                <span class="form-control-static" [innerText]="embedUrl"></span>
+            </div>
+            <div>
+                <button class="btn btn-default" ngxClipboard [cbContent]="embedUrl">Copy</button>
+            </div>
+        </div>
     </div>
     <div class="modal-footer">
 

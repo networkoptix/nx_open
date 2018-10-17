@@ -49,16 +49,17 @@
     "ADMIN TEXT"                           :    "Administrator",
     "ADV VIEWER TEXT"                      :    "Advanced Viewer",
     "VIEWER TEXT"                          :    "Viewer",
-    "LIVE VIEWER TEXT"                     :    "Live Viewer",    
+    "LIVE VIEWER TEXT"                     :    "Live Viewer",
     "CUSTOM TEXT"                          :    "Custom",
     "YOUR SYSTEM TEXT"                     :    "Your System",
+    "YOUR PERMISSIONS TEXT"                :    "Your permissions:",
 
     "ABOUT"                                :    "About",
     "KNOWN LIMITATIONS"                    :    "Known limitations",
     "SUPPORT"                              :    "Support",
     "TERMS"                                :    "Terms",
     "PRIVACY"                              :    "Privacy",
-    "COPYWRIGHT"                           :    "Copywright",
+    "COPYRIGHT"                            :    "Copyright",
 
     "DOWNLOADS HEADER TEXT"                :    "Download",
 
@@ -91,7 +92,7 @@
     "PATCHES TEXT"                         :    "Patches",
     "BETAS TEXT"                           :    "Betas",
     "CLIENT ONLY TEXT"                     :    "Client only",
-            
+
     "PASSWORD TOO SHORT BADGE TEXT"        :    "too short",
     "PASSWORD TOO COMMON BADGE TEXT"       :    "too common",
     "PASSWORD IS WEAK BADGE TEXT"          :    "weak",

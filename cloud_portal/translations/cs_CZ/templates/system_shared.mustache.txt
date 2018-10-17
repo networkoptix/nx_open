@@ -1,4 +1,4 @@
-Hello, {{message.userFullName}}
+Dobrý den, {{message.userFullName}}
 
 {{#message.sharer_name}}
 {{message.sharer_name}} ({{message.sharer_email}}) Vám nasdílel přístup k video management systému "{{message.system_name}}".

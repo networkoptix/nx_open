@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}

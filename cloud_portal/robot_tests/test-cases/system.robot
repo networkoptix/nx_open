@@ -1,6 +1,5 @@
 *** Settings ***
 Resource          ../resource.robot
-Resource          ../variables.robot
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
 Suite Setup       Open Browser and go to URL    ${url}
@@ -107,32 +106,18 @@ correct items are shown for admin
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER NAME}    ${OWNER EMAIL}
 
-
-does not show Share button, Rename button, or user list to viewer, advanced viewer, live viewer
-#This allows the expected error to not run the close browser action
-    Log in to Auto Tests System    ${EMAIL VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
-    Log Out
-    Log in to Auto Tests System    ${EMAIL ADV VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
-    Log Out
-    Log in to Auto Tests System    ${EMAIL LIVE VIEWER}
-    Register Keyword To Run On Failure    NONE
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${RENAME SYSTEM}
-    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${USERS LIST}
-    Register Keyword To Run On Failure    Failure Tasks
-    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+correct items are shown for advanced viewer and below
+    [tags]    C41562
+    ${users}         Set Variable    ${EMAIL ADVVIEWER}    ${EMAIL VIEWER}    ${EMAIL LIVEVIEWER}    ${EMAIL CUSTOM}
+    ${users text}    Set Variable     ${ADV VIEWER TEXT}    ${VIEWER TEXT}    ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
+    :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
+    \    Log in to Auto Tests System    ${user}
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[text()="${text}"]
+    \    Element Should Not Be Visible    ${RENAME SYSTEM}
+    \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
+    \    Element Should Not Be Visible    ${USERS LIST}
+    \    Log Out
+    \    Validate Log Out
 
 does not display edit and remove for owner row
     Log in to Auto Tests System    ${EMAIL ADMIN}

@@ -16,6 +16,7 @@ import { EmbedModalContent, NxModalEmbedComponent }           from './embed/embe
 import { downgradeInjectable }                                from '@angular/upgrade/static';
 import { FormsModule, EmailValidator }                        from '@angular/forms';
 import { TranslateModule }                                    from '@ngx-translate/core';
+import { ClipboardModule }                                    from 'ngx-clipboard';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import { TranslateModule }                                    from '@ngx-transla
         CommonModule,
         FormsModule,
         TranslateModule,
+        ClipboardModule,
         ComponentsModule,
         DirectivesModule,
         DropdownsModule
