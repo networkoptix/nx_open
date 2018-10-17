@@ -29,6 +29,21 @@ const QString kCameraIdParam(lit("cameraId"));
 const QString kLimitParam(lit("limit"));
 const QString kFlatParam(lit("flat"));
 
+bool isValidMotionRect(const QRect& rect)
+{
+    return !rect.isEmpty()
+        && rect.left() >= 0
+        && rect.top() >= 0
+        && rect.right() < Qn::kMotionGridWidth
+        && rect.bottom() < Qn::kMotionGridHeight;
+};
+
+bool isValidMotionRegion(const QRegion& region)
+{
+    return region.rectCount() > 0
+        && std::all_of(region.rects().cbegin(), region.rects().cend(), isValidMotionRect);
+};
+
 } // namespace
 
 QnChunksRequestData::QnChunksRequestData():
@@ -136,7 +151,19 @@ QUrlQuery QnChunksRequestData::toUrlQuery() const
 
 bool QnChunksRequestData::isValid() const
 {
-    return !resList.isEmpty()
-        && endTimeMs > startTimeMs
-        && format != Qn::UnsupportedFormat;
+    if (resList.isEmpty()
+        || endTimeMs <= startTimeMs
+        || format == Qn::UnsupportedFormat)
+    {
+        return false;
+    }
+
+    if (periodsType == Qn::MotionContent)
+    {
+        const auto motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+        return !motionRegions.empty()
+            && std::all_of(motionRegions.cbegin(), motionRegions.cend(), isValidMotionRegion);
+    }
+
+    return true;
 }
