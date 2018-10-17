@@ -3,9 +3,9 @@
 import json
 import logging
 import subprocess
+from datetime import timedelta
 
-import timeit
-
+from framework.utils import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -22,9 +22,9 @@ def fps_avg(fps):
 
 
 def _ffprobe_poll(expected_values, probe, stream_url, title):
-    start_time = timeit.default_timer()
+    timer = Timer()
     while probe.poll() is None:
-        if timeit.default_timer() - start_time > 30:
+        if timer.duration > timedelta(seconds=30):
             yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))

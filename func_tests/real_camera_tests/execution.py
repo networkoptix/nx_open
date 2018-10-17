@@ -1,6 +1,5 @@
 import logging
 import time
-import timeit
 from datetime import timedelta
 from collections import OrderedDict
 from fnmatch import fnmatch
@@ -8,7 +7,7 @@ from fnmatch import fnmatch
 from typing import List, Dict
 
 from framework.installation.mediaserver import Mediaserver
-from framework.utils import datetime_utc_now
+from framework.utils import datetime_utc_now, Timer
 from . import checks, stage, stages
 
 _logger = logging.getLogger(__name__)
@@ -75,20 +74,20 @@ class CameraStagesExecutor(object):
 
     def _make_all_stage_steps(self, server):  # types: (Mediaserver) -> Generator[None]
         self._start_time = datetime_utc_now()
-        start_time = timeit.default_timer()
+        timer = Timer()
         for executors in self._stage_executors:
             steps = executors.steps(server)
             while True:
                 try:
                     steps.next()
-                    self._duration = timedelta(seconds=timeit.default_timer() - start_time)
+                    self._duration = timer.duration
                     yield
 
                 except StopIteration:
                     _logger.info('%s stages result %s', self.name, executors.details)
                     if not executors.is_successful and executors.stage.is_essential:
                         _logger.error('Essential stage is failed, skip other stages')
-                        self._duration = timedelta(seconds=timeit.default_timer() - start_time)
+                        self._duration = timer.duration
                         return
                     break
 
@@ -143,7 +142,7 @@ class ServerStagesExecutor(object):
         _logger.debug(self, 'Server stage %r', name)
         current_stage = self.Stage(name, rules)
         checker = checks.Checker()
-        start_time = timeit.default_timer()
+        timer = Timer()
         try:
             for query, expected_values in current_stage.rules.items():
                 actual_values = self.server.api.generic.get(query)
@@ -155,7 +154,7 @@ class ServerStagesExecutor(object):
         else:
             current_stage.result = checker.result()
 
-        current_stage.duration = timedelta(seconds=timeit.default_timer() - start_time)
+        current_stage.duration = timer.duration
         self.stages.append(current_stage)
         _logger.info(self, 'Server stage %r result %r', name, current_stage.result.details)
 

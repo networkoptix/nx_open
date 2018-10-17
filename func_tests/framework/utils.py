@@ -7,6 +7,7 @@ import socket
 import struct
 import threading
 import time
+import timeit
 from contextlib import closing
 from datetime import datetime, timedelta
 from multiprocessing.dummy import Pool as ThreadPool
@@ -233,3 +234,13 @@ def threadsafe_generator(generator_fn):
         return ThreadSafeIterator(generator_fn(*args, **kw))
 
     return safe_generator_fn
+
+
+class Timer:
+
+    def __init__(self):
+        self._start = timeit.default_timer()
+
+    @property
+    def duration(self):
+        return timedelta(seconds=timeit.default_timer() - self._start)
