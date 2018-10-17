@@ -3,6 +3,8 @@
 #include <mutex>
 #include <stdio.h>
 #include <thread>
+#include <string.h>
+#include <stdlib.h>
 
 #include <signal.h>
 
@@ -21,7 +23,7 @@ enum class Role
     client
 };
 
-enum LogLevel
+enum class LogLevel
 {
     info,
     verbose
@@ -29,27 +31,27 @@ enum LogLevel
 
 struct
 {
-    Role role;
-    nx::Buffer protocolName;
+    Role role = Role::client;
+    nx::Buffer protocolName = "nxp2p";
     nx::Buffer url;
     nx::Buffer userName;
     nx::Buffer userPassword;
-    nx::Buffer serverAddress;
+    nx::Buffer serverAddress = "0.0.0.0";
     int serverPort;
     aio::AbstractAioThread* aioThread = nullptr;
-    LogLevel logLevel;
+    LogLevel logLevel = LogLevel::info;
 } config;
 
 #define LOG_INFO(fmt, ...) \
     do { \
         if (config.logLevel >= LogLevel::info) \
-            fprintf(stdout, fmt "\n" , ##__VA_ARGS__); \
+            fprintf(stdout, "%s: " fmt "\n", __func__,  ##__VA_ARGS__); \
     } while (0)
 
 #define LOG_VERBOSE(fmt, ...) \
     do { \
         if (config.logLevel >= LogLevel::verbose) \
-            fprintf(stdout, fmt "\n" , ##__VA_ARGS__); \
+            fprintf(stdout, "%s: " fmt "\n", __func__,  ##__VA_ARGS__); \
     } while (0)
 
 class WebsocketConnectionsPool;
@@ -80,57 +82,7 @@ public:
         m_httpClient.setUserName(config.userName);
         m_httpClient.setUserPassword(config.userPassword);
         m_httpClient.addRequestHeaders(websocketHeaders);
-        m_httpClient.doGet(config.url,
-            [self = shared_from_this(), this]()
-            {
-                if (m_stopped)
-                {
-                    LOG_VERBOSE("onConnect: seems like connection has been destroyed, exiting");
-                    return;
-                }
-
-                if (self->m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
-                    || !m_httpClient.response())
-                {
-                    LOG_INFO("onConnect: Http client failed to connect to host");
-                    stopInAioThread();
-                    return;
-                }
-
-                const int statusCode = m_httpClient.response()->statusLine.statusCode;
-                LOG_VERBOSE("onConnect: Http client status code: %d", statusCode);
-
-                if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
-                {
-                    LOG_INFO("onConnect: Http client got invalid response code %d", statusCode);
-                    stopInAioThread();
-                    return;
-                }
-
-                LOG_VERBOSE("onConnect: HTTP client connected successfully to the %s",
-                    config.url.constData());
-
-                auto validationError = websocket::validateResponse(m_httpClient.request(),
-                    *m_httpClient.response());
-                if (validationError != websocket::Error::noError)
-                {
-                    LOG_INFO("onConnect: Websocket handshake validation error: %d", validationError);
-                    stopInAioThread();
-                    return;
-                }
-
-                LOG_VERBOSE("onConnect: Websocket handshake response validated successfully");
-                m_websocket.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
-                    websocket::FrameType::text));
-                m_websocket->bindToAioThread(m_aioThread);
-
-                m_httpClient.pleaseStopSync();
-
-                m_websocket->start();
-                m_websocket->readSomeAsync(&m_readBuffer,
-                    [self, this](SystemError::ErrorCode errorCode, size_t bytesRead)
-                    { onRead(errorCode, bytesRead); });
-            });
+        m_httpClient.doGet(config.url, [self = shared_from_this(), this]() { onConnect(); });
     }
 
     void stop()
@@ -154,33 +106,88 @@ private:
 
     void stopInAioThread()
     {
+        LOG_VERBOSE("connection: stop requested, shutting down");
         m_stopped = true;
         m_readyPromise.set_value();
+    }
+
+    void onConnect()
+    {
+        if (m_stopped)
+        {
+            LOG_VERBOSE("seems like connection has been destroyed, exiting");
+            return;
+        }
+
+        if (m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
+            || !m_httpClient.response())
+        {
+            LOG_INFO("onConnect: Http client failed to connect to host");
+            stopInAioThread();
+            return;
+        }
+
+        const int statusCode = m_httpClient.response()->statusLine.statusCode;
+        LOG_VERBOSE("Http client status code: %d", statusCode);
+
+        if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
+        {
+            LOG_INFO("Http client got invalid response code %d", statusCode);
+            stopInAioThread();
+            return;
+        }
+
+        LOG_VERBOSE("HTTP client connected successfully to the %s",
+            config.url.constData());
+
+        auto validationError = websocket::validateResponse(m_httpClient.request(),
+            *m_httpClient.response());
+        if (validationError != websocket::Error::noError)
+        {
+            LOG_INFO("Websocket handshake validation error: %d", validationError);
+            stopInAioThread();
+            return;
+        }
+
+        LOG_VERBOSE("Websocket handshake response validated successfully");
+        LOG_INFO("successfully connected, starting reading");
+
+        m_websocket.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
+            websocket::FrameType::text));
+        m_websocket->bindToAioThread(m_aioThread);
+
+        m_httpClient.pleaseStopSync();
+
+        m_websocket->start();
+        m_websocket->readSomeAsync(&m_readBuffer,
+            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
+            { onRead(errorCode, bytesRead); });
     }
 
     void onRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
         if (m_stopped)
         {
-            LOG_VERBOSE("onRead: seems like connection has been destroyed, exiting");
+            LOG_VERBOSE("seems like connection has been destroyed, exiting");
             return;
         }
 
         if (errorCode != SystemError::noError)
         {
-            LOG_INFO("onRead: read failed with error code: %d", errorCode);
+            LOG_INFO("read failed with error code: %d", errorCode);
             stopInAioThread();
             return;
         }
 
         if (bytesRead == 0)
         {
-            LOG_INFO("onRead: connection has been closed by remote peer");
+            LOG_INFO("connection has been closed by remote peer");
             stopInAioThread();
             return;
         }
 
-        LOG_VERBOSE("onRead: successfully read message: %s", m_readBuffer.constData());
+        LOG_INFO("got message");
+        LOG_VERBOSE("message content: %s", m_readBuffer.constData());
         m_readBuffer = nx::Buffer();
 
         m_websocket->readSomeAsync(&m_readBuffer,
@@ -206,6 +213,8 @@ public:
 
     void stopAll()
     {
+        LOG_VERBOSE("Stopping all connections");
+
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_stopped)
             return;
@@ -234,40 +243,151 @@ static void connectAndListen()
     websocketConnection->startReading();
 }
 
-void prepareConfig(int argc, const char* argv[])
+static const char* const kProtocolNameOption = "--protocol-name";
+static const char* const kUrlOption = "--url";
+static const char* const kUserNameOption = "--username";
+static const char* const kPasswordOption = "--password";
+static const char* const kServerAddressOption = "--server-address";
+static const char* const kServerPortOption = "--server-port";
+static const char* const kRoleOption = "--role";
+static const char* const kLogLevelOption = "--log-level";
+static const char* const kHelpOption = "--help";
+
+static const char* const kInvalidOptionsMessage = "invalid options, run with --help";
+
+static void printHelp()
 {
-    config.protocolName = "nxp2p";
-    config.url = "ws://127.0.0.1:7001/ec2/transactionBus";
-    config.userName = "admin";
-    config.userPassword = "admin";
-    config.role = Role::client;
-    config.logLevel = verbose;
+    printf("Usage:\n websocket-utility --url <url> --username <username> --password <password>\n");
+    printf("OR\n ");
+    printf("websocket-utility [--server-address <server-address> (default: 0.0.0.0)] " \
+           "--server-port <server-port>\n");
+    printf("Additional options:\n --log-level ['verbose', 'info'(default)]\n "\
+           "--role ['client'(default) 'server']\n " \
+           "--protocol-name <protocol-name>(default: 'nxp2p')\n --help\n");
+}
+
+static void prepareConfig(int argc, const char* argv[])
+{
+    for (int i = 1; i < argc; ++i)
+    {
+        if (strcmp(argv[i], kHelpOption) == 0)
+        {
+            printHelp();
+            exit(EXIT_SUCCESS);
+        }
+
+        if (argv[i][0] != '-' || i == argc - 1)
+        {
+            LOG_INFO("%s", kInvalidOptionsMessage);
+            exit(EXIT_SUCCESS);
+        }
+
+        if (strcmp(argv[i], kProtocolNameOption) == 0)
+            config.protocolName = argv[++i];
+        else if (strcmp(argv[i], kUrlOption) == 0)
+            config.url = argv[++i];
+        else if (strcmp(argv[i], kUserNameOption) == 0)
+            config.userName = argv[++i];
+        else if (strcmp(argv[i], kPasswordOption) == 0)
+            config.userPassword = argv[++i];
+        else if (strcmp(argv[i], kServerAddressOption) == 0)
+            config.serverAddress = argv[++i];
+        else if (strcmp(argv[i], kServerPortOption) == 0)
+            config.serverPort = strtol(argv[++i], nullptr, 10);
+        else if (strcmp(argv[i], kRoleOption) == 0)
+        {
+            if (strcmp(argv[i + 1], "client") == 0)
+                config.role = Role::client;
+            if (strcmp(argv[i + 1], "server") == 0)
+                config.role = Role::server;
+
+            ++i;
+        }
+        else if (strcmp(argv[i], kLogLevelOption) == 0)
+        {
+            if (strcmp(argv[i + 1], "verbose") == 0)
+                config.logLevel = LogLevel::verbose;
+            if (strcmp(argv[i + 1], "info") == 0)
+                config.logLevel = LogLevel::info;
+
+            ++i;
+        }
+    }
+}
+
+static bool validateConfig()
+{
+    switch (config.role)
+    {
+        case Role::client:
+            if (config.url.isEmpty() || config.userName.isEmpty() || config.userPassword.isEmpty())
+            {
+                LOG_INFO("invalid options, run with --help");
+                return false;
+            }
+        return true;
+    case Role::server:
+        if (config.serverAddress.isEmpty() || config.serverPort <= 0
+            || config.protocolName.isEmpty())
+        {
+            LOG_INFO("invalid options, run with --help");
+            return false;
+        }
+        return true;
+    default:
+        return false;
+    }
+
+    return true;
 }
 
 #if defined(_WIN32)
-BOOL ctrlHandler(DWORD fdwCtrlType)
+
+static bool sigHandler(DWORD fdwCtrlType)
 {
-    websocketConnectionsPoolInstance->stopAll();
+    LOG_INFO("received SIGINT, shutting down connections..");
+    std::thread([]() { websocketConnectionsPoolInstance->stopAll(); }).detach();
     return true;
 }
+
+#elif defined(__linux__)
+
+static void sigHandler(int /*signo*/)
+{
+    LOG_INFO("received SIGINT, shutting down connections..");
+    std::thread([]() { websocketConnectionsPoolInstance->stopAll(); }).detach();
+}
+
 #endif // _WIN32
 
 int main(int argc, const char *argv[])
 {
+    prepareConfig(argc, argv);
+    if (!validateConfig())
+        return -1;
+
+    setvbuf(stdout, nullptr, _IONBF, 0);
+
     WebsocketConnectionsPool websocketConnectionsPool;
     websocketConnectionsPoolInstance = &websocketConnectionsPool;
 
     #if defined(_WIN32)
-        if (!SetConsoleCtrlHandler(ctrlHandler, true))
+        if (!SetConsoleCtrlHandler(sigHandler, true))
+        {
+            LOG_INFO("failed to install Ctrl-C handler");
             return -1;
+        }
+    #elif defined(__linux__)
+        if (signal(SIGINT, sigHandler) == SIG_ERR)
+        {
+            LOG_INFO("failed to install Ctrl-C handler");
+            return -1;
+        }
     #endif
 
     auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
-    prepareConfig(argc, argv);
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
-
-    setvbuf(stdout, nullptr, _IONBF, 0);
 
     switch (config.role)
     {
@@ -280,6 +400,7 @@ int main(int argc, const char *argv[])
     }
 
     websocketConnectionsPool.waitAll();
+    LOG_VERBOSE("Exiting...");
 
     return 0;
 }
