@@ -5,25 +5,31 @@ Item
     id: controller
 
     property bool motionSearchMode: false
+    property string motionFilter:
+    {
+        if (!motionSearchMode)
+            return ""
+
+        return d.hasFinishedCustomRoi
+            ? d.getMotionFilter(d.customTopLeftRelative, d.customBottomRightRelative)
+            : d.getMotionFilter(d.defaultTopLeftRelative, d.defaultBottomRightRelative)
+    }
+
+    property int cameraRotation: 0
     property Item viewport: null
 
-    readonly property bool hasCustomRoi:
-        d.customFirstRelativePoint && d.customSecondRelativePoint ? true : false
-
-    readonly property bool drawingRoi:
+    readonly property bool customRoiExists: d.hasFinishedCustomRoi || drawingCustomRoi
+    readonly property bool drawingCustomRoi:
     {
-        if (d.customInitialRelativePoint
-            && d.nearPositions(d.customInitialRelativePoint, d.customFirstRelativePoint))
-        {
-            return true
-        }
-        return false
+        var result = d.customInitialRelative
+            && d.nearPositions(d.customInitialRelative, d.customTopLeftRelative)
+        return result ? true : false
     }
 
     function clearCustomRoi()
     {
-        d.customFirstRelativePoint = undefined
-        d.customSecondRelativePoint = undefined
+        d.customTopLeftRelative = undefined
+        d.customBottomRightRelative = undefined
         updateDefaultRoi()
     }
 
@@ -32,7 +38,7 @@ Item
         if (!viewport)
             return
 
-        if (controller.hasCustomRoi)
+        if (controller.customRoiExists)
         {
             d.defaultTopLeftRelative = undefined
             d.defaultBottomRightRelative = undefined
@@ -41,26 +47,26 @@ Item
 
         var first = viewport.mapToItem(controller, 0, 0)
         var second = viewport.mapToItem(controller, viewport.width, viewport.height)
+        var viewportRect = d.getRectangle(first, second);
+        var cameraRect = Qt.rect(0, 0, width, height);
 
-        var topLeft = Qt.point(Math.min(first.x, second.x), Math.min(first.y, second.y))
-        var bottomRight = Qt.point(Math.max(first.x, second.x), Math.max(first.y, second.y))
-        if (topLeft.x < 0)
-            topLeft.x = 0
-        if (topLeft.y < 0)
-            topLeft.y = 0
-        if (bottomRight.x >= controller.width)
-            bottomRight.x = controller.width - 1
-        if (bottomRight.y >= controller.height)
-            bottomRight.y = controller.height - 1
-
-        d.defaultTopLeftRelative = d.toRelative(topLeft)
-        d.defaultBottomRightRelative = d.toRelative(bottomRight)
+        var rect = d.intersection(viewportRect, cameraRect)
+        if (rect)
+        {
+            d.defaultTopLeftRelative = d.toRelative(Qt.vector2d(rect.left, rect.top))
+            d.defaultBottomRightRelative = d.toRelative(Qt.vector2d(rect.right, rect.bottom))
+        }
+        else
+        {
+            d.defaultTopLeftRelative = undefined
+            d.defaultBottomRightRelative = undefined
+        }
     }
 
     function handleLongPressed()
     {
-        d.customFirstRelativePoint = d.customInitialRelativePoint
-        d.customSecondRelativePoint = d.customInitialRelativePoint
+        d.customTopLeftRelative = d.customInitialRelative
+        d.customBottomRightRelative = d.customInitialRelative
         updateDefaultRoi()
     }
 
@@ -70,33 +76,36 @@ Item
             return // We don't allow to start long tap after fast clicks (double click, for example).
 
         pressFilterTimer.restart()
-        d.customInitialRelativePoint = d.toRelative(pos)
+        d.customInitialRelative = d.toRelative(pos)
         pressAndHoldTimer.restart()
     }
 
     function handleReleased()
     {
-        d.customInitialRelativePoint = undefined
+        var rect = d.getRectangle(d.customTopLeftRelative, d.customBottomRightRelative)
+        d.customTopLeftRelative = Qt.vector2d(rect.left, rect.top)
+        d.customBottomRightRelative = Qt.vector2d(rect.right, rect.bottom)
+        d.customInitialRelative = undefined
         pressAndHoldTimer.stop()
     }
 
     function handleCancelled()
     {
         pressAndHoldTimer.stop()
-        d.customInitialRelativePoint = undefined
+        d.customInitialRelative = undefined
     }
 
     function handlePositionChanged(pos)
     {
-        if (drawingRoi)
-            d.customSecondRelativePoint = d.toRelative(pos)
+        if (drawingCustomRoi)
+            d.customBottomRightRelative = d.toRelative(pos)
         else
             handleCancelled()
     }
 
-    onHasCustomRoiChanged:
+    onCustomRoiExistsChanged:
     {
-        if (hasCustomRoi)
+        if (customRoiExists)
             motionSearchMode = true
     }
 
@@ -106,6 +115,11 @@ Item
             clearCustomRoi()
     }
 
+    onCameraRotationChanged:
+    {
+        updateDefaultRoi()
+    }
+
     Component.onCompleted: updateDefaultRoi()
 
     // Test control. Represents simple preloder for the first point
@@ -113,7 +127,7 @@ Item
     {
         id: tapPreloader
 
-        readonly property vector2d center: d.fromRelative(d.customInitialRelativePoint)
+        readonly property vector2d center: d.fromRelative(d.customInitialRelative)
         x: center.x - width / 2
         y: center.y - height / 2
 
@@ -121,7 +135,7 @@ Item
         border.color: "red"
         radius: width / 2
         color: "transparent"
-        visible: d.customInitialRelativePoint ? true : false
+        visible: d.customInitialRelative ? true : false
         height: width
         width: visible ? 50 : 0
         Behavior on width
@@ -134,40 +148,25 @@ Item
         }
     }
 
-    // Test control. Represents simple ROI
-    Rectangle
+    // Test roi for now.
+    MotionRoi
     {
-        id: roiRectangle
-        border.width: 5
-        border.color: "yellow"
-        color: singlePoint ? "red" : "transparent"
+        id: customRoiMarker
 
-        property vector2d first: d.fromRelative(controller.hasCustomRoi
-            ? d.customFirstRelativePoint
-            : d.defaultTopLeftRelative)
-        property vector2d second: d.fromRelative(controller.hasCustomRoi
-            ? d.customSecondRelativePoint
-            : d.defaultBottomRightRelative)
+        topLeft: d.fromRelative(d.customTopLeftRelative)
+        bottomRight: d.fromRelative(d.customBottomRightRelative)
+        visible: controller.motionSearchMode && controller.customRoiExists
+    }
 
-        x: getCoordinate(first.x, second.x, width)
-        y: getCoordinate(first.y, second.y, height)
+    // TODO: remove me, this is just for tests
+    MotionRoi
+    {
+        id: defaultRoi
 
-        width: getLength(first.x, second.x)
-        height: getLength(first.y, second.y)
-        visible: controller.motionSearchMode
-
-        readonly property bool singlePoint:
-            d.nearPositions(d.customFirstRelativePoint, d.customSecondRelativePoint)
-
-        function getCoordinate(firstValue, secondValue, length)
-        {
-            return singlePoint ? firstValue - length / 2 : Math.min(firstValue, secondValue)
-        }
-
-        function getLength(firstValue, secondValue)
-        {
-            return singlePoint ? 10 : Math.abs(secondValue - firstValue)
-        }
+        topLeft: d.fromRelative(d.defaultTopLeftRelative)
+        bottomRight: d.fromRelative(d.defaultBottomRightRelative)
+        visible: controller.motionSearchMode && d.defaultTopLeftRelative && d.defaultBottomRightRelative
+                 ? true :false
     }
 
     Timer
@@ -188,12 +187,17 @@ Item
     {
         id: d
 
-        property var customInitialRelativePoint
-        property var customFirstRelativePoint
-        property var customSecondRelativePoint
+        property var customInitialRelative
+        property var customTopLeftRelative
+        property var customBottomRightRelative
 
         property var defaultTopLeftRelative
         property var defaultBottomRightRelative
+
+        readonly property bool hasFinishedCustomRoi:
+            !controller.drawingCustomRoi && customTopLeftRelative && customBottomRightRelative
+                ? true
+                : false
 
         function toRelative(absolute)
         {
@@ -211,5 +215,44 @@ Item
         {
             return first && second && first.minus(second).length() < 0.005 ? true : false
         }
+
+        function getMotionFilter(topLeft, bottomRight)
+        {
+            if (!topLeft || !bottomRight)
+                return "";
+
+            var horizontalRange = 43
+            var verticalRange = 31
+
+            var left = Math.floor(topLeft.x * horizontalRange)
+            var right = Math.ceil(bottomRight.x * horizontalRange)
+            var top = Math.floor(topLeft.y * verticalRange)
+            var bottom = Math.ceil(bottomRighr.y * verticalRange)
+
+            return "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
+                .arg(left).arg(top).arg(right - left + 1).arg(bottom - top + 1)
+        }
+
+        function getRectangle(first, second)
+        {
+            var width = Math.abs(second.x - first.x)
+            var height = Math.abs(second.y - first.y)
+            var x = Math.min(first.x, second.x)
+            var y = Math.min(first.y, second.y)
+            return Qt.rect(x, y, width, height)
+        }
+
+        function intersection(first, second)
+        {
+            var left = Math.max(first.left, second.left)
+            var right = Math.min(first.right, second.right)
+            var bottom = Math.min(first.bottom, second.bottom)
+            var top = Math.max(first.top, second.top)
+
+            return left < right && top < bottom
+                ? Qt.rect(left, top, right - left, bottom - top)
+                : undefined
+        }
     }
 }
+
