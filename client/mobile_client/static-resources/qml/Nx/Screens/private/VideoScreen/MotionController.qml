@@ -82,9 +82,13 @@ Item
 
     function handleReleased()
     {
-        var rect = d.getRectangle(d.customTopLeftRelative, d.customBottomRightRelative)
-        d.customTopLeftRelative = Qt.vector2d(rect.left, rect.top)
-        d.customBottomRightRelative = Qt.vector2d(rect.right, rect.bottom)
+        if (d.customTopLeftRelative && d.customBottomRightRelative)
+        {
+            var rect = d.getRectangle(d.customTopLeftRelative, d.customBottomRightRelative)
+            d.customTopLeftRelative = Qt.vector2d(rect.left, rect.top)
+            d.customBottomRightRelative = Qt.vector2d(rect.right, rect.bottom)
+        }
+
         d.customInitialRelative = undefined
         pressAndHoldTimer.stop()
     }
@@ -227,7 +231,7 @@ Item
             var left = Math.floor(topLeft.x * horizontalRange)
             var right = Math.ceil(bottomRight.x * horizontalRange)
             var top = Math.floor(topLeft.y * verticalRange)
-            var bottom = Math.ceil(bottomRighr.y * verticalRange)
+            var bottom = Math.ceil(bottomRight.y * verticalRange)
 
             return "[[{\"x\": %1, \"y\": %2, \"width\": %3, \"height\": %4}]]"
                 .arg(left).arg(top).arg(right - left + 1).arg(bottom - top + 1)
