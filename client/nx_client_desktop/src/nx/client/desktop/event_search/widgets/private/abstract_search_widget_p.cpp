@@ -508,11 +508,17 @@ void AbstractSearchWidget::Private::setupAreaSelection()
             ui->areaSelectionButton->deactivate();
         });
 
-    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this,
+    const auto handleStateChanged =
         [this](SelectableTextButton::State state)
         {
             setWholeArea(state == SelectableTextButton::State::deactivated);
-        });
+            ui->areaSelectionButton->setToolTip(m_wholeArea
+                ? tr("Select some area on video to use it as a filter")
+                : QString());
+        };
+
+    connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this, handleStateChanged);
+    handleStateChanged(ui->areaSelectionButton->state());
 
     connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
         [this](bool wholeArea)
