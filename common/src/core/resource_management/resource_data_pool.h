@@ -32,7 +32,9 @@ public:
     bool validateData(const QByteArray& data) const;
     bool loadFile(const QString &fileName);
     bool loadData(const QByteArray& data);
-
+    void clear();
+signals:
+    void changed();
 private:
     bool loadInternal(const QString &fileName);
 private:

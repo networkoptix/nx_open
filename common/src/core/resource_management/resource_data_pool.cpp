@@ -159,11 +159,23 @@ bool QnResourceDataPool::loadData(const QByteArray& data)
     if(!validateDataInternal(data, map, chunks))
         return false;
 
-    QnMutexLocker lock(&m_mutex);
-    m_cachedResultByKey.clear();
-    for(const QnResourceDataPoolChunk &chunk: chunks)
-        for(const QString &key: chunk.keys)
-            m_dataByKey[key.toLower()].add(chunk.data);
-
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_cachedResultByKey.clear();
+        for(const QnResourceDataPoolChunk &chunk: chunks)
+            for(const QString &key: chunk.keys)
+                m_dataByKey[key.toLower()].add(chunk.data);
+    }
+    emit changed();
     return true;
+}
+
+void QnResourceDataPool::clear()
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_cachedResultByKey.clear();
+        m_dataByKey.clear();
+    }
+    emit changed();
 }

@@ -357,6 +357,8 @@ public:
     void setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities);
 
     QnResourceData resourceData() const;
+
+    virtual void setCommonModule(QnCommonModule* commonModule) override;
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
