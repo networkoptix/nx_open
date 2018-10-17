@@ -2,6 +2,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx/vms/discovery/manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2 {
 
