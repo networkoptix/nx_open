@@ -53,7 +53,7 @@ def _json_default(o):
     return str(o)
 
 
-_encoder = json.JSONEncoder(default=_json_default)
+_json_encoder = json.JSONEncoder(default=_json_default)
 
 
 class _ElasticsearchClient(object):
@@ -79,7 +79,7 @@ class _ElasticsearchClient(object):
 
     @staticmethod
     def _make_chunk(data):
-        bare = _encoder.encode(data).encode('ascii')
+        bare = _json_encoder.encode(data).encode('ascii')
         return str(len(bare)).encode('ascii') + b'\r\n' + bare + b'\r\n'
 
     def _make_payload(self, static_data, items_iter):
@@ -89,7 +89,7 @@ class _ElasticsearchClient(object):
             data = item.copy()
             data.update(static_data)
             data.update(self.run_data)
-            payload.extend(_encoder.encode(data))
+            payload.extend(_json_encoder.encode(data))
             payload.extend(b'\n')
         return payload
 
@@ -192,7 +192,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
             if field not in ('args', 'msg', 'created', 'msec', 'asctime')}
         data['ts'] = datetime.datetime.fromtimestamp(record.created, tz=self._tz),
         data.update(self._static)
-        payload = _encoder.encode(data).encode('ascii')
+        payload = _json_encoder.encode(data).encode('ascii')
         # In HTTP 1.1 Connection: keep-alive is the default.
         request = bytearray()
         request.extend('POST {}/_doc HTTP/1.1\r\n'.format(self._index).encode('ascii'))
