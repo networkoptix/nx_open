@@ -106,7 +106,7 @@
         <h2>Review</h2>
     </div>
     <h1 style="text-align: center">Review for {{ original.customization }}</h1>
-    <form target="" enctype="multipart/form-data" method="post">
+    <form action="" enctype="multipart/form-data" method="post" novalidate>
         {% csrf_token %}
         <input name="version_id" value="{{ version.id }}" hidden/>
         <input name="review_id" value="{{ original.id }}" hidden/>
