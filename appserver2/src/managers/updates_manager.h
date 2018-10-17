@@ -69,7 +69,6 @@ namespace ec2 {
         params.data = data;
         params.offset = offset;
 
-        using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdate, params,
             [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });
@@ -87,7 +86,6 @@ namespace ec2 {
         params.updateId = updateId;
         params.chunks = chunks;
 
-        using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdateResponce, params,
             [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });

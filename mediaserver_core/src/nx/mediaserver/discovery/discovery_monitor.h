@@ -10,11 +10,11 @@ namespace discovery {
 
 nx::vms::api::DiscoveredServerDataList getServers(nx::vms::discovery::Manager* manager);
 
-class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
+class DiscoveryMonitor: public QObject, public QnCommonModuleAware
 {
 public:
-    QnDiscoveryMonitor(ec2::TransactionMessageBusAdapter* messageBus);
-    virtual ~QnDiscoveryMonitor();
+    DiscoveryMonitor(ec2::TransactionMessageBusAdapter* messageBus);
+    virtual ~DiscoveryMonitor();
 
 private:
     void clientFound(QnUuid peerId, nx::vms::api::PeerType peerType);

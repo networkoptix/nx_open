@@ -123,14 +123,13 @@ int EventRulesManager<T>::sendEventAction(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::execAction,
         actionData,
         [handler, reqID](ec2::ErrorCode errorCode)
-    {
-        handler->done(reqID, errorCode);
-    });
+        {
+            handler->done(reqID, errorCode);
+        });
     return reqID;
 }
 
@@ -141,7 +140,6 @@ int EventRulesManager<T>::resetBusinessRules(impl::SimpleHandlerPtr handler)
     nx::vms::api::ResetEventRulesData params;
     // providing event rules set from the client side is rather incorrect way of reset.
 
-    using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::resetEventRules,
         params,
