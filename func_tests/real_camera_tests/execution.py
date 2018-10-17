@@ -41,9 +41,12 @@ class CameraStagesExecutor(object):
         self._all_stage_steps = self._make_all_stage_steps(server)
         self._start_time = None
         self._duration = None
-        _logger.info(
-            'Camera %s(%s) is added with %s stage(s) and %s warning(s)',
-            self.name, self.id, len(self._stage_executors), len(self._warnings))
+        _logger.info('New %s', self)
+
+    def __repr__(self):
+        return '<{type_name} for {name}({id}) with {stages} stages, {warnings} warnings>'.format(
+            type_name=type(self).__name__, stages=len(self._stage_executors),
+            warnings=len(self._warnings), **self.__dict__)
 
     def execute(self):  # types: () -> bool
         """ :returns True if all stages are finished, False otherwise (retry is required).
