@@ -69,37 +69,61 @@ public:
         m_httpClient.bindToAioThread(aioThread);
     }
 
-    using CompletionHandler = nx::utils::MoveOnlyFunc<void(const WebsocketConnectionPtr&)>;
-    void connectAsync(const nx::Buffer& url, const nx::Buffer& protocol,
-        CompletionHandler onConnect)
+    void startReading(const nx::Buffer& url, const nx::Buffer& protocol)
     {
         http::HttpHeaders websocketHeaders;
         websocket::addClientHeaders(&websocketHeaders, protocol);
 
         LOG_VERBOSE("Connecting to %s", url.constData());
         m_httpClient.doGet(url,
-            [self = shared_from_this(), this]()
+            [self = shared_from_this(), this, url]()
             {
                 if (m_stopped)
+                {
+                    LOG_VERBOSE("onConnect: seems like connection has been destroyed, exiting");
                     return;
+                }
 
                 if (self->m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
                     || !m_httpClient.response())
                 {
-                    LOG_INFO("Http client failed to connect to host");
+                    LOG_INFO("onConnect: Http client failed to connect to host");
                     stopInAioThread();
                     return;
                 }
 
                 const int statusCode = m_httpClient.response()->statusLine.statusCode;
-                LOG_VERBOSE("Http client status code: %d", statusCode);
+                LOG_VERBOSE("onConnect: Http client status code: %d", statusCode);
 
                 if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
                 {
-                    LOG_INFO("Http client got invalid response code %d", statusCode);
+                    LOG_INFO("onConnect: Http client got invalid response code %d", statusCode);
                     stopInAioThread();
                     return;
                 }
+
+                LOG_VERBOSE("onConnect: HTTP client connected successfully to the %s", url.constData());
+
+                auto validationError = websocket::validateResponse(m_httpClient.request(),
+                    *m_httpClient.response());
+                if (validationError != websocket::Error::noError)
+                {
+                    LOG_INFO("onConnect: Websocket handshake validation error: %d", validationError);
+                    stopInAioThread();
+                    return;
+                }
+
+                LOG_VERBOSE("onConnect: Websocket handshake response validated successfully");
+                m_websocket.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
+                    websocket::FrameType::text));
+                m_websocket->bindToAioThread(m_aioThread);
+
+                m_httpClient.pleaseStopSync();
+
+                m_websocket->start();
+                m_websocket->readSomeAsync(&m_readBuffer,
+                    [self, this](SystemError::ErrorCode errorCode, size_t bytesRead)
+                    { onRead(errorCode, bytesRead); });
             });
     }
 
@@ -120,11 +144,42 @@ private:
     bool m_stopped = false;
     nx::utils::promise<void> m_readyPromise;
     nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
+    nx::Buffer m_readBuffer;
 
     void stopInAioThread()
     {
         m_stopped = true;
         m_readyPromise.set_value();
+    }
+
+    void onRead(SystemError::ErrorCode errorCode, size_t bytesRead)
+    {
+        if (m_stopped)
+        {
+            LOG_VERBOSE("onRead: seems like connection has been destroyed, exiting");
+            return;
+        }
+
+        if (errorCode != SystemError::noError)
+        {
+            LOG_INFO("onRead: read failed with error code: %d", errorCode);
+            stopInAioThread();
+            return;
+        }
+
+        if (bytesRead == 0)
+        {
+            LOG_INFO("onRead: connection has been closed by remote peer");
+            stopInAioThread();
+            return;
+        }
+
+        LOG_VERBOSE("onRead: successfully read message: %s", m_readBuffer.constData());
+        m_readBuffer = nx::Buffer();
+
+        m_websocket->readSomeAsync(&m_readBuffer,
+            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
+            { onRead(errorCode, bytesRead); });
     }
 };
 
@@ -167,15 +222,11 @@ private:
     std::set<WebsocketConnectionPtr> m_connections;
 };
 
-static void onConnect(WebsocketConnectionPtr websocketConnection)
-{
-}
-
 static void connectAndListen()
 {
     auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread);
     websocketConnectionsPoolInstance->addConnection(websocketConnection);
-    websocketConnection->connectAsync(config.url, config.protocolName, onConnect);
+    websocketConnection->startReading(config.url, config.protocolName);
 }
 
 void prepareConfig(int argc, const char* argv[])
@@ -208,55 +259,4 @@ int main(int argc, const char *argv[])
     websocketConnectionsPool.waitAll();
 
     return 0;
-    //nx::utils::promise<void> readyPromise;
-    //auto readyFuture = readyPromise.get_future();
-
-    //http::AsyncClient httpClient;
-    //http::HttpHeaders headers;
-    //websocket::addClientHeaders(&headers, "nxp2p");
-    //httpClient.setAdditionalHeaders(headers);
-
-    //httpClient.doGet("http://admin:admin@127.0.0.1:7001/ec2/transactionBus",
-    //    [&readyPromise, &httpClient]()
-    //    {
-    //        if (httpClient.state() == nx::network::http::AsyncClient::State::sFailed
-    //            || !httpClient.response())
-    //        {
-    //            std::cout << "http client failed" << std::endl;
-    //            readyPromise.set_value();
-    //            return;
-    //        }
-
-    //        const int statusCode = m_httpClient->response()->statusLine.statusCode;
-
-    //        NX_VERBOSE(this, lit("%1. statusCode = %2").arg(Q_FUNC_INFO).arg(statusCode));
-
-    //        if (statusCode == nx::network::http::StatusCode::unauthorized)
-    //        {
-    //            // try next credential source
-    //            m_credentialsSource = (CredentialsSource)((int)m_credentialsSource + 1);
-    //            if (m_credentialsSource < CredentialsSource::none)
-    //            {
-    //                using namespace std::placeholders;
-    //                fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
-    //                m_httpClient->doGet(
-    //                    m_httpClient->url(),
-    //                    std::bind(&ConnectionBase::onHttpClientDone, this));
-    //            }
-    //            else
-    //            {
-    //                cancelConnecting(State::Unauthorized, lm("Unauthorized"));
-    //            }
-    //            return;
-    //        }
-    //        else if (!nx::network::http::StatusCode::isSuccessCode(statusCode)) //< Checking that statusCode is 2xx.
-    //        {
-    //            cancelConnecting(State::Error, lm("Not success HTTP status code %1").arg(statusCode));
-    //            return;
-    //        }
-    //    });
-
-    //websocket::WebSocket webSocket;
-
-    //readyPromise.wait();
 }
