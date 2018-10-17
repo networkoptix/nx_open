@@ -54,6 +54,7 @@
 #include <streaming/audio_streamer_pool.h>
 #include <media_server_process_aux.h>
 #include <nx/mediaserver/command_line_parameters.h>
+#include <nx/mediaserver/discovery/discovery_monitor.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -260,7 +261,7 @@ private:
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 
-    std::unique_ptr<ec2::QnDiscoveryMonitor> m_discoveryMonitor;
+    std::unique_ptr<nx::mediaserver::discovery::QnDiscoveryMonitor> m_discoveryMonitor;
     ec2::AbstractECConnectionPtr m_ec2Connection;
     std::unique_ptr<QnMulticast::HttpServer> m_multicastHttp;
     std::unique_ptr<nx::mediaserver_core::recorder::RemoteArchiveSynchronizer> m_remoteArchiveSynchronizer;

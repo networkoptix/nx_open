@@ -8,7 +8,6 @@
 #include <ec2_thread_pool.h>
 
 #include <transaction/transaction.h>
-#include <transaction/message_bus_adapter.h>
 
 namespace ec2 {
 
@@ -105,16 +104,15 @@ int EventRulesManager<T>::broadcastEventAction(
     const nx::vms::api::EventActionData& actionData,
     impl::SimpleHandlerPtr handler)
 {
-    QnTransaction<nx::vms::api::EventActionData> tran(
-        ApiCommand::broadcastAction,
-        m_messageBus->commonModule()->moduleGUID(),
-        actionData);
-    m_messageBus->sendTransaction(tran);
-
     const int reqID = generateRequestID();
-    nx::utils::concurrent::run(
-        Ec2ThreadPool::instance(),
-        std::bind(&impl::SimpleHandler::done, handler, reqID, ErrorCode::ok));
+    using namespace std::placeholders;
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::broadcastAction,
+        actionData,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
     return reqID;
 }
 
@@ -124,16 +122,15 @@ int EventRulesManager<T>::sendEventAction(
     const QnUuid& dstPeer,
     impl::SimpleHandlerPtr handler)
 {
-    QnTransaction<nx::vms::api::EventActionData> tran(
-        ApiCommand::execAction,
-        m_messageBus->commonModule()->moduleGUID(),
-        actionData);
-    m_messageBus->sendTransaction(tran);
-
     const int reqID = generateRequestID();
-    nx::utils::concurrent::run(
-        Ec2ThreadPool::instance(),
-        std::bind(&impl::SimpleHandler::done, handler, reqID, ErrorCode::ok));
+    using namespace std::placeholders;
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::execAction,
+        actionData,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
     return reqID;
 }
 

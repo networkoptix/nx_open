@@ -4121,7 +4121,7 @@ void MediaServerProcess::run()
     if (!connectToDatabase())
         return;
 
-    m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+    m_discoveryMonitor = std::make_unique<nx::mediaserver::discovery::QnDiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
     initializeAnalyticsEvents();
