@@ -12,7 +12,7 @@ struct QnResourceDataPoolChunk {
     QnResourceData data;
 };
 
-bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPoolChunk *target) {
+static bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPoolChunk *target) {
     QJsonObject map;
     if(!QJson::deserialize(ctx, value, &map))
         return false;
@@ -25,6 +25,26 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPool
     return true;
 }
 
+static bool validateDataInternal(
+    const QByteArray& data,
+    QJsonObject& map,
+    QList<QnResourceDataPoolChunk>& chunks)
+{
+    if (data.isEmpty())
+        return false; /* Read error. */
+
+    if (!QJson::deserialize(data, &map))
+        return false;
+
+    QString version;
+    if (!QJson::deserialize(map, lit("version"), &version) || version != lit("1.0"))
+        return false;
+
+    if (!QJson::deserialize(map, lit("data"), &chunks))
+        return false;
+
+    return true;
+}
 
 QnResourceDataPool::QnResourceDataPool(QObject *parent):
     QObject(parent)
@@ -123,21 +143,20 @@ bool QnResourceDataPool::loadInternal(const QString &fileName)
     return loadData(file.readAll());
 }
 
+bool QnResourceDataPool::validateData(const QByteArray& data) const
+{
+    QJsonObject map;
+    QList<QnResourceDataPoolChunk> chunks;
+    return validateDataInternal(data, map, chunks);
+}
+
 bool QnResourceDataPool::loadData(const QByteArray& data)
 {
-    if(data.isEmpty())
-        return false; /* Read error. */
-
     QJsonObject map;
-    if(!QJson::deserialize(data, &map))
-        return false;
-
-    QString version;
-    if(!QJson::deserialize(map, lit("version"), &version) || version != lit("1.0"))
-        return false;
-
     QList<QnResourceDataPoolChunk> chunks;
-    if(!QJson::deserialize(map, lit("data"), &chunks))
+    bool result = false;
+
+    if(!validateDataInternal(data, map, chunks))
         return false;
 
     QnMutexLocker lock(&m_mutex);
