@@ -39,9 +39,11 @@ Item
             return
         }
 
-        var topLeft = viewport.mapToItem(controller, 0, 0)
-        var bottomRight = viewport.mapToItem(controller, viewport.width, viewport.height)
+        var first = viewport.mapToItem(controller, 0, 0)
+        var second = viewport.mapToItem(controller, viewport.width, viewport.height)
 
+        var topLeft = Qt.point(Math.min(first.x, second.x), Math.min(first.y, second.y))
+        var bottomRight = Qt.point(Math.max(first.x, second.x), Math.max(first.y, second.y))
         if (topLeft.x < 0)
             topLeft.x = 0
         if (topLeft.y < 0)
@@ -92,6 +94,12 @@ Item
             handleCancelled()
     }
 
+    onHasCustomRoiChanged:
+    {
+        if (hasCustomRoi)
+            motionSearchMode = true
+    }
+
     Component.onCompleted: updateDefaultRoi()
 
     // Test control. Represents simple preloder for the first point
@@ -140,6 +148,7 @@ Item
 
         width: getLength(first.x, second.x)
         height: getLength(first.y, second.y)
+        visible: controller.motionSearchMode
 
         readonly property bool singlePoint:
             d.nearPositions(d.customFirstRelativePoint, d.customSecondRelativePoint)
