@@ -1,3 +1,10 @@
+"""pytest plugin that allows logging to Elasticsearch and uploading bulk logs.
+
+Logging from Python is performed via `_ElasticsearchLoggingHandler`.
+
+For bulk upload, use get `_ElasticsearchClient` object and call `bulk_upload` method.
+"""
+
 import collections
 import contextlib
 import datetime
