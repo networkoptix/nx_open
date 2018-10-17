@@ -69,10 +69,6 @@ class NotAFile(Exception):
     pass
 
 
-class DirIsAFile(Exception):
-    pass
-
-
 class AlreadyAcquired(Exception):
     pass
 

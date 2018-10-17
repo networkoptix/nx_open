@@ -42,7 +42,6 @@ _reraising_existing_file_errors = _reraising({
 _reraising_existing_dir_errors = _reraising({
     ENOENT: exceptions.DoesNotExist,
     EEXIST: exceptions.AlreadyExists,
-    EISDIR: exceptions.DirIsAFile,
     })
 
 
