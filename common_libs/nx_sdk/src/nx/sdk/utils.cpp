@@ -37,8 +37,8 @@ bool Utils::fillAndOutputSettingsMap(
         NX_OUTPUT << indentStr << "{";
         for (int i = 0; i < count; ++i)
         {
-            NX_OUTPUT << indentStr << "    " << nx::kit::debug::toString(settings[i].name)
-                << ": " << nx::kit::debug::toString(settings[i].value)
+            NX_OUTPUT << indentStr << "    " << nx::kit::debug::toString(settings->key(i))
+                << ": " << nx::kit::debug::toString(settings->value(i))
                 << ((i < count - 1) ? "," : "");
         }
         NX_OUTPUT << indentStr << "}";

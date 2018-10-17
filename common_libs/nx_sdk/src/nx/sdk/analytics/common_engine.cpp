@@ -115,7 +115,7 @@ void CommonEngine::executeAction(Action* action, Error* outError)
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
     if (!utils.fillAndOutputSettingsMap(
-        &params, action->params(), action->paramCount(), "params", /*outputIndent*/ 4))
+        &params, action->params(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
         *outError = Error::unknownError;

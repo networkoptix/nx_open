@@ -3,6 +3,7 @@
 #include <map>
 
 #include <nx/sdk/settings.h>
+#include <plugins/plugin_tools.h>
 
 namespace nx {
 namespace sdk {
