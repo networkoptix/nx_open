@@ -69,10 +69,6 @@ class NotAFile(Exception):
     pass
 
 
-class FileIsADir(Exception):
-    pass
-
-
 class DirIsAFile(Exception):
     pass
 
