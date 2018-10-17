@@ -105,8 +105,11 @@ EventPanel::Private::Private(EventPanel* q):
     connect(m_tabs, &QTabWidget::currentChanged, this,
         [this, extraContent]() { this->q->navigator()->setSelectedExtraContent(extraContent()); });
 
+    connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
+        [this]() { emit currentMediaWidgetAboutToBeChanged({}); });
+
     connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
-        this, &Private::handleCurrentMediaWidgetChanged, Qt::QueuedConnection);
+        this, &Private::handleCurrentMediaWidgetChanged);
 }
 
 EventPanel::Private::~Private()
@@ -202,8 +205,6 @@ void EventPanel::Private::handleCurrentMediaWidgetChanged()
 {
     const auto signalGuard = utils::makeScopeGuard(
         [this]() { emit currentMediaWidgetChanged({}); });
-
-    emit currentMediaWidgetAboutToBeChanged({});
 
     m_currentMediaWidget = qobject_cast<QnMediaResourceWidget*>(q->navigator()->currentWidget());
     if (!m_currentMediaWidget)
