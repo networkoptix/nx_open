@@ -100,6 +100,12 @@ Item
             motionSearchMode = true
     }
 
+    onMotionSearchModeChanged:
+    {
+        if (!motionSearchMode)
+            clearCustomRoi()
+    }
+
     Component.onCompleted: updateDefaultRoi()
 
     // Test control. Represents simple preloder for the first point
