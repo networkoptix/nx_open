@@ -11,65 +11,52 @@
 
 namespace nx::client::desktop {
 
+namespace {
+
+AnalyticsSearchListModel* analyticsModel(AnalyticsSearchWidget* widget)
+{
+    const auto result = qobject_cast<AnalyticsSearchListModel*>(widget->model());
+    NX_CRITICAL(result);
+    return result;
+}
+
+} // namespace
+
 AnalyticsSearchWidget::AnalyticsSearchWidget(QnWorkbenchContext* context, QWidget* parent):
     base_type(context, new AnalyticsSearchListModel(context), parent)
 {
     setRelevantControls(Control::defaults | Control::areaSelector | Control::footersToggler);
     setPlaceholderPixmap(qnSkin->pixmap("events/placeholders/analytics.png"));
 
-    const auto updateChunksFilter =
-        [this]()
-        {
-            if (!isVisible())
-            {
-                if (navigator()->selectedExtraContent() == Qn::AnalyticsContent)
-                    navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
-                return;
-            }
+    installEventHandler(this, {QEvent::Show, QEvent::Hide},
+        this, &AnalyticsSearchWidget::updateTimelineDisplay);
 
-            const auto currentCamera = navigator()->currentResource()
-                .dynamicCast<QnVirtualCameraResource>();
-
-            const bool relevant = currentCamera && cameras().contains(currentCamera);
-            if (!relevant)
-            {
-                navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
-                return;
-            }
-
-            analytics::storage::Filter filter;
-            filter.deviceIds = {currentCamera->getId()};
-            filter.boundingBox = selectedArea();
-            filter.freeText = textFilter();
-            navigator()->setAnalyticsFilter(filter);
-            navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
-        };
-
-    installEventHandler(this, {QEvent::Show, QEvent::Hide}, this, updateChunksFilter);
-
-    connect(this, &AbstractSearchWidget::cameraSetChanged, updateChunksFilter);
-    connect(this, &AbstractSearchWidget::selectedAreaChanged, updateChunksFilter);
+    connect(this, &AbstractSearchWidget::cameraSetChanged,
+        this, &AnalyticsSearchWidget::updateTimelineDisplay);
 
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
-        this, updateChunksFilter);
+        this, &AnalyticsSearchWidget::updateTimelineDisplay);
 
     connect(this, &AbstractSearchWidget::textFilterChanged,
-        [this, updateChunksFilter](const QString& text)
+        [this](const QString& text)
         {
-            auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model());
-            NX_CRITICAL(analyticsModel);
-            analyticsModel->setFilterText(text);
-            updateChunksFilter();
+            analyticsModel(this)->setFilterText(text);
+            updateTimelineDisplay();
         });
 
-    connect(this, &AbstractSearchWidget::selectedAreaChanged,
-        [this, updateChunksFilter](const QRectF& area)
+    connect(this, &AbstractSearchWidget::selectedAreaChanged, this,
+        [this](bool wholeArea)
         {
-            auto analyticsModel = qobject_cast<AnalyticsSearchListModel*>(model());
-            NX_CRITICAL(analyticsModel);
-            analyticsModel->setFilterRect(area);
-            updateChunksFilter();
+            if (wholeArea)
+                setFilterRect({});
         });
+}
+
+void AnalyticsSearchWidget::setFilterRect(const QRectF& value)
+{
+    analyticsModel(this)->setFilterRect(value);
+    setWholeArea(value.isEmpty());
+    updateTimelineDisplay();
 }
 
 QString AnalyticsSearchWidget::placeholderText(bool constrained) const
@@ -80,6 +67,33 @@ QString AnalyticsSearchWidget::placeholderText(bool constrained) const
 QString AnalyticsSearchWidget::itemCounterText(int count) const
 {
     return tr("%n objects", "", count);
+}
+
+void AnalyticsSearchWidget::updateTimelineDisplay()
+{
+    if (!isVisible())
+    {
+        if (navigator()->selectedExtraContent() == Qn::AnalyticsContent)
+            navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
+        return;
+    }
+
+    const auto currentCamera = navigator()->currentResource()
+        .dynamicCast<QnVirtualCameraResource>();
+
+    const bool relevant = currentCamera && cameras().contains(currentCamera);
+    if (!relevant)
+    {
+        navigator()->setSelectedExtraContent(Qn::RecordingContent /*means none*/);
+        return;
+    }
+
+    analytics::storage::Filter filter;
+    filter.deviceIds = {currentCamera->getId()};
+    filter.boundingBox = analyticsModel(this)->filterRect();
+    filter.freeText = textFilter();
+    navigator()->setAnalyticsFilter(filter);
+    navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
 }
 
 } // namespace nx::client::desktop

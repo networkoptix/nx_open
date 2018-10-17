@@ -51,9 +51,12 @@ public:
 
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
+    void setSingleCameraMode(bool value);
 
     QString textFilter() const;
-    QRectF selectedArea() const;
+
+    bool wholeArea() const;
+    void setWholeArea(bool value);
 
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
@@ -63,12 +66,6 @@ public:
 
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
-
-    Period previousPeriod() const;
-    Cameras previousCameras() const;
-
-    QAction* timeSelectionAction(Period period) const;
-    QAction* cameraSelectionAction(Cameras cameras) const;
 
 private:
     void setupModels();
@@ -85,8 +82,6 @@ private:
 
     void updateCurrentCameras();
     void setSelectedCameras(Cameras value);
-
-    void setSelectedArea(const QRectF& value);
 
     void setFetchDirection(AbstractSearchListModel::FetchDirection value);
     void tryFetchMore();
@@ -115,7 +110,7 @@ private:
     Cameras m_cameras = Cameras::all;
     QnTimePeriod m_currentTimePeriod = QnTimePeriod::anytime();
     QnVirtualCameraResourceSet m_currentCameras;
-    QRectF m_selectedArea;
+    bool m_wholeArea = true;
 
     Period m_previousPeriod = Period::all;
     QHash<Period, QAction*> m_timeSelectionActions;

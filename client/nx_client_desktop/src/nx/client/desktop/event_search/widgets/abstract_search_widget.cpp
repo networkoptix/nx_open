@@ -64,14 +64,14 @@ QnVirtualCameraResourceSet AbstractSearchWidget::cameras() const
     return d->cameras();
 }
 
+void AbstractSearchWidget::setSingleCameraMode(bool value)
+{
+    d->setSingleCameraMode(value);
+}
+
 QString AbstractSearchWidget::textFilter() const
 {
     return d->textFilter();
-}
-
-QRectF AbstractSearchWidget::selectedArea() const
-{
-    return d->selectedArea();
 }
 
 void AbstractSearchWidget::resetFilters()
@@ -103,24 +103,14 @@ void AbstractSearchWidget::addDeviceDependentAction(
     d->addDeviceDependentAction(action, mixedString, cameraString);
 }
 
-AbstractSearchWidget::Period AbstractSearchWidget::previousPeriod() const
+bool AbstractSearchWidget::wholeArea() const
 {
-    return d->previousPeriod();
+    return d->wholeArea();
 }
 
-AbstractSearchWidget::Cameras AbstractSearchWidget::previousCameras() const
+void AbstractSearchWidget::setWholeArea(bool value)
 {
-    return d->previousCameras();
-}
-
-QAction* AbstractSearchWidget::timeSelectionAction(Period period) const
-{
-    return d->timeSelectionAction(period);
-}
-
-QAction* AbstractSearchWidget::cameraSelectionAction(Cameras cameras) const
-{
-    return d->cameraSelectionAction(cameras);
+    d->setWholeArea(value);
 }
 
 } // namespace nx::client::desktop

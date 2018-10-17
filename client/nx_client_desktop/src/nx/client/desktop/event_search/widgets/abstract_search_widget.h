@@ -84,8 +84,11 @@ public:
     Cameras selectedCameras() const;
     QnVirtualCameraResourceSet cameras() const;
 
+    /** Temporarily set Cameras::current mode, or restore previous mode. */
+    void setSingleCameraMode(bool value);
+
     QString textFilter() const;
-    QRectF selectedArea() const;
+    bool wholeArea() const;
 
     /**
      * Resets all filters to their default state.
@@ -102,7 +105,7 @@ signals:
 
     void textFilterChanged(const QString& value);
     void timePeriodChanged(const QnTimePeriod& value);
-    void selectedAreaChanged(const QRectF& value);
+    void selectedAreaChanged(bool wholeArea); //< Area was reset to whole.
 
 protected:
     /** Sets an icon for no data placeholder. */
@@ -114,6 +117,9 @@ protected:
     /** Creates a child menu with dropdown appearance. */
     QMenu* createDropdownMenu();
 
+    /** Set whether some area on the video is selected in external selection tool. */
+    void setWholeArea(bool value);
+
     /**
      * Adds specified action to the list of device dependent actions.
      * When connection state becomes "Ready" (initial resources are received) all device dependent
@@ -122,18 +128,6 @@ protected:
      */
     void addDeviceDependentAction(
         QAction* action, const QString& mixedString, const QString& cameraString);
-
-    /** Previously selected time period type. */
-    Period previousPeriod() const;
-
-    /** Previously selected camera set type. */
-    Cameras previousCameras() const;
-
-    /** An action to select specified time period type. */
-    QAction* timeSelectionAction(Period period) const;
-
-    /** An action to select specified camera set type. */
-    QAction* cameraSelectionAction(Cameras cameras) const;
 
 private:
     /**

@@ -12,6 +12,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/palette.h>
+#include <ui/common/read_only.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
@@ -489,11 +490,13 @@ void AbstractSearchWidget::Private::setupCameraSelection()
 
 void AbstractSearchWidget::Private::setupAreaSelection()
 {
-    ui->areaSelectionButton->setSelectable(true);
+    ui->areaSelectionButton->setSelectable(false);
     ui->areaSelectionButton->setDeactivatable(true);
     ui->areaSelectionButton->setAccented(true);
+    ui->areaSelectionButton->setText(tr("In selected area"));
     ui->areaSelectionButton->setDeactivatedText(tr("Anywhere on the video"));
     ui->areaSelectionButton->setIcon(qnSkin->icon("text_buttons/area.png"));
+    setReadOnly(ui->areaSelectionButton, true);
 
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
         [this]()
@@ -508,25 +511,16 @@ void AbstractSearchWidget::Private::setupAreaSelection()
     connect(ui->areaSelectionButton, &SelectableTextButton::stateChanged, this,
         [this](SelectableTextButton::State state)
         {
-            if (state == SelectableTextButton::State::selected)
-                ui->areaSelectionButton->setText(tr("Select some area on video"));
-            else if (state == SelectableTextButton::State::unselected)
-                ui->areaSelectionButton->setText(tr("In selected area"));
-            else
-                setSelectedArea({});
+            setWholeArea(state == SelectableTextButton::State::deactivated);
         });
 
     connect(q, &AbstractSearchWidget::selectedAreaChanged, this,
-        [this](const QRectF& value)
+        [this](bool wholeArea)
         {
-            if (value.isValid())
-                ui->areaSelectionButton->setState(SelectableTextButton::State::unselected);
-            else if (ui->areaSelectionButton->state() != SelectableTextButton::State::deactivated)
-                ui->areaSelectionButton->setState(SelectableTextButton::State::selected);
+            ui->areaSelectionButton->setState(wholeArea
+                ? SelectableTextButton::State::deactivated
+                : SelectableTextButton::State::unselected);
         });
-
-    // TODO: #vkutin Implement unified area selector on QnMediaResourceWidget
-    // and add bi-directional connection with it here.
 }
 
 AbstractSearchListModel* AbstractSearchWidget::Private::model() const
@@ -640,6 +634,18 @@ AbstractSearchWidget::Cameras AbstractSearchWidget::Private::selectedCameras() c
     return m_cameras;
 }
 
+void AbstractSearchWidget::Private::setSingleCameraMode(bool value)
+{
+    const bool currentlyEnabled = m_cameras == Cameras::current;
+    if (currentlyEnabled == value)
+        return;
+
+    const auto action = m_cameraSelectionActions.value(value ? Cameras::current : m_previousCameras);
+    NX_ASSERT(action);
+    if (action)
+        action->trigger();
+}
+
 void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
 {
     if (value == m_cameras)
@@ -650,13 +656,18 @@ void AbstractSearchWidget::Private::setSelectedCameras(Cameras value)
     updateCurrentCameras();
 }
 
-void AbstractSearchWidget::Private::setSelectedArea(const QRectF& value)
+bool AbstractSearchWidget::Private::wholeArea() const
 {
-    if (qFuzzyEquals(m_selectedArea, value))
+    return ui->areaSelectionButton->state() == SelectableTextButton::State::deactivated;
+}
+
+void AbstractSearchWidget::Private::setWholeArea(bool value)
+{
+    if (m_wholeArea == value)
         return;
 
-    m_selectedArea = value;
-    emit q->selectedAreaChanged(m_selectedArea);
+    m_wholeArea = value;
+    emit q->selectedAreaChanged(m_wholeArea);
 }
 
 QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
@@ -667,11 +678,6 @@ QnVirtualCameraResourceSet AbstractSearchWidget::Private::cameras() const
 QString AbstractSearchWidget::Private::textFilter() const
 {
     return m_textFilterEdit->text();
-}
-
-QRectF AbstractSearchWidget::Private::selectedArea() const
-{
-    return m_selectedArea;
 }
 
 void AbstractSearchWidget::Private::setPlaceholderPixmap(const QPixmap& value)
@@ -770,26 +776,6 @@ void AbstractSearchWidget::Private::updateDeviceDependentActions()
                 q->resourcePool(), item.mixedString, item.cameraString));
         }
     }
-}
-
-AbstractSearchWidget::Period AbstractSearchWidget::Private::previousPeriod() const
-{
-    return m_previousPeriod;
-}
-
-AbstractSearchWidget::Cameras AbstractSearchWidget::Private::previousCameras() const
-{
-    return m_previousCameras;
-}
-
-QAction* AbstractSearchWidget::Private::timeSelectionAction(Period period) const
-{
-    return m_timeSelectionActions.value(period);
-}
-
-QAction* AbstractSearchWidget::Private::cameraSelectionAction(Cameras cameras) const
-{
-    return m_cameraSelectionActions.value(cameras);
 }
 
 void AbstractSearchWidget::Private::updateRibbonLiveMode()

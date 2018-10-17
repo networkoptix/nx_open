@@ -65,6 +65,9 @@ private:
 
     class BookmarkSearchSynchronizer;
     const QScopedPointer<BookmarkSearchSynchronizer> m_bookmarkSearchSynchronizer;
+
+    class AnalyticsSearchSynchronizer;
+    const QScopedPointer<AnalyticsSearchSynchronizer> m_analyticsSearchSynchronizer;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -79,6 +82,7 @@ public:
 private:
     void handleCurrentWidgetAboutToBeChanged();
     void handleCurrentWidgetChanged();
+    void handleMotionSelectionChanged();
 
     void updateState();
     void syncWidgetWithPanel();
@@ -98,9 +102,31 @@ private:
 
 private:
     EventPanel::Private* const m_main;
-    State m_state;
+    State m_state = State::irrelevant;
     bool m_updating = false;
     QWidget* m_revertTab = nullptr;
+};
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::AnalyticsSearchSynchronizer
+
+class EventPanel::Private::AnalyticsSearchSynchronizer: public QObject
+{
+public:
+    AnalyticsSearchSynchronizer(EventPanel::Private* main);
+    void reset();
+
+private:
+    void handleCurrentWidgetAboutToBeChanged();
+    void handleCurrentWidgetChanged();
+    void handleAnalyticsSelectionChanged();
+
+    void syncWidgetWithPanel();
+    bool analyticsAreaSelection() const; //< Whether analytics area selection mode is required.
+    void setWidgetAnalyticsSelectionEnabled(bool value);
+
+private:
+    EventPanel::Private* const m_main;
 };
 
 // ------------------------------------------------------------------------------------------------

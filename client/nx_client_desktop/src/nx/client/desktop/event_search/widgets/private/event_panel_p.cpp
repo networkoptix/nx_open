@@ -45,7 +45,8 @@ EventPanel::Private::Private(EventPanel* q):
     m_eventsTab(new EventSearchWidget(q->context(), m_tabs)),
     m_analyticsTab(new AnalyticsSearchWidget(q->context(), m_tabs)),
     m_motionSearchSynchronizer(new MotionSearchSynchronizer(this)),
-    m_bookmarkSearchSynchronizer(new BookmarkSearchSynchronizer(this))
+    m_bookmarkSearchSynchronizer(new BookmarkSearchSynchronizer(this)),
+    m_analyticsSearchSynchronizer(new AnalyticsSearchSynchronizer(this))
 {
     auto layout = new QVBoxLayout(q);
     layout->setContentsMargins(QMargins());
@@ -90,21 +91,6 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
 
-    const auto extraContent =
-        [this]()
-        {
-            if (m_tabs->currentWidget() == m_motionTab)
-                return Qn::MotionContent;
-
-            if (m_tabs->currentWidget() == m_analyticsTab)
-                return Qn::AnalyticsContent;
-
-            return Qn::RecordingContent;
-        };
-
-    connect(m_tabs, &QTabWidget::currentChanged, this,
-        [this, extraContent]() { this->q->navigator()->setSelectedExtraContent(extraContent()); });
-
     connect(q->navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, this,
         [this]() { emit currentMediaWidgetAboutToBeChanged({}); });
 
@@ -122,6 +108,7 @@ void EventPanel::Private::rebuildTabs()
     m_tabs->clear();
     m_motionSearchSynchronizer->reset();
     m_bookmarkSearchSynchronizer->reset();
+    m_analyticsSearchSynchronizer->reset();
 
     const auto updateTab =
         [this](QWidget* tab, bool condition, const QIcon& icon, const QString& text)
@@ -231,6 +218,13 @@ EventPanel::Private::MotionSearchSynchronizer::MotionSearchSynchronizer(EventPan
 
     connect(m_main->m_tabs, &QTabWidget::currentChanged,
         this, &MotionSearchSynchronizer::updateState);
+
+    connect(m_main->m_motionTab, &AbstractSearchWidget::selectedAreaChanged, this,
+        [this](bool wholeArea)
+        {
+            if (wholeArea && widget())
+                widget()->clearMotionSelection();
+        });
 }
 
 void EventPanel::Private::MotionSearchSynchronizer::reset()
@@ -258,6 +252,9 @@ void EventPanel::Private::MotionSearchSynchronizer::handleCurrentWidgetChanged()
     connect(widget(), &QnMediaResourceWidget::motionSearchModeEnabled,
         this, &MotionSearchSynchronizer::syncPanelWithWidget);
 
+    connect(widget(), &QnMediaResourceWidget::motionSelectionChanged,
+        this, &MotionSearchSynchronizer::handleMotionSelectionChanged);
+
     // If Right Panel is in current camera motion search mode,
     // enable Motion Search for newly selected media widget.
     if (m_state == State::syncedMotion)
@@ -266,6 +263,11 @@ void EventPanel::Private::MotionSearchSynchronizer::handleCurrentWidgetChanged()
     // switch Right Panel into current camera motion search mode.
     else if (widget()->isMotionSearchModeEnabled())
         syncPanelWithWidget();
+}
+
+void EventPanel::Private::MotionSearchSynchronizer::handleMotionSelectionChanged()
+{
+    m_main->m_motionTab->setFilterArea(widget() ? widget()->motionSelection() : QList<QRegion>());
 }
 
 void EventPanel::Private::MotionSearchSynchronizer::updateState()
@@ -311,11 +313,12 @@ void EventPanel::Private::MotionSearchSynchronizer::syncPanelWithWidget()
     const bool on = widget()->isMotionSearchModeEnabled();
     const bool fromOtherTab = m_state == State::irrelevant;
 
-    m_main->m_motionTab->setCurrentMotionSearchEnabled(on);
+    m_main->m_motionTab->setSingleCameraMode(on);
     if (on)
     {
         m_revertTab = fromOtherTab ? m_main->m_tabs->currentWidget() : nullptr;
         m_main->m_tabs->setCurrentWidget(m_main->m_motionTab);
+        handleMotionSelectionChanged();
     }
     else
     {
@@ -371,6 +374,88 @@ void EventPanel::Private::BookmarkSearchSynchronizer::reset()
     m_lastTab = nullptr;
     m_revertTab = nullptr;
     m_main->q->context()->action(ui::action::BookmarksModeAction)->setChecked(false);
+}
+
+// ------------------------------------------------------------------------------------------------
+// EventPanel::Private::AnalyticsSearchSynchronizer
+
+EventPanel::Private::AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
+    EventPanel::Private* main)
+    :
+    m_main(main)
+{
+    connect(m_main, &Private::currentMediaWidgetAboutToBeChanged,
+        this, &AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged);
+
+    connect(m_main, &Private::currentMediaWidgetChanged,
+        this, &AnalyticsSearchSynchronizer::handleCurrentWidgetChanged);
+
+    connect(m_main->m_analyticsTab, &AbstractSearchWidget::cameraSetChanged,
+        this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+
+    connect(m_main->m_tabs, &QTabWidget::currentChanged,
+        this, &AnalyticsSearchSynchronizer::syncWidgetWithPanel);
+
+    connect(m_main->m_analyticsTab, &AbstractSearchWidget::selectedAreaChanged, this,
+        [this](bool wholeArea)
+        {
+            if (wholeArea && m_main->m_currentMediaWidget)
+                m_main->m_currentMediaWidget->setAnalyticsSelection({});
+        });
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::reset()
+{
+    setWidgetAnalyticsSelectionEnabled(false);
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetAboutToBeChanged()
+{
+    if (!m_main->m_currentMediaWidget)
+        return;
+
+    m_main->m_currentMediaWidget->disconnect(this);
+    setWidgetAnalyticsSelectionEnabled(false);
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::handleCurrentWidgetChanged()
+{
+    if (!m_main->m_currentMediaWidget)
+        return;
+
+    connect(m_main->m_currentMediaWidget.data(), &QnMediaResourceWidget::analyticsSelectionChanged,
+        this, &AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged);
+
+    syncWidgetWithPanel();
+    handleAnalyticsSelectionChanged();
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::handleAnalyticsSelectionChanged()
+{
+    if (!analyticsAreaSelection())
+        return;
+
+    m_main->m_analyticsTab->setFilterRect(m_main->m_currentMediaWidget
+        ? m_main->m_currentMediaWidget->analyticsSelection()
+        : QRectF());
+}
+
+bool EventPanel::Private::AnalyticsSearchSynchronizer::analyticsAreaSelection() const
+{
+    return m_main->m_tabs->currentWidget() == m_main->m_analyticsTab
+        && m_main->m_analyticsTab->selectedCameras() == AbstractSearchWidget::Cameras::current;
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::setWidgetAnalyticsSelectionEnabled(
+    bool value)
+{
+    if (m_main->m_currentMediaWidget)
+        m_main->m_currentMediaWidget->setAnalyticsSelectionEnabled(value);
+}
+
+void EventPanel::Private::AnalyticsSearchSynchronizer::syncWidgetWithPanel()
+{
+    setWidgetAnalyticsSelectionEnabled(analyticsAreaSelection());
 }
 
 } // namespace nx::client::desktop
