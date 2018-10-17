@@ -26,8 +26,8 @@ Key adaptPassword(const char* password)
 
     const size_t passLength = std::max((size_t) 1, strlen(password));
     Key key = kPasswordSalt;
-    for (size_t i = 0; i < std::max(passLength, kKeySize); i++)
-        key[i % kKeySize] = password[i % passLength] ^ key[i % kKeySize];
+    for (size_t i = 0; i < passLength; i++)
+        key[i % kKeySize] ^= password[i] ^ (char) (i & 0xFF); 
     return key;
 }
 

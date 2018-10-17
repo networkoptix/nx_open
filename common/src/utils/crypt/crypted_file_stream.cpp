@@ -281,7 +281,7 @@ void CryptedFileStream::createHeader()
     m_header = Header();
 
     m_header.salt = getRandomSalt();
-    m_key = xorKeys(m_passwordKey, m_header.salt);
+    m_key = getKeyHash(xorKeys(m_passwordKey, m_header.salt));
     m_header.keyHash = getKeyHash(m_key);
 
     writeHeader();
@@ -299,7 +299,7 @@ bool CryptedFileStream::readHeader()
     if (m_header.minReadVersion > kCryptoStreamVersion) //< The file is too new.
         return false;
 
-    m_key = xorKeys(m_passwordKey, m_header.salt);
+    m_key = getKeyHash(xorKeys(m_passwordKey, m_header.salt));
 
     return getKeyHash(m_key) == m_header.keyHash;
 }
