@@ -201,8 +201,6 @@ void QnWorkbench::setCurrentLayoutIndex(int index) {
 
 void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
 {
-    qDebug() << "setCurrentLayout" << (layout ? layout->name() : "NULL");
-
     if(layout == NULL)
         layout = m_dummyLayout;
 
