@@ -59,18 +59,24 @@ void* DeviceAgent::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting *settings, int count)
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
-    NX_OUTPUT << __func__ << " Received DeviceAgent settings:";
+    NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
+
+    const auto count = settings->count();
     for (int i = 0; i < count; ++i)
     {
-        NX_OUTPUT << "    \"" << settings[i].name
-            << "\": \"" << settings[i].value << "\""
+        NX_OUTPUT << "    " << settings->key(i)
+            << ": " << settings->value(i)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
+}
 
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)

@@ -87,19 +87,25 @@ void* Engine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Engine::setSettings(const nxpl::Setting *settings, int count)
+void Engine::setSettings(const nx::sdk::Settings* settings)
 {
     NX_OUTPUT << __func__ << " Received " << m_plugin->name() << " settings:";
     NX_OUTPUT << "{";
+
+    const auto count = settings->count();
     for (int i = 0; i < count; ++i)
     {
-        NX_OUTPUT << "    " << settings[i].name
-            << ": " << settings[i].value
+        NX_OUTPUT << "    " << settings->key(i)
+            << ": " << settings->value(i)
             << ((i < count - 1) ? "," : "");
     }
     NX_OUTPUT << "}";
 }
 
+nx::sdk::Settings* Engine::settings() const
+{
+    return nullptr;
+}
 
 const char* Engine::manifest(Error* error) const
 {

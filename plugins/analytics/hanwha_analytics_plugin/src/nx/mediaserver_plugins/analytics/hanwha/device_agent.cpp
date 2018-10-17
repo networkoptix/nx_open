@@ -54,9 +54,14 @@ nx::sdk::Error DeviceAgent::setMetadataHandler(MetadataHandler* metadataHandler)
     return Error::noError;
 }
 
-void DeviceAgent::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+void DeviceAgent::setSettings(const nx::sdk::Settings* settings)
 {
     // There are no DeviceAgent settings for this plugin.
+}
+
+nx::sdk::Settings* DeviceAgent::settings() const
+{
+    return nullptr;
 }
 
 Error DeviceAgent::startFetchingMetadata(const char* const* /*typeList*/, int /*typeListSize*/)

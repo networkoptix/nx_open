@@ -71,12 +71,17 @@ void* CommonEngine::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void CommonEngine::setSettings(const nxpl::Setting* settings, int count)
+void CommonEngine::setSettings(const nx::sdk::Settings* settings)
 {
-    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, count, "Received settings"))
+    if (!utils.fillAndOutputSettingsMap(&m_settings, settings, "Received settings"))
         return; //< The error is already logged.
 
     settingsChanged();
+}
+
+nx::sdk::Settings* CommonEngine::settings() const
+{
+    return nullptr;
 }
 
 const char* CommonEngine::manifest(Error* /*error*/) const

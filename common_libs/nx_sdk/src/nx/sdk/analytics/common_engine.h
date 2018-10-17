@@ -5,6 +5,7 @@
 
 #include <plugins/plugin_tools.h>
 #include <nx/sdk/utils.h>
+#include <nx/sdk/settings.h>
 #include <nx/sdk/analytics/engine.h>
 #include <nx/sdk/analytics/objects_metadata_packet.h>
 
@@ -98,7 +99,8 @@ public:
 
 public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual nx::sdk::Settings* settings() const override;
     virtual const char* manifest(Error* error) const override;
     void freeManifest(const char* data) override;
 

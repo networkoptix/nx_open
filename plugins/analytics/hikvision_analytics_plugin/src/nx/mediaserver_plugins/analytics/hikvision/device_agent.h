@@ -48,7 +48,8 @@ public:
     void setDeviceInfo(const nx::sdk::DeviceInfo& deviceInfo);
     void setDeviceAgentManifest(const QByteArray& manifest);
     void setEngineManifest(const Hikvision::EngineManifest& manifest);
-    void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+    virtual nx::sdk::Settings* settings() const override;
 
 private:
     Engine* const m_engine;

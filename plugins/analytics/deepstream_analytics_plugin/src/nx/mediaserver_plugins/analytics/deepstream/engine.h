@@ -29,7 +29,9 @@ public:
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override;
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
     virtual const char* manifest(nx::sdk::Error* error) const override;
 

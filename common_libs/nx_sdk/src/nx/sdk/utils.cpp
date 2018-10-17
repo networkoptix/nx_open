@@ -3,26 +3,24 @@
 #define NX_DEBUG_ENABLE_OUTPUT (this->enableOutput)
 #define NX_PRINT_PREFIX (this->printPrefix)
 #include <nx/kit/debug.h>
+#include <nx/sdk/settings.h>
 
 namespace nx {
 namespace sdk {
 
 bool Utils::fillAndOutputSettingsMap(
-    std::map<std::string, std::string>* map, const nxpl::Setting* settings, int count,
-    const std::string& caption, int outputIndent) const
+    std::map<std::string, std::string>* map,
+    const nx::sdk::Settings* settings,
+    const std::string& caption,
+    int outputIndent) const
 {
-    if (count > 0 && settings == nullptr)
+    if (!settings)
     {
-        NX_PRINT << "ERROR: " << caption << ": ptr is null and count is " << count;
+        NX_PRINT << "ERROR: settings is null";
         return false;
     }
 
-    if (count == 0 && settings != nullptr)
-    {
-        NX_PRINT << "ERROR: " << caption << ": ptr is not null and count is 0";
-        return false;
-    }
-
+    const auto count = settings->count();
     if (count < 0)
     {
         NX_PRINT << "ERROR: " << caption << ": count is " << count;
@@ -47,7 +45,7 @@ bool Utils::fillAndOutputSettingsMap(
     }
 
     for (int i = 0; i < count; ++i)
-        (*map)[settings[i].name] = settings[i].value;
+        (*map)[settings->key(i)] = settings->value(i);
 
     return true;
 }

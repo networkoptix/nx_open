@@ -47,7 +47,9 @@ public:
 
     void setMonitor(MetadataMonitor* monitor);
 
-    virtual void setSettings(const nxpl::Setting* settings, int count) override;
+    virtual void setSettings(const nx::sdk::Settings* settings) override;
+
+    virtual nx::sdk::Settings* settings() const override;
 
 private:
     Engine* const m_engine;
