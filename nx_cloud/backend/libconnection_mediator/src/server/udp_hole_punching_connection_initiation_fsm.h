@@ -23,7 +23,7 @@ namespace conf { class Settings; }
 class AbstractRelayClusterClient;
 
 /**
- * @note Object can be safely freed while in onFsmFinishedEventHandler handler.
+ * NOTE: Object can be safely freed while in onFsmFinishedEventHandler handler.
  *     Otherwise, one has to stop it with QnStoppableAsync::pleaseStop
  */
 class UDPHolePunchingConnectionInitiationFsm:
@@ -33,7 +33,7 @@ class UDPHolePunchingConnectionInitiationFsm:
 
 public:
     /**
-     * @note onFsmFinishedEventHandler is allowed to free
+     * NOTE: onFsmFinishedEventHandler is allowed to free
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
     UDPHolePunchingConnectionInitiationFsm(
@@ -42,6 +42,7 @@ public:
         std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
         const conf::Settings& settings,
         AbstractRelayClusterClient* const relayClusterClient);
+
     virtual ~UDPHolePunchingConnectionInitiationFsm() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -50,10 +51,12 @@ public:
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
+
     void onConnectionResultRequest(
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
@@ -138,6 +141,7 @@ private:
     void sendConnectResponse(
         api::ResultCode resultCode,
         api::ConnectResponse connectResponse);
+    
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
@@ -151,6 +155,7 @@ private:
     static const char* toString(State);
 
     UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&) = delete;
+    
     UDPHolePunchingConnectionInitiationFsm&
         operator=(UDPHolePunchingConnectionInitiationFsm&&) = delete;
 };
