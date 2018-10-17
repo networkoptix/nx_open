@@ -41,8 +41,7 @@ private:
         const RequestContext& requestContext) override;
 
     virtual network::http::RequestResult processOpenTunnelRequest(
-        const network::http::Request& request,
-        network::http::Response* response,
+        const RequestContext& requestContext,
         ApplicationData... requestData) override;
 };
 
@@ -123,8 +122,7 @@ StatusCode::Value ConnectionUpgradeTunnelServer<ApplicationData...>::validateOpe
 template<typename ...ApplicationData>
 network::http::RequestResult
     ConnectionUpgradeTunnelServer<ApplicationData...>::processOpenTunnelRequest(
-        const network::http::Request& /*request*/,
-        network::http::Response* /*response*/,
+        const RequestContext& /*requestContext*/,
         ApplicationData... requestData)
 {
     RequestResult requestResult(StatusCode::switchingProtocols);

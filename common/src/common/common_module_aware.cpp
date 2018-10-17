@@ -166,3 +166,9 @@ nx::network::http::ClientPool* QnCommonModuleAware::httpClientPool() const
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->httpClientPool() : nullptr;
 }
+
+QnResourceDataPool* QnCommonModuleAware::dataPool() const
+{
+    NX_ASSERT(m_initialized);
+    return m_commonModule ? m_commonModule->dataPool() : nullptr;
+}

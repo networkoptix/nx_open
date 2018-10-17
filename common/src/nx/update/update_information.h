@@ -57,7 +57,9 @@ enum class InformationError
     brokenPackageError,
     missingPackageError,
     incompatibleCloudHostError,
-    notFoundError
+    incompatibleVersion,
+    notFoundError,
+    noNewVersion,
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(InformationError, (lexical))

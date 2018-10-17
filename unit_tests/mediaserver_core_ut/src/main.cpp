@@ -1,7 +1,6 @@
 #include <QtCore>
 
 #include <nx/network/test_support/run_test.h>
-#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 #include <test_support/utils.h>
 #include <common/static_common_module.h>
@@ -13,7 +12,8 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
     auto parser = std::make_unique<QCommandLineParser>();
     parser->addOptions({ {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
                        {"ftp-storage-url", "Ftp storage url"},
-                       {"smb-storage-url", "Smb storage url"} });
+                       {"smb-storage-url", "Smb storage url"},
+                       {"enable-discovery", "Enable discovery"}});
     parser->addHelpOption();
     parser->parse(arguments);
 
@@ -26,6 +26,8 @@ std::unique_ptr<QCommandLineParser> fillConfig(const QStringList& arguments)
         nx::ut::cfg::configInstance().ftpUrl = parser->value("ftp-storage-url");
     if (parser->isSet("smb-storage-url"))
         nx::ut::cfg::configInstance().smbUrl = parser->value("smb-storage-url");
+
+    nx::ut::cfg::configInstance().enableDiscovery = parser->isSet("enable-discovery");
 
     return parser;
 }

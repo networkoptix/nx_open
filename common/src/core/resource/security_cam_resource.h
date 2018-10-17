@@ -22,6 +22,8 @@
 #include <core/resource/media_stream_capability.h>
 #include <core/dataprovider/live_stream_params.h>
 #include <core/ptz/ptz_preset.h>
+#include "resource_data.h"
+
 class QnAbstractArchiveDelegate;
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
@@ -354,6 +356,7 @@ public:
 
     void setPtzCapabilitiesAddedByUser(Ptz::Capabilities capabilities);
 
+    QnResourceData resourceData() const;
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();

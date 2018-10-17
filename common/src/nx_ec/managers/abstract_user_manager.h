@@ -5,7 +5,7 @@
 #include <nx_ec/impl/sync_handler.h>
 
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/user_data_ex.h>
 #include <nx/vms/api/data/user_role_data.h>
 
 namespace ec2 {

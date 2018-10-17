@@ -726,7 +726,7 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         system = 1 << 3,
         removable = 1 << 4,
         beingChecked = 1 << 5,
-        beingRebuilded = 1 << 6
+        beingRebuilt = 1 << 6
     };
     Q_DECLARE_FLAGS(StorageStatuses, StorageStatus)
     Q_DECLARE_OPERATORS_FOR_FLAGS(StorageStatuses)

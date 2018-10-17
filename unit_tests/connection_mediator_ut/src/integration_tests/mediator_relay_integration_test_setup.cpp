@@ -183,7 +183,7 @@ void MediatorRelayIntegrationTestSetup::assertTrafficRelayUrlHasBeenReported()
     }
 }
 
-boost::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRelayUrl()
+std::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRelayUrl()
 {
     if (m_listenResponse)
         return m_listenResponse->trafficRelayUrl;
@@ -191,10 +191,10 @@ boost::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRe
     if (m_connectResponse)
         return m_connectResponse->trafficRelayUrl;
 
-    return boost::none;
+    return std::nullopt;
 }
 
-boost::optional<api::SystemCredentials> MediatorRelayIntegrationTestSetup::getSystemCredentials() const
+std::optional<api::SystemCredentials> MediatorRelayIntegrationTestSetup::getSystemCredentials() const
 {
     return m_systemCredentials;
 }

@@ -56,7 +56,6 @@ public:
             nx::network::url::Builder().setScheme("stun")
                 .setEndpoint(mediator().stunTcpEndpoint()),
             mediator().stunUdpEndpoint());
-        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     const hpm::MediatorFunctionalTest& mediator() const

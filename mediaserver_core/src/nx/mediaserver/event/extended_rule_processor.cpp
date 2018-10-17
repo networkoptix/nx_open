@@ -96,8 +96,8 @@ static const QString tpSystemName(lit("systemName"));
 static const QString tpSystemSignature(lit("systemSignature"));
 static const QString tpImageMimeType(lit("image/png"));
 static const QString tpScreenshotFilename(lit("screenshot"));
-static const QString tpScreenshot(lit("screenshot.jpeg"));
-static const QString tpScreenshotNum(lit("screenshot%1.jpeg"));
+static const QString tpScreenshotAttachmentName(lit("screenshot_%1.jpeg"));
+static const QString tpScreenshotWithNumAttachmentName(lit("screenshot_%1_%2.jpeg"));
 
 static const QString tpProductName(lit("productName"));
 static const QString tpEvent(lit("event"));
@@ -805,6 +805,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     const vms::event::AggregationInfo &aggregationInfo,
     EmailManagerImpl::AttachmentList& attachments) const
 {
+    const auto currentMsecSinceEpoch = qnSyncTime->currentMSecsSinceEpoch();
+
     vms::event::EventParameters params = action->getRuntimeParams();
     EventType eventType = params.eventType;
 
@@ -855,13 +857,14 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                     {
                         // Only fresh screenshots are sent.
                         QBuffer screenshotStream(&timestempedFrame.frame);
+                        const auto fileName = tpScreenshotAttachmentName.arg(currentMsecSinceEpoch);
                         attachments.append(
                             EmailManagerImpl::AttachmentPtr(
                                 new EmailManagerImpl::Attachment(
-                                    tpScreenshot,
+                                    fileName,
                                     screenshotStream,
                                     lit("image/jpeg"))));
-                        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                        contextMap[tpScreenshotFilename] = lit("cid:") + fileName;
                     }
                 }
             }
@@ -913,13 +916,14 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
 
                     QBuffer screenshotStream(&screenshotData);
+                    const auto fileName = tpScreenshotAttachmentName.arg(currentMsecSinceEpoch);
                     attachments.append(
                         EmailManagerImpl::AttachmentPtr(
                             new EmailManagerImpl::Attachment(
-                                tpScreenshot,
+                                fileName,
                                 screenshotStream,
                                 lit("image/jpeg"))));
-                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                    contextMap[tpScreenshotFilename] = lit("cid:") + fileName;
                 }
             }
 
@@ -956,14 +960,15 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         if (!screenshotData.isNull())
                         {
                             QBuffer screenshotStream(&screenshotData);
+                            const auto fileName = tpScreenshotWithNumAttachmentName
+                                .arg(currentMsecSinceEpoch).arg(screenshotNum++);
                             attachments.append(
                                 EmailManagerImpl::AttachmentPtr(
                                     new EmailManagerImpl::Attachment(
-                                        tpScreenshotNum.arg(screenshotNum),
+                                        fileName,
                                         screenshotStream,
                                         lit("image/jpeg"))));
-                            camera[QLatin1String("screenshot")] =
-                                lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
+                            camera[QLatin1String("screenshot")] = lit("cid:") + fileName;
                         }
 
                         cameras << camera;
@@ -1063,7 +1068,19 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 
         case EventType::cameraInputEvent:
         {
-            detailsMap[tpInputPort] = params.inputPortId;
+            // Try to use port name if possible, otherwise use port ID as is.
+            auto resource = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                params.eventResourceId);
+            NX_ASSERT(resource);
+            auto ports = resource->ioPortDescriptions();
+            auto portIt = std::find_if(ports.begin(), ports.end(),
+                [&](auto port) { return port.id == params.inputPortId; });
+
+            if (portIt != ports.end() && !portIt->inputName.isEmpty())
+                detailsMap[tpInputPort] =
+                    QString("%1 (%2)").arg(params.inputPortId).arg(portIt->inputName);
+            else
+                detailsMap[tpInputPort] = params.inputPortId;
             break;
         }
 

@@ -3067,7 +3067,7 @@ Qn::StorageStatuses QnStorageManager::storageStatusInternal(const QnStorageResou
         return result | Qn::StorageStatus::beingChecked;
 
     if (storage->hasFlags(Qn::storage_fastscan) || storageScanData.path == storage->getUrl())
-        result | Qn::StorageStatus::beingRebuilded;
+        result | Qn::StorageStatus::beingRebuilt;
 
     return result | storage->statusFlag();
 }

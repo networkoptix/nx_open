@@ -32,20 +32,41 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_Help);
 
-    auto updatesWidget = new QnServerUpdatesWidget(this);
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
+
+    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(ui->buttonBox);
+    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
     auto generalWidget = new QnGeneralSystemAdministrationWidget(this);
     auto smtpWidget = new QnSmtpSettingsWidget(this);
     auto routingWidget = new QnRoutingManagementWidget(this);
     addPage(GeneralPage,            generalWidget,                          tr("General"));
     addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
     addPage(SmtpPage,               smtpWidget,                             tr("Email"));
-    addPage(UpdatesPage,            updatesWidget,                          tr("Updates"));
 
-    // This is prototype page for updating many servers in one run
+    // This is prototype page for updating many servers in one run.
     if (nx::client::desktop::ini().massSystemUpdatePrototype)
     {
         auto multiUpdatesWidget = new nx::client::desktop::MultiServerUpdatesWidget(this);
-        addPage(MassUpdatesPage, multiUpdatesWidget, tr("Mass Updates"));
+        addPage(MassUpdatesPage, multiUpdatesWidget, tr("Updates"));
+        safeModeWatcher->addControlledWidget(multiUpdatesWidget,
+            QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+    }
+    else
+    {
+        auto updatesWidget = new QnServerUpdatesWidget(this);
+        addPage(UpdatesPage, updatesWidget, tr("Updates"));
+        safeModeWatcher->addControlledWidget(updatesWidget,
+            QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
+        connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
+            [this](bool readOnly)
+            {
+                setPageEnabled(UpdatesPage, !readOnly);
+            });
+        setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
     }
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
@@ -55,24 +76,11 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     loadDataToUi();
     autoResizePagesToContents(ui->tabWidget,  { QSizePolicy::Preferred, QSizePolicy::Preferred }, false);
 
-    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
-    auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
-
-    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
-    safeModeWatcher->addWarningLabel(ui->buttonBox);
-    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
-
     /* Hiding Apply button, otherwise it will be enabled in the QnGenericTabbedDialog code */
     safeModeWatcher->addControlledWidget(applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Hide);
-    safeModeWatcher->addControlledWidget(updatesWidget, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     safeModeWatcher->addControlledWidget(generalWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(smtpWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(routingWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
-
-    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
-        setPageEnabled(UpdatesPage, !readOnly);
-    });
-    setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
 
     connect(this, &QnGenericTabbedDialog::dialogClosed,
         this, [generalWidget]() { generalWidget->resetWarnings(); });

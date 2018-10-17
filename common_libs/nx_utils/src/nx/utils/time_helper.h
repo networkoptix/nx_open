@@ -43,14 +43,13 @@ protected:
     qint64 lastPrimaryFrameUs();
     bool isLocalTimeChanged();
     qint64 getTimeUsInternal(qint64 cameraTimeUs, bool recursionAllowed);
-    qint64 cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs, bool primaryStream) const;
+    qint64 cameraTimeToLocalTime(qint64 cameraTimeUs, qint64 currentTimeUs) const;
     QString m_resourceId;
 
 private:
     struct CamSyncInfo
     {
         QnMutex mutex;
-        qint64 lastPrimaryFrameUs;
         qint64 timeDiff = DATETIME_INVALID;
     };
 

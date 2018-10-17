@@ -294,9 +294,18 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.getMediaServersAndCameras = function(){
             return this._get('/api/aggregator?exec_cmd=ec2%2FgetMediaServersEx&exec_cmd=ec2%2FgetCamerasEx');
-        }
+        };
         ServerConnection.prototype.getResourceTypes = function(){
             return this._get('/ec2/getResourceTypes');
+        };
+
+        ServerConnection.prototype.getServerMetrics = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/api/metrics');
+        };
+        ServerConnection.prototype.getServerStatistics = function(serverId){
+            var serverConnection = serverId?('/proxy/' + serverId):'';
+            return $http.get(serverConnection + '/web/api/statistics');
         };
         /* End of Cameras and Servers */
 

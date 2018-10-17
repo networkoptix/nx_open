@@ -75,7 +75,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     ui->preferredPtzPresetTypeComboBox->clear();
     combo_box_utils::insertMultipleValuesItem(ui->preferredPtzPresetTypeComboBox);
     ui->preferredPtzPresetTypeComboBox->addItem(tr("Auto", "Automatic PTZ preset type"),
-        QVariant::fromValue(nx::core::ptz::PresetType::automatic));
+        QVariant::fromValue(nx::core::ptz::PresetType::undefined));
     ui->preferredPtzPresetTypeComboBox->addItem(tr("System", "System PTZ preset type"),
         QVariant::fromValue(nx::core::ptz::PresetType::system));
     ui->preferredPtzPresetTypeComboBox->addItem(tr("Native", "Native PTZ preset type"),

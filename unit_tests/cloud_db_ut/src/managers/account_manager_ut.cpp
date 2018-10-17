@@ -127,12 +127,13 @@ protected:
     }
 
     template<typename Duration>
-    bool equalWithError(
+    void assertEqualWithError(
         std::chrono::system_clock::time_point expected,
         std::chrono::system_clock::time_point actual,
         Duration error)
     {
-        return (expected >= actual - error) && (expected <= actual + error);
+        ASSERT_GE(expected, actual - error);
+        ASSERT_LE(expected, actual + error);
     }
 
     void thenProperTemporaryCodeIsCreated()
@@ -141,12 +142,13 @@ protected:
         const auto& tempCredentials = m_tempPasswordManager.registeredCredentials().back();
         ASSERT_EQ(1, tempCredentials.maxUseCount);
 
-        auto curTime = nx::utils::utcTime();
-        ASSERT_TRUE(equalWithError(
+        const auto curTime = nx::utils::utcTime();
+        assertEqualWithError(
             nx::utils::floor<std::chrono::seconds>(m_testStartTime) +
                 m_settings.accountManager().passwordResetCodeExpirationTimeout,
             std::chrono::system_clock::from_time_t(tempCredentials.expirationTimestampUtc),
-            curTime - m_testStartTime));
+            curTime - m_testStartTime + std::chrono::seconds(1));
+        //< 1 second is to compensate round error.
     }
 
 private:

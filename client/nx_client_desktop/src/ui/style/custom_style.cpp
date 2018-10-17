@@ -37,9 +37,8 @@ void resetStyle(QWidget* widget)
     style->polish(widget);
 }
 
-void setWarningStyle(QPalette* palette, qreal disabledOpacity)
+void setCustomStyle(QPalette* palette, const QColor& color, qreal disabledOpacity)
 {
-    const auto color = qnGlobals->errorTextColor();
     palette->setColor(QPalette::ButtonText, color);
     palette->setColor(QPalette::WindowText, color);
     palette->setColor(QPalette::Text, color);
@@ -51,6 +50,11 @@ void setWarningStyle(QPalette* palette, qreal disabledOpacity)
     palette->setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
     palette->setColor(QPalette::Disabled, QPalette::WindowText, disabledColor);
     palette->setColor(QPalette::Disabled, QPalette::Text, disabledColor);
+}
+
+void setWarningStyle(QPalette* palette, qreal disabledOpacity)
+{
+    setCustomStyle(palette, qnGlobals->errorTextColor(), disabledOpacity);
 }
 
 void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)

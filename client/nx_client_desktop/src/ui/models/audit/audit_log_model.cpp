@@ -886,7 +886,7 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
 
             case Qn::AR_CameraInsert:
             case Qn::AR_CameraUpdate:
-                return qnSkin->icon("tree/camera.png");
+                return qnSkin->icon("tree/camera.svg");
 
             default:
                 return QVariant();

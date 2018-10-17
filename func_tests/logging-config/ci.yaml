@@ -9,6 +9,3 @@ loggers:
   SMB.SMBConnection: {level: INFO}
   paramiko.transport: {level: INFO}
   parse: {level: INFO}
-
-root:
-  level: DEBUG  # Default is `WARNING`.

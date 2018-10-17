@@ -50,20 +50,20 @@ struct EndpointAdditionalInfo
 class EndpointInfoHookChain
 {
 public:
-    void registerHook(std::function<void(EndpointAdditionalInfo*)> hook)
+    void registerHook(std::function<void(QnResourceDataPool*, EndpointAdditionalInfo*)> hook)
     {
         m_hookChain.push_back(hook);
     };
-    void applyHooks(EndpointAdditionalInfo* outInfo) const
+    void applyHooks(QnResourceDataPool* dataPool, EndpointAdditionalInfo* outInfo) const
     {
         for (const auto& hook: m_hookChain)
         {
-            hook(outInfo);
+            hook(dataPool, outInfo);
         }
     };
 
 private:
-    std::vector<std::function<void(EndpointAdditionalInfo*)>> m_hookChain;
+    std::vector<std::function<void(QnResourceDataPool*, EndpointAdditionalInfo*)>> m_hookChain;
 };
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
@@ -82,7 +82,9 @@ public:
     QnUuid getOnvifResourceType(const QString& manufacturer, const QString&  model) const;
 
     void pleaseStop();
-    static bool ignoreCamera(const QString& manufacturer, const QString& name);
+    static bool ignoreCamera(
+        QnResourceDataPool* dataPool,
+        const QString& manufacturer, const QString& name);
     static bool isModelSupported(const QString& manufacturer, const QString& modelNamee);
 private:
 
@@ -98,6 +100,7 @@ private:
     static bool isModelContainVendor(const QString& vendor, const QString& model);
 
     static bool needIgnoreCamera(
+        QnResourceDataPool* dataPool,
         const QString& host,
         const QString& manufacturer,
         const QString& model);

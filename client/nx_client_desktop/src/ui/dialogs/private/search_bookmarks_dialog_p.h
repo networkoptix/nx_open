@@ -65,10 +65,11 @@ private:
 
     bool m_allCamerasChoosen;
 
-    QAction * const m_openInNewTabAction;
-    QAction * const m_editBookmarkAction;
-    QAction * const m_exportBookmarkAction;
-    QAction * const m_removeBookmarksAction;
+    QAction* const m_openInNewTabAction;
+    QAction* const m_editBookmarkAction;
+    QAction* const m_exportBookmarkAction;
+    QAction* const m_exportBookmarksAction;
+    QAction* const m_removeBookmarksAction;
     bool m_updatingParametersNow;
 
     const qint64 utcRangeStartMs;

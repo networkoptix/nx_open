@@ -35,24 +35,6 @@ public:
     }
 
 protected:
-    virtual void SetUp() override
-    {
-        mediator().setPreserveEndpointsDuringRestart(false);
-
-        base_type::SetUp();
-
-        auto serverSocket = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
-        ASSERT_TRUE(serverSocket->setNonBlockingMode(true));
-        ASSERT_TRUE(serverSocket->bind(SocketAddress::anyPrivateAddressV4));
-        ASSERT_TRUE(serverSocket->listen());
-
-        m_mediatorTcpEndpoint = serverSocket->getLocalAddress();
-
-        m_streamProxy.startProxy(
-            std::make_unique<StreamServerSocketToAcceptorWrapper>(std::move(serverSocket)),
-            mediator().stunTcpEndpoint());
-    }
-
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
@@ -67,15 +49,14 @@ protected:
     void whenStartMediator()
     {
         ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
-        m_streamProxy.setProxyDestination(mediator().stunTcpEndpoint());
     }
 
     void whenStartGateway()
     {
         // Specifying mediator port to gateway.
-        const auto mediatorEndpointStr = m_mediatorTcpEndpoint.toStdString();
+        const auto mediatorEndpointStr = mediator().stunTcpEndpoint().toStdString();
         m_vmsGateway.addArg("-general/mediatorEndpoint", mediatorEndpointStr.c_str());
+        m_vmsGateway.addArg("--cloudConnect/publicIpAddress=127.0.0.1");
 
         ASSERT_TRUE(m_vmsGateway.startAndWaitUntilStarted());
     }
@@ -106,8 +87,6 @@ protected:
 private:
     nx::cloud::gateway::VmsGatewayFunctionalTest m_vmsGateway;
     const std::string m_vmsGatewayPeerId;
-    network::SocketAddress m_mediatorTcpEndpoint;
-    nx::network::StreamProxy m_streamProxy;
 };
 
 TEST_F(VmsGatewayMediatorIntegration, gateway_reconnects_to_mediator)

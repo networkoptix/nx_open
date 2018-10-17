@@ -1,2 +1,3 @@
 advanced_lens_control
 mediaserver_metrics
+get_time_of_servers_version=2

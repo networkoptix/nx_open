@@ -446,7 +446,7 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
         case nx::vms::api::EventType::cameraMotionEvent:
         case nx::vms::api::EventType::cameraInputEvent:
-            return qnSkin->pixmap(lit("tree/camera.png"));
+            return qnSkin->pixmap(lit("tree/camera.svg"));
 
         case nx::vms::api::EventType::analyticsSdkEvent:
             return QPixmap();

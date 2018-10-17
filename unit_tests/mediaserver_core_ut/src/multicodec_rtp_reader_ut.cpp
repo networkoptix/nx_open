@@ -53,7 +53,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP )
     auth.setPassword( "ptth" );
     resource->setAuth( auth );
 
-    std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader( new QnMulticodecRtpReader( resource ) );
+    std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader( new QnMulticodecRtpReader( resource, nullptr ) );
     rtspStreamReader->setRequest( rtspUrl );
     ASSERT_TRUE( static_cast<bool>(rtspStreamReader->openStream()) );
 
@@ -536,6 +536,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
         std::unique_ptr<QnMulticodecRtpReader> rtspStreamReader(
             new QnMulticodecRtpReader(
                 resource,
+                nullptr,
                 std::make_unique<nx::network::BufferSocket>(testData)) );
         rtspStreamReader->setRequest( rtspUrl );
         ASSERT_TRUE( static_cast<bool>(rtspStreamReader->openStream()) );

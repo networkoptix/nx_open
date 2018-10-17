@@ -103,9 +103,9 @@ def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
         full_info_two = two.api.generic.get('ec2/getFullInfo')
         full_info_one_desc = 'full_info_one_{}'.format(stage)
         full_info_two_desc = 'full_info_two_{}'.format(stage)
-        artifact_factory([full_info_one_desc],
+        artifact_factory.make_artifact([full_info_one_desc],
                          name=full_info_one_desc).save_as_json(full_info_one)
-        artifact_factory([full_info_two_desc],
+        artifact_factory.make_artifact([full_info_two_desc],
                          name=full_info_two_desc).save_as_json(full_info_two)
     return one.api.generic.get('ec2/getFullInfo')
 
@@ -133,9 +133,9 @@ def test_backup_restore(artifact_factory, one, two, camera):
         assert full_info_after_backup_restore == full_info_initial, (
             "Servers ec2/getFullInfo data before and after restoreDatabase are not the same, diff")
     except AssertionError:
-        artifact_factory(['full_info_initial'],
+        artifact_factory.make_artifact(['full_info_initial'],
                          name='full_info_initial').save_as_json(full_info_initial)
-        artifact_factory(['full_info_after_backup_restore'],
+        artifact_factory.make_artifact(['full_info_after_backup_restore'],
                          name='full_info_after_backup_restore').save_as_json(full_info_after_backup_restore)
         raise
 

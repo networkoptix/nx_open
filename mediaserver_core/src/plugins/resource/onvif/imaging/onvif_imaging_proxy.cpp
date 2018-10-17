@@ -219,10 +219,8 @@ bool QnOnvifImagingProxy::makeSetRequest()
         return false;
     }
 
-    QString login = getLogin();
-    QString passwd = getPassword();
-
-    ImagingSoapWrapper soapWrapper(m_timeouts, endpoint.toStdString(), login, passwd, getTimeDrift());
+    ImagingSoapWrapper soapWrapper(m_timeouts, endpoint.toStdString(),
+        login(), password(), timeDrift());
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
     NX_ASSERT(m_values);
@@ -233,8 +231,8 @@ bool QnOnvifImagingProxy::makeSetRequest()
     int soapRes = soapWrapper.setImagingSettings(request, response);
     if (soapRes != SOAP_OK) {
         qWarning() << "QnOnvifImagingProxy::makeSetRequest: can't save imaging options."
-            << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper->getLastError();
+            << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->endpoint() << " failed. GSoap error code: "
+            << soapRes << ". " << m_rangesSoapWrapper->getLastErrorDescription();
         return false;
     }
     return true;
@@ -242,22 +240,22 @@ bool QnOnvifImagingProxy::makeSetRequest()
 
 QString QnOnvifImagingProxy::getImagingUrl() const
 {
-    return m_rangesSoapWrapper->getEndpointUrl();
+    return m_rangesSoapWrapper->endpoint();
 }
 
-QString QnOnvifImagingProxy::getLogin() const
+QString QnOnvifImagingProxy::login() const
 {
-    return m_rangesSoapWrapper->getLogin();
+    return m_rangesSoapWrapper->login();
 }
 
-QString QnOnvifImagingProxy::getPassword() const
+QString QnOnvifImagingProxy::password() const
 {
-    return m_rangesSoapWrapper->getPassword();
+    return m_rangesSoapWrapper->password();
 }
 
-int QnOnvifImagingProxy::getTimeDrift() const
+int QnOnvifImagingProxy::timeDrift() const
 {
-    return m_rangesSoapWrapper->getTimeDrift();
+    return m_rangesSoapWrapper->timeDrift();
 }
 
 CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges() {
@@ -267,9 +265,9 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadRanges() {
     int soapRes = m_rangesSoapWrapper->getOptions(rangesRequest, *m_ranges);
     if (soapRes != SOAP_OK) {
         qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging options."
-            << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper->getLastError();
-        return CameraDiagnostics::RequestFailedResult(lit("getOptions"), m_rangesSoapWrapper->getLastError());
+            << "Reason: SOAP to endpoint " << m_rangesSoapWrapper->endpoint() << " failed. GSoap error code: "
+            << soapRes << ". " << m_rangesSoapWrapper->getLastErrorDescription();
+        return CameraDiagnostics::RequestFailedResult(lit("getOptions"), m_rangesSoapWrapper->getLastErrorDescription());
     }
     return CameraDiagnostics::NoErrorResult();
 }
@@ -281,9 +279,9 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
     int soapRes = m_valsSoapWrapper->getImagingSettings(valsRequest, *m_values);
     if (soapRes != SOAP_OK) {
         qWarning() << "QnOnvifImagingProxy::makeGetRequest: can't fetch imaging settings."
-            << "Reason: SOAP to endpoint " << m_valsSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_valsSoapWrapper->getLastError();
-        return CameraDiagnostics::RequestFailedResult(lit("getImagingSettings"), m_valsSoapWrapper->getLastError());
+            << "Reason: SOAP to endpoint " << m_valsSoapWrapper->endpoint() << " failed. GSoap error code: "
+            << soapRes << ". " << m_valsSoapWrapper->getLastErrorDescription();
+        return CameraDiagnostics::RequestFailedResult(lit("getImagingSettings"), m_valsSoapWrapper->getLastErrorDescription());
     }
 
     for (auto iter = m_supportedOperations.cbegin(); iter != m_supportedOperations.cend(); ++iter) {
@@ -299,7 +297,6 @@ CameraDiagnostics::Result QnOnvifImagingProxy::loadValues(QnCameraAdvancedParamV
 QSet<QString> QnOnvifImagingProxy::supportedParameters() const {
     return m_supportedOperations.keys().toSet();
 }
-
 
 bool QnOnvifImagingProxy::setValue(const QString &id, const QString &value) {
     if (!m_supportedOperations.contains(id))

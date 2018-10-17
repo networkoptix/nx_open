@@ -44,8 +44,8 @@ static const QString kRtspPortNumberTag = lit("rtspPortNo");
 static const QString kPrimaryStreamNumber = lit("01");
 static const QString kSecondaryStreamNumber = lit("02");
 
-static const QString kVbr = lit("VBR");
-static const QString kCbr = lit("CBR");
+static const QString kVariableBitrateValue = lit("VBR");
+static const QString kConstantBitrateValue = lit("CBR");
 
 static const QString kCapabilitiesRequestPathTemplate =
     lit("/ISAPI/Streaming/channels/%1/capabilities");

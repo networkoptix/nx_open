@@ -42,7 +42,7 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
             if (buildOrChangeset.isEmpty())
                 return ValidationResult::kValid;
 
-            return checkPassword(buildOrChangeset, password)
+            return checkPassword(buildOrChangeset.trimmed(), password.trimmed())
                 ? ValidationResult::kValid
                 : ValidationResult(tr("The password is incorrect."));
         });
