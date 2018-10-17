@@ -17,6 +17,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
 #include "acti_resource_searcher.h"
@@ -177,7 +178,8 @@ QByteArray QnActiResource::makeActiRequest(
     QString* const localAddress) const
 {
     QByteArray result;
-    status = makeActiRequest(getUrl(), getAuth(), group, command, keepAllData, &result, localAddress);
+    auto auth = getAuth();
+    status = makeActiRequest(getUrl(), auth, group, command, keepAllData, &result, localAddress);
     return result;
 }
 
@@ -193,23 +195,39 @@ CLHttpStatus QnActiResource::makeActiRequest(
 {
     const nx::utils::log::Tag logTag = typeid(QnActiResource);
 
-    CLSimpleHTTPClient client(url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT),
-        TCP_TIMEOUT, auth);
-    // NOTE: should check here for correct connection? Or just try GET further...?
+    nx::network::http::HttpClient client;
+    client.setAuthType(nx::network::http::AuthType::authDigest);
+    client.setUserName(auth.user());
+    client.setUserPassword(auth.password());
+    // TODO: add timeouts to requests
 
-    QString request = nx::network::url::Builder()
+    const nx::utils::Url requestUrl = nx::network::url::Builder()
+        .setScheme(nx::network::http::kUrlSchemeName)
+        .setHost(url.host())
+        .setPort(nx::network::http::DEFAULT_HTTP_PORT)
         .setPath(kApiRequestPath)
         .appendPath(group)
-        .setQuery(command)
-        .toString();
+        .setQuery(command);
 
-    NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", request);
-    CLHttpStatus status = client.doGET(request);
-    if (status == CL_HTTP_SUCCESS) {
-        if (localAddress)
-            *localAddress = client.localAddress();
+    NX_VERBOSE(logTag, "makeActiRequest: request '%1'.", requestUrl);
+    const bool result = client.doGet(requestUrl);
+    if (!result)  //< It seems that HttpClient will log error by itself.
+        return CL_HTTP_BAD_REQUEST;  // TODO: Try to find better return-value.
+
+    auto messageBodyOptional = client.fetchEntireMessageBody();
+    if (!messageBodyOptional.has_value())
+    {
+        NX_INFO(logTag, "makeActiRequest: Error getting response body.");
         msgBody->clear();
-        client.readAll(*msgBody);
+        return CL_HTTP_BAD_REQUEST; // TODO: Try to find better return-value.
+    }
+    *msgBody = std::move(*messageBodyOptional);
+
+    const auto statusCode = client.response()->statusLine.statusCode;
+    if (nx::network::http::StatusCode::isSuccessCode(statusCode))
+    {
+        if (localAddress)
+            *localAddress = client.socket()->getLocalAddress().address.toString();
 
         // API of camera returns 200 HTTP code on errors, so trying to parse payload here.
         if (msgBody->startsWith("ERROR: bad account."))
@@ -222,7 +240,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
 
     if (!keepAllData)
         *msgBody = unquoteStr(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
-    return status;
+    return CLHttpStatus(statusCode); // TODO: try to change to nx::network::http::StatusCode
 }
 
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -755,9 +773,12 @@ void QnActiResource::startInputPortStatesMonitoring()
             eventStr += lit("&");
         eventStr += lit("EVENT_DI%1='0,0'").arg(i+1);
     }
-    QString localInterfaceAddress;  //determining address of local interface, used to connect to camera
-    QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr, responseStatusCode, false, &localInterfaceAddress);
-    if( responseStatusCode != CL_HTTP_SUCCESS )
+    // TODO: check it
+    // Determining address of local interface used to connect to camera.
+    QString localInterfaceAddress;
+    QByteArray responseMsgBody = makeActiRequest(QLatin1String("encoder"), eventStr,
+        responseStatusCode, false, &localInterfaceAddress);
+    if (responseStatusCode != CL_HTTP_SUCCESS)
         return;
 
     static const int EVENT_HTTP_SERVER_NUMBER = 1;
@@ -776,9 +797,10 @@ void QnActiResource::startInputPortStatesMonitoring()
             //OK: HTTP_SERVER='1,1,192.168.0.101,3451,hz,hzhz,10'\n
     responseMsgBody = makeActiRequest(
         QLatin1String("encoder"),
-        lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER).arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
-        responseStatusCode );
-    if( responseStatusCode != CL_HTTP_SUCCESS )
+        lit("HTTP_SERVER=%1,1,%2,%3,guest,guest,%4").arg(EVENT_HTTP_SERVER_NUMBER)
+            .arg(localInterfaceAddress).arg(actiEventPort).arg(MAX_CONNECTION_TIME_SEC),
+        responseStatusCode);
+    if (responseStatusCode != CL_HTTP_SUCCESS)
         return;
 
     //registering URL commands (one command per input port)
