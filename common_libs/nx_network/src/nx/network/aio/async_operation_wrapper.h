@@ -9,38 +9,10 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "basic_pollable.h"
+#include "detail/data_wrapper.h"
 #include "timer.h"
 
 namespace nx::network::aio {
-
-namespace detail {
-
-class AbstractHolder
-{
-public:
-    virtual ~AbstractHolder() = default;
-};
-
-template<typename Data>
-class Holder:
-    public AbstractHolder
-{
-public:
-    Holder(Data data):
-        m_data(std::move(data))
-    {
-    }
-
-    Data take()
-    {
-        return std::move(m_data);
-    }
-
-private:
-    Data m_data;
-};
-
-} // namespace detail
 
 /**
  * Introduced to move any asynchronous operation to aio thread.
@@ -148,22 +120,22 @@ private:
         template<typename Handler>
         void saveHandler(Handler handler)
         {
-            m_handlerHolder =
-                std::make_unique<detail::Holder<Handler>>(std::move(handler));
+            m_handlerWrappers =
+                std::make_unique<detail::DataWrapper<Handler>>(std::move(handler));
         }
 
         template<typename Handler>
         Handler takeHandler()
         {
-            auto handler = 
-                static_cast<detail::Holder<Handler>*>(m_handlerHolder.get())->take();
-            m_handlerHolder.reset();
+            auto handler = static_cast<detail::DataWrapper<Handler>*>(
+                m_handlerWrappers.get())->take();
+            m_handlerWrappers.reset();
 
             return handler;
         }
 
     private:
-        std::unique_ptr<detail::AbstractHolder> m_handlerHolder;
+        std::unique_ptr<detail::AbstractDataWrapper> m_handlerWrappers;
     };
 
     Func m_func;
