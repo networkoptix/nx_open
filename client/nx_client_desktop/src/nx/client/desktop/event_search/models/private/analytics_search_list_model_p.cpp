@@ -74,11 +74,22 @@ bool acceptedByTextFilter(const nx::common::metadata::DetectedObject& item, cons
     if (filter.isEmpty())
         return true;
 
-    return std::any_of(item.labels.cbegin(), item.labels.cend(),
-        [filter](const nx::common::metadata::Attribute& attribute) -> bool
+    const auto checkWord =
+        [filter](const QString& word)
         {
-            return attribute.value.startsWith(filter, Qt::CaseInsensitive)
-                || attribute.name.startsWith(filter, Qt::CaseInsensitive);
+            return word.startsWith(filter, Qt::CaseInsensitive);
+        };
+
+    return std::any_of(item.labels.cbegin(), item.labels.cend(),
+        [checkWord](const nx::common::metadata::Attribute& attribute) -> bool
+        {
+            if (checkWord(attribute.name))
+                return true;
+
+            const auto words = attribute.value.split(QRegularExpression("\\s+"),
+                QString::SkipEmptyParts);
+
+            return std::any_of(words.cbegin(), words.cend(), checkWord);
         });
 }
 
