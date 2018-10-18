@@ -1,9 +1,12 @@
 import QtQuick 2.6
+import Nx.Core.Items 1.0
+import nx.client.core 1.0
 
 Item
 {
     id: controller
 
+    property alias motionProvider: mediaPlayerMotionProvider
     property bool motionSearchMode: false
     property string motionFilter:
     {
@@ -125,6 +128,28 @@ Item
     }
 
     Component.onCompleted: updateDefaultRoi()
+
+    MaskedUniformGrid
+    {
+        anchors.fill: parent
+
+        opacity: 0.5
+        cellCountX: 44
+        cellCountY: 32
+        color: "red"
+
+        MediaPlayerMotionProvider
+        {
+            id: mediaPlayerMotionProvider
+
+            onMotionMaskChanged: motionMaskItem.motionMask = mediaPlayerMotionProvider.motionMask(0)
+        }
+
+        maskTextureProvider: MotionMaskItem
+        {
+            id: motionMaskItem
+        }
+    }
 
     // Test control. Represents simple preloder for the first point
     Rectangle

@@ -287,6 +287,7 @@ PageBase
             videoCenterHeightOffsetFactor: 1 / 3
             onClicked: toggleUi()
             motionSearchController.cameraRotation: videoScreenController.resourceHelper.customRotation
+            motionSearchController.motionProvider.mediaPlayer: videoScreenController.mediaPlayer
         }
     }
 
