@@ -153,7 +153,7 @@ void ConnectionProcessor::run()
     {
         NX_DEBUG(this, "Incoming messageBus connections are temporary disabled. Ignore new incoming connection.");
         sendResponse(nx::network::http::StatusCode::forbidden,
-            "Media server is running in standalone mode");
+            "The media server is running in standalone mode");
         return;
     }
 
@@ -170,14 +170,14 @@ void ConnectionProcessor::run()
     if (!messageBus)
     {
         sendResponse(nx::network::http::StatusCode::forbidden,
-            "Media server is not is in P2p mode");
+            "The media server is not is in P2p mode");
         return;
     }
 
     if (!messageBus->validateRemotePeerData(remotePeer))
     {
         sendResponse(nx::network::http::StatusCode::forbidden,
-            "Media server is going to restart to replace its database");
+            "The media server is going to restart to replace its database");
         return;
     }
 
@@ -217,7 +217,7 @@ void ConnectionProcessor::run()
         isDisabledPeer(remotePeer)) //< allowed peers are strict
     {
         sendResponse(nx::network::http::StatusCode::forbidden,
-            lm("Connection from peer %1 already established").arg(remotePeer.id).toUtf8());
+            lm("The connection from the peer %1 is already established").arg(remotePeer.id).toUtf8());
         return;
     }
 

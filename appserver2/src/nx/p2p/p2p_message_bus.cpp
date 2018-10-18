@@ -98,6 +98,12 @@ MessageBus::~MessageBus()
 void MessageBus::dropConnections()
 {
     QnMutexLocker lock(&m_mutex);
+    dropConnectionsThreadUnsafe();
+}
+
+void MessageBus::dropConnectionsThreadUnsafe()
+{
+    QnMutexLocker lock(&m_mutex);
     for (const auto& connection: m_connections)
         connection->setState(Connection::State::Error);
     for (const auto& connection: m_outgoingConnections)
