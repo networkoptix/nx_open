@@ -7,6 +7,7 @@
  * This unit can be compiled in the context of any C++ project.
  */
 
+#include <cstring>
 #include <cstdlib>
 #include <memory>
 
