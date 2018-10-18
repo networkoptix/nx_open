@@ -13,7 +13,7 @@ namespace gateway {
 namespace test {
 
 
-const constexpr int kTimeoutMsec = 1000;
+const constexpr int kTimeoutMsec = 5000;
 const QByteArray successResponse = "HTTP/1.1 200 OK\r\n";
 
 class VmsGatewayConnectTest:
@@ -54,7 +54,9 @@ public:
 
         // Check that CONNECT was successfull.
         ASSERT_EQ(socket->recv(responseReceiveBuffer.data(), responseReceiveBuffer.size(), 0),
-            responseReceiveBuffer.size());
+            responseReceiveBuffer.size())
+                << "CONNECT response failure: " << SystemError::getLastOSErrorText().toStdString();
+
         // We want to check only the first response line.
         ASSERT_TRUE(responseReceiveBuffer.startsWith(connectResponse));
 
@@ -148,8 +150,9 @@ TEST_F(VmsGatewayConnectTest, ConcurrentConnections)
 
 TEST_F(VmsGatewayConnectTest, WrongAddressConnect)
 {
+    // Set timeouts less then kTimeoutMsec to avoid unwanted test failures.
     ASSERT_TRUE(startAndWaitUntilStarted(/*allowIpTarget*/ true, /*proxyTargetPort*/ false,
-        /*connectSupport*/ true));
+        /*connectSupport*/ true, /*sendTimeout*/ 1, /*recvTimeout*/ 1));
     std::unique_ptr<network::TCPSocket> clientSocket;
     connectProxySocket("127.0.0.1:1", clientSocket, "HTTP/1.1 503 Service Unavailable\r\n");
     server.pleaseStopSync();
