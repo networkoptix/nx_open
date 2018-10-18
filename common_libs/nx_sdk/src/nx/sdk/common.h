@@ -3,9 +3,9 @@
 namespace nx {
 namespace sdk {
 
-struct CameraInfo
+struct DeviceInfo
 {
-    CameraInfo()
+    DeviceInfo()
     {
         vendor[0] = 0;
         model[0] = 0;
@@ -30,6 +30,11 @@ struct CameraInfo
     char password[kStringParameterMaxLength];
     int channel = 0;
     int logicalId = 0;
+};
+
+struct CameraInfo: DeviceInfo
+{
+    // Currently, CameraInfo has no specific fields.
 };
 
 struct Ratio

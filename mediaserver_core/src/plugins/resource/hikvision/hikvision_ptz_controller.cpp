@@ -357,7 +357,7 @@ void IsapiPtzController::loadCapabilities(
             m_limits.minTiltSpeed = range->integerOrZero("Min");
         }
     }
-    if (const auto space = capabilities.child("ContinuousZoomPositionSpace"))
+    if (const auto space = capabilities.child("ContinuousZoomSpace"))
     {
         m_capabilities |= Ptz::ContinuousZoomCapability;
         if (const auto range = space->child("ZRange"))

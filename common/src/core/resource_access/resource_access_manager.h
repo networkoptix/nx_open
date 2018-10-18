@@ -111,7 +111,6 @@ public:
     bool canCreateResource(
         const QnResourceAccessSubject& subject,
         const nx::vms::api::WebPageData& data) const;
-
     bool canCreateStorage(
         const QnResourceAccessSubject& subject,
         const QnUuid& storageParentId) const;

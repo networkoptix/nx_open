@@ -5,9 +5,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/analytics/manager.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
-#include <nx/plugins/settings.h>
+#include <plugins/settings.h>
 
 QnExecuteAnalyticsActionRestHandler::QnExecuteAnalyticsActionRestHandler(
     QnMediaServerModule* serverModule):
@@ -46,19 +46,19 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    auto managerPool = serverModule()->metadataManagerPool();
-    for (auto& plugin: managerPool->availablePlugins())
+    auto analyticsManager = serverModule()->analyticsManager();
+    for (auto& engine: analyticsManager->availableEngines())
     {
-        nxpt::ScopedRef<nx::sdk::metadata::Plugin> pluginGuard(plugin, /*increaseRef*/ false);
+        nxpt::ScopedRef<nx::sdk::analytics::Engine> engineGuard(engine, /*increaseRef*/ false);
 
-        const auto manifest = managerPool->loadPluginManifest(plugin);
+        const auto manifest = analyticsManager->loadEngineManifest(engine);
         if (!manifest)
             continue; //< The error is already logged.
 
         if (manifest.get().pluginId == actionData.pluginId)
         {
             AnalyticsActionResult actionResult;
-            QString errorMessage = executeAction(&actionResult, plugin, actionData);
+            QString errorMessage = executeAction(&actionResult, engine, actionData);
 
             if (!errorMessage.isEmpty())
             {
@@ -77,17 +77,17 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
 
 namespace {
 
-class Action: public nxpt::CommonRefCounter<nx::sdk::metadata::Action>
+class Action: public nxpt::CommonRefCounter<nx::sdk::analytics::Action>
 {
 public:
     virtual ~Action() {}
 
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceId) override
     {
-        if (interfaceId == nx::sdk::metadata::IID_Action)
+        if (interfaceId == nx::sdk::analytics::IID_Action)
         {
             addRef();
-            return static_cast<nx::sdk::metadata::Action*>(this);
+            return static_cast<nx::sdk::analytics::Action*>(this);
         }
         if (interfaceId == nxpl::IID_PluginInterface)
         {
@@ -105,7 +105,7 @@ public:
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
-        m_cameraId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
+        m_deviceId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.cameraId);
         m_timestampUs = actionData.timestampUs;
     }
 
@@ -113,7 +113,7 @@ public:
 
     virtual nxpl::NX_GUID objectId() override { return m_objectId; }
 
-    virtual nxpl::NX_GUID cameraId() override { return m_cameraId; }
+    virtual nxpl::NX_GUID deviceId() override { return m_deviceId; }
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
@@ -130,7 +130,7 @@ public:
 private:
     std::string m_actionId;
     nxpl::NX_GUID m_objectId;
-    nxpl::NX_GUID m_cameraId;
+    nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
     const nx::plugins::SettingsHolder m_params;
@@ -160,15 +160,15 @@ QString errorMessage(nx::sdk::Error error)
  */
 QString QnExecuteAnalyticsActionRestHandler::executeAction(
     AnalyticsActionResult* outActionResult,
-    nx::sdk::metadata::Plugin* plugin,
+    nx::sdk::analytics::Engine* engine,
     const AnalyticsAction& actionData)
 {
     Action action(actionData, outActionResult);
 
     nx::sdk::Error error = nx::sdk::Error::noError;
-    plugin->executeAction(&action, &error);
+    engine->executeAction(&action, &error);
 
-    // By this time, Plugin either already called Action::handleResult(), or is not going to do it.
+    // By this time, engine either already called Action::handleResult(), or is not going to do it.
 
     return errorMessage(error);
 }

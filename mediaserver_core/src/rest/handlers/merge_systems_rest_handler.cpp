@@ -51,23 +51,31 @@ int QnMergeSystemsRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
-    if (QnPermissionsHelper::isSafeMode(serverModule()))
-        return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
-        return QnPermissionsHelper::notOwnerError(result);
-
     nx::vms::utils::SystemMergeProcessor systemMergeProcessor(owner->commonModule());
-    systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
-    const auto resultCode = systemMergeProcessor.merge(
-        owner->accessRights(),
-        owner->authSession(),
-        data,
-        &result);
-    if (resultCode != nx::network::http::StatusCode::ok)
+    using MergeStatus = ::utils::MergeSystemsStatus::Value;
+
+    if (QnPermissionsHelper::isSafeMode(serverModule()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::safeMode);
+    }
+    else if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
+    {
+        systemMergeProcessor.setMergeError(&result, MergeStatus::forbidden);
+    }
+    else
+    {
+        systemMergeProcessor.enableDbBackup(serverModule()->settings().dataDir());
+        result = systemMergeProcessor.merge(
+            owner->accessRights(),
+            owner->authSession(),
+            data);
+    }
+
+    if (result.error)
     {
         NX_DEBUG(this, lm("Merge with %1 failed with result %2")
-            .args(data.url, nx::network::http::StatusCode::toString(resultCode)));
-        return resultCode;
+            .args(data.url, toString(result.error)));
+        return nx::network::http::StatusCode::ok;
     }
 
     updateLocalServerAuthKeyInConfig(owner->commonModule());

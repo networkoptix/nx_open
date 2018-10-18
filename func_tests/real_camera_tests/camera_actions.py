@@ -3,9 +3,9 @@
 import json
 import logging
 import subprocess
+from datetime import timedelta
 
-import timeit
-
+from framework.utils import Timer
 from .checks import Success, Halt, Failure, expect_values
 
 _logger = logging.getLogger(__name__)
@@ -22,9 +22,9 @@ def fps_avg(fps):
 
 
 def _ffprobe_poll(expected_values, probe, stream_url, title):
-    start_time = timeit.default_timer()
+    timer = Timer()
     while probe.poll() is None:
-        if timeit.default_timer() - start_time > 30:
+        if timer.duration > timedelta(seconds=30):
             yield Halt('{!r} ffprobe has timed out'.format(title))
             return
         yield Halt('{!r} ffprobe is in progress'.format(title))
@@ -58,11 +58,15 @@ def _ffprobe_poll(expected_values, probe, stream_url, title):
     yield expect_values(expected_values, dict(video=video, audio=audio), path=title)
 
 
-def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
+def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000, audio_stage=None):
     frames = max(expected_values.get('video', {}).get('fps', [30]))
     last_failure = None
-    for _ in range(rerun_count):
-        options = ['-show_streams', '-of', 'json', '-fpsprobesize', str(frames)]
+    for run_number in range(rerun_count):
+        if audio_stage:
+            probesize = ('-probesize', '100k')
+        else:
+            probesize = ('-fpsprobesize', str(frames))
+        options = ['-show_streams', '-of', 'json', probesize[0], probesize[1]]
         probe = subprocess.Popen(
             ['ffprobe'] + options + [stream_url],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -71,8 +75,8 @@ def ffprobe_streams(expected_values, stream_url, title, rerun_count=1000):
                 if isinstance(result, Success):
                     return
                 elif isinstance(result, Halt) and last_failure:
-                    # In case of halt keep last error messages.
-                    yield last_failure.append_errors('retry:', result.message)
+                    yield last_failure.with_more_errors(
+                        'retry {}:'.format(run_number), result.message)
                 elif isinstance(result, Failure):
                     last_failure = result
                     yield result

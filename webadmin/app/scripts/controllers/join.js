@@ -101,6 +101,10 @@ angular.module('webadminApp')
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
                     return false;
+                case 'DUPLICATE_MEDIASERVER_FOUND':
+                    errorToShow = L.join.duplicateServersError;
+                    dialogs.alert(errorToShow);
+                    return false;
             }
             return errorToShow;
         }

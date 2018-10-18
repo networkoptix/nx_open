@@ -42,6 +42,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/async_image_widget.h>
 #include <nx/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/utils/app_info.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -122,6 +123,7 @@ static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
         ResourceTreeNodeType::layoutTours,
         ResourceTreeNodeType::filteredVideowalls,
         ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::analyticsEngines,
         ResourceTreeNodeType::filteredUsers,
         ResourceTreeNodeType::localResources
     });

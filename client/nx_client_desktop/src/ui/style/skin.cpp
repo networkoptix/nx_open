@@ -133,6 +133,9 @@ QPixmap QnSkin::pixmap(const char* name, bool correctDevicePixelRatio)
 
 QPixmap QnSkin::pixmap(const QString& name, bool correctDevicePixelRatio)
 {
+    if (name.endsWith(".svg"))
+        return maximumSizePixmap(icon(name), QIcon::Normal, QIcon::Off, correctDevicePixelRatio);
+
     static const auto kHiDpiSuffix = lit("@2x");
 
     auto result =

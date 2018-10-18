@@ -55,6 +55,8 @@ enum ApiObjectType
     ApiObject_BusinessRule,
     ApiObject_Storage,
     ApiObject_WebPage,
+    ApiObject_AnalyticsPlugin,
+    ApiObject_AnalyticsEngine,
     ApiObjectUserRole,
 };
 
@@ -315,6 +317,16 @@ namespace detail
         //getWebPageList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::WebPageDataList& webPageList);
 
+        //getAnalyticsPluginList
+        ErrorCode doQueryNoLock(
+            const QnUuid& id,
+            nx::vms::api::AnalyticsPluginDataList& outAnalyticsPluginList);
+
+        //getAnalyticsEnginesList
+        ErrorCode doQueryNoLock(
+            const QnUuid& id,
+            nx::vms::api::AnalyticsEngineDataList& outAnalyticsEngineList);
+
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::EventRuleDataList& userList);
 
@@ -413,6 +425,17 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::WebPageDataList>& tran);
+
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::AnalyticsPluginData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::AnalyticsEngineData>& tran);
+
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::AnalyticsPluginDataList>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::AnalyticsEngineDataList>& tran);
+
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DiscoveryData>& tran);
         ErrorCode executeTransactionInternal(
@@ -665,6 +688,12 @@ namespace detail
         ErrorCode removeWebPage(const QnUuid &id);
         ErrorCode insertOrReplaceWebPage(const nx::vms::api::WebPageData& data, qint32 internalId);
 
+        ErrorCode saveAnalyticsPlugin(const nx::vms::api::AnalyticsPluginData& params);
+        ErrorCode removeAnalyticsPlugin(const QnUuid &id);
+
+        ErrorCode saveAnalyticsEngine(const nx::vms::api::AnalyticsEngineData& params);
+        ErrorCode removeAnalyticsEngine(const QnUuid &id);
+
         ErrorCode insertOrReplaceBusinessRuleTable( const nx::vms::api::EventRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid);
         ErrorCode removeBusinessRule( const QnUuid& id );
@@ -751,6 +780,8 @@ namespace detail
             ResyncUserAccessRights  = 0x4000,
             ResyncGlobalSettings    = 0x8000,
             ResyncResourceProperties = 0x10000,
+            ResyncAnalyticsPlugins = 0x20000,
+            ResyncAnalyticsEngines = 0x40000,
        };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
@@ -907,6 +938,8 @@ public:
         filterData(data->storages);
         filterData(data->resStatusList);
         filterData(data->webPages);
+        filterData(data->analyticsPlugins);
+        filterData(data->analyticsEngines);
 
         return ErrorCode::ok;
     }

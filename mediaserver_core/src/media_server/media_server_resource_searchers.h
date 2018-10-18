@@ -13,7 +13,12 @@ public:
     virtual ~QnMediaServerResourceSearchers() override;
 
     template <typename T>
-    T* searcher() const { return dynamic_cast<T*>(m_searchers.value(std::type_index(typeid(T)))); }
+    T* searcher() const
+    {
+        auto result = dynamic_cast<T*>(m_searchers.value(std::type_index(typeid(T))));
+        NX_ASSERT(result);
+        return result;
+    }
 
     void start();
     void stop();

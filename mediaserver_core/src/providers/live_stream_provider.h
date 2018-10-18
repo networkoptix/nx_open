@@ -14,7 +14,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataprovider/live_stream_params.h>
-#include <nx/mediaserver/metadata/video_data_receptor.h>
+#include <nx/mediaserver/analytics/video_data_receptor.h>
 #include <core/dataconsumer/data_copier.h>
 #include <nx/mediaserver/server_module_aware.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
@@ -88,10 +88,6 @@ private:
 
     void updateStreamResolution(int channelNumber, const QSize& newResolution);
 
-    void extractMediaStreamParams(
-        const QnCompressedVideoDataPtr& videoData,
-        QSize* const newResolution);
-
     void saveMediaStreamParamsIfNeeded(const QnCompressedVideoDataPtr& videoData);
 
     void saveBitrateIfNeeded(
@@ -102,9 +98,10 @@ private:
     void emitAnalyticsEventIfNeeded(const QnAbstractCompressedMetadataPtr& metadata);
     QnLiveStreamParams mergeWithAdvancedParams(const QnLiveStreamParams& params);
 
-    nx::mediaserver::metadata::VideoDataReceptorPtr getVideoDataReceptorForMetadataPluginsIfNeeded(
-        const QnCompressedVideoDataPtr& compressedFrame,
-        bool* outNeedUncompressedFrame);
+    nx::mediaserver::analytics::VideoDataReceptorPtr
+        getVideoDataReceptorForMetadataPluginsIfNeeded(
+            const QnCompressedVideoDataPtr& compressedFrame,
+            bool* outNeedUncompressedFrame);
 
 private:
     // NOTE: m_newLiveParams are going to update a little before the actual stream gets reopened.
@@ -133,7 +130,7 @@ private:
     int m_framesSincePrevMediaStreamCheck;
     QWeakPointer<QnAbstractVideoCamera> m_owner;
 
-    QWeakPointer<nx::mediaserver::metadata::VideoDataReceptor> m_videoDataReceptor;
+    QWeakPointer<nx::mediaserver::analytics::VideoDataReceptor> m_videoDataReceptor;
     QSharedPointer<MetadataDataReceptor> m_metadataReceptor;
     QnAbstractDataReceptorPtr m_analyticsEventsSaver;
     QSharedPointer<DataCopier> m_dataReceptorMultiplexer;

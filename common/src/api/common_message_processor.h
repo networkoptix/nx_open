@@ -48,6 +48,12 @@ public:
         const nx::vms::api::WebPageData& webpage,
         ec2::NotificationSource source);
     virtual void updateResource(
+        const nx::vms::api::AnalyticsPluginData& analyticsPluginData,
+        ec2::NotificationSource source);
+    virtual void updateResource(
+        const nx::vms::api::AnalyticsEngineData& analyticsEngineData,
+        ec2::NotificationSource source);
+    virtual void updateResource(
         const nx::vms::api::CameraData& camera,
         ec2::NotificationSource source);
     virtual void updateResource(

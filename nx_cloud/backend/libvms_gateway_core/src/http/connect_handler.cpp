@@ -52,7 +52,6 @@ void ConnectHandler::processRequest(
         !m_targetSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         NX_INFO(this, "Failed to set socket options. %1", SystemError::getLastOSErrorText());
-
         return completionHandler(nx::network::http::StatusCode::internalServerError);
     }
 
@@ -77,6 +76,7 @@ void ConnectHandler::connect(const network::SocketAddress& address,
                     m_targetSocket.get(), SystemError::toString(error));
                 return completionHandler(nx::network::http::StatusCode::serviceUnavailable);
             }
+            NX_VERBOSE(this, "Successfully connected to %1", m_targetSocket->getForeignAddress());
 
             // TODO: check when is called onResponseSendHandler, is it possible to skip some data
             //      between sending response and start of tunnel
