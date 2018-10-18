@@ -104,9 +104,6 @@ class LocalPath(PosixPath, FileSystemPath):
             raise exceptions.NotAFile("{!r}.stat() returns {!r}".format(self, path_stat))
         return path_stat.st_size
 
-    def copy_to(self, destination):
-        destination.copy_from(self)
-
     def take_from(self, local_source_path):
         destination = self / local_source_path.name
         if not local_source_path.exists():

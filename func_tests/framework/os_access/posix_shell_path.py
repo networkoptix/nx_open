@@ -196,9 +196,3 @@ class PosixShellPath(BasePosixPath):
         if file_type != u'regular file':
             raise exceptions.NotAFile("{} reports {}".format(command, output))
         return size
-
-    def copy_to(self, destination):
-        self._shell.copy_posix_file_to(self, destination)
-
-    def copy_from(self, source):
-        self._shell.copy_file_from_posix(source, self)

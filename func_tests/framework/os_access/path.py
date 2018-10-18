@@ -113,12 +113,6 @@ class FileSystemPath(PurePath):
             raise exceptions.NotAFile("Stat: {}".format(path_stat))
         return path_stat.st_size
 
-    def copy_to(self, destination):
-        copy_file_using_read_and_write(self, destination)
-
-    def copy_from(self, source):
-        copy_file_using_read_and_write(source, self)
-
     def ensure_empty_dir(self):
         if self.exists():
             self.rmtree()
@@ -190,7 +184,5 @@ class BasePosixPath(FileSystemPath, PurePosixPath):
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
     _logger.info("Copy from %s to %s", source, destination)
-    source.copy_to(destination)
-
-def copy_file_using_read_and_write(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
     destination.write_bytes(source.read_bytes())
+
