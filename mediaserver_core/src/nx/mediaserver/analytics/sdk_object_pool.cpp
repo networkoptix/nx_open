@@ -138,6 +138,15 @@ bool SdkObjectPool::initPluginResources()
         const auto manifest = sdk_support::manifest<analytics_api::PluginManifest>(
             analyticsPlugin);
 
+        if (!manifest)
+        {
+            NX_ERROR(
+                this,
+                "Can't fetch manifest from analytics plugin %1",
+                analyticsPlugin->name());
+            continue;
+        }
+
         const auto id = QnUuid::fromArbitraryData(manifest->id);
 
         {

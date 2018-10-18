@@ -772,6 +772,8 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
     updateResources(fullData.webPages);
     updateResources(fullData.servers);
     updateResources(fullData.storages);
+    updateResources(fullData.analyticsPlugins);
+    updateResources(fullData.analyticsEngines);
 
     resourcePool()->commit();
 

@@ -79,6 +79,8 @@ void CommonPlugin::setLocale(const char* /*locale*/)
 
 const char* CommonPlugin::manifest(nx::sdk::Error* outError) const
 {
+    if (outError)
+        *outError = nx::sdk::Error::noError;
     return m_manifest.c_str();
 }
 

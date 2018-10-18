@@ -41,7 +41,7 @@ std::optional<ManifestType> manifest(const char* const manifestString)
 template<typename ManifestType, typename SdkObjectPtr>
 std::optional<ManifestType> manifest(const SdkObjectPtr& sdkObject)
 {
-    nx::sdk::Error error;
+    nx::sdk::Error error = nx::sdk::Error::noError;
 
     // TODO: #dmishin RAII wrapper for manifest. Or change manifest interface
     // from char* to PluginInterface.
