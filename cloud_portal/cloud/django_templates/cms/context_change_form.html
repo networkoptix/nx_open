@@ -71,7 +71,7 @@
     {% if perms.cms.edit_content %}
         <div class="submit-row">
             {% if preview_link %}
-                <button class='btn btn-sm btn-default pull-left' onClick="openPreview()">Open Preview</button>
+                <button class='btn btn-sm btn-default pull-left' onClick="openPreview();return false;">Open Preview</button>
             {% endif %}
             {% if user.is_superuser and context.file_path %}
                 <a class="btn btn-sm btn-default"

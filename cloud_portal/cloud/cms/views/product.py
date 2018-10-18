@@ -110,7 +110,7 @@ def context_editor_action(request, product, context_id, language_code):
             add_upload_error_messages(request, upload_errors)
         else:
             messages.success(request, saved_msg)
-            if product.product_type == ProductType.PRODUCT_TYPES.cloud_portal:
+            if product.product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
                 preview_link = modify_db.generate_preview_link(context)
 
     return preview_link
@@ -129,7 +129,7 @@ def page_editor(request):
 
     preview_link = context_editor_action(request, product, context_id, language_code)
 
-    if 'SendReview' in request.POST and preview_link:
+    if 'SendReview' in request.POST:
         review = ProductCustomizationReview.objects.filter(version_id=ContentVersion.objects.latest('created_date')).first()
         redirect_url = reverse('admin:cms_productcustomizationreview_change', args=(review.id,))
         return redirect(redirect_url)

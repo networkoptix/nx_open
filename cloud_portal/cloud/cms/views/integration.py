@@ -27,9 +27,9 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
         for integration in integrations:
             integration_dict = {}
-            current_version = integration.version_id()
+            current_version = integration.version_id() if not show_pending else 0
             if current_version == 0 and (not show_pending or not integration.contentversion_set.filter(
-                    productcustomizationreview__state__in=[PENDING]).exists()):
+                    productcustomizationreview__state=PENDING).exists()):
                 continue
 
             for context in contexts:
@@ -55,7 +55,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
                 integration_dict['pending'] = current_version == 0
             integrations_json.append(integration_dict)
 
-    return {'data': integrations_json}
+    return integrations_json
 
 
 @api_view(("GET", ))
@@ -68,7 +68,6 @@ def get_integration(request, product_id=None):
     return api_success(make_integrations_json([products.get(id=product_id)]))
 
 
-
 @api_view(("GET", ))
 @permission_classes((IsAuthenticated, ))
 def get_integrations(request):
@@ -77,11 +76,12 @@ def get_integrations(request):
 
     if not integrations.exists():
         return api_success([])
-
-    show_pending = False
-
-    # Will change once we figure out permission
+    integration_list = []
+    # Users with manager permissions all accepted products and pending drafts
     if UserGroupsToCustomizationPermissions.check_permission(request.user, settings.CUSTOMIZATION, 'cms.can_view_pending'):
-        show_pending = 'pending' in request.GET
+        drafts = Product.objects.filter(product_type__type=INTEGRATION,
+                                        contentversion__productcustomizationreview__state=PENDING)
+        integration_list = make_integrations_json(drafts, show_pending=True)
 
-    return api_success(make_integrations_json(integrations, show_pending=show_pending))
+    integration_list.extend(make_integrations_json(integrations))
+    return api_success({'data': integration_list})

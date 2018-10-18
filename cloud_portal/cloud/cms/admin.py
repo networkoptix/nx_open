@@ -61,6 +61,7 @@ class ProductTypeAdmin(CMSAdmin):
 
 admin.site.register(ProductType, ProductTypeAdmin)
 
+
 # TODO: CLOUD-2388  Add additional views to here link -> http://patrick.arminio.info/additional-admin-views/
 class ProductAdmin(CMSAdmin):
     list_display = ('product_settings', 'edit_product', 'name', 'product_type', 'customizations_list', )
@@ -131,7 +132,7 @@ class ContextProxyAdmin(CMSAdmin):
         if request.method == "POST" and 'product_id' in request.POST:
             extra_context['preview_link'] = page_editor(request)
             if 'SendReview' in request.POST:
-                return redirect(extra_context['preview_link'])
+                return redirect(extra_context['preview_link'].url)
 
         extra_context['title'] = "Edit {}".format(Context.objects.get(id=object_id).name)
         extra_context['language_code'] = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
