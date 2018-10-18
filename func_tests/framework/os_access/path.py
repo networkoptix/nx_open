@@ -1,8 +1,9 @@
 import logging
 import os
+import stat
 from abc import ABCMeta, abstractmethod
 
-from pathlib2 import PurePath
+from pathlib2 import PurePath, PurePosixPath
 
 from framework.os_access import exceptions
 from framework.os_access.exceptions import DoesNotExist, NotADir
@@ -51,13 +52,38 @@ class FileSystemPath(PurePath):
             except NotADir:
                 yield child
 
-    @abstractmethod
     def mkdir(self, parents=False, exist_ok=True):
-        pass
+        try:
+            self._mkdir_raw()
+        except exceptions.AlreadyExists:
+            if not exist_ok:
+                raise
+        except exceptions.BadParent:
+            if not parents:
+                raise
+            self.parent.mkdir(parents=True, exist_ok=False)
+            self.mkdir(parents=False, exist_ok=False)
 
-    @abstractmethod
+    def _mkdir_raw(self):
+        raise NotImplementedError("Either `mkdir` or `_mkdir_raw` must be implemented")
+
     def rmtree(self, ignore_errors=False):
-        pass
+        try:
+            iter_entries = self.glob('*')
+        except exceptions.DoesNotExist:
+            if ignore_errors:
+                pass
+            else:
+                raise
+        except exceptions.NotADir:
+            self.unlink()
+        else:
+            for entry in iter_entries:
+                entry.rmtree()
+            self.rmdir()
+
+    def rmdir(self):
+        raise NotImplementedError("Either `rmtree` or `rmdir` must be implemented")
 
     @abstractmethod
     def read_bytes(self, offset=0, max_length=None):
@@ -67,17 +93,25 @@ class FileSystemPath(PurePath):
     def write_bytes(self, contents, offset=None):
         return 0
 
-    @abstractmethod
-    def read_text(self, encoding, errors):
-        return u''
+    def read_text(self, encoding='utf8', errors='strict'):
+        data = self.read_bytes()
+        text = data.decode(encoding=encoding, errors=errors)
+        return text
 
-    @abstractmethod
-    def write_text(self, data, encoding, errors):
-        return 0
+    def write_text(self, text, encoding='utf8', errors='strict'):
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
 
-    @abstractmethod
+    def stat(self):
+        raise NotImplementedError("Either `size` or `stat` must be implemented.")
+
     def size(self):
-        return 0
+        path_stat = self.stat()
+        if not stat.S_ISREG(path_stat.st_mode):
+            raise exceptions.NotAFile("Stat: {}".format(path_stat))
+        return path_stat.st_size
 
     def copy_to(self, destination):
         copy_file_using_read_and_write(self, destination)
@@ -147,6 +181,11 @@ class FileSystemPath(PurePath):
                 destination)
         copy_file(local_source_path, destination)
         return destination
+
+
+class BasePosixPath(FileSystemPath, PurePosixPath):
+    __metaclass__ = ABCMeta
+    _tmp = '/tmp/func_tests'
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None

@@ -194,6 +194,17 @@ class Shell(object):
         return self.sh_script(
             script, cwd=cwd, env=env, logger=logger).run(input=input, timeout_sec=timeout_sec)
 
+    def current_user_name(self):
+        user_name = self.command(['whoami']).run().rstrip('\n')
+        return user_name
+
+    def home_dir(self, user_name):
+        output = self.run_command(['getent', 'passwd', user_name])
+        if not output:
+            raise RuntimeError("Can't determine home directory for {!r}".format(user_name))
+        user_home_dir = output.split(':')[5]
+        return user_home_dir
+
     def copy_posix_file_to(self, posix_source, destination):
         copy_file_using_read_and_write(posix_source, destination)
 

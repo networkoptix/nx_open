@@ -43,7 +43,11 @@ class Timeout(Exception):
         self.timeout_sec = timeout_sec
 
 
-class DoesNotExist(Exception):
+class BadPath(Exception):
+    pass
+
+
+class DoesNotExist(BadPath):
     pass
 
 
@@ -61,11 +65,15 @@ class BadParent(Exception):
     pass
 
 
-class NotADir(Exception):
+class NotADir(BadPath):
     pass
 
 
-class NotAFile(Exception):
+class NotAFile(BadPath):
+    pass
+
+
+class NotEmpty(Exception):
     pass
 
 

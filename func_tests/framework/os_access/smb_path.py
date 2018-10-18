@@ -25,6 +25,7 @@ _STATUS_NOT_A_DIRECTORY = 0xC0000103
 _STATUS_FILE_IS_A_DIRECTORY = 0xC00000BA
 _STATUS_SHARING_VIOLATION = 0xC0000043
 _STATUS_DELETE_PENDING = 0xC0000056
+_STATUS_DIRECTORY_NOT_EMPTY = 0xC0000101
 
 _logger = logging.getLogger(__name__)
 
@@ -245,20 +246,13 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 else:
                     raise
 
-    def rmtree(self, ignore_errors=False):
-        try:
-            iter_entries = self.glob('*')
-        except exceptions.DoesNotExist:
-            if ignore_errors:
-                pass
-            else:
-                raise
-        except exceptions.NotADir:
-            self.unlink()
-        else:
-            for entry in iter_entries:
-                entry.rmtree()
-            self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
+    @_reraising_on_operation_failure({
+        _STATUS_DIRECTORY_NOT_EMPTY: exceptions.NotEmpty,
+        _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
+        _STATUS_OBJECT_PATH_NOT_FOUND: exceptions.DoesNotExist,
+        })
+    def rmdir(self):
+        self._smb_connection_pool.connection().deleteDirectory(self._service_name, self._relative_path)
 
     @_reraising_on_operation_failure({
         _STATUS_FILE_IS_A_DIRECTORY: exceptions.NotAFile,
@@ -292,17 +286,6 @@ class SMBPath(FileSystemPath, PureWindowsPath):
                 self._service_name, self._relative_path,
                 ad_hoc_file_object,
                 offset=offset)
-
-    def read_text(self, encoding='ascii', errors='strict'):
-        data = self.read_bytes()
-        text = data.decode(encoding=encoding, errors=errors)
-        return text
-
-    def write_text(self, text, encoding='ascii', errors='strict'):
-        data = text.encode(encoding=encoding, errors=errors)
-        bytes_written = self.write_bytes(data)
-        assert bytes_written == len(data)
-        return len(text)
 
     @_reraising_on_operation_failure({
         _STATUS_OBJECT_NAME_NOT_FOUND: exceptions.DoesNotExist,
