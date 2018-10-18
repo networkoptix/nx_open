@@ -88,8 +88,6 @@ Hanwha_XNB-6000:
     outs: [{id: 'AlarmOutput.1', name: 'Alarm Output #1'}]
 
 
-
-
 Arecont-2245PM:
   discovery if False: # Temporarily removed from stand.
     physicalId: 00-1A-07-0A-3A-88
@@ -116,49 +114,6 @@ Arecont-2245PM:
   audio_parameters if False:
     # I am not sure if this one has got audio_parameters in. The doc is very sparse.
     - {'skip_codec_change': True, 'codec': 'G711'}
-
-
-# Needs a reboot every time. Camera is VERY BUGGY!
-DWC-MD421D_1.1.1.8:
-
-  discovery:
-    physicalId: 00-1C-A6-01-21-97
-    vendor: Digital Watchdog
-    model: DWC-MD421D
-
-  authorization if False: # Camera needs firmware upgrade to v.1.1.2.x
-    password: auto
-
-  attributes:
-    firmware: 1.1.1.8
-    isAudioSupported: 1
-    ptzCapabilities: 12  # Zoom + Focus.
-
-  attributes if features.advanced_lens_control:
-    ptzCapabilities: 8405004
-
-  recording:
-    primary: {'codec': 'H264', 'resolution': '1920x1080', 'fps': [[13, 17], [8, 12]]}
-    #secondary: {'codec': 'H264', 'resolution': '640x352', 'fps': [5, 10]}
-
-  video_parameters:
-    primary:
-      - {'codec': 'H264', 'resolution': '1920x1080'}
-      - {'codec': 'H264', 'resolution': '960x544'}
-    secondary:
-      - {'codec': 'H264', 'resolution': '640x352', 'fps': [8, 12]}
-      #- {'codec': 'H264', 'resolution': '320x240', 'fps': [24, 36]}
-    stream_urls:
-      '1': "rtsp://192.168.200.13:554/h264"
-      '2': "rtsp://192.168.200.13:8554/h264"
-
-  # Not sure if it has audio_parameters, but isAudioSupported == 1.
-  audio_parameters if False:
-    - {'skip_codec_change': True, 'codec': 'MP2'}
-
-  io_events:
-    ins: [{id: '1'}]
-    outs: [{id: 't_RelayOut-0'}]
 
 
 IqEye_A32N:
