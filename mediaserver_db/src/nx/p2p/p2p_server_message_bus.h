@@ -105,7 +105,7 @@ private:
     ec2::detail::QnDbManager* m_db;
     QElapsedTimer m_dbCommitTimer;
     QElapsedTimer m_wantToSubscribeTimer;
-    std::atomic<bool> m_restartPending{false};
+    bool m_restartPending{false};
 };
 
 } // namespace p2p

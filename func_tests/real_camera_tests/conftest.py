@@ -31,7 +31,7 @@ def pytest_addoption(parser):
 
 
 RctOptions = namedtuple(
-    'Options',
+    'RctOptions',
     [
         'interface',
         'network',
@@ -52,10 +52,7 @@ def rct_options(request):
 
 
 def _local_file(value):
-    path = Path(value)
-    if not path.is_absolute():
-        path = Path(__file__).parent / path
-    return path
+    return Path(__file__).parent / value
 
 
 def _time_delta(value):

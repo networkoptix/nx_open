@@ -1,3 +1,10 @@
+"""pytest plugin that allows logging to Elasticsearch and uploading bulk logs.
+
+Logging from Python is performed via `_ElasticsearchLoggingHandler`.
+
+For bulk upload, use get `_ElasticsearchClient` object and call `bulk_upload` method.
+"""
+
 import collections
 import contextlib
 import datetime
@@ -57,6 +64,14 @@ _json_encoder = json.JSONEncoder(default=_json_default)
 
 
 class _ElasticsearchClient(object):
+    """Client knows the address of Elasticsearch and stores run id and run start time, which are
+    intended to be added in all records sent via this client, whether via logging handler or
+    bulk upload mechanism.
+
+    Elasticsearch index is no part of this client as index is different for different types of
+    data.
+    """
+
     def __init__(self, addr):
         self.addr = addr
         now = datetime.datetime.now(tz=tzlocal.get_localzone())
@@ -68,7 +83,7 @@ class _ElasticsearchClient(object):
         port = int(port_str)
         return cls((hostname, port))
 
-    def connected_socket(self):
+    def open_connection(self):
         s = socket.socket()
         # TCP buffer is used as queue. If there is a room for queue, `send` returns immediately.
         # Otherwise, the call blocks, and this is an intended behavior.
@@ -94,7 +109,7 @@ class _ElasticsearchClient(object):
         return payload
 
     def bulk_upload(self, index, static_data, items_iter):
-        with contextlib.closing(self.connected_socket()) as s:
+        with contextlib.closing(self.open_connection()) as s:
             _logger.info("Bulk upload to index %s with data: %r.", index, static_data)
             data = self._make_payload(static_data, items_iter)
             header_template = (
@@ -118,6 +133,15 @@ class _ElasticsearchClient(object):
 
 
 class _ElasticsearchLoggingHandler(logging.Handler):
+    """Python logging handler that sends records to Elasticsearch every time record is emitted.
+
+    It uses Elasticsearch Index HTTP API with HTTP pipelining. Each time new record is sent,
+    handler checks for responses that are already received and process them. All blocking calls
+    either don't actually block or block for a negligible amount of time (in contrast to requests
+    lin which waits for response when request is made). Therefore, no threads are needed here.
+
+    Thread-safety is provided by locks in `logging.Handler`.
+    """
     def __init__(self, client, index, app):
         super(_ElasticsearchLoggingHandler, self).__init__()
 
@@ -138,7 +162,7 @@ class _ElasticsearchLoggingHandler(logging.Handler):
             }
         self._static.update(client.run_data)
 
-        self._sock = client.connected_socket()
+        self._sock = client.open_connection()
         self._index = index
 
         self._response_processor = self._process_responses_stream()

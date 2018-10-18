@@ -3085,7 +3085,7 @@ void MediaServerProcess::initializeLogging()
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }),
-        /*do not write log header*/ false);
+        /*writeLogHeader*/ false);
 
     logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
@@ -3975,7 +3975,18 @@ void MediaServerProcess::loadResourceParamsData()
     QString source;
     ResourceParamWithRefData param;
     param.name = Qn::kResourceDataParamName;
-    auto oldValue = serverModule()->commonModule()->propertyDictionary()->value(QnUuid(), param.name);
+
+    QString oldValue;
+    nx::vms::api::ResourceParamWithRefDataList data;
+    manager->getKvPairsSync(QnUuid(), &data);
+    for (const auto& param: data)
+    {
+        if (param.name == Qn::kResourceDataParamName)
+        {
+            oldValue = param.value;
+            break;
+        }
+    }
     if (oldValue.isEmpty())
     {
         source = ":/resource_data.json";
@@ -3987,7 +3998,7 @@ void MediaServerProcess::loadResourceParamsData()
         const auto internetValue = loadDataFromUrl(url);
         if (!internetValue.isEmpty())
         {
-            if (serverModule()->commonModule()->dataPool()->loadData(internetValue))
+            if (serverModule()->commonModule()->dataPool()->validateData(internetValue))
             {
                 param.value = internetValue;
                 source = url;
@@ -4008,7 +4019,6 @@ void MediaServerProcess::loadResourceParamsData()
         ResourceParamWithRefDataList params;
         params.push_back(param);
         manager->saveSync(params);
-        m_serverMessageProcessor->resetPropertyList(params);
     }
 
     const auto externalResourceFileName =
@@ -4111,7 +4121,7 @@ void MediaServerProcess::run()
     if (!connectToDatabase())
         return;
 
-    m_discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+    m_discoveryMonitor = std::make_unique<nx::mediaserver::discovery::DiscoveryMonitor>(
         m_ec2ConnectionFactory->messageBus());
 
     initializeAnalyticsEvents();
@@ -4172,8 +4182,8 @@ void MediaServerProcess::run()
 
     initializeUpnpPortMapper();
 
-    loadResourcesFromDatabase();
     loadResourceParamsData();
+    loadResourcesFromDatabase();
 
     m_serverMessageProcessor->startReceivingLocalNotifications(m_ec2Connection);
 

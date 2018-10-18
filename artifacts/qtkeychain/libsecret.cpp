@@ -330,7 +330,7 @@ LibSecretKeyring::LibSecretKeyring()
     else
     {
         auto error = errorString();
-        qCritical() << "LibSecretKeyring::LibSecretKeyring() failed to load LibSecret library: " << error;
+        qWarning() << "LibSecretKeyring::LibSecretKeyring() failed to load LibSecret library: " << error;
     }
 #endif
 }

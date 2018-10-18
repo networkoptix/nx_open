@@ -234,10 +234,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
     m_dualsensor = isDualSensor();
-
-    if (!isRTSPSupported())
-        setCameraCapability(Qn::CameraTimeCapability, false);
-
+    setCameraCapability(Qn::CameraTimeCapability, isRTSPSupported());
     return CameraDiagnostics::NoErrorResult();
 }
 

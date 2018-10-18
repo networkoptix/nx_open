@@ -45,8 +45,6 @@
 #include <transaction/server_transaction_message_bus.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 
-// TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
-
 using namespace nx::vms::api;
 
 namespace ec2 {
@@ -1369,7 +1367,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt]:string id Layout unique ID or logical ID. If omitted, return data for all layouts.
+     * %param[opt]:string id Layout unique id or logical id. If omitted, return data for all
+     *     layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
@@ -1436,7 +1435,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in cells (integer).
      * %param backgroundHeight Height of the background image in cells (integer).
@@ -1505,7 +1504,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value true
      * %param fixedWidth Fixed width of the layout in cells (integer).
      * %param fixedHeight Fixed height of the layout in cells (integer).
-     * %param logicalId Logical ID of the layout, set by user (integer).
+     * %param logicalId Logical id of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in pixels (integer).
      * %param backgroundHeight Height of the background image in pixels (integer).

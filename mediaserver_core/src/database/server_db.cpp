@@ -266,13 +266,13 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 
 } // namespace
 
-static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
+static const qint64 kDbCleanupIntervalUs = 1000000ll * 3600;
 
 QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     :
     nx::mediaserver::ServerModuleAware(serverModule),
-    m_lastCleanuptime(0),
-    m_auditCleanuptime(0),
+    m_lastCleanuptimeUs(0),
+    m_auditCleanuptimeUs(0),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
@@ -534,9 +534,9 @@ bool QnServerDb::cleanupEvents()
 
     // cleanup by time
     qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTimeUs - m_lastCleanuptime > CLEANUP_INTERVAL)
+    if (currentTimeUs - m_lastCleanuptimeUs > kDbCleanupIntervalUs)
     {
-        m_lastCleanuptime = currentTimeUs;
+        m_lastCleanuptimeUs = currentTimeUs;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
         int utcMs = currentTimeUs / 1000LL - globalSettings()->eventLogPeriodDays() * 3600 * 24 * 1000LL;
@@ -713,13 +713,13 @@ bool QnServerDb::cleanupAuditLog()
 {
     bool rez = true;
 
-    qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
-    if (currentTime - m_auditCleanuptime > CLEANUP_INTERVAL)
+    qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
+    if (currentTimeUs - m_auditCleanuptimeUs > kDbCleanupIntervalUs)
     {
-        m_auditCleanuptime = currentTime;
+        m_auditCleanuptimeUs = currentTimeUs;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = currentTime / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
+        int utc = currentTimeUs / 1000000ll - globalSettings()->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }

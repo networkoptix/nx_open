@@ -12,8 +12,8 @@
 
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
+#include <plugins/settings.h>
 #include <nx/sdk/analytics/engine.h>
-#include <nx/plugins/settings.h>
 
 /**
  * Loads custom application plugins and provides plugin management methods. Plugins are looked for

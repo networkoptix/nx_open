@@ -892,6 +892,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
+    commonModule()->dataPool()->clear();
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 

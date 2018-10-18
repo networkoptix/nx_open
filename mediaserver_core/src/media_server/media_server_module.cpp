@@ -321,6 +321,7 @@ void QnMediaServerModule::stop()
     m_upnpDeviceSearcher->pleaseStop();
 
     resourceDiscoveryManager()->stop();
+    m_licenseWatcher->stop();
 }
 
 void QnMediaServerModule::stopLongRunnables()

@@ -406,6 +406,12 @@ void ServerMessageBus::gotConnectionFromRemotePeer(
     const Qn::UserAccessData& userAccessData,
     std::function<void()> onConnectionClosedCallback)
 {
+    if (!isStarted())
+    {
+        NX_DEBUG(this, "P2p message bus is not started yet. Ignore incoming connection");
+        return;
+    }
+
     P2pConnectionPtr connection(new Connection(
         commonModule(),
         remotePeer,
@@ -779,6 +785,8 @@ bool ServerMessageBus::handlePushImpersistentBroadcastTransaction(
 
 bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remotePeer)
 {
+    QnMutexLocker lock(&m_mutex);
+
     if (m_restartPending)
         return false;
     if (remotePeer.identityTime > commonModule()->systemIdentityTime())
@@ -789,7 +797,7 @@ bool ServerMessageBus::validateRemotePeerData(const vms::api::PeerDataEx& remote
             .arg(remotePeer.id.toString()));
 
         m_restartPending = true;
-        dropConnections();
+        dropConnectionsThreadUnsafe();
         commonModule()->setSystemIdentityTime(remotePeer.identityTime, remotePeer.id);
         return false;
     }
