@@ -11,6 +11,7 @@
 #include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/mediaserver/sdk_support/pointers.h>
 #include <nx/mediaserver_plugins/utils/uuid.h>
+#include <nx/mediaserver/sdk_support/utils.h>
 #include <nx/plugins/settings.h>
 #include <plugins/plugin_tools.h>
 
@@ -107,10 +108,11 @@ public:
     }
 
     Action(const AnalyticsAction& actionData, AnalyticsActionResult* actionResult):
-        m_params(actionData.params), m_actionResult(actionResult)
+        m_params(
+            nx::mediaserver::sdk_support::toSdkSettings(actionData.params)),
+        m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
-        NX_ASSERT(m_params.isValid());
 
         m_actionId = actionData.actionId.toStdString();
         m_objectId = nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(actionData.objectId);
@@ -126,9 +128,9 @@ public:
 
     virtual int64_t timestampUs() override { return m_timestampUs; }
 
-    virtual const nxpl::Setting* params() override { return m_params.array(); }
+    virtual const nx::sdk::Settings* params() override { return m_params.get(); }
 
-    virtual int paramCount() override { return m_params.size(); }
+    virtual int paramCount() override { return m_params->count(); }
 
     virtual void handleResult(const char* actionUrl, const char* messageToUser) override
     {
@@ -142,7 +144,7 @@ private:
     nxpl::NX_GUID m_deviceId;
     int64_t m_timestampUs;
 
-    const nx::plugins::SettingsHolder m_params;
+    const nx::mediaserver::sdk_support::UniquePtr<nx::sdk::Settings> m_params;
 
     AnalyticsActionResult* m_actionResult = nullptr;
 };
