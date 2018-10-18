@@ -164,6 +164,9 @@ void AbstractAsyncSearchListModel::Private::completePrefetch(
                     result.truncateFront(fetched.startTimeMs + 1);
                 if (q->effectiveLiveSupported())
                     result.truncate(fetched.endTimeMs());
+
+                if (result.isNull() && fetchedAll)
+                    result.durationMs = 1; //< To avoid getting null time window when all is fetched.
             }
             else
             {
