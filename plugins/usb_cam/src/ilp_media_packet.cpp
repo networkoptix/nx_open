@@ -6,6 +6,7 @@
 #include <functional>
 
 #include <plugins/plugin_tools.h>
+#include <nx/kit/utils.h>
 #include <utils/memory/cyclic_allocator.h>
 
 namespace nx {
@@ -38,7 +39,7 @@ ILPMediaPacket::~ILPMediaPacket()
     if( m_buffer )
     {
         using namespace std::placeholders;
-        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -128,7 +129,7 @@ void ILPMediaPacket::resizeBuffer( size_t bufSize )
     }
 
     using namespace std::placeholders;
-    void* newBuffer = nxpt::mallocAligned(
+    void* newBuffer = nx::kit::utils::mallocAligned(
         bufSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
         nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
         std::bind( &CyclicAllocator::alloc, m_allocator, _1 ) );
@@ -137,7 +138,7 @@ void ILPMediaPacket::resizeBuffer( size_t bufSize )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
+        nx::kit::utils::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }
