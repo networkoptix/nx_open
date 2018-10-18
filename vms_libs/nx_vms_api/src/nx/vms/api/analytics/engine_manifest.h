@@ -12,12 +12,6 @@ namespace nx::vms::api::analytics {
 
 struct NX_VMS_API EngineManifest
 {
-    Q_GADGET
-    Q_ENUMS(Capability)
-    Q_FLAGS(Capabilities)
-
-public: //< Required for Qt MOC run.
-
     struct ObjectAction
     {
         QString id;
@@ -41,8 +35,10 @@ public: //< Required for Qt MOC run.
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
+    // TODO: Remove when not needed for GUI's EventTypeDescriptor.
     QString pluginId;
     TranslatableString pluginName;
+
     Capabilities capabilities;
 
     QList<EventType> eventTypes;
@@ -64,9 +60,7 @@ QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction, (json), NX_VMS_API)
 } // namespace nx::vms::api::analytics
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capability,
-    (metatype)(numeric)(lexical),
-    NX_VMS_API)
+    (metatype)(numeric)(lexical), NX_VMS_API)
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capabilities,
-    (metatype)(numeric)(lexical),
-    NX_VMS_API)
+    (metatype)(numeric)(lexical), NX_VMS_API)
