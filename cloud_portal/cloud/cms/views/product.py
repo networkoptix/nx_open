@@ -110,8 +110,8 @@ def context_editor_action(request, product, context_id, language_code):
             add_upload_error_messages(request, upload_errors)
         else:
             messages.success(request, saved_msg)
-            preview_link = modify_db.generate_preview_link(context)
-            print preview_link
+            if product.product_type == ProductType.PRODUCT_TYPES.cloud_portal:
+                preview_link = modify_db.generate_preview_link(context)
 
     return preview_link
 

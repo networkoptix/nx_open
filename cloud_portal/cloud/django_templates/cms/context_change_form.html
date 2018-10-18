@@ -34,13 +34,8 @@
                             <br><br>
                         {% endif %}
 
-                        {% if optional and not record_exists %}
-                            <img class="preview-image original-preview optional-image"
-                                 src="data:image/png;base64,{{ field.value }}">
-                        {% else %}
-                            <img class="preview-image original-preview"
-                                 src="data:image/png;base64,{{ field.value }}">
-                        {% endif %}
+                        <img class="preview-image context-preview {% if optional and not record_exists %} optional-image {% endif %}"
+                             src="data:image/png;base64,{{ field.value }}">
                     </div>
 
                 {% elif field|is_FileField and field.value %}

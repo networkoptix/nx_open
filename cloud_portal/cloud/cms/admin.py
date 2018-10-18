@@ -129,7 +129,7 @@ class ContextProxyAdmin(CMSAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         if request.method == "POST" and 'product_id' in request.POST:
-            extra_context['preview_link'] = page_editor(request).url
+            extra_context['preview_link'] = page_editor(request)
             if 'SendReview' in request.POST:
                 return redirect(extra_context['preview_link'])
 
