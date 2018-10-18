@@ -1,6 +1,9 @@
-nx_add_test(nx_cassandra_ut NO_MOC
+nx_add_test(nx_cassandra_ut
+    NO_MOC
+    NO_RC_FILE
     PUBLIC_LIBS
-        GTest GMock
+        GTest
+        GMock
         nx_cassandra
         nx_utils
         libtraffic_relay

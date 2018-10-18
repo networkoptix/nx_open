@@ -128,18 +128,25 @@ def audio_parameters(run, *configurations):  # type: (stage.Run, dict) -> Genera
     """For each configuration: enables recording with audio; applies configuration and checks if
     actual stream parameters on primary stream correspond to it.
     """
-    # Enable recording to keep video stream open during entire stage.
+    # Enable recording to keep video stream open during the entire stage.
     with run.server.api.camera_recording(run.uuid):
         with run.server.api.camera_audio_enabled(run.uuid):
             for index, configuration in enumerate(configurations):
                 if not configuration.get('skip_codec_change'):
-                    configure_audio(
-                        run.server.api, run.id, run.data['cameraAdvancedParams'], **configuration)
+                    if 'set_codec' in configuration.keys():
+                        configure_audio(
+                            run.server.api, run.id, run.data['cameraAdvancedParams'],
+                            configuration.pop('set_codec'))
+                    else:
+                        configure_audio(
+                            run.server.api, run.id, run.data['cameraAdvancedParams'],
+                            **configuration)
                 else:
                     del configuration["skip_codec_change"]
 
                 for error in ffprobe_streams(
-                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index)):
+                        {'audio': configuration}, run.media_url(), 'primary[{}]'.format(index),
+                        audio_stage=True):
                     yield error
 
     yield Success()
