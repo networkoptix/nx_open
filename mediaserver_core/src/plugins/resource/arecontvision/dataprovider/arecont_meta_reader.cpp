@@ -1,3 +1,6 @@
+
+#ifdef ENABLE_ARECONT
+
 #include "arecont_meta_reader.h"
 
 #include <nx/network/url/url_builder.h>
@@ -149,3 +152,5 @@ void ArecontMetaReader::onMetaData(const ParsingInfo& info)
             lm("Failed to get motion meta data. Invalid response format %1").arg(result));
     }
 }
+
+#endif // ENABLE_ARECONT

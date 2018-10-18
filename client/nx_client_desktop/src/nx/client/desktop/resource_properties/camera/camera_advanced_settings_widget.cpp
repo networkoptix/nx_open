@@ -116,7 +116,7 @@ bool CameraAdvancedSettingsWidget::hasWebPage() const
 {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return false;
-    QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
+    QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
     return resourceData.value<bool>(lit("showUrl"), false);
 }
 
@@ -145,7 +145,7 @@ void CameraAdvancedSettingsWidget::reloadData()
         if (!m_camera)
             return;
 
-        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
+        QnResourceData resourceData = m_camera->commonModule()->dataPool()->data(m_camera);
         auto urlPath = resourceData.value<QString>(lit("urlLocalePath"), QString());
         while (urlPath.startsWith(lit("/")))
             urlPath = urlPath.mid(1); //< VMS Gateway does not like several slashes at the beginning.

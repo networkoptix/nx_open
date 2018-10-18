@@ -62,6 +62,10 @@ Removed param <strong><code><i>scheduleTask.recordAudio</i></code></strong>
     /ec2/getCamerasEx
 </pre>
 
+<!-- <em>[proprietary]</em> Made <strong><i>GET</i></strong> deprecated in favor of <strong><b>POST</b></strong> in method
+<strong><code>/api/activateLicense</code></strong> (deprecated method support expires after 4.0).
+-->
+
 <!--============================================================================================-->
 <hr/>
 <h2>VMS <b>3.2</b> relative to <i>3.1</i></h2>
@@ -227,6 +231,11 @@ Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
 Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
 <strong><code>/api/manualCamera/add</code></strong>
 (deprecated method support expires after 3.2). Check changed params in the API documentation.
+<p/>
+
+Renamed param
+<strong><code><i>timeSinseEpochMs</i> -> <b>timeSinceEpochMs</b></code></strong>
+in method <strong><code>/ec2/getTimeOfServers</code></strong>
 <p/>
 
 </div>

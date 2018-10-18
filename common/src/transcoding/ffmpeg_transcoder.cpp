@@ -362,8 +362,6 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
 int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
 {
-    if (!m_vTranscoder && !m_aTranscoder)
-        return 0;
 
     for (int streamIndex = 0; streamIndex < 2; ++streamIndex)
     {

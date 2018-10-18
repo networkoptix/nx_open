@@ -36,6 +36,7 @@ class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
 class QnAuditManager;
 class CameraDriverRestrictionList;
+class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx { namespace metrics { struct Storage; } }
@@ -277,6 +278,8 @@ public:
     /** instanceCounter used for unit test purpose only */
 
     CameraDriverRestrictionList* cameraDriverRestrictionList() const;
+
+    QnResourceDataPool* dataPool() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -337,6 +340,7 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
+    QnResourceDataPool* m_dataPool = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;

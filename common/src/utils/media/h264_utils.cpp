@@ -87,6 +87,22 @@ void readNALUsFromAnnexBStream(
 
 namespace h264 {
 
+bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps)
+{
+    auto nalUnits = decodeNalUnits(videoData);
+
+    for (const auto& nalu: nalUnits)
+    {
+        if ((*nalu.first & 0x1f) == nuSPS)
+        {
+            if (nalu.second < 4)
+                continue;   //invalid sps
+            sps.decodeBuffer(nalu.first, nalu.first + nalu.second);
+            return sps.deserialize() == 0;
+        }
+    }
+    return false;
+}
 bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
 {
     return data->context &&

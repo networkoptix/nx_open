@@ -158,6 +158,8 @@ public:
     /** Override for IO modules. */
     virtual QnIOStateDataList ioPortStates() const;
 
+    nx::streaming::rtp::TimeOffsetPtr getTimeOffset() { return m_timeOffset; }
+
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -214,6 +216,7 @@ private:
         = std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
 
     int m_channelNumber; // video/audio source number
+    nx::streaming::rtp::TimeOffsetPtr m_timeOffset;
     QElapsedTimer m_lastInitTime;
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;

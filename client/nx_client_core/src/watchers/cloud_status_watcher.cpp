@@ -399,6 +399,7 @@ void QnCloudStatusWatcherPrivate::updateStatusFromResultCode(api::ResultCode res
         case api::ResultCode::accountBlocked:
             setStatus(QnCloudStatusWatcher::LoggedOut,
                 QnCloudStatusWatcher::UserTemporaryLockedOut);
+            break;
         default:
             setStatus(QnCloudStatusWatcher::Offline,
                 QnCloudStatusWatcher::UnknownError);
@@ -415,7 +416,7 @@ void QnCloudStatusWatcher::updateSystems()
 
     const bool isMobile = d->isMobile;
 
-    if (status() != Online)
+    if (status() == LoggedOut)
         return;
 
     if (!d->checkSuppressed())

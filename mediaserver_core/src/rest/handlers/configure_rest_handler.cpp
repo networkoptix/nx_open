@@ -120,6 +120,9 @@ int QnConfigureRestHandler::execute(
     const auto oldSystemId = owner->globalSettings()->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
+        NX_DEBUG(this, lm("Changing local system id from %1 to %2")
+            .args(owner->globalSettings()->localSystemId(), data.localSystemId));
+
         if (!utils.backupDatabase())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));

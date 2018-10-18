@@ -19,12 +19,6 @@ namespace test {
 class AddressResolverOrder:
     public ::testing::Test
 {
-public:
-    AddressResolverOrder()
-    {
-        m_addressResolver.setCloudResolveEnabled(true);
-    }
-
 protected:
     void givenCloudHostname()
     {
@@ -50,12 +44,6 @@ protected:
         m_addressResolver.dnsResolver().addEtcHost(
             m_hostname,
             {{m_dnsEntry}});
-    }
-
-    void disableCloudConnect()
-    {
-        m_addressResolver.setCloudResolveEnabled(false);
-        // Mediator is not resolved, so cloud connect is disabled.
     }
 
     void disabledCloudResolve()
@@ -148,27 +136,6 @@ TEST_F(AddressResolverOrder, cloud_resolve_is_skipped_for_non_cloud_address)
     givenNonCloudHostname();
     makeHostnameResolvableWithDns();
     assertResolveReturnsDnsResolveResult();
-}
-
-TEST_F(
-    AddressResolverOrder,
-    cloud_resolve_is_skipped_if_cloud_connect_is_not_initialized)
-{
-    disableCloudConnect();
-
-    givenCloudHostname();
-    makeHostnameResolvableWithDns();
-    assertResolveReturnsDnsResolveResult();
-}
-
-TEST_F(
-    AddressResolverOrder,
-    cloud_hostname_is_not_resolved_if_cloud_connect_is_not_initialized)
-{
-    disableCloudConnect();
-
-    givenCloudHostname();
-    assertHostnameCannotBeResolved();
 }
 
 TEST_F(

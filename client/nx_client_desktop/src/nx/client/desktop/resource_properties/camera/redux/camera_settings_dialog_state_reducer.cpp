@@ -173,7 +173,7 @@ State fillBitrateFromFixedQuality(State state)
 
 QString settingsUrlPath(const Camera& camera)
 {
-    const auto resourceData = qnStaticCommon->dataPool()->data(camera);
+    const auto resourceData = camera->commonModule()->dataPool()->data(camera);
     if (!resourceData.value<bool>(lit("showUrl"), false))
         return QString();
 
@@ -364,7 +364,7 @@ bool isDefaultExpertSettings(const State& state)
     }
 
     if (state.canSwitchPtzPresetTypes() && (!state.expert.preferredPtzPresetType.hasValue()
-        || state.expert.preferredPtzPresetType() != nx::core::ptz::PresetType::automatic))
+        || state.expert.preferredPtzPresetType() != nx::core::ptz::PresetType::undefined))
     {
         return false;
     }
@@ -1302,7 +1302,7 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     state = setUseBitratePerGOP(std::move(state), false);
     state = setPrimaryRecordingDisabled(std::move(state), false);
     state = setSecondaryRecordingDisabled(std::move(state), false);
-    state = setPreferredPtzPresetType(std::move(state), nx::core::ptz::PresetType::automatic);
+    state = setPreferredPtzPresetType(std::move(state), nx::core::ptz::PresetType::undefined);
     state = setForcedPtzPanTiltCapability(std::move(state), false);
     state = setForcedPtzZoomCapability(std::move(state), false);
     state = setRtpTransportType(std::move(state), vms::api::RtpTransportType::automatic);

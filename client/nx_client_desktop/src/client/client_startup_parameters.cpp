@@ -10,6 +10,7 @@
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <ini.h>
 
 namespace {
 
@@ -151,7 +152,11 @@ nx::utils::Url QnStartupParameters::parseAuthenticationString() const
 
 bool QnStartupParameters::isDevMode() const
 {
-    /* MD5("razrazraz") */
-    return nx::utils::QnCryptographicHash::hash(devModeKey.toLatin1(), nx::utils::QnCryptographicHash::Md5)
-        == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
+    // MD5("razrazraz").
+    const auto developerKey =
+        QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
+
+    using Hash = nx::utils::QnCryptographicHash;
+    return nx::client::desktop::ini().developerMode
+        || Hash::hash(devModeKey.toLatin1(), Hash::Md5) == developerKey;
 }

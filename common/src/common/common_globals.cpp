@@ -91,7 +91,7 @@ QString toString(MediaStreamEvent value)
         case TooManyOpenedConnections:
             return lit("Too many opened connections");
         case ForbiddenWithDefaultPassword:
-            return lit("Please setup camera password");
+            return lit("Please set up camera password");
         case ForbiddenWithNoLicense:
             return lit("No license");
         case oldFirmware:

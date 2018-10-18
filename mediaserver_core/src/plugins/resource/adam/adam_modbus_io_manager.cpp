@@ -8,7 +8,6 @@
 
 #include "adam_modbus_io_manager.h"
 #include <nx/utils/timer_manager.h>
-#include <common/static_common_module.h>
 
 using namespace nx_io_managment;
 
@@ -224,9 +223,7 @@ bool QnAdamModbusIOManager::initializeIO()
 
     auto securityResource = dynamic_cast<QnSecurityCamResource*>(m_resource);
 
-    auto resourceData = qnStaticCommon->dataPool()->data(
-        securityResource->getVendor(),
-        securityResource->getModel());
+    auto resourceData = securityResource->resourceData();
 
     auto startInputCoil = resourceData.value<quint16>(kAdamStartInputCoilParamName);
     auto startOutputCoil = resourceData.value<quint16>(kAdamStartOutputCoilParamName);

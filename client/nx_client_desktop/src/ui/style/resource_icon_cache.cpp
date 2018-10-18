@@ -26,151 +26,97 @@ Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 namespace {
 
-const QString customKeyProperty = lit("customIconCacheKey");
-
 QIcon loadIcon(const QString& name)
 {
     static const QnIcon::SuffixesList kResourceIconSuffixes({
-        {QnIcon::Active,   lit("accented")},
-        {QnIcon::Disabled, lit("disabled")},
-        {QnIcon::Selected, lit("selected")},
+        {QnIcon::Active,   "accented"},
+        {QnIcon::Disabled, "disabled"},
+        {QnIcon::Selected, "selected"},
     });
 
     return qnSkin->icon(name, QString(), &kResourceIconSuffixes);
 }
 
-#define QN_STRINGIFY(VALUE) case QnResourceIconCache::VALUE: return QLatin1String(BOOST_PP_STRINGIZE(VALUE))
-
-QString baseToString(QnResourceIconCache::Key base)
-{
-    switch (base)
-    {
-        QN_STRINGIFY(Unknown);
-        QN_STRINGIFY(LocalResources);
-        QN_STRINGIFY(CurrentSystem);
-
-        QN_STRINGIFY(Server);
-        QN_STRINGIFY(Servers);
-        QN_STRINGIFY(HealthMonitor);
-
-        QN_STRINGIFY(Layout);
-        QN_STRINGIFY(SharedLayout);
-        QN_STRINGIFY(Layouts);
-        QN_STRINGIFY(SharedLayouts);
-
-        QN_STRINGIFY(Camera);
-        QN_STRINGIFY(WearableCamera);
-        QN_STRINGIFY(Cameras);
-
-        QN_STRINGIFY(Recorder);
-        QN_STRINGIFY(MultisensorCamera);
-        QN_STRINGIFY(Image);
-        QN_STRINGIFY(Media);
-        QN_STRINGIFY(User);
-        QN_STRINGIFY(Users);
-        QN_STRINGIFY(VideoWall);
-        QN_STRINGIFY(VideoWallItem);
-        QN_STRINGIFY(VideoWallMatrix);
-
-        QN_STRINGIFY(OtherSystem);
-        QN_STRINGIFY(OtherSystems);
-
-        QN_STRINGIFY(IOModule);
-        QN_STRINGIFY(WebPage);
-        QN_STRINGIFY(WebPages);
-        QN_STRINGIFY(AnalyticsEngine);
-        QN_STRINGIFY(AnalyticsEngines);
-        default:
-            return QString::number(base);
-    };
-}
-
-QString statusToString(QnResourceIconCache::Key status)
-{
-    switch (status)
-    {
-        QN_STRINGIFY(Offline);
-        QN_STRINGIFY(Unauthorized);
-        QN_STRINGIFY(Online);
-        QN_STRINGIFY(Locked);
-        QN_STRINGIFY(Incompatible);
-        QN_STRINGIFY(Control);
-        default:
-            return QString::number(status >> 8);
-    };
-}
-
-QString keyToString(QnResourceIconCache::Key key)
-{
-    QString basePart = baseToString(key & QnResourceIconCache::TypeMask);
-    QString statusPart = statusToString(key & QnResourceIconCache::StatusMask);
-    return basePart + L':' + statusPart;
-}
-
-#undef QN_STRINGIFY
-
 } //namespace
 
-QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
+QnResourceIconCache::QnResourceIconCache(QObject* parent):
+    QObject(parent)
 {
-    m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(LocalResources,          loadIcon(lit("tree/local.png")));
-    m_cache.insert(CurrentSystem,           loadIcon(lit("tree/system.png")));
-    m_cache.insert(Server,                  loadIcon(lit("tree/server.png")));
-    m_cache.insert(Servers,                 loadIcon(lit("tree/servers.png")));
-    m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
-    m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
-    m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
-    m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
-    m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
-    m_cache.insert(LayoutTour,              loadIcon(lit("tree/layout_tour.png")));
-    m_cache.insert(LayoutTours,             loadIcon(lit("tree/layout_tours.png")));
-    m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
-    m_cache.insert(WearableCamera,          loadIcon(lit("tree/wearable_camera.png")));
-    m_cache.insert(Cameras,                 loadIcon(lit("tree/cameras.png")));
-    m_cache.insert(IOModule,                loadIcon(lit("tree/io.png")));
-    m_cache.insert(Recorder,                loadIcon(lit("tree/encoder.png")));
-    m_cache.insert(MultisensorCamera,       loadIcon(lit("tree/multisensor.png")));
-    m_cache.insert(Image,                   loadIcon(lit("tree/snapshot.png")));
-    m_cache.insert(Media,                   loadIcon(lit("tree/media.png")));
-    m_cache.insert(User,                    loadIcon(lit("tree/user.png")));
-    m_cache.insert(Users,                   loadIcon(lit("tree/users.png")));
-    m_cache.insert(VideoWall,               loadIcon(lit("tree/videowall.png")));
-    m_cache.insert(VideoWallItem,           loadIcon(lit("tree/screen.png")));
-    m_cache.insert(VideoWallMatrix,         loadIcon(lit("tree/matrix.png")));
-    m_cache.insert(OtherSystem,             loadIcon(lit("tree/other_systems.png")));
-    m_cache.insert(OtherSystems,            loadIcon(lit("tree/other_systems.png")));
-    m_cache.insert(WebPage,                 loadIcon(lit("tree/webpage.png")));
-    m_cache.insert(WebPages,                loadIcon(lit("tree/webpages.png")));
-    m_cache.insert(AnalyticsEngine,         loadIcon(lit("tree/server.png")));
-    m_cache.insert(AnalyticsEngines,        loadIcon(lit("tree/servers.png")));
-    m_cache.insert(C2P,                     loadIcon(lit("tree/c2p.png")));
+    m_cache.insert(Unknown, QIcon());
 
-    m_cache.insert(Media | Offline,         loadIcon(lit("tree/media_offline.png")));
-    m_cache.insert(Image | Offline,         loadIcon(lit("tree/snapshot_offline.png")));
-    m_cache.insert(Server | Offline,        loadIcon(lit("tree/server_offline.png")));
-    m_cache.insert(Server | Incompatible,   loadIcon(lit("tree/server_incompatible.png")));
-    m_cache.insert(Server | Control,        loadIcon(lit("tree/server_current.png")));
-    m_cache.insert(Server | Unauthorized,   loadIcon(lit("tree/server_unauthorized.png")));
-    m_cache.insert(HealthMonitor| Offline,  loadIcon(lit("tree/health_monitor_offline.png")));
-    m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
-    m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
-    m_cache.insert(Camera | Incompatible,   loadIcon(lit("tree/camera_alert.png")));
-    m_cache.insert(IOModule | Incompatible, loadIcon(lit("tree/camera_alert.png")));
-    m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));
-    m_cache.insert(SharedLayout | Locked,   loadIcon(lit("tree/layout_shared_locked.png")));
-    m_cache.insert(VideoWallItem | Locked,  loadIcon(lit("tree/screen_locked.png")));
-    m_cache.insert(VideoWallItem | Control, loadIcon(lit("tree/screen_controlled.png")));
-    m_cache.insert(VideoWallItem | Offline, loadIcon(lit("tree/screen_offline.png")));
-    m_cache.insert(IOModule | Offline,      loadIcon(lit("tree/io_offline.png")));
-    m_cache.insert(IOModule | Unauthorized, loadIcon(lit("tree/io_unauthorized.png")));
-    m_cache.insert(WebPage | Offline,       loadIcon(lit("tree/webpage_offline.png")));
-    m_cache.insert(AnalyticsEngine | Offline, loadIcon(lit("tree/server_offline.png")));
+    // Systems.
+    m_cache.insert(CurrentSystem, loadIcon("tree/system.png"));
+    m_cache.insert(OtherSystem, loadIcon("tree/other_systems.png"));
+    m_cache.insert(OtherSystems, loadIcon("tree/other_systems.png"));
 
-    /* Read-only server that is auto-discovered. */
-    m_cache.insert(Server | Incompatible | ReadOnly,    loadIcon(lit("tree/server_incompatible_disabled.png")));
-    /* Read-only server we are connected to. */
-    m_cache.insert(Server | Control | ReadOnly,         loadIcon(lit("tree/server_incompatible.png")));
+    // Servers.
+    m_cache.insert(Servers, loadIcon("tree/servers.png"));
+    m_cache.insert(Server, loadIcon("tree/server.png"));
+    m_cache.insert(Server | Offline, loadIcon("tree/server_offline.png"));
+    m_cache.insert(Server | Incompatible, loadIcon("tree/server_incompatible.png"));
+    m_cache.insert(Server | Control, loadIcon("tree/server_current.png"));
+    m_cache.insert(Server | Unauthorized, loadIcon("tree/server_unauthorized.png"));
+    // Read-only server that is auto-discovered.
+    m_cache.insert(Server | Incompatible | ReadOnly,
+        loadIcon("tree/server_incompatible_disabled.png"));
+    // Read-only server we are connected to.
+    m_cache.insert(Server | Control | ReadOnly, loadIcon("tree/server_incompatible.png"));
+    m_cache.insert(HealthMonitor, loadIcon("tree/health_monitor.png"));
+    m_cache.insert(HealthMonitor | Offline, loadIcon("tree/health_monitor_offline.png"));
+
+    // Layouts.
+    m_cache.insert(Layouts, loadIcon("tree/layouts.png"));
+    m_cache.insert(Layout, loadIcon("tree/layout.png"));
+    m_cache.insert(Layout | Locked, loadIcon("tree/layout_locked.png"));
+    m_cache.insert(SharedLayout, loadIcon("tree/layout_shared.png"));
+    m_cache.insert(SharedLayout | Locked, loadIcon("tree/layout_shared_locked.png"));
+    m_cache.insert(SharedLayouts, loadIcon("tree/layouts_shared.png"));
+    m_cache.insert(LayoutTour, loadIcon("tree/layout_tour.png"));
+    m_cache.insert(LayoutTours, loadIcon("tree/layout_tours.png"));
+
+    // Cameras.
+    m_cache.insert(Cameras, loadIcon("tree/cameras.png"));
+    m_cache.insert(Camera, loadIcon("tree/camera.svg"));
+    m_cache.insert(Camera | Offline, loadIcon("tree/camera_offline.svg"));
+    m_cache.insert(Camera | Unauthorized, loadIcon("tree/camera_unauthorized.svg"));
+    m_cache.insert(Camera | Incompatible, loadIcon("tree/camera_alert.svg"));
+    m_cache.insert(WearableCamera, loadIcon("tree/wearable_camera.png"));
+    m_cache.insert(IOModule, loadIcon("tree/io.png"));
+    m_cache.insert(IOModule | Offline, loadIcon("tree/io_offline.png"));
+    m_cache.insert(IOModule | Unauthorized, loadIcon("tree/io_unauthorized.png"));
+    m_cache.insert(IOModule | Incompatible, loadIcon("tree/camera_alert.svg"));
+    m_cache.insert(Recorder, loadIcon("tree/encoder.png"));
+    m_cache.insert(MultisensorCamera, loadIcon("tree/multisensor.svg"));
+
+    // Local files.
+    m_cache.insert(LocalResources, loadIcon("tree/local.png"));
+    m_cache.insert(Image, loadIcon("tree/snapshot.png"));
+    m_cache.insert(Image | Offline, loadIcon("tree/snapshot_offline.png"));
+    m_cache.insert(Media, loadIcon("tree/media.png"));
+    m_cache.insert(Media | Offline, loadIcon("tree/media_offline.png"));
+
+    // Users.
+    m_cache.insert(Users, loadIcon("tree/users.png"));
+    m_cache.insert(User, loadIcon("tree/user.png"));
+
+    // Videowalls.
+    m_cache.insert(VideoWall, loadIcon("tree/videowall.png"));
+    m_cache.insert(VideoWallItem, loadIcon("tree/screen.png"));
+    m_cache.insert(VideoWallItem | Locked, loadIcon("tree/screen_locked.png"));
+    m_cache.insert(VideoWallItem | Control, loadIcon("tree/screen_controlled.png"));
+    m_cache.insert(VideoWallItem | Offline, loadIcon("tree/screen_offline.png"));
+    m_cache.insert(VideoWallMatrix, loadIcon("tree/matrix.png"));
+
+    // Web Pages.
+    m_cache.insert(WebPages, loadIcon("tree/webpages.png"));
+    m_cache.insert(WebPage, loadIcon("tree/webpage.png"));
+    m_cache.insert(WebPage | Offline, loadIcon("tree/webpage_offline.png"));
+    m_cache.insert(C2P, loadIcon("tree/c2p.png"));
+
+    // Analytics.
+    m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
+    m_cache.insert(AnalyticsEngines, loadIcon("tree/servers.png"));
+    m_cache.insert(AnalyticsEngine | Offline, loadIcon("tree/server_offline.png"));
 }
 
 QnResourceIconCache::~QnResourceIconCache()
@@ -211,7 +157,6 @@ QIcon QnResourceIconCache::icon(Key key)
         const auto status = key & StatusMask;
         if (status != QnResourceIconCache::Online)
         {
-            qDebug() << "Error: unknown icon" << keyToString(key);
             NX_ASSERT(false, Q_FUNC_INFO, "All icons should be pre-generated.");
         }
 
@@ -245,38 +190,58 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     auto customIconKey = qnResourceRuntimeDataManager->resourceData(resource, Qn::ResourceIconKeyRole);
     if (customIconKey.isValid())
-    {
-        bool ok = true;
-        key = static_cast<Key>(customIconKey.toInt());
-        if (ok)
-            return key;
-    }
+        return static_cast<Key>(customIconKey.toInt());
 
     Qn::ResourceFlags flags = resource->flags();
     if (flags.testFlag(Qn::local_server))
+    {
         key = LocalResources;
+    }
     else if (flags.testFlag(Qn::server))
+    {
         key = Server;
+    }
     else if (flags.testFlag(Qn::layout))
+    {
         key = Layout;
+    }
     else if (flags.testFlag(Qn::io_module))
+    {
         key = IOModule;
+    }
     else if (flags.testFlag(Qn::wearable_camera))
+    {
         key = WearableCamera;
+    }
     else if (flags.testFlag(Qn::live_cam))
+    {
         key = Camera;
+    }
     else if (flags.testFlag(Qn::local_image))
+    {
         key = Image;
+    }
     else if (flags.testFlag(Qn::local_video))
+    {
         key = Media;
+    }
     else if (flags.testFlag(Qn::server_archive))
+    {
+        // What's that actually?
         key = Media;
+    }
     else if (flags.testFlag(Qn::user))
+    {
         key = User;
+    }
     else if (flags.testFlag(Qn::videowall))
+    {
         key = VideoWall;
+    }
     else if (const auto engine = resource.dynamicCast<nx::vms::common::AnalyticsEngineResource>())
+    {
         key = AnalyticsEngine;
+    }
     else if (flags.testFlag(Qn::web_page))
     {
         key = WebPage;
@@ -326,7 +291,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
             ? Incompatible
             : Online;
     }
-    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    else if (const auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         const bool videowall = !layout->data().value(Qn::VideoWallResourceRole)
             .value<QnVideoWallResourcePtr>().isNull();

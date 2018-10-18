@@ -20,6 +20,7 @@ class QnResourceStatusDictionary;
 class QnGlobalSettings;
 class QnLayoutTourManager;
 class QnAuditManager;
+class QnResourceDataPool;
 
 namespace nx { namespace vms { namespace event { class RuleManager; }}}
 namespace nx::network::http { class ClientPool; }
@@ -59,6 +60,7 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const;
     QnAuditManager* auditManager() const;
     nx::network::http::ClientPool* httpClientPool() const;
+    QnResourceDataPool* dataPool() const;
 private:
     void init(QObject *parent);
 

@@ -16,6 +16,7 @@ struct Config
     QString ftpUrl;
     /** Samba storage url. */
     QString smbUrl;
+    bool enableDiscovery = false;
 };
 
 nx::ut::cfg::Config& configInstance();

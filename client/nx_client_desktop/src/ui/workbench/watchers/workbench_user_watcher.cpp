@@ -78,15 +78,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user)
 
         connect(m_user, &QnResource::nameChanged, this,
             &QnWorkbenchUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::hashChanged, this,
-            &QnWorkbenchUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::passwordChanged, this,
-            &QnWorkbenchUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::digestChanged, this,
-            &QnWorkbenchUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::cryptSha512HashChanged, this,
-            &QnWorkbenchUserWatcher::at_user_resourceChanged);
-        connect(m_user, &QnUserResource::realmChanged, this,
+        connect(m_user, &QnUserResource::hashesChanged, this,
             &QnWorkbenchUserWatcher::at_user_resourceChanged);
     }
 

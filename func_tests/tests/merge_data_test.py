@@ -66,7 +66,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
     assert TimePeriod(start_time, sample_media_file.duration) in server.api.get_recorded_time_periods(camera.id)
     stream = server.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory(['stream-media', stream_type]),
+        artifact_factory.make_artifact(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include <gtest/gtest.h>
 
@@ -35,14 +36,15 @@ protected:
     ConnectResult doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-        boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = boost::none,
+        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = std::nullopt,
         std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig = nullptr);
+
     ConnectResult doSimpleConnectTest(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
         const nx::hpm::AbstractCloudDataProvider::System& system,
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server,
-        boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = boost::none);
+        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint = std::nullopt);
 
     void generalTest();
     void cancellationTest();
@@ -52,7 +54,7 @@ protected:
         nx::hpm::MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
         const nx::hpm::AbstractCloudDataProvider::System& system,
         const std::unique_ptr<nx::hpm::MediaServerEmulator>& server,
-        boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
+        std::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
         ConnectResult* const connectResult);
 
 private:

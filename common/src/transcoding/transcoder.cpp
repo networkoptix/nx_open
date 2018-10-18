@@ -439,6 +439,8 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     m_outputPacketSize.clear();
     if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
+        finalize(result);
+
         if (++m_eofCounter >= 3)
             return -8; // EOF reached
         else
@@ -519,6 +521,7 @@ int QnTranscoder::finalize(QnByteArray* const result)
     finalizeInternal(result);
     if (result)
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
+    m_initialized = false;
     return OperationResult::Success;
 }
 

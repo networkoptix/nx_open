@@ -63,20 +63,19 @@ class UnpackMediaserverInstallationGroups(object):
         try:
             yield server
         finally:
-            self._post_process_server(server)
+            self._post_process_servers([server])
 
     @contextmanager
     def many_allocated_servers(self, count, system_settings, server_config=None):
         count_per_group = count // len(self._group_list)  # assuming it is divisible
         server_list_list = [
-            self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
-            for group in self._group_list]
+            self._allocate_servers_from_group(idx, group, count_per_group, system_settings, server_config)
+            for idx, group in enumerate(self._group_list)]
         server_list = flatten_list(server_list_list)
         try:
             yield server_list
         finally:
-            for server in server_list:
-                self._post_process_server(server)
+            self._post_process_servers(server_list)
 
     @contextmanager
     def allocated_lws(self, server_count, merge_timeout_sec, **kw):
@@ -91,21 +90,23 @@ class UnpackMediaserverInstallationGroups(object):
             lws.wait_until_synced(merge_timeout_sec)
             yield lws
         finally:
-            self._post_process_server(lws)
+            self._post_process_servers([lws])
 
-    def _allocate_servers_from_group(self, group, count, system_settings, server_config):
+    def _allocate_servers_from_group(self, group_idx, group, count, system_settings, server_config):
         installation_list = group.allocate_many(count)
         return [
-            self._make_server(installation, '{}-{:03d}'.format(group.name, index), system_settings, server_config, index)
-            for index, installation in enumerate(installation_list)]
+            self._make_server(installation, '{}-{:03d}'.format(group.name, server_idx),
+                              system_settings, server_config, group_idx, server_idx)
+            for server_idx, installation in enumerate(installation_list)]
 
-    def _make_server(self, installation, server_name, system_settings, server_config, index=0):
+    def _make_server(self, installation, server_name, system_settings, server_config, group_idx=0, server_idx=0):
         installation.install(self._mediaserver_installer)
         installation.cleanup(self._ca.generate_key_and_cert())
         if server_config:
             if 'serverGuid' in server_config:
                 # servers must have different guids; serverGuid is expected to be format string
-                server_config = dict(server_config, serverGuid=server_config['serverGuid'].format(index))
+                server_guid = server_config['serverGuid'].format(group_idx=group_idx, server_idx=server_idx)
+                server_config = dict(server_config, serverGuid=server_guid)
             installation.update_mediaserver_conf(server_config)
         server = Mediaserver(server_name, installation, port=installation.server_port)
         try:
@@ -116,14 +117,20 @@ class UnpackMediaserverInstallationGroups(object):
             self._collect_server_actifacts(server)
             raise
 
-    def _post_process_server(self, mediaserver):
-        try:
-            mediaserver.examine()
-        except CoreDumpError as e:
-            # sometimes server (particularly, lws) is failing right between ping and gcore run
-            # we must tolerate this or we won't be able to process his core dump
-            _logger.error('Failed to make core dump for %r: %s', mediaserver, e.cause)
-        self._collect_server_actifacts(mediaserver)
+    def _post_process_servers(self, server_list):
+        core_dumped_server_count = 0
+        for idx, server in enumerate(server_list):
+            try:
+                server.examine()
+            except CoreDumpError as e:
+                # sometimes server (particularly, lws) is failing right between ping and gcore run
+                # we must tolerate this or we won't be able to process his core dump
+                _logger.error('Failed to make core dump for %r: %s', server, e.cause)
+            # collect logs for first server and dumps from at most 3
+            if idx == 0 or server.has_core_dumps() and core_dumped_server_count < 3:
+                self._collect_server_actifacts(server)
+                if idx > 0:
+                    core_dumped_server_count += 1  # not counting first one
 
     def _collect_server_actifacts(self, mediaserver):
         mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name

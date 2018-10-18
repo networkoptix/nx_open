@@ -16,7 +16,6 @@ namespace network {
 namespace aio {
 
 AIOThread::AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
-    QnLongRunnable(false),
     m_taskQueue(std::make_unique<detail::AioTaskQueue>(std::move(pollSet)))
 {
     setObjectName(QString::fromLatin1("AIOThread"));
@@ -30,7 +29,7 @@ AIOThread::~AIOThread()
 
 void AIOThread::pleaseStop()
 {
-    QnLongRunnable::pleaseStop();
+    nx::utils::Thread::pleaseStop();
     m_taskQueue->pollSet->interrupt();
 }
 

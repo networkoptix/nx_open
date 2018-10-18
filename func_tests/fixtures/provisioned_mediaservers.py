@@ -6,10 +6,10 @@ import pytest
 import framework.licensing as licensing
 from defaults import defaults
 from framework.installation.installer import InstallerSet
+from framework.installation.log_parser import parse_mediaserver_logs
 from framework.installation.mediaserver import Mediaserver
 from framework.merging import merge_systems
 from framework.os_access.local_path import LocalPath
-from framework.os_access.path import copy_file
 
 pytest_plugins = ['fixtures.vms']
 
@@ -119,7 +119,7 @@ def one_licensed_mediaserver(one_mediaserver, required_licenses):
 
 
 @pytest.fixture()
-def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca):
+def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca, elasticsearch):
     @contextmanager
     def cm(vm):
         mediaserver = Mediaserver.setup(
@@ -133,5 +133,18 @@ def mediaserver_allocation(mediaserver_installer_set, artifacts_dir, ca):
         finally:
             mediaserver.examine()
             mediaserver.collect_artifacts(mediaserver_artifacts_dir)
+            # TODO: Get logs only once.
+            if elasticsearch is not None:
+                for log_file in mediaserver.installation.list_log_files():
+                    log_bytes = log_file.read_bytes()
+                    static_data = {
+                        'mediaserver': {
+                            'name': mediaserver.name,
+                            'api': mediaserver.api.generic.http.url(''),
+                            'file': log_file.name,
+                            },
+                        }
+                    parsed_log = parse_mediaserver_logs(log_bytes)
+                    elasticsearch.bulk_upload('ft_mediaserver', static_data, parsed_log)
 
     return cm

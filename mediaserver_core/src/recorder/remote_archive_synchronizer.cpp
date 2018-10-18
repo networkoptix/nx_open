@@ -6,7 +6,6 @@
 #include <utils/common/util.h>
 
 #include <common/common_module.h>
-#include <common/static_common_module.h>
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>

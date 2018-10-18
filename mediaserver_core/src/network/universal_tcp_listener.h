@@ -73,6 +73,6 @@ private:
     std::set<QString> m_unauthorizedForwardingPaths;
 
     void onCloudBindingStatusChanged(
-        boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
+        std::optional<nx::hpm::api::SystemCredentials> cloudCredentials);
     void updateCloudConnectState(QnMutexLockerBase* const lk);
 };

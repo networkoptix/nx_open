@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "nx/network/buffer.h"
 
@@ -43,7 +43,7 @@ class AbstractCloudSystemCredentialsProvider
 public:
     virtual ~AbstractCloudSystemCredentialsProvider() {}
 
-    virtual boost::optional<SystemCredentials> getSystemCredentials() const = 0;
+    virtual std::optional<SystemCredentials> getSystemCredentials() const = 0;
 };
 
 } // namespace api

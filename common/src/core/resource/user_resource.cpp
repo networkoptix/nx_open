@@ -128,7 +128,7 @@ QByteArray QnUserResource::getHash() const
 void QnUserResource::setHash(const QByteArray& hash)
 {
     if (setMemberChecked(&QnUserResource::m_hash, hash))
-        emit hashChanged(::toSharedPointer(this));
+        emit hashesChanged(::toSharedPointer(this));
 }
 
 QString QnUserResource::getPassword() const
@@ -140,9 +140,8 @@ QString QnUserResource::getPassword() const
 void QnUserResource::setPasswordAndGenerateHash(const QString& password)
 {
     const bool emitChangedSignal = setMemberChecked(&QnUserResource::m_password, password);
-    updateHash();
-    if (emitChangedSignal)
-        emit passwordChanged(::toSharedPointer(this));
+    if (updateHash() && emitChangedSignal)
+        emit hashesChanged(::toSharedPointer(this));
 }
 
 void QnUserResource::resetPassword()
@@ -161,30 +160,31 @@ QString QnUserResource::decodeLDAPPassword() const
     return QString::fromUtf8(nx::utils::encodeSimple(encodedPassword, salt));
 }
 
-void QnUserResource::updateHash()
+bool QnUserResource::updateHash()
 {
     QString password = getPassword();
     if (password.isEmpty())
-        return;
+        return false;
 
     const auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
     using SignalGuardList = QList<nx::utils::SharedGuardPtr>;
 
-    SignalGuardList guards;
-
     const auto resource = ::toSharedPointer(this);
+    bool hashesChanged = false;
     if (setMemberChecked(&QnUserResource::m_realm, hashes.realm))
-        guards.append(createSignalGuard(this, &QnUserResource::realmChanged));
+        hashesChanged = true;
 
     if (setMemberChecked(&QnUserResource::m_hash, hashes.passwordHash))
-        guards.append(createSignalGuard(this, &QnUserResource::hashChanged));
+        hashesChanged = true;
 
     if (setMemberChecked(&QnUserResource::m_digest, hashes.passwordDigest))
-        guards.append(createSignalGuard(this, &QnUserResource::digestChanged));
+        hashesChanged = true;
 
     if (setMemberChecked(&QnUserResource::m_cryptSha512Hash, hashes.cryptSha512Hash))
-        guards.append(createSignalGuard(this, &QnUserResource::cryptSha512HashChanged));
+        hashesChanged = true;
+
+    return hashesChanged;
 }
 
 bool QnUserResource::checkLocalUserPassword(const QString &password)
@@ -234,7 +234,7 @@ void QnUserResource::setDigest(const QByteArray& digest)
         };
 
     if (setMemberChecked(&QnUserResource::m_digest, digest, middlestep))
-        emit digestChanged(::toSharedPointer(this));
+        emit hashesChanged(::toSharedPointer(this));
 }
 
 QByteArray QnUserResource::getDigest() const
@@ -246,7 +246,7 @@ QByteArray QnUserResource::getDigest() const
 void QnUserResource::setCryptSha512Hash(const QByteArray& cryptSha512Hash)
 {
     if (setMemberChecked(&QnUserResource::m_cryptSha512Hash, cryptSha512Hash))
-        emit cryptSha512HashChanged(::toSharedPointer(this));
+        emit hashesChanged(::toSharedPointer(this));
 }
 
 QByteArray QnUserResource::getCryptSha512Hash() const
@@ -266,7 +266,7 @@ void QnUserResource::setRealm(const QString& realm)
     // Uncoment to debug authorization related problems.
     // NX_ASSERT(m_digest.isEmpty() || !realm.isEmpty());
     if (setMemberChecked(&QnUserResource::m_realm, realm))
-        emit realmChanged(::toSharedPointer(this));
+        emit hashesChanged(::toSharedPointer(this));
 }
 
 GlobalPermissions QnUserResource::getRawPermissions() const
@@ -402,29 +402,29 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
     if (localOther)
     {
         NX_ASSERT(m_userType == localOther->m_userType, Q_FUNC_INFO, "User type was designed to be read-only");
-
+        bool hashesChanged = false;
         if (m_password != localOther->m_password)
         {
             m_password = localOther->m_password;
-            notifiers << [r = toSharedPointer(this)]{emit r->passwordChanged(r);};
+            hashesChanged = true;
         }
 
         if (m_hash != localOther->m_hash)
         {
             m_hash = localOther->m_hash;
-            notifiers << [r = toSharedPointer(this)]{ emit r->hashChanged(r); };
+            hashesChanged = true;
         }
 
         if (m_digest != localOther->m_digest)
         {
             m_digest = localOther->m_digest;
-            notifiers << [r = toSharedPointer(this)]{ emit r->digestChanged(r); };
+            hashesChanged = true;
         }
 
         if (m_cryptSha512Hash != localOther->m_cryptSha512Hash)
         {
             m_cryptSha512Hash = localOther->m_cryptSha512Hash;
-            notifiers << [r = toSharedPointer(this)]{ emit r->cryptSha512HashChanged(r); };
+            hashesChanged = true;
         }
 
         if (m_permissions != localOther->m_permissions)
@@ -463,7 +463,7 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             // Uncoment to debug authorization related problems.
             // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());
             m_realm = localOther->m_realm;
-            notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
+            hashesChanged = true;
         }
 
         if (m_isEnabled != localOther->m_isEnabled)
@@ -471,6 +471,9 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             m_isEnabled = localOther->m_isEnabled;
             notifiers << [r = toSharedPointer(this)]{ emit r->enabledChanged(r); };
         }
+
+        if (hashesChanged)
+            notifiers << [r = toSharedPointer(this)]{ emit r->hashesChanged(r); };
     }
 }
 

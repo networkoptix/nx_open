@@ -189,13 +189,13 @@ void Url::parse(const QString& url, SetUrlFunc setUrlFunc)
     }
 }
 
-void Url::setUrl(const QString& url, QUrl::ParsingMode /*mode*/)
+void Url::setUrl(const QString& url, QUrl::ParsingMode mode)
 {
     parse(
         url,
-        [this](const QString& url)
+        [this, mode](const QString& url)
         {
-            m_url.setUrl(url);
+            m_url.setUrl(url, mode);
         });
 }
 

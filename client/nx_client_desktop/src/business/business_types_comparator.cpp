@@ -131,6 +131,7 @@ QList<ActionType> QnBusinessTypesComparator::getAllActions() const
 QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subtype) const
 {
     static QSet<ActionType> clientsideActions{
+        ActionType::openLayoutAction,
         ActionType::showOnAlarmLayoutAction,
         ActionType::fullscreenCameraAction,
         ActionType::exitFullscreenAction

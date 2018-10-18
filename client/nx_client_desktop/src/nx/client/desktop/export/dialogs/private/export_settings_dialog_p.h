@@ -59,6 +59,7 @@ public:
     void setApplyFilters(bool value);
     void setLayoutReadOnly(bool value);
     void setWatermark(const nx::core::Watermark& watermark);
+    void setBookmarks(const QnCameraBookmarkList& bookmarks);
 
     bool mediaSupportsUtc() const;
     Filename selectedFileName(Mode mode) const;

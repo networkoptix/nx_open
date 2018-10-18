@@ -16,10 +16,14 @@ public:
         std::unique_ptr<hpm::api::MediatorServerTcpConnection> serverConnection);
 
     virtual std::unique_ptr<hpm::api::MediatorClientTcpConnection> clientConnection() override;
+
     virtual std::unique_ptr<hpm::api::MediatorServerTcpConnection> systemConnection() override;
-    virtual boost::optional<nx::network::SocketAddress> udpEndpoint() const override;
-    virtual void setOnMediatorAvailabilityChanged(
-        hpm::api::MediatorAvailabilityChangedHandler handler) override;
+
+    virtual void fetchUdpEndpoint(nx::utils::MoveOnlyFunc<void(
+        nx::network::http::StatusCode::Value /*resultCode*/,
+        nx::network::SocketAddress /*endpoint*/)> handler) override;
+
+    virtual std::optional<nx::network::SocketAddress> udpEndpoint() const override;
 
 private:
     nx::network::SocketAddress m_udpEndpoint;
