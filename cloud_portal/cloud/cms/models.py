@@ -294,7 +294,8 @@ class DataStructure(models.Model):
                          (3, 'long_text', 'Long Text'),
                          (4, 'file', 'File'),
                          (5, 'guid', 'GUID'),
-                         (6, 'select', 'Select'))
+                         (6, 'select', 'Select'),
+                         (7, 'external_file', 'External File'))
 
     type = models.IntegerField(choices=DATA_TYPES, default=DATA_TYPES.text)
     default = models.TextField(default='', blank=True)
@@ -445,6 +446,15 @@ class ProductCustomizationReview(models.Model):
         return self.version.product.__str__()
 
 
+class ExternalFile(models.Model):
+    file = models.FileField()
+    md5 = models.CharField(max_length=1024)
+    size = models.FloatField()
+
+    def __str__(self):
+        return self.file.name
+
+
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
     product = models.ForeignKey(Product, default=None, null=True)
@@ -459,7 +469,7 @@ class DataRecord(models.Model):
         blank=True, related_name='created_%(class)s')
 
     value = models.TextField(default='', blank=True)
-    file = models.FileField(upload_to='', default=None, blank=True)
+    external_file = models.ForeignKey(ExternalFile, default=None, null=True)
 
     def __str__(self):
         return self.value

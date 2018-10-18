@@ -325,3 +325,10 @@ class UserGroupsToCustomizationPermissionsAdmin(CMSAdmin):
 
 
 admin.site.register(UserGroupsToCustomizationPermissions, UserGroupsToCustomizationPermissionsAdmin)
+
+
+class ExternalFileAdmin(CMSAdmin):
+    list_filter = ('id', 'file', 'size',)
+
+
+admin.site.register(ExternalFile, ExternalFileAdmin)
