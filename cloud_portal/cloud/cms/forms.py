@@ -2,6 +2,8 @@ import yaml
 from django import forms
 from .models import *
 
+from dal import autocomplete
+
 
 def convert_meta_to_description(meta):
     meta_to_plain = {"format": "Format:  %s",
@@ -159,6 +161,15 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         exclude = []
+        widgets = {
+            'created_by': autocomplete.ModelSelect2(url='account-autocomplete',
+                                                            attrs={
+                                                                # Set some placeholder
+                                                                'data-placeholder': 'Email ...',
+                                                                #  Only trigger autocompletion after 2 characters have been typed
+                                                                'data-minimum-input-length': 2
+                                                            })
+        }
 
     def __init__(self, *args, **kwargs):
         # Do the normal form initialisation.
