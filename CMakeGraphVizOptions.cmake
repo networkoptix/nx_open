@@ -12,4 +12,11 @@ set(GRAPHVIZ_IGNORE_TARGETS
     "boost"
     "quazip"
     "ffmpeg"
+    ".*_analytics_plugin"
+    ".*_EXCLUDED"
+    "generic.*plugin"
+    "tegra_video"
+    "mjpg_link"
+    "cassandra"
+    "image_library_plugin"
 )
