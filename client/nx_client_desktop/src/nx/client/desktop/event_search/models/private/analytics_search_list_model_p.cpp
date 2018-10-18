@@ -244,7 +244,8 @@ bool AnalyticsSearchListModel::Private::isCameraApplicable(
     const QnVirtualCameraResourcePtr& camera) const
 {
     // TODO: #vkutin Implement it when it's possible!
-    return !camera.isNull();
+    NX_ASSERT(camera);
+    return true;
 }
 
 bool AnalyticsSearchListModel::Private::hasAccessRights() const
@@ -293,7 +294,7 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
 
     if (handleOverlaps && !m_data.empty())
     {
-        const auto last = m_data.front();
+        const auto& last = m_data.front();
         const auto lastTimeUs = last.firstAppearanceTimeUsec;
 
         while (end != begin)
@@ -340,20 +341,20 @@ bool AnalyticsSearchListModel::Private::commitPrefetch(const QnTimePeriod& perio
     const auto clearPrefetch = nx::utils::makeScopeGuard([this]() { m_prefetch.clear(); });
 
     if (currentRequest().direction == FetchDirection::earlier)
-        return commitInternal(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count(), false);
+        return commitInternal(periodToCommit, m_prefetch.begin(), m_prefetch.end(), count(), false);
 
     NX_ASSERT(currentRequest().direction == FetchDirection::later);
     return commitInternal(
-        periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0, q->effectiveLiveSupported());
+        periodToCommit, m_prefetch.rbegin(), m_prefetch.rend(), 0, q->effectiveLiveSupported());
 }
 
 rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& period,
     GetCallback callback, int limit)
 {
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->restConnection());
-    if (!server || !server->restConnection())
-        return false;
+    NX_ASSERT(callback && server && server->restConnection());
+    if (!callback || !server || !server->restConnection())
+        return {};
 
     Filter request;
     if (q->cameraSet()->type() != ManagedCameraSet::Type::all)
@@ -838,13 +839,6 @@ QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
     NX_ASSERT(!object.track.empty());
     if (object.track.empty())
         return {};
-
-    if (q->cameras().size() == 1) //< An optimization.
-    {
-        const auto result = *q->cameras().cbegin();
-        NX_ASSERT(result->getId() == object.track[0].deviceId);
-        return result;
-    }
 
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(object.track[0].deviceId);
 }

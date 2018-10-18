@@ -2,7 +2,7 @@
 
 namespace Qn {
 
-static const int kMotionGridWidth = 44;
-static const int kMotionGridHeight = 32;
+static constexpr int kMotionGridWidth = 44;
+static constexpr int kMotionGridHeight = 32;
 
-}
+} // namespace Qn

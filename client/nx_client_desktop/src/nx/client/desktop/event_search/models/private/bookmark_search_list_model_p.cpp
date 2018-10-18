@@ -318,12 +318,7 @@ int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const
 QnVirtualCameraResourcePtr BookmarkSearchListModel::Private::camera(
     const QnCameraBookmark& bookmark) const
 {
-    if (q->cameras().size() != 1)
-        return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
-
-    const auto camera = *q->cameras().cbegin();
-    NX_ASSERT(camera && camera->getId() == bookmark.cameraId);
-    return camera;
+    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
 }
 
 // TODO: #vkutin Make color customized properly. Replace icon with pre-colorized one.

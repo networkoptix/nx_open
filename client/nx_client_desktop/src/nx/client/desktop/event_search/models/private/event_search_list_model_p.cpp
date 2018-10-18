@@ -147,12 +147,6 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             if (!hasPreview(eventParams.eventType))
                 return false;
 
-            if (q->cameraSet()->type() != ManagedCameraSet::Type::all
-                && q->cameraSet()->cameras().size() == 1)
-            {
-                return QVariant::fromValue<QnResourcePtr>(*q->cameraSet()->cameras().cbegin());
-            }
-
             return QVariant::fromValue<QnResourcePtr>(q->resourcePool()->
                 getResourceById<QnVirtualCameraResource>(eventParams.eventResourceId));
         }
@@ -331,13 +325,10 @@ void EventSearchListModel::Private::fetchLive()
 rest::Handle EventSearchListModel::Private::getEvents(
     const QnTimePeriod& period, GetCallback callback, Qt::SortOrder order, int limit)
 {
-    if (!callback)
-        return false;
-
     const auto server = q->commonModule()->currentServer();
-    NX_ASSERT(server && server->restConnection());
-    if (!server || !server->restConnection())
-        return false;
+    NX_ASSERT(callback && server && server->restConnection());
+    if (!callback || !server || !server->restConnection())
+        return {};
 
     QnEventLogMultiserverRequestData request;
     request.filter.cameras = q->cameraSet()->type() != ManagedCameraSet::Type::all

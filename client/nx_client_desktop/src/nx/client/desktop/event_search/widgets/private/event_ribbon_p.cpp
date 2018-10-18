@@ -357,6 +357,8 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     if (!menu)
         return;
 
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, posRelativeToTile);
     menu->exec(globalPos);
 }

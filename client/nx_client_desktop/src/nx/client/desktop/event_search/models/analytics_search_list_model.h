@@ -28,7 +28,7 @@ protected:
 
 private:
     class Private;
-    Private* const d = nullptr;
+    Private* const d;
 };
 
 } // namespace nx::client::desktop
