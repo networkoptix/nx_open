@@ -1,7 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 
+#include <nx/network/aio/async_operation_wrapper.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/buffer.h>
@@ -13,14 +15,13 @@
 #include <nx/utils/thread/stoppable.h>
 
 #include "listening_peer_pool.h"
+#include "relay/abstract_relay_cluster_client.h"
 #include "statistics/connection_statistics_info.h"
 
 namespace nx {
 namespace hpm {
 
 namespace conf { class Settings; }
-
-class AbstractRelayClusterClient;
 
 /**
  * NOTE: Object can be safely freed while in onFsmFinishedEventHandler handler.
@@ -32,6 +33,9 @@ class UDPHolePunchingConnectionInitiationFsm:
     using base_type = network::aio::BasicPollable;
 
 public:
+    using ConnectCompletionHandler =
+        std::function<void(api::ResultCode, api::ConnectResponse)>;
+
     /**
      * NOTE: onFsmFinishedEventHandler is allowed to free
      *     UDPHolePunchingConnectionInitiationFsm instance.
@@ -50,7 +54,7 @@ public:
     void onConnectRequest(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
-        std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+        ConnectCompletionHandler completionHandler);
 
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
@@ -82,29 +86,42 @@ private:
     AbstractRelayClusterClient* const m_relayClusterClient;
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
-    std::function<void(api::ResultCode, api::ConnectResponse)> m_connectResponseSender;
+    ConnectCompletionHandler m_connectResponseSender;
     const std::list<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
     api::ConnectionMethods m_serverPeerConnectionMethods;
     stats::ConnectSession m_sessionStatisticsInfo;
     api::ConnectResponse m_preparedConnectResponse;
-    boost::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
+    std::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
     api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
+    nx::network::aio::AsyncOperationWrapper<
+        decltype(&AbstractRelayClusterClient::findRelayInstancePeerIsListeningOn)
+    > m_findRelayInstanceFunc;
 
     virtual void stopWhileInAioThread() override;
 
     void processConnectRequest(
         const ConnectionStrongRef& originatingPeerConnection,
         api::ConnectRequest request,
-        std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+        ConnectCompletionHandler connectResponseSender);
+
+    void processUdpConnectRequest(
+        const ConnectionStrongRef& originatingPeerConnection,
+        api::ConnectRequest request,
+        ConnectCompletionHandler connectResponseSender);
+
+    void processTcpConnectRequest(
+        const ConnectionStrongRef& originatingPeerConnection,
+        api::ConnectRequest request,
+        ConnectCompletionHandler connectResponseSender);
 
     bool connectResponseHasAlreadyBeenSent() const;
 
     void repeatConnectResponse(
-        std::function<void(api::ResultCode, api::ConnectResponse)> connectResponseSender);
+        ConnectCompletionHandler connectResponseSender);
 
     void updateSessionStatistics(
         const ConnectionStrongRef& originatingPeerConnection,
@@ -129,14 +146,17 @@ private:
 
     void initiateRelayInstanceSearch();
 
+    void findRelayInstance(
+        RelayInstanceSearchCompletionHandler handler);
+
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(boost::optional<QUrl> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(std::optional<QUrl> relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,
         std::list<network::SocketAddress> tcpEndpoints,
-        boost::optional<QUrl> relayInstanceUrl);
+        std::optional<QUrl> relayInstanceUrl);
 
     void sendConnectResponse(
         api::ResultCode resultCode,
