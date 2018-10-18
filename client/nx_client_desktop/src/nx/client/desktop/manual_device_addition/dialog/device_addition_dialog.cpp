@@ -42,26 +42,6 @@ bool isKnownAddressPage(QTabWidget* tabWidget)
     return tabWidget->currentIndex() == kKnownAddressPageIndex;
 }
 
-FakeResourceList toFakeResourcesList(const QnManualResourceSearchList& devices)
-{
-    FakeResourceList result;
-
-    for(const auto& device: devices)
-    {
-        const FakeResourceDescription camera =
-            {
-                device.uniqueId,
-                qnSkin->icon("tree/camera.png"),
-                device.name,
-                device.url
-            };
-
-        result.append(camera);
-    }
-
-    return result;
-}
-
 using ResourceCallback = std::function<void (const QnResourcePtr& resource)>;
 using CameraCallback = std::function<void (const QnVirtualCameraResourcePtr& camera)>;
 

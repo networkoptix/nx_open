@@ -1,222 +1,95 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
 import Nx 1.0
-import nx.client.core 1.0
 import nx.client.desktop 1.0
+
+import "private"
 
 Button
 {
     id: control
 
-    property color color: highlighted
-        ? ColorTheme.highlight
-        : ColorTheme.button
-    property color textColor: highlighted
-        ? ColorTheme.highlightContrast
-        : ColorTheme.buttonText
+    property bool isAccentButton: false
+    property color backgroundColor:
+        isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button
 
-    property color hoveredColor: ColorTheme.lighter(color, 1)
-    property color pressedColor: color
-    property color checkedColor: ColorTheme.darker(color, 1)
-    property color textHoveredColor: textColor
-    property color textPressedColor: textColor
-    property color focusIndicatorColor: ColorTheme.isLight(color)
-        ? ColorTheme.transparent(ColorTheme.brightText, 0.7)
-        : ColorTheme.transparent(ColorTheme.highlight, 0.5)
+    property color hoveredColor: ColorTheme.lighter(backgroundColor, 1)
+    property color pressedColor:
+        isAccentButton ? ColorTheme.darker(hoveredColor, 1) : backgroundColor
 
-    property string icon
-    property string hoveredIcon
-    property string pressedIcon
-    property int iconAlignment: Qt.AlignLeft
+    property string iconUrl
+    property string hoveredIconUrl
+    property string pressedIconUrl
 
-    property real disabledOpacity: highlighted ? 0.2 : 0.3
-    property real iconSpacing: 0
-    property real minimumIconWidth: 32
+    property bool showBackground: true
 
-    readonly property alias hovered: mouseTracker.containsMouse
+    implicitHeight: 28
 
-    property bool flat: false //< TODO: #dklychkov Remove after updating Qt version.
-    property bool frameless: false
-
-    leftPadding:
-    {
-        if (!text)
-            return 0
-
-        if (icon)
-            return iconAlignment === Qt.AlignRight ? 12 : 0
-
-        return 16
-    }
-    rightPadding:
-    {
-        if (!text)
-            return 0
-
-        if (icon)
-            return iconAlignment === Qt.AlignRight ? 0 : 12
-
-        return 16
-    }
-    topPadding: 5
-    bottomPadding: 5
-
-    implicitHeight: Math.max(label.implicitHeight + topPadding + bottomPadding, 28)
-    implicitWidth: Math.max(label.implicitWidth + leftPadding + rightPadding, 32)
+    font.pixelSize: 13
+    font.weight: Font.Medium
 
     Keys.enabled: true
     Keys.onEnterPressed: control.clicked()
     Keys.onReturnPressed: control.clicked()
 
-    font.pixelSize: 13
-    font.weight: Font.Medium
-
-    background: Rectangle
+    Binding
     {
-        color:
+        target: control
+        property: "opacity"
+        value: enabled ? 1.0 : (isAccentButton ? 0.2 : 0.3)
+    }
+
+    Image
+    {
+        id: iconImage
+
+        anchors.fill: parent
+
+        visible: control.iconUrl.length
+
+        function nonEmptyIcon(target, base)
+        {
+            return target.length ? target : base
+        }
+
+        source:
         {
             if (control.pressed)
-                return control.pressedColor
+                return nonEmptyIcon(control.pressedIconUrl, control.iconUrl)
 
-            if (control.hovered)
-                return control.hoveredColor
-
-            if (control.checked)
-                return control.checkedColor
-
-            return control.flat ? ColorTheme.transparent(control.color, 0) : control.color
-        }
-
-        radius: 2
-
-        opacity: enabled ? 1.0 : control.disabledOpacity
-
-        Rectangle
-        {
-            id: borderTop
-
-            visible: enabled && !control.flat && !control.frameless && control.pressed
-            x: 1
-            height: 1
-            width: parent.width - 2
-            color: ColorTheme.darker(parent.color, 2)
-        }
-
-        Rectangle
-        {
-            id: borderBottom
-
-            visible: enabled && !control.flat && !control.frameless && !control.pressed
-            x: 1
-            height: 1
-            width: parent.width - 2
-            anchors.bottom: parent.bottom
-            color: ColorTheme.darker(parent.color, 2)
+            return (control.hovered && control.hoveredIconUrl.length)
+                ? control.hoveredIconUrl
+                : control.iconUrl
         }
     }
 
-    label: Item
+    background: ButtonBackground
     {
-        x: control.leftPadding
-        y: control.topPadding
-        width: parent.availableWidth
-        height: parent.availableHeight
+        hovered: control.hovered
+        pressed: control.pressed
+        flat: control.flat
+        backgroundColor: control.isAccentButton ? ColorTheme.colors.brand_core : ColorTheme.button
 
-        implicitHeight: Math.max(imageArea.implicitHeight, text.implicitHeight)
-        implicitWidth: (text.visible ? text.implicitWidth : 0)
-            + (imageArea.visible ? imageArea.implicitWidth + control.iconSpacing : 0)
-
-        opacity: enabled ? 1.0 : control.disabledOpacity
-
-        Item
+        FocusFrame
         {
-            id: imageArea
-
-            implicitWidth: Math.max(control.minimumIconWidth, image.implicitWidth)
-            implicitHeight: image.implicitHeight
-
-            anchors.verticalCenter: parent.verticalCenter
-            x: (control.iconAlignment === Qt.AlignRight)
-                ? parent.width - width
-                : 0
-
-            visible: image.status === Image.Ready
-
-            Image
-            {
-                id: image
-
-                anchors.centerIn: imageArea
-
-                source:
-                {
-                    if (control.pressed)
-                        return control.pressedIcon || control.icon
-
-                    if (control.hovered)
-                        return control.hoveredIcon || control.icon
-
-                    return control.icon
-                }
-
-            }
-        }
-
-        Text
-        {
-            id: text
-
-            anchors.verticalCenter: parent.verticalCenter
-            x:
-            {
-                var availableLeft = 0
-                var availableRight = parent.width
-
-                if (imageArea.visible)
-                {
-                    if (control.iconAlignment === Qt.AlignRight)
-                        availableRight -= imageArea.width + control.iconSpacing
-                    else
-                        availableLeft += imageArea.width + control.iconSpacing
-                }
-
-                return availableLeft + (availableRight - availableLeft - width) / 2
-            }
-            width: Math.min(
-                parent.width - (imageArea.visible ? imageArea.width + control.iconSpacing : 0),
-                implicitWidth)
-
-            text: control.text
-            font: control.font
-            visible: text
-
-            elide: Text.ElideRight
-
-            color:
-            {
-                if (control.pressed)
-                    return control.textPressedColor
-
-                if (control.hovered)
-                    return control.textHoveredColor
-
-                return control.textColor
-            }
+            anchors.fill: parent
+            anchors.margins: 1
+            visible: control.visualFocus
+            color: control.isAccentButton ? ColorTheme.brightText : ColorTheme.highlight
+            opacity: 0.5
         }
     }
 
-    FocusFrame
+    contentItem: Text
     {
-        anchors.fill: parent
-        anchors.margins: 1
-        color: focusIndicatorColor
-        visible: control.activeFocus
-    }
+        verticalAlignment: Text.AlignVCenter
+        horizontalAlignment: Text.AlignHCenter
 
-    MouseTracker
-    {
-        id: mouseTracker
-        item: control
-        hoverEventsEnabled: true
+        leftPadding: 16
+        rightPadding: 16
+
+        text: control.text
+        font: control.font
+        color: control.isAccentButton ? ColorTheme.colors.brand_contrast : ColorTheme.buttonText
     }
 }

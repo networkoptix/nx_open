@@ -8,6 +8,7 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/stream_proxy.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -47,16 +48,19 @@ public:
     MediatorFunctionalTest(int flags = allFlags);
     ~MediatorFunctionalTest();
 
+    /**
+     * Use it to make restart reliable.
+     * Without using proxy mediator is not able to automatically 
+     * attach to the same port after restart.
+     * false by default.
+     */
+    void setUseProxy(bool value);
+
     virtual bool waitUntilStarted() override;
 
     network::SocketAddress stunUdpEndpoint() const;
     network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
-
-    /**
-     * True by default.
-     */
-    void setPreserveEndpointsDuringRestart(bool value);
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
@@ -86,13 +90,28 @@ protected:
     virtual void afterModuleDestruction() override;
 
 private:
+    struct TcpProxyContext
+    {
+        std::unique_ptr<nx::network::StreamProxy> server;
+        nx::network::SocketAddress endpoint;
+    };
+
     const int m_testFlags;
     int m_httpPort;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    network::SocketAddress m_stunTcpEndpoint;
     network::SocketAddress m_stunUdpEndpoint;
-    bool m_preserveEndpointsDuringRestart = true;
+    network::SocketAddress m_stunTcpEndpoint;
+    network::SocketAddress m_httpEndpoint;
+    TcpProxyContext m_httpProxy;
+    TcpProxyContext m_stunProxy;
+    bool m_tcpPortsAllocated = false;
+    bool m_useProxy = false;
+
+    int m_startCount = 0;
+
+    bool startProxy();
+    bool allocateTcpPorts();
 };
 
 } // namespace hpm

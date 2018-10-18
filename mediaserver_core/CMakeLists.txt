@@ -100,7 +100,9 @@ nx_add_target(mediaserver_core LIBRARY
         cloud_db_client
         nx_update
         nx_system_commands
-    PRIVATE_LIBS ${private_libs}
+    PRIVATE_LIBS
+        Qt5::Qml
+        ${private_libs}
 )
 
 nx_add_vendor_macros(mediaserver_core)

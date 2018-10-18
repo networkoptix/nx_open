@@ -18,7 +18,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
-#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
@@ -28,7 +28,7 @@
 
 namespace {
 
-static nx::api::Analytics::EventType analyticsEventType(
+static nx::vms::api::analytics::EventType analyticsEventType(
     const QnVirtualCameraResourcePtr& camera,
     const QString& pluginId,
     const QString& eventTypeId)
@@ -47,7 +47,7 @@ static nx::api::Analytics::EventType analyticsEventType(
 
     const auto drivers = server->analyticsDrivers();
     const auto driver = std::find_if(drivers.cbegin(), drivers.cend(),
-        [pluginId](const nx::api::AnalyticsDriverManifest& manifest)
+        [pluginId](const nx::vms::api::analytics::EngineManifest& manifest)
         {
             return manifest.pluginId == pluginId;
         });
@@ -56,15 +56,15 @@ static nx::api::Analytics::EventType analyticsEventType(
     if (driver == drivers.cend())
         return {};
 
-    const auto types = driver->outputEventTypes;
+    const auto types = driver->eventTypes;
     const auto eventType = std::find_if(types.cbegin(), types.cend(),
-        [eventTypeId](const nx::api::Analytics::EventType eventType)
+        [eventTypeId](const nx::vms::api::analytics::EventType eventType)
         {
             return eventType.id == eventTypeId;
         });
 
     return eventType == types.cend()
-        ? nx::api::Analytics::EventType()
+        ? nx::vms::api::analytics::EventType()
         : *eventType;
 }
 

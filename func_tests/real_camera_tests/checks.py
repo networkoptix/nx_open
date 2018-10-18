@@ -27,21 +27,21 @@ class Success(Result):
 
 
 class Failure(Result):
-    def __init__(self, errors=None, exception=None, is_exception=False):
-            # types: (Optional[list], Optional[list], bool) -> None
-        if not errors and not exception and not is_exception:
+    def __init__(self, errors=None, exception=None):
+            # types: (Optional[list], Optional[list]) -> None
+        """At least 1 arg should be filled.
+        """
+        self.errors = errors if isinstance(errors, list) else ([errors] if errors else [])
+        self.exception = exception or []
+        if not self.errors and not self.exception:
             raise ValueError('No error description is provided')
-        if exception and is_exception:
-            raise ValueError('Exception is initialized twice')
-        self.errors = errors if isinstance(errors, list) else \
-            ([errors] if errors else [])
-        self.exception = traceback.format_exc().strip().splitlines() \
-            if is_exception else (exception or [])
 
-    def append_errors(self, *errors):
-        result = Failure(self.errors + list(errors))
-        result.exception = self.exception
-        return result
+    def with_more_errors(self, *errors):
+        return Failure(self.errors + list(errors), self.exception)
+
+    @staticmethod
+    def from_current_exception():
+        return Failure(exception=traceback.format_exc().strip().splitlines())
 
 
 class Halt(Result):

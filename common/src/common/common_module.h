@@ -7,7 +7,6 @@
 
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <plugins/native_sdk/common_plugin_container.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/value_cache.h>
 

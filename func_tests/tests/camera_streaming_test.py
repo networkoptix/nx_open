@@ -77,7 +77,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_factory, two
     stream_type = 'hls'
     stream = one.api.get_media_stream(stream_type, camera.mac_addr)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
+        artifact_factory.make_artifact(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty
 
     check_media_stream_transports(one)

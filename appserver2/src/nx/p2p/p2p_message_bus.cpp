@@ -147,6 +147,7 @@ void MessageBus::start()
     addOfflinePeersFromDb();
     m_lastRuntimeInfo[localPeer()] = commonModule()->runtimeInfoManager()->localInfo().data;
     base_type::start();
+    m_started = true;
 }
 
 void MessageBus::stop()
@@ -158,6 +159,7 @@ void MessageBus::stop()
 
     dropConnections();
     base_type::stop();
+    m_started = false;
 }
 
 void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Url &_url)

@@ -65,6 +65,10 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
         ui->comboBoxTimeTo->addItem(hour, i * 3600);
     }
 
+    // Allowing to select the last hour in a day, according to VMS-11032.
+    QString lastHour = datetime::toString(QTime(23, 59, 0), datetime::Format::hh_mm);
+    ui->comboBoxTimeTo->addItem(lastHour, 24 * 3600);
+
     auto updateLimitControls = [this]
     {
         bool enabled = ui->limitBandwithCheckBox->isChecked();

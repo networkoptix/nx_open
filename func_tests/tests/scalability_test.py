@@ -68,7 +68,7 @@ def config(test_config):
         STORAGES_PER_SERVER=1,
         USERS_PER_SERVER=1,
         PROPERTIES_PER_CAMERA=5,
-        TRANSACTIONS_PER_SERVER_RATE=10,
+        TRANSACTIONS_PER_SERVER_RATE=10.0,
         MERGE_TIMEOUT=MEDIASERVER_MERGE_TIMEOUT,
         MESSAGE_BUS_TIMEOUT=timedelta(seconds=3),
         MESSAGE_BUS_SERVER_COUNT=5,
@@ -214,19 +214,17 @@ def api_path_getter(server, api_path):
         raise
 
 
-def pick_some_servers(server_list, required_count):
-    server_count = len(server_list)
-    if server_count <= required_count:
-        return server_list
-    else:
-        return server_list[::server_count / required_count]
+def pick_some_items(seq, count):
+    """Return items allocated distributed evenly thru sequence"""
+    count = min(len(seq), count)
+    return [seq[len(seq) * i // count] for i in range(count)]
 
 
 def wait_for_servers_synced(artifact_factory, config, env):
     wait_until_no_transactions_from_servers(
         env.real_server_list[:1], config.MESSAGE_BUS_TIMEOUT.total_seconds())
     if len(env.real_server_list) > config.MESSAGE_BUS_SERVER_COUNT:
-        server_list = pick_some_servers(env.real_server_list[1:], config.MESSAGE_BUS_SERVER_COUNT)
+        server_list = pick_some_items(env.real_server_list[1:], config.MESSAGE_BUS_SERVER_COUNT)
         wait_until_no_transactions_from_servers(server_list, config.MESSAGE_BUS_TIMEOUT.total_seconds())
 
     def wait_for_match(api_path, differ):
@@ -245,15 +243,18 @@ def wait_for_servers_synced(artifact_factory, config, env):
 # transactions ======================================================================================
 
 
-class CameraInfo(object):
+class _CameraInfo(object):
 
-    def __init__(self, camera_id, status=False):
+    def __init__(self, camera_id, is_online=False):
         self.id = camera_id
-        self.status = status
+        self.is_online = is_online
+
+    def toggle_status(self):
+        self.is_online = not self.is_online
 
     @property
-    def status_str(self):
-        if self.status:
+    def status(self):
+        if self.is_online:
             return 'Online'
         else:
             return 'Offline'
@@ -264,7 +265,7 @@ def transaction_generator(config, server_list):
 
     def server_generator(server):
         server_id = server.api.get_server_id()
-        camera_list = [CameraInfo(d['id'])
+        camera_list = [_CameraInfo(d['id'])
                        for d in server.api.generic.get('ec2/getCameras')
                        if d['parentId'] == server_id]
         if not camera_list:
@@ -272,18 +273,18 @@ def transaction_generator(config, server_list):
             # Full server does not has it's own cameras in this case.
             return
         for i, camera in enumerate(camera_list):
-            camera.status = bool(i % 2)
+            camera.is_online = bool(i % 2)
 
         for idx in itertools.count():
 
             # change every camera status
             for camera_idx, camera in enumerate(camera_list):
-                camera.status = not camera.status
+                camera.toggle_status()
                 description = 'to %s: status for #%d %s: %s' % (
-                    server.name, camera_idx, camera.id, camera.status_str)
+                    server.name, camera_idx, camera.id, camera.status)
                 params = dict(
                     id=camera.id,
-                    status=camera.status_str,
+                    status=camera.status,
                     )
                 yield FunctionWithDescription(
                     partial(server.api.generic.post, 'ec2/setResourceStatus', params),
@@ -418,20 +419,21 @@ def transactions_generated(metrics_saver, call_generator, rate, duration):
         if stale_sum / duration.total_seconds() > STALE_LIMIT_RATIO:
             _logger.warning(
                 'Servers was unable to process transactions at required rate (%s/sec):' % rate
-                + ' stalled for %s seconds' % pacer.stale_time)
+                + ' stalled for %s seconds' % stale_sum)
 
 
 # post transactions and measure their propagation time
 def run_transactions(metrics_saver, load_averge_collector, config, env):
     transaction_gen = transaction_generator(config, env.all_server_list)
     transaction_rate = config.TRANSACTIONS_PER_SERVER_RATE * len(env.all_server_list)
-    with ExitStack() as stack:
-        stack.enter_context(transactions_generated(
-            metrics_saver, transaction_gen, transaction_rate, config.TRANSACTIONS_STAGE_DURATION))
-        watched_server_list = pick_some_servers(env.all_server_list, config.MESSAGE_BUS_SERVER_COUNT)
-        bus = stack.enter_context(message_bus_running(watched_server_list))
-        stack.enter_context(load_averge_collector(env.os_access_set, 'transactions'))
+    generated_transactions = transactions_generated(
+        metrics_saver, transaction_gen, transaction_rate, config.TRANSACTIONS_STAGE_DURATION)
+    watched_server_list = pick_some_items(env.all_server_list, config.MESSAGE_BUS_SERVER_COUNT)
+    bus_context = message_bus_running(watched_server_list)
+    average_collector = load_averge_collector(env.os_access_set, 'transactions')
+    with generated_transactions, bus_context as bus, average_collector:
         delay_list = []
+        # Attention! Following is not a timeout management, just a durable stage.
         start = datetime_local_now()
         while datetime_local_now() - start < config.TRANSACTIONS_STAGE_DURATION:
             transaction = bus.get_transaction(timeout_sec=0.2)

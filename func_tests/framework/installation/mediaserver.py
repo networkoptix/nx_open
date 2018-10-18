@@ -93,6 +93,9 @@ class BaseMediaserver(object):
             else:
                 _logger.error("{} is stopped.".format(self))
 
+    def has_core_dumps(self):
+        return self.installation.list_core_dumps() != []
+
     def collect_artifacts(self, artifacts_dir):
         for file in self.installation.list_log_files():
             if file.exists():

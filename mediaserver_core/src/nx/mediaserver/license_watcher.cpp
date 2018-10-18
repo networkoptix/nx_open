@@ -68,6 +68,11 @@ LicenseWatcher::LicenseWatcher(QnCommonModule* commonModule):
 
 LicenseWatcher::~LicenseWatcher()
 {
+    stop();
+}
+
+void LicenseWatcher::stop()
+{
     utils::promise<void> promise;
     m_timer.pleaseStop(
         [this, &promise]()
@@ -81,15 +86,20 @@ LicenseWatcher::~LicenseWatcher()
 
 void LicenseWatcher::start()
 {
+    m_timer.post([this]() { update(); });
+}
+
+void LicenseWatcher::update()
+{
+    validateData();
     m_timer.start(kCheckInterval,
         [this]()
         {
-            startUpdate();
-            start();
+            update();
         });
 }
 
-void LicenseWatcher::startUpdate()
+void LicenseWatcher::validateData()
 {
     auto data = licenseData();
     if (data.licenses.empty())

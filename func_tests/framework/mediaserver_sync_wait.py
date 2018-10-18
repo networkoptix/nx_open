@@ -49,7 +49,7 @@ class SyncWaitTimeout(WaitTimeout):
     def _save_json_artifact(self, artifact_factory, server, value):
         method_name = self.api_path.replace('/', '-')
         part_list = ['result', method_name, server.name]
-        artifact = artifact_factory(part_list, name='%s-%s' % (method_name, server.name))
+        artifact = artifact_factory.make_artifact(part_list, name='%s-%s' % (method_name, server.name))
         file_path = artifact.save_as_json(value)
         _logger.debug('Results from %s from server %s %s are stored to %s',
                       self.api_path, server.name, server, file_path)

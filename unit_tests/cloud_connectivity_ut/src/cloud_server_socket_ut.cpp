@@ -610,6 +610,8 @@ public:
         nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
 
         SocketGlobalsHolder::instance()->reinitialize();
+
+        m_mediator.setUseProxy(true);
     }
 
     ~CloudServerSocket()

@@ -28,6 +28,8 @@ public:
     virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
     virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
+        const Qn::UserAccessData&) override;
 
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
@@ -44,6 +46,9 @@ public:
     virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
     virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+    virtual AbstractAnalyticsNotificationManagerPtr
+        getAnalyticsNotificationManager() override;
+
 
     virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) override;
     virtual void deleteRemotePeer(const QnUuid& id) override;

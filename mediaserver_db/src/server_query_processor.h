@@ -785,6 +785,20 @@ public:
                 return removeResourceSync(tran, ApiObject_Videowall, transactionsPostProcessList);
             case ApiCommand::removeUserRole:
                 return removeResourceSync(tran, ApiObjectUserRole, transactionsPostProcessList);
+            case ApiCommand::removeAnalyticsPlugin:
+            {
+                return removeResourceSync(
+                    tran,
+                    ApiObject_AnalyticsPlugin,
+                    transactionsPostProcessList);
+            }
+            case ApiCommand::removeAnalyticsEngine:
+            {
+                return removeResourceSync(
+                    tran,
+                    ApiObject_AnalyticsEngine,
+                    transactionsPostProcessList);
+            }
             case ApiCommand::removeResource:
             {
                 QnTransaction<nx::vms::api::IdData> updatedTran = tran;
@@ -813,6 +827,12 @@ public:
                         break;
                     case ApiObject_BusinessRule:
                         updatedTran.command = ApiCommand::removeEventRule;
+                        break;
+                    case ApiObject_AnalyticsPlugin:
+                        updatedTran.command = ApiCommand::removeAnalyticsPlugin;
+                        break;
+                    case ApiObject_AnalyticsEngine:
+                        updatedTran.command = ApiCommand::removeAnalyticsEngine;
                         break;
                     default:
                         return processUpdateSync(tran, transactionsPostProcessList, 0);

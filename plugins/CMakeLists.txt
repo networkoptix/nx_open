@@ -14,7 +14,6 @@ function(nx_add_server_plugin target)
     if(PLUGIN_OPTIONAL)
         set_output_directories(RUNTIME "bin/plugins_optional" LIBRARY "bin/plugins_optional")
     endif()
-
     nx_add_target(${target} LIBRARY ${PLUGIN_UNPARSED_ARGUMENTS})
     add_dependencies(server_plugins ${target})
 endfunction()
@@ -27,7 +26,7 @@ add_subdirectory(mjpg_link)
 
 add_subdirectory(generic_multicast_plugin)
 
-add_subdirectory(metadata)
+add_subdirectory(analytics)
 
 if(LINUX AND box STREQUAL "none")
     add_subdirectory(it930x_plugin)

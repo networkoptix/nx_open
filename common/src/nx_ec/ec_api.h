@@ -32,14 +32,15 @@
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
-#include "nx_ec/managers/abstract_server_manager.h"
-#include "nx_ec/managers/abstract_camera_manager.h"
-#include "nx_ec/managers/abstract_user_manager.h"
-#include "nx_ec/managers/abstract_layout_manager.h"
+#include <nx_ec/managers/abstract_server_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
-#include "nx_ec/managers/abstract_webpage_manager.h"
-#include "nx_ec/managers/abstract_videowall_manager.h"
+#include <nx_ec/managers/abstract_webpage_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
 #include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/vms/api/data/timestamp.h>
 #include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
@@ -1023,6 +1024,9 @@ public:
     virtual AbstractWebPageManagerPtr getWebPageManager(
         const Qn::UserAccessData& userAccessData) = 0;
 
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
+        const Qn::UserAccessData& userAccessData) = 0;
+
     virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() = 0;
     virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() = 0;
     virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() = 0;
@@ -1038,6 +1042,7 @@ public:
     virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() = 0;
     virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
+    virtual AbstractAnalyticsNotificationManagerPtr getAnalyticsNotificationManager() = 0;
 
     virtual QnCommonModule* commonModule() const = 0;
 

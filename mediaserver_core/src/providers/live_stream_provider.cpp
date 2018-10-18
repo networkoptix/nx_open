@@ -27,12 +27,12 @@
 #include <mediaserver_ini.h>
 #include <analytics/detected_objects_storage/analytics_events_receptor.h>
 #include <media_server/media_server_module.h>
-#include <nx/mediaserver/metadata/manager_pool.h>
+#include <nx/mediaserver/analytics/manager.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/resource/camera.h>
 
-using nx::mediaserver::metadata::VideoDataReceptor;
-using nx::mediaserver::metadata::VideoDataReceptorPtr;
+using nx::mediaserver::analytics::VideoDataReceptor;
+using nx::mediaserver::analytics::VideoDataReceptorPtr;
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10 * 1000;
@@ -114,8 +114,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::mediaserver::resource::Came
                     return m_cameraRes->getStatus() == Qn::Recording;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
-        auto pool = serverModule()->metadataManagerPool();
-        pool->registerDataReceptor(getResource(), m_dataReceptorMultiplexer.toWeakRef());
+        serverModule()->analyticsManager()->registerDataReceptor(
+            getResource(), m_dataReceptorMultiplexer.toWeakRef());
     }
 }
 
@@ -147,8 +147,8 @@ void QnLiveStreamProvider::setRole(Qn::ConnectionRole role)
 
     if (role == roleForAnalytics && serverModule())
     {
-        auto pool = serverModule()->metadataManagerPool();
-        m_videoDataReceptor = pool->createVideoDataReceptor(m_cameraRes->getId());
+        m_videoDataReceptor = serverModule()->analyticsManager()->createVideoDataReceptor(
+            m_cameraRes->getId());
     }
 }
 

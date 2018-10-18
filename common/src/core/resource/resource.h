@@ -190,7 +190,7 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
-    void setCommonModule(QnCommonModule* commonModule);
+    virtual void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
 
     virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).

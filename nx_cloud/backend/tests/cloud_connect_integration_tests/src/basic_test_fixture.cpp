@@ -79,6 +79,7 @@ BasicTestFixture::BasicTestFixture(
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
+    m_mediator.setUseProxy(true);
 }
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
