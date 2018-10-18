@@ -77,7 +77,7 @@ public:
         http::HttpHeaders websocketHeaders;
         websocket::addClientHeaders(&websocketHeaders, config.protocolName);
 
-        LOG_VERBOSE("Connecting to %s", config.url.constData());
+        LOG_VERBOSE("connecting to %s", config.url.constData());
 
         m_httpClient.setUserName(config.userName);
         m_httpClient.setUserPassword(config.userPassword);
@@ -122,34 +122,34 @@ private:
         if (m_httpClient.state() == nx::network::http::AsyncClient::State::sFailed
             || !m_httpClient.response())
         {
-            LOG_INFO("onConnect: Http client failed to connect to host");
+            LOG_INFO("http client failed to connect to host");
             stopInAioThread();
             return;
         }
 
         const int statusCode = m_httpClient.response()->statusLine.statusCode;
-        LOG_VERBOSE("Http client status code: %d", statusCode);
+        LOG_VERBOSE("http client status code: %d", statusCode);
 
         if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
         {
-            LOG_INFO("Http client got invalid response code %d", statusCode);
+            LOG_INFO("http client got invalid response code %d", statusCode);
             stopInAioThread();
             return;
         }
 
-        LOG_VERBOSE("HTTP client connected successfully to the %s",
+        LOG_VERBOSE("http client connected successfully to the %s",
             config.url.constData());
 
         auto validationError = websocket::validateResponse(m_httpClient.request(),
             *m_httpClient.response());
         if (validationError != websocket::Error::noError)
         {
-            LOG_INFO("Websocket handshake validation error: %d", validationError);
+            LOG_INFO("websocket handshake validation error: %d", validationError);
             stopInAioThread();
             return;
         }
 
-        LOG_VERBOSE("Websocket handshake response validated successfully");
+        LOG_VERBOSE("websocket handshake response validated successfully");
         LOG_INFO("successfully connected, starting reading");
 
         m_websocket.reset(new websocket::WebSocket(m_httpClient.takeSocket(),
@@ -213,7 +213,7 @@ public:
 
     void stopAll()
     {
-        LOG_VERBOSE("Stopping all connections");
+        LOG_VERBOSE("stopping all connections");
 
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_stopped)
