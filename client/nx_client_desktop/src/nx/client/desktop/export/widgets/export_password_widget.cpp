@@ -25,9 +25,9 @@ ExportPasswordWidget::ExportPasswordWidget(QWidget* parent):
     encryptionStatusChanged(ui->cryptCheckBox->isChecked());
 
     connect(ui->cryptCheckBox, &QCheckBox::clicked,
-        this, &ExportPasswordWidget::emitDataChanged);
+        this, &ExportPasswordWidget::emitDataEdited);
     connect(ui->passwordEdit->lineEdit(), &QLineEdit::textEdited,
-        this, [this](const QString&) { emitDataChanged(); });
+        this, [this](const QString&) { emitDataEdited(); });
 }
 
 ExportPasswordWidget::~ExportPasswordWidget()
@@ -46,12 +46,12 @@ bool ExportPasswordWidget::validate()
     return !ui->cryptCheckBox->isChecked() || ui->passwordEdit->validate(); // Order matters.
 }
 
-void ExportPasswordWidget::emitDataChanged()
+void ExportPasswordWidget::emitDataEdited()
 {
     Data data;
     data.cryptVideo = ui->cryptCheckBox->isChecked();
     data.password = ui->passwordEdit->text().trimmed(); //< Trimming the password!
-    emit dataChanged(data);
+    emit dataEdited(data);
 }
 
 } // namespace nx::client::desktop

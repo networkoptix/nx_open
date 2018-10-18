@@ -16,18 +16,18 @@ ExportMediaSettingsWidget::ExportMediaSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     connect(ui->filtersCheckBox, &QCheckBox::clicked,
-        this, &ExportMediaSettingsWidget::emitDataChanged);
+        this, &ExportMediaSettingsWidget::emitDataEdited);
 }
 
 ExportMediaSettingsWidget::~ExportMediaSettingsWidget()
 {
 }
 
-void ExportMediaSettingsWidget::emitDataChanged()
+void ExportMediaSettingsWidget::emitDataEdited()
 {
     Data data;
     data.applyFilters = ui->filtersCheckBox->isChecked();
-    emit dataChanged(data);
+    emit dataEdited(data);
 }
 
 void ExportMediaSettingsWidget::setData(const Data& data)

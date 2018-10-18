@@ -37,9 +37,10 @@ public:
     virtual qint64 grossSize() const;
 
 protected:
-    constexpr static int kCryptoStreamVersion = 1;
-    constexpr static int kCryptoBlockSize = 1024;
-    constexpr static int kHeaderSize = 1024;
+    mutable QnMutex m_mutex;
+    OpenMode m_openMode = NotOpen;
+
+    bool isWriting() const { return (m_openMode & WriteOnly); }
 
     // Equivalent to QnLayoutFileStorageResource::Stream, but there are no common headers.
     struct Stream
@@ -50,6 +51,23 @@ protected:
 
         bool isNull() const { return (position == 0) && (size == 0);}
     } m_enclosure;
+
+    struct Position
+    {
+        qint64 blockIndex = 0;
+        qint64 positionInBlock  = 0;
+
+        bool dirty = false; //< Data in decrypted block is not flashed.
+
+        void setPosition(qint64 position) { blockIndex = position / kCryptoBlockSize;
+        positionInBlock = position % kCryptoBlockSize; }
+        qint64 position() const { return blockIndex * kCryptoBlockSize + positionInBlock; }
+    } m_position;
+
+private:
+    constexpr static int kCryptoStreamVersion = 1;
+    constexpr static int kCryptoBlockSize = 1024;
+    constexpr static int kHeaderSize = 1024;
 
 #pragma pack(push, 4)
     struct Header
@@ -66,20 +84,6 @@ protected:
     Key m_passwordKey = {}; //< Hash of adapted password
     Key m_key = {};
 
-    struct Position
-    {
-        qint64 blockIndex = 0;
-        qint64 positionInBlock  = 0;
-
-        bool dirty = false; //< Data in decrypted block is not flashed.
-
-        void setPosition(qint64 position) { blockIndex = position / kCryptoBlockSize;
-        positionInBlock = position % kCryptoBlockSize; }
-        qint64 position() const { return blockIndex * kCryptoBlockSize + positionInBlock; }
-    } m_position;
-
-    OpenMode m_openMode = NotOpen;
-
     char m_currentPlainBlock[kCryptoBlockSize];
     char m_currentCryptedBlock[kCryptoBlockSize];
     void* m_context; //< Using void* because EVP_CIPHER_CTX is a OpenSSL typedef.
@@ -88,7 +92,6 @@ protected:
     bool m_blockDirty = false; //< Data in decrypted block was not flushed.
 
     QFile m_file;
-    mutable QnMutex m_mutex;
 
     // These functions do all in/out work for the implemented QIODevice interface.
     virtual qint64 readData(char* data, qint64 maxSize) override;
@@ -96,7 +99,6 @@ protected:
 
     // Helpers.
     void resetState();
-    bool isWriting() const { return (m_openMode & WriteOnly); }
 
     // Internal block functions.
     void readFromBlock(char* data, qint64 count);

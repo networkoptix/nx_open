@@ -28,12 +28,12 @@ public:
     bool validate();
 
 signals:
-    void dataChanged(Data& data); //< No signal on setData()!
+    void dataEdited(Data& data); //< No signal on setData()!
 
 private:
     Ui::ExportPasswordWidget* ui;
 
-    void emitDataChanged();
+    void emitDataEdited();
 };
 
 

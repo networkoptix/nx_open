@@ -143,23 +143,21 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
 
     const auto fileName = stripName(url);
 
-    QIODevice* stream = nullptr;
+    QScopedPointer<QIODevice> stream;
     if (shouldCrypt(fileName))
     {
         NX_ASSERT(!(openMode & QIODevice::WriteOnly) || !m_password.isEmpty()); // Want to write but no password.
         if (m_password.isEmpty()) // Cannot read crypted stream without a password.
             return nullptr;
-        stream = new QnLayoutCryptoStream(*this, url, m_password);
+        stream.reset(new QnLayoutCryptoStream(*this, url, m_password));
     }
     else
-        stream = new QnLayoutPlainStream(*this, url);
+        stream.reset(new QnLayoutPlainStream(*this, url));
 
     if (!stream->open(openMode))
-    {
-        delete stream;
         return nullptr;
-    }
-    return stream;
+
+    return stream.take();
 }
 
 int QnLayoutFileStorageResource::getCapabilities() const

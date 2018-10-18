@@ -33,12 +33,12 @@ public:
     QLayout* passwordPlaceholder();
 
 signals:
-    void dataChanged(Data& data); //< No signal on setData()!
+    void dataEdited(Data& data); //< No signal on setData()!
 
 private:
     QScopedPointer<Ui::ExportMediaSettingsWidget> ui;
 
-    void emitDataChanged();
+    void emitDataEdited();
 };
 
 } // namespace desktop

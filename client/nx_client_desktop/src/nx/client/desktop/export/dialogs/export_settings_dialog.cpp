@@ -127,11 +127,11 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     initSettingsWidgets();
 
-    connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataChanged,
+    connect(ui->exportMediaSettingsPage, &ExportMediaSettingsWidget::dataEdited,
         d, [this](const ExportMediaSettingsWidget::Data& data) { d->setApplyFilters(data.applyFilters); });
-    connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataChanged,
+    connect(ui->exportLayoutSettingsPage, &ExportLayoutSettingsWidget::dataEdited,
         d, [this](const ExportLayoutSettingsWidget::Data& data) { d->setLayoutReadOnly(data.readOnly); });
-    connect(m_passwordWidget, &ExportPasswordWidget::dataChanged,
+    connect(m_passwordWidget, &ExportPasswordWidget::dataEdited,
         d, [this](const ExportPasswordWidget::Data& data) { d->setLayoutEncryption(data.cryptVideo, data.password); });
 
     connect(ui->mediaFilenamePanel, &FilenamePanel::filenameChanged,
@@ -669,7 +669,7 @@ void ExportSettingsDialog::accept()
         return;
 
     if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName())
-            && (ini().enableEncryptedLayouts && !m_passwordWidget->validate()))
+        && ini().enableEncryptedLayouts && !m_passwordWidget->validate())
     {
         return;
     }

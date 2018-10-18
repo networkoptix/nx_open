@@ -14,18 +14,18 @@ ExportLayoutSettingsWidget::ExportLayoutSettingsWidget(QWidget* parent):
     ui->setupUi(this);
 
     connect(ui->readOnlyCheckBox, &QCheckBox::clicked,
-        this, &ExportLayoutSettingsWidget::emitDataChanged);
+        this, &ExportLayoutSettingsWidget::emitDataEdited);
 }
 
 ExportLayoutSettingsWidget::~ExportLayoutSettingsWidget()
 {
 }
 
-void ExportLayoutSettingsWidget::emitDataChanged()
+void ExportLayoutSettingsWidget::emitDataEdited()
 {
     Data data;
     data.readOnly = ui->readOnlyCheckBox->isChecked();
-    emit dataChanged(data);
+    emit dataEdited(data);
 }
 
 void ExportLayoutSettingsWidget::setData(const Data& data)
