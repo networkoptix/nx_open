@@ -220,7 +220,7 @@ private:
                             m_idToOperationContext.erase(it);
                         }
 
-                        auto handler = context.takeHandler<Handler>();
+                        auto handler = context.template takeHandler<Handler>();
                         std::apply(handler, std::move(args));
                     });
             };

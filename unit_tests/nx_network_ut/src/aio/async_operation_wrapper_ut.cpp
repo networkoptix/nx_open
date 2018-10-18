@@ -69,7 +69,7 @@ protected:
     void thenEveryOperationHasCompletedAsExpected(
         bool timedOutExpected = false)
     {
-        for (int i = 0; i < m_wrappedOperations.size(); ++i)
+        for (std::size_t i = 0; i < m_wrappedOperations.size(); ++i)
         {
             thenCompletionHandlerIsCalled();
             andCompletionHandlerIsInvokedInAioThread();
