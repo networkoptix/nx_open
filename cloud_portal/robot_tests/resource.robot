@@ -19,6 +19,7 @@ Open Browser and go to URL
     run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
     ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
+    Set Selenium Timeout    10
     Check Language
     Go To    ${url}
 
