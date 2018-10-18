@@ -29,6 +29,8 @@ add_subdirectory(generic_multicast_plugin)
 
 add_subdirectory(metadata)
 
+add_subdirectory(usb_cam)
+
 if(LINUX AND box STREQUAL "none")
     add_subdirectory(it930x_plugin)
 endif()
