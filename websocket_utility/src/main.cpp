@@ -12,6 +12,7 @@
 #include <nx/network/websocket/websocket.h>
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/move_only_func.h>
 
@@ -28,6 +29,9 @@ enum class LogLevel
     info,
     verbose
 };
+
+static const nx::Buffer kHandlerPath = "/testWebsocketConnection";
+static const nx::Buffer kTestJson = R"json({"testJsonName": "testJsonValue"})json";
 
 struct
 {
@@ -54,36 +58,11 @@ struct
             fprintf(stdout, "%s: " fmt "\n", __func__,  ##__VA_ARGS__); \
     } while (0)
 
-class WebsocketConnectionsPool;
-static WebsocketConnectionsPool* websocketConnectionsPoolInstance;
 
-static void startAccepting()
-{
-}
-
-class WebsocketConnection;
-using WebsocketConnectionPtr = std::shared_ptr<WebsocketConnection>;
-
-class WebsocketConnection: public std::enable_shared_from_this<WebsocketConnection>
+class Waitable
 {
 public:
-    WebsocketConnection(aio::AbstractAioThread* aioThread): m_aioThread(aioThread)
-    {
-        m_httpClient.bindToAioThread(aioThread);
-    }
-
-    void startReading()
-    {
-        http::HttpHeaders websocketHeaders;
-        websocket::addClientHeaders(&websocketHeaders, config.protocolName);
-
-        LOG_VERBOSE("connecting to %s", config.url.constData());
-
-        m_httpClient.setUserName(config.userName);
-        m_httpClient.setUserPassword(config.userPassword);
-        m_httpClient.addRequestHeaders(websocketHeaders);
-        m_httpClient.doGet(config.url, [self = shared_from_this(), this]() { onConnect(); });
-    }
+    Waitable(aio::AbstractAioThread* aioThread): m_aioThread(aioThread) {}
 
     void stop()
     {
@@ -95,14 +74,9 @@ public:
         m_readyFuture.wait();
     }
 
-private:
-    http::AsyncClient m_httpClient;
-    WebSocketPtr m_websocket;
+protected:
     aio::AbstractAioThread* m_aioThread = nullptr;
     bool m_stopped = false;
-    nx::utils::promise<void> m_readyPromise;
-    nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
-    nx::Buffer m_readBuffer;
 
     void stopInAioThread()
     {
@@ -111,7 +85,113 @@ private:
         m_readyPromise.set_value();
     }
 
-    void onConnect()
+private:
+    nx::utils::promise<void> m_readyPromise;
+    nx::utils::future<void> m_readyFuture = m_readyPromise.get_future();
+};
+
+using WaitablePtr = std::shared_ptr<Waitable>;
+
+class WaitablePool
+{
+public:
+    void addWaitable(const WaitablePtr waitable)
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_stopped)
+        {
+            waitable->stop();
+            return;
+        }
+
+        m_waitables.insert(waitable);
+    }
+
+    void stopAll()
+    {
+        LOG_VERBOSE("stopping all waitables");
+
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_stopped)
+            return;
+
+        m_stopped = true;
+        for (const auto& waitable: m_waitables)
+            waitable->stop();
+    }
+
+    void waitAll()
+    {
+        for (const auto& waitable: m_waitables)
+            waitable->waitForDone();
+    }
+
+private:
+    std::mutex m_mutex;
+    bool m_stopped = false;
+    std::set<WaitablePtr> m_waitables;
+};
+
+static WaitablePool* waitablePoolInstance;
+
+class WebsocketConnection;
+using WebsocketConnectionPtr = std::shared_ptr<WebsocketConnection>;
+
+class WebsocketConnection:
+    public Waitable,
+    public std::enable_shared_from_this<WebsocketConnection>
+{
+public:
+    WebsocketConnection(aio::AbstractAioThread* aioThread): Waitable(aioThread)
+    {
+        m_httpClient.bindToAioThread(aioThread);
+    }
+
+    WebsocketConnection(aio::AbstractAioThread *aioThread,
+        std::unique_ptr<AbstractStreamSocket> socket): Waitable(aioThread)
+    {
+        m_websocket.reset(new websocket::WebSocket(std::move(socket), websocket::FrameType::text));
+        m_websocket->bindToAioThread(aioThread);
+    }
+
+    void connectAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
+    {
+        http::HttpHeaders websocketHeaders;
+        websocket::addClientHeaders(&websocketHeaders, config.protocolName);
+
+        LOG_VERBOSE("connecting to %s", config.url.constData());
+
+        m_httpClient.setUserName(config.userName);
+        m_httpClient.setUserPassword(config.userPassword);
+        m_httpClient.addRequestHeaders(websocketHeaders);
+        m_httpClient.doGet(config.url,
+            [self = shared_from_this(),
+            this, completionHandler = std::move(completionHandler)]() mutable
+            {
+                onConnect(std::move(completionHandler));
+            });
+    }
+
+    void startReading()
+    {
+        m_websocket->readSomeAsync(&m_readBuffer,
+            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
+            { onRead(errorCode, bytesRead); });
+    }
+
+    void startSending()
+    {
+        m_websocket->sendAsync(kTestJson,
+            [self = shared_from_this(), this] (SystemError::ErrorCode errorCode, size_t bytesRead)
+            { onSend(errorCode, bytesRead); });
+    }
+
+private:
+    http::AsyncClient m_httpClient;
+    WebSocketPtr m_websocket;
+    nx::Buffer m_readBuffer;
+
+    void onConnect(nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
         if (m_stopped)
         {
@@ -159,9 +239,7 @@ private:
         m_httpClient.pleaseStopSync();
 
         m_websocket->start();
-        m_websocket->readSomeAsync(&m_readBuffer,
-            [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
-            { onRead(errorCode, bytesRead); });
+        completionHandler();
     }
 
     void onRead(SystemError::ErrorCode errorCode, size_t bytesRead)
@@ -194,53 +272,109 @@ private:
             [self = shared_from_this(), this](SystemError::ErrorCode errorCode, size_t bytesRead)
             { onRead(errorCode, bytesRead); });
     }
-};
 
-class WebsocketConnectionsPool
-{
-public:
-    void addConnection(const WebsocketConnectionPtr websocketConnection)
+    void onSend(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
         if (m_stopped)
         {
-            websocketConnection->stop();
+            LOG_VERBOSE("seems like connection has been destroyed, exiting");
             return;
         }
 
-        m_connections.insert(websocketConnection);
-    }
-
-    void stopAll()
-    {
-        LOG_VERBOSE("stopping all connections");
-
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_stopped)
+        if (errorCode != SystemError::noError)
+        {
+            LOG_INFO("send failed with error code: %d", errorCode);
+            stopInAioThread();
             return;
+        }
 
-        m_stopped = true;
-        for (const auto& connection: m_connections)
-            connection->stop();
+        LOG_INFO("message sent");
+        m_websocket->sendAsync(kTestJson,
+            [self = shared_from_this(), this] (SystemError::ErrorCode errorCode, size_t bytesRead)
+            { onSend(errorCode, bytesRead); });
+    }
+};
+
+class WebsocketConnectionAcceptor: public Waitable
+{
+public:
+    WebsocketConnectionAcceptor(aio::AbstractAioThread* aioThread,
+        std::function<void(WebsocketConnectionPtr)> userCompletionHandler)
+        :
+        Waitable(aioThread),
+        m_userCompletionHandler(userCompletionHandler)
+    {
+        m_httpServer.bindToAioThread(aioThread);
+        m_httpServer.registerRequestProcessorFunc(kHandlerPath,
+            [this](http::RequestContext requestContext,
+                http::RequestProcessedHandler requestCompletionHandler)
+            {
+                onAccept(std::move(requestContext), std::move(requestCompletionHandler));
+            }, http::Method::get);
     }
 
-    void waitAll()
+    bool startListening()
     {
-        for (const auto& connection: m_connections)
-            connection->waitForDone();
+        SocketAddress serverSocketAddress(QString::fromLatin1(config.serverAddress),
+            config.serverPort);
+        if (!m_httpServer.bindAndListen(serverSocketAddress))
+        {
+            LOG_INFO("failed to start http server, address: %s, port: %d",
+                config.serverAddress.constData(), config.serverPort);
+            return false;
+        }
+        LOG_INFO("starting to accept websocket connections via %s path", kHandlerPath.constData());
+        return true;
     }
 
 private:
-    std::mutex m_mutex;
-    bool m_stopped = false;
-    std::set<WebsocketConnectionPtr> m_connections;
+    http::TestHttpServer m_httpServer;
+    std::function<void(WebsocketConnectionPtr)> m_userCompletionHandler;
+
+    void onAccept(http::RequestContext requestContext,
+        http::RequestProcessedHandler requestCompletionHandler)
+    {
+        if (m_stopped)
+        {
+            LOG_VERBOSE("accepted request while in stopeed state, exiting");
+            return;
+        }
+        auto error = websocket::validateRequest(requestContext.request, requestContext.response);
+        if (error != websocket::Error::noError)
+        {
+            LOG_INFO("error validating websocket request: %d", (int) error);
+            requestCompletionHandler(http::StatusCode::badRequest);
+            return;
+        }
+        LOG_VERBOSE("received websocket connection request, headers validated succesfully");
+        requestCompletionHandler(http::StatusCode::ok);
+        auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread,
+            requestContext.connection->takeSocket());
+        m_userCompletionHandler(websocketConnection);
+    }
 };
 
 static void connectAndListen()
 {
     auto websocketConnection = std::make_shared<WebsocketConnection>(config.aioThread);
-    websocketConnectionsPoolInstance->addConnection(websocketConnection);
-    websocketConnection->startReading();
+    waitablePoolInstance->addWaitable(websocketConnection);
+    websocketConnection->connectAsync(
+        [websocketConnection]() { websocketConnection->startReading(); });
+}
+
+static void startAccepting()
+{
+    auto acceptor = std::make_shared<WebsocketConnectionAcceptor>(config.aioThread,
+        [](WebsocketConnectionPtr websocketConnection)
+        {
+            if (!websocketConnection)
+                return;
+            waitablePoolInstance->addWaitable(websocketConnection);
+//            websocketConnection->startSending();
+        });
+    if (!acceptor->startListening())
+        return;
+    waitablePoolInstance->addWaitable(acceptor);
 }
 
 static const char* const kProtocolNameOption = "--protocol-name";
@@ -264,6 +398,9 @@ static void printHelp()
     printf("Additional options:\n --log-level ['verbose', 'info'(default)]\n "\
            "--role ['client'(default) 'server']\n " \
            "--protocol-name <protocol-name>(default: 'nxp2p')\n --help\n");
+    printf("Note:\n");
+    printf(" In case if peer served by the websocket utility run in the server mode, url path must"
+           " be '/testWebsocketConnection'.");
 }
 
 static void prepareConfig(int argc, const char* argv[])
@@ -355,7 +492,7 @@ static bool sigHandler(DWORD fdwCtrlType)
 static void sigHandler(int /*signo*/)
 {
     LOG_INFO("received SIGINT, shutting down connections..");
-    std::thread([]() { websocketConnectionsPoolInstance->stopAll(); }).detach();
+    std::thread([]() { waitablePoolInstance->stopAll(); }).detach();
 }
 
 #endif // _WIN32
@@ -368,8 +505,9 @@ int main(int argc, const char *argv[])
 
     setvbuf(stdout, nullptr, _IONBF, 0);
 
-    WebsocketConnectionsPool websocketConnectionsPool;
-    websocketConnectionsPoolInstance = &websocketConnectionsPool;
+    auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
+    WaitablePool waitablePool;
+    waitablePoolInstance = &waitablePool;
 
     #if defined(_WIN32)
         if (!SetConsoleCtrlHandler(sigHandler, true))
@@ -385,7 +523,6 @@ int main(int argc, const char *argv[])
         }
     #endif
 
-    auto sgGuard = std::make_unique<SocketGlobalsHolder>(0);
     aio::Timer timer;
     config.aioThread = timer.getAioThread();
 
@@ -399,7 +536,7 @@ int main(int argc, const char *argv[])
             break;
     }
 
-    websocketConnectionsPool.waitAll();
+    waitablePool.waitAll();
     LOG_VERBOSE("Exiting...");
 
     return 0;
