@@ -36,6 +36,9 @@ public:
     void stopAnalytics();
     bool restartAnalytics(const QVariantMap& settings);
 
+    QVariantMap getSettings() const;
+    void setSettings(const QVariantMap& settings);
+
     void setMetadataSink(QnAbstractDataReceptorPtr dataReceptor);
     bool isStreamConsumer() const;
     std::optional<nx::vms::api::analytics::EngineManifest> engineManifest() const;

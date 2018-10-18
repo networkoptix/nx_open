@@ -62,6 +62,25 @@ Interface* queryInterface(SdkObject sdkObject, const nxpl::NX_GUID& guid)
     return static_cast<Interface*>(sdkObject->queryInterface(guid));
 }
 
+template<typename ResourceType>
+QnSharedResourcePointer<ResourceType> find(QnMediaServerModule* serverModule, const QString& id)
+{
+    if (!serverModule)
+    {
+        NX_ASSERT(false, "Can't access server module");
+        return nullptr;
+    }
+
+    auto resourcePool = serverModule->resourcePool();
+    if (!resourcePool)
+    {
+        NX_ASSERT(false, "Can't access resource pool");
+        return nullptr;
+    }
+
+    return resourcePool->getResourceById<ResourceType>(QnUuid(id));
+}
+
 analytics::SdkObjectPool* getSdkObjectPool(QnMediaServerModule* serverModule);
 
 bool deviceInfoFromResource(
@@ -69,6 +88,11 @@ bool deviceInfoFromResource(
     nx::sdk::DeviceInfo* outDeviceInfo);
 
 std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings);
+
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QVariantMap& settings);
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& settings);
+
+QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings);
 
 void saveManifestToFile(
     const nx::utils::log::Tag& logTag,

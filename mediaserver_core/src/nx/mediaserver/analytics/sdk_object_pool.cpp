@@ -323,12 +323,8 @@ SdkObjectPool::EnginePtr SdkObjectPool::instantiateEngine(
     jsonEngine.load(settings);
     const auto values = jsonEngine.values();
 
-    QMap<QString, QString> settingsMap;
-    for (auto itr = values.cbegin(); itr != values.cend(); ++itr)
-        settingsMap[itr.key()] = itr.value().toString();
-
-    nx::plugins::SettingsHolder settingsHolder(settingsMap);
-    sdkEngine->setSettings(settingsHolder.array(), settingsHolder.size());
+    auto sdkSettings = sdk_support::toSdkSettings(values);
+    sdkEngine->setSettings(sdkSettings.get());
 
     {
         QnMutexLocker lock(&m_mutex);

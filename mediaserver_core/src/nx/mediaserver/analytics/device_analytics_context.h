@@ -34,6 +34,8 @@ public:
     void removeEngine(const resource::AnalyticsEngineResourcePtr& engine);
 
     void setMetadataSink(QWeakPointer<QnAbstractDataReceptor> metadataSink);
+    void setSettings(const QString& engineId, const QVariantMap& settings);
+    QVariantMap getSettings(const QString& engineId) const;
 
     virtual bool needsCompressedFrames() const override;
     virtual NeededUncompressedPixelFormats neededUncompressedPixelFormats() const override;
@@ -51,12 +53,15 @@ private:
     bool isDeviceAlive() const;
     void updateSupportedFrameTypes();
 
+    std::shared_ptr<DeviceAnalyticsBinding> analyticsBinding(const QnUuid& engineId) const;
+
     bool isEngineAlreadyBound(const QnUuid& engineId) const;
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
     void issueMissingUncompressedFrameWarningOnce();
 
 private:
+    mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
     std::map<QnUuid, std::shared_ptr<DeviceAnalyticsBinding>> m_bindings;
     QWeakPointer<QnAbstractDataReceptor> m_metadataSink;

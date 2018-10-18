@@ -13,6 +13,7 @@
 #include <plugins/plugins_ini.h>
 
 #include <nx/sdk/analytics/pixel_format.h>
+#include <nx/sdk/common_settings.h>
 #include <nx/mediaserver/resource/resource_fwd.h>
 
 namespace nx::mediaserver::sdk_support {
@@ -132,6 +133,37 @@ std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap&
         settingsMap[itr.key()] = itr.value().toString();
 
     return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
+}
+
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QVariantMap& settings)
+{
+    auto sdkSettings = new nx::sdk::CommonSettings();
+    for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
+        sdkSettings->addSetting(itr.key().toStdString(), itr.value().toString().toStdString());
+
+    return UniquePtr<nx::sdk::Settings>(sdkSettings);
+}
+
+UniquePtr<nx::sdk::Settings> toSdkSettings(const QMap<QString, QString>& settings)
+{
+    auto sdkSettings = new nx::sdk::CommonSettings();
+    for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
+        sdkSettings->addSetting(itr.key().toStdString(), itr.value().toStdString());
+
+    return UniquePtr<nx::sdk::Settings>(sdkSettings);
+}
+
+QVariantMap fromSdkSettings(const nx::sdk::Settings* sdkSettings)
+{
+    QVariantMap result;
+    if (!sdkSettings)
+        return result;
+
+    const auto count = sdkSettings->count();
+    for (auto i = 0; i < count; ++i)
+        result.insert(sdkSettings->key(i), sdkSettings->value(i));
+
+    return result;
 }
 
 void saveManifestToFile(

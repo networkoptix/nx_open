@@ -6,36 +6,39 @@
 #include <libavutil/pixfmt.h>
 
 #include <nx/kit/debug.h>
+#include <nx/utils/file_system.h>
+
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
-#include <nx/utils/file_system.h>
+#include <mediaserver_ini.h>
+#include <api/helpers/camera_id_helper.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/plugin_tools.h>
-#include <nx/mediaserver_plugins/utils/uuid.h>
+#include <plugins/plugins_ini.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/mediaserver/analytics/metadata_handler.h>
 #include <nx/mediaserver/analytics/event_rule_watcher.h>
 #include <nx/mediaserver/resource/analytics_engine_resource.h>
 #include <nx/mediaserver/resource/analytics_plugin_resource.h>
 #include <nx/mediaserver/sdk_support/utils.h>
-#include <nx/plugins/settings.h>
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/debugging/visual_metadata_debugger_factory.h>
-#include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/plugins/settings.h>
 #include <nx/utils/log/log_main.h>
-#include <mediaserver_ini.h>
-#include <plugins/plugins_ini.h>
+
+#include <nx/sdk/analytics/consuming_device_agent.h>
 #include <nx/sdk/analytics/pixel_format.h>
 #include <nx/sdk/analytics/plugin.h>
 
@@ -370,9 +373,8 @@ void Manager::updateEngineSettings(const resource::AnalyticsEngineResourcePtr& e
     NX_DEBUG(this, "Updating engine %1 (%2) with settings",
         engine->getName(), engine->getId());
 
-    auto settings = engine->settingsValues();
-    auto settingsHolder = sdk_support::toSettingsHolder(settings);
-    sdkEngine->setSettings(settingsHolder->array(), settingsHolder->size());
+    auto sdkSettings = sdk_support::toSdkSettings(engine->settingsValues());
+    sdkEngine->setSettings(sdkSettings.get());
 }
 
 void Manager::registerMetadataSink(
@@ -403,6 +405,70 @@ QWeakPointer<AbstractVideoDataReceptor> Manager::registerMediaSource(const QnUui
 
     m_mediaSources[resourceId] = proxySource;
     return proxySource;
+}
+
+void Manager::setSettings(
+    const QString& deviceId,
+    const QString& engineId,
+    const QVariantMap& deviceAgentSettings)
+{
+    QSharedPointer<DeviceAnalyticsContext> analyticsContext;
+    {
+        QnMutexLocker lock(&m_contextMutex);
+        analyticsContext = context(QnUuid(deviceId));
+    }
+
+    if (!analyticsContext)
+    {
+        NX_WARNING(this, "Can't find analytics context for device with id %1", deviceId);
+        return;
+    }
+
+    return analyticsContext->setSettings(engineId, deviceAgentSettings);
+}
+
+QVariantMap Manager::getSettings(const QString& deviceId, const QString& engineId) const
+{
+    QSharedPointer<DeviceAnalyticsContext> analyticsContext;
+    {
+        QnMutexLocker lock(&m_contextMutex);
+        analyticsContext = context(QnUuid(deviceId));
+    }
+
+    if (!analyticsContext)
+        return QVariantMap();
+
+    return analyticsContext->getSettings(engineId);
+}
+
+void Manager::setSettings(const QString& engineId, const QVariantMap& engineSettings)
+{
+    auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
+        serverModule(), engineId);
+
+    if (!engine)
+    {
+        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+        return;
+    }
+
+    NX_DEBUG(this, "Setting settings for engine %1 (%2)", engine->getName(), engine->getId());
+    engine->setSettingsValues(engineSettings);
+}
+
+QVariantMap Manager::getSettings(const QString& engineId) const
+{
+    auto engine = sdk_support::find<resource::AnalyticsEngineResource>(
+        serverModule(), engineId);
+
+    if (!engine)
+    {
+        NX_WARNING(this, "Can't find engine resource with id %1", engineId);
+        return QVariantMap();
+    }
+
+    NX_DEBUG(this, "Getting settings for engine %1 (%2)", engine->getName(), engine->getId());
+    return engine->settingsValues();
 }
 
 QWeakPointer<QnAbstractDataReceptor> Manager::metadataSink(

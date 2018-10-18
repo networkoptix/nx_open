@@ -38,8 +38,6 @@ class QnCompressedVideoData;
 
 namespace nx::mediaserver::analytics {
 
-class MetadataHandler;
-
 class Manager final:
     public Connective<QObject>,
     public nx::mediaserver::ServerModuleAware
@@ -64,6 +62,16 @@ public:
         QWeakPointer<QnAbstractDataReceptor> metadataSink);
 
     QWeakPointer<AbstractVideoDataReceptor> registerMediaSource(const QnUuid& deviceId);
+
+    void setSettings(
+        const QString& deviceId,
+        const QString& engineId,
+        const QVariantMap& deviceAgentSettings);
+
+    QVariantMap getSettings(const QString& deviceId, const QString& engineId) const;
+
+    void setSettings(const QString& engineId, const QVariantMap& engineSettings);
+    QVariantMap getSettings(const QString& engineId) const;
 
 public slots:
     void initExistingResources();
@@ -100,7 +108,7 @@ private:
     QWeakPointer<ProxyVideoDataReceptor> mediaSource(const QnUuid& device) const;
 
 private:
-    QnMutex m_contextMutex;
+    mutable QnMutex m_contextMutex;
     QThread* m_thread;
     nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
 

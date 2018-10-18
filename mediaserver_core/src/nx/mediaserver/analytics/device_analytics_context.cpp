@@ -91,6 +91,34 @@ void DeviceAnalyticsContext::setMetadataSink(QWeakPointer<QnAbstractDataReceptor
     }
 }
 
+void DeviceAnalyticsContext::setSettings(const QString& engineId, const QVariantMap& settings)
+{
+    std::shared_ptr<DeviceAnalyticsBinding> binding;
+    {
+        QnMutexLocker lock(&m_mutex);
+        binding = analyticsBinding(QnUuid(engineId));
+    }
+
+    if (!binding)
+        return;
+
+    binding->setSettings(settings);
+}
+
+QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
+{
+    std::shared_ptr<DeviceAnalyticsBinding> binding;
+    {
+        QnMutexLocker lock(&m_mutex);
+        binding = analyticsBinding(QnUuid(engineId));
+    }
+
+    if (!binding)
+        return QVariantMap();
+
+    return binding->getSettings();
+}
+
 bool DeviceAnalyticsContext::needsCompressedFrames() const
 {
     return m_cachedNeedCompressedFrames;
@@ -253,6 +281,16 @@ void DeviceAnalyticsContext::updateSupportedFrameTypes()
 
     m_cachedNeedCompressedFrames = needsCompressedFrames;
     m_cachedUncompressedPixelFormats = std::move(neededUncompressedPixelFormats);
+}
+
+std::shared_ptr<DeviceAnalyticsBinding> DeviceAnalyticsContext::analyticsBinding(
+    const QnUuid& engineId) const
+{
+    auto itr = m_bindings.find(engineId);
+    if (itr == m_bindings.cend())
+        return nullptr;
+
+    return itr->second;
 }
 
 void DeviceAnalyticsContext::issueMissingUncompressedFrameWarningOnce()

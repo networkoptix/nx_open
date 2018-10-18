@@ -86,8 +86,8 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     if (m_currentSettings != settings)
     {
-        const auto sdkSettings = sdk_support::toSettingsHolder(settings);
-        m_sdkDeviceAgent->setSettings(sdkSettings->array(), sdkSettings->size());
+        const auto sdkSettings = sdk_support::toSdkSettings(settings);
+        m_sdkDeviceAgent->setSettings(sdkSettings.get());
         m_currentSettings = settings;
     }
 
@@ -109,6 +109,68 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_sdkDeviceAgent)
         return;
     m_sdkDeviceAgent->stopFetchingMetadata();
+}
+
+QVariantMap DeviceAnalyticsBinding::getSettings() const
+{
+    decltype(m_sdkDeviceAgent) deviceAgent;
+    {
+        QnMutexLocker lock(&m_mutex);
+        deviceAgent = m_sdkDeviceAgent;
+    }
+
+    if (!deviceAgent)
+    {
+        NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+
+        return QVariantMap();
+    }
+
+    sdk_support::UniquePtr<nx::sdk::Settings> settings(deviceAgent->settings());
+    if (!settings)
+    {
+        NX_DEBUG(this, "Got null device agent settings for device %1 (%2) and engine %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+
+        return QVariantMap();
+    }
+
+    QVariantMap result;
+    const auto count = settings->count();
+    for (auto i = 0; i < count; ++i)
+        result.insert(settings->key(i), settings->value(i));
+
+    return result;
+}
+
+void DeviceAnalyticsBinding::setSettings(const QVariantMap& settings)
+{
+    decltype(m_sdkDeviceAgent) deviceAgent;
+    {
+        QnMutexLocker lock(&m_mutex);
+        deviceAgent = m_sdkDeviceAgent;
+    }
+
+    if (!deviceAgent)
+    {
+        NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
+            m_device->getUserDefinedName(),
+            m_device->getId(),
+            m_engine->getName(),
+            m_engine->getId());
+
+        return;
+    }
+
+    auto sdkSettings = sdk_support::toSdkSettings(settings);
+    deviceAgent->setSettings(sdkSettings.get());
 }
 
 void DeviceAnalyticsBinding::setMetadataSink(QnAbstractDataReceptorPtr metadataSink)
