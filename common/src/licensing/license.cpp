@@ -87,7 +87,6 @@ namespace {
 #endif
     }
 
-
 /** Make sure class names totally the same as on the activation server. */
 static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
@@ -122,7 +121,6 @@ LicenseTypeInfo::LicenseTypeInfo(
     allowedForARM(allowedForARM),
     allowedToShareChannel(allowedToShareChannel)
 {}
-
 
 // -------------------------------------------------------------------------- //
 // QnLicense
@@ -591,7 +589,6 @@ bool QnLicensePool::isEmpty() const
 
     return m_licenseDict.isEmpty();
 }
-
 
 QVector<QString> QnLicensePool::hardwareIds() const {
     return commonModule()->runtimeInfoManager()->remoteInfo().data.hardwareIds;

@@ -3786,7 +3786,10 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     else
         result.emplace(kHanwhaProfileNumberProperty, QString::number(profileByRole(role)));
 
-    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && isAudioEnabled())
+    auto audioInputEnableParameter = cgiParameters().parameter(
+        QString("media/videoprofile/add_update/") + kHanwhaAudioInputEnableProperty);
+
+    if (flags.testFlag(HanwhaProfileParameterFlag::audioSupported) && audioInputEnableParameter)
         result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(isAudioEnabled()));
 
     if (isH26x)
