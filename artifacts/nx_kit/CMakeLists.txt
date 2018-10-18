@@ -16,6 +16,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
 
 add_library(nx_kit ${nxKitLibraryType}
+    src/nx/kit/utils.h
+    src/nx/kit/utils.cpp
     src/nx/kit/debug.h
     src/nx/kit/debug.cpp
     src/nx/kit/ini_config.h
