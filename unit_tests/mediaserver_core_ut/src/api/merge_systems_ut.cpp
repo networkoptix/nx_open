@@ -10,6 +10,9 @@
 #include <network/authutil.cpp>
 
 #include "test_api_requests.h"
+#include <utils/merge_systems_common.h>
+
+using MergeStatus = utils::MergeSystemsStatus::Value;
 
 namespace nx {
 namespace test {
@@ -28,7 +31,7 @@ protected:
     void assertMergeRequestReturn(
         const LauncherPtr& requestTarget,
         const LauncherPtr& serverToMerge,
-        network::http::StatusCode::Value expectedCode)
+        MergeStatus mergeStatus)
     {
         QnGetNonceReply nonceReply;
         issueGetRequest(requestTarget.get(), "api/getNonce", nonceReply);
@@ -42,8 +45,16 @@ protected:
         mergeSystemData.getKey = QString::fromLatin1(createHttpQueryAuthParam(
             "admin", "admin", nonceReply.realm, "GET", nonceReply.nonce.toUtf8()));
 
+        QByteArray responseBody;
         NX_TEST_API_POST(requestTarget.get(), "api/mergeSystems", mergeSystemData,
-            [](const QByteArray& data) {return data;}, expectedCode);
+            [](const QByteArray& data) {return data;},
+            nx::network::http::StatusCode::ok,
+            "admin", "admin",
+            &responseBody);
+        bool success = false;
+        auto result = QJson::deserialized<QnJsonRestResult>(responseBody, QnJsonRestResult(), &success);
+        ASSERT_TRUE(success);
+        ASSERT_EQ(toString(mergeStatus), result.errorString);
     }
 
     LauncherPtr givenServer()
@@ -109,7 +120,7 @@ TEST_F(MergeSystems, SafeMode_From)
     assertMergeRequestReturn(
         /* requestTarget */ server1,
         /* serverToMerge */ server2,
-        /* expectedCode */ network::http::StatusCode::forbidden);
+        /* expectedCode */ MergeStatus::safeMode);
 }
 
 TEST_F(MergeSystems, SafeMode_To)
@@ -127,7 +138,7 @@ TEST_F(MergeSystems, SafeMode_To)
     assertMergeRequestReturn(
         /* requestTarget */ server1,
         /* serverToMerge */ server2,
-        /* expectedCode */ network::http::StatusCode::forbidden);
+        /* expectedCode */ MergeStatus::safeMode);
 }
 
 } // namespace test

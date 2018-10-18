@@ -38,6 +38,7 @@ public:
      */
     const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation() const;
 
+    void setMergeError(QnJsonRestResult* result, ::utils::MergeSystemsStatus::Value mergeStatus);
 private:
     QnCommonModule* m_commonModule;
     QString m_dataDirectory;
@@ -66,10 +67,6 @@ private:
     QnJsonRestResult mergeSystems(
         Qn::UserAccessData accessRights,
         MergeSystemData data);
-
-    void setMergeError(
-        QnJsonRestResult* result,
-        ::utils::MergeSystemsStatus::Value mergeStatus);
 
     nx::network::http::StatusCode::Value applyCurrentSettings(
         const nx::utils::Url& remoteUrl,
