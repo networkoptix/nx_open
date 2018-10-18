@@ -93,9 +93,9 @@ bool MediatorFunctionalTest::waitUntilStarted()
         m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
         m_httpEndpoint = moduleInstance()->impl()->httpEndpoints().front();
     }
+
     if (!moduleInstance()->impl()->stunUdpEndpoints().empty())
         m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
-
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
